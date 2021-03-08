@@ -338,7 +338,7 @@ Cypress.Commands.add('augmentIsConfig', config => {
     method: 'GET',
     url: `${baseUrl}/api/v3/is/configuration`,
   }).then(({ body }) => {
-    cy.route('GET', `${baseUrl}/api/v3/is/configuration`, {
+    cy.intercept('GET', `${baseUrl}/api/v3/is/configuration`, {
       configuration: merge({}, body.configuration, config),
     })
   })

@@ -31,7 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
-type ApplicationUplinkQueueRangeFunc func(limit int, f func(...*ttnpb.ApplicationUp) error) (bool, error)
+type ApplicationUplinkQueueDrainFunc func(limit int, f func(...*ttnpb.ApplicationUp) error) error
 
 type ApplicationUplinkQueue interface {
 	// Add adds application uplinks ups to queue.
@@ -42,7 +42,7 @@ type ApplicationUplinkQueue interface {
 	// if such is available, otherwise it blocks until it is.
 	// Context passed to f must be derived from ctx.
 	// Implementations must respect ctx.Done() value on best-effort basis.
-	Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, ApplicationUplinkQueueRangeFunc) (time.Time, error)) error
+	Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, ApplicationUplinkQueueDrainFunc) (time.Time, error)) error
 }
 
 func applicationJoinAcceptWithoutAppSKey(pld *ttnpb.ApplicationJoinAccept) *ttnpb.ApplicationJoinAccept {
@@ -60,7 +60,7 @@ const (
 )
 
 func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error {
-	return ns.applicationUplinks.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueRangeFunc) (time.Time, error) {
+	return ns.applicationUplinks.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, drain ApplicationUplinkQueueDrainFunc) (time.Time, error) {
 		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, appID)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
@@ -68,60 +68,47 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error
 		}
 
 		cl := ttnpb.NewNsAsClient(conn)
-		for ok := false; !ok; {
-			var sendErr bool
-			ok, err = f(applicationUplinkLimit, func(ups ...*ttnpb.ApplicationUp) error {
-				_, err := cl.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
-					ApplicationUps: ups,
-				}, ns.WithClusterAuth())
-				if err != nil {
-					sendErr = true
-					log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks to Application Server")
-					return err
-				}
-				for _, up := range ups {
-					ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
-					switch pld := up.Up.(type) {
-					case *ttnpb.ApplicationUp_UplinkMessage:
-						registerForwardDataUplink(ctx, pld.UplinkMessage)
-						events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, up))
-					case *ttnpb.ApplicationUp_JoinAccept:
-						events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: up.EndDeviceIdentifiers,
-							CorrelationIDs:       up.CorrelationIDs,
-							Up: &ttnpb.ApplicationUp_JoinAccept{
-								JoinAccept: applicationJoinAcceptWithoutAppSKey(pld.JoinAccept),
-							},
-						}))
-					}
-				}
-				return nil
-			})
+		var sendErr bool
+		if err = drain(applicationUplinkLimit, func(ups ...*ttnpb.ApplicationUp) error {
+			_, err := cl.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
+				ApplicationUps: ups,
+			}, ns.WithClusterAuth())
 			if err != nil {
-				if !sendErr {
-					log.FromContext(ctx).WithError(err).Error("Failed to pop application uplinks")
-				}
-				return time.Now().Add(applicationUplinkTaskRetryInterval), nil
+				sendErr = true
+				log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks to Application Server")
+				return err
 			}
+			for _, up := range ups {
+				ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
+				switch pld := up.Up.(type) {
+				case *ttnpb.ApplicationUp_UplinkMessage:
+					registerForwardDataUplink(ctx, pld.UplinkMessage)
+					events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, up))
+				case *ttnpb.ApplicationUp_JoinAccept:
+					events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
+						EndDeviceIdentifiers: up.EndDeviceIdentifiers,
+						CorrelationIDs:       up.CorrelationIDs,
+						Up: &ttnpb.ApplicationUp_JoinAccept{
+							JoinAccept: applicationJoinAcceptWithoutAppSKey(pld.JoinAccept),
+						},
+					}))
+				}
+			}
+			return nil
+		}); err != nil {
+			if !sendErr {
+				log.FromContext(ctx).WithError(err).Error("Failed to drain application uplinks")
+			}
+			return time.Now().Add(applicationUplinkTaskRetryInterval), nil
 		}
 		return time.Time{}, nil
 	})
 }
 
-// matchApplicationDownlinks validates downs and adds them to session.QueuedApplicationDownlinks.
-// matchApplicationDownlinks returns downs, nil if session == nil.
-func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState, multicast bool, maxDownLen uint16, downs ...*ttnpb.ApplicationDownlink) (unmatched []*ttnpb.ApplicationDownlink, err error) {
-	if session == nil {
-		return downs, nil
+func minAFCntDown(session *ttnpb.Session, macState *ttnpb.MACState) (uint32, error) {
+	if session == nil || macState == nil {
+		return 0, nil
 	}
-	downs, unmatched = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.SessionKeyID, downs...)
-	switch {
-	case len(downs) == 0:
-		return unmatched, nil
-	case len(downs) > 0 && macState == nil:
-		return unmatched, errUnknownMACState.New()
-	}
-
 	var minFCnt uint32
 	if macState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 	outer:
@@ -131,7 +118,7 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 			case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
 				macPayload := pld.GetMACPayload()
 				if macPayload == nil {
-					return unmatched, errInvalidPayload.New()
+					return 0, errInvalidPayload.New()
 				}
 				if macPayload.FPort > 0 && macPayload.FCnt >= minFCnt {
 					// NOTE: In an unlikely case all len(recentDowns) downlinks are FPort==0 or something unmatched in the switch (e.g. a proprietary downlink) minFCnt will
@@ -156,6 +143,22 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 			minFCnt = fCnt + 1
 		}
 	}
+	return minFCnt, nil
+}
+
+// matchApplicationDownlinks validates downs and adds them to session.QueuedApplicationDownlinks.
+// matchApplicationDownlinks returns downs, nil if session == nil.
+func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState, multicast bool, maxDownLen uint16, minFCnt uint32, makeQueueOperationErrorDetails func() *ttnpb.DownlinkQueueOperationErrorDetails, downs ...*ttnpb.ApplicationDownlink) (unmatched []*ttnpb.ApplicationDownlink, err error) {
+	if session == nil {
+		return downs, nil
+	}
+	downs, unmatched = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.SessionKeyID, downs...)
+	switch {
+	case len(downs) == 0:
+		return unmatched, nil
+	case len(downs) > 0 && macState == nil:
+		return unmatched, errUnknownMACState.New()
+	}
 
 	for _, down := range downs {
 		switch {
@@ -163,10 +166,10 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 			return unmatched, errApplicationDownlinkTooLong.WithAttributes("length", len(down.FRMPayload), "max", maxDownLen)
 
 		case down.FCnt < minFCnt:
-			return unmatched, errFCntTooLow.WithAttributes("f_cnt", down.FCnt, "min_f_cnt", minFCnt)
+			return unmatched, errFCntTooLow.WithAttributes("f_cnt", down.FCnt, "min_f_cnt", minFCnt).WithDetails(makeQueueOperationErrorDetails())
 
 		case !bytes.Equal(down.SessionKeyID, session.SessionKeyID):
-			return unmatched, errUnknownSession.New()
+			return unmatched, errUnknownSession.WithDetails(makeQueueOperationErrorDetails())
 
 		case multicast && down.Confirmed:
 			return unmatched, errConfirmedMulticastDownlink.New()
@@ -212,11 +215,35 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 		maxDownLen -= 8
 	}
 
-	unmatched, err := matchApplicationDownlinks(dev.Session, dev.MACState, dev.Multicast, maxDownLen, downs...)
+	minCurrentFCntDown, err := minAFCntDown(dev.Session, dev.MACState)
 	if err != nil {
 		return err
 	}
-	unmatched, err = matchApplicationDownlinks(dev.PendingSession, dev.PendingMACState, dev.Multicast, maxDownLen, unmatched...)
+	minPendingFCntDown, err := minAFCntDown(dev.PendingSession, dev.PendingMACState)
+	if err != nil {
+		return err
+	}
+
+	makeDownlinkQueueOperationErrorDetails := func() *ttnpb.DownlinkQueueOperationErrorDetails {
+		d := &ttnpb.DownlinkQueueOperationErrorDetails{}
+		if dev.Session != nil {
+			d.DevAddr = &dev.Session.DevAddr
+			d.SessionKeyID = dev.Session.SessionKeyID
+			d.MinFCntDown = minCurrentFCntDown
+		}
+		if dev.PendingSession != nil {
+			d.PendingDevAddr = &dev.PendingSession.DevAddr
+			d.PendingSessionKeyID = dev.PendingSession.SessionKeyID
+			d.PendingMinFCntDown = minPendingFCntDown
+		}
+		return d
+	}
+
+	unmatched, err := matchApplicationDownlinks(dev.Session, dev.MACState, dev.Multicast, maxDownLen, minCurrentFCntDown, makeDownlinkQueueOperationErrorDetails, downs...)
+	if err != nil {
+		return err
+	}
+	unmatched, err = matchApplicationDownlinks(dev.PendingSession, dev.PendingMACState, dev.Multicast, maxDownLen, minPendingFCntDown, makeDownlinkQueueOperationErrorDetails, unmatched...)
 	if err != nil {
 		return err
 	}

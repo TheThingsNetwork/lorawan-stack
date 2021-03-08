@@ -209,7 +209,7 @@ func TestFlow(t *testing.T) {
 			},
 			ErrorAssertion: errors.IsAborted,
 			RxErrorAssertion: []func(error) bool{
-				errors.IsResourceExhausted,  // Rx1 conflicts with previous.
+				errors.IsAlreadyExists,      // Rx1 conflicts with previous.
 				errors.IsFailedPrecondition, // Rx2 not provided.
 			},
 		},

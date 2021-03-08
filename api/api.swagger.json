@@ -10401,6 +10401,14 @@
             "$ref": "#/definitions/v3Right"
           },
           "description": "Rights that are granted to this API key."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -10610,6 +10618,10 @@
         "last_f_cnt_down": {
           "type": "integer",
           "format": "int64"
+        },
+        "session_key_id": {
+          "type": "string",
+          "format": "byte"
         }
       }
     },

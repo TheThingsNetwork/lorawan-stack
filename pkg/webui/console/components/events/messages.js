@@ -37,6 +37,9 @@ const messages = defineMessages({
   errorOverviewEntry:
     'There was an error and the event cannot be displayed. The raw event can by viewed by clicking this row.',
   dataPreview: 'Data preview',
+  dataFormats: 'Data Formats',
+  dataFormatsInformation:
+    'For more information on event message types, please see our {dataFormatsDocumentationLink} documentation.',
   seeAllActivity: 'See all activity',
   syntheticEvent:
     'Note: This meta event did not originate from the network but was generated automatically by the Console. It is not related to any end device or gateway activity.',

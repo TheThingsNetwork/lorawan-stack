@@ -236,7 +236,7 @@ func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, record
 	if records == nil || !data.GetUseTLVEncoding() {
 		return nil
 	}
-	f := func(tag uint8, length uint8, bytes []byte) error {
+	f := func(tag uint8, length int, bytes []byte) error {
 		loraUp := &objects.LoRaUplink{
 			Timestamp: originalTimestamp,
 		}

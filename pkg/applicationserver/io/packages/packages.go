@@ -19,6 +19,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -53,20 +54,26 @@ func New(ctx context.Context, io io.Server, registry Registry, handlers map[stri
 	if err != nil {
 		return nil, err
 	}
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-sub.Context().Done():
-				return
-			case up := <-sub.Up():
-				if err := s.handleUp(up.Context, up.ApplicationUp); err != nil {
-					log.FromContext(s.ctx).WithError(err).Warn("Failed to handle message")
+	io.StartTask(&component.TaskConfig{
+		Context: ctx,
+		ID:      "run_application_packages",
+		Func: func(ctx context.Context) error {
+			for {
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case <-sub.Context().Done():
+					return sub.Context().Err()
+				case up := <-sub.Up():
+					if err := s.handleUp(up.Context, up.ApplicationUp); err != nil {
+						log.FromContext(up.Context).WithError(err).Warn("Failed to handle message")
+					}
 				}
 			}
-		}
-	}()
+		},
+		Restart: component.TaskRestartOnFailure,
+		Backoff: component.DefaultTaskBackoffConfig,
+	})
 	return s, nil
 }
 

@@ -1401,7 +1401,7 @@ func TestGatewayServer(t *testing.T) {
 						},
 						ErrorAssertion: errors.IsAborted,
 						RxWindowDetailsAssertion: []func(error) bool{
-							errors.IsResourceExhausted,  // Rx1 conflicts with previous.
+							errors.IsAlreadyExists,      // Rx1 conflicts with previous.
 							errors.IsFailedPrecondition, // Rx2 not provided.
 						},
 					},

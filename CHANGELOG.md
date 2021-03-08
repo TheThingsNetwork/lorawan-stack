@@ -33,11 +33,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Pagination flags for the `users oauth authorizations list` and `users oauth access-tokens list` CLI commands.
-
 ### Changed
-
-- `temp` field of the UDP stats message is now type `float32` (pointer).
 
 ### Deprecated
 
@@ -45,12 +41,32 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+### Security
+
+## [3.11.2] - 2021-03-05
+
+### Added
+
+- Pagination flags for the `users oauth authorizations list` and `users oauth access-tokens list` CLI commands.
+- End device ID generation based on DevEUI in The LoRaWAN Device Repository creation form in the Console.
+- `remote_ip` and `user_agent` metadata on OAuth events.
+- `created_at` and `updated_at` fields to API Keys.
+- Telemetry for Packet Broker Agent.
+
+### Changed
+
+- `temp` field of the UDP stats message is now type `float32` (pointer).
+
+### Fixed
+
 - Ocassional race condition in uplink matching with replicated Network Server instances.
 - Ocassional race condition when matching pending sessions.
 - Conflict error when registering an end device via the wizard in the Console.
 - Pagination in the `List` and `ListTokens` RPCs of the `OAuthAuthorizationRegistry`.
-
-### Security
+- Event name on user login.
+- Application uplink queue handling in Network Server.
+- Application Server session desynchronization with the Network Server. The Application Server will now attempt to synchronize the end device session view on downlink queue operational errors. This fixes the `f_cnt_too_low` and `unknown_session` errors reported on downlink queue push and replace.
+- Panic while generating SX1301 config for frequency plans without radio configuration.
 
 ## [3.11.1] - 2021-02-18
 
@@ -783,8 +799,6 @@ For details about compatibility between different releases, see the **Commitment
   - You may need to run `sudo snap connect ttn-lw-stack:personal-files`
 - Changing username and password to be not required in pubsub integration
 
-### Security
-
 ## [3.5.2] - 2020-02-06
 
 ### Fixed
@@ -938,8 +952,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - Fix `AppKey` decryption in Join Server.
 
-### Security
-
 ## [3.3.0] - 2019-11-25
 
 ### Added
@@ -989,8 +1001,6 @@ For details about compatibility between different releases, see the **Commitment
 - Fix device key unwrapping.
 - Fix setting gateway locations in the Console.
 
-### Security
-
 ## [3.2.4] - 2019-11-04
 
 ### Added
@@ -1004,8 +1014,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - Fix device creation rollback potentially deleting existing device with same ID.
 - Fix missing transport credentials when using external NS linking.
-
-### Security
 
 ## [3.2.3] - 2019-10-24
 
@@ -1352,7 +1360,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.1...v3.11
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.2...v3.11
+[3.11.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.1...v3.11.2
 [3.11.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.0...v3.11.1
 [3.11.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.6...v3.11.0
 [3.10.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.5...v3.10.6

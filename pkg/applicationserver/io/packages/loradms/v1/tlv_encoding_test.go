@@ -26,19 +26,24 @@ import (
 func TestTLVEncoding(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(parseTLVPayload(objects.Hex{0xbb, 0xaa}, func(tag uint8, size uint8, data []byte) error {
+	a.So(parseTLVPayload(objects.Hex{0xbb, 0xaa}, func(tag uint8, size int, data []byte) error {
 		return fmt.Errorf("foo")
 	}), should.NotBeNil)
 
-	a.So(parseTLVPayload(objects.Hex{0x01, 0x02, 0xbb, 0xaa}, func(tag uint8, size uint8, data []byte) error {
+	a.So(parseTLVPayload(objects.Hex{0x01, 0x02, 0xbb, 0xaa}, func(tag uint8, size int, data []byte) error {
 		a.So(tag, should.Equal, 0x01)
 		a.So(size, should.Equal, 0x02)
 		a.So(data, should.Resemble, []byte{0xbb, 0xaa})
 		return nil
 	}), should.BeNil)
 
-	a.So(parseTLVPayload(objects.Hex{0xff, 0x02, 0xff}, func(tag uint8, size uint8, data []byte) error {
-		t.Fatal("f shouldn't be called")
+	a.So(parseTLVPayload(objects.Hex{0xff, 0x02, 0xff}, func(tag uint8, size int, data []byte) error {
+		t.Fatal("f should not be called")
+		return nil
+	}), should.NotBeNil)
+
+	a.So(parseTLVPayload(objects.Hex{0xff, 0xff, 0xff}, func(tag uint8, size int, data []byte) error {
+		t.Fatal("f should not be called")
 		return nil
 	}), should.NotBeNil)
 }

@@ -34,7 +34,7 @@ const (
 func NewRedisApplicationUplinkQueue(ctx context.Context) (ApplicationUplinkQueue, func()) {
 	tb := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "application-uplinks")...)
-	q := redis.NewApplicationUplinkQueue(cl, 100, redisConsumerGroup, redisConsumerID)
+	q := redis.NewApplicationUplinkQueue(cl, 100, redisConsumerGroup, redisConsumerID, 0)
 	if err := q.Init(ctx); err != nil {
 		tb.Fatalf("Failed to initialize Redis application uplink queue: %s", test.FormatError(err))
 	}

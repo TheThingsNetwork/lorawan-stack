@@ -1,0 +1,6 @@
+{
+  "brands": [
+    { "brand_id": "test-brand-otaa", "name": "Test Brand OTAA" },
+    { "brand_id": "test-brand-abp", "name": "Test Brand ABP" }
+  ]
+}
