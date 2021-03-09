@@ -58,6 +58,7 @@ func (is *IdentityServer) Add(ctx context.Context, ids ttnpb.GatewayIdentifiers,
 		GatewayIdentifiers: ids,
 	}
 	if key != "" {
+		is.gateways[uid].RequireAuthenticatedConnection = true
 		is.gatewayAuths[uid] = []string{fmt.Sprintf("Bearer %v", key)}
 	}
 }

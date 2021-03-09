@@ -418,9 +418,15 @@ var (
 		"no_fallback_frequency_plan",
 		"gateway `{gateway_uid}` is not registered and no fallback frequency plan defined",
 	)
+	errUnauthenticatedGatewayConnection = errors.DefineUnauthenticated(
+		"unauthenticated_gateway_connection",
+		"gateway requires an authenticated connection",
+	)
+	errNewConnection = errors.DefineAborted(
+		"new_connection",
+		"new connection from same gateway",
+	)
 )
-
-var errNewConnection = errors.DefineAborted("new_connection", "new connection from same gateway")
 
 type connectionEntry struct {
 	*io.Connection
@@ -443,13 +449,18 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	ctx = log.NewContext(ctx, logger)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
 
-	var err error
-	var callOpt grpc.CallOption
+	var (
+		err             error
+		callOpt         grpc.CallOption
+		isAuthenticated bool
+	)
 	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
 	if errors.IsUnauthenticated(err) {
 		callOpt = gs.WithClusterAuth()
 	} else if err != nil {
 		return nil, err
+	} else {
+		isAuthenticated = true
 	}
 	registry, err := gs.getRegistry(ctx, &ids)
 	if err != nil {
@@ -465,6 +476,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 				"frequency_plan_id",
 				"frequency_plan_ids",
 				"location_public",
+				"require_authenticated_connection",
 				"schedule_anytime_delay",
 				"schedule_downlink_late",
 				"update_location_from_status",
@@ -492,6 +504,9 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		}
 	} else if err != nil {
 		return nil, err
+	}
+	if gtw.RequireAuthenticatedConnection && !isAuthenticated {
+		return nil, errUnauthenticatedGatewayConnection.New()
 	}
 
 	ids = gtw.GatewayIdentifiers
