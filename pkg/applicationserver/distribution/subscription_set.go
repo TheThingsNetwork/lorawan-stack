@@ -27,7 +27,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-const subscriptionSetBufferSize = 16
+const (
+	namespace                 = "applicationserver/distribution"
+	subscriptionSetBufferSize = 16
+)
 
 // newSubscriptionSet creates a new subscription set. The timeout represents
 // the period after which the set will shut down if empty. If the timeout is
@@ -144,8 +147,12 @@ func (s *subscriptionSet) run() {
 			lastAction = time.Now()
 		case up := <-s.upCh:
 			for sub := range subscribers {
-				if err := sub.Publish(up.Context, up.ApplicationUp); err != nil {
-					log.FromContext(sub.Context()).WithError(err).Warn("Send message failed")
+				ctx := log.NewContextWithFields(up.Context, log.Fields(
+					"namespace", namespace,
+					"protocol", sub.Protocol(),
+				))
+				if err := sub.Publish(ctx, up.ApplicationUp); err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Failed to publish message")
 				}
 			}
 		case <-tickCh:

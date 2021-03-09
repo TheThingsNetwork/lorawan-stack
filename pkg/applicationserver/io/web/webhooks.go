@@ -39,6 +39,8 @@ import (
 	"google.golang.org/api/googleapi"
 )
 
+const namespace = "applicationserver/io/web"
+
 var userAgent = "ttn-lw-application-server/" + version.TTN
 
 // Sink processes HTTP requests.
@@ -150,7 +152,7 @@ type webhooks struct {
 
 // NewWebhooks returns a new Webhooks.
 func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry, target Sink, downlinks DownlinksConfig) (Webhooks, error) {
-	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/web")
+	ctx = log.NewContextWithField(ctx, "namespace", namespace)
 	w := &webhooks{
 		ctx:       ctx,
 		server:    server,
@@ -173,8 +175,9 @@ func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry
 				case <-sub.Context().Done():
 					return sub.Context().Err()
 				case up := <-sub.Up():
-					if err := w.handleUp(up.Context, up.ApplicationUp); err != nil {
-						log.FromContext(up.Context).WithError(err).Warn("Failed to handle message")
+					ctx := log.NewContextWithField(up.Context, "namespace", namespace)
+					if err := w.handleUp(ctx, up.ApplicationUp); err != nil {
+						log.FromContext(ctx).WithError(err).Warn("Failed to handle message")
 					}
 				}
 			}
