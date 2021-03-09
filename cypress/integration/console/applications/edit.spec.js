@@ -36,7 +36,7 @@ describe('Application general settings', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   })
 
-  it('successfully edit application name and description', () => {
+  it('succeeds editing application name and description', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`)
 
     cy.findByLabelText('Name').type('test-name')
@@ -51,7 +51,7 @@ describe('Application general settings', () => {
       .should('be.visible')
   })
 
-  it('successfully add application attributes', () => {
+  it('succeeds adding application attributes', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`)
 
     cy.findByRole('button', { name: /Add attributes/ }).click()
@@ -68,7 +68,7 @@ describe('Application general settings', () => {
       .should('be.visible')
   })
 
-  it('successfully delete application', () => {
+  it('succeeds deleting application', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`)
     cy.findByRole('button', { name: /Delete application/ }).click()
 
