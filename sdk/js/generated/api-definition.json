@@ -4147,6 +4147,189 @@
       "http": []
     }
   },
+  "Pba": {
+    "GetInfo": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/pba/info",
+          "parameters": []
+        }
+      ]
+    },
+    "Register": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/pba/registration",
+          "parameters": []
+        },
+        {
+          "method": "post",
+          "pattern": "/pba/registration",
+          "parameters": []
+        }
+      ]
+    },
+    "Deregister": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/pba/registration",
+          "parameters": []
+        }
+      ]
+    },
+    "GetHomeNetworkDefaultRoutingPolicy": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/pba/home-networks/policies/default",
+          "parameters": []
+        }
+      ]
+    },
+    "SetHomeNetworkDefaultRoutingPolicy": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/pba/home-networks/policies/default",
+          "body": "*",
+          "parameters": []
+        },
+        {
+          "method": "post",
+          "pattern": "/pba/home-networks/policies/default",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    },
+    "DeleteHomeNetworkDefaultRoutingPolicy": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/pba/home-networks/policies/default",
+          "parameters": []
+        }
+      ]
+    },
+    "ListHomeNetworkRoutingPolicies": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/pba/home-networks/policies",
+          "parameters": []
+        }
+      ]
+    },
+    "GetHomeNetworkRoutingPolicy": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/pba/home-networks/policies/{net_id}",
+          "parameters": [
+            "net_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/pba/home-networks/policies/{net_id}/{tenant_id}",
+          "parameters": [
+            "net_id",
+            "tenant_id"
+          ]
+        }
+      ]
+    },
+    "SetHomeNetworkRoutingPolicy": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/pba/home-networks/policies/{home_network_id.net_id}",
+          "body": "*",
+          "parameters": [
+            "home_network_id.net_id"
+          ]
+        },
+        {
+          "method": "post",
+          "pattern": "/pba/home-networks/policies/{home_network_id.net_id}",
+          "body": "*",
+          "parameters": [
+            "home_network_id.net_id"
+          ]
+        },
+        {
+          "method": "put",
+          "pattern": "/pba/home-networks/policies/{home_network_id.net_id}/{home_network_id.tenant_id}",
+          "body": "*",
+          "parameters": [
+            "home_network_id.net_id",
+            "home_network_id.tenant_id"
+          ]
+        },
+        {
+          "method": "post",
+          "pattern": "/pba/home-networks/policies/{home_network_id.net_id}/{home_network_id.tenant_id}",
+          "body": "*",
+          "parameters": [
+            "home_network_id.net_id",
+            "home_network_id.tenant_id"
+          ]
+        }
+      ]
+    },
+    "DeleteHomeNetworkRoutingPolicy": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/pba/home-networks/policies/{net_id}",
+          "parameters": [
+            "net_id"
+          ]
+        },
+        {
+          "method": "delete",
+          "pattern": "/pba/home-networks/policies/{net_id}/{tenant_id}",
+          "parameters": [
+            "net_id",
+            "tenant_id"
+          ]
+        }
+      ]
+    },
+    "ListHomeNetworks": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/pba/home-networks",
+          "parameters": []
+        }
+      ]
+    },
+    "ListForwarderRoutingPolicies": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/pba/forwarders/policies",
+          "parameters": []
+        }
+      ]
+    }
+  },
   "EndDeviceQRCodeGenerator": {
     "GetFormat": {
       "file": "lorawan-stack/api/qrcodegenerator.proto",

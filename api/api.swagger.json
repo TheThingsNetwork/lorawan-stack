@@ -6987,6 +6987,668 @@
         ]
       }
     },
+    "/pba/forwarders/policies": {
+      "get": {
+        "summary": "List the routing policies that Forwarders configured with Packet Broker Agent as Home Network.\nListing routing policies requires administrative access.",
+        "operationId": "Pba_ListForwarderRoutingPolicies",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3PacketBrokerRoutingPolicies"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "home_network_id.net_id",
+            "description": "LoRa Alliance NetID.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "home_network_id.tenant_id",
+            "description": "Tenant identifier if the registration leases DevAddr blocks from a NetID.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      }
+    },
+    "/pba/home-networks": {
+      "get": {
+        "summary": "List the (public) home networks for which routing policies can be configured.\nListing home networks requires administrative access.",
+        "operationId": "Pba_ListHomeNetworks",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3PacketBrokerNetworks"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      }
+    },
+    "/pba/home-networks/policies": {
+      "get": {
+        "summary": "List the routing policies that Packet Broker Agent as Forwarder configured with Home Networks.\nListing routing policies requires administrative access.",
+        "operationId": "Pba_ListHomeNetworkRoutingPolicies",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3PacketBrokerRoutingPolicies"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      }
+    },
+    "/pba/home-networks/policies/default": {
+      "get": {
+        "summary": "Get the default routing policy.\nGetting routing policies requires administrative access.",
+        "operationId": "Pba_GetHomeNetworkDefaultRoutingPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3PacketBrokerDefaultRoutingPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "Pba"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes the default routing policy.\nDeleting routing policies requires administrative access.",
+        "operationId": "Pba_DeleteHomeNetworkDefaultRoutingPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "Pba"
+        ]
+      },
+      "post": {
+        "summary": "Set the default routing policy.\nSetting routing policies requires administrative access.",
+        "operationId": "Pba_SetHomeNetworkDefaultRoutingPolicy2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetPacketBrokerDefaultRoutingPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      },
+      "put": {
+        "summary": "Set the default routing policy.\nSetting routing policies requires administrative access.",
+        "operationId": "Pba_SetHomeNetworkDefaultRoutingPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetPacketBrokerDefaultRoutingPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      }
+    },
+    "/pba/home-networks/policies/{home_network_id.net_id}": {
+      "post": {
+        "summary": "Set the routing policy for the given Home Network.\nSetting routing policies requires administrative access.",
+        "operationId": "Pba_SetHomeNetworkRoutingPolicy2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "home_network_id.net_id",
+            "description": "LoRa Alliance NetID.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetPacketBrokerRoutingPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      },
+      "put": {
+        "summary": "Set the routing policy for the given Home Network.\nSetting routing policies requires administrative access.",
+        "operationId": "Pba_SetHomeNetworkRoutingPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "home_network_id.net_id",
+            "description": "LoRa Alliance NetID.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetPacketBrokerRoutingPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      }
+    },
+    "/pba/home-networks/policies/{home_network_id.net_id}/{home_network_id.tenant_id}": {
+      "post": {
+        "summary": "Set the routing policy for the given Home Network.\nSetting routing policies requires administrative access.",
+        "operationId": "Pba_SetHomeNetworkRoutingPolicy4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "home_network_id.net_id",
+            "description": "LoRa Alliance NetID.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "home_network_id.tenant_id",
+            "description": "Tenant identifier if the registration leases DevAddr blocks from a NetID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetPacketBrokerRoutingPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      },
+      "put": {
+        "summary": "Set the routing policy for the given Home Network.\nSetting routing policies requires administrative access.",
+        "operationId": "Pba_SetHomeNetworkRoutingPolicy3",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "home_network_id.net_id",
+            "description": "LoRa Alliance NetID.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "home_network_id.tenant_id",
+            "description": "Tenant identifier if the registration leases DevAddr blocks from a NetID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetPacketBrokerRoutingPolicyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      }
+    },
+    "/pba/home-networks/policies/{net_id}": {
+      "get": {
+        "summary": "Get the routing policy for the given Home Network.\nGetting routing policies requires administrative access.",
+        "operationId": "Pba_GetHomeNetworkRoutingPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3PacketBrokerRoutingPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "net_id",
+            "description": "LoRa Alliance NetID.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "tenant_id",
+            "description": "Tenant identifier if the registration leases DevAddr blocks from a NetID.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      },
+      "delete": {
+        "summary": "Delete the routing policy for the given Home Network.\nDeleting routing policies requires administrative access.",
+        "operationId": "Pba_DeleteHomeNetworkRoutingPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "net_id",
+            "description": "LoRa Alliance NetID.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "tenant_id",
+            "description": "Tenant identifier if the registration leases DevAddr blocks from a NetID.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      }
+    },
+    "/pba/home-networks/policies/{net_id}/{tenant_id}": {
+      "get": {
+        "summary": "Get the routing policy for the given Home Network.\nGetting routing policies requires administrative access.",
+        "operationId": "Pba_GetHomeNetworkRoutingPolicy2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3PacketBrokerRoutingPolicy"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "net_id",
+            "description": "LoRa Alliance NetID.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "tenant_id",
+            "description": "Tenant identifier if the registration leases DevAddr blocks from a NetID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      },
+      "delete": {
+        "summary": "Delete the routing policy for the given Home Network.\nDeleting routing policies requires administrative access.",
+        "operationId": "Pba_DeleteHomeNetworkRoutingPolicy2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "net_id",
+            "description": "LoRa Alliance NetID.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "tenant_id",
+            "description": "Tenant identifier if the registration leases DevAddr blocks from a NetID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Pba"
+        ]
+      }
+    },
+    "/pba/info": {
+      "get": {
+        "summary": "Get information about the Packet Broker registration.\nViewing Packet Packet information requires administrative access.",
+        "operationId": "Pba_GetInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3PacketBrokerInfo"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "Pba"
+        ]
+      }
+    },
+    "/pba/registration": {
+      "delete": {
+        "summary": "Deregister from Packet Broker.\nPacket Broker deregistration requires administrative access.",
+        "operationId": "Pba_Deregister",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "Pba"
+        ]
+      },
+      "post": {
+        "summary": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.",
+        "operationId": "Pba_Register2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3PacketBrokerNetwork"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "Pba"
+        ]
+      },
+      "put": {
+        "summary": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.",
+        "operationId": "Pba_Register",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3PacketBrokerNetwork"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "Pba"
+        ]
+      }
+    },
     "/qr-codes/end-devices": {
       "post": {
         "summary": "Generates a QR code.",
@@ -12196,6 +12858,21 @@
         }
       }
     },
+    "v3DevAddrPrefix": {
+      "type": "object",
+      "properties": {
+        "dev_addr": {
+          "type": "string",
+          "format": "byte",
+          "description": "DevAddr base."
+        },
+        "length": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of most significant bits from dev_addr that are used as prefix."
+        }
+      }
+    },
     "v3DeviceEIRP": {
       "type": "string",
       "enum": [
@@ -14502,6 +15179,52 @@
       ],
       "default": "PHY_UNKNOWN"
     },
+    "v3PacketBrokerDefaultRoutingPolicy": {
+      "type": "object",
+      "properties": {
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the policy got last updated."
+        },
+        "uplink": {
+          "$ref": "#/definitions/v3PacketBrokerRoutingPolicyUplink",
+          "description": "Uplink policy."
+        },
+        "downlink": {
+          "$ref": "#/definitions/v3PacketBrokerRoutingPolicyDownlink",
+          "description": "Downlink policy."
+        }
+      }
+    },
+    "v3PacketBrokerDevAddrBlock": {
+      "type": "object",
+      "properties": {
+        "dev_addr_prefix": {
+          "$ref": "#/definitions/v3DevAddrPrefix"
+        },
+        "home_network_cluster_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v3PacketBrokerInfo": {
+      "type": "object",
+      "properties": {
+        "registration": {
+          "$ref": "#/definitions/v3PacketBrokerNetwork",
+          "description": "The current registration, unset if there isn't a registration."
+        },
+        "forwarder_enabled": {
+          "type": "boolean",
+          "description": "Whether the server is configured as Forwarder (with gateways)."
+        },
+        "home_network_enabled": {
+          "type": "boolean",
+          "description": "Whether the server is configured as Home Network (with end devices)."
+        }
+      }
+    },
     "v3PacketBrokerMetadata": {
       "type": "object",
       "properties": {
@@ -14544,6 +15267,58 @@
         }
       }
     },
+    "v3PacketBrokerNetwork": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/v3PacketBrokerNetworkIdentifier",
+          "description": "Packet Broker network identifier."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the network."
+        },
+        "dev_addr_blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3PacketBrokerDevAddrBlock"
+          },
+          "description": "DevAddr blocks that are assigned to this registration."
+        },
+        "contact_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ContactInfo"
+          },
+          "description": "Contact information."
+        }
+      }
+    },
+    "v3PacketBrokerNetworkIdentifier": {
+      "type": "object",
+      "properties": {
+        "net_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "LoRa Alliance NetID."
+        },
+        "tenant_id": {
+          "type": "string",
+          "description": "Tenant identifier if the registration leases DevAddr blocks from a NetID."
+        }
+      }
+    },
+    "v3PacketBrokerNetworks": {
+      "type": "object",
+      "properties": {
+        "networks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3PacketBrokerNetwork"
+          }
+        }
+      }
+    },
     "v3PacketBrokerRouteHop": {
       "type": "object",
       "properties": {
@@ -14567,6 +15342,85 @@
         "receiver_agent": {
           "type": "string",
           "description": "Receiver agent."
+        }
+      }
+    },
+    "v3PacketBrokerRoutingPolicies": {
+      "type": "object",
+      "properties": {
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3PacketBrokerRoutingPolicy"
+          }
+        }
+      }
+    },
+    "v3PacketBrokerRoutingPolicy": {
+      "type": "object",
+      "properties": {
+        "forwarder_id": {
+          "$ref": "#/definitions/v3PacketBrokerNetworkIdentifier",
+          "description": "Packet Broker identifier of the Forwarder."
+        },
+        "home_network_id": {
+          "$ref": "#/definitions/v3PacketBrokerNetworkIdentifier",
+          "description": "Packet Broker identifier of the Home Network."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the policy got last updated."
+        },
+        "uplink": {
+          "$ref": "#/definitions/v3PacketBrokerRoutingPolicyUplink",
+          "description": "Uplink policy."
+        },
+        "downlink": {
+          "$ref": "#/definitions/v3PacketBrokerRoutingPolicyDownlink",
+          "description": "Downlink policy."
+        }
+      }
+    },
+    "v3PacketBrokerRoutingPolicyDownlink": {
+      "type": "object",
+      "properties": {
+        "join_accept": {
+          "type": "boolean",
+          "description": "Allow join-accept messages."
+        },
+        "mac_data": {
+          "type": "boolean",
+          "description": "Allow downlink messages with FPort of 0."
+        },
+        "application_data": {
+          "type": "boolean",
+          "description": "Allow downlink messages with FPort between 1 and 255."
+        }
+      }
+    },
+    "v3PacketBrokerRoutingPolicyUplink": {
+      "type": "object",
+      "properties": {
+        "join_request": {
+          "type": "boolean",
+          "description": "Forward join-request messages."
+        },
+        "mac_data": {
+          "type": "boolean",
+          "description": "Forward uplink messages with FPort of 0."
+        },
+        "application_data": {
+          "type": "boolean",
+          "description": "Forward uplink messages with FPort between 1 and 255."
+        },
+        "signal_quality": {
+          "type": "boolean",
+          "description": "Forward RSSI and SNR."
+        },
+        "localization": {
+          "type": "boolean",
+          "description": "Forward gateway location, RSSI, SNR and fine timestamp."
         }
       }
     },
@@ -15232,6 +16086,36 @@
         },
         "collaborator": {
           "$ref": "#/definitions/v3Collaborator"
+        }
+      }
+    },
+    "v3SetPacketBrokerDefaultRoutingPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "uplink": {
+          "$ref": "#/definitions/v3PacketBrokerRoutingPolicyUplink",
+          "description": "Uplink policy."
+        },
+        "downlink": {
+          "$ref": "#/definitions/v3PacketBrokerRoutingPolicyDownlink",
+          "description": "Downlink policy."
+        }
+      }
+    },
+    "v3SetPacketBrokerRoutingPolicyRequest": {
+      "type": "object",
+      "properties": {
+        "home_network_id": {
+          "$ref": "#/definitions/v3PacketBrokerNetworkIdentifier",
+          "description": "Packet Broker identifier of the Home Network."
+        },
+        "uplink": {
+          "$ref": "#/definitions/v3PacketBrokerRoutingPolicyUplink",
+          "description": "Uplink policy."
+        },
+        "downlink": {
+          "$ref": "#/definitions/v3PacketBrokerRoutingPolicyDownlink",
+          "description": "Downlink policy."
         }
       }
     },
