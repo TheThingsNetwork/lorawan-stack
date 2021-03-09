@@ -125,18 +125,20 @@ func TestAuthentication(t *testing.T) {
 
 			wg := sync.WaitGroup{}
 			wg.Add(1)
+			var err error
 			go func() {
 				defer wg.Done()
-				_, err := client.LinkGateway(ctx, creds)
-				if tc.OK && err != nil && !a.So(errors.IsCanceled(err), should.BeTrue) {
-					t.Fatalf("Unexpected link error: %v", err)
-				}
-				if !tc.OK && !a.So(errors.IsCanceled(err), should.BeFalse) {
-					t.FailNow()
-				}
+				_, err = client.LinkGateway(ctx, creds)
 			}()
 
 			wg.Wait()
+
+			if tc.OK && err != nil && !a.So(errors.IsCanceled(err), should.BeTrue) {
+				t.Fatalf("Unexpected link error: %v", err)
+			}
+			if !tc.OK && !a.So(errors.IsCanceled(err), should.BeFalse) {
+				t.FailNow()
+			}
 		})
 	}
 }
@@ -195,7 +197,7 @@ func TestTraffic(t *testing.T) {
 	go func() {
 		for up := range upCh {
 			if err := stream.Send(up); err != nil {
-				t.Fatalf("Send failed: %v", err)
+				panic(err)
 			}
 		}
 	}()
