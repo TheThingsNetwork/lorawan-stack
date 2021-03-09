@@ -197,6 +197,8 @@ blobs:
     - stack
     - cli
     folder: "{{ .Version }}"
+    extra_files:
+    - glob: ./CHANGELOG.md
 
 dockers:
   - goos: linux
