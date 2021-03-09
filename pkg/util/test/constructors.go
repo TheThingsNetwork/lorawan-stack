@@ -49,24 +49,32 @@ var (
 	}
 )
 
-func (o SessionKeysOptionNamespace) WithDefaultNwkKeys(macVersion ttnpb.MACVersion) SessionKeysOption {
-	nwkSEncKey := DefaultNwkSEncKey
-	sNwkSIntKey := DefaultSNwkSIntKey
-	if macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-		nwkSEncKey = DefaultFNwkSIntKey
-		sNwkSIntKey = DefaultFNwkSIntKey
-	}
+func (o SessionKeysOptionNamespace) WithNwkKeys(fNwkSIntKey, nwkSEncKey, sNwkSIntKey *ttnpb.KeyEnvelope) SessionKeysOption {
 	return o.Compose(
-		o.WithFNwkSIntKey(&ttnpb.KeyEnvelope{
-			Key: &DefaultFNwkSIntKey,
-		}),
-		o.WithNwkSEncKey(&ttnpb.KeyEnvelope{
-			Key: &nwkSEncKey,
-		}),
-		o.WithSNwkSIntKey(&ttnpb.KeyEnvelope{
-			Key: &sNwkSIntKey,
-		}),
+		o.WithFNwkSIntKey(fNwkSIntKey),
+		o.WithNwkSEncKey(nwkSEncKey),
+		o.WithSNwkSIntKey(sNwkSIntKey),
 	)
+}
+
+func (o SessionKeysOptionNamespace) WithDefaultNwkKeys(macVersion ttnpb.MACVersion) SessionKeysOption {
+	nwkSEncKey := DefaultNwkSEncKeyEnvelope
+	sNwkSIntKey := DefaultSNwkSIntKeyEnvelope
+	if macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		nwkSEncKey = DefaultFNwkSIntKeyEnvelope
+		sNwkSIntKey = DefaultFNwkSIntKeyEnvelope
+	}
+	return o.WithNwkKeys(DefaultFNwkSIntKeyEnvelope, nwkSEncKey, sNwkSIntKey)
+}
+
+func (o SessionKeysOptionNamespace) WithDefaultNwkKeysWrapped(macVersion ttnpb.MACVersion) SessionKeysOption {
+	nwkSEncKey := DefaultNwkSEncKeyEnvelopeWrapped
+	sNwkSIntKey := DefaultSNwkSIntKeyEnvelopeWrapped
+	if macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		nwkSEncKey = DefaultFNwkSIntKeyEnvelopeWrapped
+		sNwkSIntKey = DefaultFNwkSIntKeyEnvelopeWrapped
+	}
+	return o.WithNwkKeys(DefaultFNwkSIntKeyEnvelopeWrapped, nwkSEncKey, sNwkSIntKey)
 }
 
 func (o SessionKeysOptionNamespace) WithDefaultAppSKey() SessionKeysOption {

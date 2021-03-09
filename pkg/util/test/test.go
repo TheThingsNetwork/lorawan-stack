@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -57,6 +58,13 @@ var (
 
 	DefaultKEK      = types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	DefaultKEKLabel = "test-kek-label"
+
+	DefaultKeyVault = config.KeyVault{
+		Provider: "static",
+		Static: map[string][]byte{
+			DefaultKEKLabel: DefaultKEK[:],
+		},
+	}
 
 	DefaultAppSKey     = crypto.DeriveAppSKey(DefaultNwkKey, DefaultJoinNonce, DefaultJoinEUI, DefaultDevNonce)
 	DefaultFNwkSIntKey = crypto.DeriveFNwkSIntKey(DefaultNwkKey, DefaultJoinNonce, DefaultJoinEUI, DefaultDevNonce)
