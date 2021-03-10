@@ -42,7 +42,8 @@ const approvalStates = [
 ]
 
 const m = defineMessages({
-  adminLabel: 'Administrator',
+  adminRights: 'Admin rights',
+  adminLabel: 'Grant this user admin status',
   userDescPlaceholder: 'Description for my new user',
   userDescDescription: 'Optional user description; can also be used to save notes about the user',
   userIdPlaceholder: 'jane-doe',
@@ -50,6 +51,9 @@ const m = defineMessages({
   emailPlaceholder: 'mail@example.com',
   emailAddressDescription:
     'Primary email address used for logging in; this address is not publicly visible',
+  emailAddressValidation: 'Treat email address as validated',
+  emailAddressValidationDescription:
+    'Enable this option if you do not need this user to validate the email address',
   modalWarning:
     'Are you sure you want to delete the user "{userId}". This action cannot be undone and it will not be possible to reuse the user ID.',
 })
@@ -131,13 +135,18 @@ class UserForm extends React.Component {
   }
 
   @bind
-  async handleSubmit(values, { resetForm, setSubmitting }) {
+  async handleSubmit(vals, { resetForm, setSubmitting }) {
     const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
-    const castedValues = this.validationSchema.cast(values)
+    const { _validate_email, ...values } = this.validationSchema.cast(vals)
+
+    if (_validate_email) {
+      values.primary_email_address_validated_at = new Date().toISOString()
+    }
+
     await this.setState({ error: '' })
     try {
-      const result = await onSubmit(castedValues)
-      resetForm({ values })
+      const result = await onSubmit(values)
+      resetForm({ values: vals })
       onSubmitSuccess(result)
     } catch (error) {
       setSubmitting(false)
@@ -218,18 +227,19 @@ class UserForm extends React.Component {
           required
         />
         <Form.Field
+          name="_validate_email"
+          component={Checkbox}
+          label={m.emailAddressValidation}
+          description={m.emailAddressValidationDescription}
+        />
+        <Form.Field
           title={sharedMessages.state}
           name="state"
           component={Select}
           options={approvalStateOptions}
           required
         />
-        <Form.Field
-          title={sharedMessages.admin}
-          name="admin"
-          component={Checkbox}
-          label={m.adminLabel}
-        />
+        <Form.Field title={m.adminRights} name="admin" component={Checkbox} label={m.adminLabel} />
         {!update && (
           <Form.Field
             title={sharedMessages.password}
