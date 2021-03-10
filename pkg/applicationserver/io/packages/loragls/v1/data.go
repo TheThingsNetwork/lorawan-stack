@@ -36,10 +36,6 @@ func (t QueryType) Value() *types.Value {
 	switch t {
 	case QUERY_TOARSSI:
 		s = "TOARSSI"
-	case QUERY_GNSS:
-		s = "GNSS"
-	case QUERY_BOTH:
-		s = "BOTH"
 	default:
 		panic("invalid query type")
 	}
@@ -58,10 +54,6 @@ func (t *QueryType) FromValue(v *types.Value) error {
 	switch sv.StringValue {
 	case "TOARSSI":
 		*t = QUERY_TOARSSI
-	case "GNSS":
-		*t = QUERY_GNSS
-	case "BOTH":
-		*t = QUERY_BOTH
 	default:
 		return errInvalidValue.WithAttributes("value", sv.StringValue)
 	}
@@ -71,10 +63,6 @@ func (t *QueryType) FromValue(v *types.Value) error {
 const (
 	// QUERY_TOARSSI uses the TOA and RSSI information from the gateway metadata to compute the location of the end device.
 	QUERY_TOARSSI QueryType = 1 << 0
-	// QUERY_GNSS uses the GNSS payload to compute the location of the end device.
-	QUERY_GNSS = 2 << 0
-	// QUERY_BOTH emits both the output of QUERY_TOARSSI and QUERY_GNSS. Note that the queries are separate, and so are the end results.
-	QUERY_BOTH = QUERY_TOARSSI | QUERY_GNSS
 )
 
 // Data contains the package configuration.
