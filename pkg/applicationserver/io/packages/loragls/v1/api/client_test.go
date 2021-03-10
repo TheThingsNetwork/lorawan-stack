@@ -155,8 +155,9 @@ func TestSingleFrame(t *testing.T) {
 
 			resp, err := cl.SolveSingleFrame(ctx, singleFrameRequest)
 			req := <-reqChan
-			a.So(resp, should.Resemble, singleFrameResponse)
-			a.So(err, should.BeNil)
+			if a.So(err, should.BeNil) {
+				a.So(resp.SingleFrameResponse, should.Resemble, singleFrameResponse)
+			}
 
 			if a.So(req, should.NotBeNil) {
 				request := &objects.SingleFrameRequest{}

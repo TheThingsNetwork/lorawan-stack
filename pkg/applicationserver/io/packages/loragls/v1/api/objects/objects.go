@@ -142,3 +142,29 @@ type SingleFrameResponse struct {
 	Errors   []string              `json:"errors"`
 	Warnings []string              `json:"warnings"`
 }
+
+// ExtendedSingleFrameResponse extends SingleFrameResponse with the raw JSON representation.
+type ExtendedSingleFrameResponse struct {
+	SingleFrameResponse
+
+	Raw *json.RawMessage
+}
+
+// MarshalJSON implements json.Marshaler.
+// Note that the Raw representation takes precedence
+// in the marshaling process, if it is available.
+func (r ExtendedSingleFrameResponse) MarshalJSON() ([]byte, error) {
+	if r.Raw != nil {
+		return r.Raw.MarshalJSON()
+	}
+	return json.Marshal(r.SingleFrameResponse)
+}
+
+// UnmarshalJSON implements json.Marshaler.
+func (r *ExtendedSingleFrameResponse) UnmarshalJSON(b []byte) error {
+	r.Raw = &json.RawMessage{}
+	if err := r.Raw.UnmarshalJSON(b); err != nil {
+		return err
+	}
+	return json.Unmarshal(b, &r.SingleFrameResponse)
+}

@@ -96,7 +96,7 @@ func WithBaseURL(baseURL *url.URL) Option {
 }
 
 // SolveSingleFrame attempts to solve the location of the end-device using the provided request.
-func (c *Client) SolveSingleFrame(ctx context.Context, request *objects.SingleFrameRequest) (*objects.SingleFrameResponse, error) {
+func (c *Client) SolveSingleFrame(ctx context.Context, request *objects.SingleFrameRequest) (*objects.ExtendedSingleFrameResponse, error) {
 	buffer := bytes.NewBuffer(nil)
 	if err := json.NewEncoder(buffer).Encode(request); err != nil {
 		return nil, err
@@ -105,7 +105,7 @@ func (c *Client) SolveSingleFrame(ctx context.Context, request *objects.SingleFr
 	if err != nil {
 		return nil, err
 	}
-	response := &objects.SingleFrameResponse{}
+	response := &objects.ExtendedSingleFrameResponse{}
 	err = parse(&response, resp)
 	if err != nil {
 		return nil, err
