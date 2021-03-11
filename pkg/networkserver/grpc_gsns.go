@@ -150,11 +150,6 @@ type matchResult struct {
 	SetPaths                 []string
 }
 
-type contextualEndDevice struct {
-	context.Context
-	*ttnpb.EndDevice
-}
-
 func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParameters_Channel) ([]*ttnpb.MACParameters_Channel, bool) {
 	if cfList == nil {
 		return chs, true
@@ -189,11 +184,6 @@ func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParamete
 	}
 	return chs, true
 }
-
-var (
-	errRetransmissionDelayExceeded = errors.DefineDeadlineExceeded("retransmission_delay_exceeded", "retransmission delay exceeded maximum")
-	errTransmissionNumberExceeded  = errors.DefineResourceExhausted("transmission_number_exceeded", "transmission number exceeded maximum")
-)
 
 // matchAndHandleDataUplink handles and matches a device prematched by CMACF check.
 func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage, deduplicated bool, cmacFMatchResult cmacFMatchingResult) (*matchResult, bool, error) {
