@@ -26,6 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 - Packet Broker registration, configuration of routing policies, listing home networks and viewing routing policies set by forwarding networks. See `ttn-lw-cli packetbroker --help` for more information.
 - Support LoRa 2.4 GHz with Packet Broker.
 - Include gateway identifiers from Packet Broker in metadata.
+- Session and MAC state import functionality. This means that devices can be migrated without rejoin.
 
 ### Changed
 
@@ -37,6 +38,8 @@ For details about compatibility between different releases, see the **Commitment
 - Changed the error that is returned when attempting to validate already validated contact info.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
 - Update Go to 1.16
+- Network Server now performs more strict validation and will disallow creation and updates of invalid devices.
+- DevEUI is not required for multicast devices anymore, regarding of LoRaWAN version.
 
 ### Deprecated
 
