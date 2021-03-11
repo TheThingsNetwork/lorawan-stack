@@ -69,8 +69,8 @@ github.com/TheThingsIndustries/grpc-gateway v1.15.2-gogo h1:rWB4sbEKoL7xUC9ixUkJ
 github.com/TheThingsIndustries/grpc-gateway v1.15.2-gogo/go.mod h1:fU1VeKM8T+38FAMQNH0zO2BT6grnMyphff4CD9w1DTM=
 github.com/TheThingsIndustries/mystique v0.0.0-20200127144137-4aa959111fe7 h1:Vb+sqm8nZUi+3N10QB8g2Gio2luOgfQnLlO6eLTuYDY=
 github.com/TheThingsIndustries/mystique v0.0.0-20200127144137-4aa959111fe7/go.mod h1:SdYf+XGL8wHUUJHd6LedTIWQRGfJqBqXEYFxwlCdLc8=
-github.com/TheThingsNetwork/go-cayenne-lib v1.0.0 h1:be7h6E/69+qaYs1iwQ2xjGjSFPXzvU3q6AWBCWayG2Y=
-github.com/TheThingsNetwork/go-cayenne-lib v1.0.0/go.mod h1:Lkg0oDuFTF6WlZvyPV35WFHov5U9zPv2lLoAQ15NjrI=
+github.com/TheThingsNetwork/go-cayenne-lib v1.1.0 h1:uw+WnTMSSwTo58/ob3ktWNBiCY2psIof8p3lKdxreAE=
+github.com/TheThingsNetwork/go-cayenne-lib v1.1.0/go.mod h1:HTTus7UIBhXKvLIeNGybbG1o7wr4zwwVbbUXwFqrtp0=
 github.com/ajg/form v1.5.1/go.mod h1:uL1WgH+h2mgNtvBq0339dVnzXdBETtL2LeUXaIv25UY=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
@@ -609,8 +609,8 @@ github.com/skip2/go-qrcode v0.0.0-20200519171959-a3b48390827e h1:xVeSA6fTG0og2Ks
 github.com/skip2/go-qrcode v0.0.0-20200519171959-a3b48390827e/go.mod h1:XV66xRDqSt+GTGFMVlhk3ULuV0y9ZmzeVGR4mloJI3M=
 github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d/go.mod h1:OnSkiWE9lh6wB0YB77sQom3nweQdgAjqCqsofrRNTgc=
 github.com/smartystreets/assertions v0.0.0-20190401211740-f487f9de1cd3/go.mod h1:OnSkiWE9lh6wB0YB77sQom3nweQdgAjqCqsofrRNTgc=
-github.com/smartystreets/assertions v1.1.0 h1:MkTeG1DMwsrdH7QtLXy5W+fUxWq+vmb6cLmyJ7aRtF0=
-github.com/smartystreets/assertions v1.1.0/go.mod h1:tcbTF8ujkAEcZ8TElKY+i30BzYlVhC/LOxJk7iOWnoo=
+github.com/smartystreets/assertions v1.2.0 h1:42S6lae5dvLc7BrLu/0ugRtcFVjoJNMC/N3yZFZkDFs=
+github.com/smartystreets/assertions v1.2.0/go.mod h1:tcbTF8ujkAEcZ8TElKY+i30BzYlVhC/LOxJk7iOWnoo=
 github.com/smartystreets/goconvey v1.6.4 h1:fv0U8FUIMPNf1L9lnHLvLhgicrIVChEkdzIKYqbNC9s=
 github.com/smartystreets/goconvey v1.6.4/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9QV7WQ/tjFTllLA=
 github.com/soheilhy/cmux v0.1.4/go.mod h1:IM3LyeVVIOuxMH7sFAkER9+bJ4dT7Ms6E4xg4kGIyLM=
