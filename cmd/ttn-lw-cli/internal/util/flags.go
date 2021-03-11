@@ -284,13 +284,15 @@ func AddField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			"DataRateOffsetValue",
 			"PingSlotPeriodValue",
 			"RxDelayValue":
-			enumType := unwrapLoRaWANEnumType(typeName)
-			values := make([]string, 0, len(proto.EnumValueMap(enumType)))
-			for value := range proto.EnumValueMap(enumType) {
-				values = append(values, value)
+			fv, ok := t.FieldByName("Value")
+			if !ok {
+				panic(fmt.Sprintf("flags: %T type does not contain a Value field", typeName))
 			}
-			sort.Strings(values)
-			fs.String(name, "", fmt.Sprintf("allowed values %s", strings.Join(values, ", ")))
+			values := enumValues(fv.Type)
+			if len(values) == 0 {
+				panic(fmt.Sprintf("flags: no allowed values for %T", typeName))
+			}
+			fs.String(name, "", fmt.Sprintf("allowed values: %s", strings.Join(values, ", ")))
 			return
 
 		case "Picture":
