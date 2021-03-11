@@ -16,7 +16,6 @@ package networkserver
 
 import (
 	"context"
-	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -25,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -642,7 +642,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if ttnpb.HasAnyField(sets, "session.started_at") && req.EndDevice.GetSession().GetStartedAt().IsZero() {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.started_at")
 		} else if !ttnpb.HasAnyField(sets, "session.started_at") {
-			req.EndDevice.Session.StartedAt = timeNow().UTC()
+			req.EndDevice.Session.StartedAt = time.Now().UTC()
 			sets = ttnpb.AddFields(sets,
 				"session.started_at",
 			)
@@ -720,7 +720,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 			stored.Session = &ttnpb.Session{
 				DevAddr:                    stored.Session.DevAddr,
 				SessionKeys:                stored.Session.SessionKeys,
-				StartedAt:                  timeNow().UTC(),
+				StartedAt:                  time.Now().UTC(),
 				QueuedApplicationDownlinks: stored.Session.QueuedApplicationDownlinks,
 			}
 		}

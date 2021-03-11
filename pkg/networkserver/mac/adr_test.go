@@ -269,7 +269,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				dev := CopyEndDevice(tc.Device)
-				fp := FrequencyPlan(dev.FrequencyPlanID)
+				fp := test.FrequencyPlan(dev.FrequencyPlanID)
 				err := AdaptDataRate(ctx, dev, LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion], ttnpb.MACSettings{})
 				if !a.So(err, should.Equal, tc.Error) {
 					t.Fatalf("ADR failed with: %s", err)

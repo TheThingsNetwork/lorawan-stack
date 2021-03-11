@@ -117,8 +117,10 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 
 		start := time.Now()
 
-		dev, ok := env.AssertSetDevice(ctx, true, conf.CreateDevice)
-		if !a.So(ok, should.BeTrue) {
+		dev, err, ok := env.AssertSetDevice(ctx, true, conf.CreateDevice,
+			ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+		)
+		if !a.So(err, should.BeNil) || !a.So(ok, should.BeTrue) {
 			t.Error("Failed to create device")
 			return
 		}
@@ -134,8 +136,8 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			DataRateIndex: ttnpb.DATA_RATE_2,
 			RxMetadatas: [][]*ttnpb.RxMetadata{
 				nil,
-				RxMetadata[3:],
-				RxMetadata[:3],
+				DefaultRxMetadata[3:],
+				DefaultRxMetadata[:3],
 			},
 			CorrelationIDs: []string{
 				"GsNs-join-1",
@@ -144,8 +146,10 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 
 			ClusterResponse: &NsJsHandleJoinResponse{
 				Response: &ttnpb.JoinResponse{
-					RawPayload:     bytes.Repeat([]byte{0x42}, 33),
-					SessionKeys:    *MakeSessionKeys(dev.LoRaWANVersion, true),
+					RawPayload: bytes.Repeat([]byte{0x42}, 33),
+					SessionKeys: *test.MakeSessionKeys(
+						test.SessionKeysOptions.WithDefaultNwkKeys(dev.LoRaWANVersion),
+					),
 					Lifetime:       time.Hour,
 					CorrelationIDs: []string{"NsJs-1", "NsJs-2"},
 				},
@@ -180,7 +184,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			}
 		}
 
-		fp := FrequencyPlan(dev.FrequencyPlanID)
+		fp := test.FrequencyPlan(dev.FrequencyPlanID)
 		phy := LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion]
 
 		deviceChannels, ok := ApplyCFList(dev.PendingMACState.PendingJoinRequest.CFList, phy, dev.PendingMACState.CurrentParameters.Channels...)
@@ -195,8 +199,8 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			ChannelIndex:  2,
 			DataRateIndex: ttnpb.DATA_RATE_1,
 			RxMetadatas: [][]*ttnpb.RxMetadata{
-				RxMetadata[:2],
-				RxMetadata[2:],
+				DefaultRxMetadata[:2],
+				DefaultRxMetadata[2:],
 			},
 			CorrelationIDs: []string{"GsNs-data-0"},
 
@@ -296,13 +300,11 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string) func(context.Context, TestEnvironment) {
 	return makeOTAAFlowTest(OTAAFlowTestConfig{
 		CreateDevice: &ttnpb.SetEndDeviceRequest{
-			EndDevice: ttnpb.EndDevice{
-				EndDeviceIdentifiers: *MakeOTAAIdentifiers(nil),
-				FrequencyPlanID:      fpID,
-				LoRaWANVersion:       macVersion,
-				LoRaWANPHYVersion:    phyVersion,
-				SupportsJoin:         true,
-			},
+			EndDevice: *MakeOTAAEndDevice(
+				EndDeviceOptions.WithFrequencyPlanID(fpID),
+				EndDeviceOptions.WithLoRaWANVersion(macVersion),
+				EndDeviceOptions.WithLoRaWANPHYVersion(phyVersion),
+			),
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{
 					"frequency_plan_id",
@@ -345,14 +347,12 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	}
 	return makeOTAAFlowTest(OTAAFlowTestConfig{
 		CreateDevice: &ttnpb.SetEndDeviceRequest{
-			EndDevice: ttnpb.EndDevice{
-				EndDeviceIdentifiers: *MakeOTAAIdentifiers(nil),
-				FrequencyPlanID:      fpID,
-				LoRaWANVersion:       macVersion,
-				LoRaWANPHYVersion:    phyVersion,
-				SupportsClassC:       true,
-				SupportsJoin:         true,
-			},
+			EndDevice: *MakeOTAAEndDevice(
+				EndDeviceOptions.WithFrequencyPlanID(fpID),
+				EndDeviceOptions.WithLoRaWANVersion(macVersion),
+				EndDeviceOptions.WithLoRaWANPHYVersion(phyVersion),
+				EndDeviceOptions.WithSupportsClassC(true),
+			),
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{
 					"frequency_plan_id",

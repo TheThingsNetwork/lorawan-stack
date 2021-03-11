@@ -18,12 +18,12 @@ package internal
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -114,8 +114,12 @@ func RXMetadataStats(ctx context.Context, mds []*ttnpb.RxMetadata) (gateways int
 	return len(gtws), maxSNR
 }
 
-func TimePtr(t time.Time) *time.Time {
-	return &t
+func TimePtr(v time.Time) *time.Time {
+	return &v
+}
+
+func EndDevicePtr(v ttnpb.EndDevice) *ttnpb.EndDevice {
+	return &v
 }
 
 // CopyEndDevice returns a deep copy of ttnpb.EndDevice pb.

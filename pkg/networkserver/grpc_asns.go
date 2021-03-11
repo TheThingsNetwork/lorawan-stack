@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
@@ -27,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -177,7 +177,7 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 		case multicast && len(down.GetClassBC().GetGateways()) == 0:
 			return unmatched, errNoPath.New()
 
-		case down.GetClassBC().GetAbsoluteTime() != nil && down.GetClassBC().GetAbsoluteTime().Before(timeNow().Add(macState.CurrentParameters.Rx1Delay.Duration()/2)):
+		case down.GetClassBC().GetAbsoluteTime() != nil && down.GetClassBC().GetAbsoluteTime().Before(time.Now().Add(macState.CurrentParameters.Rx1Delay.Duration()/2)):
 			return unmatched, errExpiredDownlink.New()
 		}
 		minFCnt = down.FCnt + 1

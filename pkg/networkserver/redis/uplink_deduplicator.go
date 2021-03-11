@@ -17,9 +17,9 @@ package redis
 import (
 	"context"
 	"strconv"
-	"time"
 
 	"github.com/gogo/protobuf/proto"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )

@@ -41,7 +41,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				MACPayload: &ttnpb.MACPayload{},
 			},
 		},
-		RxMetadata: RxMetadata[:],
+		RxMetadata: DefaultRxMetadata[:],
 	}
 	ups := []*ttnpb.UplinkMessage{up}
 
@@ -735,7 +735,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				MACPayload: &ttnpb.MACPayload{},
 			},
 		},
-		RxMetadata: RxMetadata[:],
+		RxMetadata: DefaultRxMetadata[:],
 	}
 	ups := []*ttnpb.UplinkMessage{up}
 

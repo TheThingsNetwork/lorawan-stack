@@ -29,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
@@ -398,1549 +397,226 @@ func TestDeviceRegistryGet(t *testing.T) {
 }
 
 func TestDeviceRegistrySet(t *testing.T) {
-	for _, tc := range []struct {
-		Name           string
-		ContextFunc    func(context.Context) context.Context
-		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error
-		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
-		Request        *ttnpb.SetEndDeviceRequest
-		Device         *ttnpb.EndDevice
-		ErrorAssertion func(*testing.T, error) bool
-		AddCalls       uint64
-		SetByIDCalls   uint64
+	defaultMACSettings := DefaultConfig.DefaultMACSettings.Parse()
+
+	customMacSettings := defaultMACSettings
+	customMacSettings.Rx1Delay = &ttnpb.RxDelayValue{Value: ttnpb.RX_DELAY_5}
+	customMacSettings.Rx1DataRateOffset = nil
+
+	macSettingsOpt := EndDeviceOptions.WithMACSettings(&customMacSettings)
+
+	makeUpdateDeviceRequest := func(deviceOpts []test.EndDeviceOption, paths ...string) *SetDeviceRequest {
+		return &SetDeviceRequest{
+			EndDevice: test.MakeEndDevice(deviceOpts...),
+			Paths:     paths,
+		}
+	}
+
+	for createDevice, tcs := range map[*ttnpb.EndDevice][]struct {
+		SetDevice      SetDeviceRequest
+		RequiredRights []ttnpb.Right
+
+		ReturnedDevice *ttnpb.EndDevice
+		StoredDevice   *ttnpb.EndDevice
 	}{
-		{
-			Name: "No device write rights",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				err := errors.New("SetByIDFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return nil, ctx, err
-			},
-			Request: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-					LoRaWANVersion:    ttnpb.MAC_V1_0,
-					SupportsJoin:      true,
+		// OTAA Update
+		MakeOTAAEndDevice(): {
+			{
+				SetDevice: *makeUpdateDeviceRequest([]test.EndDeviceOption{
+					macSettingsOpt,
 				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-						"lorawan_phy_version",
-						"lorawan_version",
-						"supports_join",
-					},
-				},
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
-					t.Errorf("Received error: %s", err)
-					return false
-				}
-				return true
-			},
-		},
-
-		{
-			Name: "Create invalid device",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_settings.adr_margin",
-					"supports_class_b",
-					"supports_class_c",
-					"supports_join",
-				})
-
-				dev, sets, err := f(ctx, nil)
-				if !a.So(err, should.NotBeNil) {
-					return nil, ctx, errors.New("test failed")
-				}
-				a.So(dev, should.BeNil)
-				a.So(sets, should.BeNil)
-				a.So(errors.IsInvalidArgument(err), should.BeTrue)
-				return nil, ctx, err
-			},
-			Request: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					},
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-					LoRaWANVersion:    ttnpb.MAC_V1_0,
-					SupportsJoin:      true,
-				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-						"lorawan_phy_version",
-						"lorawan_version",
-						"mac_settings.adr_margin",
-						"supports_class_b",
-						"supports_class_c",
-						"supports_join",
-					},
-				},
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
-			},
-		},
-
-		// Based on https://github.com/TheThingsNetwork/lorawan-stack/issues/3198.
-		{
-			Name: "Create multicast class B device without ping slot periodicity",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"ids.dev_eui",
-					"ids.device_id",
-					"ids.join_eui",
-					"last_dev_status_received_at",
-					"lorawan_phy_version",
-					"lorawan_version",
 					"mac_settings",
-					"mac_state",
-					"multicast",
-					"queued_application_downlinks",
-					"session.dev_addr",
-					"session.keys.f_nwk_s_int_key.key",
-					"session.last_conf_f_cnt_down",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.queued_application_downlinks",
-					"supports_class_b",
-					"supports_class_c",
-					"supports_join",
-				})
+				),
 
-				dev, sets, err := f(ctx, nil)
-				if !a.So(err, should.NotBeNil) {
-					return nil, ctx, errors.New("test failed")
-				}
-				a.So(dev, should.BeNil)
-				a.So(sets, should.BeNil)
-				a.So(errors.IsInvalidArgument(err), should.BeTrue)
-				return nil, ctx, err
+				ReturnedDevice: MakeOTAAEndDevice(
+					macSettingsOpt,
+				),
+				StoredDevice: MakeOTAAEndDevice(
+					macSettingsOpt,
+				),
 			},
-			Request: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-					LoRaWANVersion:    ttnpb.MAC_V1_0,
-					Multicast:         true,
-					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
-							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &FNwkSIntKey,
-							},
-						},
-						DevAddr: DevAddr,
-					},
-					SupportsClassB: true,
-				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-						"ids.dev_eui",
-						"ids.device_id",
-						"ids.join_eui",
-						"lorawan_phy_version",
-						"lorawan_version",
-						"mac_settings",
-						"multicast",
-						"session.dev_addr",
-						"session.keys.f_nwk_s_int_key.key",
-						"supports_class_b",
-						"supports_class_c",
-						"supports_join",
-					},
-				},
-			},
-			SetByIDCalls: 1,
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
-			},
-		},
-
-		{
-			Name: "Create OTAA device with invalid frequency plan",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"last_dev_status_received_at",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_settings",
-					"mac_state",
-					"multicast",
-					"queued_application_downlinks",
-					"session.dev_addr",
-					"session.last_conf_f_cnt_down",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.queued_application_downlinks",
-					"supports_class_b",
-					"supports_class_c",
-					"supports_join",
-				})
-
-				dev, sets, err := f(ctx, nil)
-				a.So(dev, should.BeNil)
-				a.So(sets, should.BeNil)
-				if !a.So(err, should.NotBeNil) {
-					return nil, ctx, errors.New("test")
-				}
-				return nil, ctx, err
-			},
-			Request: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					},
-					FrequencyPlanID:   "invalid-frequency-plan",
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-					LoRaWANVersion:    ttnpb.MAC_V1_0,
-					SupportsJoin:      true,
-					MACSettings: &ttnpb.MACSettings{
-						ADRMargin: &pbtypes.FloatValue{Value: 4},
-					},
-				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-						"lorawan_phy_version",
-						"lorawan_version",
-						"mac_settings.adr_margin",
-						"supports_class_b",
-						"supports_class_c",
-						"supports_join",
-					},
-				},
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(errors.IsNotFound(err), should.BeTrue)
-			},
-			SetByIDCalls: 1,
-		},
-
-		{
-			Name: "Create OTAA device",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"last_dev_status_received_at",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_settings",
-					"mac_state",
-					"multicast",
-					"queued_application_downlinks",
-					"session.dev_addr",
-					"session.last_conf_f_cnt_down",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.queued_application_downlinks",
-					"supports_class_b",
-					"supports_class_c",
-					"supports_join",
-				})
-
-				dev, sets, err := f(ctx, nil)
-				if !a.So(err, should.BeNil) {
-					return nil, ctx, err
-				}
-				a.So(sets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"ids.application_ids",
-					"ids.dev_eui",
-					"ids.device_id",
-					"ids.join_eui",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_settings.adr_margin",
-					"supports_class_b",
-					"supports_class_c",
-					"supports_join",
-				})
-				a.So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-					LoRaWANVersion:    ttnpb.MAC_V1_0,
-					SupportsJoin:      true,
-					MACSettings: &ttnpb.MACSettings{
-						ADRMargin: &pbtypes.FloatValue{Value: 4},
-					},
-				})
-				return dev, ctx, nil
-			},
-			Request: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-					LoRaWANVersion:    ttnpb.MAC_V1_0,
-					SupportsJoin:      true,
-					MACSettings: &ttnpb.MACSettings{
-						ADRMargin: &pbtypes.FloatValue{Value: 4},
-					},
-				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-						"lorawan_phy_version",
-						"lorawan_version",
-						"mac_settings.adr_margin",
-						"supports_class_b",
-						"supports_class_c",
-						"supports_join",
-					},
-				},
-			},
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceID:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-				LoRaWANVersion:    ttnpb.MAC_V1_0,
-				SupportsJoin:      true,
-				MACSettings: &ttnpb.MACSettings{
-					ADRMargin: &pbtypes.FloatValue{Value: 4},
-				},
-			},
-			SetByIDCalls: 1,
-		},
-
-		{
-			// https://github.com/TheThingsNetwork/lorawan-stack/issues/104#issuecomment-465074076
-			Name: "Create OTAA device with existing session",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"last_dev_status_received_at",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_settings",
-					"mac_state",
-					"multicast",
-					"queued_application_downlinks",
-					"session.dev_addr",
-					"session.keys.f_nwk_s_int_key.key",
-					"session.last_conf_f_cnt_down",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.queued_application_downlinks",
-					"session.started_at",
-					"supports_join",
-				})
-
-				dev, sets, err := f(ctx, nil)
-				if !a.So(err, should.BeNil) {
-					return nil, ctx, err
-				}
-				a.So(sets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"ids.application_ids",
-					"ids.dev_addr",
-					"ids.dev_eui",
-					"ids.device_id",
-					"ids.join_eui",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_settings.supports_32_bit_f_cnt",
-					"mac_settings.use_adr",
-					"mac_state",
-					"session.dev_addr",
-					"session.keys.f_nwk_s_int_key.encrypted_key",
-					"session.keys.f_nwk_s_int_key.kek_label",
-					"session.keys.f_nwk_s_int_key.key",
-					"session.keys.nwk_s_enc_key.encrypted_key",
-					"session.keys.nwk_s_enc_key.kek_label",
-					"session.keys.s_nwk_s_int_key.encrypted_key",
-					"session.keys.s_nwk_s_int_key.kek_label",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.started_at",
-					"supports_join",
-				})
-
-				expected := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						JoinEUI:                &types.EUI64{0x70, 0xB3, 0xD5, 0x95, 0x20, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0xA8, 0x17, 0x58, 0xFF, 0xFE, 0x03, 0x22, 0x77},
-						DevAddr:                &types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					SupportsJoin:      true,
-					MACSettings: &ttnpb.MACSettings{
-						Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
-						UseADR:            &pbtypes.BoolValue{Value: true},
-					},
-					Session: &ttnpb.Session{
-						StartedAt:     time.Unix(0, 42).UTC(),
-						DevAddr:       types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-						LastFCntUp:    45872,
-						LastNFCntDown: 1880,
-						SessionKeys: ttnpb.SessionKeys{
-							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								EncryptedKey: []byte{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
-							},
-							NwkSEncKey: &ttnpb.KeyEnvelope{
-								EncryptedKey: []byte{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
-							},
-							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								EncryptedKey: []byte{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
-							},
-						},
-					},
-				}
-				macState, err := mac.NewState(expected, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
-				if !a.So(err, should.BeNil) {
-					panic(fmt.Sprintf("failed to reset MAC state: %s", err))
-				}
-				expected.MACState = macState
-				a.So(dev, should.Resemble, expected)
-				return dev, ctx, nil
-			},
-			Request: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						JoinEUI:                &types.EUI64{0x70, 0xB3, 0xD5, 0x95, 0x20, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0xA8, 0x17, 0x58, 0xFF, 0xFE, 0x03, 0x22, 0x77},
-						DevAddr:                &types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					SupportsJoin:      true,
-					MACSettings: &ttnpb.MACSettings{
-						Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
-						UseADR:            &pbtypes.BoolValue{Value: true},
-					},
-					Session: &ttnpb.Session{
-						StartedAt:     time.Unix(0, 42).UTC(),
-						DevAddr:       types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-						LastFCntUp:    45872,
-						LastNFCntDown: 1880,
-						SessionKeys: ttnpb.SessionKeys{
-							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &types.AES128Key{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
-							},
-						},
-					},
-				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-						"lorawan_phy_version",
-						"lorawan_version",
-						"mac_settings.supports_32_bit_f_cnt",
-						"mac_settings.use_adr",
-						"session.dev_addr",
-						"session.keys.f_nwk_s_int_key.key",
-						"session.last_f_cnt_up",
-						"session.last_n_f_cnt_down",
-						"session.started_at",
-						"supports_join",
-					},
-				},
-			},
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceID:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					JoinEUI:                &types.EUI64{0x70, 0xB3, 0xD5, 0x95, 0x20, 0x00, 0x00, 0x00},
-					DevEUI:                 &types.EUI64{0xA8, 0x17, 0x58, 0xFF, 0xFE, 0x03, 0x22, 0x77},
-					DevAddr:                &types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
-				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-				SupportsJoin:      true,
-				MACSettings: &ttnpb.MACSettings{
-					Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
-					UseADR:            &pbtypes.BoolValue{Value: true},
-				},
-				Session: &ttnpb.Session{
-					StartedAt:     time.Unix(0, 42).UTC(),
-					DevAddr:       types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-					LastFCntUp:    45872,
-					LastNFCntDown: 1880,
-					SessionKeys: ttnpb.SessionKeys{
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &types.AES128Key{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
-						},
-					},
-				},
-			},
-			SetByIDCalls: 1,
-		},
-
-		{
-			Name: "Create ABP device",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"last_dev_status_received_at",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_settings",
-					"mac_state",
-					"multicast",
-					"queued_application_downlinks",
-					"session.dev_addr",
-					"session.keys.f_nwk_s_int_key.key",
-					"session.last_conf_f_cnt_down",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.queued_application_downlinks",
-					"session.started_at",
-					"supports_join",
-				})
-
-				dev, sets, err := f(ctx, nil)
-				if !a.So(err, should.BeNil) {
-					return nil, ctx, err
-				}
-				a.So(sets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"ids.application_ids",
-					"ids.dev_addr",
-					"ids.device_id",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_settings.supports_32_bit_f_cnt",
-					"mac_settings.use_adr",
-					"mac_state",
-					"session.dev_addr",
-					"session.keys.f_nwk_s_int_key.encrypted_key",
-					"session.keys.f_nwk_s_int_key.kek_label",
-					"session.keys.f_nwk_s_int_key.key",
-					"session.keys.nwk_s_enc_key.encrypted_key",
-					"session.keys.nwk_s_enc_key.kek_label",
-					"session.keys.s_nwk_s_int_key.encrypted_key",
-					"session.keys.s_nwk_s_int_key.kek_label",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.started_at",
-					"supports_join",
-				})
-
-				expected := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DevAddr:                &types.DevAddr{0x42, 0x00, 0x00, 0x00},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					MACSettings: &ttnpb.MACSettings{
-						Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
-						UseADR:            &pbtypes.BoolValue{Value: true},
-					},
-					Session: &ttnpb.Session{
-						StartedAt:     time.Unix(0, 42).UTC(),
-						DevAddr:       types.DevAddr{0x42, 0x00, 0x00, 0x00},
-						LastFCntUp:    42,
-						LastNFCntDown: 4242,
-						SessionKeys: ttnpb.SessionKeys{
-							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-							},
-							NwkSEncKey: &ttnpb.KeyEnvelope{
-								EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-							},
-							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-							},
-						},
-					},
-				}
-				macState, err := mac.NewState(expected, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
-				if !a.So(err, should.BeNil) {
-					panic(fmt.Sprintf("failed to reset MAC state: %s", err))
-				}
-				expected.MACState = macState
-				a.So(dev, should.Resemble, expected)
-				return dev, ctx, nil
-			},
-			Request: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DevAddr:                &types.DevAddr{0x42, 0x00, 0x00, 0x00},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					MACSettings: &ttnpb.MACSettings{
-						Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
-						UseADR:            &pbtypes.BoolValue{Value: true},
-					},
-					Session: &ttnpb.Session{
-						StartedAt:     time.Unix(0, 42).UTC(),
-						DevAddr:       types.DevAddr{0x42, 0x00, 0x00, 0x00},
-						LastFCntUp:    42,
-						LastNFCntDown: 4242,
-						SessionKeys: ttnpb.SessionKeys{
-							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-							},
-						},
-					},
-				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-						"lorawan_phy_version",
-						"lorawan_version",
-						"mac_settings.supports_32_bit_f_cnt",
-						"mac_settings.use_adr",
-						"session.dev_addr",
-						"session.keys.f_nwk_s_int_key.key",
-						"session.last_f_cnt_up",
-						"session.last_n_f_cnt_down",
-						"session.started_at",
-						"supports_join",
-					},
-				},
-			},
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceID:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					DevAddr:                &types.DevAddr{0x42, 0x00, 0x00, 0x00},
-				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
-				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-				MACSettings: &ttnpb.MACSettings{
-					Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
-					UseADR:            &pbtypes.BoolValue{Value: true},
-				},
-				Session: &ttnpb.Session{
-					StartedAt:     time.Unix(0, 42).UTC(),
-					DevAddr:       types.DevAddr{0x42, 0x00, 0x00, 0x00},
-					LastFCntUp:    42,
-					LastNFCntDown: 4242,
-					SessionKeys: ttnpb.SessionKeys{
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-						},
-					},
-				},
-			},
-			SetByIDCalls: 1,
-		},
-
-		{
-			// https://github.com/TheThingsNetwork/lorawan-stack/issues/159#issue-411803325
-			Name: "Create ABP device with existing session",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"last_dev_status_received_at",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_settings",
-					"mac_state",
-					"multicast",
-					"queued_application_downlinks",
-					"session.dev_addr",
-					"session.keys.f_nwk_s_int_key.key",
-					"session.last_conf_f_cnt_down",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.queued_application_downlinks",
-					"session.started_at",
-					"supports_join",
-				})
-
-				dev, sets, err := f(ctx, nil)
-				if !a.So(err, should.BeNil) {
-					return nil, ctx, err
-				}
-				a.So(sets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"ids.application_ids",
-					"ids.dev_addr",
-					"ids.dev_eui",
-					"ids.device_id",
-					"ids.join_eui",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_settings.supports_32_bit_f_cnt",
-					"mac_settings.use_adr",
-					"mac_state",
-					"session.dev_addr",
-					"session.keys.f_nwk_s_int_key.encrypted_key",
-					"session.keys.f_nwk_s_int_key.kek_label",
-					"session.keys.f_nwk_s_int_key.key",
-					"session.keys.nwk_s_enc_key.encrypted_key",
-					"session.keys.nwk_s_enc_key.kek_label",
-					"session.keys.s_nwk_s_int_key.encrypted_key",
-					"session.keys.s_nwk_s_int_key.kek_label",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.started_at",
-					"supports_join",
-				})
-
-				expected := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						JoinEUI:                &types.EUI64{0x70, 0xB3, 0xD5, 0x95, 0x20, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0xA8, 0x17, 0x58, 0xFF, 0xFE, 0x03, 0x22, 0x77},
-						DevAddr:                &types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					MACSettings: &ttnpb.MACSettings{
-						Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
-						UseADR:            &pbtypes.BoolValue{Value: true},
-					},
-					Session: &ttnpb.Session{
-						StartedAt:     time.Unix(0, 42).UTC(),
-						DevAddr:       types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-						LastFCntUp:    45872,
-						LastNFCntDown: 1880,
-						SessionKeys: ttnpb.SessionKeys{
-							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								EncryptedKey: []byte{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
-							},
-							NwkSEncKey: &ttnpb.KeyEnvelope{
-								EncryptedKey: []byte{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
-							},
-							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								EncryptedKey: []byte{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
-							},
-						},
-					},
-				}
-				macState, err := mac.NewState(expected, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
-				if !a.So(err, should.BeNil) {
-					panic(fmt.Sprintf("failed to reset MAC state: %s", err))
-				}
-				expected.MACState = macState
-				a.So(dev, should.Resemble, expected)
-				return dev, ctx, nil
-			},
-			Request: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						JoinEUI:                &types.EUI64{0x70, 0xB3, 0xD5, 0x95, 0x20, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0xA8, 0x17, 0x58, 0xFF, 0xFE, 0x03, 0x22, 0x77},
-						DevAddr:                &types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					MACSettings: &ttnpb.MACSettings{
-						Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
-						UseADR:            &pbtypes.BoolValue{Value: true},
-					},
-					Session: &ttnpb.Session{
-						StartedAt:     time.Unix(0, 42).UTC(),
-						DevAddr:       types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-						LastFCntUp:    45872,
-						LastNFCntDown: 1880,
-						SessionKeys: ttnpb.SessionKeys{
-							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &types.AES128Key{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
-							},
-						},
-					},
-				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-						"lorawan_phy_version",
-						"lorawan_version",
-						"mac_settings.supports_32_bit_f_cnt",
-						"mac_settings.use_adr",
-						"session.dev_addr",
-						"session.keys.f_nwk_s_int_key.key",
-						"session.last_f_cnt_up",
-						"session.last_n_f_cnt_down",
-						"session.started_at",
-						"supports_join",
-					},
-				},
-			},
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceID:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					JoinEUI:                &types.EUI64{0x70, 0xB3, 0xD5, 0x95, 0x20, 0x00, 0x00, 0x00},
-					DevEUI:                 &types.EUI64{0xA8, 0x17, 0x58, 0xFF, 0xFE, 0x03, 0x22, 0x77},
-					DevAddr:                &types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
-				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-				MACSettings: &ttnpb.MACSettings{
-					Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
-					UseADR:            &pbtypes.BoolValue{Value: true},
-				},
-				Session: &ttnpb.Session{
-					StartedAt:     time.Unix(0, 42).UTC(),
-					DevAddr:       types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
-					LastFCntUp:    45872,
-					LastNFCntDown: 1880,
-					SessionKeys: ttnpb.SessionKeys{
-						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &types.AES128Key{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
-						},
-					},
-				},
-			},
-			SetByIDCalls: 1,
-		},
-
-		{
-			Name: "Update with invalid frequency plan",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"last_dev_status_received_at",
-					"lorawan_phy_version",
-					"mac_settings",
-					"mac_state",
-					"multicast",
-					"queued_application_downlinks",
-					"session.dev_addr",
-					"session.last_conf_f_cnt_down",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.queued_application_downlinks",
-				})
-
-				dev, sets, err := f(ctx, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-				})
-				a.So(dev, should.BeNil)
-				a.So(sets, should.BeNil)
-				if !a.So(err, should.NotBeNil) {
-					return nil, ctx, errors.New("test")
-				}
-				return nil, ctx, err
-			},
-			Request: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					},
-					FrequencyPlanID: "invalid-frequency-plan",
-				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-					},
-				},
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(errors.IsNotFound(err), should.BeTrue)
-			},
-			SetByIDCalls: 1,
-		},
-
-		{
-			Name: "Update device desired MAC parameters",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"last_dev_status_received_at",
-					"lorawan_phy_version",
-					"mac_settings",
-					"mac_state",
-					"multicast",
-					"queued_application_downlinks",
-					"session.dev_addr",
-					"session.last_conf_f_cnt_down",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.queued_application_downlinks",
-				})
-
-				dev, sets, err := f(ctx, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					MACState: &ttnpb.MACState{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
-						CurrentParameters: ttnpb.MACParameters{
-							Rx2Frequency: 868000000,
-						},
-						DesiredParameters: ttnpb.MACParameters{
-							Rx2Frequency: 868000000,
-						},
-					},
-				})
-				if !a.So(err, should.BeNil) {
-					return nil, ctx, err
-				}
-				a.So(sets, should.HaveSameElementsDeep, []string{
-					"mac_state.desired_parameters.rx2_frequency",
-				})
-				a.So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					},
-					MACState: &ttnpb.MACState{
-						DesiredParameters: ttnpb.MACParameters{
-							Rx2Frequency: 123456789,
-						},
-					},
-				})
-				return &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					MACState: &ttnpb.MACState{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
-						CurrentParameters: ttnpb.MACParameters{
-							Rx2Frequency: 868000000,
-						},
-						DesiredParameters: ttnpb.MACParameters{
-							Rx2Frequency: 123456789,
-						},
-					},
-				}, ctx, nil
-			},
-			Request: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					},
-					MACState: &ttnpb.MACState{
-						DesiredParameters: ttnpb.MACParameters{
-							Rx2Frequency: 123456789,
-						},
-					},
-				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{
-						"mac_state.desired_parameters.rx2_frequency",
-					},
-				},
-			},
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceID:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-				},
-				MACState: &ttnpb.MACState{
-					DesiredParameters: ttnpb.MACParameters{
-						Rx2Frequency: 123456789,
-					},
-				},
-			},
-			SetByIDCalls: 1,
-		},
-
-		{
-			Name: "Lower device FCntUp",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
-							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-							},
-						},
-					},
-				})
-			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-				err := errors.New("AddFunc must not be called")
-				test.MustTFromContext(ctx).Error(err)
-				return err
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.HaveSameElementsDeep, []string{
-					"frequency_plan_id",
-					"last_dev_status_received_at",
-					"lorawan_phy_version",
-					"mac_settings",
-					"mac_state",
-					"multicast",
-					"queued_application_downlinks",
-					"session.dev_addr",
-					"session.last_conf_f_cnt_down",
-					"session.last_f_cnt_up",
-					"session.last_n_f_cnt_down",
-					"session.queued_application_downlinks",
-				})
-
-				dev, sets, err := f(ctx, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					MACState: &ttnpb.MACState{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
-						CurrentParameters: ttnpb.MACParameters{
-							Rx2Frequency: 868000000,
-						},
-						DesiredParameters: ttnpb.MACParameters{
-							Rx2Frequency: 868000000,
-						},
-					},
-				})
-				if !a.So(err, should.BeNil) {
-					return nil, ctx, err
-				}
-				a.So(sets, should.HaveSameElementsDeep, []string{
-					"mac_state.desired_parameters.rx2_frequency",
-				})
-				a.So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					},
-					MACState: &ttnpb.MACState{
-						DesiredParameters: ttnpb.MACParameters{
-							Rx2Frequency: 123456789,
-						},
-					},
-				})
-				return &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					MACState: &ttnpb.MACState{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
-						CurrentParameters: ttnpb.MACParameters{
-							Rx2Frequency: 868000000,
-						},
-						DesiredParameters: ttnpb.MACParameters{
-							Rx2Frequency: 123456789,
-						},
-					},
-				}, ctx, nil
-			},
-			Request: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-					},
-					MACState: &ttnpb.MACState{
-						DesiredParameters: ttnpb.MACParameters{
-							Rx2Frequency: 123456789,
-						},
-					},
-				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{
-						"mac_state.desired_parameters.rx2_frequency",
-					},
-				},
-			},
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceID:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-				},
-				MACState: &ttnpb.MACState{
-					DesiredParameters: ttnpb.MACParameters{
-						Rx2Frequency: 123456789,
-					},
-				},
-			},
-			SetByIDCalls: 1,
 		},
 	} {
-		tc := tc
-		test.RunSubtest(t, test.SubtestConfig{
-			Name:     tc.Name,
-			Parallel: true,
-			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				var addCalls, setByIDCalls uint64
+		for _, tc := range tcs {
+			createDevice := createDevice
+			tc := tc
+			test.RunSubtest(t, test.SubtestConfig{
+				Name: MakeTestCaseName(
+					func() string {
+						if createDevice != nil {
+							return "Update"
+						}
+						return "Create"
+					}(),
+					func() string {
+						if tc.ReturnedDevice.SupportsJoin {
+							return "OTAA"
+						}
+						if tc.ReturnedDevice.Multicast {
+							return "Multicast"
+						}
+						return "ABP"
+					}(),
+					tc.ReturnedDevice.LoRaWANVersion.String(),
+					fmt.Sprintf("paths:[%s]", strings.Join(tc.SetDevice.Paths, ",")),
+				),
+				Parallel: true,
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					nsConf := DefaultConfig
+					nsConf.DeviceKEKLabel = test.DefaultKEKLabel
 
-				ns, ctx, env, stop := StartTest(
-					ctx,
-					TestConfig{
-						NetworkServer: Config{
-							Devices: &MockDeviceRegistry{
-								SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
-									atomic.AddUint64(&setByIDCalls, 1)
-									return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+					_, ctx, env, stop := StartTest(ctx, TestConfig{
+						Component: component.Config{
+							ServiceBase: config.ServiceBase{
+								GRPC: config.GRPC{
+									LogIgnoreMethods: []string{
+										"/ttn.lorawan.v3.ApplicationAccess/ListRights",
+										"/ttn.lorawan.v3.NsEndDeviceRegistry/Set",
+									},
 								},
-							},
-							DownlinkTasks: &MockDownlinkTaskQueue{
-								AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
-									atomic.AddUint64(&addCalls, 1)
-									return tc.AddFunc(ctx, ids, at, replace)
-								},
+								KeyVault: test.DefaultKeyVault,
 							},
 						},
+						NetworkServer: nsConf,
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
 						),
-					},
-				)
-				defer stop()
+					})
+					defer stop()
 
-				go LogEvents(t, env.Events)
+					clock := test.NewMockClock(time.Now().UTC())
+					defer SetMockClock(clock)()
 
-				ns.AddContextFiller(tc.ContextFunc)
-				ns.AddContextFiller(func(ctx context.Context) context.Context {
-					return test.ContextWithTB(ctx, t)
-				})
+					withCreatedAt := test.EndDeviceOptions.WithCreatedAt(clock.Now())
+					if createDevice != nil {
+						_, ctx = MustCreateDevice(ctx, env.Devices, createDevice)
+						clock.Add(time.Nanosecond)
+					}
 
-				req := deepcopy.Copy(tc.Request).(*ttnpb.SetEndDeviceRequest)
-				dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Set(ctx, req)
-				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+					now := clock.Now()
+					withTimestamps := withCreatedAt.Compose(
+						test.EndDeviceOptions.WithUpdatedAt(now),
+						func(dev ttnpb.EndDevice) ttnpb.EndDevice {
+							if dev.Session != nil && dev.Session.StartedAt.IsZero() {
+								dev.Session = CopySession(dev.Session)
+								dev.Session.StartedAt = now
+							}
+							return dev
+						},
+					)
+
+					req := &ttnpb.SetEndDeviceRequest{
+						EndDevice: *tc.SetDevice.EndDevice,
+						FieldMask: pbtypes.FieldMask{
+							Paths: tc.SetDevice.Paths,
+						},
+					}
+
+					dev, err, ok := env.AssertSetDevice(ctx, createDevice == nil, req)
+					if !a.So(ok, should.BeTrue) {
+						return
+					}
 					a.So(dev, should.BeNil)
-				} else if a.So(err, should.BeNil) {
-					a.So(dev, should.Resemble, tc.Device)
-				}
-				a.So(req, should.Resemble, tc.Request)
-				a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
-				a.So(addCalls, should.Equal, tc.AddCalls)
-			},
-		})
+					if !a.So(err, should.BeError) || !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+						t.Errorf("Expected 'permission denied' error, got: %s", test.FormatError(err))
+						return
+					}
+					if len(tc.RequiredRights) > 0 {
+						dev, err, ok = env.AssertSetDevice(ctx, createDevice == nil, req,
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						)
+						if !a.So(ok, should.BeTrue) {
+							return
+						}
+						a.So(dev, should.BeNil)
+						if !a.So(err, should.BeError) || !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+							t.Errorf("Expected 'permission denied' error, got: %s", test.FormatError(err))
+							return
+						}
+					}
+
+					rights := append([]ttnpb.Right{
+						ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+					}, tc.RequiredRights...)
+					expectedReturn := test.Must(ttnpb.ApplyEndDeviceFieldMask(nil, EndDevicePtr(withTimestamps(*tc.ReturnedDevice)), ttnpb.AddImplicitEndDeviceGetFields(tc.SetDevice.Paths...)...)).(*ttnpb.EndDevice)
+
+					dev, err, ok = env.AssertSetDevice(ctx, createDevice == nil, req, rights...)
+					if !a.So(ok, should.BeTrue) || !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
+						return
+					}
+					a.So(dev, should.Resemble, expectedReturn)
+
+					dev, _, err = env.Devices.GetByID(ctx, tc.SetDevice.ApplicationIdentifiers, tc.SetDevice.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
+						return
+					}
+					a.So(dev, should.Resemble, EndDevicePtr(withTimestamps(*tc.StoredDevice)))
+
+					now = clock.Add(time.Nanosecond)
+					dev, err, ok = env.AssertSetDevice(ctx, false, &ttnpb.SetEndDeviceRequest{
+						EndDevice: *expectedReturn,
+						FieldMask: pbtypes.FieldMask{
+							Paths: tc.SetDevice.Paths,
+						},
+					}, rights...)
+					if !a.So(ok, should.BeTrue) || !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
+						return
+					}
+					a.So(dev, should.Resemble, EndDevicePtr(EndDeviceOptions.WithUpdatedAt(now)(*expectedReturn)))
+				},
+			})
+		}
 	}
 }
 
-func TestDeviceRegistryReset(t *testing.T) {
-	const appIDString = "device-reset-test-app-id"
-	appID := ttnpb.ApplicationIdentifiers{ApplicationID: appIDString}
-	const devID = "device-reset-test-dev-id"
-
-	devAddr := types.DevAddr{0x42, 0xff, 0xff, 0xff}
-
-	sessionKeys := &ttnpb.SessionKeys{
-		FNwkSIntKey: &ttnpb.KeyEnvelope{
-			Key: &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-		},
-		NwkSEncKey: &ttnpb.KeyEnvelope{
-			Key: &types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-		},
-		SNwkSIntKey: &ttnpb.KeyEnvelope{
-			Key: &types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-		},
-		SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
+	activeSessionOpts := []test.SessionOption{
+		SessionOptions.WithLastFCntUp(0x42),
+		SessionOptions.WithLastNFCntDown(0x24),
+		SessionOptions.WithDefaultQueuedApplicationDownlinks(),
 	}
+	macSettings := DefaultConfig.DefaultMACSettings.Parse()
+	activateOpt := EndDeviceOptions.Activate(macSettings, true, activeSessionOpts)
 
-	downlinkQueue := []*ttnpb.ApplicationDownlink{
-		{
-			CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-			FCnt:           0x22,
-			FPort:          0x1,
-			FRMPayload:     []byte("testPayload"),
-			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-			SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-		},
-		{
-			CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
-			FCnt:           0x23,
-			FPort:          0x1,
-			FRMPayload:     []byte("testPayload"),
-			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-			SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-		},
-	}
-
+	// TODO: Refactor into same structure as Set
 	for _, tc := range []struct {
-		CreateDevice SetDeviceRequest
+		CreateDevice *SetDeviceRequest
 	}{
 		{},
 
 		{
-			CreateDevice: SetDeviceRequest{
-				EndDevice: &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANVersion:    ttnpb.MAC_V1_1,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-				},
-				Paths: []string{
-					"frequency_plan_id",
-					"ids",
-					"lorawan_phy_version",
-					"lorawan_version",
-				},
+			CreateDevice: MakeOTAASetDeviceRequest(nil),
+		},
+		{
+			CreateDevice: MakeOTAASetDeviceRequest([]test.EndDeviceOption{
+				activateOpt,
 			},
+				"mac_state",
+				"session",
+			),
+		},
+		{
+			CreateDevice: MakeOTAASetDeviceRequest([]test.EndDeviceOption{
+				EndDeviceOptions.WithLoRaWANVersion(ttnpb.MAC_V1_0_3),
+				EndDeviceOptions.WithLoRaWANPHYVersion(ttnpb.PHY_V1_0_3_REV_A),
+				activateOpt,
+			},
+				"mac_state",
+				"session",
+			),
 		},
 
 		{
-			CreateDevice: SetDeviceRequest{
-				EndDevice: &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANVersion:    ttnpb.MAC_V1_1,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					MACState:          MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B),
-				},
-				Paths: []string{
-					"frequency_plan_id",
-					"ids",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_state",
-				},
-			},
+			CreateDevice: MakeABPSetDeviceRequest(macSettings, nil, nil, nil),
 		},
-
 		{
-			CreateDevice: SetDeviceRequest{
-				EndDevice: &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
-						DevAddr:                &devAddr,
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANVersion:    ttnpb.MAC_V1_1,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					MACState:          MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B),
-					Session: &ttnpb.Session{
-						DevAddr:                    devAddr,
-						LastNFCntDown:              0x24,
-						LastFCntUp:                 0x42,
-						SessionKeys:                *sessionKeys,
-						QueuedApplicationDownlinks: downlinkQueue,
-					},
-				},
-				Paths: []string{
-					"frequency_plan_id",
-					"ids",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_state",
-					"session",
-				},
-			},
+			CreateDevice: MakeABPSetDeviceRequest(macSettings, activeSessionOpts, nil, nil),
 		},
-
 		{
-			CreateDevice: SetDeviceRequest{
-				EndDevice: &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
-						DevAddr:                &devAddr,
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
-					MACState:          MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A),
-					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
-						LastNFCntDown: 0x24,
-						LastFCntUp:    0x42,
-						SessionKeys:   *sessionKeys,
-					},
-				},
-				Paths: []string{
-					"frequency_plan_id",
-					"ids",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"mac_state",
-					"session",
-				},
-			},
-		},
-
-		{
-			CreateDevice: SetDeviceRequest{
-				EndDevice: &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
-						DevAddr:                &devAddr,
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
-					PendingMACState:   MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A),
-					PendingSession: &ttnpb.Session{
-						DevAddr:       devAddr,
-						LastNFCntDown: 0x24,
-						LastFCntUp:    0x42,
-						SessionKeys:   *sessionKeys,
-					},
-					SupportsJoin: true,
-				},
-				Paths: []string{
-					"frequency_plan_id",
-					"ids",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"pending_mac_state",
-					"pending_session",
-					"supports_join",
-				},
-			},
+			CreateDevice: MakeABPSetDeviceRequest(macSettings, activeSessionOpts, nil, []test.EndDeviceOption{
+				EndDeviceOptions.WithLoRaWANVersion(ttnpb.MAC_V1_0_3),
+				EndDeviceOptions.WithLoRaWANPHYVersion(ttnpb.PHY_V1_0_3_REV_A),
+			}),
 		},
 	} {
 		for _, conf := range []struct {
@@ -2015,7 +691,7 @@ func TestDeviceRegistryReset(t *testing.T) {
 			conf := conf
 			test.RunSubtest(t, test.SubtestConfig{
 				Name: func() string {
-					if tc.CreateDevice.EndDevice == nil {
+					if tc.CreateDevice == nil {
 						return "no device"
 					}
 					return MakeTestCaseName(
@@ -2037,6 +713,9 @@ func TestDeviceRegistryReset(t *testing.T) {
 				}(),
 				Parallel: true,
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					nsConf := DefaultConfig
+					nsConf.DeviceKEKLabel = test.DefaultKEKLabel
+
 					ns, ctx, env, stop := StartTest(ctx, TestConfig{
 						Component: component.Config{
 							ServiceBase: config.ServiceBase{
@@ -2046,36 +725,37 @@ func TestDeviceRegistryReset(t *testing.T) {
 										"/ttn.lorawan.v3.NsEndDeviceRegistry/ResetFactoryDefaults",
 									},
 								},
+								KeyVault: test.DefaultKeyVault,
 							},
 						},
-						NetworkServer: DefaultConfig,
+						NetworkServer: nsConf,
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
 						),
 					})
 					defer stop()
 
-					var now time.Time
-					var created *ttnpb.EndDevice
-					if tc.CreateDevice.EndDevice != nil {
-						created, ctx = MustCreateDevice(ctx, env.Devices, tc.CreateDevice.EndDevice, tc.CreateDevice.Paths...)
+					clock := test.NewMockClock(time.Now().UTC())
+					defer SetMockClock(clock)()
 
-						now = time.Now().Add(time.Second)
-						defer SetMockClock(test.NewMockClock(now))()
+					req := &ttnpb.ResetAndGetEndDeviceRequest{
+						EndDeviceIdentifiers: *test.MakeEndDeviceIdentifiers(),
+						FieldMask: pbtypes.FieldMask{
+							Paths: conf.Paths,
+						},
 					}
 
-					dev, err, ok := env.AssertResetFactoryDefaults(
-						ctx,
-						&ttnpb.ResetAndGetEndDeviceRequest{
-							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-								ApplicationIdentifiers: appID,
-								DeviceID:               devID,
-							},
-							FieldMask: pbtypes.FieldMask{
-								Paths: conf.Paths,
-							},
-						},
-					)
+					var created *ttnpb.EndDevice
+					if tc.CreateDevice != nil {
+						created, ctx = MustCreateDevice(ctx, env.Devices, tc.CreateDevice.EndDevice)
+
+						req.ApplicationIdentifiers = tc.CreateDevice.ApplicationIdentifiers
+						req.DeviceID = tc.CreateDevice.DeviceID
+
+						clock.Add(time.Nanosecond)
+					}
+
+					dev, err, ok := env.AssertResetFactoryDefaults(ctx, req)
 					if !a.So(ok, should.BeTrue) {
 						return
 					}
@@ -2085,21 +765,11 @@ func TestDeviceRegistryReset(t *testing.T) {
 						return
 					}
 
-					dev, err, ok = env.AssertResetFactoryDefaults(
-						ctx,
-						&ttnpb.ResetAndGetEndDeviceRequest{
-							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-								ApplicationIdentifiers: appID,
-								DeviceID:               devID,
-							},
-							FieldMask: pbtypes.FieldMask{
-								Paths: conf.Paths,
-							},
-						},
-						append([]ttnpb.Right{
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-						}, conf.RequiredRights...)...,
-					)
+					now := clock.Now().UTC()
+
+					dev, err, ok = env.AssertResetFactoryDefaults(ctx, req, append([]ttnpb.Right{
+						ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+					}, conf.RequiredRights...)...)
 					if !a.So(ok, should.BeTrue) {
 						return
 					}
@@ -2133,17 +803,15 @@ func TestDeviceRegistryReset(t *testing.T) {
 						}
 						session = &ttnpb.Session{
 							DevAddr:                    created.Session.DevAddr,
-							SessionKeys:                created.Session.SessionKeys,
-							StartedAt:                  now.UTC(),
 							QueuedApplicationDownlinks: created.Session.QueuedApplicationDownlinks,
+							SessionKeys:                created.Session.SessionKeys,
+							StartedAt:                  now,
 						}
 					}
 					if !a.So(err, should.BeNil) {
 						t.Errorf("Expected no error, got: %s", test.FormatError(err))
 						return
 					}
-
-					a.So([]time.Time{created.CreatedAt, dev.UpdatedAt, time.Now()}, should.BeChronological)
 
 					expected := CopyEndDevice(created)
 					expected.BatteryPercentage = nil
@@ -2154,11 +822,11 @@ func TestDeviceRegistryReset(t *testing.T) {
 					expected.PendingSession = nil
 					expected.PowerState = ttnpb.PowerState_POWER_UNKNOWN
 					expected.Session = session
-					expected.UpdatedAt = dev.UpdatedAt
-					if !a.So(dev, should.Resemble, test.Must(ttnpb.FilterGetEndDevice(expected, conf.Paths...)).(*ttnpb.EndDevice)) {
+					expected.UpdatedAt = clock.Now().UTC()
+					if !a.So(dev, should.Resemble, test.Must(ttnpb.ApplyEndDeviceFieldMask(nil, expected, ttnpb.AddImplicitEndDeviceGetFields(conf.Paths...)...)).(*ttnpb.EndDevice)) {
 						return
 					}
-					updated, _, err := env.Devices.GetByID(ctx, appID, devID, ttnpb.EndDeviceFieldPathsTopLevel)
+					updated, _, err := env.Devices.GetByID(ctx, tc.CreateDevice.ApplicationIdentifiers, tc.CreateDevice.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
 					if a.So(err, should.BeNil) {
 						a.So(updated, should.Resemble, expected)
 					}

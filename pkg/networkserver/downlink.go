@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"math"
 	"sort"
-	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -32,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -88,8 +88,8 @@ type generateDownlinkState struct {
 	ifScheduledApplicationUps []*ttnpb.ApplicationUp
 
 	ApplicationDownlink      *ttnpb.ApplicationDownlink
-	NeedsDownlinkQueueUpdate bool
 	EventBuilders            events.Builders
+	NeedsDownlinkQueueUpdate bool
 }
 
 func (s generateDownlinkState) appendApplicationUplinks(ups []*ttnpb.ApplicationUp, scheduled bool) []*ttnpb.ApplicationUp {
@@ -106,7 +106,7 @@ func (ns *NetworkServer) nextDataDownlinkTaskAt(ctx context.Context, dev *ttnpb.
 		return time.Time{}, nil
 	}
 
-	if t := timeNow().UTC().Add(nsScheduleWindow()); earliestAt.Before(t) {
+	if t := time.Now().UTC().Add(nsScheduleWindow()); earliestAt.Before(t) {
 		earliestAt = t
 	}
 	var taskAt time.Time
@@ -907,7 +907,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 			errs = append(errs, err)
 			continue
 		}
-		transmitAt := timeNow().Add(delay)
+		transmitAt := time.Now().Add(delay)
 		logger.WithFields(log.Fields(
 			"transmission_delay", delay,
 			"transmit_at", transmitAt,
@@ -1089,7 +1089,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		}
 	}
 
-	now := timeNow()
+	now := time.Now()
 	if slot.RX2().Before(now) {
 		log.FromContext(ctx).Debug("RX2 expired, skip class A downlink slot")
 		dev.MACState.QueuedResponses = nil
@@ -1303,7 +1303,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		}
 	}
 
-	genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, slot.Class, latestTime(slot.Time, timeNow()),
+	genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, slot.Class, latestTime(slot.Time, time.Now()),
 		dr.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()),
 		maxUpLength,
 	)
@@ -1337,7 +1337,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			QueuedApplicationUplinks: genState.appendApplicationUplinks(nil, false),
 		}
 
-	case slot.Time.After(timeNow()):
+	case slot.Time.After(time.Now()):
 		log.FromContext(ctx).Debug("Slot starts in the future, set absolute time in downlink request")
 		absTime = &slot.Time
 
@@ -1486,7 +1486,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 	err := ns.downlinkTasks.Pop(ctx, func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) (time.Time, error) {
 		ctx = log.NewContextWithFields(ctx, log.Fields(
 			"device_uid", unique.ID(ctx, devID),
-			"started_at", timeNow().UTC(),
+			"started_at", time.Now().UTC(),
 		))
 		logger := log.FromContext(ctx)
 		logger.WithField("start_at", t).Debug("Process downlink task")
@@ -1560,7 +1560,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 
 					rx1 := up.ReceivedAt.Add(phy.JoinAcceptDelay1)
-					now := timeNow()
+					now := time.Now()
 					if rx1.Add(time.Second).Before(now) {
 						logger.Warn("RX1 and RX2 are expired, skip join-accept downlink slot")
 						dev.PendingMACState.RxWindowsAvailable = false
@@ -1750,22 +1750,22 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							logger.Error("Invalid downlink slot generated, skip class B/C downlink slot")
 							return dev, nil, nil
 
-						case !slot.IsApplicationTime && slot.Class == ttnpb.CLASS_C && timeUntil(slot.Time) > 0:
+						case !slot.IsApplicationTime && slot.Class == ttnpb.CLASS_C && time.Until(slot.Time) > 0:
 							logger.WithFields(log.Fields(
 								"slot_start", slot.Time,
 							)).Info("Class C downlink scheduling attempt performed too soon, retry attempt")
 							taskUpdateStrategy = nextDownlinkTask
 							return dev, nil, nil
 
-						case timeUntil(slot.Time) > dev.MACState.CurrentParameters.Rx1Delay.Duration()+2*nsScheduleWindow():
+						case time.Until(slot.Time) > dev.MACState.CurrentParameters.Rx1Delay.Duration()+2*nsScheduleWindow():
 							logger.WithFields(log.Fields(
 								"slot_start", slot.Time,
 							)).Info("Class B/C downlink scheduling attempt performed too soon, retry attempt")
 							taskUpdateStrategy = nextDownlinkTask
 							return dev, nil, nil
 
-						case !slot.IsApplicationTime && slot.Class == ttnpb.CLASS_B && timeUntil(slot.Time) < dev.MACState.CurrentParameters.Rx1Delay.Duration()/2:
-							earliestAt = timeNow().Add(dev.MACState.CurrentParameters.Rx1Delay.Duration() / 2)
+						case !slot.IsApplicationTime && slot.Class == ttnpb.CLASS_B && time.Until(slot.Time) < dev.MACState.CurrentParameters.Rx1Delay.Duration()/2:
+							earliestAt = time.Now().Add(dev.MACState.CurrentParameters.Rx1Delay.Duration() / 2)
 							continue
 						}
 						a := ns.attemptNetworkInitiatedDataDownlink(ctx, dev, phy, fp, slot, maxUpLength)
@@ -1791,7 +1791,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		case nextDownlinkTask:
 
 		case retryDownlinkTask:
-			earliestAt = timeNow().Add(downlinkRetryInterval + nsScheduleWindow())
+			earliestAt = time.Now().Add(downlinkRetryInterval + nsScheduleWindow())
 
 		case noDownlinkTask:
 			return time.Time{}, nil

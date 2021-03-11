@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
@@ -102,21 +103,6 @@ var (
 )
 
 type DownlinkPath = downlinkPath
-
-var timeMu sync.RWMutex
-
-func SetMockClock(clock *test.MockClock) func() {
-	timeMu.Lock()
-	oldNow := timeNow
-	oldAfter := timeAfter
-	timeNow = clock.Now
-	timeAfter = clock.After
-	return func() {
-		timeNow = oldNow
-		timeAfter = oldAfter
-		timeMu.Unlock()
-	}
-}
 
 func NSScheduleWindow() time.Duration {
 	return nsScheduleWindow()
@@ -227,7 +213,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 			OptNeg:      conf.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 		},
 		RxDelay: conf.RXDelay,
-		CFList:  frequencyplans.CFList(*FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
+		CFList:  frequencyplans.CFList(*test.FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
 		CorrelationIDs: CopyStrings(func() []string {
 			if len(conf.CorrelationIDs) == 0 {
 				return JoinRequestCorrelationIDs[:]
@@ -529,7 +515,7 @@ func (env TestEnvironment) AssertListApplicationRights(ctx context.Context, appI
 	}()
 
 	if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
-		func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
+		func(ctx, _ context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
 			_, a := test.MustNewTFromContext(ctx)
 			return test.ClusterGetPeerResponse{
 					Peer: NewISPeer(ctx, &test.MockApplicationAccessServer{
@@ -556,6 +542,116 @@ func (env TestEnvironment) AssertListApplicationRights(ctx context.Context, appI
 	), should.BeTrue)
 }
 
+func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req *ttnpb.SetEndDeviceRequest, rights ...ttnpb.Right) (*ttnpb.EndDevice, error, bool) {
+	t, a := test.MustNewTFromContext(ctx)
+	t.Helper()
+
+	const (
+		authType  = "Bearer"
+		authValue = "set-key"
+	)
+	var (
+		dev *ttnpb.EndDevice
+		err error
+	)
+	reqCtx, cancel := context.WithCancel(ctx)
+	go func() {
+		dev, err = ttnpb.NewNsEndDeviceRegistryClient(env.ClientConn).Set(
+			reqCtx,
+			req,
+			grpc.PerRPCCredentials(rpcmetadata.MD{
+				AuthType:      authType,
+				AuthValue:     authValue,
+				AllowInsecure: true,
+			}),
+		)
+		cancel()
+	}()
+
+	if !a.So(env.AssertListApplicationRights(reqCtx, req.EndDevice.ApplicationIdentifiers, authType, authValue, rights...), should.BeTrue) {
+		t.Error("ListRights assertion failed")
+		return nil, nil, false
+	}
+
+	action := "create"
+	expectedEvent := EvtCreateEndDevice.BindData(nil)
+	if !create {
+		action = "update"
+		expectedEvent = EvtUpdateEndDevice.BindData(req.FieldMask.Paths)
+	}
+	select {
+	case <-ctx.Done():
+		t.Errorf("Timed out while waiting for device %s event to be published or Set call to return", action)
+		return nil, nil, false
+
+	case <-reqCtx.Done():
+		if err == nil {
+			t.Errorf("Device %s event was not published", action)
+			return nil, nil, false
+		}
+
+	case ev := <-env.Events:
+		if !a.So(ev.Event, should.ResembleEvent, expectedEvent.New(
+			events.ContextWithCorrelationID(reqCtx, ev.Event.CorrelationIDs()...),
+			events.WithIdentifiers(req.EndDevice.EndDeviceIdentifiers),
+		)) {
+			t.Errorf("Failed to assert device %s event", action)
+			return nil, nil, false
+		}
+		close(ev.Response)
+	}
+
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for Set call to return")
+		return nil, nil, false
+
+	case <-reqCtx.Done():
+		return dev, err, true
+	}
+}
+
+func (env TestEnvironment) AssertGetDevice(ctx context.Context, req *ttnpb.GetEndDeviceRequest, rights ...ttnpb.Right) (*ttnpb.EndDevice, error, bool) {
+	t, a := test.MustNewTFromContext(ctx)
+	t.Helper()
+
+	const (
+		authType  = "Bearer"
+		authValue = "get-key"
+	)
+	var (
+		dev *ttnpb.EndDevice
+		err error
+	)
+	reqCtx, cancel := context.WithCancel(ctx)
+	go func() {
+		dev, err = ttnpb.NewNsEndDeviceRegistryClient(env.ClientConn).Get(
+			reqCtx,
+			req,
+			grpc.PerRPCCredentials(rpcmetadata.MD{
+				AuthType:      authType,
+				AuthValue:     authValue,
+				AllowInsecure: true,
+			}),
+		)
+		cancel()
+	}()
+
+	if !a.So(env.AssertListApplicationRights(reqCtx, req.ApplicationIdentifiers, authType, authValue, rights...), should.BeTrue) {
+		t.Error("ListRights assertion failed")
+		return nil, nil, false
+	}
+
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for Get call to return")
+		return nil, nil, false
+
+	case <-reqCtx.Done():
+		return dev, err, true
+	}
+}
+
 func (env TestEnvironment) AssertResetFactoryDefaults(ctx context.Context, req *ttnpb.ResetAndGetEndDeviceRequest, rights ...ttnpb.Right) (*ttnpb.EndDevice, error, bool) {
 	t, a := test.MustNewTFromContext(ctx)
 	t.Helper()
@@ -568,11 +664,10 @@ func (env TestEnvironment) AssertResetFactoryDefaults(ctx context.Context, req *
 		dev *ttnpb.EndDevice
 		err error
 	)
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
+	reqCtx, cancel := context.WithCancel(ctx)
 	go func() {
 		dev, err = ttnpb.NewNsEndDeviceRegistryClient(env.ClientConn).ResetFactoryDefaults(
-			ctx,
+			reqCtx,
 			req,
 			grpc.PerRPCCredentials(rpcmetadata.MD{
 				AuthType:      authType,
@@ -580,17 +675,22 @@ func (env TestEnvironment) AssertResetFactoryDefaults(ctx context.Context, req *
 				AllowInsecure: true,
 			}),
 		)
-		wg.Done()
+		cancel()
 	}()
-	if !a.So(env.AssertListApplicationRights(ctx, req.ApplicationIdentifiers, authType, authValue, rights...), should.BeTrue) {
+
+	if !a.So(env.AssertListApplicationRights(reqCtx, req.ApplicationIdentifiers, authType, authValue, rights...), should.BeTrue) {
 		t.Error("ListRights assertion failed")
 		return nil, nil, false
 	}
-	if !a.So(test.WaitContext(ctx, wg.Wait), should.BeTrue) {
-		t.Error("Timed out while waiting for Reset call to return")
+
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for ResetFactoryDefaults call to return")
 		return nil, nil, false
+
+	case <-reqCtx.Done():
+		return dev, err, true
 	}
-	return dev, err, true
 }
 
 func (env TestEnvironment) AssertNsAsHandleUplink(ctx context.Context, appID ttnpb.ApplicationIdentifiers, assert func(context.Context, ...*ttnpb.ApplicationUp) bool, err error) bool {
@@ -655,14 +755,6 @@ func MakeDownlinkPathsWithPeerIndex(downlinkPaths []DownlinkPath, peerIdxs ...ui
 		})
 	}
 	return paths
-}
-
-func UintRepeat(v uint, count int) []uint {
-	vs := []uint{}
-	for i := 0; i < count; i++ {
-		vs = append(vs, v)
-	}
-	return vs
 }
 
 func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, paths []DownlinkPathWithPeerIndex, asserts ...func(ctx, reqCtx context.Context, down *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool)) bool {
@@ -820,7 +912,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 			t.Helper()
 
-			fp := FrequencyPlan(conf.FrequencyPlanID)
+			fp := test.FrequencyPlan(conf.FrequencyPlanID)
 			phy := LoRaWANBands[fp.BandID][conf.PHYVersion]
 
 			var downlinkPaths []DownlinkPath
@@ -1013,7 +1105,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 			t.Helper()
 
-			fp := FrequencyPlan(dev.FrequencyPlanID)
+			fp := test.FrequencyPlan(dev.FrequencyPlanID)
 			phy := LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion]
 
 			scheduledDown, ok := env.AssertScheduleDownlink(ctx, DownlinkSchedulingAssertionConfig{
@@ -1339,7 +1431,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 	t, a := test.MustNewTFromContext(ctx)
 	t.Helper()
 
-	fp := FrequencyPlan(conf.Device.FrequencyPlanID)
+	fp := test.FrequencyPlan(conf.Device.FrequencyPlanID)
 	phy := LoRaWANBands[fp.BandID][conf.Device.LoRaWANPHYVersion]
 	upCh := phy.UplinkChannels[conf.ChannelIndex]
 	upDR := phy.DataRates[conf.DataRateIndex].Rate
@@ -1500,7 +1592,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 							keys.NwkSEncKey = keys.FNwkSIntKey
 							keys.SNwkSIntKey = keys.FNwkSIntKey
 						}
-						return *CopySessionKeys(&keys)
+						return keys
 					}(),
 					CorrelationIDs: joinResp.CorrelationIDs,
 				},
@@ -1757,82 +1849,6 @@ func DownlinkProtoPaths(paths ...DownlinkPath) (pbs []*ttnpb.DownlinkPath) {
 	return pbs
 }
 
-func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, bool) {
-	t, a := test.MustNewTFromContext(ctx)
-	t.Helper()
-
-	listRightsCh := make(chan test.ApplicationAccessListRightsRequest)
-	defer func() {
-		close(listRightsCh)
-	}()
-
-	var dev *ttnpb.EndDevice
-	var err error
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		dev, err = ttnpb.NewNsEndDeviceRegistryClient(env.ClientConn).Set(
-			ctx,
-			req,
-			grpc.PerRPCCredentials(rpcmetadata.MD{
-				AuthType:      "Bearer",
-				AuthValue:     "set-key",
-				AllowInsecure: true,
-			}),
-		)
-		wg.Done()
-	}()
-
-	var reqCIDs []string
-	if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
-		func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
-			_, a := test.MustNewTFromContext(ctx)
-			reqCIDs = events.CorrelationIDsFromContext(reqCtx)
-			return test.ClusterGetPeerResponse{
-					Peer: NewISPeer(ctx, &test.MockApplicationAccessServer{
-						ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
-					}),
-				}, test.AllTrue(
-					a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS),
-					a.So(ids, should.BeNil),
-				)
-		}), should.BeTrue) {
-		return nil, false
-	}
-	a.So(reqCIDs, should.HaveLength, 1)
-
-	if !a.So(test.AssertListRightsRequest(ctx, listRightsCh,
-		func(ctx, reqCtx context.Context, ids ttnpb.Identifiers) bool {
-			_, a := test.MustNewTFromContext(ctx)
-			md := rpcmetadata.FromIncomingContext(reqCtx)
-			return a.So(md.AuthType, should.Equal, "Bearer") &&
-				a.So(md.AuthValue, should.Equal, "set-key") &&
-				a.So(ids, should.Resemble, &req.EndDevice.ApplicationIdentifiers)
-		}, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-	), should.BeTrue) {
-		return nil, false
-	}
-
-	ev := EvtCreateEndDevice.BindData(nil)
-	if !create {
-		ev = EvtUpdateEndDevice.BindData(nil)
-	}
-	if !a.So(env.Events, should.ReceiveEventResembling, ev.New(events.ContextWithCorrelationID(test.Context(), reqCIDs...), events.WithIdentifiers(req.EndDevice.EndDeviceIdentifiers))) {
-		if create {
-			t.Error("Failed to assert end device create event")
-		} else {
-			t.Error("Failed to assert end device update event")
-		}
-		return nil, false
-	}
-
-	if !a.So(test.WaitContext(ctx, wg.Wait), should.BeTrue) {
-		t.Error("Timed out while waiting for device to be set")
-		return nil, false
-	}
-	return dev, a.So(err, should.BeNil)
-}
-
 func StartTaskExclude(names ...string) component.StartTaskFunc {
 	if !sort.StringsAreSorted(names) {
 		panic("names must be sorted alphabetically")
@@ -1886,6 +1902,7 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 				},
 			}, nil
 		}),
+		component.WithGRPCLogger(log.Noop),
 	}
 	if conf.TaskStarter != nil {
 		cmpOpts = append(cmpOpts, component.WithTaskStarter(conf.TaskStarter))
@@ -1992,19 +2009,144 @@ func LogEvents(t *testing.T, ch <-chan test.EventPubSubPublishRequest) {
 	}
 }
 
-func MustCreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, context.Context) {
-	dev, ctx, err := CreateDevice(ctx, r, dev, paths...)
-	test.Must(nil, err)
-	return dev, ctx
+var MACStateOptions = test.MACStateOptions
+
+func MakeMACState(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, opts ...test.MACStateOption) *ttnpb.MACState {
+	v := MACStateOptions.Compose(opts...)(*test.Must(mac.NewState(dev, test.FrequencyPlanStore, defaults)).(*ttnpb.MACState))
+	return &v
 }
 
-func MustGetDeviceByID(ctx context.Context, r DeviceRegistry, appID ttnpb.ApplicationIdentifiers, devID string, paths ...string) (*ttnpb.EndDevice, context.Context) {
-	if len(paths) == 0 {
-		paths = ttnpb.EndDeviceFieldPathsTopLevel
+type SessionOptionNamespace struct{ test.SessionOptionNamespace }
+
+func (o SessionOptionNamespace) WithDefaultQueuedApplicationDownlinks() test.SessionOption {
+	return func(x ttnpb.Session) ttnpb.Session {
+		x.QueuedApplicationDownlinks = DefaultApplicationDownlinkQueue[:]
+		return x
 	}
-	dev, ctx, err := r.GetByID(ctx, appID, devID, paths)
-	test.Must(nil, err)
-	return dev, ctx
+}
+
+var SessionOptions SessionOptionNamespace
+
+func MakeSession(macVersion ttnpb.MACVersion, wrapKeys bool, opts ...test.SessionOption) *ttnpb.Session {
+	return test.MakeSession(
+		SessionOptions.WithSessionKeys(*MakeSessionKeys(macVersion, wrapKeys)),
+		SessionOptions.Compose(opts...),
+	)
+}
+
+type EndDeviceOptionNamespace struct{ test.EndDeviceOptionNamespace }
+
+func (o EndDeviceOptionNamespace) Activate(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts ...test.MACStateOption) test.EndDeviceOption {
+	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+		macState := MakeMACState(&x, defaults, macStateOpts...)
+		ses := MakeSession(macState.LoRaWANVersion, wrapKeys, sessionOpts...)
+		return o.Compose(
+			o.WithMACState(macState),
+			o.WithSession(ses),
+			o.WithEndDeviceIdentifiersOptions(
+				test.EndDeviceIdentifiersOptions.WithDevAddr(&ses.DevAddr),
+			),
+		)(x)
+	}
+}
+
+var EndDeviceOptions EndDeviceOptionNamespace
+
+func MakeEndDevice(opts ...test.EndDeviceOption) *ttnpb.EndDevice {
+	return test.MakeEndDevice(
+		EndDeviceOptions.WithDefaultFrequencyPlanID(),
+		EndDeviceOptions.WithDefaultLoRaWANVersion(),
+		EndDeviceOptions.WithDefaultLoRaWANPHYVersion(),
+		EndDeviceOptions.Compose(opts...),
+	)
+}
+
+func MakeOTAAEndDevice(opts ...test.EndDeviceOption) *ttnpb.EndDevice {
+	return MakeEndDevice(
+		EndDeviceOptions.WithDefaultJoinEUI(),
+		EndDeviceOptions.WithDefaultDevEUI(),
+		EndDeviceOptions.WithSupportsJoin(true),
+		EndDeviceOptions.Compose(opts...),
+	)
+}
+
+func MakeABPEndDevice(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, opts ...test.EndDeviceOption) *ttnpb.EndDevice {
+	return MakeEndDevice(
+		EndDeviceOptions.Compose(opts...),
+		func(x ttnpb.EndDevice) ttnpb.EndDevice {
+			if x.Multicast || x.DevEUI != nil && !x.DevEUI.IsZero() || !x.LoRaWANVersion.RequireDevEUIForABP() {
+				return x
+			}
+			return EndDeviceOptions.WithDefaultDevEUI()(x)
+		},
+		EndDeviceOptions.Activate(defaults, wrapKeys, sessionOpts, macStateOpts...),
+	)
+}
+
+func MakeMulticastEndDevice(class ttnpb.Class, defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, opts ...test.EndDeviceOption) *ttnpb.EndDevice {
+	return MakeABPEndDevice(defaults, wrapKeys, sessionOpts, macStateOpts,
+		EndDeviceOptions.WithMulticast(true),
+		func() test.EndDeviceOption {
+			switch class {
+			case ttnpb.CLASS_B:
+				return EndDeviceOptions.WithSupportsClassB(true)
+			case ttnpb.CLASS_C:
+				return EndDeviceOptions.WithSupportsClassC(true)
+			default:
+				panic(fmt.Sprintf("invalid multicast device class: %v", class))
+			}
+		}(),
+		EndDeviceOptions.Compose(opts...),
+	)
+}
+
+func MakeEndDevicePaths(paths ...string) []string {
+	return ttnpb.AddFields([]string{
+		"frequency_plan_id",
+		"ids.application_ids",
+		"ids.device_id",
+		"lorawan_phy_version",
+		"lorawan_version",
+	},
+		paths...,
+	)
+}
+
+func MakeOTAAEndDevicePaths(paths ...string) []string {
+	return MakeEndDevicePaths(append([]string{
+		"ids.dev_eui",
+		"ids.join_eui",
+		"supports_join",
+	}, paths...)...)
+}
+
+func MakeABPEndDevicePaths(withDevEUI bool, paths ...string) []string {
+	if withDevEUI {
+		paths = append([]string{
+			"ids.dev_eui",
+		}, paths...)
+	}
+	return MakeEndDevicePaths(append([]string{
+		"mac_state.lorawan_version",
+		"session.keys.f_nwk_s_int_key.key",
+		"session.keys.nwk_s_int.key",
+		"session.keys.s_nwk_s_int_key.key",
+		"session.keys.session_key_id",
+	}, paths...)...)
+}
+
+func MakeMulticastEndDevicePaths(supportsClassB, supportsClassC bool, paths ...string) []string {
+	if supportsClassB {
+		paths = append([]string{
+			"supports_class_b",
+		}, paths...)
+	}
+	if supportsClassC {
+		paths = append([]string{
+			"supports_class_c",
+		}, paths...)
+	}
+	return MakeABPEndDevicePaths(false, paths...)
 }
 
 type SetDeviceRequest struct {
@@ -2012,21 +2154,48 @@ type SetDeviceRequest struct {
 	Paths []string
 }
 
+func MakeSetDeviceRequest(deviceOpts []test.EndDeviceOption, paths ...string) *SetDeviceRequest {
+	return &SetDeviceRequest{
+		EndDevice: MakeEndDevice(deviceOpts...),
+		Paths:     MakeEndDevicePaths(paths...),
+	}
+}
+
+func MakeOTAASetDeviceRequest(deviceOpts []test.EndDeviceOption, paths ...string) *SetDeviceRequest {
+	return &SetDeviceRequest{
+		EndDevice: MakeOTAAEndDevice(deviceOpts...),
+		Paths:     MakeOTAAEndDevicePaths(paths...),
+	}
+}
+
+func MakeABPSetDeviceRequest(defaults ttnpb.MACSettings, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, deviceOpts []test.EndDeviceOption, paths ...string) *SetDeviceRequest {
+	dev := MakeABPEndDevice(defaults, false, sessionOpts, macStateOpts, deviceOpts...)
+	return &SetDeviceRequest{
+		EndDevice: dev,
+		Paths:     MakeABPEndDevicePaths(!dev.Multicast && dev.LoRaWANVersion.RequireDevEUIForABP(), paths...),
+	}
+}
+
+func MakeMulticastSetDeviceRequest(class ttnpb.Class, defaults ttnpb.MACSettings, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, deviceOpts []test.EndDeviceOption, paths ...string) *SetDeviceRequest {
+	dev := MakeMulticastEndDevice(class, defaults, false, sessionOpts, macStateOpts, deviceOpts...)
+	return &SetDeviceRequest{
+		EndDevice: dev,
+		Paths:     MakeMulticastEndDevicePaths(dev.SupportsClassB, dev.SupportsClassC, paths...),
+	}
+}
+
 type ContextualEndDevice struct {
 	context.Context
 	*ttnpb.EndDevice
 }
 
-func MustCreateDevices(ctx context.Context, r DeviceRegistry, devs ...SetDeviceRequest) []*ContextualEndDevice {
-	var setDevices []*ContextualEndDevice
-	for _, dev := range devs {
-		set, ctx := MustCreateDevice(ctx, r, dev.EndDevice, dev.Paths...)
-		setDevices = append(setDevices, &ContextualEndDevice{
-			Context:   ctx,
-			EndDevice: set,
-		})
-	}
-	return setDevices
+func MustCreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, context.Context) {
+	dev, ctx, err := CreateDevice(ctx, r, dev, ttnpb.ExcludeFields(ttnpb.EndDeviceFieldPathsTopLevel,
+		"created_at",
+		"updated_at",
+	)...)
+	test.Must(nil, err)
+	return dev, ctx
 }
 
 var _ DownlinkTaskQueue = MockDownlinkTaskQueue{}

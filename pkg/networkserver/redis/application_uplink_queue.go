@@ -16,11 +16,11 @@ package redis
 
 import (
 	"context"
-	"time"
 
 	"github.com/go-redis/redis/v8"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"

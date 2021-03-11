@@ -16,12 +16,12 @@ package networkserver
 
 import (
 	"context"
-	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/internal/registry"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )

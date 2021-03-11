@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -28,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
