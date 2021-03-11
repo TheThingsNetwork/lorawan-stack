@@ -23,6 +23,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Downlink queue operations on ABP devices not working under specific circumstances.
+
 ### Security
 
 ## [3.11.2] - 2021-03-05

@@ -328,6 +328,7 @@ func (as *ApplicationServer) skipPayloadCrypto(ctx context.Context, link *ttnpb.
 var (
 	errDeviceNotFound  = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
 	errNoDeviceSession = errors.DefineFailedPrecondition("no_device_session", "no device session; check device activation")
+	errRebuild         = errors.DefineAborted("rebuild", "could not rebuild device session; check device address")
 )
 
 // buildSessionsFromError attempts to rebuild the end device session and pending session based on the error
@@ -370,21 +371,27 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 	}
 
 	var mask []string
-	if len(diagnostics.SessionKeyID) > 0 {
-		session, err := reconstructSession(diagnostics.SessionKeyID, diagnostics.DevAddr, diagnostics.MinFCntDown)
-		if err != nil {
-			return nil, err
+	if diagnostics.DevAddr != nil {
+		switch {
+		case len(diagnostics.SessionKeyID) > 0:
+			session, err := reconstructSession(diagnostics.SessionKeyID, diagnostics.DevAddr, diagnostics.MinFCntDown)
+			if err != nil {
+				return nil, err
+			}
+			dev.Session = session
+			dev.DevAddr = &session.DevAddr
+		case dev.Session != nil && dev.Session.DevAddr.Equal(*diagnostics.DevAddr):
+			dev.Session.LastAFCntDown = diagnostics.MinFCntDown
+		default:
+			return nil, errRebuild.New()
 		}
-		dev.Session = session
-		dev.DevAddr = &session.DevAddr
-
 	} else {
 		dev.Session = nil
 		dev.DevAddr = nil
 	}
 	mask = append(mask, "session", "ids.dev_addr")
 
-	if len(diagnostics.PendingSessionKeyID) > 0 {
+	if diagnostics.PendingDevAddr != nil {
 		session, err := reconstructSession(diagnostics.PendingSessionKeyID, diagnostics.PendingDevAddr, diagnostics.PendingMinFCntDown)
 		if err != nil {
 			return nil, err
@@ -492,7 +499,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 				}
 				_, err = op(client, ctx, req, as.WithClusterAuth())
 				if err != nil {
-					if attempt >= maxDownlinkQueueOperationAttempts {
+					if attempt >= maxDownlinkQueueOperationAttempts || as.skipPayloadCrypto(ctx, link, dev, nil) {
 						return nil, nil, err
 					}
 
@@ -1124,11 +1131,11 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 			switch {
 			case len(invalid.SessionKeyID) > 0:
 				sessionKeyID = invalid.SessionKeyID
-			case len(invalid.Downlinks) > 0 && len(invalid.Downlinks[0].SessionKeyID) > 0:
+			case len(invalid.Downlinks) > 0:
 				sessionKeyID = invalid.Downlinks[0].SessionKeyID
-			case dev.Session != nil && len(dev.Session.SessionKeyID) > 0:
+			case dev.Session != nil:
 				sessionKeyID = dev.Session.SessionKeyID
-			case dev.PendingSession != nil && len(dev.PendingSession.SessionKeyID) > 0:
+			case dev.PendingSession != nil:
 				sessionKeyID = dev.PendingSession.SessionKeyID
 			default:
 				return nil, nil, errNoDeviceSession.WithAttributes("device_uid", unique.ID(ctx, ids))

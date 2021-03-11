@@ -2384,6 +2384,15 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:rebuild": {
+    "translations": {
+      "en": "could not rebuild device session; check device address"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
   "error:pkg/applicationserver:unknown_session": {
     "translations": {
       "en": "unknown session"
