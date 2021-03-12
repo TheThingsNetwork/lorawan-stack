@@ -70,7 +70,7 @@ const defaultValues = {
   },
 }
 
-const LoRaCloudForm = () => {
+const LoRaCloudDASForm = () => {
   const [error, setError] = useState('')
   const appId = useSelector(selectSelectedApplicationId)
   const selector = ['data']
@@ -144,4 +144,4 @@ const LoRaCloudForm = () => {
   )
 }
 
-export default LoRaCloudForm
+export default LoRaCloudDASForm
