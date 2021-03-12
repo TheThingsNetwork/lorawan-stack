@@ -36,12 +36,13 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import {
   setAppPkgDefaultAssoc,
   getAppPkgDefaultAssoc,
+  deleteAppPkgDefaultAssoc,
 } from '@console/store/actions/application-packages'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import {
   selectApplicationPackageDefaultAssociation,
-  selectApplicationPackagesError,
+  selectGetApplicationPackagesError,
 } from '@console/store/selectors/application-packages'
 
 const m = defineMessages({
@@ -70,29 +71,33 @@ const defaultValues = {
   },
 }
 
+const promisifiedSetAppPkgDefaultAssoc = attachPromise(setAppPkgDefaultAssoc)
+const promisifiedDeleteAppPkgDefaultAssoc = attachPromise(deleteAppPkgDefaultAssoc)
+
 const LoRaCloudDASForm = () => {
   const [error, setError] = useState('')
   const appId = useSelector(selectSelectedApplicationId)
   const selector = ['data']
 
   const dispatch = useDispatch()
-  const defaultAssociation = useSelector(selectApplicationPackageDefaultAssociation)
-  const packageError = useSelector(selectApplicationPackagesError)
+  const defaultAssociation = useSelector(state =>
+    selectApplicationPackageDefaultAssociation(state, LORA_CLOUD_DAS.DEFAULT_PORT),
+  )
+  const packageError = useSelector(selectGetApplicationPackagesError)
   const initialValues = validationSchema.cast(defaultAssociation || defaultValues)
 
   const handleSubmit = useCallback(
     async values => {
       try {
-        const result = await dispatch(
-          attachPromise(setAppPkgDefaultAssoc)(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
+        await dispatch(
+          promisifiedSetAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
             package_name: LORA_CLOUD_DAS.DEFAULT_PACKAGE_NAME,
             ...values,
           }),
         )
-        const deleted = Boolean(!result.data.token)
         toast({
           title: 'LoRa Cloud',
-          message: deleted ? m.tokenDeleted : m.tokenUpdated,
+          message: m.tokenUpdated,
           type: toast.types.SUCCESS,
         })
       } catch (error) {
@@ -102,9 +107,22 @@ const LoRaCloudDASForm = () => {
     [appId, dispatch],
   )
 
-  const handleDelete = useCallback(async () => await handleSubmit({ data: { token: '' } }), [
-    handleSubmit,
-  ])
+  const handleDelete = useCallback(async () => {
+    try {
+      await dispatch(
+        promisifiedDeleteAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
+          package_name: LORA_CLOUD_DAS.DEFAULT_PACKAGE_NAME,
+        }),
+      )
+      toast({
+        title: 'LoRa Cloud',
+        message: m.tokenDeleted,
+        type: toast.types.SUCCESS,
+      })
+    } catch (error) {
+      setError(error)
+    }
+  }, [appId, dispatch])
 
   if (packageError && !isNotFoundError(packageError)) {
     throw error
