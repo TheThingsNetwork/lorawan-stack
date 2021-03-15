@@ -18,11 +18,17 @@ import (
 	"encoding"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"reflect"
+	"sort"
+	"strings"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -79,6 +85,18 @@ func TestStringers(t *testing.T) {
 func TestEnumMarshalers(t *testing.T) {
 	var vals [][]fmt.Stringer
 
+	var mTypes []fmt.Stringer
+	for i := range MType_name {
+		mTypes = append(mTypes, MType(i))
+	}
+	vals = append(vals, mTypes)
+
+	var majors []fmt.Stringer
+	for i := range Major_name {
+		majors = append(majors, Major(i))
+	}
+	vals = append(vals, majors)
+
 	var macVers []fmt.Stringer
 	for i := range MACVersion_name {
 		macVers = append(macVers, MACVersion(i))
@@ -90,6 +108,102 @@ func TestEnumMarshalers(t *testing.T) {
 		phyVers = append(phyVers, PHYVersion(i))
 	}
 	vals = append(vals, phyVers)
+
+	var drIdxs []fmt.Stringer
+	for i := range DataRateIndex_name {
+		drIdxs = append(drIdxs, DataRateIndex(i))
+	}
+	vals = append(vals, drIdxs)
+
+	var rejoins []fmt.Stringer
+	for i := range RejoinType_name {
+		rejoins = append(rejoins, RejoinType(i))
+	}
+	vals = append(vals, rejoins)
+
+	var cfLists []fmt.Stringer
+	for i := range CFListType_name {
+		cfLists = append(cfLists, CFListType(i))
+	}
+	vals = append(vals, cfLists)
+
+	var classes []fmt.Stringer
+	for i := range Class_name {
+		classes = append(classes, Class(i))
+	}
+	vals = append(vals, classes)
+
+	var txSchedulePrios []fmt.Stringer
+	for i := range TxSchedulePriority_name {
+		txSchedulePrios = append(txSchedulePrios, TxSchedulePriority(i))
+	}
+	vals = append(vals, txSchedulePrios)
+
+	var cids []fmt.Stringer
+	for i := range MACCommandIdentifier_name {
+		cids = append(cids, MACCommandIdentifier(i))
+	}
+	vals = append(vals, cids)
+
+	var dutyCycles []fmt.Stringer
+	for i := range AggregatedDutyCycle_name {
+		dutyCycles = append(dutyCycles, AggregatedDutyCycle(i))
+	}
+	vals = append(vals, dutyCycles)
+
+	var pingSlots []fmt.Stringer
+	for i := range PingSlotPeriod_name {
+		pingSlots = append(pingSlots, PingSlotPeriod(i))
+	}
+	vals = append(vals, pingSlots)
+
+	var rejoinCounts []fmt.Stringer
+	for i := range RejoinCountExponent_name {
+		rejoinCounts = append(rejoinCounts, RejoinCountExponent(i))
+	}
+	vals = append(vals, rejoinCounts)
+
+	var rejoinTimes []fmt.Stringer
+	for i := range RejoinTimeExponent_name {
+		rejoinTimes = append(rejoinTimes, RejoinTimeExponent(i))
+	}
+	vals = append(vals, rejoinTimes)
+
+	var rejoinPeriods []fmt.Stringer
+	for i := range RejoinPeriodExponent_name {
+		rejoinPeriods = append(rejoinPeriods, RejoinPeriodExponent(i))
+	}
+	vals = append(vals, rejoinPeriods)
+
+	var deviceEIRPs []fmt.Stringer
+	for i := range DeviceEIRP_name {
+		deviceEIRPs = append(deviceEIRPs, DeviceEIRP(i))
+	}
+	vals = append(vals, deviceEIRPs)
+
+	var ackLimitExponents []fmt.Stringer
+	for i := range ADRAckLimitExponent_name {
+		ackLimitExponents = append(ackLimitExponents, ADRAckLimitExponent(i))
+	}
+	vals = append(vals, ackLimitExponents)
+
+	var ackDelayExponents []fmt.Stringer
+	for i := range ADRAckDelayExponent_name {
+		ackDelayExponents = append(ackDelayExponents, ADRAckDelayExponent(i))
+	}
+	vals = append(vals, ackDelayExponents)
+
+	var rxDelays []fmt.Stringer
+	for i := range RxDelay_name {
+		rxDelays = append(rxDelays, RxDelay(i))
+	}
+	vals = append(vals, rxDelays)
+
+	var minors []fmt.Stringer
+	for i := range Minor_name {
+		minors = append(minors, Minor(i))
+	}
+	vals = append(vals, minors)
 
 	var grants []fmt.Stringer
 	for i := range GrantType_name {
@@ -121,6 +235,7 @@ func TestEnumMarshalers(t *testing.T) {
 	}
 	vals = append(vals, rights)
 
+	var outLines []string
 	for _, vs := range vals {
 		typ := reflect.TypeOf(vs[0])
 		newV := func() interface{} { return reflect.New(typ).Interface() }
@@ -135,8 +250,12 @@ func TestEnumMarshalers(t *testing.T) {
 				t.Run(v.String(), func(t *testing.T) {
 					if m, ok := v.(encoding.TextMarshaler); ok {
 						t.Run("Text", func(t *testing.T) {
+							a := assertions.New(t)
 							b, err := m.MarshalText()
-							a.So(err, should.BeNil)
+							if !a.So(err, should.BeNil) {
+								t.Error(test.FormatError(err))
+							}
+							outLines = append(outLines, fmt.Sprintf(`Text: %s "%s" -> "%s"`, typ, v, b))
 
 							got, ok := newV().(encoding.TextUnmarshaler)
 							if !ok {
@@ -149,15 +268,21 @@ func TestEnumMarshalers(t *testing.T) {
 
 							got = newV().(encoding.TextUnmarshaler)
 							err = got.UnmarshalText([]byte(v.(fmt.Stringer).String()))
-							a.So(err, should.BeNil)
+							if !a.So(err, should.BeNil) {
+								t.Error(test.FormatError(err))
+							}
 							a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
 						})
 					}
 
 					if m, ok := v.(encoding.BinaryMarshaler); ok {
 						t.Run("Binary", func(t *testing.T) {
+							a := assertions.New(t)
 							b, err := m.MarshalBinary()
-							a.So(err, should.BeNil)
+							if !a.So(err, should.BeNil) {
+								t.Error(test.FormatError(err))
+							}
+							outLines = append(outLines, fmt.Sprintf(`Binary: %s "%s" -> %v`, typ, v, b))
 
 							got, ok := newV().(encoding.BinaryUnmarshaler)
 							if !ok {
@@ -165,15 +290,21 @@ func TestEnumMarshalers(t *testing.T) {
 							}
 
 							err = got.UnmarshalBinary(b)
-							a.So(err, should.BeNil)
+							if !a.So(err, should.BeNil) {
+								t.Error(test.FormatError(err))
+							}
 							a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
 						})
 					}
 
 					if m, ok := v.(json.Marshaler); ok {
 						t.Run("JSON", func(t *testing.T) {
+							a := assertions.New(t)
 							b, err := m.MarshalJSON()
-							a.So(err, should.BeNil)
+							if !a.So(err, should.BeNil) {
+								t.Error(test.FormatError(err))
+							}
+							outLines = append(outLines, fmt.Sprintf(`JSON: %s "%s" -> "%s"`, typ, v, b))
 
 							got, ok := newV().(json.Unmarshaler)
 							if !ok {
@@ -181,12 +312,32 @@ func TestEnumMarshalers(t *testing.T) {
 							}
 
 							err = got.UnmarshalJSON(b)
-							a.So(err, should.BeNil)
+							if !a.So(err, should.BeNil) {
+								t.Error(test.FormatError(err))
+							}
 							a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
 						})
 					}
 				})
 			}
 		})
+	}
+
+	if t.Failed() {
+		return
+	}
+	sort.Strings(outLines)
+	out := strings.Join(outLines, "\n")
+	goldenPath := filepath.Join("testdata", "ttnpb_encoding_golden")
+	if os.Getenv("TEST_WRITE_GOLDEN") == "1" {
+		if err := ioutil.WriteFile(goldenPath, []byte(out), 0o644); err != nil {
+			t.Fatalf("Failed to write golden file: %s", err)
+		}
+	} else {
+		prevOut, err := ioutil.ReadFile(goldenPath)
+		if err != nil {
+			t.Fatalf("Failed to read golden file: %s", err)
+		}
+		assertions.New(t).So(out, should.Resemble, string(prevOut))
 	}
 }
