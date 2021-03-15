@@ -67,6 +67,22 @@ Binary: ttnpb.DataRateIndex "6" -> [6]
 Binary: ttnpb.DataRateIndex "7" -> [7]
 Binary: ttnpb.DataRateIndex "8" -> [8]
 Binary: ttnpb.DataRateIndex "9" -> [9]
+Binary: ttnpb.DataRateIndexValue "{0 {} 0}" -> [0]
+Binary: ttnpb.DataRateIndexValue "{1 {} 0}" -> [1]
+Binary: ttnpb.DataRateIndexValue "{10 {} 0}" -> [10]
+Binary: ttnpb.DataRateIndexValue "{11 {} 0}" -> [11]
+Binary: ttnpb.DataRateIndexValue "{12 {} 0}" -> [12]
+Binary: ttnpb.DataRateIndexValue "{13 {} 0}" -> [13]
+Binary: ttnpb.DataRateIndexValue "{14 {} 0}" -> [14]
+Binary: ttnpb.DataRateIndexValue "{15 {} 0}" -> [15]
+Binary: ttnpb.DataRateIndexValue "{2 {} 0}" -> [2]
+Binary: ttnpb.DataRateIndexValue "{3 {} 0}" -> [3]
+Binary: ttnpb.DataRateIndexValue "{4 {} 0}" -> [4]
+Binary: ttnpb.DataRateIndexValue "{5 {} 0}" -> [5]
+Binary: ttnpb.DataRateIndexValue "{6 {} 0}" -> [6]
+Binary: ttnpb.DataRateIndexValue "{7 {} 0}" -> [7]
+Binary: ttnpb.DataRateIndexValue "{8 {} 0}" -> [8]
+Binary: ttnpb.DataRateIndexValue "{9 {} 0}" -> [9]
 Binary: ttnpb.DataRateOffset "0" -> [0]
 Binary: ttnpb.DataRateOffset "1" -> [1]
 Binary: ttnpb.DataRateOffset "2" -> [2]
@@ -75,6 +91,14 @@ Binary: ttnpb.DataRateOffset "4" -> [4]
 Binary: ttnpb.DataRateOffset "5" -> [5]
 Binary: ttnpb.DataRateOffset "6" -> [6]
 Binary: ttnpb.DataRateOffset "7" -> [7]
+Binary: ttnpb.DataRateOffsetValue "{0 {} 0}" -> [0]
+Binary: ttnpb.DataRateOffsetValue "{1 {} 0}" -> [1]
+Binary: ttnpb.DataRateOffsetValue "{2 {} 0}" -> [2]
+Binary: ttnpb.DataRateOffsetValue "{3 {} 0}" -> [3]
+Binary: ttnpb.DataRateOffsetValue "{4 {} 0}" -> [4]
+Binary: ttnpb.DataRateOffsetValue "{5 {} 0}" -> [5]
+Binary: ttnpb.DataRateOffsetValue "{6 {} 0}" -> [6]
+Binary: ttnpb.DataRateOffsetValue "{7 {} 0}" -> [7]
 Binary: ttnpb.DeviceEIRP "DEVICE_EIRP_10" -> [1]
 Binary: ttnpb.DeviceEIRP "DEVICE_EIRP_12" -> [2]
 Binary: ttnpb.DeviceEIRP "DEVICE_EIRP_13" -> [3]
@@ -242,6 +266,22 @@ JSON: ttnpb.DataRateIndex "6" -> "6"
 JSON: ttnpb.DataRateIndex "7" -> "7"
 JSON: ttnpb.DataRateIndex "8" -> "8"
 JSON: ttnpb.DataRateIndex "9" -> "9"
+JSON: ttnpb.DataRateIndexValue "{0 {} 0}" -> "0"
+JSON: ttnpb.DataRateIndexValue "{1 {} 0}" -> "1"
+JSON: ttnpb.DataRateIndexValue "{10 {} 0}" -> "10"
+JSON: ttnpb.DataRateIndexValue "{11 {} 0}" -> "11"
+JSON: ttnpb.DataRateIndexValue "{12 {} 0}" -> "12"
+JSON: ttnpb.DataRateIndexValue "{13 {} 0}" -> "13"
+JSON: ttnpb.DataRateIndexValue "{14 {} 0}" -> "14"
+JSON: ttnpb.DataRateIndexValue "{15 {} 0}" -> "15"
+JSON: ttnpb.DataRateIndexValue "{2 {} 0}" -> "2"
+JSON: ttnpb.DataRateIndexValue "{3 {} 0}" -> "3"
+JSON: ttnpb.DataRateIndexValue "{4 {} 0}" -> "4"
+JSON: ttnpb.DataRateIndexValue "{5 {} 0}" -> "5"
+JSON: ttnpb.DataRateIndexValue "{6 {} 0}" -> "6"
+JSON: ttnpb.DataRateIndexValue "{7 {} 0}" -> "7"
+JSON: ttnpb.DataRateIndexValue "{8 {} 0}" -> "8"
+JSON: ttnpb.DataRateIndexValue "{9 {} 0}" -> "9"
 JSON: ttnpb.DataRateOffset "0" -> "0"
 JSON: ttnpb.DataRateOffset "1" -> "1"
 JSON: ttnpb.DataRateOffset "2" -> "2"
@@ -250,6 +290,14 @@ JSON: ttnpb.DataRateOffset "4" -> "4"
 JSON: ttnpb.DataRateOffset "5" -> "5"
 JSON: ttnpb.DataRateOffset "6" -> "6"
 JSON: ttnpb.DataRateOffset "7" -> "7"
+JSON: ttnpb.DataRateOffsetValue "{0 {} 0}" -> "0"
+JSON: ttnpb.DataRateOffsetValue "{1 {} 0}" -> "1"
+JSON: ttnpb.DataRateOffsetValue "{2 {} 0}" -> "2"
+JSON: ttnpb.DataRateOffsetValue "{3 {} 0}" -> "3"
+JSON: ttnpb.DataRateOffsetValue "{4 {} 0}" -> "4"
+JSON: ttnpb.DataRateOffsetValue "{5 {} 0}" -> "5"
+JSON: ttnpb.DataRateOffsetValue "{6 {} 0}" -> "6"
+JSON: ttnpb.DataRateOffsetValue "{7 {} 0}" -> "7"
 Text: ttnpb.ADRAckDelayExponent "ADR_ACK_DELAY_1" -> "ADR_ACK_DELAY_1"
 Text: ttnpb.ADRAckDelayExponent "ADR_ACK_DELAY_1024" -> "ADR_ACK_DELAY_1024"
 Text: ttnpb.ADRAckDelayExponent "ADR_ACK_DELAY_128" -> "ADR_ACK_DELAY_128"
@@ -319,6 +367,22 @@ Text: ttnpb.DataRateIndex "6" -> "6"
 Text: ttnpb.DataRateIndex "7" -> "7"
 Text: ttnpb.DataRateIndex "8" -> "8"
 Text: ttnpb.DataRateIndex "9" -> "9"
+Text: ttnpb.DataRateIndexValue "{0 {} 0}" -> "0"
+Text: ttnpb.DataRateIndexValue "{1 {} 0}" -> "1"
+Text: ttnpb.DataRateIndexValue "{10 {} 0}" -> "10"
+Text: ttnpb.DataRateIndexValue "{11 {} 0}" -> "11"
+Text: ttnpb.DataRateIndexValue "{12 {} 0}" -> "12"
+Text: ttnpb.DataRateIndexValue "{13 {} 0}" -> "13"
+Text: ttnpb.DataRateIndexValue "{14 {} 0}" -> "14"
+Text: ttnpb.DataRateIndexValue "{15 {} 0}" -> "15"
+Text: ttnpb.DataRateIndexValue "{2 {} 0}" -> "2"
+Text: ttnpb.DataRateIndexValue "{3 {} 0}" -> "3"
+Text: ttnpb.DataRateIndexValue "{4 {} 0}" -> "4"
+Text: ttnpb.DataRateIndexValue "{5 {} 0}" -> "5"
+Text: ttnpb.DataRateIndexValue "{6 {} 0}" -> "6"
+Text: ttnpb.DataRateIndexValue "{7 {} 0}" -> "7"
+Text: ttnpb.DataRateIndexValue "{8 {} 0}" -> "8"
+Text: ttnpb.DataRateIndexValue "{9 {} 0}" -> "9"
 Text: ttnpb.DataRateOffset "0" -> "0"
 Text: ttnpb.DataRateOffset "1" -> "1"
 Text: ttnpb.DataRateOffset "2" -> "2"
@@ -327,6 +391,14 @@ Text: ttnpb.DataRateOffset "4" -> "4"
 Text: ttnpb.DataRateOffset "5" -> "5"
 Text: ttnpb.DataRateOffset "6" -> "6"
 Text: ttnpb.DataRateOffset "7" -> "7"
+Text: ttnpb.DataRateOffsetValue "{0 {} 0}" -> "0"
+Text: ttnpb.DataRateOffsetValue "{1 {} 0}" -> "1"
+Text: ttnpb.DataRateOffsetValue "{2 {} 0}" -> "2"
+Text: ttnpb.DataRateOffsetValue "{3 {} 0}" -> "3"
+Text: ttnpb.DataRateOffsetValue "{4 {} 0}" -> "4"
+Text: ttnpb.DataRateOffsetValue "{5 {} 0}" -> "5"
+Text: ttnpb.DataRateOffsetValue "{6 {} 0}" -> "6"
+Text: ttnpb.DataRateOffsetValue "{7 {} 0}" -> "7"
 Text: ttnpb.DeviceEIRP "DEVICE_EIRP_10" -> "DEVICE_EIRP_10"
 Text: ttnpb.DeviceEIRP "DEVICE_EIRP_12" -> "DEVICE_EIRP_12"
 Text: ttnpb.DeviceEIRP "DEVICE_EIRP_13" -> "DEVICE_EIRP_13"
