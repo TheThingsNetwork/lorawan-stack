@@ -130,6 +130,18 @@ func (v *DataRateIndexValue) FieldIsZero(p string) bool {
 }
 
 // FieldIsZero returns whether path p is zero.
+func (v *DataRateOffsetValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
 func (v *RxDelayValue) FieldIsZero(p string) bool {
 	if v == nil {
 		return true
@@ -154,6 +166,30 @@ func (v *PingSlotPeriodValue) FieldIsZero(p string) bool {
 }
 
 // FieldIsZero returns whether path p is zero.
+func (v *BoolValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return !v.Value
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *FrequencyValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
 func (v *MACSettings) FieldIsZero(p string) bool {
 	if v == nil {
 		return true
@@ -163,6 +199,8 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.ADRMargin == nil
 	case "beacon_frequency":
 		return v.BeaconFrequency == nil
+	case "beacon_frequency.value":
+		return v.BeaconFrequency.FieldIsZero("value")
 	case "class_b_timeout":
 		return v.ClassBTimeout == nil
 	case "class_c_timeout":
@@ -177,6 +215,8 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.DesiredADRAckLimitExponent.FieldIsZero("value")
 	case "desired_beacon_frequency":
 		return v.DesiredBeaconFrequency == nil
+	case "desired_beacon_frequency.value":
+		return v.DesiredBeaconFrequency.FieldIsZero("value")
 	case "desired_max_duty_cycle":
 		return v.DesiredMaxDutyCycle == nil
 	case "desired_max_duty_cycle.value":
@@ -187,8 +227,12 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.DesiredPingSlotDataRateIndex.FieldIsZero("value")
 	case "desired_ping_slot_frequency":
 		return v.DesiredPingSlotFrequency == nil
+	case "desired_ping_slot_frequency.value":
+		return v.DesiredPingSlotFrequency.FieldIsZero("value")
 	case "desired_rx1_data_rate_offset":
 		return v.DesiredRx1DataRateOffset == nil
+	case "desired_rx1_data_rate_offset.value":
+		return v.DesiredRx1DataRateOffset.FieldIsZero("value")
 	case "desired_rx1_delay":
 		return v.DesiredRx1Delay == nil
 	case "desired_rx1_delay.value":
@@ -199,6 +243,8 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.DesiredRx2DataRateIndex.FieldIsZero("value")
 	case "desired_rx2_frequency":
 		return v.DesiredRx2Frequency == nil
+	case "desired_rx2_frequency.value":
+		return v.DesiredRx2Frequency.FieldIsZero("value")
 	case "factory_preset_frequencies":
 		return v.FactoryPresetFrequencies == nil
 	case "max_duty_cycle":
@@ -211,14 +257,20 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.PingSlotDataRateIndex.FieldIsZero("value")
 	case "ping_slot_frequency":
 		return v.PingSlotFrequency == nil
+	case "ping_slot_frequency.value":
+		return v.PingSlotFrequency.FieldIsZero("value")
 	case "ping_slot_periodicity":
 		return v.PingSlotPeriodicity == nil
 	case "ping_slot_periodicity.value":
 		return v.PingSlotPeriodicity.FieldIsZero("value")
 	case "resets_f_cnt":
 		return v.ResetsFCnt == nil
+	case "resets_f_cnt.value":
+		return v.ResetsFCnt.FieldIsZero("value")
 	case "rx1_data_rate_offset":
 		return v.Rx1DataRateOffset == nil
+	case "rx1_data_rate_offset.value":
+		return v.Rx1DataRateOffset.FieldIsZero("value")
 	case "rx1_delay":
 		return v.Rx1Delay == nil
 	case "rx1_delay.value":
@@ -229,14 +281,20 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.Rx2DataRateIndex.FieldIsZero("value")
 	case "rx2_frequency":
 		return v.Rx2Frequency == nil
+	case "rx2_frequency.value":
+		return v.Rx2Frequency.FieldIsZero("value")
 	case "status_count_periodicity":
 		return v.StatusCountPeriodicity == nil
 	case "status_time_periodicity":
 		return v.StatusTimePeriodicity == nil
 	case "supports_32_bit_f_cnt":
 		return v.Supports32BitFCnt == nil
+	case "supports_32_bit_f_cnt.value":
+		return v.Supports32BitFCnt.FieldIsZero("value")
 	case "use_adr":
 		return v.UseADR == nil
+	case "use_adr.value":
+		return v.UseADR.FieldIsZero("value")
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -271,6 +329,8 @@ func (v *MACParameters) FieldIsZero(p string) bool {
 		return v.Channels == nil
 	case "downlink_dwell_time":
 		return v.DownlinkDwellTime == nil
+	case "downlink_dwell_time.value":
+		return v.DownlinkDwellTime.FieldIsZero("value")
 	case "max_duty_cycle":
 		return v.MaxDutyCycle == 0
 	case "max_eirp":
@@ -297,6 +357,8 @@ func (v *MACParameters) FieldIsZero(p string) bool {
 		return v.Rx2Frequency == 0
 	case "uplink_dwell_time":
 		return v.UplinkDwellTime == nil
+	case "uplink_dwell_time.value":
+		return v.UplinkDwellTime.FieldIsZero("value")
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -435,6 +497,8 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.CurrentParameters.FieldIsZero("channels")
 	case "current_parameters.downlink_dwell_time":
 		return v.CurrentParameters.FieldIsZero("downlink_dwell_time")
+	case "current_parameters.downlink_dwell_time.value":
+		return v.CurrentParameters.FieldIsZero("downlink_dwell_time.value")
 	case "current_parameters.max_duty_cycle":
 		return v.CurrentParameters.FieldIsZero("max_duty_cycle")
 	case "current_parameters.max_eirp":
@@ -461,6 +525,8 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.CurrentParameters.FieldIsZero("rx2_frequency")
 	case "current_parameters.uplink_dwell_time":
 		return v.CurrentParameters.FieldIsZero("uplink_dwell_time")
+	case "current_parameters.uplink_dwell_time.value":
+		return v.CurrentParameters.FieldIsZero("uplink_dwell_time.value")
 	case "desired_parameters":
 		return fieldsAreZero(&v.DesiredParameters, MACParametersFieldPathsTopLevel...)
 	case "desired_parameters.adr_ack_delay":
@@ -487,6 +553,8 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.DesiredParameters.FieldIsZero("channels")
 	case "desired_parameters.downlink_dwell_time":
 		return v.DesiredParameters.FieldIsZero("downlink_dwell_time")
+	case "desired_parameters.downlink_dwell_time.value":
+		return v.DesiredParameters.FieldIsZero("downlink_dwell_time.value")
 	case "desired_parameters.max_duty_cycle":
 		return v.DesiredParameters.FieldIsZero("max_duty_cycle")
 	case "desired_parameters.max_eirp":
@@ -513,6 +581,8 @@ func (v *MACState) FieldIsZero(p string) bool {
 		return v.DesiredParameters.FieldIsZero("rx2_frequency")
 	case "desired_parameters.uplink_dwell_time":
 		return v.DesiredParameters.FieldIsZero("uplink_dwell_time")
+	case "desired_parameters.uplink_dwell_time.value":
+		return v.DesiredParameters.FieldIsZero("uplink_dwell_time.value")
 	case "device_class":
 		return v.DeviceClass == 0
 	case "last_adr_change_f_cnt_up":
@@ -927,6 +997,8 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MACSettings.FieldIsZero("adr_margin")
 	case "mac_settings.beacon_frequency":
 		return v.MACSettings.FieldIsZero("beacon_frequency")
+	case "mac_settings.beacon_frequency.value":
+		return v.MACSettings.FieldIsZero("beacon_frequency.value")
 	case "mac_settings.class_b_timeout":
 		return v.MACSettings.FieldIsZero("class_b_timeout")
 	case "mac_settings.class_c_timeout":
@@ -941,6 +1013,8 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MACSettings.FieldIsZero("desired_adr_ack_limit_exponent.value")
 	case "mac_settings.desired_beacon_frequency":
 		return v.MACSettings.FieldIsZero("desired_beacon_frequency")
+	case "mac_settings.desired_beacon_frequency.value":
+		return v.MACSettings.FieldIsZero("desired_beacon_frequency.value")
 	case "mac_settings.desired_max_duty_cycle":
 		return v.MACSettings.FieldIsZero("desired_max_duty_cycle")
 	case "mac_settings.desired_max_duty_cycle.value":
@@ -951,8 +1025,12 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MACSettings.FieldIsZero("desired_ping_slot_data_rate_index.value")
 	case "mac_settings.desired_ping_slot_frequency":
 		return v.MACSettings.FieldIsZero("desired_ping_slot_frequency")
+	case "mac_settings.desired_ping_slot_frequency.value":
+		return v.MACSettings.FieldIsZero("desired_ping_slot_frequency.value")
 	case "mac_settings.desired_rx1_data_rate_offset":
 		return v.MACSettings.FieldIsZero("desired_rx1_data_rate_offset")
+	case "mac_settings.desired_rx1_data_rate_offset.value":
+		return v.MACSettings.FieldIsZero("desired_rx1_data_rate_offset.value")
 	case "mac_settings.desired_rx1_delay":
 		return v.MACSettings.FieldIsZero("desired_rx1_delay")
 	case "mac_settings.desired_rx1_delay.value":
@@ -963,6 +1041,8 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MACSettings.FieldIsZero("desired_rx2_data_rate_index.value")
 	case "mac_settings.desired_rx2_frequency":
 		return v.MACSettings.FieldIsZero("desired_rx2_frequency")
+	case "mac_settings.desired_rx2_frequency.value":
+		return v.MACSettings.FieldIsZero("desired_rx2_frequency.value")
 	case "mac_settings.factory_preset_frequencies":
 		return v.MACSettings.FieldIsZero("factory_preset_frequencies")
 	case "mac_settings.max_duty_cycle":
@@ -975,14 +1055,20 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MACSettings.FieldIsZero("ping_slot_data_rate_index.value")
 	case "mac_settings.ping_slot_frequency":
 		return v.MACSettings.FieldIsZero("ping_slot_frequency")
+	case "mac_settings.ping_slot_frequency.value":
+		return v.MACSettings.FieldIsZero("ping_slot_frequency.value")
 	case "mac_settings.ping_slot_periodicity":
 		return v.MACSettings.FieldIsZero("ping_slot_periodicity")
 	case "mac_settings.ping_slot_periodicity.value":
 		return v.MACSettings.FieldIsZero("ping_slot_periodicity.value")
 	case "mac_settings.resets_f_cnt":
 		return v.MACSettings.FieldIsZero("resets_f_cnt")
+	case "mac_settings.resets_f_cnt.value":
+		return v.MACSettings.FieldIsZero("resets_f_cnt.value")
 	case "mac_settings.rx1_data_rate_offset":
 		return v.MACSettings.FieldIsZero("rx1_data_rate_offset")
+	case "mac_settings.rx1_data_rate_offset.value":
+		return v.MACSettings.FieldIsZero("rx1_data_rate_offset.value")
 	case "mac_settings.rx1_delay":
 		return v.MACSettings.FieldIsZero("rx1_delay")
 	case "mac_settings.rx1_delay.value":
@@ -993,14 +1079,20 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MACSettings.FieldIsZero("rx2_data_rate_index.value")
 	case "mac_settings.rx2_frequency":
 		return v.MACSettings.FieldIsZero("rx2_frequency")
+	case "mac_settings.rx2_frequency.value":
+		return v.MACSettings.FieldIsZero("rx2_frequency.value")
 	case "mac_settings.status_count_periodicity":
 		return v.MACSettings.FieldIsZero("status_count_periodicity")
 	case "mac_settings.status_time_periodicity":
 		return v.MACSettings.FieldIsZero("status_time_periodicity")
 	case "mac_settings.supports_32_bit_f_cnt":
 		return v.MACSettings.FieldIsZero("supports_32_bit_f_cnt")
+	case "mac_settings.supports_32_bit_f_cnt.value":
+		return v.MACSettings.FieldIsZero("supports_32_bit_f_cnt.value")
 	case "mac_settings.use_adr":
 		return v.MACSettings.FieldIsZero("use_adr")
+	case "mac_settings.use_adr.value":
+		return v.MACSettings.FieldIsZero("use_adr.value")
 	case "mac_state":
 		return v.MACState == nil
 	case "max_frequency":
