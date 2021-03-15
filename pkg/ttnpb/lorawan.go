@@ -252,6 +252,7 @@ func (v DataRateIndex) MarshalText() ([]byte, error) {
 
 // MarshalJSON implements json.Marshaler interface.
 func (v DataRateIndex) MarshalJSON() ([]byte, error) {
+	// MarshalText returns v in number form.
 	return v.MarshalText()
 }
 
@@ -354,6 +355,7 @@ func (v DataRateOffset) MarshalText() ([]byte, error) {
 
 // MarshalJSON implements json.Marshaler interface.
 func (v DataRateOffset) MarshalJSON() ([]byte, error) {
+	// MarshalText returns v in number form.
 	return v.MarshalText()
 }
 
