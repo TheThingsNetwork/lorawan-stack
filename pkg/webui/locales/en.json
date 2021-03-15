@@ -797,6 +797,8 @@
   "lib.shared-messages.refresh": "Refresh",
   "lib.shared-messages.replaceWebhook": "Replace webhook",
   "lib.shared-messages.removeCollaborator": "Remove collaborator",
+  "lib.shared-messages.requireAuthenticatedConnection": "Require authenticated connection",
+  "lib.shared-messages.requireAuthenticatedConnectionDescription": "Controls whether this gateway may only connect if it uses an authenticated Basic Station or MQTT connection",
   "lib.shared-messages.resetsFCnt": "Resets frame counters",
   "lib.shared-messages.resetsJoinNonces": "Resets join nonces",
   "lib.shared-messages.resetWarning": "Reseting is insecure and makes your end device susceptible for replay attacks",

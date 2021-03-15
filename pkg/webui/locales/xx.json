@@ -797,6 +797,8 @@
   "lib.shared-messages.refresh": "Xxxxxxx",
   "lib.shared-messages.replaceWebhook": "Xxxxxxx xxxxxxx",
   "lib.shared-messages.removeCollaborator": "Xxxxxx xxxxxxxxxxxx",
+  "lib.shared-messages.requireAuthenticatedConnection": "Xxxxxxx xxxxxxxxxxxxx xxxxxxxxxx",
+  "lib.shared-messages.requireAuthenticatedConnectionDescription": "Xxxxxxxx xxxxxxx xxxx xxxxxxx xxx xxxx xxxxxxx xx xx xxxx xx xxxxxxxxxxxxx Xxxxx Xxxxxxx xx XXXX xxxxxxxxxx",
   "lib.shared-messages.resetsFCnt": "Xxxxxx xxxxx xxxxxxxx",
   "lib.shared-messages.resetsJoinNonces": "Xxxxxx xxxx xxxxxx",
   "lib.shared-messages.resetWarning": "Xxxxxxxx xx xxxxxxxx xxx xxxxx xxxx xxx xxxxxx xxxxxxxxxxx xxx xxxxxx xxxxxxx",

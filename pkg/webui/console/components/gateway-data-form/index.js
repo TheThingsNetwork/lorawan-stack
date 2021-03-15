@@ -171,6 +171,13 @@ class GatewayDataForm extends React.Component {
           component={Input}
         />
         <Form.Field
+          title={sharedMessages.requireAuthenticatedConnection}
+          name="require_authenticated_connection"
+          component={Checkbox}
+          label={sharedMessages.enabled}
+          description={sharedMessages.requireAuthenticatedConnectionDescription}
+        />
+        <Form.Field
           title={sharedMessages.gatewayStatus}
           name="status_public"
           component={Checkbox}

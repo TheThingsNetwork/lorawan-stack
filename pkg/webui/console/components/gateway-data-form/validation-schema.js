@@ -46,6 +46,7 @@ const validationSchema = Yup.object().shape({
     addressRegexp,
     Yup.passValues(sharedMessages.validateAddressFormat),
   ),
+  require_authenticated_connection: Yup.boolean().default(false),
   location_public: Yup.boolean().default(false),
   status_public: Yup.boolean().default(false),
   schedule_downlink_late: Yup.boolean().default(false),
