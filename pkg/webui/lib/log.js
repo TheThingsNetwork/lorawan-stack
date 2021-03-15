@@ -16,20 +16,22 @@
 
 import dev from './dev'
 
-export function warn(...args) {
+export const warn = (...args) => {
   if (dev) {
     console.warn(...args)
   }
 }
 
-export function error(...args) {
+export const error = (...args) => {
   if (dev) {
     console.warn(...args)
   }
 }
 
-export default function log(...args) {
+const log = (...args) => {
   if (dev) {
     console.log(...args)
   }
 }
+
+export default log

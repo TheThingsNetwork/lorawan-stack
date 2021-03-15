@@ -111,26 +111,25 @@ class InnerForm extends React.PureComponent {
   }
 }
 
-const formRenderer = ({ children, ...rest }) =>
-  function(renderProps) {
-    const { className, error, errorTitle, info, infoTitle, disabled } = rest
-    const { handleSubmit, ...restFormikProps } = renderProps
+const formRenderer = ({ children, ...rest }) => renderProps => {
+  const { className, error, errorTitle, info, infoTitle, disabled } = rest
+  const { handleSubmit, ...restFormikProps } = renderProps
 
-    return (
-      <InnerForm
-        className={className}
-        formError={error}
-        formErrorTitle={errorTitle}
-        formInfo={info}
-        formInfoTitle={infoTitle}
-        handleSubmit={handleSubmit}
-        disabled={disabled}
-        {...restFormikProps}
-      >
-        {children}
-      </InnerForm>
-    )
-  }
+  return (
+    <InnerForm
+      className={className}
+      formError={error}
+      formErrorTitle={errorTitle}
+      formInfo={info}
+      formInfoTitle={infoTitle}
+      handleSubmit={handleSubmit}
+      disabled={disabled}
+      {...restFormikProps}
+    >
+      {children}
+    </InnerForm>
+  )
+}
 
 class Form extends React.PureComponent {
   static propTypes = {

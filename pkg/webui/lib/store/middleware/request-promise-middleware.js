@@ -21,20 +21,19 @@ import { CancelablePromise } from 'cancelable-promise'
  * @param {object} store - The store to apply the middleware to.
  * @returns {object} The middleware.
  */
-const requestPromiseMiddleware = store => next =>
-  function(action) {
-    if (action.meta && action.meta._attachPromise) {
-      return new CancelablePromise(function(resolve, reject) {
-        action.meta = {
-          ...action.meta,
-          _resolve: resolve,
-          _reject: reject,
-        }
-        next(action)
-      })
-    }
-
-    return next(action)
+const requestPromiseMiddleware = store => next => action => {
+  if (action.meta && action.meta._attachPromise) {
+    return new CancelablePromise((resolve, reject) => {
+      action.meta = {
+        ...action.meta,
+        _resolve: resolve,
+        _reject: reject,
+      }
+      next(action)
+    })
   }
+
+  return next(action)
+}
 
 export default requestPromiseMiddleware

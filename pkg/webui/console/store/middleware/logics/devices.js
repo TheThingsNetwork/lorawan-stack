@@ -23,7 +23,7 @@ import createEventsConnectLogics from './events'
 
 const getDeviceLogic = createRequestLogic({
   type: devices.GET_DEV,
-  async process({ action }, dispatch) {
+  process: async ({ action }, dispatch) => {
     const {
       payload: { appId, deviceId },
       meta: { selector, options },
@@ -37,7 +37,7 @@ const getDeviceLogic = createRequestLogic({
 const updateDeviceLogic = createRequestLogic(
   {
     type: devices.UPDATE_DEV,
-    async process({ action }) {
+    process: async ({ action }) => {
       const {
         payload: { appId, deviceId, patch },
       } = action
@@ -51,7 +51,7 @@ const updateDeviceLogic = createRequestLogic(
 
 const getDevicesListLogic = createRequestLogic({
   type: devices.GET_DEVICES_LIST,
-  async process({ action }) {
+  process: async ({ action }) => {
     const {
       id: appId,
       params: { page, limit, order, query },
@@ -77,7 +77,7 @@ const getDevicesListLogic = createRequestLogic({
 
 const getDeviceTemplateFormatsLogic = createRequestLogic({
   type: deviceTemplateFormats.GET_DEVICE_TEMPLATE_FORMATS,
-  async process() {
+  process: async () => {
     const formats = await api.deviceTemplates.listFormats()
     return formats
   },

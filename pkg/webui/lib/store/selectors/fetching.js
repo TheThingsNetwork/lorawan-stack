@@ -31,11 +31,10 @@ const selectFetchingEntry = (state, id) => selectFetchingStore(state)[id] || fal
  * @returns {boolean} `true` if one of the base action types is in the `fetching` state,
  * `false` otherwise.
  */
-export const createFetchingSelector = actions =>
-  function(state) {
-    if (!Array.isArray(actions)) {
-      return selectFetchingEntry(state, actions)
-    }
-
-    return actions.some(action => selectFetchingEntry(state, action))
+export const createFetchingSelector = actions => state => {
+  if (!Array.isArray(actions)) {
+    return selectFetchingEntry(state, actions)
   }
+
+  return actions.some(action => selectFetchingEntry(state, action))
+}

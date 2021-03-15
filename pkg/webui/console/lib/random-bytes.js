@@ -14,9 +14,8 @@
 
 import crypto from 'crypto'
 
-export default function randomByteString(len, type = 'hex') {
-  return crypto
+export default (len, type = 'hex') =>
+  crypto
     .randomBytes(type === 'hex' ? Math.floor(len / 2) : len)
     .toString(type)
     .toUpperCase()
-}

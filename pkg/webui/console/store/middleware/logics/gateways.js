@@ -33,7 +33,7 @@ import createEventsConnectLogics from './events'
 
 const getGatewayLogic = createRequestLogic({
   type: gateways.GET_GTW,
-  async process({ action }, dispatch) {
+  process: async ({ action }, dispatch) => {
     const { payload, meta } = action
     const { id = {} } = payload
     const selector = meta.selector || ''
@@ -45,7 +45,7 @@ const getGatewayLogic = createRequestLogic({
 
 const updateGatewayLogic = createRequestLogic({
   type: gateways.UPDATE_GTW,
-  async process({ action }) {
+  process: async ({ action }) => {
     const {
       payload: { id, patch },
     } = action
@@ -57,7 +57,7 @@ const updateGatewayLogic = createRequestLogic({
 
 const deleteGatewayLogic = createRequestLogic({
   type: gateways.DELETE_GTW,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { id } = action.payload
 
     await api.gateway.delete(id)
@@ -69,7 +69,7 @@ const deleteGatewayLogic = createRequestLogic({
 const getGatewaysLogic = createRequestLogic({
   type: gateways.GET_GTWS_LIST,
   latest: true,
-  async process({ action }) {
+  process: async ({ action }) => {
     const {
       params: { page, limit, query, order },
     } = action.payload
@@ -128,7 +128,7 @@ const getGatewaysLogic = createRequestLogic({
 
 const getGatewaysRightsLogic = createRequestLogic({
   type: gateways.GET_GTWS_RIGHTS_LIST,
-  async process({ action }, dispatch, done) {
+  process: async ({ action }, dispatch, done) => {
     const { id } = action.payload
     const result = await api.rights.gateways(id)
     return result.rights.sort()
@@ -142,7 +142,7 @@ const startGatewayStatisticsLogic = createLogic({
   processOptions: {
     dispatchMultiple: true,
   },
-  async process({ cancelled$, action, getState }, dispatch, done) {
+  process: async ({ cancelled$, action, getState }, dispatch, done) => {
     const { id } = action.payload
     const { timeout = 60000 } = action.meta
 
@@ -203,7 +203,7 @@ const startGatewayStatisticsLogic = createLogic({
 
 const updateGatewayStatisticsLogic = createRequestLogic({
   type: gateways.UPDATE_GTW_STATS,
-  async process({ action }) {
+  process: async ({ action }) => {
     const { id } = action.payload
 
     const stats = await api.gateway.stats(id)

@@ -32,7 +32,7 @@ const m = defineMessages({
   grantedRights: 'Granted Rights',
 })
 
-const formatRight = function(right) {
+const formatRight = right => {
   return right
     .split('_')
     .slice(1)
@@ -47,9 +47,7 @@ const headers = [
     name: 'id',
     displayName: m.keyId,
     width: 30,
-    render(id) {
-      return <span className={style.keyId}>{id}</span>
-    },
+    render: id => <span className={style.keyId}>{id}</span>,
   },
   {
     name: 'name',
@@ -60,7 +58,7 @@ const headers = [
     name: 'rights',
     displayName: m.grantedRights,
     width: 40,
-    render(rights) {
+    render: rights => {
       const tags = rights.map(r => (
         <Tag className={style.rightTag} content={formatRight(r)} key={r} />
       ))

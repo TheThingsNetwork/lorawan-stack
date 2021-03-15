@@ -22,7 +22,6 @@ import { createBrowserHistory } from 'history'
 import sensitiveFields from '@ttn-lw/constants/sensitive-data'
 
 import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
-
 import omitDeep from '@ttn-lw/lib/omit'
 import dev from '@ttn-lw/lib/dev'
 import env from '@ttn-lw/lib/env'
