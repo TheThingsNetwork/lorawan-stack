@@ -44,6 +44,7 @@ func TestCache(t *testing.T) {
 
 	c := NewInMemoryCache(mockFetcher, 5*time.Minute, time.Minute).(*inMemoryCache)
 
+	mockFetcher.authInfoError = mockErr
 	mockFetcher.applicationError = mockErr
 	mockFetcher.clientError = mockErr
 	mockFetcher.gatewayError = mockErr
@@ -51,55 +52,62 @@ func TestCache(t *testing.T) {
 	mockFetcher.userError = mockErr
 
 	ctxA := context.WithValue(test.Context(), struct{}{}, "A")
-	res := fetchRights(ctxA, "foo", c)
-
+	_, authInfoErr := fetchAuthInfo(ctxA, c)
+	a.So(mockFetcher.authInfoCtx, should.Equal, ctxA)
+	a.So(authInfoErr, should.Resemble, mockFetcher.authInfoError)
+	entityRes := fetchEntityRights(ctxA, "foo", c)
 	a.So(mockFetcher.applicationCtx, should.Equal, ctxA)
 	a.So(mockFetcher.gatewayCtx, should.Equal, ctxA)
 	a.So(mockFetcher.organizationCtx, should.Equal, ctxA)
-
-	a.So(res.AppErr, should.Resemble, mockFetcher.applicationError)
-	a.So(res.GtwErr, should.Resemble, mockFetcher.gatewayError)
-	a.So(res.OrgErr, should.Resemble, mockFetcher.organizationError)
+	a.So(entityRes.AppErr, should.Resemble, mockFetcher.applicationError)
+	a.So(entityRes.GtwErr, should.Resemble, mockFetcher.gatewayError)
+	a.So(entityRes.OrgErr, should.Resemble, mockFetcher.organizationError)
 
 	timeTravel(31 * time.Second) // Error responses should be cached for 1 minute.
 
 	ctxB := context.WithValue(test.Context(), struct{}{}, "B")
-	res = fetchRights(ctxB, "foo", c)
-
+	_, _ = fetchAuthInfo(ctxB, c)
+	a.So(mockFetcher.authInfoCtx, should.Equal, ctxA)
+	_ = fetchEntityRights(ctxB, "foo", c)
 	a.So(mockFetcher.applicationCtx, should.Equal, ctxA)
 	a.So(mockFetcher.gatewayCtx, should.Equal, ctxA)
 	a.So(mockFetcher.organizationCtx, should.Equal, ctxA)
 
 	timeTravel(31 * time.Second) // Error responses should be expired after 1 minute.
 
-	res = fetchRights(ctxB, "foo", c)
-
+	_, _ = fetchAuthInfo(ctxB, c)
+	a.So(mockFetcher.authInfoCtx, should.Equal, ctxB)
+	_ = fetchEntityRights(ctxB, "foo", c)
 	a.So(mockFetcher.applicationCtx, should.Equal, ctxB)
 	a.So(mockFetcher.gatewayCtx, should.Equal, ctxB)
 	a.So(mockFetcher.organizationCtx, should.Equal, ctxB)
 
 	timeTravel(61 * time.Second)
 
+	mockFetcher.authInfoError = nil
 	mockFetcher.applicationError, mockFetcher.gatewayError, mockFetcher.organizationError = nil, nil, nil
 
-	res = fetchRights(ctxA, "foo", c)
-
+	_, _ = fetchAuthInfo(ctxA, c)
+	a.So(mockFetcher.authInfoCtx, should.Equal, ctxA)
+	_ = fetchEntityRights(ctxA, "foo", c)
 	a.So(mockFetcher.applicationCtx, should.Equal, ctxA)
 	a.So(mockFetcher.gatewayCtx, should.Equal, ctxA)
 	a.So(mockFetcher.organizationCtx, should.Equal, ctxA)
 
 	timeTravel(3 * time.Minute) // Success responses should be cached for 5 minutes.
 
-	res = fetchRights(ctxB, "foo", c)
-
+	_, _ = fetchAuthInfo(ctxB, c)
+	a.So(mockFetcher.authInfoCtx, should.Equal, ctxA)
+	_ = fetchEntityRights(ctxB, "foo", c)
 	a.So(mockFetcher.applicationCtx, should.Equal, ctxA)
 	a.So(mockFetcher.gatewayCtx, should.Equal, ctxA)
 	a.So(mockFetcher.organizationCtx, should.Equal, ctxA)
 
 	timeTravel(3 * time.Minute) // Success responses should be expired after 5 minutes.
 
-	res = fetchRights(ctxB, "foo", c)
-
+	_, _ = fetchAuthInfo(ctxB, c)
+	a.So(mockFetcher.authInfoCtx, should.Equal, ctxB)
+	_ = fetchEntityRights(ctxB, "foo", c)
 	a.So(mockFetcher.applicationCtx, should.Equal, ctxB)
 	a.So(mockFetcher.gatewayCtx, should.Equal, ctxB)
 	a.So(mockFetcher.organizationCtx, should.Equal, ctxB)
@@ -108,6 +116,7 @@ func TestCache(t *testing.T) {
 
 	c.maybeCleanup()
 
+	a.So(c.authInfo, should.BeEmpty)
 	a.So(c.applicationRights, should.BeEmpty)
 	a.So(c.gatewayRights, should.BeEmpty)
 	a.So(c.organizationRights, should.BeEmpty)

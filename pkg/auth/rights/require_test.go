@@ -29,6 +29,29 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+func requireAuthInfo(ctx context.Context) (res struct {
+	AuthenticatedErr error
+	UniversalErr     error
+	IsAdminErr       error
+}) {
+	var wg sync.WaitGroup
+	wg.Add(3)
+	go func() {
+		res.AuthenticatedErr = RequireAuthenticated(ctx)
+		wg.Done()
+	}()
+	go func() {
+		res.UniversalErr = RequireUniversal(ctx, ttnpb.RIGHT_SEND_INVITES)
+		wg.Done()
+	}()
+	go func() {
+		res.IsAdminErr = RequireIsAdmin(ctx)
+		wg.Done()
+	}()
+	wg.Wait()
+	return
+}
+
 func requireRights(ctx context.Context, id string) (res struct {
 	AppErr error
 	CliErr error
@@ -66,6 +89,15 @@ func TestRequire(t *testing.T) {
 	a := assertions.New(t)
 
 	a.So(func() {
+		RequireAuthenticated(test.Context())
+	}, should.Panic)
+	a.So(func() {
+		RequireUniversal(test.Context(), ttnpb.RIGHT_SEND_INVITES)
+	}, should.Panic)
+	a.So(func() {
+		RequireIsAdmin(test.Context())
+	}, should.Panic)
+	a.So(func() {
 		RequireApplication(test.Context(), ttnpb.ApplicationIdentifiers{}, ttnpb.RIGHT_APPLICATION_INFO)
 	}, should.Panic)
 	a.So(func() {
@@ -99,41 +131,59 @@ func TestRequire(t *testing.T) {
 			unique.ID(fooCtx, ttnpb.UserIdentifiers{UserID: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO),
 		},
 	})
+	fooCtx = NewContextWithAuthInfo(fooCtx, &ttnpb.AuthInfoResponse{
+		UniversalRights: ttnpb.RightsFrom(ttnpb.RIGHT_SEND_INVITES),
+		IsAdmin:         true,
+	})
 
-	fooRes := requireRights(fooCtx, "foo")
-	a.So(fooRes.AppErr, should.BeNil)
-	a.So(fooRes.CliErr, should.BeNil)
-	a.So(fooRes.GtwErr, should.BeNil)
-	a.So(fooRes.OrgErr, should.BeNil)
-	a.So(fooRes.UsrErr, should.BeNil)
+	fooAuthInfoRes := requireAuthInfo(fooCtx)
+	a.So(fooAuthInfoRes.AuthenticatedErr, should.BeNil)
+	a.So(fooAuthInfoRes.UniversalErr, should.BeNil)
+	a.So(fooAuthInfoRes.IsAdminErr, should.BeNil)
+	fooEntityRes := requireRights(fooCtx, "foo")
+	a.So(fooEntityRes.AppErr, should.BeNil)
+	a.So(fooEntityRes.CliErr, should.BeNil)
+	a.So(fooEntityRes.GtwErr, should.BeNil)
+	a.So(fooEntityRes.OrgErr, should.BeNil)
+	a.So(fooEntityRes.UsrErr, should.BeNil)
 
 	mockErr := errors.New("mock")
 	errFetchCtx := NewContextWithFetcher(test.Context(), &mockFetcher{
+		authInfoError:     mockErr,
 		applicationError:  mockErr,
 		clientError:       mockErr,
 		gatewayError:      mockErr,
 		organizationError: mockErr,
 		userError:         mockErr,
 	})
-	errFetchRes := requireRights(errFetchCtx, "foo")
-	a.So(errFetchRes.AppErr, should.Resemble, mockErr)
-	a.So(errFetchRes.CliErr, should.Resemble, mockErr)
-	a.So(errFetchRes.GtwErr, should.Resemble, mockErr)
-	a.So(errFetchRes.OrgErr, should.Resemble, mockErr)
-	a.So(errFetchRes.UsrErr, should.Resemble, mockErr)
+	errFetchAuthInfoRes := requireAuthInfo(errFetchCtx)
+	a.So(errFetchAuthInfoRes.AuthenticatedErr, should.Resemble, mockErr)
+	a.So(errFetchAuthInfoRes.UniversalErr, should.Resemble, mockErr)
+	a.So(errFetchAuthInfoRes.IsAdminErr, should.Resemble, mockErr)
+	errFetchEntityRes := requireRights(errFetchCtx, "foo")
+	a.So(errFetchEntityRes.AppErr, should.Resemble, mockErr)
+	a.So(errFetchEntityRes.CliErr, should.Resemble, mockErr)
+	a.So(errFetchEntityRes.GtwErr, should.Resemble, mockErr)
+	a.So(errFetchEntityRes.OrgErr, should.Resemble, mockErr)
+	a.So(errFetchEntityRes.UsrErr, should.Resemble, mockErr)
 
 	errPermissionDenied := status.New(codes.PermissionDenied, "permission denied").Err()
 	permissionDeniedFetchCtx := NewContextWithFetcher(test.Context(), &mockFetcher{
+		authInfoError:     errPermissionDenied,
 		applicationError:  errPermissionDenied,
 		clientError:       errPermissionDenied,
 		gatewayError:      errPermissionDenied,
 		organizationError: errPermissionDenied,
 		userError:         errPermissionDenied,
 	})
-	permissionDeniedRes := requireRights(permissionDeniedFetchCtx, "foo")
-	a.So(errors.IsPermissionDenied(permissionDeniedRes.AppErr), should.BeTrue)
-	a.So(errors.IsPermissionDenied(permissionDeniedRes.CliErr), should.BeTrue)
-	a.So(errors.IsPermissionDenied(permissionDeniedRes.GtwErr), should.BeTrue)
-	a.So(errors.IsPermissionDenied(permissionDeniedRes.OrgErr), should.BeTrue)
-	a.So(errors.IsPermissionDenied(permissionDeniedRes.UsrErr), should.BeTrue)
+	permissionDeniedAuthInfoRes := requireAuthInfo(permissionDeniedFetchCtx)
+	a.So(errors.IsUnauthenticated(permissionDeniedAuthInfoRes.AuthenticatedErr), should.BeTrue)
+	a.So(errors.IsPermissionDenied(permissionDeniedAuthInfoRes.UniversalErr), should.BeTrue)
+	a.So(errors.IsPermissionDenied(permissionDeniedAuthInfoRes.IsAdminErr), should.BeTrue)
+	permissionDeniedEntityRes := requireRights(permissionDeniedFetchCtx, "foo")
+	a.So(errors.IsPermissionDenied(permissionDeniedEntityRes.AppErr), should.BeTrue)
+	a.So(errors.IsPermissionDenied(permissionDeniedEntityRes.CliErr), should.BeTrue)
+	a.So(errors.IsPermissionDenied(permissionDeniedEntityRes.GtwErr), should.BeTrue)
+	a.So(errors.IsPermissionDenied(permissionDeniedEntityRes.OrgErr), should.BeTrue)
+	a.So(errors.IsPermissionDenied(permissionDeniedEntityRes.UsrErr), should.BeTrue)
 }

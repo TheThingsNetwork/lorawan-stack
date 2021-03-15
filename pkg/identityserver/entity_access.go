@@ -288,6 +288,11 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	return res, nil
 }
 
+// AuthInfo implements rights.AuthInfoFetcher.
+func (is *IdentityServer) AuthInfo(ctx context.Context) (*ttnpb.AuthInfoResponse, error) {
+	return is.authInfo(ctx)
+}
+
 // RequireAuthenticated checks the request context for authentication presence
 // and returns an error if there is none.
 func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {

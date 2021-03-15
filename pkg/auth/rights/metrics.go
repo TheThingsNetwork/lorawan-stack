@@ -47,7 +47,7 @@ func init() {
 	metrics.MustRegister(rightsRequests, rightsFetches)
 }
 
-func register(ctx context.Context, c *metrics.ContextualCounterVec, entity string, rights *ttnpb.Rights, err error) {
+func registerEntityRights(ctx context.Context, c *metrics.ContextualCounterVec, entity string, rights *ttnpb.Rights, err error) {
 	switch {
 	case errors.IsUnauthenticated(err):
 		c.WithLabelValues(ctx, entity, "unauthenticated").Inc()
@@ -63,9 +63,34 @@ func register(ctx context.Context, c *metrics.ContextualCounterVec, entity strin
 }
 
 func registerRightsRequest(ctx context.Context, entity string, rights *ttnpb.Rights, err error) {
-	register(ctx, rightsRequests, entity, rights, err)
+	registerEntityRights(ctx, rightsRequests, entity, rights, err)
 }
 
 func registerRightsFetch(ctx context.Context, entity string, rights *ttnpb.Rights, err error) {
-	register(ctx, rightsFetches, entity, rights, err)
+	registerEntityRights(ctx, rightsFetches, entity, rights, err)
+}
+
+func registerAuthInfo(ctx context.Context, c *metrics.ContextualCounterVec, authInfo *ttnpb.AuthInfoResponse, err error) {
+	switch {
+	case errors.IsUnauthenticated(err):
+		c.WithLabelValues(ctx, "auth_info", "unauthenticated").Inc()
+	case errors.IsPermissionDenied(err):
+		c.WithLabelValues(ctx, "auth_info", "permission_denied").Inc()
+	case err != nil:
+		c.WithLabelValues(ctx, "auth_info", "error").Inc()
+	case authInfo.GetIsAdmin():
+		c.WithLabelValues(ctx, "auth_info", "admin").Inc()
+	case authInfo.GetUniversalRights() == nil || len(authInfo.GetUniversalRights().GetRights()) == 0:
+		c.WithLabelValues(ctx, "auth_info", "zero").Inc()
+	default:
+		c.WithLabelValues(ctx, "auth_info", "ok").Inc()
+	}
+}
+
+func registerAuthInfoRequest(ctx context.Context, authInfo *ttnpb.AuthInfoResponse, err error) {
+	registerAuthInfo(ctx, rightsRequests, authInfo, err)
+}
+
+func registerAuthInfoFetch(ctx context.Context, authInfo *ttnpb.AuthInfoResponse, err error) {
+	registerAuthInfo(ctx, rightsFetches, authInfo, err)
 }

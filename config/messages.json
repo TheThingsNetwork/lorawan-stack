@@ -2528,9 +2528,27 @@
       "file": "require.go"
     }
   },
+  "error:pkg/auth/rights:insufficient_universal_rights": {
+    "translations": {
+      "en": "insufficient universal rights"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
   "error:pkg/auth/rights:insufficient_user_rights": {
     "translations": {
       "en": "insufficient rights for user `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
+  "error:pkg/auth/rights:no_admin": {
+    "translations": {
+      "en": "no admin"
     },
     "description": {
       "package": "pkg/auth/rights",
@@ -2591,9 +2609,27 @@
       "file": "require.go"
     }
   },
+  "error:pkg/auth/rights:no_universal_rights": {
+    "translations": {
+      "en": "no universal rights"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
   "error:pkg/auth/rights:no_user_rights": {
     "translations": {
       "en": "no rights for user `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
+  "error:pkg/auth/rights:unauthenticated": {
+    "translations": {
+      "en": "unauthenticated"
     },
     "description": {
       "package": "pkg/auth/rights",
