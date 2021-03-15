@@ -91,6 +91,7 @@ type Agent struct {
 	downstreamCh chan *downlinkMessage
 
 	grpc struct {
+		pba   ttnpb.PbaServer
 		nsPba ttnpb.NsPbaServer
 		gsPba ttnpb.GsPbaServer
 	}
@@ -237,6 +238,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	if a.homeNetworkConfig.Enable {
 		a.downstreamCh = make(chan *downlinkMessage, downstreamBufferSize)
 	}
+	a.grpc.pba = &pbaServer{}
 	a.grpc.nsPba = &nsPbaServer{
 		contextDecoupler: a,
 		downstreamCh:     a.downstreamCh,
@@ -288,12 +290,14 @@ func (a *Agent) Roles() []ttnpb.ClusterRole {
 
 // RegisterServices registers services provided by a at s.
 func (a *Agent) RegisterServices(s *grpc.Server) {
+	ttnpb.RegisterPbaServer(s, a.grpc.pba)
 	ttnpb.RegisterNsPbaServer(s, a.grpc.nsPba)
 	ttnpb.RegisterGsPbaServer(s, a.grpc.gsPba)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (a *Agent) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+	ttnpb.RegisterPbaHandler(a.Context(), s, conn)
 }
 
 func (a *Agent) dialContext(ctx context.Context) (*grpc.ClientConn, error) {
