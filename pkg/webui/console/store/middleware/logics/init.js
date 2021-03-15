@@ -22,7 +22,7 @@ import * as init from '@console/store/actions/init'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
-  async process(_, dispatch) {
+  process: async (_, dispatch) => {
     dispatch(user.getUserRights())
 
     let info, rights
@@ -52,6 +52,7 @@ const consoleAppLogic = createRequestLogic({
           'state',
           'name',
           'primary_email_address_validated_at',
+          'profile_picture',
         ])
         userResult.isAdmin = info.is_admin || false
         dispatch(user.getUserMeSuccess(userResult))

@@ -16,9 +16,9 @@ import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import Dropdown from '@ttn-lw/components/dropdown'
+import ProfilePicture from '@ttn-lw/components/profile-picture'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -50,7 +50,10 @@ const MobileMenu = ({ className, children, user, onItemsClick, onLogout }) => {
       {Boolean(user) && (
         <div className={style.userHeader}>
           <div className={style.userMessage}>
-            <Icon className={style.userIcon} icon="person" nudgeUp />
+            <ProfilePicture
+              profilePicture={user.profile_picture}
+              className={style.profilePictureMobile}
+            />
             <Message
               className={style.userMessage}
               content={m.loggedInAs}

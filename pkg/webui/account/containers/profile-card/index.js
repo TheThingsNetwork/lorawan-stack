@@ -38,7 +38,7 @@ const ProfileCard = () => {
     profilePicture: selectUserProfilePicture(state),
   }))
   return (
-    <section className={style.container}>
+    <section className={style.container} data-test-id="profile-card">
       <ProfilePicture profilePicture={profilePicture} className={style.profilePicture} />
       <div className={style.panel}>
         <div className={style.name}>
