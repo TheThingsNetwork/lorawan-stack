@@ -17,7 +17,6 @@ package ttnpb
 import (
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/blang/semver"
@@ -36,31 +35,58 @@ func init() {
 	PHYVersion_value["1.1-b"] = int32(PHY_V1_1_REV_B)   // 1.1 is the official version number
 }
 
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v MType) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("MType enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
 // MarshalText implements encoding.TextMarshaler interface.
 func (v MType) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *MType) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("MType", MType_name, b)
+	if err != nil {
+		return err
+	}
+	*v = MType(i)
+	return nil
+}
+
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *MType) UnmarshalText(b []byte) error {
-	if i, ok := MType_value[string(b)]; ok {
-		*v = MType(i)
-		return nil
+	i, err := unmarshalEnumFromText("MType", MType_value, b)
+	if err != nil {
+		return err
 	}
-	return errCouldNotParse("MType")(string(b))
+	*v = MType(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (v *MType) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("MType", MType_name, b)
 	if err != nil {
-		return errCouldNotParse("MType")(string(b)).WithCause(err)
+		return err
 	}
 	*v = MType(i)
 	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v Major) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("Major enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -68,23 +94,34 @@ func (v Major) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *Major) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("Major", Major_name, b)
+	if err != nil {
+		return err
+	}
+	*v = Major(i)
+	return nil
+}
+
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *Major) UnmarshalText(b []byte) error {
-	if i, ok := Major_value[string(b)]; ok {
-		*v = Major(i)
-		return nil
+	i, err := unmarshalEnumFromTextPrefix("Major", Major_value, "LORAWAN_", b)
+	if err != nil {
+		return err
 	}
-	return errCouldNotParse("Major")(string(b))
+	*v = Major(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (v *Major) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("Major", Major_name, b)
 	if err != nil {
-		return errCouldNotParse("Major")(string(b)).WithCause(err)
+		return err
 	}
 	*v = Major(i)
 	return nil
@@ -111,29 +148,37 @@ func (v MACVersion) EncodeMsgpack(enc *msgpack.Encoder) error {
 	return enc.EncodeUint8(uint8(v))
 }
 
-// UnmarshalBinary implements encoding.BinaryMarshaler interface.
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
 func (v *MACVersion) UnmarshalBinary(b []byte) error {
-	if len(b) != 1 {
-		return errCouldNotParse("MACVersion")(string(b))
+	i, err := unmarshalEnumFromBinary("MACVersion", MACVersion_name, b)
+	if err != nil {
+		return err
 	}
-	*v = MACVersion(b[0])
+	*v = MACVersion(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *MACVersion) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := MACVersion_value[s]; ok {
-		*v = MACVersion(i)
-		return nil
+	i, err := unmarshalEnumFromTextPrefix("MACVersion", MACVersion_value, "MAC_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "MAC_") {
-		if i, ok := MACVersion_value["MAC_"+s]; ok {
-			*v = MACVersion(i)
-			return nil
-		}
+	*v = MACVersion(i)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *MACVersion) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	return errCouldNotParse("MACVersion")(s)
+	i, err := unmarshalEnumFromNumber("MACVersion", MACVersion_name, b)
+	if err != nil {
+		return err
+	}
+	*v = MACVersion(i)
+	return nil
 }
 
 // DecodeMsgpack implements msgpack.CustomDecoder interface.
@@ -146,17 +191,12 @@ func (v *MACVersion) DecodeMsgpack(dec *msgpack.Decoder) error {
 	return nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *MACVersion) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v PHYVersion) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("PHYVersion enum exceeds 255"))
 	}
-	i, err := strconv.Atoi(string(b))
-	if err != nil {
-		return errCouldNotParse("MACVersion")(string(b)).WithCause(err)
-	}
-	*v = MACVersion(i)
-	return nil
+	return []byte{byte(v)}, nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -164,33 +204,45 @@ func (v PHYVersion) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *PHYVersion) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("PHYVersion", PHYVersion_name, b)
+	if err != nil {
+		return err
+	}
+	*v = PHYVersion(i)
+	return nil
+}
+
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *PHYVersion) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := PHYVersion_value[s]; ok {
-		*v = PHYVersion(i)
-		return nil
+	i, err := unmarshalEnumFromTextPrefix("PHYVersion", PHYVersion_value, "PHY_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "PHY_") {
-		if i, ok := PHYVersion_value["PHY_"+s]; ok {
-			*v = PHYVersion(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("PHYVersion")(s)
+	*v = PHYVersion(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (v *PHYVersion) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("PHYVersion", PHYVersion_name, b)
 	if err != nil {
-		return errCouldNotParse("PHYVersion")(string(b)).WithCause(err)
+		return err
 	}
 	*v = PHYVersion(i)
 	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v DataRateIndex) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("DataRateIndex enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -203,33 +255,96 @@ func (v DataRateIndex) MarshalJSON() ([]byte, error) {
 	return v.MarshalText()
 }
 
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *DataRateIndex) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("DataRateIndex", DataRateIndex_name, b)
+	if err != nil {
+		return err
+	}
+	*v = DataRateIndex(i)
+	return nil
+}
+
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *DataRateIndex) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := DataRateIndex_value[s]; ok {
-		*v = DataRateIndex(i)
-		return nil
+	i, err := unmarshalEnumFromTextPrefix("DataRateIndex", DataRateIndex_value, "DATA_RATE_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "DATA_RATE_") {
-		if i, ok := DataRateIndex_value["DATA_RATE_"+s]; ok {
-			*v = DataRateIndex(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("DataRateIndex")(string(b))
+	*v = DataRateIndex(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (v *DataRateIndex) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("DataRateIndex", DataRateIndex_name, b)
 	if err != nil {
-		return errCouldNotParse("DataRateIndex")(string(b)).WithCause(err)
+		return err
 	}
 	*v = DataRateIndex(i)
 	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v DataRateIndexValue) MarshalBinary() ([]byte, error) {
+	return v.Value.MarshalBinary()
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v DataRateIndexValue) MarshalText() ([]byte, error) {
+	return v.Value.MarshalText()
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v DataRateIndexValue) MarshalJSON() ([]byte, error) {
+	return v.Value.MarshalJSON()
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *DataRateIndexValue) UnmarshalBinary(b []byte) error {
+	var vv DataRateIndex
+	if err := vv.UnmarshalBinary(b); err != nil {
+		return err
+	}
+	*v = DataRateIndexValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *DataRateIndexValue) UnmarshalText(b []byte) error {
+	var vv DataRateIndex
+	if err := vv.UnmarshalText(b); err != nil {
+		return err
+	}
+	*v = DataRateIndexValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *DataRateIndexValue) UnmarshalJSON(b []byte) error {
+	var vv DataRateIndex
+	if err := vv.UnmarshalJSON(b); err != nil {
+		return err
+	}
+	*v = DataRateIndexValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v DataRateOffset) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("DataRateOffset enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -242,77 +357,219 @@ func (v DataRateOffset) MarshalJSON() ([]byte, error) {
 	return v.MarshalText()
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *DataRateOffset) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := DataRateOffset_value[s]; ok {
-		*v = DataRateOffset(i)
-		return nil
-	}
-	if !strings.HasPrefix(s, "DATA_RATE_OFFSET") {
-		if i, ok := DataRateOffset_value["DATA_RATE_OFFSET"+s]; ok {
-			*v = DataRateOffset(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("DataRateOffset")(string(b))
-}
-
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *DataRateOffset) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
-	}
-	i, err := strconv.Atoi(string(b))
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *DataRateOffset) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("DataRateOffset", DataRateOffset_name, b)
 	if err != nil {
-		return errCouldNotParse("DataRateOffset")(string(b)).WithCause(err)
+		return err
 	}
 	*v = DataRateOffset(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *RejoinType) UnmarshalText(b []byte) error {
-	if i, ok := RejoinType_value[string(b)]; ok {
-		*v = RejoinType(i)
-		return nil
+func (v *DataRateOffset) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromTextPrefix("DataRateOffset", DataRateOffset_value, "DATA_RATE_OFFSET_", b)
+	if err != nil {
+		return err
 	}
-	return errCouldNotParse("RejoinType")(string(b))
+	*v = DataRateOffset(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
-func (v *RejoinType) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+func (v *DataRateOffset) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("DataRateOffset", DataRateOffset_name, b)
 	if err != nil {
-		return errCouldNotParse("RejoinType")(string(b)).WithCause(err)
+		return err
+	}
+	*v = DataRateOffset(i)
+	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v DataRateOffsetValue) MarshalBinary() ([]byte, error) {
+	return v.Value.MarshalBinary()
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v DataRateOffsetValue) MarshalText() ([]byte, error) {
+	return v.Value.MarshalText()
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v DataRateOffsetValue) MarshalJSON() ([]byte, error) {
+	return v.Value.MarshalJSON()
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *DataRateOffsetValue) UnmarshalBinary(b []byte) error {
+	var vv DataRateOffset
+	if err := vv.UnmarshalBinary(b); err != nil {
+		return err
+	}
+	*v = DataRateOffsetValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *DataRateOffsetValue) UnmarshalText(b []byte) error {
+	var vv DataRateOffset
+	if err := vv.UnmarshalText(b); err != nil {
+		return err
+	}
+	*v = DataRateOffsetValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *DataRateOffsetValue) UnmarshalJSON(b []byte) error {
+	var vv DataRateOffset
+	if err := vv.UnmarshalJSON(b); err != nil {
+		return err
+	}
+	*v = DataRateOffsetValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v FrequencyValue) MarshalText() ([]byte, error) {
+	return []byte(strconv.FormatUint(v.Value, 10)), nil
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v FrequencyValue) MarshalJSON() ([]byte, error) {
+	return v.MarshalText()
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *FrequencyValue) UnmarshalText(b []byte) error {
+	var vv uint64
+	vv, err := strconv.ParseUint(string(b), 10, 64)
+	if err != nil {
+		return err
+	}
+	*v = FrequencyValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *FrequencyValue) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
+	}
+	return v.UnmarshalText(b)
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v RejoinType) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("RejoinType enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v RejoinType) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *RejoinType) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("RejoinType", RejoinType_name, b)
+	if err != nil {
+		return err
 	}
 	*v = RejoinType(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *CFListType) UnmarshalText(b []byte) error {
-	if i, ok := CFListType_value[string(b)]; ok {
-		*v = CFListType(i)
-		return nil
+func (v *RejoinType) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromText("RejoinType", RejoinType_value, b)
+	if err != nil {
+		return err
 	}
-	return errCouldNotParse("CFListType")(string(b))
+	*v = RejoinType(i)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *RejoinType) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
+	}
+	i, err := unmarshalEnumFromNumber("RejoinType", RejoinType_name, b)
+	if err != nil {
+		return err
+	}
+	*v = RejoinType(i)
+	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v CFListType) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("CFListType enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v CFListType) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *CFListType) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("CFListType", CFListType_name, b)
+	if err != nil {
+		return err
+	}
+	*v = CFListType(i)
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *CFListType) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromText("CFListType", CFListType_value, b)
+	if err != nil {
+		return err
+	}
+	*v = CFListType(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (v *CFListType) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("CFListType", CFListType_name, b)
 	if err != nil {
-		return errCouldNotParse("CFListType")(string(b)).WithCause(err)
+		return err
 	}
 	*v = CFListType(i)
 	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v Class) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("Class enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -320,33 +577,45 @@ func (v Class) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *Class) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("Class", Class_name, b)
+	if err != nil {
+		return err
+	}
+	*v = Class(i)
+	return nil
+}
+
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *Class) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := Class_value[s]; ok {
-		*v = Class(i)
-		return nil
+	i, err := unmarshalEnumFromTextPrefix("Class", Class_value, "CLASS_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "CLASS_") {
-		if i, ok := Class_value["CLASS_"+s]; ok {
-			*v = Class(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("Class")(s)
+	*v = Class(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (v *Class) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("Class", Class_name, b)
 	if err != nil {
-		return errCouldNotParse("Class")(string(b)).WithCause(err)
+		return err
 	}
 	*v = Class(i)
 	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v TxSchedulePriority) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("TxSchedulePriority enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -354,26 +623,45 @@ func (v TxSchedulePriority) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *TxSchedulePriority) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("TxSchedulePriority", TxSchedulePriority_name, b)
+	if err != nil {
+		return err
+	}
+	*v = TxSchedulePriority(i)
+	return nil
+}
+
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *TxSchedulePriority) UnmarshalText(b []byte) error {
-	if i, ok := TxSchedulePriority_value[string(b)]; ok {
-		*v = TxSchedulePriority(i)
-		return nil
+	i, err := unmarshalEnumFromText("TxSchedulePriority", TxSchedulePriority_value, b)
+	if err != nil {
+		return err
 	}
-	return errCouldNotParse("TxSchedulePriority")(string(b))
+	*v = TxSchedulePriority(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (v *TxSchedulePriority) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("TxSchedulePriority", TxSchedulePriority_name, b)
 	if err != nil {
-		return errCouldNotParse("TxSchedulePriority")(string(b)).WithCause(err)
+		return err
 	}
 	*v = TxSchedulePriority(i)
 	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v MACCommandIdentifier) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("MACCommandIdentifier enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -381,62 +669,91 @@ func (v MACCommandIdentifier) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *MACCommandIdentifier) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := MACCommandIdentifier_value[s]; ok {
-		*v = MACCommandIdentifier(i)
-		return nil
-	}
-	if !strings.HasPrefix(s, "CID_") {
-		if i, ok := MACCommandIdentifier_value["CID_"+s]; ok {
-			*v = MACCommandIdentifier(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("MACCommandIdentifier")(s)
-}
-
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *MACCommandIdentifier) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
-	}
-	i, err := strconv.Atoi(string(b))
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *MACCommandIdentifier) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("MACCommandIdentifier", MACCommandIdentifier_name, b)
 	if err != nil {
-		return errCouldNotParse("MACCommandIdentifier")(string(b)).WithCause(err)
+		return err
 	}
 	*v = MACCommandIdentifier(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *MACCommandIdentifier) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromTextPrefix("MACCommandIdentifier", MACCommandIdentifier_value, "CID_", b)
+	if err != nil {
+		return err
+	}
+	*v = MACCommandIdentifier(i)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *MACCommandIdentifier) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
+	}
+	i, err := unmarshalEnumFromNumber("MACCommandIdentifier", MACCommandIdentifier_name, b)
+	if err != nil {
+		return err
+	}
+	*v = MACCommandIdentifier(i)
+	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v AggregatedDutyCycle) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("AggregatedDutyCycle enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v AggregatedDutyCycle) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *AggregatedDutyCycle) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("AggregatedDutyCycle", AggregatedDutyCycle_name, b)
+	if err != nil {
+		return err
+	}
+	*v = AggregatedDutyCycle(i)
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *AggregatedDutyCycle) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := AggregatedDutyCycle_value[s]; ok {
-		*v = AggregatedDutyCycle(i)
-		return nil
+	i, err := unmarshalEnumFromTextPrefix("AggregatedDutyCycle", AggregatedDutyCycle_value, "DUTY_CYCLE_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "DUTY_CYCLE_") {
-		if i, ok := AggregatedDutyCycle_value["DUTY_CYCLE_"+s]; ok {
-			*v = AggregatedDutyCycle(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("AggregatedDutyCycle")(s)
+	*v = AggregatedDutyCycle(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (v *AggregatedDutyCycle) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("AggregatedDutyCycle", AggregatedDutyCycle_name, b)
 	if err != nil {
-		return errCouldNotParse("AggregatedDutyCycle")(string(b)).WithCause(err)
+		return err
 	}
 	*v = AggregatedDutyCycle(i)
 	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v PingSlotPeriod) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("PingSlotPeriod enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -444,120 +761,183 @@ func (v PingSlotPeriod) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *PingSlotPeriod) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := PingSlotPeriod_value[s]; ok {
-		*v = PingSlotPeriod(i)
-		return nil
-	}
-	if !strings.HasPrefix(s, "PING_EVERY_") {
-		if i, ok := PingSlotPeriod_value["PING_EVERY_"+s]; ok {
-			*v = PingSlotPeriod(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("PingSlotPeriod")(s)
-}
-
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *PingSlotPeriod) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
-	}
-	i, err := strconv.Atoi(string(b))
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *PingSlotPeriod) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("PingSlotPeriod", PingSlotPeriod_name, b)
 	if err != nil {
-		return errCouldNotParse("PingSlotPeriod")(string(b)).WithCause(err)
+		return err
 	}
 	*v = PingSlotPeriod(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *RejoinCountExponent) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := RejoinCountExponent_value[s]; ok {
-		*v = RejoinCountExponent(i)
-		return nil
+func (v *PingSlotPeriod) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromTextPrefix("PingSlotPeriod", PingSlotPeriod_value, "PING_EVERY_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "REJOIN_COUNT_") {
-		if i, ok := RejoinCountExponent_value["REJOIN_COUNT_"+s]; ok {
-			*v = RejoinCountExponent(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("RejoinCountExponent")(s)
+	*v = PingSlotPeriod(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
-func (v *RejoinCountExponent) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+func (v *PingSlotPeriod) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("PingSlotPeriod", PingSlotPeriod_name, b)
 	if err != nil {
-		return errCouldNotParse("RejoinCountExponent")(string(b)).WithCause(err)
+		return err
+	}
+	*v = PingSlotPeriod(i)
+	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v RejoinCountExponent) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("RejoinCountExponent enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v RejoinCountExponent) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *RejoinCountExponent) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("RejoinCountExponent", RejoinCountExponent_name, b)
+	if err != nil {
+		return err
 	}
 	*v = RejoinCountExponent(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *RejoinTimeExponent) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := RejoinTimeExponent_value[s]; ok {
-		*v = RejoinTimeExponent(i)
-		return nil
+func (v *RejoinCountExponent) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromTextPrefix("RejoinCountExponent", RejoinCountExponent_value, "REJOIN_COUNT_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "REJOIN_TIME_") {
-		if i, ok := RejoinTimeExponent_value["REJOIN_TIME_"+s]; ok {
-			*v = RejoinTimeExponent(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("RejoinTimeExponent")(s)
+	*v = RejoinCountExponent(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
-func (v *RejoinTimeExponent) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+func (v *RejoinCountExponent) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("RejoinCountExponent", RejoinCountExponent_name, b)
 	if err != nil {
-		return errCouldNotParse("RejoinTimeExponent")(string(b)).WithCause(err)
+		return err
+	}
+	*v = RejoinCountExponent(i)
+	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v RejoinTimeExponent) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("RejoinTimeExponent enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v RejoinTimeExponent) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *RejoinTimeExponent) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("RejoinTimeExponent", RejoinTimeExponent_name, b)
+	if err != nil {
+		return err
 	}
 	*v = RejoinTimeExponent(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *RejoinTimeExponent) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromTextPrefix("RejoinTimeExponent", RejoinTimeExponent_value, "REJOIN_TIME_", b)
+	if err != nil {
+		return err
+	}
+	*v = RejoinTimeExponent(i)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *RejoinTimeExponent) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
+	}
+	i, err := unmarshalEnumFromNumber("RejoinTimeExponent", RejoinTimeExponent_name, b)
+	if err != nil {
+		return err
+	}
+	*v = RejoinTimeExponent(i)
+	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v RejoinPeriodExponent) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("RejoinPeriodExponent enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v RejoinPeriodExponent) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *RejoinPeriodExponent) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("RejoinPeriodExponent", RejoinPeriodExponent_name, b)
+	if err != nil {
+		return err
+	}
+	*v = RejoinPeriodExponent(i)
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *RejoinPeriodExponent) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := RejoinPeriodExponent_value[s]; ok {
-		*v = RejoinPeriodExponent(i)
-		return nil
+	i, err := unmarshalEnumFromTextPrefix("RejoinPeriodExponent", RejoinPeriodExponent_value, "REJOIN_PERIOD_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "REJOIN_PERIOD_") {
-		if i, ok := RejoinPeriodExponent_value["REJOIN_PERIOD_"+s]; ok {
-			*v = RejoinPeriodExponent(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("RejoinPeriodExponent")(s)
+	*v = RejoinPeriodExponent(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (v *RejoinPeriodExponent) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("RejoinPeriodExponent", RejoinPeriodExponent_name, b)
 	if err != nil {
-		return errCouldNotParse("RejoinPeriodExponent")(string(b)).WithCause(err)
+		return err
 	}
 	*v = RejoinPeriodExponent(i)
 	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v DeviceEIRP) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("DeviceEIRP enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -565,164 +945,218 @@ func (v DeviceEIRP) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *DeviceEIRP) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := DeviceEIRP_value[s]; ok {
-		*v = DeviceEIRP(i)
-		return nil
-	}
-	if !strings.HasPrefix(s, "DEVICE_EIRP_") {
-		if i, ok := DeviceEIRP_value["DEVICE_EIRP_"+s]; ok {
-			*v = DeviceEIRP(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("DeviceEIRP")(s)
-}
-
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *DeviceEIRP) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
-	}
-	i, err := strconv.Atoi(string(b))
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *DeviceEIRP) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("DeviceEIRP", DeviceEIRP_name, b)
 	if err != nil {
-		return errCouldNotParse("DeviceEIRP")(string(b)).WithCause(err)
+		return err
 	}
 	*v = DeviceEIRP(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *ADRAckLimitExponent) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := ADRAckLimitExponent_value[s]; ok {
-		*v = ADRAckLimitExponent(i)
-		return nil
+func (v *DeviceEIRP) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromTextPrefix("DeviceEIRP", DeviceEIRP_value, "DEVICE_EIRP_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "ADR_ACK_LIMIT_") {
-		if i, ok := ADRAckLimitExponent_value["ADR_ACK_LIMIT_"+s]; ok {
-			*v = ADRAckLimitExponent(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("ADRAckLimitExponent")(s)
+	*v = DeviceEIRP(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
-func (v *ADRAckLimitExponent) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+func (v *DeviceEIRP) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("DeviceEIRP", DeviceEIRP_name, b)
 	if err != nil {
-		return errCouldNotParse("ADRAckLimitExponent")(string(b)).WithCause(err)
+		return err
+	}
+	*v = DeviceEIRP(i)
+	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v ADRAckLimitExponent) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("ADRAckLimitExponent enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v ADRAckLimitExponent) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *ADRAckLimitExponent) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("ADRAckLimitExponent", ADRAckLimitExponent_name, b)
+	if err != nil {
+		return err
 	}
 	*v = ADRAckLimitExponent(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *ADRAckDelayExponent) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := ADRAckDelayExponent_value[s]; ok {
-		*v = ADRAckDelayExponent(i)
-		return nil
+func (v *ADRAckLimitExponent) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromTextPrefix("ADRAckLimitExponent", ADRAckLimitExponent_value, "ADR_ACK_LIMIT_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "ADR_ACK_DELAY_") {
-		if i, ok := ADRAckDelayExponent_value["ADR_ACK_DELAY_"+s]; ok {
-			*v = ADRAckDelayExponent(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("ADRAckDelayExponent")(s)
+	*v = ADRAckLimitExponent(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
-func (v *ADRAckDelayExponent) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+func (v *ADRAckLimitExponent) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("ADRAckLimitExponent", ADRAckLimitExponent_name, b)
 	if err != nil {
-		return errCouldNotParse("ADRAckDelayExponent")(string(b)).WithCause(err)
+		return err
+	}
+	*v = ADRAckLimitExponent(i)
+	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v ADRAckDelayExponent) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("ADRAckDelayExponent enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v ADRAckDelayExponent) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *ADRAckDelayExponent) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("ADRAckDelayExponent", ADRAckDelayExponent_name, b)
+	if err != nil {
+		return err
 	}
 	*v = ADRAckDelayExponent(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *RxDelay) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := RxDelay_value[s]; ok {
-		*v = RxDelay(i)
-		return nil
+func (v *ADRAckDelayExponent) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromTextPrefix("ADRAckDelayExponent", ADRAckDelayExponent_value, "ADR_ACK_DELAY_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "RX_DELAY_") {
-		if i, ok := RxDelay_value["RX_DELAY_"+s]; ok {
-			*v = RxDelay(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("RxDelay")(s)
+	*v = ADRAckDelayExponent(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
-func (v *RxDelay) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+func (v *ADRAckDelayExponent) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("ADRAckDelayExponent", ADRAckDelayExponent_name, b)
 	if err != nil {
-		return errCouldNotParse("RxDelay")(string(b)).WithCause(err)
+		return err
+	}
+	*v = ADRAckDelayExponent(i)
+	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v RxDelay) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("RxDelay enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v RxDelay) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *RxDelay) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("RxDelay", RxDelay_name, b)
+	if err != nil {
+		return err
 	}
 	*v = RxDelay(i)
 	return nil
 }
 
-// Duration returns v as time.Duration.
-func (v RxDelay) Duration() time.Duration {
-	switch v {
-	case RX_DELAY_0, RX_DELAY_1:
-		return time.Second
-	default:
-		return time.Duration(v) * time.Second
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *RxDelay) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromTextPrefix("RxDelay", RxDelay_value, "RX_DELAY_", b)
+	if err != nil {
+		return err
 	}
+	*v = RxDelay(i)
+	return nil
 }
 
-// Validate reports whether v represents a valid RxDelay.
-func (v RxDelay) Validate() error {
-	if v < 0 || v >= RxDelay(len(RxDelay_name)) {
-		return errExpectedBetween("RxDelay", 0, len(RxDelay_name)-1)(v)
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *RxDelay) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
+	i, err := unmarshalEnumFromNumber("RxDelay", RxDelay_name, b)
+	if err != nil {
+		return err
+	}
+	*v = RxDelay(i)
+	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v Minor) MarshalBinary() ([]byte, error) {
+	if v > 255 {
+		panic(fmt.Errorf("Minor enum exceeds 255"))
+	}
+	return []byte{byte(v)}, nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v Minor) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *Minor) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("Minor", Minor_name, b)
+	if err != nil {
+		return err
+	}
+	*v = Minor(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *Minor) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := Minor_value[s]; ok {
-		*v = Minor(i)
-		return nil
+	i, err := unmarshalEnumFromTextPrefix("Minor", Minor_value, "MINOR_", b)
+	if err != nil {
+		return err
 	}
-	if !strings.HasPrefix(s, "MINOR_") {
-		if i, ok := Minor_value["MINOR_"+s]; ok {
-			*v = Minor(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("Minor")(s)
+	*v = Minor(i)
+	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (v *Minor) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
 	}
-	i, err := strconv.Atoi(string(b))
+	i, err := unmarshalEnumFromNumber("Minor", Minor_name, b)
 	if err != nil {
-		return errCouldNotParse("Minor")(string(b)).WithCause(err)
+		return err
 	}
 	*v = Minor(i)
 	return nil
@@ -891,6 +1325,24 @@ func (v DataRateIndex) String() string {
 // String implements fmt.Stringer.
 func (v DataRateOffset) String() string {
 	return strconv.Itoa(int(v))
+}
+
+// Duration returns v as time.Duration.
+func (v RxDelay) Duration() time.Duration {
+	switch v {
+	case RX_DELAY_0, RX_DELAY_1:
+		return time.Second
+	default:
+		return time.Duration(v) * time.Second
+	}
+}
+
+// Validate reports whether v represents a valid RxDelay.
+func (v RxDelay) Validate() error {
+	if v < 0 || v >= RxDelay(len(RxDelay_name)) {
+		return errExpectedBetween("RxDelay", 0, len(RxDelay_name)-1)(v)
+	}
+	return nil
 }
 
 // String implements fmt.Stringer.

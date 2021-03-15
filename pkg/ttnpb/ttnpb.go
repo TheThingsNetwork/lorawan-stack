@@ -13,3 +13,60 @@
 // limitations under the License.
 
 package ttnpb
+
+import (
+	"strconv"
+)
+
+func unmarshalJSONString(b []byte) ([]byte, bool) {
+	if len(b) >= 2 && b[0] == '"' && b[len(b)-1] == '"' {
+		return b[1 : len(b)-1], true
+	}
+	return b, false
+}
+
+func unmarshalEnumFromBinary(typName string, names map[int32]string, b []byte) (int32, error) {
+	if len(b) != 1 {
+		return 0, errCouldNotParse(typName)(string(b))
+	}
+	i := int32(b[0])
+	if _, ok := names[i]; !ok {
+		return 0, errCouldNotParse(typName)(string(b))
+	}
+	return i, nil
+}
+
+func unmarshalEnumFromNumber(typName string, names map[int32]string, b []byte) (int32, error) {
+	s := string(b)
+	i64, err := strconv.ParseInt(s, 10, 32)
+	if err != nil {
+		return 0, errCouldNotParse(typName)(s).WithCause(err)
+	}
+	i := int32(i64)
+	if _, ok := names[i]; !ok {
+		return 0, errCouldNotParse(typName)(s)
+	}
+	return i, nil
+}
+
+func unmarshalEnumFromText(typName string, values map[string]int32, b []byte) (int32, error) {
+	s := string(b)
+	i, ok := values[s]
+	if !ok {
+		return 0, errCouldNotParse(typName)(s)
+	}
+	return i, nil
+}
+
+func unmarshalEnumFromTextPrefix(typName string, values map[string]int32, prefix string, b []byte) (int32, error) {
+	s := string(b)
+	i, ok := values[s]
+	if ok {
+		return i, nil
+	}
+	i, ok = values[prefix+s]
+	if ok {
+		return i, nil
+	}
+	return 0, errCouldNotParse(typName)(s)
+}

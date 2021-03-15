@@ -115,6 +115,12 @@ func TestEnumMarshalers(t *testing.T) {
 	}
 	vals = append(vals, drIdxs)
 
+	var drOffsets []fmt.Stringer
+	for i := range DataRateOffset_name {
+		drOffsets = append(drOffsets, DataRateOffset(i))
+	}
+	vals = append(vals, drOffsets)
+
 	var rejoins []fmt.Stringer
 	for i := range RejoinType_name {
 		rejoins = append(rejoins, RejoinType(i))
