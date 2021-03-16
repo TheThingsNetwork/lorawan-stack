@@ -159,13 +159,18 @@ var (
 	}
 	mockGatewayEUI    = types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x19}
 	mockErrNotFound   = grpc.Errorf(codes.NotFound, "not found")
-	mockRightsFetcher = rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
-		md := rpcmetadata.FromIncomingContext(ctx)
-		if md.AuthType == "Bearer" {
-			return ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC, ttnpb.RIGHT_GATEWAY_READ_SECRETS), nil
-		}
-		return nil, rights.ErrNoGatewayRights
-	})
+	mockRightsFetcher = struct {
+		rights.AuthInfoFetcher
+		rights.EntityFetcher
+	}{
+		EntityFetcher: rights.EntityFetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+			md := rpcmetadata.FromIncomingContext(ctx)
+			if md.AuthType == "Bearer" {
+				return ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC, ttnpb.RIGHT_GATEWAY_READ_SECRETS), nil
+			}
+			return nil, rights.ErrNoGatewayRights
+		}),
+	}
 )
 
 func TestServer(t *testing.T) {
