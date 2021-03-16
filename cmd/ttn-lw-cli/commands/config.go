@@ -49,6 +49,7 @@ type Config struct {
 	DeviceTemplateConverterGRPCAddress string `name:"device-template-converter-grpc-address" yaml:"device-template-converter-grpc-address" description:"Device Template Converter address"`
 	DeviceClaimingServerGRPCAddress    string `name:"device-claiming-server-grpc-address" yaml:"device-claiming-server-grpc-address" description:"Device Claiming Server address"`
 	QRCodeGeneratorGRPCAddress         string `name:"qr-code-generator-grpc-address" yaml:"qr-code-generator-grpc-address" description:"QR Code Generator address"`
+	PacketBrokerAgentGRPCAddress       string `name:"packet-broker-agent-grpc-address" yaml:"packet-broker-agent-grpc-address" description:"Packet Broker Agent address"`
 	Insecure                           bool   `name:"insecure" yaml:"insecure" description:"Connect without TLS"`
 	CA                                 string `name:"ca" yaml:"ca" description:"CA certificate file"`
 	DumpRequests                       bool   `name:"dump-requests" yaml:"dump-requests" description:"When log level is set to debug, also dump request payload as JSON"`
@@ -72,6 +73,8 @@ func (c Config) getHosts() []string {
 	}
 	hosts = append(hosts, c.DeviceTemplateConverterGRPCAddress)
 	hosts = append(hosts, c.DeviceClaimingServerGRPCAddress)
+	hosts = append(hosts, c.QRCodeGeneratorGRPCAddress)
+	hosts = append(hosts, c.PacketBrokerAgentGRPCAddress)
 	return getHosts(hosts...)
 }
 
@@ -98,6 +101,7 @@ func MakeDefaultConfig(clusterGRPCAddress string, oauthServerAddress string, ins
 		DeviceTemplateConverterGRPCAddress: clusterGRPCAddress,
 		DeviceClaimingServerGRPCAddress:    clusterGRPCAddress,
 		QRCodeGeneratorGRPCAddress:         clusterGRPCAddress,
+		PacketBrokerAgentGRPCAddress:       clusterGRPCAddress,
 		Insecure:                           insecure,
 	}
 }
