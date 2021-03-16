@@ -1880,66 +1880,66 @@
       "file": "package.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loragls/v1/api:request": {
+  "error:pkg/applicationserver/io/packages/loragls/v3/api:request": {
     "translations": {
-      "en": "LoRaCloud GLS request failed"
+      "en": "LoRa Cloud GLS request"
     },
     "description": {
-      "package": "pkg/applicationserver/io/packages/loragls/v1/api",
+      "package": "pkg/applicationserver/io/packages/loragls/v3/api",
       "file": "messages.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loragls/v1:field_not_found": {
+  "error:pkg/applicationserver/io/packages/loragls/v3:field_not_found": {
     "translations": {
       "en": "field `{field}` not found"
     },
     "description": {
-      "package": "pkg/applicationserver/io/packages/loragls/v1",
+      "package": "pkg/applicationserver/io/packages/loragls/v3",
       "file": "data.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loragls/v1:invalid_type": {
+  "error:pkg/applicationserver/io/packages/loragls/v3:invalid_type": {
     "translations": {
       "en": "wrong type `{type}`"
     },
     "description": {
-      "package": "pkg/applicationserver/io/packages/loragls/v1",
+      "package": "pkg/applicationserver/io/packages/loragls/v3",
       "file": "data.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loragls/v1:invalid_value": {
+  "error:pkg/applicationserver/io/packages/loragls/v3:invalid_value": {
     "translations": {
       "en": "wrong value `{value}`"
     },
     "description": {
-      "package": "pkg/applicationserver/io/packages/loragls/v1",
+      "package": "pkg/applicationserver/io/packages/loragls/v3",
       "file": "data.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loragls/v1:location_query_failed": {
+  "error:pkg/applicationserver/io/packages/loragls/v3:location_query": {
     "translations": {
-      "en": "location query failed"
+      "en": "location query"
     },
     "description": {
-      "package": "pkg/applicationserver/io/packages/loragls/v1",
+      "package": "pkg/applicationserver/io/packages/loragls/v3",
       "file": "package.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loragls/v1:no_association": {
+  "error:pkg/applicationserver/io/packages/loragls/v3:no_association": {
     "translations": {
       "en": "no association available"
     },
     "description": {
-      "package": "pkg/applicationserver/io/packages/loragls/v1",
+      "package": "pkg/applicationserver/io/packages/loragls/v3",
       "file": "package.go"
     }
   },
-  "error:pkg/applicationserver/io/packages/loragls/v1:no_result": {
+  "error:pkg/applicationserver/io/packages/loragls/v3:no_result": {
     "translations": {
       "en": "no location query result"
     },
     "description": {
-      "package": "pkg/applicationserver/io/packages/loragls/v1",
+      "package": "pkg/applicationserver/io/packages/loragls/v3",
       "file": "package.go"
     }
   },
@@ -8135,12 +8135,12 @@
       "file": "observability.go"
     }
   },
-  "event:as.packages.loracloudglsv1.fail": {
+  "event:as.packages.loracloudglsv3.fail": {
     "translations": {
       "en": "fail to process upstream message"
     },
     "description": {
-      "package": "pkg/applicationserver/io/packages/loragls/v1",
+      "package": "pkg/applicationserver/io/packages/loragls/v3",
       "file": "observability.go"
     }
   },

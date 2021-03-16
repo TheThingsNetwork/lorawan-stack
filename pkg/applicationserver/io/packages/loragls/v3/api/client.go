@@ -24,7 +24,6 @@ import (
 	"net/url"
 	"path"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api/objects"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
@@ -96,7 +95,7 @@ func WithBaseURL(baseURL *url.URL) Option {
 }
 
 // SolveSingleFrame attempts to solve the location of the end-device using the provided request.
-func (c *Client) SolveSingleFrame(ctx context.Context, request *objects.SingleFrameRequest) (*objects.ExtendedSingleFrameResponse, error) {
+func (c *Client) SolveSingleFrame(ctx context.Context, request *SingleFrameRequest) (*ExtendedSingleFrameResponse, error) {
 	buffer := bytes.NewBuffer(nil)
 	if err := json.NewEncoder(buffer).Encode(request); err != nil {
 		return nil, err
@@ -105,7 +104,7 @@ func (c *Client) SolveSingleFrame(ctx context.Context, request *objects.SingleFr
 	if err != nil {
 		return nil, err
 	}
-	response := &objects.ExtendedSingleFrameResponse{}
+	response := &ExtendedSingleFrameResponse{}
 	err = parse(&response, resp)
 	if err != nil {
 		return nil, err

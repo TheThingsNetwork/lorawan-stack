@@ -26,7 +26,7 @@ import (
 
 const maxResponseSize = (1 << 24)
 
-var errRequest = errors.Define("request", "LoRaCloud GLS request failed")
+var errRequest = errors.Define("request", "LoRa Cloud GLS request")
 
 func parse(result interface{}, res *http.Response) error {
 	defer res.Body.Close()

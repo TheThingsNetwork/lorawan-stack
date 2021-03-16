@@ -22,7 +22,7 @@ import (
 )
 
 var evtPackageFail = events.Define(
-	"as.packages.loracloudglsv1.fail", "fail to process upstream message",
+	"as.packages.loracloudglsv3.fail", "fail to process upstream message",
 	events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 	events.WithErrorDataType(),
 )

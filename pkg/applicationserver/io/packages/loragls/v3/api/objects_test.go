@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package objects_test
+package api_test
 
 import (
 	"encoding/json"
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api/objects"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestUplinkUnmarshal(t *testing.T) {
 	a := assertions.New(t)
-	up := &objects.Uplink{}
+	up := &api.Uplink{}
 
 	err := up.UnmarshalJSON([]byte(`["gtw1", 1, 123, 42.42, 64.64]`))
 	if a.So(err, should.BeNil) {
@@ -50,7 +50,7 @@ func TestUplinkUnmarshal(t *testing.T) {
 func TestUplinkMarshal(t *testing.T) {
 	a := assertions.New(t)
 
-	b, err := json.Marshal(&objects.Uplink{
+	b, err := json.Marshal(&api.Uplink{
 		GatewayID: "gtw1",
 		AntennaID: uint32Ptr(0),
 		TDOA:      uint64Ptr(123),
@@ -61,7 +61,7 @@ func TestUplinkMarshal(t *testing.T) {
 		a.So(b, should.Resemble, []byte(`["gtw1",0,123,456.5,567.8]`))
 	}
 
-	b, err = json.Marshal(&objects.Uplink{
+	b, err = json.Marshal(&api.Uplink{
 		GatewayID: "gtw1",
 		AntennaID: nil,
 		TDOA:      nil,

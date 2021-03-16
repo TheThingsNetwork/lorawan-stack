@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api/objects"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
@@ -57,15 +56,15 @@ func (p *GeolocationPackage) RegisterServices(s *grpc.Server) {}
 func (p *GeolocationPackage) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {}
 
 var (
-	errLocationQueryFailed = errors.DefineInternal("location_query_failed", "location query failed")
-	errNoResult            = errors.DefineNotFound("no_result", "no location query result")
-	errNoAssociation       = errors.DefineInternal("no_association", "no association available")
+	errLocationQuery = errors.DefineInternal("location_query", "location query")
+	errNoResult      = errors.DefineNotFound("no_result", "no location query result")
+	errNoAssociation = errors.DefineInternal("no_association", "no association available")
 )
 
 // HandleUp implements packages.ApplicationPackageHandler.
 func (p *GeolocationPackage) HandleUp(ctx context.Context, def *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) (err error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages/loragls/v1")
-	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loracloudglsv1:%s", events.NewCorrelationID()))...)
+	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loracloudglsv3:%s", events.NewCorrelationID()))...)
 
 	if def == nil && assoc == nil {
 		return errNoAssociation.New()
@@ -112,7 +111,7 @@ func New(server io.Server, registry packages.Registry) packages.ApplicationPacka
 func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data) error {
 	logger := log.FromContext(ctx)
 
-	req := objects.BuildSingleFrameRequest(up.RxMetadata)
+	req := api.BuildSingleFrameRequest(up.RxMetadata)
 	if len(req.Gateways) < 3 {
 		logger.Debug("Not enough gateways available")
 		return nil
@@ -146,7 +145,7 @@ func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceI
 				MessageFormat: message,
 			})
 		}
-		return errLocationQueryFailed.WithDetails(details...)
+		return errLocationQuery.WithDetails(details...)
 	}
 
 	if resp.Result == nil {
@@ -174,15 +173,15 @@ func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids ttnpb.EndD
 	})
 }
 
-func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, position *objects.LocationSolverResult) error {
+func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, position *api.LocationSolverResult) error {
 	if position == nil {
 		return nil
 	}
 	source := ttnpb.SOURCE_UNKNOWN
 	switch position.Algorithm {
-	case objects.Algorithm_RSSI:
+	case api.Algorithm_RSSI:
 		source = ttnpb.SOURCE_LORA_RSSI_GEOLOCATION
-	case objects.Algorithm_TDOA, objects.Algorithm_RSSITDOA:
+	case api.Algorithm_TDOA, api.Algorithm_RSSITDOA:
 		source = ttnpb.SOURCE_LORA_TDOA_GEOLOCATION
 	}
 	location := position.Location

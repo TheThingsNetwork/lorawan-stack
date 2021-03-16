@@ -24,7 +24,6 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api/objects"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -97,7 +96,7 @@ func TestAuth(t *testing.T) {
 }
 
 var (
-	singleFrameRequest = objects.BuildSingleFrameRequest([]*ttnpb.RxMetadata{
+	singleFrameRequest = api.BuildSingleFrameRequest([]*ttnpb.RxMetadata{
 		{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "gtw1",
@@ -125,12 +124,12 @@ var (
 		},
 	})
 
-	singleFrameResponse = objects.SingleFrameResponse{
-		Result: &objects.LocationSolverResult{
+	singleFrameResponse = api.SingleFrameResponse{
+		Result: &api.LocationSolverResult{
 			UsedGateways: 2,
 			HDOP:         float64Ptr(123.4),
-			Algorithm:    objects.Algorithm_RSSITDOA,
-			Location: objects.Location{
+			Algorithm:    api.Algorithm_RSSITDOA,
+			Location: api.Location{
 				Latitude:  123.4,
 				Longitude: 456.7,
 				Tolerance: 123,
@@ -160,7 +159,7 @@ func TestSingleFrame(t *testing.T) {
 			}
 
 			if a.So(req, should.NotBeNil) {
-				request := &objects.SingleFrameRequest{}
+				request := &api.SingleFrameRequest{}
 				a.So(json.NewDecoder(req.Body).Decode(request), should.BeNil)
 				a.So(request, should.Resemble, singleFrameRequest)
 			}
