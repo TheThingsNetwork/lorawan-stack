@@ -13,6 +13,8 @@
 // limitations under the License.
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
+import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 
 export const GET_DEVICE_TEMPLATE_FORMATS_BASE = 'GET_DEVICE_TEMPLATE_FORMATS'
 export const [
@@ -24,6 +26,10 @@ export const [
   {
     request: getDeviceTemplateFormats,
     success: getDeviceTemplateFormatsSuccess,
-    failure: geteviceTemplateFormatsFailure,
+    failure: getDeviceTemplateFormatsFailure,
   },
 ] = createRequestActions(GET_DEVICE_TEMPLATE_FORMATS_BASE)
+export const getDeviceTemplateFormatsFetching = createFetchingSelector(
+  GET_DEVICE_TEMPLATE_FORMATS_BASE,
+)
+export const getDeviceTemplateFormatsError = createErrorSelector(GET_DEVICE_TEMPLATE_FORMATS_BASE)
