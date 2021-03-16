@@ -125,7 +125,7 @@ var (
 		},
 	})
 
-	singleFrameResponse = &objects.SingleFrameResponse{
+	singleFrameResponse = objects.SingleFrameResponse{
 		Result: &objects.LocationSolverResult{
 			UsedGateways: 2,
 			HDOP:         float64Ptr(123.4),

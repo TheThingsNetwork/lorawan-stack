@@ -112,12 +112,17 @@ func New(server io.Server, registry packages.Registry) packages.ApplicationPacka
 func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data) error {
 	logger := log.FromContext(ctx)
 
+	req := objects.BuildSingleFrameRequest(up.RxMetadata)
+	if len(req.Gateways) < 3 {
+		logger.Debug("Not enough gateways available")
+		return nil
+	}
 	client, err := api.New(p.client, api.WithToken(data.Token), api.WithBaseURL(data.ServerURL))
 	if err != nil {
 		logger.WithError(err).Debug("Failed to create API client")
 		return err
 	}
-	resp, err := client.SolveSingleFrame(ctx, objects.BuildSingleFrameRequest(up.RxMetadata))
+	resp, err := client.SolveSingleFrame(ctx, req)
 	if err != nil {
 		logger.WithError(err).Debug("Query failed")
 		return err
