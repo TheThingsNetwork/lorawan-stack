@@ -300,20 +300,17 @@ func (a *Agent) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterPbaHandler(a.Context(), s, conn)
 }
 
-func (a *Agent) dialContext(ctx context.Context) (*grpc.ClientConn, error) {
-	dialOpts, err := a.dialOptions(ctx)
+func (a *Agent) dialContext(ctx context.Context, target string, dialOpts ...grpc.DialOption) (*grpc.ClientConn, error) {
+	baseDialOpts, err := a.dialOptions(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defaultOpts := rpcclient.DefaultDialOptions(ctx)
-	opts := make([]grpc.DialOption, 0, len(defaultOpts)+len(dialOpts)+2)
+	opts := make([]grpc.DialOption, 0, len(defaultOpts)+len(baseDialOpts)+len(dialOpts))
 	opts = append(opts, defaultOpts...)
+	opts = append(opts, baseDialOpts...)
 	opts = append(opts, dialOpts...)
-	opts = append(opts,
-		grpc.WithBlock(),
-		grpc.FailOnNonTempDialError(true),
-	)
-	return grpc.DialContext(ctx, a.dataPlaneAddress, opts...)
+	return grpc.DialContext(ctx, target, opts...)
 }
 
 const (
@@ -330,7 +327,10 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 		"forwarder_cluster_id", a.clusterID,
 	))
 
-	conn, err := a.dialContext(ctx)
+	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
+		grpc.WithBlock(),
+		grpc.FailOnNonTempDialError(true),
+	)
 	if err != nil {
 		return err
 	}
@@ -421,7 +421,10 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 		"group", a.clusterID,
 	))
 
-	conn, err := a.dialContext(ctx)
+	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
+		grpc.WithBlock(),
+		grpc.FailOnNonTempDialError(true),
+	)
 	if err != nil {
 		return err
 	}
@@ -618,7 +621,10 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	))
 	logger := log.FromContext(ctx)
 
-	conn, err := a.dialContext(ctx)
+	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
+		grpc.WithBlock(),
+		grpc.FailOnNonTempDialError(true),
+	)
 	if err != nil {
 		return err
 	}
@@ -804,7 +810,10 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 		"home_network_cluster_id", a.homeNetworkClusterID,
 	))
 
-	conn, err := a.dialContext(ctx)
+	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
+		grpc.WithBlock(),
+		grpc.FailOnNonTempDialError(true),
+	)
 	if err != nil {
 		return err
 	}
