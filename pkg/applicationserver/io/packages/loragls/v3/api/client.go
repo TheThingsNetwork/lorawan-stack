@@ -24,7 +24,7 @@ import (
 	"net/url"
 	"path"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v1/api/objects"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api/objects"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )

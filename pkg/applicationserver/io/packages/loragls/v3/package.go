@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package loracloudgeolocationv1
+package loracloudgeolocationv3
 
 import (
 	"context"
@@ -25,8 +25,8 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v1/api"
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v1/api/objects"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api/objects"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
@@ -38,7 +38,7 @@ import (
 )
 
 // PackageName defines the package name.
-const PackageName = "lora-cloud-geolocation-v1"
+const PackageName = "lora-cloud-geolocation-v3"
 
 // GeolocationPackage is the LoRa Cloud Geolocation application package.
 //
