@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc/peer"
@@ -48,10 +49,25 @@ func (f *defaultFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 	return &ttnpb.EndDevice{EndDeviceIdentifiers: ids}, nil
 }
 
+type defaultMessageProcessor struct{}
+
+func (p *defaultMessageProcessor) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+	return nil
+}
+
+func (p *defaultMessageProcessor) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
+	return nil
+}
+
+func (p *defaultMessageProcessor) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+	return nil
+}
+
 type impl struct {
 	server             io.Server
 	fetcher            EndDeviceFetcher
 	mqttConfigProvider config.MQTTConfigProvider
+	processor          messageprocessors.PayloadProcessor
 }
 
 // WithMQTTConfigProvider sets the MQTT configuration provider for the gRPC frontend.
@@ -68,9 +84,16 @@ func WithEndDeviceFetcher(f EndDeviceFetcher) Option {
 	})
 }
 
+// WithPayloadProcessor sets the PayloadProcessor that will be used by the gRPC frontend.
+func WithPayloadProcessor(processor messageprocessors.PayloadProcessor) Option {
+	return optionFunc(func(i *impl) {
+		i.processor = processor
+	})
+}
+
 // New returns a new gRPC frontend.
 func New(server io.Server, opts ...Option) ttnpb.AppAsServer {
-	i := &impl{server: server, fetcher: &defaultFetcher{}}
+	i := &impl{server: server, fetcher: &defaultFetcher{}, processor: &defaultMessageProcessor{}}
 	for _, opt := range opts {
 		opt.apply(i)
 	}
@@ -185,4 +208,40 @@ func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pb
 		return nil, err
 	}
 	return ttnpb.Empty, nil
+}
+
+func (as *impl) EncodeDownlink(ctx context.Context, req *ttnpb.EncodeDownlinkRequest) (*ttnpb.EncodeDownlinkResponse, error) {
+	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+		return nil, err
+	}
+	if err := as.processor.EncodeDownlink(ctx, *req.EndDeviceIds, req.VersionIds, req.Downlink, req.Formatter, req.Parameter); err != nil {
+		return nil, err
+	}
+	return &ttnpb.EncodeDownlinkResponse{
+		Downlink: req.Downlink,
+	}, nil
+}
+
+func (as *impl) DecodeUplink(ctx context.Context, req *ttnpb.DecodeUplinkRequest) (*ttnpb.DecodeUplinkResponse, error) {
+	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+		return nil, err
+	}
+	if err := as.processor.DecodeUplink(ctx, *req.EndDeviceIds, req.VersionIds, req.Uplink, req.Formatter, req.Parameter); err != nil {
+		return nil, err
+	}
+	return &ttnpb.DecodeUplinkResponse{
+		Uplink: req.Uplink,
+	}, nil
+}
+
+func (as *impl) DecodeDownlink(ctx context.Context, req *ttnpb.DecodeDownlinkRequest) (*ttnpb.DecodeDownlinkResponse, error) {
+	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+		return nil, err
+	}
+	if err := as.processor.DecodeDownlink(ctx, *req.EndDeviceIds, req.VersionIds, req.Downlink, req.Formatter, req.Parameter); err != nil {
+		return nil, err
+	}
+	return &ttnpb.DecodeDownlinkResponse{
+		Downlink: req.Downlink,
+	}, nil
 }
