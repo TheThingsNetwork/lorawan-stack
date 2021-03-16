@@ -20,6 +20,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -130,7 +131,14 @@ func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 			ctx := log.NewContextWithField(ctx, "package", name)
 			err := handler.HandleUp(ctx, pair.defaultAssociation, pair.association, msg)
 			if err != nil {
+				errorLabel := unknown
+				if ttnErr, ok := errors.From(err); ok {
+					errorLabel = ttnErr.FullName()
+				}
+				packagesMetrics.messagesFailed.WithLabelValues(name, errorLabel).Inc()
 				return err
+			} else {
+				packagesMetrics.messagesProcessed.WithLabelValues(name).Inc()
 			}
 		} else {
 			return errNotImplemented.WithAttributes("name", name)

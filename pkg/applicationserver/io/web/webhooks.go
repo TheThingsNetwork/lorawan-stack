@@ -113,11 +113,11 @@ func (s *QueuedSink) Run(ctx context.Context) error {
 					webhookMetrics.webhookQueue.Dec()
 					ctx := req.Context()
 					if err := s.Target.Process(req); err != nil {
+						errorLabel := unknown
 						if ttnErr, ok := errors.From(err); ok {
-							webhookMetrics.webhooksFailed.WithLabelValues(ttnErr.FullName()).Inc()
-						} else {
-							webhookMetrics.webhooksFailed.WithLabelValues(unknown).Inc()
+							errorLabel = ttnErr.FullName()
 						}
+						webhookMetrics.webhooksFailed.WithLabelValues(errorLabel).Inc()
 						log.FromContext(ctx).WithError(err).Warn("Failed to process message")
 					} else {
 						webhookMetrics.webhooksSent.Inc()
