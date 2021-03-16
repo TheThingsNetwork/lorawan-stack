@@ -29,6 +29,7 @@ import {
   mayViewGateways,
   mayViewOrganizationsOfUser,
   mayManageUsers,
+  mayViewOrEditApiKeys,
 } from '@console/lib/feature-checks'
 
 import { logout } from '@console/store/actions/user'
@@ -48,6 +49,7 @@ import Logo from '../logo'
         mayViewGateways: checkFromState(mayViewGateways, state),
         mayViewOrganizations: checkFromState(mayViewOrganizationsOfUser, state),
         mayManageUsers: checkFromState(mayManageUsers, state),
+        mayViewOrEditApiKeys: checkFromState(mayViewOrEditApiKeys, state),
       }
     }
     return { user }
@@ -63,6 +65,7 @@ class Header extends Component {
     mayManageUsers: PropTypes.bool,
     mayViewApplications: PropTypes.bool,
     mayViewGateways: PropTypes.bool,
+    mayViewOrEditApiKeys: PropTypes.bool,
     mayViewOrganizations: PropTypes.bool,
     /** A flag identifying whether the header should display the search input. */
     searchable: PropTypes.bool,
@@ -81,6 +84,7 @@ class Header extends Component {
     mayViewApplications: false,
     mayViewGateways: false,
     mayViewOrganizations: false,
+    mayViewOrEditApiKeys: false,
   }
 
   render() {
@@ -93,6 +97,7 @@ class Header extends Component {
       mayViewGateways,
       mayViewOrganizations,
       mayManageUsers,
+      mayViewOrEditApiKeys,
     } = this.props
 
     const navigation = [
@@ -140,11 +145,13 @@ class Header extends Component {
             path="/admin/user-management"
           />
         )}
-        <Dropdown.Item
-          title={sharedMessages.personalApiKeys}
-          icon="api_keys"
-          path="/user/api-keys"
-        />
+        {mayViewOrEditApiKeys && (
+          <Dropdown.Item
+            title={sharedMessages.personalApiKeys}
+            icon="api_keys"
+            path="/user/api-keys"
+          />
+        )}
         <Dropdown.Item title={sharedMessages.logout} icon="logout" action={handleLogout} />
       </React.Fragment>
     )
@@ -164,11 +171,13 @@ class Header extends Component {
             />
           </React.Fragment>
         )}
-        <Dropdown.Item
-          title={sharedMessages.personalApiKeys}
-          icon="api_keys"
-          path="/user/api-keys"
-        />
+        {mayViewOrEditApiKeys && (
+          <Dropdown.Item
+            title={sharedMessages.personalApiKeys}
+            icon="api_keys"
+            path="/user/api-keys"
+          />
+        )}
       </React.Fragment>
     )
 

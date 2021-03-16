@@ -36,6 +36,7 @@ For details about compatibility between different releases, see the **Commitment
 - `remote_ip` and `user_agent` metadata on OAuth events.
 - `created_at` and `updated_at` fields to API Keys.
 - Telemetry for Packet Broker Agent.
+- User rights check for managing API keys in the Console.
 
 ### Changed
 
