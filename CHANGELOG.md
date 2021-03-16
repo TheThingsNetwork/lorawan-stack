@@ -12,12 +12,15 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - `sentry.environment` configuration option to set the `environment` tag on Sentry reports.
+- TR005 QR code format, with ID `tr005`.
 
 ### Changed
 
 - Default value of `gs.udp.addr-change-block` is now 0, which disables the IP firewall for UDP traffic. Deployments that need to enforce the IP check should set a value greater than 0. Note that the new default value makes UDP connections less secure.
 
 ### Deprecated
+
+- TR005 Draft 2 and 3 QR code formats. Use the final version of the technical recommendation, with ID `tr005`.
 
 ### Removed
 
