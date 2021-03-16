@@ -1384,6 +1384,324 @@
           ]
         },
         {
+          "name": "DecodeDownlinkRequest",
+          "longName": "DecodeDownlinkRequest",
+          "fullName": "ttn.lorawan.v3.DecodeDownlinkRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "end_device_ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "version_ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceVersionIdentifiers",
+              "longType": "EndDeviceVersionIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink",
+              "description": "",
+              "label": "",
+              "type": "ApplicationDownlink",
+              "longType": "ApplicationDownlink",
+              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "formatter",
+              "description": "",
+              "label": "",
+              "type": "PayloadFormatter",
+              "longType": "PayloadFormatter",
+              "fullType": "ttn.lorawan.v3.PayloadFormatter",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "parameter",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DecodeDownlinkResponse",
+          "longName": "DecodeDownlinkResponse",
+          "fullName": "ttn.lorawan.v3.DecodeDownlinkResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "downlink",
+              "description": "",
+              "label": "",
+              "type": "ApplicationDownlink",
+              "longType": "ApplicationDownlink",
+              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DecodeUplinkRequest",
+          "longName": "DecodeUplinkRequest",
+          "fullName": "ttn.lorawan.v3.DecodeUplinkRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "end_device_ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "version_ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceVersionIdentifiers",
+              "longType": "EndDeviceVersionIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "uplink",
+              "description": "",
+              "label": "",
+              "type": "ApplicationUplink",
+              "longType": "ApplicationUplink",
+              "fullType": "ttn.lorawan.v3.ApplicationUplink",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "formatter",
+              "description": "",
+              "label": "",
+              "type": "PayloadFormatter",
+              "longType": "PayloadFormatter",
+              "fullType": "ttn.lorawan.v3.PayloadFormatter",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "parameter",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DecodeUplinkResponse",
+          "longName": "DecodeUplinkResponse",
+          "fullName": "ttn.lorawan.v3.DecodeUplinkResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "uplink",
+              "description": "",
+              "label": "",
+              "type": "ApplicationUplink",
+              "longType": "ApplicationUplink",
+              "fullType": "ttn.lorawan.v3.ApplicationUplink",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EncodeDownlinkRequest",
+          "longName": "EncodeDownlinkRequest",
+          "fullName": "ttn.lorawan.v3.EncodeDownlinkRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "end_device_ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "version_ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceVersionIdentifiers",
+              "longType": "EndDeviceVersionIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink",
+              "description": "",
+              "label": "",
+              "type": "ApplicationDownlink",
+              "longType": "ApplicationDownlink",
+              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "formatter",
+              "description": "",
+              "label": "",
+              "type": "PayloadFormatter",
+              "longType": "PayloadFormatter",
+              "fullType": "ttn.lorawan.v3.PayloadFormatter",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "parameter",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EncodeDownlinkResponse",
+          "longName": "EncodeDownlinkResponse",
+          "fullName": "ttn.lorawan.v3.EncodeDownlinkResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "downlink",
+              "description": "",
+              "label": "",
+              "type": "ApplicationDownlink",
+              "longType": "ApplicationDownlink",
+              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetApplicationLinkRequest",
           "longName": "GetApplicationLinkRequest",
           "fullName": "ttn.lorawan.v3.GetApplicationLinkRequest",
@@ -1666,6 +1984,75 @@
                     {
                       "method": "POST",
                       "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/simulate",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "EncodeDownlink",
+              "description": "",
+              "requestType": "EncodeDownlinkRequest",
+              "requestLongType": "EncodeDownlinkRequest",
+              "requestFullType": "ttn.lorawan.v3.EncodeDownlinkRequest",
+              "requestStreaming": false,
+              "responseType": "EncodeDownlinkResponse",
+              "responseLongType": "EncodeDownlinkResponse",
+              "responseFullType": "ttn.lorawan.v3.EncodeDownlinkResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/encode",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DecodeUplink",
+              "description": "",
+              "requestType": "DecodeUplinkRequest",
+              "requestLongType": "DecodeUplinkRequest",
+              "requestFullType": "ttn.lorawan.v3.DecodeUplinkRequest",
+              "requestStreaming": false,
+              "responseType": "DecodeUplinkResponse",
+              "responseLongType": "DecodeUplinkResponse",
+              "responseFullType": "ttn.lorawan.v3.DecodeUplinkResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/decode",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DecodeDownlink",
+              "description": "",
+              "requestType": "DecodeDownlinkRequest",
+              "requestLongType": "DecodeDownlinkRequest",
+              "requestFullType": "ttn.lorawan.v3.DecodeDownlinkRequest",
+              "requestStreaming": false,
+              "responseType": "DecodeDownlinkResponse",
+              "responseLongType": "DecodeDownlinkResponse",
+              "responseFullType": "ttn.lorawan.v3.DecodeDownlinkResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/decode",
                       "body": "*"
                     }
                   ]

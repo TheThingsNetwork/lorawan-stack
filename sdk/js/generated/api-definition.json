@@ -313,6 +313,48 @@
           ]
         }
       ]
+    },
+    "EncodeDownlink": {
+      "file": "lorawan-stack/api/applicationserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/encode",
+          "body": "*",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id"
+          ]
+        }
+      ]
+    },
+    "DecodeUplink": {
+      "file": "lorawan-stack/api/applicationserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/decode",
+          "body": "*",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id"
+          ]
+        }
+      ]
+    },
+    "DecodeDownlink": {
+      "file": "lorawan-stack/api/applicationserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/decode",
+          "body": "*",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id"
+          ]
+        }
+      ]
     }
   },
   "As": {
