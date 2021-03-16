@@ -36,7 +36,11 @@ import {
   mayViewApplicationDevices,
 } from '@console/lib/feature-checks'
 
-import { getDeviceTemplateFormats } from '@console/store/actions/device-template-formats'
+import {
+  getDeviceTemplateFormats,
+  getDeviceTemplateFormatsError,
+  getDeviceTemplateFormatsFetching,
+} from '@console/store/actions/device-template-formats'
 import { getDevicesList } from '@console/store/actions/devices'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
@@ -99,6 +103,8 @@ const headers = [
       appId: selectSelectedApplicationId(state),
       deviceTemplateFormats: selectDeviceTemplateFormats(state),
       mayCreateDevices: checkFromState(mayCreateOrEditApplicationDevices, state),
+      error: getDeviceTemplateFormatsError(state),
+      fetching: getDeviceTemplateFormatsFetching(state),
     }
   },
   { getDeviceTemplateFormats },
@@ -110,6 +116,8 @@ class DevicesTable extends React.Component {
     appId: PropTypes.string.isRequired,
     devicePathPrefix: PropTypes.string,
     deviceTemplateFormats: PropTypes.shape({}).isRequired,
+    error: PropTypes.error,
+    fetching: PropTypes.bool,
     mayCreateDevices: PropTypes.bool.isRequired,
     totalCount: PropTypes.number,
   }
@@ -117,6 +125,8 @@ class DevicesTable extends React.Component {
   static defaultProps = {
     devicePathPrefix: undefined,
     totalCount: 0,
+    error: undefined,
+    fetching: false,
   }
 
   constructor(props) {
