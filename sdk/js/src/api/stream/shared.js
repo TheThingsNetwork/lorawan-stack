@@ -13,7 +13,7 @@
 // limitations under the License.
 
 export const notify = (listener, ...args) => {
-  if (listener !== null) {
+  if (typeof listener === 'function') {
     listener(...args)
   }
 }
