@@ -18,7 +18,6 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -51,15 +50,26 @@ func (c *mockGatewayRegistryClient) Get(ctx context.Context, in *ttnpb.GetGatewa
 	return c.out, c.err
 }
 
-func TestGetGateway(t *testing.T) {
-	mockRightsFetcher := rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
-		md := rpcmetadata.FromIncomingContext(ctx)
-		if strings.ToLower(md.AuthType) == "bearer" {
-			return ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO), nil
-		}
-		return nil, rights.ErrNoGatewayRights.New()
-	})
+type rightsFetcher struct {
+	rights.AuthInfoFetcher
+	rights.EntityFetcher
+}
 
+func newContextWithRightsFetcher(ctx context.Context) context.Context {
+	return rights.NewContextWithFetcher(ctx, &rightsFetcher{
+		EntityFetcher: rights.EntityFetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+			md := rpcmetadata.FromIncomingContext(ctx)
+			if md.AuthType != "Bearer" {
+				return nil, nil
+			}
+			return ttnpb.RightsFrom(
+				ttnpb.RIGHT_GATEWAY_INFO,
+			), nil
+		}),
+	})
+}
+
+func TestGetGateway(t *testing.T) {
 	for _, tc := range []struct {
 		Name              string
 		SetupStore        func(*mockGatewayRegistryClient)
@@ -169,7 +179,7 @@ func TestGetGateway(t *testing.T) {
 			}
 			c := componenttest.NewComponent(t, conf)
 			c.AddContextFiller(func(ctx context.Context) context.Context {
-				return rights.NewContextWithFetcher(ctx, mockRightsFetcher)
+				return rights.NewContextWithFetcher(ctx, &rightsFetcher{})
 			})
 
 			New(c, WithRegistry(reg), WithAuth(auth))

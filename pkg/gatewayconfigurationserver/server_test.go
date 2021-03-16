@@ -235,24 +235,27 @@ func TestWeb(t *testing.T) {
 	})
 }
 
+type rightsFetcher struct {
+	rights.AuthInfoFetcher
+	rights.EntityFetcher
+}
+
 func newContextWithRightsFetcher(ctx context.Context) context.Context {
-	return rights.NewContextWithFetcher(
-		ctx,
-		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (set *ttnpb.Rights, err error) {
+	return rights.NewContextWithFetcher(ctx, &rightsFetcher{
+		EntityFetcher: rights.EntityFetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
 			uid := unique.ID(ctx, ids)
 			if uid != registeredGatewayUID {
-				return
+				return nil, nil
 			}
 			md := rpcmetadata.FromIncomingContext(ctx)
 			if md.AuthType != "Bearer" || md.AuthValue != registeredGatewayKey {
-				return
+				return nil, nil
 			}
-			set = ttnpb.RightsFrom(
+			return ttnpb.RightsFrom(
 				ttnpb.RIGHT_GATEWAY_INFO,
-			)
-			return
+			), nil
 		}),
-	)
+	})
 }
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
