@@ -42,6 +42,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/cayennelpp"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/javascript"
@@ -63,7 +64,7 @@ type ApplicationServer struct {
 
 	linkRegistry     LinkRegistry
 	deviceRegistry   DeviceRegistry
-	formatters       payloadFormatters
+	formatters       messageprocessors.MapPayloadProcessor
 	webhooks         web.Webhooks
 	webhookTemplates web.TemplateStore
 	pubsub           *pubsub.PubSub
@@ -116,7 +117,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		config:         conf,
 		linkRegistry:   conf.Links,
 		deviceRegistry: wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
-		formatters: payloadFormatters{
+		formatters: messageprocessors.MapPayloadProcessor{
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
 		},
