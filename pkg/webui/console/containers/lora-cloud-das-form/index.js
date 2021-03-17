@@ -46,14 +46,11 @@ import {
 } from '@console/store/selectors/application-packages'
 
 const m = defineMessages({
-  token: 'Token',
+  tokenDescription: 'Device & Application Services Access Token as configured within LoRa Cloud',
   lr1110Encoding: 'LR1110 demo encoding',
   setLoRaCloudToken: 'Set LoRa Cloud token',
-  deleteToken: 'Delete token',
-  deleteWarning: 'Are you sure you want to delete the current token? This action cannot be undone.',
-  tokenUpdated: 'Token updated',
-  tokenDeleted: 'Token deleted',
-  setToken: 'Set token',
+  deleteWarning:
+    'Are you sure you want to delete the LoRa Cloud Device & Application Services token? This action cannot be undone.',
 })
 
 const validationSchema = Yup.object()
@@ -97,7 +94,7 @@ const LoRaCloudDASForm = () => {
         )
         toast({
           title: 'LoRa Cloud',
-          message: m.tokenUpdated,
+          message: sharedMessages.tokenUpdated,
           type: toast.types.SUCCESS,
         })
       } catch (error) {
@@ -116,7 +113,7 @@ const LoRaCloudDASForm = () => {
       )
       toast({
         title: 'LoRa Cloud',
-        message: m.tokenDeleted,
+        message: sharedMessages.tokenDeleted,
         type: toast.types.SUCCESS,
       })
     } catch (error) {
@@ -139,15 +136,21 @@ const LoRaCloudDASForm = () => {
         onSubmit={handleSubmit}
         enableReinitialize
       >
-        <Form.Field component={Input} title={m.token} name="data.token" required />
+        <Form.Field
+          component={Input}
+          title={sharedMessages.token}
+          description={m.tokenDescription}
+          name="data.token"
+          required
+        />
         <Form.Field component={Checkbox} title={m.lr1110Encoding} name="data.use_tlv_encoding" />
         <SubmitBar>
-          <Form.Submit component={SubmitButton} message={m.setToken} />
+          <Form.Submit component={SubmitButton} message={sharedMessages.tokenSet} />
           {Boolean(defaultAssociation) && (
             <ModalButton
               type="button"
               icon="delete"
-              message={m.deleteToken}
+              message={sharedMessages.tokenDelete}
               modalData={{
                 message: m.deleteWarning,
               }}

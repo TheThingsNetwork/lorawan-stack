@@ -45,13 +45,10 @@ import {
 } from '@console/store/selectors/application-packages'
 
 const m = defineMessages({
-  token: 'Token',
+  tokenDescription: 'Geolocation access token as configured within LoRa Cloud',
   setLoRaCloudToken: 'Set LoRa Cloud token',
-  deleteToken: 'Delete token',
-  deleteWarning: 'Are you sure you want to delete the current token? This action cannot be undone.',
-  tokenUpdated: 'Token updated',
-  tokenDeleted: 'Token deleted',
-  setToken: 'Set token',
+  deleteWarning:
+    'Are you sure you want to delete the LoRaCloud Geolocation token? This action cannot be undone.',
 })
 
 const validationSchema = Yup.object()
@@ -96,7 +93,7 @@ const LoRaCloudGLSForm = () => {
         )
         toast({
           title: 'LoRa Cloud',
-          message: m.tokenUpdated,
+          message: sharedMessages.tokenUpdated,
           type: toast.types.SUCCESS,
         })
       } catch (error) {
@@ -115,7 +112,7 @@ const LoRaCloudGLSForm = () => {
       )
       toast({
         title: 'LoRa Cloud',
-        message: m.tokenDeleted,
+        message: sharedMessages.tokenDeleted,
         type: toast.types.SUCCESS,
       })
     } catch (error) {
@@ -138,14 +135,20 @@ const LoRaCloudGLSForm = () => {
         onSubmit={handleSubmit}
         enableReinitialize
       >
-        <Form.Field component={Input} title={m.token} name="data.token" required />
+        <Form.Field
+          component={Input}
+          title={sharedMessages.token}
+          description={m.tokenDescription}
+          name="data.token"
+          required
+        />
         <SubmitBar>
-          <Form.Submit component={SubmitButton} message={m.setToken} />
+          <Form.Submit component={SubmitButton} message={sharedMessages.tokenSet} />
           {Boolean(defaultAssociation) && (
             <ModalButton
               type="button"
               icon="delete"
-              message={m.deleteToken}
+              message={sharedMessages.tokenDelete}
               modalData={{
                 message: m.deleteWarning,
               }}
