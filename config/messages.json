@@ -2366,15 +2366,6 @@
       "file": "registry.go"
     }
   },
-  "error:pkg/applicationserver:formatter_not_configured": {
-    "translations": {
-      "en": "formatter `{formatter}` is not configured"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "payload.go"
-    }
-  },
   "error:pkg/applicationserver:invalid_ttl": {
     "translations": {
       "en": "Invalid TTL `{ttl}`"
@@ -6099,6 +6090,15 @@
     "description": {
       "package": "pkg/messageprocessors/javascript",
       "file": "javascript.go"
+    }
+  },
+  "error:pkg/messageprocessors:formatter_not_configured": {
+    "translations": {
+      "en": "formatter `{formatter}` is not configured"
+    },
+    "description": {
+      "package": "pkg/messageprocessors",
+      "file": "payload.go"
     }
   },
   "error:pkg/networkserver/internal:corrupted_mac_state": {

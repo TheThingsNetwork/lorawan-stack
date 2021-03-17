@@ -23,7 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -155,43 +154,6 @@ func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndD
 		} else if len(downlink.DecodedPayloadWarnings) > 0 {
 			events.Publish(evtDecodeWarningDataDown.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, downlink))
 		}
-	}
-	return nil
-}
-
-type payloadFormatters map[ttnpb.PayloadFormatter]messageprocessors.PayloadEncodeDecoder
-
-var errFormatterNotConfigured = errors.DefineFailedPrecondition("formatter_not_configured", "formatter `{formatter}` is not configured")
-
-func (p payloadFormatters) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
-	mp, ok := p[formatter]
-	if !ok {
-		return errFormatterNotConfigured.WithAttributes("formatter", formatter)
-	}
-	if err := mp.EncodeDownlink(ctx, ids, version, msg, parameter); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p payloadFormatters) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
-	mp, ok := p[formatter]
-	if !ok {
-		return errFormatterNotConfigured.WithAttributes("formatter", formatter)
-	}
-	if err := mp.DecodeUplink(ctx, ids, version, msg, parameter); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p payloadFormatters) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
-	mp, ok := p[formatter]
-	if !ok {
-		return errFormatterNotConfigured.WithAttributes("formatter", formatter)
-	}
-	if err := mp.DecodeDownlink(ctx, ids, version, msg, parameter); err != nil {
-		return err
 	}
 	return nil
 }

@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	. "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/grpc"
@@ -31,6 +32,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
+	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/cayennelpp"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -520,5 +523,129 @@ func TestSimulateUplink(t *testing.T) {
 				t.Fatal("Timed out waiting for simulated uplink")
 			}
 		})
+	}
+}
+
+func TestMessageProcessors(t *testing.T) {
+	a := assertions.New(t)
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: cluster.Config{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	as := mock.NewServer(c)
+	srv := New(as, WithPayloadProcessor(&messageprocessors.MapPayloadProcessor{
+		ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
+	}))
+	c.RegisterGRPC(&mockRegisterer{ctx, srv})
+	componenttest.StartComponent(t, c)
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+
+	client := ttnpb.NewAppAsClient(c.LoopbackConn())
+
+	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "Bearer",
+		AuthValue:     registeredApplicationKey,
+		AllowInsecure: true,
+	})
+
+	{
+		resp, err := client.EncodeDownlink(ctx, &ttnpb.EncodeDownlinkRequest{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: registeredApplicationID,
+				DeviceID:               "foobar",
+			},
+			Downlink: &ttnpb.ApplicationDownlink{
+				DecodedPayload: &pbtypes.Struct{
+					Fields: map[string]*pbtypes.Value{
+						"value_2": {
+							Kind: &pbtypes.Value_NumberValue{
+								NumberValue: -50.51,
+							},
+						},
+					},
+				},
+				FPort: 1,
+			},
+			Formatter: ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
+		}, creds)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		if a.So(resp.Downlink, should.NotBeNil) {
+			a.So(resp.Downlink.FPort, should.Equal, 1)
+			a.So(resp.Downlink.FRMPayload, should.Resemble, []byte{2, 236, 69})
+		}
+	}
+
+	{
+		resp, err := client.DecodeUplink(ctx, &ttnpb.DecodeUplinkRequest{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: registeredApplicationID,
+				DeviceID:               "foobar",
+			},
+			Uplink: &ttnpb.ApplicationUplink{
+				FRMPayload: []byte{1, 0, 255},
+				RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+				Settings:   ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
+				FPort:      1,
+			},
+			Formatter: ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
+		}, creds)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		if a.So(resp.Uplink, should.NotBeNil) {
+			a.So(resp.Uplink.FPort, should.Equal, 1)
+			a.So(resp.Uplink.DecodedPayload, should.Resemble, &pbtypes.Struct{
+				Fields: map[string]*pbtypes.Value{
+					"digital_in_1": {
+						Kind: &pbtypes.Value_NumberValue{NumberValue: 255},
+					},
+				},
+			})
+		}
+	}
+
+	{
+		resp, err := client.DecodeDownlink(ctx, &ttnpb.DecodeDownlinkRequest{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: registeredApplicationID,
+				DeviceID:               "foobar",
+			},
+			Downlink: &ttnpb.ApplicationDownlink{
+				FRMPayload: []byte{2, 236, 69},
+				FPort:      1,
+			},
+			Formatter: ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
+		}, creds)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		if a.So(resp.Downlink, should.NotBeNil) {
+			a.So(resp.Downlink.FPort, should.Equal, 1)
+			a.So(resp.Downlink.DecodedPayload, should.Resemble, &pbtypes.Struct{
+				Fields: map[string]*pbtypes.Value{
+					"value_2": {
+						Kind: &pbtypes.Value_NumberValue{
+							NumberValue: -50.51,
+						},
+					},
+				},
+			})
+		}
 	}
 }

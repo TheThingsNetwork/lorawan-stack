@@ -597,6 +597,372 @@ func (m *NsAsHandleUplinkRequest) GetApplicationUps() []*ApplicationUp {
 	return nil
 }
 
+type EncodeDownlinkRequest struct {
+	EndDeviceIds         *EndDeviceIdentifiers        `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,proto3" json:"end_device_ids,omitempty"`
+	VersionIds           *EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=version_ids,json=versionIds,proto3" json:"version_ids,omitempty"`
+	Downlink             *ApplicationDownlink         `protobuf:"bytes,3,opt,name=downlink,proto3" json:"downlink,omitempty"`
+	Formatter            PayloadFormatter             `protobuf:"varint,4,opt,name=formatter,proto3,enum=ttn.lorawan.v3.PayloadFormatter" json:"formatter,omitempty"`
+	Parameter            string                       `protobuf:"bytes,5,opt,name=parameter,proto3" json:"parameter,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
+}
+
+func (m *EncodeDownlinkRequest) Reset()      { *m = EncodeDownlinkRequest{} }
+func (*EncodeDownlinkRequest) ProtoMessage() {}
+func (*EncodeDownlinkRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_df9d75a19dc066e1, []int{8}
+}
+func (m *EncodeDownlinkRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EncodeDownlinkRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EncodeDownlinkRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EncodeDownlinkRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EncodeDownlinkRequest.Merge(m, src)
+}
+func (m *EncodeDownlinkRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *EncodeDownlinkRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_EncodeDownlinkRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EncodeDownlinkRequest proto.InternalMessageInfo
+
+func (m *EncodeDownlinkRequest) GetEndDeviceIds() *EndDeviceIdentifiers {
+	if m != nil {
+		return m.EndDeviceIds
+	}
+	return nil
+}
+
+func (m *EncodeDownlinkRequest) GetVersionIds() *EndDeviceVersionIdentifiers {
+	if m != nil {
+		return m.VersionIds
+	}
+	return nil
+}
+
+func (m *EncodeDownlinkRequest) GetDownlink() *ApplicationDownlink {
+	if m != nil {
+		return m.Downlink
+	}
+	return nil
+}
+
+func (m *EncodeDownlinkRequest) GetFormatter() PayloadFormatter {
+	if m != nil {
+		return m.Formatter
+	}
+	return PayloadFormatter_FORMATTER_NONE
+}
+
+func (m *EncodeDownlinkRequest) GetParameter() string {
+	if m != nil {
+		return m.Parameter
+	}
+	return ""
+}
+
+type EncodeDownlinkResponse struct {
+	Downlink             *ApplicationDownlink `protobuf:"bytes,1,opt,name=downlink,proto3" json:"downlink,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
+}
+
+func (m *EncodeDownlinkResponse) Reset()      { *m = EncodeDownlinkResponse{} }
+func (*EncodeDownlinkResponse) ProtoMessage() {}
+func (*EncodeDownlinkResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_df9d75a19dc066e1, []int{9}
+}
+func (m *EncodeDownlinkResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EncodeDownlinkResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EncodeDownlinkResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EncodeDownlinkResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EncodeDownlinkResponse.Merge(m, src)
+}
+func (m *EncodeDownlinkResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *EncodeDownlinkResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_EncodeDownlinkResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EncodeDownlinkResponse proto.InternalMessageInfo
+
+func (m *EncodeDownlinkResponse) GetDownlink() *ApplicationDownlink {
+	if m != nil {
+		return m.Downlink
+	}
+	return nil
+}
+
+type DecodeUplinkRequest struct {
+	EndDeviceIds         *EndDeviceIdentifiers        `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,proto3" json:"end_device_ids,omitempty"`
+	VersionIds           *EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=version_ids,json=versionIds,proto3" json:"version_ids,omitempty"`
+	Uplink               *ApplicationUplink           `protobuf:"bytes,3,opt,name=uplink,proto3" json:"uplink,omitempty"`
+	Formatter            PayloadFormatter             `protobuf:"varint,4,opt,name=formatter,proto3,enum=ttn.lorawan.v3.PayloadFormatter" json:"formatter,omitempty"`
+	Parameter            string                       `protobuf:"bytes,5,opt,name=parameter,proto3" json:"parameter,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
+}
+
+func (m *DecodeUplinkRequest) Reset()      { *m = DecodeUplinkRequest{} }
+func (*DecodeUplinkRequest) ProtoMessage() {}
+func (*DecodeUplinkRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_df9d75a19dc066e1, []int{10}
+}
+func (m *DecodeUplinkRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DecodeUplinkRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DecodeUplinkRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DecodeUplinkRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DecodeUplinkRequest.Merge(m, src)
+}
+func (m *DecodeUplinkRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *DecodeUplinkRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DecodeUplinkRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DecodeUplinkRequest proto.InternalMessageInfo
+
+func (m *DecodeUplinkRequest) GetEndDeviceIds() *EndDeviceIdentifiers {
+	if m != nil {
+		return m.EndDeviceIds
+	}
+	return nil
+}
+
+func (m *DecodeUplinkRequest) GetVersionIds() *EndDeviceVersionIdentifiers {
+	if m != nil {
+		return m.VersionIds
+	}
+	return nil
+}
+
+func (m *DecodeUplinkRequest) GetUplink() *ApplicationUplink {
+	if m != nil {
+		return m.Uplink
+	}
+	return nil
+}
+
+func (m *DecodeUplinkRequest) GetFormatter() PayloadFormatter {
+	if m != nil {
+		return m.Formatter
+	}
+	return PayloadFormatter_FORMATTER_NONE
+}
+
+func (m *DecodeUplinkRequest) GetParameter() string {
+	if m != nil {
+		return m.Parameter
+	}
+	return ""
+}
+
+type DecodeUplinkResponse struct {
+	Uplink               *ApplicationUplink `protobuf:"bytes,1,opt,name=uplink,proto3" json:"uplink,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
+}
+
+func (m *DecodeUplinkResponse) Reset()      { *m = DecodeUplinkResponse{} }
+func (*DecodeUplinkResponse) ProtoMessage() {}
+func (*DecodeUplinkResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_df9d75a19dc066e1, []int{11}
+}
+func (m *DecodeUplinkResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DecodeUplinkResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DecodeUplinkResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DecodeUplinkResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DecodeUplinkResponse.Merge(m, src)
+}
+func (m *DecodeUplinkResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *DecodeUplinkResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DecodeUplinkResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DecodeUplinkResponse proto.InternalMessageInfo
+
+func (m *DecodeUplinkResponse) GetUplink() *ApplicationUplink {
+	if m != nil {
+		return m.Uplink
+	}
+	return nil
+}
+
+type DecodeDownlinkRequest struct {
+	EndDeviceIds         *EndDeviceIdentifiers        `protobuf:"bytes,1,opt,name=end_device_ids,json=endDeviceIds,proto3" json:"end_device_ids,omitempty"`
+	VersionIds           *EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=version_ids,json=versionIds,proto3" json:"version_ids,omitempty"`
+	Downlink             *ApplicationDownlink         `protobuf:"bytes,3,opt,name=downlink,proto3" json:"downlink,omitempty"`
+	Formatter            PayloadFormatter             `protobuf:"varint,4,opt,name=formatter,proto3,enum=ttn.lorawan.v3.PayloadFormatter" json:"formatter,omitempty"`
+	Parameter            string                       `protobuf:"bytes,5,opt,name=parameter,proto3" json:"parameter,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
+}
+
+func (m *DecodeDownlinkRequest) Reset()      { *m = DecodeDownlinkRequest{} }
+func (*DecodeDownlinkRequest) ProtoMessage() {}
+func (*DecodeDownlinkRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_df9d75a19dc066e1, []int{12}
+}
+func (m *DecodeDownlinkRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DecodeDownlinkRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DecodeDownlinkRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DecodeDownlinkRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DecodeDownlinkRequest.Merge(m, src)
+}
+func (m *DecodeDownlinkRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *DecodeDownlinkRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DecodeDownlinkRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DecodeDownlinkRequest proto.InternalMessageInfo
+
+func (m *DecodeDownlinkRequest) GetEndDeviceIds() *EndDeviceIdentifiers {
+	if m != nil {
+		return m.EndDeviceIds
+	}
+	return nil
+}
+
+func (m *DecodeDownlinkRequest) GetVersionIds() *EndDeviceVersionIdentifiers {
+	if m != nil {
+		return m.VersionIds
+	}
+	return nil
+}
+
+func (m *DecodeDownlinkRequest) GetDownlink() *ApplicationDownlink {
+	if m != nil {
+		return m.Downlink
+	}
+	return nil
+}
+
+func (m *DecodeDownlinkRequest) GetFormatter() PayloadFormatter {
+	if m != nil {
+		return m.Formatter
+	}
+	return PayloadFormatter_FORMATTER_NONE
+}
+
+func (m *DecodeDownlinkRequest) GetParameter() string {
+	if m != nil {
+		return m.Parameter
+	}
+	return ""
+}
+
+type DecodeDownlinkResponse struct {
+	Downlink             *ApplicationDownlink `protobuf:"bytes,1,opt,name=downlink,proto3" json:"downlink,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
+}
+
+func (m *DecodeDownlinkResponse) Reset()      { *m = DecodeDownlinkResponse{} }
+func (*DecodeDownlinkResponse) ProtoMessage() {}
+func (*DecodeDownlinkResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_df9d75a19dc066e1, []int{13}
+}
+func (m *DecodeDownlinkResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DecodeDownlinkResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DecodeDownlinkResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DecodeDownlinkResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DecodeDownlinkResponse.Merge(m, src)
+}
+func (m *DecodeDownlinkResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *DecodeDownlinkResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DecodeDownlinkResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DecodeDownlinkResponse proto.InternalMessageInfo
+
+func (m *DecodeDownlinkResponse) GetDownlink() *ApplicationDownlink {
+	if m != nil {
+		return m.Downlink
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterEnum("ttn.lorawan.v3.AsConfiguration_PubSub_Providers_Status", AsConfiguration_PubSub_Providers_Status_name, AsConfiguration_PubSub_Providers_Status_value)
 	golang_proto.RegisterEnum("ttn.lorawan.v3.AsConfiguration_PubSub_Providers_Status", AsConfiguration_PubSub_Providers_Status_name, AsConfiguration_PubSub_Providers_Status_value)
@@ -620,6 +986,18 @@ func init() {
 	golang_proto.RegisterType((*GetAsConfigurationResponse)(nil), "ttn.lorawan.v3.GetAsConfigurationResponse")
 	proto.RegisterType((*NsAsHandleUplinkRequest)(nil), "ttn.lorawan.v3.NsAsHandleUplinkRequest")
 	golang_proto.RegisterType((*NsAsHandleUplinkRequest)(nil), "ttn.lorawan.v3.NsAsHandleUplinkRequest")
+	proto.RegisterType((*EncodeDownlinkRequest)(nil), "ttn.lorawan.v3.EncodeDownlinkRequest")
+	golang_proto.RegisterType((*EncodeDownlinkRequest)(nil), "ttn.lorawan.v3.EncodeDownlinkRequest")
+	proto.RegisterType((*EncodeDownlinkResponse)(nil), "ttn.lorawan.v3.EncodeDownlinkResponse")
+	golang_proto.RegisterType((*EncodeDownlinkResponse)(nil), "ttn.lorawan.v3.EncodeDownlinkResponse")
+	proto.RegisterType((*DecodeUplinkRequest)(nil), "ttn.lorawan.v3.DecodeUplinkRequest")
+	golang_proto.RegisterType((*DecodeUplinkRequest)(nil), "ttn.lorawan.v3.DecodeUplinkRequest")
+	proto.RegisterType((*DecodeUplinkResponse)(nil), "ttn.lorawan.v3.DecodeUplinkResponse")
+	golang_proto.RegisterType((*DecodeUplinkResponse)(nil), "ttn.lorawan.v3.DecodeUplinkResponse")
+	proto.RegisterType((*DecodeDownlinkRequest)(nil), "ttn.lorawan.v3.DecodeDownlinkRequest")
+	golang_proto.RegisterType((*DecodeDownlinkRequest)(nil), "ttn.lorawan.v3.DecodeDownlinkRequest")
+	proto.RegisterType((*DecodeDownlinkResponse)(nil), "ttn.lorawan.v3.DecodeDownlinkResponse")
+	golang_proto.RegisterType((*DecodeDownlinkResponse)(nil), "ttn.lorawan.v3.DecodeDownlinkResponse")
 }
 
 func init() {
@@ -630,114 +1008,132 @@ func init() {
 }
 
 var fileDescriptor_df9d75a19dc066e1 = []byte{
-	// 1711 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x58, 0x4d, 0x6c, 0x1b, 0xc7,
-	0x15, 0xde, 0x21, 0x29, 0x89, 0x1a, 0x3b, 0xb2, 0x3c, 0x76, 0x13, 0x89, 0x49, 0x97, 0xc6, 0xc6,
-	0x4d, 0x25, 0x21, 0xdc, 0x75, 0xe5, 0xfe, 0xaa, 0x68, 0x85, 0xa5, 0x25, 0x2b, 0x12, 0x24, 0x45,
-	0x59, 0x4a, 0x35, 0xe0, 0xd8, 0x21, 0x86, 0xdc, 0x21, 0xb5, 0xe0, 0x72, 0x77, 0xb3, 0x33, 0x4b,
-	0x45, 0xfe, 0x01, 0x82, 0xc2, 0x48, 0x83, 0x1c, 0xda, 0x20, 0x45, 0x80, 0x1c, 0x5b, 0xb4, 0x05,
-	0x72, 0x0c, 0xda, 0x43, 0x73, 0x6a, 0x03, 0x14, 0x05, 0x5c, 0xf4, 0xe2, 0xa0, 0x97, 0x5c, 0xaa,
-	0x46, 0xcb, 0x1e, 0x02, 0xf4, 0x92, 0x63, 0xe0, 0x53, 0xb1, 0xb3, 0xcb, 0x7f, 0x52, 0xa2, 0x7f,
-	0xe0, 0xdc, 0x66, 0xe6, 0xbd, 0xf7, 0xbd, 0xef, 0xbd, 0x79, 0xef, 0x0d, 0x97, 0x70, 0xd6, 0xb4,
-	0x5d, 0xbc, 0x87, 0xad, 0x0c, 0x65, 0xb8, 0x58, 0x51, 0xb0, 0x63, 0x28, 0xd8, 0x71, 0x4c, 0xa3,
-	0x88, 0x99, 0x61, 0x5b, 0x94, 0xb8, 0x35, 0xe2, 0xca, 0x8e, 0x6b, 0x33, 0x1b, 0x4d, 0x30, 0x66,
-	0xc9, 0x91, 0xba, 0x5c, 0xbb, 0x98, 0x52, 0xcb, 0x06, 0xdb, 0xf5, 0x0a, 0x72, 0xd1, 0xae, 0x2a,
-	0xc4, 0xaa, 0xd9, 0xfb, 0x8e, 0x6b, 0xbf, 0xb1, 0xaf, 0x70, 0xe5, 0x62, 0xa6, 0x4c, 0xac, 0x4c,
-	0x0d, 0x9b, 0x86, 0x8e, 0x19, 0x51, 0x7a, 0x16, 0x21, 0x64, 0x2a, 0xd3, 0x06, 0x51, 0xb6, 0xcb,
-	0x76, 0x68, 0x5c, 0xf0, 0x4a, 0x7c, 0xc7, 0x37, 0x7c, 0x15, 0xa9, 0x3f, 0x57, 0xb6, 0xed, 0xb2,
-	0x49, 0x42, 0x96, 0x96, 0x65, 0xb3, 0x90, 0x64, 0x24, 0x7d, 0x36, 0x92, 0x36, 0x31, 0x48, 0xd5,
-	0x61, 0xfb, 0x91, 0xf0, 0x5c, 0xb7, 0xb0, 0x64, 0x10, 0x53, 0xcf, 0x57, 0x31, 0xad, 0x44, 0x1a,
-	0xe9, 0x6e, 0x0d, 0x66, 0x54, 0x09, 0x65, 0xb8, 0xea, 0x44, 0x0a, 0x62, 0xb7, 0xc2, 0x9e, 0x8b,
-	0x1d, 0x87, 0xb8, 0x0d, 0xff, 0x52, 0x6f, 0x2a, 0x89, 0xa5, 0xe7, 0x75, 0x52, 0x33, 0x8a, 0x8d,
-	0x80, 0x9f, 0xef, 0xd5, 0x31, 0x74, 0x62, 0x31, 0xa3, 0x64, 0xb4, 0x80, 0xce, 0xf5, 0x2a, 0x55,
-	0x09, 0xa5, 0xb8, 0x4c, 0x1a, 0x1a, 0xcf, 0xf5, 0xd1, 0x78, 0x9d, 0xb1, 0x50, 0x2a, 0xfd, 0x1b,
-	0xc0, 0x53, 0x6a, 0xeb, 0x12, 0xd7, 0x0d, 0xab, 0x82, 0xae, 0x40, 0xa4, 0x93, 0x12, 0xf6, 0x4c,
-	0x96, 0x2f, 0xd9, 0x6e, 0x15, 0x33, 0x46, 0x5c, 0x3a, 0x15, 0x3f, 0x07, 0x66, 0x4e, 0xcc, 0xcf,
-	0xc8, 0x9d, 0x37, 0x2b, 0x6f, 0x84, 0xde, 0xb6, 0xf0, 0xbe, 0x69, 0x63, 0xfd, 0x72, 0x53, 0x5f,
-	0x3b, 0x1d, 0x61, 0xb4, 0x8e, 0xd0, 0x34, 0x8c, 0x33, 0x93, 0x4e, 0x25, 0xce, 0x81, 0x99, 0x64,
-	0x76, 0xcc, 0x3f, 0x48, 0xc7, 0xb7, 0xd7, 0x73, 0x5a, 0x70, 0x86, 0xd6, 0xe0, 0x19, 0x5a, 0x31,
-	0x9c, 0xbc, 0x13, 0xe2, 0xe4, 0x8b, 0xee, 0xbe, 0xc3, 0xec, 0xa9, 0x11, 0xee, 0x34, 0x25, 0x87,
-	0xe9, 0x94, 0x1b, 0xe9, 0x94, 0xb3, 0xb6, 0x6d, 0xfe, 0x0c, 0x9b, 0x1e, 0xd1, 0x4e, 0x07, 0x66,
-	0x91, 0xf7, 0x4b, 0xdc, 0x68, 0x2d, 0x91, 0x04, 0x93, 0xb1, 0xb5, 0x44, 0x32, 0x36, 0x19, 0x97,
-	0xfe, 0x0a, 0xe0, 0xf4, 0x0a, 0x61, 0x5d, 0x21, 0x6a, 0xe4, 0x75, 0x8f, 0x50, 0x86, 0x30, 0x3c,
-	0xd5, 0x56, 0xc1, 0x79, 0x43, 0xa7, 0x53, 0x80, 0x7b, 0x7c, 0xa1, 0x3b, 0xcc, 0x36, 0x80, 0xd5,
-	0xd6, 0x25, 0x64, 0x27, 0xef, 0x67, 0x47, 0xde, 0x01, 0xb1, 0x49, 0x70, 0xf7, 0x20, 0x2d, 0xdc,
-	0x3b, 0x48, 0x03, 0x6d, 0x02, 0xb7, 0x6b, 0x52, 0xb4, 0x08, 0x61, 0xab, 0x7c, 0xa6, 0x62, 0x03,
-	0xe2, 0xb9, 0x1c, 0xa8, 0x6c, 0x60, 0x5a, 0xc9, 0x26, 0x02, 0x24, 0x6d, 0xbc, 0xd4, 0x38, 0x90,
-	0xde, 0x8a, 0xc1, 0xe9, 0xdc, 0xd7, 0x19, 0xc1, 0x32, 0x4c, 0x98, 0x86, 0xd5, 0xe0, 0x9e, 0x3e,
-	0x02, 0x37, 0x20, 0xd6, 0x07, 0x90, 0x9b, 0x77, 0x25, 0x22, 0xfe, 0xe0, 0x89, 0xf8, 0x55, 0x02,
-	0x9e, 0xed, 0x72, 0x96, 0x63, 0x98, 0x51, 0xf4, 0x13, 0x38, 0x1e, 0x78, 0x20, 0x7a, 0x1e, 0xb3,
-	0x28, 0xfa, 0x5e, 0xe0, 0xed, 0x46, 0x87, 0x66, 0x13, 0xef, 0xfe, 0x27, 0x0d, 0xb4, 0x64, 0x68,
-	0xa2, 0x32, 0xf4, 0x77, 0x00, 0x9f, 0xb6, 0x08, 0xdb, 0xb3, 0xdd, 0x4a, 0x3e, 0x1c, 0x62, 0x79,
-	0xac, 0xeb, 0x2e, 0xa1, 0x94, 0x87, 0x3c, 0x9e, 0xfd, 0x25, 0xb8, 0x9f, 0x7d, 0x07, 0xb8, 0xbf,
-	0x00, 0xf3, 0x77, 0xc0, 0x6b, 0x33, 0x8b, 0x0b, 0x33, 0x8b, 0x0b, 0xaf, 0xe2, 0xcc, 0x0d, 0x35,
-	0x73, 0xf5, 0x42, 0xe6, 0x47, 0xd7, 0x6f, 0xb5, 0xad, 0x5b, 0xcb, 0x6b, 0x99, 0xeb, 0x73, 0x6d,
-	0x82, 0xd9, 0x6b, 0xf2, 0xec, 0x5c, 0x60, 0xa7, 0x66, 0xae, 0xe2, 0xcc, 0x8d, 0xd0, 0xae, 0xb5,
-	0x6e, 0x2d, 0xb9, 0x5d, 0x4b, 0x30, 0x3b, 0xb3, 0xb8, 0xb0, 0xf0, 0x6a, 0xb0, 0xba, 0xf9, 0x9d,
-	0x17, 0xbf, 0x77, 0x7b, 0x76, 0xf1, 0xfc, 0xad, 0xd7, 0xce, 0x6b, 0x67, 0x23, 0xba, 0x39, 0xce,
-	0x56, 0x0d, 0xc9, 0xa2, 0x97, 0xe1, 0x19, 0x13, 0x53, 0x96, 0xf7, 0x9c, 0xbc, 0x4b, 0x8a, 0xc4,
-	0xa8, 0x85, 0x09, 0x89, 0x0f, 0x99, 0x90, 0xc9, 0xc0, 0x78, 0xc7, 0xd1, 0x22, 0x53, 0x95, 0xa1,
-	0x69, 0x98, 0xf4, 0x9c, 0x7c, 0xd1, 0xf6, 0x2c, 0xc6, 0x7b, 0x36, 0xa1, 0x8d, 0x79, 0xce, 0xa5,
-	0x60, 0x8b, 0xae, 0xc3, 0x14, 0xf7, 0xa5, 0xdb, 0x7b, 0x56, 0x90, 0xc8, 0x60, 0x50, 0xec, 0x61,
-	0x57, 0x0f, 0x5d, 0x8e, 0x0c, 0xe9, 0xf2, 0x99, 0x00, 0x63, 0x29, 0x82, 0xb8, 0xdc, 0x40, 0x50,
-	0x19, 0xfa, 0x16, 0x9c, 0x68, 0x22, 0x87, 0xfe, 0x47, 0xb9, 0xff, 0xa7, 0x1a, 0xa7, 0x9c, 0x85,
-	0x74, 0x27, 0x01, 0x4f, 0xa9, 0xf4, 0x92, 0x6d, 0x95, 0x8c, 0xb2, 0xe7, 0xf2, 0xaa, 0x40, 0x6b,
-	0x70, 0xd4, 0xf1, 0x0a, 0xd4, 0x2b, 0x0c, 0xec, 0x83, 0x4e, 0x03, 0x79, 0xcb, 0x2b, 0xe4, 0xbc,
-	0x42, 0x16, 0xfa, 0x07, 0xe9, 0xd1, 0x70, 0xad, 0x45, 0x08, 0xa9, 0xdf, 0xc7, 0x61, 0x74, 0x84,
-	0x36, 0xe1, 0xb8, 0xe3, 0xda, 0x35, 0x43, 0x0f, 0x46, 0x61, 0x88, 0x7c, 0x61, 0x38, 0x64, 0x79,
-	0xab, 0x61, 0xa7, 0xb5, 0x20, 0x52, 0xff, 0x88, 0xc1, 0xf1, 0xa6, 0x00, 0xed, 0xc0, 0x44, 0x30,
-	0x93, 0x39, 0xf0, 0xc4, 0xfc, 0x0f, 0x1e, 0x14, 0x58, 0x0e, 0xfa, 0xc0, 0xa3, 0xd9, 0xa4, 0x7f,
-	0x90, 0x4e, 0x6c, 0xbc, 0xb2, 0xbd, 0xad, 0x71, 0xb8, 0x00, 0xd6, 0xc2, 0x2c, 0x2c, 0xe3, 0x47,
-	0x85, 0xdd, 0x54, 0xb7, 0x73, 0x1a, 0x87, 0x43, 0xd7, 0xe0, 0x18, 0xde, 0xa3, 0x79, 0xc3, 0x0e,
-	0x8b, 0xeb, 0x11, 0x90, 0x79, 0xd2, 0xd5, 0x2b, 0xb9, 0x55, 0x7b, 0x5b, 0x1b, 0xc5, 0x7b, 0x74,
-	0xd5, 0x66, 0xd2, 0x05, 0x38, 0x1a, 0x4a, 0xd1, 0x09, 0x38, 0xb6, 0xbc, 0xa9, 0x66, 0xd7, 0x97,
-	0x97, 0x26, 0x85, 0x60, 0x73, 0x45, 0xd5, 0x36, 0x57, 0x37, 0x57, 0x26, 0x01, 0x3a, 0x09, 0x93,
-	0x4b, 0xab, 0xb9, 0x50, 0x14, 0x93, 0x9e, 0x0d, 0x47, 0x7c, 0xa7, 0xcf, 0x68, 0x40, 0x4a, 0x45,
-	0x98, 0xea, 0x27, 0xa4, 0x4e, 0xf0, 0x8b, 0x05, 0x2d, 0xc3, 0xa7, 0x8a, 0xed, 0x82, 0xe8, 0x6a,
-	0xd3, 0xc7, 0x04, 0xa4, 0x75, 0x5a, 0x49, 0x15, 0xf8, 0xcc, 0x26, 0x55, 0xe9, 0x4b, 0xd8, 0xd2,
-	0x4d, 0xb2, 0xe3, 0x98, 0x6d, 0x03, 0x7a, 0xab, 0x73, 0x40, 0x7b, 0x4e, 0x50, 0x3e, 0xf1, 0x99,
-	0x13, 0xf3, 0xdf, 0x3c, 0x62, 0x90, 0xee, 0x38, 0xd9, 0xe4, 0xfd, 0xec, 0xc8, 0x7b, 0x20, 0x96,
-	0xec, 0x9c, 0xc7, 0x3b, 0x0e, 0x9d, 0xff, 0x74, 0x04, 0xc6, 0x54, 0x8a, 0xde, 0x07, 0x70, 0x6c,
-	0x85, 0x30, 0xfe, 0x62, 0xcf, 0x76, 0x63, 0x0d, 0x7c, 0xf2, 0x52, 0xc7, 0xcd, 0x6f, 0xe9, 0xa7,
-	0x3f, 0xff, 0xd7, 0x7f, 0x7f, 0x1d, 0xfb, 0x21, 0xfa, 0xbe, 0x82, 0x69, 0xc7, 0xef, 0x3b, 0xe5,
-	0x66, 0xd7, 0x4b, 0x23, 0x77, 0xee, 0x6f, 0x2b, 0x7c, 0xce, 0x7f, 0x00, 0xe0, 0x58, 0x6e, 0x10,
-	0xaf, 0xdc, 0xc3, 0xf3, 0x52, 0x39, 0xaf, 0x1f, 0xa7, 0x1e, 0x92, 0xd7, 0x02, 0x98, 0x43, 0xb7,
-	0x20, 0x5c, 0x22, 0x26, 0x61, 0x84, 0x93, 0x1b, 0xf2, 0x85, 0x4c, 0x3d, 0xdd, 0x33, 0xc7, 0x96,
-	0x83, 0x1f, 0x8b, 0x92, 0xcc, 0x09, 0xcd, 0xcc, 0xbd, 0x70, 0x1c, 0xa1, 0x28, 0x31, 0xef, 0x01,
-	0x78, 0x32, 0xba, 0xb0, 0xf0, 0xdd, 0x1a, 0x96, 0xc0, 0xf9, 0x63, 0x52, 0xc3, 0xd1, 0xa4, 0xef,
-	0x72, 0x3a, 0x32, 0x7a, 0x71, 0x38, 0x3a, 0x0a, 0xe5, 0x1c, 0xee, 0x00, 0x38, 0xb9, 0x42, 0x58,
-	0xe7, 0x0c, 0xed, 0x5b, 0x4e, 0x7d, 0xdb, 0x2b, 0x35, 0x37, 0x8c, 0x6a, 0xd8, 0x6c, 0xd2, 0x34,
-	0x67, 0x78, 0x06, 0x9d, 0x0e, 0x18, 0x76, 0x34, 0xd0, 0xfc, 0x15, 0x98, 0x08, 0x1a, 0x08, 0xbd,
-	0x0c, 0x4f, 0xb6, 0x37, 0x11, 0xfa, 0x76, 0x37, 0xfc, 0x80, 0x36, 0x1b, 0x74, 0x49, 0xf3, 0xbf,
-	0x4d, 0xc2, 0x11, 0xd5, 0x71, 0x54, 0x8a, 0xb6, 0xe1, 0x78, 0xce, 0x2b, 0xd0, 0xa2, 0x6b, 0x14,
-	0xc8, 0xd0, 0xa9, 0x3f, 0xba, 0x49, 0x2f, 0x00, 0xf4, 0x4f, 0x00, 0x4f, 0x37, 0x5e, 0xb0, 0x57,
-	0x3c, 0xe2, 0x91, 0x2d, 0x8f, 0xee, 0xa2, 0x9e, 0x1b, 0xeb, 0x50, 0x39, 0x86, 0xb3, 0xf4, 0x06,
-	0xcf, 0x93, 0x2b, 0x55, 0x7b, 0x6f, 0xb2, 0xf5, 0x91, 0xd0, 0xa7, 0xd0, 0x7b, 0x0b, 0x3f, 0x54,
-	0xed, 0xb5, 0x6b, 0x2e, 0x6f, 0x2b, 0xc1, 0x8b, 0xaa, 0x38, 0x1e, 0xdd, 0x0d, 0x1a, 0xe4, 0x53,
-	0x00, 0xcf, 0x76, 0x51, 0x75, 0x4c, 0x5c, 0x24, 0x8f, 0x18, 0xd0, 0x4d, 0x1e, 0x90, 0x27, 0x39,
-	0x4f, 0x2c, 0x20, 0x37, 0xe4, 0x1d, 0xc4, 0xf4, 0xa7, 0xee, 0x1b, 0x5a, 0x37, 0x28, 0xeb, 0x0d,
-	0x68, 0xd9, 0xd2, 0x97, 0x38, 0xc8, 0xb0, 0x9d, 0xd7, 0xc0, 0xa4, 0x92, 0xc6, 0xc3, 0x5b, 0x47,
-	0x6b, 0x0f, 0x3e, 0x99, 0x9a, 0xf1, 0x74, 0x05, 0x80, 0x7e, 0x07, 0xe0, 0x37, 0x56, 0x08, 0x0b,
-	0x1e, 0xf3, 0x4b, 0xb6, 0x65, 0x91, 0x22, 0xaf, 0x4c, 0xab, 0x64, 0x0f, 0x5d, 0xba, 0x52, 0xcf,
-	0x97, 0x5a, 0x0f, 0xd6, 0xf0, 0xb3, 0xfe, 0x36, 0xff, 0x66, 0xcc, 0x14, 0x9b, 0xe6, 0x19, 0x23,
-	0xe0, 0xf2, 0x37, 0x00, 0x27, 0x72, 0x46, 0xd5, 0x33, 0x31, 0x6b, 0x74, 0xec, 0xd1, 0x1d, 0x33,
-	0xb0, 0x44, 0x6e, 0x70, 0x26, 0x4c, 0xb2, 0x9f, 0x44, 0x89, 0x78, 0x8e, 0x42, 0x23, 0xd6, 0x0b,
-	0x60, 0x6e, 0xfe, 0x7f, 0x09, 0x78, 0x46, 0xa5, 0xcd, 0x02, 0xd0, 0x48, 0xd9, 0xa0, 0xcc, 0xdd,
-	0x47, 0x7f, 0x04, 0x30, 0xbe, 0x42, 0x18, 0x7a, 0xbe, 0xcf, 0x8c, 0x6b, 0xd3, 0x0e, 0x6b, 0x7f,
-	0x7a, 0x60, 0x41, 0x49, 0x15, 0x1e, 0x1b, 0x41, 0xc5, 0x27, 0x10, 0x1b, 0x7a, 0x2b, 0x06, 0xe3,
-	0xb9, 0x7e, 0xa4, 0x73, 0x0f, 0x46, 0xfa, 0x2f, 0x80, 0xb3, 0xfe, 0x33, 0x48, 0x1d, 0x49, 0x5b,
-	0x7e, 0x48, 0xda, 0x72, 0x27, 0xed, 0x05, 0x30, 0x77, 0x75, 0x43, 0x7a, 0xe9, 0x71, 0x79, 0x0a,
-	0xfa, 0xfe, 0x7d, 0x00, 0x47, 0xc3, 0xd7, 0x7e, 0xc8, 0x66, 0x1f, 0x54, 0x9a, 0x1b, 0x3c, 0x11,
-	0x2b, 0x73, 0xcb, 0x8f, 0xa5, 0xbd, 0xb3, 0x7f, 0x00, 0x77, 0x0f, 0x45, 0x70, 0xef, 0x50, 0x04,
-	0x9f, 0x1d, 0x8a, 0xc2, 0xe7, 0x87, 0xa2, 0xf0, 0xc5, 0xa1, 0x28, 0x7c, 0x79, 0x28, 0x0a, 0x5f,
-	0x1d, 0x8a, 0xe0, 0x4d, 0x5f, 0x04, 0x6f, 0xfb, 0xa2, 0xf0, 0xa1, 0x2f, 0x82, 0x8f, 0x7c, 0x51,
-	0xf8, 0xd8, 0x17, 0x85, 0x4f, 0x7c, 0x51, 0xb8, 0xeb, 0x8b, 0xe0, 0x9e, 0x2f, 0x82, 0xcf, 0x7c,
-	0x51, 0xf8, 0xdc, 0x17, 0xc1, 0x17, 0xbe, 0x28, 0x7c, 0xe9, 0x8b, 0xe0, 0x2b, 0x5f, 0x14, 0xde,
-	0xac, 0x8b, 0xc2, 0xdb, 0x75, 0x11, 0xbc, 0x5b, 0x17, 0x85, 0x0f, 0xea, 0x22, 0xf8, 0x4d, 0x5d,
-	0x14, 0x3e, 0xac, 0x8b, 0xc2, 0x47, 0x75, 0x11, 0x7c, 0x5c, 0x17, 0xc1, 0x27, 0x75, 0x11, 0x5c,
-	0x55, 0xca, 0xb6, 0xcc, 0x76, 0x09, 0xdb, 0x35, 0xac, 0x32, 0x95, 0xa3, 0x0f, 0x48, 0xa5, 0xf3,
-	0xbf, 0xa1, 0xda, 0x45, 0xc5, 0xa9, 0x94, 0x15, 0xc6, 0x2c, 0xa7, 0x50, 0x18, 0xe5, 0x69, 0xb8,
-	0xf8, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0x41, 0xae, 0x0a, 0x12, 0xf6, 0x13, 0x00, 0x00,
+	// 1994 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x59, 0x5d, 0x6c, 0xdb, 0xd6,
+	0x15, 0xd6, 0x95, 0x64, 0x5b, 0xbe, 0x71, 0x1c, 0xe7, 0x3a, 0x4d, 0x6d, 0x35, 0xa3, 0x3d, 0x36,
+	0xcd, 0x6c, 0xaf, 0xa2, 0x32, 0x67, 0x7f, 0xf5, 0xb0, 0x19, 0x94, 0xed, 0x38, 0x36, 0x6c, 0xd7,
+	0xa1, 0xec, 0x06, 0x4b, 0x93, 0x0a, 0x57, 0xe2, 0xb5, 0x4c, 0x58, 0x22, 0x59, 0xde, 0x4b, 0xb9,
+	0xce, 0x0f, 0x50, 0x14, 0x41, 0x57, 0xf4, 0x61, 0x2b, 0x3a, 0x14, 0xe8, 0xe3, 0x80, 0x6d, 0x40,
+	0x1f, 0x8b, 0xf5, 0x61, 0x7d, 0xda, 0x0a, 0x0c, 0x03, 0x32, 0xec, 0x25, 0x45, 0x5f, 0x0a, 0x0c,
+	0xf3, 0x6a, 0x79, 0x18, 0x0a, 0x0c, 0x18, 0xfa, 0x58, 0xe4, 0x69, 0xe0, 0x25, 0x29, 0x89, 0x94,
+	0x64, 0x2b, 0x3f, 0x70, 0x30, 0x60, 0x6f, 0x57, 0xbc, 0xe7, 0x7c, 0xe7, 0x3b, 0xbf, 0x3c, 0xb4,
+	0xe1, 0x78, 0xc9, 0xb0, 0xf0, 0x36, 0xd6, 0x53, 0x94, 0xe1, 0xc2, 0x56, 0x1a, 0x9b, 0x5a, 0x1a,
+	0x9b, 0x66, 0x49, 0x2b, 0x60, 0xa6, 0x19, 0x3a, 0x25, 0x56, 0x85, 0x58, 0x92, 0x69, 0x19, 0xcc,
+	0x40, 0xfd, 0x8c, 0xe9, 0x92, 0x27, 0x2e, 0x55, 0x2e, 0x24, 0xe5, 0xa2, 0xc6, 0x36, 0xed, 0xbc,
+	0x54, 0x30, 0xca, 0x69, 0xa2, 0x57, 0x8c, 0x1d, 0xd3, 0x32, 0x5e, 0xdb, 0x49, 0x73, 0xe1, 0x42,
+	0xaa, 0x48, 0xf4, 0x54, 0x05, 0x97, 0x34, 0x15, 0x33, 0x92, 0x6e, 0x3a, 0xb8, 0x90, 0xc9, 0x54,
+	0x03, 0x44, 0xd1, 0x28, 0x1a, 0xae, 0x72, 0xde, 0xde, 0xe0, 0xbf, 0xf8, 0x0f, 0x7e, 0xf2, 0xc4,
+	0xcf, 0x14, 0x0d, 0xa3, 0x58, 0x22, 0x2e, 0x4b, 0x5d, 0x37, 0x98, 0x4b, 0xd2, 0xbb, 0x7d, 0xc6,
+	0xbb, 0xad, 0x61, 0x90, 0xb2, 0xc9, 0x76, 0xbc, 0xcb, 0xd1, 0xf0, 0xe5, 0x86, 0x46, 0x4a, 0x6a,
+	0xae, 0x8c, 0xe9, 0x96, 0x27, 0x31, 0x12, 0x96, 0x60, 0x5a, 0x99, 0x50, 0x86, 0xcb, 0xa6, 0x27,
+	0x20, 0x84, 0x05, 0xb6, 0x2d, 0x6c, 0x9a, 0xc4, 0xf2, 0xed, 0x8b, 0xcd, 0xa1, 0x24, 0xba, 0x9a,
+	0x53, 0x49, 0x45, 0x2b, 0xf8, 0x0e, 0x3f, 0xdb, 0x2c, 0xa3, 0xa9, 0x44, 0x67, 0xda, 0x86, 0x56,
+	0x07, 0x1a, 0x6d, 0x16, 0x2a, 0x13, 0x4a, 0x71, 0x91, 0xf8, 0x12, 0x67, 0x5a, 0x48, 0xbc, 0xca,
+	0x98, 0x7b, 0x2b, 0xfe, 0x1d, 0xc0, 0x13, 0x72, 0x3d, 0x89, 0x4b, 0x9a, 0xbe, 0x85, 0xae, 0x40,
+	0xa4, 0x92, 0x0d, 0x6c, 0x97, 0x58, 0x6e, 0xc3, 0xb0, 0xca, 0x98, 0x31, 0x62, 0xd1, 0xa1, 0xd8,
+	0x28, 0x18, 0x3b, 0x36, 0x39, 0x26, 0x05, 0x33, 0x2b, 0x2d, 0xbb, 0xd6, 0x56, 0xf1, 0x4e, 0xc9,
+	0xc0, 0xea, 0xc5, 0x9a, 0xbc, 0x72, 0xd2, 0xc3, 0xa8, 0x3f, 0x42, 0xc3, 0x30, 0xc6, 0x4a, 0x74,
+	0x28, 0x3e, 0x0a, 0xc6, 0x12, 0x99, 0x9e, 0xea, 0xee, 0x48, 0x6c, 0x6d, 0x29, 0xab, 0x38, 0xcf,
+	0xd0, 0x22, 0x1c, 0xa4, 0x5b, 0x9a, 0x99, 0x33, 0x5d, 0x9c, 0x5c, 0xc1, 0xda, 0x31, 0x99, 0x31,
+	0xd4, 0xc5, 0x8d, 0x26, 0x25, 0x37, 0x9c, 0x92, 0x1f, 0x4e, 0x29, 0x63, 0x18, 0xa5, 0x97, 0x70,
+	0xc9, 0x26, 0xca, 0x49, 0x47, 0xcd, 0xb3, 0x3e, 0xc3, 0x95, 0x16, 0xe3, 0x09, 0x30, 0x10, 0x5d,
+	0x8c, 0x27, 0xa2, 0x03, 0x31, 0xf1, 0x8f, 0x00, 0x0e, 0xcf, 0x13, 0x16, 0x72, 0x51, 0x21, 0xaf,
+	0xda, 0x84, 0x32, 0x84, 0xe1, 0x89, 0x86, 0x0a, 0xce, 0x69, 0x2a, 0x1d, 0x02, 0xdc, 0xe2, 0xb9,
+	0xb0, 0x9b, 0x0d, 0x00, 0x0b, 0xf5, 0x24, 0x64, 0x06, 0xee, 0x67, 0xba, 0xde, 0x06, 0xd1, 0x01,
+	0x70, 0x77, 0x77, 0x24, 0x72, 0x6f, 0x77, 0x04, 0x28, 0xfd, 0xb8, 0x51, 0x92, 0xa2, 0x69, 0x08,
+	0xeb, 0xe5, 0x33, 0x14, 0x6d, 0xe3, 0xcf, 0x45, 0x47, 0x64, 0x19, 0xd3, 0xad, 0x4c, 0xdc, 0x41,
+	0x52, 0x7a, 0x37, 0xfc, 0x07, 0xe2, 0x9b, 0x51, 0x38, 0x9c, 0x7d, 0x92, 0x1e, 0xcc, 0xc1, 0x78,
+	0x49, 0xd3, 0x7d, 0xee, 0x23, 0x07, 0xe0, 0x3a, 0xc4, 0x5a, 0x00, 0x72, 0xf5, 0x50, 0x20, 0x62,
+	0x0f, 0x1e, 0x88, 0x5f, 0xc4, 0xe1, 0xa9, 0x90, 0xb1, 0x2c, 0xc3, 0x8c, 0xa2, 0x1f, 0xc3, 0x5e,
+	0xc7, 0x02, 0x51, 0x73, 0x98, 0x79, 0xde, 0x37, 0x03, 0xaf, 0xf9, 0x1d, 0x9a, 0x89, 0xbf, 0xf3,
+	0x8f, 0x11, 0xa0, 0x24, 0x5c, 0x15, 0x99, 0xa1, 0x3f, 0x03, 0x78, 0x5a, 0x27, 0x6c, 0xdb, 0xb0,
+	0xb6, 0x72, 0xee, 0x10, 0xcb, 0x61, 0x55, 0xb5, 0x08, 0xa5, 0xdc, 0xe5, 0xde, 0xcc, 0xcf, 0xc1,
+	0xfd, 0xcc, 0xdb, 0xc0, 0xfa, 0x19, 0x98, 0xbc, 0x03, 0x5e, 0x19, 0x9b, 0x9e, 0x1a, 0x9b, 0x9e,
+	0x7a, 0x19, 0xa7, 0x6e, 0xc8, 0xa9, 0xab, 0xe7, 0x53, 0x2f, 0x5c, 0xbf, 0xd5, 0x70, 0xae, 0x1f,
+	0xaf, 0xa5, 0xae, 0x4f, 0x34, 0x5c, 0x8c, 0x5f, 0x93, 0xc6, 0x27, 0x1c, 0x3d, 0x39, 0x75, 0x15,
+	0xa7, 0x6e, 0xb8, 0x7a, 0xf5, 0x73, 0xfd, 0xc8, 0xf5, 0xea, 0x17, 0xe3, 0x63, 0xd3, 0x53, 0x53,
+	0x2f, 0x3b, 0xa7, 0x9b, 0xdf, 0x79, 0xfe, 0x7b, 0xb7, 0xc7, 0xa7, 0xcf, 0xde, 0x7a, 0xe5, 0xac,
+	0x72, 0xca, 0xa3, 0x9b, 0xe5, 0x6c, 0x65, 0x97, 0x2c, 0x7a, 0x11, 0x0e, 0x96, 0x30, 0x65, 0x39,
+	0xdb, 0xcc, 0x59, 0xa4, 0x40, 0xb4, 0x8a, 0x1b, 0x90, 0x58, 0x87, 0x01, 0x19, 0x70, 0x94, 0xd7,
+	0x4d, 0xc5, 0x53, 0x95, 0x19, 0x1a, 0x86, 0x09, 0xdb, 0xcc, 0x15, 0x0c, 0x5b, 0x67, 0xbc, 0x67,
+	0xe3, 0x4a, 0x8f, 0x6d, 0xce, 0x38, 0x3f, 0xd1, 0x75, 0x98, 0xe4, 0xb6, 0x54, 0x63, 0x5b, 0x77,
+	0x02, 0xe9, 0x0c, 0x8a, 0x6d, 0x6c, 0xa9, 0xae, 0xc9, 0xae, 0x0e, 0x4d, 0x3e, 0xed, 0x60, 0xcc,
+	0x7a, 0x10, 0x17, 0x7d, 0x04, 0x99, 0xa1, 0xe7, 0x60, 0x7f, 0x0d, 0xd9, 0xb5, 0xdf, 0xcd, 0xed,
+	0x1f, 0xf7, 0x9f, 0x72, 0x16, 0xe2, 0x9d, 0x38, 0x3c, 0x21, 0xd3, 0x19, 0x43, 0xdf, 0xd0, 0x8a,
+	0xb6, 0xc5, 0xab, 0x02, 0x2d, 0xc2, 0x6e, 0xd3, 0xce, 0x53, 0x3b, 0xdf, 0xb6, 0x0f, 0x82, 0x0a,
+	0xd2, 0xaa, 0x9d, 0xcf, 0xda, 0xf9, 0x0c, 0xac, 0xee, 0x8e, 0x74, 0xbb, 0x67, 0xc5, 0x43, 0x48,
+	0xfe, 0x26, 0x06, 0xbd, 0x47, 0x68, 0x05, 0xf6, 0x9a, 0x96, 0x51, 0xd1, 0x54, 0x67, 0x14, 0xba,
+	0xc8, 0xe7, 0x3b, 0x43, 0x96, 0x56, 0x7d, 0x3d, 0xa5, 0x0e, 0x91, 0xfc, 0x4b, 0x14, 0xf6, 0xd6,
+	0x2e, 0xd0, 0x3a, 0x8c, 0x3b, 0x33, 0x99, 0x03, 0xf7, 0x4f, 0xfe, 0xe0, 0x41, 0x81, 0x25, 0xa7,
+	0x0f, 0x6c, 0x9a, 0x49, 0x54, 0x77, 0x47, 0xe2, 0xcb, 0x97, 0xd7, 0xd6, 0x14, 0x0e, 0xe7, 0xc0,
+	0xea, 0x98, 0xb9, 0x65, 0xfc, 0xa8, 0xb0, 0x2b, 0xf2, 0x5a, 0x56, 0xe1, 0x70, 0xe8, 0x1a, 0xec,
+	0xc1, 0xdb, 0x34, 0xa7, 0x19, 0x6e, 0x71, 0x3d, 0x02, 0x32, 0x0f, 0xba, 0x7c, 0x25, 0xbb, 0x60,
+	0xac, 0x29, 0xdd, 0x78, 0x9b, 0x2e, 0x18, 0x4c, 0x3c, 0x0f, 0xbb, 0xdd, 0x5b, 0x74, 0x0c, 0xf6,
+	0xcc, 0xad, 0xc8, 0x99, 0xa5, 0xb9, 0xd9, 0x81, 0x88, 0xf3, 0xe3, 0x8a, 0xac, 0xac, 0x2c, 0xac,
+	0xcc, 0x0f, 0x00, 0xd4, 0x07, 0x13, 0xb3, 0x0b, 0x59, 0xf7, 0x2a, 0x2a, 0x3e, 0xe3, 0x8e, 0xf8,
+	0xa0, 0x4d, 0x6f, 0x40, 0x8a, 0x05, 0x98, 0x6c, 0x75, 0x49, 0x4d, 0x67, 0x63, 0x41, 0x73, 0xf0,
+	0x78, 0xa1, 0xf1, 0xc2, 0x4b, 0xed, 0xc8, 0x21, 0x0e, 0x29, 0x41, 0x2d, 0x71, 0x0b, 0x3e, 0xbd,
+	0x42, 0x65, 0x7a, 0x09, 0xeb, 0x6a, 0x89, 0xac, 0x9b, 0xa5, 0x86, 0x01, 0xbd, 0x1a, 0x1c, 0xd0,
+	0xb6, 0xe9, 0x94, 0x4f, 0x6c, 0xec, 0xd8, 0xe4, 0x37, 0x0e, 0x18, 0xa4, 0xeb, 0x66, 0x26, 0x71,
+	0x3f, 0xd3, 0xf5, 0x2e, 0x88, 0x26, 0x82, 0xf3, 0x78, 0xdd, 0xa4, 0xe2, 0x7f, 0xa2, 0xf0, 0xa9,
+	0x39, 0xbd, 0x60, 0xa8, 0xc4, 0x6f, 0x1d, 0xdf, 0xd6, 0x1a, 0xec, 0xaf, 0x6f, 0x11, 0x0d, 0xef,
+	0x82, 0xb3, 0x61, 0x53, 0x73, 0xba, 0x3a, 0xcb, 0x85, 0x1a, 0xdf, 0x04, 0x09, 0x7f, 0x70, 0x2b,
+	0x7d, 0xa4, 0x7e, 0x4f, 0xd1, 0x12, 0x3c, 0x56, 0x21, 0x16, 0xf5, 0x5f, 0x2f, 0xee, 0x6b, 0xe0,
+	0xdb, 0x6d, 0x21, 0x5f, 0x72, 0x65, 0x1b, 0x90, 0x15, 0x58, 0xf1, 0x9f, 0x51, 0xb4, 0x00, 0x13,
+	0x7e, 0x13, 0x7b, 0xa3, 0xe9, 0xd9, 0x03, 0x02, 0xe1, 0x7b, 0xd8, 0x40, 0xae, 0xa6, 0x8e, 0x2e,
+	0xc1, 0xde, 0xda, 0x7e, 0xc2, 0x07, 0x54, 0xff, 0xe4, 0x68, 0x18, 0x2b, 0xbc, 0x97, 0x70, 0xa0,
+	0x37, 0x38, 0x50, 0x5d, 0x19, 0x9d, 0x81, 0xbd, 0x26, 0xb6, 0x70, 0x99, 0x38, 0x48, 0xce, 0xf4,
+	0xea, 0x55, 0xea, 0x0f, 0xc4, 0x9f, 0xc2, 0xd3, 0xe1, 0x78, 0x7b, 0xe5, 0x33, 0xdd, 0xe0, 0x0c,
+	0xe8, 0xd8, 0x99, 0xba, 0x0b, 0xe2, 0xbf, 0xa2, 0x70, 0x70, 0x96, 0x38, 0xd8, 0xc1, 0xaa, 0xf9,
+	0x5f, 0xc8, 0xe4, 0x0c, 0xec, 0xb6, 0xcd, 0x86, 0x3c, 0x7e, 0xf3, 0xc0, 0x82, 0x0e, 0x65, 0xd1,
+	0x53, 0x3d, 0xb2, 0x1c, 0x5e, 0x86, 0xa7, 0x82, 0x71, 0xf6, 0x32, 0xf8, 0x42, 0xcd, 0x09, 0xd0,
+	0xa1, 0x13, 0x3e, 0x75, 0xde, 0x87, 0x2e, 0xe6, 0xff, 0xfb, 0xf0, 0xa8, 0xfa, 0x30, 0x1c, 0xef,
+	0xc7, 0xd4, 0x87, 0x93, 0x9f, 0x76, 0xc1, 0xa8, 0x4c, 0xd1, 0x7b, 0x00, 0xf6, 0xcc, 0x13, 0xc6,
+	0xbf, 0x82, 0xc6, 0xc3, 0x08, 0x6d, 0x3f, 0x23, 0x92, 0x87, 0xed, 0xc4, 0xe2, 0x4f, 0xde, 0xf8,
+	0xec, 0x9f, 0xbf, 0x8c, 0xfe, 0x10, 0x7d, 0x3f, 0x8d, 0x69, 0xe0, 0x9b, 0x39, 0x7d, 0x33, 0xb4,
+	0xbd, 0x4b, 0xc1, 0xdf, 0xb7, 0xd3, 0x3c, 0xc2, 0xef, 0x03, 0xd8, 0x93, 0x6d, 0xc7, 0x2b, 0xfb,
+	0xf0, 0xbc, 0x64, 0xce, 0xeb, 0x47, 0xc9, 0x87, 0xe4, 0x35, 0x05, 0x26, 0xd0, 0x2d, 0x08, 0x67,
+	0x49, 0x89, 0x30, 0xc2, 0xc9, 0x75, 0xf8, 0xd5, 0x91, 0x3c, 0xdd, 0xb4, 0x1b, 0xce, 0x39, 0x1f,
+	0xe0, 0xa2, 0xc4, 0x09, 0x8d, 0x4d, 0x9c, 0x3b, 0x8c, 0x90, 0x17, 0x98, 0x77, 0x01, 0xec, 0xf3,
+	0x12, 0xe6, 0x7e, 0x0b, 0x74, 0x4a, 0xe0, 0xec, 0x21, 0xa1, 0xe1, 0x68, 0xe2, 0x77, 0x39, 0x1d,
+	0x09, 0x3d, 0xdf, 0x19, 0x9d, 0x34, 0xe5, 0x1c, 0xee, 0x00, 0x38, 0x30, 0x4f, 0x58, 0x70, 0x2f,
+	0x6d, 0x59, 0x4e, 0x2d, 0x57, 0x96, 0xe4, 0x44, 0x27, 0xa2, 0x6e, 0xe5, 0x8b, 0xc3, 0x9c, 0xe1,
+	0x20, 0x3a, 0xe9, 0x30, 0x0c, 0x2c, 0x25, 0x93, 0x57, 0x60, 0xdc, 0x59, 0x4a, 0xd0, 0x8b, 0xb0,
+	0xaf, 0x71, 0x31, 0x41, 0xdf, 0x0a, 0xc3, 0xb7, 0x59, 0x5d, 0xda, 0x25, 0x69, 0xf2, 0xa3, 0xe3,
+	0xb0, 0x4b, 0x36, 0x4d, 0x99, 0xa2, 0x35, 0xd8, 0x9b, 0xb5, 0xf3, 0xb4, 0x60, 0x69, 0x79, 0xd2,
+	0x71, 0xe8, 0x0f, 0x5e, 0x7c, 0xce, 0x03, 0xf4, 0x57, 0x00, 0x4f, 0xfa, 0x3d, 0x7a, 0xd9, 0x26,
+	0x36, 0x59, 0xb5, 0xe9, 0x26, 0x6a, 0xca, 0x58, 0x40, 0xe4, 0x10, 0xce, 0xe2, 0x6b, 0x3c, 0x4e,
+	0x96, 0x58, 0x6e, 0xce, 0x64, 0x70, 0x54, 0x4b, 0x87, 0x15, 0xbe, 0x2b, 0xda, 0xac, 0x57, 0x3b,
+	0xde, 0x4e, 0x3b, 0x63, 0x25, 0x6d, 0xda, 0x74, 0xd3, 0x69, 0x90, 0x4f, 0x01, 0x3c, 0x15, 0xa2,
+	0x6a, 0x96, 0x70, 0x81, 0x3c, 0xa2, 0x43, 0x37, 0xb9, 0x43, 0xb6, 0x68, 0x1e, 0x99, 0x43, 0x96,
+	0xcb, 0xdb, 0xf1, 0xe9, 0xa3, 0x70, 0x86, 0x96, 0x34, 0xca, 0x50, 0x47, 0xaf, 0xb7, 0x03, 0x3b,
+	0xcf, 0xc7, 0xa4, 0xa2, 0xc2, 0xdd, 0x5b, 0x42, 0x8b, 0x0f, 0x3e, 0x99, 0x6a, 0xfe, 0x84, 0x1c,
+	0x40, 0xbf, 0x06, 0xf0, 0xa9, 0x79, 0xc2, 0x9c, 0x0f, 0xa4, 0x19, 0x43, 0xd7, 0x49, 0x81, 0x57,
+	0xa6, 0xbe, 0x61, 0x74, 0x5c, 0xba, 0x62, 0xd3, 0x5f, 0xbf, 0x9a, 0xb0, 0x3a, 0x9f, 0xf5, 0xb7,
+	0xf9, 0xdf, 0xe1, 0x52, 0x85, 0x9a, 0x7a, 0x4a, 0x73, 0xb8, 0xfc, 0x09, 0xc0, 0xfe, 0xac, 0x56,
+	0xb6, 0x4b, 0x98, 0xf9, 0x1d, 0x7b, 0x70, 0xc7, 0xb4, 0x2d, 0x91, 0x1b, 0x9c, 0x09, 0x13, 0x8d,
+	0xa3, 0x28, 0x11, 0xdb, 0x4c, 0x53, 0x8f, 0xb5, 0x53, 0x21, 0x7f, 0x03, 0xb0, 0x3f, 0xb8, 0x34,
+	0xa3, 0xe7, 0x9a, 0xcb, 0xa3, 0xc5, 0xf2, 0x94, 0x3c, 0x77, 0x98, 0x98, 0x37, 0xf9, 0x8e, 0xd4,
+	0x3b, 0xde, 0x00, 0x84, 0x13, 0x71, 0xbc, 0xfb, 0x0c, 0xc0, 0xbe, 0xc6, 0x75, 0x12, 0x35, 0xad,
+	0x1b, 0x2d, 0x96, 0xfa, 0xe6, 0xca, 0x6f, 0xb5, 0x91, 0x1e, 0xed, 0xa4, 0xb2, 0xcd, 0xb4, 0x4a,
+	0x7c, 0xaf, 0x9c, 0x9c, 0x05, 0x17, 0xac, 0xe6, 0x9c, 0xb5, 0x5c, 0x78, 0x9b, 0x73, 0xd6, 0x7a,
+	0x4f, 0x7b, 0x02, 0x39, 0xab, 0x79, 0x37, 0xf9, 0xef, 0x38, 0x1c, 0x94, 0x69, 0x6d, 0x24, 0x29,
+	0xa4, 0xa8, 0x51, 0x66, 0xed, 0xa0, 0xdf, 0x01, 0x18, 0x9b, 0x27, 0xac, 0x39, 0x85, 0xf3, 0x84,
+	0x35, 0x48, 0xbb, 0x8e, 0x0e, 0xb7, 0x1d, 0x71, 0xe2, 0x16, 0xf7, 0x8d, 0xa0, 0xc2, 0x11, 0xf8,
+	0x86, 0xde, 0x8c, 0xc2, 0x58, 0xb6, 0x15, 0xe9, 0xec, 0x83, 0x91, 0xfe, 0x03, 0xe0, 0xac, 0x7f,
+	0x0f, 0x92, 0x07, 0xd2, 0x96, 0x1e, 0x92, 0xb6, 0x14, 0xa4, 0x3d, 0x05, 0x26, 0xae, 0x2e, 0x8b,
+	0x97, 0x1e, 0x97, 0x25, 0xa7, 0x66, 0xdf, 0x03, 0xb0, 0xdb, 0xdd, 0x3f, 0x3b, 0x7c, 0xfd, 0xb4,
+	0x1b, 0x96, 0xcb, 0x3c, 0x10, 0xf3, 0x13, 0x73, 0x8f, 0xe5, 0x85, 0x93, 0xf9, 0x2d, 0xb8, 0xbb,
+	0x27, 0x80, 0x7b, 0x7b, 0x02, 0xf8, 0x7c, 0x4f, 0x88, 0x7c, 0xb1, 0x27, 0x44, 0xbe, 0xdc, 0x13,
+	0x22, 0x5f, 0xed, 0x09, 0x91, 0xaf, 0xf7, 0x04, 0xf0, 0x7a, 0x55, 0x00, 0x6f, 0x55, 0x85, 0xc8,
+	0x07, 0x55, 0x01, 0x7c, 0x58, 0x15, 0x22, 0x1f, 0x57, 0x85, 0xc8, 0x27, 0x55, 0x21, 0x72, 0xb7,
+	0x2a, 0x80, 0x7b, 0x55, 0x01, 0x7c, 0x5e, 0x15, 0x22, 0x5f, 0x54, 0x05, 0xf0, 0x65, 0x55, 0x88,
+	0x7c, 0x55, 0x15, 0xc0, 0xd7, 0x55, 0x21, 0xf2, 0xfa, 0xbe, 0x10, 0x79, 0x6b, 0x5f, 0x00, 0xef,
+	0xec, 0x0b, 0x91, 0xf7, 0xf7, 0x05, 0xf0, 0xab, 0x7d, 0x21, 0xf2, 0xc1, 0xbe, 0x10, 0xf9, 0x70,
+	0x5f, 0x00, 0x1f, 0xef, 0x0b, 0xe0, 0x93, 0x7d, 0x01, 0x5c, 0x4d, 0x17, 0x0d, 0x89, 0x6d, 0x12,
+	0xb6, 0xa9, 0xe9, 0x45, 0x2a, 0x79, 0x7f, 0x26, 0x4e, 0x07, 0xff, 0x03, 0x54, 0xb9, 0x90, 0x36,
+	0xb7, 0x8a, 0x69, 0xc6, 0x74, 0x33, 0x9f, 0xef, 0xe6, 0x61, 0xb8, 0xf0, 0xdf, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0x78, 0x14, 0x59, 0x5c, 0xdc, 0x1b, 0x00, 0x00,
 }
 
 func (x AsConfiguration_PubSub_Providers_Status) String() string {
@@ -1034,6 +1430,186 @@ func (this *NsAsHandleUplinkRequest) Equal(that interface{}) bool {
 		if !this.ApplicationUps[i].Equal(that1.ApplicationUps[i]) {
 			return false
 		}
+	}
+	return true
+}
+func (this *EncodeDownlinkRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*EncodeDownlinkRequest)
+	if !ok {
+		that2, ok := that.(EncodeDownlinkRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.EndDeviceIds.Equal(that1.EndDeviceIds) {
+		return false
+	}
+	if !this.VersionIds.Equal(that1.VersionIds) {
+		return false
+	}
+	if !this.Downlink.Equal(that1.Downlink) {
+		return false
+	}
+	if this.Formatter != that1.Formatter {
+		return false
+	}
+	if this.Parameter != that1.Parameter {
+		return false
+	}
+	return true
+}
+func (this *EncodeDownlinkResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*EncodeDownlinkResponse)
+	if !ok {
+		that2, ok := that.(EncodeDownlinkResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Downlink.Equal(that1.Downlink) {
+		return false
+	}
+	return true
+}
+func (this *DecodeUplinkRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*DecodeUplinkRequest)
+	if !ok {
+		that2, ok := that.(DecodeUplinkRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.EndDeviceIds.Equal(that1.EndDeviceIds) {
+		return false
+	}
+	if !this.VersionIds.Equal(that1.VersionIds) {
+		return false
+	}
+	if !this.Uplink.Equal(that1.Uplink) {
+		return false
+	}
+	if this.Formatter != that1.Formatter {
+		return false
+	}
+	if this.Parameter != that1.Parameter {
+		return false
+	}
+	return true
+}
+func (this *DecodeUplinkResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*DecodeUplinkResponse)
+	if !ok {
+		that2, ok := that.(DecodeUplinkResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Uplink.Equal(that1.Uplink) {
+		return false
+	}
+	return true
+}
+func (this *DecodeDownlinkRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*DecodeDownlinkRequest)
+	if !ok {
+		that2, ok := that.(DecodeDownlinkRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.EndDeviceIds.Equal(that1.EndDeviceIds) {
+		return false
+	}
+	if !this.VersionIds.Equal(that1.VersionIds) {
+		return false
+	}
+	if !this.Downlink.Equal(that1.Downlink) {
+		return false
+	}
+	if this.Formatter != that1.Formatter {
+		return false
+	}
+	if this.Parameter != that1.Parameter {
+		return false
+	}
+	return true
+}
+func (this *DecodeDownlinkResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*DecodeDownlinkResponse)
+	if !ok {
+		that2, ok := that.(DecodeDownlinkResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Downlink.Equal(that1.Downlink) {
+		return false
 	}
 	return true
 }
@@ -1373,6 +1949,9 @@ type AppAsClient interface {
 	GetMQTTConnectionInfo(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*MQTTConnectionInfo, error)
 	// Simulate an upstream message. This can be used to test integrations.
 	SimulateUplink(ctx context.Context, in *ApplicationUp, opts ...grpc.CallOption) (*types.Empty, error)
+	EncodeDownlink(ctx context.Context, in *EncodeDownlinkRequest, opts ...grpc.CallOption) (*EncodeDownlinkResponse, error)
+	DecodeUplink(ctx context.Context, in *DecodeUplinkRequest, opts ...grpc.CallOption) (*DecodeUplinkResponse, error)
+	DecodeDownlink(ctx context.Context, in *DecodeDownlinkRequest, opts ...grpc.CallOption) (*DecodeDownlinkResponse, error)
 }
 
 type appAsClient struct {
@@ -1460,6 +2039,33 @@ func (c *appAsClient) SimulateUplink(ctx context.Context, in *ApplicationUp, opt
 	return out, nil
 }
 
+func (c *appAsClient) EncodeDownlink(ctx context.Context, in *EncodeDownlinkRequest, opts ...grpc.CallOption) (*EncodeDownlinkResponse, error) {
+	out := new(EncodeDownlinkResponse)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.AppAs/EncodeDownlink", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appAsClient) DecodeUplink(ctx context.Context, in *DecodeUplinkRequest, opts ...grpc.CallOption) (*DecodeUplinkResponse, error) {
+	out := new(DecodeUplinkResponse)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.AppAs/DecodeUplink", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appAsClient) DecodeDownlink(ctx context.Context, in *DecodeDownlinkRequest, opts ...grpc.CallOption) (*DecodeDownlinkResponse, error) {
+	out := new(DecodeDownlinkResponse)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.AppAs/DecodeDownlink", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AppAsServer is the server API for AppAs service.
 type AppAsServer interface {
 	// Subscribe to upstream messages.
@@ -1475,6 +2081,9 @@ type AppAsServer interface {
 	GetMQTTConnectionInfo(context.Context, *ApplicationIdentifiers) (*MQTTConnectionInfo, error)
 	// Simulate an upstream message. This can be used to test integrations.
 	SimulateUplink(context.Context, *ApplicationUp) (*types.Empty, error)
+	EncodeDownlink(context.Context, *EncodeDownlinkRequest) (*EncodeDownlinkResponse, error)
+	DecodeUplink(context.Context, *DecodeUplinkRequest) (*DecodeUplinkResponse, error)
+	DecodeDownlink(context.Context, *DecodeDownlinkRequest) (*DecodeDownlinkResponse, error)
 }
 
 // UnimplementedAppAsServer can be embedded to have forward compatible implementations.
@@ -1498,6 +2107,15 @@ func (*UnimplementedAppAsServer) GetMQTTConnectionInfo(ctx context.Context, req 
 }
 func (*UnimplementedAppAsServer) SimulateUplink(ctx context.Context, req *ApplicationUp) (*types.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SimulateUplink not implemented")
+}
+func (*UnimplementedAppAsServer) EncodeDownlink(ctx context.Context, req *EncodeDownlinkRequest) (*EncodeDownlinkResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EncodeDownlink not implemented")
+}
+func (*UnimplementedAppAsServer) DecodeUplink(ctx context.Context, req *DecodeUplinkRequest) (*DecodeUplinkResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecodeUplink not implemented")
+}
+func (*UnimplementedAppAsServer) DecodeDownlink(ctx context.Context, req *DecodeDownlinkRequest) (*DecodeDownlinkResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecodeDownlink not implemented")
 }
 
 func RegisterAppAsServer(s *grpc.Server, srv AppAsServer) {
@@ -1615,6 +2233,60 @@ func _AppAs_SimulateUplink_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppAs_EncodeDownlink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EncodeDownlinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppAsServer).EncodeDownlink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.AppAs/EncodeDownlink",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppAsServer).EncodeDownlink(ctx, req.(*EncodeDownlinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppAs_DecodeUplink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DecodeUplinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppAsServer).DecodeUplink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.AppAs/DecodeUplink",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppAsServer).DecodeUplink(ctx, req.(*DecodeUplinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppAs_DecodeDownlink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DecodeDownlinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppAsServer).DecodeDownlink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.AppAs/DecodeDownlink",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppAsServer).DecodeDownlink(ctx, req.(*DecodeDownlinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _AppAs_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ttn.lorawan.v3.AppAs",
 	HandlerType: (*AppAsServer)(nil),
@@ -1638,6 +2310,18 @@ var _AppAs_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SimulateUplink",
 			Handler:    _AppAs_SimulateUplink_Handler,
+		},
+		{
+			MethodName: "EncodeDownlink",
+			Handler:    _AppAs_EncodeDownlink_Handler,
+		},
+		{
+			MethodName: "DecodeUplink",
+			Handler:    _AppAs_DecodeUplink_Handler,
+		},
+		{
+			MethodName: "DecodeDownlink",
+			Handler:    _AppAs_DecodeDownlink_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
@@ -2230,6 +2914,324 @@ func (m *NsAsHandleUplinkRequest) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
+func (m *EncodeDownlinkRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EncodeDownlinkRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EncodeDownlinkRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Parameter) > 0 {
+		i -= len(m.Parameter)
+		copy(dAtA[i:], m.Parameter)
+		i = encodeVarintApplicationserver(dAtA, i, uint64(len(m.Parameter)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.Formatter != 0 {
+		i = encodeVarintApplicationserver(dAtA, i, uint64(m.Formatter))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Downlink != nil {
+		{
+			size, err := m.Downlink.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.VersionIds != nil {
+		{
+			size, err := m.VersionIds.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.EndDeviceIds != nil {
+		{
+			size, err := m.EndDeviceIds.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *EncodeDownlinkResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EncodeDownlinkResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EncodeDownlinkResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Downlink != nil {
+		{
+			size, err := m.Downlink.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *DecodeUplinkRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DecodeUplinkRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DecodeUplinkRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Parameter) > 0 {
+		i -= len(m.Parameter)
+		copy(dAtA[i:], m.Parameter)
+		i = encodeVarintApplicationserver(dAtA, i, uint64(len(m.Parameter)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.Formatter != 0 {
+		i = encodeVarintApplicationserver(dAtA, i, uint64(m.Formatter))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Uplink != nil {
+		{
+			size, err := m.Uplink.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.VersionIds != nil {
+		{
+			size, err := m.VersionIds.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.EndDeviceIds != nil {
+		{
+			size, err := m.EndDeviceIds.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *DecodeUplinkResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DecodeUplinkResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DecodeUplinkResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Uplink != nil {
+		{
+			size, err := m.Uplink.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *DecodeDownlinkRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DecodeDownlinkRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DecodeDownlinkRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Parameter) > 0 {
+		i -= len(m.Parameter)
+		copy(dAtA[i:], m.Parameter)
+		i = encodeVarintApplicationserver(dAtA, i, uint64(len(m.Parameter)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.Formatter != 0 {
+		i = encodeVarintApplicationserver(dAtA, i, uint64(m.Formatter))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Downlink != nil {
+		{
+			size, err := m.Downlink.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.VersionIds != nil {
+		{
+			size, err := m.VersionIds.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.EndDeviceIds != nil {
+		{
+			size, err := m.EndDeviceIds.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *DecodeDownlinkResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DecodeDownlinkResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DecodeDownlinkResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Downlink != nil {
+		{
+			size, err := m.Downlink.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintApplicationserver(dAtA []byte, offset int, v uint64) int {
 	offset -= sovApplicationserver(v)
 	base := offset
@@ -2353,6 +3355,90 @@ func NewPopulatedNsAsHandleUplinkRequest(r randyApplicationserver, easy bool) *N
 		for i := 0; i < v6; i++ {
 			this.ApplicationUps[i] = NewPopulatedApplicationUp(r, easy)
 		}
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedEncodeDownlinkRequest(r randyApplicationserver, easy bool) *EncodeDownlinkRequest {
+	this := &EncodeDownlinkRequest{}
+	if r.Intn(5) != 0 {
+		this.EndDeviceIds = NewPopulatedEndDeviceIdentifiers(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.VersionIds = NewPopulatedEndDeviceVersionIdentifiers(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.Downlink = NewPopulatedApplicationDownlink(r, easy)
+	}
+	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
+	this.Parameter = randStringApplicationserver(r)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedEncodeDownlinkResponse(r randyApplicationserver, easy bool) *EncodeDownlinkResponse {
+	this := &EncodeDownlinkResponse{}
+	if r.Intn(5) != 0 {
+		this.Downlink = NewPopulatedApplicationDownlink(r, easy)
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedDecodeUplinkRequest(r randyApplicationserver, easy bool) *DecodeUplinkRequest {
+	this := &DecodeUplinkRequest{}
+	if r.Intn(5) != 0 {
+		this.EndDeviceIds = NewPopulatedEndDeviceIdentifiers(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.VersionIds = NewPopulatedEndDeviceVersionIdentifiers(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.Uplink = NewPopulatedApplicationUplink(r, easy)
+	}
+	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
+	this.Parameter = randStringApplicationserver(r)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedDecodeUplinkResponse(r randyApplicationserver, easy bool) *DecodeUplinkResponse {
+	this := &DecodeUplinkResponse{}
+	if r.Intn(5) != 0 {
+		this.Uplink = NewPopulatedApplicationUplink(r, easy)
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedDecodeDownlinkRequest(r randyApplicationserver, easy bool) *DecodeDownlinkRequest {
+	this := &DecodeDownlinkRequest{}
+	if r.Intn(5) != 0 {
+		this.EndDeviceIds = NewPopulatedEndDeviceIdentifiers(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.VersionIds = NewPopulatedEndDeviceVersionIdentifiers(r, easy)
+	}
+	if r.Intn(5) != 0 {
+		this.Downlink = NewPopulatedApplicationDownlink(r, easy)
+	}
+	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
+	this.Parameter = randStringApplicationserver(r)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedDecodeDownlinkResponse(r randyApplicationserver, easy bool) *DecodeDownlinkResponse {
+	this := &DecodeDownlinkResponse{}
+	if r.Intn(5) != 0 {
+		this.Downlink = NewPopulatedApplicationDownlink(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -2591,6 +3677,129 @@ func (m *NsAsHandleUplinkRequest) Size() (n int) {
 	return n
 }
 
+func (m *EncodeDownlinkRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.EndDeviceIds != nil {
+		l = m.EndDeviceIds.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	if m.VersionIds != nil {
+		l = m.VersionIds.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	if m.Downlink != nil {
+		l = m.Downlink.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	if m.Formatter != 0 {
+		n += 1 + sovApplicationserver(uint64(m.Formatter))
+	}
+	l = len(m.Parameter)
+	if l > 0 {
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	return n
+}
+
+func (m *EncodeDownlinkResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Downlink != nil {
+		l = m.Downlink.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	return n
+}
+
+func (m *DecodeUplinkRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.EndDeviceIds != nil {
+		l = m.EndDeviceIds.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	if m.VersionIds != nil {
+		l = m.VersionIds.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	if m.Uplink != nil {
+		l = m.Uplink.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	if m.Formatter != 0 {
+		n += 1 + sovApplicationserver(uint64(m.Formatter))
+	}
+	l = len(m.Parameter)
+	if l > 0 {
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	return n
+}
+
+func (m *DecodeUplinkResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Uplink != nil {
+		l = m.Uplink.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	return n
+}
+
+func (m *DecodeDownlinkRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.EndDeviceIds != nil {
+		l = m.EndDeviceIds.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	if m.VersionIds != nil {
+		l = m.VersionIds.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	if m.Downlink != nil {
+		l = m.Downlink.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	if m.Formatter != 0 {
+		n += 1 + sovApplicationserver(uint64(m.Formatter))
+	}
+	l = len(m.Parameter)
+	if l > 0 {
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	return n
+}
+
+func (m *DecodeDownlinkResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Downlink != nil {
+		l = m.Downlink.Size()
+		n += 1 + l + sovApplicationserver(uint64(l))
+	}
+	return n
+}
+
 func sovApplicationserver(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
@@ -2709,6 +3918,78 @@ func (this *NsAsHandleUplinkRequest) String() string {
 	repeatedStringForApplicationUps += "}"
 	s := strings.Join([]string{`&NsAsHandleUplinkRequest{`,
 		`ApplicationUps:` + repeatedStringForApplicationUps + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *EncodeDownlinkRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&EncodeDownlinkRequest{`,
+		`EndDeviceIds:` + strings.Replace(fmt.Sprintf("%v", this.EndDeviceIds), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1) + `,`,
+		`VersionIds:` + strings.Replace(fmt.Sprintf("%v", this.VersionIds), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1) + `,`,
+		`Downlink:` + strings.Replace(fmt.Sprintf("%v", this.Downlink), "ApplicationDownlink", "ApplicationDownlink", 1) + `,`,
+		`Formatter:` + fmt.Sprintf("%v", this.Formatter) + `,`,
+		`Parameter:` + fmt.Sprintf("%v", this.Parameter) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *EncodeDownlinkResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&EncodeDownlinkResponse{`,
+		`Downlink:` + strings.Replace(fmt.Sprintf("%v", this.Downlink), "ApplicationDownlink", "ApplicationDownlink", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *DecodeUplinkRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&DecodeUplinkRequest{`,
+		`EndDeviceIds:` + strings.Replace(fmt.Sprintf("%v", this.EndDeviceIds), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1) + `,`,
+		`VersionIds:` + strings.Replace(fmt.Sprintf("%v", this.VersionIds), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1) + `,`,
+		`Uplink:` + strings.Replace(fmt.Sprintf("%v", this.Uplink), "ApplicationUplink", "ApplicationUplink", 1) + `,`,
+		`Formatter:` + fmt.Sprintf("%v", this.Formatter) + `,`,
+		`Parameter:` + fmt.Sprintf("%v", this.Parameter) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *DecodeUplinkResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&DecodeUplinkResponse{`,
+		`Uplink:` + strings.Replace(fmt.Sprintf("%v", this.Uplink), "ApplicationUplink", "ApplicationUplink", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *DecodeDownlinkRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&DecodeDownlinkRequest{`,
+		`EndDeviceIds:` + strings.Replace(fmt.Sprintf("%v", this.EndDeviceIds), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1) + `,`,
+		`VersionIds:` + strings.Replace(fmt.Sprintf("%v", this.VersionIds), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1) + `,`,
+		`Downlink:` + strings.Replace(fmt.Sprintf("%v", this.Downlink), "ApplicationDownlink", "ApplicationDownlink", 1) + `,`,
+		`Formatter:` + fmt.Sprintf("%v", this.Formatter) + `,`,
+		`Parameter:` + fmt.Sprintf("%v", this.Parameter) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *DecodeDownlinkResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&DecodeDownlinkResponse{`,
+		`Downlink:` + strings.Replace(fmt.Sprintf("%v", this.Downlink), "ApplicationDownlink", "ApplicationDownlink", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3858,6 +5139,909 @@ func (m *NsAsHandleUplinkRequest) Unmarshal(dAtA []byte) error {
 			}
 			m.ApplicationUps = append(m.ApplicationUps, &ApplicationUp{})
 			if err := m.ApplicationUps[len(m.ApplicationUps)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EncodeDownlinkRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EncodeDownlinkRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EncodeDownlinkRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceIds", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.EndDeviceIds == nil {
+				m.EndDeviceIds = &EndDeviceIdentifiers{}
+			}
+			if err := m.EndDeviceIds.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VersionIds", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.VersionIds == nil {
+				m.VersionIds = &EndDeviceVersionIdentifiers{}
+			}
+			if err := m.VersionIds.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Downlink", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Downlink == nil {
+				m.Downlink = &ApplicationDownlink{}
+			}
+			if err := m.Downlink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Formatter", wireType)
+			}
+			m.Formatter = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Formatter |= PayloadFormatter(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Parameter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Parameter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EncodeDownlinkResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EncodeDownlinkResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EncodeDownlinkResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Downlink", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Downlink == nil {
+				m.Downlink = &ApplicationDownlink{}
+			}
+			if err := m.Downlink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DecodeUplinkRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DecodeUplinkRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DecodeUplinkRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceIds", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.EndDeviceIds == nil {
+				m.EndDeviceIds = &EndDeviceIdentifiers{}
+			}
+			if err := m.EndDeviceIds.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VersionIds", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.VersionIds == nil {
+				m.VersionIds = &EndDeviceVersionIdentifiers{}
+			}
+			if err := m.VersionIds.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uplink", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Uplink == nil {
+				m.Uplink = &ApplicationUplink{}
+			}
+			if err := m.Uplink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Formatter", wireType)
+			}
+			m.Formatter = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Formatter |= PayloadFormatter(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Parameter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Parameter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DecodeUplinkResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DecodeUplinkResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DecodeUplinkResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uplink", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Uplink == nil {
+				m.Uplink = &ApplicationUplink{}
+			}
+			if err := m.Uplink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DecodeDownlinkRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DecodeDownlinkRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DecodeDownlinkRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceIds", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.EndDeviceIds == nil {
+				m.EndDeviceIds = &EndDeviceIdentifiers{}
+			}
+			if err := m.EndDeviceIds.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VersionIds", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.VersionIds == nil {
+				m.VersionIds = &EndDeviceVersionIdentifiers{}
+			}
+			if err := m.VersionIds.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Downlink", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Downlink == nil {
+				m.Downlink = &ApplicationDownlink{}
+			}
+			if err := m.Downlink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Formatter", wireType)
+			}
+			m.Formatter = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Formatter |= PayloadFormatter(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Parameter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Parameter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DecodeDownlinkResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DecodeDownlinkResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DecodeDownlinkResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Downlink", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Downlink == nil {
+				m.Downlink = &ApplicationDownlink{}
+			}
+			if err := m.Downlink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

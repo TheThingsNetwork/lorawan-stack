@@ -1679,6 +1679,94 @@
         ]
       }
     },
+    "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/decode": {
+      "post": {
+        "operationId": "AppAs_DecodeDownlink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3DecodeDownlinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3DecodeDownlinkRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AppAs"
+        ]
+      }
+    },
+    "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/encode": {
+      "post": {
+        "operationId": "AppAs_EncodeDownlink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3EncodeDownlinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3EncodeDownlinkRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AppAs"
+        ]
+      }
+    },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push": {
       "post": {
         "summary": "Push downlink messages to the end of the downlink queue.",
@@ -1961,6 +2049,50 @@
         ],
         "tags": [
           "ApplicationUpStorage"
+        ]
+      }
+    },
+    "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/decode": {
+      "post": {
+        "operationId": "AppAs_DecodeUplink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3DecodeUplinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3DecodeUplinkRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AppAs"
         ]
       }
     },
@@ -11572,6 +11704,62 @@
         }
       }
     },
+    "v3DecodeDownlinkRequest": {
+      "type": "object",
+      "properties": {
+        "end_device_ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "version_ids": {
+          "$ref": "#/definitions/v3EndDeviceVersionIdentifiers"
+        },
+        "downlink": {
+          "$ref": "#/definitions/v3ApplicationDownlink"
+        },
+        "formatter": {
+          "$ref": "#/definitions/v3PayloadFormatter"
+        },
+        "parameter": {
+          "type": "string"
+        }
+      }
+    },
+    "v3DecodeDownlinkResponse": {
+      "type": "object",
+      "properties": {
+        "downlink": {
+          "$ref": "#/definitions/v3ApplicationDownlink"
+        }
+      }
+    },
+    "v3DecodeUplinkRequest": {
+      "type": "object",
+      "properties": {
+        "end_device_ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "version_ids": {
+          "$ref": "#/definitions/v3EndDeviceVersionIdentifiers"
+        },
+        "uplink": {
+          "$ref": "#/definitions/v3ApplicationUplink"
+        },
+        "formatter": {
+          "$ref": "#/definitions/v3PayloadFormatter"
+        },
+        "parameter": {
+          "type": "string"
+        }
+      }
+    },
+    "v3DecodeUplinkResponse": {
+      "type": "object",
+      "properties": {
+        "uplink": {
+          "$ref": "#/definitions/v3ApplicationUplink"
+        }
+      }
+    },
     "v3DeviceEIRP": {
       "type": "string",
       "enum": [
@@ -11655,6 +11843,34 @@
           "items": {
             "$ref": "#/definitions/v3ApplicationDownlink"
           }
+        }
+      }
+    },
+    "v3EncodeDownlinkRequest": {
+      "type": "object",
+      "properties": {
+        "end_device_ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "version_ids": {
+          "$ref": "#/definitions/v3EndDeviceVersionIdentifiers"
+        },
+        "downlink": {
+          "$ref": "#/definitions/v3ApplicationDownlink"
+        },
+        "formatter": {
+          "$ref": "#/definitions/v3PayloadFormatter"
+        },
+        "parameter": {
+          "type": "string"
+        }
+      }
+    },
+    "v3EncodeDownlinkResponse": {
+      "type": "object",
+      "properties": {
+        "downlink": {
+          "$ref": "#/definitions/v3ApplicationDownlink"
         }
       }
     },
