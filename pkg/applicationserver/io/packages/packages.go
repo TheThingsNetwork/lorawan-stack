@@ -130,8 +130,10 @@ func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 			ctx := log.NewContextWithField(ctx, "package", name)
 			err := handler.HandleUp(ctx, pair.defaultAssociation, pair.association, msg)
 			if err != nil {
+				registerMessageFailed(name, err)
 				return err
 			}
+			registerMessageProcessed(name)
 		} else {
 			return errNotImplemented.WithAttributes("name", name)
 		}

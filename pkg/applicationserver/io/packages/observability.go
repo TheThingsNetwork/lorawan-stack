@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package web
+package packages
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
@@ -21,75 +21,56 @@ import (
 )
 
 const (
-	subsystem = "as_webhook"
+	subsystem = "as_packages"
 	unknown   = "unknown"
 )
 
-var webhookMetrics = &messageMetrics{
-	webhookQueue: metrics.NewGauge(
-		prometheus.GaugeOpts{
-			Subsystem: subsystem,
-			Name:      "queue_size",
-			Help:      "Webhook queue size",
-		},
-	),
-	webhooksSent: metrics.NewCounter(
+var packagesMetrics = &messageMetrics{
+	messagesProcessed: metrics.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "sent_total",
-			Help:      "Total number of sent webhooks",
+			Name:      "processed_total",
+			Help:      "Total number of processed messages",
 		},
+		[]string{"package"},
 	),
-	webhooksFailed: metrics.NewCounterVec(
+	messagesFailed: metrics.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "failed_total",
-			Help:      "Total number of failed webhooks",
+			Help:      "Total number of failed messages",
 		},
-		[]string{"error"},
+		[]string{"package", "error"},
 	),
 }
 
 func init() {
-	webhookMetrics.webhookQueue.Set(0)
-	webhookMetrics.webhooksSent.Add(0)
-	metrics.MustRegister(webhookMetrics)
+	metrics.MustRegister(packagesMetrics)
 }
 
 type messageMetrics struct {
-	webhookQueue   prometheus.Gauge
-	webhooksSent   prometheus.Counter
-	webhooksFailed *prometheus.CounterVec
+	messagesProcessed *prometheus.CounterVec
+	messagesFailed    *prometheus.CounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
-	m.webhookQueue.Describe(ch)
-	m.webhooksSent.Describe(ch)
-	m.webhooksFailed.Describe(ch)
+	m.messagesProcessed.Describe(ch)
+	m.messagesFailed.Describe(ch)
 }
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
-	m.webhookQueue.Collect(ch)
-	m.webhooksSent.Collect(ch)
-	m.webhooksFailed.Collect(ch)
+	m.messagesProcessed.Collect(ch)
+	m.messagesFailed.Collect(ch)
 }
 
-func registerWebhookQueued() {
-	webhookMetrics.webhookQueue.Inc()
+func registerMessageProcessed(name string) {
+	packagesMetrics.messagesProcessed.WithLabelValues(name).Inc()
 }
 
-func registerWebhookDequeued() {
-	webhookMetrics.webhookQueue.Dec()
-}
-
-func registerWebhookSent() {
-	webhookMetrics.webhooksSent.Inc()
-}
-
-func registerWebhookFailed(err error) {
+func registerMessageFailed(name string, err error) {
 	errorLabel := unknown
 	if ttnErr, ok := errors.From(err); ok {
 		errorLabel = ttnErr.FullName()
 	}
-	webhookMetrics.webhooksFailed.WithLabelValues(errorLabel).Inc()
+	packagesMetrics.messagesFailed.WithLabelValues(name, errorLabel).Inc()
 }

@@ -110,17 +110,13 @@ func (s *QueuedSink) Run(ctx context.Context) error {
 					wg.Done()
 					return
 				case req := <-s.Queue:
-					webhookMetrics.webhookQueue.Dec()
+					registerWebhookDequeued()
 					ctx := req.Context()
 					if err := s.Target.Process(req); err != nil {
-						if ttnErr, ok := errors.From(err); ok {
-							webhookMetrics.webhooksFailed.WithLabelValues(ttnErr.FullName()).Inc()
-						} else {
-							webhookMetrics.webhooksFailed.WithLabelValues(unknown).Inc()
-						}
+						registerWebhookFailed(err)
 						log.FromContext(ctx).WithError(err).Warn("Failed to process message")
 					} else {
-						webhookMetrics.webhooksSent.Inc()
+						registerWebhookSent()
 					}
 				}
 			}
@@ -138,11 +134,12 @@ var errQueueFull = errors.DefineResourceExhausted("queue_full", "the queue is fu
 func (s *QueuedSink) Process(req *http.Request) error {
 	select {
 	case s.Queue <- req:
-		webhookMetrics.webhookQueue.Inc()
+		registerWebhookQueued()
 		return nil
 	default:
-		webhookMetrics.webhooksFailed.WithLabelValues(errQueueFull.FullName()).Inc()
-		return errQueueFull.New()
+		err := errQueueFull.New()
+		registerWebhookFailed(err)
+		return err
 	}
 }
 
