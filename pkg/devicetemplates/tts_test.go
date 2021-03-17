@@ -89,7 +89,42 @@ const (
 		"supports_join": false
 	}`
 
-	otaaWithSession = `{"ids":{"device_id":"industrial-tracker","application_ids":{"application_id":"ttn-tabs"},"dev_eui":"E8E1E100010146B1","join_eui":"E8E1E1000101363E"},"name":"industrial-tracker","lorawan_version":"MAC_V1_0_2","lorawan_phy_version":"PHY_V1_0_2_REV_B","frequency_plan_id":"EU_863_870","supports_join":true,"root_keys":{"app_key":{"key":"00112233445566778899AABBCCDDEEFF"}},"mac_settings":{"rx1_delay":{"value":"RX_DELAY_1"},"supports_32_bit_f_cnt":true,"resets_f_cnt":false},"session":{"dev_addr":"260125FD","keys":{"app_s_key":{"key":"00112233445566778899AABBCCDDEEFF"},"f_nwk_s_int_key":{"key":"00112233445566778899AABBCCDDEEFF"}},"last_f_cnt_up":0,"last_n_f_cnt_down":0}}`
+	otaaWithSession = `{
+		"ids": {
+			"device_id": "industrial-tracker",
+			"application_ids": {
+				"application_id": "ttn-tabs"
+			},
+			"dev_eui": "E8E1E100010146B1",
+			"join_eui": "E8E1E1000101363E"
+		},
+		"name": "industrial-tracker",
+		"lorawan_version": "1.0.2",
+		"lorawan_phy_version": "1.0.2-b",
+		"frequency_plan_id": "EU_863_870",
+		"supports_join": true,
+		"root_keys": {
+			"app_key": {
+				"key": "00112233445566778899AABBCCDDEEFF"
+			}
+		},
+		"mac_settings": {
+			"rx1_delay": 1
+		},
+		"session": {
+			"dev_addr": "260125FD",
+			"keys": {
+				"app_s_key": {
+					"key": "00112233445566778899AABBCCDDEEFF"
+				},
+				"f_nwk_s_int_key": {
+					"key": "00112233445566778899AABBCCDDEEFF"
+				}
+			},
+			"last_f_cnt_up": 0,
+			"last_n_f_cnt_down": 0
+		}
+	}`
 
 	devWithDevAddr = `{
 		"ids": {
