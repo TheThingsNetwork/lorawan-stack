@@ -173,11 +173,27 @@ func TestEnumMarshalers(t *testing.T) {
 	}
 	vals = append(vals, dutyCycles)
 
+	var dutyCycleVals []interface{}
+	for i := range AggregatedDutyCycle_name {
+		dutyCycleVals = append(dutyCycleVals, AggregatedDutyCycleValue{
+			Value: AggregatedDutyCycle(i),
+		})
+	}
+	vals = append(vals, dutyCycleVals)
+
 	var pingSlots []interface{}
 	for i := range PingSlotPeriod_name {
 		pingSlots = append(pingSlots, PingSlotPeriod(i))
 	}
 	vals = append(vals, pingSlots)
+
+	var pingSlotVals []interface{}
+	for i := range PingSlotPeriod_name {
+		pingSlotVals = append(pingSlotVals, PingSlotPeriodValue{
+			Value: PingSlotPeriod(i),
+		})
+	}
+	vals = append(vals, pingSlotVals)
 
 	var rejoinCounts []interface{}
 	for i := range RejoinCountExponent_name {
@@ -209,17 +225,41 @@ func TestEnumMarshalers(t *testing.T) {
 	}
 	vals = append(vals, ackLimitExponents)
 
+	var ackLimitExponentVals []interface{}
+	for i := range ADRAckLimitExponent_name {
+		ackLimitExponentVals = append(ackLimitExponentVals, ADRAckLimitExponentValue{
+			Value: ADRAckLimitExponent(i),
+		})
+	}
+	vals = append(vals, ackLimitExponentVals)
+
 	var ackDelayExponents []interface{}
 	for i := range ADRAckDelayExponent_name {
 		ackDelayExponents = append(ackDelayExponents, ADRAckDelayExponent(i))
 	}
 	vals = append(vals, ackDelayExponents)
 
+	var ackDelayExponentVals []interface{}
+	for i := range ADRAckDelayExponent_name {
+		ackDelayExponentVals = append(ackDelayExponentVals, ADRAckDelayExponentValue{
+			Value: ADRAckDelayExponent(i),
+		})
+	}
+	vals = append(vals, ackDelayExponentVals)
+
 	var rxDelays []interface{}
 	for i := range RxDelay_name {
 		rxDelays = append(rxDelays, RxDelay(i))
 	}
 	vals = append(vals, rxDelays)
+
+	var rxDelayVals []interface{}
+	for i := range RxDelay_name {
+		rxDelayVals = append(rxDelayVals, RxDelayValue{
+			Value: RxDelay(i),
+		})
+	}
+	vals = append(vals, rxDelayVals)
 
 	var minors []interface{}
 	for i := range Minor_name {
