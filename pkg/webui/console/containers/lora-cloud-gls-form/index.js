@@ -16,11 +16,10 @@ import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 
-import LORA_CLOUD_DAS from '@console/constants/lora-cloud-das'
+import LORA_CLOUD_GLS from '@console/constants/lora-cloud-gls'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
-import Checkbox from '@ttn-lw/components/checkbox'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import ModalButton from '@ttn-lw/components/button/modal-button'
@@ -46,18 +45,17 @@ import {
 } from '@console/store/selectors/application-packages'
 
 const m = defineMessages({
-  tokenDescription: 'Device & Application Services Access Token as configured within LoRa Cloud',
-  lr1110Encoding: 'LR1110 demo encoding',
+  tokenDescription: 'Geolocation access token as configured within LoRa Cloud',
   setLoRaCloudToken: 'Set LoRa Cloud token',
   deleteWarning:
-    'Are you sure you want to delete the LoRa Cloud Device & Application Services token? This action cannot be undone.',
+    'Are you sure you want to delete the LoRaCloud Geolocation token? This action cannot be undone.',
 })
 
 const validationSchema = Yup.object()
   .shape({
     data: Yup.object().shape({
       token: Yup.string().required(sharedMessages.validateRequired),
-      use_tlv_encoding: Yup.boolean(),
+      query: Yup.string().oneOf(['TOARSSI']),
     }),
   })
   .noUnknown()
@@ -65,20 +63,21 @@ const validationSchema = Yup.object()
 const defaultValues = {
   data: {
     token: '',
+    query: 'TOARSSI',
   },
 }
 
 const promisifiedSetAppPkgDefaultAssoc = attachPromise(setAppPkgDefaultAssoc)
 const promisifiedDeleteAppPkgDefaultAssoc = attachPromise(deleteAppPkgDefaultAssoc)
 
-const LoRaCloudDASForm = () => {
+const LoRaCloudGLSForm = () => {
   const [error, setError] = useState('')
   const appId = useSelector(selectSelectedApplicationId)
   const selector = ['data']
 
   const dispatch = useDispatch()
   const defaultAssociation = useSelector(state =>
-    selectApplicationPackageDefaultAssociation(state, LORA_CLOUD_DAS.DEFAULT_PORT),
+    selectApplicationPackageDefaultAssociation(state, LORA_CLOUD_GLS.DEFAULT_PORT),
   )
   const packageError = useSelector(selectGetApplicationPackagesError)
   const initialValues = validationSchema.cast(defaultAssociation || defaultValues)
@@ -87,8 +86,8 @@ const LoRaCloudDASForm = () => {
     async values => {
       try {
         await dispatch(
-          promisifiedSetAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
-            package_name: LORA_CLOUD_DAS.DEFAULT_PACKAGE_NAME,
+          promisifiedSetAppPkgDefaultAssoc(appId, LORA_CLOUD_GLS.DEFAULT_PORT, {
+            package_name: LORA_CLOUD_GLS.DEFAULT_PACKAGE_NAME,
             ...values,
           }),
         )
@@ -107,8 +106,8 @@ const LoRaCloudDASForm = () => {
   const handleDelete = useCallback(async () => {
     try {
       await dispatch(
-        promisifiedDeleteAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
-          package_name: LORA_CLOUD_DAS.DEFAULT_PACKAGE_NAME,
+        promisifiedDeleteAppPkgDefaultAssoc(appId, LORA_CLOUD_GLS.DEFAULT_PORT, {
+          package_name: LORA_CLOUD_GLS.DEFAULT_PACKAGE_NAME,
         }),
       )
       toast({
@@ -127,7 +126,7 @@ const LoRaCloudDASForm = () => {
 
   return (
     <RequireRequest
-      requestAction={getAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, selector)}
+      requestAction={getAppPkgDefaultAssoc(appId, LORA_CLOUD_GLS.DEFAULT_PORT, selector)}
     >
       <Form
         error={error}
@@ -143,7 +142,6 @@ const LoRaCloudDASForm = () => {
           name="data.token"
           required
         />
-        <Form.Field component={Checkbox} title={m.lr1110Encoding} name="data.use_tlv_encoding" />
         <SubmitBar>
           <Form.Submit component={SubmitButton} message={sharedMessages.tokenSet} />
           {Boolean(defaultAssociation) && (
@@ -165,4 +163,4 @@ const LoRaCloudDASForm = () => {
   )
 }
 
-export default LoRaCloudDASForm
+export default LoRaCloudGLSForm
