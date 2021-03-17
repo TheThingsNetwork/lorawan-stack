@@ -23,6 +23,7 @@ import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Link from '@ttn-lw/components/link'
+import Collapse from '@ttn-lw/components/collapse'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -43,11 +44,15 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 import style from './application-integrations-lora-cloud.styl'
 
 const m = defineMessages({
+  loraCloudInfoText:
+    'Lora Cloud provides value added APIs that enable simple solutions for common tasks related to LoRaWAN networks and LoRa-based devices. You can setup our LoRaCloud integrations below.',
   officialLoRaCloudDocumentation: 'Official LoRa Cloud documentation',
-  loRaCloudInfoText: `With the LoRa Cloud Device & Application Services protocol, you can manage common device functionality at the application layer for LoRaWAN®-enabled devices. This protocol consists of a set of messages that are exchanged on a predefined device management LoRaWAN port (199 by default). The purpose of these messages is three-fold:
-<ol><li>Periodically communicate info messages</li><li>Trigger client-initiated management commands</li><li>Run advanced, application-layer protocols which solve common LoRaWAN use cases</li></ol>`,
   furtherResources: 'Further resources',
   setToken: 'Set LoRa Cloud token',
+  dasDescription:
+    'With the LoRa Cloud Device & Application Services protocol, you can manage common device functionality at the application layer for LoRaWAN-enabled devices.',
+  glsDescription:
+    'LoRa Cloud Geolocation is a simple cloud API that can be easily integrated with The Things Stack to enable estimating the location of any LoRa-based device.',
 })
 
 const LoRaCloud = () => {
@@ -63,14 +68,7 @@ const LoRaCloud = () => {
           <Row>
             <Col lg={8} md={12}>
               <img className={style.logo} src={LoRaCloudImage} alt="LoRa Cloud" />
-              <Message
-                content={m.loRaCloudInfoText}
-                className={style.info}
-                values={{
-                  ol: msg => <ol key="list">{msg}</ol>,
-                  li: msg => <li>{msg}</li>,
-                }}
-              />
+              <Message content={m.loraCloudInfoText} className={style.info} />
               <div>
                 <Message
                   component="h4"
@@ -81,21 +79,22 @@ const LoRaCloud = () => {
                   path="/integrations/application-packages/lora-cloud-device-and-application-services/"
                   secondary
                 >
-                  LoRa Cloud Device & Application Services
+                  Device & Application Services
                 </Link.DocLink>
                 {' | '}
-                <Link.Anchor
-                  href="https://www.loracloud.com/documentation/device_management"
-                  external
-                  secondary
-                >
+                <Link.Anchor href="https://www.loracloud.com" external secondary>
                   <Message content={m.officialLoRaCloudDocumentation} />
                 </Link.Anchor>
               </div>
               <hr className={style.hRule} />
-              <Message component="h3" content={m.setToken} />
-              <LoRaCloudDASForm />
-              <LoRaCloudGLSForm />
+              <Collapse title="Geolocation" description={m.glsDescription}>
+                <Message component="h3" content={m.setToken} />
+                <LoRaCloudGLSForm />
+              </Collapse>
+              <Collapse title="Device & Application Services" description={m.dasDescription}>
+                <Message component="h3" content={m.setToken} />
+                <LoRaCloudDASForm />
+              </Collapse>
             </Col>
           </Row>
         </Container>

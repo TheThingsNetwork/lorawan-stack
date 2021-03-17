@@ -13,6 +13,6 @@
 // limitations under the License.
 
 export default Object.freeze({
-  DEFAULT_PORT: 198,
-  DEFAULT_PACKAGE_NAME: 'lora-cloud-geolocation-v1',
+  DEFAULT_PORT: 197,
+  DEFAULT_PACKAGE_NAME: 'lora-cloud-geolocation-v3',
 })
