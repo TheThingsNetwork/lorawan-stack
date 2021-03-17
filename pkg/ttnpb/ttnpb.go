@@ -18,6 +18,10 @@ import (
 	"strconv"
 )
 
+func marshalJSONEnum(v int32) []byte {
+	return []byte(strconv.Itoa(int(v)))
+}
+
 func unmarshalJSONString(b []byte) ([]byte, bool) {
 	if len(b) >= 2 && b[0] == '"' && b[len(b)-1] == '"' {
 		return b[1 : len(b)-1], true

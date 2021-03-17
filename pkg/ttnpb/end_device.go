@@ -24,9 +24,52 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+// XXX_WellKnownType ensures BoolValue is encoded as upstream BoolValue.
+func (v *BoolValue) XXX_WellKnownType() string {
+	return "BoolValue"
+}
+
 // MarshalText implements encoding.TextMarshaler interface.
-func (v PowerState) MarshalText() ([]byte, error) {
-	return []byte(v.String()), nil
+func (v BoolValue) MarshalText() ([]byte, error) {
+	if !v.Value {
+		return []byte("false"), nil
+	}
+	return []byte("true"), nil
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v BoolValue) MarshalJSON() ([]byte, error) {
+	return v.MarshalText()
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *BoolValue) UnmarshalText(b []byte) error {
+	switch s := string(b); s {
+	case "true":
+		*v = BoolValue{Value: true}
+	case "false":
+		*v = BoolValue{}
+	default:
+		return errCouldNotParse("BoolValue")(s)
+	}
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *BoolValue) UnmarshalJSON(b []byte) error {
+	return v.UnmarshalText(b)
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *BoolValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return !v.Value
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
@@ -77,114 +120,6 @@ func (v *EndDeviceAuthenticationCode) FieldIsZero(p string) bool {
 		return v.ValidTo == nil
 	case "value":
 		return v.Value == ""
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
-func (v *ADRAckDelayExponentValue) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "value":
-		return v.Value == 0
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
-func (v *ADRAckLimitExponentValue) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "value":
-		return v.Value == 0
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
-func (v *AggregatedDutyCycleValue) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "value":
-		return v.Value == 0
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
-func (v *DataRateIndexValue) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "value":
-		return v.Value == 0
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
-func (v *DataRateOffsetValue) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "value":
-		return v.Value == 0
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
-func (v *RxDelayValue) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "value":
-		return v.Value == 0
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
-func (v *PingSlotPeriodValue) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "value":
-		return v.Value == 0
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
-func (v *BoolValue) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "value":
-		return !v.Value
-	}
-	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// FieldIsZero returns whether path p is zero.
-func (v *FrequencyValue) FieldIsZero(p string) bool {
-	if v == nil {
-		return true
-	}
-	switch p {
-	case "value":
-		return v.Value == 0
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }

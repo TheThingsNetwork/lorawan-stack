@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/blang/semver"
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -237,6 +238,11 @@ func (v *PHYVersion) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// String implements fmt.Stringer.
+func (v DataRateIndex) String() string {
+	return strconv.Itoa(int(v))
+}
+
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v DataRateIndex) MarshalBinary() ([]byte, error) {
 	if v > 255 {
@@ -252,8 +258,7 @@ func (v DataRateIndex) MarshalText() ([]byte, error) {
 
 // MarshalJSON implements json.Marshaler interface.
 func (v DataRateIndex) MarshalJSON() ([]byte, error) {
-	// MarshalText returns v in number form.
-	return v.MarshalText()
+	return marshalJSONEnum(int32(v)), nil
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -304,6 +309,17 @@ func (v DataRateIndexValue) MarshalJSON() ([]byte, error) {
 	return v.Value.MarshalJSON()
 }
 
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v DataRateIndexValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	if v == (DataRateIndexValue{}) && !m.EmitDefaults {
+		return nil, nil
+	}
+	if !m.EnumsAsInts {
+		return nil, errEnumAsJSONString.New()
+	}
+	return v.MarshalJSON()
+}
+
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
 func (v *DataRateIndexValue) UnmarshalBinary(b []byte) error {
 	var vv DataRateIndex
@@ -340,6 +356,28 @@ func (v *DataRateIndexValue) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *DataRateIndexValue) UnmarshalJSONPB(m *jsonpb.Unmarshaler, b []byte) error {
+	return v.UnmarshalJSON(b)
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *DataRateIndexValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// String implements fmt.Stringer.
+func (v DataRateOffset) String() string {
+	return strconv.Itoa(int(v))
+}
+
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v DataRateOffset) MarshalBinary() ([]byte, error) {
 	if v > 255 {
@@ -355,8 +393,7 @@ func (v DataRateOffset) MarshalText() ([]byte, error) {
 
 // MarshalJSON implements json.Marshaler interface.
 func (v DataRateOffset) MarshalJSON() ([]byte, error) {
-	// MarshalText returns v in number form.
-	return v.MarshalText()
+	return marshalJSONEnum(int32(v)), nil
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -407,6 +444,17 @@ func (v DataRateOffsetValue) MarshalJSON() ([]byte, error) {
 	return v.Value.MarshalJSON()
 }
 
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v DataRateOffsetValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	if v == (DataRateOffsetValue{}) && !m.EmitDefaults {
+		return nil, nil
+	}
+	if !m.EnumsAsInts {
+		return nil, errEnumAsJSONString.New()
+	}
+	return v.MarshalJSON()
+}
+
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
 func (v *DataRateOffsetValue) UnmarshalBinary(b []byte) error {
 	var vv DataRateOffset
@@ -443,6 +491,23 @@ func (v *DataRateOffsetValue) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *DataRateOffsetValue) UnmarshalJSONPB(m *jsonpb.Unmarshaler, b []byte) error {
+	return v.UnmarshalJSON(b)
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *DataRateOffsetValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
 // MarshalText implements encoding.TextMarshaler interface.
 func (v FrequencyValue) MarshalText() ([]byte, error) {
 	return []byte(strconv.FormatUint(v.Value, 10)), nil
@@ -450,7 +515,20 @@ func (v FrequencyValue) MarshalText() ([]byte, error) {
 
 // MarshalJSON implements json.Marshaler interface.
 func (v FrequencyValue) MarshalJSON() ([]byte, error) {
-	return v.MarshalText()
+	b, err := v.MarshalText()
+	if err != nil {
+		return nil, err
+	}
+	// Ensure number is marshaled as a string according to the spec.
+	return append(append([]byte{'"'}, b...), '"'), nil
+}
+
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v FrequencyValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	if v == (FrequencyValue{}) && !m.EmitDefaults {
+		return nil, nil
+	}
+	return v.MarshalJSON()
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
@@ -474,7 +552,23 @@ func (v *FrequencyValue) UnmarshalJSON(b []byte) error {
 	return v.UnmarshalText(b)
 }
 
-// MarshalBinary implements encoding.BinaryMarshaler interface.
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *FrequencyValue) UnmarshalJSONPB(m *jsonpb.Unmarshaler, b []byte) error {
+	return v.UnmarshalJSON(b)
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *FrequencyValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
 func (v RejoinType) MarshalBinary() ([]byte, error) {
 	if v > 255 {
 		panic(fmt.Errorf("RejoinType enum exceeds 255"))
@@ -717,6 +811,11 @@ func (v AggregatedDutyCycle) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
+// MarshalJSON implements json.Marshaler interface.
+func (v AggregatedDutyCycle) MarshalJSON() ([]byte, error) {
+	return marshalJSONEnum(int32(v)), nil
+}
+
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
 func (v *AggregatedDutyCycle) UnmarshalBinary(b []byte) error {
 	i, err := unmarshalEnumFromBinary("AggregatedDutyCycle", AggregatedDutyCycle_name, b)
@@ -751,6 +850,85 @@ func (v *AggregatedDutyCycle) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v AggregatedDutyCycleValue) MarshalBinary() ([]byte, error) {
+	return v.Value.MarshalBinary()
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v AggregatedDutyCycleValue) MarshalText() ([]byte, error) {
+	return v.Value.MarshalText()
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v AggregatedDutyCycleValue) MarshalJSON() ([]byte, error) {
+	return v.Value.MarshalJSON()
+}
+
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v AggregatedDutyCycleValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	if v == (AggregatedDutyCycleValue{}) && !m.EmitDefaults {
+		return nil, nil
+	}
+	if !m.EnumsAsInts {
+		return nil, errEnumAsJSONString.New()
+	}
+	return v.MarshalJSON()
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *AggregatedDutyCycleValue) UnmarshalBinary(b []byte) error {
+	var vv AggregatedDutyCycle
+	if err := vv.UnmarshalBinary(b); err != nil {
+		return err
+	}
+	*v = AggregatedDutyCycleValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *AggregatedDutyCycleValue) UnmarshalText(b []byte) error {
+	var vv AggregatedDutyCycle
+	if err := vv.UnmarshalText(b); err != nil {
+		return err
+	}
+	*v = AggregatedDutyCycleValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *AggregatedDutyCycleValue) UnmarshalJSON(b []byte) error {
+	var vv AggregatedDutyCycle
+	if err := vv.UnmarshalJSON(b); err != nil {
+		return err
+	}
+	*v = AggregatedDutyCycleValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *AggregatedDutyCycleValue) UnmarshalJSONPB(m *jsonpb.Unmarshaler, b []byte) error {
+	return v.UnmarshalJSON(b)
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *AggregatedDutyCycleValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v PingSlotPeriod) MarshalBinary() ([]byte, error) {
 	if v > 255 {
 		panic(fmt.Errorf("PingSlotPeriod enum exceeds 255"))
@@ -761,6 +939,11 @@ func (v PingSlotPeriod) MarshalBinary() ([]byte, error) {
 // MarshalText implements encoding.TextMarshaler interface.
 func (v PingSlotPeriod) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v PingSlotPeriod) MarshalJSON() ([]byte, error) {
+	return marshalJSONEnum(int32(v)), nil
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -794,6 +977,85 @@ func (v *PingSlotPeriod) UnmarshalJSON(b []byte) error {
 	}
 	*v = PingSlotPeriod(i)
 	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v PingSlotPeriodValue) MarshalBinary() ([]byte, error) {
+	return v.Value.MarshalBinary()
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v PingSlotPeriodValue) MarshalText() ([]byte, error) {
+	return v.Value.MarshalText()
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v PingSlotPeriodValue) MarshalJSON() ([]byte, error) {
+	return v.Value.MarshalJSON()
+}
+
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v PingSlotPeriodValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	if v == (PingSlotPeriodValue{}) && !m.EmitDefaults {
+		return nil, nil
+	}
+	if !m.EnumsAsInts {
+		return nil, errEnumAsJSONString.New()
+	}
+	return v.MarshalJSON()
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *PingSlotPeriodValue) UnmarshalBinary(b []byte) error {
+	var vv PingSlotPeriod
+	if err := vv.UnmarshalBinary(b); err != nil {
+		return err
+	}
+	*v = PingSlotPeriodValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *PingSlotPeriodValue) UnmarshalText(b []byte) error {
+	var vv PingSlotPeriod
+	if err := vv.UnmarshalText(b); err != nil {
+		return err
+	}
+	*v = PingSlotPeriodValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *PingSlotPeriodValue) UnmarshalJSON(b []byte) error {
+	var vv PingSlotPeriod
+	if err := vv.UnmarshalJSON(b); err != nil {
+		return err
+	}
+	*v = PingSlotPeriodValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *PingSlotPeriodValue) UnmarshalJSONPB(m *jsonpb.Unmarshaler, b []byte) error {
+	return v.UnmarshalJSON(b)
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *PingSlotPeriodValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
@@ -993,6 +1255,11 @@ func (v ADRAckLimitExponent) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
+// MarshalJSON implements json.Marshaler interface.
+func (v ADRAckLimitExponent) MarshalJSON() ([]byte, error) {
+	return marshalJSONEnum(int32(v)), nil
+}
+
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
 func (v *ADRAckLimitExponent) UnmarshalBinary(b []byte) error {
 	i, err := unmarshalEnumFromBinary("ADRAckLimitExponent", ADRAckLimitExponent_name, b)
@@ -1027,6 +1294,85 @@ func (v *ADRAckLimitExponent) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v ADRAckLimitExponentValue) MarshalBinary() ([]byte, error) {
+	return v.Value.MarshalBinary()
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v ADRAckLimitExponentValue) MarshalText() ([]byte, error) {
+	return v.Value.MarshalText()
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v ADRAckLimitExponentValue) MarshalJSON() ([]byte, error) {
+	return v.Value.MarshalJSON()
+}
+
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v ADRAckLimitExponentValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	if v == (ADRAckLimitExponentValue{}) && !m.EmitDefaults {
+		return nil, nil
+	}
+	if !m.EnumsAsInts {
+		return nil, errEnumAsJSONString.New()
+	}
+	return v.MarshalJSON()
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *ADRAckLimitExponentValue) UnmarshalBinary(b []byte) error {
+	var vv ADRAckLimitExponent
+	if err := vv.UnmarshalBinary(b); err != nil {
+		return err
+	}
+	*v = ADRAckLimitExponentValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *ADRAckLimitExponentValue) UnmarshalText(b []byte) error {
+	var vv ADRAckLimitExponent
+	if err := vv.UnmarshalText(b); err != nil {
+		return err
+	}
+	*v = ADRAckLimitExponentValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *ADRAckLimitExponentValue) UnmarshalJSON(b []byte) error {
+	var vv ADRAckLimitExponent
+	if err := vv.UnmarshalJSON(b); err != nil {
+		return err
+	}
+	*v = ADRAckLimitExponentValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *ADRAckLimitExponentValue) UnmarshalJSONPB(m *jsonpb.Unmarshaler, b []byte) error {
+	return v.UnmarshalJSON(b)
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ADRAckLimitExponentValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v ADRAckDelayExponent) MarshalBinary() ([]byte, error) {
 	if v > 255 {
 		panic(fmt.Errorf("ADRAckDelayExponent enum exceeds 255"))
@@ -1037,6 +1383,11 @@ func (v ADRAckDelayExponent) MarshalBinary() ([]byte, error) {
 // MarshalText implements encoding.TextMarshaler interface.
 func (v ADRAckDelayExponent) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v ADRAckDelayExponent) MarshalJSON() ([]byte, error) {
+	return marshalJSONEnum(int32(v)), nil
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -1073,6 +1424,85 @@ func (v *ADRAckDelayExponent) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v ADRAckDelayExponentValue) MarshalBinary() ([]byte, error) {
+	return v.Value.MarshalBinary()
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v ADRAckDelayExponentValue) MarshalText() ([]byte, error) {
+	return v.Value.MarshalText()
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v ADRAckDelayExponentValue) MarshalJSON() ([]byte, error) {
+	return v.Value.MarshalJSON()
+}
+
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v ADRAckDelayExponentValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	if v == (ADRAckDelayExponentValue{}) && !m.EmitDefaults {
+		return nil, nil
+	}
+	if !m.EnumsAsInts {
+		return nil, errEnumAsJSONString.New()
+	}
+	return v.MarshalJSON()
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *ADRAckDelayExponentValue) UnmarshalBinary(b []byte) error {
+	var vv ADRAckDelayExponent
+	if err := vv.UnmarshalBinary(b); err != nil {
+		return err
+	}
+	*v = ADRAckDelayExponentValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *ADRAckDelayExponentValue) UnmarshalText(b []byte) error {
+	var vv ADRAckDelayExponent
+	if err := vv.UnmarshalText(b); err != nil {
+		return err
+	}
+	*v = ADRAckDelayExponentValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *ADRAckDelayExponentValue) UnmarshalJSON(b []byte) error {
+	var vv ADRAckDelayExponent
+	if err := vv.UnmarshalJSON(b); err != nil {
+		return err
+	}
+	*v = ADRAckDelayExponentValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *ADRAckDelayExponentValue) UnmarshalJSONPB(m *jsonpb.Unmarshaler, b []byte) error {
+	return v.UnmarshalJSON(b)
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ADRAckDelayExponentValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v RxDelay) MarshalBinary() ([]byte, error) {
 	if v > 255 {
 		panic(fmt.Errorf("RxDelay enum exceeds 255"))
@@ -1083,6 +1513,11 @@ func (v RxDelay) MarshalBinary() ([]byte, error) {
 // MarshalText implements encoding.TextMarshaler interface.
 func (v RxDelay) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v RxDelay) MarshalJSON() ([]byte, error) {
+	return marshalJSONEnum(int32(v)), nil
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -1116,6 +1551,85 @@ func (v *RxDelay) UnmarshalJSON(b []byte) error {
 	}
 	*v = RxDelay(i)
 	return nil
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v RxDelayValue) MarshalBinary() ([]byte, error) {
+	return v.Value.MarshalBinary()
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v RxDelayValue) MarshalText() ([]byte, error) {
+	return v.Value.MarshalText()
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v RxDelayValue) MarshalJSON() ([]byte, error) {
+	return v.Value.MarshalJSON()
+}
+
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v RxDelayValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	if v == (RxDelayValue{}) && !m.EmitDefaults {
+		return nil, nil
+	}
+	if !m.EnumsAsInts {
+		return nil, errEnumAsJSONString.New()
+	}
+	return v.MarshalJSON()
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *RxDelayValue) UnmarshalBinary(b []byte) error {
+	var vv RxDelay
+	if err := vv.UnmarshalBinary(b); err != nil {
+		return err
+	}
+	*v = RxDelayValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *RxDelayValue) UnmarshalText(b []byte) error {
+	var vv RxDelay
+	if err := vv.UnmarshalText(b); err != nil {
+		return err
+	}
+	*v = RxDelayValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *RxDelayValue) UnmarshalJSON(b []byte) error {
+	var vv RxDelay
+	if err := vv.UnmarshalJSON(b); err != nil {
+		return err
+	}
+	*v = RxDelayValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *RxDelayValue) UnmarshalJSONPB(m *jsonpb.Unmarshaler, b []byte) error {
+	return v.UnmarshalJSON(b)
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *RxDelayValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
@@ -1317,16 +1831,6 @@ func (v PHYVersion) Compare(o PHYVersion) int {
 	return semver.MustParse(v.String()).Compare(
 		semver.MustParse(o.String()),
 	)
-}
-
-// String implements fmt.Stringer.
-func (v DataRateIndex) String() string {
-	return strconv.Itoa(int(v))
-}
-
-// String implements fmt.Stringer.
-func (v DataRateOffset) String() string {
-	return strconv.Itoa(int(v))
 }
 
 // Duration returns v as time.Duration.
