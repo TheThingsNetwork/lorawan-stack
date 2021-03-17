@@ -5,6 +5,9 @@ go 1.15
 // Use our fork of grpc-gateway.
 replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.15.2-gogo
 
+// Use our fork of gogo/protobuf.
+replace github.com/gogo/protobuf => github.com/TheThingsIndustries/gogoprotobuf v1.3.1
+
 // Do not upgrade Echo beyond v4.1.2.
 // See https://github.com/TheThingsNetwork/lorawan-stack/issues/977.
 replace github.com/labstack/echo/v4 => github.com/labstack/echo/v4 v4.1.2
