@@ -16,6 +16,7 @@ package packages
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 )
 
@@ -60,4 +61,16 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.messagesProcessed.Collect(ch)
 	m.messagesFailed.Collect(ch)
+}
+
+func registerMessageProcessed(name string) {
+	packagesMetrics.messagesProcessed.WithLabelValues(name).Inc()
+}
+
+func registerMessageFailed(name string, err error) {
+	errorLabel := unknown
+	if ttnErr, ok := errors.From(err); ok {
+		errorLabel = ttnErr.FullName()
+	}
+	packagesMetrics.messagesFailed.WithLabelValues(name, errorLabel).Inc()
 }

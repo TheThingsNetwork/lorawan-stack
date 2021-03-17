@@ -16,6 +16,7 @@ package web
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 )
 
@@ -71,4 +72,24 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.webhookQueue.Collect(ch)
 	m.webhooksSent.Collect(ch)
 	m.webhooksFailed.Collect(ch)
+}
+
+func registerWebhookQueued() {
+	webhookMetrics.webhookQueue.Inc()
+}
+
+func registerWebhookDequeued() {
+	webhookMetrics.webhookQueue.Dec()
+}
+
+func registerWebhookSent() {
+	webhookMetrics.webhooksSent.Inc()
+}
+
+func registerWebhookFailed(err error) {
+	errorLabel := unknown
+	if ttnErr, ok := errors.From(err); ok {
+		errorLabel = ttnErr.FullName()
+	}
+	webhookMetrics.webhooksFailed.WithLabelValues(errorLabel).Inc()
 }
