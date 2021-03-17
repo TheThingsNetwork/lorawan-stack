@@ -58,8 +58,8 @@ class ApplicationPackages {
     return Marshaler.payloadSingleResponse(result)
   }
 
-  deleteDefaultAssociation(appId, fPort) {
-    const result = this._api.DeleteDefaultAssociation({
+  async deleteDefaultAssociation(appId, fPort) {
+    const result = await this._api.DeleteDefaultAssociation({
       routeParams: {
         'application_ids.application_id': appId,
         f_port: fPort,
