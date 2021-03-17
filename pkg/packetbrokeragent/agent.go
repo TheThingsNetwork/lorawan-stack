@@ -53,8 +53,18 @@ const (
 // TenantContextFiller fills the parent context based on the tenant ID.
 type TenantContextFiller func(parent context.Context, tenantID string) (context.Context, error)
 
-// TenantExtractor extracts the tenant ID from the context.
-type TenantExtractor func(context context.Context) string
+// TenantIDExtractor extracts the tenant ID from the context.
+type TenantIDExtractor func(ctx context.Context) string
+
+// RegistrationInfo contains information about a Packet Broker registration.
+type RegistrationInfo struct {
+	Name          string
+	DevAddrBlocks []*ttnpb.PacketBrokerDevAddrBlock
+	ContactInfo   []*ttnpb.ContactInfo
+}
+
+// RegistrationInfoExtractor extracts registration information from the context.
+type RegistrationInfoExtractor func(ctx context.Context) (*RegistrationInfo, error)
 
 type uplinkMessage struct {
 	context.Context
@@ -69,7 +79,8 @@ type downlinkMessage struct {
 
 // Agent implements the Packet Broker Agent component, acting as Home Network.
 //
-// Agent exposes the GsPba and NsPba interfaces for forwarding uplink and subscribing to uplink.
+// Agent exposes the Pba interface for Packet Broker registration and routing policy management.
+// Agent also exposes the GsPba and NsPba interfaces for forwarding uplink and subscribing to uplink.
 type Agent struct {
 	*component.Component
 	ctx context.Context
@@ -84,8 +95,9 @@ type Agent struct {
 	homeNetworkConfig HomeNetworkConfig
 	devAddrPrefixes   []types.DevAddrPrefix
 
-	tenantContextFillers []TenantContextFiller
-	tenantExtractor      TenantExtractor
+	tenantContextFillers      []TenantContextFiller
+	tenantIDExtractor         TenantIDExtractor
+	registrationInfoExtractor RegistrationInfoExtractor
 
 	upstreamCh   chan *uplinkMessage
 	downstreamCh chan *downlinkMessage
@@ -108,11 +120,17 @@ func WithTenantContextFiller(filler TenantContextFiller) Option {
 	}
 }
 
-// WithTenantExtractor returns an Option that configures the Agent to use the given tenant extractor for publishing
-// messages. The Config's TenantID is always used in subscriptions.
-func WithTenantExtractor(extractor TenantExtractor) Option {
+// WithTenantIDExtractor returns an Option that configures the Agent to use the given tenant ID extractor.
+func WithTenantIDExtractor(extractor TenantIDExtractor) Option {
 	return func(a *Agent) {
-		a.tenantExtractor = extractor
+		a.tenantIDExtractor = extractor
+	}
+}
+
+// WithRegistrationInfo returns an Option that configures the Agent to use the given registration information extractor.
+func WithRegistrationInfo(extractor RegistrationInfoExtractor) Option {
+	return func(a *Agent) {
+		a.registrationInfoExtractor = extractor
 	}
 }
 
@@ -203,8 +221,32 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		forwarderConfig:      conf.Forwarder,
 		homeNetworkConfig:    conf.HomeNetwork,
 		devAddrPrefixes:      devAddrPrefixes,
-		tenantExtractor: func(_ context.Context) string {
+		tenantIDExtractor: func(_ context.Context) string {
 			return conf.TenantID
+		},
+		registrationInfoExtractor: func(_ context.Context) (*RegistrationInfo, error) {
+			blocks := make([]*ttnpb.PacketBrokerDevAddrBlock, len(devAddrPrefixes))
+			for i, p := range devAddrPrefixes {
+				blocks[i] = &ttnpb.PacketBrokerDevAddrBlock{
+					DevAddrPrefix: &ttnpb.DevAddrPrefix{
+						DevAddr: &p.DevAddr,
+						Length:  uint32(p.Length),
+					},
+					HomeNetworkClusterID: homeNetworkClusterID,
+				}
+			}
+			contactInfo := make([]*ttnpb.ContactInfo, 0, 2)
+			if adminContact := conf.Registration.AdministrativeContact.ContactInfo(ttnpb.CONTACT_TYPE_OTHER); adminContact != nil {
+				contactInfo = append(contactInfo, adminContact)
+			}
+			if techContact := conf.Registration.TechnicalContact.ContactInfo(ttnpb.CONTACT_TYPE_TECHNICAL); techContact != nil {
+				contactInfo = append(contactInfo, techContact)
+			}
+			return &RegistrationInfo{
+				Name:          conf.Registration.Name,
+				DevAddrBlocks: blocks,
+				ContactInfo:   contactInfo,
+			}, nil
 		},
 	}
 	if a.forwarderConfig.Enable {
@@ -246,10 +288,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		return nil, err
 	}
 	a.grpc.pba = &pbaServer{
-		iamConn:         iamConn,
-		netID:           a.netID,
-		tenantExtractor: a.tenantExtractor,
-		clusterID:       a.clusterID,
+		iamConn:                   iamConn,
+		netID:                     a.netID,
+		tenantIDExtractor:         a.tenantIDExtractor,
+		registrationInfoExtractor: a.registrationInfoExtractor,
+		clusterID:                 a.clusterID,
 	}
 	a.grpc.nsPba = &nsPbaServer{
 		contextDecoupler: a,
@@ -394,7 +437,7 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 		case <-time.After(workerIdleTimeout):
 			return nil
 		case up := <-uplinkCh:
-			tenantID := a.tenantExtractor(up.Context)
+			tenantID := a.tenantIDExtractor(up.Context)
 			msg := up.UplinkMessage
 			ctx := log.NewContextWithFields(ctx, log.Fields(
 				"forwarder_tenant_id", tenantID,
@@ -877,7 +920,7 @@ func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientCo
 		case <-time.After(workerIdleTimeout):
 			return nil
 		case down := <-downlinkCh:
-			tenantID := a.tenantExtractor(down.Context)
+			tenantID := a.tenantIDExtractor(down.Context)
 			msg, token := down.DownlinkMessage, down.agentUplinkToken
 			ctx := log.NewContextWithFields(ctx, log.Fields(
 				"forwarder_net_id", token.ForwarderNetID,

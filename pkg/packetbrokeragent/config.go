@@ -16,6 +16,7 @@ package packetbrokeragent
 
 import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"gopkg.in/square/go-jose.v2"
 )
@@ -23,6 +24,7 @@ import (
 // Config configures Packet Broker clients.
 type Config struct {
 	IAMAddress           string               `name:"iam-address" description:"Address of Packet Broker IAM"`
+	Registration         RegistrationConfig   `name:"registration" description:"Registration with Packet Broker"`
 	DataPlaneAddress     string               `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
 	Insecure             bool                 `name:"insecure" description:"Connect without using TLS"`
 	NetID                types.NetID          `name:"net-id" description:"LoRa Alliance NetID"`
@@ -34,6 +36,27 @@ type Config struct {
 	OAuth2               OAuth2Config         `name:"oauth2" description:"OAuth 2.0 configuration"`
 	Forwarder            ForwarderConfig      `name:"forwarder" description:"Forwarder configuration for publishing uplink messages and subscribing to downlink messages"`
 	HomeNetwork          HomeNetworkConfig    `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
+}
+
+type RegistrationConfig struct {
+	Name                  string            `name:"name" description:"Friendly name to register with Packet Broker"`
+	AdministrativeContact ContactInfoConfig `name:"administrative-contact" description:"Administrative contact to register with Packet Broker"`
+	TechnicalContact      ContactInfoConfig `name:"technical-contact" description:"Technical contact to register with Packet Broker"`
+}
+
+type ContactInfoConfig struct {
+	Email string `name:"email" description:"Email address"`
+}
+
+func (c ContactInfoConfig) ContactInfo(contactType ttnpb.ContactType) *ttnpb.ContactInfo {
+	if c.Email == "" {
+		return nil
+	}
+	return &ttnpb.ContactInfo{
+		ContactType:   contactType,
+		ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+		Value:         c.Email,
+	}
 }
 
 // OAuth2Config defines OAuth 2.0 configuration for authentication.
