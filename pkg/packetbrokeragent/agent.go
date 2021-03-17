@@ -288,11 +288,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		return nil, err
 	}
 	a.grpc.pba = &pbaServer{
-		iamConn:                   iamConn,
-		netID:                     a.netID,
-		tenantIDExtractor:         a.tenantIDExtractor,
-		registrationInfoExtractor: a.registrationInfoExtractor,
-		clusterID:                 a.clusterID,
+		Agent:   a,
+		iamConn: iamConn,
 	}
 	a.grpc.nsPba = &nsPbaServer{
 		contextDecoupler: a,
