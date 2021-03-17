@@ -2627,15 +2627,6 @@
       "file": "require.go"
     }
   },
-  "error:pkg/auth/rights:unauthenticated": {
-    "translations": {
-      "en": "unauthenticated"
-    },
-    "description": {
-      "package": "pkg/auth/rights",
-      "file": "require.go"
-    }
-  },
   "error:pkg/auth:invalid_hash": {
     "translations": {
       "en": "invalid hash"

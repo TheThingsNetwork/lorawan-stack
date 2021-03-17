@@ -24,10 +24,6 @@ import (
 
 // Errors for no/insufficient rights.
 var (
-	ErrUnauthenticated = errors.DefineUnauthenticated(
-		"unauthenticated",
-		"unauthenticated",
-	)
 	ErrNoUniversalRights = errors.DefinePermissionDenied(
 		"no_universal_rights",
 		"no universal rights",
@@ -81,28 +77,6 @@ var (
 		"insufficient rights for user `{uid}`",
 	)
 )
-
-// RequireAuthenticated checks that the context is authenticated.
-func RequireAuthenticated(ctx context.Context) error {
-	authInfo, err := AuthInfo(ctx)
-	if err != nil {
-		return err
-	}
-	if authInfo.GetIsAdmin() {
-		return nil
-	}
-	if authInfo.GetAPIKey() != nil {
-		return nil
-	} else if authInfo.GetOAuthAccessToken() != nil {
-		return nil
-	} else if authInfo.GetUserSession() != nil {
-		return nil
-	}
-	if len(authInfo.GetUniversalRights().GetRights()) > 0 {
-		return nil
-	}
-	return ErrUnauthenticated.New()
-}
 
 // RequireUniversal checks that the context contains the required universal rights.
 func RequireUniversal(ctx context.Context, required ...ttnpb.Right) error {

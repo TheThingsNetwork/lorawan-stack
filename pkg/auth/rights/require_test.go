@@ -30,16 +30,11 @@ import (
 )
 
 func requireAuthInfo(ctx context.Context) (res struct {
-	AuthenticatedErr error
-	UniversalErr     error
-	IsAdminErr       error
+	UniversalErr error
+	IsAdminErr   error
 }) {
 	var wg sync.WaitGroup
-	wg.Add(3)
-	go func() {
-		res.AuthenticatedErr = RequireAuthenticated(ctx)
-		wg.Done()
-	}()
+	wg.Add(2)
 	go func() {
 		res.UniversalErr = RequireUniversal(ctx, ttnpb.RIGHT_SEND_INVITES)
 		wg.Done()
@@ -89,9 +84,6 @@ func TestRequire(t *testing.T) {
 	a := assertions.New(t)
 
 	a.So(func() {
-		RequireAuthenticated(test.Context())
-	}, should.Panic)
-	a.So(func() {
 		RequireUniversal(test.Context(), ttnpb.RIGHT_SEND_INVITES)
 	}, should.Panic)
 	a.So(func() {
@@ -137,7 +129,6 @@ func TestRequire(t *testing.T) {
 	})
 
 	fooAuthInfoRes := requireAuthInfo(fooCtx)
-	a.So(fooAuthInfoRes.AuthenticatedErr, should.BeNil)
 	a.So(fooAuthInfoRes.UniversalErr, should.BeNil)
 	a.So(fooAuthInfoRes.IsAdminErr, should.BeNil)
 	fooEntityRes := requireRights(fooCtx, "foo")
@@ -157,7 +148,6 @@ func TestRequire(t *testing.T) {
 		userError:         mockErr,
 	})
 	errFetchAuthInfoRes := requireAuthInfo(errFetchCtx)
-	a.So(errFetchAuthInfoRes.AuthenticatedErr, should.Resemble, mockErr)
 	a.So(errFetchAuthInfoRes.UniversalErr, should.Resemble, mockErr)
 	a.So(errFetchAuthInfoRes.IsAdminErr, should.Resemble, mockErr)
 	errFetchEntityRes := requireRights(errFetchCtx, "foo")
@@ -177,7 +167,6 @@ func TestRequire(t *testing.T) {
 		userError:         errPermissionDenied,
 	})
 	permissionDeniedAuthInfoRes := requireAuthInfo(permissionDeniedFetchCtx)
-	a.So(errors.IsUnauthenticated(permissionDeniedAuthInfoRes.AuthenticatedErr), should.BeTrue)
 	a.So(errors.IsPermissionDenied(permissionDeniedAuthInfoRes.UniversalErr), should.BeTrue)
 	a.So(errors.IsPermissionDenied(permissionDeniedAuthInfoRes.IsAdminErr), should.BeTrue)
 	permissionDeniedEntityRes := requireRights(permissionDeniedFetchCtx, "foo")
