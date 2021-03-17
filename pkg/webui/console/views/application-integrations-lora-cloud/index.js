@@ -27,7 +27,7 @@ import Link from '@ttn-lw/components/link'
 import Message from '@ttn-lw/lib/components/message'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 
-import LoRaCloudForm from '@console/containers/lora-cloud-form'
+import LoRaCloudDASForm from '@console/containers/lora-cloud-das-form'
 
 import Require from '@console/lib/components/require'
 
@@ -93,7 +93,7 @@ const LoRaCloud = () => {
               </div>
               <hr className={style.hRule} />
               <Message component="h3" content={m.setToken} />
-              <LoRaCloudForm />
+              <LoRaCloudDASForm />
             </Col>
           </Row>
         </Container>

@@ -192,6 +192,9 @@ export default {
       setDefaultAssociation: tts.Applications.Packages.setDefaultAssociation.bind(
         tts.Applications.Packages,
       ),
+      deleteDefaultAssociation: tts.Applications.Packages.deleteDefaultAssociation.bind(
+        tts.Applications.Packages,
+      ),
     },
   },
   devices: {
