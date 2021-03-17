@@ -192,9 +192,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		homeNetworkClusterID = conf.ClusterID
 	}
 	a := &Agent{
-		Component: c,
-		ctx:       ctx,
-
+		Component:            c,
+		ctx:                  ctx,
 		dataPlaneAddress:     conf.DataPlaneAddress,
 		netID:                conf.NetID,
 		subscriptionTenantID: conf.TenantID,
@@ -238,7 +237,20 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	if a.homeNetworkConfig.Enable {
 		a.downstreamCh = make(chan *downlinkMessage, downstreamBufferSize)
 	}
-	a.grpc.pba = &pbaServer{}
+	for _, opt := range opts {
+		opt(a)
+	}
+
+	iamConn, err := a.dialContext(ctx, conf.IAMAddress)
+	if err != nil {
+		return nil, err
+	}
+	a.grpc.pba = &pbaServer{
+		iamConn:         iamConn,
+		netID:           a.netID,
+		tenantExtractor: a.tenantExtractor,
+		clusterID:       a.clusterID,
+	}
 	a.grpc.nsPba = &nsPbaServer{
 		contextDecoupler: a,
 		downstreamCh:     a.downstreamCh,
@@ -248,9 +260,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		messageEncrypter: a,
 		contextDecoupler: a,
 		upstreamCh:       a.upstreamCh,
-	}
-	for _, opt := range opts {
-		opt(a)
 	}
 
 	newTaskConfig := func(id string, fn component.TaskFunc) *component.TaskConfig {
