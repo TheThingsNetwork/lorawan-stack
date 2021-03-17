@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Downlink queue operations on ABP devices not working under specific circumstances.
+- NwkKey handling for end devices in the Console.
 
 ### Security
 
