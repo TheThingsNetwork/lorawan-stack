@@ -52,6 +52,10 @@ export const mayCreateOrganizations = {
   rightsSelector: selectUserRights,
   check: rights => rights.includes('RIGHT_USER_ORGANIZATIONS_CREATE'),
 }
+export const mayViewOrEditApiKeys = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_SETTINGS_API_KEYS'),
+}
 
 // Application related feature checks.
 export const mayViewApplicationInfo = {
