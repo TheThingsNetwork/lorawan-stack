@@ -81,16 +81,16 @@ class Devices {
 
       if (
         Boolean(mac_settings.ping_slot_periodicity) &&
-        typeof mac_settings.ping_slot_periodicity.value === 'undefined'
+        typeof mac_settings.ping_slot_periodicity === 'undefined'
       ) {
-        mac_settings.ping_slot_periodicity.value = 'PING_EVERY_1S'
+        mac_settings.ping_slot_periodicity = 'PING_EVERY_1S'
       }
 
       if (
         Boolean(mac_settings.rx2_data_rate_index) &&
-        typeof mac_settings.rx2_data_rate_index.value === 'undefined'
+        typeof mac_settings.rx2_data_rate_index === 'undefined'
       ) {
-        mac_settings.rx2_data_rate_index.value = 0
+        mac_settings.rx2_data_rate_index = 0
       }
     }
 
