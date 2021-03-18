@@ -33,6 +33,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Incorrect documentation url for event details data formats.
+- Search functionality for applications, gateways and organizations in the Console.
 
 ### Security
 
