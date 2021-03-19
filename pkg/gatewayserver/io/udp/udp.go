@@ -201,7 +201,12 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 		var err error
 		defer func() {
 			if err != nil {
-				s.connections.Delete(eui)
+				delete := func() { s.connections.Delete(eui) }
+				if expiration := s.config.ConnectionErrorExpires; expiration != 0 {
+					time.AfterFunc(expiration, delete)
+				} else {
+					delete()
+				}
 			}
 			cs.io, cs.ioErr = io, err
 			close(cs.ioWait)
