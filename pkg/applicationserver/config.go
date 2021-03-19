@@ -47,9 +47,10 @@ type InteropConfig struct {
 
 // EndDeviceFetcherConfig represents configuration for the end device fetcher in Application Server.
 type EndDeviceFetcherConfig struct {
-	Fetcher EndDeviceFetcher            `name:"-"`
-	Timeout time.Duration               `name:"timeout" description:"Timeout of the end device retrival operation"`
-	Cache   EndDeviceFetcherCacheConfig `name:"cache" description:"Cache configuration options for the end device fetcher"`
+	Fetcher        EndDeviceFetcher                     `name:"-"`
+	Timeout        time.Duration                        `name:"timeout" description:"Timeout of the end device retrival operation"`
+	Cache          EndDeviceFetcherCacheConfig          `name:"cache" description:"Cache configuration options for the end device fetcher"`
+	CircuitBreaker EndDeviceFetcherCircuitBreakerConfig `name:"circuit-breaker" description:"Circuit breaker options for the end device fetcher"`
 }
 
 // EndDeviceFetcherCacheConfig represents configuration for device information caching in Application Server.
@@ -57,6 +58,12 @@ type EndDeviceFetcherCacheConfig struct {
 	Enable bool          `name:"enable" description:"Cache fetched end devices"`
 	TTL    time.Duration `name:"ttl" description:"TTL for cached end devices"`
 	Size   int           `name:"size" description:"Cache size"`
+}
+
+type EndDeviceFetcherCircuitBreakerConfig struct {
+	Enable    bool          `name:"enable" description:"Enable circuit breaker behavior on burst errors"`
+	Timeout   time.Duration `name:"timeout" description:"Timeout after which the circuit breaker closes"`
+	Threshold int           `name:"threshold" description:"Number of failed fetching attempts after which the circuit breaker opens"`
 }
 
 // Config represents the ApplicationServer configuration.
@@ -213,15 +220,21 @@ func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, s
 }
 
 var (
-	errInvalidTTL = errors.DefineInvalidArgument("invalid_ttl", "Invalid TTL `{ttl}`")
+	errInvalidTTL       = errors.DefineInvalidArgument("invalid_ttl", "invalid TTL `{ttl}`")
+	errInvalidThreshold = errors.DefineInvalidArgument("invalid_threshold", "invalid threshold `{threshold}`")
 )
 
 // NewFetcher creates an EndDeviceFetcher from config.
 func (c EndDeviceFetcherConfig) NewFetcher(comp *component.Component) (EndDeviceFetcher, error) {
 	fetcher := NewRegistryEndDeviceFetcher(comp)
-	fetcher = NewSingleFlightEndDeviceFetcher(fetcher)
 	if c.Timeout != 0 {
 		fetcher = NewTimeoutEndDeviceFetcher(fetcher, c.Timeout)
+	}
+	if c.CircuitBreaker.Enable {
+		if c.CircuitBreaker.Threshold <= 0 {
+			return nil, errInvalidThreshold.WithAttributes("threshold", c.CircuitBreaker.Threshold)
+		}
+		fetcher = NewCircuitBreakerEndDeviceFetcher(fetcher, uint64(c.CircuitBreaker.Threshold), c.CircuitBreaker.Timeout)
 	}
 	if c.Cache.Enable {
 		if c.Cache.TTL <= 0 {
@@ -236,6 +249,7 @@ func (c EndDeviceFetcherConfig) NewFetcher(comp *component.Component) (EndDevice
 		builder = builder.Expiration(c.Cache.TTL)
 		fetcher = NewCachedEndDeviceFetcher(fetcher, builder.Build())
 	}
+	fetcher = NewSingleFlightEndDeviceFetcher(fetcher)
 
 	return fetcher, nil
 }

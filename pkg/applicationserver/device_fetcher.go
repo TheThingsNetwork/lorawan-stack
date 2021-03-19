@@ -18,11 +18,13 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/bluele/gcache"
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"golang.org/x/sync/singleflight"
@@ -130,6 +132,68 @@ func (f *timeoutEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceId
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 	return f.fetcher.Get(ctx, ids, fieldMaskPaths...)
+}
+
+type circuitBreakerEndDeviceFetcher struct {
+	fetcher EndDeviceFetcher
+
+	threshold uint64
+	timeout   time.Duration
+
+	mu                sync.RWMutex
+	failures          uint64
+	lastFailedAttempt time.Time
+}
+
+// NewCircuitBreakerEndDeviceFetcher wraps an end device fetcher with a circuit breaking mechanism.
+// The circuit breaker opens when the number of failure attempts is higher than the threshold,
+// and closes after the provided timeout.
+func NewCircuitBreakerEndDeviceFetcher(fetcher EndDeviceFetcher, threshold uint64, timeout time.Duration) EndDeviceFetcher {
+	return &circuitBreakerEndDeviceFetcher{
+		fetcher:   fetcher,
+		threshold: threshold,
+		timeout:   timeout,
+	}
+}
+
+var errCircuitBreakerOpen = errors.DefineUnavailable("circuit_breaker_open", "circuit breaker open")
+
+func (f *circuitBreakerEndDeviceFetcher) circuitOpen() error {
+	f.mu.RLock()
+	defer f.mu.RUnlock()
+	// If the number of failures is still under the threshold, consider the circuit as being closed.
+	if f.failures < f.threshold {
+		return nil
+	}
+	// If the attempt timeout expired, consider the circuit as being closed.
+	if time.Now().Sub(f.lastFailedAttempt) > f.timeout {
+		return nil
+	}
+	// At this point we have a number of failures that is above the threshold, and any attempts are recent.
+	// The circuit breaker is open.
+	return errCircuitBreakerOpen.New()
+}
+
+func (f *circuitBreakerEndDeviceFetcher) observeError(err error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if err != nil {
+		f.lastFailedAttempt = time.Now()
+		f.failures++
+	} else {
+		f.lastFailedAttempt = time.Time{}
+		f.failures = 0
+	}
+}
+
+// Get implements the EndDeviceFetcher interface.
+func (f *circuitBreakerEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+	if err := f.circuitOpen(); err != nil {
+		return nil, err
+	}
+	dev, err := f.fetcher.Get(ctx, ids, fieldMaskPaths...)
+	f.observeError(err)
+	return dev, err
 }
 
 func endDeviceKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) string {

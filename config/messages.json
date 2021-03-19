@@ -2330,6 +2330,15 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:circuit_breaker_open": {
+    "translations": {
+      "en": "circuit breaker open"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "device_fetcher.go"
+    }
+  },
   "error:pkg/applicationserver:device_not_found": {
     "translations": {
       "en": "device `{device_uid}` not found"
@@ -2366,9 +2375,18 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/applicationserver:invalid_threshold": {
+    "translations": {
+      "en": "invalid threshold `{threshold}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "config.go"
+    }
+  },
   "error:pkg/applicationserver:invalid_ttl": {
     "translations": {
-      "en": "Invalid TTL `{ttl}`"
+      "en": "invalid TTL `{ttl}`"
     },
     "description": {
       "package": "pkg/applicationserver",

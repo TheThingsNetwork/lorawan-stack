@@ -52,6 +52,11 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 			Enable: true,
 			TTL:    5 * time.Minute,
 		},
+		CircuitBreaker: applicationserver.EndDeviceFetcherCircuitBreakerConfig{
+			Enable:    true,
+			Threshold: 10,
+			Timeout:   15 * time.Minute,
+		},
 	},
 	Distribution: applicationserver.DistributionConfig{
 		Timeout: time.Minute,

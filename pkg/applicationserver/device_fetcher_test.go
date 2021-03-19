@@ -17,6 +17,8 @@ package applicationserver_test
 import (
 	"context"
 	"fmt"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -135,5 +137,92 @@ func TestEndDeviceFetcher(t *testing.T) {
 		}
 
 		cf.Get(test.Context(), dev, "locations")
+	})
+	t.Run("CircuitBreaker", func(t *testing.T) {
+		timeout := (1 << 6) * test.Delay
+		threshold := uint64(10)
+		var mockErr error
+		numCalls := uint64(0)
+		f := funcFetcher(
+			func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+				atomic.AddUint64(&numCalls, 1)
+				return nil, mockErr
+			},
+		)
+
+		cf := applicationserver.NewCircuitBreakerEndDeviceFetcher(f, threshold, timeout)
+
+		dev := ttnpb.EndDeviceIdentifiers{
+			DeviceID: "dev1",
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationID: "app1",
+			},
+		}
+
+		t.Run("InitialClosed", func(t *testing.T) {
+			a := assertions.New(t)
+			wg := sync.WaitGroup{}
+			for i := 0; i < 10; i++ {
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					_, err := cf.Get(test.Context(), dev, "location")
+					a.So(err, should.BeNil)
+				}()
+			}
+			wg.Wait()
+			a.So(numCalls, should.Equal, 10)
+		})
+
+		t.Run("InitialBurst", func(t *testing.T) {
+			a := assertions.New(t)
+			mockErr = fmt.Errorf("server unavailable")
+			wg := sync.WaitGroup{}
+			for i := 0; i < 10; i++ {
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					_, err := cf.Get(test.Context(), dev, "location")
+					a.So(err, should.NotBeNil)
+					a.So(err, should.Resemble, mockErr)
+				}()
+			}
+			wg.Wait()
+			a.So(numCalls, should.Equal, 20)
+		})
+
+		t.Run("BreakerOpen", func(t *testing.T) {
+			a := assertions.New(t)
+			wg := sync.WaitGroup{}
+			for i := 0; i < 10; i++ {
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					_, err := cf.Get(test.Context(), dev, "location")
+					a.So(err, should.NotBeNil)
+				}()
+			}
+			wg.Wait()
+			a.So(numCalls, should.Equal, 20)
+		})
+
+		t.Run("BreakerClosed", func(t *testing.T) {
+			a := assertions.New(t)
+			wg := sync.WaitGroup{}
+
+			time.Sleep(2 * timeout)
+			mockErr = nil
+
+			for i := 0; i < 10; i++ {
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					_, err := cf.Get(test.Context(), dev, "location")
+					a.So(err, should.BeNil)
+				}()
+			}
+			wg.Wait()
+			a.So(numCalls, should.Equal, 30)
+		})
 	})
 }
