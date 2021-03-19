@@ -466,6 +466,9 @@ func (s *srv) gc() {
 				default:
 					return true
 				}
+				if state.ioErr != nil {
+					return true
+				}
 				select {
 				case <-state.io.Context().Done():
 					logger.Debug("Connection context done")
