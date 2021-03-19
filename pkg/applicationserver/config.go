@@ -48,6 +48,7 @@ type InteropConfig struct {
 // EndDeviceFetcherConfig represents configuration for the end device fetcher in Application Server.
 type EndDeviceFetcherConfig struct {
 	Fetcher EndDeviceFetcher            `name:"-"`
+	Timeout time.Duration               `name:"timeout" description:"Timeout of the end device retrival operation"`
 	Cache   EndDeviceFetcherCacheConfig `name:"cache" description:"Cache configuration options for the end device fetcher"`
 }
 
@@ -219,6 +220,9 @@ var (
 func (c EndDeviceFetcherConfig) NewFetcher(comp *component.Component) (EndDeviceFetcher, error) {
 	fetcher := NewRegistryEndDeviceFetcher(comp)
 	fetcher = NewSingleFlightEndDeviceFetcher(fetcher)
+	if c.Timeout != 0 {
+		fetcher = NewTimeoutEndDeviceFetcher(fetcher, c.Timeout)
+	}
 	if c.Cache.Enable {
 		if c.Cache.TTL <= 0 {
 			return nil, errInvalidTTL.WithAttributes("ttl", c.Cache.TTL)

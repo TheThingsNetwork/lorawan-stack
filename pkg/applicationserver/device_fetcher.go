@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/bluele/gcache"
 	pbtypes "github.com/gogo/protobuf/types"
@@ -102,6 +103,7 @@ func NewSingleFlightEndDeviceFetcher(fetcher EndDeviceFetcher) EndDeviceFetcher 
 	return &singleFlightEndDeviceFetcher{fetcher: fetcher}
 }
 
+// Get implements the EndDeviceFetcher interface.
 func (f *singleFlightEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
 	key := endDeviceKey(ctx, ids, fieldMaskPaths...)
 	dev, err, _ := f.singleflight.Do(key, func() (interface{}, error) {
@@ -111,6 +113,23 @@ func (f *singleFlightEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDev
 		return nil, err
 	}
 	return dev.(*ttnpb.EndDevice), nil
+}
+
+type timeoutEndDeviceFetcher struct {
+	fetcher EndDeviceFetcher
+	timeout time.Duration
+}
+
+// NewTimeoutEndDeviceFetcher wraps an EndDeviceFetcher and limits the lifetime of the context used to retrieve the end device.
+func NewTimeoutEndDeviceFetcher(fetcher EndDeviceFetcher, timeout time.Duration) EndDeviceFetcher {
+	return &timeoutEndDeviceFetcher{fetcher, timeout}
+}
+
+// Get implements the EndDeviceFetcher interface.
+func (f *timeoutEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+	ctx, cancel := context.WithTimeout(ctx, f.timeout)
+	defer cancel()
+	return f.fetcher.Get(ctx, ids, fieldMaskPaths...)
 }
 
 func endDeviceKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) string {

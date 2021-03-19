@@ -28,24 +28,27 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-type mockFetcher struct {
-	numCalls int
-	err      error
-}
+type funcFetcher func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error)
 
-func (f *mockFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
-	f.numCalls++
-	return nil, f.err
+func (f funcFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+	return f(ctx, ids, fieldMaskPaths...)
 }
 
 func TestEndDeviceFetcher(t *testing.T) {
 	t.Run("Cache", func(t *testing.T) {
 		a := assertions.New(t)
-		f := &mockFetcher{}
+		numCalls := 0
+		var mockErr error
+		f := funcFetcher(
+			func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+				numCalls++
+				return nil, mockErr
+			},
+		)
 
 		_, err := f.Get(test.Context(), ttnpb.EndDeviceIdentifiers{}, "locations")
 		a.So(err, should.BeNil)
-		a.So(f.numCalls, should.Equal, 1)
+		a.So(numCalls, should.Equal, 1)
 
 		fakeClock := gcache.NewFakeClock()
 		cache := gcache.New(-1).Clock(fakeClock).Expiration(time.Second).Build()
@@ -68,46 +71,69 @@ func TestEndDeviceFetcher(t *testing.T) {
 		t.Run("Cold", func(t *testing.T) {
 			a := assertions.New(t)
 			cf.Get(test.Context(), dev1, "locations")
-			a.So(f.numCalls, should.Equal, 2)
+			a.So(numCalls, should.Equal, 2)
 			cf.Get(test.Context(), dev1, "locations")
-			a.So(f.numCalls, should.Equal, 2)
+			a.So(numCalls, should.Equal, 2)
 		})
 
 		t.Run("Expire", func(t *testing.T) {
 			a := assertions.New(t)
 			fakeClock.Advance(2 * time.Second)
 			cf.Get(test.Context(), dev1, "locations")
-			a.So(f.numCalls, should.Equal, 3)
+			a.So(numCalls, should.Equal, 3)
 			cf.Get(test.Context(), dev1, "locations")
-			a.So(f.numCalls, should.Equal, 3)
+			a.So(numCalls, should.Equal, 3)
 		})
 
 		t.Run("OtherDevice", func(t *testing.T) {
 			a := assertions.New(t)
 			cf.Get(test.Context(), dev1, "locations")
-			a.So(f.numCalls, should.Equal, 3)
+			a.So(numCalls, should.Equal, 3)
 			cf.Get(test.Context(), dev2, "locations")
-			a.So(f.numCalls, should.Equal, 4)
+			a.So(numCalls, should.Equal, 4)
 		})
 
 		t.Run("OtherFieldMask", func(t *testing.T) {
 			a := assertions.New(t)
 			cf.Get(test.Context(), dev1, "attributes")
-			a.So(f.numCalls, should.Equal, 5)
+			a.So(numCalls, should.Equal, 5)
 			cf.Get(test.Context(), dev1, "attributes")
-			a.So(f.numCalls, should.Equal, 5)
+			a.So(numCalls, should.Equal, 5)
 		})
 
 		t.Run("CacheError", func(t *testing.T) {
 			a := assertions.New(t)
-			f.err = fmt.Errorf("foobar")
+			mockErr = fmt.Errorf("foobar")
 			fakeClock.Advance(2 * time.Second)
 			_, err := cf.Get(test.Context(), dev1, "locations")
-			a.So(f.numCalls, should.Equal, 6)
-			a.So(err, should.Resemble, f.err)
+			a.So(numCalls, should.Equal, 6)
+			a.So(err, should.Resemble, mockErr)
 			_, err = cf.Get(test.Context(), dev1, "locations")
-			a.So(f.numCalls, should.Equal, 6)
-			a.So(err, should.Resemble, f.err)
+			a.So(numCalls, should.Equal, 6)
+			a.So(err, should.Resemble, mockErr)
 		})
+	})
+	t.Run("Timeout", func(t *testing.T) {
+		timeout := 5 * time.Second
+		margin := 100 * time.Millisecond
+		a := assertions.New(t)
+		f := funcFetcher(
+			func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+				deadline, ok := ctx.Deadline()
+				a.So(ok, should.BeTrue)
+				a.So(deadline.Sub(time.Now()), should.AlmostEqual, timeout, margin.Nanoseconds())
+				return nil, nil
+			},
+		)
+		cf := applicationserver.NewTimeoutEndDeviceFetcher(f, timeout)
+
+		dev := ttnpb.EndDeviceIdentifiers{
+			DeviceID: "dev1",
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationID: "app1",
+			},
+		}
+
+		cf.Get(test.Context(), dev, "locations")
 	})
 }
