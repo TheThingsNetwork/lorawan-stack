@@ -7,7 +7,7 @@ with the exception that this project **does not** follow Semantic Versioning.
 
 For details about compatibility between different releases, see the **Commitments and Releases** section of our README.
 
-## [Upcoming] (v3.12)
+## [Unreleased]
 
 ### Added
 
@@ -22,18 +22,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - Changed the pub/sub channels that the Redis backend of the Events system uses.
 - Changed the encoding of events transported by the Redis backend of the Events system.
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-## [Unreleased]
-
-### Added
-
-### Changed
 
 ### Deprecated
 
