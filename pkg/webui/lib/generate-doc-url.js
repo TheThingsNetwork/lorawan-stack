@@ -14,7 +14,7 @@
 
 import { selectApplicationConfig, selectDocumentationUrlConfig } from './selectors/env'
 
-export default function generateDocUrl(path) {
+export default path => {
   if (selectApplicationConfig() && selectDocumentationUrlConfig()) {
     return selectDocumentationUrlConfig().concat(path)
   }

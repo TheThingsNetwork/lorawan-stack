@@ -22,11 +22,11 @@ import style from './group.styl'
 
 export const RadioGroupContext = React.createContext()
 
-function findCheckedRadio(children) {
+const findCheckedRadio = children => {
   let value
   let matched = false
 
-  React.Children.forEach(children, function(radio) {
+  React.Children.forEach(children, radio => {
     if (radio && radio.props && !matched && radio.props.checked) {
       value = radio.props.value
       matched = true

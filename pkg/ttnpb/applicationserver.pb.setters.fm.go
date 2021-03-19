@@ -329,6 +329,432 @@ func (dst *NsAsHandleUplinkRequest) SetFields(src *NsAsHandleUplinkRequest, path
 	return nil
 }
 
+func (dst *EncodeDownlinkRequest) SetFields(src *EncodeDownlinkRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "end_device_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceIdentifiers
+				if (src == nil || src.EndDeviceIds == nil) && dst.EndDeviceIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EndDeviceIds
+				}
+				if dst.EndDeviceIds != nil {
+					newDst = dst.EndDeviceIds
+				} else {
+					newDst = &EndDeviceIdentifiers{}
+					dst.EndDeviceIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIds = src.EndDeviceIds
+				} else {
+					dst.EndDeviceIds = nil
+				}
+			}
+		case "version_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceVersionIdentifiers
+				if (src == nil || src.VersionIds == nil) && dst.VersionIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.VersionIds
+				}
+				if dst.VersionIds != nil {
+					newDst = dst.VersionIds
+				} else {
+					newDst = &EndDeviceVersionIdentifiers{}
+					dst.VersionIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.VersionIds = src.VersionIds
+				} else {
+					dst.VersionIds = nil
+				}
+			}
+		case "downlink":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationDownlink
+				if (src == nil || src.Downlink == nil) && dst.Downlink == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Downlink
+				}
+				if dst.Downlink != nil {
+					newDst = dst.Downlink
+				} else {
+					newDst = &ApplicationDownlink{}
+					dst.Downlink = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Downlink = src.Downlink
+				} else {
+					dst.Downlink = nil
+				}
+			}
+		case "formatter":
+			if len(subs) > 0 {
+				return fmt.Errorf("'formatter' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Formatter = src.Formatter
+			} else {
+				var zero PayloadFormatter
+				dst.Formatter = zero
+			}
+		case "parameter":
+			if len(subs) > 0 {
+				return fmt.Errorf("'parameter' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Parameter = src.Parameter
+			} else {
+				var zero string
+				dst.Parameter = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *EncodeDownlinkResponse) SetFields(src *EncodeDownlinkResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "downlink":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationDownlink
+				if (src == nil || src.Downlink == nil) && dst.Downlink == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Downlink
+				}
+				if dst.Downlink != nil {
+					newDst = dst.Downlink
+				} else {
+					newDst = &ApplicationDownlink{}
+					dst.Downlink = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Downlink = src.Downlink
+				} else {
+					dst.Downlink = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *DecodeUplinkRequest) SetFields(src *DecodeUplinkRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "end_device_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceIdentifiers
+				if (src == nil || src.EndDeviceIds == nil) && dst.EndDeviceIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EndDeviceIds
+				}
+				if dst.EndDeviceIds != nil {
+					newDst = dst.EndDeviceIds
+				} else {
+					newDst = &EndDeviceIdentifiers{}
+					dst.EndDeviceIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIds = src.EndDeviceIds
+				} else {
+					dst.EndDeviceIds = nil
+				}
+			}
+		case "version_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceVersionIdentifiers
+				if (src == nil || src.VersionIds == nil) && dst.VersionIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.VersionIds
+				}
+				if dst.VersionIds != nil {
+					newDst = dst.VersionIds
+				} else {
+					newDst = &EndDeviceVersionIdentifiers{}
+					dst.VersionIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.VersionIds = src.VersionIds
+				} else {
+					dst.VersionIds = nil
+				}
+			}
+		case "uplink":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationUplink
+				if (src == nil || src.Uplink == nil) && dst.Uplink == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Uplink
+				}
+				if dst.Uplink != nil {
+					newDst = dst.Uplink
+				} else {
+					newDst = &ApplicationUplink{}
+					dst.Uplink = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Uplink = src.Uplink
+				} else {
+					dst.Uplink = nil
+				}
+			}
+		case "formatter":
+			if len(subs) > 0 {
+				return fmt.Errorf("'formatter' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Formatter = src.Formatter
+			} else {
+				var zero PayloadFormatter
+				dst.Formatter = zero
+			}
+		case "parameter":
+			if len(subs) > 0 {
+				return fmt.Errorf("'parameter' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Parameter = src.Parameter
+			} else {
+				var zero string
+				dst.Parameter = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *DecodeUplinkResponse) SetFields(src *DecodeUplinkResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "uplink":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationUplink
+				if (src == nil || src.Uplink == nil) && dst.Uplink == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Uplink
+				}
+				if dst.Uplink != nil {
+					newDst = dst.Uplink
+				} else {
+					newDst = &ApplicationUplink{}
+					dst.Uplink = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Uplink = src.Uplink
+				} else {
+					dst.Uplink = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *DecodeDownlinkRequest) SetFields(src *DecodeDownlinkRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "end_device_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceIdentifiers
+				if (src == nil || src.EndDeviceIds == nil) && dst.EndDeviceIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EndDeviceIds
+				}
+				if dst.EndDeviceIds != nil {
+					newDst = dst.EndDeviceIds
+				} else {
+					newDst = &EndDeviceIdentifiers{}
+					dst.EndDeviceIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIds = src.EndDeviceIds
+				} else {
+					dst.EndDeviceIds = nil
+				}
+			}
+		case "version_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceVersionIdentifiers
+				if (src == nil || src.VersionIds == nil) && dst.VersionIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.VersionIds
+				}
+				if dst.VersionIds != nil {
+					newDst = dst.VersionIds
+				} else {
+					newDst = &EndDeviceVersionIdentifiers{}
+					dst.VersionIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.VersionIds = src.VersionIds
+				} else {
+					dst.VersionIds = nil
+				}
+			}
+		case "downlink":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationDownlink
+				if (src == nil || src.Downlink == nil) && dst.Downlink == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Downlink
+				}
+				if dst.Downlink != nil {
+					newDst = dst.Downlink
+				} else {
+					newDst = &ApplicationDownlink{}
+					dst.Downlink = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Downlink = src.Downlink
+				} else {
+					dst.Downlink = nil
+				}
+			}
+		case "formatter":
+			if len(subs) > 0 {
+				return fmt.Errorf("'formatter' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Formatter = src.Formatter
+			} else {
+				var zero PayloadFormatter
+				dst.Formatter = zero
+			}
+		case "parameter":
+			if len(subs) > 0 {
+				return fmt.Errorf("'parameter' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Parameter = src.Parameter
+			} else {
+				var zero string
+				dst.Parameter = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *DecodeDownlinkResponse) SetFields(src *DecodeDownlinkResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "downlink":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationDownlink
+				if (src == nil || src.Downlink == nil) && dst.Downlink == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Downlink
+				}
+				if dst.Downlink != nil {
+					newDst = dst.Downlink
+				} else {
+					newDst = &ApplicationDownlink{}
+					dst.Downlink = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Downlink = src.Downlink
+				} else {
+					dst.Downlink = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *AsConfiguration_PubSub) SetFields(src *AsConfiguration_PubSub, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

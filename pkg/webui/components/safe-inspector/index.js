@@ -26,13 +26,13 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './safe-inspector.styl'
 
-function chunkArray(array, chunkSize) {
+const chunkArray = (array, chunkSize) => {
   return Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, index) =>
     array.slice(index * chunkSize, (index + 1) * chunkSize),
   )
 }
 
-function selectText(node) {
+const selectText = node => {
   if (document.body.createTextRange) {
     const range = document.body.createTextRange()
     range.moveToElementText(node)

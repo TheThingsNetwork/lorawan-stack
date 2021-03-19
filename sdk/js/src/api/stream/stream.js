@@ -80,7 +80,7 @@ export default async (payload, url) => {
   const onChunk = ({ done, value }) => {
     if (done) {
       notify(listeners[EVENTS.CLOSE])
-      listeners = null
+      listeners = {}
       return
     }
 
@@ -104,7 +104,7 @@ export default async (payload, url) => {
     .then(onChunk)
     .catch(error => {
       notify(listeners[EVENTS.ERROR], error)
-      listeners = null
+      listeners = {}
     })
 
   return {

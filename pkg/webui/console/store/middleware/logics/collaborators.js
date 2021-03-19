@@ -20,7 +20,7 @@ import * as collaborators from '@console/store/actions/collaborators'
 
 const validParentTypes = ['application', 'gateway', 'organization']
 
-const parentTypeValidator = function({ action }, allow) {
+const parentTypeValidator = ({ action }, allow) => {
   if (!validParentTypes.includes(action.payload.parentType)) {
     // Do not reject the action but throw an error, as this is an implementation
     // error.
@@ -32,7 +32,7 @@ const parentTypeValidator = function({ action }, allow) {
 const getCollaboratorLogic = createRequestLogic({
   type: collaborators.GET_COLLABORATOR,
   validate: parentTypeValidator,
-  process({ action }) {
+  process: ({ action }) => {
     const { parentType, parentId, collaboratorId, isUser } = action.payload
 
     return isUser
@@ -44,7 +44,7 @@ const getCollaboratorLogic = createRequestLogic({
 const getCollaboratorsLogic = createRequestLogic({
   type: collaborators.GET_COLLABORATORS_LIST,
   validate: parentTypeValidator,
-  async process({ getState, action }) {
+  process: async ({ getState, action }) => {
     const { parentType, parentId, params } = action.payload
     const res = await api[parentType].collaborators.list(parentId, params)
     return { entities: res.collaborators, totalCount: res.totalCount }

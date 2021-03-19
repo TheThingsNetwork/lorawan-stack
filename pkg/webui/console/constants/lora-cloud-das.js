@@ -13,6 +13,6 @@
 // limitations under the License.
 
 export default Object.freeze({
-  DEFAULT_PORT: 199, // Miliseconds
+  DEFAULT_PORT: 199,
   DEFAULT_PACKAGE_NAME: 'lora-cloud-device-management-v1',
 })

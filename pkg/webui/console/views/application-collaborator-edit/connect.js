@@ -58,10 +58,10 @@ const mapStateToProps = (state, props) => {
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  getCollaborator(appId, collaboratorId, isUser) {
+  getCollaborator: (appId, collaboratorId, isUser) => {
     dispatch(getCollaborator('application', appId, collaboratorId, isUser))
   },
-  redirectToList(appId) {
+  redirectToList: appId => {
     dispatch(replace(`/applications/${appId}/collaborators`))
   },
   updateCollaborator: (appId, patch) => api.application.collaborators.update(appId, patch),

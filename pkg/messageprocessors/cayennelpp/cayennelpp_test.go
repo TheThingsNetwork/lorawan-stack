@@ -17,7 +17,7 @@ package cayennelpp
 import (
 	"testing"
 
-	lpp "github.com/TheThingsNetwork/go-cayenne-lib/cayennelpp"
+	lpp "github.com/TheThingsNetwork/go-cayenne-lib"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"

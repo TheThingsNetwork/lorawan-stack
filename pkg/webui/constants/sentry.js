@@ -18,7 +18,7 @@ const sentryConfig = {
   dsn: env.sentryDsn,
   release: process.env.VERSION,
   normalizeDepth: 10,
-  beforeSend(event) {
+  beforeSend: event => {
     if (event.extra.state && event.extra.state.user) {
       delete event.extra.state.user.user.name
     }

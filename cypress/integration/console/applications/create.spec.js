@@ -72,7 +72,7 @@ describe('Application create', () => {
     cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/applications/add`)
   })
 
-  it('successfully adds application', () => {
+  it('succeeds adding application', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/add`)
     cy.findByLabelText('Application ID').type(applicationId)

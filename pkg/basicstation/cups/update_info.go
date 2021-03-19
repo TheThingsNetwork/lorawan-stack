@@ -345,9 +345,15 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	}
 
 	gtw.Attributes[cupsLastSeenAttribute] = time.Now().UTC().Format(time.RFC3339)
-	gtw.Attributes[cupsStationAttribute] = req.Station
-	gtw.Attributes[cupsModelAttribute] = req.Model
-	gtw.Attributes[cupsPackageAttribute] = req.Package
+	if req.Station != "" {
+		gtw.Attributes[cupsStationAttribute] = req.Station
+	}
+	if req.Model != "" {
+		gtw.Attributes[cupsModelAttribute] = req.Model
+	}
+	if req.Package != "" {
+		gtw.Attributes[cupsPackageAttribute] = req.Package
+	}
 
 	registry, err = s.getRegistry(ctx, &gtw.GatewayIdentifiers)
 	if err != nil {

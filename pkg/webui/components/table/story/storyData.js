@@ -121,7 +121,7 @@ export default {
         centered: true,
       },
     ],
-    rows: rows.map(function(r) {
+    rows: rows.map(r => {
       return Object.assign({}, r, {
         options: (
           <div>
@@ -133,7 +133,7 @@ export default {
     }),
   },
   sortableExample: {
-    headers: headers.map(function(header) {
+    headers: headers.map(header => {
       if (header.name === 'devices' || header.name === 'appId') {
         return Object.assign({}, header, {
           sortable: true,

@@ -85,11 +85,11 @@ export default async (payload, url) => {
       })
       stream.on('end', () => {
         notify(listeners[EVENTS.CLOSE])
-        listeners = null
+        listeners = {}
       })
       stream.on('error', error => {
         notify(listeners[EVENTS.ERROR], error)
-        listeners = null
+        listeners = {}
       })
     })
 

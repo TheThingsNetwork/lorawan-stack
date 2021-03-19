@@ -28,9 +28,9 @@ class NullableStringSchemaType extends StringSchema {
     const self = this
 
     /* eslint-disable prefer-arrow/prefer-arrow-functions */
-    self.withMutation(function() {
+    self.withMutation(() => {
       self
-        .transform(function(value) {
+        .transform(value => {
           if (self.isType(value) && Boolean(value)) {
             return value
           }

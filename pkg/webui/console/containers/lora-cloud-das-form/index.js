@@ -36,23 +36,21 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import {
   setAppPkgDefaultAssoc,
   getAppPkgDefaultAssoc,
+  deleteAppPkgDefaultAssoc,
 } from '@console/store/actions/application-packages'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import {
   selectApplicationPackageDefaultAssociation,
-  selectApplicationPackagesError,
+  selectGetApplicationPackagesError,
 } from '@console/store/selectors/application-packages'
 
 const m = defineMessages({
-  token: 'Token',
+  tokenDescription: 'Device & Application Services Access Token as configured within LoRa Cloud',
   lr1110Encoding: 'LR1110 demo encoding',
   setLoRaCloudToken: 'Set LoRa Cloud token',
-  deleteToken: 'Delete token',
-  deleteWarning: 'Are you sure you want to delete the current token? This action cannot be undone.',
-  tokenUpdated: 'Token updated',
-  tokenDeleted: 'Token deleted',
-  setToken: 'Set token',
+  deleteWarning:
+    'Are you sure you want to delete the LoRa Cloud Device & Application Services token? This action cannot be undone.',
 })
 
 const validationSchema = Yup.object()
@@ -70,29 +68,33 @@ const defaultValues = {
   },
 }
 
-const LoRaCloudForm = () => {
+const promisifiedSetAppPkgDefaultAssoc = attachPromise(setAppPkgDefaultAssoc)
+const promisifiedDeleteAppPkgDefaultAssoc = attachPromise(deleteAppPkgDefaultAssoc)
+
+const LoRaCloudDASForm = () => {
   const [error, setError] = useState('')
   const appId = useSelector(selectSelectedApplicationId)
   const selector = ['data']
 
   const dispatch = useDispatch()
-  const defaultAssociation = useSelector(selectApplicationPackageDefaultAssociation)
-  const packageError = useSelector(selectApplicationPackagesError)
+  const defaultAssociation = useSelector(state =>
+    selectApplicationPackageDefaultAssociation(state, LORA_CLOUD_DAS.DEFAULT_PORT),
+  )
+  const packageError = useSelector(selectGetApplicationPackagesError)
   const initialValues = validationSchema.cast(defaultAssociation || defaultValues)
 
   const handleSubmit = useCallback(
     async values => {
       try {
-        const result = await dispatch(
-          attachPromise(setAppPkgDefaultAssoc)(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
+        await dispatch(
+          promisifiedSetAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
             package_name: LORA_CLOUD_DAS.DEFAULT_PACKAGE_NAME,
             ...values,
           }),
         )
-        const deleted = Boolean(!result.data.token)
         toast({
           title: 'LoRa Cloud',
-          message: deleted ? m.tokenDeleted : m.tokenUpdated,
+          message: sharedMessages.tokenUpdated,
           type: toast.types.SUCCESS,
         })
       } catch (error) {
@@ -102,9 +104,22 @@ const LoRaCloudForm = () => {
     [appId, dispatch],
   )
 
-  const handleDelete = useCallback(async () => await handleSubmit({ data: { token: '' } }), [
-    handleSubmit,
-  ])
+  const handleDelete = useCallback(async () => {
+    try {
+      await dispatch(
+        promisifiedDeleteAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, {
+          package_name: LORA_CLOUD_DAS.DEFAULT_PACKAGE_NAME,
+        }),
+      )
+      toast({
+        title: 'LoRa Cloud',
+        message: sharedMessages.tokenDeleted,
+        type: toast.types.SUCCESS,
+      })
+    } catch (error) {
+      setError(error)
+    }
+  }, [appId, dispatch])
 
   if (packageError && !isNotFoundError(packageError)) {
     throw error
@@ -121,15 +136,21 @@ const LoRaCloudForm = () => {
         onSubmit={handleSubmit}
         enableReinitialize
       >
-        <Form.Field component={Input} title={m.token} name="data.token" required />
+        <Form.Field
+          component={Input}
+          title={sharedMessages.token}
+          description={m.tokenDescription}
+          name="data.token"
+          required
+        />
         <Form.Field component={Checkbox} title={m.lr1110Encoding} name="data.use_tlv_encoding" />
         <SubmitBar>
-          <Form.Submit component={SubmitButton} message={m.setToken} />
+          <Form.Submit component={SubmitButton} message={sharedMessages.tokenSet} />
           {Boolean(defaultAssociation) && (
             <ModalButton
               type="button"
               icon="delete"
-              message={m.deleteToken}
+              message={sharedMessages.tokenDelete}
               modalData={{
                 message: m.deleteWarning,
               }}
@@ -144,4 +165,4 @@ const LoRaCloudForm = () => {
   )
 }
 
-export default LoRaCloudForm
+export default LoRaCloudDASForm

@@ -47,7 +47,7 @@ type TemplateData struct {
 	CSSFiles        []string `name:"css-file" description:"The names of the CSS files"`
 	JSFiles         []string `name:"js-file" description:"The names of the JS files"`
 	SentryDSN       string   `name:"sentry-dsn" description:"The Sentry DSN"`
-	CSRFToken       string   `name:-`
+	CSRFToken       string   `name:"-"`
 }
 
 // MountPath derives the mount path from the canonical URL of the config.

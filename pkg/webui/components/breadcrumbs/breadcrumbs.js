@@ -23,7 +23,7 @@ import style from './breadcrumbs.styl'
 
 const Breadcrumbs = ({ className, breadcrumbs }) => (
   <nav className={classnames(className, style.breadcrumbs)}>
-    {breadcrumbs.map(function(component, index) {
+    {breadcrumbs.map((component, index) => {
       return React.cloneElement(component, {
         key: index,
         isLast: index === breadcrumbs.length - 1,

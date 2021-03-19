@@ -21,7 +21,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './cell.styl'
 
-const Cell = function({
+const Cell = ({
   className,
   component: Component,
   centered,
@@ -30,7 +30,7 @@ const Cell = function({
   width,
   children,
   ...rest
-}) {
+}) => {
   const cellClassNames = classnames(className, style.cell, {
     [style.cellCentered]: centered,
     [style.cellSmall]: small,

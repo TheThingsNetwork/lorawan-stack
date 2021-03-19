@@ -156,6 +156,42 @@ service NsAs {
   rpc HandleUplink(NsAsHandleUplinkRequest) returns (google.protobuf.Empty);
 }
 
+message EncodeDownlinkRequest {
+  EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
+  EndDeviceVersionIdentifiers version_ids = 2;
+  ApplicationDownlink downlink = 3 [(validate.rules).message.required = true];
+  PayloadFormatter formatter = 4 [(validate.rules).enum.defined_only = true];
+  string parameter = 5;
+}
+
+message EncodeDownlinkResponse {
+  ApplicationDownlink downlink = 1;
+}
+
+message DecodeUplinkRequest {
+  EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
+  EndDeviceVersionIdentifiers version_ids = 2;
+  ApplicationUplink uplink = 3 [(validate.rules).message.required = true];
+  PayloadFormatter formatter = 4 [(validate.rules).enum.defined_only = true];
+  string parameter = 5;
+}
+
+message DecodeUplinkResponse {
+  ApplicationUplink uplink = 1;
+}
+
+message DecodeDownlinkRequest {
+  EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
+  EndDeviceVersionIdentifiers version_ids = 2;
+  ApplicationDownlink downlink = 3 [(validate.rules).message.required = true];
+  PayloadFormatter formatter = 4 [(validate.rules).enum.defined_only = true];
+  string parameter = 5;
+}
+
+message DecodeDownlinkResponse {
+  ApplicationDownlink downlink = 1;
+}
+
 // The AppAs service connects an application or integration to an Application Server.
 service AppAs {
   // Subscribe to upstream messages.
@@ -194,6 +230,24 @@ service AppAs {
       body: "*"
     };
   };
+  rpc EncodeDownlink(EncodeDownlinkRequest) returns (EncodeDownlinkResponse) {
+    option (google.api.http) = {
+      post: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/encode",
+      body: "*"
+    };
+  }
+  rpc DecodeUplink(DecodeUplinkRequest) returns (DecodeUplinkResponse) {
+    option (google.api.http) = {
+      post: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/decode",
+      body: "*"
+    };
+  }
+  rpc DecodeDownlink(DecodeDownlinkRequest) returns (DecodeDownlinkResponse) {
+    option (google.api.http) = {
+      post: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/decode",
+      body: "*"
+    };
+  }
 }
 
 // The AsEndDeviceRegistry service allows clients to manage their end devices on the Application Server.

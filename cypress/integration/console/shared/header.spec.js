@@ -71,5 +71,28 @@ describe('Header', () => {
 
       cy.location('pathname').should('eq', `${accountAppRootPath}/login`)
     })
+
+    it('displays UI elements in place', () => {
+      const user = {
+        ids: { user_id: 'test-header-user' },
+        primary_email_address: 'test-header-user@example.com',
+        password: 'ABCDefg123!',
+        password_confirm: 'ABCDefg123!',
+        name: 'Test Header User',
+      }
+
+      cy.createUser(user)
+      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+      cy.visit(Cypress.config('consoleRootPath'))
+
+      cy.get('header').within(() => {
+        cy.findByTestId('profile-dropdown').should('contain', user.name)
+
+        cy.findByAltText('Profile picture')
+          .should('be.visible')
+          .and('have.attr', 'src')
+          .and('match', /missing-profile-picture/)
+      })
+    })
   })
 })

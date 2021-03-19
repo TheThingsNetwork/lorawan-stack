@@ -14,56 +14,52 @@
 
 const selectEventsStore = (state, entityId) => state[entityId]
 
-export const createEventsSelector = entity =>
-  function(state, entityId) {
-    const store = selectEventsStore(state.events[entity], entityId)
+export const createEventsSelector = entity => (state, entityId) => {
+  const store = selectEventsStore(state.events[entity], entityId)
 
-    return store ? store.events : []
-  }
+  return store ? store.events : []
+}
 
-export const createEventsStatusSelector = entity =>
-  function(state, entityId) {
-    const store = selectEventsStore(state.events[entity], entityId)
+export const createEventsStatusSelector = entity => (state, entityId) => {
+  const store = selectEventsStore(state.events[entity], entityId)
 
-    return store ? store.status : 'unknown'
-  }
+  return store ? store.status : 'unknown'
+}
 
-export const createEventsPausedSelector = entity =>
-  function(state, entityId) {
-    const store = selectEventsStore(state.events[entity], entityId)
+export const createEventsPausedSelector = entity => (state, entityId) => {
+  const store = selectEventsStore(state.events[entity], entityId)
 
-    return Boolean(store.paused)
-  }
+  return Boolean(store.paused)
+}
 
-export const createEventsInterruptedSelector = entity =>
-  function(state, entityId) {
-    const store = selectEventsStore(state.events[entity], entityId)
+export const createEventsInterruptedSelector = entity => (state, entityId) => {
+  const store = selectEventsStore(state.events[entity], entityId)
 
-    return Boolean(store.interrupted)
-  }
+  return Boolean(store.interrupted)
+}
 
-export const createEventsErrorSelector = entity =>
-  function(state, entityId) {
-    const store = selectEventsStore(state.events[entity], entityId)
+export const createEventsErrorSelector = entity => (state, entityId) => {
+  const store = selectEventsStore(state.events[entity], entityId)
 
-    return store ? store.error : undefined
-  }
+  return store ? store.error : undefined
+}
 
-export const createEventsTruncatedSelector = entity =>
-  function(state, entityId) {
-    const store = selectEventsStore(state.events[entity], entityId)
+export const createEventsTruncatedSelector = entity => (state, entityId) => {
+  const store = selectEventsStore(state.events[entity], entityId)
 
-    return Boolean(store.truncated)
-  }
+  return Boolean(store.truncated)
+}
 
-export const createLatestEventSelector = function(entity) {
+export const createLatestEventSelector = entity => {
   const eventsSelector = createEventsSelector(entity)
 
-  return function selectLatestEvent(state, entityId) {
+  const selectLatestEvent = (state, entityId) => {
     const events = eventsSelector(state, entityId)
 
     return events[0]
   }
+
+  return selectLatestEvent
 }
 
 export const createInterruptedStreamsSelector = entity => state => {

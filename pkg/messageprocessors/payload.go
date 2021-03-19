@@ -17,6 +17,7 @@ package messageprocessors
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -32,4 +33,45 @@ type PayloadProcessor interface {
 	EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error
 	DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error
 	DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error
+}
+
+// MapPayloadProcessor implements PayloadProcessor using a mapping between ttnpb.PayloadFormatter and PayloadEncodeDecoder.
+type MapPayloadProcessor map[ttnpb.PayloadFormatter]PayloadEncodeDecoder
+
+var errFormatterNotConfigured = errors.DefineFailedPrecondition("formatter_not_configured", "formatter `{formatter}` is not configured")
+
+// EncodeDownlink implements PayloadProcessor.
+func (p MapPayloadProcessor) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+	mp, ok := p[formatter]
+	if !ok {
+		return errFormatterNotConfigured.WithAttributes("formatter", formatter)
+	}
+	if err := mp.EncodeDownlink(ctx, ids, version, msg, parameter); err != nil {
+		return err
+	}
+	return nil
+}
+
+// DecodeUplink implements PayloadProcessor.
+func (p MapPayloadProcessor) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
+	mp, ok := p[formatter]
+	if !ok {
+		return errFormatterNotConfigured.WithAttributes("formatter", formatter)
+	}
+	if err := mp.DecodeUplink(ctx, ids, version, msg, parameter); err != nil {
+		return err
+	}
+	return nil
+}
+
+// DecodeDownlink implements PayloadProcessor.
+func (p MapPayloadProcessor) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+	mp, ok := p[formatter]
+	if !ok {
+		return errFormatterNotConfigured.WithAttributes("formatter", formatter)
+	}
+	if err := mp.DecodeDownlink(ctx, ids, version, msg, parameter); err != nil {
+		return err
+	}
+	return nil
 }

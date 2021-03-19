@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const notify = function(listener, ...args) {
-  if (listener !== null) {
+export const notify = (listener, ...args) => {
+  if (typeof listener === 'function') {
     listener(...args)
   }
 }

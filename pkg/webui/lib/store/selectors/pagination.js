@@ -16,18 +16,18 @@ const selectStore = state => state.pagination
 
 const createStoreSelectorByEntity = entity => state => selectStore(state)[entity] || {}
 
-export const createPaginationIdsSelectorByEntity = function(entity) {
+export const createPaginationIdsSelectorByEntity = entity => {
   const storeSelector = createStoreSelectorByEntity(entity)
 
-  return function(state) {
+  return state => {
     return storeSelector(state).ids || []
   }
 }
 
-export const createPaginationIdsSelectorByEntityAndId = function(entity) {
+export const createPaginationIdsSelectorByEntityAndId = entity => {
   const storeSelector = createStoreSelectorByEntity(entity)
 
-  return function(state, id) {
+  return (state, id) => {
     const store = storeSelector(state)
     const storeById = store[id] || {}
 
@@ -35,18 +35,18 @@ export const createPaginationIdsSelectorByEntityAndId = function(entity) {
   }
 }
 
-export const createPaginationTotalCountSelectorByEntity = function(entity) {
+export const createPaginationTotalCountSelectorByEntity = entity => {
   const storeSelector = createStoreSelectorByEntity(entity)
 
-  return function(state) {
+  return state => {
     return storeSelector(state).totalCount
   }
 }
 
-export const createPaginationTotalCountSelectorByEntityAndId = function(entity) {
+export const createPaginationTotalCountSelectorByEntityAndId = entity => {
   const storeSelector = createStoreSelectorByEntity(entity)
 
-  return function(state, id) {
+  return (state, id) => {
     const store = storeSelector(state)
     const storeById = store[id] || {}
 

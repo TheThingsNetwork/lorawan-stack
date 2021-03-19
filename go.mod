@@ -27,7 +27,7 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/TheThingsIndustries/mystique v0.0.0-20200127144137-4aa959111fe7
-	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
+	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
 	github.com/aws/aws-sdk-go v1.31.1
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.13
@@ -46,7 +46,7 @@ require (
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
 	github.com/felixge/httpsnoop v1.0.1
-	github.com/getsentry/sentry-go v0.6.1
+	github.com/getsentry/sentry-go v0.10.0
 	github.com/go-redis/redis/v8 v8.3.2
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/gobwas/glob v0.2.3
@@ -96,7 +96,7 @@ require (
 	github.com/sendgrid/rest v2.6.2+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.5.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200519171959-a3b48390827e
-	github.com/smartystreets/assertions v1.1.0
+	github.com/smartystreets/assertions v1.2.0
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5

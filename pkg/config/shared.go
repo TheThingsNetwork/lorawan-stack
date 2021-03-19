@@ -48,7 +48,8 @@ type Log struct {
 
 // Sentry represents configuration for error tracking using Sentry.
 type Sentry struct {
-	DSN string `name:"dsn" description:"Sentry Data Source Name"`
+	DSN         string `name:"dsn" description:"Sentry Data Source Name"`
+	Environment string `name:"environment" description:"Environment to report to Sentry"`
 }
 
 // GRPC represents gRPC listener configuration.

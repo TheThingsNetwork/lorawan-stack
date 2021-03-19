@@ -138,6 +138,15 @@ $button($color)
       span:first-child
         margin-right: $cs.xs
 
+    &.responsive-label
+      +media-query($bp.xxs)
+        span:first-child
+          margin-left: 0
+          margin-right: 0
+
+        .link-button-message
+          display: none
+
   &.only-icon
     padding-left: $cs.xs
     padding-right: $cs.xs

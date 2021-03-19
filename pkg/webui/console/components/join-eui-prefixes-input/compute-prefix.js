@@ -23,7 +23,7 @@ const CHAR_BYTES = 4
  * @param {number} length - The length of the prefix.
  * @returns {Array} - A list of join EUI prefixes.
  */
-function computePrefixes(joinEUI, length = 0) {
+const computePrefixes = (joinEUI, length = 0) => {
   if (length % CHAR_BYTES === 0) {
     return [joinEUI.slice(0, Math.ceil(length / CHAR_BYTES))]
   }

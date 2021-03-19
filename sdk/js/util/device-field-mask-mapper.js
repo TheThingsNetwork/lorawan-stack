@@ -69,7 +69,7 @@ traverse(result).forEach(function() {
 fs.writeFile(
   `${__dirname}/../generated/device-entity-map.json`,
   JSON.stringify(result, null, 2),
-  function(err) {
+  err => {
     if (err) {
       return console.error(err)
     }

@@ -89,14 +89,12 @@ const headers = [
     displayName: sharedMessages.created,
     sortable: true,
     width: 12,
-    render(datetime) {
-      return <DateTime.Relative value={datetime} />
-    },
+    render: datetime => <DateTime.Relative value={datetime} />,
   },
 ]
 
 @connect(
-  function(state) {
+  state => {
     return {
       appId: selectSelectedApplicationId(state),
       deviceTemplateFormats: selectDeviceTemplateFormats(state),

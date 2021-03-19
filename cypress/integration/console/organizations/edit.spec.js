@@ -39,7 +39,7 @@ describe('Organization general settings', () => {
     )
   })
 
-  it('successfully edit organization name and description', () => {
+  it('succeeds editing organization name and description', () => {
     cy.findByLabelText('Name').type('test-name')
     cy.findByLabelText('Description').type('test-description')
 
@@ -52,7 +52,7 @@ describe('Organization general settings', () => {
       .should('be.visible')
   })
 
-  it('successfully delete organization', () => {
+  it('succeeds deleting organization', () => {
     cy.findByRole('button', { name: /Delete organization/ }).click()
 
     cy.findByTestId('modal-window')

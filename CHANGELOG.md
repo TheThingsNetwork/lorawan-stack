@@ -7,7 +7,7 @@ with the exception that this project **does not** follow Semantic Versioning.
 
 For details about compatibility between different releases, see the **Commitments and Releases** section of our README.
 
-## [Upcoming] (v3.12)
+## [Unreleased]
 
 ### Added
 
@@ -29,19 +29,29 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-## [Unreleased]
+### Security
+
+## [3.11.3] - 2021-03-19
 
 ### Added
 
+- `sentry.environment` configuration option to set the `environment` tag on Sentry reports.
+- TR005 QR code format, with ID `tr005`.
+- LoRa Cloud Geolocation Services support for TOA/RSSI end device geolocation.
+
 ### Changed
+
+- Default value of `gs.udp.addr-change-block` is now 0, which disables the IP firewall for UDP traffic. Deployments that need to enforce the IP check should set a value greater than 0. Note that the new default value makes UDP connections less secure.
+- Prevent flooding logs with "Packet Filtered" messages when UDP gateways exceed the maximum rate limit. Only one message per minute will be printed for each gateway.
 
 ### Deprecated
 
-### Removed
+- TR005 Draft 2 and 3 QR code formats. Use the final version of the technical recommendation, with ID `tr005`.
 
 ### Fixed
 
-### Security
+- Downlink queue operations on ABP devices not working under specific circumstances.
+- NwkKey handling for end devices in the Console.
 
 ## [3.11.2] - 2021-03-05
 
@@ -52,6 +62,7 @@ For details about compatibility between different releases, see the **Commitment
 - `remote_ip` and `user_agent` metadata on OAuth events.
 - `created_at` and `updated_at` fields to API Keys.
 - Telemetry for Packet Broker Agent.
+- User rights check for managing API keys in the Console.
 
 ### Changed
 
@@ -1360,7 +1371,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.2...v3.11
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.3...v3.11
+[3.11.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.2...v3.11.3
 [3.11.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.1...v3.11.2
 [3.11.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.0...v3.11.1
 [3.11.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.6...v3.11.0

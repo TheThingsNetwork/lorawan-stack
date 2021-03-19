@@ -18,7 +18,7 @@ import stringToHash from '@ttn-lw/lib/string-to-hash'
 const hash = stringToHash(selectApplicationRootPath())
 const hashKey = key => `${key}-${hash}`
 
-export function get(key) {
+export const get = key => {
   const hashedKey = hashKey(key)
   const value = localStorage.getItem(hashedKey)
   try {
@@ -28,17 +28,17 @@ export function get(key) {
   }
 }
 
-export function set(key, val) {
+export const set = (key, val) => {
   const hashedKey = hashKey(key)
   const value = JSON.stringify(val)
   localStorage.setItem(hashedKey, value)
 }
 
-export function remove(key) {
+export const remove = key => {
   const hashedKey = hashKey(key)
   return localStorage.removeItem(hashedKey)
 }
 
-export function clearAll() {
+export const clearAll = () => {
   return localStorage.clear()
 }

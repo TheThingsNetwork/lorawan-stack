@@ -22,13 +22,13 @@ import {
 
 const selectConfigurationStore = state => state.configuration
 
-export const selectGsFrequencyPlans = function(state) {
+export const selectGsFrequencyPlans = state => {
   const store = selectConfigurationStore(state)
 
   return store.gsFrequencyPlans || []
 }
 
-export const selectNsFrequencyPlans = function(state) {
+export const selectNsFrequencyPlans = state => {
   const store = selectConfigurationStore(state)
 
   return store.nsFrequencyPlans || []
