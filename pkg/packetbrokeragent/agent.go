@@ -287,9 +287,14 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
+	cpConn, err := a.dialContext(ctx, conf.ControlPlaneAddress)
+	if err != nil {
+		return nil, err
+	}
 	a.grpc.pba = &pbaServer{
 		Agent:   a,
 		iamConn: iamConn,
+		cpConn:  cpConn,
 	}
 	a.grpc.nsPba = &nsPbaServer{
 		contextDecoupler: a,

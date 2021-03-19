@@ -23,8 +23,9 @@ import (
 
 // Config configures Packet Broker clients.
 type Config struct {
-	IAMAddress           string               `name:"iam-address" description:"Address of Packet Broker IAM"`
 	Registration         RegistrationConfig   `name:"registration" description:"Registration with Packet Broker"`
+	IAMAddress           string               `name:"iam-address" description:"Address of Packet Broker IAM"`
+	ControlPlaneAddress  string               `name:"control-plane-address" description:"Address of Packet Broker Control Plane"`
 	DataPlaneAddress     string               `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
 	Insecure             bool                 `name:"insecure" description:"Connect without using TLS"`
 	NetID                types.NetID          `name:"net-id" description:"LoRa Alliance NetID"`

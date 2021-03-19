@@ -31,7 +31,8 @@ import (
 
 type pbaServer struct {
 	*Agent
-	iamConn *grpc.ClientConn
+	iamConn,
+	cpConn *grpc.ClientConn
 }
 
 func (s *pbaServer) GetInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.PacketBrokerInfo, error) {
