@@ -110,6 +110,7 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.0.0-beta.1
 	go.opencensus.io v0.22.3
 	go.packetbroker.org/api/iam v1.1.2-tts
+	go.packetbroker.org/api/iam/v2 v2.0.3-tts
 	go.packetbroker.org/api/routing v1.1.3-tts
 	go.packetbroker.org/api/v3 v3.3.2-tts
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
