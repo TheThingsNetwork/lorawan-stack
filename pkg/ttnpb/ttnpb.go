@@ -15,11 +15,25 @@
 package ttnpb
 
 import (
+	"encoding/json"
 	"strconv"
+
+	"github.com/gogo/protobuf/jsonpb"
 )
 
-func marshalJSONEnum(v int32) []byte {
-	return []byte(strconv.Itoa(int(v)))
+func marshalJSONEnum(names map[int32]string, v int32) ([]byte, error) {
+	s, ok := names[v]
+	if ok {
+		return json.Marshal(s)
+	}
+	return json.Marshal(v)
+}
+
+func marshalJSONPBEnum(m *jsonpb.Marshaler, names map[int32]string, v int32) ([]byte, error) {
+	if m.EnumsAsInts {
+		return json.Marshal(strconv.Itoa(int(v)))
+	}
+	return json.Marshal(names[v])
 }
 
 func unmarshalJSONString(b []byte) ([]byte, bool) {
