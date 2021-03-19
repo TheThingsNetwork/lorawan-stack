@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - `sentry.environment` configuration option to set the `environment` tag on Sentry reports.
 - TR005 QR code format, with ID `tr005`.
+- LoRa Cloud Geolocation Services support for TOA/RSSI end device geolocation.
 
 ### Changed
 
