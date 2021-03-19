@@ -11,8 +11,23 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.11.3] - 2021-03-19
+
+### Added
+
 - `sentry.environment` configuration option to set the `environment` tag on Sentry reports.
 - TR005 QR code format, with ID `tr005`.
+- LoRa Cloud Geolocation Services support for TOA/RSSI end device geolocation.
 
 ### Changed
 
@@ -23,14 +38,10 @@ For details about compatibility between different releases, see the **Commitment
 
 - TR005 Draft 2 and 3 QR code formats. Use the final version of the technical recommendation, with ID `tr005`.
 
-### Removed
-
 ### Fixed
 
 - Downlink queue operations on ABP devices not working under specific circumstances.
 - NwkKey handling for end devices in the Console.
-
-### Security
 
 ## [3.11.2] - 2021-03-05
 
@@ -1350,7 +1361,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.2...v3.11
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.3...v3.11
+[3.11.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.2...v3.11.3
 [3.11.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.1...v3.11.2
 [3.11.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.0...v3.11.1
 [3.11.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.10.6...v3.11.0
