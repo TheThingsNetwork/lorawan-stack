@@ -261,7 +261,11 @@ func (s *pbaServer) ListHomeNetworkRoutingPolicies(ctx context.Context, req *ttn
 	if limit == 0 || limit > listPageSize {
 		limit = listPageSize
 	}
-	for len(policies) < (page+1)*limit {
+	if page == 0 {
+		page = 1
+	}
+	end := page * limit
+	for len(policies) < end {
 		req := &routingpb.ListHomeNetworkPoliciesRequest{
 			ForwarderNetId:    netID,
 			ForwarderTenantId: tenantID,
@@ -286,8 +290,7 @@ func (s *pbaServer) ListHomeNetworkRoutingPolicies(ctx context.Context, req *ttn
 	}
 
 	var (
-		offset = page * limit
-		end    = (page + 1) * limit
+		offset = (page - 1) * limit
 		slice  []*packetbroker.RoutingPolicy
 	)
 	if len(policies) > offset {
@@ -368,8 +371,12 @@ func (s *pbaServer) ListHomeNetworks(ctx context.Context, req *ttnpb.ListHomeNet
 		return nil, err
 	}
 
+	page := req.Page
+	if page == 0 {
+		page = 1
+	}
 	networks, err := iampbv2.NewCatalogClient(s.iamConn).ListHomeNetworks(ctx, &iampbv2.ListHomeNetworksRequest{
-		Offset: req.Page * req.Limit,
+		Offset: (page - 1) * req.Limit,
 		Limit:  req.Limit,
 	})
 	if err != nil {
@@ -417,10 +424,14 @@ func (s *pbaServer) ListForwarderRoutingPolicies(ctx context.Context, req *ttnpb
 		return nil, err
 	}
 
+	page := req.Page
+	if page == 0 {
+		page = 1
+	}
 	policies, err := routingpb.NewPolicyManagerClient(s.cpConn).ListEffectivePolicies(ctx, &routingpb.ListEffectivePoliciesRequest{
 		HomeNetworkNetId:    s.netID.MarshalNumber(),
 		HomeNetworkTenantId: s.tenantIDExtractor(ctx),
-		Offset:              req.Page * req.Limit,
+		Offset:              (page - 1) * req.Limit,
 		Limit:               req.Limit,
 	})
 	if err != nil {
