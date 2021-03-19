@@ -69,6 +69,11 @@ type cachedEndDeviceFetcher struct {
 	cache   gcache.Cache
 }
 
+type endDeviceFetcherCacheEntry struct {
+	err error
+	dev *ttnpb.EndDevice
+}
+
 // NewCachedEndDeviceFetcher wraps an EndDeviceFetcher with a local cache.
 func NewCachedEndDeviceFetcher(fetcher EndDeviceFetcher, cache gcache.Cache) EndDeviceFetcher {
 	return &cachedEndDeviceFetcher{fetcher, cache}
@@ -76,15 +81,16 @@ func NewCachedEndDeviceFetcher(fetcher EndDeviceFetcher, cache gcache.Cache) End
 
 // Get implements the EndDeviceFetcher interface.
 func (f *cachedEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
-	uid := unique.ID(ctx, ids)
-	key := fmt.Sprintf("%s:%s", uid, strings.Join(fieldMaskPaths, ","))
-	dev, err := f.cache.Get(key)
-	if err != nil {
-		dev, err := f.fetcher.Get(ctx, ids, fieldMaskPaths...)
-		if err == nil {
-			f.cache.Set(key, dev)
-		}
-		return dev, err
+	key := endDeviceKey(ctx, ids, fieldMaskPaths...)
+	e, err := f.cache.Get(key)
+	if entry, ok := e.(*endDeviceFetcherCacheEntry); err == nil && ok {
+		return entry.dev, entry.err
 	}
-	return dev.(*ttnpb.EndDevice), err
+	dev, err := f.fetcher.Get(ctx, ids, fieldMaskPaths...)
+	f.cache.Set(key, &endDeviceFetcherCacheEntry{err, dev})
+	return dev, err
+}
+
+func endDeviceKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) string {
+	return fmt.Sprintf("%s:%s", unique.ID(ctx, ids), strings.Join(fieldMaskPaths, ","))
 }

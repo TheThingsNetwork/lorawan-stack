@@ -16,6 +16,7 @@ package applicationserver_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -29,11 +30,12 @@ import (
 
 type mockFetcher struct {
 	numCalls int
+	err      error
 }
 
 func (f *mockFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
 	f.numCalls++
-	return nil, nil
+	return nil, f.err
 }
 
 func TestEndDeviceFetcher(t *testing.T) {
@@ -94,6 +96,18 @@ func TestEndDeviceFetcher(t *testing.T) {
 			a.So(f.numCalls, should.Equal, 5)
 			cf.Get(test.Context(), dev1, "attributes")
 			a.So(f.numCalls, should.Equal, 5)
+		})
+
+		t.Run("CacheError", func(t *testing.T) {
+			a := assertions.New(t)
+			f.err = fmt.Errorf("foobar")
+			fakeClock.Advance(2 * time.Second)
+			_, err := cf.Get(test.Context(), dev1, "locations")
+			a.So(f.numCalls, should.Equal, 6)
+			a.So(err, should.Resemble, f.err)
+			_, err = cf.Get(test.Context(), dev1, "locations")
+			a.So(f.numCalls, should.Equal, 6)
+			a.So(err, should.Resemble, f.err)
 		})
 	})
 }
