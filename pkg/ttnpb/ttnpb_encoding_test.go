@@ -26,6 +26,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -312,7 +313,7 @@ func TestEnumMarshalers(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.Error(test.FormatError(err))
 							}
-							outLines = append(outLines, fmt.Sprintf(`Text: %s "%v" -> "%s"`, typ, v, b))
+							outLines = append(outLines, fmt.Sprintf(`Text | %s | %v | %s`, typ, v, b))
 
 							got, ok := newV().(encoding.TextUnmarshaler)
 							if !ok {
@@ -350,7 +351,7 @@ func TestEnumMarshalers(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.Error(test.FormatError(err))
 							}
-							outLines = append(outLines, fmt.Sprintf(`Binary: %s "%v" -> %v`, typ, v, b))
+							outLines = append(outLines, fmt.Sprintf(`Binary | %s | %v | %v`, typ, v, b))
 
 							got, ok := newV().(encoding.BinaryUnmarshaler)
 							if !ok {
@@ -372,7 +373,7 @@ func TestEnumMarshalers(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.Error(test.FormatError(err))
 							}
-							outLines = append(outLines, fmt.Sprintf(`JSON: %s "%v" -> "%s"`, typ, v, b))
+							outLines = append(outLines, fmt.Sprintf(`JSON | %s | %v | %s`, typ, v, b))
 
 							got, ok := newV().(json.Unmarshaler)
 							if !ok {
@@ -386,6 +387,39 @@ func TestEnumMarshalers(t *testing.T) {
 							a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
 						})
 					}
+
+					if m, ok := v.(jsonpb.JSONPBMarshaler); ok {
+						t.Run("JSONPB", func(t *testing.T) {
+							a := assertions.New(t)
+							b, err := m.MarshalJSONPB(&jsonpb.Marshaler{})
+							if !a.So(err, should.BeNil) {
+								t.Error(test.FormatError(err))
+							}
+							outLines = append(outLines, fmt.Sprintf(`JSONPB | %s | %v | %s`, typ, v, b))
+
+							{
+								got, ok := newV().(jsonpb.JSONPBUnmarshaler)
+								if !ok {
+									t.Fatal("Does not implement JSONPBUnmarshaler")
+								}
+
+								err = got.UnmarshalJSONPB(&jsonpb.Unmarshaler{}, b)
+								if !a.So(err, should.BeNil) {
+									t.Error(test.FormatError(err))
+								}
+								a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
+							}
+
+							{
+								got := newV()
+								err = json.Unmarshal(b, got)
+								if !a.So(err, should.BeNil) {
+									t.Error(test.FormatError(err))
+								}
+								a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
+							}
+						})
+					}
 				})
 			}
 		})
@@ -395,8 +429,12 @@ func TestEnumMarshalers(t *testing.T) {
 		return
 	}
 	sort.Strings(outLines)
-	out := strings.Join(outLines, "\n")
-	goldenPath := filepath.Join("testdata", "ttnpb_encoding_golden")
+	out := fmt.Sprintf(`Format | Type | Value | Encoding
+:---: | :---: | :---: | :---:
+%s`,
+		strings.Join(outLines, "\n"),
+	)
+	goldenPath := filepath.Join("testdata", "ttnpb_encoding_golden.md")
 	if os.Getenv("TEST_WRITE_GOLDEN") == "1" {
 		if err := ioutil.WriteFile(goldenPath, []byte(out), 0o644); err != nil {
 			t.Fatalf("Failed to write golden file: %s", err)
