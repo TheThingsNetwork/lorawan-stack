@@ -38,6 +38,10 @@ type Config struct {
 	// ConnectionExpires defines for how long a connection remains valid while no pull data, push data or Tx
 	// acknowledgment is received.
 	ConnectionExpires time.Duration `name:"connection-expires" description:"Time after which a connection of a gateway expires"`
+	// ConnectionErrorExpires defines for how long an existing connection is cached by the Gateway Server when there is a connection error
+	// before initiating a new connection. This ensures that packet handlers are not being stalled by gateways which cannot connect but
+	// still attempt to do so.
+	ConnectionErrorExpires time.Duration `name:"connection-error-expires" description:"Time after which a connection error of a gateway expires"`
 	// ScheduleLateTime defines the time in advance to the actual transmission the downlink message should be scheduled to
 	// the gateway.
 	ScheduleLateTime time.Duration `name:"schedule-late-time" description:"Time in advance to send downlink to the gateway when scheduling late"`
@@ -49,12 +53,13 @@ type Config struct {
 
 // DefaultConfig contains the default configuration.
 var DefaultConfig = Config{
-	PacketHandlers:      1 << 4,
-	PacketBuffer:        50,
-	DownlinkPathExpires: 15 * time.Second, // Expire downlink after missing typically 3 PULL_DATA messages.
-	ConnectionExpires:   1 * time.Minute,  // Expire connection after missing typically 2 status messages.
-	ScheduleLateTime:    800 * time.Millisecond,
-	AddrChangeBlock:     0, // Release address when the connection expires.
+	PacketHandlers:         1 << 4,
+	PacketBuffer:           50,
+	DownlinkPathExpires:    15 * time.Second, // Expire downlink after missing typically 3 PULL_DATA messages.
+	ConnectionExpires:      1 * time.Minute,  // Expire connection after missing typically 2 status messages.
+	ConnectionErrorExpires: 5 * time.Minute,
+	ScheduleLateTime:       800 * time.Millisecond,
+	AddrChangeBlock:        0, // Release address when the connection expires.
 	RateLimiting: RateLimitingConfig{
 		Enable:    true,
 		Messages:  10,
