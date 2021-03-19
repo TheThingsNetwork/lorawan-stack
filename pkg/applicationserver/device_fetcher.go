@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"golang.org/x/sync/singleflight"
 )
 
 // EndDeviceFetcher fetches end device protos.
@@ -89,6 +90,27 @@ func (f *cachedEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIde
 	dev, err := f.fetcher.Get(ctx, ids, fieldMaskPaths...)
 	f.cache.Set(key, &endDeviceFetcherCacheEntry{err, dev})
 	return dev, err
+}
+
+type singleFlightEndDeviceFetcher struct {
+	fetcher      EndDeviceFetcher
+	singleflight singleflight.Group
+}
+
+// NewSingleFlightEndDeviceFetcher wraps an EndDeviceFetcher with a single flight mechanism.
+func NewSingleFlightEndDeviceFetcher(fetcher EndDeviceFetcher) EndDeviceFetcher {
+	return &singleFlightEndDeviceFetcher{fetcher: fetcher}
+}
+
+func (f *singleFlightEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
+	key := endDeviceKey(ctx, ids, fieldMaskPaths...)
+	dev, err, _ := f.singleflight.Do(key, func() (interface{}, error) {
+		return f.fetcher.Get(ctx, ids, fieldMaskPaths...)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return dev.(*ttnpb.EndDevice), nil
 }
 
 func endDeviceKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) string {

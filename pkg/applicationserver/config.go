@@ -218,6 +218,7 @@ var (
 // NewFetcher creates an EndDeviceFetcher from config.
 func (c EndDeviceFetcherConfig) NewFetcher(comp *component.Component) (EndDeviceFetcher, error) {
 	fetcher := NewRegistryEndDeviceFetcher(comp)
+	fetcher = NewSingleFlightEndDeviceFetcher(fetcher)
 	if c.Cache.Enable {
 		if c.Cache.TTL <= 0 {
 			return nil, errInvalidTTL.WithAttributes("ttl", c.Cache.TTL)
