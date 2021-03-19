@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"bufio"
 	"context"
 	"encoding/hex"
 	"io/ioutil"
@@ -935,6 +936,7 @@ values will be stored in the Join Server.`,
 				rd, ok := io.BufferedPipe(os.Stdin)
 				if !ok {
 					logger.Info("Scan QR code")
+					rd = bufio.NewReader(os.Stdin)
 				}
 				qrCode, err := rd.ReadBytes('\n')
 				if err != nil {
