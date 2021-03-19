@@ -65,7 +65,7 @@
     "pg": "^8.5.1",
     "prettier": "^1.18.2",
     "react-test-renderer": "^16.0.0",
-    "snapshot-diff": "^0.5.1",
+    "snapshot-diff": "^0.8.1",
     "stylint": "^2.0.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
