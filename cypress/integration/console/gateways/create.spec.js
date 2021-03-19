@@ -78,7 +78,7 @@ describe('Gateway create', () => {
     cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/gateways/add`)
   })
 
-  it('successfully adds gateway', () => {
+  it('succeeds adding gateway', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/add`)
     cy.findByLabelText('Gateway ID').type(gatewayId)
     cy.findByLabelText('Frequency plan').selectOption(frequencyPlanId)

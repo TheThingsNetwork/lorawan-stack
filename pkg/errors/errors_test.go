@@ -29,12 +29,12 @@ import (
 )
 
 func Example() {
-	var errApplicationNotFound = errors.DefineNotFound(
+	errApplicationNotFound := errors.DefineNotFound(
 		"application_not_found",
 		"Application with ID `{id}` not found",
 	// Public attribute "id" is parsed from the message format.
 	)
-	var errCouldNotCreateDevice = errors.Define(
+	errCouldNotCreateDevice := errors.Define(
 		"could_not_create_device",
 		"Could not create Device",
 		"right_answer", // right_answer could be some extra attribute (that isn't rendered in the message format)
@@ -94,7 +94,8 @@ func TestContextCanceled(t *testing.T) {
 func TestContextDeadlineExceeded(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(5*time.Millisecond))
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Millisecond))
+	defer cancel()
 
 	<-ctx.Done()
 
@@ -228,5 +229,4 @@ func TestNetErrors(t *testing.T) {
 			tc.Validate(tc.Error, err, a)
 		})
 	}
-
 }

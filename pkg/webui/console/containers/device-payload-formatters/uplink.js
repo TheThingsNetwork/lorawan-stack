@@ -39,7 +39,7 @@ import {
 } from '@console/store/selectors/devices'
 
 @connect(
-  function(state) {
+  state => {
     const formatters = selectSelectedDeviceFormatters(state)
 
     return {
@@ -50,7 +50,7 @@ import {
   },
   { updateDevice: attachPromise(updateDevice) },
 )
-@withBreadcrumb('device.single.payload-formatters.uplink', function(props) {
+@withBreadcrumb('device.single.payload-formatters.uplink', props => {
   const { appId, devId } = props
 
   return (

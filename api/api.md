@@ -29,6 +29,12 @@
   - [Message `AsConfiguration`](#ttn.lorawan.v3.AsConfiguration)
   - [Message `AsConfiguration.PubSub`](#ttn.lorawan.v3.AsConfiguration.PubSub)
   - [Message `AsConfiguration.PubSub.Providers`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers)
+  - [Message `DecodeDownlinkRequest`](#ttn.lorawan.v3.DecodeDownlinkRequest)
+  - [Message `DecodeDownlinkResponse`](#ttn.lorawan.v3.DecodeDownlinkResponse)
+  - [Message `DecodeUplinkRequest`](#ttn.lorawan.v3.DecodeUplinkRequest)
+  - [Message `DecodeUplinkResponse`](#ttn.lorawan.v3.DecodeUplinkResponse)
+  - [Message `EncodeDownlinkRequest`](#ttn.lorawan.v3.EncodeDownlinkRequest)
+  - [Message `EncodeDownlinkResponse`](#ttn.lorawan.v3.EncodeDownlinkResponse)
   - [Message `GetApplicationLinkRequest`](#ttn.lorawan.v3.GetApplicationLinkRequest)
   - [Message `GetAsConfigurationRequest`](#ttn.lorawan.v3.GetAsConfigurationRequest)
   - [Message `GetAsConfigurationResponse`](#ttn.lorawan.v3.GetAsConfigurationResponse)
@@ -852,6 +858,78 @@ Application Server configuration.
 | `nats` | [`AsConfiguration.PubSub.Providers.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status) |  |  |
 | `aws_iot` | [`AsConfiguration.PubSub.Providers.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status) |  |  |
 
+### <a name="ttn.lorawan.v3.DecodeDownlinkRequest">Message `DecodeDownlinkRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
+| `downlink` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
+| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
+| `parameter` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+| `downlink` | <p>`message.required`: `true`</p> |
+| `formatter` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.DecodeDownlinkResponse">Message `DecodeDownlinkResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `downlink` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
+
+### <a name="ttn.lorawan.v3.DecodeUplinkRequest">Message `DecodeUplinkRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
+| `uplink` | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |  |
+| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
+| `parameter` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+| `uplink` | <p>`message.required`: `true`</p> |
+| `formatter` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.DecodeUplinkResponse">Message `DecodeUplinkResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `uplink` | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |  |
+
+### <a name="ttn.lorawan.v3.EncodeDownlinkRequest">Message `EncodeDownlinkRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
+| `downlink` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
+| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
+| `parameter` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+| `downlink` | <p>`message.required`: `true`</p> |
+| `formatter` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.EncodeDownlinkResponse">Message `EncodeDownlinkResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `downlink` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
+
 ### <a name="ttn.lorawan.v3.GetApplicationLinkRequest">Message `GetApplicationLinkRequest`</a>
 
 | Field | Type | Label | Description |
@@ -922,6 +1000,9 @@ The AppAs service connects an application or integration to an Application Serve
 | `DownlinkQueueList` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`ApplicationDownlinks`](#ttn.lorawan.v3.ApplicationDownlinks) | List the items currently in the downlink queue. |
 | `GetMQTTConnectionInfo` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | Get connection information to connect an MQTT client. |
 | `SimulateUplink` | [`ApplicationUp`](#ttn.lorawan.v3.ApplicationUp) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Simulate an upstream message. This can be used to test integrations. |
+| `EncodeDownlink` | [`EncodeDownlinkRequest`](#ttn.lorawan.v3.EncodeDownlinkRequest) | [`EncodeDownlinkResponse`](#ttn.lorawan.v3.EncodeDownlinkResponse) |  |
+| `DecodeUplink` | [`DecodeUplinkRequest`](#ttn.lorawan.v3.DecodeUplinkRequest) | [`DecodeUplinkResponse`](#ttn.lorawan.v3.DecodeUplinkResponse) |  |
+| `DecodeDownlink` | [`DecodeDownlinkRequest`](#ttn.lorawan.v3.DecodeDownlinkRequest) | [`DecodeDownlinkResponse`](#ttn.lorawan.v3.DecodeDownlinkResponse) |  |
 
 #### HTTP bindings
 
@@ -932,6 +1013,9 @@ The AppAs service connects an application or integration to an Application Serve
 | `DownlinkQueueList` | `GET` | `/api/v3/as/applications/{application_ids.application_id}/devices/{device_id}/down` |  |
 | `GetMQTTConnectionInfo` | `GET` | `/api/v3/as/applications/{application_id}/mqtt-connection-info` |  |
 | `SimulateUplink` | `POST` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/simulate` | `*` |
+| `EncodeDownlink` | `POST` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/encode` | `*` |
+| `DecodeUplink` | `POST` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/up/decode` | `*` |
+| `DecodeDownlink` | `POST` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/decode` | `*` |
 
 ### <a name="ttn.lorawan.v3.As">Service `As`</a>
 

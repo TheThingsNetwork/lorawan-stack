@@ -60,7 +60,7 @@ const mapStateToProps = (state, props) => {
 }
 
 const mapDispatchToProps = dispatch => ({
-  loadData(mayViewCollaborators, mayViewApiKeys, gtwId) {
+  loadData: (mayViewCollaborators, mayViewApiKeys, gtwId) => {
     if (mayViewCollaborators) {
       dispatch(getCollaboratorsList('gateway', gtwId))
     }

@@ -20,7 +20,7 @@ import (
 	"context"
 	"runtime/trace"
 
-	lpp "github.com/TheThingsNetwork/go-cayenne-lib/cayennelpp"
+	lpp "github.com/TheThingsNetwork/go-cayenne-lib"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
@@ -63,7 +63,7 @@ func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 		switch key {
 		case valueKey:
 			if val, ok := value.(float64); ok {
-				encoder.AddPort(channel, float32(val))
+				encoder.AddPort(channel, float64(val))
 			}
 		}
 	}
@@ -113,11 +113,11 @@ func (d decodedMap) DigitalOutput(channel, value uint8) {
 	d[formatName(digitalOutputKey, channel)] = value
 }
 
-func (d decodedMap) AnalogInput(channel uint8, value float32) {
+func (d decodedMap) AnalogInput(channel uint8, value float64) {
 	d[formatName(analogInputKey, channel)] = value
 }
 
-func (d decodedMap) AnalogOutput(channel uint8, value float32) {
+func (d decodedMap) AnalogOutput(channel uint8, value float64) {
 	d[formatName(analogOutputKey, channel)] = value
 }
 
@@ -129,42 +129,42 @@ func (d decodedMap) Presence(channel, value uint8) {
 	d[formatName(presenceKey, channel)] = value
 }
 
-func (d decodedMap) Temperature(channel uint8, celsius float32) {
+func (d decodedMap) Temperature(channel uint8, celsius float64) {
 	d[formatName(temperatureKey, channel)] = celsius
 }
 
-func (d decodedMap) RelativeHumidity(channel uint8, rh float32) {
+func (d decodedMap) RelativeHumidity(channel uint8, rh float64) {
 	d[formatName(relativeHumidityKey, channel)] = rh
 }
 
-func (d decodedMap) Accelerometer(channel uint8, x, y, z float32) {
-	d[formatName(accelerometerKey, channel)] = map[string]float32{
+func (d decodedMap) Accelerometer(channel uint8, x, y, z float64) {
+	d[formatName(accelerometerKey, channel)] = map[string]float64{
 		"x": x,
 		"y": y,
 		"z": z,
 	}
 }
 
-func (d decodedMap) BarometricPressure(channel uint8, hpa float32) {
+func (d decodedMap) BarometricPressure(channel uint8, hpa float64) {
 	d[formatName(barometricPressureKey, channel)] = hpa
 }
 
-func (d decodedMap) Gyrometer(channel uint8, x, y, z float32) {
-	d[formatName(gyrometerKey, channel)] = map[string]float32{
+func (d decodedMap) Gyrometer(channel uint8, x, y, z float64) {
+	d[formatName(gyrometerKey, channel)] = map[string]float64{
 		"x": x,
 		"y": y,
 		"z": z,
 	}
 }
 
-func (d decodedMap) GPS(channel uint8, latitude, longitude, altitude float32) {
-	d[formatName(gpsKey, channel)] = map[string]float32{
+func (d decodedMap) GPS(channel uint8, latitude, longitude, altitude float64) {
+	d[formatName(gpsKey, channel)] = map[string]float64{
 		"latitude":  latitude,
 		"longitude": longitude,
 		"altitude":  altitude,
 	}
 }
 
-func (d decodedMap) Port(channel uint8, value float32) {
+func (d decodedMap) Port(channel uint8, value float64) {
 	d[formatName(valueKey, channel)] = value
 }

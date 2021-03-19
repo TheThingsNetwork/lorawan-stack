@@ -74,10 +74,10 @@ import {
     }
   },
   dispatch => ({
-    getCollaborator(gtwId, collaboratorId, isUser) {
+    getCollaborator: (gtwId, collaboratorId, isUser) => {
       dispatch(getCollaborator('gateway', gtwId, collaboratorId, isUser))
     },
-    redirectToList(gtwId) {
+    redirectToList: gtwId => {
       dispatch(replace(`/gateways/${gtwId}/collaborators`))
     },
   }),

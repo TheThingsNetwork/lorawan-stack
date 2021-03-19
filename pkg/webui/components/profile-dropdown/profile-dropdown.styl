@@ -22,13 +22,13 @@
   padding: 0 $cs.xl
 
   &:hover
-    background-color: hoverize(white)
+    background-color: $c-backdrop-lighter
 
   +focus-visible()
-    background-color: hoverize(white)
+    background-color: $c-backdrop-lighter
 
   &:active, &:focus
-    background-color: activize(white)
+    background-color: $c-backdrop
 
 .id
   one-liner()
@@ -39,3 +39,8 @@
 
   &-icon
     margin-right: -.4rem
+
+.profile-picture
+  height: 3rem
+  width: 3rem
+  margin-right: $cs.m

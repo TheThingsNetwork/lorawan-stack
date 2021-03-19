@@ -27,6 +27,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+const namespace = "applicationserver/io/packages"
+
 type server struct {
 	ctx context.Context
 
@@ -43,7 +45,7 @@ type Server interface {
 
 // New returns an application packages server wrapping the given registries and handlers.
 func New(ctx context.Context, io io.Server, registry Registry, handlers map[string]ApplicationPackageHandler) (Server, error) {
-	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages")
+	ctx = log.NewContextWithField(ctx, "namespace", namespace)
 	s := &server{
 		ctx:      ctx,
 		io:       io,
@@ -65,8 +67,9 @@ func New(ctx context.Context, io io.Server, registry Registry, handlers map[stri
 				case <-sub.Context().Done():
 					return sub.Context().Err()
 				case up := <-sub.Up():
-					if err := s.handleUp(up.Context, up.ApplicationUp); err != nil {
-						log.FromContext(up.Context).WithError(err).Warn("Failed to handle message")
+					ctx := log.NewContextWithField(up.Context, "namespace", namespace)
+					if err := s.handleUp(ctx, up.ApplicationUp); err != nil {
+						log.FromContext(ctx).WithError(err).Warn("Failed to handle message")
 					}
 				}
 			}
@@ -127,8 +130,10 @@ func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 			ctx := log.NewContextWithField(ctx, "package", name)
 			err := handler.HandleUp(ctx, pair.defaultAssociation, pair.association, msg)
 			if err != nil {
+				registerMessageFailed(name, err)
 				return err
 			}
+			registerMessageProcessed(name)
 		} else {
 			return errNotImplemented.WithAttributes("name", name)
 		}

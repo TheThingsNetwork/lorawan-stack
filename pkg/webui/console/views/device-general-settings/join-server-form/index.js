@@ -59,12 +59,12 @@ const JoinServerForm = React.memo(props => {
 
   const validationContext = React.useMemo(
     () => ({
-      lorawanVersion: device.lorawanVersion,
+      lorawanVersion: device.lorawan_version,
       mayEditKeys,
       mayReadKeys,
       externalJs,
     }),
-    [device.lorawanVersion, externalJs, mayEditKeys, mayReadKeys],
+    [device.lorawan_version, externalJs, mayEditKeys, mayReadKeys],
   )
 
   // Setup and memoize initial form state.

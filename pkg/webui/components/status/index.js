@@ -29,7 +29,7 @@ const m = defineMessages({
   unknown: 'unknown',
 })
 
-const Status = function({
+const Status = ({
   intl,
   className,
   status,
@@ -39,7 +39,7 @@ const Status = function({
   children,
   title,
   flipped,
-}) {
+}) => {
   const cls = classnames(style.status, {
     [style.statusGood]: status === 'good',
     [style.statusBad]: status === 'bad',

@@ -87,7 +87,7 @@ class CodeEditor extends React.Component {
   onFocus(evt) {
     const { onFocus } = this.props
 
-    this.setState({ focus: true }, function() {
+    this.setState({ focus: true }, () => {
       if (onFocus) {
         onFocus(evt)
       }
@@ -98,7 +98,7 @@ class CodeEditor extends React.Component {
   onBlur(evt) {
     const { onBlur } = this.props
 
-    this.setState({ focus: false }, function() {
+    this.setState({ focus: false }, () => {
       if (onBlur) {
         onBlur(evt)
       }
@@ -154,7 +154,7 @@ class CodeEditor extends React.Component {
     }
 
     return (
-      <div className={editorCls}>
+      <div className={editorCls} data-test-id="code-editor">
         <ReactAce
           // Rendered options.
           theme="ttn"

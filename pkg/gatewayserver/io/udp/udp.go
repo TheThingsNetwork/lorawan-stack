@@ -24,6 +24,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/bluele/gcache"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
@@ -44,12 +45,19 @@ type srv struct {
 	packetCh    chan encoding.Packet
 	connections sync.Map
 	firewall    Firewall
+
+	rateLimitedGateways gcache.Cache
 }
 
 func (*srv) Protocol() string            { return "udp" }
 func (*srv) SupportsDownlinkClaim() bool { return true }
 
 var errUDPFrontendRecovered = errors.DefineInternal("udp_frontend_recovered", "internal server error")
+
+const (
+	rateLimitedGatewaysCacheSize int = 1 << 10
+	rateLimitedGatewaysCacheTTL      = time.Minute
+)
 
 // Serve serves the UDP frontend.
 func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) error {
@@ -58,7 +66,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 	if config.AddrChangeBlock > 0 {
 		firewall = NewMemoryFirewall(ctx, config.AddrChangeBlock)
 	}
-	if config.RateLimiting.Enable == true {
+	if config.RateLimiting.Enable {
 		firewall = NewRateLimitingFirewall(firewall, config.RateLimiting.Messages, config.RateLimiting.Threshold)
 	}
 	s := &srv{
@@ -68,6 +76,8 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 		conn:     conn,
 		packetCh: make(chan encoding.Packet, config.PacketBuffer),
 		firewall: firewall,
+
+		rateLimitedGateways: gcache.New(rateLimitedGatewaysCacheSize).LFU().Expiration(rateLimitedGatewaysCacheTTL).Build(),
 	}
 	go s.gc()
 	go func() {
@@ -150,6 +160,12 @@ func (s *srv) handlePackets() {
 
 			if s.firewall != nil {
 				if err := s.firewall.Filter(packet); err != nil {
+					if errors.IsResourceExhausted(err) {
+						if s.rateLimitedGateways.Has(eui) {
+							break
+						}
+						s.rateLimitedGateways.Set(eui, &struct{}{})
+					}
 					logger.WithError(err).Warn("Packet filtered")
 					break
 				}

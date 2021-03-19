@@ -62,10 +62,10 @@ export default OrganizationCollaboratorEdit =>
       }
     },
     dispatch => ({
-      getOrganizationCollaborator(orgId, collaboratorId, isUser) {
+      getOrganizationCollaborator: (orgId, collaboratorId, isUser) => {
         dispatch(getCollaborator('organization', orgId, collaboratorId, isUser))
       },
-      redirectToList(orgId) {
+      redirectToList: orgId => {
         dispatch(replace(`/organizations/${orgId}/collaborators`))
       },
       updateOrganizationCollaborator: (orgId, collaborator) =>

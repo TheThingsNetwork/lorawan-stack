@@ -31,17 +31,16 @@ const getErrorStoreEntrySelector = (state, baseActionType) =>
  * @param {Array} actions - A list of base action types or a single base action type.
  * @returns {object} The error object matching one of the base action types.
  */
-export const createErrorSelector = actions =>
-  function(state) {
-    if (!Array.isArray(actions)) {
-      return getErrorStoreEntrySelector(state, actions)
-    }
+export const createErrorSelector = actions => state => {
+  if (!Array.isArray(actions)) {
+    return getErrorStoreEntrySelector(state, actions)
+  }
 
-    for (const action of actions) {
-      const error = getErrorStoreEntrySelector(state, action)
+  for (const action of actions) {
+    const error = getErrorStoreEntrySelector(state, action)
 
-      if (Boolean(error)) {
-        return error
-      }
+    if (Boolean(error)) {
+      return error
     }
   }
+}

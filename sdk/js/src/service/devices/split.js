@@ -34,7 +34,7 @@ const { is: IS, ns: NS, as: AS, js: JS } = STACK_COMPONENTS_MAP
  * @returns {object} A request tree object, consisting of resulting paths for
  * each component eg: `{ is: ['ids'], as: ['session'], js: ['root_keys'] }`.
  */
-function splitPaths(paths = [], direction, base = {}, components = [IS, NS, AS, JS]) {
+const splitPaths = (paths = [], direction, base = {}, components = [IS, NS, AS, JS]) => {
   const result = base
   const retrieveIndex = direction === 'get' ? 0 : 1
 
@@ -48,7 +48,7 @@ function splitPaths(paths = [], direction, base = {}, components = [IS, NS, AS, 
 
     const definition = '_root' in subtree ? subtree._root[retrieveIndex] : subtree[retrieveIndex]
 
-    const map = function(requestTree, component, path) {
+    const map = (requestTree, component, path) => {
       if (components.includes(component)) {
         result[component] = !result[component] ? [path] : [...result[component], path]
       }
@@ -78,7 +78,7 @@ function splitPaths(paths = [], direction, base = {}, components = [IS, NS, AS, 
  * @returns {object} A request tree object, consisting of resulting paths for
  * each component eg: `{ is: ['ids'], as: ['session'], js: ['root_keys'] }`.
  */
-export function splitSetPaths(paths, base, components) {
+export const splitSetPaths = (paths, base, components) => {
   return splitPaths(paths, 'set', base, components)
 }
 
@@ -93,7 +93,7 @@ export function splitSetPaths(paths, base, components) {
  * @returns {object} A request tree object, consisting of resulting paths for
  * each component eg: `{ is: ['ids'], as: ['session'], js: ['root_keys'] }`.
  */
-export function splitGetPaths(paths, base, components) {
+export const splitGetPaths = (paths, base, components) => {
   return splitPaths(paths, 'get', base, components)
 }
 
@@ -114,7 +114,7 @@ export function splitGetPaths(paths, base, components) {
  * @returns {object} An array of device registry responses together with the
  * paths (field_mask) that they were requested with.
  */
-export async function makeRequests(
+export const makeRequests = async (
   api,
   stackConfig,
   operation,
@@ -122,7 +122,7 @@ export async function makeRequests(
   params,
   payload = {},
   ignoreNotFound = false,
-) {
+) => {
   const isCreate = operation === 'create'
   const isSet = operation === 'set'
   const isDelete = operation === 'delete'
@@ -130,13 +130,13 @@ export async function makeRequests(
 
   // Use a wrapper for the api calls to control the result object and allow
   // ignoring not found errors per component, if wished.
-  const requestWrapper = async function(
+  const requestWrapper = async (
     call,
     params,
     component,
     payload,
     ignoreRequestNotFound = ignoreNotFound,
-  ) {
+  ) => {
     const res = { hasAttempted: true, component, paths: requestTree[component], hasErrored: false }
     try {
       const result = await call(params, !isDelete ? payload : undefined)
@@ -151,7 +151,7 @@ export async function makeRequests(
   }
 
   // Split end device payload per stack component.
-  function splitPayload(payload = {}, paths, base = {}) {
+  const splitPayload = (payload = {}, paths, base = {}) => {
     if (!Boolean(payload.end_device)) {
       return payload
     }

@@ -66,54 +66,53 @@ class BreadcrumbsProvider extends React.Component {
   }
 }
 
-const withBreadcrumb = (id, element) =>
-  function(Component) {
-    class BreadcrumbsConsumer extends React.Component {
-      static propTypes = {
-        add: PropTypes.func.isRequired,
-        breadcrumb: PropTypes.oneOfType([PropTypes.func, PropTypes.element]).isRequired,
-        remove: PropTypes.func.isRequired,
-      }
-
-      constructor(props) {
-        super(props)
-
-        this.add()
-      }
-
-      add() {
-        const { add, breadcrumb } = this.props
-
-        add(id, breadcrumb)
-      }
-
-      remove() {
-        const { remove } = this.props
-
-        remove(id)
-      }
-
-      componentWillUnmount() {
-        this.remove()
-      }
-
-      render() {
-        const { add, remove, breadcrumb, ...rest } = this.props
-
-        return <Component {...rest} />
-      }
+const withBreadcrumb = (id, element) => Component => {
+  class BreadcrumbsConsumer extends React.Component {
+    static propTypes = {
+      add: PropTypes.func.isRequired,
+      breadcrumb: PropTypes.oneOfType([PropTypes.func, PropTypes.element]).isRequired,
+      remove: PropTypes.func.isRequired,
     }
 
-    const BreadcrumbsConsumerContainer = props => (
-      <Consumer>
-        {({ add, remove }) => (
-          <BreadcrumbsConsumer {...props} add={add} remove={remove} breadcrumb={element(props)} />
-        )}
-      </Consumer>
-    )
+    constructor(props) {
+      super(props)
 
-    return BreadcrumbsConsumerContainer
+      this.add()
+    }
+
+    add() {
+      const { add, breadcrumb } = this.props
+
+      add(id, breadcrumb)
+    }
+
+    remove() {
+      const { remove } = this.props
+
+      remove(id)
+    }
+
+    componentWillUnmount() {
+      this.remove()
+    }
+
+    render() {
+      const { add, remove, breadcrumb, ...rest } = this.props
+
+      return <Component {...rest} />
+    }
   }
+
+  const BreadcrumbsConsumerContainer = props => (
+    <Consumer>
+      {({ add, remove }) => (
+        <BreadcrumbsConsumer {...props} add={add} remove={remove} breadcrumb={element(props)} />
+      )}
+    </Consumer>
+  )
+
+  return BreadcrumbsConsumerContainer
+}
 
 withBreadcrumb.displayName = 'withBreadcrumb'
 

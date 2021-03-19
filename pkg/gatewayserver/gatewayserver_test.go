@@ -784,12 +784,10 @@ func TestGatewayServer(t *testing.T) {
 
 							wg := &sync.WaitGroup{}
 							wg.Add(1)
+							var linkErr error
 							go func() {
 								defer wg.Done()
-								err := ptc.Link(ctx, t, ids, registeredGatewayKey, upCh, downCh)
-								if !errors.IsCanceled(err) {
-									t.Fatalf("Expected context canceled, but have %v", err)
-								}
+								linkErr = ptc.Link(ctx, t, ids, registeredGatewayKey, upCh, downCh)
 							}()
 
 							select {
@@ -807,6 +805,9 @@ func TestGatewayServer(t *testing.T) {
 
 							cancel()
 							wg.Wait()
+							if !errors.IsCanceled(linkErr) {
+								t.Fatalf("Expected context canceled, but have %v", linkErr)
+							}
 						})
 					}
 				})
@@ -873,12 +874,10 @@ func TestGatewayServer(t *testing.T) {
 
 						wg := &sync.WaitGroup{}
 						wg.Add(1)
+						var linkErr error
 						go func() {
 							defer wg.Done()
-							err := ptc.Link(ctx, t, ids, registeredGatewayKey, upCh, downCh)
-							if !errors.IsCanceled(err) {
-								t.Fatalf("Expected context canceled, but have %v", err)
-							}
+							linkErr = ptc.Link(ctx, t, ids, registeredGatewayKey, upCh, downCh)
 						}()
 
 						for _, locationInRxMetadata := range []bool{false, true} {
@@ -920,6 +919,9 @@ func TestGatewayServer(t *testing.T) {
 
 						cancel()
 						wg.Wait()
+						if !errors.IsCanceled(linkErr) {
+							t.Fatalf("Expected context canceled, but have %v", linkErr)
+						}
 					})
 				}
 			})
@@ -929,12 +931,10 @@ func TestGatewayServer(t *testing.T) {
 
 			wg := &sync.WaitGroup{}
 			wg.Add(1)
+			var linkErr error
 			go func() {
 				defer wg.Done()
-				err := ptc.Link(ctx, t, ids, registeredGatewayKey, upCh, downCh)
-				if !errors.IsCanceled(err) {
-					t.Fatalf("Expected context canceled, but have %v", err)
-				}
+				linkErr = ptc.Link(ctx, t, ids, registeredGatewayKey, upCh, downCh)
 			}()
 
 			// Expected location for RxMetadata
@@ -1529,6 +1529,9 @@ func TestGatewayServer(t *testing.T) {
 
 			cancel()
 			wg.Wait()
+			if !errors.IsCanceled(linkErr) {
+				t.Fatalf("Expected context canceled, but have %v", linkErr)
+			}
 
 			// Wait for disconnection to be processed.
 			time.Sleep(timeout)

@@ -20,7 +20,7 @@ const fs = require('fs')
 const api = require('../generated/api.json')
 const allowedFieldMaskPaths = require('../generated/allowed-field-mask-paths.json')
 
-function map(files) {
+const map = files => {
   const result = {}
   const paramRegex = /{([a-z._]+)}/gm
 
@@ -60,7 +60,7 @@ function map(files) {
 fs.writeFile(
   `${__dirname}/../generated/api-definition.json`,
   JSON.stringify(map(api.files), null, 2),
-  function(err) {
+  err => {
     if (err) {
       return console.error(err)
     }
