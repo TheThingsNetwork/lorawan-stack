@@ -39,10 +39,7 @@ func init() {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v MType) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("MType enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -90,10 +87,7 @@ func (v *MType) UnmarshalJSON(b []byte) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v Major) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("Major enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -141,10 +135,7 @@ func (v *Major) UnmarshalJSON(b []byte) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v MACVersion) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("MACVersion enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -210,10 +201,7 @@ func (v *MACVersion) DecodeMsgpack(dec *msgpack.Decoder) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v PHYVersion) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("PHYVersion enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -266,10 +254,7 @@ func (v DataRateIndex) String() string {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v DataRateIndex) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("DataRateIndex enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -414,10 +399,7 @@ func (v DataRateOffset) String() string {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v DataRateOffset) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("DataRateOffset enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -614,10 +596,7 @@ func (v *FrequencyValue) FieldIsZero(p string) bool {
 }
 
 func (v RejoinType) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("RejoinType enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -665,10 +644,7 @@ func (v *RejoinType) UnmarshalJSON(b []byte) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v CFListType) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("CFListType enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -716,10 +692,7 @@ func (v *CFListType) UnmarshalJSON(b []byte) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v Class) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("Class enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -767,10 +740,7 @@ func (v *Class) UnmarshalJSON(b []byte) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v TxSchedulePriority) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("TxSchedulePriority enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -818,10 +788,7 @@ func (v *TxSchedulePriority) UnmarshalJSON(b []byte) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v MACCommandIdentifier) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("MACCommandIdentifier enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -869,10 +836,7 @@ func (v *MACCommandIdentifier) UnmarshalJSON(b []byte) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v AggregatedDutyCycle) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("AggregatedDutyCycle enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -1010,10 +974,7 @@ func (v *AggregatedDutyCycleValue) FieldIsZero(p string) bool {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v PingSlotPeriod) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("PingSlotPeriod enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -1151,10 +1112,7 @@ func (v *PingSlotPeriodValue) FieldIsZero(p string) bool {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v RejoinCountExponent) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("RejoinCountExponent enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -1202,10 +1160,7 @@ func (v *RejoinCountExponent) UnmarshalJSON(b []byte) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v RejoinTimeExponent) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("RejoinTimeExponent enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -1253,10 +1208,7 @@ func (v *RejoinTimeExponent) UnmarshalJSON(b []byte) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v RejoinPeriodExponent) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("RejoinPeriodExponent enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -1304,10 +1256,7 @@ func (v *RejoinPeriodExponent) UnmarshalJSON(b []byte) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v DeviceEIRP) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("DeviceEIRP enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -1355,10 +1304,7 @@ func (v *DeviceEIRP) UnmarshalJSON(b []byte) error {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v ADRAckLimitExponent) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("ADRAckLimitExponent enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -1496,10 +1442,7 @@ func (v *ADRAckLimitExponentValue) FieldIsZero(p string) bool {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v ADRAckDelayExponent) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("ADRAckDelayExponent enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -1637,10 +1580,7 @@ func (v *ADRAckDelayExponentValue) FieldIsZero(p string) bool {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v RxDelay) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("RxDelay enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
@@ -1780,10 +1720,7 @@ func (v *RxDelayValue) FieldIsZero(p string) bool {
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
 func (v Minor) MarshalBinary() ([]byte, error) {
-	if v > 255 {
-		panic(fmt.Errorf("Minor enum exceeds 255"))
-	}
-	return []byte{byte(v)}, nil
+	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
