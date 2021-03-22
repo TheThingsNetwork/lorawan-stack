@@ -1155,9 +1155,10 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		transmitAt = slot.RX2()
 		maxDR = rx2DR
 	}
+	downDwellTime := fp.DwellTime.GetDownlinks()
 
 	genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, ttnpb.CLASS_A, transmitAt,
-		maxDR.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()),
+		maxDR.MaxMACPayloadSize(downDwellTime),
 		maxUpLength,
 	)
 	var sets []string
@@ -1179,8 +1180,12 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 
 	if attemptRX1 && attemptRX2 {
-		attemptRX1 = len(genDown.RawPayload) <= int(rx1DR.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()))
-		attemptRX2 = len(genDown.RawPayload) <= int(rx2DR.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()))
+		// NOTE: genDown.RawPayload contains FRMPayload, which consists of:
+		// * MHDR - 1 byte
+		// * MACPayload - up to 250 bytes, actual value reported by band.DataRate.MaxMACPayloadSize
+		// * MIC - 4 bytes
+		attemptRX1 = len(genDown.RawPayload) <= int(rx1DR.MaxMACPayloadSize(downDwellTime))+5
+		attemptRX2 = len(genDown.RawPayload) <= int(rx2DR.MaxMACPayloadSize(downDwellTime))+5
 		if !attemptRX1 && !attemptRX2 {
 			log.FromContext(ctx).Error("Generated downlink payload size does not fit neither RX1, nor RX2, skip class A downlink slot")
 			dev.MACState.QueuedResponses = nil
