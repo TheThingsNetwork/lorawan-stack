@@ -24,6 +24,18 @@ import (
 
 // Errors for no/insufficient rights.
 var (
+	ErrNoUniversalRights = errors.DefinePermissionDenied(
+		"no_universal_rights",
+		"no universal rights",
+	)
+	ErrInsufficientUniversalRights = errors.DefinePermissionDenied(
+		"insufficient_universal_rights",
+		"insufficient universal rights",
+	)
+	ErrNoAdmin = errors.DefinePermissionDenied(
+		"no_admin",
+		"no admin",
+	)
 	ErrNoApplicationRights = errors.DefinePermissionDenied(
 		"no_application_rights",
 		"no rights for application `{uid}`",
@@ -66,9 +78,35 @@ var (
 	)
 )
 
+// RequireUniversal checks that the context contains the required universal rights.
+func RequireUniversal(ctx context.Context, required ...ttnpb.Right) error {
+	authInfo, err := AuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+	if rights := authInfo.GetUniversalRights(); len(rights.GetRights()) == 0 {
+		return ErrNoUniversalRights.New()
+	} else if missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights(); len(missing) > 0 {
+		return ErrInsufficientUniversalRights.WithAttributes("missing", missing)
+	}
+	return nil
+}
+
+// RequireIsAdmin checks that the context is authenticated as admin.
+func RequireIsAdmin(ctx context.Context) error {
+	authInfo, err := AuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+	if !authInfo.GetIsAdmin() {
+		return ErrNoAdmin.New()
+	}
+	return nil
+}
+
 // RequireApplication checks that context contains the required rights for the
 // given application ID.
-func RequireApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) (err error) {
+func RequireApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) error {
 	uid := unique.ID(ctx, id)
 	rights, err := ListApplication(ctx, id)
 	if err != nil {

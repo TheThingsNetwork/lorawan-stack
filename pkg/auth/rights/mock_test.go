@@ -40,6 +40,7 @@ func (h *mockHandler) Handler(ctx context.Context, req interface{}) (interface{}
 
 type mockFetcher struct {
 	// Request vars
+	authInfoCtx     context.Context
 	applicationCtx  context.Context
 	applicationIDs  ttnpb.ApplicationIdentifiers
 	clientCtx       context.Context
@@ -52,6 +53,8 @@ type mockFetcher struct {
 	userIDs         ttnpb.UserIdentifiers
 
 	// Response vars
+	authInfoResponse   *ttnpb.AuthInfoResponse
+	authInfoError      error
 	applicationRights  *ttnpb.Rights
 	applicationError   error
 	clientRights       *ttnpb.Rights
@@ -62,6 +65,11 @@ type mockFetcher struct {
 	organizationError  error
 	userRights         *ttnpb.Rights
 	userError          error
+}
+
+func (f *mockFetcher) AuthInfo(ctx context.Context) (*ttnpb.AuthInfoResponse, error) {
+	f.authInfoCtx = ctx
+	return f.authInfoResponse, f.authInfoError
 }
 
 func (f *mockFetcher) ApplicationRights(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {

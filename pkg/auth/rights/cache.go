@@ -27,9 +27,15 @@ import (
 
 var now = time.Now // override this in unit tests
 
-func newReq(ctx context.Context, id ttnpb.Identifiers) cachedReq {
+func newReq(ctx context.Context) cachedReq {
 	md := rpcmetadata.FromIncomingContext(ctx)
-	return cachedReq{UniqueID: unique.ID(ctx, id), AuthType: md.AuthType, AuthValue: md.AuthValue}
+	return cachedReq{AuthType: md.AuthType, AuthValue: md.AuthValue}
+}
+
+func newEntityReq(ctx context.Context, id ttnpb.Identifiers) cachedReq {
+	req := newReq(ctx)
+	req.UniqueID = unique.ID(ctx, id)
+	return req
 }
 
 type cachedReq struct {
@@ -82,6 +88,20 @@ func (c *cachedRes) wait(ctx context.Context) error {
 	}
 }
 
+type cachedAuthInfoRes struct {
+	*cachedRes
+	authInfo *ttnpb.AuthInfoResponse
+}
+
+func (c *cachedAuthInfoRes) valid(successTTL, errorTTL time.Duration) bool {
+	return c != nil && c.cachedRes.valid(successTTL, errorTTL)
+}
+
+func (c *cachedAuthInfoRes) set(authInfo *ttnpb.AuthInfoResponse, err error) {
+	c.authInfo = authInfo
+	c.cachedRes.set(authInfo.GetUniversalRights(), err)
+}
+
 // NewInMemoryCache returns a new in-memory cache on top of the given fetcher.
 // Successful responses are valid for the duration of successTTL, unsuccessful
 // responses are valid for the duration of errorTTL.
@@ -91,6 +111,7 @@ func NewInMemoryCache(fetcher Fetcher, successTTL, errorTTL time.Duration) Fetch
 		successTTL:         successTTL,
 		errorTTL:           errorTTL,
 		lastCleanup:        now(),
+		authInfo:           make(map[cachedReq]*cachedAuthInfoRes),
 		applicationRights:  make(map[cachedReq]*cachedRes),
 		clientRights:       make(map[cachedReq]*cachedRes),
 		gatewayRights:      make(map[cachedReq]*cachedRes),
@@ -105,6 +126,7 @@ type inMemoryCache struct {
 	errorTTL           time.Duration
 	mu                 sync.Mutex
 	lastCleanup        time.Time
+	authInfo           map[cachedReq]*cachedAuthInfoRes
 	applicationRights  map[cachedReq]*cachedRes
 	clientRights       map[cachedReq]*cachedRes
 	gatewayRights      map[cachedReq]*cachedRes
@@ -120,6 +142,11 @@ func (f *inMemoryCache) maybeCleanup() {
 	}
 	if now().Sub(f.lastCleanup) <= cleanupTTL*10 {
 		return
+	}
+	for req, res := range f.authInfo {
+		if !res.valid(f.successTTL, f.errorTTL) {
+			delete(f.authInfo, req)
+		}
 	}
 	for req, res := range f.applicationRights {
 		if !res.valid(f.successTTL, f.errorTTL) {
@@ -149,9 +176,29 @@ func (f *inMemoryCache) maybeCleanup() {
 	f.lastCleanup = now()
 }
 
+func (f *inMemoryCache) AuthInfo(ctx context.Context) (authInfo *ttnpb.AuthInfoResponse, err error) {
+	defer func() { registerAuthInfoRequest(ctx, authInfo, err) }()
+	req := newReq(ctx)
+	f.mu.Lock()
+	res := f.authInfo[req]
+	if !res.valid(f.successTTL, f.errorTTL) {
+		res = &cachedAuthInfoRes{
+			cachedRes: newRes(),
+		}
+		f.authInfo[req] = res
+		go res.set(f.Fetcher.AuthInfo(ctx))
+	}
+	f.maybeCleanup()
+	f.mu.Unlock()
+	if err := res.wait(ctx); err != nil {
+		return nil, err
+	}
+	return res.authInfo, res.err
+}
+
 func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "application", rights, err) }()
-	req := newReq(ctx, appID)
+	req := newEntityReq(ctx, appID)
 	f.mu.Lock()
 	res := f.applicationRights[req]
 	if !res.valid(f.successTTL, f.errorTTL) {
@@ -169,7 +216,7 @@ func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.Appli
 
 func (f *inMemoryCache) ClientRights(ctx context.Context, clientID ttnpb.ClientIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "client", rights, err) }()
-	req := newReq(ctx, clientID)
+	req := newEntityReq(ctx, clientID)
 	f.mu.Lock()
 	res := f.clientRights[req]
 	if !res.valid(f.successTTL, f.errorTTL) {
@@ -187,7 +234,7 @@ func (f *inMemoryCache) ClientRights(ctx context.Context, clientID ttnpb.ClientI
 
 func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "gateway", rights, err) }()
-	req := newReq(ctx, gtwID)
+	req := newEntityReq(ctx, gtwID)
 	f.mu.Lock()
 	res := f.gatewayRights[req]
 	if !res.valid(f.successTTL, f.errorTTL) {
@@ -205,7 +252,7 @@ func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayId
 
 func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID ttnpb.OrganizationIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "organization", rights, err) }()
-	req := newReq(ctx, orgID)
+	req := newEntityReq(ctx, orgID)
 	f.mu.Lock()
 	res := f.organizationRights[req]
 	if !res.valid(f.successTTL, f.errorTTL) {
@@ -223,7 +270,7 @@ func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID ttnpb.Orga
 
 func (f *inMemoryCache) UserRights(ctx context.Context, userID ttnpb.UserIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "user", rights, err) }()
-	req := newReq(ctx, userID)
+	req := newEntityReq(ctx, userID)
 	f.mu.Lock()
 	res := f.userRights[req]
 	if !res.valid(f.successTTL, f.errorTTL) {

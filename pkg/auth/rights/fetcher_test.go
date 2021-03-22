@@ -20,6 +20,7 @@ import (
 	"sync"
 	"testing"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -29,7 +30,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func fetchRights(ctx context.Context, id string, f Fetcher) (res struct {
+func fetchEntityRights(ctx context.Context, id string, f EntityFetcher) (res struct {
 	AppRights *ttnpb.Rights
 	AppErr    error
 	CliRights *ttnpb.Rights
@@ -67,6 +68,15 @@ func fetchRights(ctx context.Context, id string, f Fetcher) (res struct {
 	return
 }
 
+func fetchAuthInfo(ctx context.Context, f AuthInfoFetcher) (*ttnpb.AuthInfoResponse, error) {
+	return f.AuthInfo(ctx)
+}
+
+type mockEntityAccessServer struct {
+	ttnpb.EntityAccessServer
+	*mockFetcher
+}
+
 type mockApplicationAccessServer struct {
 	ttnpb.ApplicationAccessServer
 	*mockFetcher
@@ -98,12 +108,21 @@ type mockAccessServer struct {
 
 func (as *mockAccessServer) Server() *grpc.Server {
 	srv := grpc.NewServer()
+	ttnpb.RegisterEntityAccessServer(srv, mockEntityAccessServer{mockFetcher: &as.mockFetcher})
 	ttnpb.RegisterApplicationAccessServer(srv, mockApplicationAccessServer{mockFetcher: &as.mockFetcher})
 	ttnpb.RegisterClientAccessServer(srv, mockClientAccessServer{mockFetcher: &as.mockFetcher})
 	ttnpb.RegisterGatewayAccessServer(srv, mockGatewayAccessServer{mockFetcher: &as.mockFetcher})
 	ttnpb.RegisterOrganizationAccessServer(srv, mockOrganizationAccessServer{mockFetcher: &as.mockFetcher})
 	ttnpb.RegisterUserAccessServer(srv, mockUserAccessServer{mockFetcher: &as.mockFetcher})
 	return srv
+}
+
+func (as mockEntityAccessServer) AuthInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.AuthInfoResponse, error) {
+	as.authInfoCtx = ctx
+	if as.authInfoError != nil {
+		return nil, as.authInfoError
+	}
+	return as.authInfoResponse, nil
 }
 
 func (as mockApplicationAccessServer) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
@@ -146,7 +165,7 @@ func (as mockUserAccessServer) ListRights(ctx context.Context, ids *ttnpb.UserId
 	return as.userRights, nil
 }
 
-func TestFetcherFunc(t *testing.T) {
+func TestEntityFetcherFunc(t *testing.T) {
 	a := assertions.New(t)
 
 	var fetcher struct {
@@ -157,7 +176,7 @@ func TestFetcherFunc(t *testing.T) {
 		err    error
 	}
 	fetcher.err = errors.New("test err")
-	f := FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+	f := EntityFetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
 		fetcher.mu.Lock()
 		defer fetcher.mu.Unlock()
 		fetcher.ctx = append(fetcher.ctx, ctx)
@@ -165,7 +184,7 @@ func TestFetcherFunc(t *testing.T) {
 		return fetcher.rights, fetcher.err
 	})
 
-	res := fetchRights(test.Context(), "foo", f)
+	res := fetchEntityRights(test.Context(), "foo", f)
 	a.So(res.AppErr, should.Resemble, fetcher.err)
 	a.So(res.CliErr, should.Resemble, fetcher.err)
 	a.So(res.GtwErr, should.Resemble, fetcher.err)
@@ -181,11 +200,37 @@ func TestFetcherFunc(t *testing.T) {
 	}
 }
 
+func TestAuthInfoFetcherFunc(t *testing.T) {
+	a := assertions.New(t)
+
+	var fetcher struct {
+		mu       sync.Mutex
+		ctx      []context.Context
+		authInfo *ttnpb.AuthInfoResponse
+		err      error
+	}
+	fetcher.err = errors.New("test err")
+	f := AuthInfoFetcherFunc(func(ctx context.Context) (*ttnpb.AuthInfoResponse, error) {
+		fetcher.mu.Lock()
+		defer fetcher.mu.Unlock()
+		fetcher.ctx = append(fetcher.ctx, ctx)
+		return fetcher.authInfo, fetcher.err
+	})
+
+	authInfo, err := fetchAuthInfo(test.Context(), f)
+	a.So(err, should.Resemble, fetcher.err)
+	a.So(authInfo, should.Resemble, fetcher.authInfo)
+}
+
 func TestAccessFetcher(t *testing.T) {
 	a := assertions.New(t)
 
 	is := &mockAccessServer{
 		mockFetcher: mockFetcher{
+			authInfoResponse: &ttnpb.AuthInfoResponse{
+				UniversalRights: ttnpb.RightsFrom(ttnpb.RIGHT_SEND_INVITES),
+				IsAdmin:         true,
+			},
 			applicationRights:  ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO),
 			clientRights:       ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
 			gatewayRights:      ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO),
@@ -209,23 +254,27 @@ func TestAccessFetcher(t *testing.T) {
 	unavailableFetcher := NewAccessFetcher(func(context.Context) *grpc.ClientConn {
 		return nil
 	}, false)
-	unavailableRes := fetchRights(test.Context(), "foo", unavailableFetcher)
-	a.So(errors.IsUnavailable(unavailableRes.AppErr), should.BeTrue)
-	a.So(errors.IsUnavailable(unavailableRes.CliErr), should.BeTrue)
-	a.So(errors.IsUnavailable(unavailableRes.GtwErr), should.BeTrue)
-	a.So(errors.IsUnavailable(unavailableRes.OrgErr), should.BeTrue)
-	a.So(errors.IsUnavailable(unavailableRes.UsrErr), should.BeTrue)
+	_, unavailableAuthInfoErr := fetchAuthInfo(test.Context(), unavailableFetcher)
+	a.So(errors.IsUnavailable(unavailableAuthInfoErr), should.BeTrue)
+	unavailableEntityRes := fetchEntityRights(test.Context(), "foo", unavailableFetcher)
+	a.So(errors.IsUnavailable(unavailableEntityRes.AppErr), should.BeTrue)
+	a.So(errors.IsUnavailable(unavailableEntityRes.CliErr), should.BeTrue)
+	a.So(errors.IsUnavailable(unavailableEntityRes.GtwErr), should.BeTrue)
+	a.So(errors.IsUnavailable(unavailableEntityRes.OrgErr), should.BeTrue)
+	a.So(errors.IsUnavailable(unavailableEntityRes.UsrErr), should.BeTrue)
 
 	onlySecureFetcher := NewAccessFetcher(func(context.Context) *grpc.ClientConn {
 		return cc
 	}, false)
 
-	bgRes := fetchRights(test.Context(), "foo", onlySecureFetcher)
-	a.So(errors.IsUnauthenticated(bgRes.AppErr), should.BeTrue)
-	a.So(errors.IsUnauthenticated(bgRes.CliErr), should.BeTrue)
-	a.So(errors.IsUnauthenticated(bgRes.GtwErr), should.BeTrue)
-	a.So(errors.IsUnauthenticated(bgRes.OrgErr), should.BeTrue)
-	a.So(errors.IsUnauthenticated(bgRes.UsrErr), should.BeTrue)
+	_, bgAuthInfoErr := fetchAuthInfo(test.Context(), onlySecureFetcher)
+	a.So(errors.IsUnauthenticated(bgAuthInfoErr), should.BeTrue)
+	bgEntityRes := fetchEntityRights(test.Context(), "foo", onlySecureFetcher)
+	a.So(errors.IsUnauthenticated(bgEntityRes.AppErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(bgEntityRes.CliErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(bgEntityRes.GtwErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(bgEntityRes.OrgErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(bgEntityRes.UsrErr), should.BeTrue)
 
 	md := metadata.Pairs("authorization", "Bearer token")
 	if ctxMd, ok := metadata.FromIncomingContext(test.Context()); ok {
@@ -233,27 +282,33 @@ func TestAccessFetcher(t *testing.T) {
 	}
 	authCtx := metadata.NewIncomingContext(test.Context(), md)
 
-	authRes := fetchRights(authCtx, "foo", onlySecureFetcher)
-	a.So(errors.IsUnauthenticated(authRes.AppErr), should.BeTrue)
-	a.So(errors.IsUnauthenticated(authRes.CliErr), should.BeTrue)
-	a.So(errors.IsUnauthenticated(authRes.GtwErr), should.BeTrue)
-	a.So(errors.IsUnauthenticated(authRes.OrgErr), should.BeTrue)
-	a.So(errors.IsUnauthenticated(authRes.UsrErr), should.BeTrue)
+	_, authInfoErr := fetchAuthInfo(authCtx, onlySecureFetcher)
+	a.So(errors.IsUnauthenticated(authInfoErr), should.BeTrue)
+	authEntityRes := fetchEntityRights(authCtx, "foo", onlySecureFetcher)
+	a.So(errors.IsUnauthenticated(authEntityRes.AppErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(authEntityRes.CliErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(authEntityRes.GtwErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(authEntityRes.OrgErr), should.BeTrue)
+	a.So(errors.IsUnauthenticated(authEntityRes.UsrErr), should.BeTrue)
 
 	alsoInsecureFetcher := NewAccessFetcher(func(context.Context) *grpc.ClientConn {
 		return cc
 	}, true)
 
-	authRes = fetchRights(authCtx, "foo", alsoInsecureFetcher)
-	a.So(authRes.AppErr, should.BeNil)
-	a.So(authRes.CliErr, should.BeNil)
-	a.So(authRes.GtwErr, should.BeNil)
-	a.So(authRes.OrgErr, should.BeNil)
-	a.So(authRes.UsrErr, should.BeNil)
+	authInfoRes, authInfoErr := fetchAuthInfo(authCtx, alsoInsecureFetcher)
+	a.So(authInfoErr, should.BeNil)
+	a.So(authInfoRes, should.Resemble, is.mockFetcher.authInfoResponse)
 
-	a.So(authRes.AppRights, should.Resemble, is.mockFetcher.applicationRights)
-	a.So(authRes.CliRights, should.Resemble, is.mockFetcher.clientRights)
-	a.So(authRes.GtwRights, should.Resemble, is.mockFetcher.gatewayRights)
-	a.So(authRes.OrgRights, should.Resemble, is.mockFetcher.organizationRights)
-	a.So(authRes.UsrRights, should.Resemble, is.mockFetcher.userRights)
+	authEntityRes = fetchEntityRights(authCtx, "foo", alsoInsecureFetcher)
+	a.So(authEntityRes.AppErr, should.BeNil)
+	a.So(authEntityRes.CliErr, should.BeNil)
+	a.So(authEntityRes.GtwErr, should.BeNil)
+	a.So(authEntityRes.OrgErr, should.BeNil)
+	a.So(authEntityRes.UsrErr, should.BeNil)
+
+	a.So(authEntityRes.AppRights, should.Resemble, is.mockFetcher.applicationRights)
+	a.So(authEntityRes.CliRights, should.Resemble, is.mockFetcher.clientRights)
+	a.So(authEntityRes.GtwRights, should.Resemble, is.mockFetcher.gatewayRights)
+	a.So(authEntityRes.OrgRights, should.Resemble, is.mockFetcher.organizationRights)
+	a.So(authEntityRes.UsrRights, should.Resemble, is.mockFetcher.userRights)
 }
