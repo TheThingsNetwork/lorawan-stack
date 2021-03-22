@@ -35,6 +35,7 @@ For details about compatibility between different releases, see the **Commitment
 - Incorrect documentation url for event details data formats.
 - Search functionality for applications, gateways and organizations in the Console.
 - Error handling of end device template formats for the application overview page in the Console.
+- Payload size limits for AU915 data rates 8 and 9, which are now consistent with Regional Parameters RP002-1.0.2.
 
 ### Security
 
