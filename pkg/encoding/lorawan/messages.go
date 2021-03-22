@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/byteutil"
 )
 
 // AppendMHDR appends encoded msg to dst.
@@ -105,7 +106,7 @@ func AppendFHDR(dst []byte, msg ttnpb.FHDR, isUplink bool) ([]byte, error) {
 	if err != nil {
 		return nil, errFailedEncoding("FCtrl").WithCause(err)
 	}
-	dst = appendUint32(dst, msg.FCnt&0xffff, 2)
+	dst = byteutil.AppendUint32(dst, msg.FCnt&0xffff, 2)
 	dst = append(dst, msg.FOpts...)
 	return dst, nil
 }
@@ -120,7 +121,7 @@ func UnmarshalFHDR(b []byte, msg *ttnpb.FHDR, isUplink bool) error {
 	if err := UnmarshalFCtrl(b[4:5], &msg.FCtrl, isUplink); err != nil {
 		return errFailedDecoding("FCtrl").WithCause(err)
 	}
-	msg.FCnt = parseUint32(b[5:7])
+	msg.FCnt = byteutil.ParseUint32(b[5:7])
 	if n == 7 {
 		// No FOpts
 		return nil
@@ -225,10 +226,10 @@ func AppendCFList(dst []byte, msg ttnpb.CFList) ([]byte, error) {
 			return nil, errExpectedLengthLowerOrEqual("CFListFreq", 5)(n)
 		}
 		for _, freq := range msg.Freq {
-			if freq > maxUint24 {
+			if freq > byteutil.MaxUint24 {
 				return nil, errMaxCFListFrequency(freq)
 			}
-			dst = appendUint32(dst, freq, 3)
+			dst = byteutil.AppendUint32(dst, freq, 3)
 		}
 		// Fill remaining space with zeros.
 		dst = append(dst, bytes.Repeat([]byte{0x0}, 15-n*3)...)
@@ -269,7 +270,7 @@ func UnmarshalCFList(b []byte, msg *ttnpb.CFList) error {
 	case 0:
 		msg.Freq = make([]uint32, 0, 5)
 		for i := 0; i < 15; i += 3 {
-			freq := parseUint32(b[i : i+3])
+			freq := byteutil.ParseUint32(b[i : i+3])
 			if freq != 0 {
 				msg.Freq = append(msg.Freq, freq)
 			}
@@ -388,7 +389,7 @@ func AppendRejoinRequestPayload(dst []byte, msg ttnpb.RejoinRequestPayload) ([]b
 	if msg.RejoinCnt > math.MaxUint16 {
 		return nil, errExpectedLowerOrEqual("RJcount1", math.MaxUint16)(msg.RejoinCnt)
 	}
-	dst = appendUint32(dst, msg.RejoinCnt, 2)
+	dst = byteutil.AppendUint32(dst, msg.RejoinCnt, 2)
 	return dst, nil
 }
 
@@ -414,14 +415,14 @@ func UnmarshalRejoinRequestPayload(b []byte, msg *ttnpb.RejoinRequestPayload) er
 		}
 		copyReverse(msg.NetID[:], b[1:4])
 		copyReverse(msg.DevEUI[:], b[4:12])
-		msg.RejoinCnt = parseUint32(b[12:14])
+		msg.RejoinCnt = byteutil.ParseUint32(b[12:14])
 	case 1:
 		if len(b) != 19 {
 			return errExpectedLengthEqual("RejoinRequestPayload", 19)(len(b))
 		}
 		copyReverse(msg.JoinEUI[:], b[1:9])
 		copyReverse(msg.DevEUI[:], b[9:17])
-		msg.RejoinCnt = parseUint32(b[17:19])
+		msg.RejoinCnt = byteutil.ParseUint32(b[17:19])
 	default:
 		return errUnknown("RejoinType")(msg.RejoinType.String())
 	}
