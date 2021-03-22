@@ -201,8 +201,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			}
 			return res, nil
 		}
-	default:
-		return nil, errAuthenticationMode.WithAttributes("mode", mode)
 	}
 
 	homeNetworkClusterID := conf.HomeNetworkClusterID
@@ -281,6 +279,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	}
 	for _, opt := range opts {
 		opt(a)
+	}
+	if a.dialOptions == nil {
+		return nil, errAuthenticationMode.WithAttributes("mode", conf.AuthenticationMode)
 	}
 
 	iamConn, err := a.dialContext(ctx, conf.IAMAddress)
