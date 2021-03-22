@@ -30,6 +30,13 @@ import (
 
 func (is *IdentityServer) initEmailTemplates(ctx context.Context) (*email.TemplateRegistry, error) {
 	config := is.configFromContext(ctx).Email.Templates
+	if config.Transport == nil {
+		transport, err := is.HTTPTransport(ctx)
+		if err != nil {
+			return nil, err
+		}
+		config.Transport = transport
+	}
 	fetcher, err := config.Fetcher(ctx, is.Component.GetBaseConfig(ctx).Blob)
 	if err != nil {
 		return nil, err

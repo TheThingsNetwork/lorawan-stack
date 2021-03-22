@@ -64,10 +64,16 @@ func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
 }
 
 // FromHTTP returns an object to fetch files from a webserver.
-func FromHTTP(rootURL string, cache bool) (Interface, error) {
-	transport := http.DefaultTransport
+func FromHTTP(transport http.RoundTripper, rootURL string, cache bool) (Interface, error) {
+	if transport == nil {
+		transport = http.DefaultTransport
+	}
 	if cache {
-		transport = httpcache.NewMemoryCacheTransport()
+		transport = &httpcache.Transport{
+			Transport:           transport,
+			Cache:               httpcache.NewMemoryCache(),
+			MarkCachedResponses: true,
+		}
 	}
 	var root *url.URL
 	if rootURL != "" {

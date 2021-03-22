@@ -150,10 +150,13 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 	case "":
 		return nil, nil
 	case "direct":
+		client, err := server.HTTPClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+		client.Timeout = c.Timeout
 		target = &web.HTTPClientSink{
-			Client: &http.Client{
-				Timeout: c.Timeout,
-			},
+			Client: client,
 		}
 	default:
 		return nil, errWebhooksTarget.WithAttributes("target", c.Target)
