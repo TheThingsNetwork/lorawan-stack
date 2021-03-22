@@ -32,6 +32,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Incorrect documentation url for event details data formats.
+
 ### Security
 
 ## [3.11.3] - 2021-03-19
