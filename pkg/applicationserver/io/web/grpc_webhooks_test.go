@@ -229,8 +229,8 @@ description: Bar`),
 			a := assertions.New(t)
 
 			config := web.TemplatesConfig{
-				Static:    tc.contents,
-				Transport: http.DefaultTransport,
+				Static:     tc.contents,
+				HTTPClient: http.DefaultClient,
 			}
 			store, err := config.NewTemplateStore()
 			a.So(err, should.BeNil)

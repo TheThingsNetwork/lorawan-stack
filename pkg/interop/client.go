@@ -424,16 +424,17 @@ func NewClient(ctx context.Context, conf config.InteropClient) (*Client, error) 
 				}
 			}
 
-			var tr *http.Transport
-			if tlsConf != nil {
-				tr = &http.Transport{
-					TLSClientConfig: tlsConf,
-				}
+			tr := http.DefaultTransport.(*http.Transport).Clone()
+			if transport, ok := conf.HTTPClient.Transport.(*http.Transport); ok {
+				tr = transport.Clone()
 			}
+			if tlsConf != nil {
+				tr.TLSClientConfig = tlsConf
+			}
+			client := *conf.HTTPClient
+			client.Transport = tr
 			js = &joinServerHTTPClient{
-				Client: http.Client{
-					Transport: tr,
-				},
+				Client:         client,
 				NewRequestFunc: makeJoinServerHTTPRequestFunc("https", yamlJSConf.DNS, yamlJSConf.FQDN, yamlJSConf.Port, yamlJSConf.Paths, yamlJSConf.Headers),
 				Protocol:       yamlJSConf.Protocol,
 			}

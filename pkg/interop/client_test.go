@@ -176,6 +176,7 @@ paths:
 				return config.InteropClient{
 						Directory:            confDir,
 						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
+						HTTPClient:           http.DefaultClient,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -294,6 +295,7 @@ paths:
 				return config.InteropClient{
 						Directory:            confDir,
 						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
+						HTTPClient:           http.DefaultClient,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -424,6 +426,7 @@ paths:
 				return config.InteropClient{
 						Directory:            confDir,
 						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
+						HTTPClient:           http.DefaultClient,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -559,6 +562,7 @@ paths:
 				return config.InteropClient{
 						Directory:            confDir,
 						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
+						HTTPClient:           http.DefaultClient,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -741,6 +745,7 @@ paths:
 				return config.InteropClient{
 						Directory:            confDir,
 						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
+						HTTPClient:           http.DefaultClient,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -859,6 +864,7 @@ paths:
 				return config.InteropClient{
 						Directory:            confDir,
 						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
+						HTTPClient:           http.DefaultClient,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -995,6 +1001,7 @@ paths:
 				return config.InteropClient{
 						Directory:            confDir,
 						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
+						HTTPClient:           http.DefaultClient,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -1144,6 +1151,7 @@ paths:
 				return config.InteropClient{
 						Directory:            confDir,
 						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
+						HTTPClient:           http.DefaultClient,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -1292,6 +1300,7 @@ paths:
 				return config.InteropClient{
 						Directory:            confDir,
 						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
+						HTTPClient:           http.DefaultClient,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}

@@ -22,7 +22,7 @@ import (
 )
 
 func Example() {
-	fetcher, err := fetch.FromHTTP(http.DefaultTransport, "http://webserver.thethings.network/repository", true)
+	fetcher, err := fetch.FromHTTP(http.DefaultClient, "http://webserver.thethings.network/repository", true)
 	if err != nil {
 		panic(err)
 	}

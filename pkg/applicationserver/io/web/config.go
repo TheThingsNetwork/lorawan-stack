@@ -31,7 +31,7 @@ type TemplatesConfig struct {
 	URL         string            `name:"url" description:"Retrieve the webhook templates from a web server"`
 	LogoBaseURL string            `name:"logo-base-url" description:"The base URL for the logo storage"`
 
-	Transport http.RoundTripper `name:"-"`
+	HTTPClient *http.Client `name:"-"`
 }
 
 // TemplateStore contains the webhook templates.
@@ -56,7 +56,7 @@ func (c TemplatesConfig) NewTemplateStore() (TemplateStore, error) {
 		fallthrough
 	case c.URL != "":
 		var err error
-		fetcher, err = fetch.FromHTTP(c.Transport, c.URL, true)
+		fetcher, err = fetch.FromHTTP(c.HTTPClient, c.URL, true)
 		if err != nil {
 			return nil, err
 		}

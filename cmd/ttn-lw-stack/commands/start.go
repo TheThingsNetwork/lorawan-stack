@@ -190,15 +190,27 @@ var startCommand = &cobra.Command{
 
 		redisConsumerID := redis.Key(host, strconv.Itoa(os.Getpid()))
 
-		transport, err := c.HTTPTransport(ctx)
+		httpClient, err := c.HTTPClient(ctx)
 		if err != nil {
 			return err
 		}
-		if conf := config.ServiceBase.FrequencyPlans; conf.Transport == nil {
-			conf.Transport = transport
+		if conf := config.ServiceBase.FrequencyPlans; conf.HTTPClient == nil {
+			conf.HTTPClient = httpClient
 		}
-		if conf := config.ServiceBase.Interop.SenderClientCA; conf.Transport == nil {
-			conf.Transport = transport
+		if conf := config.ServiceBase.Interop.SenderClientCA; conf.HTTPClient == nil {
+			conf.HTTPClient = httpClient
+		}
+		if conf := config.ServiceBase.KeyVault; conf.HTTPClient == nil {
+			conf.HTTPClient = httpClient
+		}
+		if conf := config.ServiceBase.Blob; conf.HTTPClient == nil {
+			conf.HTTPClient = httpClient
+		}
+		if conf := config.AS.Interop.InteropClient.BlobConfig; conf.HTTPClient == nil {
+			conf.HTTPClient = httpClient
+		}
+		if conf := config.NS.Interop.BlobConfig; conf.HTTPClient == nil {
+			conf.HTTPClient = httpClient
 		}
 
 		if start.IdentityServer {

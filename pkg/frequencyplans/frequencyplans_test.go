@@ -35,7 +35,7 @@ func boolPtr(v bool) *bool                       { return &v }
 func durationPtr(v time.Duration) *time.Duration { return &v }
 
 func Example() {
-	fetcher, err := fetch.FromHTTP(http.DefaultTransport, "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans", true)
+	fetcher, err := fetch.FromHTTP(http.DefaultClient, "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans", true)
 	if err != nil {
 		panic(err)
 	}

@@ -32,13 +32,13 @@ func TestHTTP(t *testing.T) {
 
 	// Invalid path
 	{
-		fetcher, err := fetch.FromHTTP(http.DefaultTransport, "", false)
+		fetcher, err := fetch.FromHTTP(http.DefaultClient, "", false)
 		if a.So(err, should.BeNil) && a.So(fetcher, should.NotBeNil) {
 			_, err = fetcher.File("test")
 			a.So(err, should.BeError)
 		}
 
-		fetcher, err = fetch.FromHTTP(http.DefaultTransport, "/asd", false)
+		fetcher, err = fetch.FromHTTP(http.DefaultClient, "/asd", false)
 		if a.So(err, should.NotBeNil) {
 			a.So(fetcher, should.BeNil)
 		}
@@ -53,7 +53,7 @@ func TestHTTP(t *testing.T) {
 	httpmock.RegisterResponder("GET", fmt.Sprintf("%s/success", serverHost), httpmock.NewStringResponder(200, content))
 	httpmock.RegisterResponder("GET", fmt.Sprintf("%s/fail", serverHost), httpmock.NewStringResponder(500, ""))
 
-	fetcher, err := fetch.FromHTTP(http.DefaultTransport, serverHost, false)
+	fetcher, err := fetch.FromHTTP(http.DefaultClient, serverHost, false)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Failed to construct HTTP fetcher: %v", err)
 	}
@@ -100,7 +100,7 @@ func TestHTTPCache(t *testing.T) {
 
 	time.Sleep(10 * test.Delay)
 
-	fetcher, err := fetch.FromHTTP(http.DefaultTransport, fmt.Sprintf("http://%s", s.Addr), true)
+	fetcher, err := fetch.FromHTTP(http.DefaultClient, fmt.Sprintf("http://%s", s.Addr), true)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Failed to construct HTTP fetcher: %v", err)
 	}

@@ -17,7 +17,6 @@ package loracloudgeolocationv3
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/gogo/protobuf/types"
@@ -40,13 +39,9 @@ import (
 const PackageName = "lora-cloud-geolocation-v3"
 
 // GeolocationPackage is the LoRa Cloud Geolocation application package.
-//
-// TODO: Once https://github.com/TheThingsNetwork/lorawan-stack/issues/2533 is merged,
-// remove the custom client usage.
 type GeolocationPackage struct {
 	server   io.Server
 	registry packages.Registry
-	client   *http.Client
 }
 
 // RegisterServices implements packages.ApplicationPackageHandler.
@@ -102,21 +97,23 @@ func New(server io.Server, registry packages.Registry) packages.ApplicationPacka
 	return &GeolocationPackage{
 		server:   server,
 		registry: registry,
-		client: &http.Client{
-			Timeout: 30 * time.Second,
-		},
 	}
 }
 
 func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data) error {
 	logger := log.FromContext(ctx)
 
+	httpClient, err := p.server.HTTPClient(ctx)
+	if err != nil {
+		return err
+	}
+
 	req := api.BuildSingleFrameRequest(up.RxMetadata)
 	if len(req.Gateways) < 3 {
 		logger.Debug("Not enough gateways available")
 		return nil
 	}
-	client, err := api.New(p.client, api.WithToken(data.Token), api.WithBaseURL(data.ServerURL))
+	client, err := api.New(httpClient, api.WithToken(data.Token), api.WithBaseURL(data.ServerURL))
 	if err != nil {
 		logger.WithError(err).Debug("Failed to create API client")
 		return err
