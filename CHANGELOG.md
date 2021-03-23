@@ -34,6 +34,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Incorrect documentation url for event details data formats.
 - Search functionality for applications, gateways and organizations in the Console.
+- Error handling of end device template formats for the application overview page in the Console.
 
 ### Security
 
