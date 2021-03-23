@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package config
+package config_test
 
 import (
 	"strings"
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	. "go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -29,7 +30,7 @@ func TestUnmarshal(t *testing.T) {
 	a.So(mgr, should.NotBeNil)
 
 	mgr.Parse()
-	err := mgr.mergeConfig(strings.NewReader(`file-only: 10`))
+	err := mgr.MergeConfig(strings.NewReader(`file-only: 10`))
 	a.So(err, should.BeNil)
 
 	var res map[string]interface{}
@@ -46,7 +47,7 @@ func TestUnmarshalKey(t *testing.T) {
 	a.So(mgr, should.NotBeNil)
 
 	mgr.Parse()
-	err := mgr.mergeConfig(strings.NewReader(`file-only: 10`))
+	err := mgr.MergeConfig(strings.NewReader(`file-only: 10`))
 	a.So(err, should.BeNil)
 
 	var res int

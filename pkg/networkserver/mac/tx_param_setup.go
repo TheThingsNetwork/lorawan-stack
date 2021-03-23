@@ -17,7 +17,6 @@ package mac
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -100,8 +99,8 @@ func HandleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Bu
 		req := cmd.GetTxParamSetupReq()
 
 		dev.MACState.CurrentParameters.MaxEIRP = lorawan.DeviceEIRPToFloat32(req.MaxEIRPIndex)
-		dev.MACState.CurrentParameters.DownlinkDwellTime = &pbtypes.BoolValue{Value: req.DownlinkDwellTime}
-		dev.MACState.CurrentParameters.UplinkDwellTime = &pbtypes.BoolValue{Value: req.UplinkDwellTime}
+		dev.MACState.CurrentParameters.DownlinkDwellTime = &ttnpb.BoolValue{Value: req.DownlinkDwellTime}
+		dev.MACState.CurrentParameters.UplinkDwellTime = &ttnpb.BoolValue{Value: req.UplinkDwellTime}
 
 		if lorawan.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP) == req.MaxEIRPIndex {
 			dev.MACState.DesiredParameters.MaxEIRP = dev.MACState.CurrentParameters.MaxEIRP

@@ -17,12 +17,12 @@ package networkserver
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -31,15 +31,6 @@ import (
 func nsScheduleWindow() time.Duration {
 	// TODO: Observe this value at runtime https://github.com/TheThingsNetwork/lorawan-stack/issues/1552.
 	return 200 * time.Millisecond
-}
-
-var (
-	timeNow   func() time.Time                       = time.Now
-	timeAfter func(d time.Duration) <-chan time.Time = time.After
-)
-
-func timeUntil(t time.Time) time.Duration {
-	return t.Sub(timeNow())
 }
 
 func searchUplinkChannel(freq uint64, macState *ttnpb.MACState) (uint8, error) {
@@ -222,7 +213,7 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 	if dev.GetMACState() == nil {
 		return nil, false
 	}
-	earliestAt = latestTime(earliestAt, timeNow())
+	earliestAt = latestTime(earliestAt, time.Now())
 	if dev.MACState.LastDownlinkAt != nil {
 		earliestAt = latestTime(earliestAt, *dev.MACState.LastDownlinkAt)
 	}

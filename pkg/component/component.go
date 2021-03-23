@@ -64,6 +64,7 @@ type Component struct {
 	clusterNew func(ctx context.Context, config *cluster.Config, options ...cluster.Option) (cluster.Cluster, error)
 
 	grpc           *rpcserver.Server
+	grpcLogger     log.Interface
 	grpcSubsystems []rpcserver.Registerer
 
 	web           *web.Server
@@ -100,6 +101,13 @@ type Option func(*Component)
 func WithClusterNew(f func(ctx context.Context, config *cluster.Config, options ...cluster.Option) (cluster.Cluster, error)) Option {
 	return func(c *Component) {
 		c.clusterNew = f
+	}
+}
+
+// WithGRPCLogger returns an option that overrides the component's gRPC logger.
+func WithGRPCLogger(l log.Interface) Option {
+	return func(c *Component) {
+		c.grpcLogger = l
 	}
 }
 

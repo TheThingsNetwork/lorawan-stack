@@ -18,9 +18,7 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -28,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -228,18 +227,18 @@ func DeviceDesiredMaxEIRP(dev *ttnpb.EndDevice, phy *band.Band, fp *frequencypla
 	}
 }
 
-func DeviceDesiredUplinkDwellTime(fp *frequencyplans.FrequencyPlan) *pbtypes.BoolValue {
+func DeviceDesiredUplinkDwellTime(fp *frequencyplans.FrequencyPlan) *ttnpb.BoolValue {
 	if fp.DwellTime.Uplinks == nil {
 		return nil
 	}
-	return &pbtypes.BoolValue{Value: *fp.DwellTime.Uplinks}
+	return &ttnpb.BoolValue{Value: *fp.DwellTime.Uplinks}
 }
 
-func DeviceDesiredDownlinkDwellTime(fp *frequencyplans.FrequencyPlan) *pbtypes.BoolValue {
+func DeviceDesiredDownlinkDwellTime(fp *frequencyplans.FrequencyPlan) *ttnpb.BoolValue {
 	if fp.DwellTime.Downlinks == nil {
 		return nil
 	}
-	return &pbtypes.BoolValue{Value: *fp.DwellTime.Downlinks}
+	return &ttnpb.BoolValue{Value: *fp.DwellTime.Downlinks}
 }
 
 func DeviceDefaultRX1Delay(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) ttnpb.RxDelay {
@@ -286,18 +285,18 @@ func DeviceDesiredADRAckDelayExponent(dev *ttnpb.EndDevice, phy *band.Band, defa
 	}
 }
 
-func DeviceDefaultRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
+func DeviceDefaultRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) ttnpb.DataRateOffset {
 	switch {
 	case dev.GetMACSettings().GetRx1DataRateOffset() != nil:
 		return dev.MACSettings.Rx1DataRateOffset.Value
 	case defaults.Rx1DataRateOffset != nil:
 		return defaults.Rx1DataRateOffset.Value
 	default:
-		return 0
+		return ttnpb.DataRateOffset_DATA_RATE_OFFSET_0
 	}
 }
 
-func DeviceDesiredRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
+func DeviceDesiredRX1DataRateOffset(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) ttnpb.DataRateOffset {
 	switch {
 	case dev.GetMACSettings().GetDesiredRx1DataRateOffset() != nil:
 		return dev.MACSettings.DesiredRx1DataRateOffset.Value

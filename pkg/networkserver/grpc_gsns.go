@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
@@ -31,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/toa"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -150,11 +150,6 @@ type matchResult struct {
 	SetPaths                 []string
 }
 
-type contextualEndDevice struct {
-	context.Context
-	*ttnpb.EndDevice
-}
-
 func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParameters_Channel) ([]*ttnpb.MACParameters_Channel, bool) {
 	if cfList == nil {
 		return chs, true
@@ -189,11 +184,6 @@ func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParamete
 	}
 	return chs, true
 }
-
-var (
-	errRetransmissionDelayExceeded = errors.DefineDeadlineExceeded("retransmission_delay_exceeded", "retransmission delay exceeded maximum")
-	errTransmissionNumberExceeded  = errors.DefineResourceExhausted("transmission_number_exceeded", "transmission number exceeded maximum")
-)
 
 // matchAndHandleDataUplink handles and matches a device prematched by CMACF check.
 func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage, deduplicated bool, cmacFMatchResult cmacFMatchingResult) (*matchResult, bool, error) {
@@ -1005,7 +995,7 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDevic
 }
 
 func (ns *NetworkServer) deduplicationDone(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time {
-	return timeAfter(timeUntil(up.ReceivedAt.Add(ns.deduplicationWindow(ctx))))
+	return time.After(time.Until(up.ReceivedAt.Add(ns.deduplicationWindow(ctx))))
 }
 
 func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
@@ -1189,7 +1179,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 
 	// TODO: Extract this into a utility function shared with mac.HandleRejoinRequest. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
 	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - macState.DesiredParameters.Rx1Delay.Duration()/2 - nsScheduleWindow())
-	if earliestAt := timeNow().Add(nsScheduleWindow()); downAt.Before(earliestAt) {
+	if earliestAt := time.Now().Add(nsScheduleWindow()); downAt.Before(earliestAt) {
 		downAt = earliestAt
 	}
 	logger.WithField("start_at", downAt).Debug("Add downlink task")
@@ -1219,7 +1209,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		fmt.Sprintf("ns:uplink:%s", events.NewCorrelationID()),
 	)...)
 	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
-	up.ReceivedAt = timeNow().UTC()
+	up.ReceivedAt = time.Now().UTC()
 	up.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)

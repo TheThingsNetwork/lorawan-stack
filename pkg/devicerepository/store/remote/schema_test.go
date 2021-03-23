@@ -74,7 +74,7 @@ func TestSchema(t *testing.T) {
 					LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
 					SupportsJoin:      true,
 					MACSettings: &ttnpb.MACSettings{
-						Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
+						Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
 					},
 					MACState: &ttnpb.MACState{
 						DesiredParameters: ttnpb.MACParameters{
@@ -109,9 +109,9 @@ func TestSchema(t *testing.T) {
 					},
 					MACSettings: &ttnpb.MACSettings{
 						Rx1Delay:          &ttnpb.RxDelayValue{Value: ttnpb.RX_DELAY_1},
-						Rx1DataRateOffset: &pbtypes.UInt32Value{Value: 0},
+						Rx1DataRateOffset: &ttnpb.DataRateOffsetValue{Value: ttnpb.DataRateOffset_DATA_RATE_OFFSET_0},
 						Rx2DataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
-						Rx2Frequency:      &pbtypes.UInt64Value{Value: 86952500},
+						Rx2Frequency:      &ttnpb.FrequencyValue{Value: 86952500},
 						FactoryPresetFrequencies: []uint64{
 							86810000,
 							86830000,
@@ -122,7 +122,7 @@ func TestSchema(t *testing.T) {
 							86770000,
 							86790000,
 						},
-						Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
+						Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
 					},
 					MACState: &ttnpb.MACState{
 						DesiredParameters: ttnpb.MACParameters{
@@ -162,7 +162,7 @@ func TestSchema(t *testing.T) {
 						ClassBTimeout:         durationPtr(8 * time.Second),
 						PingSlotPeriodicity:   &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
 						PingSlotDataRateIndex: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
-						PingSlotFrequency:     &pbtypes.UInt64Value{Value: 86830000},
+						PingSlotFrequency:     &ttnpb.FrequencyValue{Value: 86830000},
 					},
 				},
 				FieldMask: pbtypes.FieldMask{

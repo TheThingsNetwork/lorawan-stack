@@ -417,6 +417,20 @@ var MACCommandFieldPathsTopLevel = []string{
 	"cid",
 	"payload",
 }
+var FrequencyValueFieldPathsNested = []string{
+	"value",
+}
+
+var FrequencyValueFieldPathsTopLevel = []string{
+	"value",
+}
+var DataRateOffsetValueFieldPathsNested = []string{
+	"value",
+}
+
+var DataRateOffsetValueFieldPathsTopLevel = []string{
+	"value",
+}
 var DataRateIndexValueFieldPathsNested = []string{
 	"value",
 }

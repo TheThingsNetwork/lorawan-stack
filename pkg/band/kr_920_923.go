@@ -106,7 +106,7 @@ func init() {
 		},
 
 		Rx1Channel: channelIndexIdentity,
-		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
+		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset ttnpb.DataRateOffset, _ bool) (ttnpb.DataRateIndex, error) {
 			if idx > ttnpb.DATA_RATE_5 {
 				return 0, errDataRateIndexTooHigh.WithAttributes("max", 5)
 			}

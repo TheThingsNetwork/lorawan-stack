@@ -413,7 +413,7 @@ func HandleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 			t.Logf("Sleeping for %v for cached values to get cleaned up...", sleepFor)
 			time.Sleep(sleepFor)
 			test.RunSubtestFromContext(ctx, test.SubtestConfig{
-				Name: "2st run",
+				Name: "2nd run",
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 					handleDeviceRegistryTest(ctx, reg)
 				},

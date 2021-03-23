@@ -53,7 +53,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 				MACPayload: &ttnpb.MACPayload{},
 			},
 		},
-		RxMetadata: RxMetadata[:],
+		RxMetadata: DefaultRxMetadata[:],
 		ReceivedAt: beaconTime,
 	}
 	ups := []*ttnpb.UplinkMessage{up}
@@ -98,7 +98,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 				},
 			},
 			ExpectedSlot: classA,
@@ -121,7 +121,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{},
 					},
@@ -151,7 +151,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{},
@@ -174,7 +174,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 				},
 			},
 			ExpectedSlot: classA,
@@ -193,7 +193,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:  ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 				},
 			},
 		},
@@ -214,7 +214,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 				},
 			},
 			ExpectedSlot: classA,
@@ -236,7 +236,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:  ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 				},
 			},
 		},
@@ -254,7 +254,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:  ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{},
 					},
@@ -285,7 +285,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 				},
 			},
 			ExpectedSlot: classA,
@@ -304,7 +304,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:  ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 				},
 			},
 		},
@@ -321,7 +321,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:  ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{},
 					},
@@ -345,7 +345,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					DeviceClass:    ttnpb.CLASS_C,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 				},
 			},
 		},
@@ -361,7 +361,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					DeviceClass:    ttnpb.CLASS_C,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
@@ -394,7 +394,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_0_3,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
@@ -430,7 +430,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					DeviceClass:    ttnpb.CLASS_C,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
@@ -460,7 +460,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_0_3,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
@@ -484,7 +484,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_0_3,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
@@ -507,7 +507,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_0_3,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: test.DefaultDevAddr,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{

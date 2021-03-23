@@ -16,12 +16,11 @@ package networkserver
 
 import (
 	"context"
-	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/internal/registry"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -32,8 +31,8 @@ type UplinkMatch struct {
 	LoRaWANVersion         ttnpb.MACVersion
 	FNwkSIntKey            *ttnpb.KeyEnvelope
 	LastFCnt               uint32
-	ResetsFCnt             *pbtypes.BoolValue
-	Supports32BitFCnt      *pbtypes.BoolValue
+	ResetsFCnt             *ttnpb.BoolValue
+	Supports32BitFCnt      *ttnpb.BoolValue
 	IsPending              bool
 }
 

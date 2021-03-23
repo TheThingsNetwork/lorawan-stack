@@ -29,7 +29,10 @@ import (
 )
 
 func (c *Component) initGRPC() {
-	rpclog.ReplaceGrpcLogger(c.logger.WithField("namespace", "grpc"))
+	if c.grpcLogger == nil {
+		c.grpcLogger = c.logger.WithField("namespace", "grpc")
+	}
+	rpclog.ReplaceGrpcLogger(c.grpcLogger)
 
 	c.grpc = rpcserver.New(
 		c.ctx,

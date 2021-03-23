@@ -301,6 +301,9 @@ describe('<NetworkSettingsForm /> validation schema', () => {
         lorawan_phy_version: '1.1.0-a',
         frequency_plan_id: 'test-freq-plan',
         _device_classes: { class_b: true },
+        mac_settings: {
+          ping_slot_periodicity: 'PING_EVERY_1S',
+        },
         session: {
           dev_addr: '4'.repeat(8),
           keys: {

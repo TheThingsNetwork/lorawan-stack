@@ -66,10 +66,10 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	out := &MACParameters{}
 	out.MaxEIRP = r.Float32()
 	if r.Intn(2) == 0 {
-		out.UplinkDwellTime = pbtypes.NewPopulatedBoolValue(r, easy)
+		out.UplinkDwellTime = &BoolValue{Value: r.Uint32()%2 == 0}
 	}
 	if r.Intn(2) == 0 {
-		out.DownlinkDwellTime = pbtypes.NewPopulatedBoolValue(r, easy)
+		out.DownlinkDwellTime = &BoolValue{Value: r.Uint32()%2 == 0}
 	}
 	out.ADRDataRateIndex = NewPopulatedDataRateIndex(r, easy)
 	out.ADRTxPowerIndex = r.Uint32() % 16
@@ -82,7 +82,7 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 		out.Channels[i] = NewPopulatedMACParameters_Channel(r, easy)
 	}
 	out.Rx1Delay = RxDelay(r.Uint32() % 16)
-	out.Rx1DataRateOffset = r.Uint32() % 6
+	out.Rx1DataRateOffset = DataRateOffset(r.Uint32() % 8)
 	out.Rx2DataRateIndex = NewPopulatedDataRateIndex(r, easy)
 	out.Rx2Frequency = NewPopulatedFrequency(r, easy)
 	out.RejoinTimePeriodicity = RejoinTimeExponent([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])

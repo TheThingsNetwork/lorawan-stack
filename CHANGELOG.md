@@ -25,6 +25,7 @@ For details about compatibility between different releases, see the **Commitment
 - Changed the encoding of events transported by the Redis backend of the Events system.
 - All external HTTP calls are now using TLS client configuration. This fixes issues where HTTP calls would fail if custom (e.g. self-signed) CAs were used.
 - All external HTTP calls are now using a default timeout. This fixes issues where HTTP calls would stall for a long time.
+- All value wrappers now are encoded and decoded as the value being wrapped in JSON. That means, that, e.g. format of `mac_settings.rx1_delay` is changed from `{"value": 2}` to just `2`.
 
 ### Deprecated
 

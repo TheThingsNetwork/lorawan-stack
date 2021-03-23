@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack/v5"
 	nsredis "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
@@ -324,15 +323,15 @@ var (
 								key = &types.AES128Key{}
 								copy(key[:], stored.FNwkSIntKey.Key)
 							}
-							var resetsFCnt *pbtypes.BoolValue
+							var resetsFCnt *ttnpb.BoolValue
 							if stored.ResetsFCnt != nil {
-								resetsFCnt = &pbtypes.BoolValue{
+								resetsFCnt = &ttnpb.BoolValue{
 									Value: stored.ResetsFCnt.Value,
 								}
 							}
-							var supports32BitFCnt *pbtypes.BoolValue
+							var supports32BitFCnt *ttnpb.BoolValue
 							if stored.Supports32BitFCnt != nil {
-								supports32BitFCnt = &pbtypes.BoolValue{
+								supports32BitFCnt = &ttnpb.BoolValue{
 									Value: stored.Supports32BitFCnt.Value,
 								}
 							}

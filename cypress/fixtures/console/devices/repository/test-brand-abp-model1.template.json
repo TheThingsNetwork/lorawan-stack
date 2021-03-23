@@ -12,9 +12,8 @@
     "lorawan_version": "1.0.3",
     "lorawan_phy_version": "1.0.3-a",
     "mac_settings": {
-      "rx1_delay": { "value": 1 },
+      "rx1_delay": 1,
       "rx1_data_rate_offset": 0,
-      "rx2_data_rate_index": {},
       "rx2_frequency": "86952500",
       "factory_preset_frequencies": ["86810000", "86830000", "86850000"],
       "supports_32_bit_f_cnt": true

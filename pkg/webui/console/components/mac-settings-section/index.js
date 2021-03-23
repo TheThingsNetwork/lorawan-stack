@@ -107,7 +107,7 @@ const MacSettingsSection = props => {
             title={m.rx1DelayTitle}
             type="number"
             description={m.rx1DelayDescription}
-            name="mac_settings.rx1_delay.value"
+            name="mac_settings.rx1_delay"
             component={Input}
             min={1}
             max={15}
@@ -134,7 +134,7 @@ const MacSettingsSection = props => {
         title={m.rx2DataRateIndexTitle}
         type="number"
         description={m.rx2DataDateIndexDescription}
-        name="mac_settings.rx2_data_rate_index.value"
+        name="mac_settings.rx2_data_rate_index"
         component={Input}
         min={0}
         max={15}
@@ -163,7 +163,7 @@ const MacSettingsSection = props => {
           <Form.Field
             title={m.pingSlotPeriodicityTitle}
             description={m.pingSlotPeriodicityDescription}
-            name="mac_settings.ping_slot_periodicity.value"
+            name="mac_settings.ping_slot_periodicity"
             component={Select}
             options={pingSlotPeriodicityOptions}
             required={isMulticast}

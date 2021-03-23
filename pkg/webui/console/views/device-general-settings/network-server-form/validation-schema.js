@@ -124,20 +124,13 @@ const validationSchema = Yup.object()
       (mode, isClassB, schema) => {
         return schema.shape({
           rx1_delay: Yup.lazy(delay => {
-            if (
-              !Boolean(delay) ||
-              delay.value === undefined ||
-              delay.value === '' ||
-              mode !== ACTIVATION_MODES.ABP
-            ) {
-              return Yup.object().strip()
+            if (delay === undefined || delay === '' || mode !== ACTIVATION_MODES.ABP) {
+              return Yup.number().strip()
             }
 
-            return schema.shape({
-              value: Yup.number()
-                .min(1, Yup.passValues(sharedMessages.validateNumberGte))
-                .max(15, Yup.passValues(sharedMessages.validateNumberLte)),
-            })
+            return Yup.number()
+              .min(1, Yup.passValues(sharedMessages.validateNumberGte))
+              .max(15, Yup.passValues(sharedMessages.validateNumberLte))
           }),
           rx1_data_rate_offset: Yup.lazy(value => {
             if (value === undefined || value === '' || mode !== ACTIVATION_MODES.ABP) {
@@ -156,15 +149,13 @@ const validationSchema = Yup.object()
             return Yup.boolean().default(false)
           }),
           rx2_data_rate_index: Yup.lazy(dataRate => {
-            if (!Boolean(dataRate) || dataRate.value === '' || dataRate.value === undefined) {
-              return Yup.object().strip()
+            if (dataRate === '' || dataRate === undefined) {
+              return Yup.number().strip()
             }
 
-            return Yup.object({
-              value: Yup.number()
-                .min(0, Yup.passValues(sharedMessages.validateNumberGte))
-                .max(15, Yup.passValues(sharedMessages.validateNumberLte)),
-            })
+            return Yup.number()
+              .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+              .max(15, Yup.passValues(sharedMessages.validateNumberLte))
           }),
           rx2_frequency: Yup.lazy(frequency => {
             if (frequency === undefined || frequency === '') {
@@ -174,18 +165,14 @@ const validationSchema = Yup.object()
           }),
           ping_slot_periodicity: Yup.lazy(() => {
             if (!isClassB && mode !== ACTIVATION_MODES.MULTICAST) {
-              return Yup.number().strip()
+              return Yup.string().strip()
             }
 
             if (mode !== ACTIVATION_MODES.MULTICAST) {
-              return schema.shape({
-                value: Yup.string(),
-              })
+              return Yup.string()
             }
 
-            return schema.shape({
-              value: Yup.string().required(sharedMessages.validateRequired),
-            })
+            return Yup.string().required(sharedMessages.validateRequired)
           }),
           ping_slot_frequency: Yup.lazy(frequency => {
             if (!Boolean(frequency) || !isClassB) {
