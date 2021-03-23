@@ -7478,15 +7478,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/ttnpb:enum_as_string": {
-    "translations": {
-      "en": "attempt to marshal enum as JSON string"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/ttnpb:field": {
     "translations": {
       "en": "invalid field `{field}`"
