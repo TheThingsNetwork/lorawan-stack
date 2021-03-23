@@ -63,7 +63,7 @@ describe('End device repository create', () => {
       cy.findByRole('heading', { name: '1. Select the end device' }).should('be.visible')
       cy.findByLabelText('Brand').should('be.visible')
       cy.findByText(/Cannot find your exact end device?/).within(() => {
-        cy.findByRole('link', { name: 'try manual device registration' })
+        cy.findByRole('link', { name: 'Try manual device registration' })
           .should('be.visible')
           .and('have.attr', 'href', `/console/applications/${appId}/devices/add/manual`)
       })
