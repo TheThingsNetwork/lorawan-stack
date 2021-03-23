@@ -1026,12 +1026,13 @@ This command saves a QR code in PNG format in the given folder. The filename is
 the device ID.
 
 This command may take end device identifiers from stdin.`,
-		Example: `To generate a QR code for a single end device:
-  ttn-lw-cli end-devices generate-qr app1 dev1
+		Example: `
+  To generate a QR code for a single end device:
+    $ ttn-lw-cli end-devices generate-qr app1 dev1
 
-To generate a QR code for multiple end devices:
-  ttn-lw-cli end-devices list app1 \
-    | ttn-lw-cli end-devices generate-qr`,
+  To generate a QR code for multiple end devices:
+    $ ttn-lw-cli end-devices list app1 \
+      | ttn-lw-cli end-devices generate-qr`,
 		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
 			var ids *ttnpb.EndDeviceIdentifiers
 			if inputDecoder != nil {
