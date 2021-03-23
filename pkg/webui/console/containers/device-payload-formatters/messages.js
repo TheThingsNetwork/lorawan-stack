@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.tabs
-  margin-top: 0
-  margin-bottom: $ls.s
+import { defineMessages } from 'react-intl'
 
-  +media-query($bp.s)
-    background: none
-    margin-right: 0
+const m = defineMessages({
+  defaultFormatter:
+    'Click <Link>here</Link> to modify the default payload formatter for this application',
+})
 
-.full-width
-  width: 100%
-  max-width: $bp.xl
-  padding: 0 $ls.xs
-  margin: auto
-  box-sizing: border-box
+export default m
