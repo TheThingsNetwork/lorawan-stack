@@ -17,6 +17,7 @@ import classnames from 'classnames'
 import { NavLink } from 'react-router-dom'
 
 import Icon from '@ttn-lw/components/icon'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -46,7 +47,7 @@ Dropdown.defaultProps = {
   onItemsClick: () => null,
 }
 
-const DropdownItem = ({ icon, title, path, action, exact, showActive, tabIndex }) => {
+const DropdownItem = ({ icon, title, path, action, exact, showActive, tabIndex, external }) => {
   const iconElement = icon && <Icon className={style.icon} icon={icon} nudgeUp />
   const activeClassName = classnames({
     [style.active]: showActive,
@@ -56,6 +57,11 @@ const DropdownItem = ({ icon, title, path, action, exact, showActive, tabIndex }
       {iconElement}
       <Message content={title} />
     </button>
+  ) : external ? (
+    <Link.Anchor href={path} external tabIndex={tabIndex}>
+      {iconElement}
+      <Message content={title} />
+    </Link.Anchor>
   ) : (
     <NavLink activeClassName={activeClassName} to={path} exact={exact} tabIndex={tabIndex}>
       {iconElement}
@@ -72,6 +78,7 @@ const DropdownItem = ({ icon, title, path, action, exact, showActive, tabIndex }
 DropdownItem.propTypes = {
   action: PropTypes.func,
   exact: PropTypes.bool,
+  external: PropTypes.bool,
   icon: PropTypes.string.isRequired,
   path: PropTypes.string,
   showActive: PropTypes.bool,
@@ -82,6 +89,7 @@ DropdownItem.propTypes = {
 DropdownItem.defaultProps = {
   action: undefined,
   exact: false,
+  external: false,
   path: undefined,
   showActive: true,
   tabIndex: '0',
