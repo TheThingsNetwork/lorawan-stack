@@ -25,6 +25,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"golang.org/x/sync/singleflight"
@@ -174,15 +175,30 @@ func (f *circuitBreakerEndDeviceFetcher) circuitOpen() error {
 	return errCircuitBreakerOpen.New()
 }
 
-func (f *circuitBreakerEndDeviceFetcher) observeError(err error) {
+func (f *circuitBreakerEndDeviceFetcher) observeError(ctx context.Context, err error) {
+	logger := log.FromContext(ctx).WithField("circuit", "end_device_fetcher")
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	if err != nil {
+	switch {
+	case errors.IsCanceled(err),
+		errors.IsDeadlineExceeded(err),
+		errors.IsAborted(err),
+		errors.IsInternal(err),
+		errors.IsUnavailable(err):
 		f.lastFailedAttempt = time.Now()
 		f.failures++
-	} else {
+		if f.failures < f.threshold {
+			return
+		}
+		logger.WithError(err).WithField("count", f.failures).Warn("Circuit breaker open")
+	case err == nil:
+		n := f.failures
 		f.lastFailedAttempt = time.Time{}
 		f.failures = 0
+		if n < f.threshold {
+			return
+		}
+		logger.WithField("previous_count", n).Info("Circuit breaker closed")
 	}
 }
 
@@ -192,7 +208,7 @@ func (f *circuitBreakerEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndD
 		return nil, err
 	}
 	dev, err := f.fetcher.Get(ctx, ids, fieldMaskPaths...)
-	f.observeError(err)
+	f.observeError(ctx, err)
 	return dev, err
 }
 

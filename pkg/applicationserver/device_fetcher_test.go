@@ -25,6 +25,8 @@ import (
 	"github.com/bluele/gcache"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -37,6 +39,7 @@ func (f funcFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fi
 }
 
 func TestEndDeviceFetcher(t *testing.T) {
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	t.Run("Cache", func(t *testing.T) {
 		a := assertions.New(t)
 		numCalls := 0
@@ -48,7 +51,7 @@ func TestEndDeviceFetcher(t *testing.T) {
 			},
 		)
 
-		_, err := f.Get(test.Context(), ttnpb.EndDeviceIdentifiers{}, "locations")
+		_, err := f.Get(ctx, ttnpb.EndDeviceIdentifiers{}, "locations")
 		a.So(err, should.BeNil)
 		a.So(numCalls, should.Equal, 1)
 
@@ -72,34 +75,34 @@ func TestEndDeviceFetcher(t *testing.T) {
 
 		t.Run("Cold", func(t *testing.T) {
 			a := assertions.New(t)
-			cf.Get(test.Context(), dev1, "locations")
+			cf.Get(ctx, dev1, "locations")
 			a.So(numCalls, should.Equal, 2)
-			cf.Get(test.Context(), dev1, "locations")
+			cf.Get(ctx, dev1, "locations")
 			a.So(numCalls, should.Equal, 2)
 		})
 
 		t.Run("Expire", func(t *testing.T) {
 			a := assertions.New(t)
 			fakeClock.Advance(2 * time.Second)
-			cf.Get(test.Context(), dev1, "locations")
+			cf.Get(ctx, dev1, "locations")
 			a.So(numCalls, should.Equal, 3)
-			cf.Get(test.Context(), dev1, "locations")
+			cf.Get(ctx, dev1, "locations")
 			a.So(numCalls, should.Equal, 3)
 		})
 
 		t.Run("OtherDevice", func(t *testing.T) {
 			a := assertions.New(t)
-			cf.Get(test.Context(), dev1, "locations")
+			cf.Get(ctx, dev1, "locations")
 			a.So(numCalls, should.Equal, 3)
-			cf.Get(test.Context(), dev2, "locations")
+			cf.Get(ctx, dev2, "locations")
 			a.So(numCalls, should.Equal, 4)
 		})
 
 		t.Run("OtherFieldMask", func(t *testing.T) {
 			a := assertions.New(t)
-			cf.Get(test.Context(), dev1, "attributes")
+			cf.Get(ctx, dev1, "attributes")
 			a.So(numCalls, should.Equal, 5)
-			cf.Get(test.Context(), dev1, "attributes")
+			cf.Get(ctx, dev1, "attributes")
 			a.So(numCalls, should.Equal, 5)
 		})
 
@@ -107,10 +110,10 @@ func TestEndDeviceFetcher(t *testing.T) {
 			a := assertions.New(t)
 			mockErr = fmt.Errorf("foobar")
 			fakeClock.Advance(2 * time.Second)
-			_, err := cf.Get(test.Context(), dev1, "locations")
+			_, err := cf.Get(ctx, dev1, "locations")
 			a.So(numCalls, should.Equal, 6)
 			a.So(err, should.Resemble, mockErr)
-			_, err = cf.Get(test.Context(), dev1, "locations")
+			_, err = cf.Get(ctx, dev1, "locations")
 			a.So(numCalls, should.Equal, 6)
 			a.So(err, should.Resemble, mockErr)
 		})
@@ -136,7 +139,7 @@ func TestEndDeviceFetcher(t *testing.T) {
 			},
 		}
 
-		cf.Get(test.Context(), dev, "locations")
+		cf.Get(ctx, dev, "locations")
 	})
 	t.Run("CircuitBreaker", func(t *testing.T) {
 		timeout := (1 << 6) * test.Delay
@@ -166,7 +169,7 @@ func TestEndDeviceFetcher(t *testing.T) {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					_, err := cf.Get(test.Context(), dev, "location")
+					_, err := cf.Get(ctx, dev, "location")
 					a.So(err, should.BeNil)
 				}()
 			}
@@ -176,13 +179,13 @@ func TestEndDeviceFetcher(t *testing.T) {
 
 		t.Run("InitialBurst", func(t *testing.T) {
 			a := assertions.New(t)
-			mockErr = fmt.Errorf("server unavailable")
+			mockErr = errors.DefineUnavailable("unavailable", "server unavailable").New()
 			wg := sync.WaitGroup{}
 			for i := 0; i < 10; i++ {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					_, err := cf.Get(test.Context(), dev, "location")
+					_, err := cf.Get(ctx, dev, "location")
 					a.So(err, should.NotBeNil)
 					a.So(err, should.Resemble, mockErr)
 				}()
@@ -198,12 +201,35 @@ func TestEndDeviceFetcher(t *testing.T) {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					_, err := cf.Get(test.Context(), dev, "location")
+					_, err := cf.Get(ctx, dev, "location")
 					a.So(err, should.NotBeNil)
 				}()
 			}
 			wg.Wait()
 			a.So(numCalls, should.Equal, 20)
+		})
+
+		t.Run("SecondBurst", func(t *testing.T) {
+			a := assertions.New(t)
+			wg := sync.WaitGroup{}
+
+			time.Sleep(2 * timeout)
+
+			for i := 0; i < 10; i++ {
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					_, err := cf.Get(ctx, dev, "location")
+					a.So(err, should.NotBeNil)
+				}()
+			}
+			wg.Wait()
+			// After the circuit breaker timeout expires, multiple calls
+			// may be allowed to execute simultaneously in order to verify
+			// if the underlying fetcher recovered. We expect at least one
+			// new attempt after the timeout, but it is possible that all
+			// of the goroutines actually do a call.
+			a.So(numCalls, should.BeBetweenOrEqual, 21, 30)
 		})
 
 		t.Run("BreakerClosed", func(t *testing.T) {
@@ -213,16 +239,17 @@ func TestEndDeviceFetcher(t *testing.T) {
 			time.Sleep(2 * timeout)
 			mockErr = nil
 
+			initialCalls := numCalls
 			for i := 0; i < 10; i++ {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					_, err := cf.Get(test.Context(), dev, "location")
+					_, err := cf.Get(ctx, dev, "location")
 					a.So(err, should.BeNil)
 				}()
 			}
 			wg.Wait()
-			a.So(numCalls, should.Equal, 30)
+			a.So(numCalls, should.Equal, initialCalls+10)
 		})
 	})
 }
