@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -151,10 +151,13 @@ class FetchTable extends Component {
       order: undefined,
     }
 
-    const { debouncedFunction, cancel } = debounce(this.requestSearch, 350)
+    const { debounced: debouncedFunction, cancel: cancelFunction } = debounce(
+      this.requestSearch,
+      350,
+    )
 
     this.debouncedRequestSearch = debouncedFunction
-    this.debounceCancel = cancel
+    this.debounceCancel = cancelFunction
   }
 
   componentDidMount() {
@@ -332,6 +335,7 @@ class FetchTable extends Component {
           <div className={style.filtersRight}>
             {searchable && (
               <Input
+                data-test-id="search-input"
                 value={query}
                 icon="search"
                 loading={fetchingSearch}
