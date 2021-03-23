@@ -47,9 +47,15 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		Downlinks: web.DownlinksConfig{PublicAddress: shared.DefaultPublicURL + "/api/v3"},
 	},
 	EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
+		Timeout: 5 * time.Second,
 		Cache: applicationserver.EndDeviceFetcherCacheConfig{
 			Enable: true,
 			TTL:    5 * time.Minute,
+		},
+		CircuitBreaker: applicationserver.EndDeviceFetcherCircuitBreakerConfig{
+			Enable:    true,
+			Threshold: 10,
+			Timeout:   15 * time.Minute,
 		},
 	},
 	Distribution: applicationserver.DistributionConfig{
