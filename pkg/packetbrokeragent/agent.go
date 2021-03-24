@@ -302,7 +302,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		downstreamCh:     a.downstreamCh,
 	}
 	a.grpc.gsPba = &gsPbaServer{
-		tokenEncrypter:   a.forwarderConfig.TokenEncrypter,
+		config:           a.forwarderConfig,
 		messageEncrypter: a,
 		contextDecoupler: a,
 		upstreamCh:       a.upstreamCh,

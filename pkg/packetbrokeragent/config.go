@@ -69,10 +69,13 @@ type OAuth2Config struct {
 
 // ForwarderConfig defines configuration of the Forwarder role.
 type ForwarderConfig struct {
-	Enable         bool             `name:"enable" description:"Enable Forwarder role"`
-	WorkerPool     WorkerPoolConfig `name:"worker-pool" description:"Workers pool configuration"`
-	TokenKey       []byte           `name:"token-key" description:"AES 128 or 256-bit key for encrypting tokens"`
-	TokenEncrypter jose.Encrypter   `name:"-"`
+	Enable            bool             `name:"enable" description:"Enable Forwarder role"`
+	WorkerPool        WorkerPoolConfig `name:"worker-pool" description:"Workers pool configuration"`
+	TokenKey          []byte           `name:"token-key" description:"AES 128 or 256-bit key for encrypting tokens"`
+	TokenEncrypter    jose.Encrypter   `name:"-"`
+	IncludeGatewayEUI bool             `name:"include-gateway-eui" description:"Include the gateway EUI in forwarded metadata"`
+	IncludeGatewayID  bool             `name:"include-gateway-id" description:"Include the gateway ID in forwarded metadata"`
+	HashGatewayID     bool             `name:"hash-gateway-id" description:"Hash the gateway ID (if forwarded in the metadata)"`
 }
 
 // HomeNetworkConfig defines the configuration of the Home Network role.

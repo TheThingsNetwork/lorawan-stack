@@ -17,6 +17,7 @@ package packetbrokeragent
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"math"
 	"time"
@@ -197,7 +198,7 @@ var (
 	errWrapGatewayUplinkToken    = errors.DefineAborted("wrap_gateway_uplink_token", "wrap gateway uplink token")
 )
 
-func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, tokenEncrypter jose.Encrypter) (*packetbroker.UplinkMessage, error) {
+func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config ForwarderConfig) (*packetbroker.UplinkMessage, error) {
 	msg.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(msg.RawPayload, msg.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
@@ -257,6 +258,30 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, tokenEncry
 	var gatewayReceiveTime *time.Time
 	var gatewayUplinkToken []byte
 	if len(msg.RxMetadata) > 0 {
+		md := msg.RxMetadata[0]
+		if config.IncludeGatewayEUI && md.EUI != nil {
+			up.GatewayId = &packetbroker.GatewayIdentifier{
+				Eui: &pbtypes.UInt64Value{
+					Value: md.EUI.MarshalNumber(),
+				},
+			}
+		}
+		if config.IncludeGatewayID {
+			if up.GatewayId == nil {
+				up.GatewayId = &packetbroker.GatewayIdentifier{}
+			}
+			if config.HashGatewayID {
+				hash := sha256.Sum256([]byte(md.GatewayID))
+				up.GatewayId.Id = &packetbroker.GatewayIdentifier_Hash{
+					Hash: hash[:],
+				}
+			} else {
+				up.GatewayId.Id = &packetbroker.GatewayIdentifier_Plain{
+					Plain: md.GatewayID,
+				}
+			}
+		}
+
 		var teaser packetbroker.GatewayMetadataTeaser_Terrestrial
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
 		var localization *packetbroker.GatewayMetadataLocalization_Terrestrial
@@ -306,7 +331,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, tokenEncry
 			}
 			if len(gatewayUplinkToken) == 0 {
 				var err error
-				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, md.GatewayIdentifiers, md.UplinkToken, tokenEncrypter)
+				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, md.GatewayIdentifiers, md.UplinkToken, config.TokenEncrypter)
 				if err != nil {
 					return nil, errWrapGatewayUplinkToken.WithCause(err)
 				}
@@ -405,14 +430,30 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 	}
 	if gtwMd := msg.Message.GatewayMetadata; gtwMd != nil {
 		pbMD := &ttnpb.PacketBrokerMetadata{
-			MessageID:            msg.Id,
-			ForwarderNetID:       forwarderNetID,
-			ForwarderTenantID:    msg.ForwarderTenantId,
-			ForwarderClusterID:   msg.ForwarderClusterId,
-			HomeNetworkNetID:     homeNetworkNetID,
-			HomeNetworkTenantID:  msg.HomeNetworkTenantId,
-			HomeNetworkClusterID: msg.HomeNetworkClusterId,
+			MessageId:            msg.Id,
+			ForwarderNetId:       forwarderNetID,
+			ForwarderTenantId:    msg.ForwarderTenantId,
+			ForwarderClusterId:   msg.ForwarderClusterId,
+			HomeNetworkNetId:     homeNetworkNetID,
+			HomeNetworkTenantId:  msg.HomeNetworkTenantId,
+			HomeNetworkClusterId: msg.HomeNetworkClusterId,
 			Hops:                 make([]*ttnpb.PacketBrokerRouteHop, 0, len(msg.Hops)),
+		}
+		if id := msg.GetMessage().GetGatewayId(); id != nil {
+			if eui := id.Eui; eui != nil {
+				pbMD.ForwarderGatewayEui = &types.EUI64{}
+				pbMD.ForwarderGatewayEui.UnmarshalNumber(eui.Value)
+			}
+			switch s := id.Id.(type) {
+			case *packetbroker.GatewayIdentifier_Hash:
+				pbMD.ForwarderGatewayId = &pbtypes.StringValue{
+					Value: base64.StdEncoding.EncodeToString(s.Hash),
+				}
+			case *packetbroker.GatewayIdentifier_Plain:
+				pbMD.ForwarderGatewayId = &pbtypes.StringValue{
+					Value: s.Plain,
+				}
+			}
 		}
 		for _, h := range msg.Hops {
 			receivedAt, err := pbtypes.TimestampFromProto(h.ReceivedAt)

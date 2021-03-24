@@ -100,8 +100,11 @@ func TestForwarder(t *testing.T) {
 			WorkerPool: WorkerPoolConfig{
 				Limit: 1,
 			},
-			TokenKey:       tokenKey,
-			TokenEncrypter: tokenEncrypter,
+			TokenKey:          tokenKey,
+			TokenEncrypter:    tokenEncrypter,
+			IncludeGatewayEUI: true,
+			IncludeGatewayID:  true,
+			HashGatewayID:     true,
 		},
 	}, testOptions...))
 	componenttest.StartComponent(t, c)
@@ -121,10 +124,13 @@ func TestForwarder(t *testing.T) {
 						ReceivedAt: time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
-								ChannelRSSI:        -42,
-								RSSI:               -42,
-								SNR:                10.5,
+								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+									GatewayID: "foo-gateway",
+									EUI:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
+								},
+								ChannelRSSI: -42,
+								RSSI:        -42,
+								SNR:         10.5,
 								Location: &ttnpb.Location{
 									Latitude:  52.5,
 									Longitude: 4.8,
@@ -155,6 +161,14 @@ func TestForwarder(t *testing.T) {
 					ForwarderTenantId:  "foo-tenant",
 					ForwarderClusterId: "test",
 					Message: &packetbroker.UplinkMessage{
+						GatewayId: &packetbroker.GatewayIdentifier{
+							Eui: &pbtypes.UInt64Value{
+								Value: 0x1122334455667788,
+							},
+							Id: &packetbroker.GatewayIdentifier_Hash{
+								Hash: []byte{0xc7, 0x4a, 0x72, 0x7c, 0xe5, 0x01, 0xe9, 0xc1, 0x20, 0x6b, 0xb2, 0x81, 0x82, 0xeb, 0x06, 0x91, 0x7f, 0x94, 0x43, 0x54, 0x30, 0x90, 0x78, 0x0f, 0x3a, 0x39, 0x3d, 0xeb, 0xad, 0x91, 0xad, 0x96},
+							},
+						},
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						DataRateIndex:        5,
 						Frequency:            869525000,
@@ -235,12 +249,15 @@ func TestForwarder(t *testing.T) {
 						ReceivedAt: time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
-								ChannelRSSI:        4.2,
-								RSSI:               4.2,
-								SNR:                -5.5,
-								UplinkToken:        []byte("test-token"),
-								Timestamp:          123456,
+								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+									GatewayID: "foo-gateway",
+									EUI:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
+								},
+								ChannelRSSI: 4.2,
+								RSSI:        4.2,
+								SNR:         -5.5,
+								UplinkToken: []byte("test-token"),
+								Timestamp:   123456,
 							},
 						},
 						Settings: ttnpb.TxSettings{
@@ -264,6 +281,14 @@ func TestForwarder(t *testing.T) {
 					ForwarderTenantId:  "foo-tenant",
 					ForwarderClusterId: "test",
 					Message: &packetbroker.UplinkMessage{
+						GatewayId: &packetbroker.GatewayIdentifier{
+							Eui: &pbtypes.UInt64Value{
+								Value: 0x1122334455667788,
+							},
+							Id: &packetbroker.GatewayIdentifier_Hash{
+								Hash: []byte{0xc7, 0x4a, 0x72, 0x7c, 0xe5, 0x01, 0xe9, 0xc1, 0x20, 0x6b, 0xb2, 0x81, 0x82, 0xeb, 0x06, 0x91, 0x7f, 0x94, 0x43, 0x54, 0x30, 0x90, 0x78, 0x0f, 0x3a, 0x39, 0x3d, 0xeb, 0xad, 0x91, 0xad, 0x96},
+							},
+						},
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						DataRateIndex:        3,
 						Frequency:            868300000,
@@ -452,6 +477,14 @@ func TestHomeNetwork(t *testing.T) {
 					HomeNetworkClusterId: "test",
 					Id:                   "test",
 					Message: &packetbroker.UplinkMessage{
+						GatewayId: &packetbroker.GatewayIdentifier{
+							Eui: &pbtypes.UInt64Value{
+								Value: 0x1122334455667788,
+							},
+							Id: &packetbroker.GatewayIdentifier_Plain{
+								Plain: "foo-gateway",
+							},
+						},
 						DataRateIndex:        5,
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						Frequency:            869525000,
@@ -531,13 +564,17 @@ func TestHomeNetwork(t *testing.T) {
 						{
 							GatewayIdentifiers: cluster.PacketBrokerGatewayID,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
-								MessageID:            "test",
-								ForwarderNetID:       [3]byte{0x0, 0x0, 0x42},
-								ForwarderTenantID:    "foo-tenant",
-								ForwarderClusterID:   "test",
-								HomeNetworkNetID:     [3]byte{0x0, 0x0, 0x13},
-								HomeNetworkTenantID:  "foo-tenant",
-								HomeNetworkClusterID: "test",
+								MessageId:           "test",
+								ForwarderNetId:      [3]byte{0x0, 0x0, 0x42},
+								ForwarderTenantId:   "foo-tenant",
+								ForwarderClusterId:  "test",
+								ForwarderGatewayEui: eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
+								ForwarderGatewayId: &pbtypes.StringValue{
+									Value: "foo-gateway",
+								},
+								HomeNetworkNetId:     [3]byte{0x0, 0x0, 0x13},
+								HomeNetworkTenantId:  "foo-tenant",
+								HomeNetworkClusterId: "test",
 							},
 							ChannelRSSI: -42,
 							RSSI:        -42,
@@ -579,6 +616,14 @@ func TestHomeNetwork(t *testing.T) {
 					HomeNetworkClusterId: "test",
 					Id:                   "test",
 					Message: &packetbroker.UplinkMessage{
+						GatewayId: &packetbroker.GatewayIdentifier{
+							Eui: &pbtypes.UInt64Value{
+								Value: 0x1122334455667788,
+							},
+							Id: &packetbroker.GatewayIdentifier_Plain{
+								Plain: "foo-gateway",
+							},
+						},
 						DataRateIndex:        3,
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						Frequency:            869525000,
@@ -635,13 +680,17 @@ func TestHomeNetwork(t *testing.T) {
 						{
 							GatewayIdentifiers: cluster.PacketBrokerGatewayID,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
-								MessageID:            "test",
-								ForwarderNetID:       [3]byte{0x0, 0x0, 0x42},
-								ForwarderTenantID:    "foo-tenant",
-								ForwarderClusterID:   "test",
-								HomeNetworkNetID:     [3]byte{0x0, 0x0, 0x13},
-								HomeNetworkTenantID:  "foo-tenant",
-								HomeNetworkClusterID: "test",
+								MessageId:           "test",
+								ForwarderNetId:      [3]byte{0x0, 0x0, 0x42},
+								ForwarderTenantId:   "foo-tenant",
+								ForwarderClusterId:  "test",
+								ForwarderGatewayEui: eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
+								ForwarderGatewayId: &pbtypes.StringValue{
+									Value: "foo-gateway",
+								},
+								HomeNetworkNetId:     [3]byte{0x0, 0x0, 0x13},
+								HomeNetworkTenantId:  "foo-tenant",
+								HomeNetworkClusterId: "test",
 							},
 							ChannelRSSI: 4.2,
 							RSSI:        4.2,

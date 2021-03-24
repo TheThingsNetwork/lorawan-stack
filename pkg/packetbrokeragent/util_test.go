@@ -64,6 +64,10 @@ func mustServePBDataPlane(ctx context.Context) (*mock.PBDataPlane, net.Addr) {
 	return dp, lis.Addr()
 }
 
+func eui64Ptr(v types.EUI64) *types.EUI64 {
+	return &v
+}
+
 func devAddrPtr(v types.DevAddr) *types.DevAddr {
 	return &v
 }
