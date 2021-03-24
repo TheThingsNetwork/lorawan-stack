@@ -36,5 +36,8 @@ var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{
 			Limit: 1024,
 		},
+		IncludeGatewayEUI: true,
+		IncludeGatewayID:  true,
+		HashGatewayID:     false,
 	},
 }
