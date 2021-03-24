@@ -73,6 +73,8 @@ type Gateway struct {
 
 	TargetCUPSURI string `gorm:"type:VARCHAR"`
 	TargetCUPSKey []byte `gorm:"type:BYTEA"`
+
+	RequireAuthenticatedConnection bool
 }
 
 func init() {
@@ -166,6 +168,9 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 			pb.TargetCUPSKey = nil
 		}
 	},
+	requireAuthenticatedConnectionField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.RequireAuthenticatedConnection = gtw.RequireAuthenticatedConnection
+	},
 }
 
 // functions to set fields from the gateway proto into the gateway model.
@@ -256,6 +261,9 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 			gtw.TargetCUPSKey = nil
 		}
 	},
+	requireAuthenticatedConnectionField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.RequireAuthenticatedConnection = pb.RequireAuthenticatedConnection
+	},
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -273,32 +281,33 @@ func init() {
 
 // fieldmask path to column name in gateways table.
 var gatewayColumnNames = map[string][]string{
-	"ids.eui":                     {"gateway_eui"},
-	antennasField:                 {},
-	attributesField:               {},
-	autoUpdateField:               {autoUpdateField},
-	brandIDField:                  {"brand_id"},
-	claimAuthenticationCodeField:  {"claim_authentication_code_secret", "claim_authentication_code_valid_from", "claim_authentication_code_valid_to"},
-	contactInfoField:              {},
-	descriptionField:              {descriptionField},
-	downlinkPathConstraintField:   {downlinkPathConstraintField},
-	enforceDutyCycleField:         {enforceDutyCycleField},
-	firmwareVersionField:          {"firmware_version"},
-	frequencyPlanIDsField:         {"frequency_plan_id"},
-	gatewayServerAddressField:     {gatewayServerAddressField},
-	hardwareVersionField:          {"hardware_version"},
-	locationPublicField:           {locationPublicField},
-	lbsLNSSecretField:             {lbsLNSSecretField},
-	modelIDField:                  {"model_id"},
-	nameField:                     {nameField},
-	scheduleAnytimeDelayField:     {scheduleAnytimeDelayField},
-	scheduleDownlinkLateField:     {scheduleDownlinkLateField},
-	statusPublicField:             {statusPublicField},
-	targetCUPSURIField:            {"target_cups_uri"},
-	targetCUPSKeyField:            {"target_cups_key"},
-	updateChannelField:            {updateChannelField},
-	updateLocationFromStatusField: {updateLocationFromStatusField},
-	versionIDsField:               {"brand_id", "model_id", "hardware_version", "firmware_version"},
+	"ids.eui":                           {"gateway_eui"},
+	antennasField:                       {},
+	attributesField:                     {},
+	autoUpdateField:                     {autoUpdateField},
+	brandIDField:                        {"brand_id"},
+	claimAuthenticationCodeField:        {"claim_authentication_code_secret", "claim_authentication_code_valid_from", "claim_authentication_code_valid_to"},
+	contactInfoField:                    {},
+	descriptionField:                    {descriptionField},
+	downlinkPathConstraintField:         {downlinkPathConstraintField},
+	enforceDutyCycleField:               {enforceDutyCycleField},
+	firmwareVersionField:                {"firmware_version"},
+	frequencyPlanIDsField:               {"frequency_plan_id"},
+	gatewayServerAddressField:           {gatewayServerAddressField},
+	hardwareVersionField:                {"hardware_version"},
+	locationPublicField:                 {locationPublicField},
+	lbsLNSSecretField:                   {lbsLNSSecretField},
+	modelIDField:                        {"model_id"},
+	nameField:                           {nameField},
+	scheduleAnytimeDelayField:           {scheduleAnytimeDelayField},
+	scheduleDownlinkLateField:           {scheduleDownlinkLateField},
+	statusPublicField:                   {statusPublicField},
+	targetCUPSURIField:                  {"target_cups_uri"},
+	targetCUPSKeyField:                  {"target_cups_key"},
+	updateChannelField:                  {updateChannelField},
+	updateLocationFromStatusField:       {updateLocationFromStatusField},
+	versionIDsField:                     {"brand_id", "model_id", "hardware_version", "firmware_version"},
+	requireAuthenticatedConnectionField: {requireAuthenticatedConnectionField},
 }
 
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {

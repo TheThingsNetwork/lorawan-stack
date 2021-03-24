@@ -50,6 +50,7 @@ const (
 	redirectURIsField                   = "redirect_uris"
 	logoutRedirectURIsField             = "logout_redirect_uris"
 	requirePasswordUpdateField          = "require_password_update"
+	requireAuthenticatedConnectionField = "require_authenticated_connection"
 	rightsField                         = "rights"
 	scheduleDownlinkLateField           = "schedule_downlink_late"
 	scheduleAnytimeDelayField           = "schedule_anytime_delay"

@@ -657,6 +657,16 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 					dst.TargetCUPSKey = nil
 				}
 			}
+		case "require_authenticated_connection":
+			if len(subs) > 0 {
+				return fmt.Errorf("'require_authenticated_connection' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RequireAuthenticatedConnection = src.RequireAuthenticatedConnection
+			} else {
+				var zero bool
+				dst.RequireAuthenticatedConnection = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

@@ -50,6 +50,13 @@ describe('Gateway create', () => {
     cy.findDescriptionByLabelText('Gateway Server address')
       .should('contain', 'The address of the Gateway Server to connect to')
       .and('be.visible')
+    cy.findByLabelText('Require authenticated connection').should('exist')
+    cy.findDescriptionByLabelText('Require authenticated connection')
+      .should(
+        'contain',
+        'Controls whether this gateway may only connect if it uses an authenticated Basic Station or MQTT connection',
+      )
+      .and('be.visible')
     cy.findByLabelText('Gateway status').should('exist')
     cy.findDescriptionByLabelText('Gateway status')
       .should('contain', 'The status of this gateway may be publicly displayed')

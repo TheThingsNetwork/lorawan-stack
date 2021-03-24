@@ -98,6 +98,7 @@ import {
       'update_channel',
       'schedule_anytime_delay',
       'attributes',
+      'require_authenticated_connection',
     ]),
   ({ fetching, gateway }) => fetching || !Boolean(gateway),
 )

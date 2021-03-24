@@ -72,6 +72,15 @@ describe('Gateway general settings', () => {
     cy.findDescriptionByLabelText('Gateway Server address')
       .should('contain', 'The address of the Gateway Server to connect to')
       .and('be.visible')
+    cy.findByLabelText('Require authenticated connection')
+      .should('exist')
+      .and('have.attr', 'value', 'false')
+    cy.findDescriptionByLabelText('Require authenticated connection')
+      .should(
+        'contain',
+        'Controls whether this gateway may only connect if it uses an authenticated Basic Station or MQTT connection',
+      )
+      .and('be.visible')
     cy.findByLabelText('Gateway status')
       .should('exist')
       .and('have.attr', 'value', 'false')

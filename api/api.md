@@ -3405,9 +3405,8 @@ Gateway is the message that defines a gateway on the network.
 | `lbs_lns_secret` | [`Secret`](#ttn.lorawan.v3.Secret) |  | The LoRa Basics Station LNS secret. This is either an auth token (such as an API Key) or a TLS private certificate. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value. |
 | `claim_authentication_code` | [`GatewayClaimAuthenticationCode`](#ttn.lorawan.v3.GatewayClaimAuthenticationCode) |  | The authentication code for gateway claiming. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value. The entire field must be used in RPCs since sub-fields are validated wrt to each other. Direct selection/update of sub-fields only are not allowed. Use the top level field mask `claim_authentication_code` even when updating single fields. |
 | `target_cups_uri` | [`string`](#string) |  | CUPS URI for LoRa Basics Station CUPS redirection. The CUPS Trust field will be automatically fetched from the cert chain presented by the target server. |
-| `target_cups_key` | [`Secret`](#ttn.lorawan.v3.Secret) |  | CUPS Key for LoRa Basics Station CUPS redirection. If redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
-
-next: 27 |
+| `target_cups_key` | [`Secret`](#ttn.lorawan.v3.Secret) |  | CUPS Key for LoRa Basics Station CUPS redirection. If redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value. |
+| `require_authenticated_connection` | [`bool`](#bool) |  | Require an authenticated gateway connection. This prevents the gateway from using the UDP protocol and requires authentication when using other protocols. |
 
 #### Field Rules
 

@@ -1012,6 +1012,8 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "require_authenticated_connection":
+			// no validation rules for RequireAuthenticatedConnection
 		default:
 			return GatewayValidationError{
 				field:  name,

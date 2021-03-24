@@ -13841,11 +13841,21 @@
             },
             {
               "name": "target_cups_key",
-              "description": "CUPS Key for LoRa Basics Station CUPS redirection.\nIf redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.\n\nnext: 27",
+              "description": "CUPS Key for LoRa Basics Station CUPS redirection.\nIf redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance.\nRequires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.",
               "label": "",
               "type": "Secret",
               "longType": "Secret",
               "fullType": "ttn.lorawan.v3.Secret",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "require_authenticated_connection",
+              "description": "Require an authenticated gateway connection. This prevents the gateway from using the UDP protocol and requires authentication when using other protocols.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
             }

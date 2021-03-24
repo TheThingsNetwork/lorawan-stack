@@ -171,7 +171,10 @@ message Gateway {
   // If redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance.
   // Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
   Secret target_cups_key = 25 [(gogoproto.customname) = "TargetCUPSKey"];
-  // next: 27
+  // Require an authenticated gateway connection. This prevents the gateway from using the UDP protocol and requires authentication when using other protocols.
+  bool require_authenticated_connection = 27;
+
+  // next: 28
 }
 
 message Gateways {
