@@ -43,6 +43,7 @@ type RegistrationConfig struct {
 	Name                  string            `name:"name" description:"Friendly name to register with Packet Broker"`
 	AdministrativeContact ContactInfoConfig `name:"administrative-contact" description:"Administrative contact to register with Packet Broker"`
 	TechnicalContact      ContactInfoConfig `name:"technical-contact" description:"Technical contact to register with Packet Broker"`
+	Listed                bool              `name:"listed" description:"List the Home Network in the Packet Broker catalog"`
 }
 
 type ContactInfoConfig struct {

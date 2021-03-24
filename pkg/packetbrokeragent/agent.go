@@ -61,6 +61,7 @@ type RegistrationInfo struct {
 	Name          string
 	DevAddrBlocks []*ttnpb.PacketBrokerDevAddrBlock
 	ContactInfo   []*ttnpb.ContactInfo
+	Listed        bool
 }
 
 // RegistrationInfoExtractor extracts registration information from the context.
@@ -244,6 +245,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 				Name:          conf.Registration.Name,
 				DevAddrBlocks: blocks,
 				ContactInfo:   contactInfo,
+				Listed:        conf.Registration.Listed,
 			}, nil
 		},
 	}
