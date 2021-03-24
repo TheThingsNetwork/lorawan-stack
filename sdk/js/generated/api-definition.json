@@ -4448,6 +4448,18 @@
           ]
         }
       ]
+    },
+    "CreateLoginToken": {
+      "file": "lorawan-stack/api/user_services.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/users/{user_ids.user_id}/login-tokens",
+          "parameters": [
+            "user_ids.user_id"
+          ]
+        }
+      ]
     }
   },
   "UserInvitationRegistry": {

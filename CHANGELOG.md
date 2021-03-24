@@ -20,6 +20,9 @@ For details about compatibility between different releases, see the **Commitment
 - UDP connection error caching. The duration can be configured via the `gs.udp.connection-error-expires` configuration entry.
 - Option to require individual gateways to use authenticated connections.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+- Login Tokens (magic login links) that can be used for password-less login.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+  - This feature is disabled by default; use the new `is.login-tokens.enabled` option to enable it.
 
 ### Changed
 

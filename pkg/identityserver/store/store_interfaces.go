@@ -188,6 +188,13 @@ type InvitationStore interface {
 	DeleteInvitation(ctx context.Context, email string) error
 }
 
+// LoginTokenStore interface for storing user login tokens.
+type LoginTokenStore interface {
+	FindActiveLoginTokens(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.LoginToken, error)
+	CreateLoginToken(ctx context.Context, token *ttnpb.LoginToken) (*ttnpb.LoginToken, error)
+	ConsumeLoginToken(ctx context.Context, token string) (*ttnpb.LoginToken, error)
+}
+
 // EntitySearch interface for searching entities.
 type EntitySearch interface {
 	FindApplications(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchApplicationsRequest) ([]*ttnpb.ApplicationIdentifiers, error)

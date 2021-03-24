@@ -2681,3 +2681,313 @@ var _ListUserSessionsRequest_Order_InLookup = map[string]struct{}{
 	"created_at":  {},
 	"-created_at": {},
 }
+
+// ValidateFields checks the field values on LoginToken with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *LoginToken) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = LoginTokenFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "user_ids":
+
+			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return LoginTokenValidationError{
+						field:  "user_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "created_at":
+
+			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return LoginTokenValidationError{
+						field:  "created_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "updated_at":
+
+			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return LoginTokenValidationError{
+						field:  "updated_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "expires_at":
+
+			if v, ok := interface{}(&m.ExpiresAt).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return LoginTokenValidationError{
+						field:  "expires_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "token":
+			// no validation rules for Token
+		case "used":
+			// no validation rules for Used
+		default:
+			return LoginTokenValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// LoginTokenValidationError is the validation error returned by
+// LoginToken.ValidateFields if the designated constraints aren't met.
+type LoginTokenValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoginTokenValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoginTokenValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoginTokenValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoginTokenValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoginTokenValidationError) ErrorName() string { return "LoginTokenValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoginTokenValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoginToken.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoginTokenValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoginTokenValidationError{}
+
+// ValidateFields checks the field values on CreateLoginTokenRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CreateLoginTokenRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = CreateLoginTokenRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "user_ids":
+
+			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return CreateLoginTokenRequestValidationError{
+						field:  "user_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "skip_email":
+			// no validation rules for SkipEmail
+		default:
+			return CreateLoginTokenRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// CreateLoginTokenRequestValidationError is the validation error returned by
+// CreateLoginTokenRequest.ValidateFields if the designated constraints aren't met.
+type CreateLoginTokenRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateLoginTokenRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateLoginTokenRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateLoginTokenRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateLoginTokenRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateLoginTokenRequestValidationError) ErrorName() string {
+	return "CreateLoginTokenRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateLoginTokenRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateLoginTokenRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateLoginTokenRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateLoginTokenRequestValidationError{}
+
+// ValidateFields checks the field values on CreateLoginTokenResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CreateLoginTokenResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = CreateLoginTokenResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "token":
+			// no validation rules for Token
+		default:
+			return CreateLoginTokenResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// CreateLoginTokenResponseValidationError is the validation error returned by
+// CreateLoginTokenResponse.ValidateFields if the designated constraints
+// aren't met.
+type CreateLoginTokenResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateLoginTokenResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateLoginTokenResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateLoginTokenResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateLoginTokenResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateLoginTokenResponseValidationError) ErrorName() string {
+	return "CreateLoginTokenResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateLoginTokenResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateLoginTokenResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateLoginTokenResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateLoginTokenResponseValidationError{}

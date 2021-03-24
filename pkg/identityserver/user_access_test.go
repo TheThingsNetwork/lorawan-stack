@@ -17,6 +17,7 @@ package identityserver
 import (
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -259,6 +260,60 @@ func TestUserAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
 			a.So(updated.Name, should.Equal, newAPIKeyName)
+		}
+	})
+}
+
+func TestUserAccesLoginTokens(t *testing.T) {
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.LoginTokens.Enabled = false
+		user, _ := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
+		reg := ttnpb.NewUserAccessClient(cc)
+		_, err := reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
+			UserIdentifiers: user.UserIdentifiers,
+		})
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.Resemble(err, errLoginTokensDisabled), should.BeTrue)
+		}
+	})
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.LoginTokens.Enabled = true
+		is.config.LoginTokens.TokenTTL = 10 * time.Minute
+
+		user, _ := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
+		adminUser, adminCreds := population.Users[adminUserIdx], userCreds(adminUserIdx)
+
+		reg := ttnpb.NewUserAccessClient(cc)
+
+		token, err := reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
+			UserIdentifiers: user.UserIdentifiers,
+		})
+		if a.So(err, should.BeNil) {
+			a.So(token.Token, should.BeBlank)
+		}
+
+		token, err = reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
+			UserIdentifiers: user.UserIdentifiers,
+		}, adminCreds)
+		if a.So(err, should.BeNil) {
+			a.So(token.Token, should.NotBeBlank)
+		}
+
+		token, err = reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
+			UserIdentifiers: adminUser.UserIdentifiers,
+		}, adminCreds)
+		if a.So(err, should.BeNil) {
+			a.So(token.Token, should.BeBlank)
+		}
+
+		token, err = reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
+			UserIdentifiers: adminUser.UserIdentifiers,
+		}, adminCreds)
+		if a.So(err, should.BeNil) {
+			a.So(token.Token, should.BeBlank)
 		}
 	})
 }
