@@ -22,6 +22,7 @@ import Footer from '@ttn-lw/containers/footer'
 import Header from '@account/containers/header'
 
 import Login from '@account/views/login'
+import TokenLogin from '@account/views/token-login'
 import CreateAccount from '@account/views/create-account'
 import ForgotPassword from '@account/views/forgot-password'
 import UpdatePassword from '@account/views/update-password'
@@ -42,6 +43,7 @@ const FrontView = ({ location }) => {
         <div className={style.main}>
           <Switch>
             <Route path="/login" component={Login} />
+            <Route path="/token-login" component={TokenLogin} />
             <Route path="/register" component={CreateAccount} />
             <Route path="/forgot-password" component={ForgotPassword} />
             <Route path="/update-password" component={UpdatePassword} />

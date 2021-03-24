@@ -46,8 +46,9 @@ type server struct {
 
 // Store used by the account app.
 type Store interface {
-	// UserStore and UserSessionStore are needed for user login/logout.
+	// UserStore, LoginTokenStore and UserSessionStore are needed for user login/logout.
 	store.UserStore
+	store.LoginTokenStore
 	store.UserSessionStore
 }
 
@@ -108,10 +109,12 @@ func (s *server) RegisterRoutes(server *web.Server) {
 
 	api := root.Group("/api")
 	api.POST("/auth/login", s.Login)
+	api.POST("/auth/token-login", s.TokenLogin)
 	api.POST("/auth/logout", s.Logout, s.requireLogin)
 	api.GET("/me", s.CurrentUser, s.requireLogin)
 
 	page := root.Group("")
 	page.GET("/login", webui.Template.Handler, s.redirectToNext)
+	page.GET("/token-login", webui.Template.Handler, s.redirectToNext)
 	page.GET("/*", webui.Template.Handler)
 }

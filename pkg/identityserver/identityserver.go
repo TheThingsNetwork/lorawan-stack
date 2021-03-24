@@ -118,9 +118,11 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 
 	is.account = account.NewServer(is.Context(), struct {
 		store.UserStore
+		store.LoginTokenStore
 		store.UserSessionStore
 	}{
 		UserStore:        store.GetUserStore(is.db),
+		LoginTokenStore:  store.GetLoginTokenStore(is.db),
 		UserSessionStore: store.GetUserSessionStore(is.db),
 	}, is.config.OAuth)
 	if err != nil {

@@ -32,21 +32,25 @@ type mockStoreContents struct {
 		session   *ttnpb.UserSession
 		sessionID string
 		userIDs   *ttnpb.UserIdentifiers
+		token     string
 	}
 	res struct {
-		session *ttnpb.UserSession
-		user    *ttnpb.User
+		session    *ttnpb.UserSession
+		user       *ttnpb.User
+		loginToken *ttnpb.LoginToken
 	}
 	err struct {
 		getUser       error
 		createSession error
 		getSession    error
 		deleteSession error
+		loginToken    error
 	}
 }
 
 type mockStore struct {
 	store.UserStore
+	store.LoginTokenStore
 	store.UserSessionStore
 
 	mockStoreContents
@@ -83,4 +87,10 @@ func (s *mockStore) DeleteSession(ctx context.Context, userIDs *ttnpb.UserIdenti
 	s.req.ctx, s.req.userIDs, s.req.sessionID = ctx, userIDs, sessionID
 	s.calls = append(s.calls, "DeleteSession")
 	return s.err.deleteSession
+}
+
+func (s *mockStore) ConsumeLoginToken(ctx context.Context, token string) (*ttnpb.LoginToken, error) {
+	s.req.ctx, s.req.token = ctx, token
+	s.calls = append(s.calls, "ConsumeLoginToken")
+	return s.res.loginToken, s.err.loginToken
 }
