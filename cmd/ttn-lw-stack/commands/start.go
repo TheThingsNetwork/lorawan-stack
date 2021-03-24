@@ -190,27 +190,21 @@ var startCommand = &cobra.Command{
 
 		redisConsumerID := redis.Key(host, strconv.Itoa(os.Getpid()))
 
-		httpClient, err := c.HTTPClient(ctx)
-		if err != nil {
-			return err
-		}
-		if conf := config.ServiceBase.FrequencyPlans; conf.HTTPClient == nil {
-			conf.HTTPClient = httpClient
-		}
-		if conf := config.ServiceBase.Interop.SenderClientCA; conf.HTTPClient == nil {
-			conf.HTTPClient = httpClient
-		}
-		if conf := config.ServiceBase.KeyVault; conf.HTTPClient == nil {
-			conf.HTTPClient = httpClient
-		}
-		if conf := config.ServiceBase.Blob; conf.HTTPClient == nil {
-			conf.HTTPClient = httpClient
-		}
-		if conf := config.AS.Interop.InteropClient.BlobConfig; conf.HTTPClient == nil {
-			conf.HTTPClient = httpClient
-		}
-		if conf := config.NS.Interop.BlobConfig; conf.HTTPClient == nil {
-			conf.HTTPClient = httpClient
+		for _, httpClient := range []**http.Client{
+			&config.ServiceBase.FrequencyPlans.HTTPClient,
+			&config.ServiceBase.Interop.SenderClientCA.HTTPClient,
+			&config.ServiceBase.KeyVault.HTTPClient,
+			&config.ServiceBase.Blob.HTTPClient,
+			&config.AS.Interop.InteropClient.BlobConfig.HTTPClient,
+			&config.NS.Interop.BlobConfig.HTTPClient,
+		} {
+			if *httpClient != nil {
+				continue
+			}
+			*httpClient, err = c.HTTPClient(ctx)
+			if err != nil {
+				return err
+			}
 		}
 
 		if start.IdentityServer {

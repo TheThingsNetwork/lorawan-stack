@@ -205,6 +205,14 @@ type BlobConfig struct {
 	HTTPClient *http.Client `name:"-"`
 }
 
+// IsZero returns whether conf is empty.
+func (c BlobConfig) IsZero() bool {
+	return c.Provider == "" &&
+		c.Local == BlobConfigLocal{} &&
+		c.AWS == BlobConfigAWS{} &&
+		c.GCP == BlobConfigGCP{}
+}
+
 // Bucket returns the requested blob bucket using the config.
 func (c BlobConfig) Bucket(ctx context.Context, bucket string) (*blob.Bucket, error) {
 	switch c.Provider {
@@ -321,7 +329,7 @@ func (c InteropClient) IsZero() bool {
 		c.URL == "" &&
 		c.Blob.IsZero() &&
 		c.GetFallbackTLSConfig == nil &&
-		c.BlobConfig == BlobConfig{}
+		c.BlobConfig.IsZero()
 }
 
 // Fetcher returns fetch.Interface defined by conf.
