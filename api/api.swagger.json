@@ -15245,6 +15245,15 @@
           "type": "string",
           "description": "Forwarder Cluster ID of the Packet Broker Forwarder."
         },
+        "forwarder_gateway_eui": {
+          "type": "string",
+          "format": "byte",
+          "description": "Forwarder gateway EUI."
+        },
+        "forwarder_gateway_id": {
+          "type": "string",
+          "description": "Forwarder gateway ID."
+        },
         "home_network_net_id": {
           "type": "string",
           "format": "byte",

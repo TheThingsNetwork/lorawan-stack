@@ -25125,6 +25125,26 @@
               "defaultValue": ""
             },
             {
+              "name": "forwarder_gateway_eui",
+              "description": "Forwarder gateway EUI.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "forwarder_gateway_id",
+              "description": "Forwarder gateway ID.",
+              "label": "",
+              "type": "StringValue",
+              "longType": "google.protobuf.StringValue",
+              "fullType": "google.protobuf.StringValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "home_network_net_id",
               "description": "LoRa Alliance NetID of the Packet Broker Home Network Member.",
               "label": "",

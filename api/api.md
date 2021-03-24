@@ -6108,6 +6108,8 @@ More payload formatters can be added. |
 | `forwarder_net_id` | [`bytes`](#bytes) |  | LoRa Alliance NetID of the Packet Broker Forwarder Member. |
 | `forwarder_tenant_id` | [`string`](#string) |  | Tenant ID managed by the Packet Broker Forwarder Member. |
 | `forwarder_cluster_id` | [`string`](#string) |  | Forwarder Cluster ID of the Packet Broker Forwarder. |
+| `forwarder_gateway_eui` | [`bytes`](#bytes) |  | Forwarder gateway EUI. |
+| `forwarder_gateway_id` | [`google.protobuf.StringValue`](#google.protobuf.StringValue) |  | Forwarder gateway ID. |
 | `home_network_net_id` | [`bytes`](#bytes) |  | LoRa Alliance NetID of the Packet Broker Home Network Member. |
 | `home_network_tenant_id` | [`string`](#string) |  | Tenant ID managed by the Packet Broker Home Network Member. This value is empty if it cannot be determined by the Packet Broker Router. |
 | `home_network_cluster_id` | [`string`](#string) |  | Home Network Cluster ID of the Packet Broker Home Network. |
