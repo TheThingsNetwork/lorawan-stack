@@ -46,6 +46,7 @@ var (
 		packetbroker.Region_KR_920_923: band.KR_920_923,
 		packetbroker.Region_IN_865_867: band.IN_865_867,
 		packetbroker.Region_RU_864_870: band.RU_864_870,
+		packetbroker.Region_WW_2G4:     band.ISM_2400,
 	}
 	toPBRegion = map[string]packetbroker.Region{
 		band.EU_863_870: packetbroker.Region_EU_863_870,
@@ -58,6 +59,7 @@ var (
 		band.KR_920_923: packetbroker.Region_KR_920_923,
 		band.IN_865_867: packetbroker.Region_IN_865_867,
 		band.RU_864_870: packetbroker.Region_RU_864_870,
+		band.ISM_2400:   packetbroker.Region_WW_2G4,
 	}
 )
 
