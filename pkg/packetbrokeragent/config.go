@@ -81,10 +81,9 @@ type ForwarderConfig struct {
 
 // HomeNetworkConfig defines the configuration of the Home Network role.
 type HomeNetworkConfig struct {
-	Enable             bool                  `name:"enable" description:"Enable Home Network role"`
-	DevAddrPrefixes    []types.DevAddrPrefix `name:"dev-addr-prefixes" description:"DevAddr prefixes to subscribe to"`
-	WorkerPool         WorkerPoolConfig      `name:"worker-pool" description:"Workers pool configuration"`
-	BlacklistForwarder bool                  `name:"blacklist-forwarder" description:"Blacklist traffic from Forwarder to avoid traffic loops (DEPRECATED)"`
+	Enable          bool                  `name:"enable" description:"Enable Home Network role"`
+	DevAddrPrefixes []types.DevAddrPrefix `name:"dev-addr-prefixes" description:"DevAddr prefixes to subscribe to"`
+	WorkerPool      WorkerPoolConfig      `name:"worker-pool" description:"Workers pool configuration"`
 }
 
 // WorkerPoolConfig contains the worker pool configuration for a Packet Broker role.
