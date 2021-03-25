@@ -404,10 +404,12 @@ func (st *setDeviceState) ValidateField(isValid func(*ttnpb.EndDevice) bool, pat
 	}, path)
 }
 
+var errFieldNotZero = errors.DefineInvalidArgument("field_not_zero", "field `{name}` is not zero")
+
 func (st *setDeviceState) ValidateFieldIsZero(path string) error {
 	if st.HasSetField(path) {
 		if !st.Device.FieldIsZero(path) {
-			return newInvalidFieldValueError(path)
+			return newInvalidFieldValueError(path).WithCause(errFieldNotZero.WithAttributes("name", path))
 		}
 		return nil
 	}
@@ -422,10 +424,12 @@ func (st *setDeviceState) ValidateFieldIsZero(path string) error {
 	return nil
 }
 
+var errFieldIsZero = errors.DefineInvalidArgument("field_is_zero", "field `{name}` is zero")
+
 func (st *setDeviceState) ValidateFieldIsNotZero(path string) error {
 	if st.HasSetField(path) {
 		if st.Device.FieldIsZero(path) {
-			return newInvalidFieldValueError(path)
+			return newInvalidFieldValueError(path).WithCause(errFieldIsZero.WithAttributes("name", path))
 		}
 		return nil
 	}
