@@ -36,9 +36,11 @@ func packetBrokerNetworkIDFlags(allowDefault bool) *pflag.FlagSet {
 	return flagSet
 }
 
-var (
-	errDefaultPacketBrokerNetworkIdentifier = errors.DefineInvalidArgument("default_packet_broker_network_identifier", "default Packet Broker network identifier")
-)
+var errDefaultPacketBrokerNetworkIdentifier = errors.DefineInvalidArgument("default_packet_broker_network_identifier", "default Packet Broker network identifier")
+
+func packetBrokerCacheInfo() {
+	logger.Info("Changes to routing policies take up to 10 minutes to be fully propagated")
+}
 
 // getPacketBrokerNetworkID parses the network identifier from arguments and flags or nil if default is specified.
 func getPacketBrokerNetworkID(flagSet *pflag.FlagSet, args []string, allowDefault bool) (*ttnpb.PacketBrokerNetworkIdentifier, error) {
@@ -291,7 +293,11 @@ for the Home Network (by NetID and tenant ID).`,
 					Downlink:      &downlink,
 				})
 			}
-			return err
+			if err != nil {
+				return err
+			}
+			packetBrokerCacheInfo()
+			return nil
 		},
 	}
 	packetBrokerHomeNetworksPolicyDeleteCommand = &cobra.Command{
@@ -312,7 +318,11 @@ for the Home Network (by NetID and tenant ID).`,
 			} else {
 				_, err = ttnpb.NewPbaClient(pba).DeleteHomeNetworkRoutingPolicy(ctx, id)
 			}
-			return err
+			if err != nil {
+				return err
+			}
+			packetBrokerCacheInfo()
+			return nil
 		},
 	}
 	packetBrokerHomeNetworksListCommand = &cobra.Command{
