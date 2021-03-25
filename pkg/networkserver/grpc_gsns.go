@@ -45,7 +45,7 @@ const (
 	// retransmissionWindow is the maximum delay between Rx2 end and an uplink retransmission.
 	retransmissionWindow = 10 * time.Second
 
-	// maxConfNbTrans is the maximum number of confirmed uplink retransmissions for pre-1.0.3 devices.
+	// maxConfNbTrans is the maximum number of confirmed uplink retransmissions for pre-1.0.4 devices.
 	maxConfNbTrans = 5
 )
 
@@ -75,7 +75,7 @@ func maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32)
 	if !confirmed {
 		return nbTrans
 	}
-	if ver.Compare(ttnpb.MAC_V1_0_3) < 0 {
+	if ver.Compare(ttnpb.MAC_V1_0_4) < 0 {
 		return maxConfNbTrans
 	}
 	return nbTrans
