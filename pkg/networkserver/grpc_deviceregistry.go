@@ -499,120 +499,6 @@ func (st *setDeviceState) ValidateSetFields(isValid func(map[string]*ttnpb.EndDe
 	return st.ValidateFields(isValid, paths...)
 }
 
-// ValidateIfZeroThenZero ensures FieldIsZero(left) -> FieldIsZero(r), for each r in right.
-func (st *setDeviceState) ValidateIfZeroThenZero(left string, right ...string) error {
-	if st.HasSetField(left) {
-		if !st.Device.FieldIsZero(left) {
-			return nil
-		}
-		return st.ValidateFieldsAreZero(right...)
-	}
-	for _, r := range right {
-		if !st.HasSetField(r) || st.Device.FieldIsZero(r) {
-			continue
-		}
-		if err := st.ValidateFieldIsNotZero(left); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// ValidateIfZeroThenNotZero ensures FieldIsZero(left) -> !FieldIsZero(r), for each r in right.
-func (st *setDeviceState) ValidateIfZeroThenNotZero(left string, right ...string) error {
-	if st.HasSetField(left) {
-		if !st.Device.FieldIsZero(left) {
-			return nil
-		}
-		return st.ValidateFieldsAreNotZero(right...)
-	}
-	for _, r := range right {
-		if !st.HasSetField(r) || !st.Device.FieldIsZero(r) {
-			continue
-		}
-		if err := st.ValidateFieldIsNotZero(left); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// ValidateIfNotZeroThenZero ensures !FieldIsZero(left) -> FieldIsZero(r), for each r in right.
-func (st *setDeviceState) ValidateIfNotZeroThenZero(left string, right ...string) error {
-	if st.HasSetField(left) {
-		if st.Device.FieldIsZero(left) {
-			return nil
-		}
-		return st.ValidateFieldsAreZero(right...)
-	}
-	for _, r := range right {
-		if !st.HasSetField(r) || st.Device.FieldIsZero(r) {
-			continue
-		}
-		if err := st.ValidateFieldIsZero(left); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// ValidateIfNotZeroThenNotZero ensures !FieldIsZero(left) -> !FieldIsZero(r), for each r in right.
-func (st *setDeviceState) ValidateIfNotZeroThenNotZero(left string, right ...string) error {
-	if st.HasSetField(left) {
-		if st.Device.FieldIsZero(left) {
-			return nil
-		}
-		return st.ValidateFieldsAreNotZero(right...)
-	}
-	for _, r := range right {
-		if !st.HasSetField(r) || !st.Device.FieldIsZero(r) {
-			continue
-		}
-		if err := st.ValidateFieldIsZero(left); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// ValidateIfZeroThenFunc ensures FieldIsZero(left) -> f(map r -> *ttnpb.EndDevice), for each r in right.
-func (st *setDeviceState) ValidateIfZeroThenFunc(isValid func(map[string]*ttnpb.EndDevice) (bool, string), left string, right ...string) error {
-	if st.HasSetField(left) {
-		if !st.Device.FieldIsZero(left) {
-			return nil
-		}
-		return st.ValidateFields(isValid, right...)
-	}
-	if !st.HasSetField(right...) {
-		return nil
-	}
-	return st.ValidateFields(func(m map[string]*ttnpb.EndDevice) (bool, string) {
-		if !m[left].FieldIsZero(left) {
-			return true, ""
-		}
-		return isValid(m)
-	}, append([]string{left}, right...)...)
-}
-
-// ValidateIfNotZeroThenFunc ensures !FieldIsZero(left) -> f(map r -> *ttnpb.EndDevice), for each r in right.
-func (st *setDeviceState) ValidateIfNotZeroThenFunc(isValid func(map[string]*ttnpb.EndDevice) (bool, string), left string, right ...string) error {
-	if st.HasSetField(left) {
-		if st.Device.FieldIsZero(left) {
-			return nil
-		}
-		return st.ValidateFields(isValid, right...)
-	}
-	if !st.HasSetField(right...) {
-		return nil
-	}
-	return st.ValidateFields(func(m map[string]*ttnpb.EndDevice) (bool, string) {
-		if m[left].FieldIsZero(left) {
-			return true, ""
-		}
-		return isValid(m)
-	}, append([]string{left}, right...)...)
-}
-
 // SetFunc is the function meant to be passed to SetByID.
 func (st *setDeviceState) SetFunc(f func(context.Context, *ttnpb.EndDevice) error) func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 	return func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -672,6 +558,353 @@ func setKeyEqual(m map[string]*ttnpb.EndDevice, getA, getB func(*ttnpb.EndDevice
 	}
 	return true
 }
+
+type ifThenFuncFieldRight struct {
+	Func   func(m map[string]*ttnpb.EndDevice) (bool, string)
+	Fields []string
+}
+
+var (
+	ifZeroThenZeroFields = map[string][]string{
+		"supports_join": {
+			"pending_mac_state.current_parameters.adr_ack_delay_exponent.value",
+			"pending_mac_state.current_parameters.adr_ack_limit_exponent.value",
+			"pending_mac_state.current_parameters.adr_data_rate_index",
+			"pending_mac_state.current_parameters.adr_nb_trans",
+			"pending_mac_state.current_parameters.adr_tx_power_index",
+			"pending_mac_state.current_parameters.beacon_frequency",
+			"pending_mac_state.current_parameters.channels",
+			"pending_mac_state.current_parameters.downlink_dwell_time.value",
+			"pending_mac_state.current_parameters.max_duty_cycle",
+			"pending_mac_state.current_parameters.max_eirp",
+			"pending_mac_state.current_parameters.ping_slot_data_rate_index_value.value",
+			"pending_mac_state.current_parameters.ping_slot_frequency",
+			"pending_mac_state.current_parameters.rejoin_count_periodicity",
+			"pending_mac_state.current_parameters.rejoin_time_periodicity",
+			"pending_mac_state.current_parameters.rx1_data_rate_offset",
+			"pending_mac_state.current_parameters.rx1_delay",
+			"pending_mac_state.current_parameters.rx2_data_rate_index",
+			"pending_mac_state.current_parameters.rx2_frequency",
+			"pending_mac_state.current_parameters.uplink_dwell_time.value",
+			"pending_mac_state.desired_parameters.adr_ack_delay_exponent.value",
+			"pending_mac_state.desired_parameters.adr_ack_limit_exponent.value",
+			"pending_mac_state.desired_parameters.adr_data_rate_index",
+			"pending_mac_state.desired_parameters.adr_nb_trans",
+			"pending_mac_state.desired_parameters.adr_tx_power_index",
+			"pending_mac_state.desired_parameters.beacon_frequency",
+			"pending_mac_state.desired_parameters.channels",
+			"pending_mac_state.desired_parameters.downlink_dwell_time.value",
+			"pending_mac_state.desired_parameters.max_duty_cycle",
+			"pending_mac_state.desired_parameters.max_eirp",
+			"pending_mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
+			"pending_mac_state.desired_parameters.ping_slot_frequency",
+			"pending_mac_state.desired_parameters.rejoin_count_periodicity",
+			"pending_mac_state.desired_parameters.rejoin_time_periodicity",
+			"pending_mac_state.desired_parameters.rx1_data_rate_offset",
+			"pending_mac_state.desired_parameters.rx1_delay",
+			"pending_mac_state.desired_parameters.rx2_data_rate_index",
+			"pending_mac_state.desired_parameters.rx2_frequency",
+			"pending_mac_state.desired_parameters.uplink_dwell_time.value",
+			"pending_mac_state.device_class",
+			"pending_mac_state.last_adr_change_f_cnt_up",
+			"pending_mac_state.last_confirmed_downlink_at",
+			"pending_mac_state.last_dev_status_f_cnt_up",
+			"pending_mac_state.last_downlink_at",
+			"pending_mac_state.last_network_initiated_downlink_at",
+			"pending_mac_state.lorawan_version",
+			"pending_mac_state.pending_join_request.cf_list.ch_masks",
+			"pending_mac_state.pending_join_request.cf_list.freq",
+			"pending_mac_state.pending_join_request.cf_list.type",
+			"pending_mac_state.pending_join_request.downlink_settings.opt_neg",
+			"pending_mac_state.pending_join_request.downlink_settings.rx1_dr_offset",
+			"pending_mac_state.pending_join_request.downlink_settings.rx2_dr",
+			"pending_mac_state.pending_join_request.rx_delay",
+			"pending_mac_state.ping_slot_periodicity.value",
+			"pending_mac_state.queued_join_accept.correlation_ids",
+			"pending_mac_state.queued_join_accept.keys.app_s_key.encrypted_key",
+			"pending_mac_state.queued_join_accept.keys.app_s_key.kek_label",
+			"pending_mac_state.queued_join_accept.keys.app_s_key.key",
+			"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+			"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+			"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+			"pending_mac_state.queued_join_accept.keys.session_key_id",
+			"pending_mac_state.queued_join_accept.payload",
+			"pending_mac_state.queued_join_accept.request.cf_list.ch_masks",
+			"pending_mac_state.queued_join_accept.request.cf_list.freq",
+			"pending_mac_state.queued_join_accept.request.cf_list.type",
+			"pending_mac_state.queued_join_accept.request.dev_addr",
+			"pending_mac_state.queued_join_accept.request.downlink_settings.opt_neg",
+			"pending_mac_state.queued_join_accept.request.downlink_settings.rx1_dr_offset",
+			"pending_mac_state.queued_join_accept.request.downlink_settings.rx2_dr",
+			"pending_mac_state.queued_join_accept.request.net_id",
+			"pending_mac_state.queued_join_accept.request.rx_delay",
+			"pending_mac_state.recent_downlinks",
+			"pending_mac_state.recent_uplinks",
+			"pending_mac_state.rejected_adr_data_rate_indexes",
+			"pending_mac_state.rejected_adr_tx_power_indexes",
+			"pending_mac_state.rejected_data_rate_ranges",
+			"pending_mac_state.rejected_frequencies",
+			"pending_mac_state.rx_windows_available",
+			"pending_session.dev_addr",
+			"pending_session.keys.f_nwk_s_int_key.key",
+			"pending_session.keys.nwk_s_enc_key.key",
+			"pending_session.keys.s_nwk_s_int_key.key",
+			"pending_session.keys.session_key_id",
+			"session.keys.session_key_id",
+		},
+	}
+
+	ifZeroThenNotZeroFields = map[string][]string{
+		"supports_join": {
+			"session.dev_addr",
+			"session.keys.f_nwk_s_int_key.key",
+			// NOTE: LoRaWAN-version specific fields are validated within Set directly.
+		},
+	}
+
+	ifNotZeroThenZeroFields = map[string][]string{
+		"multicast": {
+			"mac_state.last_adr_change_f_cnt_up",
+			"mac_state.last_confirmed_downlink_at",
+			"mac_state.last_dev_status_f_cnt_up",
+			"mac_state.pending_application_downlink",
+			"mac_state.pending_requests",
+			"mac_state.queued_responses",
+			"mac_state.recent_uplinks",
+			"mac_state.rejected_adr_data_rate_indexes",
+			"mac_state.rejected_adr_tx_power_indexes",
+			"mac_state.rejected_data_rate_ranges",
+			"mac_state.rejected_frequencies",
+			"mac_state.rx_windows_available",
+			"session.last_conf_f_cnt_down",
+			"session.last_f_cnt_up",
+			"supports_join",
+		},
+	}
+
+	ifNotZeroThenNotZeroFields = map[string][]string{
+		"supports_join": {
+			"ids.dev_eui",
+			"ids.join_eui",
+		},
+	}
+
+	ifZeroThenFuncFields = map[string][]ifThenFuncFieldRight{
+		"supports_join": {
+			{
+				Func: func(m map[string]*ttnpb.EndDevice) (bool, string) {
+					if dev, ok := m["ids.dev_eui"]; ok && dev.DevEUI != nil && !dev.DevEUI.IsZero() {
+						return true, ""
+					}
+					if m["lorawan_version"].LoRaWANVersion.RequireDevEUIForABP() {
+						return false, "ids.dev_eui"
+					}
+					return true, ""
+				},
+				Fields: []string{
+					"ids.dev_eui",
+					"lorawan_version",
+				},
+			},
+
+			{
+				Func: func(m map[string]*ttnpb.EndDevice) (bool, string) {
+					if !m["supports_class_b"].GetSupportsClassB() ||
+						m["mac_settings.ping_slot_periodicity.value"].GetMACSettings().GetPingSlotPeriodicity() != nil {
+						return true, ""
+					}
+					return false, "mac_settings.ping_slot_periodicity.value"
+				},
+				Fields: []string{
+					"mac_settings.ping_slot_periodicity.value",
+					"supports_class_b",
+				},
+			},
+		},
+	}
+
+	ifNotZeroThenFuncFields = map[string][]ifThenFuncFieldRight{
+		"multicast": append(func() (rs []ifThenFuncFieldRight) {
+			for s, eq := range map[string]func(ttnpb.MACParameters, ttnpb.MACParameters) bool{
+				"adr_ack_delay_exponent.value": func(a, b ttnpb.MACParameters) bool {
+					return a.ADRAckDelayExponent.Equal(b.ADRAckDelayExponent)
+				},
+				"adr_ack_limit_exponent.value": func(a, b ttnpb.MACParameters) bool {
+					return a.ADRAckLimitExponent.Equal(b.ADRAckLimitExponent)
+				},
+				"adr_data_rate_index": func(a, b ttnpb.MACParameters) bool {
+					return a.ADRDataRateIndex == b.ADRDataRateIndex
+				},
+				"adr_nb_trans": func(a, b ttnpb.MACParameters) bool {
+					return a.ADRNbTrans == b.ADRNbTrans
+				},
+				"adr_tx_power_index": func(a, b ttnpb.MACParameters) bool {
+					return a.ADRTxPowerIndex == b.ADRTxPowerIndex
+				},
+				"beacon_frequency": func(a, b ttnpb.MACParameters) bool {
+					return a.BeaconFrequency == b.BeaconFrequency
+				},
+				"channels": func(a, b ttnpb.MACParameters) bool {
+					if len(a.Channels) != len(b.Channels) {
+						return false
+					}
+					for i, ch := range a.Channels {
+						if !ch.Equal(b.Channels[i]) {
+							return false
+						}
+					}
+					return true
+				},
+				"downlink_dwell_time.value": func(a, b ttnpb.MACParameters) bool {
+					return a.DownlinkDwellTime.Equal(b.DownlinkDwellTime)
+				},
+				"max_duty_cycle": func(a, b ttnpb.MACParameters) bool {
+					return a.MaxDutyCycle == b.MaxDutyCycle
+				},
+				"max_eirp": func(a, b ttnpb.MACParameters) bool {
+					return a.MaxEIRP == b.MaxEIRP
+				},
+				"ping_slot_data_rate_index_value.value": func(a, b ttnpb.MACParameters) bool {
+					return a.PingSlotDataRateIndexValue.Equal(b.PingSlotDataRateIndexValue)
+				},
+				"ping_slot_frequency": func(a, b ttnpb.MACParameters) bool {
+					return a.PingSlotFrequency == b.PingSlotFrequency
+				},
+				"rejoin_count_periodicity": func(a, b ttnpb.MACParameters) bool {
+					return a.RejoinCountPeriodicity == b.RejoinCountPeriodicity
+				},
+				"rejoin_time_periodicity": func(a, b ttnpb.MACParameters) bool {
+					return a.RejoinTimePeriodicity == b.RejoinTimePeriodicity
+				},
+				"rx1_data_rate_offset": func(a, b ttnpb.MACParameters) bool {
+					return a.Rx1DataRateOffset == b.Rx1DataRateOffset
+				},
+				"rx1_delay": func(a, b ttnpb.MACParameters) bool {
+					return a.Rx1Delay == b.Rx1Delay
+				},
+				"rx2_data_rate_index": func(a, b ttnpb.MACParameters) bool {
+					return a.Rx2DataRateIndex == b.Rx2DataRateIndex
+				},
+				"rx2_frequency": func(a, b ttnpb.MACParameters) bool {
+					return a.Rx2Frequency == b.Rx2Frequency
+				},
+				"uplink_dwell_time.value": func(a, b ttnpb.MACParameters) bool {
+					return a.UplinkDwellTime.Equal(b.UplinkDwellTime)
+				},
+			} {
+				curPath := "mac_state.current_parameters." + s
+				desPath := "mac_state.desired_parameters." + s
+				eq := eq
+				rs = append(rs, ifThenFuncFieldRight{
+					Func: func(m map[string]*ttnpb.EndDevice) (bool, string) {
+						curDev := m[curPath]
+						desDev := m[desPath]
+						if curDev == nil || desDev == nil {
+							if curDev != desDev {
+								return false, desPath
+							}
+							return true, ""
+						}
+						if !eq(curDev.MACState.CurrentParameters, desDev.MACState.DesiredParameters) {
+							return false, desPath
+						}
+						return true, ""
+					},
+					Fields: []string{
+						curPath,
+						desPath,
+					},
+				})
+			}
+			return rs
+		}(),
+
+			ifThenFuncFieldRight{
+				Func: func(m map[string]*ttnpb.EndDevice) (bool, string) {
+					if !m["supports_class_b"].GetSupportsClassB() && !m["supports_class_c"].GetSupportsClassC() {
+						return false, "supports_class_b"
+					}
+					return true, ""
+				},
+				Fields: []string{
+					"supports_class_b",
+					"supports_class_c",
+				},
+			},
+
+			ifThenFuncFieldRight{
+				Func: func(m map[string]*ttnpb.EndDevice) (bool, string) {
+					if !m["supports_class_b"].GetSupportsClassB() ||
+						m["mac_settings.ping_slot_periodicity.value"].GetMACSettings().GetPingSlotPeriodicity() != nil {
+						return true, ""
+					}
+					return false, "mac_settings.ping_slot_periodicity.value"
+				},
+				Fields: []string{
+					"mac_settings.ping_slot_periodicity.value",
+					"supports_class_b",
+				},
+			},
+		),
+	}
+
+	// downlinkInfluencingSetFields contains fields that can influence downlink scheduling, e.g. trigger one or make a scheduled slot obsolete.
+	downlinkInfluencingSetFields = [...]string{
+		"last_dev_status_received_at",
+		"mac_state.current_parameters.adr_ack_delay_exponent.value",
+		"mac_state.current_parameters.adr_ack_limit_exponent.value",
+		"mac_state.current_parameters.adr_data_rate_index",
+		"mac_state.current_parameters.adr_nb_trans",
+		"mac_state.current_parameters.adr_tx_power_index",
+		"mac_state.current_parameters.beacon_frequency",
+		"mac_state.current_parameters.channels",
+		"mac_state.current_parameters.downlink_dwell_time.value",
+		"mac_state.current_parameters.max_duty_cycle",
+		"mac_state.current_parameters.max_eirp",
+		"mac_state.current_parameters.ping_slot_data_rate_index_value.value",
+		"mac_state.current_parameters.ping_slot_frequency",
+		"mac_state.current_parameters.rejoin_count_periodicity",
+		"mac_state.current_parameters.rejoin_time_periodicity",
+		"mac_state.current_parameters.rx1_data_rate_offset",
+		"mac_state.current_parameters.rx1_delay",
+		"mac_state.current_parameters.rx2_data_rate_index",
+		"mac_state.current_parameters.rx2_frequency",
+		"mac_state.current_parameters.uplink_dwell_time.value",
+		"mac_state.desired_parameters.adr_ack_delay_exponent.value",
+		"mac_state.desired_parameters.adr_ack_limit_exponent.value",
+		"mac_state.desired_parameters.adr_data_rate_index",
+		"mac_state.desired_parameters.adr_nb_trans",
+		"mac_state.desired_parameters.adr_tx_power_index",
+		"mac_state.desired_parameters.beacon_frequency",
+		"mac_state.desired_parameters.channels",
+		"mac_state.desired_parameters.downlink_dwell_time.value",
+		"mac_state.desired_parameters.max_duty_cycle",
+		"mac_state.desired_parameters.max_eirp",
+		"mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
+		"mac_state.desired_parameters.ping_slot_frequency",
+		"mac_state.desired_parameters.rejoin_count_periodicity",
+		"mac_state.desired_parameters.rejoin_time_periodicity",
+		"mac_state.desired_parameters.rx1_data_rate_offset",
+		"mac_state.desired_parameters.rx1_delay",
+		"mac_state.desired_parameters.rx2_data_rate_index",
+		"mac_state.desired_parameters.rx2_frequency",
+		"mac_state.desired_parameters.uplink_dwell_time.value",
+		"mac_state.device_class",
+		"mac_state.last_confirmed_downlink_at",
+		"mac_state.last_dev_status_f_cnt_up",
+		"mac_state.last_downlink_at",
+		"mac_state.last_network_initiated_downlink_at",
+		"mac_state.lorawan_version",
+		"mac_state.ping_slot_periodicity.value",
+		"mac_state.queued_responses",
+		"mac_state.recent_uplinks",
+		"mac_state.rejected_adr_data_rate_indexes",
+		"mac_state.rejected_adr_tx_power_indexes",
+		"mac_state.rejected_data_rate_ranges",
+		"mac_state.rejected_frequencies",
+		"mac_state.rx_windows_available",
+	}
+)
 
 // Set implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
@@ -765,61 +998,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		return nil, err
 	}
 
-	switch {
-	case st.HasSetField(
-		"ids.dev_eui",
-	):
-		if st.Device.DevEUI != nil && !st.Device.DevEUI.IsZero() {
-			break
-		}
-		if st.HasSetField(
-			"supports_join",
-		) {
-			if st.Device.SupportsJoin {
-				return nil, errNoDevEUI.New()
-			} else {
-				if err := st.ValidateField(func(dev *ttnpb.EndDevice) bool {
-					return !dev.LoRaWANVersion.RequireDevEUIForABP()
-				}, "lorawan_version"); err != nil {
-					return nil, err
-				}
-			}
-		} else {
-			if err := st.ValidateFields(func(m map[string]*ttnpb.EndDevice) (bool, string) {
-				if m["supports_join"].GetSupportsJoin() {
-					return false, "supports_join"
-				} else if m["lorawan_version"].LoRaWANVersion.RequireDevEUIForABP() {
-					return false, "lorawan_version"
-				}
-				return true, ""
-			},
-				"lorawan_version",
-				"supports_join",
-			); err != nil {
-				return nil, err
-			}
-		}
-	case st.HasSetField(
-		"lorawan_version",
-		"supports_join",
-	):
-		if err := st.ValidateFields(func(m map[string]*ttnpb.EndDevice) (bool, string) {
-			if dev, ok := m["ids.dev_eui"]; ok && dev.DevEUI != nil && !dev.DevEUI.IsZero() {
-				return true, ""
-			}
-			if m["supports_join"].GetSupportsJoin() || m["lorawan_version"].LoRaWANVersion.RequireDevEUIForABP() {
-				return false, "ids.dev_eui"
-			}
-			return true, ""
-		},
-			"ids.dev_eui",
-			"lorawan_version",
-			"supports_join",
-		); err != nil {
-			return nil, err
-		}
-	}
-
+	// Ensure ids.dev_addr and session.dev_addr are consistent.
 	if st.HasSetField("ids.dev_addr") {
 		if err := st.ValidateField(func(dev *ttnpb.EndDevice) bool {
 			if st.Device.DevAddr == nil {
@@ -840,248 +1019,143 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		)
 	}
 
-	if err := st.ValidateIfNotZeroThenNotZero("supports_join",
-		"ids.join_eui",
-	); err != nil {
-		return nil, err
-	}
-
-	if err := st.ValidateIfZeroThenZero("supports_join",
-		"pending_mac_state.current_parameters.adr_ack_delay_exponent.value",
-		"pending_mac_state.current_parameters.adr_ack_limit_exponent.value",
-		"pending_mac_state.current_parameters.adr_data_rate_index",
-		"pending_mac_state.current_parameters.adr_nb_trans",
-		"pending_mac_state.current_parameters.adr_tx_power_index",
-		"pending_mac_state.current_parameters.beacon_frequency",
-		"pending_mac_state.current_parameters.channels",
-		"pending_mac_state.current_parameters.downlink_dwell_time.value",
-		"pending_mac_state.current_parameters.max_duty_cycle",
-		"pending_mac_state.current_parameters.max_eirp",
-		"pending_mac_state.current_parameters.ping_slot_data_rate_index_value.value",
-		"pending_mac_state.current_parameters.ping_slot_frequency",
-		"pending_mac_state.current_parameters.rejoin_count_periodicity",
-		"pending_mac_state.current_parameters.rejoin_time_periodicity",
-		"pending_mac_state.current_parameters.rx1_data_rate_offset",
-		"pending_mac_state.current_parameters.rx1_delay",
-		"pending_mac_state.current_parameters.rx2_data_rate_index",
-		"pending_mac_state.current_parameters.rx2_frequency",
-		"pending_mac_state.current_parameters.uplink_dwell_time.value",
-		"pending_mac_state.desired_parameters.adr_ack_delay_exponent.value",
-		"pending_mac_state.desired_parameters.adr_ack_limit_exponent.value",
-		"pending_mac_state.desired_parameters.adr_data_rate_index",
-		"pending_mac_state.desired_parameters.adr_nb_trans",
-		"pending_mac_state.desired_parameters.adr_tx_power_index",
-		"pending_mac_state.desired_parameters.beacon_frequency",
-		"pending_mac_state.desired_parameters.channels",
-		"pending_mac_state.desired_parameters.downlink_dwell_time.value",
-		"pending_mac_state.desired_parameters.max_duty_cycle",
-		"pending_mac_state.desired_parameters.max_eirp",
-		"pending_mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
-		"pending_mac_state.desired_parameters.ping_slot_frequency",
-		"pending_mac_state.desired_parameters.rejoin_count_periodicity",
-		"pending_mac_state.desired_parameters.rejoin_time_periodicity",
-		"pending_mac_state.desired_parameters.rx1_data_rate_offset",
-		"pending_mac_state.desired_parameters.rx1_delay",
-		"pending_mac_state.desired_parameters.rx2_data_rate_index",
-		"pending_mac_state.desired_parameters.rx2_frequency",
-		"pending_mac_state.desired_parameters.uplink_dwell_time.value",
-		"pending_mac_state.device_class",
-		"pending_mac_state.last_adr_change_f_cnt_up",
-		"pending_mac_state.last_confirmed_downlink_at",
-		"pending_mac_state.last_dev_status_f_cnt_up",
-		"pending_mac_state.last_downlink_at",
-		"pending_mac_state.last_network_initiated_downlink_at",
-		"pending_mac_state.lorawan_version",
-		"pending_mac_state.pending_join_request.cf_list.ch_masks",
-		"pending_mac_state.pending_join_request.cf_list.freq",
-		"pending_mac_state.pending_join_request.cf_list.type",
-		"pending_mac_state.pending_join_request.downlink_settings.opt_neg",
-		"pending_mac_state.pending_join_request.downlink_settings.rx1_dr_offset",
-		"pending_mac_state.pending_join_request.downlink_settings.rx2_dr",
-		"pending_mac_state.pending_join_request.rx_delay",
-		"pending_mac_state.ping_slot_periodicity.value",
-		"pending_mac_state.queued_join_accept.correlation_ids",
-		"pending_mac_state.queued_join_accept.keys.app_s_key.encrypted_key",
-		"pending_mac_state.queued_join_accept.keys.app_s_key.kek_label",
-		"pending_mac_state.queued_join_accept.keys.app_s_key.key",
-		"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
-		"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
-		"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
-		"pending_mac_state.queued_join_accept.keys.session_key_id",
-		"pending_mac_state.queued_join_accept.payload",
-		"pending_mac_state.queued_join_accept.request.cf_list.ch_masks",
-		"pending_mac_state.queued_join_accept.request.cf_list.freq",
-		"pending_mac_state.queued_join_accept.request.cf_list.type",
-		"pending_mac_state.queued_join_accept.request.dev_addr",
-		"pending_mac_state.queued_join_accept.request.downlink_settings.opt_neg",
-		"pending_mac_state.queued_join_accept.request.downlink_settings.rx1_dr_offset",
-		"pending_mac_state.queued_join_accept.request.downlink_settings.rx2_dr",
-		"pending_mac_state.queued_join_accept.request.net_id",
-		"pending_mac_state.queued_join_accept.request.rx_delay",
-		"pending_mac_state.recent_downlinks",
-		"pending_mac_state.recent_uplinks",
-		"pending_mac_state.rejected_adr_data_rate_indexes",
-		"pending_mac_state.rejected_adr_tx_power_indexes",
-		"pending_mac_state.rejected_data_rate_ranges",
-		"pending_mac_state.rejected_frequencies",
-		"pending_mac_state.rx_windows_available",
-		"pending_session.dev_addr",
-		"pending_session.keys.f_nwk_s_int_key.key",
-		"pending_session.keys.nwk_s_enc_key.key",
-		"pending_session.keys.s_nwk_s_int_key.key",
-		"pending_session.keys.session_key_id",
-		"session.keys.session_key_id",
-	); err != nil {
-		return nil, err
-	}
-	if err := st.ValidateIfZeroThenNotZero("supports_join",
-		"session.dev_addr",
-		"session.keys.f_nwk_s_int_key.key",
-	); err != nil {
-		return nil, err
-	}
-
-	if err := st.ValidateIfNotZeroThenZero("multicast",
-		"mac_state.last_adr_change_f_cnt_up",
-		"mac_state.last_confirmed_downlink_at",
-		"mac_state.last_dev_status_f_cnt_up",
-		"mac_state.pending_application_downlink",
-		"mac_state.pending_requests",
-		"mac_state.queued_responses",
-		"mac_state.recent_uplinks",
-		"mac_state.rejected_adr_data_rate_indexes",
-		"mac_state.rejected_adr_tx_power_indexes",
-		"mac_state.rejected_data_rate_ranges",
-		"mac_state.rejected_frequencies",
-		"mac_state.rx_windows_available",
-		"session.last_conf_f_cnt_down",
-		"session.last_f_cnt_up",
-		"supports_join",
-	); err != nil {
-		return nil, err
-	}
-	if err := st.ValidateIfNotZeroThenFunc(func(m map[string]*ttnpb.EndDevice) (bool, string) {
-		if !m["supports_class_b"].GetSupportsClassB() && !m["supports_class_c"].GetSupportsClassC() {
-			return false, "supports_class_b"
-		}
-		return true, ""
-	},
-		"multicast",
-
-		"supports_class_b",
-		"supports_class_c",
-	); err != nil {
-		return nil, err
-	}
-
-	for s, eq := range map[string]func(ttnpb.MACParameters, ttnpb.MACParameters) bool{
-		"adr_ack_delay_exponent.value": func(a, b ttnpb.MACParameters) bool {
-			return a.ADRAckDelayExponent.Equal(b.ADRAckDelayExponent)
-		},
-		"adr_ack_limit_exponent.value": func(a, b ttnpb.MACParameters) bool {
-			return a.ADRAckLimitExponent.Equal(b.ADRAckLimitExponent)
-		},
-		"adr_data_rate_index": func(a, b ttnpb.MACParameters) bool {
-			return a.ADRDataRateIndex == b.ADRDataRateIndex
-		},
-		"adr_nb_trans": func(a, b ttnpb.MACParameters) bool {
-			return a.ADRNbTrans == b.ADRNbTrans
-		},
-		"adr_tx_power_index": func(a, b ttnpb.MACParameters) bool {
-			return a.ADRTxPowerIndex == b.ADRTxPowerIndex
-		},
-		"beacon_frequency": func(a, b ttnpb.MACParameters) bool {
-			return a.BeaconFrequency == b.BeaconFrequency
-		},
-		"channels": func(a, b ttnpb.MACParameters) bool {
-			if len(a.Channels) != len(b.Channels) {
-				return false
+	// Ensure FieldIsZero(left) -> FieldIsZero(r), for each r in right.
+	for left, right := range ifZeroThenZeroFields {
+		if st.HasSetField(left) {
+			if !st.Device.FieldIsZero(left) {
+				continue
 			}
-			for i, ch := range a.Channels {
-				if !ch.Equal(b.Channels[i]) {
-					return false
+			if err := st.ValidateFieldsAreZero(right...); err != nil {
+				return nil, err
+			}
+		}
+		for _, r := range right {
+			if !st.HasSetField(r) || st.Device.FieldIsZero(r) {
+				continue
+			}
+			if err := st.ValidateFieldIsNotZero(left); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Ensure FieldIsZero(left) -> !FieldIsZero(r), for each r in right.
+	for left, right := range ifZeroThenNotZeroFields {
+		if st.HasSetField(left) {
+			if !st.Device.FieldIsZero(left) {
+				continue
+			}
+			if err := st.ValidateFieldsAreNotZero(right...); err != nil {
+				return nil, err
+			}
+		}
+		for _, r := range right {
+			if !st.HasSetField(r) || !st.Device.FieldIsZero(r) {
+				continue
+			}
+			if err := st.ValidateFieldIsNotZero(left); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Ensure FieldIsZero(left) -> r.Func(map rr -> *ttnpb.EndDevice), for each rr in r.Fields for each r in rs.
+	for left, rs := range ifZeroThenFuncFields {
+		for _, r := range rs {
+			if st.HasSetField(left) {
+				if !st.Device.FieldIsZero(left) {
+					continue
+				}
+				if err := st.ValidateFields(r.Func, r.Fields...); err != nil {
+					return nil, err
 				}
 			}
-			return true
-		},
-		"downlink_dwell_time.value": func(a, b ttnpb.MACParameters) bool {
-			return a.DownlinkDwellTime.Equal(b.DownlinkDwellTime)
-		},
-		"max_duty_cycle": func(a, b ttnpb.MACParameters) bool {
-			return a.MaxDutyCycle == b.MaxDutyCycle
-		},
-		"max_eirp": func(a, b ttnpb.MACParameters) bool {
-			return a.MaxEIRP == b.MaxEIRP
-		},
-		"ping_slot_data_rate_index_value.value": func(a, b ttnpb.MACParameters) bool {
-			return a.PingSlotDataRateIndexValue.Equal(b.PingSlotDataRateIndexValue)
-		},
-		"ping_slot_frequency": func(a, b ttnpb.MACParameters) bool {
-			return a.PingSlotFrequency == b.PingSlotFrequency
-		},
-		"rejoin_count_periodicity": func(a, b ttnpb.MACParameters) bool {
-			return a.RejoinCountPeriodicity == b.RejoinCountPeriodicity
-		},
-		"rejoin_time_periodicity": func(a, b ttnpb.MACParameters) bool {
-			return a.RejoinTimePeriodicity == b.RejoinTimePeriodicity
-		},
-		"rx1_data_rate_offset": func(a, b ttnpb.MACParameters) bool {
-			return a.Rx1DataRateOffset == b.Rx1DataRateOffset
-		},
-		"rx1_delay": func(a, b ttnpb.MACParameters) bool {
-			return a.Rx1Delay == b.Rx1Delay
-		},
-		"rx2_data_rate_index": func(a, b ttnpb.MACParameters) bool {
-			return a.Rx2DataRateIndex == b.Rx2DataRateIndex
-		},
-		"rx2_frequency": func(a, b ttnpb.MACParameters) bool {
-			return a.Rx2Frequency == b.Rx2Frequency
-		},
-		"uplink_dwell_time.value": func(a, b ttnpb.MACParameters) bool {
-			return a.UplinkDwellTime.Equal(b.UplinkDwellTime)
-		},
-	} {
-		curPath := "mac_state.current_parameters." + s
-		desPath := "mac_state.desired_parameters." + s
-		eq := eq
-		if err := st.ValidateIfNotZeroThenFunc(func(m map[string]*ttnpb.EndDevice) (bool, string) {
-			curDev := m[curPath]
-			desDev := m[desPath]
-			if curDev == nil || desDev == nil {
-				if curDev != desDev {
-					return false, desPath
+			if !st.HasSetField(r.Fields...) {
+				continue
+			}
+
+			left := left
+			r := r
+			if err := st.ValidateFields(func(m map[string]*ttnpb.EndDevice) (bool, string) {
+				if !m[left].FieldIsZero(left) {
+					return true, ""
 				}
-				return true, ""
+				return r.Func(m)
+			}, append([]string{left}, r.Fields...)...); err != nil {
+				return nil, err
 			}
-			if !eq(curDev.MACState.CurrentParameters, desDev.MACState.DesiredParameters) {
-				return false, desPath
-			}
-			return true, ""
-		},
-			"multicast",
-
-			curPath,
-			desPath,
-		); err != nil {
-			return nil, err
 		}
 	}
 
-	if err := st.ValidateIfNotZeroThenFunc(func(m map[string]*ttnpb.EndDevice) (bool, string) {
-		if !m["supports_class_b"].GetSupportsClassB() ||
-			m["mac_settings.ping_slot_periodicity.value"].GetMACSettings().GetPingSlotPeriodicity() != nil {
-			return true, ""
+	// Ensure !FieldIsZero(left) -> FieldIsZero(r), for each r in right.
+	for left, right := range ifNotZeroThenZeroFields {
+		if st.HasSetField(left) {
+			if st.Device.FieldIsZero(left) {
+				continue
+			}
+			if err := st.ValidateFieldsAreZero(right...); err != nil {
+				return nil, err
+			}
 		}
-		return false, "mac_settings.ping_slot_periodicity.value"
-	},
-		"multicast",
-
-		"supports_class_b",
-		"mac_settings.ping_slot_periodicity.value",
-	); err != nil {
-		return nil, err
+		for _, r := range right {
+			if !st.HasSetField(r) || st.Device.FieldIsZero(r) {
+				continue
+			}
+			if err := st.ValidateFieldIsZero(left); err != nil {
+				return nil, err
+			}
+		}
 	}
 
+	// Ensure !FieldIsZero(left) -> !FieldIsZero(r), for each r in right.
+	for left, right := range ifNotZeroThenNotZeroFields {
+		if st.HasSetField(left) {
+			if st.Device.FieldIsZero(left) {
+				continue
+			}
+			if err := st.ValidateFieldsAreNotZero(right...); err != nil {
+				return nil, err
+			}
+		}
+		for _, r := range right {
+			if !st.HasSetField(r) || !st.Device.FieldIsZero(r) {
+				continue
+			}
+			if err := st.ValidateFieldIsZero(left); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Ensure !FieldIsZero(left) -> r.Func(map rr -> *ttnpb.EndDevice), for each rr in r.Fields for each r in rs.
+	for left, rs := range ifNotZeroThenFuncFields {
+		for _, r := range rs {
+			if st.HasSetField(left) {
+				if st.Device.FieldIsZero(left) {
+					continue
+				}
+				if err := st.ValidateFields(r.Func, r.Fields...); err != nil {
+					return nil, err
+				}
+			}
+			if !st.HasSetField(r.Fields...) {
+				continue
+			}
+
+			left := left
+			r := r
+			if err := st.ValidateFields(func(m map[string]*ttnpb.EndDevice) (bool, string) {
+				if m[left].FieldIsZero(left) {
+					return true, ""
+				}
+				return r.Func(m)
+			}, append([]string{left}, r.Fields...)...); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Ensure parameters are consistent with band specifications.
 	if st.HasSetField(
 		"frequency_plan_id",
 		"lorawan_phy_version",
@@ -1990,61 +2064,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		return nil, err
 	}
 
-	needsDownlinkCheck := st.HasSetField(
-		"last_dev_status_received_at",
-		"mac_state.current_parameters.adr_ack_delay_exponent.value",
-		"mac_state.current_parameters.adr_ack_limit_exponent.value",
-		"mac_state.current_parameters.adr_data_rate_index",
-		"mac_state.current_parameters.adr_nb_trans",
-		"mac_state.current_parameters.adr_tx_power_index",
-		"mac_state.current_parameters.beacon_frequency",
-		"mac_state.current_parameters.channels",
-		"mac_state.current_parameters.downlink_dwell_time.value",
-		"mac_state.current_parameters.max_duty_cycle",
-		"mac_state.current_parameters.max_eirp",
-		"mac_state.current_parameters.ping_slot_data_rate_index_value.value",
-		"mac_state.current_parameters.ping_slot_frequency",
-		"mac_state.current_parameters.rejoin_count_periodicity",
-		"mac_state.current_parameters.rejoin_time_periodicity",
-		"mac_state.current_parameters.rx1_data_rate_offset",
-		"mac_state.current_parameters.rx1_delay",
-		"mac_state.current_parameters.rx2_data_rate_index",
-		"mac_state.current_parameters.rx2_frequency",
-		"mac_state.current_parameters.uplink_dwell_time.value",
-		"mac_state.desired_parameters.adr_ack_delay_exponent.value",
-		"mac_state.desired_parameters.adr_ack_limit_exponent.value",
-		"mac_state.desired_parameters.adr_data_rate_index",
-		"mac_state.desired_parameters.adr_nb_trans",
-		"mac_state.desired_parameters.adr_tx_power_index",
-		"mac_state.desired_parameters.beacon_frequency",
-		"mac_state.desired_parameters.channels",
-		"mac_state.desired_parameters.downlink_dwell_time.value",
-		"mac_state.desired_parameters.max_duty_cycle",
-		"mac_state.desired_parameters.max_eirp",
-		"mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
-		"mac_state.desired_parameters.ping_slot_frequency",
-		"mac_state.desired_parameters.rejoin_count_periodicity",
-		"mac_state.desired_parameters.rejoin_time_periodicity",
-		"mac_state.desired_parameters.rx1_data_rate_offset",
-		"mac_state.desired_parameters.rx1_delay",
-		"mac_state.desired_parameters.rx2_data_rate_index",
-		"mac_state.desired_parameters.rx2_frequency",
-		"mac_state.desired_parameters.uplink_dwell_time.value",
-		"mac_state.device_class",
-		"mac_state.last_confirmed_downlink_at",
-		"mac_state.last_dev_status_f_cnt_up",
-		"mac_state.last_downlink_at",
-		"mac_state.last_network_initiated_downlink_at",
-		"mac_state.lorawan_version",
-		"mac_state.ping_slot_periodicity.value",
-		"mac_state.queued_responses",
-		"mac_state.recent_uplinks",
-		"mac_state.rejected_adr_data_rate_indexes",
-		"mac_state.rejected_adr_tx_power_indexes",
-		"mac_state.rejected_data_rate_ranges",
-		"mac_state.rejected_frequencies",
-		"mac_state.rx_windows_available",
-	)
+	needsDownlinkCheck := st.HasSetField(downlinkInfluencingSetFields[:]...)
 	if needsDownlinkCheck {
 		st.AddGetFields(
 			"frequency_plan_id",
