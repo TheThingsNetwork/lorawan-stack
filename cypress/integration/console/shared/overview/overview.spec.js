@@ -35,10 +35,7 @@ describe('Overview', () => {
     }
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createApplication(application, userId)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {
@@ -73,10 +70,7 @@ describe('Overview', () => {
     }
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createGateway(gateway, userId)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {
@@ -111,10 +105,7 @@ describe('Overview', () => {
     }
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createOrganization(organization, userId)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {
@@ -174,11 +165,8 @@ describe('Overview', () => {
     }
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createApplication(application, userId)
       cy.createEndDevice(applicationId, endDeviceRequestBody)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {

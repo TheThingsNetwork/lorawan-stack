@@ -42,7 +42,6 @@ describe('End device manual create', () => {
     }
 
     before(() => {
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
       cy.createApplication(application, user.ids.user_id)
     })
 
@@ -385,7 +384,6 @@ describe('End device manual create', () => {
     const appId = application.ids.application_id
 
     before(() => {
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
       cy.createApplication(application, user.ids.user_id)
     })
 
@@ -509,7 +507,6 @@ describe('End device manual create', () => {
     }
 
     before(() => {
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
       cy.createApplication(application, user.ids.user_id)
     })
 

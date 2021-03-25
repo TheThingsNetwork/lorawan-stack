@@ -40,10 +40,19 @@ const applicationFeatureToggles = defineSmokeTest(
       'RIGHT_APPLICATION_TRAFFIC_READ',
       'RIGHT_APPLICATION_TRAFFIC_UP_WRITE',
     ]
+    const collaborator = {
+      ids: { user_id: 'feature-toggle-test-collaborator' },
+      primary_email_address: 'test-collaborator@example.com',
+      password: 'ABCDefg123!',
+      password_confirm: 'ABCDefg123!',
+      email: 'feature-toggle-test-collaborator@example.com',
+    }
     cy.createUser(user)
-    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.createUser(collaborator)
     cy.createApplication(application, user.ids.user_id)
-    cy.setApplicationCollaborator(application.ids.application_id, user.ids.user_id, rights)
+    cy.setApplicationCollaborator(application.ids.application_id, collaborator.ids.user_id, rights)
+
+    cy.loginConsole({ user_id: collaborator.ids.user_id, password: collaborator.password })
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${application.ids.application_id}`)
 
     cy.findByTestId('navigation-sidebar').within(() => {

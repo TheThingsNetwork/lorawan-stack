@@ -42,10 +42,7 @@ describe('End device repository create', () => {
     }
 
     before(() => {
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
       cy.createApplication(application, user.ids.user_id)
-      cy.clearCookies()
-      cy.clearLocalStorage()
     })
 
     it('displays UI elements in place', () => {
@@ -394,10 +391,7 @@ describe('End device repository create', () => {
     }
 
     before(() => {
-      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
       cy.createApplication(application, user.ids.user_id)
-      cy.clearCookies()
-      cy.clearLocalStorage()
     })
 
     describe('Test Brand', () => {

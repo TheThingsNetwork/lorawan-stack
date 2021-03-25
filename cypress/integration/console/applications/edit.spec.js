@@ -26,10 +26,7 @@ describe('Application general settings', () => {
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
-    cy.loginConsole({ user_id: userId, password: user.password })
     cy.createApplication(application, userId)
-    cy.clearLocalStorage()
-    cy.clearCookies()
   })
 
   beforeEach(() => {

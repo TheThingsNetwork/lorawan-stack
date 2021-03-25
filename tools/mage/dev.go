@@ -284,6 +284,7 @@ func (Dev) InitStack() error {
 // StartDevStack starts TTS in end-to-end test configuration.
 func (Dev) StartDevStack() error {
 	os.Setenv("TTN_LW_IS_DATABASE_URI", databaseURI)
+	os.Setenv("TTN_LW_IS_ADMIN_RIGHTS_ALL", "true")
 	if mg.Verbose() {
 		fmt.Println("Starting the Stack")
 	}

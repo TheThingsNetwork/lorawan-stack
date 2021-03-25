@@ -26,10 +26,7 @@ describe('Organization general settings', () => {
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
-    cy.loginConsole({ user_id: userId, password: user.password })
     cy.createOrganization(organization, userId)
-    cy.clearLocalStorage()
-    cy.clearCookies()
   })
 
   beforeEach(() => {

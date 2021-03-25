@@ -71,13 +71,7 @@ describe('Collaborators', () => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createUser(collaboratorUser)
-    cy.loginConsole({
-      user_id: collaboratorId,
-      password: collaboratorUser.password,
-    })
     cy.createOrganization(organization, collaboratorId)
-    cy.clearLocalStorage()
-    cy.clearCookies()
   })
 
   describe('Application', () => {
@@ -88,12 +82,9 @@ describe('Collaborators', () => {
     const userCollaborator = generateCollaborator(entity, 'user')
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createApplication(application, userId)
       cy.createCollaborator(entity, applicationId, orgCollaborator)
       cy.createCollaborator(entity, applicationId, userCollaborator)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     it('succeeds editing organization collaborator', () => {
@@ -193,12 +184,9 @@ describe('Collaborators', () => {
     const userCollaborator = generateCollaborator(entity, 'user')
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createGateway(gateway, userId)
       cy.createCollaborator(entity, gatewayId, orgCollaborator)
       cy.createCollaborator(entity, gatewayId, userCollaborator)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     it('succeeds editing organization collaborator', () => {
@@ -297,11 +285,8 @@ describe('Collaborators', () => {
     const userCollaborator = generateCollaborator(entity, 'user')
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createOrganization(org, userId)
       cy.createCollaborator(entity, orgId, userCollaborator)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     it('succeeds editing user collaborator', () => {

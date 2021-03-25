@@ -18,6 +18,12 @@ import { noop, merge } from 'lodash'
 
 import stringToHash from '../../pkg/webui/lib/string-to-hash'
 
+before(() => {
+  cy.readFile('.env/admin_api_key.txt').then(adminKey => {
+    Cypress.config('adminApiKey', adminKey)
+  })
+})
+
 // Helper function to quickly login to the Account App app programmatically.
 Cypress.Commands.add('loginAccountApp', credentials => {
   const baseUrl = Cypress.config('baseUrl')
@@ -149,141 +155,132 @@ Cypress.Commands.add('createUser', user => {
 // Helper function to create a new application programmatically.
 Cypress.Commands.add('createApplication', (application, userId) => {
   const baseUrl = Cypress.config('baseUrl')
-  cy.getAccessToken(accessToken => {
-    cy.request({
-      method: 'POST',
-      url: `${baseUrl}/api/v3/users/${userId}/applications`,
-      body: { application },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    method: 'POST',
+    url: `${baseUrl}/api/v3/users/${userId}/applications`,
+    body: { application },
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
   })
 })
 
 // Helper function to create a new api key programmatically
 Cypress.Commands.add('createApiKey', (entity, entityId, apiKey, cb = noop) => {
   const baseUrl = Cypress.config('baseUrl')
-  cy.getAccessToken(accessToken => {
-    cy.request({
-      method: 'POST',
-      url: `${baseUrl}/api/v3/${entity}/${entityId}/api-keys`,
-      body: { ...apiKey },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }).then(response => cb(response.body))
-  })
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    method: 'POST',
+    url: `${baseUrl}/api/v3/${entity}/${entityId}/api-keys`,
+    body: { ...apiKey },
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
+  }).then(response => cb(response.body))
 })
 
 // Helper function to create a new collaborator programmatically
 Cypress.Commands.add('createCollaborator', (entity, entityId, collaborator) => {
   const baseUrl = Cypress.config('baseUrl')
-  cy.getAccessToken(accessToken => {
-    cy.request({
-      method: 'PUT',
-      url: `${baseUrl}/api/v3/${entity}/${entityId}/collaborators`,
-      body: collaborator,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    method: 'PUT',
+    url: `${baseUrl}/api/v3/${entity}/${entityId}/collaborators`,
+    body: collaborator,
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
   })
 })
 
 // Helper function to set an application collaborator programmatically.
 Cypress.Commands.add('setApplicationCollaborator', (applicationId, collaboratorId, rights) => {
   const baseUrl = Cypress.config('baseUrl')
-  cy.getAccessToken(accessToken => {
-    const body = {
-      collaborator: {
-        ids: { user_ids: { user_id: collaboratorId } },
-        rights,
-      },
-    }
-    cy.request({
-      method: 'PUT',
-      url: `${baseUrl}/api/v3/applications/${applicationId}/collaborators`,
-      body,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
+  const adminApiKey = Cypress.config('adminApiKey')
+  const body = {
+    collaborator: {
+      ids: { user_ids: { user_id: collaboratorId } },
+      rights,
+    },
+  }
+  cy.request({
+    method: 'PUT',
+    url: `${baseUrl}/api/v3/applications/${applicationId}/collaborators`,
+    body,
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
   })
 })
 
 // Helper function to create a new gateway programmatically.
 Cypress.Commands.add('createGateway', (gateway, userId) => {
   const baseUrl = Cypress.config('baseUrl')
-  cy.getAccessToken(accessToken => {
-    cy.request({
-      method: 'POST',
-      url: `${baseUrl}/api/v3/users/${userId}/gateways`,
-      body: { gateway },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    method: 'POST',
+    url: `${baseUrl}/api/v3/users/${userId}/gateways`,
+    body: { gateway },
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
   })
 })
 
 // Helper function to create a new organization programmatically.
 Cypress.Commands.add('createOrganization', (organization, userId) => {
   const baseUrl = Cypress.config('baseUrl')
-  cy.getAccessToken(accessToken => {
-    cy.request({
-      method: 'POST',
-      url: `${baseUrl}/api/v3/users/${userId}/organizations`,
-      body: { organization },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    method: 'POST',
+    url: `${baseUrl}/api/v3/users/${userId}/organizations`,
+    body: { organization },
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
   })
 })
 
 // Helper function to create a new end device programmatically.
 Cypress.Commands.add('createEndDevice', (applicationId, endDevice) => {
   const baseUrl = Cypress.config('baseUrl')
-  cy.getAccessToken(accessToken => {
-    cy.request({
-      method: 'POST',
-      url: `${baseUrl}/api/v3/applications/${applicationId}/devices`,
-      body: endDevice,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    method: 'POST',
+    url: `${baseUrl}/api/v3/applications/${applicationId}/devices`,
+    body: endDevice,
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
   })
 })
 
 // Helper function to create a new pub sub programmatically.
 Cypress.Commands.add('createPubSub', (applicationId, pubSub) => {
   const baseUrl = Cypress.config('baseUrl')
-  cy.getAccessToken(accessToken => {
-    cy.request({
-      method: 'POST',
-      url: `${baseUrl}/api/v3/as/pubsub/${applicationId}`,
-      body: pubSub,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    method: 'POST',
+    url: `${baseUrl}/api/v3/as/pubsub/${applicationId}`,
+    body: pubSub,
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
   })
 })
 
 // Helper function to update gateway programmatically.
 Cypress.Commands.add('updateGateway', (gatewayId, gateway) => {
   const baseUrl = Cypress.config('baseUrl')
-  cy.getAccessToken(accessToken => {
-    cy.request({
-      method: 'PUT',
-      url: `${baseUrl}/api/v3/gateways/${gatewayId}`,
-      body: gateway,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    method: 'PUT',
+    url: `${baseUrl}/api/v3/gateways/${gatewayId}`,
+    body: gateway,
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
   })
 })
 

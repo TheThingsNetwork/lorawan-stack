@@ -55,7 +55,6 @@ describe('Payload formatters', () => {
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
-    cy.loginConsole({ user_id: userId, password: user.password })
     cy.createApplication(application, userId)
     cy.createEndDevice(applicationId, endDeviceRequestBody)
   })

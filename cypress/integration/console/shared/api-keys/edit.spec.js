@@ -37,13 +37,10 @@ describe('API keys', () => {
     const entity = 'applications'
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createApplication(application, userId)
       cy.createApiKey(entity, applicationId, apiKey, key => {
         Cypress.config('apiKeyId', key.id)
       })
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {
@@ -108,18 +105,14 @@ describe('API keys', () => {
     const entity = 'gateways'
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createGateway(gateway, userId)
       cy.createApiKey(entity, gatewayId, apiKey, key => {
         Cypress.config('apiKeyId', key.id)
       })
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-      cy.createApiKey(entity, gatewayId, apiKey)
     })
 
     it('succeeds editing api key', () => {
@@ -182,18 +175,14 @@ describe('API keys', () => {
     const entity = 'organizations'
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createOrganization(organization, userId)
       cy.createApiKey(entity, organizationId, apiKey, key => {
         Cypress.config('apiKeyId', key.id)
       })
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-      cy.createApiKey(entity, organizationId, apiKey)
     })
 
     it('succeeds editing api key', () => {
@@ -252,17 +241,13 @@ describe('API keys', () => {
     const entity = 'users'
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createApiKey(entity, userId, apiKey, key => {
         Cypress.config('apiKeyId', key.id)
       })
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-      cy.createApiKey(entity, userId, apiKey)
     })
 
     it('succeeds editing api key', () => {
