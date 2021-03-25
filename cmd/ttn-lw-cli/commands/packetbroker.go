@@ -352,9 +352,14 @@ for the Home Network (by NetID and tenant ID).`,
 		Aliases: []string{"forwarder", "fwd"},
 		Short:   "Forwarder commands",
 	}
-	packetBrokerForwardersShowCommand = &cobra.Command{
-		Use:   "show",
-		Short: "Show routing policies configured by Forwarders",
+	packetBrokerForwardersPoliciesCommand = &cobra.Command{
+		Use:     "policies",
+		Aliases: []string{"policy", "po"},
+		Short:   "Manage Forwarder routing policies",
+	}
+	packetBrokerForwardersPoliciesListCommand = &cobra.Command{
+		Use:   "list",
+		Short: "List routing policies configured by Forwarders",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pba, err := api.Dial(ctx, config.PacketBrokerAgentGRPCAddress)
 			if err != nil {
@@ -392,8 +397,9 @@ func init() {
 	packetBrokerHomeNetworksListCommand.Flags().AddFlagSet(paginationFlags())
 	packetBrokerHomeNetworksCommand.AddCommand(packetBrokerHomeNetworksListCommand)
 	packetBrokerCommand.AddCommand(packetBrokerHomeNetworksCommand)
-	packetBrokerForwardersShowCommand.Flags().AddFlagSet(paginationFlags())
-	packetBrokerForwardersCommand.AddCommand(packetBrokerForwardersShowCommand)
+	packetBrokerForwardersPoliciesListCommand.Flags().AddFlagSet(paginationFlags())
+	packetBrokerForwardersPoliciesCommand.AddCommand(packetBrokerForwardersPoliciesListCommand)
+	packetBrokerForwardersCommand.AddCommand(packetBrokerForwardersPoliciesCommand)
 	packetBrokerCommand.AddCommand(packetBrokerForwardersCommand)
 
 	Root.AddCommand(packetBrokerCommand)
