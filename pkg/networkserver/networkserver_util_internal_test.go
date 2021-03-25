@@ -570,7 +570,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 
 	if !a.So(env.AssertListApplicationRights(reqCtx, req.EndDevice.ApplicationIdentifiers, authType, authValue, rights...), should.BeTrue) {
 		t.Error("ListRights assertion failed")
-		return nil, nil, false
+		return nil, err, false
 	}
 
 	action := "create"
@@ -582,7 +582,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 	select {
 	case <-ctx.Done():
 		t.Errorf("Timed out while waiting for device %s event to be published or Set call to return", action)
-		return nil, nil, false
+		return nil, err, false
 
 	case <-reqCtx.Done():
 		if err == nil {
@@ -596,7 +596,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 			events.WithIdentifiers(req.EndDevice.EndDeviceIdentifiers),
 		)) {
 			t.Errorf("Failed to assert device %s event", action)
-			return nil, nil, false
+			return nil, err, false
 		}
 		close(ev.Response)
 	}
@@ -604,7 +604,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 	select {
 	case <-ctx.Done():
 		t.Error("Timed out while waiting for Set call to return")
-		return nil, nil, false
+		return nil, err, false
 
 	case <-reqCtx.Done():
 		return dev, err, true
