@@ -445,20 +445,25 @@ func MakeDownlinkMACBuffer(phy *band.Band, cmds ...MACCommander) []byte {
 
 var SessionKeysOptions = test.SessionKeysOptions
 
-func MakeSessionKeys(macVersion ttnpb.MACVersion, wrapKeys bool, opts ...test.SessionKeysOption) *ttnpb.SessionKeys {
+func MakeSessionKeys(macVersion ttnpb.MACVersion, wrapKeys, withID bool, opts ...test.SessionKeysOption) *ttnpb.SessionKeys {
 	defaultKeyOpt := SessionKeysOptions.WithDefaultNwkKeys
 	if wrapKeys {
 		defaultKeyOpt = SessionKeysOptions.WithDefaultNwkKeysWrapped
 	}
+	var id []byte
+	if withID {
+		id = test.DefaultSessionKeyID
+	}
 	return test.MakeSessionKeys(
 		defaultKeyOpt(macVersion),
+		SessionKeysOptions.WithSessionKeyID(id),
 		SessionKeysOptions.Compose(opts...),
 	)
 }
 
 func messageGenerationKeys(sk *ttnpb.SessionKeys, macVersion ttnpb.MACVersion) ttnpb.SessionKeys {
 	if sk == nil {
-		return *MakeSessionKeys(macVersion, false)
+		return *MakeSessionKeys(macVersion, false, false)
 	}
 	decrypt := func(ke *ttnpb.KeyEnvelope) *types.AES128Key {
 		switch {

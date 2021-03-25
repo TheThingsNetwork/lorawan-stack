@@ -26,9 +26,7 @@ var (
 		RootKeyID: DefaultRootKeyID,
 	}
 
-	baseSessionKeys = ttnpb.SessionKeys{
-		SessionKeyID: DefaultSessionKeyID,
-	}
+	baseSessionKeys = ttnpb.SessionKeys{}
 
 	baseSession = ttnpb.Session{
 		DevAddr:     DefaultDevAddr,
@@ -81,6 +79,10 @@ func (o SessionKeysOptionNamespace) WithDefaultAppSKey() SessionKeysOption {
 	return o.WithAppSKey(&ttnpb.KeyEnvelope{
 		Key: &DefaultAppSKey,
 	})
+}
+
+func (o SessionKeysOptionNamespace) WithDefaultSessionKeyID() SessionKeysOption {
+	return o.WithSessionKeyID(DefaultSessionKeyID)
 }
 
 func (o SessionOptionNamespace) WithSessionKeysOptions(opts ...SessionKeysOption) SessionOption {

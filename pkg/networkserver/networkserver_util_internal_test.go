@@ -2027,9 +2027,9 @@ func (o SessionOptionNamespace) WithDefaultQueuedApplicationDownlinks() test.Ses
 
 var SessionOptions SessionOptionNamespace
 
-func MakeSession(macVersion ttnpb.MACVersion, wrapKeys bool, opts ...test.SessionOption) *ttnpb.Session {
+func MakeSession(macVersion ttnpb.MACVersion, wrapKeys, withID bool, opts ...test.SessionOption) *ttnpb.Session {
 	return test.MakeSession(
-		SessionOptions.WithSessionKeys(*MakeSessionKeys(macVersion, wrapKeys)),
+		SessionOptions.WithSessionKeys(*MakeSessionKeys(macVersion, wrapKeys, withID)),
 		SessionOptions.Compose(opts...),
 	)
 }
@@ -2039,7 +2039,7 @@ type EndDeviceOptionNamespace struct{ test.EndDeviceOptionNamespace }
 func (o EndDeviceOptionNamespace) Activate(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts ...test.MACStateOption) test.EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		macState := MakeMACState(&x, defaults, macStateOpts...)
-		ses := MakeSession(macState.LoRaWANVersion, wrapKeys, sessionOpts...)
+		ses := MakeSession(macState.LoRaWANVersion, wrapKeys, x.SupportsJoin, sessionOpts...)
 		return o.Compose(
 			o.WithMACState(macState),
 			o.WithSession(ses),

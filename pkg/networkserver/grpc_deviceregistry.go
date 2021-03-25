@@ -1412,9 +1412,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"session.keys.s_nwk_s_int_key.key": func() bool {
 				return st.Device.Session.SNwkSIntKey != nil && st.Device.Session.SNwkSIntKey.IsZero()
 			},
-			"session.keys.session_key_id": func() bool {
-				return len(st.Device.Session.SessionKeyID) == 0
-			},
 		} {
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
 				return nil, err
@@ -1682,8 +1679,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return false, "session.keys.s_nwk_s_int_key.key"
 			}
 		}
-		if dev, ok := m["session.keys.session_key_id"]; !ok || dev.Session == nil {
-			return false, "session.keys.session_key_id"
+		if m["supports_join"].GetSupportsJoin() {
+			if dev, ok := m["session.keys.session_key_id"]; !ok || dev.Session == nil {
+				return false, "session.keys.session_key_id"
+			}
 		}
 		return true, ""
 	},
@@ -1768,6 +1767,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"session.last_f_cnt_up",
 		"session.last_n_f_cnt_down",
 		"session.started_at",
+		"supports_join",
 	); err != nil {
 		return nil, err
 	}
