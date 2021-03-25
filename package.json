@@ -38,7 +38,7 @@
     "copy-webpack-plugin": "^5.1.0",
     "css-hot-loader": "^1.3.9",
     "css-loader": "^2.1.1",
-    "cypress": "6.5.0",
+    "cypress": "6.8.0",
     "cypress-file-upload": "^5.0.2",
     "eslint": "^6.2.2",
     "eslint-config-prettier": "^6.0.0",
@@ -129,7 +129,7 @@
     "yup": "^0.29.1"
   },
   "resolutions": {
-    "cypress": "6.5.0"
+    "cypress": "6.8.0"
   },
   "babel": {
     "extends": "./config/.babelrc"
