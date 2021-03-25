@@ -1277,6 +1277,15 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:default_packet_broker_network_identifier": {
+    "translations": {
+      "en": "default Packet Broker network identifier"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "packetbroker.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:end_device_eui_update": {
     "translations": {
       "en": "end device EUIs can not be updated"
@@ -7028,6 +7037,15 @@
       "file": "agent.go"
     }
   },
+  "error:pkg/packetbrokeragent:network": {
+    "translations": {
+      "en": "not supported for network"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "grpc_pba.go"
+    }
+  },
   "error:pkg/packetbrokeragent:no_downlink_paths": {
     "translations": {
       "en": "no downlink paths"
@@ -7053,6 +7071,15 @@
     "description": {
       "package": "pkg/packetbrokeragent",
       "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:registration": {
+    "translations": {
+      "en": "get registration information"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "grpc_pba.go"
     }
   },
   "error:pkg/packetbrokeragent:token_key": {
