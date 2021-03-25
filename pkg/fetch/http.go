@@ -25,8 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
-const timeout = 10 * time.Second
-
 type httpFetcher struct {
 	baseFetcher
 	httpClient *http.Client
@@ -64,13 +62,15 @@ func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
 }
 
 // FromHTTP returns an object to fetch files from a webserver.
-func FromHTTP(transport http.RoundTripper, rootURL string, cache bool) (Interface, error) {
-	if transport == nil {
-		transport = http.DefaultTransport
+func FromHTTP(client *http.Client, rootURL string, cache bool) (Interface, error) {
+	if client == nil {
+		client = http.DefaultClient
 	}
 	if cache {
-		transport = &httpcache.Transport{
-			Transport:           transport,
+		cp := *client
+		client = &cp
+		client.Transport = &httpcache.Transport{
+			Transport:           client.Transport,
 			Cache:               httpcache.NewMemoryCache(),
 			MarkCachedResponses: true,
 		}
@@ -90,10 +90,7 @@ func FromHTTP(transport http.RoundTripper, rootURL string, cache bool) (Interfac
 		baseFetcher: baseFetcher{
 			latency: fetchLatency.WithLabelValues("http", rootURL),
 		},
-		httpClient: &http.Client{
-			Transport: transport,
-			Timeout:   timeout,
-		},
-		root: root,
+		httpClient: client,
+		root:       root,
 	}, nil
 }

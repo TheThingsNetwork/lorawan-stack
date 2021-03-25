@@ -36,7 +36,7 @@ func TestBuild(t *testing.T) {
 		fetcher = fetch.FromFilesystem(localPath)
 	} else {
 		var err error
-		fetcher, err = fetch.FromHTTP(http.DefaultTransport, "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master", true)
+		fetcher, err = fetch.FromHTTP(http.DefaultClient, "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master", true)
 		if err != nil {
 			t.Fatalf("Failed to construct HTTP fetcher: %v", err)
 		}
@@ -49,7 +49,7 @@ func TestBuild(t *testing.T) {
 		referenceFetcher = fetch.FromFilesystem(referenceLocalPath)
 	} else {
 		var err error
-		referenceFetcher, err = fetch.FromHTTP(http.DefaultTransport, "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/master", true)
+		referenceFetcher, err = fetch.FromHTTP(http.DefaultClient, "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/master", true)
 		if err != nil {
 			t.Fatalf("Failed to construct HTTP fetcher: %v", err)
 		}

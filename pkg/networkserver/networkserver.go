@@ -191,12 +191,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 			return c.GetTLSClientConfig(ctx)
 		}
 		interopConf.BlobConfig = c.GetBaseConfig(ctx).Blob
-		if interopConf.Transport == nil {
-			tr, err := c.HTTPTransport(ctx)
+		if interopConf.HTTPClient == nil {
+			httpClient, err := c.HTTPClient(ctx)
 			if err != nil {
 				return nil, err
 			}
-			interopConf.Transport = tr
+			interopConf.HTTPClient = httpClient
 		}
 
 		interopCl, err = interop.NewClient(ctx, interopConf)

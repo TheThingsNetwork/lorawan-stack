@@ -101,7 +101,7 @@ type emailTemplatesConfig struct {
 
 	Includes []string `name:"includes" description:"The email templates that will be preloaded on startup"`
 
-	Transport http.RoundTripper `name:"-"`
+	HTTPClient *http.Client `name:"-"`
 }
 
 // Fetcher returns a fetch.Interface based on the configuration.
@@ -130,7 +130,7 @@ func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobC
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
 	case "url":
-		return fetch.FromHTTP(c.Transport, c.URL, true)
+		return fetch.FromHTTP(c.HTTPClient, c.URL, true)
 	case "blob":
 		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {

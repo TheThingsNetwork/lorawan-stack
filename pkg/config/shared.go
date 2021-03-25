@@ -150,6 +150,8 @@ type KeyVault struct {
 	Provider string            `name:"provider" description:"Provider (static)"`
 	Cache    KeyVaultCache     `name:"cache"`
 	Static   map[string][]byte `name:"static"`
+
+	HTTPClient *http.Client `name:"-"`
 }
 
 // KeyVault returns an initialized crypto.KeyVault based on the configuration.
@@ -199,6 +201,16 @@ type BlobConfig struct {
 	Local    BlobConfigLocal `name:"local"`
 	AWS      BlobConfigAWS   `name:"aws"`
 	GCP      BlobConfigGCP   `name:"gcp"`
+
+	HTTPClient *http.Client `name:"-"`
+}
+
+// IsZero returns whether conf is empty.
+func (c BlobConfig) IsZero() bool {
+	return c.Provider == "" &&
+		c.Local == BlobConfigLocal{} &&
+		c.AWS == BlobConfigAWS{} &&
+		c.GCP == BlobConfigGCP{}
 }
 
 // Bucket returns the requested blob bucket using the config.
@@ -207,7 +219,7 @@ func (c BlobConfig) Bucket(ctx context.Context, bucket string) (*blob.Bucket, er
 	case "local":
 		return ttnblob.Local(ctx, bucket, c.Local.Directory)
 	case "aws":
-		conf := aws.NewConfig()
+		conf := aws.NewConfig().WithHTTPClient(c.HTTPClient)
 		if c.AWS.Endpoint != "" {
 			conf = conf.WithEndpoint(c.AWS.Endpoint)
 		}
@@ -256,7 +268,7 @@ type FrequencyPlansConfig struct {
 	URL          string            `name:"url" description:"URL, which contains frequency plans"`
 	Blob         BlobPathConfig    `name:"blob"`
 
-	Transport http.RoundTripper `name:"-"`
+	HTTPClient *http.Client `name:"-"`
 }
 
 // Fetcher returns a fetch.Interface based on the configuration.
@@ -285,7 +297,7 @@ func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) 
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
 	case "url":
-		return fetch.FromHTTP(c.Transport, c.URL, true)
+		return fetch.FromHTTP(c.HTTPClient, c.URL, true)
 	case "blob":
 		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
@@ -307,7 +319,7 @@ type InteropClient struct {
 	GetFallbackTLSConfig func(ctx context.Context) (*tls.Config, error) `name:"-"`
 	BlobConfig           BlobConfig                                     `name:"-"`
 
-	Transport http.RoundTripper `name:"-"`
+	HTTPClient *http.Client `name:"-"`
 }
 
 // IsZero returns whether conf is empty.
@@ -317,7 +329,7 @@ func (c InteropClient) IsZero() bool {
 		c.URL == "" &&
 		c.Blob.IsZero() &&
 		c.GetFallbackTLSConfig == nil &&
-		c.BlobConfig == BlobConfig{}
+		c.BlobConfig.IsZero()
 }
 
 // Fetcher returns fetch.Interface defined by conf.
@@ -342,7 +354,7 @@ func (c InteropClient) Fetcher(ctx context.Context) (fetch.Interface, error) {
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
 	case "url":
-		return fetch.FromHTTP(c.Transport, c.URL, true)
+		return fetch.FromHTTP(c.HTTPClient, c.URL, true)
 	case "blob":
 		b, err := c.BlobConfig.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
@@ -363,7 +375,7 @@ type SenderClientCA struct {
 
 	BlobConfig BlobConfig `name:"-"`
 
-	Transport http.RoundTripper `name:"-"`
+	HTTPClient *http.Client `name:"-"`
 }
 
 // Fetcher returns fetch.Interface defined by conf.
@@ -373,7 +385,7 @@ func (c SenderClientCA) Fetcher(ctx context.Context) (fetch.Interface, error) {
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
 	case "url":
-		return fetch.FromHTTP(c.Transport, c.URL, true)
+		return fetch.FromHTTP(c.HTTPClient, c.URL, true)
 	case "blob":
 		b, err := c.BlobConfig.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
