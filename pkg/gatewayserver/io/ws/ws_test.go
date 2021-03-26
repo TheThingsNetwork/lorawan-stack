@@ -21,6 +21,7 @@ import (
 	"math"
 	"net"
 	"net/http"
+	"sync"
 	"testing"
 	"time"
 
@@ -301,15 +302,20 @@ func TestDiscover(t *testing.T) {
 				t.Fatalf("Failed to write message: %v", err)
 			}
 
+			var readErr error
 			resCh := make(chan []byte)
+			var wg sync.WaitGroup
+			wg.Add(1)
 			go func() {
+				defer wg.Done()
 				_, data, err := conn.ReadMessage()
 				if err != nil {
 					close(resCh)
 					if err == websocket.ErrBadHandshake {
 						return
 					}
-					t.Fatalf("Failed to read message: %v", err)
+					readErr = err
+					return
 				}
 				resCh <- data
 			}()
@@ -322,6 +328,10 @@ func TestDiscover(t *testing.T) {
 				a.So(response, should.Resemble, tc.Response)
 			case <-time.After(timeout):
 				t.Fatal("Read message timeout")
+			}
+			wg.Wait()
+			if readErr != nil {
+				t.Fatalf("Failed to read message: %v", readErr)
 			}
 		})
 	}
@@ -364,12 +374,16 @@ func TestDiscover(t *testing.T) {
 				t.Fatalf("Failed to write message: %v", err)
 			}
 
+			var wg sync.WaitGroup
+			wg.Add(1)
 			go func() {
-				_, _, err := conn.ReadMessage()
-				if err == nil {
-					t.Fatalf("Expected connection closure with error but received none")
-				}
+				defer wg.Done()
+				_, _, err = conn.ReadMessage()
 			}()
+			wg.Wait()
+			if err != nil {
+				t.Fatalf("Failed to read message: %v", err)
+			}
 		})
 	}
 
@@ -404,16 +418,20 @@ func TestDiscover(t *testing.T) {
 			if err := conn.WriteMessage(websocket.TextMessage, req); err != nil {
 				t.Fatalf("Failed to write message: %v", err)
 			}
+			var readErr error
 			resCh := make(chan []byte)
+			var wg sync.WaitGroup
+			wg.Add(1)
 			go func() {
+				defer wg.Done()
 				_, data, err := conn.ReadMessage()
 				if err != nil {
 					close(resCh)
 					if err == websocket.ErrBadHandshake {
 						return
-					} else {
-						t.Fatalf("Failed to read message: %v", err)
 					}
+					readErr = err
+					return
 				}
 				resCh <- data
 			}()
@@ -433,7 +451,10 @@ func TestDiscover(t *testing.T) {
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
 			}
-			conn.Close()
+			wg.Wait()
+			if readErr != nil {
+				t.Fatalf("Failed to read message: %v", readErr)
+			}
 		})
 	}
 }
@@ -669,11 +690,16 @@ func TestVersion(t *testing.T) {
 				t.Fatalf("Failed to write message: %v", err)
 			}
 
+			var readErr error
+			var wg sync.WaitGroup
 			resCh := make(chan []byte)
+			wg.Add(1)
 			go func() {
+				defer wg.Done()
 				_, data, err := conn.ReadMessage()
 				if err != nil {
-					t.Fatalf("Failed to read message: %v", err)
+					readErr = err
+					return
 				}
 				resCh <- data
 			}()
@@ -687,6 +713,10 @@ func TestVersion(t *testing.T) {
 				a.So(response, should.Resemble, tc.ExpectedRouterConfig)
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
+			}
+			wg.Wait()
+			if readErr != nil {
+				t.Fatalf("Failed to read message: %v", err)
 			}
 			select {
 			case stat := <-gsConn.Status():
@@ -1039,11 +1069,16 @@ func TestTraffic(t *testing.T) {
 					t.Fatalf("Failed to send downlink: %v", err)
 				}
 
-				resCh := make(chan []byte)
+				var readErr error
+				var wg sync.WaitGroup
+				resCh := make(chan []byte, 1)
+				wg.Add(1)
 				go func() {
+					defer wg.Done()
 					_, data, err := wsConn.ReadMessage()
 					if err != nil {
-						t.Fatalf("Failed to read message: %v", err)
+						readErr = err
+						return
 					}
 					resCh <- data
 				}()
@@ -1062,6 +1097,10 @@ func TestTraffic(t *testing.T) {
 					}
 				case <-time.After(timeout):
 					t.Fatalf("Read message timeout")
+				}
+				wg.Wait()
+				if readErr != nil {
+					t.Fatalf("Failed to read message: %v", readErr)
 				}
 			}
 		})
@@ -1356,11 +1395,16 @@ func TestRTT(t *testing.T) {
 					t.Fatalf("Failed to send downlink: %v", err)
 				}
 
+				var readErr error
+				var wg sync.WaitGroup
 				resCh := make(chan []byte)
+				wg.Add(1)
 				go func() {
+					defer wg.Done()
 					_, data, err := wsConn.ReadMessage()
 					if err != nil {
-						t.Fatalf("Failed to read message: %v", err)
+						readErr = err
+						return
 					}
 					resCh <- data
 				}()
@@ -1377,6 +1421,10 @@ func TestRTT(t *testing.T) {
 					testTime.Rx = &now
 				case <-time.After(timeout):
 					t.Fatalf("Read message timeout")
+				}
+				wg.Wait()
+				if readErr != nil {
+					t.Fatalf("Failed to read message: %v", err)
 				}
 			}
 		})

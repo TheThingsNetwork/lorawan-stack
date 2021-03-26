@@ -113,18 +113,19 @@ func TestAuthentication(t *testing.T) {
 
 			wg := sync.WaitGroup{}
 			wg.Add(1)
+			var err error
 			go func() {
 				defer wg.Done()
-				_, err := client.Subscribe(ctx, &tc.ID, creds)
-				if tc.OK && err != nil && !a.So(errors.IsCanceled(err), should.BeTrue) {
-					t.Fatalf("Unexpected link error: %v", err)
-				}
-				if !tc.OK && !a.So(errors.IsCanceled(err), should.BeFalse) {
-					t.FailNow()
-				}
+				_, err = client.Subscribe(ctx, &tc.ID, creds)
 			}()
-
 			wg.Wait()
+
+			if tc.OK && err != nil && !a.So(errors.IsCanceled(err), should.BeTrue) {
+				t.Fatalf("Unexpected link error: %v", err)
+			}
+			if !tc.OK && !a.So(errors.IsCanceled(err), should.BeFalse) {
+				t.FailNow()
+			}
 		})
 	}
 }
