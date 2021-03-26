@@ -32,10 +32,7 @@ describe('API keys', () => {
     const application = { ids: { application_id: applicationId } }
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createApplication(application, userId)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {
@@ -71,10 +68,7 @@ describe('API keys', () => {
     const gateway = { ids: { gateway_id: gatewayId } }
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createGateway(gateway, userId)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {
@@ -112,10 +106,7 @@ describe('API keys', () => {
     }
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createOrganization(organization, userId)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {

@@ -47,14 +47,7 @@ describe('Collaborators', () => {
     cy.createUser(user)
     cy.createUser(collaboratorUser)
     cy.createUser(orgUser)
-
-    cy.loginConsole({
-      user_id: orgUserId,
-      password: orgUser.password,
-    })
     cy.createOrganization(organization, orgUserId)
-    cy.clearLocalStorage()
-    cy.clearCookies()
   })
 
   describe('Application', () => {
@@ -62,10 +55,7 @@ describe('Collaborators', () => {
     const application = { ids: { application_id: applicationId } }
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createApplication(application, userId)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {
@@ -137,10 +127,7 @@ describe('Collaborators', () => {
     const gateway = { ids: { gateway_id: gatewayId } }
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createGateway(gateway, userId)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {
@@ -208,10 +195,7 @@ describe('Collaborators', () => {
     }
 
     before(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
       cy.createOrganization(testOrg, userId)
-      cy.clearLocalStorage()
-      cy.clearCookies()
     })
 
     beforeEach(() => {

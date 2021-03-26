@@ -50,7 +50,6 @@ describe('Gateway location', () => {
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
-    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.createGateway(gateway, userId)
     cy.updateGateway(gatewayId, updatedGatewayLocation)
   })

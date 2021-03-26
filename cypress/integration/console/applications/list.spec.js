@@ -25,7 +25,6 @@ describe('Applications list', () => {
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
-    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.createApplication({ ids: { application_id: appIds[0] } }, userId)
     cy.createApplication({ ids: { application_id: appIds[1] } }, userId)
     cy.createApplication({ ids: { application_id: appIds[2] } }, userId)

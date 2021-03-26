@@ -36,11 +36,11 @@ describe('Gateway general settings', () => {
         key: 'value',
       },
     }
-    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.createGateway(gateway, user.ids.user_id)
   })
 
   it('displays newly created gateway values', () => {
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(
       `${Cypress.config('consoleRootPath')}/gateways/${gateway.ids.gateway_id}/general-settings`,
     )

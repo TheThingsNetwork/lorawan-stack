@@ -26,9 +26,9 @@ const gatewayDelete = defineSmokeTest('succeeds deleting a gateway', () => {
   const gateway = {
     ids: { gateway_id: 'gtw-test-delete' },
   }
-  cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   cy.createGateway(gateway, user.ids.user_id)
 
+  cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   cy.visit(Cypress.config('consoleRootPath'))
   cy.get('header').within(() => {
     cy.findByRole('link', { name: /Gateways/ }).click()
