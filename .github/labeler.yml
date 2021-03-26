@@ -1,6 +1,8 @@
 c/identity server:
 - pkg/identityserver/*
 - pkg/identityserver/**/*
+- pkg/account/*
+- pkg/account/**/*
 - pkg/oauth/*
 - pkg/oauth/**/*
 
@@ -16,10 +18,6 @@ c/gateway conf server:
 - pkg/basicstation/cups/*
 - pkg/pfconfig/*
 - pkg/pfconfig/**/*
-
-c/cups:
-- pkg/basicstation/*
-- pkg/basicstation/cups/*
 
 c/network server:
 - pkg/networkserver/*
