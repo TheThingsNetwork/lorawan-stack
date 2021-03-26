@@ -20,13 +20,11 @@ import (
 	"google.golang.org/grpc"
 )
 
-func WithTestDialOptions() Option {
+func WithInsecureDialOptions() Option {
 	return func(a *Agent) {
 		a.dialOptions = func(context.Context) ([]grpc.DialOption, error) {
 			return []grpc.DialOption{
 				grpc.WithInsecure(),
-				grpc.WithBlock(),
-				grpc.FailOnNonTempDialError(true),
 			}, nil
 		}
 	}
