@@ -461,6 +461,16 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		pld.FullFCnt = func() uint32 {
 			for i := len(dev.MACState.RecentDownlinks) - 1; i >= 0; i-- {
 				down := dev.MACState.RecentDownlinks[i]
+				switch {
+				case down == nil:
+					logger.Error("Empty downlink stored in device's MAC state")
+					continue
+
+				case down.Payload == nil:
+					logger.Error("Downlink with no payload stored in device's MAC state")
+					continue
+				}
+
 				switch down.Payload.MType {
 				case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
 					return dev.Session.LastNFCntDown + 1
