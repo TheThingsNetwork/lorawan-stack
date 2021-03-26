@@ -65,7 +65,7 @@ type RegistrationInfo struct {
 }
 
 // RegistrationInfoExtractor extracts registration information from the context.
-type RegistrationInfoExtractor func(ctx context.Context) (*RegistrationInfo, error)
+type RegistrationInfoExtractor func(ctx context.Context, homeNetworkClusterID string) (*RegistrationInfo, error)
 
 type uplinkMessage struct {
 	context.Context
@@ -223,7 +223,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		tenantIDExtractor: func(_ context.Context) string {
 			return conf.TenantID
 		},
-		registrationInfoExtractor: func(_ context.Context) (*RegistrationInfo, error) {
+		registrationInfoExtractor: func(_ context.Context, homeNetworkClusterID string) (*RegistrationInfo, error) {
 			blocks := make([]*ttnpb.PacketBrokerDevAddrBlock, len(devAddrPrefixes))
 			for i, p := range devAddrPrefixes {
 				blocks[i] = &ttnpb.PacketBrokerDevAddrBlock{
