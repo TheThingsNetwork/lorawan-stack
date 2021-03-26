@@ -43,6 +43,7 @@ For details about compatibility between different releases, see the **Commitment
 - Error handling of end device template formats for the application overview page in the Console.
 - Payload size limits for AU915 data rates 8 and 9, which are now consistent with Regional Parameters RP002-1.0.2.
 - Payload size limit calculation in Network Server.
+- Occasional panic in Network Server on downlink with corrupted device states.
 
 ### Security
 
