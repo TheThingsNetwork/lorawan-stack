@@ -22,7 +22,7 @@ import (
 var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
 	IAMAddress:          "iam.packetbroker.org:443",
 	ControlPlaneAddress: "cp.packetbroker.org:443",
-	AuthenticationMode:  "tls",
+	AuthenticationMode:  "oauth2",
 	OAuth2: packetbrokeragent.OAuth2Config{
 		TokenURL: "https://iam.packetbroker.org/token",
 	},
