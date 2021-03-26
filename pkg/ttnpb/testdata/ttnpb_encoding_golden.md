@@ -420,6 +420,8 @@ JSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_512 {} 0} | "DUTY_CYCLE_512"
 JSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_64 {} 0} | "DUTY_CYCLE_64"
 JSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_8 {} 0} | "DUTY_CYCLE_8"
 JSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_8192 {} 0} | "DUTY_CYCLE_8192"
+JSON | ttnpb.BoolValue | {false {} 0} | false
+JSON | ttnpb.BoolValue | {true {} 0} | true
 JSON | ttnpb.CFListType | CHANNEL_MASKS | "CHANNEL_MASKS"
 JSON | ttnpb.CFListType | FREQUENCIES | "FREQUENCIES"
 JSON | ttnpb.Class | CLASS_A | "CLASS_A"
@@ -489,6 +491,9 @@ JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_30 | "DEVICE_EIRP_30"
 JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_33 | "DEVICE_EIRP_33"
 JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_36 | "DEVICE_EIRP_36"
 JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_8 | "DEVICE_EIRP_8"
+JSON | ttnpb.FrequencyValue | {100000 {} 0} | "100000"
+JSON | ttnpb.FrequencyValue | {2000000 {} 0} | "2000000"
+JSON | ttnpb.FrequencyValue | {30000000 {} 0} | "30000000"
 JSON | ttnpb.MACCommandIdentifier | CID_ADR_PARAM_SETUP | "CID_ADR_PARAM_SETUP"
 JSON | ttnpb.MACCommandIdentifier | CID_BEACON_FREQ | "CID_BEACON_FREQ"
 JSON | ttnpb.MACCommandIdentifier | CID_BEACON_TIMING | "CID_BEACON_TIMING"
@@ -792,6 +797,9 @@ JSONPB | ttnpb.DataRateOffsetValue | {4 {} 0} | 4
 JSONPB | ttnpb.DataRateOffsetValue | {5 {} 0} | 5
 JSONPB | ttnpb.DataRateOffsetValue | {6 {} 0} | 6
 JSONPB | ttnpb.DataRateOffsetValue | {7 {} 0} | 7
+JSONPB | ttnpb.FrequencyValue | {100000 {} 0} | "100000"
+JSONPB | ttnpb.FrequencyValue | {2000000 {} 0} | "2000000"
+JSONPB | ttnpb.FrequencyValue | {30000000 {} 0} | "30000000"
 JSONPB | ttnpb.PingSlotPeriod | PING_EVERY_128S | "PING_EVERY_128S"
 JSONPB | ttnpb.PingSlotPeriod | PING_EVERY_16S | "PING_EVERY_16S"
 JSONPB | ttnpb.PingSlotPeriod | PING_EVERY_1S | "PING_EVERY_1S"
@@ -936,6 +944,8 @@ Text | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_512 {} 0} | DUTY_CYCLE_512
 Text | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_64 {} 0} | DUTY_CYCLE_64
 Text | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_8 {} 0} | DUTY_CYCLE_8
 Text | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_8192 {} 0} | DUTY_CYCLE_8192
+Text | ttnpb.BoolValue | {false {} 0} | false
+Text | ttnpb.BoolValue | {true {} 0} | true
 Text | ttnpb.CFListType | CHANNEL_MASKS | CHANNEL_MASKS
 Text | ttnpb.CFListType | FREQUENCIES | FREQUENCIES
 Text | ttnpb.Class | CLASS_A | CLASS_A
@@ -1005,6 +1015,9 @@ Text | ttnpb.DeviceEIRP | DEVICE_EIRP_30 | DEVICE_EIRP_30
 Text | ttnpb.DeviceEIRP | DEVICE_EIRP_33 | DEVICE_EIRP_33
 Text | ttnpb.DeviceEIRP | DEVICE_EIRP_36 | DEVICE_EIRP_36
 Text | ttnpb.DeviceEIRP | DEVICE_EIRP_8 | DEVICE_EIRP_8
+Text | ttnpb.FrequencyValue | {100000 {} 0} | 100000
+Text | ttnpb.FrequencyValue | {2000000 {} 0} | 2000000
+Text | ttnpb.FrequencyValue | {30000000 {} 0} | 30000000
 Text | ttnpb.GrantType | GRANT_AUTHORIZATION_CODE | GRANT_AUTHORIZATION_CODE
 Text | ttnpb.GrantType | GRANT_PASSWORD | GRANT_PASSWORD
 Text | ttnpb.GrantType | GRANT_REFRESH_TOKEN | GRANT_REFRESH_TOKEN
