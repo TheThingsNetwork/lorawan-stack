@@ -78,6 +78,10 @@ type Config struct {
 	AdminRights struct {
 		All bool `name:"all" description:"Grant all rights to admins, including _KEYS and _ALL"`
 	} `name:"admin-rights"`
+	LoginTokens struct {
+		Enabled  bool          `name:"enabled" description:"enable users requesting login tokens"`
+		TokenTTL time.Duration `name:"token-ttl" description:"TTL of login tokens"`
+	} `name:"login-tokens"`
 	Email struct {
 		email.Config `name:",squash"`
 		SendGrid     sendgrid.Config      `name:"sendgrid"`

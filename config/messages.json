@@ -4760,6 +4760,33 @@
       "file": "invitation_store.go"
     }
   },
+  "error:pkg/identityserver/store:login_token_already_used": {
+    "translations": {
+      "en": "login token already used"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "login_token_store.go"
+    }
+  },
+  "error:pkg/identityserver/store:login_token_expired": {
+    "translations": {
+      "en": "login token expired"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "login_token_store.go"
+    }
+  },
+  "error:pkg/identityserver/store:login_token_not_found": {
+    "translations": {
+      "en": "login token not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "login_token_store.go"
+    }
+  },
   "error:pkg/identityserver/store:membership_not_found": {
     "translations": {
       "en": "account `{account_id}` is not a member of `{entity_type}` `{entity_id}`"
@@ -5046,6 +5073,24 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:login_tokens_disabled": {
+    "translations": {
+      "en": "login tokens are disabled"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_access.go"
+    }
+  },
+  "error:pkg/identityserver:login_tokens_still_valid": {
+    "translations": {
+      "en": "previously created login token still valid"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_access.go"
     }
   },
   "error:pkg/identityserver:nested_organizations": {

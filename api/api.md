@@ -516,6 +516,8 @@
 - [File `lorawan-stack/api/secrets.proto`](#lorawan-stack/api/secrets.proto)
   - [Message `Secret`](#ttn.lorawan.v3.Secret)
 - [File `lorawan-stack/api/user.proto`](#lorawan-stack/api/user.proto)
+  - [Message `CreateLoginTokenRequest`](#ttn.lorawan.v3.CreateLoginTokenRequest)
+  - [Message `CreateLoginTokenResponse`](#ttn.lorawan.v3.CreateLoginTokenResponse)
   - [Message `CreateTemporaryPasswordRequest`](#ttn.lorawan.v3.CreateTemporaryPasswordRequest)
   - [Message `CreateUserAPIKeyRequest`](#ttn.lorawan.v3.CreateUserAPIKeyRequest)
   - [Message `CreateUserRequest`](#ttn.lorawan.v3.CreateUserRequest)
@@ -528,6 +530,7 @@
   - [Message `ListUserAPIKeysRequest`](#ttn.lorawan.v3.ListUserAPIKeysRequest)
   - [Message `ListUserSessionsRequest`](#ttn.lorawan.v3.ListUserSessionsRequest)
   - [Message `ListUsersRequest`](#ttn.lorawan.v3.ListUsersRequest)
+  - [Message `LoginToken`](#ttn.lorawan.v3.LoginToken)
   - [Message `SendInvitationRequest`](#ttn.lorawan.v3.SendInvitationRequest)
   - [Message `UpdateUserAPIKeyRequest`](#ttn.lorawan.v3.UpdateUserAPIKeyRequest)
   - [Message `UpdateUserPasswordRequest`](#ttn.lorawan.v3.UpdateUserPasswordRequest)
@@ -7251,6 +7254,25 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 
 ## <a name="lorawan-stack/api/user.proto">File `lorawan-stack/api/user.proto`</a>
 
+### <a name="ttn.lorawan.v3.CreateLoginTokenRequest">Message `CreateLoginTokenRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `skip_email` | [`bool`](#bool) |  | Skip sending the login token to the user by email. This field is only effective when the login token is created by an admin user. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.CreateLoginTokenResponse">Message `CreateLoginTokenResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `token` | [`string`](#string) |  | The token that can be used for logging in as the user. This field is only present if a token was created by an admin user for a non-admin user. |
+
 ### <a name="ttn.lorawan.v3.CreateTemporaryPasswordRequest">Message `CreateTemporaryPasswordRequest`</a>
 
 | Field | Type | Label | Description |
@@ -7416,6 +7438,23 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `order` | <p>`string.in`: `[ user_id -user_id name -name primary_email_address -primary_email_address state -state admin -admin created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
+### <a name="ttn.lorawan.v3.LoginToken">Message `LoginToken`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `token` | [`string`](#string) |  |  |
+| `used` | [`bool`](#bool) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.SendInvitationRequest">Message `SendInvitationRequest`</a>
 
 | Field | Type | Label | Description |
@@ -7579,6 +7618,7 @@ API keys of users.
 | `ListAPIKeys` | [`ListUserAPIKeysRequest`](#ttn.lorawan.v3.ListUserAPIKeysRequest) | [`APIKeys`](#ttn.lorawan.v3.APIKeys) | List the API keys for this user. |
 | `GetAPIKey` | [`GetUserAPIKeyRequest`](#ttn.lorawan.v3.GetUserAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Get a single API key of this user. |
 | `UpdateAPIKey` | [`UpdateUserAPIKeyRequest`](#ttn.lorawan.v3.UpdateUserAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Update the rights of an API key of the user. This method can also be used to delete the API key, by giving it no rights. The caller is required to have all assigned or/and removed rights. |
+| `CreateLoginToken` | [`CreateLoginTokenRequest`](#ttn.lorawan.v3.CreateLoginTokenRequest) | [`CreateLoginTokenResponse`](#ttn.lorawan.v3.CreateLoginTokenResponse) | Create a login token that can be used for a one-time login as a user. |
 
 #### HTTP bindings
 
@@ -7589,6 +7629,7 @@ API keys of users.
 | `ListAPIKeys` | `GET` | `/api/v3/users/{user_ids.user_id}/api-keys` |  |
 | `GetAPIKey` | `GET` | `/api/v3/users/{user_ids.user_id}/api-keys/{key_id}` |  |
 | `UpdateAPIKey` | `PUT` | `/api/v3/users/{user_ids.user_id}/api-keys/{api_key.id}` | `*` |
+| `CreateLoginToken` | `POST` | `/api/v3/users/{user_ids.user_id}/login-tokens` |  |
 
 ### <a name="ttn.lorawan.v3.UserInvitationRegistry">Service `UserInvitationRegistry`</a>
 

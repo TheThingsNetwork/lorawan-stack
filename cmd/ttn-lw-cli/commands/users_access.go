@@ -214,6 +214,28 @@ var (
 			return nil
 		},
 	}
+	usersCreateLoginToken = &cobra.Command{
+		Use:               "create-login-token [user-id]",
+		Short:             "Create a user login token",
+		PersistentPreRunE: preRun(optionalAuth),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewUserAccessClient(is).CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
+				UserIdentifiers: *usrID,
+			})
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 )
 
 var userRightsFlags = rightsFlags(func(flag string) bool {
@@ -244,4 +266,6 @@ func init() {
 	userAPIKeys.AddCommand(userAPIKeysDelete)
 	userAPIKeys.PersistentFlags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(userAPIKeys)
+	usersCreateLoginToken.Flags().AddFlagSet(userIDFlags())
+	usersCommand.AddCommand(usersCreateLoginToken)
 }

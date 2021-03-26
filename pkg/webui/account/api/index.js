@@ -52,6 +52,7 @@ instance.interceptors.response.use(
 export default {
   account: {
     login: credentials => instance.post(`${appRoot}/api/auth/login`, credentials),
+    tokenLogin: credentials => instance.post(`${appRoot}/api/auth/token-login`, credentials),
     logout: () => instance.post(`${appRoot}/api/auth/logout`),
     me: () => instance.get(`${appRoot}/api/me`),
   },

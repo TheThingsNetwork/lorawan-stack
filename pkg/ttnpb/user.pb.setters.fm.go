@@ -1088,3 +1088,142 @@ func (dst *ListUserSessionsRequest) SetFields(src *ListUserSessionsRequest, path
 	}
 	return nil
 }
+
+func (dst *LoginToken) SetFields(src *LoginToken, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = &src.UserIdentifiers
+				}
+				newDst = &dst.UserIdentifiers
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIdentifiers = src.UserIdentifiers
+				} else {
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
+				}
+			}
+		case "created_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'created_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreatedAt = src.CreatedAt
+			} else {
+				var zero time.Time
+				dst.CreatedAt = zero
+			}
+		case "updated_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'updated_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdatedAt = src.UpdatedAt
+			} else {
+				var zero time.Time
+				dst.UpdatedAt = zero
+			}
+		case "expires_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'expires_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ExpiresAt = src.ExpiresAt
+			} else {
+				var zero time.Time
+				dst.ExpiresAt = zero
+			}
+		case "token":
+			if len(subs) > 0 {
+				return fmt.Errorf("'token' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Token = src.Token
+			} else {
+				var zero string
+				dst.Token = zero
+			}
+		case "used":
+			if len(subs) > 0 {
+				return fmt.Errorf("'used' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Used = src.Used
+			} else {
+				var zero bool
+				dst.Used = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *CreateLoginTokenRequest) SetFields(src *CreateLoginTokenRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = &src.UserIdentifiers
+				}
+				newDst = &dst.UserIdentifiers
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIdentifiers = src.UserIdentifiers
+				} else {
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
+				}
+			}
+		case "skip_email":
+			if len(subs) > 0 {
+				return fmt.Errorf("'skip_email' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SkipEmail = src.SkipEmail
+			} else {
+				var zero bool
+				dst.SkipEmail = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *CreateLoginTokenResponse) SetFields(src *CreateLoginTokenResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "token":
+			if len(subs) > 0 {
+				return fmt.Errorf("'token' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Token = src.Token
+			} else {
+				var zero string
+				dst.Token = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

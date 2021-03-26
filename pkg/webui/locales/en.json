@@ -56,6 +56,8 @@
   "account.views.profile-settings.index.generalSettingsDescription": "Change basic info such as your name, profile picture or email address.",
   "account.views.profile-settings.index.changePasswordTitle": "Change password",
   "account.views.profile-settings.index.changePasswordDescription": "Set up a new password for your account.",
+  "account.views.token-login.index.loginToken": "Login Token",
+  "account.views.token-login.index.loginFailed": "Login failed",
   "account.views.update-password.index.sessionRevoked": "Your password was changed and all active sessions were revoked",
   "account.views.validate.index.backToAccount": "Back to Account",
   "account.views.validate.index.contactInfoValidation": "Contact info validation",

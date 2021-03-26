@@ -8759,6 +8759,38 @@
         ]
       }
     },
+    "/users/{user_ids.user_id}/login-tokens": {
+      "post": {
+        "summary": "Create a login token that can be used for a one-time login as a user.",
+        "operationId": "UserAccess_CreateLoginToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3CreateLoginTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserAccess"
+        ]
+      }
+    },
     "/users/{user_ids.user_id}/password": {
       "put": {
         "summary": "Update the password of the user.",
@@ -11924,6 +11956,15 @@
         "collaborator": {
           "$ref": "#/definitions/v3OrganizationOrUserIdentifiers",
           "description": "Collaborator to grant all rights on the newly created gateway."
+        }
+      }
+    },
+    "v3CreateLoginTokenResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "The token that can be used for logging in as the user.\nThis field is only present if a token was created by an admin user for a non-admin user."
         }
       }
     },

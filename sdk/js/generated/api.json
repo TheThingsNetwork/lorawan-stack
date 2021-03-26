@@ -30495,6 +30495,66 @@
       "extensions": [],
       "messages": [
         {
+          "name": "CreateLoginTokenRequest",
+          "longName": "CreateLoginTokenRequest",
+          "fullName": "ttn.lorawan.v3.CreateLoginTokenRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_ids",
+              "description": "",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "skip_email",
+              "description": "Skip sending the login token to the user by email.\nThis field is only effective when the login token is created by an admin user.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "CreateLoginTokenResponse",
+          "longName": "CreateLoginTokenResponse",
+          "fullName": "ttn.lorawan.v3.CreateLoginTokenResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "token",
+              "description": "The token that can be used for logging in as the user.\nThis field is only present if a token was created by an admin user for a non-admin user.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "CreateTemporaryPasswordRequest",
           "longName": "CreateTemporaryPasswordRequest",
           "fullName": "ttn.lorawan.v3.CreateTemporaryPasswordRequest",
@@ -31101,6 +31161,85 @@
             {
               "name": "deleted",
               "description": "Only return recently deleted users.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LoginToken",
+          "longName": "LoginToken",
+          "fullName": "ttn.lorawan.v3.LoginToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_ids",
+              "description": "",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "created_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "updated_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "expires_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "token",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "used",
+              "description": "",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -31938,6 +32077,28 @@
                       "method": "PUT",
                       "pattern": "/users/{user_ids.user_id}/api-keys/{api_key.id}",
                       "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "CreateLoginToken",
+              "description": "Create a login token that can be used for a one-time login as a user.",
+              "requestType": "CreateLoginTokenRequest",
+              "requestLongType": "CreateLoginTokenRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateLoginTokenRequest",
+              "requestStreaming": false,
+              "responseType": "CreateLoginTokenResponse",
+              "responseLongType": "CreateLoginTokenResponse",
+              "responseFullType": "ttn.lorawan.v3.CreateLoginTokenResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/users/{user_ids.user_id}/login-tokens"
                     }
                   ]
                 }

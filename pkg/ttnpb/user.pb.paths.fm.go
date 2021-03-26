@@ -337,3 +337,40 @@ var ListUserSessionsRequestFieldPathsTopLevel = []string{
 	"page",
 	"user_ids",
 }
+var LoginTokenFieldPathsNested = []string{
+	"created_at",
+	"expires_at",
+	"token",
+	"updated_at",
+	"used",
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
+}
+
+var LoginTokenFieldPathsTopLevel = []string{
+	"created_at",
+	"expires_at",
+	"token",
+	"updated_at",
+	"used",
+	"user_ids",
+}
+var CreateLoginTokenRequestFieldPathsNested = []string{
+	"skip_email",
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
+}
+
+var CreateLoginTokenRequestFieldPathsTopLevel = []string{
+	"skip_email",
+	"user_ids",
+}
+var CreateLoginTokenResponseFieldPathsNested = []string{
+	"token",
+}
+
+var CreateLoginTokenResponseFieldPathsTopLevel = []string{
+	"token",
+}

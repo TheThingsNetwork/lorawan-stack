@@ -47,6 +47,11 @@ type loginFormData struct {
 	Password string `json:"password"`
 }
 
+type tokenFormData struct {
+	encoding string
+	Token    string `json:"token"`
+}
+
 type authorizeFormData struct {
 	encoding  string
 	Authorize bool `json:"authorize"`
@@ -259,6 +264,27 @@ func TestAuthentication(t *testing.T) {
 				a.So(s.req.sessionID, should.Equal, "session_id")
 			},
 		},
+		{
+			Name: "token login",
+			StoreSetup: func(s *mockStore) {
+				s.res.loginToken = &ttnpb.LoginToken{
+					UserIdentifiers: mockUser.UserIdentifiers,
+				}
+				s.res.session = mockSession
+			},
+			Method:       "POST",
+			Path:         "/oauth/api/auth/token-login",
+			Body:         tokenFormData{"form", "this-is-the-token"},
+			ExpectedCode: http.StatusNoContent,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.Contain, "ConsumeLoginToken")
+				a.So(s.req.token, should.Equal, "this-is-the-token")
+
+				a.So(s.calls, should.Contain, "CreateSession")
+				a.So(s.req.session.UserIdentifiers, should.Resemble, mockUser.UserIdentifiers)
+			},
+		},
 	} {
 		name := tt.Name
 		if name == "" {
@@ -293,6 +319,18 @@ func TestAuthentication(t *testing.T) {
 					body = bytes.NewBuffer([]byte(url.Values{
 						"user_id":  []string{b.UserID},
 						"password": []string{b.Password},
+					}.Encode()))
+					contentType = "application/x-www-form-urlencoded"
+				}
+			case tokenFormData:
+				if b.encoding == "json" {
+					json, _ := json.Marshal(b)
+					body = bytes.NewBuffer(json)
+					contentType = "application/json"
+				}
+				if b.encoding == "form" {
+					body = bytes.NewBuffer([]byte(url.Values{
+						"token": []string{b.Token},
 					}.Encode()))
 					contentType = "application/x-www-form-urlencoded"
 				}

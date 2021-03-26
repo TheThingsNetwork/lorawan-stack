@@ -71,5 +71,6 @@ func init() {
 	DefaultIdentityServerConfig.UserRights.CreateClients = true
 	DefaultIdentityServerConfig.UserRights.CreateGateways = true
 	DefaultIdentityServerConfig.UserRights.CreateOrganizations = true
+	DefaultIdentityServerConfig.LoginTokens.TokenTTL = time.Hour
 	DefaultIdentityServerConfig.Delete.Restore = 24 * time.Hour
 }

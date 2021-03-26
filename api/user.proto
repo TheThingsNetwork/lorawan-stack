@@ -224,3 +224,27 @@ message ListUserSessionsRequest {
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 4;
 }
+
+message LoginToken {
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp expires_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  string token = 5;
+  bool used = 6;
+}
+
+message CreateLoginTokenRequest {
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Skip sending the login token to the user by email.
+  // This field is only effective when the login token is created by an admin user.
+  bool skip_email = 2;
+}
+
+message CreateLoginTokenResponse {
+  // The token that can be used for logging in as the user.
+  // This field is only present if a token was created by an admin user for a non-admin user.
+  string token = 1;
+}

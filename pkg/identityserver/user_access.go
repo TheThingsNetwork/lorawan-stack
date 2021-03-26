@@ -16,10 +16,14 @@ package identityserver
 
 import (
 	"context"
+	"time"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -182,6 +186,77 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 	return key, nil
 }
 
+const maxActiveLoginTokens = 5
+
+var (
+	errLoginTokensDisabled   = errors.DefineFailedPrecondition("login_tokens_disabled", "login tokens are disabled")
+	errLoginTokensStillValid = errors.DefineAlreadyExists("login_tokens_still_valid", "previously created login token still valid")
+)
+
+func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.CreateLoginTokenRequest) (*ttnpb.CreateLoginTokenResponse, error) {
+	loginTokenConfig := is.configFromContext(ctx).LoginTokens
+	if !loginTokenConfig.Enabled {
+		return nil, errLoginTokensDisabled.New()
+	}
+
+	var canCreateMoreTokens bool
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		activeTokens, err := store.GetLoginTokenStore(db).FindActiveLoginTokens(ctx, &req.UserIdentifiers)
+		if err != nil {
+			return err
+		}
+		canCreateMoreTokens = len(activeTokens) < maxActiveLoginTokens
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !canCreateMoreTokens {
+		return nil, errLoginTokensStillValid.New()
+	}
+
+	var canSkipEmail, canReturnToken bool
+	if is.IsAdmin(ctx) {
+		canSkipEmail = true // Admin callers can skip sending emails.
+		err := is.withDatabase(ctx, func(db *gorm.DB) error {
+			usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, &types.FieldMask{Paths: []string{"admin"}})
+			if !usr.Admin {
+				canReturnToken = true // Admin callers can get login tokens for non-admin users.
+			}
+			return err
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	token, err := auth.GenerateKey(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
+		_, err := store.GetLoginTokenStore(db).CreateLoginToken(ctx, &ttnpb.LoginToken{
+			UserIdentifiers: req.UserIdentifiers,
+			ExpiresAt:       time.Now().Add(loginTokenConfig.TokenTTL),
+			Token:           token,
+		})
+		return err
+	})
+
+	if !(canSkipEmail && req.SkipEmail) {
+		err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
+			return &emails.LoginToken{Data: data, LoginToken: token, TTL: loginTokenConfig.TokenTTL}
+		})
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Error("Could not send API key created notification email")
+		}
+	}
+	if !canReturnToken {
+		token = ""
+	}
+	return &ttnpb.CreateLoginTokenResponse{Token: token}, nil
+}
+
 type userAccess struct {
 	*IdentityServer
 }
@@ -204,4 +279,8 @@ func (ua *userAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListUserAPIKey
 
 func (ua *userAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ua.updateUserAPIKey(ctx, req)
+}
+
+func (ua *userAccess) CreateLoginToken(ctx context.Context, req *ttnpb.CreateLoginTokenRequest) (*ttnpb.CreateLoginTokenResponse, error) {
+	return ua.createLoginToken(ctx, req)
 }

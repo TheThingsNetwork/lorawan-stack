@@ -78,6 +78,26 @@ func (s *server) Login(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+type tokenLoginRequest struct {
+	Token string `json:"token" form:"token"`
+}
+
+func (s *server) TokenLogin(c echo.Context) error {
+	ctx := c.Request().Context()
+	req := new(tokenLoginRequest)
+	if err := c.Bind(req); err != nil {
+		return err
+	}
+	loginToken, err := s.store.ConsumeLoginToken(ctx, req.Token)
+	if err != nil {
+		return err
+	}
+	if err := s.CreateUserSession(c, loginToken.UserIdentifiers); err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
 func (s *server) CreateUserSession(c echo.Context, userIDs ttnpb.UserIdentifiers) error {
 	ctx := c.Request().Context()
 	tokenSecret, err := auth.GenerateKey(ctx)
