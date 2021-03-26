@@ -80,13 +80,10 @@ jobs:
       run: tools/bin/mage js:clean js:build
     - name: Check for diff
       run: tools/bin/mage git:diff
-    - name: Determine Goreleaser version
-      id: goreleaser_version
-      run: echo "::set-output name=value::$(cat tools/go.mod | grep 'github.com/goreleaser/goreleaser v' | cut -d ' ' -f 2)"
     - name: Run Goreleaser
       uses: goreleaser/goreleaser-action@v2
       with:
-        version: ${{ steps.goreleaser_version.outputs.value }}
+        version: 'v0.161.1'
         args: release --config .goreleaser.snapshot.yml --snapshot
     - name: Push Docker image
       run: |
