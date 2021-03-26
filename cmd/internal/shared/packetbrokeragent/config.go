@@ -26,6 +26,9 @@ var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
 	OAuth2: packetbrokeragent.OAuth2Config{
 		TokenURL: "https://iam.packetbroker.org/token",
 	},
+	Registration: packetbrokeragent.RegistrationConfig{
+		Listed: true,
+	},
 	HomeNetwork: packetbrokeragent.HomeNetworkConfig{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{
 			Limit: 4096,
