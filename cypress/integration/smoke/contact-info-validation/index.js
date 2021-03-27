@@ -37,8 +37,7 @@ const contactInfoValidation = defineSmokeTest('succeeds validating contact info'
   cy.reload()
   cy.findByTestId('error-notification')
     .should('be.visible')
-    .should('contain', 'was not found')
-    .should('contain', 'already been validated')
+    .should('contain', 'token already used')
 })
 
 export default [contactInfoValidation]
