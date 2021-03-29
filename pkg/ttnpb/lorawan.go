@@ -549,7 +549,7 @@ func (v FrequencyValue) MarshalJSON() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(b)
+	return json.Marshal(string(b))
 }
 
 // MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.

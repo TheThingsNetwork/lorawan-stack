@@ -83,8 +83,13 @@ func TestStringers(t *testing.T) {
 	}
 }
 
-func TestEnumMarshalers(t *testing.T) {
+func TestMarshalers(t *testing.T) {
 	var vals [][]interface{}
+
+	vals = append(vals, []interface{}{
+		BoolValue{},
+		BoolValue{Value: true},
+	})
 
 	var mTypes []interface{}
 	for i := range MType_name {
@@ -137,6 +142,12 @@ func TestEnumMarshalers(t *testing.T) {
 		})
 	}
 	vals = append(vals, drOffsetVals)
+
+	vals = append(vals, []interface{}{
+		FrequencyValue{Value: 100000},
+		FrequencyValue{Value: 2000000},
+		FrequencyValue{Value: 30000000},
+	})
 
 	var rejoins []interface{}
 	for i := range RejoinType_name {
