@@ -100,6 +100,20 @@ func (o SessionOptionNamespace) WithDefaultAppSKey() SessionOption {
 	return o.WithSessionKeysOptions(SessionKeysOptions.WithDefaultAppSKey())
 }
 
+func (o MACStateOptionNamespace) AppendRecentUplinks(ups ...*ttnpb.UplinkMessage) MACStateOption {
+	return func(x ttnpb.MACState) ttnpb.MACState {
+		x.RecentUplinks = append(x.RecentUplinks, ups...)
+		return x
+	}
+}
+
+func (o MACStateOptionNamespace) AppendRecentDownlinks(downs ...*ttnpb.DownlinkMessage) MACStateOption {
+	return func(x ttnpb.MACState) ttnpb.MACState {
+		x.RecentDownlinks = append(x.RecentDownlinks, downs...)
+		return x
+	}
+}
+
 func (o EndDeviceIdentifiersOptionNamespace) WithDefaultJoinEUI() EndDeviceIdentifiersOption {
 	return o.WithJoinEUI(&DefaultJoinEUI)
 }
@@ -141,4 +155,26 @@ func (o EndDeviceOptionNamespace) WithDefaultLoRaWANVersion() EndDeviceOption {
 
 func (o EndDeviceOptionNamespace) WithDefaultLoRaWANPHYVersion() EndDeviceOption {
 	return o.WithLoRaWANPHYVersion(DefaultPHYVersion)
+}
+
+func (o EndDeviceOptionNamespace) WithMACStateOptions(opts ...MACStateOption) EndDeviceOption {
+	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+		if x.MACState == nil {
+			panic("MACState is nil")
+		}
+		v := MACStateOptions.Compose(opts...)(*x.MACState)
+		x.MACState = &v
+		return x
+	}
+}
+
+func (o EndDeviceOptionNamespace) WithPendingMACStateOptions(opts ...MACStateOption) EndDeviceOption {
+	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+		if x.PendingMACState == nil {
+			panic("PendingMACState is nil")
+		}
+		v := MACStateOptions.Compose(opts...)(*x.PendingMACState)
+		x.PendingMACState = &v
+		return x
+	}
 }

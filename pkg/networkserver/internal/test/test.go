@@ -102,6 +102,14 @@ func AES128KeyPtr(key types.AES128Key) *types.AES128Key {
 	return &key
 }
 
+func MACStatePtr(v ttnpb.MACState) *ttnpb.MACState {
+	return &v
+}
+
+func Band(fpID string, phyVer ttnpb.PHYVersion) band.Band {
+	return *LoRaWANBands[test.FrequencyPlan(fpID).BandID][phyVer]
+}
+
 var (
 	DefaultGatewayAntennaIdentifiers = [...]ttnpb.GatewayAntennaIdentifiers{
 		{

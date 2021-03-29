@@ -2036,16 +2036,143 @@ func MakeSession(macVersion ttnpb.MACVersion, wrapKeys, withID bool, opts ...tes
 
 type EndDeviceOptionNamespace struct{ test.EndDeviceOptionNamespace }
 
+func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wrapKeys bool) test.EndDeviceOption {
+	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+		if !x.SupportsJoin {
+			panic("join request requested for non-OTAA device")
+		}
+		phy := Band(x.FrequencyPlanID, x.LoRaWANPHYVersion)
+		drIdx := func() ttnpb.DataRateIndex {
+			for idx := ttnpb.DATA_RATE_0; idx <= ttnpb.DATA_RATE_15; idx++ {
+				if _, ok := phy.DataRates[idx]; ok {
+					return idx
+				}
+			}
+			panic("no data rates")
+		}()
+		macState := MakeMACState(&x, defaults,
+			MACStateOptions.WithRxWindowsAvailable(true),
+			MACStateOptions.WithRecentUplinks(
+				MakeJoinRequest(JoinRequestConfig{
+					DecodePayload:  true,
+					JoinEUI:        *x.JoinEUI,
+					DevEUI:         *x.DevEUI,
+					CorrelationIDs: []string{"join-request"},
+					MIC:            [4]byte{0x42, 0xff, 0xff, 0xff},
+					DataRateIndex:  drIdx,
+					DataRate:       phy.DataRates[drIdx].Rate, // TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/3997)
+					Frequency:      phy.UplinkChannels[0].Frequency,
+				}),
+			),
+		)
+		return o.WithPendingMACState(MACStatePtr(MACStateOptions.WithQueuedJoinAccept(&ttnpb.MACState_JoinAccept{
+			Payload: bytes.Repeat([]byte{0xff}, 17),
+			Request: ttnpb.MACState_JoinRequest{
+				DownlinkSettings: ttnpb.DLSettings{
+					Rx1DROffset: macState.DesiredParameters.Rx1DataRateOffset,
+					Rx2DR:       macState.DesiredParameters.Rx2DataRateIndex,
+					OptNeg:      x.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+				},
+				RxDelay: macState.DesiredParameters.Rx1Delay,
+				CFList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanID), x.LoRaWANPHYVersion),
+			},
+			Keys:           *MakeSessionKeys(x.LoRaWANVersion, wrapKeys, true),
+			DevAddr:        test.DefaultDevAddr,
+			NetID:          test.DefaultNetID,
+			CorrelationIDs: []string{"join-request"},
+		})(*macState)))(x)
+	}
+}
+
+func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriority) test.EndDeviceOption {
+	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+		if !x.SupportsJoin {
+			panic("join accept requested for non-OTAA device")
+		}
+		if x.PendingMACState == nil {
+			panic("PendingMACState is nil")
+		}
+		return o.Compose(
+			o.WithPendingSession(&ttnpb.Session{
+				DevAddr: x.PendingMACState.QueuedJoinAccept.DevAddr,
+				SessionKeys: ttnpb.SessionKeys{
+					SessionKeyID: x.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+					FNwkSIntKey:  x.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey,
+					SNwkSIntKey:  x.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey,
+					NwkSEncKey:   x.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey,
+				},
+			}),
+			o.WithPendingMACStateOptions(
+				MACStateOptions.WithPendingJoinRequest(&x.PendingMACState.QueuedJoinAccept.Request),
+				MACStateOptions.WithQueuedJoinAccept(nil),
+				MACStateOptions.WithRxWindowsAvailable(false),
+				MACStateOptions.AppendRecentDownlinks(&ttnpb.DownlinkMessage{
+					RawPayload: x.PendingMACState.QueuedJoinAccept.Payload,
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_JOIN_ACCEPT,
+							Major: ttnpb.Major_LORAWAN_R1,
+						},
+						Payload: &ttnpb.Message_JoinAcceptPayload{
+							JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
+								NetID:      x.PendingMACState.QueuedJoinAccept.NetID,
+								DevAddr:    x.PendingMACState.QueuedJoinAccept.DevAddr,
+								DLSettings: x.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
+								RxDelay:    x.PendingMACState.QueuedJoinAccept.Request.RxDelay,
+								CFList:     x.PendingMACState.QueuedJoinAccept.Request.CFList,
+							},
+						},
+					},
+					EndDeviceIDs: &x.EndDeviceIdentifiers,
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
+							Priority:         priority,
+							FrequencyPlanID:  x.FrequencyPlanID,
+							Rx1Delay:         ttnpb.RxDelay(Band(x.FrequencyPlanID, x.LoRaWANPHYVersion).JoinAcceptDelay1 / time.Second),
+							Rx2DataRateIndex: x.PendingMACState.CurrentParameters.Rx2DataRateIndex,
+							Rx2Frequency:     x.PendingMACState.CurrentParameters.Rx2Frequency,
+							// TODO: Generate RX1 transmission parameters if necessary.
+							// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
+						},
+					},
+					CorrelationIDs: []string{"join-accept"},
+				}),
+			),
+		)(x)
+	}
+}
+
 func (o EndDeviceOptionNamespace) Activate(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts ...test.MACStateOption) test.EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		macState := MakeMACState(&x, defaults, macStateOpts...)
-		ses := MakeSession(macState.LoRaWANVersion, wrapKeys, x.SupportsJoin, sessionOpts...)
+		if !x.SupportsJoin {
+			macState := MakeMACState(&x, defaults, macStateOpts...)
+			ses := MakeSession(macState.LoRaWANVersion, wrapKeys, false, sessionOpts...)
+			return o.Compose(
+				o.WithMACState(macState),
+				o.WithSession(ses),
+				o.WithEndDeviceIdentifiersOptions(
+					test.EndDeviceIdentifiersOptions.WithDevAddr(&ses.DevAddr),
+				),
+			)(x)
+		}
 		return o.Compose(
-			o.WithMACState(macState),
-			o.WithSession(ses),
-			o.WithEndDeviceIdentifiersOptions(
-				test.EndDeviceIdentifiersOptions.WithDevAddr(&ses.DevAddr),
-			),
+			o.SendJoinRequest(defaults, wrapKeys),
+			o.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
+			// TODO: Send uplink including MAC commands depending on the version.
+			// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
+			func(x ttnpb.EndDevice) ttnpb.EndDevice {
+				return o.Compose(
+					o.WithEndDeviceIdentifiersOptions(
+						test.EndDeviceIdentifiersOptions.WithDevAddr(&x.PendingSession.DevAddr),
+					),
+					o.WithMACState(x.PendingMACState),
+					o.WithSession(x.PendingSession),
+				)(x)
+			},
+			o.WithMACStateOptions(MACStateOptions.WithPendingJoinRequest(nil)),
+			o.WithPendingMACState(nil),
+			o.WithPendingSession(nil),
 		)(x)
 	}
 }
