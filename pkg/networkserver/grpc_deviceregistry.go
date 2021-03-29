@@ -358,6 +358,7 @@ func (st *setDeviceState) RequireFields(paths ...string) error {
 	return nil
 }
 
+// WithFields calls f when path is available.
 func (st *setDeviceState) WithField(f func(*ttnpb.EndDevice) error, path string) error {
 	if st.HasSetField(path) {
 		return f(st.Device)
@@ -369,6 +370,7 @@ func (st *setDeviceState) WithField(f func(*ttnpb.EndDevice) error, path string)
 	return nil
 }
 
+// WithFields calls f when all paths in paths are available.
 func (st *setDeviceState) WithFields(f func(map[string]*ttnpb.EndDevice) error, paths ...string) error {
 	storedPaths := make([]string, 0, len(paths))
 	m := make(map[string]*ttnpb.EndDevice, len(paths))
@@ -395,6 +397,7 @@ func (st *setDeviceState) WithFields(f func(map[string]*ttnpb.EndDevice) error, 
 	return nil
 }
 
+// ValidateField ensures that isValid(dev), where dev is the device containing path evaluates to true.
 func (st *setDeviceState) ValidateField(isValid func(*ttnpb.EndDevice) bool, path string) error {
 	return st.WithField(func(dev *ttnpb.EndDevice) error {
 		if !isValid(dev) {
@@ -406,6 +409,7 @@ func (st *setDeviceState) ValidateField(isValid func(*ttnpb.EndDevice) bool, pat
 
 var errFieldNotZero = errors.DefineInvalidArgument("field_not_zero", "field `{name}` is not zero")
 
+// ValidateFieldIsZero ensures that path is zero.
 func (st *setDeviceState) ValidateFieldIsZero(path string) error {
 	if st.HasSetField(path) {
 		if !st.Device.FieldIsZero(path) {
@@ -426,6 +430,7 @@ func (st *setDeviceState) ValidateFieldIsZero(path string) error {
 
 var errFieldIsZero = errors.DefineInvalidArgument("field_is_zero", "field `{name}` is zero")
 
+// ValidateFieldIsNotZero ensures that path is not zero.
 func (st *setDeviceState) ValidateFieldIsNotZero(path string) error {
 	if st.HasSetField(path) {
 		if st.Device.FieldIsZero(path) {
@@ -444,6 +449,7 @@ func (st *setDeviceState) ValidateFieldIsNotZero(path string) error {
 	return nil
 }
 
+// ValidateFieldsAreZero ensures that each p in paths is zero.
 func (st *setDeviceState) ValidateFieldsAreZero(paths ...string) error {
 	for _, p := range paths {
 		if err := st.ValidateFieldIsZero(p); err != nil {
@@ -453,6 +459,7 @@ func (st *setDeviceState) ValidateFieldsAreZero(paths ...string) error {
 	return nil
 }
 
+// ValidateFieldsAreNotZero ensures none of p in paths is zero.
 func (st *setDeviceState) ValidateFieldsAreNotZero(paths ...string) error {
 	for _, p := range paths {
 		if err := st.ValidateFieldIsNotZero(p); err != nil {
@@ -462,6 +469,10 @@ func (st *setDeviceState) ValidateFieldsAreNotZero(paths ...string) error {
 	return nil
 }
 
+// ValidateFields calls isValid with a map path -> *ttnpb.EndDevice, where the value stored under the key
+// is either a pointer to stored device or to device being set in request, depending on the request fieldmask.
+// isValid is only executed once all fields are present. That means that if request sets all fields in paths
+// isValid is executed immediately, otherwise it is called later (after device fetch) by SetFunc.
 func (st *setDeviceState) ValidateFields(isValid func(map[string]*ttnpb.EndDevice) (bool, string), paths ...string) error {
 	return st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
 		ok, p := isValid(m)
@@ -472,6 +483,7 @@ func (st *setDeviceState) ValidateFields(isValid func(map[string]*ttnpb.EndDevic
 	}, paths...)
 }
 
+// ValidateSetField validates the field iff path is being set in request.
 func (st *setDeviceState) ValidateSetField(isValid func() bool, path string) error {
 	if !st.HasSetField(path) {
 		return nil
@@ -482,6 +494,8 @@ func (st *setDeviceState) ValidateSetField(isValid func() bool, path string) err
 	return nil
 }
 
+// ValidateSetField is like ValidateSetField, but allows the validator callback to return an error
+// and propagates it to the caller as the cause.
 func (st *setDeviceState) ValidateSetFieldWithCause(isValid func() error, path string) error {
 	if !st.HasSetField(path) {
 		return nil
@@ -492,6 +506,7 @@ func (st *setDeviceState) ValidateSetFieldWithCause(isValid func() error, path s
 	return nil
 }
 
+// ValidateSetFields validates the fields iff at least one of p in paths is being set in request.
 func (st *setDeviceState) ValidateSetFields(isValid func(map[string]*ttnpb.EndDevice) (bool, string), paths ...string) error {
 	if !st.HasSetField(paths...) {
 		return nil
@@ -559,6 +574,7 @@ func setKeyEqual(m map[string]*ttnpb.EndDevice, getA, getB func(*ttnpb.EndDevice
 	return true
 }
 
+// ifThenFuncFieldRight represents the RHS of a functional implication.
 type ifThenFuncFieldRight struct {
 	Func   func(m map[string]*ttnpb.EndDevice) (bool, string)
 	Fields []string
