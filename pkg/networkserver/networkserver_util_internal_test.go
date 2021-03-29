@@ -2254,24 +2254,27 @@ func MakeABPEndDevicePaths(withDevEUI bool, paths ...string) []string {
 		}, paths...)
 	}
 	return MakeEndDevicePaths(append([]string{
-		"mac_state.lorawan_version",
+		"session.dev_addr",
 		"session.keys.f_nwk_s_int_key.key",
-		"session.keys.nwk_s_int.key",
+		"session.keys.nwk_s_enc_key.key",
 		"session.keys.s_nwk_s_int_key.key",
 		"session.keys.session_key_id",
 	}, paths...)...)
 }
 
 func MakeMulticastEndDevicePaths(supportsClassB, supportsClassC bool, paths ...string) []string {
+	paths = append([]string{
+		"multicast",
+	}, paths...)
 	if supportsClassB {
-		paths = append([]string{
+		paths = append(paths,
 			"supports_class_b",
-		}, paths...)
+		)
 	}
 	if supportsClassC {
-		paths = append([]string{
+		paths = append(paths,
 			"supports_class_c",
-		}, paths...)
+		)
 	}
 	return MakeABPEndDevicePaths(false, paths...)
 }
