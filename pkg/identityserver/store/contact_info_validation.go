@@ -33,6 +33,7 @@ type ContactInfoValidation struct {
 	ContactMethod int    `gorm:"not null"`
 	Value         string `gorm:"type:VARCHAR"`
 
+	Used      bool
 	ExpiresAt time.Time
 }
 
