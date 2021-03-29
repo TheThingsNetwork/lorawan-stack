@@ -426,9 +426,8 @@ var (
 					device.Session = &ttnpb.Session{
 						DevAddr: devAddr,
 						SessionKeys: ttnpb.SessionKeys{
-							SessionKeyID: generateBytes(16),
-							FNwkSIntKey:  &ttnpb.KeyEnvelope{Key: generateKey()},
-							AppSKey:      &ttnpb.KeyEnvelope{Key: generateKey()},
+							FNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey()},
+							AppSKey:     &ttnpb.KeyEnvelope{Key: generateKey()},
 						},
 					}
 					paths = append(paths,
