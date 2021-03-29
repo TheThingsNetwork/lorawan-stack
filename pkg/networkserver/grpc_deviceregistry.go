@@ -1707,8 +1707,15 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 
 		isMulticast := m["multicast"].GetMulticast()
-		if !hasMACState && !hasSession && !isMulticast {
+		switch {
+		case !hasMACState && !hasSession && !isMulticast:
 			return true, ""
+
+		case !hasSession:
+			return false, "session"
+
+		case !hasMACState && st.HasSetField("mac_state"):
+			return false, "mac_state"
 		}
 
 		var macVersion ttnpb.MACVersion
@@ -1883,8 +1890,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				break
 			}
 		}
-		if !hasPendingMACState && !hasPendingSession {
+		switch {
+		case !hasPendingMACState && !hasPendingSession:
 			return true, ""
+		case !hasPendingMACState:
+			return false, "pending_mac_state"
+		}
+		for k, v := range m {
+			if strings.HasPrefix(k, "pending_mac_state.queued_join_accept.") && v.PendingMACState.GetQueuedJoinAccept() != nil {
+				hasQueuedJoinAccept = true
+				break
+			}
 		}
 
 		var macVersion ttnpb.MACVersion
@@ -1930,14 +1946,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if dev, ok := m["pending_session.keys.session_key_id"]; !ok || dev.PendingSession == nil {
 				return false, "pending_session.keys.session_key_id"
 			}
+		} else if !hasQueuedJoinAccept {
+			return false, "pending_mac_state.queued_join_accept"
 		}
 
-		for k, v := range m {
-			if strings.HasPrefix(k, "pending_mac_state.queued_join_accept.") && v.PendingMACState.GetQueuedJoinAccept() != nil {
-				hasQueuedJoinAccept = true
-				break
-			}
-		}
 		if hasQueuedJoinAccept {
 			getFNwkSIntKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
 				keys := dev.GetPendingMACState().GetQueuedJoinAccept().GetKeys()

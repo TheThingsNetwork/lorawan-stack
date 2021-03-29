@@ -430,10 +430,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 	activateOpt := EndDeviceOptions.Activate(customMACSettings, false, activeSessionOpts, activeMACStateOpts...)
 
-	pendingMACStateOpt := func(dev ttnpb.EndDevice) ttnpb.EndDevice {
-		return EndDeviceOptions.WithPendingMACState(MakeMACState(&dev, customMACSettings))(dev)
-	}
-
 	macStateWithoutRX1DelayOpt := func(dev ttnpb.EndDevice) ttnpb.EndDevice {
 		dev.MACState.CurrentParameters.Rx1Delay = 0
 		return dev
@@ -463,7 +459,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
-					pendingMACStateOpt,
+					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
 				},
 					"pending_mac_state",
 				),
@@ -472,10 +468,31 @@ func TestDeviceRegistrySet(t *testing.T) {
 				},
 
 				ReturnedDevice: MakeOTAAEndDevice(
-					pendingMACStateOpt,
+					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
 				),
 				StoredDevice: MakeOTAAEndDevice(
-					pendingMACStateOpt,
+					EndDeviceOptions.SendJoinRequest(customMACSettings, true),
+				),
+			},
+			{
+				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
+					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
+					EndDeviceOptions.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
+				},
+					"pending_mac_state",
+					"pending_session",
+				),
+				RequiredRights: []ttnpb.Right{
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				},
+
+				ReturnedDevice: MakeOTAAEndDevice(
+					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
+					EndDeviceOptions.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
+				),
+				StoredDevice: MakeOTAAEndDevice(
+					EndDeviceOptions.SendJoinRequest(customMACSettings, true),
+					EndDeviceOptions.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
 				),
 			},
 			{
@@ -528,6 +545,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 				),
 				StoredDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.Activate(customMACSettings, true, activeSessionOpts, currentMACStateOverrideOpt),
+					EndDeviceOptions.WithMACStateOptions(
+						MACStateOptions.WithRecentUplinks(),
+						MACStateOptions.WithRecentDownlinks(),
+					),
 				),
 			},
 			{
@@ -551,6 +572,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 				),
 				StoredDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.Activate(defaultMACSettings, true, nil, desiredMACStateOverrideOpt),
+					EndDeviceOptions.WithMACStateOptions(
+						MACStateOptions.WithRecentUplinks(),
+						MACStateOptions.WithRecentDownlinks(),
+					),
 				),
 			},
 
@@ -601,6 +626,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 					EndDeviceOptions.WithLoRaWANVersion(ttnpb.MAC_V1_0_3),
 					EndDeviceOptions.WithLoRaWANPHYVersion(ttnpb.PHY_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(customMACSettings, true, activeSessionOpts, currentMACStateOverrideOpt),
+					EndDeviceOptions.WithMACStateOptions(
+						MACStateOptions.WithRecentUplinks(),
+						MACStateOptions.WithRecentDownlinks(),
+					),
 				),
 			},
 			{
@@ -628,6 +657,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 					EndDeviceOptions.WithLoRaWANVersion(ttnpb.MAC_V1_0_3),
 					EndDeviceOptions.WithLoRaWANPHYVersion(ttnpb.PHY_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(defaultMACSettings, true, nil, desiredMACStateOverrideOpt),
+					EndDeviceOptions.WithMACStateOptions(
+						MACStateOptions.WithRecentUplinks(),
+						MACStateOptions.WithRecentDownlinks(),
+					),
 				),
 			},
 
