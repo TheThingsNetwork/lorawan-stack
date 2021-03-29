@@ -1964,7 +1964,7 @@ func TestApplicationServer(t *testing.T) {
 									t.Fatalf("Expected no upstream message but got %v", msg)
 								}
 							}
-						case <-time.After(Timeout):
+						case <-time.After(Timeout * 2):
 							if !tc.ExpectTimeout && tc.AssertUp != nil {
 								t.Fatal("Expected upstream timeout")
 							}
@@ -2590,7 +2590,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							} else {
 								t.Fatalf("Expected no upstream message but got %v", msg)
 							}
-						case <-time.After(Timeout):
+						case <-time.After(Timeout * 2):
 							if step.AssertUp != nil {
 								step.AssertUp(t, nil)
 							} else {
