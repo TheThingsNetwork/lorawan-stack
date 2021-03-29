@@ -9597,6 +9597,37 @@
           ]
         },
         {
+          "name": "DevAddrPrefix",
+          "longName": "DevAddrPrefix",
+          "fullName": "ttn.lorawan.v3.DevAddrPrefix",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "dev_addr",
+              "description": "DevAddr base.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "length",
+              "description": "Number of most significant bits from dev_addr that are used as prefix.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "EndDevice",
           "longName": "EndDevice",
           "fullName": "ttn.lorawan.v3.EndDevice",
@@ -25094,6 +25125,26 @@
               "defaultValue": ""
             },
             {
+              "name": "forwarder_gateway_eui",
+              "description": "Forwarder gateway EUI.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "forwarder_gateway_id",
+              "description": "Forwarder gateway ID.",
+              "label": "",
+              "type": "StringValue",
+              "longType": "google.protobuf.StringValue",
+              "fullType": "google.protobuf.StringValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "home_network_net_id",
               "description": "LoRa Alliance NetID of the Packet Broker Home Network Member.",
               "label": "",
@@ -27688,11 +27739,647 @@
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
       "hasExtensions": false,
-      "hasMessages": false,
+      "hasMessages": true,
       "hasServices": true,
       "enums": [],
       "extensions": [],
-      "messages": [],
+      "messages": [
+        {
+          "name": "ListForwarderRoutingPoliciesRequest",
+          "longName": "ListForwarderRoutingPoliciesRequest",
+          "fullName": "ttn.lorawan.v3.ListForwarderRoutingPoliciesRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "home_network_id",
+              "description": "Packet Broker identifier of the Home Network.",
+              "label": "",
+              "type": "PacketBrokerNetworkIdentifier",
+              "longType": "PacketBrokerNetworkIdentifier",
+              "fullType": "ttn.lorawan.v3.PacketBrokerNetworkIdentifier",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListHomeNetworkRoutingPoliciesRequest",
+          "longName": "ListHomeNetworkRoutingPoliciesRequest",
+          "fullName": "ttn.lorawan.v3.ListHomeNetworkRoutingPoliciesRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListHomeNetworksRequest",
+          "longName": "ListHomeNetworksRequest",
+          "fullName": "ttn.lorawan.v3.ListHomeNetworksRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerDefaultRoutingPolicy",
+          "longName": "PacketBrokerDefaultRoutingPolicy",
+          "fullName": "ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "updated_at",
+              "description": "Timestamp when the policy got last updated.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "uplink",
+              "description": "Uplink policy.",
+              "label": "",
+              "type": "PacketBrokerRoutingPolicyUplink",
+              "longType": "PacketBrokerRoutingPolicyUplink",
+              "fullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink",
+              "description": "Downlink policy.",
+              "label": "",
+              "type": "PacketBrokerRoutingPolicyDownlink",
+              "longType": "PacketBrokerRoutingPolicyDownlink",
+              "fullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerDevAddrBlock",
+          "longName": "PacketBrokerDevAddrBlock",
+          "fullName": "ttn.lorawan.v3.PacketBrokerDevAddrBlock",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "dev_addr_prefix",
+              "description": "",
+              "label": "",
+              "type": "DevAddrPrefix",
+              "longType": "DevAddrPrefix",
+              "fullType": "ttn.lorawan.v3.DevAddrPrefix",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "home_network_cluster_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerInfo",
+          "longName": "PacketBrokerInfo",
+          "fullName": "ttn.lorawan.v3.PacketBrokerInfo",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "registration",
+              "description": "The current registration, unset if there isn't a registration.",
+              "label": "",
+              "type": "PacketBrokerNetwork",
+              "longType": "PacketBrokerNetwork",
+              "fullType": "ttn.lorawan.v3.PacketBrokerNetwork",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "forwarder_enabled",
+              "description": "Whether the server is configured as Forwarder (with gateways).",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "home_network_enabled",
+              "description": "Whether the server is configured as Home Network (with end devices).",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerNetwork",
+          "longName": "PacketBrokerNetwork",
+          "fullName": "ttn.lorawan.v3.PacketBrokerNetwork",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "Packet Broker network identifier.",
+              "label": "",
+              "type": "PacketBrokerNetworkIdentifier",
+              "longType": "PacketBrokerNetworkIdentifier",
+              "fullType": "ttn.lorawan.v3.PacketBrokerNetworkIdentifier",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "name",
+              "description": "Name of the network.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "dev_addr_blocks",
+              "description": "DevAddr blocks that are assigned to this registration.",
+              "label": "repeated",
+              "type": "PacketBrokerDevAddrBlock",
+              "longType": "PacketBrokerDevAddrBlock",
+              "fullType": "ttn.lorawan.v3.PacketBrokerDevAddrBlock",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "contact_info",
+              "description": "Contact information.",
+              "label": "repeated",
+              "type": "ContactInfo",
+              "longType": "ContactInfo",
+              "fullType": "ttn.lorawan.v3.ContactInfo",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerNetworkIdentifier",
+          "longName": "PacketBrokerNetworkIdentifier",
+          "fullName": "ttn.lorawan.v3.PacketBrokerNetworkIdentifier",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "net_id",
+              "description": "LoRa Alliance NetID.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "tenant_id",
+              "description": "Tenant identifier if the registration leases DevAddr blocks from a NetID.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerNetworks",
+          "longName": "PacketBrokerNetworks",
+          "fullName": "ttn.lorawan.v3.PacketBrokerNetworks",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "networks",
+              "description": "",
+              "label": "repeated",
+              "type": "PacketBrokerNetwork",
+              "longType": "PacketBrokerNetwork",
+              "fullType": "ttn.lorawan.v3.PacketBrokerNetwork",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerRoutingPolicies",
+          "longName": "PacketBrokerRoutingPolicies",
+          "fullName": "ttn.lorawan.v3.PacketBrokerRoutingPolicies",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "policies",
+              "description": "",
+              "label": "repeated",
+              "type": "PacketBrokerRoutingPolicy",
+              "longType": "PacketBrokerRoutingPolicy",
+              "fullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicy",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerRoutingPolicy",
+          "longName": "PacketBrokerRoutingPolicy",
+          "fullName": "ttn.lorawan.v3.PacketBrokerRoutingPolicy",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "forwarder_id",
+              "description": "Packet Broker identifier of the Forwarder.",
+              "label": "",
+              "type": "PacketBrokerNetworkIdentifier",
+              "longType": "PacketBrokerNetworkIdentifier",
+              "fullType": "ttn.lorawan.v3.PacketBrokerNetworkIdentifier",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "home_network_id",
+              "description": "Packet Broker identifier of the Home Network.",
+              "label": "",
+              "type": "PacketBrokerNetworkIdentifier",
+              "longType": "PacketBrokerNetworkIdentifier",
+              "fullType": "ttn.lorawan.v3.PacketBrokerNetworkIdentifier",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "updated_at",
+              "description": "Timestamp when the policy got last updated.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "uplink",
+              "description": "Uplink policy.",
+              "label": "",
+              "type": "PacketBrokerRoutingPolicyUplink",
+              "longType": "PacketBrokerRoutingPolicyUplink",
+              "fullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink",
+              "description": "Downlink policy.",
+              "label": "",
+              "type": "PacketBrokerRoutingPolicyDownlink",
+              "longType": "PacketBrokerRoutingPolicyDownlink",
+              "fullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerRoutingPolicyDownlink",
+          "longName": "PacketBrokerRoutingPolicyDownlink",
+          "fullName": "ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "join_accept",
+              "description": "Allow join-accept messages.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "mac_data",
+              "description": "Allow downlink messages with FPort of 0.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "application_data",
+              "description": "Allow downlink messages with FPort between 1 and 255.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerRoutingPolicyUplink",
+          "longName": "PacketBrokerRoutingPolicyUplink",
+          "fullName": "ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "join_request",
+              "description": "Forward join-request messages.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "mac_data",
+              "description": "Forward uplink messages with FPort of 0.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "application_data",
+              "description": "Forward uplink messages with FPort between 1 and 255.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "signal_quality",
+              "description": "Forward RSSI and SNR.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "localization",
+              "description": "Forward gateway location, RSSI, SNR and fine timestamp.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SetPacketBrokerDefaultRoutingPolicyRequest",
+          "longName": "SetPacketBrokerDefaultRoutingPolicyRequest",
+          "fullName": "ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "uplink",
+              "description": "Uplink policy.",
+              "label": "",
+              "type": "PacketBrokerRoutingPolicyUplink",
+              "longType": "PacketBrokerRoutingPolicyUplink",
+              "fullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "downlink",
+              "description": "Downlink policy.",
+              "label": "",
+              "type": "PacketBrokerRoutingPolicyDownlink",
+              "longType": "PacketBrokerRoutingPolicyDownlink",
+              "fullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SetPacketBrokerRoutingPolicyRequest",
+          "longName": "SetPacketBrokerRoutingPolicyRequest",
+          "fullName": "ttn.lorawan.v3.SetPacketBrokerRoutingPolicyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "home_network_id",
+              "description": "Packet Broker identifier of the Home Network.",
+              "label": "",
+              "type": "PacketBrokerNetworkIdentifier",
+              "longType": "PacketBrokerNetworkIdentifier",
+              "fullType": "ttn.lorawan.v3.PacketBrokerNetworkIdentifier",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "uplink",
+              "description": "Uplink policy.",
+              "label": "",
+              "type": "PacketBrokerRoutingPolicyUplink",
+              "longType": "PacketBrokerRoutingPolicyUplink",
+              "fullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "downlink",
+              "description": "Downlink policy.",
+              "label": "",
+              "type": "PacketBrokerRoutingPolicyDownlink",
+              "longType": "PacketBrokerRoutingPolicyDownlink",
+              "fullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
       "services": [
         {
           "name": "GsPba",
@@ -27731,6 +28418,312 @@
               "responseLongType": ".google.protobuf.Empty",
               "responseFullType": "google.protobuf.Empty",
               "responseStreaming": false
+            }
+          ]
+        },
+        {
+          "name": "Pba",
+          "longName": "Pba",
+          "fullName": "ttn.lorawan.v3.Pba",
+          "description": "The Pba service allows clients to manage peering through Packet Broker.",
+          "methods": [
+            {
+              "name": "GetInfo",
+              "description": "Get information about the Packet Broker registration.\nViewing Packet Packet information requires administrative access.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "PacketBrokerInfo",
+              "responseLongType": "PacketBrokerInfo",
+              "responseFullType": "ttn.lorawan.v3.PacketBrokerInfo",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/pba/info"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Register",
+              "description": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "PacketBrokerNetwork",
+              "responseLongType": "PacketBrokerNetwork",
+              "responseFullType": "ttn.lorawan.v3.PacketBrokerNetwork",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/pba/registration"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/pba/registration"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Deregister",
+              "description": "Deregister from Packet Broker.\nPacket Broker deregistration requires administrative access.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/pba/registration"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetHomeNetworkDefaultRoutingPolicy",
+              "description": "Get the default routing policy.\nGetting routing policies requires administrative access.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "PacketBrokerDefaultRoutingPolicy",
+              "responseLongType": "PacketBrokerDefaultRoutingPolicy",
+              "responseFullType": "ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/pba/home-networks/policies/default"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "SetHomeNetworkDefaultRoutingPolicy",
+              "description": "Set the default routing policy.\nSetting routing policies requires administrative access.",
+              "requestType": "SetPacketBrokerDefaultRoutingPolicyRequest",
+              "requestLongType": "SetPacketBrokerDefaultRoutingPolicyRequest",
+              "requestFullType": "ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/pba/home-networks/policies/default",
+                      "body": "*"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/pba/home-networks/policies/default",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteHomeNetworkDefaultRoutingPolicy",
+              "description": "Deletes the default routing policy.\nDeleting routing policies requires administrative access.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/pba/home-networks/policies/default"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListHomeNetworkRoutingPolicies",
+              "description": "List the routing policies that Packet Broker Agent as Forwarder configured with Home Networks.\nListing routing policies requires administrative access.",
+              "requestType": "ListHomeNetworkRoutingPoliciesRequest",
+              "requestLongType": "ListHomeNetworkRoutingPoliciesRequest",
+              "requestFullType": "ttn.lorawan.v3.ListHomeNetworkRoutingPoliciesRequest",
+              "requestStreaming": false,
+              "responseType": "PacketBrokerRoutingPolicies",
+              "responseLongType": "PacketBrokerRoutingPolicies",
+              "responseFullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicies",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/pba/home-networks/policies"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetHomeNetworkRoutingPolicy",
+              "description": "Get the routing policy for the given Home Network.\nGetting routing policies requires administrative access.",
+              "requestType": "PacketBrokerNetworkIdentifier",
+              "requestLongType": "PacketBrokerNetworkIdentifier",
+              "requestFullType": "ttn.lorawan.v3.PacketBrokerNetworkIdentifier",
+              "requestStreaming": false,
+              "responseType": "PacketBrokerRoutingPolicy",
+              "responseLongType": "PacketBrokerRoutingPolicy",
+              "responseFullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicy",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/pba/home-networks/policies/{net_id}"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/pba/home-networks/policies/{net_id}/{tenant_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "SetHomeNetworkRoutingPolicy",
+              "description": "Set the routing policy for the given Home Network.\nSetting routing policies requires administrative access.",
+              "requestType": "SetPacketBrokerRoutingPolicyRequest",
+              "requestLongType": "SetPacketBrokerRoutingPolicyRequest",
+              "requestFullType": "ttn.lorawan.v3.SetPacketBrokerRoutingPolicyRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/pba/home-networks/policies/{home_network_id.net_id}",
+                      "body": "*"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/pba/home-networks/policies/{home_network_id.net_id}",
+                      "body": "*"
+                    },
+                    {
+                      "method": "PUT",
+                      "pattern": "/pba/home-networks/policies/{home_network_id.net_id}/{home_network_id.tenant_id}",
+                      "body": "*"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/pba/home-networks/policies/{home_network_id.net_id}/{home_network_id.tenant_id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteHomeNetworkRoutingPolicy",
+              "description": "Delete the routing policy for the given Home Network.\nDeleting routing policies requires administrative access.",
+              "requestType": "PacketBrokerNetworkIdentifier",
+              "requestLongType": "PacketBrokerNetworkIdentifier",
+              "requestFullType": "ttn.lorawan.v3.PacketBrokerNetworkIdentifier",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/pba/home-networks/policies/{net_id}"
+                    },
+                    {
+                      "method": "DELETE",
+                      "pattern": "/pba/home-networks/policies/{net_id}/{tenant_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListHomeNetworks",
+              "description": "List the (public) home networks for which routing policies can be configured.\nListing home networks requires administrative access.",
+              "requestType": "ListHomeNetworksRequest",
+              "requestLongType": "ListHomeNetworksRequest",
+              "requestFullType": "ttn.lorawan.v3.ListHomeNetworksRequest",
+              "requestStreaming": false,
+              "responseType": "PacketBrokerNetworks",
+              "responseLongType": "PacketBrokerNetworks",
+              "responseFullType": "ttn.lorawan.v3.PacketBrokerNetworks",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/pba/home-networks"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListForwarderRoutingPolicies",
+              "description": "List the routing policies that Forwarders configured with Packet Broker Agent as Home Network.\nListing routing policies requires administrative access.",
+              "requestType": "ListForwarderRoutingPoliciesRequest",
+              "requestLongType": "ListForwarderRoutingPoliciesRequest",
+              "requestFullType": "ttn.lorawan.v3.ListForwarderRoutingPoliciesRequest",
+              "requestStreaming": false,
+              "responseType": "PacketBrokerRoutingPolicies",
+              "responseLongType": "PacketBrokerRoutingPolicies",
+              "responseFullType": "ttn.lorawan.v3.PacketBrokerRoutingPolicies",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/pba/forwarders/policies"
+                    }
+                  ]
+                }
+              }
             }
           ]
         }

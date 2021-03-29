@@ -34,3 +34,1597 @@ var (
 
 // define the regex for a UUID once up-front
 var _packetbrokeragent_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+
+// ValidateFields checks the field values on PacketBrokerNetworkIdentifier with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *PacketBrokerNetworkIdentifier) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerNetworkIdentifierFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "net_id":
+			// no validation rules for NetID
+		case "tenant_id":
+
+			if utf8.RuneCountInString(m.GetTenantID()) > 36 {
+				return PacketBrokerNetworkIdentifierValidationError{
+					field:  "tenant_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_PacketBrokerNetworkIdentifier_TenantID_Pattern.MatchString(m.GetTenantID()) {
+				return PacketBrokerNetworkIdentifierValidationError{
+					field:  "tenant_id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$\"",
+				}
+			}
+
+		default:
+			return PacketBrokerNetworkIdentifierValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerNetworkIdentifierValidationError is the validation error
+// returned by PacketBrokerNetworkIdentifier.ValidateFields if the designated
+// constraints aren't met.
+type PacketBrokerNetworkIdentifierValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerNetworkIdentifierValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerNetworkIdentifierValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerNetworkIdentifierValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerNetworkIdentifierValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerNetworkIdentifierValidationError) ErrorName() string {
+	return "PacketBrokerNetworkIdentifierValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerNetworkIdentifierValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerNetworkIdentifier.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerNetworkIdentifierValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerNetworkIdentifierValidationError{}
+
+var _PacketBrokerNetworkIdentifier_TenantID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+
+// ValidateFields checks the field values on PacketBrokerDevAddrBlock with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *PacketBrokerDevAddrBlock) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerDevAddrBlockFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "dev_addr_prefix":
+
+			if v, ok := interface{}(m.GetDevAddrPrefix()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerDevAddrBlockValidationError{
+						field:  "dev_addr_prefix",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "home_network_cluster_id":
+			// no validation rules for HomeNetworkClusterID
+		default:
+			return PacketBrokerDevAddrBlockValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerDevAddrBlockValidationError is the validation error returned by
+// PacketBrokerDevAddrBlock.ValidateFields if the designated constraints
+// aren't met.
+type PacketBrokerDevAddrBlockValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerDevAddrBlockValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerDevAddrBlockValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerDevAddrBlockValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerDevAddrBlockValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerDevAddrBlockValidationError) ErrorName() string {
+	return "PacketBrokerDevAddrBlockValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerDevAddrBlockValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerDevAddrBlock.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerDevAddrBlockValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerDevAddrBlockValidationError{}
+
+// ValidateFields checks the field values on PacketBrokerNetwork with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *PacketBrokerNetwork) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerNetworkFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "id":
+
+			if v, ok := interface{}(m.GetId()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerNetworkValidationError{
+						field:  "id",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "name":
+			// no validation rules for Name
+		case "dev_addr_blocks":
+
+			for idx, item := range m.GetDevAddrBlocks() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return PacketBrokerNetworkValidationError{
+							field:  fmt.Sprintf("dev_addr_blocks[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "contact_info":
+
+			for idx, item := range m.GetContactInfo() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return PacketBrokerNetworkValidationError{
+							field:  fmt.Sprintf("contact_info[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return PacketBrokerNetworkValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerNetworkValidationError is the validation error returned by
+// PacketBrokerNetwork.ValidateFields if the designated constraints aren't met.
+type PacketBrokerNetworkValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerNetworkValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerNetworkValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerNetworkValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerNetworkValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerNetworkValidationError) ErrorName() string {
+	return "PacketBrokerNetworkValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerNetworkValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerNetwork.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerNetworkValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerNetworkValidationError{}
+
+// ValidateFields checks the field values on PacketBrokerNetworks with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *PacketBrokerNetworks) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerNetworksFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "networks":
+
+			for idx, item := range m.GetNetworks() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return PacketBrokerNetworksValidationError{
+							field:  fmt.Sprintf("networks[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return PacketBrokerNetworksValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerNetworksValidationError is the validation error returned by
+// PacketBrokerNetworks.ValidateFields if the designated constraints aren't met.
+type PacketBrokerNetworksValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerNetworksValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerNetworksValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerNetworksValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerNetworksValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerNetworksValidationError) ErrorName() string {
+	return "PacketBrokerNetworksValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerNetworksValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerNetworks.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerNetworksValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerNetworksValidationError{}
+
+// ValidateFields checks the field values on PacketBrokerInfo with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *PacketBrokerInfo) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerInfoFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "registration":
+
+			if v, ok := interface{}(m.GetRegistration()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerInfoValidationError{
+						field:  "registration",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "forwarder_enabled":
+			// no validation rules for ForwarderEnabled
+		case "home_network_enabled":
+			// no validation rules for HomeNetworkEnabled
+		default:
+			return PacketBrokerInfoValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerInfoValidationError is the validation error returned by
+// PacketBrokerInfo.ValidateFields if the designated constraints aren't met.
+type PacketBrokerInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerInfoValidationError) ErrorName() string { return "PacketBrokerInfoValidationError" }
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerInfoValidationError{}
+
+// ValidateFields checks the field values on PacketBrokerRoutingPolicyUplink
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *PacketBrokerRoutingPolicyUplink) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerRoutingPolicyUplinkFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "join_request":
+			// no validation rules for JoinRequest
+		case "mac_data":
+			// no validation rules for MacData
+		case "application_data":
+			// no validation rules for ApplicationData
+		case "signal_quality":
+			// no validation rules for SignalQuality
+		case "localization":
+			// no validation rules for Localization
+		default:
+			return PacketBrokerRoutingPolicyUplinkValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerRoutingPolicyUplinkValidationError is the validation error
+// returned by PacketBrokerRoutingPolicyUplink.ValidateFields if the
+// designated constraints aren't met.
+type PacketBrokerRoutingPolicyUplinkValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerRoutingPolicyUplinkValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerRoutingPolicyUplinkValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerRoutingPolicyUplinkValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerRoutingPolicyUplinkValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerRoutingPolicyUplinkValidationError) ErrorName() string {
+	return "PacketBrokerRoutingPolicyUplinkValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerRoutingPolicyUplinkValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerRoutingPolicyUplink.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerRoutingPolicyUplinkValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerRoutingPolicyUplinkValidationError{}
+
+// ValidateFields checks the field values on PacketBrokerRoutingPolicyDownlink
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *PacketBrokerRoutingPolicyDownlink) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerRoutingPolicyDownlinkFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "join_accept":
+			// no validation rules for JoinAccept
+		case "mac_data":
+			// no validation rules for MacData
+		case "application_data":
+			// no validation rules for ApplicationData
+		default:
+			return PacketBrokerRoutingPolicyDownlinkValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerRoutingPolicyDownlinkValidationError is the validation error
+// returned by PacketBrokerRoutingPolicyDownlink.ValidateFields if the
+// designated constraints aren't met.
+type PacketBrokerRoutingPolicyDownlinkValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerRoutingPolicyDownlinkValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerRoutingPolicyDownlinkValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerRoutingPolicyDownlinkValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerRoutingPolicyDownlinkValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerRoutingPolicyDownlinkValidationError) ErrorName() string {
+	return "PacketBrokerRoutingPolicyDownlinkValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerRoutingPolicyDownlinkValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerRoutingPolicyDownlink.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerRoutingPolicyDownlinkValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerRoutingPolicyDownlinkValidationError{}
+
+// ValidateFields checks the field values on PacketBrokerDefaultRoutingPolicy
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *PacketBrokerDefaultRoutingPolicy) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerDefaultRoutingPolicyFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "updated_at":
+
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerDefaultRoutingPolicyValidationError{
+						field:  "updated_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "uplink":
+
+			if v, ok := interface{}(m.GetUplink()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerDefaultRoutingPolicyValidationError{
+						field:  "uplink",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink":
+
+			if v, ok := interface{}(m.GetDownlink()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerDefaultRoutingPolicyValidationError{
+						field:  "downlink",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return PacketBrokerDefaultRoutingPolicyValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerDefaultRoutingPolicyValidationError is the validation error
+// returned by PacketBrokerDefaultRoutingPolicy.ValidateFields if the
+// designated constraints aren't met.
+type PacketBrokerDefaultRoutingPolicyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerDefaultRoutingPolicyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerDefaultRoutingPolicyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerDefaultRoutingPolicyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerDefaultRoutingPolicyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerDefaultRoutingPolicyValidationError) ErrorName() string {
+	return "PacketBrokerDefaultRoutingPolicyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerDefaultRoutingPolicyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerDefaultRoutingPolicy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerDefaultRoutingPolicyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerDefaultRoutingPolicyValidationError{}
+
+// ValidateFields checks the field values on PacketBrokerRoutingPolicy with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *PacketBrokerRoutingPolicy) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerRoutingPolicyFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "forwarder_id":
+
+			if v, ok := interface{}(m.GetForwarderId()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerRoutingPolicyValidationError{
+						field:  "forwarder_id",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "home_network_id":
+
+			if v, ok := interface{}(m.GetHomeNetworkId()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerRoutingPolicyValidationError{
+						field:  "home_network_id",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "updated_at":
+
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerRoutingPolicyValidationError{
+						field:  "updated_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "uplink":
+
+			if v, ok := interface{}(m.GetUplink()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerRoutingPolicyValidationError{
+						field:  "uplink",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink":
+
+			if v, ok := interface{}(m.GetDownlink()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerRoutingPolicyValidationError{
+						field:  "downlink",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return PacketBrokerRoutingPolicyValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerRoutingPolicyValidationError is the validation error returned by
+// PacketBrokerRoutingPolicy.ValidateFields if the designated constraints
+// aren't met.
+type PacketBrokerRoutingPolicyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerRoutingPolicyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerRoutingPolicyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerRoutingPolicyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerRoutingPolicyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerRoutingPolicyValidationError) ErrorName() string {
+	return "PacketBrokerRoutingPolicyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerRoutingPolicyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerRoutingPolicy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerRoutingPolicyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerRoutingPolicyValidationError{}
+
+// ValidateFields checks the field values on
+// SetPacketBrokerDefaultRoutingPolicyRequest with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *SetPacketBrokerDefaultRoutingPolicyRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = SetPacketBrokerDefaultRoutingPolicyRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "uplink":
+
+			if m.GetUplink() == nil {
+				return SetPacketBrokerDefaultRoutingPolicyRequestValidationError{
+					field:  "uplink",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUplink()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return SetPacketBrokerDefaultRoutingPolicyRequestValidationError{
+						field:  "uplink",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink":
+
+			if m.GetDownlink() == nil {
+				return SetPacketBrokerDefaultRoutingPolicyRequestValidationError{
+					field:  "downlink",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDownlink()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return SetPacketBrokerDefaultRoutingPolicyRequestValidationError{
+						field:  "downlink",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return SetPacketBrokerDefaultRoutingPolicyRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// SetPacketBrokerDefaultRoutingPolicyRequestValidationError is the validation
+// error returned by SetPacketBrokerDefaultRoutingPolicyRequest.ValidateFields
+// if the designated constraints aren't met.
+type SetPacketBrokerDefaultRoutingPolicyRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetPacketBrokerDefaultRoutingPolicyRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetPacketBrokerDefaultRoutingPolicyRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetPacketBrokerDefaultRoutingPolicyRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetPacketBrokerDefaultRoutingPolicyRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetPacketBrokerDefaultRoutingPolicyRequestValidationError) ErrorName() string {
+	return "SetPacketBrokerDefaultRoutingPolicyRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetPacketBrokerDefaultRoutingPolicyRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetPacketBrokerDefaultRoutingPolicyRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetPacketBrokerDefaultRoutingPolicyRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetPacketBrokerDefaultRoutingPolicyRequestValidationError{}
+
+// ValidateFields checks the field values on
+// ListHomeNetworkRoutingPoliciesRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *ListHomeNetworkRoutingPoliciesRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListHomeNetworkRoutingPoliciesRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "limit":
+
+			if m.GetLimit() > 1000 {
+				return ListHomeNetworkRoutingPoliciesRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
+		default:
+			return ListHomeNetworkRoutingPoliciesRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListHomeNetworkRoutingPoliciesRequestValidationError is the validation error
+// returned by ListHomeNetworkRoutingPoliciesRequest.ValidateFields if the
+// designated constraints aren't met.
+type ListHomeNetworkRoutingPoliciesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListHomeNetworkRoutingPoliciesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListHomeNetworkRoutingPoliciesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListHomeNetworkRoutingPoliciesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListHomeNetworkRoutingPoliciesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListHomeNetworkRoutingPoliciesRequestValidationError) ErrorName() string {
+	return "ListHomeNetworkRoutingPoliciesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListHomeNetworkRoutingPoliciesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListHomeNetworkRoutingPoliciesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListHomeNetworkRoutingPoliciesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListHomeNetworkRoutingPoliciesRequestValidationError{}
+
+// ValidateFields checks the field values on PacketBrokerRoutingPolicies with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *PacketBrokerRoutingPolicies) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerRoutingPoliciesFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "policies":
+
+			for idx, item := range m.GetPolicies() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return PacketBrokerRoutingPoliciesValidationError{
+							field:  fmt.Sprintf("policies[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return PacketBrokerRoutingPoliciesValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerRoutingPoliciesValidationError is the validation error returned
+// by PacketBrokerRoutingPolicies.ValidateFields if the designated constraints
+// aren't met.
+type PacketBrokerRoutingPoliciesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerRoutingPoliciesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerRoutingPoliciesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerRoutingPoliciesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerRoutingPoliciesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerRoutingPoliciesValidationError) ErrorName() string {
+	return "PacketBrokerRoutingPoliciesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerRoutingPoliciesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerRoutingPolicies.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerRoutingPoliciesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerRoutingPoliciesValidationError{}
+
+// ValidateFields checks the field values on
+// SetPacketBrokerRoutingPolicyRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *SetPacketBrokerRoutingPolicyRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = SetPacketBrokerRoutingPolicyRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "home_network_id":
+
+			if v, ok := interface{}(m.GetHomeNetworkId()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return SetPacketBrokerRoutingPolicyRequestValidationError{
+						field:  "home_network_id",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "uplink":
+
+			if m.GetUplink() == nil {
+				return SetPacketBrokerRoutingPolicyRequestValidationError{
+					field:  "uplink",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUplink()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return SetPacketBrokerRoutingPolicyRequestValidationError{
+						field:  "uplink",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink":
+
+			if m.GetDownlink() == nil {
+				return SetPacketBrokerRoutingPolicyRequestValidationError{
+					field:  "downlink",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDownlink()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return SetPacketBrokerRoutingPolicyRequestValidationError{
+						field:  "downlink",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return SetPacketBrokerRoutingPolicyRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// SetPacketBrokerRoutingPolicyRequestValidationError is the validation error
+// returned by SetPacketBrokerRoutingPolicyRequest.ValidateFields if the
+// designated constraints aren't met.
+type SetPacketBrokerRoutingPolicyRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetPacketBrokerRoutingPolicyRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetPacketBrokerRoutingPolicyRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetPacketBrokerRoutingPolicyRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetPacketBrokerRoutingPolicyRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetPacketBrokerRoutingPolicyRequestValidationError) ErrorName() string {
+	return "SetPacketBrokerRoutingPolicyRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetPacketBrokerRoutingPolicyRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetPacketBrokerRoutingPolicyRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetPacketBrokerRoutingPolicyRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetPacketBrokerRoutingPolicyRequestValidationError{}
+
+// ValidateFields checks the field values on ListHomeNetworksRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListHomeNetworksRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListHomeNetworksRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "limit":
+
+			if m.GetLimit() > 1000 {
+				return ListHomeNetworksRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
+		default:
+			return ListHomeNetworksRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListHomeNetworksRequestValidationError is the validation error returned by
+// ListHomeNetworksRequest.ValidateFields if the designated constraints aren't met.
+type ListHomeNetworksRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListHomeNetworksRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListHomeNetworksRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListHomeNetworksRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListHomeNetworksRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListHomeNetworksRequestValidationError) ErrorName() string {
+	return "ListHomeNetworksRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListHomeNetworksRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListHomeNetworksRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListHomeNetworksRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListHomeNetworksRequestValidationError{}
+
+// ValidateFields checks the field values on
+// ListForwarderRoutingPoliciesRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *ListForwarderRoutingPoliciesRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListForwarderRoutingPoliciesRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "home_network_id":
+
+			if v, ok := interface{}(m.GetHomeNetworkId()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListForwarderRoutingPoliciesRequestValidationError{
+						field:  "home_network_id",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "limit":
+			// no validation rules for Limit
+		case "page":
+			// no validation rules for Page
+		default:
+			return ListForwarderRoutingPoliciesRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListForwarderRoutingPoliciesRequestValidationError is the validation error
+// returned by ListForwarderRoutingPoliciesRequest.ValidateFields if the
+// designated constraints aren't met.
+type ListForwarderRoutingPoliciesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListForwarderRoutingPoliciesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListForwarderRoutingPoliciesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListForwarderRoutingPoliciesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListForwarderRoutingPoliciesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListForwarderRoutingPoliciesRequestValidationError) ErrorName() string {
+	return "ListForwarderRoutingPoliciesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListForwarderRoutingPoliciesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListForwarderRoutingPoliciesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListForwarderRoutingPoliciesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListForwarderRoutingPoliciesRequestValidationError{}

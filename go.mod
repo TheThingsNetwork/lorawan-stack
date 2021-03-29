@@ -109,8 +109,10 @@ require (
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.0.0-beta.1
 	go.opencensus.io v0.22.3
-	go.packetbroker.org/api/routing v1.0.3-tts
-	go.packetbroker.org/api/v3 v3.2.1-tts
+	go.packetbroker.org/api/iam v1.2.2-tts
+	go.packetbroker.org/api/iam/v2 v2.1.2-tts
+	go.packetbroker.org/api/routing v1.2.2-tts
+	go.packetbroker.org/api/v3 v3.4.2-tts
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
 	gocloud.dev v0.20.0
 	gocloud.dev/pubsub/natspubsub v0.19.0

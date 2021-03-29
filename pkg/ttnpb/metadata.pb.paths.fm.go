@@ -23,6 +23,8 @@ var RxMetadataFieldPathsNested = []string{
 	"location.source",
 	"packet_broker",
 	"packet_broker.forwarder_cluster_id",
+	"packet_broker.forwarder_gateway_eui",
+	"packet_broker.forwarder_gateway_id",
 	"packet_broker.forwarder_net_id",
 	"packet_broker.forwarder_tenant_id",
 	"packet_broker.home_network_cluster_id",
@@ -77,6 +79,8 @@ var LocationFieldPathsTopLevel = []string{
 }
 var PacketBrokerMetadataFieldPathsNested = []string{
 	"forwarder_cluster_id",
+	"forwarder_gateway_eui",
+	"forwarder_gateway_id",
 	"forwarder_net_id",
 	"forwarder_tenant_id",
 	"home_network_cluster_id",
@@ -88,6 +92,8 @@ var PacketBrokerMetadataFieldPathsNested = []string{
 
 var PacketBrokerMetadataFieldPathsTopLevel = []string{
 	"forwarder_cluster_id",
+	"forwarder_gateway_eui",
+	"forwarder_gateway_id",
 	"forwarder_net_id",
 	"forwarder_tenant_id",
 	"home_network_cluster_id",

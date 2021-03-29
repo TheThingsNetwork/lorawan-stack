@@ -296,9 +296,9 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					{
 						GatewayIdentifiers: cluster.PacketBrokerGatewayID,
 						PacketBroker: &ttnpb.PacketBrokerMetadata{
-							ForwarderNetID:     types.NetID{0x0, 0x0, 0x42},
-							ForwarderTenantID:  "test",
-							ForwarderClusterID: "test",
+							ForwarderNetId:     types.NetID{0x0, 0x0, 0x42},
+							ForwarderTenantId:  "test",
+							ForwarderClusterId: "test",
 						},
 						SNR: 26,
 					},

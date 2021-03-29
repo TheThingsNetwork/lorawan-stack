@@ -53,8 +53,19 @@ const (
 // TenantContextFiller fills the parent context based on the tenant ID.
 type TenantContextFiller func(parent context.Context, tenantID string) (context.Context, error)
 
-// TenantExtractor extracts the tenant ID from the context.
-type TenantExtractor func(context context.Context) string
+// TenantIDExtractor extracts the tenant ID from the context.
+type TenantIDExtractor func(ctx context.Context) string
+
+// RegistrationInfo contains information about a Packet Broker registration.
+type RegistrationInfo struct {
+	Name          string
+	DevAddrBlocks []*ttnpb.PacketBrokerDevAddrBlock
+	ContactInfo   []*ttnpb.ContactInfo
+	Listed        bool
+}
+
+// RegistrationInfoExtractor extracts registration information from the context.
+type RegistrationInfoExtractor func(ctx context.Context, homeNetworkClusterID string) (*RegistrationInfo, error)
 
 type uplinkMessage struct {
 	context.Context
@@ -69,7 +80,8 @@ type downlinkMessage struct {
 
 // Agent implements the Packet Broker Agent component, acting as Home Network.
 //
-// Agent exposes the GsPba and NsPba interfaces for forwarding uplink and subscribing to uplink.
+// Agent exposes the Pba interface for Packet Broker registration and routing policy management.
+// Agent also exposes the GsPba and NsPba interfaces for forwarding uplink and subscribing to uplink.
 type Agent struct {
 	*component.Component
 	ctx context.Context
@@ -84,13 +96,15 @@ type Agent struct {
 	homeNetworkConfig HomeNetworkConfig
 	devAddrPrefixes   []types.DevAddrPrefix
 
-	tenantContextFillers []TenantContextFiller
-	tenantExtractor      TenantExtractor
+	tenantContextFillers      []TenantContextFiller
+	tenantIDExtractor         TenantIDExtractor
+	registrationInfoExtractor RegistrationInfoExtractor
 
 	upstreamCh   chan *uplinkMessage
 	downstreamCh chan *downlinkMessage
 
 	grpc struct {
+		pba   ttnpb.PbaServer
 		nsPba ttnpb.NsPbaServer
 		gsPba ttnpb.GsPbaServer
 	}
@@ -107,11 +121,17 @@ func WithTenantContextFiller(filler TenantContextFiller) Option {
 	}
 }
 
-// WithTenantExtractor returns an Option that configures the Agent to use the given tenant extractor for publishing
-// messages. The Config's TenantID is always used in subscriptions.
-func WithTenantExtractor(extractor TenantExtractor) Option {
+// WithTenantIDExtractor returns an Option that configures the Agent to use the given tenant ID extractor.
+func WithTenantIDExtractor(extractor TenantIDExtractor) Option {
 	return func(a *Agent) {
-		a.tenantExtractor = extractor
+		a.tenantIDExtractor = extractor
+	}
+}
+
+// WithRegistrationInfo returns an Option that configures the Agent to use the given registration information extractor.
+func WithRegistrationInfo(extractor RegistrationInfoExtractor) Option {
+	return func(a *Agent) {
+		a.registrationInfoExtractor = extractor
 	}
 }
 
@@ -182,8 +202,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			}
 			return res, nil
 		}
-	default:
-		return nil, errAuthenticationMode.WithAttributes("mode", mode)
 	}
 
 	homeNetworkClusterID := conf.HomeNetworkClusterID
@@ -191,9 +209,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		homeNetworkClusterID = conf.ClusterID
 	}
 	a := &Agent{
-		Component: c,
-		ctx:       ctx,
-
+		Component:            c,
+		ctx:                  ctx,
 		dataPlaneAddress:     conf.DataPlaneAddress,
 		netID:                conf.NetID,
 		subscriptionTenantID: conf.TenantID,
@@ -203,8 +220,33 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		forwarderConfig:      conf.Forwarder,
 		homeNetworkConfig:    conf.HomeNetwork,
 		devAddrPrefixes:      devAddrPrefixes,
-		tenantExtractor: func(_ context.Context) string {
+		tenantIDExtractor: func(_ context.Context) string {
 			return conf.TenantID
+		},
+		registrationInfoExtractor: func(_ context.Context, homeNetworkClusterID string) (*RegistrationInfo, error) {
+			blocks := make([]*ttnpb.PacketBrokerDevAddrBlock, len(devAddrPrefixes))
+			for i, p := range devAddrPrefixes {
+				blocks[i] = &ttnpb.PacketBrokerDevAddrBlock{
+					DevAddrPrefix: &ttnpb.DevAddrPrefix{
+						DevAddr: &p.DevAddr,
+						Length:  uint32(p.Length),
+					},
+					HomeNetworkClusterID: homeNetworkClusterID,
+				}
+			}
+			contactInfo := make([]*ttnpb.ContactInfo, 0, 2)
+			if adminContact := conf.Registration.AdministrativeContact.ContactInfo(ttnpb.CONTACT_TYPE_OTHER); adminContact != nil {
+				contactInfo = append(contactInfo, adminContact)
+			}
+			if techContact := conf.Registration.TechnicalContact.ContactInfo(ttnpb.CONTACT_TYPE_TECHNICAL); techContact != nil {
+				contactInfo = append(contactInfo, techContact)
+			}
+			return &RegistrationInfo{
+				Name:          conf.Registration.Name,
+				DevAddrBlocks: blocks,
+				ContactInfo:   contactInfo,
+				Listed:        conf.Registration.Listed,
+			}, nil
 		},
 	}
 	if a.forwarderConfig.Enable {
@@ -237,18 +279,35 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	if a.homeNetworkConfig.Enable {
 		a.downstreamCh = make(chan *downlinkMessage, downstreamBufferSize)
 	}
+	for _, opt := range opts {
+		opt(a)
+	}
+	if a.dialOptions == nil {
+		return nil, errAuthenticationMode.WithAttributes("mode", conf.AuthenticationMode)
+	}
+
+	iamConn, err := a.dialContext(ctx, conf.IAMAddress)
+	if err != nil {
+		return nil, err
+	}
+	cpConn, err := a.dialContext(ctx, conf.ControlPlaneAddress)
+	if err != nil {
+		return nil, err
+	}
+	a.grpc.pba = &pbaServer{
+		Agent:   a,
+		iamConn: iamConn,
+		cpConn:  cpConn,
+	}
 	a.grpc.nsPba = &nsPbaServer{
 		contextDecoupler: a,
 		downstreamCh:     a.downstreamCh,
 	}
 	a.grpc.gsPba = &gsPbaServer{
-		tokenEncrypter:   a.forwarderConfig.TokenEncrypter,
+		config:           a.forwarderConfig,
 		messageEncrypter: a,
 		contextDecoupler: a,
 		upstreamCh:       a.upstreamCh,
-	}
-	for _, opt := range opts {
-		opt(a)
 	}
 
 	newTaskConfig := func(id string, fn component.TaskFunc) *component.TaskConfig {
@@ -288,28 +347,27 @@ func (a *Agent) Roles() []ttnpb.ClusterRole {
 
 // RegisterServices registers services provided by a at s.
 func (a *Agent) RegisterServices(s *grpc.Server) {
+	ttnpb.RegisterPbaServer(s, a.grpc.pba)
 	ttnpb.RegisterNsPbaServer(s, a.grpc.nsPba)
 	ttnpb.RegisterGsPbaServer(s, a.grpc.gsPba)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (a *Agent) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+	ttnpb.RegisterPbaHandler(a.Context(), s, conn)
 }
 
-func (a *Agent) dialContext(ctx context.Context) (*grpc.ClientConn, error) {
-	dialOpts, err := a.dialOptions(ctx)
+func (a *Agent) dialContext(ctx context.Context, target string, dialOpts ...grpc.DialOption) (*grpc.ClientConn, error) {
+	baseDialOpts, err := a.dialOptions(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defaultOpts := rpcclient.DefaultDialOptions(ctx)
-	opts := make([]grpc.DialOption, 0, len(defaultOpts)+len(dialOpts)+2)
+	opts := make([]grpc.DialOption, 0, len(defaultOpts)+len(baseDialOpts)+len(dialOpts))
 	opts = append(opts, defaultOpts...)
+	opts = append(opts, baseDialOpts...)
 	opts = append(opts, dialOpts...)
-	opts = append(opts,
-		grpc.WithBlock(),
-		grpc.FailOnNonTempDialError(true),
-	)
-	return grpc.DialContext(ctx, a.dataPlaneAddress, opts...)
+	return grpc.DialContext(ctx, target, opts...)
 }
 
 const (
@@ -326,7 +384,10 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 		"forwarder_cluster_id", a.clusterID,
 	))
 
-	conn, err := a.dialContext(ctx)
+	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
+		grpc.WithBlock(),
+		grpc.FailOnNonTempDialError(true),
+	)
 	if err != nil {
 		return err
 	}
@@ -381,7 +442,7 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 		case <-time.After(workerIdleTimeout):
 			return nil
 		case up := <-uplinkCh:
-			tenantID := a.tenantExtractor(up.Context)
+			tenantID := a.tenantIDExtractor(up.Context)
 			msg := up.UplinkMessage
 			ctx := log.NewContextWithFields(ctx, log.Fields(
 				"forwarder_tenant_id", tenantID,
@@ -417,7 +478,10 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 		"group", a.clusterID,
 	))
 
-	conn, err := a.dialContext(ctx)
+	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
+		grpc.WithBlock(),
+		grpc.FailOnNonTempDialError(true),
+	)
 	if err != nil {
 		return err
 	}
@@ -614,7 +678,10 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	))
 	logger := log.FromContext(ctx)
 
-	conn, err := a.dialContext(ctx)
+	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
+		grpc.WithBlock(),
+		grpc.FailOnNonTempDialError(true),
+	)
 	if err != nil {
 		return err
 	}
@@ -800,7 +867,10 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 		"home_network_cluster_id", a.homeNetworkClusterID,
 	))
 
-	conn, err := a.dialContext(ctx)
+	conn, err := a.dialContext(ctx, a.dataPlaneAddress,
+		grpc.WithBlock(),
+		grpc.FailOnNonTempDialError(true),
+	)
 	if err != nil {
 		return err
 	}
@@ -855,7 +925,7 @@ func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientCo
 		case <-time.After(workerIdleTimeout):
 			return nil
 		case down := <-downlinkCh:
-			tenantID := a.tenantExtractor(down.Context)
+			tenantID := a.tenantIDExtractor(down.Context)
 			msg, token := down.DownlinkMessage, down.agentUplinkToken
 			ctx := log.NewContextWithFields(ctx, log.Fields(
 				"forwarder_net_id", token.ForwarderNetID,

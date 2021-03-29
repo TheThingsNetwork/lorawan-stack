@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"gopkg.in/square/go-jose.v2"
 )
 
 type messageEncrypter interface {
@@ -33,7 +32,7 @@ type messageEncrypter interface {
 }
 
 type gsPbaServer struct {
-	tokenEncrypter   jose.Encrypter
+	config           ForwarderConfig
 	messageEncrypter messageEncrypter
 	contextDecoupler contextDecoupler
 	upstreamCh       chan *uplinkMessage
@@ -57,7 +56,7 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 	)...)
 	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
 
-	msg, err := toPBUplink(ctx, up, s.tokenEncrypter)
+	msg, err := toPBUplink(ctx, up, s.config)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to convert outgoing uplink message")
 		return nil, err

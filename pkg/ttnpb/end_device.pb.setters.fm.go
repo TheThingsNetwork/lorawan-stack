@@ -2286,6 +2286,36 @@ func (dst *EndDevices) SetFields(src *EndDevices, paths ...string) error {
 	return nil
 }
 
+func (dst *DevAddrPrefix) SetFields(src *DevAddrPrefix, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "dev_addr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_addr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevAddr = src.DevAddr
+			} else {
+				dst.DevAddr = nil
+			}
+		case "length":
+			if len(subs) > 0 {
+				return fmt.Errorf("'length' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Length = src.Length
+			} else {
+				var zero uint32
+				dst.Length = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *CreateEndDeviceRequest) SetFields(src *CreateEndDeviceRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

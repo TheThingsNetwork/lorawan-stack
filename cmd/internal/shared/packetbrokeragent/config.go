@@ -20,19 +20,26 @@ import (
 
 // DefaultPacketBrokerAgentConfig is the default configuration for the Packet Broker Agent.
 var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
-	AuthenticationMode: "tls",
+	IAMAddress:          "iam.packetbroker.org:443",
+	ControlPlaneAddress: "cp.packetbroker.org:443",
+	AuthenticationMode:  "oauth2",
 	OAuth2: packetbrokeragent.OAuth2Config{
 		TokenURL: "https://iam.packetbroker.org/token",
+	},
+	Registration: packetbrokeragent.RegistrationConfig{
+		Listed: true,
 	},
 	HomeNetwork: packetbrokeragent.HomeNetworkConfig{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{
 			Limit: 4096,
 		},
-		BlacklistForwarder: true,
 	},
 	Forwarder: packetbrokeragent.ForwarderConfig{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{
 			Limit: 1024,
 		},
+		IncludeGatewayEUI: true,
+		IncludeGatewayID:  true,
+		HashGatewayID:     false,
 	},
 }

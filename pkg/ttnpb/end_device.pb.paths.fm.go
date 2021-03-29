@@ -958,6 +958,15 @@ var EndDevicesFieldPathsNested = []string{
 var EndDevicesFieldPathsTopLevel = []string{
 	"end_devices",
 }
+var DevAddrPrefixFieldPathsNested = []string{
+	"dev_addr",
+	"length",
+}
+
+var DevAddrPrefixFieldPathsTopLevel = []string{
+	"dev_addr",
+	"length",
+}
 var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device",
 	"end_device.application_server_address",

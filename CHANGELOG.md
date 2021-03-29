@@ -23,6 +23,9 @@ For details about compatibility between different releases, see the **Commitment
 - Login Tokens (magic login links) that can be used for password-less login.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
   - This feature is disabled by default; use the new `is.login-tokens.enabled` option to enable it.
+- Packet Broker registration, configuration of routing policies, listing home networks and viewing routing policies set by forwarding networks. See `ttn-lw-cli packetbroker --help` for more information.
+- Support LoRa 2.4 GHz with Packet Broker.
+- Include gateway identifiers from Packet Broker in metadata.
 
 ### Changed
 

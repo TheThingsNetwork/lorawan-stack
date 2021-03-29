@@ -170,6 +170,7 @@
   - [Message `BoolValue`](#ttn.lorawan.v3.BoolValue)
   - [Message `ConvertEndDeviceTemplateRequest`](#ttn.lorawan.v3.ConvertEndDeviceTemplateRequest)
   - [Message `CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest)
+  - [Message `DevAddrPrefix`](#ttn.lorawan.v3.DevAddrPrefix)
   - [Message `EndDevice`](#ttn.lorawan.v3.EndDevice)
   - [Message `EndDevice.AttributesEntry`](#ttn.lorawan.v3.EndDevice.AttributesEntry)
   - [Message `EndDevice.LocationsEntry`](#ttn.lorawan.v3.EndDevice.LocationsEntry)
@@ -469,8 +470,24 @@
   - [Service `OrganizationAccess`](#ttn.lorawan.v3.OrganizationAccess)
   - [Service `OrganizationRegistry`](#ttn.lorawan.v3.OrganizationRegistry)
 - [File `lorawan-stack/api/packetbrokeragent.proto`](#lorawan-stack/api/packetbrokeragent.proto)
+  - [Message `ListForwarderRoutingPoliciesRequest`](#ttn.lorawan.v3.ListForwarderRoutingPoliciesRequest)
+  - [Message `ListHomeNetworkRoutingPoliciesRequest`](#ttn.lorawan.v3.ListHomeNetworkRoutingPoliciesRequest)
+  - [Message `ListHomeNetworksRequest`](#ttn.lorawan.v3.ListHomeNetworksRequest)
+  - [Message `PacketBrokerDefaultRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy)
+  - [Message `PacketBrokerDevAddrBlock`](#ttn.lorawan.v3.PacketBrokerDevAddrBlock)
+  - [Message `PacketBrokerInfo`](#ttn.lorawan.v3.PacketBrokerInfo)
+  - [Message `PacketBrokerNetwork`](#ttn.lorawan.v3.PacketBrokerNetwork)
+  - [Message `PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier)
+  - [Message `PacketBrokerNetworks`](#ttn.lorawan.v3.PacketBrokerNetworks)
+  - [Message `PacketBrokerRoutingPolicies`](#ttn.lorawan.v3.PacketBrokerRoutingPolicies)
+  - [Message `PacketBrokerRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerRoutingPolicy)
+  - [Message `PacketBrokerRoutingPolicyDownlink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink)
+  - [Message `PacketBrokerRoutingPolicyUplink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink)
+  - [Message `SetPacketBrokerDefaultRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest)
+  - [Message `SetPacketBrokerRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerRoutingPolicyRequest)
   - [Service `GsPba`](#ttn.lorawan.v3.GsPba)
   - [Service `NsPba`](#ttn.lorawan.v3.NsPba)
+  - [Service `Pba`](#ttn.lorawan.v3.Pba)
 - [File `lorawan-stack/api/picture.proto`](#lorawan-stack/api/picture.proto)
   - [Message `Picture`](#ttn.lorawan.v3.Picture)
   - [Message `Picture.Embedded`](#ttn.lorawan.v3.Picture.Embedded)
@@ -2628,6 +2645,13 @@ and allows clients to claim end devices.
 | Field | Validations |
 | ----- | ----------- |
 | `end_device` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.DevAddrPrefix">Message `DevAddrPrefix`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `dev_addr` | [`bytes`](#bytes) |  | DevAddr base. |
+| `length` | [`uint32`](#uint32) |  | Number of most significant bits from dev_addr that are used as prefix. |
 
 ### <a name="ttn.lorawan.v3.EndDevice">Message `EndDevice`</a>
 
@@ -6084,6 +6108,8 @@ More payload formatters can be added. |
 | `forwarder_net_id` | [`bytes`](#bytes) |  | LoRa Alliance NetID of the Packet Broker Forwarder Member. |
 | `forwarder_tenant_id` | [`string`](#string) |  | Tenant ID managed by the Packet Broker Forwarder Member. |
 | `forwarder_cluster_id` | [`string`](#string) |  | Forwarder Cluster ID of the Packet Broker Forwarder. |
+| `forwarder_gateway_eui` | [`bytes`](#bytes) |  | Forwarder gateway EUI. |
+| `forwarder_gateway_id` | [`google.protobuf.StringValue`](#google.protobuf.StringValue) |  | Forwarder gateway ID. |
 | `home_network_net_id` | [`bytes`](#bytes) |  | LoRa Alliance NetID of the Packet Broker Home Network Member. |
 | `home_network_tenant_id` | [`string`](#string) |  | Tenant ID managed by the Packet Broker Home Network Member. This value is empty if it cannot be determined by the Packet Broker Router. |
 | `home_network_cluster_id` | [`string`](#string) |  | Home Network Cluster ID of the Packet Broker Home Network. |
@@ -6658,6 +6684,154 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 
 ## <a name="lorawan-stack/api/packetbrokeragent.proto">File `lorawan-stack/api/packetbrokeragent.proto`</a>
 
+### <a name="ttn.lorawan.v3.ListForwarderRoutingPoliciesRequest">Message `ListForwarderRoutingPoliciesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `home_network_id` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) |  | Packet Broker identifier of the Home Network. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+### <a name="ttn.lorawan.v3.ListHomeNetworkRoutingPoliciesRequest">Message `ListHomeNetworkRoutingPoliciesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.ListHomeNetworksRequest">Message `ListHomeNetworksRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy">Message `PacketBrokerDefaultRoutingPolicy`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when the policy got last updated. |
+| `uplink` | [`PacketBrokerRoutingPolicyUplink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink) |  | Uplink policy. |
+| `downlink` | [`PacketBrokerRoutingPolicyDownlink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink) |  | Downlink policy. |
+
+### <a name="ttn.lorawan.v3.PacketBrokerDevAddrBlock">Message `PacketBrokerDevAddrBlock`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `dev_addr_prefix` | [`DevAddrPrefix`](#ttn.lorawan.v3.DevAddrPrefix) |  |  |
+| `home_network_cluster_id` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.PacketBrokerInfo">Message `PacketBrokerInfo`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `registration` | [`PacketBrokerNetwork`](#ttn.lorawan.v3.PacketBrokerNetwork) |  | The current registration, unset if there isn't a registration. |
+| `forwarder_enabled` | [`bool`](#bool) |  | Whether the server is configured as Forwarder (with gateways). |
+| `home_network_enabled` | [`bool`](#bool) |  | Whether the server is configured as Home Network (with end devices). |
+
+### <a name="ttn.lorawan.v3.PacketBrokerNetwork">Message `PacketBrokerNetwork`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) |  | Packet Broker network identifier. |
+| `name` | [`string`](#string) |  | Name of the network. |
+| `dev_addr_blocks` | [`PacketBrokerDevAddrBlock`](#ttn.lorawan.v3.PacketBrokerDevAddrBlock) | repeated | DevAddr blocks that are assigned to this registration. |
+| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information. |
+
+### <a name="ttn.lorawan.v3.PacketBrokerNetworkIdentifier">Message `PacketBrokerNetworkIdentifier`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `net_id` | [`uint32`](#uint32) |  | LoRa Alliance NetID. |
+| `tenant_id` | [`string`](#string) |  | Tenant identifier if the registration leases DevAddr blocks from a NetID. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `tenant_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
+
+### <a name="ttn.lorawan.v3.PacketBrokerNetworks">Message `PacketBrokerNetworks`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `networks` | [`PacketBrokerNetwork`](#ttn.lorawan.v3.PacketBrokerNetwork) | repeated |  |
+
+### <a name="ttn.lorawan.v3.PacketBrokerRoutingPolicies">Message `PacketBrokerRoutingPolicies`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `policies` | [`PacketBrokerRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerRoutingPolicy) | repeated |  |
+
+### <a name="ttn.lorawan.v3.PacketBrokerRoutingPolicy">Message `PacketBrokerRoutingPolicy`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `forwarder_id` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) |  | Packet Broker identifier of the Forwarder. |
+| `home_network_id` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) |  | Packet Broker identifier of the Home Network. |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when the policy got last updated. |
+| `uplink` | [`PacketBrokerRoutingPolicyUplink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink) |  | Uplink policy. |
+| `downlink` | [`PacketBrokerRoutingPolicyDownlink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink) |  | Downlink policy. |
+
+### <a name="ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink">Message `PacketBrokerRoutingPolicyDownlink`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `join_accept` | [`bool`](#bool) |  | Allow join-accept messages. |
+| `mac_data` | [`bool`](#bool) |  | Allow downlink messages with FPort of 0. |
+| `application_data` | [`bool`](#bool) |  | Allow downlink messages with FPort between 1 and 255. |
+
+### <a name="ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink">Message `PacketBrokerRoutingPolicyUplink`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `join_request` | [`bool`](#bool) |  | Forward join-request messages. |
+| `mac_data` | [`bool`](#bool) |  | Forward uplink messages with FPort of 0. |
+| `application_data` | [`bool`](#bool) |  | Forward uplink messages with FPort between 1 and 255. |
+| `signal_quality` | [`bool`](#bool) |  | Forward RSSI and SNR. |
+| `localization` | [`bool`](#bool) |  | Forward gateway location, RSSI, SNR and fine timestamp. |
+
+### <a name="ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest">Message `SetPacketBrokerDefaultRoutingPolicyRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `uplink` | [`PacketBrokerRoutingPolicyUplink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink) |  | Uplink policy. |
+| `downlink` | [`PacketBrokerRoutingPolicyDownlink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink) |  | Downlink policy. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `uplink` | <p>`message.required`: `true`</p> |
+| `downlink` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.SetPacketBrokerRoutingPolicyRequest">Message `SetPacketBrokerRoutingPolicyRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `home_network_id` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) |  | Packet Broker identifier of the Home Network. |
+| `uplink` | [`PacketBrokerRoutingPolicyUplink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink) |  | Uplink policy. |
+| `downlink` | [`PacketBrokerRoutingPolicyDownlink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink) |  | Downlink policy. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `uplink` | <p>`message.required`: `true`</p> |
+| `downlink` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GsPba">Service `GsPba`</a>
 
 The GsPba service connects a Gateway Server to a Packet Broker Agent.
@@ -6673,6 +6847,49 @@ The NsPba service connects a Network Server to a Packet Broker Agent.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `PublishDownlink` | [`DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | PublishDownlink instructs the Packet Broker Agent to publish a downlink message to Packet Broker Router. |
+
+### <a name="ttn.lorawan.v3.Pba">Service `Pba`</a>
+
+The Pba service allows clients to manage peering through Packet Broker.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `GetInfo` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`PacketBrokerInfo`](#ttn.lorawan.v3.PacketBrokerInfo) | Get information about the Packet Broker registration. Viewing Packet Packet information requires administrative access. |
+| `Register` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`PacketBrokerNetwork`](#ttn.lorawan.v3.PacketBrokerNetwork) | Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated. All registration settings are taken from Packet Broker Agent configuration and caller context. Packet Broker registration requires administrative access. |
+| `Deregister` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Deregister from Packet Broker. Packet Broker deregistration requires administrative access. |
+| `GetHomeNetworkDefaultRoutingPolicy` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`PacketBrokerDefaultRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy) | Get the default routing policy. Getting routing policies requires administrative access. |
+| `SetHomeNetworkDefaultRoutingPolicy` | [`SetPacketBrokerDefaultRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the default routing policy. Setting routing policies requires administrative access. |
+| `DeleteHomeNetworkDefaultRoutingPolicy` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Deletes the default routing policy. Deleting routing policies requires administrative access. |
+| `ListHomeNetworkRoutingPolicies` | [`ListHomeNetworkRoutingPoliciesRequest`](#ttn.lorawan.v3.ListHomeNetworkRoutingPoliciesRequest) | [`PacketBrokerRoutingPolicies`](#ttn.lorawan.v3.PacketBrokerRoutingPolicies) | List the routing policies that Packet Broker Agent as Forwarder configured with Home Networks. Listing routing policies requires administrative access. |
+| `GetHomeNetworkRoutingPolicy` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) | [`PacketBrokerRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerRoutingPolicy) | Get the routing policy for the given Home Network. Getting routing policies requires administrative access. |
+| `SetHomeNetworkRoutingPolicy` | [`SetPacketBrokerRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerRoutingPolicyRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the routing policy for the given Home Network. Setting routing policies requires administrative access. |
+| `DeleteHomeNetworkRoutingPolicy` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the routing policy for the given Home Network. Deleting routing policies requires administrative access. |
+| `ListHomeNetworks` | [`ListHomeNetworksRequest`](#ttn.lorawan.v3.ListHomeNetworksRequest) | [`PacketBrokerNetworks`](#ttn.lorawan.v3.PacketBrokerNetworks) | List the (public) home networks for which routing policies can be configured. Listing home networks requires administrative access. |
+| `ListForwarderRoutingPolicies` | [`ListForwarderRoutingPoliciesRequest`](#ttn.lorawan.v3.ListForwarderRoutingPoliciesRequest) | [`PacketBrokerRoutingPolicies`](#ttn.lorawan.v3.PacketBrokerRoutingPolicies) | List the routing policies that Forwarders configured with Packet Broker Agent as Home Network. Listing routing policies requires administrative access. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `GetInfo` | `GET` | `/api/v3/pba/info` |  |
+| `Register` | `PUT` | `/api/v3/pba/registration` |  |
+| `Register` | `POST` | `/api/v3/pba/registration` |  |
+| `Deregister` | `DELETE` | `/api/v3/pba/registration` |  |
+| `GetHomeNetworkDefaultRoutingPolicy` | `GET` | `/api/v3/pba/home-networks/policies/default` |  |
+| `SetHomeNetworkDefaultRoutingPolicy` | `PUT` | `/api/v3/pba/home-networks/policies/default` | `*` |
+| `SetHomeNetworkDefaultRoutingPolicy` | `POST` | `/api/v3/pba/home-networks/policies/default` | `*` |
+| `DeleteHomeNetworkDefaultRoutingPolicy` | `DELETE` | `/api/v3/pba/home-networks/policies/default` |  |
+| `ListHomeNetworkRoutingPolicies` | `GET` | `/api/v3/pba/home-networks/policies` |  |
+| `GetHomeNetworkRoutingPolicy` | `GET` | `/api/v3/pba/home-networks/policies/{net_id}` |  |
+| `GetHomeNetworkRoutingPolicy` | `GET` | `/api/v3/pba/home-networks/policies/{net_id}/{tenant_id}` |  |
+| `SetHomeNetworkRoutingPolicy` | `PUT` | `/api/v3/pba/home-networks/policies/{home_network_id.net_id}` | `*` |
+| `SetHomeNetworkRoutingPolicy` | `POST` | `/api/v3/pba/home-networks/policies/{home_network_id.net_id}` | `*` |
+| `SetHomeNetworkRoutingPolicy` | `PUT` | `/api/v3/pba/home-networks/policies/{home_network_id.net_id}/{home_network_id.tenant_id}` | `*` |
+| `SetHomeNetworkRoutingPolicy` | `POST` | `/api/v3/pba/home-networks/policies/{home_network_id.net_id}/{home_network_id.tenant_id}` | `*` |
+| `DeleteHomeNetworkRoutingPolicy` | `DELETE` | `/api/v3/pba/home-networks/policies/{net_id}` |  |
+| `DeleteHomeNetworkRoutingPolicy` | `DELETE` | `/api/v3/pba/home-networks/policies/{net_id}/{tenant_id}` |  |
+| `ListHomeNetworks` | `GET` | `/api/v3/pba/home-networks` |  |
+| `ListForwarderRoutingPolicies` | `GET` | `/api/v3/pba/forwarders/policies` |  |
 
 ## <a name="lorawan-stack/api/picture.proto">File `lorawan-stack/api/picture.proto`</a>
 
