@@ -1893,40 +1893,43 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		} else {
 			macVersion = dev.PendingMACState.LoRaWANVersion
 		}
-		if dev, ok := m["pending_session.dev_addr"]; !ok || dev.PendingSession == nil {
-			return false, "pending_session.dev_addr"
-		}
-
-		getFNwkSIntKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-			return dev.GetPendingSession().GetSessionKeys().GetFNwkSIntKey()
-		}
-		if setKeyIsZero(m, getFNwkSIntKey, "pending_session.keys.f_nwk_s_int_key") {
-			return false, "pending_session.keys.f_nwk_s_int_key.key"
-		}
-		getNwkSEncKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-			return dev.GetPendingSession().GetSessionKeys().GetNwkSEncKey()
-		}
-		if setKeyIsZero(m, getNwkSEncKey, "pending_session.keys.nwk_s_enc_key") {
-			return false, "pending_session.keys.nwk_s_enc_key.key"
-		}
-		getSNwkSIntKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-			return dev.GetPendingSession().GetSessionKeys().GetSNwkSIntKey()
-		}
-		if setKeyIsZero(m, getSNwkSIntKey, "pending_session.keys.s_nwk_s_int_key") {
-			return false, "pending_session.keys.s_nwk_s_int_key.key"
-		}
-
 		supports1_1 := macVersion.Compare(ttnpb.MAC_V1_1) >= 0
-		if !supports1_1 {
-			if !setKeyEqual(m, getFNwkSIntKey, getNwkSEncKey, "pending_session.keys.f_nwk_s_int_key", "pending_session.keys.nwk_s_enc_key") {
+
+		if hasPendingSession {
+			// NOTE: PendingMACState may be set before PendingSession is set by downlink routine.
+			if dev, ok := m["pending_session.dev_addr"]; !ok || dev.PendingSession == nil {
+				return false, "pending_session.dev_addr"
+			}
+
+			getFNwkSIntKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
+				return dev.GetPendingSession().GetSessionKeys().GetFNwkSIntKey()
+			}
+			if setKeyIsZero(m, getFNwkSIntKey, "pending_session.keys.f_nwk_s_int_key") {
+				return false, "pending_session.keys.f_nwk_s_int_key.key"
+			}
+			getNwkSEncKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
+				return dev.GetPendingSession().GetSessionKeys().GetNwkSEncKey()
+			}
+			if setKeyIsZero(m, getNwkSEncKey, "pending_session.keys.nwk_s_enc_key") {
 				return false, "pending_session.keys.nwk_s_enc_key.key"
 			}
-			if !setKeyEqual(m, getFNwkSIntKey, getSNwkSIntKey, "pending_session.keys.f_nwk_s_int_key", "pending_session.keys.s_nwk_s_int_key") {
+			getSNwkSIntKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
+				return dev.GetPendingSession().GetSessionKeys().GetSNwkSIntKey()
+			}
+			if setKeyIsZero(m, getSNwkSIntKey, "pending_session.keys.s_nwk_s_int_key") {
 				return false, "pending_session.keys.s_nwk_s_int_key.key"
 			}
-		}
-		if dev, ok := m["pending_session.keys.session_key_id"]; !ok || dev.PendingSession == nil {
-			return false, "pending_session.keys.session_key_id"
+			if !supports1_1 {
+				if !setKeyEqual(m, getFNwkSIntKey, getNwkSEncKey, "pending_session.keys.f_nwk_s_int_key", "pending_session.keys.nwk_s_enc_key") {
+					return false, "pending_session.keys.nwk_s_enc_key.key"
+				}
+				if !setKeyEqual(m, getFNwkSIntKey, getSNwkSIntKey, "pending_session.keys.f_nwk_s_int_key", "pending_session.keys.s_nwk_s_int_key") {
+					return false, "pending_session.keys.s_nwk_s_int_key.key"
+				}
+			}
+			if dev, ok := m["pending_session.keys.session_key_id"]; !ok || dev.PendingSession == nil {
+				return false, "pending_session.keys.session_key_id"
+			}
 		}
 
 		for k, v := range m {

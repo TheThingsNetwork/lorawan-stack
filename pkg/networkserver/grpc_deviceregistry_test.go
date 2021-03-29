@@ -430,6 +430,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 	activateOpt := EndDeviceOptions.Activate(customMACSettings, false, activeSessionOpts, activeMACStateOpts...)
 
+	pendingMACStateOpt := func(dev ttnpb.EndDevice) ttnpb.EndDevice {
+		return EndDeviceOptions.WithPendingMACState(MakeMACState(&dev, customMACSettings))(dev)
+	}
+
 	macStateWithoutRX1DelayOpt := func(dev ttnpb.EndDevice) ttnpb.EndDevice {
 		dev.MACState.CurrentParameters.Rx1Delay = 0
 		return dev
@@ -456,6 +460,23 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 				ReturnedDevice: MakeOTAAEndDevice(),
 				StoredDevice:   MakeOTAAEndDevice(),
+			},
+			{
+				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
+					pendingMACStateOpt,
+				},
+					"pending_mac_state",
+				),
+				RequiredRights: []ttnpb.Right{
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				},
+
+				ReturnedDevice: MakeOTAAEndDevice(
+					pendingMACStateOpt,
+				),
+				StoredDevice: MakeOTAAEndDevice(
+					pendingMACStateOpt,
+				),
 			},
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
