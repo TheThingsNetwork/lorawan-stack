@@ -212,7 +212,7 @@ func TestPopTask(t *testing.T) {
 			t.FailNow()
 		}
 
-		timeout := (1 >> 5) * test.Delay
+		timeout := (1 << 5) * test.Delay
 
 		timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 		err = PopTask(timeoutCtx, cl.Client, testGroup, "testID", 10, func(redis.Pipeliner, string, time.Time) error {
@@ -528,7 +528,7 @@ func TestMutex(t *testing.T) {
 
 	timeoutErrCh := make(chan error, 1)
 	go func() {
-		ctx, cancel := context.WithTimeout(ctx, test.Delay)
+		ctx, cancel := context.WithTimeout(ctx, (1<<5)*test.Delay)
 		defer cancel()
 		timeoutErrCh <- LockMutex(ctx, cl, key, "test-id-3", ttl)
 	}()
