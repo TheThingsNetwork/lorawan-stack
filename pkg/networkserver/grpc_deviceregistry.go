@@ -1633,7 +1633,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if st.HasSetField("pending_mac_state_queued_join_accept.keys.f_nwk_s_int_key.key") {
+		if st.HasSetField("pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key") {
 			k := st.Device.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey.Key
 			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
@@ -1641,8 +1641,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 			st.Device.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey = fNwkSIntKey
 			st.AddSetFields(
-				"pending_mac_state_queued_join_accept.keys.f_nwk_s_int_key.encrypted_key",
-				"pending_mac_state_queued_join_accept.keys.f_nwk_s_int_key.kek_label",
+				"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.encrypted_key",
+				"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
 				dev.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{
@@ -1650,7 +1650,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				}
 			})
 		}
-		if st.HasSetField("pending_mac_state_queued_join_accept.keys.nwk_s_enc_key.key") {
+		if st.HasSetField("pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key") {
 			k := st.Device.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey.Key
 			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
@@ -1658,8 +1658,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 			st.Device.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey = nwkSEncKey
 			st.AddSetFields(
-				"pending_mac_state_queued_join_accept.keys.nwk_s_enc_key.encrypted_key",
-				"pending_mac_state_queued_join_accept.keys.nwk_s_enc_key.kek_label",
+				"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.encrypted_key",
+				"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
 				dev.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{
@@ -1667,7 +1667,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				}
 			})
 		}
-		if st.HasSetField("pending_mac_state_queued_join_accept.keys.s_nwk_s_int_key.key") {
+		if st.HasSetField("pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key") {
 			k := st.Device.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey.Key
 			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
@@ -1675,8 +1675,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 			st.Device.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey = sNwkSIntKey
 			st.AddSetFields(
-				"pending_mac_state_queued_join_accept.keys.s_nwk_s_int_key.encrypted_key",
-				"pending_mac_state_queued_join_accept.keys.s_nwk_s_int_key.kek_label",
+				"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.encrypted_key",
+				"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
 				dev.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{
