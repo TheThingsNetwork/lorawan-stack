@@ -351,13 +351,6 @@ func (st *setDeviceState) GetFields() []string {
 	return append(st.paths, st.extraGets...)
 }
 
-func (st *setDeviceState) RequireFields(paths ...string) error {
-	if err := ttnpb.RequireFields(st.SetFields(), paths...); err != nil {
-		return errInvalidFieldMask.WithCause(err)
-	}
-	return nil
-}
-
 // WithFields calls f when path is available.
 func (st *setDeviceState) WithField(f func(*ttnpb.EndDevice) error, path string) error {
 	if st.HasSetField(path) {
@@ -2186,13 +2179,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 
 		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, st.Device.EndDeviceIdentifiers, nil)
-		if err := st.RequireFields(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"lorawan_version",
-		); err != nil {
-			return err
-		}
 
 		if hasSession {
 			if !st.HasSetField("mac_state") {
