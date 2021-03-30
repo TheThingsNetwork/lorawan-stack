@@ -51,6 +51,21 @@ func ForwardFlag(flagSet *pflag.FlagSet, old string, new string) {
 	}
 }
 
+// HideFlag hides the provided flag from the flag set.
+func HideFlag(flagSet *pflag.FlagSet, name string) {
+	if flag := flagSet.Lookup(name); flag != nil {
+		flag.Hidden = true
+	}
+}
+
+// HideFlagSet hides the flags from the provided flag set.
+func HideFlagSet(flagSet *pflag.FlagSet) *pflag.FlagSet {
+	flagSet.VisitAll(func(f *pflag.Flag) {
+		f.Hidden = true
+	})
+	return flagSet
+}
+
 var (
 	toDash       = strings.NewReplacer("_", "-")
 	toUnderscore = strings.NewReplacer("-", "_")
@@ -724,6 +739,28 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 					return fmt.Errorf("%v is not assignable to %v", ft, vt)
 				}
 				return nil
+			}
+			for name, oneofProp := range props.OneofTypes {
+				if name != path[1] {
+					continue
+				}
+				if field.Type().Kind() != reflect.Interface {
+					panic("oneof field is not an interface")
+				}
+				elem := field.Elem()
+				switch {
+				case !elem.IsValid():
+					field.Set(reflect.New(oneofProp.Type.Elem()))
+				case elem.Type() != oneofProp.Type:
+					return fmt.Errorf("different oneof type")
+				}
+				field = field.Elem()
+				if field.Type().Kind() == reflect.Ptr {
+					if field.IsNil() {
+						field.Set(reflect.New(field.Type().Elem()))
+					}
+					field = field.Elem()
+				}
 			}
 			return setField(field, path[1:], v)
 		}
