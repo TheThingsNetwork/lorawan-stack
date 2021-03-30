@@ -705,7 +705,7 @@ var (
 					if dev, ok := m["ids.dev_eui"]; ok && dev.DevEUI != nil && !dev.DevEUI.IsZero() {
 						return true, ""
 					}
-					if m["lorawan_version"].LoRaWANVersion.RequireDevEUIForABP() {
+					if m["lorawan_version"].LoRaWANVersion.RequireDevEUIForABP() && !m["multicast"].GetMulticast() {
 						return false, "ids.dev_eui"
 					}
 					return true, ""
@@ -713,6 +713,7 @@ var (
 				Fields: []string{
 					"ids.dev_eui",
 					"lorawan_version",
+					"multicast",
 				},
 			},
 
