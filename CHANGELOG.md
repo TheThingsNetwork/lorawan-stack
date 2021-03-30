@@ -51,6 +51,7 @@ For details about compatibility between different releases, see the **Commitment
 - Payload size limit calculation in Network Server.
 - Occasional panic in Network Server on downlink with corrupted device states.
 - Occasional panic in Identity Server on extracting log fields from invalid requests.
+- Print an error message stating that the Storage Integration is not available in the open source edition of The Things Stack when trying to execute `ttn-lw-stack storage-db` commands.
 
 ### Security
 

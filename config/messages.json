@@ -1700,6 +1700,15 @@
       "file": "is_db_create_admin_user.go"
     }
   },
+  "error:cmd/ttn-lw-stack/commands:storage_integration_not_available": {
+    "translations": {
+      "en": "Storage Integration not available"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-stack/commands",
+      "file": "storage_db.go"
+    }
+  },
   "error:cmd/ttn-lw-stack/commands:unknown_component": {
     "translations": {
       "en": "unknown component `{component}`"
