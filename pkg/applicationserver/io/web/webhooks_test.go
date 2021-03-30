@@ -399,6 +399,7 @@ func TestWebhooks(t *testing.T) {
 									"https://example.com/api/v3/as/applications/foo-app/webhooks/foo-hook/devices/foo-device/down/push")
 								a.So(req.Header.Get("X-Downlink-Replace"), should.Equal,
 									"https://example.com/api/v3/as/applications/foo-app/webhooks/foo-hook/devices/foo-device/down/replace")
+								a.So(req.Header.Get("X-Tts-Domain"), should.Equal, "example.com")
 								actualBody, err := ioutil.ReadAll(req.Body)
 								if !a.So(err, should.BeNil) {
 									t.FailNow()

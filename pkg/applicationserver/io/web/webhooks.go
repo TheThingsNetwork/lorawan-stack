@@ -218,6 +218,8 @@ const (
 	downlinkReplaceHeader = "X-Downlink-Replace"
 
 	downlinkOperationURLFormat = "%s/as/applications/%s/webhooks/%s/devices/%s/down/%s"
+
+	domainHeader = "X-Tts-Domain"
 )
 
 func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.ApplicationWebhookIdentifiers, devID ttnpb.EndDeviceIdentifiers, op string) string {
@@ -233,6 +235,19 @@ func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.Applic
 		devID.DeviceID,
 		op,
 	)
+}
+
+func (w *webhooks) createDomain(ctx context.Context) string {
+	downlinks := w.downlinks
+	baseURL := downlinks.PublicTLSAddress
+	if baseURL == "" {
+		baseURL = downlinks.PublicAddress
+	}
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		return ""
+	}
+	return u.Host
 }
 
 func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
@@ -354,6 +369,9 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 		req.Header.Set(downlinkKeyHeader, hook.DownlinkAPIKey)
 		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "push"))
 		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "replace"))
+	}
+	if domain := w.createDomain(ctx); domain != "" {
+		req.Header.Set(domainHeader, domain)
 	}
 	req.Header.Set("Content-Type", format.ContentType)
 	req.Header.Set("User-Agent", userAgent)
