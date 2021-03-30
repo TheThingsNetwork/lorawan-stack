@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/cloud"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/redis"
 	_ "gocloud.dev/pubsub/awssnssqs" // AWS backend for PubSub.
@@ -31,7 +32,8 @@ import (
 func InitializeEvents(ctx context.Context, taskStarter component.TaskStarter, conf config.ServiceBase) error {
 	switch conf.Events.Backend {
 	case "internal":
-		return nil // this is the default.
+		events.SetDefaultPubSub(basic.NewPubSub())
+		return nil
 	case "redis":
 		events.SetDefaultPubSub(redis.NewPubSub(ctx, taskStarter, conf.Events.Redis))
 		return nil
