@@ -49,6 +49,7 @@ For details about compatibility between different releases, see the **Commitment
 - Payload size limits for AU915 data rates 8 and 9, which are now consistent with Regional Parameters RP002-1.0.2.
 - Payload size limit calculation in Network Server.
 - Occasional panic in Network Server on downlink with corrupted device states.
+- Occasional panic in Identity Server on extracting log fields from invalid requests.
 
 ### Security
 

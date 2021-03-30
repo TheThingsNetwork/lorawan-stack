@@ -62,6 +62,7 @@ func extractCollaboratorFields(m map[string]interface{}, ids *OrganizationOrUser
 		return
 	}
 	switch oneof := ids.Ids.(type) {
+	case nil:
 	case *OrganizationOrUserIdentifiers_OrganizationIDs:
 		m["collaborator_organization_id"] = oneof.OrganizationIDs.OrganizationID
 	case *OrganizationOrUserIdentifiers_UserIDs:
