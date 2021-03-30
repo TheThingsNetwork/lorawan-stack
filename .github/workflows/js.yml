@@ -38,7 +38,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: '~1.15'
+        go-version: '~1.16'
     - name: Initialize Go module cache
       uses: actions/cache@v2
       with:
@@ -100,7 +100,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: '~1.15'
+        go-version: '~1.16'
     - name: Initialize public folder cache
       id: public-cache
       uses: actions/cache@v2

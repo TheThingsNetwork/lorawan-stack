@@ -34,10 +34,10 @@ jobs:
         with:
           path: public
           key: public-cache-${{ hashFiles('pkg/webui/**') }}-${{ hashFiles('sdk/js/**/*.js', 'sdk/js/generated/*.json') }}-${{ hashFiles('config/webpack.config.babel.js') }}-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock')}}
-      - name: Set up Go 1.14
+      - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: '~1.14'
+          go-version: '~1.16'
       - name: Initialize Go module cache
         uses: actions/cache@v2
         with:

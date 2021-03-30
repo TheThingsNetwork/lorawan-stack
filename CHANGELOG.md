@@ -36,6 +36,7 @@ For details about compatibility between different releases, see the **Commitment
 - All value wrappers now are encoded and decoded as the value being wrapped in JSON. That means, that, e.g. format of `mac_settings.rx1_delay` is changed from `{"value": 2}` to just `2`.
 - Changed the error that is returned when attempting to validate already validated contact info.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added column.
+- Update Go to 1.16
 
 ### Deprecated
 
