@@ -16,4 +16,5 @@ package packages
 
 // Config contains configuration options for application packages.
 type Config struct {
+	Workers int `name:"workers" description:"Number of workers per application package"`
 }
