@@ -553,30 +553,28 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Support rejoins. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
-	return &ttnpb.MACState{
-		LoRaWANVersion:      DeviceDefaultLoRaWANVersion(dev),
-		DeviceClass:         class,
-		PingSlotPeriodicity: DeviceDefaultPingSlotPeriodicity(dev, defaults),
-		CurrentParameters: ttnpb.MACParameters{
-			MaxEIRP:                    phy.DefaultMaxEIRP,
-			ADRDataRateIndex:           ttnpb.DATA_RATE_0,
-			ADRNbTrans:                 1,
-			Rx1Delay:                   DeviceDefaultRX1Delay(dev, phy, defaults),
-			Rx1DataRateOffset:          DeviceDefaultRX1DataRateOffset(dev, defaults),
-			Rx2DataRateIndex:           DeviceDefaultRX2DataRateIndex(dev, phy, defaults),
-			Rx2Frequency:               DeviceDefaultRX2Frequency(dev, phy, defaults),
-			MaxDutyCycle:               DeviceDefaultMaxDutyCycle(dev, defaults),
-			RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
-			RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
-			PingSlotFrequency:          DeviceDefaultPingSlotFrequency(dev, phy, defaults),
-			BeaconFrequency:            DeviceDefaultBeaconFrequency(dev, defaults),
-			Channels:                   DeviceDefaultChannels(dev, phy, defaults),
-			ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit},
-			ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay},
-			PingSlotDataRateIndexValue: DeviceDefaultPingSlotDataRateIndexValue(dev, phy, defaults),
-		},
-		DesiredParameters: ttnpb.MACParameters{
+
+	current := ttnpb.MACParameters{
+		MaxEIRP:                    phy.DefaultMaxEIRP,
+		ADRDataRateIndex:           ttnpb.DATA_RATE_0,
+		ADRNbTrans:                 1,
+		Rx1Delay:                   DeviceDefaultRX1Delay(dev, phy, defaults),
+		Rx1DataRateOffset:          DeviceDefaultRX1DataRateOffset(dev, defaults),
+		Rx2DataRateIndex:           DeviceDefaultRX2DataRateIndex(dev, phy, defaults),
+		Rx2Frequency:               DeviceDefaultRX2Frequency(dev, phy, defaults),
+		MaxDutyCycle:               DeviceDefaultMaxDutyCycle(dev, defaults),
+		RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
+		RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
+		PingSlotFrequency:          DeviceDefaultPingSlotFrequency(dev, phy, defaults),
+		BeaconFrequency:            DeviceDefaultBeaconFrequency(dev, defaults),
+		Channels:                   DeviceDefaultChannels(dev, phy, defaults),
+		ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit},
+		ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay},
+		PingSlotDataRateIndexValue: DeviceDefaultPingSlotDataRateIndexValue(dev, phy, defaults),
+	}
+	desired := current
+	if !dev.Multicast {
+		desired = ttnpb.MACParameters{
 			MaxEIRP:                    DeviceDesiredMaxEIRP(dev, phy, fp, defaults),
 			ADRDataRateIndex:           ttnpb.DATA_RATE_0,
 			ADRNbTrans:                 1,
@@ -595,6 +593,14 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 			ADRAckLimitExponent:        DeviceDesiredADRAckLimitExponent(dev, phy, defaults),
 			ADRAckDelayExponent:        DeviceDesiredADRAckDelayExponent(dev, phy, defaults),
 			PingSlotDataRateIndexValue: DeviceDesiredPingSlotDataRateIndexValue(dev, phy, fp, defaults),
-		},
+		}
+	}
+	// TODO: Support rejoins. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
+	return &ttnpb.MACState{
+		LoRaWANVersion:      DeviceDefaultLoRaWANVersion(dev),
+		DeviceClass:         class,
+		PingSlotPeriodicity: DeviceDefaultPingSlotPeriodicity(dev, defaults),
+		CurrentParameters:   current,
+		DesiredParameters:   desired,
 	}, nil
 }
