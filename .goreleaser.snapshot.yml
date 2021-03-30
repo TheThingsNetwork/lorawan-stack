@@ -22,6 +22,7 @@ builds:
       - linux
     goarch:
       - amd64
+      - arm64
 
   - id: cli
     main: ./cmd/ttn-lw-cli
@@ -38,16 +39,45 @@ builds:
       - linux
     goarch:
       - amd64
+      - arm64
 
 dockers:
   - goos: linux
     goarch: amd64
     dockerfile: Dockerfile
+    use_buildx: true
     binaries:
       - ttn-lw-cli
       - ttn-lw-stack
+    build_flag_templates:
+      - --platform=linux/amd64
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.vendor=The Things Network Foundation"
+      - "--label=org.opencontainers.image.title=The Things Stack"
+      - "--label=org.opencontainers.image.url=https://www.thethingsindustries.com/docs"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     image_templates:
-      - 'lorawan-stack-dev:{{ .FullCommit }}'
+      - 'lorawan-stack-dev:{{ .FullCommit }}-amd64'
+    skip_push: true
+    extra_files:
+      - data
+      - public
+  - goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile
+    use_buildx: true
+    binaries:
+      - ttn-lw-cli
+      - ttn-lw-stack
+    build_flag_templates:
+      - --platform=linux/arm64
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.vendor=The Things Network Foundation"
+      - "--label=org.opencontainers.image.title=The Things Stack"
+      - "--label=org.opencontainers.image.url=https://www.thethingsindustries.com/docs"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    image_templates:
+      - 'lorawan-stack-dev:{{ .FullCommit }}-arm64'
     skip_push: true
     extra_files:
       - data

@@ -18,17 +18,15 @@ jobs:
       with:
         fetch-depth: 0
         submodules: true
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
     - name: Login to Docker Hub
       uses: docker/login-action@v1
       with:
         username: '${{ secrets.DOCKERHUB_USERNAME }}'
         password: '${{ secrets.DOCKERHUB_PASSWORD }}'
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v1
-      with:
-        registry: ghcr.io
-        username: '${{ secrets.GHCR_USERNAME }}'
-        password: '${{ secrets.GHCR_PASSWORD }}'
     - name: Set up Node
       uses: actions/setup-node@v2-beta
       with:
@@ -80,17 +78,18 @@ jobs:
       run: tools/bin/mage js:clean js:build
     - name: Check for diff
       run: tools/bin/mage git:diff
-    - name: Determine Goreleaser version
-      id: goreleaser_version
-      run: echo "::set-output name=value::$(cat tools/go.mod | grep 'github.com/goreleaser/goreleaser v' | cut -d ' ' -f 2)"
     - name: Run Goreleaser
       uses: goreleaser/goreleaser-action@v2
       with:
-        version: ${{ steps.goreleaser_version.outputs.value }}
+        version: 'v0.161.1'
         args: release --config .goreleaser.snapshot.yml --snapshot
-    - name: Push Docker image
+    - name: Tag and Push Docker images
       run: |
-        docker tag lorawan-stack-dev:${{ github.sha }} thethingsnetwork/lorawan-stack-dev:${{ github.sha }}
-        docker tag lorawan-stack-dev:${{ github.sha }} ghcr.io/thethingsnetwork/lorawan-stack-dev:${{ github.sha }}
-        docker push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}
-        docker push ghcr.io/thethingsnetwork/lorawan-stack-dev:${{ github.sha }}
+        docker tag lorawan-stack-dev:${{ github.sha }}-amd64 thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-amd64
+        docker push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-amd64
+        docker tag lorawan-stack-dev:${{ github.sha }}-arm64 thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-arm64
+        docker push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-arm64
+        docker manifest create thethingsnetwork/lorawan-stack-dev:${{ github.sha }} thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-amd64 thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-arm64
+        docker manifest push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}
+      env:
+        DOCKER_CLI_EXPERIMENTAL: enabled

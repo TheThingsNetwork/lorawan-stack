@@ -81,13 +81,10 @@ jobs:
           const tag = context.ref.slice('refs/tags/v'.length);
           const tagParts = tag.split('.');
           require('fs').writeFileSync('/tmp/release-notes.md', `[Release notes](https://github.com/TheThingsNetwork/lorawan-stack/blob/${tag}/CHANGELOG.md#${tagParts[0]}${tagParts[1]}${tagParts[2]}---${{ steps.date.outputs.value }})`);
-    - name: Determine Goreleaser version
-      id: goreleaser_version
-      run: echo "::set-output name=value::$(cat tools/go.mod | grep 'github.com/goreleaser/goreleaser v' | cut -d ' ' -f 2)"
     - name: Run Goreleaser
       uses: goreleaser/goreleaser-action@v2
       with:
-        version: ${{ steps.goreleaser_version.outputs.value }}
+        version: 'v0.161.1'
         args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md
       env:
         AWS_REGION: ${{ secrets.AWS_REGION }}
