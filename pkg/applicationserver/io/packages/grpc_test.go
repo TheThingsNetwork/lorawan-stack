@@ -97,7 +97,7 @@ func TestAuthentication(t *testing.T) {
 	defer flush()
 	defer redisClient.Close()
 	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient}
-	srv, err := packages.New(ctx, as, apRegistry, map[string]packages.ApplicationPackageHandler{})
+	srv, err := packages.New(ctx, as, apRegistry, map[string]packages.ApplicationPackageHandler{}, 1)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -181,7 +181,7 @@ func TestAssociations(t *testing.T) {
 	handlers := map[string]packages.ApplicationPackageHandler{
 		mockHandler.Package().Name: mockHandler,
 	}
-	srv, err := packages.New(ctx, as, apRegistry, handlers)
+	srv, err := packages.New(ctx, as, apRegistry, handlers, 1)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}

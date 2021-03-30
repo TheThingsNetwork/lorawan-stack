@@ -20,6 +20,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 )
@@ -65,6 +66,11 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		Providers: map[string]string{
 			"mqtt": "enabled",
 			"nats": "enabled",
+		},
+	},
+	Packages: applicationserver.ApplicationPackagesConfig{
+		Config: packages.Config{
+			Workers: 16,
 		},
 	},
 }
