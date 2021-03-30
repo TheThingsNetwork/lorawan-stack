@@ -301,6 +301,279 @@ func (m *AuthorizeApplicationRequest) GetAPIKey() string {
 	return ""
 }
 
+type CUPSRedirection struct {
+	// CUPS URI for LoRa Basics Station CUPS redirection.
+	TargetCUPSURI string `protobuf:"bytes,1,opt,name=target_cups_uri,json=targetCupsUri,proto3" json:"target_cups_uri,omitempty"`
+	// The key set in the gateway to authenticate itself.
+	CurrentGatewayKey    string   `protobuf:"bytes,2,opt,name=current_gateway_key,json=currentGatewayKey,proto3" json:"current_gateway_key,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CUPSRedirection) Reset()      { *m = CUPSRedirection{} }
+func (*CUPSRedirection) ProtoMessage() {}
+func (*CUPSRedirection) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e8a7f6d184fc3dc3, []int{2}
+}
+func (m *CUPSRedirection) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CUPSRedirection) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CUPSRedirection.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *CUPSRedirection) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CUPSRedirection.Merge(m, src)
+}
+func (m *CUPSRedirection) XXX_Size() int {
+	return m.Size()
+}
+func (m *CUPSRedirection) XXX_DiscardUnknown() {
+	xxx_messageInfo_CUPSRedirection.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CUPSRedirection proto.InternalMessageInfo
+
+func (m *CUPSRedirection) GetTargetCUPSURI() string {
+	if m != nil {
+		return m.TargetCUPSURI
+	}
+	return ""
+}
+
+func (m *CUPSRedirection) GetCurrentGatewayKey() string {
+	if m != nil {
+		return m.CurrentGatewayKey
+	}
+	return ""
+}
+
+type ClaimGatewayRequest struct {
+	// Types that are valid to be assigned to SourceGateway:
+	//	*ClaimGatewayRequest_AuthenticatedIdentifiers_
+	//	*ClaimGatewayRequest_QRCode
+	SourceGateway isClaimGatewayRequest_SourceGateway `protobuf_oneof:"source_gateway"`
+	// Collaborator to grant all rights on the target gateway.
+	Collaborator OrganizationOrUserIdentifiers `protobuf:"bytes,3,opt,name=collaborator,proto3" json:"collaborator"`
+	// Gateway ID for the target gateway. This must be a unique value.
+	// If this is not set, the target ID for the target gateway will be set to `eui-<gateway-eui>`
+	TargetGatewayID string `protobuf:"bytes,4,opt,name=target_gateway_id,json=targetGatewayId,proto3" json:"target_gateway_id,omitempty"`
+	// Target Gateway Server Address for the target gateway.
+	TargetGatewayServerAddress string `protobuf:"bytes,5,opt,name=target_gateway_server_address,json=targetGatewayServerAddress,proto3" json:"target_gateway_server_address,omitempty"`
+	// Parameters to set CUPS redirection for the gateway.
+	CUPSRedirection      *CUPSRedirection `protobuf:"bytes,6,opt,name=cups_redirection,json=cupsRedirection,proto3" json:"cups_redirection,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
+}
+
+func (m *ClaimGatewayRequest) Reset()      { *m = ClaimGatewayRequest{} }
+func (*ClaimGatewayRequest) ProtoMessage() {}
+func (*ClaimGatewayRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e8a7f6d184fc3dc3, []int{3}
+}
+func (m *ClaimGatewayRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ClaimGatewayRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ClaimGatewayRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ClaimGatewayRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ClaimGatewayRequest.Merge(m, src)
+}
+func (m *ClaimGatewayRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *ClaimGatewayRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ClaimGatewayRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ClaimGatewayRequest proto.InternalMessageInfo
+
+type isClaimGatewayRequest_SourceGateway interface {
+	isClaimGatewayRequest_SourceGateway()
+	Equal(interface{}) bool
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type ClaimGatewayRequest_AuthenticatedIdentifiers_ struct {
+	AuthenticatedIdentifiers *ClaimGatewayRequest_AuthenticatedIdentifiers `protobuf:"bytes,1,opt,name=authenticated_identifiers,json=authenticatedIdentifiers,proto3,oneof" json:"authenticated_identifiers,omitempty"`
+}
+type ClaimGatewayRequest_QRCode struct {
+	QRCode []byte `protobuf:"bytes,2,opt,name=qr_code,json=qrCode,proto3,oneof" json:"qr_code,omitempty"`
+}
+
+func (*ClaimGatewayRequest_AuthenticatedIdentifiers_) isClaimGatewayRequest_SourceGateway() {}
+func (*ClaimGatewayRequest_QRCode) isClaimGatewayRequest_SourceGateway()                    {}
+
+func (m *ClaimGatewayRequest) GetSourceGateway() isClaimGatewayRequest_SourceGateway {
+	if m != nil {
+		return m.SourceGateway
+	}
+	return nil
+}
+
+func (m *ClaimGatewayRequest) GetAuthenticatedIdentifiers() *ClaimGatewayRequest_AuthenticatedIdentifiers {
+	if x, ok := m.GetSourceGateway().(*ClaimGatewayRequest_AuthenticatedIdentifiers_); ok {
+		return x.AuthenticatedIdentifiers
+	}
+	return nil
+}
+
+func (m *ClaimGatewayRequest) GetQRCode() []byte {
+	if x, ok := m.GetSourceGateway().(*ClaimGatewayRequest_QRCode); ok {
+		return x.QRCode
+	}
+	return nil
+}
+
+func (m *ClaimGatewayRequest) GetCollaborator() OrganizationOrUserIdentifiers {
+	if m != nil {
+		return m.Collaborator
+	}
+	return OrganizationOrUserIdentifiers{}
+}
+
+func (m *ClaimGatewayRequest) GetTargetGatewayID() string {
+	if m != nil {
+		return m.TargetGatewayID
+	}
+	return ""
+}
+
+func (m *ClaimGatewayRequest) GetTargetGatewayServerAddress() string {
+	if m != nil {
+		return m.TargetGatewayServerAddress
+	}
+	return ""
+}
+
+func (m *ClaimGatewayRequest) GetCUPSRedirection() *CUPSRedirection {
+	if m != nil {
+		return m.CUPSRedirection
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ClaimGatewayRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*ClaimGatewayRequest_AuthenticatedIdentifiers_)(nil),
+		(*ClaimGatewayRequest_QRCode)(nil),
+	}
+}
+
+type ClaimGatewayRequest_AuthenticatedIdentifiers struct {
+	GatewayEUI           go_thethings_network_lorawan_stack_v3_pkg_types.EUI64 `protobuf:"bytes,1,opt,name=gateway_eui,json=gatewayEui,proto3,customtype=go.thethings.network/lorawan-stack/v3/pkg/types.EUI64" json:"gateway_eui"`
+	AuthenticationCode   []byte                                                `protobuf:"bytes,2,opt,name=authentication_code,json=authenticationCode,proto3" json:"authentication_code,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                                              `json:"-"`
+	XXX_sizecache        int32                                                 `json:"-"`
+}
+
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) Reset() {
+	*m = ClaimGatewayRequest_AuthenticatedIdentifiers{}
+}
+func (*ClaimGatewayRequest_AuthenticatedIdentifiers) ProtoMessage() {}
+func (*ClaimGatewayRequest_AuthenticatedIdentifiers) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e8a7f6d184fc3dc3, []int{3, 0}
+}
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ClaimGatewayRequest_AuthenticatedIdentifiers.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ClaimGatewayRequest_AuthenticatedIdentifiers.Merge(m, src)
+}
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) XXX_Size() int {
+	return m.Size()
+}
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) XXX_DiscardUnknown() {
+	xxx_messageInfo_ClaimGatewayRequest_AuthenticatedIdentifiers.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ClaimGatewayRequest_AuthenticatedIdentifiers proto.InternalMessageInfo
+
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) GetAuthenticationCode() []byte {
+	if m != nil {
+		return m.AuthenticationCode
+	}
+	return nil
+}
+
+type AuthorizeGatewayRequest struct {
+	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3,embedded=gateway_ids" json:"gateway_ids"`
+	APIKey               string   `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AuthorizeGatewayRequest) Reset()      { *m = AuthorizeGatewayRequest{} }
+func (*AuthorizeGatewayRequest) ProtoMessage() {}
+func (*AuthorizeGatewayRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e8a7f6d184fc3dc3, []int{4}
+}
+func (m *AuthorizeGatewayRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *AuthorizeGatewayRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_AuthorizeGatewayRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *AuthorizeGatewayRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AuthorizeGatewayRequest.Merge(m, src)
+}
+func (m *AuthorizeGatewayRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *AuthorizeGatewayRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AuthorizeGatewayRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AuthorizeGatewayRequest proto.InternalMessageInfo
+
+func (m *AuthorizeGatewayRequest) GetAPIKey() string {
+	if m != nil {
+		return m.APIKey
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*ClaimEndDeviceRequest)(nil), "ttn.lorawan.v3.ClaimEndDeviceRequest")
 	golang_proto.RegisterType((*ClaimEndDeviceRequest)(nil), "ttn.lorawan.v3.ClaimEndDeviceRequest")
@@ -308,6 +581,14 @@ func init() {
 	golang_proto.RegisterType((*ClaimEndDeviceRequest_AuthenticatedIdentifiers)(nil), "ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers")
 	proto.RegisterType((*AuthorizeApplicationRequest)(nil), "ttn.lorawan.v3.AuthorizeApplicationRequest")
 	golang_proto.RegisterType((*AuthorizeApplicationRequest)(nil), "ttn.lorawan.v3.AuthorizeApplicationRequest")
+	proto.RegisterType((*CUPSRedirection)(nil), "ttn.lorawan.v3.CUPSRedirection")
+	golang_proto.RegisterType((*CUPSRedirection)(nil), "ttn.lorawan.v3.CUPSRedirection")
+	proto.RegisterType((*ClaimGatewayRequest)(nil), "ttn.lorawan.v3.ClaimGatewayRequest")
+	golang_proto.RegisterType((*ClaimGatewayRequest)(nil), "ttn.lorawan.v3.ClaimGatewayRequest")
+	proto.RegisterType((*ClaimGatewayRequest_AuthenticatedIdentifiers)(nil), "ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers")
+	golang_proto.RegisterType((*ClaimGatewayRequest_AuthenticatedIdentifiers)(nil), "ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers")
+	proto.RegisterType((*AuthorizeGatewayRequest)(nil), "ttn.lorawan.v3.AuthorizeGatewayRequest")
+	golang_proto.RegisterType((*AuthorizeGatewayRequest)(nil), "ttn.lorawan.v3.AuthorizeGatewayRequest")
 }
 
 func init() {
@@ -318,85 +599,110 @@ func init() {
 }
 
 var fileDescriptor_e8a7f6d184fc3dc3 = []byte{
-	// 1245 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0x4f, 0x6c, 0xdb, 0x54,
-	0x18, 0xf7, 0xeb, 0x9f, 0xa4, 0x7b, 0x5d, 0x4b, 0x64, 0x4a, 0xe7, 0xb5, 0xe5, 0xb9, 0xeb, 0x32,
-	0x96, 0x76, 0xb5, 0xcd, 0x52, 0x86, 0x44, 0x05, 0x54, 0xf1, 0x12, 0x91, 0xac, 0x68, 0x02, 0xb3,
-	0x5d, 0xd6, 0xad, 0xe1, 0x35, 0x7e, 0x4b, 0x4d, 0x52, 0x3b, 0xb3, 0x9d, 0x8c, 0xb4, 0xab, 0x54,
-	0x4d, 0x48, 0x4c, 0x3b, 0x00, 0x12, 0x17, 0x24, 0x2e, 0x5c, 0x26, 0x4d, 0xe2, 0xc0, 0x8e, 0x3b,
-	0x8e, 0xdb, 0x8e, 0x13, 0x5c, 0xa6, 0x1d, 0xa2, 0xc5, 0xe1, 0xb0, 0xe3, 0x8e, 0x55, 0x4e, 0xc8,
-	0xcf, 0x6e, 0xe2, 0x34, 0x89, 0xd8, 0xe0, 0xc2, 0xed, 0x7b, 0xf9, 0xbe, 0xf7, 0xfd, 0x7e, 0xdf,
-	0xcf, 0x5f, 0xbe, 0xef, 0xc1, 0xc5, 0xa2, 0x61, 0xe2, 0x9b, 0x58, 0x17, 0x2c, 0x1b, 0xe7, 0x0a,
-	0x12, 0x2e, 0x69, 0x92, 0x4a, 0x2a, 0x5a, 0x8e, 0xe4, 0x8a, 0x58, 0xdb, 0xd2, 0xf4, 0xbc, 0x45,
-	0xcc, 0x0a, 0x31, 0xc5, 0x92, 0x69, 0xd8, 0x06, 0x3b, 0x6e, 0xdb, 0xba, 0xe8, 0xdf, 0x10, 0x2b,
-	0x4b, 0x53, 0x89, 0xbc, 0x66, 0x6f, 0x96, 0x37, 0xc4, 0x9c, 0xb1, 0x25, 0x11, 0xbd, 0x62, 0x54,
-	0x4b, 0xa6, 0xf1, 0x75, 0x55, 0xa2, 0xc1, 0x39, 0x21, 0x4f, 0x74, 0xa1, 0x82, 0x8b, 0x9a, 0x8a,
-	0x6d, 0x22, 0x75, 0x19, 0x5e, 0xca, 0x29, 0x21, 0x90, 0x22, 0x6f, 0xe4, 0x0d, 0xef, 0xf2, 0x46,
-	0xf9, 0x3a, 0x3d, 0xd1, 0x03, 0xb5, 0xfc, 0xf0, 0x99, 0xbc, 0x61, 0xe4, 0x8b, 0x84, 0x12, 0xc5,
-	0xba, 0x6e, 0xd8, 0xd8, 0xd6, 0x0c, 0xdd, 0xf2, 0xbd, 0xd3, 0xbe, 0xb7, 0x95, 0x83, 0x6c, 0x95,
-	0xec, 0xaa, 0xef, 0x3c, 0xd9, 0x5d, 0xaa, 0xa6, 0x12, 0xdd, 0xd6, 0xae, 0x6b, 0xc4, 0xf4, 0x33,
-	0xcc, 0x3d, 0x1b, 0x83, 0x6f, 0x9d, 0x77, 0x4b, 0x4f, 0xe9, 0x6a, 0x92, 0x0a, 0xa1, 0x90, 0x1b,
-	0x65, 0x62, 0xd9, 0xec, 0xcf, 0x00, 0x1e, 0xc7, 0x65, 0x7b, 0xd3, 0xbd, 0x91, 0xc3, 0x36, 0x51,
-	0xb3, 0x81, 0xdb, 0x1c, 0x98, 0x05, 0xb1, 0xd1, 0xf8, 0xc7, 0x62, 0xa7, 0x40, 0x62, 0xcf, 0x54,
-	0x62, 0x22, 0x98, 0x26, 0xd3, 0xce, 0x22, 0xcf, 0x38, 0x35, 0x9e, 0xeb, 0xe7, 0x4d, 0x33, 0x0a,
-	0x87, 0xfb, 0xf8, 0x58, 0x09, 0x86, 0x6f, 0x98, 0xd9, 0x9c, 0xa1, 0x12, 0x6e, 0x60, 0x16, 0xc4,
-	0x8e, 0xca, 0x13, 0x4d, 0x39, 0xbc, 0x3d, 0x1c, 0x61, 0xb8, 0xbd, 0x11, 0xa7, 0xc6, 0x87, 0x3e,
-	0x57, 0xce, 0x1b, 0x2a, 0x49, 0x33, 0x4a, 0xe8, 0x86, 0xe9, 0x5a, 0xec, 0x6d, 0x00, 0x27, 0x6d,
-	0x6c, 0xe6, 0x89, 0x9d, 0xc5, 0xa5, 0x52, 0xd1, 0xcd, 0xa8, 0x19, 0x7a, 0x56, 0x53, 0x2d, 0x6e,
-	0x90, 0xd6, 0xf2, 0xce, 0xe1, 0x5a, 0x12, 0xed, 0xb0, 0x20, 0xe7, 0x68, 0x53, 0x1e, 0xbe, 0x0b,
-	0x06, 0x22, 0xe0, 0x71, 0x8d, 0x67, 0x9c, 0x1a, 0x3f, 0x71, 0x89, 0x66, 0x0d, 0x46, 0x27, 0x2d,
-	0x65, 0xc2, 0xee, 0xfa, 0x55, 0xb5, 0xd8, 0xeb, 0x30, 0xe2, 0x73, 0xf0, 0x9a, 0x2e, 0xab, 0xa9,
-	0xdc, 0xd0, 0x2c, 0x88, 0x1d, 0x91, 0x3f, 0x6c, 0xca, 0xa7, 0xcd, 0x53, 0x5c, 0x34, 0x7e, 0x62,
-	0x7d, 0x0d, 0x0b, 0xdb, 0xef, 0x0a, 0x1f, 0x5c, 0x8b, 0xad, 0x2c, 0xaf, 0x09, 0xd7, 0x56, 0x0e,
-	0x8e, 0xf3, 0x3b, 0xf1, 0xc5, 0xdd, 0xe8, 0xad, 0xf5, 0xa8, 0x53, 0xe3, 0xc7, 0x3d, 0x4c, 0x4f,
-	0xe5, 0x4c, 0x52, 0x19, 0xb7, 0x83, 0x67, 0x95, 0xfd, 0x03, 0xc0, 0xb7, 0x7d, 0x20, 0x9d, 0xd8,
-	0x37, 0x0d, 0xb3, 0x90, 0xf5, 0xfa, 0x3a, 0x8b, 0x55, 0xd5, 0x24, 0x96, 0xc5, 0x85, 0x29, 0xea,
-	0x77, 0xa0, 0x29, 0xdf, 0x05, 0xe6, 0xb7, 0x20, 0xfe, 0x0d, 0x58, 0x8f, 0xad, 0x2c, 0xbb, 0x90,
-	0x58, 0xd8, 0x4e, 0x08, 0x57, 0x5c, 0xc4, 0x5b, 0x01, 0xbb, 0x6d, 0x5e, 0x15, 0xae, 0x2d, 0x04,
-	0x1c, 0xf3, 0x57, 0xc5, 0xf9, 0x05, 0xf7, 0x5e, 0x42, 0xb8, 0xe2, 0x33, 0xbd, 0x15, 0xb0, 0xdb,
-	0x26, 0xbd, 0xd7, 0x76, 0xcc, 0xc7, 0x56, 0x96, 0x97, 0xd7, 0x5c, 0x6b, 0xe7, 0xec, 0xe2, 0xb9,
-	0xdd, 0xf9, 0x15, 0xb7, 0x34, 0x65, 0xca, 0x63, 0x7d, 0xd1, 0x23, 0xfd, 0x05, 0xe5, 0x9c, 0xf0,
-	0x28, 0xb3, 0x5b, 0x90, 0xef, 0x5d, 0x53, 0x81, 0x14, 0xb2, 0x45, 0xbc, 0x41, 0x8a, 0xdc, 0x08,
-	0xad, 0xea, 0x74, 0x53, 0x1e, 0x36, 0x07, 0xb9, 0xbd, 0x88, 0x53, 0xe3, 0xa7, 0x2f, 0x75, 0x27,
-	0x5c, 0x4d, 0xad, 0x7e, 0xea, 0x86, 0x2b, 0xd3, 0x3d, 0xd0, 0x56, 0x49, 0x81, 0x3a, 0xd9, 0x67,
-	0x00, 0x9e, 0xe8, 0xd1, 0x30, 0x87, 0x74, 0x3c, 0xf2, 0xff, 0xd4, 0x11, 0x75, 0xb5, 0x5f, 0xa7,
-	0x96, 0x55, 0x78, 0xb2, 0x7f, 0x6d, 0x6d, 0x3d, 0x21, 0xad, 0xee, 0x4c, 0x40, 0x4f, 0xfe, 0x52,
-	0xef, 0xc4, 0x2d, 0x4d, 0xf9, 0x3e, 0xc8, 0x2d, 0x5d, 0x09, 0x9c, 0xe9, 0x0f, 0xad, 0xa9, 0xdc,
-	0x28, 0xc5, 0x8c, 0x36, 0xe5, 0x21, 0x73, 0x80, 0x53, 0x9d, 0x1a, 0x7f, 0xbc, 0x0f, 0x64, 0x26,
-	0xa9, 0x1c, 0xef, 0x03, 0x96, 0x51, 0xd9, 0x22, 0x1c, 0x6b, 0x77, 0x8b, 0x9b, 0x77, 0x8c, 0x8e,
-	0x89, 0xf4, 0xb3, 0x1a, 0x7f, 0x2e, 0x6f, 0x88, 0xf6, 0x26, 0xb1, 0x37, 0xdd, 0x71, 0x2f, 0xfa,
-	0xcd, 0x24, 0x75, 0x4e, 0xcb, 0xca, 0x92, 0x54, 0x2a, 0xe4, 0x25, 0xbb, 0x5a, 0x22, 0x96, 0x78,
-	0x91, 0xd8, 0x99, 0xa4, 0x53, 0xe3, 0x47, 0x5b, 0xcd, 0x94, 0x49, 0x2a, 0xa3, 0xad, 0xe6, 0xc9,
-	0xa8, 0x6c, 0x12, 0x22, 0x4d, 0x3f, 0x98, 0xf4, 0xd9, 0xc0, 0xd4, 0x72, 0x6b, 0xa3, 0x53, 0x6a,
-	0x78, 0x16, 0xc4, 0x46, 0x94, 0x99, 0x76, 0x54, 0xa2, 0x23, 0xc8, 0x9d, 0x51, 0x53, 0xbf, 0x0e,
-	0xc0, 0xbe, 0xd3, 0x90, 0xcd, 0xc1, 0x91, 0xaf, 0x0c, 0x4d, 0xcf, 0x92, 0xb2, 0x46, 0xa7, 0xef,
-	0x51, 0x39, 0xed, 0x4e, 0xa0, 0x7f, 0x53, 0x4f, 0xea, 0x72, 0xe6, 0xfd, 0xf7, 0x9c, 0x1a, 0x1f,
-	0xbe, 0x60, 0x68, 0x7a, 0xea, 0x72, 0x46, 0x09, 0xbb, 0x99, 0x53, 0x65, 0x8d, 0xfd, 0x12, 0x86,
-	0x55, 0x52, 0xa1, 0x18, 0xde, 0x58, 0xfd, 0xe4, 0xbf, 0x62, 0x84, 0x92, 0xa4, 0xe2, 0x42, 0x84,
-	0x54, 0x52, 0x71, 0x11, 0xd2, 0xf0, 0xcd, 0x5e, 0xf2, 0x0c, 0xd2, 0xaf, 0x7e, 0xac, 0x29, 0x4f,
-	0x98, 0x6c, 0x3c, 0xb2, 0xbe, 0xe6, 0xff, 0x2b, 0x76, 0xce, 0x2e, 0x2e, 0xc5, 0x77, 0xa3, 0x0a,
-	0x8b, 0xbb, 0xd4, 0x92, 0x27, 0xe0, 0x98, 0x65, 0x94, 0xcd, 0x1c, 0xf1, 0x87, 0x29, 0x3b, 0xb8,
-	0x2f, 0x83, 0x0b, 0x43, 0x23, 0xa1, 0x48, 0xf8, 0xc2, 0xd0, 0xc8, 0xd1, 0xc8, 0xd8, 0xdc, 0x6f,
-	0x00, 0x4e, 0xbb, 0x7a, 0x1a, 0xa6, 0xb6, 0x4d, 0x02, 0x4d, 0x72, 0xb0, 0xe2, 0x30, 0x7c, 0xe3,
-	0xf0, 0x2e, 0x00, 0xaf, 0xb5, 0x0b, 0x22, 0xc1, 0x5d, 0xf0, 0xa4, 0xc6, 0x03, 0x65, 0x1c, 0x77,
-	0x4e, 0x7c, 0x01, 0x86, 0x71, 0x49, 0xcb, 0x16, 0x48, 0x95, 0x0a, 0x7a, 0x84, 0xee, 0x29, 0x73,
-	0x38, 0x02, 0xb8, 0x3d, 0xe0, 0xaa, 0x93, 0xf8, 0x2c, 0xb3, 0x4a, 0xaa, 0x4a, 0x08, 0x97, 0xb4,
-	0x55, 0x52, 0x8d, 0xff, 0x3e, 0x08, 0x8f, 0xb5, 0xd6, 0xe7, 0x79, 0xff, 0x49, 0xe2, 0xf5, 0x34,
-	0x5b, 0x84, 0xc3, 0xf4, 0x17, 0xf6, 0xd4, 0x2b, 0x6d, 0xdd, 0xa9, 0xe8, 0xe1, 0xb0, 0x56, 0x44,
-	0xa0, 0x84, 0xb9, 0xc9, 0xdb, 0x7f, 0xfe, 0xf5, 0xe3, 0x40, 0x64, 0x6e, 0x54, 0x22, 0x6a, 0xce,
-	0x92, 0xe8, 0x33, 0x68, 0x19, 0x2c, 0xb0, 0xf7, 0x00, 0x9c, 0xe8, 0xa5, 0x1d, 0x7b, 0xa6, 0x4b,
-	0x9b, 0xfe, 0x0a, 0x4f, 0x4d, 0x8a, 0xde, 0x0b, 0x45, 0x3c, 0x78, 0xa1, 0x88, 0x29, 0xf7, 0x85,
-	0x32, 0x97, 0xa6, 0xa8, 0xf2, 0xdc, 0x47, 0x1e, 0x6a, 0x40, 0x34, 0x4b, 0xda, 0x39, 0xf4, 0x4d,
-	0xc4, 0xce, 0xf3, 0xae, 0x84, 0x0f, 0x00, 0x5d, 0x9e, 0xdf, 0x03, 0x38, 0x79, 0x59, 0xc7, 0xbd,
-	0x98, 0xbe, 0xe2, 0x57, 0xec, 0x4b, 0xf2, 0x1c, 0x25, 0x29, 0x2d, 0x08, 0xff, 0x4c, 0x32, 0x40,
-	0x4a, 0xbe, 0x07, 0x1e, 0xd7, 0x11, 0x78, 0x52, 0x47, 0xe0, 0x69, 0x1d, 0x31, 0xcf, 0xeb, 0x88,
-	0x79, 0x51, 0x47, 0xcc, 0xcb, 0x3a, 0x62, 0xf6, 0xeb, 0x08, 0xec, 0x39, 0x08, 0xdc, 0x71, 0x10,
-	0x73, 0xdf, 0x41, 0xe0, 0x81, 0x83, 0x98, 0x87, 0x0e, 0x62, 0x1e, 0x39, 0x88, 0x79, 0xec, 0x20,
-	0xf0, 0xc4, 0x41, 0xe0, 0xa9, 0x83, 0x98, 0xe7, 0x0e, 0x02, 0x2f, 0x1c, 0xc4, 0xbc, 0x74, 0x10,
-	0xd8, 0x77, 0x10, 0xb3, 0xd7, 0x40, 0xcc, 0x9d, 0x06, 0x02, 0x3f, 0x34, 0x10, 0xf3, 0x53, 0x03,
-	0x81, 0x5f, 0x1a, 0x88, 0xb9, 0xdf, 0x40, 0xcc, 0x83, 0x06, 0x02, 0x0f, 0x1b, 0x08, 0x3c, 0x6a,
-	0x20, 0x70, 0x45, 0x7a, 0x8d, 0x7f, 0xa8, 0xad, 0x97, 0x36, 0x36, 0x42, 0xb4, 0xdc, 0xa5, 0xbf,
-	0x03, 0x00, 0x00, 0xff, 0xff, 0xcd, 0x84, 0xdf, 0xe6, 0x13, 0x0b, 0x00, 0x00,
+	// 1645 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x57, 0x4b, 0x6c, 0x13, 0xd7,
+	0x1a, 0x9e, 0x93, 0x87, 0x9d, 0x9c, 0xbc, 0x9c, 0x49, 0x08, 0xc6, 0xc9, 0x9d, 0x09, 0x26, 0xdc,
+	0x3c, 0x88, 0x67, 0x2e, 0xce, 0x05, 0x5d, 0x22, 0xb8, 0x91, 0x27, 0x8e, 0x88, 0x49, 0x05, 0x74,
+	0xc0, 0x1b, 0x02, 0x71, 0x27, 0x9e, 0x83, 0x33, 0x8d, 0x33, 0x63, 0x66, 0xc6, 0xa6, 0x4e, 0x88,
+	0x1a, 0xa1, 0xaa, 0x45, 0x2c, 0xfa, 0x50, 0xa5, 0xaa, 0x55, 0xbb, 0xe8, 0x06, 0x09, 0xa9, 0x8b,
+	0xb2, 0x64, 0x09, 0xea, 0x86, 0x25, 0x6a, 0x37, 0x88, 0x85, 0x45, 0xc6, 0x5d, 0xb0, 0x64, 0x89,
+	0xb2, 0xaa, 0xce, 0x99, 0xb1, 0x3d, 0x7e, 0xd1, 0x50, 0x36, 0xec, 0xce, 0x9c, 0xc7, 0xff, 0x7f,
+	0xff, 0xff, 0x7f, 0xe7, 0xfb, 0xe7, 0xc0, 0xe9, 0xb4, 0xa6, 0x4b, 0x37, 0x25, 0x35, 0x64, 0x98,
+	0x52, 0x72, 0x9d, 0x97, 0x32, 0x0a, 0x2f, 0xa3, 0x9c, 0x92, 0x44, 0xc9, 0xb4, 0xa4, 0x6c, 0x28,
+	0x6a, 0xca, 0x40, 0x7a, 0x0e, 0xe9, 0x5c, 0x46, 0xd7, 0x4c, 0x8d, 0xee, 0x35, 0x4d, 0x95, 0x73,
+	0x4e, 0x70, 0xb9, 0x99, 0x40, 0x24, 0xa5, 0x98, 0x6b, 0xd9, 0x55, 0x2e, 0xa9, 0x6d, 0xf0, 0x48,
+	0xcd, 0x69, 0xf9, 0x8c, 0xae, 0x7d, 0x92, 0xe7, 0xc9, 0xe6, 0x64, 0x28, 0x85, 0xd4, 0x50, 0x4e,
+	0x4a, 0x2b, 0xb2, 0x64, 0x22, 0xbe, 0x6e, 0x60, 0x9b, 0x0c, 0x84, 0x5c, 0x26, 0x52, 0x5a, 0x4a,
+	0xb3, 0x0f, 0xaf, 0x66, 0xaf, 0x93, 0x2f, 0xf2, 0x41, 0x46, 0xce, 0xf6, 0x91, 0x94, 0xa6, 0xa5,
+	0xd2, 0x88, 0x00, 0x95, 0x54, 0x55, 0x33, 0x25, 0x53, 0xd1, 0x54, 0xc3, 0x59, 0x1d, 0x76, 0x56,
+	0xcb, 0x36, 0xd0, 0x46, 0xc6, 0xcc, 0x3b, 0x8b, 0x47, 0xea, 0x43, 0x55, 0x64, 0xa4, 0x9a, 0xca,
+	0x75, 0x05, 0xe9, 0x8e, 0x85, 0xe0, 0xf3, 0x1e, 0x78, 0x60, 0x1e, 0x87, 0xbe, 0xa0, 0xca, 0x51,
+	0x92, 0x08, 0x11, 0xdd, 0xc8, 0x22, 0xc3, 0xa4, 0x7f, 0x04, 0xf0, 0x90, 0x94, 0x35, 0xd7, 0xf0,
+	0x89, 0xa4, 0x64, 0x22, 0x39, 0xe1, 0x3a, 0xed, 0x07, 0xa3, 0x60, 0xa2, 0x2b, 0xfc, 0x7f, 0xae,
+	0x3a, 0x41, 0x5c, 0x43, 0x53, 0x5c, 0xc4, 0x6d, 0x26, 0x56, 0xb1, 0x22, 0x8c, 0x58, 0x05, 0xd6,
+	0xdf, 0x6c, 0x75, 0x91, 0x12, 0xfd, 0x52, 0x93, 0x35, 0x9a, 0x87, 0xde, 0x1b, 0x7a, 0x22, 0xa9,
+	0xc9, 0xc8, 0xdf, 0x32, 0x0a, 0x26, 0xba, 0x85, 0xc1, 0x3d, 0xc1, 0xbb, 0xd9, 0xee, 0xa3, 0xfc,
+	0x3b, 0x1d, 0x56, 0x81, 0xf5, 0x7c, 0x28, 0xce, 0x6b, 0x32, 0x5a, 0xa4, 0x44, 0xcf, 0x0d, 0x1d,
+	0x8f, 0xe8, 0xdb, 0x00, 0x0e, 0x99, 0x92, 0x9e, 0x42, 0x66, 0x42, 0xca, 0x64, 0xd2, 0xd8, 0xa2,
+	0xa2, 0xa9, 0x09, 0x45, 0x36, 0xfc, 0xad, 0x24, 0x96, 0x7f, 0xd7, 0xc6, 0x12, 0xa9, 0x6c, 0x73,
+	0x63, 0x1e, 0xdb, 0x13, 0xda, 0xef, 0x82, 0x16, 0x1f, 0x78, 0x52, 0x60, 0x29, 0xab, 0xc0, 0x0e,
+	0x5e, 0x26, 0x56, 0xdd, 0xbb, 0xa3, 0x86, 0x38, 0x68, 0xd6, 0xcd, 0xca, 0x06, 0x7d, 0x1d, 0xfa,
+	0x1c, 0x0c, 0x36, 0xe9, 0x12, 0x8a, 0xec, 0x6f, 0x1b, 0x05, 0x13, 0x9d, 0xc2, 0xe9, 0x3d, 0x61,
+	0x5c, 0x3f, 0xea, 0x1f, 0x0b, 0x1f, 0x5e, 0x59, 0x96, 0x42, 0x9b, 0xff, 0x09, 0x9d, 0xba, 0x36,
+	0x31, 0x37, 0xbb, 0x1c, 0xba, 0x36, 0x57, 0xfa, 0x9c, 0xdc, 0x0a, 0x4f, 0x6f, 0x8f, 0xdd, 0x5a,
+	0x19, 0xb3, 0x0a, 0x6c, 0xaf, 0xed, 0xd3, 0xce, 0x72, 0x2c, 0x2a, 0xf6, 0x9a, 0xee, 0x6f, 0x99,
+	0xfe, 0x1d, 0xc0, 0x7f, 0x39, 0x8e, 0x54, 0x64, 0xde, 0xd4, 0xf4, 0xf5, 0x84, 0xcd, 0xeb, 0x84,
+	0x24, 0xcb, 0x3a, 0x32, 0x0c, 0xbf, 0x97, 0x78, 0xfd, 0x12, 0xec, 0x09, 0x77, 0x81, 0xfe, 0x05,
+	0x08, 0x7f, 0x06, 0x56, 0x26, 0xe6, 0x66, 0xb1, 0x4b, 0x29, 0xb4, 0x19, 0x09, 0x5d, 0xc1, 0x1e,
+	0x6f, 0xb9, 0xc6, 0x95, 0xe1, 0xd5, 0xd0, 0xb5, 0x29, 0xd7, 0xc2, 0xe4, 0x55, 0x6e, 0x72, 0x0a,
+	0x9f, 0x8b, 0x84, 0xae, 0x38, 0x48, 0x6f, 0xb9, 0xc6, 0x95, 0x21, 0x39, 0x57, 0x59, 0x98, 0x9c,
+	0x98, 0x9b, 0x9d, 0x5d, 0xc6, 0xa3, 0xad, 0xe3, 0xd3, 0x27, 0xb6, 0x27, 0xe7, 0x70, 0x68, 0x62,
+	0xc0, 0x46, 0x7d, 0xde, 0x06, 0x7d, 0x89, 0x60, 0x8e, 0xd8, 0x90, 0xe9, 0x0d, 0xc8, 0x36, 0x8e,
+	0x69, 0x1d, 0xad, 0x27, 0xd2, 0xd2, 0x2a, 0x4a, 0xfb, 0x3b, 0x48, 0x54, 0xe3, 0x7b, 0x42, 0xbb,
+	0xde, 0xea, 0xdf, 0xf1, 0x59, 0x05, 0x76, 0xf8, 0x72, 0xbd, 0xc1, 0xa5, 0x85, 0xa5, 0x0f, 0xf0,
+	0x76, 0x71, 0xb8, 0x81, 0xb7, 0x25, 0xb4, 0x4e, 0x16, 0xe9, 0xe7, 0x00, 0x1e, 0x6e, 0x40, 0x98,
+	0x9a, 0x3c, 0x76, 0xbe, 0x9f, 0x79, 0x64, 0xea, 0xe8, 0x57, 0x9d, 0xcb, 0x3c, 0x3c, 0xd2, 0x3c,
+	0xb6, 0x4a, 0x3e, 0x21, 0x89, 0xee, 0x98, 0x2b, 0x9f, 0xec, 0xe5, 0xc6, 0x86, 0xcb, 0x39, 0x65,
+	0x9b, 0x78, 0x2e, 0xe7, 0x15, 0xc1, 0x91, 0xe6, 0xae, 0x15, 0xd9, 0xdf, 0x45, 0x7c, 0x8e, 0xed,
+	0x09, 0x6d, 0x7a, 0x8b, 0x5f, 0xb6, 0x0a, 0xec, 0xa1, 0x26, 0x2e, 0x63, 0x51, 0xf1, 0x50, 0x13,
+	0x67, 0x31, 0x99, 0x4e, 0xc3, 0x9e, 0x0a, 0x5b, 0xb0, 0xdd, 0x1e, 0x22, 0x13, 0x8b, 0xcf, 0x0b,
+	0xec, 0x89, 0x94, 0xc6, 0x99, 0x6b, 0xc8, 0x5c, 0xc3, 0x72, 0xcf, 0x39, 0x64, 0xe2, 0xab, 0xd5,
+	0x32, 0x37, 0xc3, 0x67, 0xd6, 0x53, 0xbc, 0x99, 0xcf, 0x20, 0x83, 0x3b, 0x8f, 0xcc, 0x58, 0xd4,
+	0x2a, 0xb0, 0x5d, 0x65, 0x32, 0xc5, 0xa2, 0x62, 0x57, 0x99, 0x3c, 0x31, 0x99, 0x8e, 0x42, 0x46,
+	0x51, 0x4b, 0x4a, 0x9f, 0x70, 0xa9, 0x16, 0x8e, 0x8d, 0xa8, 0x54, 0xfb, 0x28, 0x98, 0xe8, 0x10,
+	0x47, 0x2a, 0xbb, 0x22, 0x55, 0x9b, 0xb0, 0x46, 0x05, 0x7e, 0x69, 0x81, 0x4d, 0xd5, 0x90, 0x4e,
+	0xc2, 0x8e, 0x8f, 0x35, 0x45, 0x4d, 0xa0, 0xac, 0x42, 0xd4, 0xb7, 0x5b, 0x58, 0xc4, 0x0a, 0xf4,
+	0x4f, 0xe2, 0x59, 0x88, 0xc7, 0x4e, 0xfe, 0xd7, 0x2a, 0xb0, 0xde, 0x73, 0x9a, 0xa2, 0x2e, 0xc4,
+	0x63, 0xa2, 0x17, 0x5b, 0x5e, 0xc8, 0x2a, 0xf4, 0x47, 0xd0, 0x2b, 0xa3, 0x1c, 0xf1, 0x61, 0xcb,
+	0xea, 0xd9, 0x77, 0xf5, 0xe1, 0x89, 0xa2, 0x1c, 0x76, 0xe1, 0x91, 0x51, 0x0e, 0x7b, 0x58, 0x84,
+	0x03, 0x8d, 0xd2, 0xd3, 0x4a, 0xaa, 0x7e, 0x70, 0x4f, 0x18, 0xd4, 0xe9, 0xb0, 0x6f, 0x65, 0xd9,
+	0xb9, 0x15, 0x5b, 0xc7, 0xa7, 0x67, 0xc2, 0xdb, 0x63, 0x22, 0x2d, 0xd5, 0x65, 0x4b, 0x18, 0x84,
+	0x3d, 0x86, 0x96, 0xd5, 0x93, 0xc8, 0x11, 0x53, 0xba, 0xf5, 0xb5, 0x00, 0xce, 0xb5, 0x75, 0x78,
+	0x7c, 0xde, 0x73, 0x6d, 0x1d, 0xdd, 0xbe, 0x9e, 0xe0, 0xaf, 0x00, 0x0e, 0xe3, 0x7c, 0x6a, 0xba,
+	0xb2, 0x89, 0x5c, 0x24, 0x29, 0xb5, 0x38, 0x09, 0xf6, 0xd5, 0xf6, 0x02, 0xf0, 0x56, 0xbd, 0xc0,
+	0xe7, 0xee, 0x05, 0x4f, 0x0b, 0x2c, 0x10, 0x7b, 0xa5, 0x6a, 0xc5, 0x0f, 0x41, 0xaf, 0x94, 0x51,
+	0x12, 0xeb, 0x28, 0x4f, 0x12, 0xda, 0x49, 0xfa, 0x94, 0xde, 0xee, 0x03, 0xfe, 0x1d, 0x80, 0xb3,
+	0x13, 0xb9, 0x18, 0x5b, 0x42, 0x79, 0xd1, 0x23, 0x65, 0x94, 0x25, 0x94, 0x0f, 0x7e, 0x0e, 0x60,
+	0xdf, 0x7c, 0xfc, 0xe2, 0x25, 0x11, 0xc9, 0x8a, 0x8e, 0x92, 0xd8, 0x0a, 0x7d, 0x0a, 0xf6, 0x39,
+	0x4c, 0x4e, 0x66, 0x33, 0x46, 0x22, 0xab, 0xdb, 0xf5, 0xef, 0x14, 0xfa, 0xad, 0x02, 0xdb, 0x63,
+	0x53, 0x12, 0x9f, 0x89, 0x8b, 0x31, 0xd1, 0xe1, 0xfc, 0x7c, 0x36, 0x63, 0xc4, 0x75, 0x85, 0xfe,
+	0x1f, 0x1c, 0x48, 0x66, 0x75, 0x1d, 0xa9, 0x66, 0x22, 0x25, 0x99, 0xe8, 0xa6, 0x94, 0x77, 0x21,
+	0xe9, 0x28, 0x5d, 0x6b, 0xb1, 0xdf, 0xd9, 0x74, 0xd6, 0xde, 0x83, 0x81, 0x3c, 0xf6, 0xc2, 0x01,
+	0xd2, 0xcc, 0x9d, 0xb9, 0x52, 0xca, 0x7e, 0xd8, 0xc7, 0x5f, 0xc1, 0xe9, 0x86, 0x7f, 0x05, 0xd5,
+	0x86, 0xde, 0x8b, 0x7f, 0x82, 0x04, 0xec, 0x4e, 0x6a, 0xe9, 0xb4, 0xb4, 0xaa, 0xe9, 0x92, 0xa9,
+	0xe9, 0xce, 0x8f, 0x40, 0xa8, 0x16, 0xfe, 0x05, 0x3d, 0x25, 0xa9, 0xca, 0x26, 0xa9, 0xe9, 0x05,
+	0x3d, 0x6e, 0x60, 0x7d, 0xa9, 0xe0, 0xed, 0x76, 0x73, 0x40, 0xac, 0x32, 0x48, 0x2b, 0xb0, 0xdf,
+	0x29, 0x5d, 0x29, 0xfd, 0xe5, 0x86, 0x7f, 0xe6, 0xad, 0x1a, 0x7e, 0x9f, 0x5d, 0x66, 0x27, 0x87,
+	0xb1, 0xa8, 0xe8, 0x50, 0xa2, 0x34, 0x51, 0xd5, 0xf2, 0x4b, 0xbe, 0x6a, 0x5a, 0x55, 0xfb, 0x7b,
+	0xdd, 0xf2, 0x9d, 0x48, 0xaa, 0xdb, 0x54, 0x02, 0xfa, 0x08, 0xe7, 0xf5, 0xca, 0x75, 0xf0, 0x7b,
+	0x48, 0x91, 0xd8, 0x3a, 0x8e, 0x55, 0xdf, 0x1a, 0x61, 0x00, 0x67, 0xad, 0x66, 0x52, 0xec, 0xc3,
+	0xd6, 0x5c, 0x13, 0x81, 0xdf, 0xc0, 0x1b, 0x14, 0x37, 0x0d, 0xbb, 0x4a, 0xa9, 0xac, 0x88, 0xee,
+	0xd2, 0xbb, 0x0a, 0x22, 0x74, 0x22, 0xc5, 0xa2, 0x08, 0x1d, 0xfb, 0x58, 0x18, 0x4f, 0x35, 0x16,
+	0x46, 0x9b, 0xc9, 0xf8, 0xae, 0x6e, 0x92, 0xbb, 0xda, 0x48, 0x09, 0x0f, 0xc0, 0x5e, 0x47, 0x09,
+	0x1d, 0x7b, 0x44, 0x0a, 0x83, 0x3f, 0x01, 0x78, 0xb0, 0x2c, 0x7f, 0x35, 0xf7, 0x38, 0x5e, 0x89,
+	0xad, 0x22, 0x7b, 0xc1, 0xda, 0xa4, 0x96, 0xe9, 0xf5, 0x26, 0xc9, 0x2b, 0x05, 0x81, 0xe5, 0x6e,
+	0xaa, 0x56, 0xee, 0xfa, 0x49, 0x1f, 0xf7, 0x35, 0xd0, 0xba, 0xf0, 0xe3, 0x56, 0x78, 0xb0, 0xfc,
+	0x54, 0x98, 0x77, 0x9e, 0x5f, 0x76, 0xfd, 0xe9, 0x34, 0x6c, 0x27, 0x33, 0xf4, 0xd1, 0x7d, 0xbd,
+	0x30, 0x02, 0x63, 0xb5, 0xdb, 0xca, 0x3b, 0x5c, 0xd8, 0x83, 0x43, 0xb7, 0xff, 0xf8, 0xf3, 0xdb,
+	0x16, 0x5f, 0xb0, 0x8b, 0x47, 0x72, 0xd2, 0xe0, 0xc9, 0x93, 0x6f, 0x16, 0x4c, 0xd1, 0xf7, 0x00,
+	0x1c, 0x6c, 0xd4, 0x27, 0xe8, 0x63, 0x75, 0x7d, 0xa0, 0x79, 0x37, 0x09, 0x0c, 0x71, 0xf6, 0x6b,
+	0x8c, 0x2b, 0xbd, 0xc6, 0xb8, 0x05, 0xfc, 0x1a, 0x0b, 0x2e, 0x12, 0xaf, 0x42, 0xf0, 0x8c, 0xed,
+	0xd5, 0xd5, 0x20, 0x0c, 0x7e, 0xab, 0xa6, 0xff, 0x70, 0xd5, 0xdf, 0xdb, 0xbc, 0x54, 0x72, 0x88,
+	0x71, 0x7e, 0x05, 0xe0, 0x50, 0x5c, 0x95, 0x1a, 0x21, 0xdd, 0x67, 0xc7, 0x6a, 0x0a, 0xf2, 0x04,
+	0x01, 0xc9, 0x4f, 0x85, 0xfe, 0x1e, 0xa4, 0x0b, 0x54, 0xf8, 0xbb, 0x56, 0x78, 0xc0, 0x21, 0x49,
+	0x4d, 0x05, 0xd7, 0x4a, 0x15, 0x3c, 0xb2, 0x8f, 0x6e, 0x10, 0xd8, 0x07, 0xf3, 0x5c, 0xd5, 0x4b,
+	0x25, 0xd3, 0xae, 0xea, 0x7d, 0x03, 0xa0, 0xaf, 0x96, 0xe6, 0xf4, 0x78, 0xd3, 0xca, 0xd5, 0x78,
+	0x6e, 0x96, 0x90, 0xd3, 0xc4, 0xdb, 0xc9, 0xe0, 0x71, 0xdb, 0x9b, 0xc3, 0x71, 0x83, 0xdf, 0x72,
+	0x5d, 0x1b, 0xae, 0x32, 0xae, 0xa9, 0xd4, 0xa7, 0x90, 0x76, 0x15, 0xaa, 0x04, 0x6a, 0x1f, 0x51,
+	0x36, 0xc5, 0x13, 0x22, 0x78, 0xc6, 0xa7, 0x8e, 0x36, 0xc7, 0xe3, 0xc2, 0x20, 0xdc, 0x03, 0x4f,
+	0x76, 0x19, 0xf0, 0x74, 0x97, 0x01, 0xcf, 0x76, 0x19, 0xea, 0xc5, 0x2e, 0x43, 0xbd, 0xdc, 0x65,
+	0xa8, 0x57, 0xbb, 0x0c, 0xf5, 0x7a, 0x97, 0x01, 0x3b, 0x16, 0x03, 0xee, 0x58, 0x0c, 0x75, 0xdf,
+	0x62, 0xc0, 0x03, 0x8b, 0xa1, 0x1e, 0x5a, 0x0c, 0xf5, 0xc8, 0x62, 0xa8, 0x27, 0x16, 0x03, 0x9e,
+	0x5a, 0x0c, 0x78, 0x66, 0x31, 0xd4, 0x0b, 0x8b, 0x01, 0x2f, 0x2d, 0x86, 0x7a, 0x65, 0x31, 0xe0,
+	0xb5, 0xc5, 0x50, 0x3b, 0x45, 0x86, 0xba, 0x53, 0x64, 0xc0, 0xd7, 0x45, 0x86, 0xfa, 0xbe, 0xc8,
+	0x80, 0x9f, 0x8b, 0x0c, 0x75, 0xbf, 0xc8, 0x50, 0x0f, 0x8a, 0x0c, 0x78, 0x58, 0x64, 0xc0, 0xa3,
+	0x22, 0x03, 0xae, 0xf0, 0x6f, 0xa1, 0x8a, 0xa6, 0x9a, 0x59, 0x5d, 0xf5, 0x90, 0x30, 0x67, 0xfe,
+	0x0a, 0x00, 0x00, 0xff, 0xff, 0x41, 0xf9, 0xfc, 0x6c, 0x98, 0x11, 0x00, 0x00,
 }
 
 func (this *ClaimEndDeviceRequest) Equal(that interface{}) bool {
@@ -565,6 +871,177 @@ func (this *AuthorizeApplicationRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *CUPSRedirection) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*CUPSRedirection)
+	if !ok {
+		that2, ok := that.(CUPSRedirection)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.TargetCUPSURI != that1.TargetCUPSURI {
+		return false
+	}
+	if this.CurrentGatewayKey != that1.CurrentGatewayKey {
+		return false
+	}
+	return true
+}
+func (this *ClaimGatewayRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ClaimGatewayRequest)
+	if !ok {
+		that2, ok := that.(ClaimGatewayRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if that1.SourceGateway == nil {
+		if this.SourceGateway != nil {
+			return false
+		}
+	} else if this.SourceGateway == nil {
+		return false
+	} else if !this.SourceGateway.Equal(that1.SourceGateway) {
+		return false
+	}
+	if !this.Collaborator.Equal(&that1.Collaborator) {
+		return false
+	}
+	if this.TargetGatewayID != that1.TargetGatewayID {
+		return false
+	}
+	if this.TargetGatewayServerAddress != that1.TargetGatewayServerAddress {
+		return false
+	}
+	if !this.CUPSRedirection.Equal(that1.CUPSRedirection) {
+		return false
+	}
+	return true
+}
+func (this *ClaimGatewayRequest_AuthenticatedIdentifiers_) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ClaimGatewayRequest_AuthenticatedIdentifiers_)
+	if !ok {
+		that2, ok := that.(ClaimGatewayRequest_AuthenticatedIdentifiers_)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.AuthenticatedIdentifiers.Equal(that1.AuthenticatedIdentifiers) {
+		return false
+	}
+	return true
+}
+func (this *ClaimGatewayRequest_QRCode) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ClaimGatewayRequest_QRCode)
+	if !ok {
+		that2, ok := that.(ClaimGatewayRequest_QRCode)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !bytes.Equal(this.QRCode, that1.QRCode) {
+		return false
+	}
+	return true
+}
+func (this *ClaimGatewayRequest_AuthenticatedIdentifiers) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ClaimGatewayRequest_AuthenticatedIdentifiers)
+	if !ok {
+		that2, ok := that.(ClaimGatewayRequest_AuthenticatedIdentifiers)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.GatewayEUI.Equal(that1.GatewayEUI) {
+		return false
+	}
+	if !bytes.Equal(this.AuthenticationCode, that1.AuthenticationCode) {
+		return false
+	}
+	return true
+}
+func (this *AuthorizeGatewayRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*AuthorizeGatewayRequest)
+	if !ok {
+		that2, ok := that.(AuthorizeGatewayRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.GatewayIdentifiers.Equal(&that1.GatewayIdentifiers) {
+		return false
+	}
+	if this.APIKey != that1.APIKey {
+		return false
+	}
+	return true
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -726,6 +1203,156 @@ var _EndDeviceClaimingServer_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UnauthorizeApplication",
 			Handler:    _EndDeviceClaimingServer_UnauthorizeApplication_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "lorawan-stack/api/deviceclaimingserver.proto",
+}
+
+// GatewayClaimingServerClient is the client API for GatewayClaimingServer service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type GatewayClaimingServerClient interface {
+	// Claims a gateway by claim authentication code or QR code and transfers the gateway to the target user.
+	Claim(ctx context.Context, in *ClaimGatewayRequest, opts ...grpc.CallOption) (*GatewayIdentifiers, error)
+	// AuthorizeGateway allows a gateway to be claimed.
+	AuthorizeGateway(ctx context.Context, in *AuthorizeGatewayRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	// UnauthorizeGateway prevents a gateway from being claimed.
+	UnauthorizeGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
+}
+
+type gatewayClaimingServerClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewGatewayClaimingServerClient(cc *grpc.ClientConn) GatewayClaimingServerClient {
+	return &gatewayClaimingServerClient{cc}
+}
+
+func (c *gatewayClaimingServerClient) Claim(ctx context.Context, in *ClaimGatewayRequest, opts ...grpc.CallOption) (*GatewayIdentifiers, error) {
+	out := new(GatewayIdentifiers)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.GatewayClaimingServer/Claim", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gatewayClaimingServerClient) AuthorizeGateway(ctx context.Context, in *AuthorizeGatewayRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+	out := new(types.Empty)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.GatewayClaimingServer/AuthorizeGateway", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gatewayClaimingServerClient) UnauthorizeGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*types.Empty, error) {
+	out := new(types.Empty)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.GatewayClaimingServer/UnauthorizeGateway", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GatewayClaimingServerServer is the server API for GatewayClaimingServer service.
+type GatewayClaimingServerServer interface {
+	// Claims a gateway by claim authentication code or QR code and transfers the gateway to the target user.
+	Claim(context.Context, *ClaimGatewayRequest) (*GatewayIdentifiers, error)
+	// AuthorizeGateway allows a gateway to be claimed.
+	AuthorizeGateway(context.Context, *AuthorizeGatewayRequest) (*types.Empty, error)
+	// UnauthorizeGateway prevents a gateway from being claimed.
+	UnauthorizeGateway(context.Context, *GatewayIdentifiers) (*types.Empty, error)
+}
+
+// UnimplementedGatewayClaimingServerServer can be embedded to have forward compatible implementations.
+type UnimplementedGatewayClaimingServerServer struct {
+}
+
+func (*UnimplementedGatewayClaimingServerServer) Claim(ctx context.Context, req *ClaimGatewayRequest) (*GatewayIdentifiers, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Claim not implemented")
+}
+func (*UnimplementedGatewayClaimingServerServer) AuthorizeGateway(ctx context.Context, req *AuthorizeGatewayRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AuthorizeGateway not implemented")
+}
+func (*UnimplementedGatewayClaimingServerServer) UnauthorizeGateway(ctx context.Context, req *GatewayIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnauthorizeGateway not implemented")
+}
+
+func RegisterGatewayClaimingServerServer(s *grpc.Server, srv GatewayClaimingServerServer) {
+	s.RegisterService(&_GatewayClaimingServer_serviceDesc, srv)
+}
+
+func _GatewayClaimingServer_Claim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClaimGatewayRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayClaimingServerServer).Claim(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.GatewayClaimingServer/Claim",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayClaimingServerServer).Claim(ctx, req.(*ClaimGatewayRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GatewayClaimingServer_AuthorizeGateway_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthorizeGatewayRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayClaimingServerServer).AuthorizeGateway(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.GatewayClaimingServer/AuthorizeGateway",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayClaimingServerServer).AuthorizeGateway(ctx, req.(*AuthorizeGatewayRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GatewayClaimingServer_UnauthorizeGateway_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayClaimingServerServer).UnauthorizeGateway(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.GatewayClaimingServer/UnauthorizeGateway",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayClaimingServerServer).UnauthorizeGateway(ctx, req.(*GatewayIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _GatewayClaimingServer_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.lorawan.v3.GatewayClaimingServer",
+	HandlerType: (*GatewayClaimingServerServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Claim",
+			Handler:    _GatewayClaimingServer_Claim_Handler,
+		},
+		{
+			MethodName: "AuthorizeGateway",
+			Handler:    _GatewayClaimingServer_AuthorizeGateway_Handler,
+		},
+		{
+			MethodName: "UnauthorizeGateway",
+			Handler:    _GatewayClaimingServer_UnauthorizeGateway_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -965,6 +1592,228 @@ func (m *AuthorizeApplicationRequest) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
+func (m *CUPSRedirection) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CUPSRedirection) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CUPSRedirection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CurrentGatewayKey) > 0 {
+		i -= len(m.CurrentGatewayKey)
+		copy(dAtA[i:], m.CurrentGatewayKey)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.CurrentGatewayKey)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.TargetCUPSURI) > 0 {
+		i -= len(m.TargetCUPSURI)
+		copy(dAtA[i:], m.TargetCUPSURI)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetCUPSURI)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ClaimGatewayRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ClaimGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ClaimGatewayRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.CUPSRedirection != nil {
+		{
+			size, err := m.CUPSRedirection.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.TargetGatewayServerAddress) > 0 {
+		i -= len(m.TargetGatewayServerAddress)
+		copy(dAtA[i:], m.TargetGatewayServerAddress)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetGatewayServerAddress)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.TargetGatewayID) > 0 {
+		i -= len(m.TargetGatewayID)
+		copy(dAtA[i:], m.TargetGatewayID)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetGatewayID)))
+		i--
+		dAtA[i] = 0x22
+	}
+	{
+		size, err := m.Collaborator.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	if m.SourceGateway != nil {
+		{
+			size := m.SourceGateway.Size()
+			i -= size
+			if _, err := m.SourceGateway.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers_) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.AuthenticatedIdentifiers != nil {
+		{
+			size, err := m.AuthenticatedIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ClaimGatewayRequest_QRCode) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ClaimGatewayRequest_QRCode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.QRCode != nil {
+		i -= len(m.QRCode)
+		copy(dAtA[i:], m.QRCode)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.QRCode)))
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.AuthenticationCode) > 0 {
+		i -= len(m.AuthenticationCode)
+		copy(dAtA[i:], m.AuthenticationCode)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.AuthenticationCode)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size := m.GatewayEUI.Size()
+		i -= size
+		if _, err := m.GatewayEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *AuthorizeGatewayRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AuthorizeGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AuthorizeGatewayRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.APIKey) > 0 {
+		i -= len(m.APIKey)
+		copy(dAtA[i:], m.APIKey)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.APIKey)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintDeviceclaimingserver(dAtA []byte, offset int, v uint64) int {
 	offset -= sovDeviceclaimingserver(v)
 	base := offset
@@ -1036,6 +1885,74 @@ func NewPopulatedAuthorizeApplicationRequest(r randyDeviceclaimingserver, easy b
 	return this
 }
 
+func NewPopulatedCUPSRedirection(r randyDeviceclaimingserver, easy bool) *CUPSRedirection {
+	this := &CUPSRedirection{}
+	this.TargetCUPSURI = randStringDeviceclaimingserver(r)
+	this.CurrentGatewayKey = randStringDeviceclaimingserver(r)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedClaimGatewayRequest(r randyDeviceclaimingserver, easy bool) *ClaimGatewayRequest {
+	this := &ClaimGatewayRequest{}
+	oneofNumber_SourceGateway := []int32{1, 2}[r.Intn(2)]
+	switch oneofNumber_SourceGateway {
+	case 1:
+		this.SourceGateway = NewPopulatedClaimGatewayRequest_AuthenticatedIdentifiers_(r, easy)
+	case 2:
+		this.SourceGateway = NewPopulatedClaimGatewayRequest_QRCode(r, easy)
+	}
+	v6 := NewPopulatedOrganizationOrUserIdentifiers(r, easy)
+	this.Collaborator = *v6
+	this.TargetGatewayID = randStringDeviceclaimingserver(r)
+	this.TargetGatewayServerAddress = randStringDeviceclaimingserver(r)
+	if r.Intn(5) != 0 {
+		this.CUPSRedirection = NewPopulatedCUPSRedirection(r, easy)
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedClaimGatewayRequest_AuthenticatedIdentifiers_(r randyDeviceclaimingserver, easy bool) *ClaimGatewayRequest_AuthenticatedIdentifiers_ {
+	this := &ClaimGatewayRequest_AuthenticatedIdentifiers_{}
+	this.AuthenticatedIdentifiers = NewPopulatedClaimGatewayRequest_AuthenticatedIdentifiers(r, easy)
+	return this
+}
+func NewPopulatedClaimGatewayRequest_QRCode(r randyDeviceclaimingserver, easy bool) *ClaimGatewayRequest_QRCode {
+	this := &ClaimGatewayRequest_QRCode{}
+	v7 := r.Intn(100)
+	this.QRCode = make([]byte, v7)
+	for i := 0; i < v7; i++ {
+		this.QRCode[i] = byte(r.Intn(256))
+	}
+	return this
+}
+func NewPopulatedClaimGatewayRequest_AuthenticatedIdentifiers(r randyDeviceclaimingserver, easy bool) *ClaimGatewayRequest_AuthenticatedIdentifiers {
+	this := &ClaimGatewayRequest_AuthenticatedIdentifiers{}
+	v8 := go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedEUI64(r)
+	this.GatewayEUI = *v8
+	v9 := r.Intn(100)
+	this.AuthenticationCode = make([]byte, v9)
+	for i := 0; i < v9; i++ {
+		this.AuthenticationCode[i] = byte(r.Intn(256))
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedAuthorizeGatewayRequest(r randyDeviceclaimingserver, easy bool) *AuthorizeGatewayRequest {
+	this := &AuthorizeGatewayRequest{}
+	v10 := NewPopulatedGatewayIdentifiers(r, easy)
+	this.GatewayIdentifiers = *v10
+	this.APIKey = randStringDeviceclaimingserver(r)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 type randyDeviceclaimingserver interface {
 	Float32() float32
 	Float64() float64
@@ -1055,9 +1972,9 @@ func randUTF8RuneDeviceclaimingserver(r randyDeviceclaimingserver) rune {
 	return rune(ru + 61)
 }
 func randStringDeviceclaimingserver(r randyDeviceclaimingserver) string {
-	v6 := r.Intn(100)
-	tmps := make([]rune, v6)
-	for i := 0; i < v6; i++ {
+	v11 := r.Intn(100)
+	tmps := make([]rune, v11)
+	for i := 0; i < v11; i++ {
 		tmps[i] = randUTF8RuneDeviceclaimingserver(r)
 	}
 	return string(tmps)
@@ -1079,11 +1996,11 @@ func randFieldDeviceclaimingserver(dAtA []byte, r randyDeviceclaimingserver, fie
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateDeviceclaimingserver(dAtA, uint64(key))
-		v7 := r.Int63()
+		v12 := r.Int63()
 		if r.Intn(2) == 0 {
-			v7 *= -1
+			v12 *= -1
 		}
-		dAtA = encodeVarintPopulateDeviceclaimingserver(dAtA, uint64(v7))
+		dAtA = encodeVarintPopulateDeviceclaimingserver(dAtA, uint64(v12))
 	case 1:
 		dAtA = encodeVarintPopulateDeviceclaimingserver(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -1209,6 +2126,103 @@ func (m *AuthorizeApplicationRequest) Size() (n int) {
 	return n
 }
 
+func (m *CUPSRedirection) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.TargetCUPSURI)
+	if l > 0 {
+		n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	}
+	l = len(m.CurrentGatewayKey)
+	if l > 0 {
+		n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	}
+	return n
+}
+
+func (m *ClaimGatewayRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.SourceGateway != nil {
+		n += m.SourceGateway.Size()
+	}
+	l = m.Collaborator.Size()
+	n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	l = len(m.TargetGatewayID)
+	if l > 0 {
+		n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	}
+	l = len(m.TargetGatewayServerAddress)
+	if l > 0 {
+		n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	}
+	if m.CUPSRedirection != nil {
+		l = m.CUPSRedirection.Size()
+		n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	}
+	return n
+}
+
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers_) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.AuthenticatedIdentifiers != nil {
+		l = m.AuthenticatedIdentifiers.Size()
+		n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	}
+	return n
+}
+func (m *ClaimGatewayRequest_QRCode) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.QRCode != nil {
+		l = len(m.QRCode)
+		n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	}
+	return n
+}
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.GatewayEUI.Size()
+	n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	l = len(m.AuthenticationCode)
+	if l > 0 {
+		n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	}
+	return n
+}
+
+func (m *AuthorizeGatewayRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	l = len(m.APIKey)
+	if l > 0 {
+		n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	}
+	return n
+}
+
 func sovDeviceclaimingserver(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
@@ -1272,6 +2286,73 @@ func (this *AuthorizeApplicationRequest) String() string {
 	}
 	s := strings.Join([]string{`&AuthorizeApplicationRequest{`,
 		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`APIKey:` + fmt.Sprintf("%v", this.APIKey) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *CUPSRedirection) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CUPSRedirection{`,
+		`TargetCUPSURI:` + fmt.Sprintf("%v", this.TargetCUPSURI) + `,`,
+		`CurrentGatewayKey:` + fmt.Sprintf("%v", this.CurrentGatewayKey) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ClaimGatewayRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ClaimGatewayRequest{`,
+		`SourceGateway:` + fmt.Sprintf("%v", this.SourceGateway) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborator), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`TargetGatewayID:` + fmt.Sprintf("%v", this.TargetGatewayID) + `,`,
+		`TargetGatewayServerAddress:` + fmt.Sprintf("%v", this.TargetGatewayServerAddress) + `,`,
+		`CUPSRedirection:` + strings.Replace(this.CUPSRedirection.String(), "CUPSRedirection", "CUPSRedirection", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ClaimGatewayRequest_AuthenticatedIdentifiers_) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ClaimGatewayRequest_AuthenticatedIdentifiers_{`,
+		`AuthenticatedIdentifiers:` + strings.Replace(fmt.Sprintf("%v", this.AuthenticatedIdentifiers), "ClaimGatewayRequest_AuthenticatedIdentifiers", "ClaimGatewayRequest_AuthenticatedIdentifiers", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ClaimGatewayRequest_QRCode) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ClaimGatewayRequest_QRCode{`,
+		`QRCode:` + fmt.Sprintf("%v", this.QRCode) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ClaimGatewayRequest_AuthenticatedIdentifiers) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ClaimGatewayRequest_AuthenticatedIdentifiers{`,
+		`GatewayEUI:` + fmt.Sprintf("%v", this.GatewayEUI) + `,`,
+		`AuthenticationCode:` + fmt.Sprintf("%v", this.AuthenticationCode) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *AuthorizeGatewayRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&AuthorizeGatewayRequest{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
 		`APIKey:` + fmt.Sprintf("%v", this.APIKey) + `,`,
 		`}`,
 	}, "")
@@ -1896,6 +2977,615 @@ func (m *AuthorizeApplicationRequest) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field APIKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.APIKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CUPSRedirection) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDeviceclaimingserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CUPSRedirection: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CUPSRedirection: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TargetCUPSURI", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TargetCUPSURI = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CurrentGatewayKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CurrentGatewayKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ClaimGatewayRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDeviceclaimingserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ClaimGatewayRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ClaimGatewayRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AuthenticatedIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ClaimGatewayRequest_AuthenticatedIdentifiers{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.SourceGateway = &ClaimGatewayRequest_AuthenticatedIdentifiers_{v}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field QRCode", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := make([]byte, postIndex-iNdEx)
+			copy(v, dAtA[iNdEx:postIndex])
+			m.SourceGateway = &ClaimGatewayRequest_QRCode{v}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborator", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Collaborator.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TargetGatewayID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TargetGatewayID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TargetGatewayServerAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TargetGatewayServerAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CUPSRedirection", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CUPSRedirection == nil {
+				m.CUPSRedirection = &CUPSRedirection{}
+			}
+			if err := m.CUPSRedirection.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDeviceclaimingserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AuthenticatedIdentifiers: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AuthenticatedIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayEUI", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AuthenticationCode", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AuthenticationCode = append(m.AuthenticationCode[:0], dAtA[iNdEx:postIndex]...)
+			if m.AuthenticationCode == nil {
+				m.AuthenticationCode = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AuthorizeGatewayRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDeviceclaimingserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AuthorizeGatewayRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AuthorizeGatewayRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceclaimingserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthDeviceclaimingserver
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

@@ -107,3 +107,66 @@ service EndDeviceClaimingServer {
     };
   };
 }
+
+message CUPSRedirection {
+  // CUPS URI for LoRa Basics Station CUPS redirection.
+  string target_cups_uri = 1 [(gogoproto.customname) = "TargetCUPSURI"];
+
+  // The key set in the gateway to authenticate itself.
+  string current_gateway_key = 2 [(validate.rules).string.max_len = 2048];
+}
+
+message ClaimGatewayRequest {
+  message AuthenticatedIdentifiers {
+    bytes gateway_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "GatewayEUI"];
+    bytes authentication_code = 2 [(validate.rules).bytes.max_len = 2048];
+  }
+  oneof source_gateway {
+    option (validate.required) = true;
+    AuthenticatedIdentifiers authenticated_identifiers = 1 [(gogoproto.customname) = "AuthenticatedIdentifiers"];
+    bytes qr_code = 2 [(validate.rules).bytes = {min_len: 0, max_len: 1024}, (gogoproto.customname) = "QRCode"];
+  }
+
+  // Collaborator to grant all rights on the target gateway.
+  OrganizationOrUserIdentifiers collaborator = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+
+  // Gateway ID for the target gateway. This must be a unique value.
+  // If this is not set, the target ID for the target gateway will be set to `eui-<gateway-eui>`
+  string target_gateway_id = 4 [(gogoproto.customname) = "TargetGatewayID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$" , max_len: 36}];
+
+  // Target Gateway Server Address for the target gateway.
+  string target_gateway_server_address = 5 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+
+  // Parameters to set CUPS redirection for the gateway.
+  CUPSRedirection cups_redirection = 6 [(gogoproto.customname) = "CUPSRedirection"];
+}
+
+message AuthorizeGatewayRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  string api_key = 2 [(gogoproto.customname) = "APIKey", (validate.rules).string.min_len = 1];
+}
+
+service GatewayClaimingServer {
+  // Claims a gateway by claim authentication code or QR code and transfers the gateway to the target user.
+  rpc Claim(ClaimGatewayRequest) returns (GatewayIdentifiers) {
+    option (google.api.http) = {
+      post: "/gcls/claim",
+      body: "*"
+    };
+  };
+
+  // AuthorizeGateway allows a gateway to be claimed.
+  rpc AuthorizeGateway(AuthorizeGatewayRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/gcls/gateways/{gateway_ids.gateway_id}/authorize",
+      body: "*"
+    };
+  };
+
+  // UnauthorizeGateway prevents a gateway from being claimed.
+  rpc UnauthorizeGateway(GatewayIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/gcls/gateways/{gateway_id}/authorize"
+    };
+  };
+}

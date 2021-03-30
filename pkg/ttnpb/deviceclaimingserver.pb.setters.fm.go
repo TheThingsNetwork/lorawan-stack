@@ -226,6 +226,221 @@ func (dst *AuthorizeApplicationRequest) SetFields(src *AuthorizeApplicationReque
 	return nil
 }
 
+func (dst *CUPSRedirection) SetFields(src *CUPSRedirection, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "target_cups_uri":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_cups_uri' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetCUPSURI = src.TargetCUPSURI
+			} else {
+				var zero string
+				dst.TargetCUPSURI = zero
+			}
+		case "current_gateway_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'current_gateway_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CurrentGatewayKey = src.CurrentGatewayKey
+			} else {
+				var zero string
+				dst.CurrentGatewayKey = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ClaimGatewayRequest) SetFields(src *ClaimGatewayRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "collaborator":
+			if len(subs) > 0 {
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = &src.Collaborator
+				}
+				newDst = &dst.Collaborator
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Collaborator = src.Collaborator
+				} else {
+					var zero OrganizationOrUserIdentifiers
+					dst.Collaborator = zero
+				}
+			}
+		case "target_gateway_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_gateway_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetGatewayID = src.TargetGatewayID
+			} else {
+				var zero string
+				dst.TargetGatewayID = zero
+			}
+		case "target_gateway_server_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_gateway_server_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetGatewayServerAddress = src.TargetGatewayServerAddress
+			} else {
+				var zero string
+				dst.TargetGatewayServerAddress = zero
+			}
+		case "cups_redirection":
+			if len(subs) > 0 {
+				var newDst, newSrc *CUPSRedirection
+				if (src == nil || src.CUPSRedirection == nil) && dst.CUPSRedirection == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.CUPSRedirection
+				}
+				if dst.CUPSRedirection != nil {
+					newDst = dst.CUPSRedirection
+				} else {
+					newDst = &CUPSRedirection{}
+					dst.CUPSRedirection = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.CUPSRedirection = src.CUPSRedirection
+				} else {
+					dst.CUPSRedirection = nil
+				}
+			}
+
+		case "source_gateway":
+			if len(subs) == 0 && src == nil {
+				dst.SourceGateway = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.SourceGateway = src.SourceGateway
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "authenticated_identifiers":
+					_, srcOk := src.SourceGateway.(*ClaimGatewayRequest_AuthenticatedIdentifiers_)
+					if !srcOk && src.SourceGateway != nil {
+						return fmt.Errorf("attempt to set oneof 'authenticated_identifiers', while different oneof is set in source")
+					}
+					_, dstOk := dst.SourceGateway.(*ClaimGatewayRequest_AuthenticatedIdentifiers_)
+					if !dstOk && dst.SourceGateway != nil {
+						return fmt.Errorf("attempt to set oneof 'authenticated_identifiers', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ClaimGatewayRequest_AuthenticatedIdentifiers
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.SourceGateway.(*ClaimGatewayRequest_AuthenticatedIdentifiers_).AuthenticatedIdentifiers
+						}
+						if dstOk {
+							newDst = dst.SourceGateway.(*ClaimGatewayRequest_AuthenticatedIdentifiers_).AuthenticatedIdentifiers
+						} else {
+							newDst = &ClaimGatewayRequest_AuthenticatedIdentifiers{}
+							dst.SourceGateway = &ClaimGatewayRequest_AuthenticatedIdentifiers_{AuthenticatedIdentifiers: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.SourceGateway = src.SourceGateway
+						} else {
+							dst.SourceGateway = nil
+						}
+					}
+				case "qr_code":
+					_, srcOk := src.SourceGateway.(*ClaimGatewayRequest_QRCode)
+					if !srcOk && src.SourceGateway != nil {
+						return fmt.Errorf("attempt to set oneof 'qr_code', while different oneof is set in source")
+					}
+					_, dstOk := dst.SourceGateway.(*ClaimGatewayRequest_QRCode)
+					if !dstOk && dst.SourceGateway != nil {
+						return fmt.Errorf("attempt to set oneof 'qr_code', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						return fmt.Errorf("'qr_code' has no subfields, but %s were specified", oneofSubs)
+					}
+					if src != nil {
+						dst.SourceGateway = src.SourceGateway
+					} else {
+						dst.SourceGateway = nil
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *AuthorizeGatewayRequest) SetFields(src *AuthorizeGatewayRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				newDst = &dst.GatewayIdentifiers
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
+			}
+		case "api_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'api_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.APIKey = src.APIKey
+			} else {
+				var zero string
+				dst.APIKey = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimEndDeviceRequest_AuthenticatedIdentifiers, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -258,6 +473,36 @@ func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimE
 			} else {
 				var zero string
 				dst.AuthenticationCode = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ClaimGatewayRequest_AuthenticatedIdentifiers) SetFields(src *ClaimGatewayRequest_AuthenticatedIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayEUI = src.GatewayEUI
+			} else {
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
+				dst.GatewayEUI = zero
+			}
+		case "authentication_code":
+			if len(subs) > 0 {
+				return fmt.Errorf("'authentication_code' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AuthenticationCode = src.AuthenticationCode
+			} else {
+				dst.AuthenticationCode = nil
 			}
 
 		default:
