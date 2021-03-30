@@ -400,18 +400,25 @@ func TestDeviceRegistrySet(t *testing.T) {
 	defaultMACSettings := DefaultConfig.DefaultMACSettings.Parse()
 
 	customMACSettings := defaultMACSettings
-	customMACSettings.Rx1Delay = &ttnpb.RxDelayValue{Value: ttnpb.RX_DELAY_5}
+	customMACSettings.Rx1Delay = &ttnpb.RxDelayValue{Value: ttnpb.RX_DELAY_2}
 	customMACSettings.Rx1DataRateOffset = nil
 
 	customMACSettingsOpt := EndDeviceOptions.WithMACSettings(&customMACSettings)
 
+	multicastClassBMACSettings := defaultMACSettings
+	multicastClassBMACSettings.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
+		Value: ttnpb.PING_EVERY_16S,
+	}
+
+	multicastClassBMACSettingsOpt := EndDeviceOptions.WithMACSettings(&multicastClassBMACSettings)
+
 	currentMACStateOverrideOpt := func(macState ttnpb.MACState) ttnpb.MACState {
-		macState.CurrentParameters.Rx1Delay = ttnpb.RX_DELAY_4
+		macState.CurrentParameters.Rx1Delay = ttnpb.RX_DELAY_3
 		macState.CurrentParameters.Rx1DataRateOffset = ttnpb.DataRateOffset_DATA_RATE_OFFSET_1
 		return macState
 	}
 	desiredMACStateOverrideOpt := func(macState ttnpb.MACState) ttnpb.MACState {
-		macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
+		macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_4
 		macState.DesiredParameters.Rx1DataRateOffset = ttnpb.DataRateOffset_DATA_RATE_OFFSET_2
 		return macState
 	}
@@ -578,7 +585,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				),
 			},
 
-			// 1.0.3
+			// OTAA Create 1.0.3
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
 					EndDeviceOptions.WithLoRaWANVersion(ttnpb.MAC_V1_0_3),
@@ -730,13 +737,15 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 			// Multicast Create
 			{
-				SetDevice: *MakeMulticastSetDeviceRequest(ttnpb.CLASS_C, customMACSettings, activeSessionOpts, nil, nil),
+				SetDevice: *MakeMulticastSetDeviceRequest(ttnpb.CLASS_C, defaultMACSettings, activeSessionOpts, nil, nil,
+					"session.last_n_f_cnt_down",
+				),
 				RequiredRights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
-				ReturnedDevice: MakeMulticastEndDevice(ttnpb.CLASS_C, customMACSettings, false, activeSessionOpts, nil),
-				StoredDevice:   MakeMulticastEndDevice(ttnpb.CLASS_C, customMACSettings, true, activeSessionOpts, nil),
+				ReturnedDevice: MakeMulticastEndDevice(ttnpb.CLASS_C, defaultMACSettings, false, activeSessionOpts, nil),
+				StoredDevice:   MakeMulticastEndDevice(ttnpb.CLASS_C, defaultMACSettings, true, activeSessionOpts, nil),
 			},
 		},
 
@@ -778,11 +787,25 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"pending_mac_state",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS, // `pending_mac_state` require key write rights
+					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS, // `pending_mac_state` requires key write rights
 				},
 
 				ReturnedDevice: EndDevicePtr(macStateWithoutRX1DelayOpt(*MakeABPEndDevice(defaultMACSettings, false, activeSessionOptsWithStartedAt, nil))),
 				StoredDevice:   EndDevicePtr(macStateWithoutRX1DelayOpt(*MakeABPEndDevice(defaultMACSettings, true, activeSessionOptsWithStartedAt, nil))),
+			},
+		},
+
+		// Multicast Update
+		MakeMulticastEndDevice(ttnpb.CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil): {
+			{
+				SetDevice: *makeUpdateDeviceRequest([]test.EndDeviceOption{
+					multicastClassBMACSettingsOpt,
+				},
+					"mac_settings",
+				),
+
+				ReturnedDevice: EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.CLASS_B, defaultMACSettings, false, activeSessionOptsWithStartedAt, nil))),
+				StoredDevice:   EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil))),
 			},
 		},
 	} {
@@ -792,10 +815,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 			test.RunSubtest(t, test.SubtestConfig{
 				Name: MakeTestCaseName(func() []string {
 					dev := createDevice
-					typ := "Create"
+					typ := "Update"
 					if createDevice == nil {
 						dev = tc.SetDevice.EndDevice
-						typ = "Update"
+						typ = "Create"
 					}
 					return []string{
 						typ,

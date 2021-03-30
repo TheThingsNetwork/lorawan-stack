@@ -1687,10 +1687,14 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 	}
 
-	// hasSession indicates whether the effective device model contains a non-zero session.
-	var hasSession bool
+	var (
+		// hasSession indicates whether the effective device model contains a non-zero session.
+		hasSession bool
+
+		// hasMACState indicates whether the effective device model contains a non-zero MAC state.
+		hasMACState bool
+	)
 	if err := st.ValidateSetFields(func(m map[string]*ttnpb.EndDevice) (bool, string) {
-		var hasMACState bool
 		for k, v := range m {
 			switch {
 			case strings.HasPrefix(k, "mac_state."):
@@ -1721,13 +1725,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 		var macVersion ttnpb.MACVersion
 		if hasMACState {
+			// NOTE: If not set, this will be derived from top-level device model.
 			if isMulticast {
-				if dev, ok := m["mac_state.device_class"]; !ok || dev.MACState == nil || dev.MACState.DeviceClass == ttnpb.CLASS_A {
+				if dev, ok := m["mac_state.device_class"]; ok && dev.MACState.GetDeviceClass() == ttnpb.CLASS_A {
 					return false, "mac_state.device_class"
 				}
 			}
-			if dev, ok := m["mac_state.lorawan_version"]; !ok || dev.MACState == nil {
+			// NOTE: If not set, this will be derived from top-level device model.
+			if dev, ok := m["mac_state.lorawan_version"]; ok && dev.MACState == nil {
 				return false, "mac_state.lorawan_version"
+			} else if !ok {
+				macVersion = m["lorawan_version"].LoRaWANVersion
 			} else {
 				macVersion = dev.MACState.LoRaWANVersion
 			}
@@ -2160,44 +2168,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 	var evt events.Event
 	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.EndDeviceIdentifiers.ApplicationIdentifiers, st.Device.EndDeviceIdentifiers.DeviceID, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
-		if stored != nil {
-			evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, st.Device.EndDeviceIdentifiers, req.FieldMask.Paths)
-			if st.HasSetField("multicast") && st.Device.Multicast != stored.Multicast {
-				return errInvalidFieldValue.WithAttributes("field", "multicast")
-			}
-			if st.HasSetField("supports_join") && st.Device.SupportsJoin != stored.SupportsJoin {
-				return errInvalidFieldValue.WithAttributes("field", "supports_join")
-			}
-			if hasSession {
-				if st.HasSetField("session.keys.f_nwk_s_int_key.key") && st.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-					st.Device.Session.NwkSEncKey = st.Device.Session.FNwkSIntKey
-					st.Device.Session.SNwkSIntKey = st.Device.Session.FNwkSIntKey
-					st.AddSetFields(
-						"session.keys.nwk_s_enc_key.encrypted_key",
-						"session.keys.nwk_s_enc_key.kek_label",
-						"session.keys.nwk_s_enc_key.key",
-						"session.keys.s_nwk_s_int_key.encrypted_key",
-						"session.keys.s_nwk_s_int_key.kek_label",
-						"session.keys.s_nwk_s_int_key.key",
-					)
-				}
-
-				if st.HasSetField("session.started_at") && st.Device.GetSession().GetStartedAt().IsZero() ||
-					st.HasSetField("session.session_key_id") && !bytes.Equal(st.Device.GetSession().GetSessionKeyID(), stored.GetSession().GetSessionKeyID()) ||
-					stored.GetSession().GetStartedAt().IsZero() {
-					st.Device.Session.StartedAt = time.Now().UTC()
-					st.AddSetFields(
-						"session.started_at",
-					)
-				}
-			}
-			return nil
-		}
-
-		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, st.Device.EndDeviceIdentifiers, nil)
-
 		if hasSession {
-			if !st.HasSetField("mac_state") {
+			macVersion := stored.GetMACState().GetLoRaWANVersion()
+			if stored.GetMACState() == nil && !st.HasSetField("mac_state") {
 				macState, err := mac.NewState(st.Device, ns.FrequencyPlans, ns.defaultMACSettings)
 				if err != nil {
 					return err
@@ -2211,9 +2184,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				st.AddSetFields(
 					"mac_state",
 				)
+				macVersion = macState.LoRaWANVersion
+			} else if st.HasSetField("mac_state.lorawan_version") {
+				macVersion = st.Device.MACState.LoRaWANVersion
 			}
 
-			if st.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			if st.HasSetField("session.keys.f_nwk_s_int_key.key") && macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 				st.Device.Session.NwkSEncKey = st.Device.Session.FNwkSIntKey
 				st.Device.Session.SNwkSIntKey = st.Device.Session.FNwkSIntKey
 				st.AddSetFields(
@@ -2226,7 +2202,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				)
 			}
 
-			if !st.HasSetField("session.started_at") || st.Device.GetSession().GetStartedAt().IsZero() {
+			if st.HasSetField("session.started_at") && st.Device.GetSession().GetStartedAt().IsZero() ||
+				st.HasSetField("session.session_key_id") && !bytes.Equal(st.Device.GetSession().GetSessionKeyID(), stored.GetSession().GetSessionKeyID()) ||
+				stored.GetSession().GetStartedAt().IsZero() {
 				st.Device.Session.StartedAt = time.Now().UTC()
 				st.AddSetFields(
 					"session.started_at",
@@ -2234,8 +2212,15 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 		}
 		if hasPendingSession {
-			supports1_1 := st.Device.PendingMACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0
-			if !supports1_1 {
+			var macVersion ttnpb.MACVersion
+			if st.HasSetField("pending_mac_state.lorawan_version") {
+				macVersion = st.Device.GetPendingMACState().GetLoRaWANVersion()
+			} else {
+				macVersion = stored.GetPendingMACState().GetLoRaWANVersion()
+			}
+
+			supports1_1 := macVersion.Compare(ttnpb.MAC_V1_1) >= 0
+			if st.HasSetField("pending_session.keys.f_nwk_s_int_key.key") && !supports1_1 {
 				st.Device.PendingSession.NwkSEncKey = st.Device.PendingSession.FNwkSIntKey
 				st.Device.PendingSession.SNwkSIntKey = st.Device.PendingSession.FNwkSIntKey
 				st.AddSetFields(
@@ -2247,7 +2232,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					"pending_session.keys.s_nwk_s_int_key.key",
 				)
 			}
-			if hasQueuedJoinAccept && !supports1_1 {
+			if st.HasSetField("pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key") && hasQueuedJoinAccept && !supports1_1 {
 				st.Device.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey = st.Device.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey
 				st.Device.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey = st.Device.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey
 				st.AddSetFields(
@@ -2259,6 +2244,19 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
 				)
 			}
+		}
+
+		if stored == nil {
+			evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, st.Device.EndDeviceIdentifiers, nil)
+			return nil
+		}
+
+		evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, st.Device.EndDeviceIdentifiers, req.FieldMask.Paths)
+		if st.HasSetField("multicast") && st.Device.Multicast != stored.Multicast {
+			return newInvalidFieldValueError("multicast")
+		}
+		if st.HasSetField("supports_join") && st.Device.SupportsJoin != stored.SupportsJoin {
+			return newInvalidFieldValueError("supports_join")
 		}
 		return nil
 	}))
