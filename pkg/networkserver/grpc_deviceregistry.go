@@ -1169,6 +1169,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if st.HasSetField(
 		"frequency_plan_id",
 		"lorawan_phy_version",
+		"mac_settings.factory_preset_frequencies",
 		"mac_settings.ping_slot_frequency.value",
 		"mac_settings.use_adr.value",
 		"mac_state.current_parameters.adr_data_rate_index",
@@ -1397,6 +1398,29 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				})
 			},
 				"pending_mac_state.desired_parameters.ping_slot_data_rate_index_value",
+			); err != nil {
+				return nil, err
+			}
+		}
+
+		if st.HasSetField(
+			"frequency_plan_id",
+			"lorawan_phy_version",
+			"mac_settings.factory_preset_frequencies",
+		) {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				if dev.GetMACSettings() == nil || len(dev.MACSettings.FactoryPresetFrequencies) == 0 {
+					return nil
+				}
+				return withPHY(func(phy *band.Band) error {
+					if phy.MaxUplinkChannels != phy.MaxDownlinkChannels {
+						// TODO: Allow this (https://github.com/TheThingsNetwork/lorawan-stack/issues/2269).
+						return newInvalidFieldValueError("mac_settings.factory_preset_frequencies")
+					}
+					return nil
+				})
+			},
+				"mac_settings.factory_preset_frequencies",
 			); err != nil {
 				return nil, err
 			}
