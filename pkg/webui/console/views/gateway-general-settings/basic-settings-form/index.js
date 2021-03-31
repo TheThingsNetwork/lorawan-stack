@@ -60,12 +60,19 @@ const BasicSettingsForm = React.memo(props => {
       ...gateway,
       attributes: mapAttributesToFormValue(gateway.attributes),
     }
+    if (initialValues.lbs_lns_secret !== undefined && initialValues.lbs_lns_secret.value !== undefined){
+      initialValues.lbs_lns_secret.value = atob(initialValues.lbs_lns_secret.value)
+    }
     return validationSchema.cast(initialValues)
   }, [gateway])
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(values)
+      if (castedValues.lbs_lns_secret !== undefined && castedValues.lbs_lns_secret.value !== undefined){
+        castedValues.lbs_lns_secret.value = btoa(castedValues.lbs_lns_secret.value)
+        console.log(castedValues.lbs_lns_secret.value)
+      }
       setError(undefined)
       try {
         await onSubmit(castedValues)
@@ -131,6 +138,12 @@ const BasicSettingsForm = React.memo(props => {
         component={Checkbox}
         label={sharedMessages.enabled}
         description={sharedMessages.requireAuthenticatedConnectionDescription}
+        />
+        <Form.Field
+        title={sharedMessages.lbsLNSSecret}
+        description={sharedMessages.lbsLNSSecretDescription}
+        name="lbs_lns_secret.value"
+        component={Input}
       />
       <Form.Field
         title={sharedMessages.gatewayStatus}

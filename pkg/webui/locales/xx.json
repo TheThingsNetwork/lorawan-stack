@@ -718,6 +718,8 @@
   "lib.shared-messages.lastSeen": "Xxxx xxxx",
   "lib.shared-messages.latitude": "Xxxxxxxx",
   "lib.shared-messages.latitudeDesc": "Xxx xxxxx-xxxxx xxxxxxxx xx xxxxxxx, xxxxx x xx xxx xxxxxxx",
+  "lib.shared-messages.lbsLNSSecret": "XxXx Xxxxxx Xxxxxxx XXX Xxxxxxxxxxxxxx Xxx",
+  "lib.shared-messages.lbsLNSSecretDescription": "Xxx Xxxxxxxxxxxxxx Xxx xxx Xxxx Xxxxxx Xxxxxxx XXX xxxxxxxxxxx. Xxxx xxxxx xx xxxxxxx xxx xxxxx xxxxxxxx.",
   "lib.shared-messages.link": "Xxxx",
   "lib.shared-messages.linked": "Xxxxxx",
   "lib.shared-messages.liveData": "Xxxx xxxx",
