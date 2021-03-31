@@ -123,6 +123,11 @@ jobs:
         TEST_REDIS: '1'
         TEST_SLOWDOWN: '8'
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_TEST_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_TEST_SECRET_ACCESS_KEY }}
+        GCP_CREDENTIALS: ${{ secrets.GCP_TEST_CREDENTIALS }}
+        TEST_BUCKET: lorawan-stack-test-bucket
       run: tools/bin/mage go:coveralls
     - name: Check for diff
       run: tools/bin/mage git:diff
