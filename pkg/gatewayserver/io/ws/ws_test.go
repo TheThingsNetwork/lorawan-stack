@@ -34,6 +34,7 @@ import (
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
@@ -42,6 +43,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -1521,4 +1523,41 @@ func TestPingPong(t *testing.T) {
 	case <-time.After(timeout):
 		t.Fatalf("Server pong timeout")
 	}
+}
+
+func TestRateLimit(t *testing.T) {
+	t.Run("Accept", func(t *testing.T) {
+		maxRate := uint(3)
+		conf := ratelimit.Config{
+			Profiles: []ratelimit.Profile{{
+				Name:          "accept connections",
+				MaxRatePerMin: maxRate,
+				MaxBurst:      maxRate,
+				Associations:  []string{"gs:accept:ws"},
+			}},
+		}
+		withServer(t, defaultConfig, conf, func(t *testing.T, _ *mock.IdentityServer, serverAddress string) {
+			a := assertions.New(t)
+			for i := uint(0); i < maxRate; i++ {
+				conn, _, err := websocket.DefaultDialer.Dial(serverAddress+testTrafficEndPoint, nil)
+				if !a.So(err, should.BeNil) {
+					t.Fatalf("Connection failed: %v", err)
+				}
+				conn.Close()
+			}
+
+			for i := 0; i < 3; i++ {
+				_, resp, err := websocket.DefaultDialer.Dial(serverAddress+testTrafficEndPoint, nil)
+				a.So(err, should.NotBeNil)
+				if !a.So(errors.IsResourceExhausted(errors.FromHTTPStatusCode(resp.StatusCode)), should.BeTrue) {
+					t.FailNow()
+				}
+
+				a.So(resp.Header.Get("x-rate-limit-limit"), should.NotBeEmpty)
+				a.So(resp.Header.Get("x-rate-limit-available"), should.NotBeEmpty)
+				a.So(resp.Header.Get("x-rate-limit-reset"), should.NotBeEmpty)
+				a.So(resp.Header.Get("x-rate-limit-retry"), should.NotBeEmpty)
+			}
+		})
+	})
 }

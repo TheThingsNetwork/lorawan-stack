@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -70,6 +71,7 @@ func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config)
 		middleware.ID(""),
 		echomiddleware.BodyLimit("16M"),
 		middleware.Log(log.FromContext(ctx)),
+		ratelimit.EchoMiddleware(server.RateLimiter(), "gs:accept:ws"),
 		middleware.Recover(),
 	)
 
@@ -142,10 +144,11 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 	eps := s.formatter.Endpoints()
 
-	logger := log.FromContext(ctx).WithFields(log.Fields(
+	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"endpoint", eps.Traffic,
 		"remote_addr", c.Request().RemoteAddr,
 	))
+	logger := log.FromContext(ctx)
 
 	// Convert the ID to EUI.
 	str := euiHexPattern.FindStringSubmatch(id)
@@ -288,7 +291,13 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		}
 	}()
 
+	resource := ratelimit.GatewayUpResource(ctx, ids)
 	for {
+		if err := ratelimit.Require(s.server.RateLimiter(), resource); err != nil {
+			logger.WithError(err).Warn("Terminate connection")
+			conn.Disconnect(err)
+			return err
+		}
 		_, data, err := ws.ReadMessage()
 		if err != nil {
 			logger.WithError(err).Debug("Failed to read message")

@@ -24,12 +24,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bluele/gcache"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/v3/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -46,17 +46,16 @@ type srv struct {
 	connections sync.Map
 	firewall    Firewall
 
-	rateLimitedGateways gcache.Cache
+	limitLogs ratelimit.Interface
 }
 
 func (*srv) Protocol() string            { return "udp" }
 func (*srv) SupportsDownlinkClaim() bool { return true }
 
-var errUDPFrontendRecovered = errors.DefineInternal("udp_frontend_recovered", "internal server error")
-
-const (
-	rateLimitedGatewaysCacheSize int = 1 << 10
-	rateLimitedGatewaysCacheTTL      = time.Minute
+var (
+	errUDPFrontendRecovered      = errors.DefineInternal("udp_frontend_recovered", "internal server error")
+	limitLogsConfig              = ratelimit.Profile{MaxRatePerMin: 1}
+	limitLogsSize           uint = 1 << 13
 )
 
 // Serve serves the UDP frontend.
@@ -69,6 +68,10 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 	if config.RateLimiting.Enable {
 		firewall = NewRateLimitingFirewall(firewall, config.RateLimiting.Messages, config.RateLimiting.Threshold)
 	}
+	limitLogs, err := limitLogsConfig.New(ctx, limitLogsSize)
+	if err != nil {
+		return err
+	}
 	s := &srv{
 		ctx:      ctx,
 		config:   config,
@@ -77,7 +80,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 		packetCh: make(chan encoding.Packet, config.PacketBuffer),
 		firewall: firewall,
 
-		rateLimitedGateways: gcache.New(rateLimitedGatewaysCacheSize).LFU().Expiration(rateLimitedGatewaysCacheTTL).Build(),
+		limitLogs: limitLogs,
 	}
 	go s.gc()
 	go func() {
@@ -107,11 +110,18 @@ func (s *srv) read() (err error) {
 			return err
 		}
 		now := time.Now()
+		ctx := log.NewContextWithField(s.ctx, "remote_addr", addr.String())
+
+		if err := ratelimit.Require(s.server.RateLimiter(), ratelimit.GatewayUDPTrafficResource(addr)); err != nil {
+			if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(addr.IP.String())) == nil {
+				log.FromContext(s.ctx).WithError(err).Warn("Drop packet")
+			}
+			continue
+		}
 
 		packetBuf := make([]byte, n)
 		copy(packetBuf, buf[:])
 
-		ctx := log.NewContextWithField(s.ctx, "remote_addr", addr.String())
 		packet := encoding.Packet{
 			GatewayAddr: addr,
 			ReceivedAt:  now,
@@ -160,11 +170,8 @@ func (s *srv) handlePackets() {
 
 			if s.firewall != nil {
 				if err := s.firewall.Filter(packet); err != nil {
-					if errors.IsResourceExhausted(err) {
-						if s.rateLimitedGateways.Has(eui) {
-							break
-						}
-						s.rateLimitedGateways.Set(eui, &struct{}{})
+					if errors.IsResourceExhausted(err) && ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(eui.String())) == nil {
+						break
 					}
 					logger.WithError(err).Warn("Packet filtered")
 					break

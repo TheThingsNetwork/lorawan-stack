@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -65,4 +66,8 @@ func (srv mockServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIden
 
 func (srv mockServer) FromRequestContext(ctx context.Context) context.Context {
 	return ctx
+}
+
+func (srv mockServer) RateLimiter() ratelimit.Interface {
+	return nil
 }

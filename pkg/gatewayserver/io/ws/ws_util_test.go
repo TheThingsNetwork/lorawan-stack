@@ -16,10 +16,24 @@ package ws_test
 
 import (
 	"context"
+	"fmt"
+	"net"
+	"net/http"
+	"testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
@@ -30,4 +44,42 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 		}
 	}
 	panic("could not connect to peer")
+}
+
+func withServer(t *testing.T, wsConfig ws.Config, rateLimitConf ratelimit.Config, f func(t *testing.T, is *mock.IdentityServer, serverAddress string)) {
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
+
+	is, isAddr := mock.NewIS(ctx)
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: cluster.Config{
+				IdentityServer: isAddr,
+			},
+			RateLimiting: rateLimitConf,
+		},
+	})
+	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+	componenttest.StartComponent(t, c)
+	defer c.Close()
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+	gs := mock.NewServer(c)
+
+	bsWebServer := ws.New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), wsConfig)
+	lis, err := net.Listen("tcp", serverAddress)
+	if err != nil {
+		t.FailNow()
+	}
+	defer lis.Close()
+	go func() error {
+		return http.Serve(lis, bsWebServer)
+	}()
+	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
+
+	f(t, is, servAddr)
 }

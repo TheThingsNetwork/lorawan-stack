@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/mqtt"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc/metadata"
@@ -72,8 +73,19 @@ func (s *srv) accept() error {
 			return err
 		}
 
+		remoteAddr := mqttConn.RemoteAddr().String()
+		ctx := log.NewContextWithFields(s.ctx, log.Fields("remote_addr", remoteAddr))
+
+		resource := ratelimit.GatewayAcceptMQTTConnectionResource(remoteAddr)
+		if err := ratelimit.Require(s.server.RateLimiter(), resource); err != nil {
+			if err := mqttConn.Close(); err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Close connection failed")
+			}
+			log.FromContext(ctx).WithError(err).Debug("Drop connection")
+			continue
+		}
+
 		go func() {
-			ctx := log.NewContextWithFields(s.ctx, log.Fields("remote_addr", mqttConn.RemoteAddr().String()))
 			conn := &connection{server: s.server, mqtt: mqttConn, format: s.format}
 			if err := conn.setup(ctx); err != nil {
 				switch err {
@@ -95,6 +107,8 @@ type connection struct {
 	session session.Session
 	io      *io.Connection
 	tokens  io.DownlinkTokens
+
+	resource ratelimit.Resource
 }
 
 func (*connection) Protocol() string            { return "mqtt" }
@@ -242,6 +256,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	if err != nil {
 		return nil, err
 	}
+	c.resource = ratelimit.GatewayUpResource(ctx, ids)
 
 	access := topicAccess{
 		gtwUID: uid,
@@ -296,6 +311,13 @@ func (c *connection) CanWrite(info *auth.Info, topicParts ...string) bool {
 
 func (c *connection) deliver(pkt *packet.PublishPacket) {
 	logger := log.FromContext(c.io.Context()).WithField("topic", pkt.TopicName)
+
+	if err := ratelimit.Require(c.server.RateLimiter(), c.resource); err != nil {
+		logger.WithError(err).Warn("Terminate connection")
+		c.io.Disconnect(err)
+		return
+	}
+
 	switch {
 	case c.format.IsBirthTopic(pkt.TopicParts):
 	case c.format.IsLastWillTopic(pkt.TopicParts):
