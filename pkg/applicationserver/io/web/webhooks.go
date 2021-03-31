@@ -206,6 +206,7 @@ func (w *webhooks) RegisterRoutes(server *ttnweb.Server) {
 		mux.MiddlewareFunc(webmiddleware.Metadata("Authorization")),
 		w.validateAndFillIDs,
 		w.requireApplicationRights(ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE),
+		w.requireRateLimits(),
 	)
 
 	router.Handle("/push", w.handleDown(io.Server.DownlinkQueuePush)).Methods(http.MethodPost)

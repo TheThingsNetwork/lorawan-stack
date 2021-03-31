@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -49,6 +50,8 @@ type Server interface {
 	DownlinkQueueList(context.Context, ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error)
 	// HTTPClient returns a configured *http.Client.
 	HTTPClient(context.Context) (*http.Client, error)
+	// RateLimiter returns the rate limiter instance.
+	RateLimiter() ratelimit.Interface
 }
 
 // ContextualApplicationUp represents an ttnpb.ApplicationUp with its context.

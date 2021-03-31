@@ -20,6 +20,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -129,4 +130,8 @@ func (s *server) SetSubscribeError(err error) {
 
 func (s *server) Subscriptions() <-chan *io.Subscription {
 	return s.subscriptionsCh
+}
+
+func (s *server) RateLimiter() ratelimit.Interface {
+	return &ratelimit.NoopRateLimiter{}
 }

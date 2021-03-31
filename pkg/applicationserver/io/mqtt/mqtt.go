@@ -28,11 +28,13 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/session"
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
+	ttsauth "go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/mqtt"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc/metadata"
@@ -69,8 +71,19 @@ func (s *srv) accept() error {
 			return err
 		}
 
+		remoteAddr := mqttConn.RemoteAddr().String()
+		ctx := log.NewContextWithFields(s.ctx, log.Fields("remote_addr", remoteAddr))
+
+		resource := ratelimit.ApplicationAcceptMQTTConnectionResource(remoteAddr)
+		if err := ratelimit.Require(s.server.RateLimiter(), resource); err != nil {
+			if err := mqttConn.Close(); err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Close connection failed")
+			}
+			log.FromContext(ctx).WithError(err).Debug("Drop connection")
+			continue
+		}
+
 		go func() {
-			ctx := log.NewContextWithFields(s.ctx, log.Fields("remote_addr", mqttConn.RemoteAddr().String()))
 			conn := &connection{server: s.server, mqtt: mqttConn, format: s.format}
 			if err := conn.setup(ctx); err != nil {
 				switch err {
@@ -91,6 +104,8 @@ type connection struct {
 	mqtt    mqttnet.Conn
 	session session.Session
 	io      *io.Subscription
+
+	resource ratelimit.Resource
 }
 
 func (c *connection) setup(ctx context.Context) error {
@@ -252,6 +267,13 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 		return nil, err
 	}
 	ctx = c.io.Context()
+
+	authTokenID := ""
+	if _, v, _, err := ttsauth.SplitToken(string(info.Password)); err == nil && v != "" {
+		authTokenID = v
+	}
+	c.resource = ratelimit.ApplicationMQTTDownResource(ctx, ids, authTokenID)
+
 	access := topicAccess{
 		appUID: uid,
 	}
@@ -315,6 +337,13 @@ func (c *connection) CanWrite(info *auth.Info, topicParts ...string) bool {
 
 func (c *connection) deliver(pkt *packet.PublishPacket) {
 	logger := log.FromContext(c.io.Context()).WithField("topic", pkt.TopicName)
+
+	if err := ratelimit.Require(c.server.RateLimiter(), c.resource); err != nil {
+		logger.WithError(err).Warn("Terminate connection")
+		c.io.Disconnect(err)
+		return
+	}
+
 	var deviceID string
 	var op func(io.Server, context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
 	switch {
