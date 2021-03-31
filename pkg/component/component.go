@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
@@ -89,6 +90,8 @@ type Component struct {
 
 	taskStarter TaskStarter
 	taskConfigs []*TaskConfig
+
+	limiter ratelimit.Interface
 }
 
 // Option allows extending the component when it is instantiated with New.
@@ -161,6 +164,11 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		taskStarter: StartTaskFunc(DefaultStartTask),
 	}
 
+	c.limiter, err = config.RateLimiting.New(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, opt := range opts {
 		opt(c)
 	}
@@ -184,7 +192,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 	}
 
 	config.Interop.SenderClientCA.BlobConfig = config.Blob
-	c.interop, err = interop.NewServer(c.ctx, c.FillContext, config.Interop)
+	c.interop, err = interop.NewServer(c, c.FillContext, config.Interop)
 	if err != nil {
 		return nil, err
 	}

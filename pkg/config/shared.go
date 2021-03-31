@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"gocloud.dev/blob"
 )
@@ -420,6 +421,7 @@ type ServiceBase struct {
 	FrequencyPlans FrequencyPlansConfig `name:"frequency-plans" description:"Source of the frequency plans"`
 	Rights         Rights               `name:"rights"`
 	KeyVault       KeyVault             `name:"key-vault"`
+	RateLimiting   ratelimit.Config     `name:"rate-limiting" description:"Rate limiting configuration"`
 }
 
 // FrequencyPlansFetcher returns a fetch.Interface based on the frequency plans configuration.
