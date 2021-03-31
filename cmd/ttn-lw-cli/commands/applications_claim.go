@@ -77,6 +77,9 @@ key is provided, a new API key will be created.`,
 			if err != nil {
 				return err
 			}
+
+			logger.Warn("Make sure to delete the API Key used for authorizing claiming as this is not done automatically")
+
 			_, err = ttnpb.NewEndDeviceClaimingServerClient(dcs).UnauthorizeApplication(ctx, appID)
 			return err
 		},

@@ -135,9 +135,14 @@
   - [Service `ContactInfoRegistry`](#ttn.lorawan.v3.ContactInfoRegistry)
 - [File `lorawan-stack/api/deviceclaimingserver.proto`](#lorawan-stack/api/deviceclaimingserver.proto)
   - [Message `AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest)
+  - [Message `AuthorizeGatewayRequest`](#ttn.lorawan.v3.AuthorizeGatewayRequest)
+  - [Message `CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection)
   - [Message `ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest)
   - [Message `ClaimEndDeviceRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers)
+  - [Message `ClaimGatewayRequest`](#ttn.lorawan.v3.ClaimGatewayRequest)
+  - [Message `ClaimGatewayRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers)
   - [Service `EndDeviceClaimingServer`](#ttn.lorawan.v3.EndDeviceClaimingServer)
+  - [Service `GatewayClaimingServer`](#ttn.lorawan.v3.GatewayClaimingServer)
 - [File `lorawan-stack/api/devicerepository.proto`](#lorawan-stack/api/devicerepository.proto)
   - [Message `EndDeviceBrand`](#ttn.lorawan.v3.EndDeviceBrand)
   - [Message `EndDeviceModel`](#ttn.lorawan.v3.EndDeviceModel)
@@ -2241,6 +2246,33 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | `application_ids` | <p>`message.required`: `true`</p> |
 | `api_key` | <p>`string.min_len`: `1`</p><p>`string.max_len`: `128`</p> |
 
+### <a name="ttn.lorawan.v3.AuthorizeGatewayRequest">Message `AuthorizeGatewayRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `api_key` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`message.required`: `true`</p> |
+| `api_key` | <p>`string.min_len`: `1`</p> |
+
+### <a name="ttn.lorawan.v3.CUPSRedirection">Message `CUPSRedirection`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `target_cups_uri` | [`string`](#string) |  | CUPS URI for LoRa Basics Station CUPS redirection. |
+| `current_gateway_key` | [`string`](#string) |  | The key set in the gateway to authenticate itself. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `current_gateway_key` | <p>`string.max_len`: `2048`</p> |
+
 ### <a name="ttn.lorawan.v3.ClaimEndDeviceRequest">Message `ClaimEndDeviceRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2284,6 +2316,39 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | ----- | ----------- |
 | `authentication_code` | <p>`string.pattern`: `^[A-Z0-9]{1,32}$`</p> |
 
+### <a name="ttn.lorawan.v3.ClaimGatewayRequest">Message `ClaimGatewayRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `authenticated_identifiers` | [`ClaimGatewayRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers) |  |  |
+| `qr_code` | [`bytes`](#bytes) |  |  |
+| `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  | Collaborator to grant all rights on the target gateway. |
+| `target_gateway_id` | [`string`](#string) |  | Gateway ID for the target gateway. This must be a unique value. If this is not set, the target ID for the target gateway will be set to `eui-<gateway-eui>` |
+| `target_gateway_server_address` | [`string`](#string) |  | Target Gateway Server Address for the target gateway. |
+| `cups_redirection` | [`CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection) |  | Parameters to set CUPS redirection for the gateway. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `qr_code` | <p>`bytes.min_len`: `0`</p><p>`bytes.max_len`: `1024`</p> |
+| `collaborator` | <p>`message.required`: `true`</p> |
+| `target_gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
+| `target_gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
+
+### <a name="ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers">Message `ClaimGatewayRequest.AuthenticatedIdentifiers`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_eui` | [`bytes`](#bytes) |  |  |
+| `authentication_code` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `authentication_code` | <p>`bytes.max_len`: `2048`</p> |
+
 ### <a name="ttn.lorawan.v3.EndDeviceClaimingServer">Service `EndDeviceClaimingServer`</a>
 
 The EndDeviceClaimingServer service configures authorization to claim end devices registered in an application,
@@ -2302,6 +2367,22 @@ and allows clients to claim end devices.
 | `Claim` | `POST` | `/api/v3/edcs/claim` | `*` |
 | `AuthorizeApplication` | `POST` | `/api/v3/edcs/applications/{application_ids.application_id}/authorize` | `*` |
 | `UnauthorizeApplication` | `DELETE` | `/api/v3/edcs/applications/{application_id}/authorize` |  |
+
+### <a name="ttn.lorawan.v3.GatewayClaimingServer">Service `GatewayClaimingServer`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Claim` | [`ClaimGatewayRequest`](#ttn.lorawan.v3.ClaimGatewayRequest) | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | Claims a gateway by claim authentication code or QR code and transfers the gateway to the target user. |
+| `AuthorizeGateway` | [`AuthorizeGatewayRequest`](#ttn.lorawan.v3.AuthorizeGatewayRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | AuthorizeGateway allows a gateway to be claimed. |
+| `UnauthorizeGateway` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | UnauthorizeGateway prevents a gateway from being claimed. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Claim` | `POST` | `/api/v3/gcls/claim` | `*` |
+| `AuthorizeGateway` | `POST` | `/api/v3/gcls/gateways/{gateway_ids.gateway_id}/authorize` | `*` |
+| `UnauthorizeGateway` | `DELETE` | `/api/v3/gcls/gateways/{gateway_id}/authorize` |  |
 
 ## <a name="lorawan-stack/api/devicerepository.proto">File `lorawan-stack/api/devicerepository.proto`</a>
 

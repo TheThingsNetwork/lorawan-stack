@@ -1911,6 +1911,44 @@
       ]
     }
   },
+  "GatewayClaimingServer": {
+    "Claim": {
+      "file": "lorawan-stack/api/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/gcls/claim",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    },
+    "AuthorizeGateway": {
+      "file": "lorawan-stack/api/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/gcls/gateways/{gateway_ids.gateway_id}/authorize",
+          "body": "*",
+          "parameters": [
+            "gateway_ids.gateway_id"
+          ]
+        }
+      ]
+    },
+    "UnauthorizeGateway": {
+      "file": "lorawan-stack/api/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/gcls/gateways/{gateway_id}/authorize",
+          "parameters": [
+            "gateway_id"
+          ]
+        }
+      ]
+    }
+  },
   "DeviceRepository": {
     "ListBrands": {
       "file": "lorawan-stack/api/devicerepository.proto",

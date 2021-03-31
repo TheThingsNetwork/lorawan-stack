@@ -7533,6 +7533,92 @@
           ]
         },
         {
+          "name": "AuthorizeGatewayRequest",
+          "longName": "AuthorizeGatewayRequest",
+          "fullName": "ttn.lorawan.v3.AuthorizeGatewayRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "api_key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.min_len",
+                    "value": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CUPSRedirection",
+          "longName": "CUPSRedirection",
+          "fullName": "ttn.lorawan.v3.CUPSRedirection",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "target_cups_uri",
+              "description": "CUPS URI for LoRa Basics Station CUPS redirection.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "current_gateway_key",
+              "description": "The key set in the gateway to authenticate itself.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "ClaimEndDeviceRequest",
           "longName": "ClaimEndDeviceRequest",
           "fullName": "ttn.lorawan.v3.ClaimEndDeviceRequest",
@@ -7773,6 +7859,156 @@
               }
             }
           ]
+        },
+        {
+          "name": "ClaimGatewayRequest",
+          "longName": "ClaimGatewayRequest",
+          "fullName": "ttn.lorawan.v3.ClaimGatewayRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authenticated_identifiers",
+              "description": "",
+              "label": "",
+              "type": "AuthenticatedIdentifiers",
+              "longType": "ClaimGatewayRequest.AuthenticatedIdentifiers",
+              "fullType": "ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "qr_code",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.min_len",
+                    "value": 0
+                  },
+                  {
+                    "name": "bytes.max_len",
+                    "value": 1024
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator",
+              "description": "Collaborator to grant all rights on the target gateway.",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "target_gateway_id",
+              "description": "Gateway ID for the target gateway. This must be a unique value.\nIf this is not set, the target ID for the target gateway will be set to `eui-\u003cgateway-eui\u003e`",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "target_gateway_server_address",
+              "description": "Target Gateway Server Address for the target gateway.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "cups_redirection",
+              "description": "Parameters to set CUPS redirection for the gateway.",
+              "label": "",
+              "type": "CUPSRedirection",
+              "longType": "CUPSRedirection",
+              "fullType": "ttn.lorawan.v3.CUPSRedirection",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AuthenticatedIdentifiers",
+          "longName": "ClaimGatewayRequest.AuthenticatedIdentifiers",
+          "fullName": "ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "authentication_code",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            }
+          ]
         }
       ],
       "services": [
@@ -7845,6 +8081,82 @@
                     {
                       "method": "DELETE",
                       "pattern": "/edcs/applications/{application_id}/authorize"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "GatewayClaimingServer",
+          "longName": "GatewayClaimingServer",
+          "fullName": "ttn.lorawan.v3.GatewayClaimingServer",
+          "description": "",
+          "methods": [
+            {
+              "name": "Claim",
+              "description": "Claims a gateway by claim authentication code or QR code and transfers the gateway to the target user.",
+              "requestType": "ClaimGatewayRequest",
+              "requestLongType": "ClaimGatewayRequest",
+              "requestFullType": "ttn.lorawan.v3.ClaimGatewayRequest",
+              "requestStreaming": false,
+              "responseType": "GatewayIdentifiers",
+              "responseLongType": "GatewayIdentifiers",
+              "responseFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/gcls/claim",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "AuthorizeGateway",
+              "description": "AuthorizeGateway allows a gateway to be claimed.",
+              "requestType": "AuthorizeGatewayRequest",
+              "requestLongType": "AuthorizeGatewayRequest",
+              "requestFullType": "ttn.lorawan.v3.AuthorizeGatewayRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/gcls/gateways/{gateway_ids.gateway_id}/authorize",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UnauthorizeGateway",
+              "description": "UnauthorizeGateway prevents a gateway from being claimed.",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/gcls/gateways/{gateway_id}/authorize"
                     }
                   ]
                 }

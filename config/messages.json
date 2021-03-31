@@ -1358,6 +1358,15 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:insufficient_source_gateway_rights": {
+    "translations": {
+      "en": "API Key has insufficient source gateway rights"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "gateways_claim.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:join_server_disabled": {
     "translations": {
       "en": "Join Server is disabled"
@@ -1518,6 +1527,15 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "applications_packages.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_gateway_eui": {
+    "translations": {
+      "en": "no gateway EUI set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "gateways.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:no_gateway_id": {

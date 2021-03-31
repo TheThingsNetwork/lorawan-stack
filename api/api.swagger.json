@@ -5089,6 +5089,117 @@
         ]
       }
     },
+    "/gcls/claim": {
+      "post": {
+        "summary": "Claims a gateway by claim authentication code or QR code and transfers the gateway to the target user.",
+        "operationId": "GatewayClaimingServer_Claim",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GatewayIdentifiers"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ClaimGatewayRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GatewayClaimingServer"
+        ]
+      }
+    },
+    "/gcls/gateways/{gateway_ids.gateway_id}/authorize": {
+      "post": {
+        "summary": "AuthorizeGateway allows a gateway to be claimed.",
+        "operationId": "GatewayClaimingServer_AuthorizeGateway",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3AuthorizeGatewayRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GatewayClaimingServer"
+        ]
+      }
+    },
+    "/gcls/gateways/{gateway_id}/authorize": {
+      "delete": {
+        "summary": "UnauthorizeGateway prevents a gateway from being claimed.",
+        "operationId": "GatewayClaimingServer_UnauthorizeGateway",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "GatewayClaimingServer"
+        ]
+      }
+    },
     "/gs/gateways/{gateway_id}/connection/stats": {
       "get": {
         "summary": "Get statistics about the current gateway connection to the Gateway Server.\nThis is not persisted between reconnects.",
@@ -9941,25 +10052,6 @@
         }
       }
     },
-    "ClaimEndDeviceRequestAuthenticatedIdentifiers": {
-      "type": "object",
-      "properties": {
-        "join_eui": {
-          "type": "string",
-          "format": "byte",
-          "description": "JoinEUI (or AppEUI) of the device to claim."
-        },
-        "dev_eui": {
-          "type": "string",
-          "format": "byte",
-          "description": "DevEUI of the device to claim."
-        },
-        "authentication_code": {
-          "type": "string",
-          "description": "Authentication code to prove ownership.\nIn the LoRa Alliance TR005 specification, this equals the OwnerToken."
-        }
-      }
-    },
     "CompliancesCompliance": {
       "type": "object",
       "properties": {
@@ -12218,6 +12310,17 @@
         }
       }
     },
+    "v3AuthorizeGatewayRequest": {
+      "type": "object",
+      "properties": {
+        "gateway_ids": {
+          "$ref": "#/definitions/v3GatewayIdentifiers"
+        },
+        "api_key": {
+          "type": "string"
+        }
+      }
+    },
     "v3CFList": {
       "type": "object",
       "properties": {
@@ -12249,11 +12352,24 @@
       ],
       "default": "FREQUENCIES"
     },
+    "v3CUPSRedirection": {
+      "type": "object",
+      "properties": {
+        "target_cups_uri": {
+          "type": "string",
+          "description": "CUPS URI for LoRa Basics Station CUPS redirection."
+        },
+        "current_gateway_key": {
+          "type": "string",
+          "description": "The key set in the gateway to authenticate itself."
+        }
+      }
+    },
     "v3ClaimEndDeviceRequest": {
       "type": "object",
       "properties": {
         "authenticated_identifiers": {
-          "$ref": "#/definitions/ClaimEndDeviceRequestAuthenticatedIdentifiers",
+          "$ref": "#/definitions/v3ClaimEndDeviceRequestAuthenticatedIdentifiers",
           "description": "Authenticated identifiers."
         },
         "qr_code": {
@@ -12297,6 +12413,66 @@
         "invalidate_authentication_code": {
           "type": "boolean",
           "description": "If set, invalidate the authentication code with which the device gets claimed. This prohibits subsequent claiming requests."
+        }
+      }
+    },
+    "v3ClaimEndDeviceRequestAuthenticatedIdentifiers": {
+      "type": "object",
+      "properties": {
+        "join_eui": {
+          "type": "string",
+          "format": "byte",
+          "description": "JoinEUI (or AppEUI) of the device to claim."
+        },
+        "dev_eui": {
+          "type": "string",
+          "format": "byte",
+          "description": "DevEUI of the device to claim."
+        },
+        "authentication_code": {
+          "type": "string",
+          "description": "Authentication code to prove ownership.\nIn the LoRa Alliance TR005 specification, this equals the OwnerToken."
+        }
+      }
+    },
+    "v3ClaimGatewayRequest": {
+      "type": "object",
+      "properties": {
+        "authenticated_identifiers": {
+          "$ref": "#/definitions/v3ClaimGatewayRequestAuthenticatedIdentifiers"
+        },
+        "qr_code": {
+          "type": "string",
+          "format": "byte"
+        },
+        "collaborator": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers",
+          "description": "Collaborator to grant all rights on the target gateway."
+        },
+        "target_gateway_id": {
+          "type": "string",
+          "title": "Gateway ID for the target gateway. This must be a unique value.\nIf this is not set, the target ID for the target gateway will be set to `eui-\u003cgateway-eui\u003e`"
+        },
+        "target_gateway_server_address": {
+          "type": "string",
+          "description": "Target Gateway Server Address for the target gateway."
+        },
+        "cups_redirection": {
+          "$ref": "#/definitions/v3CUPSRedirection",
+          "description": "Parameters to set CUPS redirection for the gateway."
+        }
+      }
+    },
+    "v3ClaimGatewayRequestAuthenticatedIdentifiers": {
+      "type": "object",
+      "properties": {
+        "gateway_eui": {
+          "type": "string",
+          "format": "byte"
+        },
+        "authentication_code": {
+          "type": "string",
+          "format": "byte"
         }
       }
     },

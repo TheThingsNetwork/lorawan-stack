@@ -46,7 +46,10 @@ func gatewayIDFlags() *pflag.FlagSet {
 	return flagSet
 }
 
-var errNoGatewayID = errors.DefineInvalidArgument("no_gateway_id", "no gateway ID set")
+var (
+	errNoGatewayID  = errors.DefineInvalidArgument("no_gateway_id", "no gateway ID set")
+	errNoGatewayEUI = errors.DefineInvalidArgument("no_gateway_eui", "no gateway EUI set")
+)
 
 func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb.GatewayIdentifiers, error) {
 	gatewayID, _ := flagSet.GetString("gateway-id")
@@ -64,9 +67,33 @@ func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb
 		gatewayEUIHex = args[1]
 	}
 	if gatewayID == "" && requireID {
-		return nil, errNoGatewayID
+		return nil, errNoGatewayID.New()
 	}
 	ids := &ttnpb.GatewayIdentifiers{GatewayID: gatewayID}
+	if gatewayEUIHex != "" {
+		var gatewayEUI ttntypes.EUI64
+		if err := gatewayEUI.UnmarshalText([]byte(gatewayEUIHex)); err != nil {
+			return nil, err
+		}
+		ids.EUI = &gatewayEUI
+	}
+	return ids, nil
+}
+
+func getGatewayEUI(flagSet *pflag.FlagSet, args []string, requireEUI bool) (*ttnpb.GatewayIdentifiers, error) {
+	gatewayEUIHex, _ := flagSet.GetString("gateway-eui")
+	switch len(args) {
+	case 0:
+	case 1:
+		gatewayEUIHex = args[0]
+	default:
+		logger.Warn("Multiple EUIs found in arguments, considering the first")
+		gatewayEUIHex = args[0]
+	}
+	if gatewayEUIHex == "" && requireEUI {
+		return nil, errNoGatewayEUI.New()
+	}
+	ids := &ttnpb.GatewayIdentifiers{}
 	if gatewayEUIHex != "" {
 		var gatewayEUI ttntypes.EUI64
 		if err := gatewayEUI.UnmarshalText([]byte(gatewayEUIHex)); err != nil {
@@ -227,7 +254,7 @@ var (
 
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
-				return errNoCollaborator
+				return errNoCollaborator.New()
 			}
 			var gateway ttnpb.Gateway
 			if inputDecoder != nil {
@@ -267,7 +294,7 @@ var (
 			}
 
 			if gateway.GatewayID == "" {
-				return errNoGatewayID
+				return errNoGatewayID.New()
 			}
 
 			var antenna ttnpb.GatewayAntenna
@@ -340,7 +367,7 @@ var (
 					res.Antennas = append(res.Antennas, ttnpb.GatewayAntenna{})
 					antennaIndex = len(res.Antennas) - 1
 				} else if antennaIndex > len(res.Antennas) {
-					return errAntennaIndex
+					return errAntennaIndex.New()
 				}
 				if antennaRemove {
 					gateway.Antennas = append(res.Antennas[:antennaIndex], res.Antennas[antennaIndex+1:]...)
@@ -432,7 +459,7 @@ var (
 			}
 
 			if gsMismatch := compareServerAddressGateway(gateway, config); gsMismatch {
-				return errAddressMismatchGateway
+				return errAddressMismatchGateway.New()
 			}
 
 			gs, err := api.Dial(ctx, config.GatewayServerGRPCAddress)
@@ -470,7 +497,7 @@ var (
 				return err
 			}
 			if !confirmChoice(gatewayPurgeWarning, force) {
-				return errNoConfirmation
+				return errNoConfirmation.New()
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {

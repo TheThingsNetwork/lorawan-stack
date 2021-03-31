@@ -348,6 +348,378 @@ var _ interface {
 	ErrorName() string
 } = AuthorizeApplicationRequestValidationError{}
 
+// ValidateFields checks the field values on CUPSRedirection with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CUPSRedirection) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = CUPSRedirectionFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "target_cups_uri":
+			// no validation rules for TargetCUPSURI
+		case "current_gateway_key":
+
+			if utf8.RuneCountInString(m.GetCurrentGatewayKey()) > 2048 {
+				return CUPSRedirectionValidationError{
+					field:  "current_gateway_key",
+					reason: "value length must be at most 2048 runes",
+				}
+			}
+
+		default:
+			return CUPSRedirectionValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// CUPSRedirectionValidationError is the validation error returned by
+// CUPSRedirection.ValidateFields if the designated constraints aren't met.
+type CUPSRedirectionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CUPSRedirectionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CUPSRedirectionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CUPSRedirectionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CUPSRedirectionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CUPSRedirectionValidationError) ErrorName() string { return "CUPSRedirectionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e CUPSRedirectionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCUPSRedirection.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CUPSRedirectionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CUPSRedirectionValidationError{}
+
+// ValidateFields checks the field values on ClaimGatewayRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ClaimGatewayRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ClaimGatewayRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "collaborator":
+
+			if v, ok := interface{}(&m.Collaborator).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ClaimGatewayRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "target_gateway_id":
+
+			if utf8.RuneCountInString(m.GetTargetGatewayID()) > 36 {
+				return ClaimGatewayRequestValidationError{
+					field:  "target_gateway_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_ClaimGatewayRequest_TargetGatewayID_Pattern.MatchString(m.GetTargetGatewayID()) {
+				return ClaimGatewayRequestValidationError{
+					field:  "target_gateway_id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$\"",
+				}
+			}
+
+		case "target_gateway_server_address":
+
+			if !_ClaimGatewayRequest_TargetGatewayServerAddress_Pattern.MatchString(m.GetTargetGatewayServerAddress()) {
+				return ClaimGatewayRequestValidationError{
+					field:  "target_gateway_server_address",
+					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
+				}
+			}
+
+		case "cups_redirection":
+
+			if v, ok := interface{}(m.GetCUPSRedirection()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ClaimGatewayRequestValidationError{
+						field:  "cups_redirection",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "source_gateway":
+			if m.SourceGateway == nil {
+				return ClaimGatewayRequestValidationError{
+					field:  "source_gateway",
+					reason: "value is required",
+				}
+			}
+			if len(subs) == 0 {
+				subs = []string{
+					"authenticated_identifiers", "qr_code",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "authenticated_identifiers":
+					w, ok := m.SourceGateway.(*ClaimGatewayRequest_AuthenticatedIdentifiers_)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetAuthenticatedIdentifiers()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ClaimGatewayRequestValidationError{
+								field:  "authenticated_identifiers",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "qr_code":
+					w, ok := m.SourceGateway.(*ClaimGatewayRequest_QRCode)
+					if !ok || w == nil {
+						continue
+					}
+
+					if l := len(m.GetQRCode()); l < 0 || l > 1024 {
+						return ClaimGatewayRequestValidationError{
+							field:  "qr_code",
+							reason: "value length must be between 0 and 1024 bytes, inclusive",
+						}
+					}
+
+				}
+			}
+		default:
+			return ClaimGatewayRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ClaimGatewayRequestValidationError is the validation error returned by
+// ClaimGatewayRequest.ValidateFields if the designated constraints aren't met.
+type ClaimGatewayRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClaimGatewayRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClaimGatewayRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClaimGatewayRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClaimGatewayRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClaimGatewayRequestValidationError) ErrorName() string {
+	return "ClaimGatewayRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ClaimGatewayRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClaimGatewayRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClaimGatewayRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClaimGatewayRequestValidationError{}
+
+var _ClaimGatewayRequest_TargetGatewayID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+
+var _ClaimGatewayRequest_TargetGatewayServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
+
+// ValidateFields checks the field values on AuthorizeGatewayRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *AuthorizeGatewayRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = AuthorizeGatewayRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_ids":
+
+			if v, ok := interface{}(&m.GatewayIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return AuthorizeGatewayRequestValidationError{
+						field:  "gateway_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "api_key":
+
+			if utf8.RuneCountInString(m.GetAPIKey()) < 1 {
+				return AuthorizeGatewayRequestValidationError{
+					field:  "api_key",
+					reason: "value length must be at least 1 runes",
+				}
+			}
+
+		default:
+			return AuthorizeGatewayRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// AuthorizeGatewayRequestValidationError is the validation error returned by
+// AuthorizeGatewayRequest.ValidateFields if the designated constraints aren't met.
+type AuthorizeGatewayRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AuthorizeGatewayRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AuthorizeGatewayRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AuthorizeGatewayRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AuthorizeGatewayRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AuthorizeGatewayRequestValidationError) ErrorName() string {
+	return "AuthorizeGatewayRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AuthorizeGatewayRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAuthorizeGatewayRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AuthorizeGatewayRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AuthorizeGatewayRequestValidationError{}
+
 // ValidateFields checks the field values on
 // ClaimEndDeviceRequest_AuthenticatedIdentifiers with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -448,3 +820,97 @@ var _ interface {
 } = ClaimEndDeviceRequest_AuthenticatedIdentifiersValidationError{}
 
 var _ClaimEndDeviceRequest_AuthenticatedIdentifiers_AuthenticationCode_Pattern = regexp.MustCompile("^[A-Z0-9]{1,32}$")
+
+// ValidateFields checks the field values on
+// ClaimGatewayRequest_AuthenticatedIdentifiers with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ClaimGatewayRequest_AuthenticatedIdentifiersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_eui":
+			// no validation rules for GatewayEUI
+		case "authentication_code":
+
+			if len(m.GetAuthenticationCode()) > 2048 {
+				return ClaimGatewayRequest_AuthenticatedIdentifiersValidationError{
+					field:  "authentication_code",
+					reason: "value length must be at most 2048 bytes",
+				}
+			}
+
+		default:
+			return ClaimGatewayRequest_AuthenticatedIdentifiersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ClaimGatewayRequest_AuthenticatedIdentifiersValidationError is the
+// validation error returned by
+// ClaimGatewayRequest_AuthenticatedIdentifiers.ValidateFields if the
+// designated constraints aren't met.
+type ClaimGatewayRequest_AuthenticatedIdentifiersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClaimGatewayRequest_AuthenticatedIdentifiersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClaimGatewayRequest_AuthenticatedIdentifiersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClaimGatewayRequest_AuthenticatedIdentifiersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClaimGatewayRequest_AuthenticatedIdentifiersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClaimGatewayRequest_AuthenticatedIdentifiersValidationError) ErrorName() string {
+	return "ClaimGatewayRequest_AuthenticatedIdentifiersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ClaimGatewayRequest_AuthenticatedIdentifiersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClaimGatewayRequest_AuthenticatedIdentifiers.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClaimGatewayRequest_AuthenticatedIdentifiersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClaimGatewayRequest_AuthenticatedIdentifiersValidationError{}
