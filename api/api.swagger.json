@@ -10342,19 +10342,6 @@
         }
       }
     },
-    "ExampleInput": {
-      "type": "object",
-      "properties": {
-        "f_port": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "frm_payload": {
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
     "FirmwareVersionProfile": {
       "type": "object",
       "properties": {
@@ -10936,7 +10923,7 @@
           "type": "string"
         },
         "input": {
-          "$ref": "#/definitions/ExampleInput"
+          "type": "object"
         },
         "output": {
           "type": "object"

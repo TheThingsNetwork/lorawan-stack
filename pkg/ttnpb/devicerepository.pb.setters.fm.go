@@ -1379,28 +1379,12 @@ func (dst *MessagePayloadFormatter_Example) SetFields(src *MessagePayloadFormatt
 			}
 		case "input":
 			if len(subs) > 0 {
-				var newDst, newSrc *MessagePayloadFormatter_Example_Input
-				if (src == nil || src.Input == nil) && dst.Input == nil {
-					continue
-				}
-				if src != nil {
-					newSrc = src.Input
-				}
-				if dst.Input != nil {
-					newDst = dst.Input
-				} else {
-					newDst = &MessagePayloadFormatter_Example_Input{}
-					dst.Input = newDst
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
+				return fmt.Errorf("'input' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Input = src.Input
 			} else {
-				if src != nil {
-					dst.Input = src.Input
-				} else {
-					dst.Input = nil
-				}
+				dst.Input = nil
 			}
 		case "output":
 			if len(subs) > 0 {
@@ -1410,36 +1394,6 @@ func (dst *MessagePayloadFormatter_Example) SetFields(src *MessagePayloadFormatt
 				dst.Output = src.Output
 			} else {
 				dst.Output = nil
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *MessagePayloadFormatter_Example_Input) SetFields(src *MessagePayloadFormatter_Example_Input, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "f_port":
-			if len(subs) > 0 {
-				return fmt.Errorf("'f_port' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.FPort = src.FPort
-			} else {
-				var zero uint32
-				dst.FPort = zero
-			}
-		case "frm_payload":
-			if len(subs) > 0 {
-				return fmt.Errorf("'frm_payload' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.FRMPayload = src.FRMPayload
-			} else {
-				dst.FRMPayload = nil
 			}
 
 		default:

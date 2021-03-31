@@ -647,7 +647,10 @@ func TestGRPC(t *testing.T) {
 
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
-			st.uplinkDecoder = ttnpb.NewPopulatedMessagePayloadFormatter(test.Randy, true)
+			st.uplinkDecoder = &ttnpb.MessagePayloadFormatter{
+				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+				FormatterParameter: "uplink decoder",
+			}
 			st.err = nil
 
 			c, err := cl.GetUplinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
@@ -690,7 +693,10 @@ func TestGRPC(t *testing.T) {
 
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
-			st.downlinkDecoder = ttnpb.NewPopulatedMessagePayloadFormatter(test.Randy, true)
+			st.downlinkDecoder = &ttnpb.MessagePayloadFormatter{
+				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+				FormatterParameter: "downlink decoder script",
+			}
 			st.err = nil
 
 			c, err := cl.GetDownlinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
@@ -733,7 +739,10 @@ func TestGRPC(t *testing.T) {
 
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
-			st.downlinkEncoder = ttnpb.NewPopulatedMessagePayloadFormatter(test.Randy, true)
+			st.downlinkEncoder = &ttnpb.MessagePayloadFormatter{
+				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+				FormatterParameter: "downlink encoder script",
+			}
 			st.err = nil
 
 			c, err := cl.GetDownlinkEncoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{

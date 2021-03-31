@@ -344,8 +344,6 @@ var EndDeviceModel_Compliances_ComplianceFieldPathsTopLevel = []string{
 var MessagePayloadFormatter_ExampleFieldPathsNested = []string{
 	"description",
 	"input",
-	"input.f_port",
-	"input.frm_payload",
 	"output",
 }
 
@@ -353,13 +351,4 @@ var MessagePayloadFormatter_ExampleFieldPathsTopLevel = []string{
 	"description",
 	"input",
 	"output",
-}
-var MessagePayloadFormatter_Example_InputFieldPathsNested = []string{
-	"f_port",
-	"frm_payload",
-}
-
-var MessagePayloadFormatter_Example_InputFieldPathsTopLevel = []string{
-	"f_port",
-	"frm_payload",
 }

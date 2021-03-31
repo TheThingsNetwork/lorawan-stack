@@ -317,11 +317,7 @@ message MessagePayloadFormatter {
 
   message Example {
     string description = 1;
-    message Input {
-      uint32 f_port = 1 [(validate.rules).uint32.lte = 255];
-      bytes frm_payload = 2 [(gogoproto.customname) = "FRMPayload"];
-    };
-    Input input = 2;
+    google.protobuf.Struct input = 2;
     google.protobuf.Struct output = 3;
   }
   // Examples

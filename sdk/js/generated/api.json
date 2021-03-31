@@ -9671,9 +9671,9 @@
               "name": "input",
               "description": "",
               "label": "",
-              "type": "Input",
-              "longType": "MessagePayloadFormatter.Example.Input",
-              "fullType": "ttn.lorawan.v3.MessagePayloadFormatter.Example.Input",
+              "type": "Struct",
+              "longType": "google.protobuf.Struct",
+              "fullType": "google.protobuf.Struct",
               "ismap": false,
               "defaultValue": ""
             },
@@ -9684,45 +9684,6 @@
               "type": "Struct",
               "longType": "google.protobuf.Struct",
               "fullType": "google.protobuf.Struct",
-              "ismap": false,
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "Input",
-          "longName": "MessagePayloadFormatter.Example.Input",
-          "fullName": "ttn.lorawan.v3.MessagePayloadFormatter.Example.Input",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "f_port",
-              "description": "",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "uint32.lte",
-                    "value": 255
-                  }
-                ]
-              }
-            },
-            {
-              "name": "frm_payload",
-              "description": "",
-              "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
               "ismap": false,
               "defaultValue": ""
             }

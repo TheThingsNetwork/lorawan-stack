@@ -445,12 +445,9 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 }
 
 type EndDeviceCodecExample struct {
-	Description string `yaml:"description"`
-	Input       struct {
-		FPort uint32 `yaml:"fPort"`
-		Bytes []byte `yaml:"bytes"`
-	} `yaml:"input"`
-	Output map[string]interface{} `yaml:"output"`
+	Description string                 `yaml:"description"`
+	Input       map[string]interface{} `yaml:"input"`
+	Output      map[string]interface{} `yaml:"output"`
 }
 
 // EndDeviceCodecs is the format of the `vendor/<vendor>/<codec-id>.yaml` files.
