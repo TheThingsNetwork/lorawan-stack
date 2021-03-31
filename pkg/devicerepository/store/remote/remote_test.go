@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/remote"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -416,6 +417,85 @@ func TestRemoteStore(t *testing.T) {
 				})
 			})
 		}
+
+		t.Run("Examples", func(t *testing.T) {
+			for _, tc := range []struct {
+				name     string
+				codec    string
+				f        func(store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error)
+				examples []*ttnpb.MessagePayloadFormatter_Example
+			}{
+				{
+					name:  "UplinkDecoder",
+					codec: "// uplink decoder\n",
+					f:     s.GetUplinkDecoder,
+					examples: []*ttnpb.MessagePayloadFormatter_Example{{
+						Description: "dummy example",
+						Input: mustStruct(map[string]interface{}{
+							"fPort": 10,
+							"bytes": []int{1, 1, 100},
+						}),
+						Output: mustStruct(map[string]interface{}{
+							"type":  "BATTERY_STATUS",
+							"value": 100,
+						}),
+					}},
+				},
+				{
+					name:  "DownlinkDecoder",
+					codec: "// downlink decoder\n",
+					f:     s.GetDownlinkDecoder,
+					examples: []*ttnpb.MessagePayloadFormatter_Example{{
+						Description: "downlink decode example",
+						Input: mustStruct(map[string]interface{}{
+							"action": "DIM",
+							"value":  5,
+						}),
+						Output: mustStruct(map[string]interface{}{
+							"fPort": 20,
+							"bytes": []int{1, 5},
+						}),
+					}},
+				},
+				{
+					name:  "DownlinkEncoder",
+					codec: "// downlink encoder\n",
+					f:     s.GetDownlinkEncoder,
+					examples: []*ttnpb.MessagePayloadFormatter_Example{{
+						Description: "downlink encode example",
+						Input: mustStruct(map[string]interface{}{
+							"fPort": 20,
+							"bytes": []int{1, 5},
+						}),
+						Output: mustStruct(map[string]interface{}{
+							"action": "DIM",
+							"value":  5,
+						}),
+					}},
+				},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					a := assertions.New(t)
+
+					versionIDs := &ttnpb.EndDeviceVersionIdentifiers{
+						BrandID:         "foo-vendor",
+						ModelID:         "dev2",
+						FirmwareVersion: "1.1",
+						BandID:          "EU_433",
+					}
+					codec, err := tc.f(store.GetCodecRequest{
+						VersionIDs: versionIDs,
+						Paths:      []string{"examples"},
+					})
+					a.So(err, should.BeNil)
+					a.So(codec, should.Resemble, &ttnpb.MessagePayloadFormatter{
+						Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+						FormatterParameter: tc.codec,
+						Examples:           tc.examples,
+					})
+				})
+			}
+		})
 	})
 
 	t.Run("GetTemplate", func(t *testing.T) {
@@ -461,4 +541,12 @@ func TestRemoteStore(t *testing.T) {
 			a.So(tmpl, should.NotBeNil)
 		})
 	})
+}
+
+func mustStruct(d map[string]interface{}) *pbtypes.Struct {
+	v, err := gogoproto.Struct(d)
+	if err != nil {
+		panic(err)
+	}
+	return v
 }
