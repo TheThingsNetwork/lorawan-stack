@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/web/middleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
@@ -37,8 +38,14 @@ type Server interface {
 	Logout(c echo.Context) error
 }
 
+// Component represents the Component to the Account app.
+type Component interface {
+	Context() context.Context
+	RateLimiter() ratelimit.Interface
+}
+
 type server struct {
-	ctx     context.Context
+	c       Component
 	config  oauth.Config
 	store   Store
 	session sess.Session
@@ -53,9 +60,9 @@ type Store interface {
 }
 
 // NewServer returns a new account app on top of the given store.
-func NewServer(ctx context.Context, store Store, config oauth.Config) Server {
+func NewServer(c Component, store Store, config oauth.Config) Server {
 	s := &server{
-		ctx:     ctx,
+		c:       c,
 		config:  config,
 		store:   store,
 		session: sess.Session{Store: store},
@@ -80,13 +87,14 @@ func (s *server) configFromContext(ctx context.Context) *oauth.Config {
 }
 
 func (s *server) Printf(format string, v ...interface{}) {
-	log.FromContext(s.ctx).Warnf(format, v...)
+	log.FromContext(s.c.Context()).Warnf(format, v...)
 }
 
 func (s *server) RegisterRoutes(server *web.Server) {
 	csrfMiddleware := middleware.CSRF("_csrf", "/", s.config.CSRFAuthKey)
 	root := server.Group(
 		s.config.Mount,
+		ratelimit.EchoMiddleware(s.c.RateLimiter(), "http:account"),
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
 				config := s.configFromContext(c.Request().Context())

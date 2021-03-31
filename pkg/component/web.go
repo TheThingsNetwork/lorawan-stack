@@ -25,6 +25,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/heptiolabs/healthcheck"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 )
@@ -70,6 +71,7 @@ func (c *Component) initWeb() error {
 
 	if c.config.HTTP.PProf.Enable {
 		g := web.RootRouter().NewRoute().Subrouter()
+		g.Use(ratelimit.HTTPMiddleware(c.RateLimiter(), "http:pprof"))
 		if c.config.HTTP.PProf.Password != "" {
 			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
 				"pprof",
@@ -84,6 +86,7 @@ func (c *Component) initWeb() error {
 
 	if c.config.HTTP.Metrics.Enable {
 		g := web.RootRouter().NewRoute().Subrouter()
+		g.Use(ratelimit.HTTPMiddleware(c.RateLimiter(), "http:metrics"))
 		if c.config.HTTP.Metrics.Password != "" {
 			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
 				"metrics",
@@ -96,6 +99,7 @@ func (c *Component) initWeb() error {
 	if c.config.HTTP.Health.Enable {
 		g := web.RootRouter().NewRoute().Subrouter()
 		if c.config.HTTP.Health.Password != "" {
+			g.Use(ratelimit.HTTPMiddleware(c.RateLimiter(), "http:health"))
 			g.Use(mux.MiddlewareFunc(webmiddleware.BasicAuth(
 				"health",
 				webmiddleware.AuthUser(healthUsername, c.config.HTTP.Health.Password),
