@@ -52,6 +52,7 @@
 /pkg/web @bafonins @kschiffer @pgalic96
 /pkg/webmiddleware @htdvisser @bafonins @kschiffer
 /pkg/webui @bafonins @kschiffer @pgalic96
+/pkg/ratelimit @johanstokking @htdvisser @neoaggelos
 
 # Subsystems
 

@@ -2258,6 +2258,15 @@
       "file": "webhooks.go"
     }
   },
+  "error:pkg/applicationserver/io/web:rate_limit_exceeded": {
+    "translations": {
+      "en": "rate limit exceeded"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "middleware.go"
+    }
+  },
   "error:pkg/applicationserver/io/web:read_body": {
     "translations": {
       "en": "read body"
@@ -7305,6 +7314,15 @@
     "description": {
       "package": "pkg/qrcodegenerator",
       "file": "qrcodegenerator.go"
+    }
+  },
+  "error:pkg/ratelimit:rate_limit_exceeded": {
+    "translations": {
+      "en": "rate limit of `{rate}` accesses per minute exceeded for resource `{key}`"
+    },
+    "description": {
+      "package": "pkg/ratelimit",
+      "file": "config.go"
     }
   },
   "error:pkg/redis:decode": {
