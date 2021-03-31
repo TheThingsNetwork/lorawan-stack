@@ -102,6 +102,14 @@ func AES128KeyPtr(key types.AES128Key) *types.AES128Key {
 	return &key
 }
 
+func MACStatePtr(v ttnpb.MACState) *ttnpb.MACState {
+	return &v
+}
+
+func Band(fpID string, phyVer ttnpb.PHYVersion) band.Band {
+	return *LoRaWANBands[test.FrequencyPlan(fpID).BandID][phyVer]
+}
+
 var (
 	DefaultGatewayAntennaIdentifiers = [...]ttnpb.GatewayAntennaIdentifiers{
 		{
@@ -445,20 +453,25 @@ func MakeDownlinkMACBuffer(phy *band.Band, cmds ...MACCommander) []byte {
 
 var SessionKeysOptions = test.SessionKeysOptions
 
-func MakeSessionKeys(macVersion ttnpb.MACVersion, wrapKeys bool, opts ...test.SessionKeysOption) *ttnpb.SessionKeys {
+func MakeSessionKeys(macVersion ttnpb.MACVersion, wrapKeys, withID bool, opts ...test.SessionKeysOption) *ttnpb.SessionKeys {
 	defaultKeyOpt := SessionKeysOptions.WithDefaultNwkKeys
 	if wrapKeys {
 		defaultKeyOpt = SessionKeysOptions.WithDefaultNwkKeysWrapped
 	}
+	var id []byte
+	if withID {
+		id = test.DefaultSessionKeyID
+	}
 	return test.MakeSessionKeys(
 		defaultKeyOpt(macVersion),
+		SessionKeysOptions.WithSessionKeyID(id),
 		SessionKeysOptions.Compose(opts...),
 	)
 }
 
 func messageGenerationKeys(sk *ttnpb.SessionKeys, macVersion ttnpb.MACVersion) ttnpb.SessionKeys {
 	if sk == nil {
-		return *MakeSessionKeys(macVersion, false)
+		return *MakeSessionKeys(macVersion, false, false)
 	}
 	decrypt := func(ke *ttnpb.KeyEnvelope) *types.AES128Key {
 		switch {

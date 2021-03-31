@@ -92,7 +92,7 @@ func TestNewMACState(t *testing.T) {
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DesiredParameters = macState.CurrentParameters
 				macState.DeviceClass = ttnpb.CLASS_B
 				return macState
 			}(),
@@ -114,7 +114,7 @@ func TestNewMACState(t *testing.T) {
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DesiredParameters = macState.CurrentParameters
 				macState.DeviceClass = ttnpb.CLASS_C
 				return macState
 			}(),
@@ -173,7 +173,7 @@ func TestNewMACState(t *testing.T) {
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DesiredParameters = macState.CurrentParameters
 				macState.DeviceClass = ttnpb.CLASS_B
 				return macState
 			}(),
@@ -195,7 +195,7 @@ func TestNewMACState(t *testing.T) {
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DesiredParameters = macState.CurrentParameters
 				macState.DeviceClass = ttnpb.CLASS_C
 				return macState
 			}(),

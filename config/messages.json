@@ -6641,6 +6641,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:field_is_zero": {
+    "translations": {
+      "en": "field `{name}` is zero"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
   "error:pkg/networkserver:field_mask": {
     "translations": {
       "en": "invalid field mask"
@@ -6648,6 +6657,15 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:field_not_zero": {
+    "translations": {
+      "en": "field `{name}` is not zero"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_deviceregistry.go"
     }
   },
   "error:pkg/networkserver:field_value": {

@@ -570,7 +570,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 
 	if !a.So(env.AssertListApplicationRights(reqCtx, req.EndDevice.ApplicationIdentifiers, authType, authValue, rights...), should.BeTrue) {
 		t.Error("ListRights assertion failed")
-		return nil, nil, false
+		return nil, err, false
 	}
 
 	action := "create"
@@ -582,7 +582,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 	select {
 	case <-ctx.Done():
 		t.Errorf("Timed out while waiting for device %s event to be published or Set call to return", action)
-		return nil, nil, false
+		return nil, err, false
 
 	case <-reqCtx.Done():
 		if err == nil {
@@ -596,7 +596,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 			events.WithIdentifiers(req.EndDevice.EndDeviceIdentifiers),
 		)) {
 			t.Errorf("Failed to assert device %s event", action)
-			return nil, nil, false
+			return nil, err, false
 		}
 		close(ev.Response)
 	}
@@ -604,7 +604,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 	select {
 	case <-ctx.Done():
 		t.Error("Timed out while waiting for Set call to return")
-		return nil, nil, false
+		return nil, err, false
 
 	case <-reqCtx.Done():
 		return dev, err, true
@@ -2027,25 +2027,152 @@ func (o SessionOptionNamespace) WithDefaultQueuedApplicationDownlinks() test.Ses
 
 var SessionOptions SessionOptionNamespace
 
-func MakeSession(macVersion ttnpb.MACVersion, wrapKeys bool, opts ...test.SessionOption) *ttnpb.Session {
+func MakeSession(macVersion ttnpb.MACVersion, wrapKeys, withID bool, opts ...test.SessionOption) *ttnpb.Session {
 	return test.MakeSession(
-		SessionOptions.WithSessionKeys(*MakeSessionKeys(macVersion, wrapKeys)),
+		SessionOptions.WithSessionKeys(*MakeSessionKeys(macVersion, wrapKeys, withID)),
 		SessionOptions.Compose(opts...),
 	)
 }
 
 type EndDeviceOptionNamespace struct{ test.EndDeviceOptionNamespace }
 
+func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wrapKeys bool) test.EndDeviceOption {
+	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+		if !x.SupportsJoin {
+			panic("join request requested for non-OTAA device")
+		}
+		phy := Band(x.FrequencyPlanID, x.LoRaWANPHYVersion)
+		drIdx := func() ttnpb.DataRateIndex {
+			for idx := ttnpb.DATA_RATE_0; idx <= ttnpb.DATA_RATE_15; idx++ {
+				if _, ok := phy.DataRates[idx]; ok {
+					return idx
+				}
+			}
+			panic("no data rates")
+		}()
+		macState := MakeMACState(&x, defaults,
+			MACStateOptions.WithRxWindowsAvailable(true),
+			MACStateOptions.WithRecentUplinks(
+				MakeJoinRequest(JoinRequestConfig{
+					DecodePayload:  true,
+					JoinEUI:        *x.JoinEUI,
+					DevEUI:         *x.DevEUI,
+					CorrelationIDs: []string{"join-request"},
+					MIC:            [4]byte{0x42, 0xff, 0xff, 0xff},
+					DataRateIndex:  drIdx,
+					DataRate:       phy.DataRates[drIdx].Rate, // TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/3997)
+					Frequency:      phy.UplinkChannels[0].Frequency,
+				}),
+			),
+		)
+		return o.WithPendingMACState(MACStatePtr(MACStateOptions.WithQueuedJoinAccept(&ttnpb.MACState_JoinAccept{
+			Payload: bytes.Repeat([]byte{0xff}, 17),
+			Request: ttnpb.MACState_JoinRequest{
+				DownlinkSettings: ttnpb.DLSettings{
+					Rx1DROffset: macState.DesiredParameters.Rx1DataRateOffset,
+					Rx2DR:       macState.DesiredParameters.Rx2DataRateIndex,
+					OptNeg:      x.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+				},
+				RxDelay: macState.DesiredParameters.Rx1Delay,
+				CFList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanID), x.LoRaWANPHYVersion),
+			},
+			Keys:           *MakeSessionKeys(x.LoRaWANVersion, wrapKeys, true),
+			DevAddr:        test.DefaultDevAddr,
+			NetID:          test.DefaultNetID,
+			CorrelationIDs: []string{"join-request"},
+		})(*macState)))(x)
+	}
+}
+
+func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriority) test.EndDeviceOption {
+	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+		if !x.SupportsJoin {
+			panic("join accept requested for non-OTAA device")
+		}
+		if x.PendingMACState == nil {
+			panic("PendingMACState is nil")
+		}
+		return o.Compose(
+			o.WithPendingSession(&ttnpb.Session{
+				DevAddr: x.PendingMACState.QueuedJoinAccept.DevAddr,
+				SessionKeys: ttnpb.SessionKeys{
+					SessionKeyID: x.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+					FNwkSIntKey:  x.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey,
+					SNwkSIntKey:  x.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey,
+					NwkSEncKey:   x.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey,
+				},
+			}),
+			o.WithPendingMACStateOptions(
+				MACStateOptions.WithPendingJoinRequest(&x.PendingMACState.QueuedJoinAccept.Request),
+				MACStateOptions.WithQueuedJoinAccept(nil),
+				MACStateOptions.WithRxWindowsAvailable(false),
+				MACStateOptions.AppendRecentDownlinks(&ttnpb.DownlinkMessage{
+					RawPayload: x.PendingMACState.QueuedJoinAccept.Payload,
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_JOIN_ACCEPT,
+							Major: ttnpb.Major_LORAWAN_R1,
+						},
+						Payload: &ttnpb.Message_JoinAcceptPayload{
+							JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
+								NetID:      x.PendingMACState.QueuedJoinAccept.NetID,
+								DevAddr:    x.PendingMACState.QueuedJoinAccept.DevAddr,
+								DLSettings: x.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
+								RxDelay:    x.PendingMACState.QueuedJoinAccept.Request.RxDelay,
+								CFList:     x.PendingMACState.QueuedJoinAccept.Request.CFList,
+							},
+						},
+					},
+					EndDeviceIDs: &x.EndDeviceIdentifiers,
+					Settings: &ttnpb.DownlinkMessage_Request{
+						Request: &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
+							Priority:         priority,
+							FrequencyPlanID:  x.FrequencyPlanID,
+							Rx1Delay:         ttnpb.RxDelay(Band(x.FrequencyPlanID, x.LoRaWANPHYVersion).JoinAcceptDelay1 / time.Second),
+							Rx2DataRateIndex: x.PendingMACState.CurrentParameters.Rx2DataRateIndex,
+							Rx2Frequency:     x.PendingMACState.CurrentParameters.Rx2Frequency,
+							// TODO: Generate RX1 transmission parameters if necessary.
+							// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
+						},
+					},
+					CorrelationIDs: []string{"join-accept"},
+				}),
+			),
+		)(x)
+	}
+}
+
 func (o EndDeviceOptionNamespace) Activate(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts ...test.MACStateOption) test.EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		macState := MakeMACState(&x, defaults, macStateOpts...)
-		ses := MakeSession(macState.LoRaWANVersion, wrapKeys, sessionOpts...)
+		if !x.SupportsJoin {
+			macState := MakeMACState(&x, defaults, macStateOpts...)
+			ses := MakeSession(macState.LoRaWANVersion, wrapKeys, false, sessionOpts...)
+			return o.Compose(
+				o.WithMACState(macState),
+				o.WithSession(ses),
+				o.WithEndDeviceIdentifiersOptions(
+					test.EndDeviceIdentifiersOptions.WithDevAddr(&ses.DevAddr),
+				),
+			)(x)
+		}
 		return o.Compose(
-			o.WithMACState(macState),
-			o.WithSession(ses),
-			o.WithEndDeviceIdentifiersOptions(
-				test.EndDeviceIdentifiersOptions.WithDevAddr(&ses.DevAddr),
-			),
+			o.SendJoinRequest(defaults, wrapKeys),
+			o.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
+			// TODO: Send uplink including MAC commands depending on the version.
+			// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
+			func(x ttnpb.EndDevice) ttnpb.EndDevice {
+				return o.Compose(
+					o.WithEndDeviceIdentifiersOptions(
+						test.EndDeviceIdentifiersOptions.WithDevAddr(&x.PendingSession.DevAddr),
+					),
+					o.WithMACState(x.PendingMACState),
+					o.WithSession(x.PendingSession),
+				)(x)
+			},
+			o.WithMACStateOptions(MACStateOptions.WithPendingJoinRequest(nil)),
+			o.WithPendingMACState(nil),
+			o.WithPendingSession(nil),
 		)(x)
 	}
 }
@@ -2127,24 +2254,27 @@ func MakeABPEndDevicePaths(withDevEUI bool, paths ...string) []string {
 		}, paths...)
 	}
 	return MakeEndDevicePaths(append([]string{
-		"mac_state.lorawan_version",
+		"session.dev_addr",
 		"session.keys.f_nwk_s_int_key.key",
-		"session.keys.nwk_s_int.key",
+		"session.keys.nwk_s_enc_key.key",
 		"session.keys.s_nwk_s_int_key.key",
 		"session.keys.session_key_id",
 	}, paths...)...)
 }
 
 func MakeMulticastEndDevicePaths(supportsClassB, supportsClassC bool, paths ...string) []string {
+	paths = append([]string{
+		"multicast",
+	}, paths...)
 	if supportsClassB {
-		paths = append([]string{
+		paths = append(paths,
 			"supports_class_b",
-		}, paths...)
+		)
 	}
 	if supportsClassC {
-		paths = append([]string{
+		paths = append(paths,
 			"supports_class_c",
-		}, paths...)
+		)
 	}
 	return MakeABPEndDevicePaths(false, paths...)
 }
@@ -2190,10 +2320,7 @@ type ContextualEndDevice struct {
 }
 
 func MustCreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, context.Context) {
-	dev, ctx, err := CreateDevice(ctx, r, dev, ttnpb.ExcludeFields(ttnpb.EndDeviceFieldPathsTopLevel,
-		"created_at",
-		"updated_at",
-	)...)
+	dev, ctx, err := CreateDevice(ctx, r, dev, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.NsEndDeviceRegistry/Set"].Allowed...)
 	test.Must(nil, err)
 	return dev, ctx
 }
