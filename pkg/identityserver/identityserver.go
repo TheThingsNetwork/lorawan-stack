@@ -116,7 +116,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		OAuthStore:       store.GetOAuthStore(is.db),
 	}, is.config.OAuth)
 
-	is.account = account.NewServer(is.Context(), struct {
+	is.account = account.NewServer(c, struct {
 		store.UserStore
 		store.LoginTokenStore
 		store.UserSessionStore

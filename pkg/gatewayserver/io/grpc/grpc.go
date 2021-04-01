@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -107,7 +108,13 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 	}
 
 	go func() {
+		resource := ratelimit.GatewayUpResource(ctx, ids)
 		for {
+			if err := ratelimit.Require(s.server.RateLimiter(), resource); err != nil {
+				logger.WithError(err).Warn("Terminate connection")
+				conn.Disconnect(err)
+				return
+			}
 			msg, err := link.Recv()
 			if err != nil {
 				if !errors.IsCanceled(err) {

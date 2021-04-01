@@ -28,6 +28,7 @@ import (
 	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/web/middleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
@@ -202,6 +203,7 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 func (s *server) RegisterRoutes(server *web.Server) {
 	root := server.Group(
 		s.config.Mount,
+		ratelimit.EchoMiddleware(s.c.RateLimiter(), "http:oauth"),
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
 				config := s.configFromContext(c.Request().Context())

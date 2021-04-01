@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
@@ -92,6 +93,7 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 
 	middleware := []webmiddleware.MiddlewareFunc{
 		webmiddleware.Namespace("gatewayconfigurationserver/v2"),
+		ratelimit.HTTPMiddleware(s.component.RateLimiter(), "http:gcs"),
 		rewriteAuthorization,
 		webmiddleware.Metadata("Authorization"),
 	}

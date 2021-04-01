@@ -83,7 +83,6 @@ func init() {
 }
 
 func TestAuthentication(t *testing.T) {
-	ctx := test.Context()
 	store := &mockStore{}
 	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	if err != nil {
@@ -99,7 +98,7 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	})
-	s := account.NewServer(ctx, store, oauth.Config{
+	s := account.NewServer(c, store, oauth.Config{
 		Mount:       "/oauth",
 		CSRFAuthKey: []byte("12345678123456781234567812345678"),
 		UI: oauth.UIConfig{

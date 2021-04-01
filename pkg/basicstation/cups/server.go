@@ -28,6 +28,7 @@ import (
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"golang.org/x/sync/singleflight"
@@ -196,7 +197,7 @@ func NewServer(c *component.Component, options ...Option) *Server {
 
 // RegisterRoutes implements web.Registerer
 func (s *Server) RegisterRoutes(web *web.Server) {
-	web.POST("/update-info", s.UpdateInfo)
+	web.POST("/update-info", s.UpdateInfo, ratelimit.EchoMiddleware(s.component.RateLimiter(), "basicstation:cups"))
 }
 
 func getContext(c echo.Context) context.Context {

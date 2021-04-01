@@ -27,6 +27,7 @@ import (
 	gcsv2 "go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/cpf"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/semtechudp"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
@@ -117,6 +118,7 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 	router := server.Prefix(ttnpb.HTTPAPIPrefix + "/gcs/gateways/{gateway_id}/").Subrouter()
 	router.Use(
 		mux.MiddlewareFunc(webmiddleware.Namespace("gatewayconfigurationserver")),
+		ratelimit.HTTPMiddleware(s.Component.RateLimiter(), "http:gcs"),
 		mux.MiddlewareFunc(webmiddleware.Metadata("Authorization")),
 		validateAndFillIDs,
 	)

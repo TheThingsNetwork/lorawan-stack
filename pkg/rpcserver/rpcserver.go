@@ -36,6 +36,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware"
 	rpcfillcontext "go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/fillcontext"
@@ -64,6 +65,7 @@ type options struct {
 	serverOptions      []grpc.ServerOption
 	trustedProxies     []string
 	logIgnoreMethods   []string
+	limiter            ratelimit.Interface
 }
 
 // Option for the gRPC server
@@ -111,6 +113,12 @@ func WithLogIgnoreMethods(methods []string) Option {
 	}
 }
 
+func WithRateLimiter(limiter ratelimit.Interface) Option {
+	return func(o *options) {
+		o.limiter = limiter
+	}
+}
+
 // ErrRPCRecovered is returned when a panic is caught from an RPC.
 var ErrRPCRecovered = errors.DefineInternal("rpc_recovered", "Internal Server Error")
 
@@ -121,6 +129,7 @@ var ErrRPCRecovered = errors.DefineInternal("rpc_recovered", "Internal Server Er
 // logging, sending errors to Sentry, validation, errors, panic recovery
 func New(ctx context.Context, opts ...Option) *Server {
 	options := new(options)
+	options.limiter = &ratelimit.NoopRateLimiter{}
 	for _, opt := range opts {
 		opt(options)
 	}
@@ -154,6 +163,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		metrics.StreamServerInterceptor,
 		errors.StreamServerInterceptor(),
 		// NOTE: All middleware that works with lorawan-stack/pkg/errors errors must be placed below.
+		ratelimit.StreamServerInterceptor(options.limiter),
 		sentrymiddleware.StreamServerInterceptor(),
 		grpc_recovery.StreamServerInterceptor(recoveryOpts...),
 		validator.StreamServerInterceptor(),
@@ -171,6 +181,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		metrics.UnaryServerInterceptor,
 		errors.UnaryServerInterceptor(),
 		// NOTE: All middleware that works with lorawan-stack/pkg/errors errors must be placed below.
+		ratelimit.UnaryServerInterceptor(options.limiter),
 		sentrymiddleware.UnaryServerInterceptor(),
 		grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
 		validator.UnaryServerInterceptor(),
@@ -230,6 +241,14 @@ func New(ctx context.Context, opts ...Option) *Server {
 			switch s {
 			case "x-total-count":
 				return "X-Total-Count", true
+			case "x-rate-limit-limit":
+				return "X-Rate-Limit-Limit", true
+			case "x-rate-limit-available":
+				return "X-Rate-Limit-Available", true
+			case "x-rate-limit-reset":
+				return "X-Rate-Limit-Reset", true
+			case "x-rate-limit-retry":
+				return "X-Rate-Limit-Retry", true
 			case "warning":
 				// NOTE: the "Warning" header in HTTP is specified differently than our "warning" gRPC metadata.
 				return "X-Warning", true

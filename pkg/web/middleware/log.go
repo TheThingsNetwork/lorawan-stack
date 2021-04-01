@@ -15,6 +15,7 @@
 package middleware
 
 import (
+	"net/http"
 	"time"
 
 	echo "github.com/labstack/echo/v4"
@@ -64,9 +65,10 @@ func Log(logger log.Interface) echo.MiddlewareFunc {
 			}
 			logger = logger.WithField("status", statusCode)
 
-			if statusCode >= 500 {
+			switch {
+			case statusCode >= 500:
 				logger.Error("Request error")
-			} else {
+			case statusCode != http.StatusTooManyRequests:
 				logger.Info("Request handled")
 			}
 

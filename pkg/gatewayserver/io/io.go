@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -64,6 +65,8 @@ type Server interface {
 	UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 	// FromRequestContext decouples the lifetime of the provided context from the values found in the context.
 	FromRequestContext(ctx context.Context) context.Context
+	// RateLimiter returns the rate limiter instance.
+	RateLimiter() ratelimit.Interface
 }
 
 // Connection is a connection to a gateway managed by a frontend.

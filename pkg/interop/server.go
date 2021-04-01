@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/web/middleware"
 	yaml "gopkg.in/yaml.v2"
@@ -96,12 +97,18 @@ type Server struct {
 	as  ApplicationServer
 }
 
+// Components represents the Component to the Interop Server.
+type Component interface {
+	Context() context.Context
+	RateLimiter() ratelimit.Interface
+}
+
 // SenderClientCAsConfigurationName represents the filename of sender client CAs configuration.
 const SenderClientCAsConfigurationName = "config.yml"
 
 // NewServer builds a new server.
-func NewServer(ctx context.Context, contextFiller fillcontext.Filler, conf config.InteropServer) (*Server, error) {
-	logger := log.FromContext(ctx).WithField("namespace", "interop")
+func NewServer(c Component, contextFiller fillcontext.Filler, conf config.InteropServer) (*Server, error) {
+	logger := log.FromContext(c.Context()).WithField("namespace", "interop")
 
 	decodeCerts := func(b []byte) (res []*x509.Certificate, err error) {
 		for len(b) > 0 {
@@ -150,7 +157,7 @@ func NewServer(ctx context.Context, contextFiller fillcontext.Filler, conf confi
 			}
 		}
 	} else {
-		fetcher, err := conf.SenderClientCA.Fetcher(ctx)
+		fetcher, err := conf.SenderClientCA.Fetcher(c.Context())
 		if err != nil {
 			return nil, err
 		}
@@ -194,6 +201,7 @@ func NewServer(ctx context.Context, contextFiller fillcontext.Filler, conf confi
 	server.Use(
 		middleware.ID(""),
 		echomiddleware.BodyLimit("16M"),
+		ratelimit.EchoMiddleware(c.RateLimiter(), "http:interop"),
 		middleware.Recover(),
 	)
 	if contextFiller != nil {

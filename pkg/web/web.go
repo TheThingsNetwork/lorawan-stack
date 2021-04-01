@@ -236,10 +236,20 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		mux.MiddlewareFunc(
 			webmiddleware.Conditional(
 				webmiddleware.CORS(webmiddleware.CORSConfig{
-					AllowedHeaders:   []string{"Authorization", "Content-Type", "X-CSRF-Token"},
-					AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete},
-					AllowedOrigins:   []string{"*"},
-					ExposedHeaders:   []string{"Date", "Content-Length", "X-Request-Id", "X-Total-Count", "X-Warning"},
+					AllowedHeaders: []string{"Authorization", "Content-Type", "X-CSRF-Token"},
+					AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete},
+					AllowedOrigins: []string{"*"},
+					ExposedHeaders: []string{
+						"Date",
+						"Content-Length",
+						"X-Rate-Limit-Limit",
+						"X-Rate-Limit-Available",
+						"X-Rate-Limit-Reset",
+						"X-Rate-Limit-Retry",
+						"X-Request-Id",
+						"X-Total-Count",
+						"X-Warning",
+					},
 					MaxAge:           600,
 					AllowCredentials: true,
 				}),

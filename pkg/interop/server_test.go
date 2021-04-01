@@ -16,6 +16,7 @@ package interop_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"testing"
@@ -23,10 +24,23 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	. "go.thethings.network/lorawan-stack/v3/pkg/interop"
+	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
+
+type mockComponent struct {
+	ctx context.Context
+}
+
+func (c *mockComponent) Context() context.Context {
+	return c.ctx
+}
+
+func (c *mockComponent) RateLimiter() ratelimit.Interface {
+	return &ratelimit.NoopRateLimiter{}
+}
 
 func TestServeHTTP(t *testing.T) {
 	for _, tc := range []struct {
@@ -90,7 +104,7 @@ func TestServeHTTP(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			s, err := NewServer(test.Context(), nil, config.InteropServer{
+			s, err := NewServer(&mockComponent{test.Context()}, nil, config.InteropServer{
 				SenderClientCA: config.SenderClientCA{
 					Source:    "directory",
 					Directory: "testdata",
