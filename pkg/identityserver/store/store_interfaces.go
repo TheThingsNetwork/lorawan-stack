@@ -207,12 +207,12 @@ type EntitySearch interface {
 
 // ContactInfoStore interface for contact info validation.
 type ContactInfoStore interface {
-	GetContactInfo(ctx context.Context, entityID ttnpb.Identifiers) ([]*ttnpb.ContactInfo, error)
-	SetContactInfo(ctx context.Context, entityID ttnpb.Identifiers, contactInfo []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error)
+	GetContactInfo(ctx context.Context, entityID ttnpb.IDStringer) ([]*ttnpb.ContactInfo, error)
+	SetContactInfo(ctx context.Context, entityID ttnpb.IDStringer, contactInfo []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error)
 	CreateValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error)
 	// Confirm a validation. Only the ID and Token need to be set.
 	Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
-	DeleteEntityContactInfo(ctx context.Context, entityID ttnpb.Identifiers) error
+	DeleteEntityContactInfo(ctx context.Context, entityID ttnpb.IDStringer) error
 }
 
 // MigrationStore interface for migration history.
