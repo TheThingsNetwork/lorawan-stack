@@ -211,7 +211,8 @@ export default defineMessages({
   latitude: 'Latitude',
   latitudeDesc: 'The north-south position in degrees, where 0 is the equator',
   lbsLNSSecret: 'LoRa Basics Station LNS Authentication Key',
-  lbsLNSSecretDescription: 'The Authentication Key for Lora Basics Station LNS connections. This field is ignored for other gateways.',
+  lbsLNSSecretDescription:
+    'The Authentication Key for Lora Basics Station LNS connections. This field is ignored for other gateways.',
   link: 'Link',
   linked: 'Linked',
   liveData: 'Live data',
