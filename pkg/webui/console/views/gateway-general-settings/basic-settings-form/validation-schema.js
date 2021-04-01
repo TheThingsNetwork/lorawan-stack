@@ -39,6 +39,10 @@ const validationSchema = Yup.object().shape({
     Yup.passValues(sharedMessages.validateAddressFormat),
   ),
   require_authenticated_connection: Yup.boolean().default(false),
+  // The API allows 2048 bytes. But since we convert to Base64 we need an additional 33% (at max) capacity. So 66% of 2048 = 1351,68 and hence this is set to 1350.
+  lbs_lns_secret: Yup.object().shape({
+    value: Yup.string().max(1350, Yup.passValues(sharedMessages.validateTooLong)),
+  }),
   location_public: Yup.boolean().default(false),
   status_public: Yup.boolean().default(false),
   update_location_from_status: Yup.boolean().default(false),
