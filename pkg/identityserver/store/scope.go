@@ -182,7 +182,7 @@ func splitEndDeviceIDString(s string) (appID string, devID string) {
 	return s[:sepIdx], s[sepIdx+1:]
 }
 
-func withID(id ttnpb.Identifiers) func(*gorm.DB) *gorm.DB {
+func withID(id ttnpb.IDStringer) func(*gorm.DB) *gorm.DB {
 	switch entityTypeForID(id) {
 	case "application":
 		return withApplicationID(id.IDString())

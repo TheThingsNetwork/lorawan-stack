@@ -16,10 +16,15 @@ package ttnpb
 
 import "fmt"
 
-// Identifiers is the interface implemented by all (single) identifiers.
-type Identifiers interface {
+// IDStringer identifies the string type and ID of identifiers.
+type IDStringer interface {
 	EntityType() string
 	IDString() string
+}
+
+// Identifiers is the interface implemented by all (single) identifiers.
+type Identifiers interface {
+	IDStringer
 	Identifiers() Identifiers
 	EntityIdentifiers() *EntityIdentifiers
 	CombinedIdentifiers() *CombinedIdentifiers

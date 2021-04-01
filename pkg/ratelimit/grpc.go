@@ -37,28 +37,11 @@ func grpcRemoteIP(ctx context.Context) string {
 }
 
 func grpcEntityFromRequest(ctx context.Context, req interface{}) string {
-	if r, ok := req.(interface {
-		EntityIdentifiers() *ttnpb.EntityIdentifiers
-	}); ok {
-		entityIDs := r.EntityIdentifiers()
-		if ids := entityIDs.GetDeviceIDs(); ids != nil && !ids.IsZero() {
-			return fmt.Sprintf("dev:%s", unique.ID(ctx, ids))
+	if r, ok := req.(ttnpb.IDStringer); ok {
+		if r.IDString() == "" {
+			return fmt.Sprintf("%s:_", r.EntityType())
 		}
-		if ids := entityIDs.GetGatewayIDs(); ids != nil && !ids.IsZero() {
-			return fmt.Sprintf("gtw:%s", unique.ID(ctx, ids))
-		}
-		if ids := entityIDs.GetApplicationIDs(); ids != nil && !ids.IsZero() {
-			return fmt.Sprintf("app:%s", unique.ID(ctx, ids))
-		}
-		if ids := entityIDs.GetClientIDs(); ids != nil && !ids.IsZero() {
-			return fmt.Sprintf("cli:%s", unique.ID(ctx, ids))
-		}
-		if ids := entityIDs.GetUserIDs(); ids != nil && !ids.IsZero() {
-			return fmt.Sprintf("user:%s", unique.ID(ctx, ids))
-		}
-		if ids := entityIDs.GetOrganizationIDs(); ids != nil && !ids.IsZero() {
-			return fmt.Sprintf("org:%s", unique.ID(ctx, ids))
-		}
+		return fmt.Sprintf("%s:%s", r.EntityType(), unique.ID(ctx, r))
 	}
 	return ""
 }

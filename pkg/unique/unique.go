@@ -24,14 +24,16 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var errUniqueIdentifier = errors.DefineInvalidArgument("unique_identifier", "invalid unique identifier `{uid}`")
-var errFormat = errors.DefineInvalidArgument("format", "invalid format in value `{value}`")
+var (
+	errUniqueIdentifier = errors.DefineInvalidArgument("unique_identifier", "invalid unique identifier `{uid}`")
+	errFormat           = errors.DefineInvalidArgument("format", "invalid format in value `{value}`")
+)
 
 // ID returns the unique identifier of the specified identifiers.
 // This function panics if the resulting identifier is invalid.
 // The reason for panicking is that taking the unique identifier of a nil or
 // zero value may result in unexpected and potentially harmful behavior.
-func ID(ctx context.Context, id ttnpb.Identifiers) (res string) {
+func ID(ctx context.Context, id ttnpb.IDStringer) (res string) {
 	res = id.IDString()
 	if res == "" || strings.HasPrefix(res, ".") || strings.HasSuffix(res, ".") {
 		panic(fmt.Errorf("failed to determine unique ID: the primary identifier is invalid"))

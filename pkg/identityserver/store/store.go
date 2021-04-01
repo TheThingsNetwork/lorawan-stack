@@ -47,7 +47,7 @@ func (s *store) query(ctx context.Context, model interface{}, funcs ...func(*gor
 	return query
 }
 
-func (s *store) findEntity(ctx context.Context, entityID ttnpb.Identifiers, fields ...string) (modelInterface, error) {
+func (s *store) findEntity(ctx context.Context, entityID ttnpb.IDStringer, fields ...string) (modelInterface, error) {
 	model := modelForID(entityID)
 	query := s.query(ctx, model, withID(entityID))
 	if len(fields) == 1 && fields[0] == "id" {
@@ -65,7 +65,7 @@ func (s *store) findEntity(ctx context.Context, entityID ttnpb.Identifiers, fiel
 	return model, nil
 }
 
-func (s *store) findDeletedEntity(ctx context.Context, entityID ttnpb.Identifiers, fields ...string) (modelInterface, error) {
+func (s *store) findDeletedEntity(ctx context.Context, entityID ttnpb.IDStringer, fields ...string) (modelInterface, error) {
 	return s.findEntity(WithSoftDeleted(ctx, false), entityID, fields...)
 }
 
@@ -82,7 +82,7 @@ func (s *store) updateEntity(ctx context.Context, model interface{}, columns ...
 	return query.Save(model).Error
 }
 
-func (s *store) deleteEntity(ctx context.Context, entityID ttnpb.Identifiers) error {
+func (s *store) deleteEntity(ctx context.Context, entityID ttnpb.IDStringer) error {
 	model, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
 		return err
@@ -103,7 +103,7 @@ func (s *store) deleteEntity(ctx context.Context, entityID ttnpb.Identifiers) er
 	return nil
 }
 
-func (s *store) restoreEntity(ctx context.Context, entityID ttnpb.Identifiers) error {
+func (s *store) restoreEntity(ctx context.Context, entityID ttnpb.IDStringer) error {
 	model, err := s.findDeletedEntity(ctx, entityID, "id")
 	if err != nil {
 		return err
@@ -253,7 +253,7 @@ func Transact(ctx context.Context, db *gorm.DB, f func(db *gorm.DB) error) (err 
 	return f(tx)
 }
 
-func entityTypeForID(id ttnpb.Identifiers) string {
+func entityTypeForID(id ttnpb.IDStringer) string {
 	return strings.Replace(id.EntityType(), " ", "_", -1)
 }
 
@@ -276,7 +276,7 @@ func modelForEntityType(entityType string) modelInterface {
 	}
 }
 
-func modelForID(id ttnpb.Identifiers) modelInterface {
+func modelForID(id ttnpb.IDStringer) modelInterface {
 	return modelForEntityType(entityTypeForID(id))
 }
 
@@ -298,7 +298,7 @@ var (
 	errMigrationNotFound = errors.DefineNotFound("migration_not_found", "migration not found")
 )
 
-func errNotFoundForID(id ttnpb.Identifiers) error {
+func errNotFoundForID(id ttnpb.IDStringer) error {
 	switch t := entityTypeForID(id); t {
 	case "application":
 		return errApplicationNotFound.WithAttributes("application_id", id.IDString())
