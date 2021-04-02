@@ -195,7 +195,7 @@ func (c PubSubConfig) NewPubSub(comp *component.Component, server io.Server) (*p
 	if c.Registry == nil {
 		return nil, nil
 	}
-	statuses, err := pubsub.ProviderStatusesFromMap(c.Providers)
+	statuses, err := pubsub.ProviderStatusesFromMap(comp.Context(), c.Providers)
 	if err != nil {
 		return nil, err
 	}
