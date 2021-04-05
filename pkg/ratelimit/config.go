@@ -27,10 +27,10 @@ const defaultMaxSize = 1 << 12
 
 // Profile represents configuration for a rate limiting class.
 type Profile struct {
-	Name          string   `name:"name" description:"Rate limiting class name"`
-	MaxRatePerMin uint     `name:"max-rate-per-min" description:"Maximum allowed rate per minute"`
-	MaxBurst      uint     `name:"max-burst" description:"Maximum rate allowed for short bursts"`
-	Associations  []string `name:"associations" description:"List of classes to apply this profile on"`
+	Name         string   `name:"name" description:"Rate limiting class name"`
+	MaxPerMin    uint     `name:"max-per-min" description:"Maximum allowed rate (per minute)"`
+	MaxBurst     uint     `name:"max-burst" description:"Maximum rate allowed for short bursts"`
+	Associations []string `name:"associations" description:"List of classes to apply this profile on"`
 }
 
 // MemoryConfig represents configuration for the in-memory rate limiting store.
@@ -82,10 +82,10 @@ func (c Profile) New(ctx context.Context, size uint) (Interface, error) {
 		return nil, err
 	}
 	if c.MaxBurst == 0 {
-		c.MaxBurst = c.MaxRatePerMin
+		c.MaxBurst = c.MaxPerMin
 	}
 	quota := throttled.RateQuota{
-		MaxRate:  throttled.PerMin(int(c.MaxRatePerMin)),
+		MaxRate:  throttled.PerMin(int(c.MaxPerMin)),
 		MaxBurst: int(c.MaxBurst - 1),
 	}
 	limiter, err := throttled.NewGCRARateLimiter(store, quota)

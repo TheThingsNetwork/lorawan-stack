@@ -38,22 +38,22 @@ func TestRateLimit(t *testing.T) {
 	limiter, err := ratelimit.Config{
 		Profiles: []ratelimit.Profile{
 			{
-				Name:          "Default profile",
-				MaxRatePerMin: maxRate,
-				MaxBurst:      maxRate,
-				Associations:  []string{"default"},
+				Name:         "Default profile",
+				MaxPerMin:    maxRate,
+				MaxBurst:     maxRate,
+				Associations: []string{"default"},
 			},
 			{
-				Name:          "Multiple associations",
-				MaxRatePerMin: maxRate,
-				MaxBurst:      maxRate,
-				Associations:  []string{"assoc1", "assoc2"},
+				Name:         "Multiple associations",
+				MaxPerMin:    maxRate,
+				MaxBurst:     maxRate,
+				Associations: []string{"assoc1", "assoc2"},
 			},
 			{
-				Name:          "Override",
-				MaxRatePerMin: overrideRate,
-				MaxBurst:      overrideRate,
-				Associations:  []string{"override"},
+				Name:         "Override",
+				MaxPerMin:    overrideRate,
+				MaxBurst:     overrideRate,
+				Associations: []string{"override"},
 			},
 		},
 	}.New(test.Context())
