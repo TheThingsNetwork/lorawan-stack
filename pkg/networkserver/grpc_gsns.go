@@ -263,8 +263,8 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		dev.MACState != nil &&
 		pld.DevAddr.Equal(dev.Session.DevAddr) &&
 		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.MACState.LoRaWANVersion.UseLegacyMIC() &&
-		cmacFMatchResult.FullFCnt == pld.FCnt,
-		cmacFMatchResult.FullFCnt == FullFCnt(uint16(pld.FCnt), dev.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(dev, ns.defaultMACSettings)):
+		(cmacFMatchResult.FullFCnt == FullFCnt(uint16(pld.FCnt), dev.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(dev, ns.defaultMACSettings)) ||
+			cmacFMatchResult.FullFCnt == pld.FCnt):
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.Session.FNwkSIntKey.KEKLabel).Warn("Failed to unwrap FNwkSIntKey")
