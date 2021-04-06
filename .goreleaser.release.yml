@@ -106,11 +106,15 @@ nfpms:
     recommends:
       - redis
       - cockroach
-    files:
-      "public/**/*": "/srv/ttn-lorawan/public"
-      "config/completion/bash/*": "/usr/share/bash-completion/completions"
-      "config/completion/fish/*": "/usr/share/fish/vendor_completions.d"
-      "config/completion/zsh/*": "/usr/share/zsh/vendor-completions"
+    contents:
+      - src: "public/**/*"
+        dst: "/srv/ttn-lorawan/public"
+      - src: "config/completion/bash/*"
+        dst: "/usr/share/bash-completion/completions"
+      - src: "config/completion/fish/*"
+        dst: "/usr/share/fish/vendor_completions.d"
+      - src: "config/completion/zsh/*"
+        dst: "/usr/share/zsh/vendor-completions"
 
 snapcrafts:
   - id: stack
@@ -204,7 +208,7 @@ dockers:
   - goos: linux
     goarch: amd64
     dockerfile: Dockerfile
-    binaries:
+    ids:
       - ttn-lw-cli
       - ttn-lw-stack
     image_templates:
