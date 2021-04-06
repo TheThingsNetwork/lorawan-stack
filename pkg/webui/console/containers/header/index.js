@@ -23,6 +23,7 @@ import Dropdown from '@ttn-lw/components/dropdown'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import selectAccountUrl from '@console/lib/selectors/app-config'
 import {
   checkFromState,
   mayViewApplications,
@@ -37,6 +38,8 @@ import { logout } from '@console/store/actions/user'
 import { selectUser } from '@console/store/selectors/user'
 
 import Logo from '../logo'
+
+const accountUrl = selectAccountUrl()
 
 @withRouter
 @connect(
@@ -138,6 +141,12 @@ class Header extends Component {
 
     const dropdownItems = (
       <React.Fragment>
+        <Dropdown.Item
+          title={sharedMessages.profileSettings}
+          icon="user"
+          path={`${accountUrl}/profile-settings`}
+          external
+        />
         {mayManageUsers && (
           <Dropdown.Item
             title={sharedMessages.userManagement}

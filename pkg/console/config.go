@@ -43,6 +43,7 @@ type FrontendConfig struct {
 	Language             string `json:"language" name:"-"`
 	SupportLink          string `json:"support_link" name:"support-link" description:"The URI that the support button will point to"`
 	StackConfig          `json:"stack_config" name:",squash"`
+	AccountURL           string `json:"account_url" name:"account-url" description:"The URL that points to the root of the Account"`
 }
 
 // Config is the configuration for the Console.

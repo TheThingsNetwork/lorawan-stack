@@ -44,6 +44,7 @@ var DefaultConsoleConfig = console.Config{
 		},
 		FrontendConfig: console.FrontendConfig{
 			DocumentationBaseURL: "https://thethingsstack.io",
+			AccountURL:           "/oauth",
 			StackConfig: console.StackConfig{
 				IS:   webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
 				GS:   webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
