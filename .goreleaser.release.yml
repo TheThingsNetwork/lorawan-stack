@@ -107,7 +107,7 @@ nfpms:
       - redis
       - cockroach
     contents:
-      - src: "public/**/*"
+      - src: "public/**"
         dst: "/srv/ttn-lorawan/public"
       - src: "config/completion/bash/*"
         dst: "/usr/share/bash-completion/completions"
