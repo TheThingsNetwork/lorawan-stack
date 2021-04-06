@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.12.0] - 2021-04-06
+
+### Added
+
 - API and CLI commands for listing, searching for and restoring recently deleted applications, OAuth clients, gateways, organizations and users.
 - State Description fields for adding context to the (rejected, flagged, suspended) state of Users and OAuth clients.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
@@ -44,10 +58,6 @@ For details about compatibility between different releases, see the **Commitment
 - Network Server now performs more strict validation and will disallow creation and updates of invalid devices.
 - DevEUI is not required for multicast devices anymore, regarding of LoRaWAN version.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Incorrect documentation url for event details data formats.
@@ -58,8 +68,6 @@ For details about compatibility between different releases, see the **Commitment
 - Occasional panic in Network Server on downlink with corrupted device states.
 - Occasional panic in Identity Server on extracting log fields from invalid requests.
 - Print an error message stating that the Storage Integration is not available in the open source edition of The Things Stack when trying to execute `ttn-lw-stack storage-db` commands.
-
-### Security
 
 ## [3.11.3] - 2021-03-19
 
@@ -1401,7 +1409,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.3...v3.11
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.0...v3.12
+[3.12.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.3...v3.12.0
 [3.11.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.2...v3.11.3
 [3.11.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.1...v3.11.2
 [3.11.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.0...v3.11.1
