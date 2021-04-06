@@ -30,6 +30,7 @@ import FormInfoField from './field/info'
 import FormSubmit from './submit'
 import FormCollapseSection from './section'
 import FormSubTitle from './sub-title'
+import FormFieldContainer from './field/container'
 
 import style from './form.styl'
 
@@ -237,5 +238,6 @@ Form.InfoField = FormInfoField
 Form.Submit = FormSubmit
 Form.CollapseSection = FormCollapseSection
 Form.SubTitle = FormSubTitle
+Form.FieldContainer = FormFieldContainer
 
 export { Form as default, useFormikContext as useFormContext }
