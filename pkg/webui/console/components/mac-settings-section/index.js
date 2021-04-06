@@ -166,7 +166,7 @@ const MacSettingsSection = props => {
             name="mac_settings.ping_slot_periodicity"
             component={Select}
             options={pingSlotPeriodicityOptions}
-            required={isMulticast}
+            required={isClassB && isMulticast}
             menuPlacement="top"
           />
           <Form.Field

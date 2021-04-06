@@ -50,6 +50,7 @@ const defaultFormValues = {
   mac_settings: {
     resets_f_cnt: false,
     supports_32_bit_f_cnt: true,
+    ping_slot_periodicity: '',
   },
   session: {
     dev_addr: '',
@@ -67,9 +68,7 @@ const NetworkSettingsForm = props => {
   const { activationMode, lorawanVersion } = props
   const { error, snapshot } = useWizardContext()
 
-  const [isClassB, setClassB] = React.useState(
-    activationMode === ACTIVATION_MODES.MULTICAST || snapshot.supports_class_b,
-  )
+  const [isClassB, setClassB] = React.useState(snapshot.supports_class_b)
   const handleClassBChange = React.useCallback(evt => {
     const { checked } = evt.target
 

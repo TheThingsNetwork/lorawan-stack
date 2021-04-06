@@ -117,7 +117,13 @@ const validationSchema = Yup.object({
           })
         }
 
-        return schema.required(sharedMessages.validateRequired)
+        return Yup.lazy(pingSlot => {
+          if (!pingSlot && !isClassB) {
+            return schema.strip()
+          }
+
+          return schema.required(sharedMessages.validateRequired)
+        })
       },
     ),
     ping_slot_frequency: Yup.lazy(value => {
