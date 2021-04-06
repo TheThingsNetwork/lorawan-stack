@@ -55,6 +55,7 @@ const BasicSettingsForm = props => {
   const lwVersion = parseLorawanMacVersion(lorawanVersion)
   const isNone = activationMode === ACTIVATION_MODES.NONE
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
+  const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
 
   return (
     <Wizard.Form
@@ -88,17 +89,19 @@ const BasicSettingsForm = props => {
               glossaryId={lwVersion < 104 ? glossaryId.APP_EUI : glossaryId.JOIN_EUI}
             />
           )}
-          <Form.Field
-            title={sharedMessages.devEUI}
-            name="ids.dev_eui"
-            type="byte"
-            min={8}
-            max={8}
-            description={sharedMessages.deviceEUIDescription}
-            required={isOTAA || lwVersion === 104}
-            component={Input}
-            glossaryId={glossaryId.DEV_EUI}
-          />
+          {!isMulticast && (
+            <Form.Field
+              title={sharedMessages.devEUI}
+              name="ids.dev_eui"
+              type="byte"
+              min={8}
+              max={8}
+              description={sharedMessages.deviceEUIDescription}
+              required={isOTAA || lwVersion === 104}
+              component={Input}
+              glossaryId={glossaryId.DEV_EUI}
+            />
+          )}
         </>
       )}
       <Form.Field
