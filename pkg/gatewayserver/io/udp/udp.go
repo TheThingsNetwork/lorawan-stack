@@ -54,7 +54,7 @@ func (*srv) SupportsDownlinkClaim() bool { return true }
 
 var (
 	errUDPFrontendRecovered      = errors.DefineInternal("udp_frontend_recovered", "internal server error")
-	limitLogsConfig              = ratelimit.Profile{MaxRatePerMin: 1}
+	limitLogsConfig              = ratelimit.Profile{MaxPerMin: 1}
 	limitLogsSize           uint = 1 << 13
 )
 

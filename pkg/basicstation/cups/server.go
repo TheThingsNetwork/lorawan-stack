@@ -197,7 +197,7 @@ func NewServer(c *component.Component, options ...Option) *Server {
 
 // RegisterRoutes implements web.Registerer
 func (s *Server) RegisterRoutes(web *web.Server) {
-	web.POST("/update-info", s.UpdateInfo, ratelimit.EchoMiddleware(s.component.RateLimiter(), "basicstation:cups"))
+	web.POST("/update-info", s.UpdateInfo, ratelimit.EchoMiddleware(s.component.RateLimiter(), "http:gcs:cups"))
 }
 
 func getContext(c echo.Context) context.Context {

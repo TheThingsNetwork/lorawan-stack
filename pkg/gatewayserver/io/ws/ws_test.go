@@ -1530,10 +1530,10 @@ func TestRateLimit(t *testing.T) {
 		maxRate := uint(3)
 		conf := ratelimit.Config{
 			Profiles: []ratelimit.Profile{{
-				Name:          "accept connections",
-				MaxRatePerMin: maxRate,
-				MaxBurst:      maxRate,
-				Associations:  []string{"gs:accept:ws"},
+				Name:         "accept connections",
+				MaxPerMin:    maxRate,
+				MaxBurst:     maxRate,
+				Associations: []string{"gs:accept:ws"},
 			}},
 		}
 		withServer(t, defaultConfig, conf, func(t *testing.T, _ *mock.IdentityServer, serverAddress string) {
