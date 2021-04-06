@@ -718,6 +718,8 @@
   "lib.shared-messages.lastSeen": "Last seen",
   "lib.shared-messages.latitude": "Latitude",
   "lib.shared-messages.latitudeDesc": "The north-south position in degrees, where 0 is the equator",
+  "lib.shared-messages.lbsLNSSecret": "LoRa Basics Station LNS Authentication Key",
+  "lib.shared-messages.lbsLNSSecretDescription": "The Authentication Key for Lora Basics Station LNS connections. This field is ignored for other gateways.",
   "lib.shared-messages.link": "Link",
   "lib.shared-messages.linked": "Linked",
   "lib.shared-messages.liveData": "Live data",

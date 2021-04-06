@@ -98,6 +98,12 @@ describe('Gateway general settings', () => {
     cy.findByLabelText('Automatic updates')
       .should('exist')
       .and('have.attr', 'value', 'false')
+    cy.findDescriptionByLabelText('LoRa Basics Station LNS Authentication Key')
+    .should(
+      'contain',
+      'The Authentication Key for Lora Basics Station LNS connections. This field is ignored for other gateways.'
+    )
+    .and('be.visible')
     cy.findDescriptionByLabelText('Automatic updates')
       .should('contain', 'Gateway can be updated automatically')
       .and('be.visible')

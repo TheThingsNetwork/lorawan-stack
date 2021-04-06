@@ -91,6 +91,7 @@ import {
       'gateway_server_address',
       'antennas',
       'location_public',
+      'lbs_lns_secret',
       'status_public',
       'auto_update',
       'schedule_downlink_late',
