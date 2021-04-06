@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -52,16 +53,15 @@ func providerStatusFromString(s string) (ProviderStatus, error) {
 	}
 }
 
-var errInvalidProviderType = errors.DefineInvalidArgument("invalid_provider_type", "invalid provider type `{type}`")
-
-func providerTypeFromString(s string) (reflect.Type, error) {
+func providerTypeFromString(ctx context.Context, s string) (reflect.Type, error) {
 	switch s {
 	case "mqtt":
 		return reflect.TypeOf(&ttnpb.ApplicationPubSub_MQTT{}), nil
 	case "nats":
 		return reflect.TypeOf(&ttnpb.ApplicationPubSub_NATS{}), nil
 	default:
-		return nil, errInvalidProviderType.WithAttributes("type", s)
+		log.FromContext(ctx).WithField("provider", s).Warn("Unknown PubSub provider specified")
+		return nil, nil
 	}
 }
 
@@ -69,12 +69,15 @@ func providerTypeFromString(s string) (reflect.Type, error) {
 type ProviderStatuses map[reflect.Type]ProviderStatus
 
 // ProviderStatusesFromMap constructs the provider statuses from the provided map.
-func ProviderStatusesFromMap(m map[string]string) (ProviderStatuses, error) {
+func ProviderStatusesFromMap(ctx context.Context, m map[string]string) (ProviderStatuses, error) {
 	providers := make(ProviderStatuses)
 	for k, v := range m {
-		tp, err := providerTypeFromString(k)
+		tp, err := providerTypeFromString(ctx, k)
 		if err != nil {
 			return nil, err
+		}
+		if tp == nil {
+			continue
 		}
 		status, err := providerStatusFromString(v)
 		if err != nil {

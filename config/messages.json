@@ -2168,15 +2168,6 @@
       "file": "providers.go"
     }
   },
-  "error:pkg/applicationserver/io/pubsub:invalid_provider_type": {
-    "translations": {
-      "en": "invalid provider type `{type}`"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/pubsub",
-      "file": "providers.go"
-    }
-  },
   "error:pkg/applicationserver/io/pubsub:provider_disabled": {
     "translations": {
       "en": "provider `{provider}` is disabled"
