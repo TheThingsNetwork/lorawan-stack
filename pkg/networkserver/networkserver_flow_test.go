@@ -42,7 +42,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 	case test.EUFrequencyPlanID:
 		linkADRReq := &ttnpb.MACCommand_LinkADRReq{
 			ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
-			DataRateIndex: ttnpb.DATA_RATE_4,
+			DataRateIndex: ttnpb.DATA_RATE_5,
 			TxPowerIndex:  1,
 			NbTrans:       1,
 		}
@@ -55,7 +55,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 		linkADRReqs := []MACCommander{
 			&ttnpb.MACCommand_LinkADRReq{
 				ChannelMask:   []bool{false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true},
-				DataRateIndex: ttnpb.DATA_RATE_2,
+				DataRateIndex: ttnpb.DATA_RATE_3,
 				TxPowerIndex:  1,
 				NbTrans:       1,
 			},
@@ -65,7 +65,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 				&ttnpb.MACCommand_LinkADRReq{
 					ChannelMask:        []bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 					ChannelMaskControl: 7,
-					DataRateIndex:      ttnpb.DATA_RATE_2,
+					DataRateIndex:      ttnpb.DATA_RATE_3,
 					TxPowerIndex:       1,
 					NbTrans:            1,
 				},
@@ -85,7 +85,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 		}
 		linkADRReq := &ttnpb.MACCommand_LinkADRReq{
 			ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
-			DataRateIndex: ttnpb.DATA_RATE_4,
+			DataRateIndex: ttnpb.DATA_RATE_5,
 			TxPowerIndex:  1,
 			NbTrans:       1,
 		}

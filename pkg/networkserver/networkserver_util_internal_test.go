@@ -1079,6 +1079,21 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							a.So(lorawan.UnmarshalMessage(req.Message.RawPayload, actual), should.BeNil)
 							a.So(lorawan.UnmarshalMessage(conf.Payload, expected), should.BeNil)
 							a.So(actual, should.Resemble, expected)
+							if aPld, ePld := actual.GetMACPayload(), expected.GetMACPayload(); !conf.MACState.LoRaWANVersion.EncryptFOpts() &&
+								aPld != nil && ePld != nil &&
+								!bytes.Equal(aPld.FHDR.FOpts, ePld.FHDR.FOpts) {
+								macCommands := func(b []byte) (cmds []*ttnpb.MACCommand) {
+									for r := bytes.NewReader(b); r.Len() > 0; {
+										cmd := &ttnpb.MACCommand{}
+										if !a.So(lorawan.DefaultMACCommands.ReadDownlink(*phy, r, cmd), should.BeNil) {
+											return nil
+										}
+										cmds = append(cmds, cmd)
+									}
+									return cmds
+								}
+								a.So(macCommands(aPld.FHDR.FOpts), should.Resemble, macCommands(ePld.FHDR.FOpts))
+							}
 						}
 						t.Errorf("NsGs.ScheduleDownlink request assertion failed for schedule attempt number %d", i)
 						return
