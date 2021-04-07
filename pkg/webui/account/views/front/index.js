@@ -28,7 +28,6 @@ import ForgotPassword from '@account/views/forgot-password'
 import UpdatePassword from '@account/views/update-password'
 import FrontNotFound from '@account/views/front-not-found'
 import Validate from '@account/views/validate'
-import Code from '@account/views/code'
 
 import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -48,7 +47,6 @@ const FrontView = ({ location }) => {
             <Route path="/forgot-password" component={ForgotPassword} />
             <Route path="/update-password" component={UpdatePassword} />
             <Route path="/validate" component={Validate} />
-            <Route path="/code" component={Code} />
             <Redirect exact from="/" to="/login" />
             {authRoutes.map(({ path, exact }) => (
               <Route path={path} exact={exact} key={path}>

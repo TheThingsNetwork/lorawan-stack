@@ -16,17 +16,18 @@ import React from 'react'
 import Query from 'query-string'
 import { Redirect } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
+import { Container, Col, Row } from 'react-grid-system'
 
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Button from '@ttn-lw/components/button'
+import PageTitle from '@ttn-lw/components/page-title'
 
 import Message from '@ttn-lw/lib/components/message'
-import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import style from '@account/views/front/front.styl'
-
-import { selectApplicationSiteName, selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
+import { selectApplicationSiteTitle } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import style from './code.styl'
 
 const m = defineMessages({
   code: 'Authorization code',
@@ -34,7 +35,6 @@ const m = defineMessages({
   backToAccount: 'Back to {siteTitle}',
 })
 
-const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 
 const Code = ({ location }) => {
@@ -45,30 +45,30 @@ const Code = ({ location }) => {
   }
 
   return (
-    <>
-      <div className={style.form}>
-        <IntlHelmet title={m.createANewAccount} />
-        <h1 className={style.title}>
-          {siteName}
-          <br />
-          <Message content={m.code} component="strong" />
-        </h1>
-        <hr className={style.hRule} />
-        <Message content={m.codeDescription} component="label" className={style.codeDescription} />
-        <SafeInspector
-          data={query.code}
-          initiallyVisible
-          hideable={false}
-          isBytes={false}
-          className={style.code}
-        />
-        <Button.Link
-          to="/"
-          icon="keyboard_arrow_left"
-          message={{ ...m.backToAccount, values: { siteTitle } }}
-        />
-      </div>
-    </>
+    <Container>
+      <Row>
+        <Col lg={4} md={6} sm={12}>
+          <PageTitle title={m.code} />
+          <Message
+            content={m.codeDescription}
+            component="label"
+            className={style.codeDescription}
+          />
+          <SafeInspector
+            data={query.code}
+            initiallyVisible
+            hideable={false}
+            isBytes={false}
+            className={style.code}
+          />
+          <Button.Link
+            to="/"
+            icon="keyboard_arrow_left"
+            message={{ ...m.backToAccount, values: { siteTitle } }}
+          />
+        </Col>
+      </Row>
+    </Container>
   )
 }
 
