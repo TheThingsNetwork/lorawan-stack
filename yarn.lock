@@ -14765,7 +14765,7 @@ tslib@^2.0.1:
   integrity sha512-SgIkNheinmEBgx1IUNirK0TUD4X9yjjBRTqqjggWCU3pUEqIk3/Uwl3yRixYKT6WjQuGiwDv4NomL3wqRCj+CQ==
 
 "ttn-lw@file:sdk/js":
-  version "3.12.0-dev"
+  version "3.13.0-dev"
   dependencies:
     arraybuffer-to-string "^1.0.2"
     axios "^0.21.1"
