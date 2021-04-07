@@ -17,27 +17,26 @@ package ttnpb
 import "context"
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (p MACPayload) ValidateContext(context.Context) error {
-	if p.DevAddr.IsZero() {
-		return errMissing("DevAddr")
-	}
-	return p.ValidateFields()
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (p JoinRequestPayload) ValidateContext(context.Context) error {
-	if p.DevEUI.IsZero() {
-		return errMissing("DevEUI")
-	}
-	return p.ValidateFields()
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (req *GatewayUplinkMessage) ValidateContext(context.Context) error {
+func (req *GetApplicationPubSubRequest) ValidateContext(context.Context) error {
 	return req.ValidateFields()
 }
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (req *DownlinkQueueRequest) ValidateContext(context.Context) error {
+func (req *ListApplicationPubSubsRequest) ValidateContext(context.Context) error {
+	return req.ValidateFields()
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (req *SetApplicationPubSubRequest) ValidateContext(context.Context) error {
+	if len(req.FieldMask.Paths) == 0 {
+		return req.ValidateFields()
+	}
+	return req.ValidateFields(append(FieldsWithPrefix("pubsub", req.FieldMask.Paths...),
+		"pubsub.ids",
+	)...)
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (req *ApplicationPubSubIdentifiers) ValidateContext(context.Context) error {
 	return req.ValidateFields()
 }

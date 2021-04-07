@@ -15,7 +15,6 @@
 package ttnpb
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -1228,34 +1227,12 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (m *UpdateEndDeviceRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
-		return m.ValidateFields()
-	}
-	return m.ValidateFields(append(FieldsWithPrefix("end_device", m.FieldMask.Paths...),
-		"end_device.ids.application_ids",
-		"end_device.ids.device_id",
-	)...)
-}
-
 // FieldIsZero returns whether path p is zero.
 func (m *UpdateEndDeviceRequest) FieldIsZero(p string) bool {
 	if m == nil {
 		return true
 	}
 	return m.EndDevice.FieldIsZero(p)
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (m *SetEndDeviceRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
-		return m.ValidateFields()
-	}
-	return m.ValidateFields(append(FieldsWithPrefix("end_device", m.FieldMask.Paths...),
-		"end_device.ids.application_ids",
-		"end_device.ids.device_id",
-	)...)
 }
 
 // FieldIsZero returns whether path p is zero.
