@@ -158,16 +158,15 @@ describe('<BasicSettingsForm /> validation schema', () => {
           lorawanVersion: '1.0.4',
         })(schema)
 
-      it('requires `dev_eui`', done => {
-        try {
-          validate(schema)
-          done.fail('should fail')
-        } catch (error) {
-          expect(error).toBeDefined()
-          expect(error.name).toBe('ValidationError')
-          expect(error.path).toBe('ids.dev_eui')
-          done()
-        }
+      it('processes valid schema with or without `dev_eui`', () => {
+        const validatedValue = validate(schema)
+
+        expect(validatedValue).toBeDefined()
+        expect(validatedValue.ids).toBeDefined()
+        expect(validatedValue.ids.device_id).toBe(deviceId)
+        expect(validatedValue.ids.dev_eui).toBeUndefined()
+        expect(validatedValue.name).toBe(deviceName)
+        expect(validatedValue.description).toBe(deviceDescription)
       })
     })
 

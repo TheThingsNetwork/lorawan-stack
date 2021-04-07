@@ -40,10 +40,7 @@ const validationSchema = Yup.object()
           })
         }
 
-        if (
-          activationMode === ACTIVATION_MODES.ABP ||
-          activationMode === ACTIVATION_MODES.MULTICAST
-        ) {
+        if (activationMode === ACTIVATION_MODES.ABP) {
           if (parseLorawanMacVersion(version) === 104) {
             return schema.shape({
               device_id: deviceIdSchema,
