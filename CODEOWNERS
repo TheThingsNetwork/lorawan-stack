@@ -9,18 +9,18 @@
 # Dependencies
 /go.mod @johanstokking @htdvisser @rvolosatovs
 /go.sum @johanstokking @htdvisser @rvolosatovs
-/package.json @bafonins @kschiffer @pgalic96
-/yarn.lock @bafonins @kschiffer @pgalic96
-/sdk/js/package.json @bafonins @kschiffer @pgalic96
-/sdk/js/yarn.lock @bafonins @kschiffer @pgalic96
+/package.json @bafonins @kschiffer @asmulko
+/yarn.lock @bafonins @kschiffer @asmulko
+/sdk/js/package.json @bafonins @kschiffer @asmulko
+/sdk/js/yarn.lock @bafonins @kschiffer @asmulko
 
 # Build pipeline and tooling
 /Makefile @htdvisser @rvolosatovs @johanstokking
 /tools @htdvisser @rvolosatovs @johanstokking
 /.github/workflows @htdvisser @rvolosatovs @johanstokking
-/config @bafonins @kschiffer @pgalic96
+/config @bafonins @kschiffer @asmulko
 /config/stack @benolayinka @neoaggelos
-/cypress @bafonins @kschiffer @pgalic96
+/cypress @bafonins @kschiffer @asmulko
 
 # API, configuration, CLI and storage compatibility
 /api @johanstokking @htdvisser @rvolosatovs
@@ -49,9 +49,9 @@
 /pkg/rpcmiddleware @htdvisser @johanstokking @adriansmares
 /pkg/rpcserver @htdvisser @johanstokking @adriansmares
 /pkg/types @johanstokking @htdvisser @rvolosatovs
-/pkg/web @bafonins @kschiffer @pgalic96
+/pkg/web @bafonins @kschiffer @asmulko
 /pkg/webmiddleware @htdvisser @bafonins @kschiffer
-/pkg/webui @bafonins @kschiffer @pgalic96
+/pkg/webui @bafonins @kschiffer @asmulko
 /pkg/ratelimit @johanstokking @htdvisser @neoaggelos
 
 # Subsystems
@@ -76,7 +76,7 @@
 
 /pkg/joinserver @johanstokking @rvolosatovs @adriansmares
 
-/pkg/console @bafonins @kschiffer @pgalic96
+/pkg/console @bafonins @kschiffer @asmulko
 
 /pkg/packetbrokeragent @johanstokking @adriansmares
 
@@ -88,7 +88,7 @@
 /pkg/devicerepository @johanstokking @neoaggelos
 
 # SDKs
-/sdk/js @bafonins @kschiffer @pgalic96
+/sdk/js @bafonins @kschiffer @asmulko
 
 # Clear generated code
 /api/api.md
