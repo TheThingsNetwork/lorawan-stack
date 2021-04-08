@@ -276,6 +276,14 @@
               "options": {
                 "validate.rules": [
                   {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
                     "name": "repeated.items.enum.defined_only",
                     "value": true
                   }
@@ -13748,6 +13756,14 @@
               "options": {
                 "validate.rules": [
                   {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
                     "name": "repeated.items.enum.defined_only",
                     "value": true
                   }
@@ -26952,6 +26968,14 @@
               "options": {
                 "validate.rules": [
                   {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
                     "name": "repeated.items.enum.defined_only",
                     "value": true
                   }
@@ -31944,6 +31968,14 @@
               "defaultValue": "",
               "options": {
                 "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
                   {
                     "name": "repeated.items.enum.defined_only",
                     "value": true
