@@ -86,10 +86,55 @@ var (
 	errPasswordStrengthUppercase = errors.DefineInvalidArgument("password_strength_uppercase", "need at least `{n}` uppercase letter(s)")
 	errPasswordStrengthDigits    = errors.DefineInvalidArgument("password_strength_digits", "need at least `{n}` digit(s)")
 	errPasswordStrengthSpecial   = errors.DefineInvalidArgument("password_strength_special", "need at least `{n}` special character(s)")
+	errPasswordEqualsOld         = errors.DefineInvalidArgument("password_equals_old", "must not equal old password")
+	errPasswordContainsUserID    = errors.DefineInvalidArgument("password_contains_user_id", "must not contain user ID")
+	errCommonPassword            = errors.DefineInvalidArgument("common_password", "must not be too common")
 	errAdminsPurgeUsers          = errors.DefinePermissionDenied("admins_purge_users", "users may only be purged by admins")
 )
 
-func (is *IdentityServer) validatePasswordStrength(ctx context.Context, password string) error {
+// Source: https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/10-million-password-list-top-10000.txt
+// Filtered for passwords that are at least 8 characters long, and contain both numbers and letters.
+var commonPasswords = []string{
+	"1qaz2wsx", "trustno1", "1234qwer", "q1w2e3r4t5", "qwer1234", "q1w2e3r4", "1q2w3e4r", "jordan23", "abcd1234",
+	"password1", "qwerty123", "1q2w3e4r5t", "rush2112", "passw0rd", "1qazxsw2", "blink182", "12qwaszx", "asdf1234",
+	"1232323q", "12345qwert", "123456789a", "suckballz1", "qwerty12", "zaq12wsx", "ncc1701d", "hello123", "michael1",
+	"123456789q", "123qweasd", "charlie1", "a1b2c3d4", "password123", "oso123aljg", "123qweasdzxc", "letmein1",
+	"1234abcd", "qazwsx123", "mustang1", "freedom1", "fuckyou2", "1qaz2wsx3edc", "welcome1", "123qwe123", "wrinkle1",
+	"access14", "babylon5", "yankees1", "q1w2e3r4t5y6", "jessica1", "ncc1701e", "super123", "letmein2", "a1234567",
+	"gn56gn56", "matthew1", "anthony1", "satan666", "1q2w3e4r5t6y", "fuckyou1", "shaney14", "qwerty12345", "1234567a",
+	"1a2b3c4d", "ailcreated5240", "william1", "1234567q", "zaq1xsw2", "zxcv1234", "formula1", "a1s2d3f4", "thunder1",
+	"heather1", "chelsea1", "123456qwerty", "1234567890q", "richard1", "qwerty123456", "asshole1", "qwert123",
+	"scooter1", "ncc1701a", "pa55word", "patrick1", "gateway1", "cowboys1", "agent007", "porsche9", "diamond1",
+	"assword1", "1qaz1qaz", "pokemon1", "123456789z", "front242", "apollo13", "gordon24", "brandon1", "arsenal1",
+	"123456aa", "raiders1", "ojdlg123aljg", "jackson1", "fordf150", "pa55w0rd", "melissa1", "kcj9wx5n", "happy123",
+	"football1", "abc12345", "1qa2ws3ed", "rangers1", "p0015123", "nwo4life", "phoenix1", "pass1234", "chester1",
+	"jasmine1", "r2d2c3po", "chicken1", "marino13", "apple123", "samsung1", "1x2zkg8w", "test1234", "a123456789",
+	"america1", "12345678q", "qazwsx12", "qwerty1234", "montgom240", "12qw34er", "123qwerty", "1q2w3e4r5", "superman1",
+	"zxcvbnm1", "james007", "12345qwe", "zxasqw12", "gfhjkm123", "packers1", "newpass6", "charles1", "12345678a",
+	"shannon1", "madison1", "izdec0211", "nokia6300", "chicago1", "florida1", "baseball1", "123qq123", "1234567890a",
+	"50spanks", "password2", "digital1", "123456qw", "z1x2c3v4", "jasnel12", "q2w3e4r5", "lineage2", "fuckoff1",
+	"newyork1", "fishing1", "dragon12", "wg8e3wjf", "rebecca1", "ferrari1", "monster1", "crystal1", "winston1",
+	"monkey12", "jackson5", "1234asdf", "panther1", "green123", "1a2s3d4f", "123456qwe", "gandalf1", "devil666",
+	"9293709b13", "rainbow6", "qazwsxedc123", "scorpio1", "iverson3", "bulldog1", "master12", "ood123654", "dolphin1",
+	"a12345678", "pussy123", "tiger123", "summer99", "playboy1", "michael2", "killer12", "iloveyou2", "zxcvbnm123",
+	"pool6123", "mazdarx7", "hawaii50", "gabriel1", "1z2x3c4v", "yankees2", "tiffany1", "nascar24", "mazda626",
+	"asdfgh01", "123456789s", "just4fun", "cameron1", "andyod22", "password12", "james123", "drummer1", "qwerty11",
+	"qweasd123", "broncos1", "zxcasdqwe123", "soccer12", "soccer10", "qwert12345", "pumpkin1", "porsche1", "noname123",
+	"death666", "12qw12qw", "angel123", "123456ru", "pufunga7782", "iloveyou1", "david123", "yamahar1", "spencer1",
+	"marcius2", "ghbdtn123", "cygnusx1", "buddy123", "zachary1", "qwe123qwe", "mustang6", "jackass1", "ghhh47hj7649",
+	"1234zxcv", "vikings1", "penguin1", "assword123", "12345qwerty", "shadow12", "private1", "nokian73", "hallo123",
+	"cbr900rr", "asdqwe123", "warrior1", "nirvana1", "money123", "marines1", "cricket1", "chris123", "bubba123",
+	"f00tball", "peaches1", "nokia6233", "maxwell1", "mash4077", "spartan1", "q123456789", "power123", "genesis1",
+	"favorite6", "dodgers1", "awesome1", "12345qaz", "trouble1", "testing1", "summer69", "segblue2", "p0o9i8u7",
+	"gsxr1000", "austin31", "23skidoo", "123qwert", "12345qwer", "12345abc", "123456789m", "voyager1", "sammy123",
+	"rainbow1", "perfect1", "pantera1", "p4ssw0rd", "johnson1", "dragon69", "blue1234", "123456789qwe", "sabrina1",
+	"q1234567", "ncc74656", "natasha1", "destiny1", "1qazzaq1", "1qazxsw23edc", "123456qqq", "123456789d", "stephen1",
+	"liverpool1", "killer123", "buffalo1", "7777777a", "1passwor", "therock1", "success1", "password9", "eclipse1",
+	"charlie2", "1qw23er4", "1q1q1q1q", "1234rewq", "weare138", "vanessa1", "patches1", "password99", "forever1",
+	"captain1", "bubbles1",
+}
+
+func (is *IdentityServer) validatePasswordStrength(ctx context.Context, username, password string) error {
 	requirements := is.configFromContext(ctx).UserRegistration.PasswordRequirements
 	if len(password) < requirements.MinLength {
 		return errPasswordStrengthMinLength.WithAttributes("n", requirements.MinLength)
@@ -116,6 +161,16 @@ func (is *IdentityServer) validatePasswordStrength(ctx context.Context, password
 	}
 	if special < requirements.MinSpecial {
 		return errPasswordStrengthSpecial.WithAttributes("n", requirements.MinSpecial)
+	}
+	if requirements.RejectUserID && strings.Contains(strings.ToLower(password), strings.ToLower(username)) {
+		return errPasswordContainsUserID.New()
+	}
+	if requirements.RejectCommon {
+		for _, reject := range commonPasswords {
+			if strings.ToLower(password) == reject {
+				return errCommonPassword.New()
+			}
+		}
 	}
 	return nil
 }
@@ -175,7 +230,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		})
 	}
 
-	if err := is.validatePasswordStrength(ctx, req.User.Password); err != nil {
+	if err := is.validatePasswordStrength(ctx, req.UserID, req.User.Password); err != nil {
 		return nil, err
 	}
 	hashedPassword, err := auth.Hash(ctx, req.User.Password)
@@ -499,8 +554,11 @@ var (
 )
 
 func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*types.Empty, error) {
-	if err := is.validatePasswordStrength(ctx, req.New); err != nil {
+	if err := is.validatePasswordStrength(ctx, req.UserID, req.New); err != nil {
 		return nil, err
+	}
+	if req.Old == req.New {
+		return nil, errPasswordEqualsOld.New()
 	}
 	hashedPassword, err := auth.Hash(ctx, req.New)
 	if err != nil {
