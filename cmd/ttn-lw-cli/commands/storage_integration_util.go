@@ -16,6 +16,7 @@ package commands
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -43,7 +44,8 @@ func getStoredUpFlags() *pflag.FlagSet {
 	for k := range ttnpb.StoredApplicationUpTypes {
 		types = append(types, k)
 	}
-	flags.String("type", "", fmt.Sprintf("message type (%s)", strings.Join(types, "|")))
+	sort.Strings(types)
+	flags.String("type", "", fmt.Sprintf("message type (allowed values: %s)", strings.Join(types, ", ")))
 
 	return flags
 }
