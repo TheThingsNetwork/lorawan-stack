@@ -880,16 +880,21 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				DeviceChannelIndex: up.DeviceChannelIndex,
 				ConsumedAirtime:    up.ConsumedAirtime,
 			}, recentUplinkCount)
+
+			if up.Settings.DataRateIndex < stored.MACState.CurrentParameters.ADRDataRateIndex {
+				// Device lowers TX power index before lowering data rate index according to the spec.
+				stored.MACState.CurrentParameters.ADRTxPowerIndex = 0
+				paths = ttnpb.AddFields(paths,
+					"mac_state.current_parameters.adr_tx_power_index",
+				)
+			}
+			stored.MACState.CurrentParameters.ADRDataRateIndex = up.Settings.DataRateIndex
+			paths = ttnpb.AddFields(paths,
+				"mac_state.current_parameters.adr_data_rate_index",
+			)
+
 			useADR := mac.DeviceUseADR(stored, ns.defaultMACSettings, matched.phy)
 			if useADR {
-				if !pld.FHDR.ADR {
-					paths = ttnpb.AddFields(paths,
-						"mac_state.current_parameters.adr_data_rate_index",
-						"mac_state.current_parameters.adr_tx_power_index",
-					)
-					stored.MACState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_0
-					stored.MACState.CurrentParameters.ADRTxPowerIndex = 0
-				}
 				paths = ttnpb.AddFields(paths,
 					"mac_state.desired_parameters.adr_data_rate_index",
 					"mac_state.desired_parameters.adr_nb_trans",
