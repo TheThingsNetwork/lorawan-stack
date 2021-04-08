@@ -1031,8 +1031,26 @@ func (m *CreateOrganizationAPIKeyRequest) ValidateFields(paths ...string) error 
 
 		case "rights":
 
+			if len(m.GetRights()) < 1 {
+				return CreateOrganizationAPIKeyRequestValidationError{
+					field:  "rights",
+					reason: "value must contain at least 1 item(s)",
+				}
+			}
+
+			_CreateOrganizationAPIKeyRequest_Rights_Unique := make(map[Right]struct{}, len(m.GetRights()))
+
 			for idx, item := range m.GetRights() {
 				_, _ = idx, item
+
+				if _, exists := _CreateOrganizationAPIKeyRequest_Rights_Unique[item]; exists {
+					return CreateOrganizationAPIKeyRequestValidationError{
+						field:  fmt.Sprintf("rights[%v]", idx),
+						reason: "repeated value must contain unique items",
+					}
+				} else {
+					_CreateOrganizationAPIKeyRequest_Rights_Unique[item] = struct{}{}
+				}
 
 				if _, ok := Right_name[int32(item)]; !ok {
 					return CreateOrganizationAPIKeyRequestValidationError{

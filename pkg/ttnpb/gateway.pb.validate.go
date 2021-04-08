@@ -1954,8 +1954,26 @@ func (m *CreateGatewayAPIKeyRequest) ValidateFields(paths ...string) error {
 
 		case "rights":
 
+			if len(m.GetRights()) < 1 {
+				return CreateGatewayAPIKeyRequestValidationError{
+					field:  "rights",
+					reason: "value must contain at least 1 item(s)",
+				}
+			}
+
+			_CreateGatewayAPIKeyRequest_Rights_Unique := make(map[Right]struct{}, len(m.GetRights()))
+
 			for idx, item := range m.GetRights() {
 				_, _ = idx, item
+
+				if _, exists := _CreateGatewayAPIKeyRequest_Rights_Unique[item]; exists {
+					return CreateGatewayAPIKeyRequestValidationError{
+						field:  fmt.Sprintf("rights[%v]", idx),
+						reason: "repeated value must contain unique items",
+					}
+				} else {
+					_CreateGatewayAPIKeyRequest_Rights_Unique[item] = struct{}{}
+				}
 
 				if _, ok := Right_name[int32(item)]; !ok {
 					return CreateGatewayAPIKeyRequestValidationError{

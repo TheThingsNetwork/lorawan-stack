@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- It is no longer possible to accidentally create API keys without any rights.
+
 ### Security
 
 ## [3.12.0] - 2021-04-06
