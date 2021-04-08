@@ -22,6 +22,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - It is no longer possible to accidentally create API keys without any rights.
+- Application overview page crashing for collaborators without certain rights.
 
 ### Security
 
