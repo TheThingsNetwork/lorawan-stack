@@ -202,6 +202,7 @@ blobs:
     - cli
     folder: "{{ .Version }}"
     extra_files:
+    - glob: ./api/*.proto
     - glob: ./CHANGELOG.md
 
 dockers:
