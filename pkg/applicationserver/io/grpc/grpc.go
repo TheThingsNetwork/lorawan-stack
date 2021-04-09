@@ -63,11 +63,19 @@ func (p *defaultMessageProcessor) DecodeDownlink(ctx context.Context, ids ttnpb.
 	return nil
 }
 
+// SkipPayloadCryptoFunc is a function that checks if the end device should skip payload crypto operations.
+type SkipPayloadCryptoFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (bool, error)
+
+func defaultSkipPayloadCrypto(context.Context, ttnpb.EndDeviceIdentifiers) (bool, error) {
+	return false, nil
+}
+
 type impl struct {
 	server             io.Server
 	fetcher            EndDeviceFetcher
 	mqttConfigProvider config.MQTTConfigProvider
 	processor          messageprocessors.PayloadProcessor
+	skipPayloadCrypto  SkipPayloadCryptoFunc
 }
 
 // WithMQTTConfigProvider sets the MQTT configuration provider for the gRPC frontend.
@@ -91,9 +99,16 @@ func WithPayloadProcessor(processor messageprocessors.PayloadProcessor) Option {
 	})
 }
 
+// WithSkipPayloadCrypto sets the skip payload crypto predicate that will be used by the gRPC frontend.
+func WithSkipPayloadCrypto(f SkipPayloadCryptoFunc) Option {
+	return optionFunc(func(i *impl) {
+		i.skipPayloadCrypto = f
+	})
+}
+
 // New returns a new gRPC frontend.
 func New(server io.Server, opts ...Option) ttnpb.AppAsServer {
-	i := &impl{server: server, fetcher: &defaultFetcher{}, processor: &defaultMessageProcessor{}}
+	i := &impl{server: server, fetcher: &defaultFetcher{}, processor: &defaultMessageProcessor{}, skipPayloadCrypto: defaultSkipPayloadCrypto}
 	for _, opt := range opts {
 		opt.apply(i)
 	}
@@ -192,9 +207,17 @@ func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.Application
 	}, nil
 }
 
+var errPayloadCryptoSkipped = errors.DefineFailedPrecondition("payload_crypto_skipped", "payload crypto skipped")
+
 func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, up.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_UP_WRITE); err != nil {
 		return nil, err
+	}
+	skip, err := s.skipPayloadCrypto(ctx, up.EndDeviceIdentifiers)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Debug("Failed to determine if the payload crypto should be skipped")
+	} else if skip {
+		return nil, errPayloadCryptoSkipped.New()
 	}
 	up.Simulated = true
 	dev, err := s.fetcher.Get(ctx, up.EndDeviceIdentifiers, "ids")
@@ -203,7 +226,6 @@ func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pb
 	} else {
 		up.EndDeviceIdentifiers = dev.EndDeviceIdentifiers
 	}
-
 	if err := s.server.Publish(ctx, up); err != nil {
 		return nil, err
 	}
