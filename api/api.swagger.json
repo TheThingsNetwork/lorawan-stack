@@ -15476,6 +15476,10 @@
             "$ref": "#/definitions/v3ContactInfo"
           },
           "description": "Contact information."
+        },
+        "listed": {
+          "type": "boolean",
+          "description": "Whether the network is listed so it can be viewed by other networks."
         }
       }
     },

@@ -28360,6 +28360,16 @@
               "fullType": "ttn.lorawan.v3.ContactInfo",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "listed",
+              "description": "Whether the network is listed so it can be viewed by other networks.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
