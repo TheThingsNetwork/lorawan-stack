@@ -68,7 +68,10 @@ export default class WebhookTemplateForm extends Component {
 
     const headers = Object.keys(template.headers || {}).reduce((acc, key) => {
       const val = template.headers[key]
-      acc[key] = val.replace(/{([a-z0-9_-]+)}/i, (_, field) => values[field])
+      const headerValue = val.replace(/{([a-z0-9_-]+)}/i, (_, field) => values[field])
+      if (headerValue !== '') {
+        acc[key] = headerValue
+      }
       return acc
     }, {})
 
@@ -150,7 +153,9 @@ export default class WebhookTemplateForm extends Component {
       ...fields.reduce(
         (acc, field) => ({
           ...acc,
-          [field.id]: Yup.string().required(sharedMessages.validateRequired),
+          [field.id]: field.optional
+            ? Yup.string()
+            : Yup.string().required(sharedMessages.validateRequired),
         }),
         {
           webhook_id: Yup.string()
@@ -205,7 +210,7 @@ export default class WebhookTemplateForm extends Component {
               title={field.name}
               description={field.description}
               key={field.id}
-              required
+              required={!field.optional}
             />
           ))}
           <SubmitBar>
