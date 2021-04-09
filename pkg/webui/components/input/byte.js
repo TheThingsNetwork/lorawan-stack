@@ -150,7 +150,7 @@ export default class ByteInput extends React.Component {
     const { max, showPerChar } = this.props
     const { data } = evt.nativeEvent
 
-    let value = clean(event.target.value)
+    let value = clean(evt.target.value)
     const normalizedMax = showPerChar ? Math.ceil(max / 2) : max
 
     // Check if the value already has length equal to `max`.
