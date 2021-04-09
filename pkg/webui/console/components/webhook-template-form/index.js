@@ -162,9 +162,12 @@ export default class WebhookTemplateForm extends Component {
       ),
     })
 
-    const initialValues = fields.reduce((acc, field) => ({ ...acc, [field.id]: '' }), {
-      webhook_id: '',
-    })
+    const initialValues = fields.reduce(
+      (acc, field) => ({ ...acc, [field.id]: field.default_value || '' }),
+      {
+        webhook_id: '',
+      },
+    )
     return (
       <div>
         <PortalledModal
