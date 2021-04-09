@@ -1759,6 +1759,7 @@ The fields are meant to be replaced inside the URLs and headers when the webhook
 | `description` | [`string`](#string) |  |  |
 | `secret` | [`bool`](#bool) |  | Secret decides if the field should be shown in plain-text or should stay hidden. |
 | `default_value` | [`string`](#string) |  |  |
+| `optional` | [`bool`](#bool) |  |  |
 
 #### Field Rules
 

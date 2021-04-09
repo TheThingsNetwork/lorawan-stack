@@ -12215,6 +12215,9 @@
         },
         "default_value": {
           "type": "string"
+        },
+        "optional": {
+          "type": "boolean"
         }
       },
       "description": "ApplicationWebhookTemplateField represents a custom field that needs to be filled by the user in order to use the template.\nA field can be an API key, an username or password, or any custom platform specific field (such as region).\nThe fields are meant to be replaced inside the URLs and headers when the webhook is created."
