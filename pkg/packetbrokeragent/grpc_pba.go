@@ -51,6 +51,7 @@ func (s *pbaServer) GetInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Packe
 			GetDevAddrBlocks() []*packetbroker.DevAddrBlock
 			GetAdministrativeContact() *packetbroker.ContactInfo
 			GetTechnicalContact() *packetbroker.ContactInfo
+			GetListed() bool
 		}
 		err error
 	)
@@ -88,6 +89,7 @@ func (s *pbaServer) GetInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Packe
 			Name:          registration.GetName(),
 			DevAddrBlocks: asDevAddrBlocks(registration.GetDevAddrBlocks()),
 			ContactInfo:   asContactInfo(registration.GetAdministrativeContact(), registration.GetTechnicalContact()),
+			Listed:        registration.GetListed(),
 		}
 	}
 
@@ -137,6 +139,7 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 				DevAddrBlocks:         devAddrBlocks,
 				AdministrativeContact: adminContact,
 				TechnicalContact:      technicalContact,
+				Listed:                registration.Listed,
 			},
 		})
 	} else {
@@ -155,6 +158,9 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 			TechnicalContact: &iampb.ContactInfoValue{
 				Value: technicalContact,
 			},
+			Listed: &pbtypes.BoolValue{
+				Value: registration.Listed,
+			},
 		})
 	}
 
@@ -170,6 +176,7 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 		Name:          registration.Name,
 		DevAddrBlocks: asDevAddrBlocks(devAddrBlocks),
 		ContactInfo:   asContactInfo(adminContact, technicalContact),
+		Listed:        registration.Listed,
 	}, nil
 }
 

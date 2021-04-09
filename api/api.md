@@ -6830,6 +6830,7 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | `name` | [`string`](#string) |  | Name of the network. |
 | `dev_addr_blocks` | [`PacketBrokerDevAddrBlock`](#ttn.lorawan.v3.PacketBrokerDevAddrBlock) | repeated | DevAddr blocks that are assigned to this registration. |
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information. |
+| `listed` | [`bool`](#bool) |  | Whether the network is listed so it can be viewed by other networks. |
 
 ### <a name="ttn.lorawan.v3.PacketBrokerNetworkIdentifier">Message `PacketBrokerNetworkIdentifier`</a>
 

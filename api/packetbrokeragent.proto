@@ -60,6 +60,8 @@ message PacketBrokerNetwork {
   repeated PacketBrokerDevAddrBlock dev_addr_blocks = 3;
   // Contact information.
   repeated ContactInfo contact_info = 4;
+  // Whether the network is listed so it can be viewed by other networks.
+  bool listed = 5;
 }
 
 message PacketBrokerNetworks {
