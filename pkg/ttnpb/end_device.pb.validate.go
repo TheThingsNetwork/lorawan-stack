@@ -3659,10 +3659,10 @@ func (m *MACParameters_Channel) ValidateFields(paths ...string) error {
 		switch name {
 		case "uplink_frequency":
 
-			if m.GetUplinkFrequency() < 100000 {
+			if val := m.GetUplinkFrequency(); val > 0 && val < 100000 {
 				return MACParameters_ChannelValidationError{
 					field:  "uplink_frequency",
-					reason: "value must be greater than or equal to 100000",
+					reason: "value must be outside range (0, 100000)",
 				}
 			}
 
