@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - It is no longer possible to accidentally create API keys without any rights.
 - Application overview page crashing for collaborators without certain rights.
+- `mac_settings.factory_preset_frequencies` handling in US-like bands.
 
 ### Security
 

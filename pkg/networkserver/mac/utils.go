@@ -451,95 +451,116 @@ func DeviceDesiredBeaconFrequency(dev *ttnpb.EndDevice, defaults ttnpb.MACSettin
 	}
 }
 
-func DeviceDefaultChannels(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) []*ttnpb.MACParameters_Channel {
-	// NOTE: FactoryPresetFrequencies does not indicate the data rate ranges allowed for channels.
-	// In the latest regional parameters spec(1.1b) the data rate ranges are DR0-DR5 for mandatory channels in all non-fixed channel plans,
-	// hence we assume the same range for predefined channels.
-	var chs []*ttnpb.MACParameters_Channel
-	switch {
-	case len(dev.GetMACSettings().GetFactoryPresetFrequencies()) > 0:
-		chs = make([]*ttnpb.MACParameters_Channel, 0, len(dev.MACSettings.FactoryPresetFrequencies))
-		for _, freq := range dev.MACSettings.FactoryPresetFrequencies {
-			chs = append(chs, &ttnpb.MACParameters_Channel{
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				UplinkFrequency:   freq,
-				DownlinkFrequency: freq,
-				EnableUplink:      true,
-			})
-		}
-	case len(defaults.GetFactoryPresetFrequencies()) > 0:
-		chs = make([]*ttnpb.MACParameters_Channel, 0, len(defaults.FactoryPresetFrequencies))
-		for _, freq := range defaults.FactoryPresetFrequencies {
-			chs = append(chs, &ttnpb.MACParameters_Channel{
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				UplinkFrequency:   freq,
-				DownlinkFrequency: freq,
-				EnableUplink:      true,
-			})
-		}
-	default:
-		if len(phy.DownlinkChannels) > len(phy.UplinkChannels) ||
-			len(phy.UplinkChannels) > int(phy.MaxUplinkChannels) ||
-			len(phy.DownlinkChannels) > int(phy.MaxDownlinkChannels) {
-			// NOTE: In case the spec changes and this assumption is not valid anymore,
-			// the implementation of this function won't be valid and has to be changed.
-			panic("uplink/downlink channel length is inconsistent")
-		}
-		chs = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels))
-		for i, phyUpCh := range phy.UplinkChannels {
-			chs = append(chs, &ttnpb.MACParameters_Channel{
-				MinDataRateIndex:  phyUpCh.MinDataRate,
-				MaxDataRateIndex:  phyUpCh.MaxDataRate,
-				UplinkFrequency:   phyUpCh.Frequency,
-				DownlinkFrequency: phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency,
-				EnableUplink:      true,
-			})
-		}
+func deviceFactoryPresetFrequencies(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) []uint64 {
+	if freqs := dev.GetMACSettings().GetFactoryPresetFrequencies(); len(freqs) > 0 {
+		return freqs
 	}
-	return chs
+	return defaults.GetFactoryPresetFrequencies()
 }
 
-func DeviceDesiredChannels(phy *band.Band, fp *frequencyplans.FrequencyPlan, defaults ttnpb.MACSettings) []*ttnpb.MACParameters_Channel {
-	if len(phy.DownlinkChannels) > len(phy.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) ||
-		len(phy.UplinkChannels) > int(phy.MaxUplinkChannels) || len(phy.DownlinkChannels) > int(phy.MaxDownlinkChannels) ||
-		len(fp.UplinkChannels) > int(phy.MaxUplinkChannels) || len(fp.DownlinkChannels) > int(phy.MaxDownlinkChannels) {
+func DeviceDefaultChannels(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) []*ttnpb.MACParameters_Channel {
+	if len(phy.DownlinkChannels) > len(phy.UplinkChannels) ||
+		len(phy.UplinkChannels) > int(phy.MaxUplinkChannels) ||
+		len(phy.DownlinkChannels) > int(phy.MaxDownlinkChannels) {
 		// NOTE: In case the spec changes and this assumption is not valid anymore,
 		// the implementation of this function won't be valid and has to be changed.
 		panic("uplink/downlink channel length is inconsistent")
 	}
 
-	chs := make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels)+len(fp.UplinkChannels))
+	factoryPresetFreqs := deviceFactoryPresetFrequencies(dev, defaults)
+
+	chs := make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels)+len(factoryPresetFreqs))
 	for i, phyUpCh := range phy.UplinkChannels {
+		downFreq := phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency
+		if dev.Multicast {
+			chs = append(chs, &ttnpb.MACParameters_Channel{
+				DownlinkFrequency: downFreq,
+			})
+			continue
+		}
 		chs = append(chs, &ttnpb.MACParameters_Channel{
 			MinDataRateIndex:  phyUpCh.MinDataRate,
 			MaxDataRateIndex:  phyUpCh.MaxDataRate,
 			UplinkFrequency:   phyUpCh.Frequency,
-			DownlinkFrequency: phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency,
+			DownlinkFrequency: downFreq,
+			EnableUplink:      len(factoryPresetFreqs) == 0,
 		})
 	}
 
-outerUp:
-	for _, fpUpCh := range fp.UplinkChannels {
+outer:
+	for _, freq := range factoryPresetFreqs {
+		for _, ch := range chs {
+			if ch.UplinkFrequency == freq {
+				ch.EnableUplink = true
+				// NOTE: duplicates should not be allowed.
+				continue outer
+			}
+		}
+		if dev.Multicast {
+			chs = append(chs, &ttnpb.MACParameters_Channel{
+				DownlinkFrequency: freq,
+			})
+			continue
+		}
+		// NOTE: FactoryPresetFrequencies does not indicate the data rate ranges allowed for channels.
+		// In the latest regional parameters spec(1.1b) the data rate ranges are DR0-DR5 for mandatory channels in all non-fixed channel plans,
+		// hence we assume the same range for predefined channels.
+		chs = append(chs, &ttnpb.MACParameters_Channel{
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			UplinkFrequency:   freq,
+			DownlinkFrequency: freq,
+			EnableUplink:      true,
+		})
+	}
+	return chs
+}
+
+func DeviceDesiredChannels(dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, defaults ttnpb.MACSettings) []*ttnpb.MACParameters_Channel {
+	if len(phy.DownlinkChannels) > len(phy.UplinkChannels) ||
+		len(phy.UplinkChannels) > int(phy.MaxUplinkChannels) ||
+		len(phy.DownlinkChannels) > int(phy.MaxDownlinkChannels) ||
+		len(fp.DownlinkChannels) != 0 && len(fp.DownlinkChannels) != len(fp.UplinkChannels) ||
+		len(fp.UplinkChannels) > int(phy.MaxUplinkChannels) ||
+		len(fp.DownlinkChannels) > int(phy.MaxDownlinkChannels) {
+		// NOTE: In case the spec changes and this assumption is not valid anymore,
+		// the implementation of this function won't be valid and has to be changed.
+		panic("uplink/downlink channel length is inconsistent")
+	}
+
+	defaultChs := DeviceDefaultChannels(dev, phy, defaults)
+
+	chs := make([]*ttnpb.MACParameters_Channel, 0, len(defaultChs)+len(fp.UplinkChannels))
+	for _, ch := range defaultChs {
+		chs = append(chs, &ttnpb.MACParameters_Channel{
+			MinDataRateIndex:  ch.MinDataRateIndex,
+			MaxDataRateIndex:  ch.MaxDataRateIndex,
+			UplinkFrequency:   ch.UplinkFrequency,
+			DownlinkFrequency: ch.DownlinkFrequency,
+		})
+	}
+
+outer:
+	for i, fpUpCh := range fp.UplinkChannels {
 		for _, ch := range chs {
 			if ch.UplinkFrequency == fpUpCh.Frequency {
 				ch.MinDataRateIndex = ttnpb.DataRateIndex(fpUpCh.MinDataRate)
 				ch.MaxDataRateIndex = ttnpb.DataRateIndex(fpUpCh.MaxDataRate)
 				ch.EnableUplink = true
-				continue outerUp
+				// NOTE: duplicates should not be allowed.
+				continue outer
 			}
+		}
+		downFreq := fpUpCh.Frequency
+		if i < len(fp.DownlinkChannels) {
+			downFreq = fp.DownlinkChannels[i].Frequency
 		}
 		chs = append(chs, &ttnpb.MACParameters_Channel{
 			MinDataRateIndex:  ttnpb.DataRateIndex(fpUpCh.MinDataRate),
 			MaxDataRateIndex:  ttnpb.DataRateIndex(fpUpCh.MaxDataRate),
 			UplinkFrequency:   fpUpCh.Frequency,
-			DownlinkFrequency: phy.DownlinkChannels[len(chs)%len(phy.DownlinkChannels)].Frequency,
+			DownlinkFrequency: downFreq,
 			EnableUplink:      true,
 		})
-	}
-	if len(fp.DownlinkChannels) > 0 {
-		for i, ch := range chs {
-			ch.DownlinkFrequency = fp.DownlinkChannels[i%len(fp.DownlinkChannels)].Frequency
-		}
 	}
 	return chs
 }
@@ -587,7 +608,7 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 			RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
 			PingSlotFrequency:          DeviceDesiredPingSlotFrequency(dev, phy, fp, defaults),
 			BeaconFrequency:            DeviceDesiredBeaconFrequency(dev, defaults),
-			Channels:                   DeviceDesiredChannels(phy, fp, defaults),
+			Channels:                   DeviceDesiredChannels(dev, phy, fp, defaults),
 			UplinkDwellTime:            DeviceDesiredUplinkDwellTime(fp),
 			DownlinkDwellTime:          DeviceDesiredDownlinkDwellTime(fp),
 			ADRAckLimitExponent:        DeviceDesiredADRAckLimitExponent(dev, phy, defaults),
