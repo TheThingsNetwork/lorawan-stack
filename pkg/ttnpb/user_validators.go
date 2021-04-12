@@ -67,11 +67,6 @@ func (req *UpdateUserAPIKeyRequest) ValidateContext(context.Context) error {
 }
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (req *CreateLoginTokenRequest) ValidateContext(context.Context) error {
-	return req.ValidateFields()
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (req *ListUserSessionsRequest) ValidateContext(context.Context) error {
 	return req.ValidateFields()
 }
