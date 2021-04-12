@@ -66,9 +66,9 @@ class CodeEditor extends React.Component {
     language: 'javascript',
     maxLines: Infinity,
     minLines: 1,
-    onBlur: undefined,
-    onChange: undefined,
-    onFocus: undefined,
+    onBlur: () => null,
+    onChange: () => null,
+    onFocus: () => null,
     placeholder: '',
     readOnly: false,
     scrollToBottom: false,
@@ -88,9 +88,7 @@ class CodeEditor extends React.Component {
     const { onFocus } = this.props
 
     this.setState({ focus: true }, () => {
-      if (onFocus) {
-        onFocus(evt)
-      }
+      onFocus(evt)
     })
   }
 
@@ -99,10 +97,15 @@ class CodeEditor extends React.Component {
     const { onBlur } = this.props
 
     this.setState({ focus: false }, () => {
-      if (onBlur) {
-        onBlur(evt)
-      }
+      onBlur(evt)
     })
+  }
+
+  @bind
+  onChange(evt) {
+    const { onChange } = this.props
+
+    onChange(evt)
   }
 
   componentDidUpdate({ value }) {
@@ -119,7 +122,6 @@ class CodeEditor extends React.Component {
       className,
       language,
       name,
-      onChange,
       value,
       placeholder,
       readOnly,
@@ -154,7 +156,7 @@ class CodeEditor extends React.Component {
     }
 
     return (
-      <div className={editorCls} data-test-id="code-editor">
+      <div className={editorCls} data-test-id={`code-editor-${name}`}>
         <ReactAce
           // Rendered options.
           theme="ttn"
@@ -168,7 +170,7 @@ class CodeEditor extends React.Component {
           showGutter={showGutter}
           // Other props.
           name={name}
-          onChange={onChange}
+          onChange={this.onChange}
           value={currentValue}
           defaultValue={placeholder}
           setOptions={options}

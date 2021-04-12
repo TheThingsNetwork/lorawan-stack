@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,13 @@ import { connect } from 'react-redux'
 
 import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
 
+import api from '@console/api'
+
+import Notification from '@ttn-lw/components/notification'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import toast from '@ttn-lw/components/toast'
+import Link from '@ttn-lw/components/link'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -30,25 +34,36 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
+import { hexToBase64 } from '@console/lib/bytes'
+
 import { updateDevice } from '@console/store/actions/devices'
 
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import {
+  selectSelectedApplicationId,
+  selectApplicationLink,
+} from '@console/store/selectors/applications'
 import {
   selectSelectedDeviceId,
   selectSelectedDeviceFormatters,
+  selectSelectedDevice,
 } from '@console/store/selectors/devices'
+
+import messages from './messages'
 
 @connect(
   state => {
-    const formatters = selectSelectedDeviceFormatters(state)
-
     return {
       appId: selectSelectedApplicationId(state),
+      device: selectSelectedDevice(state),
       devId: selectSelectedDeviceId(state),
-      formatters,
+      link: selectApplicationLink(state),
+      formatters: selectSelectedDeviceFormatters(state),
+      decodeUplink: api.as.decodeUplink,
     }
   },
-  { updateDevice: attachPromise(updateDevice) },
+  {
+    updateDevice: attachPromise(updateDevice),
+  },
 )
 @withBreadcrumb('device.single.payload-formatters.uplink', props => {
   const { appId, devId } = props
@@ -63,13 +78,33 @@ import {
 class DevicePayloadFormatters extends React.PureComponent {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    decodeUplink: PropTypes.func.isRequired,
     devId: PropTypes.string.isRequired,
+    device: PropTypes.device.isRequired,
     formatters: PropTypes.formatters,
+    link: PropTypes.shape({
+      default_formatters: PropTypes.shape({
+        up_formatter: PropTypes.string,
+        up_formatter_parameter: PropTypes.string,
+      }),
+    }).isRequired,
     updateDevice: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     formatters: undefined,
+  }
+
+  constructor(props) {
+    super(props)
+
+    const { formatters } = props
+
+    this.state = {
+      type: Boolean(formatters)
+        ? formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE
+        : PAYLOAD_FORMATTER_TYPES.DEFAULT,
+    }
   }
 
   @bind
@@ -104,26 +139,90 @@ class DevicePayloadFormatters extends React.PureComponent {
     })
   }
 
+  @bind
+  async onTestSubmit(data) {
+    const { appId, devId, decodeUplink, device } = this.props
+    const { f_port, payload, formatter, parameter } = data
+    const { version_ids } = device
+
+    const { uplink } = await decodeUplink(appId, devId, {
+      uplink: {
+        f_port,
+        frm_payload: hexToBase64(payload),
+        // `rx_metadata` and `settings` fields are required by the validation middleware in AS.
+        // These fields won't affect the result of decoding an uplink message.
+        rx_metadata: [{ gateway_ids: { gateway_id: 'gtw-test' } }],
+        settings: { data_rate: { lora: {} } },
+      },
+      version_ids: Object.keys(version_ids).length > 0 ? version_ids : undefined,
+      formatter,
+      parameter,
+    })
+
+    return {
+      payload: uplink.decoded_payload,
+      warnings: uplink.decoded_payload_warnings,
+    }
+  }
+
+  @bind
+  onTypeChange(type) {
+    this.setState({ type })
+  }
+
   render() {
-    const { formatters } = this.props
+    const { formatters, link, appId } = this.props
+    const { type } = this.state
+    const { default_formatters = {} } = link
 
     const formatterType = Boolean(formatters)
       ? formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE
       : PAYLOAD_FORMATTER_TYPES.DEFAULT
     const formatterParameter = Boolean(formatters) ? formatters.up_formatter_parameter : undefined
+    const appFormatterType = Boolean(default_formatters.up_formatter)
+      ? default_formatters.up_formatter
+      : PAYLOAD_FORMATTER_TYPES.NONE
+    const appFormatterParameter = Boolean(default_formatters.up_formatter_parameter)
+      ? default_formatters.up_formatter_parameter
+      : undefined
+
+    const isDefaultType = type === PAYLOAD_FORMATTER_TYPES.DEFAULT
 
     return (
       <React.Fragment>
         <IntlHelmet title={sharedMessages.payloadFormattersUplink} />
+        {isDefaultType && (
+          <Notification
+            small
+            info
+            content={messages.defaultFormatter}
+            messageValues={{
+              Link: msg => (
+                <Link
+                  secondary
+                  key="manual-link"
+                  to={`/applications/${appId}/payload-formatters/uplink`}
+                >
+                  {msg}
+                </Link>
+              ),
+            }}
+          />
+        )}
         <PayloadFormattersForm
           uplink
           linked
           allowReset
+          allowTest
           onSubmit={this.onSubmit}
           onSubmitSuccess={this.onSubmitSuccess}
+          onTestSubmit={this.onTestSubmit}
           title={sharedMessages.payloadFormattersUplink}
           initialType={formatterType}
           initialParameter={formatterParameter}
+          defaultType={appFormatterType}
+          defaultParameter={appFormatterParameter}
+          onTypeChange={this.onTypeChange}
         />
       </React.Fragment>
     )

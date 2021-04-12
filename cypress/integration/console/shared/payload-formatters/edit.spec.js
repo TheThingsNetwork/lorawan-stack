@@ -72,8 +72,8 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/payload-formatters/uplink`,
         )
 
-        cy.findByLabelText('Javascript').check()
-        cy.findByTestId('code-editor').should('be.visible')
+        cy.findByLabelText('Formatter type').selectOption('javascript')
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -91,7 +91,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/payload-formatters/uplink`,
         )
 
-        cy.findByLabelText('GRPC service').check()
+        cy.findByLabelText('Formatter type').selectOption('grpc')
         cy.findByLabelText('Formatter parameter').type('localhost')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -110,7 +110,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/payload-formatters/uplink`,
         )
 
-        cy.findByLabelText('CayenneLPP').check()
+        cy.findByLabelText('Formatter type').selectOption('cayennelpp')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -129,7 +129,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/payload-formatters/uplink`,
         )
 
-        cy.findByLabelText('Repository').check()
+        cy.findByLabelText('Formatter type').selectOption('repository')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -148,7 +148,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/payload-formatters/uplink`,
         )
 
-        cy.findByLabelText('None').check()
+        cy.findByLabelText('Formatter type').selectOption('none')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -173,8 +173,8 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/payload-formatters/downlink`,
         )
 
-        cy.findByLabelText('Javascript').check()
-        cy.findByTestId('code-editor').should('be.visible')
+        cy.findByLabelText('Formatter type').selectOption('javascript')
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -192,7 +192,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/payload-formatters/downlink`,
         )
 
-        cy.findByLabelText('GRPC service').check()
+        cy.findByLabelText('Formatter type').selectOption('grpc')
         cy.findByLabelText('Formatter parameter').type('localhost')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -211,7 +211,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/payload-formatters/downlink`,
         )
 
-        cy.findByLabelText('CayenneLPP').check()
+        cy.findByLabelText('Formatter type').selectOption('cayennelpp')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -230,7 +230,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/payload-formatters/downlink`,
         )
 
-        cy.findByLabelText('Repository').check()
+        cy.findByLabelText('Formatter type').selectOption('repository')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -249,7 +249,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/payload-formatters/downlink`,
         )
 
-        cy.findByLabelText('None').check()
+        cy.findByLabelText('Formatter type').selectOption('none')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -276,8 +276,8 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
         )
 
-        cy.findByLabelText('Javascript').check()
-        cy.findByTestId('code-editor').should('be.visible')
+        cy.findByLabelText('Formatter type').selectOption('javascript')
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -295,7 +295,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
         )
 
-        cy.findByLabelText('GRPC service').check()
+        cy.findByLabelText('Formatter type').selectOption('grpc')
         cy.findByLabelText('Formatter parameter').type('localhost')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -314,7 +314,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
         )
 
-        cy.findByLabelText('CayenneLPP').check()
+        cy.findByLabelText('Formatter type').selectOption('cayennelpp')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -333,7 +333,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
         )
 
-        cy.findByLabelText('Repository').check()
+        cy.findByLabelText('Formatter type').selectOption('repository')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -352,7 +352,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
         )
 
-        cy.findByLabelText('None').check()
+        cy.findByLabelText('Formatter type').selectOption('none')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -371,7 +371,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
         )
 
-        cy.findByLabelText('Use application payload formatter').check()
+        cy.findByLabelText('Formatter type').selectOption('default')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -395,8 +395,8 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/downlink`,
         )
 
-        cy.findByLabelText('Javascript').check()
-        cy.findByTestId('code-editor').should('be.visible')
+        cy.findByLabelText('Formatter type').selectOption('javascript')
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -414,7 +414,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/downlink`,
         )
 
-        cy.findByLabelText('GRPC service').check()
+        cy.findByLabelText('Formatter type').selectOption('grpc')
         cy.findByLabelText('Formatter parameter').type('localhost')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -433,7 +433,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/downlink`,
         )
 
-        cy.findByLabelText('CayenneLPP').check()
+        cy.findByLabelText('Formatter type').selectOption('cayennelpp')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -452,7 +452,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/downlink`,
         )
 
-        cy.findByLabelText('Repository').check()
+        cy.findByLabelText('Formatter type').selectOption('repository')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -471,7 +471,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/downlink`,
         )
 
-        cy.findByLabelText('None').check()
+        cy.findByLabelText('Formatter type').selectOption('none')
         cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
@@ -490,7 +490,7 @@ describe('Payload formatters', () => {
           )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/downlink`,
         )
 
-        cy.findByLabelText('Use application payload formatter').check()
+        cy.findByLabelText('Formatter type').selectOption('default')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 

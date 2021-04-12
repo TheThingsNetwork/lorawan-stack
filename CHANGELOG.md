@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Payload formatter testing functionality in the Console.
+
 ### Changed
 
 - Network Server now takes uplink data rate index for ADR.

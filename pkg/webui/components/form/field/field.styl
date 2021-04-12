@@ -38,6 +38,30 @@
       .label::after
         margin-left: 0.1rem
 
+  &.grow
+    flex-grow: 1
+
+.field-container
+  display: flex
+  margin-bottom: $ls.xxs
+
+
+  &:not(.horizontal)
+    flex-direction: column
+
+  &.horizontal
+    flex-direction: row
+
+    .field
+      margin-bottom: 0
+
+      &.auto-width
+        width: auto
+        align-content: flex-start
+
+      &:not(:last-child)
+        margin-right: $ls.xxs
+
 .label
   display: block
   align-items: flex-start
