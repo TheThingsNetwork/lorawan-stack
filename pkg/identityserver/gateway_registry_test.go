@@ -311,8 +311,8 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		eui := types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
 
-		targetCUPSURI := "thethings.example.com"
-		otherTargetCUPSURI := "thenotthings.example.com:1234"
+		targetCUPSURI := "https://thethings.example.com"
+		otherTargetCUPSURI := "https://thenotthings.example.com:1234"
 
 		gatewayID := "foo-with-secrets"
 		gatewayName := "Foo Gateway with Secrets"
