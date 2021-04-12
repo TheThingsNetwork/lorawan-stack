@@ -43,7 +43,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
     const validate = schema =>
       createValidation({
         activationMode: ACTIVATION_MODES.OTAA,
-        lorawanVersion: '1.0.0',
+        lorawanVersion: 'MAC_V1_0',
       })(schema)
 
     it('requires `join_eui`', done => {
@@ -94,7 +94,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.ABP,
-          lorawanVersion: '1.0.4',
+          lorawanVersion: 'MAC_V1_0_4',
         })(schema)
 
       it('requires `dev_eui`', done => {
@@ -122,7 +122,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.ABP,
-          lorawanVersion: '1.0.0',
+          lorawanVersion: 'MAC_V1_0',
         })(schema)
 
       it('processes valid schema w/ or w/o `dev_eui`', () => {
@@ -155,7 +155,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.MULTICAST,
-          lorawanVersion: '1.0.4',
+          lorawanVersion: 'MAC_V1_0_4',
         })(schema)
 
       it('processes valid schema with or without `dev_eui`', () => {
@@ -174,7 +174,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.MULTICAST,
-          lorawanVersion: '1.0.0',
+          lorawanVersion: 'MAC_V1_0',
         })(schema)
 
       it('processes valid schema with or without `dev_eui`', () => {
@@ -206,7 +206,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
     const validate = schema =>
       createValidation({
         activationMode: ACTIVATION_MODES.MULTICAST,
-        lorawanVersion: '1.0.0',
+        lorawanVersion: 'MAC_V1_0',
       })(schema)
 
     it('processes valid schema', () => {

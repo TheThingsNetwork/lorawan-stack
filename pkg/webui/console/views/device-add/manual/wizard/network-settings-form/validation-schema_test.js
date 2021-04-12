@@ -74,8 +74,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
   describe('when using `ABP` activation mode', () => {
     it('handles `mac_settings.resets_f_cnt`', () => {
       const schema = {
-        lorawan_version: '1.0.0',
-        lorawan_phy_version: '1.0.0',
+        lorawan_version: 'MAC_V1_0',
+        lorawan_phy_version: 'PHY_V1_0',
         frequency_plan_id: 'test-freq-plan',
         mac_settings: {
           resets_f_cnt: true,
@@ -106,8 +106,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
 
     it('requires `f_nwk_s_int_key`', done => {
       const schema = {
-        lorawan_version: '1.0.0',
-        lorawan_phy_version: '1.0.0',
+        lorawan_version: 'MAC_V1_0',
+        lorawan_phy_version: 'PHY_V1_0',
         frequency_plan_id: 'test-freq-plan',
         mac_settings: {
           resets_f_cnt: true,
@@ -134,8 +134,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
   describe('when `lorawan_version` is 1.1.0', () => {
     it('requires `s_nwk_s_int_key` for `ABP` activation mode', done => {
       const schema = {
-        lorawan_version: '1.1.0',
-        lorawan_phy_version: '1.1.0-a',
+        lorawan_version: 'MAC_V1_1_0',
+        lorawan_phy_version: 'PHY_V1_1_REV_A',
         frequency_plan_id: 'test-freq-plan',
         session: {
           dev_addr: '1'.repeat(8),
@@ -163,8 +163,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
 
     it('requires `nwk_s_enc_key` for `ABP` activation mode', done => {
       const schema = {
-        lorawan_version: '1.1.0',
-        lorawan_phy_version: '1.1.0-a',
+        lorawan_version: 'MAC_V1_1_0',
+        lorawan_phy_version: 'PHY_V1_1_REV_A',
         frequency_plan_id: 'test-freq-plan',
         session: {
           dev_addr: '1'.repeat(8),
@@ -197,8 +197,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
       const nwkSEncKey = '3'.repeat(32)
 
       const schema = {
-        lorawan_version: '1.1.0',
-        lorawan_phy_version: '1.1.0-a',
+        lorawan_version: 'MAC_V1_1_0',
+        lorawan_phy_version: 'PHY_V1_1_REV_A',
         frequency_plan_id: 'test-freq-plan',
         session: {
           dev_addr: '4'.repeat(8),
@@ -235,8 +235,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
 
     it('requires `s_nwk_s_int_key` for `multicast` activation mode', done => {
       const schema = {
-        lorawan_version: '1.1.0',
-        lorawan_phy_version: '1.1.0-a',
+        lorawan_version: 'MAC_V1_1_0',
+        lorawan_phy_version: 'PHY_V1_1_REV_A',
         frequency_plan_id: 'test-freq-plan',
         session: {
           dev_addr: '1'.repeat(8),
@@ -264,8 +264,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
 
     it('requires `nwk_s_enc_key` for `multicast` activation mode', done => {
       const schema = {
-        lorawan_version: '1.1.0',
-        lorawan_phy_version: '1.1.0-a',
+        lorawan_version: 'MAC_V1_1_0',
+        lorawan_phy_version: 'PHY_V1_1_REV_A',
         frequency_plan_id: 'test-freq-plan',
         session: {
           dev_addr: '1'.repeat(8),
@@ -297,8 +297,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
       const nwkSEncKey = '3'.repeat(32)
 
       const schema = {
-        lorawan_version: '1.1.0',
-        lorawan_phy_version: '1.1.0-a',
+        lorawan_version: 'MAC_V1_1_0',
+        lorawan_phy_version: 'PHY_V1_1_REV_A',
         frequency_plan_id: 'test-freq-plan',
         _device_classes: { class_b: true },
         mac_settings: {
@@ -343,8 +343,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
           join_eui: '1'.repeat(16),
           dev_eui: '1'.repeat(16),
         },
-        lorawan_version: '1.1.0',
-        lorawan_phy_version: '1.1.0-a',
+        lorawan_version: 'MAC_V1_1_0',
+        lorawan_phy_version: 'PHY_V1_1_REV_A',
         frequency_plan_id: 'test-freq-plan',
         session: {
           dev_addr: '4'.repeat(8),
@@ -374,8 +374,8 @@ describe('<NetworkSettingsForm /> validation schema', () => {
           join_eui: '1'.repeat(16),
           dev_eui: '1'.repeat(16),
         },
-        lorawan_version: '1.1.0',
-        lorawan_phy_version: '1.1.0-a',
+        lorawan_version: 'MAC_V1_1_0',
+        lorawan_phy_version: 'PHY_V1_1_REV_A',
         frequency_plan_id: 'test-freq-plan',
         session: {
           dev_addr: '4'.repeat(8),
