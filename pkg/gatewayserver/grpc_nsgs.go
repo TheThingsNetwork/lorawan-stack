@@ -72,9 +72,9 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 			pathErrs = append(pathErrs, errNotConnected.WithAttributes("gateway_uid", uid))
 			continue
 		}
-		down := deepcopy.Copy(down).(*ttnpb.DownlinkMessage) // Let the connection own the DownlinkMessage.
-		down.GetRequest().DownlinkPaths = nil                // And do not leak the downlink paths to the gateway.
-		delay, err := conn.ScheduleDown(path, down)
+		connDown := deepcopy.Copy(down).(*ttnpb.DownlinkMessage) // Let the connection own the DownlinkMessage.
+		connDown.GetRequest().DownlinkPaths = nil                // And do not leak the downlink paths to the gateway.
+		delay, err := conn.ScheduleDown(path, connDown)
 		if err != nil {
 			logger.WithField("gateway_uid", uid).WithError(err).Debug("Failed to schedule on path")
 			pathErrs = append(pathErrs, errSchedulePath.WithCause(err).WithAttributes("gateway_uid", uid))
@@ -82,8 +82,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		}
 		ctx = events.ContextWithCorrelationID(ctx, events.CorrelationIDsFromContext(conn.Context())...)
 		down.CorrelationIDs = append(down.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
-		msg := *down
-		registerSendDownlink(ctx, conn.Gateway(), &msg, conn.Frontend().Protocol())
+		registerSendDownlink(ctx, conn.Gateway(), down, conn.Frontend().Protocol())
 		return &ttnpb.ScheduleDownlinkResponse{
 			Delay: delay,
 		}, nil
