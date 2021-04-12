@@ -134,8 +134,8 @@ message MACParameters {
 
 // Identifies an end device model with version information.
 message EndDeviceVersionIdentifiers {
-  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
-  string model_id = 2 [(gogoproto.customname) = "ModelID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36, ignore_empty: true}];
+  string model_id = 2 [(gogoproto.customname) = "ModelID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36, ignore_empty: true}];
   string hardware_version = 3 [(validate.rules).string.max_len = 32];
   string firmware_version = 4 [(validate.rules).string.max_len = 32];
   string band_id = 5 [(validate.rules).string.max_len = 32, (gogoproto.customname) = "BandID"];
