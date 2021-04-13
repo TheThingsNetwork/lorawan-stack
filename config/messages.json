@@ -5048,6 +5048,15 @@
       "file": "client_registry.go"
     }
   },
+  "error:pkg/identityserver:common_password": {
+    "translations": {
+      "en": "must not be too common"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
   "error:pkg/identityserver:db_needs_migration": {
     "translations": {
       "en": "the database needs to be migrated"
@@ -5195,6 +5204,24 @@
   "error:pkg/identityserver:old_password": {
     "translations": {
       "en": "incorrect old password"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:password_contains_user_id": {
+    "translations": {
+      "en": "must not contain user ID"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:password_equals_old": {
+    "translations": {
+      "en": "must not equal old password"
     },
     "description": {
       "package": "pkg/identityserver",
