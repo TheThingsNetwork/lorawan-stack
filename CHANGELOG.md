@@ -16,6 +16,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - Network Server now takes uplink data rate index for ADR.
+- Event streams are now closed when the callers rights are revoked.
 
 ### Deprecated
 
