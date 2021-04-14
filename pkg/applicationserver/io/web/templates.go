@@ -210,6 +210,7 @@ type webhookTemplateField struct {
 	Description  string `yaml:"description"`
 	Secret       bool   `yaml:"secret"`
 	DefaultValue string `yaml:"default-value"`
+	Optional     bool   `yaml:"optional"`
 }
 
 func (f webhookTemplateField) toPB() *ttnpb.ApplicationWebhookTemplateField {
@@ -219,6 +220,7 @@ func (f webhookTemplateField) toPB() *ttnpb.ApplicationWebhookTemplateField {
 		Description:  f.Description,
 		Secret:       f.Secret,
 		DefaultValue: f.DefaultValue,
+		Optional:     f.Optional,
 	}
 }
 

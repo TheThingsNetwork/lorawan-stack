@@ -307,6 +307,8 @@ func (m *ApplicationWebhookTemplateField) ValidateFields(paths ...string) error 
 				}
 			}
 
+		case "optional":
+			// no validation rules for Optional
 		default:
 			return ApplicationWebhookTemplateFieldValidationError{
 				field:  name,

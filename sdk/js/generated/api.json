@@ -5472,6 +5472,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "optional",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

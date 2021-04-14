@@ -24,6 +24,7 @@ var ApplicationWebhookTemplateFieldFieldPathsNested = []string{
 	"description",
 	"id",
 	"name",
+	"optional",
 	"secret",
 }
 
@@ -32,6 +33,7 @@ var ApplicationWebhookTemplateFieldFieldPathsTopLevel = []string{
 	"description",
 	"id",
 	"name",
+	"optional",
 	"secret",
 }
 var ApplicationWebhookTemplateFieldPathsNested = []string{
