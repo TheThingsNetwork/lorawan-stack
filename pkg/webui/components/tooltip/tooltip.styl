@@ -1,0 +1,76 @@
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+:global(.tippy-box)
+  border-normal()
+  z-index: $zi.tooltip
+  border-radius: $br.m
+  background: white
+  padding: $cs.xs
+  max-width: $bp.xs3
+  box-shadow: 0 4px 30px 0 rgba(0, 0, 0, .08), inset 0 -1px 0 0 rgba(0, 0, 0, .11)
+
+:global(.tippy-arrow),
+:global(.tippy-arrow)::before {
+  position: absolute
+  width: 8px
+  height: 8px
+  background: inherit
+}
+
+:global(.tippy-arrow) {
+  visibility: hidden
+}
+
+:global(.tippy-arrow)::before {
+  visibility: visible
+  content: ''
+  transform: rotate(45deg)
+}
+
+:global(.tippy-box)[data-placement^='top'] > :global(.tippy-arrow) {
+  bottom: -3px
+}
+
+:global(.tippy-box)[data-placement^='top'] > :global(.tippy-arrow):before {
+  border-normal('right')
+  border-normal('bottom')
+}
+
+:global(.tippy-box)[data-placement^='bottom'] > :global(.tippy-arrow) {
+  top: -5px
+}
+
+:global(.tippy-box)[data-placement^='bottom'] > :global(.tippy-arrow):before {
+  border-normal('left')
+  border-normal('top')
+}
+
+:global(.tippy-box)[data-placement^='left'] > :global(.tippy-arrow) {
+  right: -3px
+}
+
+:global(.tippy-box)[data-placement^='left'] > :global(.tippy-arrow):before {
+  border-normal('right')
+  border-normal('top')
+}
+
+:global(.tippy-box)[data-placement^='right'] > :global(.tippy-arrow) {
+  left: -5px
+}
+
+:global(.tippy-box)[data-placement^='right'] > :global(.tippy-arrow):before {
+  border-normal('left')
+  border-normal('bottom')
+}
