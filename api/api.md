@@ -3054,7 +3054,7 @@ This is used internally by the Network Server.
 
 | Field | Validations |
 | ----- | ----------- |
-| `uplink_frequency` | <p>`uint64.gte`: `100000`</p> |
+| `uplink_frequency` | <p>`uint64.lte`: `0`</p><p>`uint64.gte`: `100000`</p> |
 | `downlink_frequency` | <p>`uint64.gte`: `100000`</p> |
 | `min_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 | `max_data_rate_index` | <p>`enum.defined_only`: `true`</p> |

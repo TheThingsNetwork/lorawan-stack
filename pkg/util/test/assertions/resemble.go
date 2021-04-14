@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"testing"
 
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
@@ -59,8 +60,10 @@ func ShouldResemble(actual interface{}, expected ...interface{}) (message string
 	for _, d := range diff {
 		lines = append(lines, fmt.Sprintf("   %s", d))
 	}
-	lines = append(lines, fmt.Sprintf("Actual: %s", pretty.Sprint(actual)))
-	lines = append(lines, fmt.Sprintf("Expected: %s", pretty.Sprint(expected[0])))
+	if testing.Verbose() {
+		lines = append(lines, fmt.Sprintf("Actual: %s", pretty.Sprint(actual)))
+		lines = append(lines, fmt.Sprintf("Expected: %s", pretty.Sprint(expected[0])))
+	}
 	return strings.Join(append(lines, lastLine(message)), "\n")
 }
 

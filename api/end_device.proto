@@ -104,7 +104,7 @@ message MACParameters {
     option (gogoproto.populate) = false;
 
     // Uplink frequency of the channel (Hz).
-    uint64 uplink_frequency = 1 [(validate.rules).uint64.gte = 100000];
+    uint64 uplink_frequency = 1 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
     // Downlink frequency of the channel (Hz).
     uint64 downlink_frequency = 2 [(validate.rules).uint64.gte = 100000];
     // Index of the minimum data rate for uplink.

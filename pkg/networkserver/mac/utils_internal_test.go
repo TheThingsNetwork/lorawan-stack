@@ -31,7 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func TestNewMACState(t *testing.T) {
+func TestNewState(t *testing.T) {
 	for _, tc := range []struct {
 		Name               string
 		Device             *ttnpb.EndDevice
@@ -92,6 +92,14 @@ func TestNewMACState(t *testing.T) {
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
+				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
+					for _, ch := range macState.CurrentParameters.Channels {
+						chs = append(chs, &ttnpb.MACParameters_Channel{
+							DownlinkFrequency: ch.DownlinkFrequency,
+						})
+					}
+					return chs
+				}()
 				macState.DesiredParameters = macState.CurrentParameters
 				macState.DeviceClass = ttnpb.CLASS_B
 				return macState
@@ -114,8 +122,125 @@ func TestNewMACState(t *testing.T) {
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
+				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
+					for _, ch := range macState.CurrentParameters.Channels {
+						chs = append(chs, &ttnpb.MACParameters_Channel{
+							DownlinkFrequency: ch.DownlinkFrequency,
+						})
+					}
+					return chs
+				}()
 				macState.DesiredParameters = macState.CurrentParameters
 				macState.DeviceClass = ttnpb.CLASS_C
+				return macState
+			}(),
+			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
+		},
+		{
+			Name: "1.0.3/EU868/factory preset frequencies",
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANVersion:    ttnpb.MAC_V1_0_3,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+				MACSettings: &ttnpb.MACSettings{
+					FactoryPresetFrequencies: []uint64{
+						868100000,
+						868500000,
+						868700000,
+						867100000,
+					},
+				},
+			},
+			MACState: func() *ttnpb.MACState {
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A)
+				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
+					for _, ch := range macState.CurrentParameters.Channels {
+						chs = append(chs, &ttnpb.MACParameters_Channel{
+							UplinkFrequency:   ch.UplinkFrequency,
+							DownlinkFrequency: ch.DownlinkFrequency,
+							MinDataRateIndex:  ch.MinDataRateIndex,
+							MaxDataRateIndex:  ch.MaxDataRateIndex,
+							EnableUplink: func() bool {
+								for _, freq := range [...]uint64{
+									868100000,
+									868500000,
+								} {
+									if ch.UplinkFrequency == freq {
+										return true
+									}
+								}
+								return false
+							}(),
+						})
+					}
+					return append(chs,
+						&ttnpb.MACParameters_Channel{
+							UplinkFrequency:   868700000,
+							DownlinkFrequency: 868700000,
+							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							EnableUplink:      true,
+						},
+						&ttnpb.MACParameters_Channel{
+							UplinkFrequency:   867100000,
+							DownlinkFrequency: 867100000,
+							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							EnableUplink:      true,
+						},
+					)
+				}()
+				macState.DesiredParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
+					for _, ch := range macState.CurrentParameters.Channels {
+						chs = append(chs, &ttnpb.MACParameters_Channel{
+							UplinkFrequency:   ch.UplinkFrequency,
+							DownlinkFrequency: ch.DownlinkFrequency,
+							MinDataRateIndex:  ch.MinDataRateIndex,
+							MaxDataRateIndex:  ch.MaxDataRateIndex,
+							EnableUplink: func() bool {
+								for _, freq := range [...]uint64{
+									867100000,
+									868100000,
+									868300000,
+									868500000,
+								} {
+									if ch.UplinkFrequency == freq {
+										return true
+									}
+								}
+								return false
+							}(),
+						})
+					}
+					return append(chs,
+						&ttnpb.MACParameters_Channel{
+							UplinkFrequency:   867300000,
+							DownlinkFrequency: 867300000,
+							MinDataRateIndex:  ttnpb.DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							EnableUplink:      true,
+						},
+						&ttnpb.MACParameters_Channel{
+							UplinkFrequency:   867500000,
+							DownlinkFrequency: 867500000,
+							MinDataRateIndex:  ttnpb.DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							EnableUplink:      true,
+						},
+						&ttnpb.MACParameters_Channel{
+							UplinkFrequency:   867700000,
+							DownlinkFrequency: 867700000,
+							MinDataRateIndex:  ttnpb.DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							EnableUplink:      true,
+						},
+						&ttnpb.MACParameters_Channel{
+							UplinkFrequency:   867900000,
+							DownlinkFrequency: 867900000,
+							MinDataRateIndex:  ttnpb.DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							EnableUplink:      true,
+						},
+					)
+				}()
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -173,6 +298,14 @@ func TestNewMACState(t *testing.T) {
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
+				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
+					for _, ch := range macState.CurrentParameters.Channels {
+						chs = append(chs, &ttnpb.MACParameters_Channel{
+							DownlinkFrequency: ch.DownlinkFrequency,
+						})
+					}
+					return chs
+				}()
 				macState.DesiredParameters = macState.CurrentParameters
 				macState.DeviceClass = ttnpb.CLASS_B
 				return macState
@@ -195,6 +328,14 @@ func TestNewMACState(t *testing.T) {
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
+				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
+					for _, ch := range macState.CurrentParameters.Channels {
+						chs = append(chs, &ttnpb.MACParameters_Channel{
+							DownlinkFrequency: ch.DownlinkFrequency,
+						})
+					}
+					return chs
+				}()
 				macState.DesiredParameters = macState.CurrentParameters
 				macState.DeviceClass = ttnpb.CLASS_C
 				return macState
@@ -216,6 +357,79 @@ func TestNewMACState(t *testing.T) {
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				return macState
+			}(),
+			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
+		},
+		{
+			Name: "1.0.3/US915_FSB2/factory preset frequencies",
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.USFrequencyPlanID,
+				LoRaWANVersion:    ttnpb.MAC_V1_0_3,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+				MACSettings: &ttnpb.MACSettings{
+					FactoryPresetFrequencies: []uint64{
+						904300000,
+						904700000,
+						904900000,
+						905100000,
+					},
+				},
+			},
+			MACState: func() *ttnpb.MACState {
+				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A)
+				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
+					for _, ch := range macState.CurrentParameters.Channels {
+						chs = append(chs, &ttnpb.MACParameters_Channel{
+							UplinkFrequency:   ch.UplinkFrequency,
+							DownlinkFrequency: ch.DownlinkFrequency,
+							MinDataRateIndex:  ch.MinDataRateIndex,
+							MaxDataRateIndex:  ch.MaxDataRateIndex,
+							EnableUplink: func() bool {
+								for _, freq := range [...]uint64{
+									904300000,
+									904700000,
+									904900000,
+									905100000,
+								} {
+									if ch.UplinkFrequency == freq {
+										return true
+									}
+								}
+								return false
+							}(),
+						})
+					}
+					return chs
+				}()
+				macState.DesiredParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
+					for _, ch := range macState.CurrentParameters.Channels {
+						chs = append(chs, &ttnpb.MACParameters_Channel{
+							UplinkFrequency:   ch.UplinkFrequency,
+							DownlinkFrequency: ch.DownlinkFrequency,
+							MinDataRateIndex:  ch.MinDataRateIndex,
+							MaxDataRateIndex:  ch.MaxDataRateIndex,
+							EnableUplink: func() bool {
+								for _, freq := range [...]uint64{
+									903900000,
+									904100000,
+									904300000,
+									904500000,
+									904700000,
+									904900000,
+									905100000,
+									905300000,
+								} {
+									if ch.UplinkFrequency == freq {
+										return true
+									}
+								}
+								return false
+							}(),
+						})
+					}
+					return chs
+				}()
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
