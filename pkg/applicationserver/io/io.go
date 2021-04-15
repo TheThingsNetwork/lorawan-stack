@@ -28,26 +28,36 @@ import (
 
 const bufferSize = 32
 
-// Server represents the Application Server to application frontends.
-type Server interface {
-	component.TaskStarter
-	// GetBaseConfig returns the component configuration.
-	GetBaseConfig(ctx context.Context) config.ServiceBase
-	// FillContext fills the given context.
-	// This method should only be used for request contexts.
-	FillContext(ctx context.Context) context.Context
+// PubSub represents the Application Server Pub/Sub capabilities to application frontends.
+type PubSub interface {
 	// Publish publishes upstream traffic to the Application Server.
 	Publish(ctx context.Context, up *ttnpb.ApplicationUp) error
 	// Subscribe subscribes an application or integration by its identifiers to the Application Server, and returns a
 	// Subscription for traffic and control. If the cluster parameter is true, the subscription receives all of the
 	// traffic of the application. Otherwise, only traffic that was processed locally is sent.
 	Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers, cluster bool) (*Subscription, error)
+}
+
+// DownlinkQueueOperator represents the Application Server downlink queue operations to application frontends.
+type DownlinkQueueOperator interface {
 	// DownlinkQueuePush pushes the given downlink messages to the end device's application downlink queue.
 	DownlinkQueuePush(context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
 	// DownlinkQueueReplace replaces the end device's application downlink queue with the given downlink messages.
 	DownlinkQueueReplace(context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
 	// DownlinkQueueList lists the application downlink queue of the given end device.
 	DownlinkQueueList(context.Context, ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error)
+}
+
+// Server represents the Application Server to application frontends.
+type Server interface {
+	component.TaskStarter
+	PubSub
+	DownlinkQueueOperator
+	// GetBaseConfig returns the component configuration.
+	GetBaseConfig(ctx context.Context) config.ServiceBase
+	// FillContext fills the given context.
+	// This method should only be used for request contexts.
+	FillContext(ctx context.Context) context.Context
 	// HTTPClient returns a configured *http.Client.
 	HTTPClient(context.Context) (*http.Client, error)
 	// RateLimiter returns the rate limiter instance.
