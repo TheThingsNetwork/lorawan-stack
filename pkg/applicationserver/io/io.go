@@ -48,11 +48,18 @@ type DownlinkQueueOperator interface {
 	DownlinkQueueList(context.Context, ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error)
 }
 
+// UplinkStorage represents the Application Server uplink storage to application frontends.
+type UplinkStorage interface {
+	// RangeUplinks ranges the application uplinks and calls the callback function, until false is returned.
+	RangeUplinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(ctx context.Context, up *ttnpb.ApplicationUplink) bool) error
+}
+
 // Server represents the Application Server to application frontends.
 type Server interface {
 	component.TaskStarter
 	PubSub
 	DownlinkQueueOperator
+	UplinkStorage
 	// GetBaseConfig returns the component configuration.
 	GetBaseConfig(ctx context.Context) config.ServiceBase
 	// FillContext fills the given context.

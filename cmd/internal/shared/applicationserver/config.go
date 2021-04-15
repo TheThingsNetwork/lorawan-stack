@@ -59,6 +59,9 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 			Timeout:   15 * time.Minute,
 		},
 	},
+	UplinkStorage: applicationserver.UplinkStorageConfig{
+		Limit: 16,
+	},
 	Distribution: applicationserver.DistributionConfig{
 		Timeout: time.Minute,
 	},

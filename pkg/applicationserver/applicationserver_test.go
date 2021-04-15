@@ -200,6 +200,14 @@ func TestApplicationServer(t *testing.T) {
 		t.Fatalf("Failed to set link in registry: %s", err)
 	}
 
+	applicationUpsRedisClient, applicationUpsFlush := test.NewRedis(ctx, "applicationserver_test", "applicationups")
+	defer applicationUpsFlush()
+	defer applicationUpsRedisClient.Close()
+	applicationUpsRegistry := &redis.ApplicationUplinkRegistry{
+		Redis: applicationUpsRedisClient,
+		Limit: 16,
+	}
+
 	webhooksRedisClient, webhooksFlush := test.NewRedis(ctx, "applicationserver_test", "webhooks")
 	defer webhooksFlush()
 	defer webhooksRedisClient.Close()
@@ -267,6 +275,10 @@ func TestApplicationServer(t *testing.T) {
 	config := &applicationserver.Config{
 		Devices: deviceRegistry,
 		Links:   linkRegistry,
+		UplinkStorage: applicationserver.UplinkStorageConfig{
+			Registry: applicationUpsRegistry,
+			Limit:    16,
+		},
 		MQTT: config.MQTT{
 			Listen: ":1883",
 		},
