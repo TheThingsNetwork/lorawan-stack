@@ -15,7 +15,6 @@
 package ttnpb
 
 import (
-	"context"
 	"strconv"
 	"strings"
 )
@@ -52,14 +51,4 @@ func (v *GrantType) UnmarshalJSON(b []byte) error {
 	}
 	*v = GrantType(i)
 	return nil
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (m *UpdateClientRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
-		return m.ValidateFields()
-	}
-	return m.ValidateFields(append(FieldsWithPrefix("client", m.FieldMask.Paths...),
-		"client.ids",
-	)...)
 }

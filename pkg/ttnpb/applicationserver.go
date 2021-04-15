@@ -14,20 +14,7 @@
 
 package ttnpb
 
-import (
-	"context"
-	strconv "strconv"
-)
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (m *SetApplicationLinkRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
-		return m.ValidateFields()
-	}
-	return m.ValidateFields(append(FieldsWithPrefix("link", m.FieldMask.Paths...),
-		"application_ids",
-	)...)
-}
+import "strconv"
 
 // MarshalText implements encoding.TextMarshaler interface.
 func (v AsConfiguration_PubSub_Providers_Status) MarshalText() ([]byte, error) {

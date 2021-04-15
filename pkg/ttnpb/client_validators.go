@@ -17,27 +17,36 @@ package ttnpb
 import "context"
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (p MACPayload) ValidateContext(context.Context) error {
-	if p.DevAddr.IsZero() {
-		return errMissing("DevAddr")
-	}
-	return p.ValidateFields()
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (p JoinRequestPayload) ValidateContext(context.Context) error {
-	if p.DevEUI.IsZero() {
-		return errMissing("DevEUI")
-	}
-	return p.ValidateFields()
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (req *GatewayUplinkMessage) ValidateContext(context.Context) error {
+func (req *CreateClientRequest) ValidateContext(context.Context) error {
 	return req.ValidateFields()
 }
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (req *DownlinkQueueRequest) ValidateContext(context.Context) error {
+func (req *GetClientRequest) ValidateContext(context.Context) error {
+	return req.ValidateFields()
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (m *UpdateClientRequest) ValidateContext(context.Context) error {
+	if len(m.FieldMask.Paths) == 0 {
+		return m.ValidateFields()
+	}
+	return m.ValidateFields(append(FieldsWithPrefix("client", m.FieldMask.Paths...),
+		"client.ids",
+	)...)
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (req *GetClientCollaboratorRequest) ValidateContext(context.Context) error {
+	return req.ValidateFields()
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (req *SetClientCollaboratorRequest) ValidateContext(context.Context) error {
+	return req.ValidateFields()
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (req *ListClientCollaboratorsRequest) ValidateContext(context.Context) error {
 	return req.ValidateFields()
 }
