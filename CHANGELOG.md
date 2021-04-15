@@ -21,6 +21,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
+## [3.11.4] - 2021-04-15
+
+### Security
+
 - This release fixes an issue that prevented some request messages from being validated correctly, allowing invalid values in certain fields.
 
 ## [3.11.3] - 2021-03-19
@@ -1363,7 +1367,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.3...v3.11
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.4...v3.11
+[3.11.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.3...v3.11.4
 [3.11.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.2...v3.11.3
 [3.11.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.1...v3.11.2
 [3.11.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.0...v3.11.1
