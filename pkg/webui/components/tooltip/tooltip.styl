@@ -12,65 +12,68 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-:global(.tippy-box)
-  border-normal()
-  z-index: $zi.tooltip
-  border-radius: $br.m
-  background: white
-  padding: $cs.xs
-  max-width: $bp.xs3
-  box-shadow: 0 4px 30px 0 rgba(0, 0, 0, .08), inset 0 -1px 0 0 rgba(0, 0, 0, .11)
+:global {
+  .tippy-box {
+    border-normal()
+    z-index: $zi.tooltip
+    border-radius: $br.m
+    background: white
+    padding: $cs.m
+    max-width: $bp.xs3
+    box-shadow: 0 4px 30px 0 rgba(0, 0, 0, .08), inset 0 -1px 0 0 rgba(0, 0, 0, .11)
+  }
 
-:global(.tippy-arrow),
-:global(.tippy-arrow)::before {
-  position: absolute
-  width: 8px
-  height: 8px
-  background: inherit
-}
+  .tippy-arrow,
+  .tippy-arrow:before  {
+    position: absolute
+    width: 8px
+    height: 8px
+    background: inherit
+  }
 
-:global(.tippy-arrow) {
-  visibility: hidden
-}
+  .tippy-arrow {
+    visibility: hidden
+  }
 
-:global(.tippy-arrow)::before {
-  visibility: visible
-  content: ''
-  transform: rotate(45deg)
-}
+  .tippy-arrow:before {
+    visibility: visible
+    content: ''
+    transform: rotate(45deg)
+  }
 
-:global(.tippy-box)[data-placement^='top'] > :global(.tippy-arrow) {
-  bottom: -3px
-}
+  .tippy-box[data-placement^='top'] > .tippy-arrow {
+    bottom: -3px
+  }
 
-:global(.tippy-box)[data-placement^='top'] > :global(.tippy-arrow):before {
-  border-normal('right')
-  border-normal('bottom')
-}
+  .tippy-box[data-placement^='top'] > .tippy-arrow:before {
+    border-normal('right')
+    border-normal('bottom')
+  }
 
-:global(.tippy-box)[data-placement^='bottom'] > :global(.tippy-arrow) {
-  top: -5px
-}
+  .tippy-box[data-placement^='bottom'] > .tippy-arrow {
+    top: -5px
+  }
 
-:global(.tippy-box)[data-placement^='bottom'] > :global(.tippy-arrow):before {
-  border-normal('left')
-  border-normal('top')
-}
+  .tippy-box[data-placement^='bottom'] > .tippy-arrow:before {
+    border-normal('left')
+    border-normal('top')
+  }
 
-:global(.tippy-box)[data-placement^='left'] > :global(.tippy-arrow) {
-  right: -3px
-}
+  .tippy-box[data-placement^='left'] > .tippy-arrow {
+    right: -3px
+  }
 
-:global(.tippy-box)[data-placement^='left'] > :global(.tippy-arrow):before {
-  border-normal('right')
-  border-normal('top')
-}
+  .tippy-box[data-placement^='left'] > .tippy-arrow:before {
+    border-normal('right')
+    border-normal('top')
+  }
 
-:global(.tippy-box)[data-placement^='right'] > :global(.tippy-arrow) {
-  left: -5px
-}
+  .tippy-box[data-placement^='right'] > .tippy-arrow {
+    left: -5px
+  }
 
-:global(.tippy-box)[data-placement^='right'] > :global(.tippy-arrow):before {
-  border-normal('left')
-  border-normal('bottom')
+  .tippy-box[data-placement^='right'] > .tippy-arrow:before {
+    border-normal('left')
+    border-normal('bottom')
+  }
 }

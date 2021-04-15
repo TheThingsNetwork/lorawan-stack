@@ -25,6 +25,7 @@ import UnitInput from '@ttn-lw/components/unit-input'
 
 import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
+import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -126,6 +127,7 @@ const LorawanSettingsForm = React.memo(props => {
         menuPlacement="top"
         onChange={onFrequencyPlanChange}
         warning={showFrequencyPlanWarning ? sharedMessages.frequencyPlanWarning : undefined}
+        glossaryId={glossaryIds.FREQUENCY_PLAN}
       />
       <Form.Field
         title={sharedMessages.gatewayScheduleDownlinkLate}

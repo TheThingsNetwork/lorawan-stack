@@ -36,7 +36,7 @@ const popperModifiers = [
 ]
 
 const Tooltip = props => {
-  const { className, children, content, interactive, placement } = props
+  const { className, children, content, interactive, placement, delay } = props
   return (
     <Tippy
       className={className}
@@ -44,6 +44,7 @@ const Tooltip = props => {
       interactive={interactive}
       placement={placement}
       popperOptions={{ modifiers: popperModifiers }}
+      delay={delay}
     >
       {children}
     </Tippy>
@@ -54,6 +55,7 @@ Tooltip.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   content: PropTypes.node.isRequired,
+  delay: PropTypes.oneOfType([PropTypes.number, PropTypes.arrayOf([PropTypes.number])]),
   interactive: PropTypes.bool,
   placement: PropTypes.oneOf([
     'top',
@@ -78,6 +80,7 @@ Tooltip.defaultProps = {
   className: '',
   interactive: false,
   placement: 'bottom',
+  delay: 300,
 }
 
 export default Tooltip

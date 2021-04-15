@@ -207,7 +207,7 @@ DocLink.defaultProps = {
 
 Link.DocLink = DocLink
 
-const GlossaryLink = ({ glossaryId, term, hideTerm, primary, secondary, className }) => {
+const GlossaryLink = ({ title, glossaryId, term, primary, secondary, className }) => {
   const { formatMessage } = useIntl()
   return (
     <Link.DocLink
@@ -218,10 +218,9 @@ const GlossaryLink = ({ glossaryId, term, hideTerm, primary, secondary, classNam
       title={m.glossaryTitle}
       titleValues={{ term: formatTitle(term, undefined, formatMessage) }}
       tabIndex="-1"
-      raw
+      external
     >
-      {!hideTerm && <Message content={term} />}{' '}
-      <Icon className={style.glossaryIcon} icon="help_outline" />
+      <Message content={title} />
     </Link.DocLink>
   )
 }
@@ -229,15 +228,14 @@ const GlossaryLink = ({ glossaryId, term, hideTerm, primary, secondary, classNam
 GlossaryLink.propTypes = {
   className: PropTypes.string,
   glossaryId: PropTypes.string.isRequired,
-  hideTerm: PropTypes.bool,
   primary: PropTypes.bool,
   secondary: PropTypes.bool,
   term: PropTypes.message.isRequired,
+  title: PropTypes.message.isRequired,
 }
 
 GlossaryLink.defaultProps = {
   className: '',
-  hideTerm: false,
   primary: false,
   secondary: false,
 }

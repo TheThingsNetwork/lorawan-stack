@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Contextual tooltips to form fields in the Console.
+
 ### Changed
 
 - Allow the LinkADRReq commands to lower the data rate used by the end devices.

@@ -24,6 +24,7 @@ import Radio from '@ttn-lw/components/radio-button'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -49,12 +50,8 @@ const m = defineMessages({
   resetWarning: 'Resetting is insecure and makes your device susceptible for replay attacks',
   resetsFCnt: 'Resets Frame Counters',
   rx1DataRateOffsetTitle: 'RX1 Data Rate Offset',
-  rx1DataRateOffsetDescription:
-    'Offset  between  the  uplink  data  rate  and  the  downlink  data rate  used  to  communicate  with  the  end-device  on  the  first  reception  slot  (RX1)',
   rx1DelayDescription: 'Class A RX1 delay in seconds. RX2 delay is RX1 delay + 1 second.',
   rx1DelayTitle: 'RX1 Delay',
-  rx2DataDateIndexDescription:
-    'The default RX2 data rate index value the device uses after a reset',
   rx2DataRateIndexTitle: 'RX2 Data Rate Index',
   rx2FrequencyDescription: 'Frequency for RX2 (Hz)',
   rx2FrequencyTitle: 'RX2 Frequency',
@@ -114,12 +111,12 @@ const MacSettingsSection = props => {
           />
           <Form.Field
             title={m.rx1DataRateOffsetTitle}
-            description={m.rx1DataRateOffsetDescription}
             type="number"
             name="mac_settings.rx1_data_rate_offset"
             component={Input}
             min={0}
             max={7}
+            glossaryId={glossaryIds.DATA_RATE_OFFSET}
           />
           <Form.Field
             title={m.resetsFCnt}
@@ -133,11 +130,11 @@ const MacSettingsSection = props => {
       <Form.Field
         title={m.rx2DataRateIndexTitle}
         type="number"
-        description={m.rx2DataDateIndexDescription}
         name="mac_settings.rx2_data_rate_index"
         component={Input}
         min={0}
         max={15}
+        glossaryId={glossaryIds.DATA_RATE_INDEX}
       />
       <Form.Field
         type="number"

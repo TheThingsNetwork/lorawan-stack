@@ -73,10 +73,28 @@
   .title
     display: inline-block
 
-  .glossary-link
-    nudge('down', 2px)
+  .tooltip
     display: inline-block
-    text-decoration: none
+
+    &-icon
+      nudge('up', 1px)
+      color: $tc-subtle-gray
+      padding: .1rem
+      height: 1rem
+      width: 1rem
+      font-size: 1rem
+      line-height: 1
+
+    &-title
+      h4()
+      margin: 0
+
+    &-description
+      margin: 0 0 $cs.s 0
+
+    &-links
+      display: flex
+      justify-content: space-between
 
 .description
   font-weight: $fw.normal
