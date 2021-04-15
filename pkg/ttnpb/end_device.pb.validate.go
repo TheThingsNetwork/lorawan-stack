@@ -542,34 +542,42 @@ func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "brand_id":
 
-			if utf8.RuneCountInString(m.GetBrandID()) > 36 {
-				return EndDeviceVersionIdentifiersValidationError{
-					field:  "brand_id",
-					reason: "value length must be at most 36 runes",
-				}
-			}
+			if m.GetBrandID() != "" {
 
-			if !_EndDeviceVersionIdentifiers_BrandID_Pattern.MatchString(m.GetBrandID()) {
-				return EndDeviceVersionIdentifiersValidationError{
-					field:  "brand_id",
-					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+					return EndDeviceVersionIdentifiersValidationError{
+						field:  "brand_id",
+						reason: "value length must be at most 36 runes",
+					}
 				}
+
+				if !_EndDeviceVersionIdentifiers_BrandID_Pattern.MatchString(m.GetBrandID()) {
+					return EndDeviceVersionIdentifiersValidationError{
+						field:  "brand_id",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
 			}
 
 		case "model_id":
 
-			if utf8.RuneCountInString(m.GetModelID()) > 36 {
-				return EndDeviceVersionIdentifiersValidationError{
-					field:  "model_id",
-					reason: "value length must be at most 36 runes",
-				}
-			}
+			if m.GetModelID() != "" {
 
-			if !_EndDeviceVersionIdentifiers_ModelID_Pattern.MatchString(m.GetModelID()) {
-				return EndDeviceVersionIdentifiersValidationError{
-					field:  "model_id",
-					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				if utf8.RuneCountInString(m.GetModelID()) > 36 {
+					return EndDeviceVersionIdentifiersValidationError{
+						field:  "model_id",
+						reason: "value length must be at most 36 runes",
+					}
 				}
+
+				if !_EndDeviceVersionIdentifiers_ModelID_Pattern.MatchString(m.GetModelID()) {
+					return EndDeviceVersionIdentifiersValidationError{
+						field:  "model_id",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
 			}
 
 		case "hardware_version":

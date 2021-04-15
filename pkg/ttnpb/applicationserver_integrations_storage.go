@@ -14,13 +14,6 @@
 
 package ttnpb
 
-import "context"
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (m *GetStoredApplicationUpRequest) ValidateContext(context.Context) error {
-	return m.ValidateFields()
-}
-
 // StoredApplicationUpTypes is a list of available ApplicationUp message types.
 var StoredApplicationUpTypes = map[string]struct{}{
 	"":                           {},
