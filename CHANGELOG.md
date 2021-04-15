@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
+- This release fixes an issue that prevented some request messages from being validated correctly, allowing invalid values in certain fields.
+
 ## [3.11.3] - 2021-03-19
 
 ### Added

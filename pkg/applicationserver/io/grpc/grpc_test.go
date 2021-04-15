@@ -477,6 +477,9 @@ func TestSimulateUplink(t *testing.T) {
 					DeviceID:               registeredDeviceID.DeviceID,
 					ApplicationIdentifiers: registeredApplicationID,
 				},
+				Up: &ttnpb.ApplicationUp_ServiceData{
+					ServiceData: &ttnpb.ApplicationServiceData{},
+				},
 			},
 			setup: func(f *mockFetcher) {
 				f.dev = &ttnpb.EndDevice{
@@ -492,6 +495,9 @@ func TestSimulateUplink(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceID:               registeredDeviceID.DeviceID,
 					ApplicationIdentifiers: registeredApplicationID,
+				},
+				Up: &ttnpb.ApplicationUp_ServiceData{
+					ServiceData: &ttnpb.ApplicationServiceData{},
 				},
 			},
 			setup: func(f *mockFetcher) {

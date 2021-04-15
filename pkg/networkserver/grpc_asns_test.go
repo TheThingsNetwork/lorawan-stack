@@ -93,7 +93,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -140,10 +140,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession"), FCnt: 1},
-							{SessionKeyID: []byte("testSession"), FCnt: 2},
-							{SessionKeyID: []byte("testSession"), FCnt: 3},
-							{SessionKeyID: []byte("testSession"), FCnt: 5},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
 				})
@@ -161,8 +161,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -215,10 +215,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession"), FCnt: 1},
-							{SessionKeyID: []byte("testSession"), FCnt: 2},
-							{SessionKeyID: []byte("testSession"), FCnt: 3},
-							{SessionKeyID: []byte("testSession"), FCnt: 5},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
 				}
@@ -230,8 +230,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession"), FCnt: 0},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				}
 
 				a.So(sets, should.HaveSameElementsDeep, []string{
@@ -247,8 +247,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				},
 			},
 			SetByIDCalls: 1,
@@ -294,10 +294,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession"), FCnt: 1},
-							{SessionKeyID: []byte("testSession"), FCnt: 2},
-							{SessionKeyID: []byte("testSession"), FCnt: 3},
-							{SessionKeyID: []byte("testSession"), FCnt: 5},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
 					PendingMACState: &ttnpb.MACState{
@@ -309,8 +309,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							SessionKeyID: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 43},
 						},
 					},
 				}
@@ -322,11 +322,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession"), FCnt: 0},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				}
 				setDevice.PendingSession.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testPendingSession"), FCnt: 2},
+					{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 2},
 				}
 
 				a.So(sets, should.HaveSameElementsDeep, []string{
@@ -342,9 +342,9 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-					{SessionKeyID: []byte("testPendingSession"), FCnt: 2},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 2},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				},
 			},
 			SetByIDCalls: 1,
@@ -397,10 +397,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession"), FCnt: 1},
-							{SessionKeyID: []byte("testSession"), FCnt: 2},
-							{SessionKeyID: []byte("testSession"), FCnt: 3},
-							{SessionKeyID: []byte("testSession"), FCnt: 5},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
 				}
@@ -412,8 +412,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession"), FCnt: 0},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				}
 
 				a.So(sets, should.HaveSameElementsDeep, []string{
@@ -429,8 +429,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				},
 			},
 			AddCalls:     1,
@@ -468,10 +468,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession"), FCnt: 1},
-							{SessionKeyID: []byte("testSession"), FCnt: 2},
-							{SessionKeyID: []byte("testSession"), FCnt: 3},
-							{SessionKeyID: []byte("testSession"), FCnt: 5},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
 					PendingSession: &ttnpb.Session{
@@ -479,8 +479,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							SessionKeyID: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 43},
 						},
 					},
 				}
@@ -546,10 +546,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession"), FCnt: 1},
-							{SessionKeyID: []byte("testSession"), FCnt: 2},
-							{SessionKeyID: []byte("testSession"), FCnt: 3},
-							{SessionKeyID: []byte("testSession"), FCnt: 5},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
 					PendingSession: &ttnpb.Session{
@@ -557,8 +557,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							SessionKeyID: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 43},
 						},
 					},
 				}
@@ -624,10 +624,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession"), FCnt: 1},
-							{SessionKeyID: []byte("testSession"), FCnt: 2},
-							{SessionKeyID: []byte("testSession"), FCnt: 3},
-							{SessionKeyID: []byte("testSession"), FCnt: 5},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
 					PendingSession: &ttnpb.Session{
@@ -635,8 +635,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							SessionKeyID: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 43},
 						},
 					},
 				}
@@ -787,7 +787,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -834,10 +834,10 @@ func TestDownlinkQueuePush(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession"), FCnt: 1},
-							{SessionKeyID: []byte("testSession"), FCnt: 2},
-							{SessionKeyID: []byte("testSession"), FCnt: 3},
-							{SessionKeyID: []byte("testSession"), FCnt: 5},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
 				})
@@ -855,8 +855,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -909,10 +909,10 @@ func TestDownlinkQueuePush(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession"), FCnt: 1},
-							{SessionKeyID: []byte("testSession"), FCnt: 2},
-							{SessionKeyID: []byte("testSession"), FCnt: 3},
-							{SessionKeyID: []byte("testSession"), FCnt: 5},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
 				}
@@ -924,8 +924,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = append(setDevice.Session.QueuedApplicationDownlinks,
-					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FCnt: 6},
-					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FCnt: 42},
+					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 6},
+					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				)
 
 				a.So(sets, should.HaveSameElementsDeep, []string{
@@ -941,8 +941,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession"), FCnt: 6},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 6},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				},
 			},
 			SetByIDCalls: 1,
@@ -988,10 +988,10 @@ func TestDownlinkQueuePush(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession"), FCnt: 1},
-							{SessionKeyID: []byte("testSession"), FCnt: 2},
-							{SessionKeyID: []byte("testSession"), FCnt: 3},
-							{SessionKeyID: []byte("testSession"), FCnt: 5},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
 					PendingMACState: &ttnpb.MACState{
@@ -1012,11 +1012,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.Session.QueuedApplicationDownlinks = append(setDevice.Session.QueuedApplicationDownlinks,
-					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FCnt: 6},
-					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FCnt: 42},
+					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 6},
+					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				)
 				setDevice.PendingSession.QueuedApplicationDownlinks = append(setDevice.PendingSession.QueuedApplicationDownlinks,
-					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testPendingSession"), FCnt: 2},
+					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 2},
 				)
 
 				a.So(sets, should.HaveSameElementsDeep, []string{
@@ -1032,9 +1032,9 @@ func TestDownlinkQueuePush(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession"), FCnt: 6},
-					{SessionKeyID: []byte("testPendingSession"), FCnt: 2},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 6},
+					{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 2},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				},
 			},
 			SetByIDCalls: 1,
@@ -1075,10 +1075,10 @@ func TestDownlinkQueuePush(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession"), FCnt: 1},
-							{SessionKeyID: []byte("testSession"), FCnt: 2},
-							{SessionKeyID: []byte("testSession"), FCnt: 3},
-							{SessionKeyID: []byte("testSession"), FCnt: 5},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
 				})
@@ -1096,8 +1096,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-					{SessionKeyID: []byte("testSession"), FCnt: 1},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -1161,8 +1161,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-					{SessionKeyID: []byte("testSession"), FCnt: 1},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -1220,8 +1220,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-					{SessionKeyID: []byte("testSession"), FCnt: 1},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 1},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -1345,8 +1345,8 @@ func TestDownlinkQueueList(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession")},
-							{SessionKeyID: []byte("testSession"), FCnt: 42},
+							{SessionKeyID: []byte("testSession"), FPort: 42},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 						},
 					},
 				}, ctx, nil
@@ -1357,8 +1357,8 @@ func TestDownlinkQueueList(t *testing.T) {
 			},
 			Downlinks: &ttnpb.ApplicationDownlinks{
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 				},
 			},
 			GetByIDCalls: 1,
@@ -1386,9 +1386,9 @@ func TestDownlinkQueueList(t *testing.T) {
 							SessionKeyID: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 44},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 43},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 44},
 						},
 					},
 				}, ctx, nil
@@ -1399,9 +1399,9 @@ func TestDownlinkQueueList(t *testing.T) {
 			},
 			Downlinks: &ttnpb.ApplicationDownlinks{
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
-					{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
-					{SessionKeyID: []byte("testPendingSession"), FCnt: 44},
+					{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 1},
+					{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 43},
+					{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 44},
 				},
 			},
 			GetByIDCalls: 1,
@@ -1429,8 +1429,8 @@ func TestDownlinkQueueList(t *testing.T) {
 							SessionKeyID: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testSession")},
-							{SessionKeyID: []byte("testSession"), FCnt: 42},
+							{SessionKeyID: []byte("testSession"), FPort: 42},
+							{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
 						},
 					},
 					PendingSession: &ttnpb.Session{
@@ -1438,9 +1438,9 @@ func TestDownlinkQueueList(t *testing.T) {
 							SessionKeyID: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
-							{SessionKeyID: []byte("testPendingSession"), FCnt: 44},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 43},
+							{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 44},
 						},
 					},
 				}, ctx, nil
@@ -1451,11 +1451,11 @@ func TestDownlinkQueueList(t *testing.T) {
 			},
 			Downlinks: &ttnpb.ApplicationDownlinks{
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					{SessionKeyID: []byte("testSession")},
-					{SessionKeyID: []byte("testSession"), FCnt: 42},
-					{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
-					{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
-					{SessionKeyID: []byte("testPendingSession"), FCnt: 44},
+					{SessionKeyID: []byte("testSession"), FPort: 42},
+					{SessionKeyID: []byte("testSession"), FPort: 42, FCnt: 42},
+					{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 1},
+					{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 43},
+					{SessionKeyID: []byte("testPendingSession"), FPort: 42, FCnt: 44},
 				},
 			},
 			GetByIDCalls: 1,
