@@ -17,27 +17,31 @@ package ttnpb
 import "context"
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (p MACPayload) ValidateContext(context.Context) error {
-	if p.DevAddr.IsZero() {
-		return errMissing("DevAddr")
-	}
-	return p.ValidateFields()
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (p JoinRequestPayload) ValidateContext(context.Context) error {
-	if p.DevEUI.IsZero() {
-		return errMissing("DevEUI")
-	}
-	return p.ValidateFields()
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (req *GatewayUplinkMessage) ValidateContext(context.Context) error {
+func (req *GetApplicationWebhookTemplateRequest) ValidateContext(context.Context) error {
 	return req.ValidateFields()
 }
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (req *DownlinkQueueRequest) ValidateContext(context.Context) error {
+func (req *GetApplicationWebhookRequest) ValidateContext(context.Context) error {
+	return req.ValidateFields()
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (req *ListApplicationWebhooksRequest) ValidateContext(context.Context) error {
+	return req.ValidateFields()
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (m *SetApplicationWebhookRequest) ValidateContext(context.Context) error {
+	if len(m.FieldMask.Paths) == 0 {
+		return m.ValidateFields()
+	}
+	return m.ValidateFields(append(FieldsWithPrefix("webhook", m.FieldMask.Paths...),
+		"webhook.ids",
+	)...)
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (req *ApplicationWebhookIdentifiers) ValidateContext(context.Context) error {
 	return req.ValidateFields()
 }

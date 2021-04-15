@@ -139,34 +139,42 @@ func (m *GatewayModel) ValidateFields(paths ...string) error {
 		switch name {
 		case "brand_id":
 
-			if utf8.RuneCountInString(m.GetBrandID()) > 36 {
-				return GatewayModelValidationError{
-					field:  "brand_id",
-					reason: "value length must be at most 36 runes",
-				}
-			}
+			if m.GetBrandID() != "" {
 
-			if !_GatewayModel_BrandID_Pattern.MatchString(m.GetBrandID()) {
-				return GatewayModelValidationError{
-					field:  "brand_id",
-					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+					return GatewayModelValidationError{
+						field:  "brand_id",
+						reason: "value length must be at most 36 runes",
+					}
 				}
+
+				if !_GatewayModel_BrandID_Pattern.MatchString(m.GetBrandID()) {
+					return GatewayModelValidationError{
+						field:  "brand_id",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
 			}
 
 		case "id":
 
-			if utf8.RuneCountInString(m.GetID()) > 36 {
-				return GatewayModelValidationError{
-					field:  "id",
-					reason: "value length must be at most 36 runes",
-				}
-			}
+			if m.GetID() != "" {
 
-			if !_GatewayModel_ID_Pattern.MatchString(m.GetID()) {
-				return GatewayModelValidationError{
-					field:  "id",
-					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				if utf8.RuneCountInString(m.GetID()) > 36 {
+					return GatewayModelValidationError{
+						field:  "id",
+						reason: "value length must be at most 36 runes",
+					}
 				}
+
+				if !_GatewayModel_ID_Pattern.MatchString(m.GetID()) {
+					return GatewayModelValidationError{
+						field:  "id",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
 			}
 
 		case "name":
@@ -256,34 +264,42 @@ func (m *GatewayVersionIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "brand_id":
 
-			if utf8.RuneCountInString(m.GetBrandID()) > 36 {
-				return GatewayVersionIdentifiersValidationError{
-					field:  "brand_id",
-					reason: "value length must be at most 36 runes",
-				}
-			}
+			if m.GetBrandID() != "" {
 
-			if !_GatewayVersionIdentifiers_BrandID_Pattern.MatchString(m.GetBrandID()) {
-				return GatewayVersionIdentifiersValidationError{
-					field:  "brand_id",
-					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+					return GatewayVersionIdentifiersValidationError{
+						field:  "brand_id",
+						reason: "value length must be at most 36 runes",
+					}
 				}
+
+				if !_GatewayVersionIdentifiers_BrandID_Pattern.MatchString(m.GetBrandID()) {
+					return GatewayVersionIdentifiersValidationError{
+						field:  "brand_id",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
 			}
 
 		case "model_id":
 
-			if utf8.RuneCountInString(m.GetModelID()) > 36 {
-				return GatewayVersionIdentifiersValidationError{
-					field:  "model_id",
-					reason: "value length must be at most 36 runes",
-				}
-			}
+			if m.GetModelID() != "" {
 
-			if !_GatewayVersionIdentifiers_ModelID_Pattern.MatchString(m.GetModelID()) {
-				return GatewayVersionIdentifiersValidationError{
-					field:  "model_id",
-					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				if utf8.RuneCountInString(m.GetModelID()) > 36 {
+					return GatewayVersionIdentifiersValidationError{
+						field:  "model_id",
+						reason: "value length must be at most 36 runes",
+					}
 				}
+
+				if !_GatewayVersionIdentifiers_ModelID_Pattern.MatchString(m.GetModelID()) {
+					return GatewayVersionIdentifiersValidationError{
+						field:  "model_id",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
 			}
 
 		case "hardware_version":
@@ -987,17 +1003,21 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "target_cups_uri":
 
-			if uri, err := url.Parse(m.GetTargetCUPSURI()); err != nil {
-				return GatewayValidationError{
-					field:  "target_cups_uri",
-					reason: "value must be a valid URI",
-					cause:  err,
+			if m.GetTargetCUPSURI() != "" {
+
+				if uri, err := url.Parse(m.GetTargetCUPSURI()); err != nil {
+					return GatewayValidationError{
+						field:  "target_cups_uri",
+						reason: "value must be a valid URI",
+						cause:  err,
+					}
+				} else if !uri.IsAbs() {
+					return GatewayValidationError{
+						field:  "target_cups_uri",
+						reason: "value must be absolute",
+					}
 				}
-			} else if !uri.IsAbs() {
-				return GatewayValidationError{
-					field:  "target_cups_uri",
-					reason: "value must be absolute",
-				}
+
 			}
 
 		case "target_cups_key":

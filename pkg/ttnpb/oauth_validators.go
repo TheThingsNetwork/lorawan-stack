@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,16 +14,9 @@
 
 package ttnpb
 
-import (
-	"context"
-)
+import "context"
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (m *UpdateUserRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
-		return m.ValidateFields()
-	}
-	return m.ValidateFields(append(FieldsWithPrefix("user", m.FieldMask.Paths...),
-		"user.ids",
-	)...)
+func (req *ListOAuthClientAuthorizationsRequest) ValidateContext(context.Context) error {
+	return req.ValidateFields()
 }

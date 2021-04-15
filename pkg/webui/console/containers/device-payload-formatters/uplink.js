@@ -151,8 +151,10 @@ class DevicePayloadFormatters extends React.PureComponent {
         frm_payload: hexToBase64(payload),
         // `rx_metadata` and `settings` fields are required by the validation middleware in AS.
         // These fields won't affect the result of decoding an uplink message.
-        rx_metadata: [{ gateway_ids: { gateway_id: 'gtw-test' } }],
-        settings: { data_rate: { lora: {} } },
+        rx_metadata: [
+          { gateway_ids: { gateway_id: 'test' }, rssi: 42, channel_rssi: 42, snr: 4.2 },
+        ],
+        settings: { data_rate: { lora: { bandwidth: 125000, spreading_factor: 7 } } },
       },
       version_ids: Object.keys(version_ids).length > 0 ? version_ids : undefined,
       formatter,
