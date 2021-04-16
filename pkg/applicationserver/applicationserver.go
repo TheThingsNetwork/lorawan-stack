@@ -148,6 +148,17 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		iogrpc.WithMQTTConfigProvider(as),
 		iogrpc.WithEndDeviceFetcher(as.endDeviceFetcher),
 		iogrpc.WithPayloadProcessor(as.formatters),
+		iogrpc.WithSkipPayloadCrypto(func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (bool, error) {
+			link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{"skip_payload_crypto"})
+			if err != nil {
+				return false, err
+			}
+			dev, err := as.deviceRegistry.Get(ctx, ids, []string{"skip_payload_crypto_override"})
+			if err != nil {
+				return false, err
+			}
+			return as.skipPayloadCrypto(ctx, link, dev, nil), nil
+		}),
 	)
 
 	ctx, cancel := context.WithCancel(as.Context())

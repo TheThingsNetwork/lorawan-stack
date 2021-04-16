@@ -1835,6 +1835,15 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/applicationserver/io/grpc:payload_crypto_skipped": {
+    "translations": {
+      "en": "payload crypto skipped"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/grpc",
+      "file": "grpc.go"
+    }
+  },
   "error:pkg/applicationserver/io/mqtt:not_authorized": {
     "translations": {
       "en": "not authorized"
