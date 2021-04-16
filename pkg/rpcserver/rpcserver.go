@@ -163,10 +163,10 @@ func New(ctx context.Context, opts ...Option) *Server {
 		metrics.StreamServerInterceptor,
 		errors.StreamServerInterceptor(),
 		// NOTE: All middleware that works with lorawan-stack/pkg/errors errors must be placed below.
-		ratelimit.StreamServerInterceptor(options.limiter),
 		sentrymiddleware.StreamServerInterceptor(),
 		grpc_recovery.StreamServerInterceptor(recoveryOpts...),
 		validator.StreamServerInterceptor(),
+		ratelimit.StreamServerInterceptor(options.limiter),
 		hooks.StreamServerInterceptor(),
 	}
 
@@ -181,10 +181,10 @@ func New(ctx context.Context, opts ...Option) *Server {
 		metrics.UnaryServerInterceptor,
 		errors.UnaryServerInterceptor(),
 		// NOTE: All middleware that works with lorawan-stack/pkg/errors errors must be placed below.
-		ratelimit.UnaryServerInterceptor(options.limiter),
 		sentrymiddleware.UnaryServerInterceptor(),
 		grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
 		validator.UnaryServerInterceptor(),
+		ratelimit.UnaryServerInterceptor(options.limiter),
 		hooks.UnaryServerInterceptor(),
 	}
 
