@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Occasional crashes in the ratelimit middleware.
+
 ### Security
 
 ## [3.12.1] - 2021-04-15
