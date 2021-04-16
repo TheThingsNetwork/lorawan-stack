@@ -2298,6 +2298,14 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		t.Fatalf("Failed to set link in registry: %s", err)
 	}
 
+	applicationUpsRedisClient, applicationUpsFlush := test.NewRedis(ctx, "applicationserver_test", "applicationups")
+	defer applicationUpsFlush()
+	defer applicationUpsRedisClient.Close()
+	applicationUpsRegistry := &redis.ApplicationUplinkRegistry{
+		Redis: applicationUpsRedisClient,
+		Limit: 16,
+	}
+
 	distribRedisClient, distribFlush := test.NewRedis(ctx, "applicationserver_test", "traffic")
 	defer distribFlush()
 	defer distribRedisClient.Close()
@@ -2325,6 +2333,10 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	config := &applicationserver.Config{
 		Devices: deviceRegistry,
 		Links:   linkRegistry,
+		UplinkStorage: applicationserver.UplinkStorageConfig{
+			Registry: applicationUpsRegistry,
+			Limit:    16,
+		},
 		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
 			Fetcher: &noopEndDeviceFetcher{},
 		},

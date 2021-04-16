@@ -96,7 +96,7 @@ var (
 // UplinkStorageConfig defines the configuration of the application uplinks storage used by integrations.
 type UplinkStorageConfig struct {
 	Registry ApplicationUplinkRegistry `name:"-"`
-	Limit    int64                     `name:"limit" description:"How many application uplinks should be stored"`
+	Limit    int64                     `name:"limit" description:"Number of application uplinks to be stored"`
 }
 
 // WebhooksConfig defines the configuration of the webhooks integration.

@@ -369,7 +369,7 @@ func TestApplicationUplinksRegistry(t *testing.T) {
 
 			push := func(start uint32, end uint32) {
 				for i := start; i < end; i++ {
-					err := registry.Push(ctx, ids, &ttnpb.ApplicationUplink{FCnt: uint32(i)})
+					err := registry.Push(ctx, ids, &ttnpb.ApplicationUplink{FCnt: i})
 					a.So(err, should.BeNil)
 				}
 			}

@@ -82,7 +82,38 @@ func (m MockLinkRegistry) Range(ctx context.Context, paths []string, f func(cont
 // Set calls SetFunc if set and panics otherwise.
 func (m MockLinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
 	if m.SetFunc == nil {
-		panic("Set called, bt not set")
+		panic("Set called, but not set")
 	}
 	return m.SetFunc(ctx, ids, paths, f)
+}
+
+// MockApplicationUplinkRegistry is a mock ApplicationUplinkRegistry used for testing.
+type MockApplicationUplinkRegistry struct {
+	RangeFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(context.Context, *ttnpb.ApplicationUplink) bool) error
+	PushFunc  func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error
+	ClearFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error
+}
+
+// Range calls RangeFunc if set and panics otherwise.
+func (m MockApplicationUplinkRegistry) Range(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(context.Context, *ttnpb.ApplicationUplink) bool) error {
+	if m.RangeFunc == nil {
+		panic("Range called, but not set")
+	}
+	return m.RangeFunc(ctx, ids, paths, f)
+}
+
+// Push calls PushFunc if set and panics otherwise.
+func (m MockApplicationUplinkRegistry) Push(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error {
+	if m.PushFunc == nil {
+		panic("Push called, but not set")
+	}
+	return m.PushFunc(ctx, ids, up)
+}
+
+// Clear calls ClearFunc if set and panics otherwise.
+func (m MockApplicationUplinkRegistry) Clear(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+	if m.ClearFunc == nil {
+		panic("Clear called, but not set")
+	}
+	return m.ClearFunc(ctx, ids)
 }
