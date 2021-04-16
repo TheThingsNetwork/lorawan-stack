@@ -115,22 +115,6 @@ func TestLinkADRReq(t *testing.T) {
 			},
 		},
 		{
-			Name:                    "data rate too low",
-			BandID:                  band.EU_863_870,
-			LoRaWANVersion:          ttnpb.MAC_V1_0_3,
-			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_3_REV_A,
-			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
-			CurrentADRNbTrans:       1,
-			CurrentADRDataRateIndex: ttnpb.DATA_RATE_2,
-			DesiredChannels:         MakeDefaultEU868DesiredChannels(),
-			DesiredADRDataRateIndex: ttnpb.DATA_RATE_1,
-			DesiredADRNbTrans:       1,
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a, _ := test.New(t)
-				return a.So(err, should.BeError)
-			},
-		},
-		{
 			Name:                   "TX power too high",
 			BandID:                 band.EU_863_870,
 			LoRaWANVersion:         ttnpb.MAC_V1_0_3,
@@ -268,19 +252,28 @@ func TestLinkADRReq(t *testing.T) {
 			BandID:                  band.EU_863_870,
 			LoRaWANVersion:          ttnpb.MAC_V1_0_1,
 			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_1,
-			CurrentADRDataRateIndex: ttnpb.DATA_RATE_1,
+			CurrentADRDataRateIndex: ttnpb.DATA_RATE_5,
 			CurrentADRNbTrans:       1,
 			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
-			DesiredADRDataRateIndex: ttnpb.DATA_RATE_5,
+			DesiredADRDataRateIndex: ttnpb.DATA_RATE_1,
 			DesiredADRNbTrans:       1,
 			DesiredADRTxPowerIndex:  3,
 			DesiredChannels:         MakeDefaultEU868DesiredChannels(),
 			RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
-				ttnpb.DATA_RATE_1,
 				ttnpb.DATA_RATE_2,
 				ttnpb.DATA_RATE_3,
 				ttnpb.DATA_RATE_4,
-				ttnpb.DATA_RATE_5,
+			},
+			Commands: []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask: []bool{
+						true, true, true, true, true, true, true, true,
+						false, false, false, false, false, false, false, false,
+					},
+					DataRateIndex: ttnpb.DATA_RATE_1,
+					TxPowerIndex:  3,
+					NbTrans:       1,
+				},
 			},
 		},
 		{
