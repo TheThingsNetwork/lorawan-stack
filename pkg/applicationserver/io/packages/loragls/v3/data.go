@@ -17,6 +17,7 @@ package loracloudgeolocationv3
 import (
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -69,6 +70,14 @@ const (
 type Data struct {
 	// Query is the query type used by the package.
 	Query QueryType
+	// MultiFrame enables multi frame requests for TOARSSI queries.
+	MultiFrame bool
+	// MultiFrameWindowSize represents the number of historical frames to consider for the query.
+	// A window size of 0 automatically determines the number of frames based on the first byte
+	// of the uplink message.
+	MultiFrameWindowSize int
+	// MultiFrameWindowAge limits the maximum age of the historical frames considered for the query.
+	MultiFrameWindowAge time.Duration
 	// ServerURL represents the remote server to which the GLS queries are sent.
 	ServerURL *url.URL
 	// Token is the API token to be used when comunicating with the GLS server.
@@ -76,15 +85,34 @@ type Data struct {
 }
 
 const (
-	queryField     = "query"
-	serverURLField = "server_url"
-	tokenField     = "token"
+	queryField           = "query"
+	multiFrameField      = "multi_frame"
+	multiFrameWindowSize = "multi_frame_window_size"
+	multiFrameWindowAge  = "multi_frame_window_age"
+	serverURLField       = "server_url"
+	tokenField           = "token"
 )
 
 func toString(s string) *types.Value {
 	return &types.Value{
 		Kind: &types.Value_StringValue{
 			StringValue: s,
+		},
+	}
+}
+
+func toBool(b bool) *types.Value {
+	return &types.Value{
+		Kind: &types.Value_BoolValue{
+			BoolValue: b,
+		},
+	}
+}
+
+func toFloat64(f float64) *types.Value {
+	return &types.Value{
+		Kind: &types.Value_NumberValue{
+			NumberValue: f,
 		},
 	}
 }
@@ -100,6 +128,15 @@ func (d *Data) Struct() *types.Struct {
 	if d.ServerURL != nil {
 		st.Fields[serverURLField] = toString(d.ServerURL.String())
 	}
+	if d.MultiFrame {
+		st.Fields[multiFrameField] = toBool(d.MultiFrame)
+	}
+	if d.MultiFrameWindowSize > 0 {
+		st.Fields[multiFrameWindowSize] = toFloat64(float64(d.MultiFrameWindowSize))
+	}
+	if d.MultiFrameWindowAge > 0 {
+		st.Fields[multiFrameWindowAge] = toFloat64(float64(d.MultiFrameWindowAge))
+	}
 	return st
 }
 
@@ -109,6 +146,22 @@ func stringFromValue(v *types.Value) (string, error) {
 		return "", errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
 	}
 	return sv.StringValue, nil
+}
+
+func boolFromValue(v *types.Value) (bool, error) {
+	bv, ok := v.Kind.(*types.Value_BoolValue)
+	if !ok {
+		return false, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
+	}
+	return bv.BoolValue, nil
+}
+
+func float64FromValue(v *types.Value) (float64, error) {
+	fv, ok := v.Kind.(*types.Value_NumberValue)
+	if !ok {
+		return 0.0, errInvalidType.WithAttributes("type", fmt.Sprintf("%T", v.Kind))
+	}
+	return fv.NumberValue, nil
 }
 
 // FromStruct deserializes the configuration from *types.Struct.
@@ -124,6 +177,36 @@ func (d *Data) FromStruct(st *types.Struct) error {
 		}
 	}
 	{
+		value, ok := fields[multiFrameField]
+		if ok {
+			multiFrame, err := boolFromValue(value)
+			if err != nil {
+				return err
+			}
+			d.MultiFrame = multiFrame
+		}
+	}
+	{
+		value, ok := fields[multiFrameWindowSize]
+		if ok {
+			windowSize, err := float64FromValue(value)
+			if err != nil {
+				return err
+			}
+			d.MultiFrameWindowSize = int(windowSize)
+		}
+	}
+	{
+		value, ok := fields[multiFrameWindowAge]
+		if ok {
+			windowAge, err := float64FromValue(value)
+			if err != nil {
+				return err
+			}
+			d.MultiFrameWindowAge = time.Duration(windowAge)
+		}
+	}
+	{
 		value, ok := fields[tokenField]
 		if !ok {
 			return errFieldNotFound.WithAttributes("field", tokenField)
@@ -136,18 +219,18 @@ func (d *Data) FromStruct(st *types.Struct) error {
 	}
 	{
 		value, ok := fields[serverURLField]
-		if !ok {
-			return nil
+		if ok {
+			serverURL, err := stringFromValue(value)
+			if err != nil {
+				return err
+			}
+			u, err := url.Parse(serverURL)
+			if err != nil {
+				return err
+			}
+			d.ServerURL = u
 		}
-		serverURL, err := stringFromValue(value)
-		if err != nil {
-			return err
-		}
-		u, err := url.Parse(serverURL)
-		if err != nil {
-			return err
-		}
-		d.ServerURL = u
+
 	}
 	return nil
 }
