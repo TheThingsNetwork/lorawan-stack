@@ -15,10 +15,12 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 // Gateway contains the description of a LoRaWAN gateway.
@@ -85,30 +87,65 @@ type SingleFrameRequest struct {
 	Frame    Frame     `json:"frame"`
 }
 
+func parseRxMetadata(ctx context.Context, m *ttnpb.RxMetadata) (Gateway, Uplink) {
+	gtwUID := unique.ID(ctx, m.GatewayIdentifiers)
+	var tdoa *uint64
+	if m.FineTimestamp != 0 {
+		tdoa = &m.FineTimestamp
+	}
+	return Gateway{
+			GatewayID: gtwUID,
+			Latitude:  m.Location.Latitude,
+			Longitude: m.Location.Longitude,
+			Altitude:  float64(m.Location.Altitude),
+		}, Uplink{
+			GatewayID: gtwUID,
+			AntennaID: &m.AntennaIndex,
+			TDOA:      tdoa,
+			RSSI:      float64(m.RSSI),
+			SNR:       float64(m.SNR),
+		}
+}
+
 // BuildSingelFrameRequest builds a SingleFrameRequest from the provided metadata.
-func BuildSingleFrameRequest(metadata []*ttnpb.RxMetadata) *SingleFrameRequest {
+func BuildSingleFrameRequest(ctx context.Context, metadata []*ttnpb.RxMetadata) *SingleFrameRequest {
 	r := &SingleFrameRequest{}
 	for _, m := range metadata {
 		if m.Location == nil {
 			continue
 		}
-		var tdoa *uint64
-		if m.FineTimestamp != 0 {
-			tdoa = &m.FineTimestamp
+		gtw, up := parseRxMetadata(ctx, m)
+		r.Gateways = append(r.Gateways, gtw)
+		r.Frame = append(r.Frame, up)
+	}
+	return r
+}
+
+// MultiFrameRequest contains the location query request for multiple LoRaWAN frames.
+// https://www.loracloud.com/documentation/geolocation?url=v3.html#multiframe-http-request
+type MultiFrameRequest struct {
+	Gateways []Gateway `json:"gateways"`
+	Frames   []Frame   `json:"frames"`
+}
+
+// BuildMultiFrameRequest builds a MultiFrameRequest from the provided metadata.
+func BuildMultiFrameRequest(ctx context.Context, mds [][]*ttnpb.RxMetadata) *MultiFrameRequest {
+	r := &MultiFrameRequest{}
+	gateways := map[string]struct{}{}
+	for _, metadata := range mds {
+		frame := Frame{}
+		for _, m := range metadata {
+			if m.Location == nil {
+				continue
+			}
+			gtw, up := parseRxMetadata(ctx, m)
+			if _, seen := gateways[gtw.GatewayID]; !seen {
+				r.Gateways = append(r.Gateways, gtw)
+				gateways[gtw.GatewayID] = struct{}{}
+			}
+			frame = append(frame, up)
 		}
-		r.Gateways = append(r.Gateways, Gateway{
-			GatewayID: m.GatewayID,
-			Latitude:  m.Location.Latitude,
-			Longitude: m.Location.Longitude,
-			Altitude:  float64(m.Location.Altitude),
-		})
-		r.Frame = append(r.Frame, Uplink{
-			GatewayID: m.GatewayID,
-			AntennaID: &m.AntennaIndex,
-			TDOA:      tdoa,
-			RSSI:      float64(m.RSSI),
-			SNR:       float64(m.SNR),
-		})
+		r.Frames = append(r.Frames, frame)
 	}
 	return r
 }
@@ -135,17 +172,18 @@ type LocationSolverResult struct {
 	Location     Location `json:"locationEst"`
 }
 
-// SingleFrameResponse contains the location query response for a single LoRaWAN frame.
+// LocationSolverResponse contains the location query response.
 // https://www.loracloud.com/documentation/geolocation?url=v3.html#singleframe-http-request
-type SingleFrameResponse struct {
+// https://www.loracloud.com/documentation/geolocation?url=v3.html#multiframe-http-request
+type LocationSolverResponse struct {
 	Result   *LocationSolverResult `json:"result"`
 	Errors   []string              `json:"errors"`
 	Warnings []string              `json:"warnings"`
 }
 
-// ExtendedSingleFrameResponse extends SingleFrameResponse with the raw JSON representation.
-type ExtendedSingleFrameResponse struct {
-	SingleFrameResponse
+// ExtendedLocationSolverResponse extends LocationSolverResponse with the raw JSON representation.
+type ExtendedLocationSolverResponse struct {
+	LocationSolverResponse
 
 	Raw *json.RawMessage
 }
@@ -153,18 +191,18 @@ type ExtendedSingleFrameResponse struct {
 // MarshalJSON implements json.Marshaler.
 // Note that the Raw representation takes precedence
 // in the marshaling process, if it is available.
-func (r ExtendedSingleFrameResponse) MarshalJSON() ([]byte, error) {
+func (r ExtendedLocationSolverResponse) MarshalJSON() ([]byte, error) {
 	if r.Raw != nil {
 		return r.Raw.MarshalJSON()
 	}
-	return json.Marshal(r.SingleFrameResponse)
+	return json.Marshal(r.LocationSolverResponse)
 }
 
 // UnmarshalJSON implements json.Marshaler.
-func (r *ExtendedSingleFrameResponse) UnmarshalJSON(b []byte) error {
+func (r *ExtendedLocationSolverResponse) UnmarshalJSON(b []byte) error {
 	r.Raw = &json.RawMessage{}
 	if err := r.Raw.UnmarshalJSON(b); err != nil {
 		return err
 	}
-	return json.Unmarshal(b, &r.SingleFrameResponse)
+	return json.Unmarshal(b, &r.LocationSolverResponse)
 }

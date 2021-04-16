@@ -94,8 +94,8 @@ func WithBaseURL(baseURL *url.URL) Option {
 	})
 }
 
-// SolveSingleFrame attempts to solve the location of the end-device using the provided request.
-func (c *Client) SolveSingleFrame(ctx context.Context, request *SingleFrameRequest) (*ExtendedSingleFrameResponse, error) {
+// SolveSingleFrame attempts to solve the location of the end-device using the provided single frame request.
+func (c *Client) SolveSingleFrame(ctx context.Context, request *SingleFrameRequest) (*ExtendedLocationSolverResponse, error) {
 	buffer := bytes.NewBuffer(nil)
 	if err := json.NewEncoder(buffer).Encode(request); err != nil {
 		return nil, err
@@ -104,7 +104,25 @@ func (c *Client) SolveSingleFrame(ctx context.Context, request *SingleFrameReque
 	if err != nil {
 		return nil, err
 	}
-	response := &ExtendedSingleFrameResponse{}
+	response := &ExtendedLocationSolverResponse{}
+	err = parse(&response, resp)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+// SolveMultiFrame attempts to solve the location of the end-device using the provided multi frame request.
+func (c *Client) SolveMultiFrame(ctx context.Context, request *MultiFrameRequest) (*ExtendedLocationSolverResponse, error) {
+	buffer := bytes.NewBuffer(nil)
+	if err := json.NewEncoder(buffer).Encode(request); err != nil {
+		return nil, err
+	}
+	resp, err := c.Do(ctx, http.MethodPost, "solve", "multiframe", buffer)
+	if err != nil {
+		return nil, err
+	}
+	response := &ExtendedLocationSolverResponse{}
 	err = parse(&response, resp)
 	if err != nil {
 		return nil, err

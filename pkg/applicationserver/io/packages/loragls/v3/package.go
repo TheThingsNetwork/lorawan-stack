@@ -108,7 +108,7 @@ func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceI
 		return err
 	}
 
-	req := api.BuildSingleFrameRequest(up.RxMetadata)
+	req := api.BuildSingleFrameRequest(ctx, up.RxMetadata)
 	if len(req.Gateways) < 3 {
 		logger.Debug("Not enough gateways available")
 		return nil
