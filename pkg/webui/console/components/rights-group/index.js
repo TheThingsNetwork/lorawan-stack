@@ -16,6 +16,7 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { defineMessages, injectIntl } from 'react-intl'
 import classnames from 'classnames'
+import { isEqual } from 'lodash'
 
 import Checkbox from '@ttn-lw/components/checkbox'
 import Notification from '@ttn-lw/components/notification'
@@ -37,6 +38,7 @@ const m = defineMessages({
     "This {entityType} has a wildcard right that you don't have. The {entityType} can therefore only be removed entirely.",
   grantType: 'Grant type',
   allCurrentAndFutureRights: 'Grant all current and future rights',
+  grantAllReadOnlyRights: 'Grant all read-only rights',
   selectIndividualRights: 'Grant individual rights',
 })
 
@@ -75,8 +77,9 @@ const computeProps = props => {
     value.includes(RIGHT_ALL) ||
     derivedPseudoRight.some(derivedRight => value.includes(derivedRight))
 
-  // Determine the current grant type.
-  const grantType = hasPseudoRightGranted ? 'pseudo' : 'individual'
+  // Determine whether read-only rights are granted.
+  const readOnlyRights = derivedRights.filter(right => right.includes('_READ'))
+  const hasReadOnlyRights = isEqual(readOnlyRights.sort(), value.sort())
 
   return {
     outOfOwnScopeIndividualRights,
@@ -84,7 +87,7 @@ const computeProps = props => {
     derivedPseudoRight,
     derivedRights,
     hasPseudoRightGranted,
-    grantType,
+    hasReadOnlyRights,
     ...props,
   }
 }
@@ -106,8 +109,6 @@ class RightsGroup extends React.Component {
      * rights for.
      */
     entityTypeMessage: PropTypes.message.isRequired,
-    /** The right grant type. */
-    grantType: PropTypes.oneOf(['pseudo', 'individual']).isRequired,
     /**
      * Whether the entity has a pseudo right that the current use does not
      * have.
@@ -115,6 +116,8 @@ class RightsGroup extends React.Component {
     hasOutOfOwnScopePseudoRight: PropTypes.bool.isRequired,
     /** Whether the entity has a pseudo right granted. */
     hasPseudoRightGranted: PropTypes.bool.isRequired,
+    /** Whether the entity has read-only rights. */
+    hasReadOnlyRights: PropTypes.bool.isRequired,
     /**
      * The intl object provided by injectIntl of react-intl, used to translate
      * messages.
@@ -145,6 +148,7 @@ class RightsGroup extends React.Component {
 
   state = {
     individualRightValue: [],
+    selectReadOnly: undefined,
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -186,12 +190,17 @@ class RightsGroup extends React.Component {
 
   @bind
   handleGrantTypeChange(val) {
-    const { onChange, pseudoRight } = this.props
+    const { onChange, pseudoRight, derivedRights } = this.props
     const { individualRightValue } = this.state
 
     if (val === 'pseudo') {
       onChange([pseudoRight])
+    } else if (val === 'readonly') {
+      this.setState({ selectReadOnly: true })
+      const readOnlyRights = derivedRights.filter(right => right.includes('_READ'))
+      onChange(readOnlyRights)
     } else {
+      this.setState({ selectReadOnly: false })
       onChange(individualRightValue)
     }
   }
@@ -205,11 +214,23 @@ class RightsGroup extends React.Component {
       onBlur,
       outOfOwnScopeIndividualRights,
       hasOutOfOwnScopePseudoRight,
-      grantType,
       derivedPseudoRight,
       derivedRights,
+      hasPseudoRightGranted,
+      hasReadOnlyRights,
     } = this.props
-    const { individualRightValue } = this.state
+    const { individualRightValue, selectReadOnly } = this.state
+
+    // Determine the current grant type.
+    const initialReadOnlyValue = (selectReadOnly === undefined && hasReadOnlyRights) || false
+    let grantType
+    if (hasPseudoRightGranted) {
+      grantType = 'pseudo'
+    } else if ((hasReadOnlyRights && selectReadOnly) || initialReadOnlyValue) {
+      grantType = 'readonly'
+    } else {
+      grantType = 'individual'
+    }
 
     const selectedCheckboxesCount = individualRightValue.filter(right => !right.endsWith('_ALL'))
       .length
@@ -217,7 +238,8 @@ class RightsGroup extends React.Component {
     const allSelected = selectedCheckboxesCount === totalCheckboxesCount
     const indeterminate =
       selectedCheckboxesCount !== 0 && selectedCheckboxesCount !== totalCheckboxesCount
-    const allDisabled = grantType === 'pseudo' || disabled || hasOutOfOwnScopePseudoRight
+    const allDisabled =
+      grantType === 'pseudo' || grantType === 'readonly' || disabled || hasOutOfOwnScopePseudoRight
 
     let selectAllName = 'select-all'
     let selectAllTitle = m.selectAll
@@ -261,6 +283,7 @@ class RightsGroup extends React.Component {
           disabled={derivedPseudoRight.length === 0}
         >
           <Radio label={m.allCurrentAndFutureRights} value="pseudo" />
+          <Radio label={m.grantAllReadOnlyRights} value="readonly" />
           <Radio label={m.selectIndividualRights} value="individual" />
         </Radio.Group>
         <Checkbox

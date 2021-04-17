@@ -241,6 +241,7 @@
   "console.components.rights-group.index.outOfOwnScopePseudoRight": "This {entityType} has a wildcard right that you don't have. The {entityType} can therefore only be removed entirely.",
   "console.components.rights-group.index.grantType": "Grant type",
   "console.components.rights-group.index.allCurrentAndFutureRights": "Grant all current and future rights",
+  "console.components.rights-group.index.grantAllReadOnlyRights": "Grant all read-only rights",
   "console.components.rights-group.index.selectIndividualRights": "Grant individual rights",
   "console.components.uplink-form.uplink-form.simulateUplink": "Simulate uplink",
   "console.components.uplink-form.uplink-form.payloadDescription": "The desired payload bytes of the uplink message",

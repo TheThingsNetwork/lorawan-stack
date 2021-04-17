@@ -241,6 +241,7 @@
   "console.components.rights-group.index.outOfOwnScopePseudoRight": "Xxxx {entityType} xxx x xxxxxxxx xxxxx xxxx xxx xxx'x xxxx. Xxx {entityType} xxx xxxxxxxxx xxxx xx xxxxxxx xxxxxxxx.",
   "console.components.rights-group.index.grantType": "Xxxxx xxxx",
   "console.components.rights-group.index.allCurrentAndFutureRights": "Xxxxx xxx xxxxxxx xxx xxxxxx xxxxxx",
+  "console.components.rights-group.index.grantAllReadOnlyRights": "Xxxxx xxx xxxx-xxxx xxxxxx",
   "console.components.rights-group.index.selectIndividualRights": "Xxxxx xxxxxxxxxx xxxxxx",
   "console.components.uplink-form.uplink-form.simulateUplink": "Xxxxxxxx xxxxxx",
   "console.components.uplink-form.uplink-form.payloadDescription": "Xxx xxxxxxx xxxxxxx xxxxx xx xxx xxxxxx xxxxxxx",
