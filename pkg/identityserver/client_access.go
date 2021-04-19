@@ -125,8 +125,8 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 	}
 	if len(req.Collaborator.Rights) > 0 {
 		events.Publish(evtUpdateClientCollaborator.New(ctx, events.WithIdentifiers(&req.ClientIdentifiers, &req.Collaborator.OrganizationOrUserIdentifiers)))
-		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-			data.SetEntity(req.EntityIdentifiers())
+		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+			data.SetEntity(req)
 			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
 		})
 		if err != nil {

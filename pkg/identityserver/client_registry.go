@@ -298,8 +298,8 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	}
 	events.Publish(evtUpdateClient.NewWithIdentifiersAndData(ctx, &req.ClientIdentifiers, req.FieldMask.Paths))
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
-		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-			data.SetEntity(req.EntityIdentifiers())
+		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+			data.SetEntity(req)
 			return &emails.EntityStateChanged{
 				Data:             data,
 				State:            strings.ToLower(strings.TrimPrefix(cli.State.String(), "STATE_")),

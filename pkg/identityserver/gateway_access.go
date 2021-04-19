@@ -98,8 +98,8 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 	}
 	key.Key = token
 	events.Publish(evtCreateGatewayAPIKey.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, nil))
-	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+		data.SetEntity(req)
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
@@ -191,8 +191,8 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 	}
 	key.Key = ""
 	events.Publish(evtUpdateGatewayAPIKey.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, nil))
-	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+		data.SetEntity(req)
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
@@ -268,8 +268,8 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 	}
 	if len(req.Collaborator.Rights) > 0 {
 		events.Publish(evtUpdateGatewayCollaborator.New(ctx, events.WithIdentifiers(&req.GatewayIdentifiers, &req.Collaborator.OrganizationOrUserIdentifiers)))
-		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-			data.SetEntity(req.EntityIdentifiers())
+		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+			data.SetEntity(req)
 			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
 		})
 		if err != nil {

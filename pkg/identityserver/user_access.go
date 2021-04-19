@@ -83,7 +83,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 	key.Key = token
 	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+		data.SetEntity(req)
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
@@ -176,7 +176,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 	key.Key = ""
 	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+		data.SetEntity(req)
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {

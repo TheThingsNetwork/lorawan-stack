@@ -98,8 +98,8 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 	}
 	key.Key = token
 	events.Publish(evtCreateOrganizationAPIKey.NewWithIdentifiersAndData(ctx, &req.OrganizationIdentifiers, nil))
-	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+		data.SetEntity(req)
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
@@ -191,8 +191,8 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 	}
 	key.Key = ""
 	events.Publish(evtUpdateOrganizationAPIKey.NewWithIdentifiersAndData(ctx, &req.OrganizationIdentifiers, nil))
-	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+		data.SetEntity(req)
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
@@ -269,8 +269,8 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 	}
 	if len(req.Collaborator.Rights) > 0 {
 		events.Publish(evtUpdateOrganizationCollaborator.New(ctx, events.WithIdentifiers(&req.OrganizationIdentifiers, &req.Collaborator.OrganizationOrUserIdentifiers)))
-		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-			data.SetEntity(req.EntityIdentifiers())
+		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+			data.SetEntity(req)
 			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
 		})
 		if err != nil {

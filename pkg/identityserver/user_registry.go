@@ -520,7 +520,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	// - If primary email address changed
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
 		err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
-			data.SetEntity(req.EntityIdentifiers())
+			data.SetEntity(req)
 			return &emails.EntityStateChanged{
 				Data:             data,
 				State:            strings.ToLower(strings.TrimPrefix(usr.State.String(), "STATE_")),

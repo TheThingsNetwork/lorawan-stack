@@ -98,8 +98,8 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 	}
 	key.Key = token
 	events.Publish(evtCreateApplicationAPIKey.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, nil))
-	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+		data.SetEntity(req)
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
@@ -191,8 +191,8 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 	}
 	key.Key = ""
 	events.Publish(evtUpdateApplicationAPIKey.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, nil))
-	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+		data.SetEntity(req)
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
@@ -269,8 +269,8 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 	}
 	if len(req.Collaborator.Rights) > 0 {
 		events.Publish(evtUpdateApplicationCollaborator.New(ctx, events.WithIdentifiers(&req.ApplicationIdentifiers, &req.Collaborator)))
-		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-			data.SetEntity(req.EntityIdentifiers())
+		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+			data.SetEntity(req)
 			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
 		})
 		if err != nil {
