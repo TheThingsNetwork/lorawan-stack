@@ -529,8 +529,8 @@ func (env TestEnvironment) AssertListApplicationRights(ctx context.Context, appI
 	), should.BeTrue) {
 		return false
 	}
-	return a.So(test.AssertListRightsRequest(ctx, listRightsCh,
-		func(ctx, reqCtx context.Context, ids ttnpb.Identifiers) bool {
+	return a.So(test.AssertListApplicationRightsRequest(ctx, listRightsCh,
+		func(ctx, reqCtx context.Context, ids *ttnpb.ApplicationIdentifiers) bool {
 			_, a := test.MustNewTFromContext(ctx)
 			md := rpcmetadata.FromIncomingContext(reqCtx)
 			return test.AllTrue(

@@ -171,12 +171,12 @@ func TestEntityFetcherFunc(t *testing.T) {
 	var fetcher struct {
 		mu     sync.Mutex
 		ctx    []context.Context
-		ids    []ttnpb.Identifiers
+		ids    []*ttnpb.EntityIdentifiers
 		rights *ttnpb.Rights
 		err    error
 	}
 	fetcher.err = errors.New("test err")
-	f := EntityFetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+	f := EntityFetcherFunc(func(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
 		fetcher.mu.Lock()
 		defer fetcher.mu.Unlock()
 		fetcher.ctx = append(fetcher.ctx, ctx)
@@ -192,11 +192,11 @@ func TestEntityFetcherFunc(t *testing.T) {
 	a.So(res.UsrErr, should.Resemble, fetcher.err)
 
 	if a.So(fetcher.ids, should.HaveLength, 5) {
-		a.So(fetcher.ids, should.Contain, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"})
-		a.So(fetcher.ids, should.Contain, ttnpb.ClientIdentifiers{ClientID: "foo"})
-		a.So(fetcher.ids, should.Contain, ttnpb.GatewayIdentifiers{GatewayID: "foo"})
-		a.So(fetcher.ids, should.Contain, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"})
-		a.So(fetcher.ids, should.Contain, ttnpb.UserIdentifiers{UserID: "foo"})
+		a.So(fetcher.ids, should.Contain, (&ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}).GetEntityIdentifiers())
+		a.So(fetcher.ids, should.Contain, (&ttnpb.ClientIdentifiers{ClientID: "foo"}).GetEntityIdentifiers())
+		a.So(fetcher.ids, should.Contain, (&ttnpb.GatewayIdentifiers{GatewayID: "foo"}).GetEntityIdentifiers())
+		a.So(fetcher.ids, should.Contain, (&ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}).GetEntityIdentifiers())
+		a.So(fetcher.ids, should.Contain, (&ttnpb.UserIdentifiers{UserID: "foo"}).GetEntityIdentifiers())
 	}
 }
 

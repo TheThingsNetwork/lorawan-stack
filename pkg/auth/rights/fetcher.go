@@ -48,44 +48,44 @@ type Fetcher interface {
 // A EntityFetcherFunc that returns all Application rights for any Application,
 // would look like this:
 //
-//    fetcher := rights.EntityFetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+//    fetcher := rights.EntityFetcherFunc(func(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
 //    	rights := ttnpb.AllApplicationRights // Instead this usually comes from an identity server or a database.
 //    	return &rights, nil
 //    })
 //
-type EntityFetcherFunc func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error)
+type EntityFetcherFunc func(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error)
 
 // ApplicationRights implements the Fetcher interface.
 func (f EntityFetcherFunc) ApplicationRights(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
-	rights, err := f(ctx, ids)
+	rights, err := f(ctx, ids.GetEntityIdentifiers())
 	registerRightsFetch(ctx, "application", rights, err)
 	return rights, err
 }
 
 // ClientRights implements the Fetcher interface.
 func (f EntityFetcherFunc) ClientRights(ctx context.Context, ids ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
-	rights, err := f(ctx, ids)
+	rights, err := f(ctx, ids.GetEntityIdentifiers())
 	registerRightsFetch(ctx, "client", rights, err)
 	return rights, err
 }
 
 // GatewayRights implements the Fetcher interface.
 func (f EntityFetcherFunc) GatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
-	rights, err := f(ctx, ids)
+	rights, err := f(ctx, ids.GetEntityIdentifiers())
 	registerRightsFetch(ctx, "gateway", rights, err)
 	return rights, err
 }
 
 // OrganizationRights implements the Fetcher interface.
 func (f EntityFetcherFunc) OrganizationRights(ctx context.Context, ids ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
-	rights, err := f(ctx, ids)
+	rights, err := f(ctx, ids.GetEntityIdentifiers())
 	registerRightsFetch(ctx, "organization", rights, err)
 	return rights, err
 }
 
 // UserRights implements the Fetcher interface.
 func (f EntityFetcherFunc) UserRights(ctx context.Context, ids ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
-	rights, err := f(ctx, ids)
+	rights, err := f(ctx, ids.GetEntityIdentifiers())
 	registerRightsFetch(ctx, "user", rights, err)
 	return rights, err
 }

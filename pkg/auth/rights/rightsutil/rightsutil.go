@@ -29,49 +29,49 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 		return true, nil
 	}
 	for _, entityIDs := range ev.Identifiers() {
-		switch ids := entityIDs.Identifiers().(type) {
-		case *ttnpb.ApplicationIdentifiers:
-			rights, err := rights.ListApplication(ctx, *ids)
+		switch ids := entityIDs.GetIds().(type) {
+		case *ttnpb.EntityIdentifiers_ApplicationIDs:
+			rights, err := rights.ListApplication(ctx, *ids.ApplicationIDs)
 			if err != nil {
 				return false, err
 			}
 			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
 				return true, nil
 			}
-		case *ttnpb.ClientIdentifiers:
-			rights, err := rights.ListClient(ctx, *ids)
+		case *ttnpb.EntityIdentifiers_ClientIDs:
+			rights, err := rights.ListClient(ctx, *ids.ClientIDs)
 			if err != nil {
 				return false, err
 			}
 			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
 				return true, nil
 			}
-		case *ttnpb.EndDeviceIdentifiers:
-			rights, err := rights.ListApplication(ctx, ids.ApplicationIdentifiers)
+		case *ttnpb.EntityIdentifiers_DeviceIDs:
+			rights, err := rights.ListApplication(ctx, ids.DeviceIDs.ApplicationIdentifiers)
 			if err != nil {
 				return false, err
 			}
 			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
 				return true, nil
 			}
-		case *ttnpb.GatewayIdentifiers:
-			rights, err := rights.ListGateway(ctx, *ids)
+		case *ttnpb.EntityIdentifiers_GatewayIDs:
+			rights, err := rights.ListGateway(ctx, *ids.GatewayIDs)
 			if err != nil {
 				return false, err
 			}
 			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
 				return true, nil
 			}
-		case *ttnpb.OrganizationIdentifiers:
-			rights, err := rights.ListOrganization(ctx, *ids)
+		case *ttnpb.EntityIdentifiers_OrganizationIDs:
+			rights, err := rights.ListOrganization(ctx, *ids.OrganizationIDs)
 			if err != nil {
 				return false, err
 			}
 			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
 				return true, nil
 			}
-		case *ttnpb.UserIdentifiers:
-			rights, err := rights.ListUser(ctx, *ids)
+		case *ttnpb.EntityIdentifiers_UserIDs:
+			rights, err := rights.ListUser(ctx, *ids.UserIDs)
 			if err != nil {
 				return false, err
 			}
