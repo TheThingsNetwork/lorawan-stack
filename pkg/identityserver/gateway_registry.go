@@ -347,7 +347,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		}
 		gtwIDs := make([]*ttnpb.GatewayIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if gtwID := id.EntityIdentifiers().GetGatewayIDs(); gtwID != nil {
+			if gtwID := id.GetEntityIdentifiers().GetGatewayIDs(); gtwID != nil {
 				gtwIDs = append(gtwIDs, gtwID)
 			}
 		}

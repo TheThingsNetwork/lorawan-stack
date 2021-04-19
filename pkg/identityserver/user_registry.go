@@ -297,7 +297,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 	// TODO: Send welcome email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 
-	if _, err := is.requestContactInfoValidation(ctx, req.UserIdentifiers.EntityIdentifiers()); err != nil {
+	if _, err := is.requestContactInfoValidation(ctx, req.UserIdentifiers.GetEntityIdentifiers()); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Could not send contact info validations")
 	}
 

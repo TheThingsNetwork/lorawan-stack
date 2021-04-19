@@ -44,7 +44,7 @@ func init() {
 
 	// add deterministic number of organizations
 	for i := 0; i < 3; i++ {
-		organizationID := population.Organizations[i].EntityIdentifiers()
+		organizationID := population.Organizations[i].GetEntityIdentifiers()
 		ouID := paginationUser.OrganizationOrUserIdentifiers()
 		population.Memberships[organizationID] = append(population.Memberships[organizationID], &ttnpb.Collaborator{
 			OrganizationOrUserIdentifiers: *ouID,

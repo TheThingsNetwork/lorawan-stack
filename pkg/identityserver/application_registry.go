@@ -62,8 +62,10 @@ var (
 	)
 )
 
-var errAdminsCreateApplications = errors.DefinePermissionDenied("admins_create_applications", "applications may only be created by admins, or in organizations")
-var errAdminsPurgeApplications = errors.DefinePermissionDenied("admins_purge_applications", "applications may only be purged by admins")
+var (
+	errAdminsCreateApplications = errors.DefinePermissionDenied("admins_create_applications", "applications may only be created by admins, or in organizations")
+	errAdminsPurgeApplications  = errors.DefinePermissionDenied("admins_purge_applications", "applications may only be purged by admins")
+)
 
 func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
 	if err = blacklist.Check(ctx, req.ApplicationID); err != nil {
@@ -190,7 +192,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		}
 		appIDs := make([]*ttnpb.ApplicationIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if appID := id.EntityIdentifiers().GetApplicationIDs(); appID != nil {
+			if appID := id.GetEntityIdentifiers().GetApplicationIDs(); appID != nil {
 				appIDs = append(appIDs, appID)
 			}
 		}

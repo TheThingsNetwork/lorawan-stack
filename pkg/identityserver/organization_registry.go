@@ -189,7 +189,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 		}
 		orgIDs := make([]*ttnpb.OrganizationIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if orgID := id.EntityIdentifiers().GetOrganizationIDs(); orgID != nil {
+			if orgID := id.GetEntityIdentifiers().GetOrganizationIDs(); orgID != nil {
 				orgIDs = append(orgIDs, orgID)
 			}
 		}

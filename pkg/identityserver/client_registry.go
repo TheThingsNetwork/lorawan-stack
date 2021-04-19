@@ -223,7 +223,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 		}
 		cliIDs := make([]*ttnpb.ClientIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if cliID := id.EntityIdentifiers().GetClientIDs(); cliID != nil {
+			if cliID := id.GetEntityIdentifiers().GetClientIDs(); cliID != nil {
 				cliIDs = append(cliIDs, cliID)
 			}
 		}

@@ -37,7 +37,7 @@ func NewPopulator(size int, seed int64) *Populator {
 	for i := 0; i < size; i++ {
 		application := ttnpb.NewPopulatedApplication(randy, false)
 		application.Description = fmt.Sprintf("Random Application %d", i+1)
-		applicationID := application.EntityIdentifiers()
+		applicationID := application.GetEntityIdentifiers()
 		p.Applications = append(p.Applications, application)
 		p.APIKeys[applicationID] = append(
 			p.APIKeys[applicationID],
@@ -51,7 +51,7 @@ func NewPopulator(size int, seed int64) *Populator {
 		p.Clients = append(p.Clients, client)
 		gateway := ttnpb.NewPopulatedGateway(randy, false)
 		gateway.Description = fmt.Sprintf("Random Gateway %d", i+1)
-		gatewayID := gateway.EntityIdentifiers()
+		gatewayID := gateway.GetEntityIdentifiers()
 
 		// This is to prevent the IS trying to use the randomly generated key IDs to decrypt the secrets.
 		if gateway.LBSLNSSecret != nil {
@@ -74,7 +74,7 @@ func NewPopulator(size int, seed int64) *Populator {
 		)
 		organization := ttnpb.NewPopulatedOrganization(randy, false)
 		organization.Description = fmt.Sprintf("Random Organization %d", i+1)
-		organizationID := organization.EntityIdentifiers()
+		organizationID := organization.GetEntityIdentifiers()
 		p.Organizations = append(p.Organizations, organization)
 		p.APIKeys[organizationID] = append(
 			p.APIKeys[organizationID],
@@ -85,7 +85,7 @@ func NewPopulator(size int, seed int64) *Populator {
 		)
 		user := ttnpb.NewPopulatedUser(randy, false)
 		user.Description = fmt.Sprintf("Random User %d", i+1)
-		userID := user.EntityIdentifiers()
+		userID := user.GetEntityIdentifiers()
 		p.Users = append(p.Users, user)
 		p.APIKeys[userID] = append(
 			p.APIKeys[userID],
@@ -97,7 +97,7 @@ func NewPopulator(size int, seed int64) *Populator {
 	}
 	var userIndex, organizationIndex int
 	for _, application := range p.Applications {
-		applicationID := application.EntityIdentifiers()
+		applicationID := application.GetEntityIdentifiers()
 		userCollaborators := randy.Intn((len(p.Users)/10)+1) + 1
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
@@ -118,7 +118,7 @@ func NewPopulator(size int, seed int64) *Populator {
 		}
 	}
 	for _, client := range p.Clients {
-		clientID := client.EntityIdentifiers()
+		clientID := client.GetEntityIdentifiers()
 		userCollaborators := randy.Intn((len(p.Users)/10)+1) + 1
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
@@ -139,7 +139,7 @@ func NewPopulator(size int, seed int64) *Populator {
 		}
 	}
 	for _, gateway := range p.Gateways {
-		gatewayID := gateway.EntityIdentifiers()
+		gatewayID := gateway.GetEntityIdentifiers()
 		userCollaborators := randy.Intn((len(p.Users)/10)+1) + 1
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
@@ -160,7 +160,7 @@ func NewPopulator(size int, seed int64) *Populator {
 		}
 	}
 	for _, organization := range p.Organizations {
-		organizationID := organization.EntityIdentifiers()
+		organizationID := organization.GetEntityIdentifiers()
 		userCollaborators := randy.Intn((len(p.Users)/10)+1) + 1
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
@@ -228,7 +228,7 @@ func (p *Populator) populateApplications(ctx context.Context, db *gorm.DB) (err 
 		if err != nil {
 			return err
 		}
-		p.Applications[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, application.EntityIdentifiers(), application.ContactInfo)
+		p.Applications[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, application, application.ContactInfo)
 		if err != nil {
 			return err
 		}
@@ -246,7 +246,7 @@ func (p *Populator) populateClients(ctx context.Context, db *gorm.DB) (err error
 			return err
 		}
 		client.Secret = secret
-		p.Clients[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, client.EntityIdentifiers(), client.ContactInfo)
+		p.Clients[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, client, client.ContactInfo)
 		if err != nil {
 			return err
 		}
@@ -260,7 +260,7 @@ func (p *Populator) populateGateways(ctx context.Context, db *gorm.DB) (err erro
 		if err != nil {
 			return err
 		}
-		p.Gateways[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, gateway.EntityIdentifiers(), gateway.ContactInfo)
+		p.Gateways[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, gateway, gateway.ContactInfo)
 		if err != nil {
 			return err
 		}
@@ -274,7 +274,7 @@ func (p *Populator) populateOrganizations(ctx context.Context, db *gorm.DB) (err
 		if err != nil {
 			return err
 		}
-		p.Organizations[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, organization.EntityIdentifiers(), organization.ContactInfo)
+		p.Organizations[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, organization, organization.ContactInfo)
 		if err != nil {
 			return err
 		}
@@ -292,7 +292,7 @@ func (p *Populator) populateUsers(ctx context.Context, db *gorm.DB) (err error) 
 			return err
 		}
 		p.Users[i].Password = password
-		p.Users[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, user.EntityIdentifiers(), user.ContactInfo)
+		p.Users[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, user, user.ContactInfo)
 		if err != nil {
 			return err
 		}

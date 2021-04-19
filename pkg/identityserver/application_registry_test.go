@@ -43,7 +43,7 @@ func init() {
 
 	// add deterministic number of applications
 	for i := 0; i < 3; i++ {
-		applicationID := population.Applications[i].EntityIdentifiers()
+		applicationID := population.Applications[i].GetEntityIdentifiers()
 		population.Memberships[applicationID] = append(population.Memberships[applicationID], &ttnpb.Collaborator{
 			OrganizationOrUserIdentifiers: *paginationUser.OrganizationOrUserIdentifiers(),
 			Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
