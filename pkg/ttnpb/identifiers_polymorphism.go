@@ -27,7 +27,6 @@ type Identifiers interface {
 	IDStringer
 	Identifiers() Identifiers
 	EntityIdentifiers() *EntityIdentifiers
-	CombinedIdentifiers() *CombinedIdentifiers
 }
 
 // EntityIdentifiers returns the ApplicationIdentifiers as EntityIdentifiers.

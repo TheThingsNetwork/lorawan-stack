@@ -266,7 +266,6 @@
 - [File `lorawan-stack/api/identifiers.proto`](#lorawan-stack/api/identifiers.proto)
   - [Message `ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers)
   - [Message `ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers)
-  - [Message `CombinedIdentifiers`](#ttn.lorawan.v3.CombinedIdentifiers)
   - [Message `EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers)
   - [Message `EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers)
   - [Message `GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers)
@@ -4055,15 +4054,6 @@ The NsGs service connects a Network Server to a Gateway Server.
 | Field | Validations |
 | ----- | ----------- |
 | `client_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-
-### <a name="ttn.lorawan.v3.CombinedIdentifiers">Message `CombinedIdentifiers`</a>
-
-Combine the identifiers of multiple entities.
-The main purpose of this message is its use in events.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `entity_identifiers` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.EndDeviceIdentifiers">Message `EndDeviceIdentifiers`</a>
 

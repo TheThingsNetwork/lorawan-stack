@@ -521,23 +521,3 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 	}
 	return nil
 }
-
-func (dst *CombinedIdentifiers) SetFields(src *CombinedIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "entity_identifiers":
-			if len(subs) > 0 {
-				return fmt.Errorf("'entity_identifiers' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.EntityIdentifiers = src.EntityIdentifiers
-			} else {
-				dst.EntityIdentifiers = nil
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}

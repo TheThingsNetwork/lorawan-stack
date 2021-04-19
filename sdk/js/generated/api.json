@@ -16513,27 +16513,6 @@
           ]
         },
         {
-          "name": "CombinedIdentifiers",
-          "longName": "CombinedIdentifiers",
-          "fullName": "ttn.lorawan.v3.CombinedIdentifiers",
-          "description": "Combine the identifiers of multiple entities.\nThe main purpose of this message is its use in events.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "entity_identifiers",
-              "description": "",
-              "label": "repeated",
-              "type": "EntityIdentifiers",
-              "longType": "EntityIdentifiers",
-              "fullType": "ttn.lorawan.v3.EntityIdentifiers",
-              "ismap": false,
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
           "name": "EndDeviceIdentifiers",
           "longName": "EndDeviceIdentifiers",
           "fullName": "ttn.lorawan.v3.EndDeviceIdentifiers",
