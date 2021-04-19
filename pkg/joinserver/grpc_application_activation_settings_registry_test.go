@@ -89,7 +89,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				component.WithClusterNew(func(context.Context, *cluster.Config, ...cluster.Option) (cluster.Cluster, error) {
 					return &test.MockCluster{
 						JoinFunc: test.ClusterJoinNilFunc,
-						GetPeerFunc: func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (cluster.Peer, error) {
+						GetPeerFunc: func(reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (cluster.Peer, error) {
 							_, a := test.MustNewTFromContext(ctx)
 							a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS)
 							return test.Must(test.NewGRPCServerPeer(ctx, &test.MockApplicationAccessServer{

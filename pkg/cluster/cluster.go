@@ -25,13 +25,25 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
 )
+
+// EntityIdentifiers are types from which we can get *ttnpb.EntityIdentifiers.
+type EntityIdentifiers interface {
+	// GetEntityIdentifiers wraps the identifiers in a *ttnpb.EntityIdentifiers.
+	// This must return a nil *ttnpb.EntityIdentifiers for nil identifiers (it must not panic).
+	GetEntityIdentifiers() *ttnpb.EntityIdentifiers
+}
+
+func getEntityIdentifiers(eIDs EntityIdentifiers) *ttnpb.EntityIdentifiers {
+	if eIDs == nil {
+		return nil
+	}
+	return eIDs.GetEntityIdentifiers()
+}
 
 // Cluster interface that is implemented by all different clustering implementations.
 type Cluster interface {
@@ -45,21 +57,21 @@ type Cluster interface {
 	// GetPeer returns a peer with the given role, and a responsibility for the
 	// given identifiers. If the identifiers are nil, this function returns a random
 	// peer from the list that would be returned by GetPeers.
-	GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (Peer, error)
+	GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids EntityIdentifiers) (Peer, error)
 	// GetPeerConn returns the gRPC client connection of a peer, if the peer is available as
 	// as per GetPeer.
-	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (*grpc.ClientConn, error)
+	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids EntityIdentifiers) (*grpc.ClientConn, error)
 
 	// ClaimIDs can be used to indicate that the current peer takes
 	// responsibility for entities identified by ids.
 	// Claiming an already claimed ID will transfer the claim (without notifying
 	// the previous holder). Releasing a non-claimed ID is a no-op. An error may
 	// only be returned if the claim/unclaim couldn't be communicated with the cluster.
-	ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error
+	ClaimIDs(ctx context.Context, ids EntityIdentifiers) error
 	// UnclaimIDs can be used to indicate that the current peer
 	// releases responsibility for entities identified by ids.
 	// The specified context ctx may already be done before calling this function.
-	UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) error
+	UnclaimIDs(ctx context.Context, ids EntityIdentifiers) error
 
 	// TLS returns whether the cluster uses TLS for cluster connections.
 	TLS() bool
@@ -86,8 +98,15 @@ func WithConn(conn *grpc.ClientConn) Option {
 	})
 }
 
+// WithDialOptions sets the default dial options for connections to cluster peers.
+func WithDialOptions(f func(ctx context.Context) []grpc.DialOption) Option {
+	return optionFunc(func(c *cluster) {
+		c.dialOptions = f
+	})
+}
+
 // WithServices registers the given services on the "self" peer.
-func WithServices(services ...rpcserver.Registerer) Option {
+func WithServices(services ...interface{ Roles() []ttnpb.ClusterRole }) Option {
 	return optionFunc(func(c *cluster) {
 		for _, service := range services {
 			if roles := service.Roles(); len(roles) > 0 {
@@ -123,7 +142,10 @@ func defaultNew(ctx context.Context, config *Config, options ...Option) (Cluster
 		ctx:           ctx,
 		tls:           config.TLS,
 		tlsServerName: config.TLSServerName,
-		peers:         make(map[string]*peer),
+		dialOptions: func(ctx context.Context) []grpc.DialOption {
+			return nil
+		},
+		peers: make(map[string]*peer),
 	}
 
 	if err := c.loadKeys(ctx, config.Keys...); err != nil {
@@ -167,6 +189,7 @@ type cluster struct {
 	tls           bool
 	tlsConfig     *tls.Config
 	tlsServerName string
+	dialOptions   func(ctx context.Context) []grpc.DialOption
 	peers         map[string]*peer
 	self          *peer
 
@@ -249,7 +272,7 @@ func (c *cluster) Join() (err error) {
 			peer.connErr = errPeerEmptyTarget
 			continue
 		}
-		options := rpcclient.DefaultDialOptions(c.ctx)
+		options := c.dialOptions(c.ctx)
 		if c.tls {
 			tlsConfig := &tls.Config{}
 			if c.tlsConfig != nil {
@@ -303,10 +326,10 @@ func (c *cluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]Peer,
 }
 
 // overridePeerRole may change the peer role depending on the identifiers.
-func overridePeerRole(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) ttnpb.ClusterRole {
+func overridePeerRole(ctx context.Context, role ttnpb.ClusterRole, ids *ttnpb.EntityIdentifiers) ttnpb.ClusterRole {
 	switch role {
 	case ttnpb.ClusterRole_GATEWAY_SERVER:
-		if ids != nil && ids.EntityType() == "gateway" && ids.IDString() == PacketBrokerGatewayID.GatewayID {
+		if ids := ids.GetGatewayIDs(); ids != nil && ids.GetGatewayID() == PacketBrokerGatewayID.GatewayID {
 			return ttnpb.ClusterRole_PACKET_BROKER_AGENT
 		}
 	default:
@@ -316,7 +339,8 @@ func overridePeerRole(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Ide
 
 var errPeerUnavailable = errors.DefineUnavailable("peer_unavailable", "{cluster_role} cluster peer unavailable")
 
-func (c *cluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (Peer, error) {
+func (c *cluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, eIDs EntityIdentifiers) (Peer, error) {
+	ids := getEntityIdentifiers(eIDs)
 	role = overridePeerRole(ctx, role, ids)
 	matches, err := c.GetPeers(ctx, role)
 	if err != nil {
@@ -329,8 +353,8 @@ func (c *cluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb
 	return nil, errPeerUnavailable.WithAttributes("cluster_role", strings.Title(strings.Replace(role.String(), "_", " ", -1)))
 }
 
-func (c *cluster) GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (*grpc.ClientConn, error) {
-	peer, err := c.GetPeer(ctx, role, ids)
+func (c *cluster) GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, eIDs EntityIdentifiers) (*grpc.ClientConn, error) {
+	peer, err := c.GetPeer(ctx, role, eIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -339,12 +363,12 @@ func (c *cluster) GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids t
 
 // ClaimIDs is a no-op in the reference implementation.
 // The reference cluster only has a single instance of each component, so we don't need to claim.
-func (c *cluster) ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error {
+func (c *cluster) ClaimIDs(ctx context.Context, eIDs EntityIdentifiers) error {
 	return nil
 }
 
 // UnclaimIDs is a no-op in the reference implementation.
 // The reference cluster only has a single instance of each component, so we don't need to unclaim.
-func (c *cluster) UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) error {
+func (c *cluster) UnclaimIDs(ctx context.Context, eIDs EntityIdentifiers) error {
 	return nil
 }

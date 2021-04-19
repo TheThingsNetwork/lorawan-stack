@@ -18,6 +18,7 @@ package ns
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -28,10 +29,10 @@ import (
 
 // Cluster provides cluster operations.
 type Cluster interface {
-	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (*grpc.ClientConn, error)
+	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error)
 	WithClusterAuth() grpc.CallOption
-	ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error
-	UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) error
+	ClaimIDs(ctx context.Context, ids cluster.EntityIdentifiers) error
+	UnclaimIDs(ctx context.Context, ids cluster.EntityIdentifiers) error
 	FromRequestContext(ctx context.Context) context.Context
 }
 
@@ -68,14 +69,14 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		return nil
 	}
 	logger := log.FromContext(ctx)
-	if err := h.cluster.ClaimIDs(ctx, ids); err != nil {
+	if err := h.cluster.ClaimIDs(ctx, &ids); err != nil {
 		logger.WithError(err).Error("Failed to claim downlink path")
 		return err
 	}
 	logger.Info("Downlink path claimed")
 	defer func() {
 		ctx := h.cluster.FromRequestContext(ctx)
-		if err := h.cluster.UnclaimIDs(ctx, ids); err != nil {
+		if err := h.cluster.UnclaimIDs(ctx, &ids); err != nil {
 			logger.WithError(err).Error("Failed to unclaim downlink path")
 			return
 		}
@@ -89,7 +90,7 @@ var errNetworkServerNotFound = errors.DefineNotFound("network_server_not_found",
 
 // HandleUplink implements upstream.Handler.
 func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUplinkMessage) error {
-	nsConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	nsConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
 		return errNetworkServerNotFound.WithCause(err)
 	}
@@ -104,7 +105,7 @@ func (h *Handler) HandleStatus(context.Context, ttnpb.GatewayIdentifiers, *ttnpb
 
 // HandleTxAck implements upstream.Handler.
 func (h *Handler) HandleTxAck(ctx context.Context, ids ttnpb.GatewayIdentifiers, msg *ttnpb.TxAcknowledgment) error {
-	nsConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	nsConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
 		return errNetworkServerNotFound.WithCause(err)
 	}

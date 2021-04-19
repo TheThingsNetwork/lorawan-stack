@@ -99,9 +99,9 @@ type MockCluster struct {
 	JoinFunc               func() error
 	LeaveFunc              func() error
 	GetPeersFunc           func(ctx context.Context, role ttnpb.ClusterRole) ([]cluster.Peer, error)
-	GetPeerFunc            func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (cluster.Peer, error)
-	ClaimIDsFunc           func(ctx context.Context, ids ttnpb.Identifiers) error
-	UnclaimIDsFunc         func(ctx context.Context, ids ttnpb.Identifiers) error
+	GetPeerFunc            func(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (cluster.Peer, error)
+	ClaimIDsFunc           func(ctx context.Context, ids cluster.EntityIdentifiers) error
+	UnclaimIDsFunc         func(ctx context.Context, ids cluster.EntityIdentifiers) error
 	TLSFunc                func() bool
 	AuthFunc               func() grpc.CallOption
 	WithVerifiedSourceFunc func(ctx context.Context) context.Context
@@ -132,7 +132,7 @@ func (m MockCluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]cl
 }
 
 // GetPeer calls GetPeerFunc if set and panics otherwise.
-func (m MockCluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (cluster.Peer, error) {
+func (m MockCluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (cluster.Peer, error) {
 	if m.GetPeerFunc == nil {
 		panic("GetPeer called, but not set")
 	}
@@ -140,7 +140,7 @@ func (m MockCluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids tt
 }
 
 // GetPeerConn calls GetPeer and then Conn.
-func (m MockCluster) GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (*grpc.ClientConn, error) {
+func (m MockCluster) GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error) {
 	peer, err := m.GetPeer(ctx, role, ids)
 	if err != nil {
 		return nil, err
@@ -149,7 +149,7 @@ func (m MockCluster) GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, id
 }
 
 // ClaimIDs calls ClaimIDsFunc if set and panics otherwise.
-func (m MockCluster) ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error {
+func (m MockCluster) ClaimIDs(ctx context.Context, ids cluster.EntityIdentifiers) error {
 	if m.ClaimIDsFunc == nil {
 		panic("ClaimIDs called, but not set")
 	}
@@ -157,7 +157,7 @@ func (m MockCluster) ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error 
 }
 
 // UnclaimIDs calls UnclaimIDsFunc if set and panics otherwise.
-func (m MockCluster) UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) error {
+func (m MockCluster) UnclaimIDs(ctx context.Context, ids cluster.EntityIdentifiers) error {
 	if m.UnclaimIDsFunc == nil {
 		panic("UnclaimIDs called, but not set")
 	}
@@ -210,12 +210,12 @@ type ClusterGetPeerResponse struct {
 type ClusterGetPeerRequest struct {
 	Context     context.Context
 	Role        ttnpb.ClusterRole
-	Identifiers ttnpb.Identifiers
+	Identifiers cluster.EntityIdentifiers
 	Response    chan<- ClusterGetPeerResponse
 }
 
-func MakeClusterGetPeerChFunc(reqCh chan<- ClusterGetPeerRequest) func(context.Context, ttnpb.ClusterRole, ttnpb.Identifiers) (cluster.Peer, error) {
-	return func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (cluster.Peer, error) {
+func MakeClusterGetPeerChFunc(reqCh chan<- ClusterGetPeerRequest) func(context.Context, ttnpb.ClusterRole, cluster.EntityIdentifiers) (cluster.Peer, error) {
+	return func(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (cluster.Peer, error) {
 		respCh := make(chan ClusterGetPeerResponse)
 		reqCh <- ClusterGetPeerRequest{
 			Context:     ctx,
@@ -265,7 +265,7 @@ func AssertClusterAuthRequest(ctx context.Context, reqCh <-chan ClusterAuthReque
 	}
 }
 
-func AssertClusterGetPeerRequest(ctx context.Context, reqCh <-chan ClusterGetPeerRequest, assert func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (ClusterGetPeerResponse, bool)) bool {
+func AssertClusterGetPeerRequest(ctx context.Context, reqCh <-chan ClusterGetPeerRequest, assert func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (ClusterGetPeerResponse, bool)) bool {
 	t := MustTFromContext(ctx)
 	t.Helper()
 	select {

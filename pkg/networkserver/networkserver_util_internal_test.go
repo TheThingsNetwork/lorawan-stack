@@ -515,7 +515,7 @@ func (env TestEnvironment) AssertListApplicationRights(ctx context.Context, appI
 	}()
 
 	if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
-		func(ctx, _ context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
+		func(ctx, _ context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (test.ClusterGetPeerResponse, bool) {
 			_, a := test.MustNewTFromContext(ctx)
 			return test.ClusterGetPeerResponse{
 					Peer: NewISPeer(ctx, &test.MockApplicationAccessServer{
@@ -705,7 +705,7 @@ func (env TestEnvironment) AssertNsAsHandleUplink(ctx context.Context, appID ttn
 				close(handleUplinkCh)
 			}()
 			if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
-				func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
+				func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (test.ClusterGetPeerResponse, bool) {
 					_, a := test.MustNewTFromContext(ctx)
 					return test.ClusterGetPeerResponse{
 							Peer: NewASPeer(ctx, &MockNsAsServer{
@@ -713,7 +713,7 @@ func (env TestEnvironment) AssertNsAsHandleUplink(ctx context.Context, appID ttn
 							}),
 						}, test.AllTrue(
 							a.So(role, should.Equal, ttnpb.ClusterRole_APPLICATION_SERVER),
-							a.So(ids, should.Resemble, appID),
+							a.So(ids.GetEntityIdentifiers().GetApplicationIDs(), should.Resemble, &appID),
 						)
 				},
 			), should.BeTrue) {
@@ -809,26 +809,26 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 			}()
 			var reqIDs []ttnpb.GatewayIdentifiers
 			for range paths {
-				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
+				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (test.ClusterGetPeerResponse, bool) {
 					_, a := test.MustNewTFromContext(ctx)
-					gtwIDs, ok := ids.(ttnpb.GatewayIdentifiers)
+					gtwIDs := ids.GetEntityIdentifiers().GetGatewayIDs()
 					if !test.AllTrue(
 						a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
 						a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER),
-						a.So(ok, should.BeTrue),
+						a.So(gtwIDs, should.NotBeNil),
 					) {
 						return test.ClusterGetPeerResponse{
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					if !a.So(expectedIDs, should.Contain, gtwIDs) {
+					if !a.So(expectedIDs, should.Contain, *gtwIDs) {
 						t.Errorf("Gateway Server peer requested for unknown gateway IDs: %v.\nExpected one of %v", gtwIDs, expectedIDs)
 						return test.ClusterGetPeerResponse{
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					reqIDs = append(reqIDs, gtwIDs)
-					peer, ok := peerByIDs[gtwIDs]
+					reqIDs = append(reqIDs, *gtwIDs)
+					peer, ok := peerByIDs[*gtwIDs]
 					if !ok {
 						return test.ClusterGetPeerResponse{
 							Error: errPeerNotFound.New(),
@@ -980,26 +980,26 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 			}()
 			var reqIDs []ttnpb.GatewayIdentifiers
 			for range downlinkPaths {
-				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
+				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (test.ClusterGetPeerResponse, bool) {
 					_, a := test.MustNewTFromContext(ctx)
-					gtwIDs, ok := ids.(ttnpb.GatewayIdentifiers)
+					gtwIDs := ids.GetEntityIdentifiers().GetGatewayIDs()
 					if !test.AllTrue(
 						a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
 						a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER),
-						a.So(ok, should.BeTrue),
+						a.So(gtwIDs, should.NotBeNil),
 					) {
 						return test.ClusterGetPeerResponse{
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					if !a.So(expectedIDs, should.Contain, gtwIDs) {
+					if !a.So(expectedIDs, should.Contain, *gtwIDs) {
 						t.Errorf("Gateway Server peer requested for unknown gateway IDs: %v.\nExpected one of %v", gtwIDs, expectedIDs)
 						return test.ClusterGetPeerResponse{
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					reqIDs = append(reqIDs, gtwIDs)
-					peer, ok := peerByIDs[gtwIDs]
+					reqIDs = append(reqIDs, *gtwIDs)
+					peer, ok := peerByIDs[*gtwIDs]
 					if !ok {
 						return test.ClusterGetPeerResponse{
 							Error: errPeerNotFound.New(),
@@ -1381,7 +1381,7 @@ func (env TestEnvironment) AssertHandleJoinRequest(ctx context.Context, conf Joi
 	}), should.BeTrue)
 }
 
-func (env TestEnvironment) AssertNsJsJoin(ctx context.Context, getPeerAssert func(ctx, reqCtx context.Context, ids ttnpb.Identifiers) bool, joinAssert func(ctx, reqCtx context.Context, msg *ttnpb.JoinRequest) bool, joinResp *ttnpb.JoinResponse, err error) bool {
+func (env TestEnvironment) AssertNsJsJoin(ctx context.Context, getPeerAssert func(ctx, reqCtx context.Context, ids cluster.EntityIdentifiers) bool, joinAssert func(ctx, reqCtx context.Context, msg *ttnpb.JoinRequest) bool, joinResp *ttnpb.JoinResponse, err error) bool {
 	test.MustTFromContext(ctx).Helper()
 	return test.RunSubtestFromContext(ctx, test.SubtestConfig{
 		Name: "NsJs.HandleJoin",
@@ -1389,7 +1389,7 @@ func (env TestEnvironment) AssertNsJsJoin(ctx context.Context, getPeerAssert fun
 			t.Helper()
 
 			joinReqCh := make(chan NsJsHandleJoinRequest)
-			if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (test.ClusterGetPeerResponse, bool) {
+			if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (test.ClusterGetPeerResponse, bool) {
 				_, a := test.MustNewTFromContext(ctx)
 				return test.ClusterGetPeerResponse{
 						Peer: NewJSPeer(ctx, &MockNsJsServer{
@@ -1500,10 +1500,10 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			if conf.ClusterResponse != nil {
 				if !a.So(env.AssertNsJsJoin(
 					ctx,
-					func(ctx, reqCtx context.Context, peerIDs ttnpb.Identifiers) bool {
+					func(ctx, reqCtx context.Context, peerIDs cluster.EntityIdentifiers) bool {
 						return test.AllTrue(
 							a.So(events.CorrelationIDsFromContext(reqCtx), should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIDs),
-							a.So(peerIDs, should.Resemble, conf.Device.EndDeviceIdentifiers),
+							a.So(peerIDs.GetEntityIdentifiers().GetDeviceIDs(), should.Resemble, &conf.Device.EndDeviceIdentifiers),
 						)
 					},
 					func(ctx, reqCtx context.Context, req *ttnpb.JoinRequest) bool {

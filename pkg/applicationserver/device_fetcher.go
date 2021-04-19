@@ -56,7 +56,7 @@ func NewRegistryEndDeviceFetcher(c *component.Component) EndDeviceFetcher {
 
 // Get implements the EndDeviceFetcher interface.
 func (f *endDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
-	cc, err := f.c.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	cc, err := f.c.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, &ids)
 	if err != nil {
 		return nil, err
 	}

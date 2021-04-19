@@ -829,7 +829,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 				"target", "gateway_server",
 				"gateway_uid", unique.ID(ctx, path.GatewayIdentifiers),
 			))
-			peer, err := ns.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, *path.GatewayIdentifiers)
+			peer, err := ns.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, path.GatewayIdentifiers)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to get Gateway Server peer")
 				continue

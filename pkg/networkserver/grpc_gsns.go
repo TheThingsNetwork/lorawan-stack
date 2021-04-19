@@ -961,7 +961,7 @@ func joinResponseWithoutKeys(resp *ttnpb.JoinResponse) *ttnpb.JoinResponse {
 func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, []events.Event, error) {
 	var queuedEvents []events.Event
 	logger := log.FromContext(ctx)
-	cc, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_JOIN_SERVER, ids)
+	cc, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_JOIN_SERVER, &ids)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.WithError(err).Debug("Join Server peer not found")

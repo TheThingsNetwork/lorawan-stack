@@ -107,7 +107,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		dev.RootKeys = &ttnpb.RootKeys{
 			RootKeyID: rootKeysEnc.GetRootKeyID(),
 		}
-		cc, err := srv.JS.GetPeerConn(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
+		cc, err := srv.JS.GetPeerConn(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, &dev.EndDeviceIdentifiers)
 		if err != nil {
 			if !errors.IsNotFound(err) {
 				logger.WithError(err).Debug("Crypto Server connection is not available")

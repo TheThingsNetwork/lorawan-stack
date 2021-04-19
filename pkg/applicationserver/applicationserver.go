@@ -442,7 +442,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	for _, item := range items {
 		registerReceiveDownlink(ctx, ids, item)
 	}
-	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
 		return err
 	}
@@ -611,7 +611,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if err != nil {
 		return nil, err
 	}
-	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
 		return nil, err
 	}
@@ -656,7 +656,7 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 		DevEUI:       *ids.DevEUI,
 		JoinEUI:      *ids.JoinEUI,
 	}
-	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, ids); err == nil {
+	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, &ids); err == nil {
 		cc, err := js.Conn()
 		if err != nil {
 			return ttnpb.KeyEnvelope{}, err
@@ -790,7 +790,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 // resetInvalidDownlinkQueue clears the invalid downlink queue of the provided device and publishes the appropriate events.
 func (as *ApplicationServer) resetInvalidDownlinkQueue(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
 	logger := log.FromContext(ctx)
-	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
 		return err
 	}
@@ -890,7 +890,7 @@ func (as *ApplicationServer) recalculatePendingDownlinkQueue(ctx context.Context
 			return err
 		}
 
-		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, dev.ApplicationIdentifiers)
+		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &dev.ApplicationIdentifiers)
 		if err != nil {
 			return err
 		}
@@ -934,7 +934,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			return nil
 		}
 
-		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, dev.ApplicationIdentifiers)
+		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &dev.ApplicationIdentifiers)
 		if err != nil {
 			return err
 		}
@@ -1051,7 +1051,7 @@ matchSession:
 		// Next AFCntDown 1 is assumed. If this is a LoRaWAN 1.0.x end device and the Network Server sent MAC layer
 		// downlink already, the Network Server will trigger the DownlinkQueueInvalidated event. Therefore, this
 		// recalculation may result in another recalculation.
-		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 		if err != nil {
 			return nil, err
 		}
@@ -1192,7 +1192,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 
 func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *ttnpb.ApplicationLink) error {
 	logger := log.FromContext(ctx)
-	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
 		return err
 	}

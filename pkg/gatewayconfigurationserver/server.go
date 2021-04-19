@@ -45,7 +45,7 @@ func (s *Server) withGateway(next func(http.ResponseWriter, *http.Request, *ttnp
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		gtwID := gatewayIDFromContext(ctx)
-		cc, err := s.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, gtwID)
+		cc, err := s.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, &gtwID)
 		if err != nil {
 			webhandlers.Error(w, r, err)
 			return

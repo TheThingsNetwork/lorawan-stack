@@ -622,7 +622,7 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 		forwarderNetID.String(), down.ForwarderTenantId, down.ForwarderClusterId,
 	).Inc()
 
-	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, ids)
+	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, &ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to get Gateway Server peer")
 		return err
@@ -852,7 +852,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 		homeNetworkNetID.String(), up.HomeNetworkTenantId, up.HomeNetworkClusterId,
 	).Inc()
 
-	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
 		return err
 	}
