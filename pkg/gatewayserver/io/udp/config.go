@@ -14,7 +14,11 @@
 
 package udp
 
-import "time"
+import (
+	"time"
+
+	"github.com/bluele/gcache"
+)
 
 // RateLimitingConfig contains configuration settings for the rate limiting
 // capabilities of the UDP gateway frontend firewall.
@@ -49,6 +53,8 @@ type Config struct {
 	AddrChangeBlock time.Duration `name:"addr-change-block" description:"Time to block traffic when a gateway's address changes"`
 	// RateLimitingConfig is the configuration for the rate limiting firewall capabilities.
 	RateLimiting RateLimitingConfig `name:"rate-limiting"`
+	// GatewayIdentifiersCache is used to cache gateway identifiers that are fetched from the Entity Registry.
+	GatewayIdentifiersCache gcache.Cache `name:"-"`
 }
 
 // DefaultConfig contains the default configuration.
@@ -65,4 +71,5 @@ var DefaultConfig = Config{
 		Messages:  10,
 		Threshold: 10 * time.Millisecond,
 	},
+	GatewayIdentifiersCache: gcache.New(1000).Expiration(time.Minute).LFU().Build(),
 }

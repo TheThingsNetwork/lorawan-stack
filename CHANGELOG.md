@@ -14,6 +14,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - Allow the LinkADRReq commands to lower the data rate used by the end devices.
+- Temporarily cache the result of calls to the Identity Server made by the Gateway Server for UDP gateways.
 
 ### Deprecated
 

@@ -75,7 +75,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 	s := &srv{
 		ctx:      ctx,
 		config:   config,
-		server:   server,
+		server:   newServerWithIdentifiersCache(server, config.GatewayIdentifiersCache),
 		conn:     conn,
 		packetCh: make(chan encoding.Packet, config.PacketBuffer),
 		firewall: firewall,
