@@ -41,8 +41,10 @@ func applicationIDFlags() *pflag.FlagSet {
 	return flagSet
 }
 
-var errNoApplicationID = errors.DefineInvalidArgument("no_application_id", "no application ID set")
-var errNoConfirmation = errors.DefineInvalidArgument("no_confirmation", "action not confirmed")
+var (
+	errNoApplicationID = errors.DefineInvalidArgument("no_application_id", "no application ID set")
+	errNoConfirmation  = errors.DefineInvalidArgument("no_confirmation", "action not confirmed")
+)
 
 func getApplicationID(flagSet *pflag.FlagSet, args []string) *ttnpb.ApplicationIdentifiers {
 	var applicationID string
@@ -289,7 +291,7 @@ var (
 		if appID == nil {
 			return nil, errNoApplicationID
 		}
-		return appID.EntityIdentifiers(), nil
+		return appID.GetEntityIdentifiers(), nil
 	})
 	applicationsPurgeCommand = &cobra.Command{
 		Use:     "purge [application-id]",
