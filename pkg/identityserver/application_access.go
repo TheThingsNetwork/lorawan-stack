@@ -97,7 +97,7 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 		return nil, err
 	}
 	key.Key = token
-	events.Publish(evtCreateApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
+	events.Publish(evtCreateApplicationAPIKey.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, nil))
 	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
@@ -186,11 +186,11 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 		return nil, err
 	}
 	if key == nil { // API key was deleted.
-		events.Publish(evtDeleteApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
+		events.Publish(evtDeleteApplicationAPIKey.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
+	events.Publish(evtUpdateApplicationAPIKey.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, nil))
 	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
@@ -268,7 +268,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 		return nil, err
 	}
 	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateApplicationCollaborator.NewWithIdentifiersAndData(ctx, ttnpb.CombineIdentifiers(req.ApplicationIdentifiers, req.Collaborator), nil))
+		events.Publish(evtUpdateApplicationCollaborator.New(ctx, events.WithIdentifiers(&req.ApplicationIdentifiers, &req.Collaborator)))
 		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())
 			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
@@ -277,7 +277,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteApplicationCollaborator.NewWithIdentifiersAndData(ctx, ttnpb.CombineIdentifiers(req.ApplicationIdentifiers, req.Collaborator), nil))
+		events.Publish(evtDeleteApplicationCollaborator.New(ctx, events.WithIdentifiers(&req.ApplicationIdentifiers, &req.Collaborator)))
 	}
 	return ttnpb.Empty, nil
 }

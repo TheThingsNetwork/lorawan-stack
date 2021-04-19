@@ -801,9 +801,9 @@ func (as *ApplicationServer) resetInvalidDownlinkQueue(ctx context.Context, ids 
 	_, err = client.DownlinkQueueReplace(ctx, req, as.WithClusterAuth())
 	if err != nil {
 		logger.WithError(err).Warn("Failed to clear the downlink queue; any queued items in the Network Server are invalid")
-		events.Publish(evtInvalidQueueDataDown.NewWithIdentifiersAndData(ctx, ids, err))
+		events.Publish(evtInvalidQueueDataDown.NewWithIdentifiersAndData(ctx, &ids, err))
 	} else {
-		events.Publish(evtLostQueueDataDown.NewWithIdentifiersAndData(ctx, ids, err))
+		events.Publish(evtLostQueueDataDown.NewWithIdentifiersAndData(ctx, &ids, err))
 	}
 	return err
 }

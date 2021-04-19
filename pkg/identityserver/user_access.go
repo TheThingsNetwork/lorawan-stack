@@ -81,7 +81,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 		return nil, err
 	}
 	key.Key = token
-	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
@@ -170,11 +170,11 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 		return nil, err
 	}
 	if key == nil { // API key was deleted.
-		events.Publish(evtDeleteUserAPIKey.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+		events.Publish(evtDeleteUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}

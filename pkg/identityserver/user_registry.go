@@ -302,7 +302,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	}
 
 	usr.Password = "" // Create doesn't have a FieldMask, so we need to manually remove the password.
-	events.Publish(evtCreateUser.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+	events.Publish(evtCreateUser.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 	return usr, nil
 }
 
@@ -514,7 +514,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, req.FieldMask.Paths))
 
 	// TODO: Send emails (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	// - If primary email address changed
@@ -583,7 +583,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			// }
 		} else {
 			if usr.TemporaryPassword == "" {
-				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 				return errIncorrectPassword.New()
 			}
 			region := trace.StartRegion(ctx, "validate temporary password")
@@ -593,10 +593,10 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			case err != nil:
 				return err
 			case !valid:
-				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 				return errIncorrectPassword.New()
 			case usr.TemporaryPasswordExpiresAt.Before(time.Now()):
-				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 				return errTemporaryPasswordExpired.New()
 			}
 			usr.TemporaryPassword, usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = "", nil, nil
@@ -640,7 +640,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, updateMask))
+	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, updateMask))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 		return &emails.PasswordChanged{Data: data}
 	})
@@ -684,7 +684,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		"user_uid", unique.ID(ctx, req.UserIdentifiers),
 		"temporary_password", temporaryPassword,
 	)).Info("Created temporary password")
-	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, updateTemporaryPasswordFieldMask))
+	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, updateTemporaryPasswordFieldMask))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 		return &emails.TemporaryPassword{
 			Data:              data,

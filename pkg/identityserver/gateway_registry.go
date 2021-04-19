@@ -175,7 +175,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		}
 		return nil, err
 	}
-	events.Publish(evtCreateGateway.NewWithIdentifiersAndData(ctx, req.GatewayIdentifiers, nil))
+	events.Publish(evtCreateGateway.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, nil))
 
 	return gtw, nil
 }
@@ -537,7 +537,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateGateway.NewWithIdentifiersAndData(ctx, req.GatewayIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateGateway.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, req.FieldMask.Paths))
 	return gtw, nil
 }
 

@@ -222,9 +222,9 @@ func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	}
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		events.Publish(evtReceiveJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, nil))
+		events.Publish(evtReceiveJoinAccept.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, nil))
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		events.Publish(evtReceiveDataUp.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, nil))
+		events.Publish(evtReceiveDataUp.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, nil))
 	default:
 		return
 	}
@@ -234,13 +234,13 @@ func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, msg))
+		events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, msg))
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		events.Publish(evtForwardDataUp.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, msg))
+		events.Publish(evtForwardDataUp.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, msg))
 	case *ttnpb.ApplicationUp_LocationSolved:
-		events.Publish(evtForwardLocationSolved.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, msg))
+		events.Publish(evtForwardLocationSolved.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, msg))
 	case *ttnpb.ApplicationUp_ServiceData:
-		events.Publish(evtForwardServiceData.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, msg))
+		events.Publish(evtForwardServiceData.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, msg))
 	default:
 		return
 	}
@@ -250,9 +250,9 @@ func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		events.Publish(evtDropJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, err))
+		events.Publish(evtDropJoinAccept.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, err))
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		events.Publish(evtDropDataUp.NewWithIdentifiersAndData(ctx, msg.EndDeviceIdentifiers, err))
+		events.Publish(evtDropDataUp.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, err))
 	default:
 		return
 	}
@@ -264,17 +264,17 @@ func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 }
 
 func registerReceiveDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) {
-	events.Publish(evtReceiveDataDown.NewWithIdentifiersAndData(ctx, ids, msg))
+	events.Publish(evtReceiveDataDown.NewWithIdentifiersAndData(ctx, &ids, msg))
 	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.ApplicationID).Inc()
 }
 
 func registerForwardDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, ns string) {
-	events.Publish(evtForwardDataDown.NewWithIdentifiersAndData(ctx, ids, msg))
+	events.Publish(evtForwardDataDown.NewWithIdentifiersAndData(ctx, &ids, msg))
 	asMetrics.downlinkForwarded.WithLabelValues(ctx, ns).Inc()
 }
 
 func registerDropDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, err error) {
-	events.Publish(evtDropDataDown.NewWithIdentifiersAndData(ctx, ids, err))
+	events.Publish(evtDropDataDown.NewWithIdentifiersAndData(ctx, &ids, err))
 	if ttnErr, ok := errors.From(err); ok {
 		asMetrics.downlinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {

@@ -97,7 +97,7 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 		return nil, err
 	}
 	key.Key = token
-	events.Publish(evtCreateGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GatewayIdentifiers, nil))
+	events.Publish(evtCreateGatewayAPIKey.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, nil))
 	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
@@ -186,11 +186,11 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 		return nil, err
 	}
 	if key == nil { // API key was deleted.
-		events.Publish(evtDeleteGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GatewayIdentifiers, nil))
+		events.Publish(evtDeleteGatewayAPIKey.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GatewayIdentifiers, nil))
+	events.Publish(evtUpdateGatewayAPIKey.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, nil))
 	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 		data.SetEntity(req.EntityIdentifiers())
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
@@ -267,7 +267,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 		return nil, err
 	}
 	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateGatewayCollaborator.NewWithIdentifiersAndData(ctx, ttnpb.CombineIdentifiers(req.GatewayIdentifiers, req.Collaborator), nil))
+		events.Publish(evtUpdateGatewayCollaborator.New(ctx, events.WithIdentifiers(&req.GatewayIdentifiers, &req.Collaborator.OrganizationOrUserIdentifiers)))
 		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())
 			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
@@ -276,7 +276,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteGatewayCollaborator.NewWithIdentifiersAndData(ctx, ttnpb.CombineIdentifiers(req.GatewayIdentifiers, req.Collaborator), nil))
+		events.Publish(evtDeleteGatewayCollaborator.New(ctx, events.WithIdentifiers(&req.GatewayIdentifiers, &req.Collaborator.OrganizationOrUserIdentifiers)))
 	}
 	return ttnpb.Empty, nil
 }

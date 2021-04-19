@@ -2271,11 +2271,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 
 		if stored == nil {
-			evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, st.Device.EndDeviceIdentifiers, nil)
+			evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, &st.Device.EndDeviceIdentifiers, nil)
 			return nil
 		}
 
-		evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, st.Device.EndDeviceIdentifiers, req.FieldMask.Paths)
+		evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, &st.Device.EndDeviceIdentifiers, req.FieldMask.Paths)
 		if st.HasSetField("multicast") && st.Device.Multicast != stored.Multicast {
 			return newInvalidFieldValueError("multicast")
 		}

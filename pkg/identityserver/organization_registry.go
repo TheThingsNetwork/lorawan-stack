@@ -110,7 +110,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtCreateOrganization.NewWithIdentifiersAndData(ctx, req.OrganizationIdentifiers, nil))
+	events.Publish(evtCreateOrganization.NewWithIdentifiersAndData(ctx, &req.OrganizationIdentifiers, nil))
 	return org, nil
 }
 
@@ -242,7 +242,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateOrganization.NewWithIdentifiersAndData(ctx, req.OrganizationIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateOrganization.NewWithIdentifiersAndData(ctx, &req.OrganizationIdentifiers, req.FieldMask.Paths))
 	return org, nil
 }
 

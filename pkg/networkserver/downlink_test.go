@@ -186,7 +186,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids ttnpb.EndDeviceIdentifiers, err error, n uint) bool {
 			_, a := test.MustNewTFromContext(ctx)
 			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIDs...)
-			evIDOpt := events.WithIdentifiers(ids)
+			evIDOpt := events.WithIdentifiers(&ids)
 			for i := uint(0); i < n; i++ {
 				if !test.AllTrue(
 					a.So(env.Events, should.ReceiveEventFunc, attemptEventEqual,
@@ -205,7 +205,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids ttnpb.EndDeviceIdentifiers, resp *ttnpb.ScheduleDownlinkResponse, evs ...events.Builder) bool {
 			_, a := test.MustNewTFromContext(ctx)
 			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIDs...)
-			evIDOpt := events.WithIdentifiers(ids)
+			evIDOpt := events.WithIdentifiers(&ids)
 			return test.AllTrue(
 				a.So(env.Events, should.ReceiveEventFunc, attemptEventEqual,
 					attempt.With(events.WithData(down)).New(ctx, evIDOpt),
@@ -2493,7 +2493,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 				return []events.Event{
 					EvtForwardJoinAccept.With(
-						events.WithIdentifiers(ids),
+						events.WithIdentifiers(&ids),
 						events.WithData(&ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: ids,
 							CorrelationIDs:       cids,

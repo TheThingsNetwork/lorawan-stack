@@ -109,7 +109,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtCreateApplication.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
+	events.Publish(evtCreateApplication.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, nil))
 	return app, nil
 }
 
@@ -243,7 +243,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateApplication.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateApplication.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, req.FieldMask.Paths))
 	return app, nil
 }
 

@@ -80,7 +80,7 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 func registerAcceptJoin(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.JoinRequest) {
-	events.Publish(evtAcceptJoin.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, nil))
+	events.Publish(evtAcceptJoin.NewWithIdentifiersAndData(ctx, &dev.EndDeviceIdentifiers, nil))
 	jsMetrics.joinAccepted.WithLabelValues(ctx, msg.NetID.String()).Inc()
 }
 

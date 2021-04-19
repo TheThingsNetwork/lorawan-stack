@@ -28,5 +28,5 @@ var evtPackageFail = events.Define(
 )
 
 func registerPackageFail(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, err error) {
-	events.Publish(evtPackageFail.NewWithIdentifiersAndData(ctx, ids, err))
+	events.Publish(evtPackageFail.NewWithIdentifiersAndData(ctx, &ids, err))
 }

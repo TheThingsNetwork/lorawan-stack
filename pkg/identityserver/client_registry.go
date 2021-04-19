@@ -142,7 +142,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 
 	cli.Secret = secret // Return the unhashed secret, in case it was generated.
 
-	events.Publish(evtCreateClient.NewWithIdentifiersAndData(ctx, req.ClientIdentifiers, nil))
+	events.Publish(evtCreateClient.NewWithIdentifiersAndData(ctx, &req.ClientIdentifiers, nil))
 	return cli, nil
 }
 
@@ -296,7 +296,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateClient.NewWithIdentifiersAndData(ctx, req.ClientIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateClient.NewWithIdentifiersAndData(ctx, &req.ClientIdentifiers, req.FieldMask.Paths))
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
 		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())

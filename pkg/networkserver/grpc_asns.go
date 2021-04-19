@@ -83,9 +83,9 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error
 				switch pld := up.Up.(type) {
 				case *ttnpb.ApplicationUp_UplinkMessage:
 					registerForwardDataUplink(ctx, pld.UplinkMessage)
-					events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, up))
+					events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, up))
 				case *ttnpb.ApplicationUp_JoinAccept:
-					events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
+					events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: up.EndDeviceIdentifiers,
 						CorrelationIDs:       up.CorrelationIDs,
 						Up: &ttnpb.ApplicationUp_JoinAccept{

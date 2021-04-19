@@ -150,7 +150,7 @@ func Example() {
 	ctx = events.ContextWithCorrelationID(ctx, events.NewCorrelationID())
 
 	// Publishing an event to the events package will dispatch it on the "global" event pubsub.
-	events.Publish(adrSendEvent.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, requests))
+	events.Publish(adrSendEvent.NewWithIdentifiersAndData(ctx, &dev.EndDeviceIdentifiers, requests))
 
 	wg.Wait() // only for synchronizing the unit test
 
