@@ -22,119 +22,83 @@ type IDStringer interface {
 	IDString() string
 }
 
-// Identifiers is the interface implemented by all (single) identifiers.
-type Identifiers interface {
-	IDStringer
-	Identifiers() Identifiers
-	EntityIdentifiers() *EntityIdentifiers
-}
-
-// EntityIdentifiers returns the ApplicationIdentifiers as EntityIdentifiers.
-func (ids ApplicationIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+// GetEntityIdentifiers returns the ApplicationIdentifiers as EntityIdentifiers.
+func (ids *ApplicationIdentifiers) GetEntityIdentifiers() *EntityIdentifiers {
+	if ids == nil {
+		return nil
+	}
 	return &EntityIdentifiers{Ids: &EntityIdentifiers_ApplicationIDs{
-		ApplicationIDs: &ids,
+		ApplicationIDs: ids,
 	}}
 }
 
-// EntityIdentifiers returns the ClientIdentifiers as EntityIdentifiers.
-func (ids ClientIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+// GetEntityIdentifiers returns the ClientIdentifiers as EntityIdentifiers.
+func (ids *ClientIdentifiers) GetEntityIdentifiers() *EntityIdentifiers {
+	if ids == nil {
+		return nil
+	}
 	return &EntityIdentifiers{Ids: &EntityIdentifiers_ClientIDs{
-		ClientIDs: &ids,
+		ClientIDs: ids,
 	}}
 }
 
-// EntityIdentifiers returns the EndDeviceIdentifiers as EntityIdentifiers.
-func (ids EndDeviceIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+// GetEntityIdentifiers returns the EndDeviceIdentifiers as EntityIdentifiers.
+func (ids *EndDeviceIdentifiers) GetEntityIdentifiers() *EntityIdentifiers {
+	if ids == nil {
+		return nil
+	}
 	return &EntityIdentifiers{Ids: &EntityIdentifiers_DeviceIDs{
-		DeviceIDs: &ids,
+		DeviceIDs: ids,
 	}}
 }
 
-// EntityIdentifiers returns the GatewayIdentifiers as EntityIdentifiers.
-func (ids GatewayIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+// GetEntityIdentifiers returns the GatewayIdentifiers as EntityIdentifiers.
+func (ids *GatewayIdentifiers) GetEntityIdentifiers() *EntityIdentifiers {
+	if ids == nil {
+		return nil
+	}
 	return &EntityIdentifiers{Ids: &EntityIdentifiers_GatewayIDs{
-		GatewayIDs: &ids,
+		GatewayIDs: ids,
 	}}
 }
 
-// EntityIdentifiers implements returns theOrganizationIdentifiers as EntityIdentifiers.
-func (ids OrganizationIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+// GetEntityIdentifiers returns the OrganizationIdentifiers as EntityIdentifiers.
+func (ids *OrganizationIdentifiers) GetEntityIdentifiers() *EntityIdentifiers {
+	if ids == nil {
+		return nil
+	}
 	return &EntityIdentifiers{Ids: &EntityIdentifiers_OrganizationIDs{
-		OrganizationIDs: &ids,
+		OrganizationIDs: ids,
 	}}
 }
 
-// EntityIdentifiers returns the UserIdentifiers as EntityIdentifiers.
-func (ids UserIdentifiers) EntityIdentifiers() *EntityIdentifiers {
+// GetEntityIdentifiers returns the UserIdentifiers as EntityIdentifiers.
+func (ids *UserIdentifiers) GetEntityIdentifiers() *EntityIdentifiers {
+	if ids == nil {
+		return nil
+	}
 	return &EntityIdentifiers{Ids: &EntityIdentifiers_UserIDs{
-		UserIDs: &ids,
+		UserIDs: ids,
 	}}
 }
 
-// EntityIdentifiers returns itself.
-func (ids EntityIdentifiers) EntityIdentifiers() *EntityIdentifiers {
-	return &ids
-}
+// GetEntityIdentifiers returns itself.
+func (ids *EntityIdentifiers) GetEntityIdentifiers() *EntityIdentifiers { return ids }
 
-// EntityIdentifiers returns the Identifiers inside the oneof as EntityIdentifiers.
-func (ids OrganizationOrUserIdentifiers) EntityIdentifiers() *EntityIdentifiers {
-	switch oneof := ids.Ids.(type) {
-	case *OrganizationOrUserIdentifiers_OrganizationIDs:
-		return oneof.OrganizationIDs.EntityIdentifiers()
-	case *OrganizationOrUserIdentifiers_UserIDs:
-		return oneof.UserIDs.EntityIdentifiers()
-	default:
-		panic("missed oneof type in OrganizationOrUserIdentifiers.EntityIdentifiers()")
+// GetEntityIdentifiers returns the Identifiers inside the oneof as EntityIdentifiers.
+func (ids *OrganizationOrUserIdentifiers) GetEntityIdentifiers() *EntityIdentifiers {
+	if ids == nil {
+		return nil
 	}
-}
-
-// Identifiers returns itself.
-func (ids ApplicationIdentifiers) Identifiers() Identifiers { return &ids }
-
-// Identifiers returns itself.
-func (ids ClientIdentifiers) Identifiers() Identifiers { return &ids }
-
-// Identifiers returns itself.
-func (ids EndDeviceIdentifiers) Identifiers() Identifiers { return &ids }
-
-// Identifiers returns itself.
-func (ids GatewayIdentifiers) Identifiers() Identifiers { return &ids }
-
-// Identifiers returns itself.
-func (ids OrganizationIdentifiers) Identifiers() Identifiers { return &ids }
-
-// Identifiers returns itself.
-func (ids UserIdentifiers) Identifiers() Identifiers { return &ids }
-
-// Identifiers returns the concrete identifiers inside the oneof.
-func (ids EntityIdentifiers) Identifiers() Identifiers {
 	switch oneof := ids.Ids.(type) {
-	case *EntityIdentifiers_ApplicationIDs:
-		return oneof.ApplicationIDs
-	case *EntityIdentifiers_ClientIDs:
-		return oneof.ClientIDs
-	case *EntityIdentifiers_DeviceIDs:
-		return oneof.DeviceIDs
-	case *EntityIdentifiers_GatewayIDs:
-		return oneof.GatewayIDs
-	case *EntityIdentifiers_OrganizationIDs:
-		return oneof.OrganizationIDs
-	case *EntityIdentifiers_UserIDs:
-		return oneof.UserIDs
-	default:
-		panic("missed oneof type in EntityIdentifiers.Identifiers()")
-	}
-}
-
-// Identifiers returns the concrete identifiers inside the oneof.
-func (ids OrganizationOrUserIdentifiers) Identifiers() Identifiers {
-	switch oneof := ids.Ids.(type) {
+	case nil:
+		return nil
 	case *OrganizationOrUserIdentifiers_OrganizationIDs:
-		return oneof.OrganizationIDs
+		return oneof.OrganizationIDs.GetEntityIdentifiers()
 	case *OrganizationOrUserIdentifiers_UserIDs:
-		return oneof.UserIDs
+		return oneof.UserIDs.GetEntityIdentifiers()
 	default:
-		panic("missed oneof type in OrganizationOrUserIdentifiers.Identifiers()")
+		panic("missed oneof type in OrganizationOrUserIdentifiers.GetEntityIdentifiers()")
 	}
 }
 

@@ -69,56 +69,56 @@ func TestOrganizationOrUserIdentifiers(t *testing.T) {
 	usrID := NewPopulatedUserIdentifiers(test.Randy, true)
 	ouID := usrID.OrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
-	a.So(ouID.Identifiers(), should.Resemble, usrID)
+	a.So(ouID.GetUserIDs(), should.Resemble, usrID)
 
 	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
 	ouID = orgID.OrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
-	a.So(ouID.Identifiers(), should.Resemble, orgID)
+	a.So(ouID.GetOrganizationIDs(), should.Resemble, orgID)
 }
 
 func TestEntityIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
 	appID := NewPopulatedApplicationIdentifiers(test.Randy, true)
-	eID := appID.EntityIdentifiers()
+	eID := appID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, appID)
+	a.So(eID.GetApplicationIDs(), should.Resemble, appID)
 
 	cliID := NewPopulatedClientIdentifiers(test.Randy, true)
-	eID = cliID.EntityIdentifiers()
+	eID = cliID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, cliID)
+	a.So(eID.GetClientIDs(), should.Resemble, cliID)
 
 	devID := NewPopulatedEndDeviceIdentifiers(test.Randy, true)
-	eID = devID.EntityIdentifiers()
+	eID = devID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, devID)
+	a.So(eID.GetDeviceIDs(), should.Resemble, devID)
 
 	gtwID := NewPopulatedGatewayIdentifiers(test.Randy, true)
-	eID = gtwID.EntityIdentifiers()
+	eID = gtwID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, gtwID)
+	a.So(eID.GetGatewayIDs(), should.Resemble, gtwID)
 
 	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
-	eID = orgID.EntityIdentifiers()
+	eID = orgID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, orgID)
+	a.So(eID.GetOrganizationIDs(), should.Resemble, orgID)
 
 	ouID := orgID.OrganizationOrUserIdentifiers()
-	eID = ouID.EntityIdentifiers()
+	eID = ouID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, orgID)
+	a.So(eID.GetOrganizationIDs(), should.Resemble, orgID)
 
 	usrID := NewPopulatedUserIdentifiers(test.Randy, true)
-	eID = usrID.EntityIdentifiers()
+	eID = usrID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, usrID)
+	a.So(eID.GetUserIDs(), should.Resemble, usrID)
 
 	ouID = usrID.OrganizationOrUserIdentifiers()
-	eID = ouID.EntityIdentifiers()
+	eID = ouID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, usrID)
+	a.So(eID.GetUserIDs(), should.Resemble, usrID)
 }
 
 func TestUserIdentifiersValidate(t *testing.T) {
