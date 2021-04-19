@@ -586,7 +586,7 @@ func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayId
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		// delete related API keys before purging the gateway
-		err := store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids)
+		err := store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

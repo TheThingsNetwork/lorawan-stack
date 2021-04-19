@@ -752,7 +752,7 @@ func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifi
 			return err
 		}
 		// delete related API keys before purging the user
-		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids)
+		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

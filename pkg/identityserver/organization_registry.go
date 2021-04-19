@@ -295,7 +295,7 @@ func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.Orga
 			return err
 		}
 		// Delete related API keys before purging the organization.
-		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids)
+		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

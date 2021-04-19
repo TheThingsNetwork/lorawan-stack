@@ -308,7 +308,7 @@ func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.Appli
 			return errApplicationHasDevices.WithAttributes("count", int(total))
 		}
 		// delete related API keys before purging the application
-		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids)
+		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

@@ -90,7 +90,7 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GatewayIdentifiers, key)
+		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GatewayIdentifiers.GetEntityIdentifiers(), key)
 		return err
 	})
 	if err != nil {
@@ -121,7 +121,7 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.Lis
 	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GatewayIdentifiers)
+		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GatewayIdentifiers.GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -179,7 +179,7 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GatewayIdentifiers, &req.APIKey)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GatewayIdentifiers.GetEntityIdentifiers(), &req.APIKey)
 		return err
 	})
 	if err != nil {
