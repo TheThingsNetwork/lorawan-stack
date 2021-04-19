@@ -213,7 +213,7 @@ func (is *IdentityServer) getOrganizationCollaborator(ctx context.Context, req *
 		rights, err := is.getMembershipStore(ctx, db).GetMember(
 			ctx,
 			&req.OrganizationOrUserIdentifiers,
-			req.OrganizationIdentifiers,
+			req.OrganizationIdentifiers.GetEntityIdentifiers(),
 		)
 		if err != nil {
 			return err
@@ -241,7 +241,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 			existingRights, err := store.GetMember(
 				ctx,
 				&req.Collaborator.OrganizationOrUserIdentifiers,
-				req.OrganizationIdentifiers,
+				req.OrganizationIdentifiers.GetEntityIdentifiers(),
 			)
 
 			if err != nil && !errors.IsNotFound(err) {
@@ -260,7 +260,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 		return store.SetMember(
 			ctx,
 			&req.Collaborator.OrganizationOrUserIdentifiers,
-			req.OrganizationIdentifiers,
+			req.OrganizationIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(req.Collaborator.Rights...),
 		)
 	})
@@ -294,7 +294,7 @@ func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, req
 		}
 	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.OrganizationIdentifiers)
+		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.OrganizationIdentifiers.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

@@ -92,7 +92,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
-			app.ApplicationIdentifiers,
+			app.ApplicationIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
@@ -313,7 +313,7 @@ func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.Appli
 			return err
 		}
 		// delete related memberships before purging the application
-		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids)
+		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

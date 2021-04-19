@@ -122,7 +122,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
-			cli.ClientIdentifiers,
+			cli.ClientIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
@@ -363,7 +363,7 @@ func (is *IdentityServer) purgeClient(ctx context.Context, ids *ttnpb.ClientIden
 			return err
 		}
 		// delete related memberships before purging the client
-		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids)
+		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

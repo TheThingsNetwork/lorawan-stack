@@ -148,7 +148,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
-			gtw.GatewayIdentifiers,
+			gtw.GatewayIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
@@ -591,7 +591,7 @@ func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayId
 			return err
 		}
 		// delete related memberships before purging the gateway
-		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids)
+		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

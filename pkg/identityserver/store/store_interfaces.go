@@ -127,18 +127,18 @@ type UserSessionStore interface {
 // operations should typically be cached. The recommended cache behavior is:
 type MembershipStore interface {
 	// Find direct and optionally also indirect memberships of the organization or user.
-	FindMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) ([]ttnpb.Identifiers, error)
+	FindMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) ([]*ttnpb.EntityIdentifiers, error)
 	// Find indirect memberships (through organizations) between the user and entity.
-	FindIndirectMemberships(ctx context.Context, userID *ttnpb.UserIdentifiers, entityID ttnpb.Identifiers) ([]IndirectMembership, error)
+	FindIndirectMemberships(ctx context.Context, userID *ttnpb.UserIdentifiers, entityID *ttnpb.EntityIdentifiers) ([]IndirectMembership, error)
 
 	// Find direct members and rights of the given entity.
-	FindMembers(ctx context.Context, entityID ttnpb.Identifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error)
+	FindMembers(ctx context.Context, entityID *ttnpb.EntityIdentifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error)
 	// Get direct member rights on an entity.
-	GetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers) (*ttnpb.Rights, error)
+	GetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error)
 	// Set direct member rights on an entity. Rights can be deleted by not passing any rights.
-	SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers, rights *ttnpb.Rights) error
+	SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) error
 	// Delete all member rights on an entity. Used for purging entities.
-	DeleteEntityMembers(ctx context.Context, entityID ttnpb.Identifiers) error
+	DeleteEntityMembers(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error
 	// Delete all user rights for an entity.
 	DeleteAccountMembers(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers) error
 }

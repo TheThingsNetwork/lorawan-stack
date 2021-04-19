@@ -93,7 +93,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
-			org.OrganizationIdentifiers,
+			org.OrganizationIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err

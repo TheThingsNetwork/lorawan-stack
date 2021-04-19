@@ -213,7 +213,7 @@ func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb
 		rights, err := is.getMembershipStore(ctx, db).GetMember(
 			ctx,
 			&req.OrganizationOrUserIdentifiers,
-			req.GatewayIdentifiers,
+			req.GatewayIdentifiers.GetEntityIdentifiers(),
 		)
 		if err != nil {
 			return err
@@ -240,7 +240,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 			existingRights, err := store.GetMember(
 				ctx,
 				&req.Collaborator.OrganizationOrUserIdentifiers,
-				req.GatewayIdentifiers,
+				req.GatewayIdentifiers.GetEntityIdentifiers(),
 			)
 
 			if err != nil && !errors.IsNotFound(err) {
@@ -259,7 +259,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 		return store.SetMember(
 			ctx,
 			&req.Collaborator.OrganizationOrUserIdentifiers,
-			req.GatewayIdentifiers,
+			req.GatewayIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(req.Collaborator.Rights...),
 		)
 	})
@@ -293,7 +293,7 @@ func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttn
 		}
 	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GatewayIdentifiers)
+		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GatewayIdentifiers.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

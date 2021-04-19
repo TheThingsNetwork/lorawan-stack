@@ -213,7 +213,7 @@ func (is *IdentityServer) getApplicationCollaborator(ctx context.Context, req *t
 		rights, err := is.getMembershipStore(ctx, db).GetMember(
 			ctx,
 			&req.OrganizationOrUserIdentifiers,
-			req.ApplicationIdentifiers,
+			req.ApplicationIdentifiers.GetEntityIdentifiers(),
 		)
 		if err != nil {
 			return err
@@ -241,7 +241,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 			existingRights, err := store.GetMember(
 				ctx,
 				&req.Collaborator.OrganizationOrUserIdentifiers,
-				req.ApplicationIdentifiers,
+				req.ApplicationIdentifiers.GetEntityIdentifiers(),
 			)
 
 			if err != nil && !errors.IsNotFound(err) {
@@ -260,7 +260,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 		return store.SetMember(
 			ctx,
 			&req.Collaborator.OrganizationOrUserIdentifiers,
-			req.ApplicationIdentifiers,
+			req.ApplicationIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(req.Collaborator.Rights...),
 		)
 	})
@@ -294,7 +294,7 @@ func (is *IdentityServer) listApplicationCollaborators(ctx context.Context, req 
 		}
 	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.ApplicationIdentifiers)
+		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.ApplicationIdentifiers.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}
