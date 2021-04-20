@@ -140,14 +140,14 @@ func providerLabelValue(i *integration) string {
 }
 
 func registerIntegrationStart(ctx context.Context, i *integration) {
-	events.Publish(evtPubSubStart.NewWithIdentifiersAndData(ctx, i.ApplicationIdentifiers, i.ApplicationPubSubIdentifiers))
+	events.Publish(evtPubSubStart.NewWithIdentifiersAndData(ctx, &i.ApplicationIdentifiers, i.ApplicationPubSubIdentifiers))
 	labelValue := providerLabelValue(i)
 	pubsubMetrics.integrationsStarted.WithLabelValues(ctx, labelValue).Inc()
 	pubsubMetrics.integrationsStopped.WithLabelValues(ctx, labelValue) // Initialize the "stopped" counter.
 }
 
 func registerIntegrationStop(ctx context.Context, i *integration) {
-	events.Publish(evtPubSubStop.NewWithIdentifiersAndData(ctx, i.ApplicationIdentifiers, i.ApplicationPubSubIdentifiers))
+	events.Publish(evtPubSubStop.NewWithIdentifiersAndData(ctx, &i.ApplicationIdentifiers, i.ApplicationPubSubIdentifiers))
 	pubsubMetrics.integrationsStopped.WithLabelValues(ctx, providerLabelValue(i)).Inc()
 }
 
@@ -160,6 +160,6 @@ func registerIntegrationFail(ctx context.Context, i *integration, err error) {
 			"pub_sub_id", i.PubSubID,
 		).
 		WithCause(err)
-	events.Publish(evtPubSubFail.NewWithIdentifiersAndData(ctx, i.ApplicationIdentifiers, err))
+	events.Publish(evtPubSubFail.NewWithIdentifiersAndData(ctx, &i.ApplicationIdentifiers, err))
 	pubsubMetrics.integrationsFailed.WithLabelValues(ctx, providerLabelValue(i)).Inc()
 }

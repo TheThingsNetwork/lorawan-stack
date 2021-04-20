@@ -925,12 +925,12 @@ func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.Gatewa
 
 // ClaimDownlink claims the downlink path for the given gateway.
 func (gs *GatewayServer) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
-	return gs.ClaimIDs(ctx, ids)
+	return gs.ClaimIDs(ctx, &ids)
 }
 
 // UnclaimDownlink releases the claim of the downlink path for the given gateway.
 func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
-	return gs.UnclaimIDs(ctx, ids)
+	return gs.UnclaimIDs(ctx, &ids)
 }
 
 type ctxConfigKeyType struct{}

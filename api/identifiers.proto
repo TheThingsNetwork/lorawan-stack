@@ -95,8 +95,3 @@ message EntityIdentifiers {
   }
 }
 
-// Combine the identifiers of multiple entities.
-// The main purpose of this message is its use in events.
-message CombinedIdentifiers {
-  repeated EntityIdentifiers entity_identifiers = 1;
-}

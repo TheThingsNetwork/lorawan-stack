@@ -37,10 +37,10 @@ type optionFunc func(e *event)
 func (f optionFunc) applyTo(e *event) { f(e) }
 
 // WithIdentifiers returns an option that sets the identifiers of the event.
-func WithIdentifiers(identifiers ...ttnpb.Identifiers) Option {
+func WithIdentifiers(identifiers ...EntityIdentifiers) Option {
 	return optionFunc(func(e *event) {
 		for _, ids := range identifiers {
-			e.innerEvent.Identifiers = append(e.innerEvent.Identifiers, ids.EntityIdentifiers())
+			e.innerEvent.Identifiers = append(e.innerEvent.Identifiers, ids.GetEntityIdentifiers())
 		}
 	})
 }

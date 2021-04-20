@@ -110,7 +110,7 @@ func registerSubscriptionSetStop(ctx context.Context) {
 }
 
 func registerSubscribe(ctx context.Context, sub *io.Subscription) {
-	var ids ttnpb.Identifiers
+	var ids events.EntityIdentifiers
 	if appIDs := sub.ApplicationIDs(); appIDs != nil {
 		ids = appIDs
 	}
@@ -120,7 +120,7 @@ func registerSubscribe(ctx context.Context, sub *io.Subscription) {
 }
 
 func registerUnsubscribe(ctx context.Context, sub *io.Subscription) {
-	var ids ttnpb.Identifiers
+	var ids events.EntityIdentifiers
 	if appIDs := sub.ApplicationIDs(); appIDs != nil {
 		ids = appIDs
 	}

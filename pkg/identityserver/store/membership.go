@@ -41,13 +41,13 @@ type polymorphicEntity struct {
 	EntityType string
 }
 
-func (s *store) findIdentifiers(entities ...polymorphicEntity) (map[polymorphicEntity]ttnpb.Identifiers, error) {
+func (s *store) findIdentifiers(entities ...polymorphicEntity) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
 	return findIdentifiers(s.DB, entities...)
 }
 
-func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphicEntity]ttnpb.Identifiers, error) {
+func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
 	var err error
-	identifiers := make(map[polymorphicEntity]ttnpb.Identifiers, len(entities))
+	identifiers := make(map[polymorphicEntity]*ttnpb.EntityIdentifiers, len(entities))
 	for _, entityType := range []string{"application", "client", "gateway", "organization", "user"} {
 		uuids := make([]string, 0, len(entities))
 		for _, entity := range entities {
@@ -83,18 +83,18 @@ func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphi
 	return identifiers, nil
 }
 
-func buildIdentifiers(entityType, id string) ttnpb.Identifiers {
+func buildIdentifiers(entityType, id string) *ttnpb.EntityIdentifiers {
 	switch entityType {
 	case "application":
-		return &ttnpb.ApplicationIdentifiers{ApplicationID: id}
+		return (&ttnpb.ApplicationIdentifiers{ApplicationID: id}).GetEntityIdentifiers()
 	case "client":
-		return &ttnpb.ClientIdentifiers{ClientID: id}
+		return (&ttnpb.ClientIdentifiers{ClientID: id}).GetEntityIdentifiers()
 	case "gateway":
-		return &ttnpb.GatewayIdentifiers{GatewayID: id}
+		return (&ttnpb.GatewayIdentifiers{GatewayID: id}).GetEntityIdentifiers()
 	case "organization":
-		return &ttnpb.OrganizationIdentifiers{OrganizationID: id}
+		return (&ttnpb.OrganizationIdentifiers{OrganizationID: id}).GetEntityIdentifiers()
 	case "user":
-		return &ttnpb.UserIdentifiers{UserID: id}
+		return (&ttnpb.UserIdentifiers{UserID: id}).GetEntityIdentifiers()
 	default:
 		panic(fmt.Sprintf("can't build identifiers for entity type %q", entityType))
 	}

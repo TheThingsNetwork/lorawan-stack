@@ -19,6 +19,7 @@ import (
 	"context"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -30,7 +31,7 @@ const publishUplinkTimeout = 3 * time.Second
 
 // Cluster represents the interface the cluster.
 type Cluster interface {
-	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (*grpc.ClientConn, error)
+	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error)
 	WithClusterAuth() grpc.CallOption
 }
 
@@ -69,7 +70,7 @@ var errPacketBrokerAgentNotFound = errors.DefineNotFound("packet_broker_agent_no
 
 // HandleUplink implements upstream.Handler.
 func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUplinkMessage) error {
-	pbaConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, ids)
+	pbaConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, &ids)
 	if err != nil {
 		return errPacketBrokerAgentNotFound.WithCause(err)
 	}

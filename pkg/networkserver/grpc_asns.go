@@ -61,7 +61,7 @@ const (
 
 func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error {
 	return ns.applicationUplinks.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, drain ApplicationUplinkQueueDrainFunc) (time.Time, error) {
-		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, appID)
+		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, &appID)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
 			return time.Now().Add(applicationUplinkTaskRetryInterval), nil
@@ -83,9 +83,9 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error
 				switch pld := up.Up.(type) {
 				case *ttnpb.ApplicationUp_UplinkMessage:
 					registerForwardDataUplink(ctx, pld.UplinkMessage)
-					events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, up))
+					events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, up))
 				case *ttnpb.ApplicationUp_JoinAccept:
-					events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
+					events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: up.EndDeviceIdentifiers,
 						CorrelationIDs:       up.CorrelationIDs,
 						Up: &ttnpb.ApplicationUp_JoinAccept{

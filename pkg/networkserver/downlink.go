@@ -829,7 +829,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 				"target", "gateway_server",
 				"gateway_uid", unique.ID(ctx, path.GatewayIdentifiers),
 			))
-			peer, err := ns.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, *path.GatewayIdentifiers)
+			peer, err := ns.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, path.GatewayIdentifiers)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to get Gateway Server peer")
 				continue
@@ -893,7 +893,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 	}
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("ns:downlink:%s", events.NewCorrelationID()))
 	errs := make([]error, 0, len(attempts))
-	eventIDOpt := events.WithIdentifiers(req.EndDeviceIdentifiers)
+	eventIDOpt := events.WithIdentifiers(&req.EndDeviceIdentifiers)
 	for _, a := range attempts {
 		req.TxRequest.DownlinkPaths = a.paths
 		down := &ttnpb.DownlinkMessage{

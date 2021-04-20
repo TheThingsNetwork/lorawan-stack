@@ -76,14 +76,14 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 	a.So(backend.Subscribe(
 		subCtx,
 		"test.some.**",
-		[]*ttnpb.EntityIdentifiers{appID.EntityIdentifiers()},
+		[]*ttnpb.EntityIdentifiers{appID.GetEntityIdentifiers()},
 		ch1,
 	), should.BeNil)
 
 	a.So(backend.Subscribe(
 		subCtx,
 		"test.other.**",
-		[]*ttnpb.EntityIdentifiers{gtwID.EntityIdentifiers()},
+		[]*ttnpb.EntityIdentifiers{gtwID.GetEntityIdentifiers()},
 		ch2,
 	), should.BeNil)
 
@@ -97,7 +97,7 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 		a.So(e.Identifiers(), should.BeNil)
 	}
 
-	backend.Publish(events.New(ctx, "test.some.evt1", "test event 1", events.WithIdentifiers(appID)))
+	backend.Publish(events.New(ctx, "test.some.evt1", "test event 1", events.WithIdentifiers(&appID)))
 	checkEvt1 := func(e events.Event) {
 		checkEvent(e)
 		a.So(e.Name(), should.Equal, "test.some.evt1")

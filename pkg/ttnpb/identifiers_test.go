@@ -63,147 +63,62 @@ func TestIdentifiersIsZero(t *testing.T) {
 	}
 }
 
-func TestCombinedIdentifiers(t *testing.T) {
-	a := assertions.New(t)
-
-	for _, msg := range []interface{ CombinedIdentifiers() *CombinedIdentifiers }{
-		NewPopulatedApplicationIdentifiers(test.Randy, true),
-		NewPopulatedClientIdentifiers(test.Randy, true),
-		NewPopulatedEndDeviceIdentifiers(test.Randy, true),
-		NewPopulatedGatewayIdentifiers(test.Randy, true),
-		NewPopulatedOrganizationIdentifiers(test.Randy, true),
-		NewPopulatedUserIdentifiers(test.Randy, true),
-		NewPopulatedUserSessionIdentifiers(test.Randy, true),
-		NewPopulatedEntityIdentifiers(test.Randy, true),
-		NewPopulatedCombinedIdentifiers(test.Randy, true),
-
-		NewPopulatedCreateApplicationRequest(test.Randy, true),
-		NewPopulatedCreateClientRequest(test.Randy, true),
-		NewPopulatedCreateEndDeviceRequest(test.Randy, true),
-		NewPopulatedCreateGatewayRequest(test.Randy, true),
-		NewPopulatedCreateOrganizationRequest(test.Randy, true),
-		NewPopulatedCreateUserRequest(test.Randy, true),
-
-		NewPopulatedGetApplicationRequest(test.Randy, true),
-		NewPopulatedGetClientRequest(test.Randy, true),
-		NewPopulatedGetEndDeviceRequest(test.Randy, true),
-		NewPopulatedGetGatewayRequest(test.Randy, true),
-		NewPopulatedGetOrganizationRequest(test.Randy, true),
-		NewPopulatedGetUserRequest(test.Randy, true),
-
-		NewPopulatedListApplicationsRequest(test.Randy, true),
-		NewPopulatedListClientsRequest(test.Randy, true),
-		NewPopulatedListEndDevicesRequest(test.Randy, true),
-		NewPopulatedListGatewaysRequest(test.Randy, true),
-		NewPopulatedListOrganizationsRequest(test.Randy, true),
-		NewPopulatedListUserSessionsRequest(test.Randy, true),
-
-		NewPopulatedUpdateApplicationRequest(test.Randy, true),
-		NewPopulatedUpdateClientRequest(test.Randy, true),
-		NewPopulatedUpdateEndDeviceRequest(test.Randy, true),
-		NewPopulatedUpdateGatewayRequest(test.Randy, true),
-		NewPopulatedUpdateOrganizationRequest(test.Randy, true),
-		NewPopulatedUpdateUserRequest(test.Randy, true),
-
-		NewPopulatedSetEndDeviceRequest(test.Randy, true),
-
-		NewPopulatedCreateApplicationAPIKeyRequest(test.Randy, true),
-		NewPopulatedCreateGatewayAPIKeyRequest(test.Randy, true),
-		NewPopulatedCreateOrganizationAPIKeyRequest(test.Randy, true),
-		NewPopulatedCreateUserAPIKeyRequest(test.Randy, true),
-
-		NewPopulatedUpdateApplicationAPIKeyRequest(test.Randy, true),
-		NewPopulatedUpdateGatewayAPIKeyRequest(test.Randy, true),
-		NewPopulatedUpdateOrganizationAPIKeyRequest(test.Randy, true),
-		NewPopulatedUpdateUserAPIKeyRequest(test.Randy, true),
-
-		NewPopulatedSetApplicationCollaboratorRequest(test.Randy, true),
-		NewPopulatedSetClientCollaboratorRequest(test.Randy, true),
-		NewPopulatedSetGatewayCollaboratorRequest(test.Randy, true),
-		NewPopulatedSetOrganizationCollaboratorRequest(test.Randy, true),
-
-		NewPopulatedCreateTemporaryPasswordRequest(test.Randy, true),
-		NewPopulatedUpdateUserPasswordRequest(test.Randy, true),
-
-		NewPopulatedPullGatewayConfigurationRequest(test.Randy, true),
-
-		NewPopulatedDownlinkQueueRequest(test.Randy, true),
-
-		NewPopulatedGetApplicationLinkRequest(test.Randy, true),
-		NewPopulatedSetApplicationLinkRequest(test.Randy, true),
-
-		NewPopulatedEncodeDownlinkMessageRequest(test.Randy, true),
-		NewPopulatedDecodeUplinkMessageRequest(test.Randy, true),
-		NewPopulatedDecodeDownlinkMessageRequest(test.Randy, true),
-
-		NewPopulatedListOAuthAccessTokensRequest(test.Randy, true),
-		NewPopulatedListOAuthClientAuthorizationsRequest(test.Randy, true),
-		NewPopulatedOAuthAccessTokenIdentifiers(test.Randy, true),
-		NewPopulatedOAuthClientAuthorizationIdentifiers(test.Randy, true),
-
-		NewPopulatedStreamEventsRequest(test.Randy, true),
-	} {
-		combined := msg.CombinedIdentifiers()
-		a.So(combined, should.NotBeNil)
-	}
-}
-
 func TestOrganizationOrUserIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
 	usrID := NewPopulatedUserIdentifiers(test.Randy, true)
 	ouID := usrID.OrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
-	a.So(ouID.Identifiers(), should.Resemble, usrID)
+	a.So(ouID.GetUserIDs(), should.Resemble, usrID)
 
 	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
 	ouID = orgID.OrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
-	a.So(ouID.Identifiers(), should.Resemble, orgID)
+	a.So(ouID.GetOrganizationIDs(), should.Resemble, orgID)
 }
 
 func TestEntityIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
 	appID := NewPopulatedApplicationIdentifiers(test.Randy, true)
-	eID := appID.EntityIdentifiers()
+	eID := appID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, appID)
+	a.So(eID.GetApplicationIDs(), should.Resemble, appID)
 
 	cliID := NewPopulatedClientIdentifiers(test.Randy, true)
-	eID = cliID.EntityIdentifiers()
+	eID = cliID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, cliID)
+	a.So(eID.GetClientIDs(), should.Resemble, cliID)
 
 	devID := NewPopulatedEndDeviceIdentifiers(test.Randy, true)
-	eID = devID.EntityIdentifiers()
+	eID = devID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, devID)
+	a.So(eID.GetDeviceIDs(), should.Resemble, devID)
 
 	gtwID := NewPopulatedGatewayIdentifiers(test.Randy, true)
-	eID = gtwID.EntityIdentifiers()
+	eID = gtwID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, gtwID)
+	a.So(eID.GetGatewayIDs(), should.Resemble, gtwID)
 
 	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
-	eID = orgID.EntityIdentifiers()
+	eID = orgID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, orgID)
+	a.So(eID.GetOrganizationIDs(), should.Resemble, orgID)
 
 	ouID := orgID.OrganizationOrUserIdentifiers()
-	eID = ouID.EntityIdentifiers()
+	eID = ouID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, orgID)
+	a.So(eID.GetOrganizationIDs(), should.Resemble, orgID)
 
 	usrID := NewPopulatedUserIdentifiers(test.Randy, true)
-	eID = usrID.EntityIdentifiers()
+	eID = usrID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, usrID)
+	a.So(eID.GetUserIDs(), should.Resemble, usrID)
 
 	ouID = usrID.OrganizationOrUserIdentifiers()
-	eID = ouID.EntityIdentifiers()
+	eID = ouID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.Identifiers(), should.Resemble, usrID)
+	a.So(eID.GetUserIDs(), should.Resemble, usrID)
 }
 
 func TestUserIdentifiersValidate(t *testing.T) {

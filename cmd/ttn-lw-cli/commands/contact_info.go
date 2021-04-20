@@ -34,17 +34,17 @@ func listContactInfo(entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, e
 	}
 	fieldMask := types.FieldMask{Paths: []string{"contact_info"}}
 	var res interface{}
-	switch id := entityID.Identifiers().(type) {
-	case *ttnpb.ApplicationIdentifiers:
-		res, err = ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{ApplicationIdentifiers: *id, FieldMask: fieldMask})
-	case *ttnpb.ClientIdentifiers:
-		res, err = ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{ClientIdentifiers: *id, FieldMask: fieldMask})
-	case *ttnpb.GatewayIdentifiers:
-		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id, FieldMask: fieldMask})
-	case *ttnpb.OrganizationIdentifiers:
-		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id, FieldMask: fieldMask})
-	case *ttnpb.UserIdentifiers:
-		res, err = ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{UserIdentifiers: *id, FieldMask: fieldMask})
+	switch id := entityID.GetIds().(type) {
+	case *ttnpb.EntityIdentifiers_ApplicationIDs:
+		res, err = ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{ApplicationIdentifiers: *id.ApplicationIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_ClientIDs:
+		res, err = ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{ClientIdentifiers: *id.ClientIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_GatewayIDs:
+		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id.GatewayIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_OrganizationIDs:
+		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id.OrganizationIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_UserIDs:
+		res, err = ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{UserIdentifiers: *id.UserIDs, FieldMask: fieldMask})
 	default:
 		panic(fmt.Errorf("no contact info in %T", id))
 	}
@@ -61,17 +61,17 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 	}
 	fieldMask := types.FieldMask{Paths: []string{"contact_info"}}
 	var res interface{}
-	switch id := entityID.Identifiers().(type) {
-	case *ttnpb.ApplicationIdentifiers:
-		res, err = ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{ApplicationIdentifiers: *id, FieldMask: fieldMask})
-	case *ttnpb.ClientIdentifiers:
-		res, err = ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{ClientIdentifiers: *id, FieldMask: fieldMask})
-	case *ttnpb.GatewayIdentifiers:
-		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id, FieldMask: fieldMask})
-	case *ttnpb.OrganizationIdentifiers:
-		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id, FieldMask: fieldMask})
-	case *ttnpb.UserIdentifiers:
-		res, err = ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{UserIdentifiers: *id, FieldMask: fieldMask})
+	switch id := entityID.GetIds().(type) {
+	case *ttnpb.EntityIdentifiers_ApplicationIDs:
+		res, err = ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{ApplicationIdentifiers: *id.ApplicationIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_ClientIDs:
+		res, err = ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{ClientIdentifiers: *id.ClientIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_GatewayIDs:
+		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id.GatewayIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_OrganizationIDs:
+		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id.OrganizationIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_UserIDs:
+		res, err = ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{UserIdentifiers: *id.UserIDs, FieldMask: fieldMask})
 	default:
 		panic(fmt.Errorf("no contact info in %T", id))
 	}

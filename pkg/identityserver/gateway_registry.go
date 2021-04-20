@@ -148,7 +148,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
-			gtw.GatewayIdentifiers,
+			gtw.GatewayIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
@@ -175,7 +175,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		}
 		return nil, err
 	}
-	events.Publish(evtCreateGateway.NewWithIdentifiersAndData(ctx, req.GatewayIdentifiers, nil))
+	events.Publish(evtCreateGateway.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, nil))
 
 	return gtw, nil
 }
@@ -347,7 +347,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		}
 		gtwIDs := make([]*ttnpb.GatewayIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if gtwID := id.EntityIdentifiers().GetGatewayIDs(); gtwID != nil {
+			if gtwID := id.GetEntityIdentifiers().GetGatewayIDs(); gtwID != nil {
 				gtwIDs = append(gtwIDs, gtwID)
 			}
 		}
@@ -537,7 +537,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateGateway.NewWithIdentifiersAndData(ctx, req.GatewayIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateGateway.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, req.FieldMask.Paths))
 	return gtw, nil
 }
 
@@ -586,12 +586,12 @@ func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayId
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		// delete related API keys before purging the gateway
-		err := store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids)
+		err := store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}
 		// delete related memberships before purging the gateway
-		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids)
+		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

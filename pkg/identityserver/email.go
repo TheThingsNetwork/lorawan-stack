@@ -134,7 +134,7 @@ func (is *IdentityServer) SendAdminsEmail(ctx context.Context, makeMessage func(
 }
 
 // SendContactsEmail sends an email to the contacts of the given entity.
-func (is *IdentityServer) SendContactsEmail(ctx context.Context, ids *ttnpb.EntityIdentifiers, makeMessage func(emails.Data) email.MessageData) error {
+func (is *IdentityServer) SendContactsEmail(ctx context.Context, ids ttnpb.IDStringer, makeMessage func(emails.Data) email.MessageData) error {
 	var contacts []*ttnpb.ContactInfo
 	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		contacts, err = store.GetContactInfoStore(db).GetContactInfo(ctx, ids)

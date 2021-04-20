@@ -93,7 +93,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
-			org.OrganizationIdentifiers,
+			org.OrganizationIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
@@ -110,7 +110,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtCreateOrganization.NewWithIdentifiersAndData(ctx, req.OrganizationIdentifiers, nil))
+	events.Publish(evtCreateOrganization.NewWithIdentifiersAndData(ctx, &req.OrganizationIdentifiers, nil))
 	return org, nil
 }
 
@@ -189,7 +189,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 		}
 		orgIDs := make([]*ttnpb.OrganizationIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if orgID := id.EntityIdentifiers().GetOrganizationIDs(); orgID != nil {
+			if orgID := id.GetEntityIdentifiers().GetOrganizationIDs(); orgID != nil {
 				orgIDs = append(orgIDs, orgID)
 			}
 		}
@@ -242,7 +242,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateOrganization.NewWithIdentifiersAndData(ctx, req.OrganizationIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateOrganization.NewWithIdentifiersAndData(ctx, &req.OrganizationIdentifiers, req.FieldMask.Paths))
 	return org, nil
 }
 
@@ -295,7 +295,7 @@ func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.Orga
 			return err
 		}
 		// Delete related API keys before purging the organization.
-		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids)
+		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

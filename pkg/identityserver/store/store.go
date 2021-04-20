@@ -121,7 +121,7 @@ func (s *store) restoreEntity(ctx context.Context, entityID ttnpb.IDStringer) er
 	return s.DB.Unscoped().Model(model).UpdateColumn("deleted_at", gorm.Expr("NULL")).Error
 }
 
-func (s *store) purgeEntity(ctx context.Context, entityID ttnpb.Identifiers) error {
+func (s *store) purgeEntity(ctx context.Context, entityID ttnpb.IDStringer) error {
 	model, err := s.findDeletedEntity(ctx, entityID, "id")
 	if err != nil {
 		return err

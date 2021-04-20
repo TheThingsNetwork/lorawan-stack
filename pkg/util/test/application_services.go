@@ -121,7 +121,7 @@ func MakeApplicationAccessListRightsChFunc(reqCh chan<- ApplicationAccessListRig
 	}
 }
 
-func AssertListRightsRequest(ctx context.Context, reqCh <-chan ApplicationAccessListRightsRequest, assert func(ctx, reqCtx context.Context, ids ttnpb.Identifiers) bool, rights ...ttnpb.Right) bool {
+func AssertListApplicationRightsRequest(ctx context.Context, reqCh <-chan ApplicationAccessListRightsRequest, assert func(ctx, reqCtx context.Context, ids *ttnpb.ApplicationIdentifiers) bool, rights ...ttnpb.Right) bool {
 	t := MustTFromContext(ctx)
 	t.Helper()
 	select {

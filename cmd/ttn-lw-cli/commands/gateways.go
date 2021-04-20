@@ -480,7 +480,7 @@ var (
 		if err != nil {
 			return nil, err
 		}
-		return gtwID.EntityIdentifiers(), nil
+		return gtwID.GetEntityIdentifiers(), nil
 	})
 	gatewaysPurgeCommand = &cobra.Command{
 		Use:     "purge [gateway-id]",

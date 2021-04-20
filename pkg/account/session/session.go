@@ -162,7 +162,7 @@ func (s *Session) DoLogin(ctx context.Context, userID, password string) error {
 	ok, err := auth.Validate(user.Password, password)
 	region.End()
 	if err != nil || !ok {
-		events.Publish(evtUserLoginFailed.NewWithIdentifiersAndData(ctx, user.UserIdentifiers, nil))
+		events.Publish(evtUserLoginFailed.NewWithIdentifiersAndData(ctx, &user.UserIdentifiers, nil))
 		return errIncorrectPasswordOrUserID.New()
 	}
 	return nil
