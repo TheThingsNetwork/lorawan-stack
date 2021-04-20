@@ -40,9 +40,31 @@ func New() messageprocessors.PayloadEncodeDecoder {
 	}
 }
 
+type endDeviceVersionIdentifiers struct {
+	BrandID         string `json:"brandID"`
+	ModelID         string `json:"modelID"`
+	FirmwareVersion string `json:"firmwareVersion"`
+	HardwareVersion string `json:"hardwareVersion"`
+	BandID          string `json:"bandID"`
+}
+
+func fromPB(version *ttnpb.EndDeviceVersionIdentifiers) endDeviceVersionIdentifiers {
+	v := endDeviceVersionIdentifiers{}
+	if version == nil {
+		return v
+	}
+	v.BrandID = version.BrandID
+	v.ModelID = version.ModelID
+	v.FirmwareVersion = version.FirmwareVersion
+	v.HardwareVersion = version.HardwareVersion
+	v.BandID = version.BandID
+	return v
+}
+
 type encodeDownlinkInput struct {
-	Data  map[string]interface{} `json:"data"`
-	FPort *uint8                 `json:"fPort"`
+	Data    map[string]interface{}      `json:"data"`
+	FPort   *uint8                      `json:"fPort"`
+	Version endDeviceVersionIdentifiers `json:"version"`
 }
 
 type encodeDownlinkOutput struct {
@@ -72,8 +94,9 @@ func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 	}
 	fPort := uint8(msg.FPort)
 	input := encodeDownlinkInput{
-		Data:  data,
-		FPort: &fPort,
+		Data:    data,
+		FPort:   &fPort,
+		Version: fromPB(version),
 	}
 
 	// Fallback to legacy Encoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
@@ -116,8 +139,9 @@ func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 }
 
 type decodeUplinkInput struct {
-	Bytes []uint8 `json:"bytes"`
-	FPort uint8   `json:"fPort"`
+	Bytes   []uint8                     `json:"bytes"`
+	FPort   uint8                       `json:"fPort"`
+	Version endDeviceVersionIdentifiers `json:"version"`
 }
 
 type decodeUplinkOutput struct {
@@ -131,8 +155,9 @@ func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 	defer trace.StartRegion(ctx, "decode uplink message").End()
 
 	input := decodeUplinkInput{
-		Bytes: msg.FRMPayload,
-		FPort: uint8(msg.FPort),
+		Bytes:   msg.FRMPayload,
+		FPort:   uint8(msg.FPort),
+		Version: fromPB(version),
 	}
 
 	// Fallback to legacy Decoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
@@ -143,6 +168,13 @@ func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 			input = {
 				bytes: input.bytes.slice(),
 				fPort: input.fPort,
+				version: {
+					brandID: input.version.brandID,
+					modelID: input.version.modelID,
+					bandID: input.version.bandID,
+					firmwareVersion: input.version.firmwareVersion,
+					hardwareVersion: input.version.hardwareVersion,
+				},
 			}
 			if (typeof decodeUplink === 'function') {
 				return decodeUplink(input);
@@ -176,8 +208,9 @@ func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 }
 
 type decodeDownlinkInput struct {
-	Bytes []uint8 `json:"bytes"`
-	FPort uint8   `json:"fPort"`
+	Bytes   []uint8                     `json:"bytes"`
+	FPort   uint8                       `json:"fPort"`
+	Version endDeviceVersionIdentifiers `json:"version"`
 }
 
 type decodeDownlinkOutput struct {
@@ -191,8 +224,9 @@ func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 	defer trace.StartRegion(ctx, "decode downlink message").End()
 
 	input := decodeDownlinkInput{
-		Bytes: msg.FRMPayload,
-		FPort: uint8(msg.FPort),
+		Bytes:   msg.FRMPayload,
+		FPort:   uint8(msg.FPort),
+		Version: fromPB(version),
 	}
 
 	script = fmt.Sprintf(`
@@ -202,6 +236,13 @@ func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 			input = {
 				bytes: input.bytes.slice(),
 				fPort: input.fPort,
+				version: {
+					brandID: input.version.brandID,
+					modelID: input.version.modelID,
+					bandID: input.version.bandID,
+					firmwareVersion: input.version.firmwareVersion,
+					hardwareVersion: input.version.hardwareVersion,
+				},
 			}
 			return decodeDownlink(input);
 		}

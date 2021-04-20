@@ -26,6 +26,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
+var version = &ttnpb.EndDeviceVersionIdentifiers{
+	BrandID:         "test-brand",
+	ModelID:         "test-model",
+	BandID:          "EU_863_870",
+	FirmwareVersion: "1.0-fw",
+	HardwareVersion: "1.0-hw",
+}
+
 func TestLegacyEncodeDownlink(t *testing.T) {
 	a := assertions.New(t)
 
@@ -227,6 +235,29 @@ func TestEncodeDownlink(t *testing.T) {
 		`
 		err := host.EncodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errOutputErrors.WithAttributes("errors", "error 1, error 2"))
+	}
+
+	// Version identifiers
+	{
+		script := `
+		function encodeDownlink(input) {
+			if (input.version.brandID === "test-brand"
+			 && input.version.modelID === "test-model"
+			 && input.version.hardwareVersion === "1.0-hw"
+			 && input.version.firmwareVersion === "1.0-fw"
+			 && input.version.bandID === "EU_863_870") {
+				return {
+					fPort: 10,
+					bytes: [1],
+				}
+			}
+			return {fPort: 0, bytes: [0]}
+		}
+		`
+		err := host.EncodeDownlink(ctx, ids, version, message, script)
+		a.So(err, should.BeNil)
+		a.So(message.FRMPayload, should.Resemble, []byte{1})
+		a.So(message.FPort, should.Equal, 10)
 	}
 }
 
@@ -441,6 +472,28 @@ func TestDecodeUplink(t *testing.T) {
 		err := host.DecodeUplink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
 	}
+
+	// Version identifiers.
+	{
+		script := `
+		function decodeUplink(input) {
+			return {
+				data: input.version,
+			}
+		}
+		`
+		err := host.DecodeUplink(ctx, ids, version, message, script)
+		a.So(err, should.BeNil)
+		m, err := gogoproto.Map(message.DecodedPayload)
+		a.So(err, should.BeNil)
+		a.So(m, should.Resemble, map[string]interface{}{
+			"brandID":         "test-brand",
+			"modelID":         "test-model",
+			"bandID":          "EU_863_870",
+			"firmwareVersion": "1.0-fw",
+			"hardwareVersion": "1.0-hw",
+		})
+	}
 }
 
 func TestDecodeDownlink(t *testing.T) {
@@ -571,5 +624,27 @@ func TestDecodeDownlink(t *testing.T) {
 		`
 		err := host.DecodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
+	}
+
+	// Version identifiers.
+	{
+		script := `
+		function decodeDownlink(input) {
+			return {
+				data: input.version,
+			}
+		}
+		`
+		err := host.DecodeDownlink(ctx, ids, version, message, script)
+		a.So(err, should.BeNil)
+		m, err := gogoproto.Map(message.DecodedPayload)
+		a.So(err, should.BeNil)
+		a.So(m, should.Resemble, map[string]interface{}{
+			"brandID":         "test-brand",
+			"modelID":         "test-model",
+			"bandID":          "EU_863_870",
+			"firmwareVersion": "1.0-fw",
+			"hardwareVersion": "1.0-hw",
+		})
 	}
 }

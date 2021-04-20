@@ -11,6 +11,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Javascript payload formatters now receive an extra `version` input parameter containing the version identifiers (brand, model, band, firmware version and hardware version) of the device.
+  - The new `version` input contains the fields `brandID`, `modelID`, `bandID`, `firmwareVersion`, `hardwareVersion`.
+  - For the `decodeUplink(input)`, `decodeDownlink(input)` and `encodeDownlink(input)` payload formatters, you can access the identifiers as `input.version`.
+
 ### Changed
 
 - Allow the LinkADRReq commands to lower the data rate used by the end devices.
