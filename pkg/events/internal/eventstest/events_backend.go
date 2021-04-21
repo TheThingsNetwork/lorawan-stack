@@ -68,21 +68,21 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 
 	a.So(backend.Subscribe(
 		subCtx,
-		"test.some.**",
+		[]string{"test.some.evt0", "test.some.evt1"},
 		nil,
 		ch0,
 	), should.BeNil)
 
 	a.So(backend.Subscribe(
 		subCtx,
-		"test.some.**",
+		[]string{"test.some.evt0", "test.some.evt1"},
 		[]*ttnpb.EntityIdentifiers{appID.GetEntityIdentifiers()},
 		ch1,
 	), should.BeNil)
 
 	a.So(backend.Subscribe(
 		subCtx,
-		"test.other.**",
+		[]string{"test.other.evt2"},
 		[]*ttnpb.EntityIdentifiers{gtwID.GetEntityIdentifiers()},
 		ch2,
 	), should.BeNil)

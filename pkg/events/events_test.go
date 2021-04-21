@@ -124,7 +124,7 @@ func Example() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	events.Subscribe(ctx, "ns.**", nil, events.HandlerFunc(func(e events.Event) {
+	events.Subscribe(ctx, []string{"ns.mac.adr.send_req"}, nil, events.HandlerFunc(func(e events.Event) {
 		fmt.Printf("Received event %s\n", e.Name())
 
 		wg.Done() // only for synchronizing the unit test

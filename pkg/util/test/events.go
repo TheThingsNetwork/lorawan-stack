@@ -26,7 +26,7 @@ import (
 
 type MockEventPubSub struct {
 	PublishFunc   func(events.Event)
-	SubscribeFunc func(context.Context, string, []*ttnpb.EntityIdentifiers, events.Handler) error
+	SubscribeFunc func(context.Context, []string, []*ttnpb.EntityIdentifiers, events.Handler) error
 }
 
 // Publish calls PublishFunc if set and panics otherwise.
@@ -38,11 +38,11 @@ func (m MockEventPubSub) Publish(ev events.Event) {
 }
 
 // Subscribe calls SubscribeFunc if set and panics otherwise.
-func (m MockEventPubSub) Subscribe(ctx context.Context, name string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
+func (m MockEventPubSub) Subscribe(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
 	if m.SubscribeFunc == nil {
 		panic("Subscribe called, but not set")
 	}
-	return m.SubscribeFunc(ctx, name, ids, hdl)
+	return m.SubscribeFunc(ctx, names, ids, hdl)
 }
 
 type EventPubSubPublishRequest struct {
@@ -200,7 +200,7 @@ var (
 	eventsPubSubMu               = &sync.RWMutex{}
 	eventsPubSub   events.PubSub = &MockEventPubSub{
 		PublishFunc:   func(events.Event) {},
-		SubscribeFunc: func(context.Context, string, []*ttnpb.EntityIdentifiers, events.Handler) error { return nil },
+		SubscribeFunc: func(context.Context, []string, []*ttnpb.EntityIdentifiers, events.Handler) error { return nil },
 	}
 )
 
@@ -209,8 +209,8 @@ func init() {
 		PublishFunc: func(ev events.Event) {
 			eventsPubSub.Publish(ev)
 		},
-		SubscribeFunc: func(ctx context.Context, name string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
-			return eventsPubSub.Subscribe(ctx, name, ids, hdl)
+		SubscribeFunc: func(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
+			return eventsPubSub.Subscribe(ctx, names, ids, hdl)
 		},
 	})
 }
@@ -243,7 +243,7 @@ func CollectEvents(f func()) []events.Event {
 func RedirectEvents(ch chan events.Event) func() {
 	return SetDefaultEventsPubSub(&MockEventPubSub{
 		PublishFunc: func(ev events.Event) { ch <- ev },
-		SubscribeFunc: func(ctx context.Context, name string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
+		SubscribeFunc: func(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
 			return nil
 		},
 	})

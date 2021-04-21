@@ -64,7 +64,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 
 	ch := make(events.Channel, 8)
 	handler := events.ContextHandler(ctx, ch)
-	if err := srv.pubsub.Subscribe(ctx, "", req.Identifiers, handler); err != nil {
+	if err := srv.pubsub.Subscribe(ctx, nil, req.Identifiers, handler); err != nil {
 		return err
 	}
 

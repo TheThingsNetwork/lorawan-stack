@@ -127,7 +127,7 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 }
 
 // Subscribe to events from Go Cloud.
-func (ps *PubSub) Subscribe(ctx context.Context, name string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
+func (ps *PubSub) Subscribe(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
 	ps.subOnce.Do(func() {
 		ps.taskStarter.StartTask(&component.TaskConfig{
 			Context: ps.ctx,
@@ -137,7 +137,7 @@ func (ps *PubSub) Subscribe(ctx context.Context, name string, ids []*ttnpb.Entit
 			Backoff: component.DefaultTaskBackoffConfig,
 		})
 	})
-	return ps.PubSub.Subscribe(ctx, name, ids, hdl)
+	return ps.PubSub.Subscribe(ctx, names, ids, hdl)
 }
 
 func (ps *PubSub) getMetadata(evt events.Event) map[string]string {

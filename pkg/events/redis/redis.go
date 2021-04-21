@@ -36,25 +36,16 @@ import (
 // NewPubSub creates a new PubSub that publishes and subscribes to Redis.
 func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, conf ttnredis.Config) *PubSub {
 	ttnRedisClient := ttnredis.New(&conf)
-	eventChannel := func(ctx context.Context, name string, ids *ttnpb.EntityIdentifiers) string {
-		if name == "" {
-			name = "*"
-		}
-		if ids == nil {
-			return ttnRedisClient.Key("events", "*", "*", name)
-		}
-		return ttnRedisClient.Key("events", ids.EntityType(), unique.ID(ctx, ids), name)
-	}
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "events/redis",
 	))
 	ctx, cancel := context.WithCancel(ctx)
 	ps := &PubSub{
-		PubSub:        basic.NewPubSub(),
-		ctx:           ctx,
-		cancel:        cancel,
-		client:        ttnRedisClient.Client,
-		eventChannel:  eventChannel,
+		PubSub: basic.NewPubSub(),
+		ctx:    ctx,
+		cancel: cancel,
+		client: ttnRedisClient,
+
 		subscriptions: make(map[string]int),
 	}
 	ps.sub = ps.client.Subscribe(ctx)
@@ -71,17 +62,23 @@ func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, conf ttnr
 // PubSub with Redis backend.
 type PubSub struct {
 	*basic.PubSub
-
-	eventChannel func(ctx context.Context, name string, ids *ttnpb.EntityIdentifiers) string
-
-	ctx    context.Context
-	cancel context.CancelFunc
-	client *redis.Client
-
+	ctx           context.Context
+	cancel        context.CancelFunc
+	client        *ttnredis.Client
 	subOnce       sync.Once
 	mu            sync.RWMutex
 	sub           *redis.PubSub
 	subscriptions map[string]int
+}
+
+func (ps *PubSub) eventChannel(ctx context.Context, name string, ids *ttnpb.EntityIdentifiers) string {
+	if name == "" {
+		name = "*"
+	}
+	if ids == nil {
+		return ps.client.Key("events", "*", "*", name)
+	}
+	return ps.client.Key("events", ids.EntityType(), unique.ID(ctx, ids), name)
 }
 
 var errChannelClosed = errors.DefineAborted("channel_closed", "channel closed")
@@ -146,26 +143,25 @@ type patternEvent struct {
 	pattern string
 }
 
-func (ps *PubSub) eventChannelPatterns(ctx context.Context, name string, ids []*ttnpb.EntityIdentifiers) []string {
-	if name == "" {
-		name = "*"
-	} else {
-		name = strings.Replace(name, "**", "*", -1)
+func (ps *PubSub) eventChannelPatterns(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers) []string {
+	if len(names) == 0 {
+		names = []string{"*"}
 	}
-
 	if len(ids) == 0 {
 		ids = []*ttnpb.EntityIdentifiers{nil}
 	}
 
 	var patterns []string
-	for _, id := range ids {
-		patterns = append(patterns, ps.eventChannel(ctx, name, id))
-		if appID := id.GetApplicationIds(); appID != nil {
-			pattern := ps.eventChannel(ctx, name, (&ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: *appID,
-				DeviceId:               "*",
-			}).GetEntityIdentifiers())
-			patterns = append(patterns, pattern)
+	for _, name := range names {
+		for _, id := range ids {
+			patterns = append(patterns, ps.eventChannel(ctx, name, id))
+			if appID := id.GetApplicationIds(); appID != nil {
+				pattern := ps.eventChannel(ctx, name, (&ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: *appID,
+					DeviceId:               "*",
+				}).GetEntityIdentifiers())
+				patterns = append(patterns, pattern)
+			}
 		}
 	}
 
@@ -173,14 +169,14 @@ func (ps *PubSub) eventChannelPatterns(ctx context.Context, name string, ids []*
 }
 
 // Subscribe implements the events.Subscriber interface.
-func (ps *PubSub) Subscribe(ctx context.Context, name string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
+func (ps *PubSub) Subscribe(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
 	ps.mu.Lock()
 	defer ps.mu.Unlock()
 
 	sub := &subscription{
-		name:     name,
+		names:    names,
 		ids:      ids,
-		patterns: ps.eventChannelPatterns(ctx, name, ids),
+		patterns: ps.eventChannelPatterns(ctx, names, ids),
 		hdl:      hdl,
 	}
 
