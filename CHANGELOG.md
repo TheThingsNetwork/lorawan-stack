@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Contextual tooltips to form fields in the Console.
+- Gateway Configuration Server to the cluster package.
 
 ### Changed
 
