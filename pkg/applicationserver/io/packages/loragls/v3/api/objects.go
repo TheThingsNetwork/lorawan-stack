@@ -16,6 +16,8 @@ package api
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
@@ -89,17 +91,19 @@ type SingleFrameRequest struct {
 
 func parseRxMetadata(ctx context.Context, m *ttnpb.RxMetadata) (Gateway, Uplink) {
 	gtwUID := unique.ID(ctx, m.GatewayIdentifiers)
+	hashed := sha256.Sum256([]byte(gtwUID))
+	hashedUID := hex.EncodeToString(hashed[:])
 	var tdoa *uint64
 	if m.FineTimestamp != 0 {
 		tdoa = &m.FineTimestamp
 	}
 	return Gateway{
-			GatewayID: gtwUID,
+			GatewayID: hashedUID,
 			Latitude:  m.Location.Latitude,
 			Longitude: m.Location.Longitude,
 			Altitude:  float64(m.Location.Altitude),
 		}, Uplink{
-			GatewayID: gtwUID,
+			GatewayID: hashedUID,
 			AntennaID: &m.AntennaIndex,
 			TDOA:      tdoa,
 			RSSI:      float64(m.RSSI),

@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Contextual tooltips to form fields in the Console.
 - Gateway Configuration Server to the cluster package.
+- LoRaCloud GLS multi frame request support.
 
 ### Changed
 
