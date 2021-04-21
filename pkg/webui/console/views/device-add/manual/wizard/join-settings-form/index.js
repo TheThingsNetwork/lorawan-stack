@@ -64,50 +64,53 @@ const JoinSettingsForm = React.memo(props => {
 
   const lwVersion = parseLorawanMacVersion(lorawanVersion)
 
+  let appKeyPlaceholder = undefined
+  let nwkKeyPlaceholder = undefined
+  if (!mayEditKeys) {
+    appKeyPlaceholder = sharedMessages.insufficientAppKeyRights
+    nwkKeyPlaceholder = sharedMessages.insufficientNwkKeyRights
+  }
+
   return (
     <Wizard.Form
       initialValues={defaultInitialValues}
       validationContext={validationContext}
       validationSchema={validationSchema}
     >
-      {mayEditKeys && (
-        <>
-          <Form.SubTitle title={sharedMessages.rootKeys} />
-          <Form.Field
-            required
-            autoFocus={mayEditKeys}
-            title={sharedMessages.appKey}
-            name="root_keys.app_key.key"
-            type="byte"
-            min={16}
-            max={16}
-            description={
-              lwVersion >= 110
-                ? sharedMessages.appKeyNewDescription
-                : sharedMessages.appKeyDescription
-            }
-            component={Input.Generate}
-            disabled={!mayEditKeys}
-            mayGenerateValue={mayEditKeys}
-            onGenerateValue={generate16BytesKey}
-            glossaryId={glossaryId.APP_KEY}
-          />
-          {lwVersion >= 110 && (
-            <Form.Field
-              required
-              title={sharedMessages.nwkKey}
-              name="root_keys.nwk_key.key"
-              type="byte"
-              min={16}
-              max={16}
-              description={sharedMessages.nwkKeyDescription}
-              component={Input.Generate}
-              disabled={!mayEditKeys}
-              mayGenerateValue={mayEditKeys}
-              onGenerateValue={generate16BytesKey}
-            />
-          )}
-        </>
+      <Form.SubTitle title={sharedMessages.rootKeys} />
+      <Form.Field
+        required
+        autoFocus={mayEditKeys}
+        disabled={!mayEditKeys}
+        title={sharedMessages.appKey}
+        name="root_keys.app_key.key"
+        type="byte"
+        min={16}
+        max={16}
+        description={
+          lwVersion >= 110 ? sharedMessages.appKeyNewDescription : sharedMessages.appKeyDescription
+        }
+        component={Input.Generate}
+        mayGenerateValue={mayEditKeys}
+        onGenerateValue={generate16BytesKey}
+        glossaryId={glossaryId.APP_KEY}
+        placeholder={appKeyPlaceholder}
+      />
+      {lwVersion >= 110 && (
+        <Form.Field
+          required
+          title={sharedMessages.nwkKey}
+          name="root_keys.nwk_key.key"
+          type="byte"
+          min={16}
+          max={16}
+          description={sharedMessages.nwkKeyDescription}
+          component={Input.Generate}
+          disabled={!mayEditKeys}
+          mayGenerateValue={mayEditKeys}
+          onGenerateValue={generate16BytesKey}
+          placeholder={nwkKeyPlaceholder}
+        />
       )}
       <Form.CollapseSection
         id="advanced-settings"
