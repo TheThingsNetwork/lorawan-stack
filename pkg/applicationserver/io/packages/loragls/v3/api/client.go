@@ -130,6 +130,24 @@ func (c *Client) SolveMultiFrame(ctx context.Context, request *MultiFrameRequest
 	return response, nil
 }
 
+// SolveGNSS attempts to solve the location of the end-device using the provided GNSS request.
+func (c *Client) SolveGNSS(ctx context.Context, request *GNSSRequest) (*ExtendedGNSSLocationSolverResponse, error) {
+	buffer := bytes.NewBuffer(nil)
+	if err := json.NewEncoder(buffer).Encode(request); err != nil {
+		return nil, err
+	}
+	resp, err := c.Do(ctx, http.MethodPost, "solve", "gnss_lr1110_singleframe", buffer)
+	if err != nil {
+		return nil, err
+	}
+	response := &ExtendedGNSSLocationSolverResponse{}
+	err = parse(&response, resp)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
 // New creates a new Client with the given options.
 func New(cl *http.Client, opts ...Option) (*Client, error) {
 	client := &Client{
