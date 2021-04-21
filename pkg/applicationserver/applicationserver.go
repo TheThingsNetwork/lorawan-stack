@@ -64,6 +64,7 @@ type ApplicationServer struct {
 
 	linkRegistry     LinkRegistry
 	deviceRegistry   DeviceRegistry
+	appUpsRegistry   ApplicationUplinkRegistry
 	formatters       messageprocessors.MapPayloadProcessor
 	webhooks         web.Webhooks
 	webhookTemplates web.TemplateStore
@@ -124,6 +125,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		config:         conf,
 		linkRegistry:   conf.Links,
 		deviceRegistry: wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
+		appUpsRegistry: conf.UplinkStorage.Registry,
 		formatters: messageprocessors.MapPayloadProcessor{
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
@@ -1101,6 +1103,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		if err := as.decryptAndDecodeUplink(ctx, dev, uplink, link.DefaultFormatters); err != nil {
 			return err
 		}
+		if err := as.appUpsRegistry.Push(ctx, ids, uplink); err != nil {
+			return err
+		}
 	} else if dev.Session != nil && dev.Session.AppSKey != nil {
 		uplink.AppSKey = dev.Session.AppSKey
 		uplink.LastAFCntDown = dev.Session.LastAFCntDown
@@ -1285,4 +1290,9 @@ func (as *ApplicationServer) GetMQTTConfig(ctx context.Context) (*config.MQTT, e
 		return nil, err
 	}
 	return &config.MQTT, nil
+}
+
+// RangeUplinks ranges the application uplinks and calls the callback function, until false is returned.
+func (as *ApplicationServer) RangeUplinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(ctx context.Context, up *ttnpb.ApplicationUplink) bool) error {
+	return as.appUpsRegistry.Range(ctx, ids, paths, f)
 }

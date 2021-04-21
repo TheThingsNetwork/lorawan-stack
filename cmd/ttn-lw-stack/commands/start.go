@@ -295,6 +295,10 @@ var startCommand = &cobra.Command{
 			config.AS.Devices = &asredis.DeviceRegistry{
 				Redis: NewComponentDeviceRegistryRedis(*config, "as"),
 			}
+			config.AS.UplinkStorage.Registry = &asredis.ApplicationUplinkRegistry{
+				Redis: redis.New(config.Redis.WithNamespace("as", "applicationups")),
+				Limit: config.AS.UplinkStorage.Limit,
+			}
 			config.AS.Distribution.PubSub = &asdistribredis.PubSub{
 				Redis: redis.New(config.Cache.Redis.WithNamespace("as", "traffic")),
 			}

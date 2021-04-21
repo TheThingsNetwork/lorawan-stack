@@ -591,9 +591,11 @@ func TestDeviceRegistryDelete(t *testing.T) {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
 		SetFunc        func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+		UpClearFunc    func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error
 		DeviceRequest  *ttnpb.EndDeviceIdentifiers
 		ErrorAssertion func(*testing.T, error) bool
 		SetCalls       uint64
+		UpClearCalls   uint64
 	}{
 		{
 			Name: "Permission denied",
@@ -607,6 +609,10 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
 				return nil, errors.New("SetFunc must not be called")
+			},
+			UpClearFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+				test.MustTFromContext(ctx).Errorf("UpClearFunc must not be called")
+				return errors.New("UpClearFunc must not be called")
 			},
 			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -629,6 +635,10 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
 				return nil, errors.New("SetFunc must not be called")
+			},
+			UpClearFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+				test.MustTFromContext(ctx).Errorf("UpClearFunc must not be called")
+				return errors.New("UpClearFunc must not be called")
 			},
 			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -658,8 +668,15 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a.So(dev, should.BeNil)
 				return nil, nil
 			},
+			UpClearFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+				a.So(ids, should.Resemble, registeredDevice.EndDeviceIdentifiers)
+				return nil
+			},
 			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
 			SetCalls:      1,
+			UpClearCalls:  1,
 		},
 
 		{
@@ -683,17 +700,33 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a.So(dev, should.BeNil)
 				return nil, nil
 			},
+			UpClearFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+				a.So(ids, should.Resemble, registeredDevice.EndDeviceIdentifiers)
+				return nil
+			},
 			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
 			SetCalls:      1,
+			UpClearCalls:  1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
 			var setCalls uint64
+			var upClearCalls uint64
 
 			as := test.Must(New(componenttest.NewComponent(t, &component.Config{}),
 				&Config{
+					UplinkStorage: UplinkStorageConfig{
+						Registry: &MockApplicationUplinkRegistry{
+							ClearFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+								atomic.AddUint64(&upClearCalls, 1)
+								return tc.UpClearFunc(ctx, ids)
+							},
+						},
+					},
 					Devices: &MockDeviceRegistry{
 						SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&setCalls, 1)
@@ -719,6 +752,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 
 			_, err := ttnpb.NewAsEndDeviceRegistryClient(as.LoopbackConn()).Delete(ctx, req)
 			a.So(setCalls, should.Equal, tc.SetCalls)
+			a.So(upClearCalls, should.Equal, tc.UpClearCalls)
 			if tc.ErrorAssertion != nil {
 				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 			} else {
