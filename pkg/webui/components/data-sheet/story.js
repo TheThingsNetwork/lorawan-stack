@@ -46,6 +46,13 @@ const testData = [
     header: 'Activation Info',
     items: [
       { key: 'Device EUI', value: '1212121212', type: 'byte', sensitive: false },
+      {
+        key: 'Device EUI with Uint32_t',
+        value: '1212121212',
+        type: 'byte',
+        sensitive: false,
+        enableUint32: true,
+      },
       { key: 'Join EUI', value: '1212121212', type: 'byte', sensitive: false },
       {
         key: 'Value with Nesting',

@@ -85,6 +85,8 @@ DataSheet.propTypes = {
       /** A list of items for the group. */
       items: PropTypes.arrayOf(
         PropTypes.shape({
+          /** Whether uint32_t notation should be enabled for byte representation. */
+          enableUint32: PropTypes.bool,
           /** The key of the item. */
           key: PropTypes.message,
           /** The value of the item. */
@@ -124,6 +126,7 @@ const DataSheetRow = ({ item, sub }) => {
             isBytes={item.type === 'byte'}
             small
             data={item.value}
+            enableUint32={item.enableUint32}
           />
         ) : (
           item.value || (
@@ -137,6 +140,8 @@ const DataSheetRow = ({ item, sub }) => {
 
 DataSheetRow.propTypes = {
   item: PropTypes.shape({
+    /** Whether uint32_t notation should be enabled for byte representation. */
+    enableUint32: PropTypes.bool,
     /** The key of the item. */
     key: PropTypes.message,
     /** The value of the item. */

@@ -31,6 +31,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Payload formatter testing functionality in the Console.
 - Options in the Identity Server to reject passwords that contain the user ID (`is.user-registration.password-requirements.reject-user-id`) or common passwords (`is.user-registration.password-requirements.reject-common`).
+- C-Style uint32_t representation for end device address field.
 
 ### Changed
 
