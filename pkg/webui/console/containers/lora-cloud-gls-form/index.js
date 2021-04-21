@@ -24,6 +24,8 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import toast from '@ttn-lw/components/toast'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Select from '@ttn-lw/components/select'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
@@ -49,13 +51,39 @@ const m = defineMessages({
   setLoRaCloudToken: 'Set LoRa Cloud token',
   deleteWarning:
     'Are you sure you want to delete the LoRaCloud Geolocation token? This action cannot be undone.',
+  queryType: 'Query type',
+  queryTypeDescription: 'What kind of geolocation query should be used',
+  multiFrame: 'Multiframe',
+  multiFrameDescription: 'Enable multiframe lookups',
+  multiFrameWindowSize: 'Multiframe window size',
+  multiFrameWindowSizeDescription:
+    'How many historical message to send as part of the request. A window size of 0 automatically determines this based on the first byte of the payload.',
+  multiFrameTimeWindow: 'Multiframe time window',
+  multiFrameTimeWindowDescription: 'How recent the historical messages should be, in minutes.',
 })
+
+const LORACLOUD_GLS_QUERY_LABELS = Object.freeze([{ value: 'TDOARSSI', label: 'LoRa® TOA/RSSI' }])
+const LORACLOUD_GLS_QUERY_TYPES = Object.freeze({
+  TDOARSSI: 'TDOARSSI',
+})
+const LORACLOUD_GLS_QUERY_VALUES = Object.freeze(Object.values(LORACLOUD_GLS_QUERY_TYPES))
 
 const validationSchema = Yup.object()
   .shape({
     data: Yup.object().shape({
       token: Yup.string().required(sharedMessages.validateRequired),
-      query: Yup.string().oneOf(['TOARSSI']),
+      query: Yup.string()
+        .oneOf(LORACLOUD_GLS_QUERY_VALUES)
+        .required(sharedMessages.validateRequired),
+      multi_frame: Yup.boolean().required(sharedMessages.validateRequired),
+      multi_frame_window_size: Yup.number()
+        .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+        .max(16, Yup.passValues(sharedMessages.validateNumberLte))
+        .required(sharedMessages.validateRequired),
+      multi_frame_window_age: Yup.number()
+        .min(1, Yup.passValues(sharedMessages.validateNumberGte))
+        .max(7 * 24 * 60, Yup.passValues(sharedMessages.validateNumberLte))
+        .required(sharedMessages.validateRequired),
     }),
   })
   .noUnknown()
@@ -63,7 +91,10 @@ const validationSchema = Yup.object()
 const defaultValues = {
   data: {
     token: '',
-    query: 'TOARSSI',
+    query: LORACLOUD_GLS_QUERY_TYPES.TDOARSSI,
+    multi_frame: false,
+    multi_frame_window_size: 0,
+    multi_frame_window_age: 1440,
   },
 }
 
@@ -124,6 +155,15 @@ const LoRaCloudGLSForm = () => {
     throw error
   }
 
+  const initialQuery = initialValues.data.query
+  const [queryType, setQueryType] = useState(initialQuery)
+
+  const initialMultiFrame = initialValues.data.multi_frame
+  const [multiFrame, setMultiFrame] = useState(initialMultiFrame)
+  const handleMultiFrameChange = useCallback(evt => setMultiFrame(evt.target.checked), [
+    setMultiFrame,
+  ])
+
   return (
     <RequireRequest
       requestAction={getAppPkgDefaultAssoc(appId, LORA_CLOUD_GLS.DEFAULT_PORT, selector)}
@@ -142,6 +182,51 @@ const LoRaCloudGLSForm = () => {
           name="data.token"
           required
         />
+        <Form.Field
+          component={Select}
+          title={m.queryType}
+          description={m.queryTypeDescription}
+          name="data.query"
+          options={LORACLOUD_GLS_QUERY_LABELS}
+          onChange={setQueryType}
+          required
+        />
+        {queryType === LORACLOUD_GLS_QUERY_TYPES.TDOARSSI && (
+          <>
+            <Form.Field
+              component={Checkbox}
+              title={m.multiFrame}
+              description={m.multiFrameDescription}
+              name="data.multi_frame"
+              onChange={handleMultiFrameChange}
+              required
+            />
+            {multiFrame && (
+              <>
+                <Form.Field
+                  component={Input}
+                  title={m.multiFrameWindowSize}
+                  description={m.multiFrameWindowSizeDescription}
+                  name="data.multi_frame_window_size"
+                  type="number"
+                  min={0}
+                  max={16}
+                  required
+                />
+                <Form.Field
+                  component={Input}
+                  title={m.multiFrameTimeWindow}
+                  description={m.multiFrameTimeWindowDescription}
+                  name="data.multi_frame_window_age"
+                  type="number"
+                  min={1}
+                  max={7 * 24 * 60}
+                  required
+                />
+              </>
+            )}
+          </>
+        )}
         <SubmitBar>
           <Form.Submit component={SubmitButton} message={sharedMessages.tokenSet} />
           {Boolean(defaultAssociation) && (
