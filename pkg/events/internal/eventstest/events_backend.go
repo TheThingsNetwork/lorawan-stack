@@ -16,21 +16,27 @@ package eventstest
 
 import (
 	"context"
+	"fmt"
 	"runtime"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"golang.org/x/sync/errgroup"
 )
 
 // TestBackend runs the common test suite for all events backends.
 func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, backend events.PubSub) {
-	ctx = events.ContextWithCorrelationID(ctx, t.Name())
+	now := time.Now()
+	correlationID := fmt.Sprintf("%s@%s", t.Name(), now)
+
+	ctx = events.ContextWithCorrelationID(ctx, correlationID)
 
 	timeout := test.Delay
 	if deadline, ok := ctx.Deadline(); ok {
@@ -65,6 +71,30 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 
 	subCtx, unsubscribe := context.WithCancel(ctx)
 	defer unsubscribe()
+
+	backend.Publish(events.New(ctx, "test.some.evt1", "test event 1", events.WithIdentifiers(&appID)))
+
+	if store, ok := backend.(events.Store); ok {
+		chx := make(events.Channel, 10)
+		histSubCtx, cancel := context.WithCancel(subCtx)
+		var g errgroup.Group
+		g.Go(func() error {
+			after := now.Add(-1 * time.Second)
+			return store.SubscribeWithHistory(
+				histSubCtx,
+				[]string{"test.some.evt1"},
+				[]*ttnpb.EntityIdentifiers{appID.GetEntityIdentifiers()},
+				&after, 1, chx,
+			)
+		})
+		defer func() {
+			cancel()
+			if err := g.Wait(); err != nil && !errors.IsCanceled(err) {
+				t.Error(err)
+			}
+			a.So(chx, should.HaveLength, 2)
+		}()
+	}
 
 	a.So(backend.Subscribe(
 		subCtx,
@@ -136,5 +166,29 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 
 	if a.So(ch2, should.HaveLength, 1) {
 		checkEvt2(<-ch2)
+	}
+
+	if store, ok := backend.(events.Store); ok {
+		after := now.Add(-1 * time.Second)
+
+		evts, err := store.FetchHistory(ctx, []string{
+			"test.some.evt1",
+		}, []*ttnpb.EntityIdentifiers{
+			appID.GetEntityIdentifiers(),
+			devID.GetEntityIdentifiers(),
+			gtwID.GetEntityIdentifiers(),
+		}, &after, 0)
+		a.So(err, should.BeNil)
+		a.So(evts, should.HaveLength, 2)
+
+		evts, err = store.FetchHistory(ctx, nil, []*ttnpb.EntityIdentifiers{
+			appID.GetEntityIdentifiers(),
+		}, &after, 1)
+		a.So(err, should.BeNil)
+		a.So(evts, should.HaveLength, 1)
+
+		evts, err = store.FindRelated(ctx, correlationID)
+		a.So(err, should.BeNil)
+		a.So(evts, should.HaveLength, 4)
 	}
 }

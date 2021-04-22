@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -37,6 +38,9 @@ const workersPerCPU = 2
 
 // NewEventsServer returns a new EventsServer on the given PubSub.
 func NewEventsServer(ctx context.Context, pubsub events.PubSub) *EventsServer {
+	if _, ok := pubsub.(events.Store); ok {
+		log.FromContext(ctx).Infof("Events PubSub: %T is also a Store!", pubsub)
+	}
 	return &EventsServer{
 		ctx:    ctx,
 		pubsub: pubsub,
@@ -64,12 +68,21 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 
 	ch := make(events.Channel, 8)
 	handler := events.ContextHandler(ctx, ch)
-	if err := srv.pubsub.Subscribe(ctx, nil, req.Identifiers, handler); err != nil {
-		return err
-	}
 
-	if req.Tail > 0 || req.After != nil {
-		warning.Add(ctx, "Historical events not implemented")
+	store, hasStore := srv.pubsub.(events.Store)
+	var group *errgroup.Group
+	if hasStore && (req.Tail > 0 || req.After != nil) {
+		group, ctx = errgroup.WithContext(ctx)
+		group.Go(func() error {
+			return store.SubscribeWithHistory(ctx, nil, req.Identifiers, req.After, int(req.Tail), handler)
+		})
+	} else {
+		if req.Tail > 0 || req.After != nil {
+			warning.Add(ctx, "Historical events not implemented")
+		}
+		if err := srv.pubsub.Subscribe(ctx, nil, req.Identifiers, handler); err != nil {
+			return err
+		}
 	}
 
 	if err := stream.SendHeader(metadata.MD{}); err != nil {
@@ -94,6 +107,9 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	for {
 		select {
 		case <-ctx.Done():
+			if group != nil {
+				return group.Wait()
+			}
 			return ctx.Err()
 		case evt := <-ch:
 			isVisible, err := rightsutil.EventIsVisible(ctx, evt)
