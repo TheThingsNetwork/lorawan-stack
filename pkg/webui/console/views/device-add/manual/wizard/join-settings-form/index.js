@@ -14,8 +14,6 @@
 
 import React from 'react'
 
-import glossaryId from '@console/constants/glossary-ids'
-
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Form from '@ttn-lw/components/form'
@@ -23,6 +21,7 @@ import Wizard from '@ttn-lw/components/wizard'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
+import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -87,14 +86,11 @@ const JoinSettingsForm = React.memo(props => {
         type="byte"
         min={16}
         max={16}
-        description={
-          lwVersion >= 110 ? sharedMessages.appKeyNewDescription : sharedMessages.appKeyDescription
-        }
         component={Input.Generate}
         mayGenerateValue={mayEditKeys}
         onGenerateValue={generate16BytesKey}
-        glossaryId={glossaryId.APP_KEY}
         placeholder={appKeyPlaceholder}
+        glossaryId={glossaryIds.APP_KEY}
       />
       {lwVersion >= 110 && (
         <Form.Field
@@ -104,12 +100,12 @@ const JoinSettingsForm = React.memo(props => {
           type="byte"
           min={16}
           max={16}
-          description={sharedMessages.nwkKeyDescription}
           component={Input.Generate}
           disabled={!mayEditKeys}
           mayGenerateValue={mayEditKeys}
           onGenerateValue={generate16BytesKey}
           placeholder={nwkKeyPlaceholder}
+          glossaryId={glossaryIds.NETWORK_KEY}
         />
       )}
       <Form.CollapseSection

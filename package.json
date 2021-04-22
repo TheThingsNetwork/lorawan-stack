@@ -81,6 +81,7 @@
   "dependencies": {
     "@formatjs/intl-relativetimeformat": "^2.8.2",
     "@sentry/browser": "^5.19.0",
+    "@tippyjs/react": "^4.2.5",
     "autobind-decorator": "^2.1.0",
     "axios": "^0.21.1",
     "cancelable-promise": "^3.1.2",

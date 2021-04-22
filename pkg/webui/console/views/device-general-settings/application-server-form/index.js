@@ -25,6 +25,7 @@ import Yup from '@ttn-lw/lib/yup'
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
 
 import { generate16BytesKey } from '@console/lib/device-utils'
 
@@ -176,11 +177,11 @@ const ApplicationServerForm = React.memo(props => {
         min={16}
         max={16}
         disabled={!mayEditKeys || skipCrypto}
-        description={sharedMessages.appSKeyDescription}
         placeholder={skipCrypto ? sharedMessages.skipCryptoPlaceholder : undefined}
         component={Input.Generate}
         mayGenerateValue={mayEditKeys && !skipCrypto}
         onGenerateValue={generate16BytesKey}
+        glossaryId={glossaryIds.APP_SESSION_KEY}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

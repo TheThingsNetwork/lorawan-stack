@@ -14,8 +14,6 @@
 
 import React from 'react'
 
-import glossaryId from '@console/constants/glossary-ids'
-
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Select from '@ttn-lw/components/select'
@@ -30,6 +28,7 @@ import MacSettingsSection from '@console/components/mac-settings-section'
 import DevAddrInput from '@console/containers/dev-addr-input'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
+import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -106,33 +105,32 @@ const NetworkSettingsForm = props => {
       <NsFrequencyPlansSelect
         required
         autoFocus
-        glossaryId={glossaryId.FREQUENCY_PLAN}
+        glossaryId={glossaryIds.FREQUENCY_PLAN}
         name="frequency_plan_id"
       />
       <Form.Field
         required
         disabled
         title={sharedMessages.macVersion}
-        description={sharedMessages.macVersionDescription}
         name="lorawan_version"
         component={Select}
         options={LORAWAN_VERSIONS}
-        glossaryId={glossaryId.LORAWAN_VERSION}
+        glossaryId={glossaryIds.LORAWAN_VERSION}
       />
       <Form.Field
         required
         title={sharedMessages.phyVersion}
-        description={sharedMessages.lorawanPhyVersionDescription}
         name="lorawan_phy_version"
         component={PhyVersionInput}
         lorawanVersion={lorawanVersion}
-        glossaryId={glossaryId.REGIONAL_PARAMETERS}
+        glossaryId={glossaryIds.REGIONAL_PARAMETERS}
       />
       <Form.Field
         title={sharedMessages.lorawanClassCapabilities}
         name="_device_classes"
         component={Checkbox.Group}
         required={isMulticast}
+        glossaryId={glossaryIds.CLASSES}
       >
         <Checkbox
           name="class_b"
@@ -143,12 +141,7 @@ const NetworkSettingsForm = props => {
       </Form.Field>
       {(isMulticast || isABP) && (
         <>
-          <DevAddrInput
-            title={sharedMessages.devAddr}
-            name="session.dev_addr"
-            description={sharedMessages.deviceAddrDescription}
-            required
-          />
+          <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
           <Form.Field
             mayGenerateValue
             title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
@@ -157,17 +150,12 @@ const NetworkSettingsForm = props => {
             min={16}
             max={16}
             required
-            description={
-              lwVersion >= 110
-                ? sharedMessages.fNwkSIntKeyDescription
-                : sharedMessages.nwkSKeyDescription
-            }
             component={Input.Generate}
             onGenerateValue={generate16BytesKey}
             glossaryId={
               lwVersion >= 110
-                ? glossaryId.NETWORK_SESSION_KEY
-                : glossaryId.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
+                ? glossaryIds.NETWORK_SESSION_KEY
+                : glossaryIds.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
             }
           />
           {lwVersion >= 110 && (
@@ -182,7 +170,7 @@ const NetworkSettingsForm = props => {
               description={sharedMessages.sNwkSIKeyDescription}
               component={Input.Generate}
               onGenerateValue={generate16BytesKey}
-              glossaryId={glossaryId.SERVING_NETWORK_SESSION_INTEGRITY_KEY}
+              glossaryId={glossaryIds.SERVING_NETWORK_SESSION_INTEGRITY_KEY}
             />
           )}
           {lwVersion >= 110 && (
@@ -197,7 +185,7 @@ const NetworkSettingsForm = props => {
               description={sharedMessages.nwkSEncKeyDescription}
               component={Input.Generate}
               onGenerateValue={generate16BytesKey}
-              glossaryId={glossaryId.NETWORK_SESSION_ENCRYPTION_KEY}
+              glossaryId={glossaryIds.NETWORK_SESSION_ENCRYPTION_KEY}
             />
           )}
         </>

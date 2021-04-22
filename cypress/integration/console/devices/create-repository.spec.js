@@ -249,27 +249,9 @@ describe('End device repository create', () => {
         selectUno()
 
         cy.findByLabelText('Frequency plan').should('be.visible')
-        cy.findDescriptionByLabelText('Frequency plan')
-          .should('contain', 'The frequency plan used by the end device')
-          .and('be.visible')
         cy.findByLabelText('AppEUI').should('be.visible')
-        cy.findDescriptionByLabelText('AppEUI')
-          .should(
-            'contain',
-            'The AppEUI uniquely identifies the owner of the end device. If no AppEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.',
-          )
-          .and('be.visible')
         cy.findByLabelText('DevEUI').should('be.visible')
-        cy.findDescriptionByLabelText('DevEUI')
-          .should('contain', 'The DevEUI is the unique identifier for this end device')
-          .and('be.visible')
         cy.findByLabelText('AppKey').should('be.visible')
-        cy.findDescriptionByLabelText('AppKey')
-          .should(
-            'contain',
-            'The root key to derive session keys to secure communication between the end device and the application',
-          )
-          .and('be.visible')
         cy.findByLabelText('End device ID').should('be.visible')
         cy.findByLabelText('View registered end device').should('exist')
         cy.findByLabelText('Register another end device of this type').should('exist')
@@ -424,24 +406,9 @@ describe('End device repository create', () => {
         cy.findByLabelText('Profile (Region)').selectOption('EU_863_870')
 
         cy.findByLabelText('Frequency plan').should('be.visible')
-        cy.findDescriptionByLabelText('Frequency plan')
-          .should('contain', 'The frequency plan used by the end device')
-          .and('be.visible')
         cy.findByLabelText('Device address').should('be.visible')
-        cy.findDescriptionByLabelText('Device address')
-          .should(
-            'contain',
-            'Device address, issued by the Network Server or chosen by device manufacturer in case of testing range',
-          )
-          .and('be.visible')
         cy.findByLabelText('AppSKey').should('be.visible')
-        cy.findDescriptionByLabelText('AppSKey')
-          .should('contain', 'Application session key')
-          .and('be.visible')
         cy.findByLabelText('NwkSKey').should('be.visible')
-        cy.findDescriptionByLabelText('NwkSKey')
-          .should('contain', 'Network session key')
-          .and('be.visible')
         cy.findByLabelText('End device ID').should('be.visible')
         cy.findByLabelText('View registered end device').should('exist')
         cy.findByLabelText('Register another end device of this type').should('exist')

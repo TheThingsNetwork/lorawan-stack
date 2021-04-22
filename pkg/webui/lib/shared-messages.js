@@ -51,16 +51,11 @@ export default defineMessages({
     'The AppEUI uniquely identifies the owner of the end device. If no AppEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.',
   appId: 'Application ID',
   appKey: 'AppKey',
-  appKeyDescription:
-    'The root key to derive session keys to secure communication between the end device and the application',
-  appKeyNewDescription:
-    'The root key to derive the application session key to secure communication between the end device and the application',
   application: 'Application',
   applications: 'Applications',
   applicationServerAddress: 'Application Server address',
   approve: 'Approve',
   appSKey: 'AppSKey',
-  appSKeyDescription: 'Application session key',
   asServerID: 'Application Server ID',
   asServerIDDescription: 'The AS-ID of the Application Server to use',
   asServerKekLabel: 'Application Server KEK label',
@@ -120,13 +115,10 @@ export default defineMessages({
   devAddr: 'Device address',
   devDesc: 'End device description',
   devEUI: 'DevEUI',
-  deviceAddrDescription:
-    'Device address, issued by the Network Server or chosen by device manufacturer in case of testing range',
   deviceCounted: '{count, plural, one {End device} other {End devices}}',
   deviceDescDescription:
     'Optional end device description; can also be used to save notes about the end device',
   deviceDescPlaceholder: 'Description for my new end device',
-  deviceEUIDescription: 'The DevEUI is the unique identifier for this end device',
   deviceIdPlaceholder: 'my-new-device',
   deviceNamePlaceholder: 'My new end device',
   device: 'End device',
@@ -163,7 +155,6 @@ export default defineMessages({
   fetching: 'Fetching data…',
   firmwareVersion: 'Firmware version',
   fNwkSIntKey: 'FNwkSIntKey',
-  fNwkSIntKeyDescription: 'Forwarding network session integrity key',
   frameCounterWidth: 'Frame counter width',
   frequencyPlan: 'Frequency plan',
   frequencyPlanWarning:
@@ -203,8 +194,6 @@ export default defineMessages({
   insufficientAppKeyRights: 'Insufficient rights to set an AppKey',
   insufficientNwkKeyRights: 'Insufficient rights to set a NwkKey',
   joinEUI: 'JoinEUI',
-  joinEUIDescription:
-    'The JoinEUI identifies the Join Server. If no JoinEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.',
   joinServerAddress: 'Join Server address',
   key: 'key',
   keyEdit: 'Edit API key',
@@ -230,7 +219,6 @@ export default defineMessages({
   lorawanOptions: 'LoRaWAN options',
   lorawanPhyVersionDescription: 'The LoRaWAN PHY version of the end device',
   macVersion: 'LoRaWAN version',
-  macVersionDescription: 'The LoRaWAN version (MAC), as provided by the device manufacturer',
   messaging: 'Messaging',
   messageTypes: 'Message types',
   milliseconds: 'milliseconds',
@@ -256,12 +244,9 @@ export default defineMessages({
   nsServerKekLabelDescription:
     'The KEK label of the Network Server to use for wrapping the network session key',
   nwkKey: 'NwkKey',
-  nwkKeyDescription:
-    'The root key to derive network session keys to secure communication between the end device and the network',
   nwkSEncKey: 'NwkSEncKey',
   nwkSEncKeyDescription: 'Network session encryption key',
   nwkSKey: 'NwkSKey',
-  nwkSKeyDescription: 'Network session key',
   offline: 'Offline',
   ok: 'Ok',
   online: 'Online',

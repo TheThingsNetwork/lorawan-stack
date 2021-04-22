@@ -16,8 +16,6 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { merge } from 'lodash'
 
-import glossaryId from '@console/constants/glossary-ids'
-
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Input from '@ttn-lw/components/input'
@@ -26,6 +24,7 @@ import Radio from '@ttn-lw/components/radio-button'
 import Form from '@ttn-lw/components/form'
 import Checkbox from '@ttn-lw/components/checkbox'
 
+import glossaryId from '@ttn-lw/lib/constants/glossary-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -211,7 +210,6 @@ const ConfigurationForm = React.memo(props => {
             required
             autoFocus={!canCreateJs && !canCreateNs}
             title={sharedMessages.macVersion}
-            description={sharedMessages.macVersionDescription}
             glossaryId={glossaryId.LORAWAN_VERSION}
             name="lorawan_version"
             component={Select}
@@ -238,7 +236,6 @@ const ConfigurationForm = React.memo(props => {
           {showExternalJs && (
             <Form.Field
               title={sharedMessages.externalJoinServer}
-              glossaryTerm={sharedMessages.componentJs}
               glossaryId={glossaryId.JOIN_SERVER}
               name="_external_js"
               onChange={handleExternalJsChange}

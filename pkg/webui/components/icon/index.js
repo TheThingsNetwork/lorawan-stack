@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { forwardRef } from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -68,7 +68,9 @@ const hardcoded = {
   valid: 'check_circle',
 }
 
-const Icon = ({ icon, className, nudgeUp, nudgeDown, small, large, ...rest }) => {
+const Icon = forwardRef((props, ref) => {
+  const { icon, className, nudgeUp, nudgeDown, small, large, ...rest } = props
+
   const classname = classnames(style.icon, className, {
     [style.nudgeUp]: nudgeUp,
     [style.nudgeDown]: nudgeDown,
@@ -77,11 +79,11 @@ const Icon = ({ icon, className, nudgeUp, nudgeDown, small, large, ...rest }) =>
   })
 
   return (
-    <span className={classname} {...rest}>
+    <span className={classname} ref={ref} {...rest}>
       {hardcoded[icon] || icon}
     </span>
   )
-}
+})
 
 Icon.propTypes = {
   className: PropTypes.string,

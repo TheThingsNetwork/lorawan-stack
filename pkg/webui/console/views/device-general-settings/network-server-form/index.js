@@ -29,6 +29,7 @@ import MacSettingsSection from '@console/components/mac-settings-section'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import DevAddrInput from '@console/containers/dev-addr-input'
 
+import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
 import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -186,20 +187,20 @@ const NetworkServerForm = React.memo(props => {
     >
       <Form.Field
         title={sharedMessages.macVersion}
-        description={sharedMessages.macVersionDescription}
         name="lorawan_version"
         component={Select}
         required
         options={LORAWAN_VERSIONS}
         onChange={handleVersionChange}
+        glossaryId={glossaryIds.LORAWAN_VERSION}
       />
       <Form.Field
         title={sharedMessages.phyVersion}
-        description={sharedMessages.lorawanPhyVersionDescription}
         name="lorawan_phy_version"
         component={PhyVersionInput}
         lorawanVersion={lorawanVersion}
         required
+        glossaryId={glossaryIds.REGIONAL_PARAMETERS}
       />
       <NsFrequencyPlansSelect name="frequency_plan_id" required />
       <Form.Field
@@ -232,7 +233,6 @@ const NetworkServerForm = React.memo(props => {
           <DevAddrInput
             title={sharedMessages.devAddr}
             name="session.dev_addr"
-            description={sharedMessages.deviceAddrDescription}
             disabled={!mayEditKeys}
             required={mayReadKeys && mayEditKeys}
           />
@@ -242,15 +242,15 @@ const NetworkServerForm = React.memo(props => {
             type="byte"
             min={16}
             max={16}
-            description={
-              lorawanVersion >= 110
-                ? sharedMessages.fNwkSIntKeyDescription
-                : sharedMessages.nwkSKeyDescription
-            }
             disabled={!mayEditKeys}
             component={Input.Generate}
             mayGenerateValue={mayEditKeys}
             onGenerateValue={generate16BytesKey}
+            glossaryId={
+              lwVersion >= 110
+                ? glossaryIds.NETWORK_SESSION_KEY
+                : glossaryIds.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
+            }
           />
           {lwVersion >= 110 && (
             <Form.Field

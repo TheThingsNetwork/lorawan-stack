@@ -72,33 +72,18 @@ class BasicSettingsStep {
   }
 
   fillJoinEUI(eui) {
-    cy.findDescriptionByLabelText('JoinEUI')
-      .should(
-        'contain',
-        'The JoinEUI identifies the Join Server. If no JoinEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.',
-      )
-      .should('be.visible')
     cy.findByLabelText('JoinEUI')
       .should('be.visible')
       .type(eui)
   }
 
   fillAppEUI(eui) {
-    cy.findDescriptionByLabelText('AppEUI')
-      .should(
-        'contain',
-        'The AppEUI uniquely identifies the owner of the end device. If no AppEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.',
-      )
-      .should('be.visible')
     cy.findByLabelText('AppEUI')
       .should('be.visible')
       .type(eui)
   }
 
   fillDevEUI(eui) {
-    cy.findDescriptionByLabelText('DevEUI')
-      .should('contain', 'The DevEUI is the unique identifier for this end device')
-      .should('be.visible')
     cy.findByLabelText('DevEUI')
       .should('be.visible')
       .type(eui)
@@ -154,21 +139,12 @@ class NetworkLayerStep {
   }
 
   fillDevAddress(address) {
-    cy.findDescriptionByLabelText('Device address')
-      .should(
-        'contain',
-        'Device address, issued by the Network Server or chosen by device manufacturer in case of testing range',
-      )
-      .and('be.visible')
     cy.findByLabelText('Device address')
       .should('be.visible')
       .type(address)
   }
 
   fillNwkSKey(key) {
-    cy.findDescriptionByLabelText('NwkSKey')
-      .should('contain', 'Network session key')
-      .and('be.visible')
     cy.findByLabelText('NwkSKey')
       .should('be.visible')
       .type(key)
@@ -201,9 +177,6 @@ class NetworkLayerStep {
   }
 
   fillRx2DataRateIndex(index) {
-    cy.findDescriptionByLabelText('RX2 Data Rate Index')
-      .should('contain', 'The default RX2 data rate index value the device uses after a reset')
-      .and('be.visible')
     cy.findByLabelText('RX2 Data Rate Index')
       .should('be.visible')
       .type(index)
@@ -276,34 +249,12 @@ class JoinSettingsStep {
   }
 
   fillAppKey(key) {
-    if (this._lorawanVersion >= 110) {
-      cy.findDescriptionByLabelText('AppKey')
-        .should(
-          'contain',
-          'The root key to derive the application session key to secure communication between the end device and the application',
-        )
-        .and('be.visible')
-    } else {
-      cy.findDescriptionByLabelText('AppKey')
-        .should(
-          'contain',
-          'The root key to derive session keys to secure communication between the end device and the application',
-        )
-        .and('be.visible')
-    }
-
     cy.findByLabelText('AppKey')
       .should('be.visible')
       .type(key)
   }
 
   fillNwkKey(key) {
-    cy.findDescriptionByLabelText('NwkKey')
-      .should(
-        'contain',
-        'The root key to derive network session keys to secure communication between the end device and the network',
-      )
-      .should('be.visible')
     cy.findByLabelText('NwkKey')
       .should('be.visible')
       .type(key)
@@ -348,9 +299,6 @@ class ApplicationLayerStep {
   }
 
   fillAppSKey(key) {
-    cy.findDescriptionByLabelText('AppSKey')
-      .should('contain', 'Application session key')
-      .should('be.visible')
     cy.findByLabelText('AppSKey')
       .should('be.visible')
       .type(key)

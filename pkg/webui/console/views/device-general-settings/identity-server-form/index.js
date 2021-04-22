@@ -27,6 +27,7 @@ import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
 
 import { mapFormValueToAttributes, mapAttributesToFormValue } from '@console/lib/attributes'
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
@@ -161,13 +162,10 @@ const IdentityServerForm = React.memo(props => {
   }
 
   let joinEUITitle = sharedMessages.appEUIJoinEUI
-  let joinEUIDescription
   if (lorawanVersion >= 100 && lorawanVersion < 104) {
     joinEUITitle = sharedMessages.appEUI
-    joinEUIDescription = sharedMessages.appEUIDescription
   } else if (lorawanVersion >= 104) {
     joinEUITitle = sharedMessages.joinEUI
-    joinEUIDescription = sharedMessages.joinEUIDescription
   }
 
   return (
@@ -196,10 +194,10 @@ const IdentityServerForm = React.memo(props => {
           type="byte"
           min={8}
           max={8}
-          description={joinEUIDescription}
           required
           disabled
           component={Input}
+          glossaryId={glossaryIds.JOIN_EUI}
         />
       )}
       {hasDevEUI && (
@@ -209,10 +207,10 @@ const IdentityServerForm = React.memo(props => {
           type="byte"
           min={8}
           max={8}
-          description={sharedMessages.deviceEUIDescription}
           required
           disabled
           component={Input}
+          glossaryId={glossaryIds.DEV_EUI}
         />
       )}
       <Form.Field

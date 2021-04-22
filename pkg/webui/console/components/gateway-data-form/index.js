@@ -15,7 +15,6 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 
-import glossaryId from '@console/constants/glossary-ids'
 import delay from '@console/constants/delays'
 import frequencyPlans from '@console/constants/frequency-plans'
 
@@ -31,6 +30,7 @@ import Message from '@ttn-lw/lib/components/message'
 import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import OwnersSelect from '@console/containers/owners-select'
 
+import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -147,7 +147,6 @@ class GatewayDataForm extends React.Component {
           max={8}
           placeholder={sharedMessages.gatewayEUI}
           component={Input}
-          glossaryId={glossaryId.GATEWAY_EUI}
         />
         <Form.Field
           title={sharedMessages.gatewayName}
@@ -198,7 +197,7 @@ class GatewayDataForm extends React.Component {
           name="frequency_plan_id"
           menuPlacement="top"
           onChange={this.handleFrequencyPlanChange}
-          glossaryId={glossaryId.FREQUENCY_PLAN}
+          glossaryId={glossaryIds.FREQUENCY_PLAN}
           warning={showFrequencyPlanWarning ? sharedMessages.frequencyPlanWarning : undefined}
         />
         <Form.Field
