@@ -126,11 +126,24 @@ type Cache struct {
 	Redis   redis.Config `name:"redis"`
 }
 
+// RedisEvents represents configuration for the Redis events backend.
+type RedisEvents struct {
+	redis.Config `name:",squash"`
+	Store        struct {
+		Enable             bool          `name:"enable" description:"Enable events store"`
+		TTL                time.Duration `name:"ttl" description:"How long event payloads are retained"`
+		EntityCount        int           `name:"entity-count" description:"How many events are indexed for a entity ID"`
+		EntityTTL          time.Duration `name:"entity-ttl" description:"How long events are indexed for a entity ID"`
+		CorrelationIDCount int           `name:"correlation-id-count" description:"How many events are indexed for a correlation ID"`
+	} `name:"store"`
+	Workers int `name:"workers"`
+}
+
 // Events represents configuration for the events system.
 type Events struct {
-	Backend string       `name:"backend" description:"Backend to use for events (internal, redis, cloud)"`
-	Redis   redis.Config `name:"redis"`
-	Cloud   CloudEvents  `name:"cloud"`
+	Backend string      `name:"backend" description:"Backend to use for events (internal, redis, cloud)"`
+	Redis   RedisEvents `name:"redis"`
+	Cloud   CloudEvents `name:"cloud"`
 }
 
 // Rights represents the configuration to apply when fetching entity rights.

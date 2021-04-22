@@ -17,13 +17,14 @@ package redis
 
 import (
 	"context"
-	"encoding/base64"
+	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
@@ -34,8 +35,8 @@ import (
 )
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Redis.
-func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, conf ttnredis.Config) *PubSub {
-	ttnRedisClient := ttnredis.New(&conf)
+func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, conf config.RedisEvents) events.PubSub {
+	ttnRedisClient := ttnredis.New(&conf.Config)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "events/redis",
 	))
@@ -49,14 +50,47 @@ func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, conf ttnr
 		subscriptions: make(map[string]int),
 	}
 	ps.sub = ps.client.Subscribe(ctx)
-	taskStarter.StartTask(&component.TaskConfig{
-		Context: ps.ctx,
-		ID:      "events_redis_subscribe",
-		Func:    ps.subscribeTask,
-		Restart: component.TaskRestartOnFailure,
-		Backoff: component.DefaultTaskBackoffConfig,
-	})
-	return ps
+
+	workers := conf.Workers
+	if workers == 0 {
+		workers = 1
+	}
+
+	for i := 0; i < workers; i++ {
+		taskStarter.StartTask(&component.TaskConfig{
+			Context: ps.ctx,
+			ID:      fmt.Sprintf("events_redis_subscribe_%02d", i),
+			Func:    ps.subscribeTask,
+			Restart: component.TaskRestartOnFailure,
+			Backoff: component.DefaultTaskBackoffConfig,
+		})
+	}
+
+	if !conf.Store.Enable {
+		return ps
+	}
+
+	pss := &PubSubStore{
+		PubSub:                    ps,
+		historyTTL:                conf.Store.TTL,
+		entityHistoryCount:        conf.Store.EntityCount,
+		entityHistoryTTL:          conf.Store.EntityTTL,
+		correlationIDHistoryCount: conf.Store.CorrelationIDCount,
+	}
+	if pss.historyTTL == 0 {
+		pss.historyTTL = 10 * time.Minute
+	}
+	if pss.entityHistoryCount == 0 {
+		pss.entityHistoryCount = 100
+	}
+	if pss.entityHistoryTTL == 0 {
+		pss.entityHistoryTTL = time.Hour
+	}
+	if pss.correlationIDHistoryCount == 0 {
+		pss.correlationIDHistoryCount = 100
+	}
+
+	return pss
 }
 
 // PubSub with Redis backend.
@@ -65,7 +99,6 @@ type PubSub struct {
 	ctx           context.Context
 	cancel        context.CancelFunc
 	client        *ttnredis.Client
-	subOnce       sync.Once
 	mu            sync.RWMutex
 	sub           *redis.PubSub
 	subscriptions map[string]int
@@ -83,28 +116,18 @@ func (ps *PubSub) eventChannel(ctx context.Context, name string, ids *ttnpb.Enti
 
 var errChannelClosed = errors.DefineAborted("channel_closed", "channel closed")
 
-const encodingPrefix = "v3-event-proto:"
+const (
+	protoEncodingPrefix = "v3-event-proto:"
+	metaEncodingPrefix  = "v3-event-meta:"
+)
 
 func (ps *PubSub) subscribeTask(ctx context.Context) error {
 	logger := log.FromContext(ctx)
-
-	ps.mu.Lock()
-	ps.sub = ps.client.Subscribe(ctx)
-	patterns := make([]string, 0, len(ps.subscriptions))
-	for pattern := range ps.subscriptions {
-		patterns = append(patterns, pattern)
-	}
-	logger.WithField("patterns", patterns).Debug("Subscribe to Redis channels")
-	ps.sub.PSubscribe(ctx, patterns...)
-	ps.mu.Unlock()
-
-	defer func() {
-		if err := ps.sub.Close(); err != nil {
-			logger.WithError(err).Warn("Failed to close Redis subscription")
-		}
-	}()
-
 	ch := ps.sub.Channel()
+	store := &PubSubStore{
+		PubSub: ps,
+		// NOTE: only for reading; no additional settings needed.
+	}
 	for {
 		select {
 		case <-ctx.Done():
@@ -113,22 +136,28 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 			if !ok {
 				return errChannelClosed.New()
 			}
-			if !strings.HasPrefix(msg.Payload, encodingPrefix) {
+			var evtPB *ttnpb.Event
+			switch {
+			case strings.HasPrefix(msg.Payload, protoEncodingPrefix):
+				evtPB = &ttnpb.Event{}
+				err := decodeEventData(msg.Payload, evtPB)
+				if err != nil {
+					logger.WithError(err).Warn("Failed to decode event payload")
+					continue
+				}
+			case strings.HasPrefix(msg.Payload, metaEncodingPrefix):
+				m := strings.Split(strings.TrimPrefix(msg.Payload, metaEncodingPrefix), " ")
+				var err error
+				evtPB, err = store.LoadEvent(ctx, m[0])
+				if err != nil {
+					logger.WithError(err).Warn("Failed to load event payload")
+					continue
+				}
+			default:
 				logger.Warn("Skip decoding event with unexpected encoding")
 				continue
 			}
-
-			bpb, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(msg.Payload, encodingPrefix))
-			if err != nil {
-				logger.WithError(err).Warn("Failed to decode event payload from base64")
-				continue
-			}
-			var pb ttnpb.Event
-			if err = proto.Unmarshal(bpb, &pb); err != nil {
-				logger.WithError(err).Warn("Failed to unmarshal event from binary protobuf")
-				continue
-			}
-			evt, err := events.FromProto(&pb)
+			evt, err := events.FromProto(evtPB)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to convert event from protobuf")
 				continue
@@ -233,26 +262,24 @@ func (ps *PubSub) Close(ctx context.Context) error {
 // Publish an event to Redis.
 func (ps *PubSub) Publish(evt events.Event) {
 	logger := log.FromContext(ps.ctx)
-	pb, err := events.Proto(evt)
+
+	b, err := encodeEventData(evt)
 	if err != nil {
-		logger.WithError(err).Warn("Failed to convert event to protobuf")
+		logger.WithError(err).Warn("Failed to encode event")
 		return
 	}
-	bpb, err := proto.Marshal(pb)
-	if err != nil {
-		logger.WithError(err).Warn("Failed to marshal event to binary protobuf")
-		return
-	}
-	b := encodingPrefix + base64.StdEncoding.EncodeToString(bpb)
-	if ids := evt.Identifiers(); len(ids) > 0 {
+
+	_, err = ps.client.Pipelined(ps.ctx, func(tx redis.Pipeliner) error {
+		ids := evt.Identifiers()
+		if len(ids) == 0 {
+			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), b)
+		}
 		for _, id := range ids {
-			if err := ps.client.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), b).Err(); err != nil {
-				logger.WithError(err).Warn("Failed to publish event")
-			}
+			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), b)
 		}
-	} else {
-		if err := ps.client.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), b).Err(); err != nil {
-			logger.WithError(err).Warn("Failed to publish event")
-		}
+		return nil
+	})
+	if err != nil {
+		logger.WithError(err).Warn("Failed to publish event")
 	}
 }

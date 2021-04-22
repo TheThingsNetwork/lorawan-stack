@@ -23,6 +23,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/internal/eventstest"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/redis"
@@ -56,7 +57,7 @@ func Example() {
 	// The task starter is used for automatic re-subscription on failure.
 	taskStarter := component.StartTaskFunc(component.DefaultStartTask)
 
-	redisPubSub := redis.NewPubSub(context.TODO(), taskStarter, ttnredis.Config{
+	redisPubSub := redis.NewPubSub(context.TODO(), taskStarter, config.RedisEvents{
 		// Config here...
 	})
 
@@ -64,7 +65,7 @@ func Example() {
 	events.SetDefaultPubSub(redisPubSub)
 }
 
-var timeout = (1 << 10) * test.Delay
+var timeout = (1 << 11) * test.Delay
 
 func TestRedisPubSub(t *testing.T) {
 	events.IncludeCaller = true
@@ -73,8 +74,11 @@ func TestRedisPubSub(t *testing.T) {
 	test.RunTest(t, test.TestConfig{
 		Timeout: timeout,
 		Func: func(ctx context.Context, a *assertions.Assertion) {
-			pubsub := redis.NewPubSub(ctx, taskStarter, redisConfig)
-			defer pubsub.Close(ctx)
+			config := config.RedisEvents{
+				Config: redisConfig,
+			}
+			pubsub := redis.NewPubSub(ctx, taskStarter, config)
+			defer pubsub.(*redis.PubSub).Close(ctx)
 
 			time.Sleep(timeout / 10)
 
@@ -82,3 +86,26 @@ func TestRedisPubSub(t *testing.T) {
 		},
 	})
 }
+
+func TestRedisPubSubStore(t *testing.T) {
+	events.IncludeCaller = true
+	taskStarter := component.StartTaskFunc(component.DefaultStartTask)
+
+	test.RunTest(t, test.TestConfig{
+		Timeout: timeout,
+		Func: func(ctx context.Context, a *assertions.Assertion) {
+			config := config.RedisEvents{
+				Config: redisConfig,
+			}
+			config.Store.Enable = true
+			pubsub := redis.NewPubSub(ctx, taskStarter, config)
+			defer pubsub.(*redis.PubSubStore).Close(ctx)
+
+			time.Sleep(timeout / 10)
+
+			eventstest.TestBackend(ctx, t, a, pubsub)
+		},
+	})
+}
+
+var ps events.Store = (*redis.PubSubStore)(nil)

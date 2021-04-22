@@ -16,6 +16,7 @@ For details about compatibility between different releases, see the **Commitment
 - Include end device version identifiers in upstream messages (see `uplink_message.version_ids.brand_id`, `uplink_message.version_ids.model_id`, `uplink_message.version_ids.firmware_version`, `uplink_message.version_ids.hardware_version` and `uplink_message.version_ids.band_id` fields).
 - Reporting uplink and downlink message delivery state changes to Packet Broker. This will be used for statistical purposes (e.g. which message is processed successfully or why it errored) as well as LoRaWAN roaming (the `XmitDataAns` result code).
 - Setting API key expiry via `--api-key-expiry` flag using RFC3339 format.
+- Events storage in the Redis events backend. This can be enabled with the new `events.redis.store.enable` option. The new options `events.redis.store.ttl`, `events.redis.store.entity-ttl`, `events.redis.store.entity-count` and `events.redis.store.correlation-id-count` can be used to configure retention.
 
 ### Changed
 

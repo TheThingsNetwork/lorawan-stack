@@ -3833,6 +3833,15 @@
       "file": "redis.go"
     }
   },
+  "error:pkg/events/redis:unknown_encoding": {
+    "translations": {
+      "en": "unknown encoding"
+    },
+    "description": {
+      "package": "pkg/events/redis",
+      "file": "codec.go"
+    }
+  },
   "error:pkg/fetch:fetch_file": {
     "translations": {
       "en": "could not fetch file `{filename}`"
