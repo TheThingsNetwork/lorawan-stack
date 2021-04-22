@@ -242,7 +242,7 @@ type rightsFetcher struct {
 
 func newContextWithRightsFetcher(ctx context.Context) context.Context {
 	return rights.NewContextWithFetcher(ctx, &rightsFetcher{
-		EntityFetcher: rights.EntityFetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+		EntityFetcher: rights.EntityFetcherFunc(func(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
 			uid := unique.ID(ctx, ids)
 			if uid != registeredGatewayUID {
 				return nil, nil

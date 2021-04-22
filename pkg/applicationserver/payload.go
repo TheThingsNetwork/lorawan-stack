@@ -45,11 +45,11 @@ func (as *ApplicationServer) encodeAndEncryptDownlink(ctx context.Context, dev *
 		}
 		if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
 			if err := as.formatters.EncodeDownlink(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, downlink, formatter, parameter); err != nil {
-				events.Publish(evtEncodeFailDataDown.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, err))
+				events.Publish(evtEncodeFailDataDown.NewWithIdentifiersAndData(ctx, &dev.EndDeviceIdentifiers, err))
 				return err
 			}
 			if len(downlink.DecodedPayloadWarnings) > 0 {
-				events.Publish(evtEncodeWarningDataDown.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, downlink))
+				events.Publish(evtEncodeWarningDataDown.NewWithIdentifiersAndData(ctx, &dev.EndDeviceIdentifiers, downlink))
 			}
 		}
 	}
@@ -99,9 +99,9 @@ func (as *ApplicationServer) decodeUplink(ctx context.Context, dev *ttnpb.EndDev
 	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
 		if err := as.formatters.DecodeUplink(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, uplink, formatter, parameter); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to decode uplink")
-			events.Publish(evtDecodeFailDataUp.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, err))
+			events.Publish(evtDecodeFailDataUp.NewWithIdentifiersAndData(ctx, &dev.EndDeviceIdentifiers, err))
 		} else if len(uplink.DecodedPayloadWarnings) > 0 {
-			events.Publish(evtDecodeWarningDataUp.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, uplink))
+			events.Publish(evtDecodeWarningDataUp.NewWithIdentifiersAndData(ctx, &dev.EndDeviceIdentifiers, uplink))
 		}
 	}
 	return nil
@@ -150,9 +150,9 @@ func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndD
 	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
 		if err := as.formatters.DecodeDownlink(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, downlink, formatter, parameter); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to decode downlink")
-			events.Publish(evtDecodeFailDataDown.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, err))
+			events.Publish(evtDecodeFailDataDown.NewWithIdentifiersAndData(ctx, &dev.EndDeviceIdentifiers, err))
 		} else if len(downlink.DecodedPayloadWarnings) > 0 {
-			events.Publish(evtDecodeWarningDataDown.NewWithIdentifiersAndData(ctx, dev.EndDeviceIdentifiers, downlink))
+			events.Publish(evtDecodeWarningDataDown.NewWithIdentifiersAndData(ctx, &dev.EndDeviceIdentifiers, downlink))
 		}
 	}
 	return nil

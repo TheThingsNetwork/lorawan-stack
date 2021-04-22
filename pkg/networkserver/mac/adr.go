@@ -145,19 +145,24 @@ func txPowerStep(phy *band.Band, from, to uint8) float32 {
 }
 
 func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) error {
-	if dev.MACState == nil || len(dev.MACState.RecentUplinks) == 0 {
+	if dev.MACState == nil {
 		return nil
 	}
 
-	adrUplinks := dev.MACState.RecentUplinks
-	for i := len(dev.MACState.RecentUplinks) - 1; i >= 0; i-- {
-		up := dev.MACState.RecentUplinks[i]
-		if (up.Payload.MType == ttnpb.MType_UNCONFIRMED_UP || up.Payload.MType == ttnpb.MType_CONFIRMED_UP) &&
-			up.Payload.GetMACPayload().FullFCnt >= dev.MACState.LastADRChangeFCntUp {
-			continue
+	adrUplinks := func() []*ttnpb.UplinkMessage {
+		for i := len(dev.MACState.RecentUplinks) - 1; i >= 0; i-- {
+			up := dev.MACState.RecentUplinks[i]
+			switch {
+			case up.Payload.MType != ttnpb.MType_UNCONFIRMED_UP && up.Payload.MType != ttnpb.MType_CONFIRMED_UP,
+				dev.MACState.LastADRChangeFCntUp != 0 && up.Payload.GetMACPayload().FullFCnt <= dev.MACState.LastADRChangeFCntUp,
+				up.Settings.DataRateIndex != dev.MACState.CurrentParameters.ADRDataRateIndex:
+				return dev.MACState.RecentUplinks[i+1:]
+			}
 		}
-		adrUplinks = dev.MACState.RecentUplinks[i+1:]
-		break
+		return dev.MACState.RecentUplinks
+	}()
+	if len(adrUplinks) == 0 {
+		return nil
 	}
 
 	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MACState.CurrentParameters.Channels...)
@@ -215,7 +220,6 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		log.FromContext(ctx).Debug("Failed to determine max SNR, avoid ADR.")
 		return nil
 	}
-	up := LastUplink(adrUplinks...)
 
 	// The link margin indicates how much stronger the signal (SNR) is than the
 	// minimum (floor) that we need to demodulate the signal. We subtract a
@@ -223,7 +227,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	// don't have enough data for our decision.
 	var margin float32
 	// NOTE: We currently assume that the uplink's SF and BW correspond to CurrentParameters.ADRDataRateIndex.
-	if dr := up.Settings.DataRate.GetLoRa(); dr != nil {
+	if dr := LastUplink(adrUplinks...).Settings.DataRate.GetLoRa(); dr != nil {
 		var ok bool
 		df, ok := demodulationFloor[dr.SpreadingFactor][dr.Bandwidth]
 		if !ok {

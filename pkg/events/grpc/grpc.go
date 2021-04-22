@@ -98,6 +98,9 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		case evt := <-ch:
 			isVisible, err := rightsutil.EventIsVisible(ctx, evt)
 			if err != nil {
+				if err := rights.RequireAny(ctx, req.Identifiers...); err != nil {
+					return err
+				}
 				log.FromContext(ctx).WithError(err).Warn("Failed to check event visibility")
 				continue
 			}

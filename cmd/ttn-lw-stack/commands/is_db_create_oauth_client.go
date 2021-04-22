@@ -145,7 +145,7 @@ var (
 					err = memberStore.SetMember(
 						ctx,
 						ttnpb.UserIdentifiers{UserID: owner}.OrganizationOrUserIdentifiers(),
-						cli.ClientIdentifiers.EntityIdentifiers(),
+						cli.ClientIdentifiers.GetEntityIdentifiers(),
 						ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
 					)
 					if err != nil {

@@ -90,16 +90,16 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.ApplicationIdentifiers, key)
+		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetEntityIdentifiers(), key)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	key.Key = token
-	events.Publish(evtCreateApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
-	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+	events.Publish(evtCreateApplicationAPIKey.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, nil))
+	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+		data.SetEntity(req)
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
@@ -121,7 +121,7 @@ func (is *IdentityServer) listApplicationAPIKeys(ctx context.Context, req *ttnpb
 	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.ApplicationIdentifiers)
+		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.ApplicationIdentifiers.GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -179,20 +179,20 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.ApplicationIdentifiers, &req.APIKey)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.ApplicationIdentifiers.GetEntityIdentifiers(), &req.APIKey)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	if key == nil { // API key was deleted.
-		events.Publish(evtDeleteApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
+		events.Publish(evtDeleteApplicationAPIKey.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
-	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+	events.Publish(evtUpdateApplicationAPIKey.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, nil))
+	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+		data.SetEntity(req)
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
@@ -213,7 +213,7 @@ func (is *IdentityServer) getApplicationCollaborator(ctx context.Context, req *t
 		rights, err := is.getMembershipStore(ctx, db).GetMember(
 			ctx,
 			&req.OrganizationOrUserIdentifiers,
-			req.ApplicationIdentifiers,
+			req.ApplicationIdentifiers.GetEntityIdentifiers(),
 		)
 		if err != nil {
 			return err
@@ -241,7 +241,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 			existingRights, err := store.GetMember(
 				ctx,
 				&req.Collaborator.OrganizationOrUserIdentifiers,
-				req.ApplicationIdentifiers,
+				req.ApplicationIdentifiers.GetEntityIdentifiers(),
 			)
 
 			if err != nil && !errors.IsNotFound(err) {
@@ -260,7 +260,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 		return store.SetMember(
 			ctx,
 			&req.Collaborator.OrganizationOrUserIdentifiers,
-			req.ApplicationIdentifiers,
+			req.ApplicationIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(req.Collaborator.Rights...),
 		)
 	})
@@ -268,16 +268,16 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 		return nil, err
 	}
 	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateApplicationCollaborator.NewWithIdentifiersAndData(ctx, ttnpb.CombineIdentifiers(req.ApplicationIdentifiers, req.Collaborator), nil))
-		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-			data.SetEntity(req.EntityIdentifiers())
+		events.Publish(evtUpdateApplicationCollaborator.New(ctx, events.WithIdentifiers(&req.ApplicationIdentifiers, &req.Collaborator)))
+		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+			data.SetEntity(req)
 			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
 		})
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteApplicationCollaborator.NewWithIdentifiersAndData(ctx, ttnpb.CombineIdentifiers(req.ApplicationIdentifiers, req.Collaborator), nil))
+		events.Publish(evtDeleteApplicationCollaborator.New(ctx, events.WithIdentifiers(&req.ApplicationIdentifiers, &req.Collaborator)))
 	}
 	return ttnpb.Empty, nil
 }
@@ -294,7 +294,7 @@ func (is *IdentityServer) listApplicationCollaborators(ctx context.Context, req 
 		}
 	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.ApplicationIdentifiers)
+		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.ApplicationIdentifiers.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

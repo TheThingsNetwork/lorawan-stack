@@ -39,6 +39,8 @@ func TestValidatePasswordStrength(t *testing.T) {
 		"āaa123➉@#":    false, // No uppercase characters.
 		"āaaAAA➉@#":    false, // No digits.
 		"āaaAAA➉23":    false, // No special characters.
+		"myusername":   false, // Contains username.
+		"password1":    false, // Too common.
 		"āaaAAA123!@#": true,
 		"       1A":    true,
 		"āaa	AAA123 ": true,
@@ -54,9 +56,11 @@ func TestValidatePasswordStrength(t *testing.T) {
 				conf.UserRegistration.PasswordRequirements.MinUppercase = 1
 				conf.UserRegistration.PasswordRequirements.MinDigits = 1
 				conf.UserRegistration.PasswordRequirements.MinSpecial = 1
+				conf.UserRegistration.PasswordRequirements.RejectUserID = true
+				conf.UserRegistration.PasswordRequirements.RejectCommon = true
 				ctx := context.WithValue(is.Context(), ctxKey, &conf)
 
-				err := is.validatePasswordStrength(ctx, p)
+				err := is.validatePasswordStrength(ctx, "username", p)
 				if ok {
 					a.So(err, should.BeNil)
 				} else {

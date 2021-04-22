@@ -144,13 +144,13 @@ const CollapsableItem = ({
   currentPathName,
   onDropdownItemsClick,
 }) => {
-  const subItems = children.map(item => {
-    return {
+  const subItems = children
+    .filter(item => Boolean(item) && 'props' in item)
+    .map(item => ({
       title: item.props.title,
       path: item.props.path,
       icon: item.props.icon,
-    }
-  })
+    }))
 
   const subItemActive = subItems.some(item => item.path === currentPathName)
 

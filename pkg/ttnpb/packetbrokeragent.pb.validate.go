@@ -296,6 +296,8 @@ func (m *PacketBrokerNetwork) ValidateFields(paths ...string) error {
 
 			}
 
+		case "listed":
+			// no validation rules for Listed
 		default:
 			return PacketBrokerNetworkValidationError{
 				field:  name,

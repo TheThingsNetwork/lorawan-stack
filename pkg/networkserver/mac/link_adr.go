@@ -106,9 +106,6 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		dev.MACState.DesiredParameters.ADRDataRateIndex > phy.MaxADRDataRateIndex {
 		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
 	}
-	if dev.MACState.CurrentParameters.ADRDataRateIndex > minDataRateIndex {
-		minDataRateIndex = dev.MACState.CurrentParameters.ADRDataRateIndex
-	}
 	if dev.MACState.DesiredParameters.ADRDataRateIndex < minDataRateIndex || dev.MACState.DesiredParameters.ADRDataRateIndex > maxDataRateIndex {
 		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
 	}

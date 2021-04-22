@@ -122,7 +122,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
-			cli.ClientIdentifiers,
+			cli.ClientIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
@@ -142,7 +142,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 
 	cli.Secret = secret // Return the unhashed secret, in case it was generated.
 
-	events.Publish(evtCreateClient.NewWithIdentifiersAndData(ctx, req.ClientIdentifiers, nil))
+	events.Publish(evtCreateClient.NewWithIdentifiersAndData(ctx, &req.ClientIdentifiers, nil))
 	return cli, nil
 }
 
@@ -223,7 +223,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 		}
 		cliIDs := make([]*ttnpb.ClientIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if cliID := id.EntityIdentifiers().GetClientIDs(); cliID != nil {
+			if cliID := id.GetEntityIdentifiers().GetClientIDs(); cliID != nil {
 				cliIDs = append(cliIDs, cliID)
 			}
 		}
@@ -296,10 +296,10 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateClient.NewWithIdentifiersAndData(ctx, req.ClientIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateClient.NewWithIdentifiersAndData(ctx, &req.ClientIdentifiers, req.FieldMask.Paths))
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
-		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
-			data.SetEntity(req.EntityIdentifiers())
+		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
+			data.SetEntity(req)
 			return &emails.EntityStateChanged{
 				Data:             data,
 				State:            strings.ToLower(strings.TrimPrefix(cli.State.String(), "STATE_")),
@@ -363,7 +363,7 @@ func (is *IdentityServer) purgeClient(ctx context.Context, ids *ttnpb.ClientIden
 			return err
 		}
 		// delete related memberships before purging the client
-		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids)
+		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

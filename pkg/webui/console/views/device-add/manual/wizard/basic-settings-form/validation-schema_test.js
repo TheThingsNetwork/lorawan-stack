@@ -43,7 +43,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
     const validate = schema =>
       createValidation({
         activationMode: ACTIVATION_MODES.OTAA,
-        lorawanVersion: '1.0.0',
+        lorawanVersion: 'MAC_V1_0',
       })(schema)
 
     it('requires `join_eui`', done => {
@@ -94,7 +94,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.ABP,
-          lorawanVersion: '1.0.4',
+          lorawanVersion: 'MAC_V1_0_4',
         })(schema)
 
       it('requires `dev_eui`', done => {
@@ -122,7 +122,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.ABP,
-          lorawanVersion: '1.0.0',
+          lorawanVersion: 'MAC_V1_0',
         })(schema)
 
       it('processes valid schema w/ or w/o `dev_eui`', () => {
@@ -155,19 +155,18 @@ describe('<BasicSettingsForm /> validation schema', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.MULTICAST,
-          lorawanVersion: '1.0.4',
+          lorawanVersion: 'MAC_V1_0_4',
         })(schema)
 
-      it('requires `dev_eui`', done => {
-        try {
-          validate(schema)
-          done.fail('should fail')
-        } catch (error) {
-          expect(error).toBeDefined()
-          expect(error.name).toBe('ValidationError')
-          expect(error.path).toBe('ids.dev_eui')
-          done()
-        }
+      it('processes valid schema with or without `dev_eui`', () => {
+        const validatedValue = validate(schema)
+
+        expect(validatedValue).toBeDefined()
+        expect(validatedValue.ids).toBeDefined()
+        expect(validatedValue.ids.device_id).toBe(deviceId)
+        expect(validatedValue.ids.dev_eui).toBeUndefined()
+        expect(validatedValue.name).toBe(deviceName)
+        expect(validatedValue.description).toBe(deviceDescription)
       })
     })
 
@@ -175,7 +174,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
       const validate = schema =>
         createValidation({
           activationMode: ACTIVATION_MODES.MULTICAST,
-          lorawanVersion: '1.0.0',
+          lorawanVersion: 'MAC_V1_0',
         })(schema)
 
       it('processes valid schema with or without `dev_eui`', () => {
@@ -207,7 +206,7 @@ describe('<BasicSettingsForm /> validation schema', () => {
     const validate = schema =>
       createValidation({
         activationMode: ACTIVATION_MODES.MULTICAST,
-        lorawanVersion: '1.0.0',
+        lorawanVersion: 'MAC_V1_0',
       })(schema)
 
     it('processes valid schema', () => {

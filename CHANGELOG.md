@@ -11,7 +11,11 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Contextual tooltips to form fields in the Console.
+
 ### Changed
+
+- Allow the LinkADRReq commands to lower the data rate used by the end devices.
 
 ### Deprecated
 
@@ -19,7 +23,32 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Occasional crashes in the ratelimit middleware.
+
 ### Security
+
+## [3.12.1] - 2021-04-15
+
+### Added
+
+- Payload formatter testing functionality in the Console.
+- Options in the Identity Server to reject passwords that contain the user ID (`is.user-registration.password-requirements.reject-user-id`) or common passwords (`is.user-registration.password-requirements.reject-common`).
+- C-Style uint32_t representation for end device address field.
+
+### Changed
+
+- Network Server now takes uplink data rate index for ADR.
+- Event streams are now closed when the callers rights are revoked.
+
+### Fixed
+
+- It is no longer possible to accidentally create API keys without any rights.
+- Application overview page crashing for collaborators without certain rights.
+- `mac_settings.factory_preset_frequencies` handling in US-like bands.
+
+### Security
+
+- This release fixes an issue that prevented some request messages from being validated correctly, allowing invalid values in certain fields.
 
 ## [3.12.0] - 2021-04-06
 
@@ -1409,7 +1438,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.0...v3.12
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.1...v3.12
+[3.12.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.0...v3.12.1
 [3.12.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.3...v3.12.0
 [3.11.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.2...v3.11.3
 [3.11.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.1...v3.11.2

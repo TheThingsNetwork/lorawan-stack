@@ -47,11 +47,13 @@ type Config struct {
 			Required bool `name:"required" description:"Require admin approval for new users"`
 		} `name:"admin-approval"`
 		PasswordRequirements struct {
-			MinLength    int `name:"min-length" description:"Minimum password length"`
-			MaxLength    int `name:"max-length" description:"Maximum password length"`
-			MinUppercase int `name:"min-uppercase" description:"Minimum number of uppercase letters"`
-			MinDigits    int `name:"min-digits" description:"Minimum number of digits"`
-			MinSpecial   int `name:"min-special" description:"Minimum number of special characters"`
+			MinLength    int  `name:"min-length" description:"Minimum password length"`
+			MaxLength    int  `name:"max-length" description:"Maximum password length"`
+			MinUppercase int  `name:"min-uppercase" description:"Minimum number of uppercase letters"`
+			MinDigits    int  `name:"min-digits" description:"Minimum number of digits"`
+			MinSpecial   int  `name:"min-special" description:"Minimum number of special characters"`
+			RejectUserID bool `name:"reject-user-id" description:"Reject passwords that contain user ID"`
+			RejectCommon bool `name:"reject-common" description:"Reject common passwords"`
 		} `name:"password-requirements"`
 	} `name:"user-registration"`
 	AuthCache struct {

@@ -34,10 +34,10 @@ func TestSetDefaultEventPubSub(t *testing.T) {
 	defer cancel()
 
 	testEvent1 := events.New(ctx, "test-set-default-event-pub-sub-1", "test-event-1",
-		events.WithIdentifiers(ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}),
+		events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}),
 	)
 	testEvent2 := events.New(ctx, "test-set-default-event-pub-sub-2", "test-event-2",
-		events.WithIdentifiers(ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}),
+		events.WithIdentifiers(&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}),
 	)
 
 	events.Publish(testEvent1)
@@ -76,10 +76,10 @@ func TestSetDefaultEventPubSub(t *testing.T) {
 func TestCollectEvents(t *testing.T) {
 	ctx := Context()
 	testEvent1 := events.New(ctx, "test-collect-events-1", "test-event-1",
-		events.WithIdentifiers(ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}),
+		events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}),
 	)
 	testEvent2 := events.New(ctx, "test-collect-events-2", "test-event-2",
-		events.WithIdentifiers(ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}),
+		events.WithIdentifiers(&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}),
 	)
 	assertions.New(t).So(CollectEvents(func() {
 		events.Publish(testEvent1)
@@ -95,10 +95,10 @@ func TestCollectEvents(t *testing.T) {
 func TestRedirectEvents(t *testing.T) {
 	ctx := Context()
 	testEvent1 := events.New(ctx, "test-redirect-events-1", "test-event-1",
-		events.WithIdentifiers(ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}),
+		events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}),
 	)
 	testEvent2 := events.New(ctx, "test-redirect-events-2", "test-event-2",
-		events.WithIdentifiers(ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}),
+		events.WithIdentifiers(&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}),
 	)
 	ch := make(chan events.Event, 2)
 	defer RedirectEvents(ch)()
@@ -121,7 +121,7 @@ func TestWaitEvent(t *testing.T) {
 	ctx := Context()
 	ch := make(chan events.Event, 1)
 	ch <- events.New(ctx, "test-wait-event-1", "test-event-1",
-		events.WithIdentifiers(ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}),
+		events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}),
 	)
 	defer close(ch)
 	assertions.New(t).So(

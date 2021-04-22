@@ -58,14 +58,18 @@ const headers = [
     name: 'rights',
     displayName: m.grantedRights,
     width: 40,
-    render: rights => {
-      const tags = rights.map(r => (
-        <Tag className={style.rightTag} content={formatRight(r)} key={r} />
-      ))
+    render: (rights = []) => {
+      if (rights.length > 0) {
+        const tags = rights.map(r => (
+          <Tag className={style.rightTag} content={formatRight(r)} key={r} />
+        ))
 
-      return (
-        <TagGroup className={style.rightTagGroup} tagMaxWidth={RIGHT_TAG_MAX_WIDTH} tags={tags} />
-      )
+        return (
+          <TagGroup className={style.rightTagGroup} tagMaxWidth={RIGHT_TAG_MAX_WIDTH} tags={tags} />
+        )
+      }
+
+      return <Message className={style.none} content={sharedMessages.none} lowercase />
     },
   },
 ]

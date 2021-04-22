@@ -289,6 +289,10 @@ export default {
   is: {
     getConfiguration: tts.Is.getConfiguration.bind(tts.Is),
   },
+  as: {
+    decodeUplink: tts.As.decodeUplink.bind(tts.As),
+    encodeDownlink: tts.As.encodeDownlink.bind(tts.As),
+  },
   organizations: {
     list: tts.Organizations.getAll.bind(tts.Organizations),
     search: tts.Organizations.search.bind(tts.Organizations),

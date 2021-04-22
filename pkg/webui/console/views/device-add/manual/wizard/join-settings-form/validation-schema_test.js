@@ -35,7 +35,7 @@ describe('<JoinSettingsForm /> validation schema', () => {
 
       let validatedValue = validationSchema.validateSync(schema, {
         context: {
-          lorawanVersion: '1.0.0',
+          lorawanVersion: 'MAC_V1_0',
           meyEditKeys: false,
         },
       })
@@ -45,7 +45,7 @@ describe('<JoinSettingsForm /> validation schema', () => {
 
       validatedValue = validationSchema.validateSync(schema, {
         context: {
-          lorawanVersion: '1.1.0',
+          lorawanVersion: 'MAC_V1_1_0',
           meyEditKeys: false,
         },
       })
@@ -61,7 +61,7 @@ describe('<JoinSettingsForm /> validation schema', () => {
         validationSchema.validateSync(schema, {
           context: {
             mayEditKeys: true,
-            lorawanVersion: '1.0.0',
+            lorawanVersion: 'MAC_V1_0',
           },
         })
 
@@ -116,7 +116,7 @@ describe('<JoinSettingsForm /> validation schema', () => {
         validationSchema.validateSync(schema, {
           context: {
             mayEditKeys: true,
-            lorawanVersion: '1.1.0',
+            lorawanVersion: 'MAC_V1_1_0',
           },
         })
 

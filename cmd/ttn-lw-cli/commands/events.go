@@ -47,7 +47,7 @@ var eventsCommand = &cobra.Command{
 			addresses[config.JoinServerGRPCAddress] = true
 		}
 
-		ids := getCombinedIdentifiers(cmd.Flags()).GetEntityIdentifiers()
+		ids := getEntityIdentifiersSlice(cmd.Flags())
 		if len(ids) == 0 {
 			return errNoIDs
 		}
@@ -101,7 +101,7 @@ var eventsCommand = &cobra.Command{
 }
 
 func init() {
-	eventsCommand.Flags().AddFlagSet(combinedIdentifiersFlags())
+	eventsCommand.Flags().AddFlagSet(entityIdentifiersSliceFlags())
 	eventsCommand.Flags().Uint32("tail", 0, "")
 	Root.AddCommand(eventsCommand)
 }

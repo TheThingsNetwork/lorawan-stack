@@ -74,16 +74,16 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.UserIdentifiers, key)
+		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.UserIdentifiers.GetEntityIdentifiers(), key)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	key.Key = token
-	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+		data.SetEntity(req)
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {
@@ -105,7 +105,7 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUs
 	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.UserIdentifiers)
+		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.UserIdentifiers.GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -163,20 +163,20 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIdentifiers, &req.APIKey)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIdentifiers.GetEntityIdentifiers(), &req.APIKey)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	if key == nil { // API key was deleted.
-		events.Publish(evtDeleteUserAPIKey.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+		events.Publish(evtDeleteUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, req.UserIdentifiers, nil))
+	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
-		data.SetEntity(req.EntityIdentifiers())
+		data.SetEntity(req)
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
 	})
 	if err != nil {

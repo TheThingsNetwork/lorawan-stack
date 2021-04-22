@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/bluele/gcache"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
@@ -60,7 +61,7 @@ func (c codecType) codecFunc(client ttnpb.DeviceRepositoryClient) getCodecFunc {
 
 // Cluster represents the interface the cluster.
 type Cluster interface {
-	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (*grpc.ClientConn, error)
+	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error)
 	WithClusterAuth() grpc.CallOption
 }
 
@@ -95,9 +96,7 @@ func cacheKey(codec codecType, version *ttnpb.EndDeviceVersionIdentifiers) strin
 	return fmt.Sprintf("%s:%s:%s:%s:%v", version.BrandID, version.ModelID, version.FirmwareVersion, version.BandID, codec)
 }
 
-var (
-	errNoVersionIdentifiers = errors.DefineInvalidArgument("no_version_identifiers", "no version identifiers for device")
-)
+var errNoVersionIdentifiers = errors.DefineInvalidArgument("no_version_identifiers", "no version identifiers for device")
 
 func (h *host) retrieve(ctx context.Context, codec codecType, ids ttnpb.ApplicationIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
 	if version == nil {

@@ -519,7 +519,6 @@ describe('End device manual create', () => {
       it('succeeds creating class B device', () => {
         const device = {
           id: 'multicast-test-class-b',
-          dev_eui: generateHexValue(16),
           dev_addr: generateHexValue(8),
           name: 'Test v1.0.4 multicast class B device',
           description: 'Test v1.0.4 multicast class B device',
@@ -538,7 +537,6 @@ describe('End device manual create', () => {
 
         const basicSettingsStep = new BasicSettingsStep()
         basicSettingsStep.fillId(device.id)
-        basicSettingsStep.fillDevEUI(device.dev_eui)
         basicSettingsStep.fillName(device.name)
         basicSettingsStep.fillDescription(device.description)
         basicSettingsStep.goToNetworkLayerStep()
@@ -566,7 +564,6 @@ describe('End device manual create', () => {
       it('succeeds creating class C device', () => {
         const device = {
           id: 'multicast-test-class-c',
-          dev_eui: generateHexValue(16),
           dev_addr: generateHexValue(8),
           name: 'Test v1.0.4 multicast class C device',
           description: 'Test v1.0.4 multicast class C device',
@@ -585,7 +582,6 @@ describe('End device manual create', () => {
 
         const basicSettingsStep = new BasicSettingsStep()
         basicSettingsStep.fillId(device.id)
-        basicSettingsStep.fillDevEUI(device.dev_eui)
         basicSettingsStep.fillName(device.name)
         basicSettingsStep.fillDescription(device.description)
         basicSettingsStep.goToNetworkLayerStep()

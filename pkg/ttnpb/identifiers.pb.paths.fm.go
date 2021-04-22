@@ -95,10 +95,3 @@ var EntityIdentifiersFieldPathsNested = []string{
 var EntityIdentifiersFieldPathsTopLevel = []string{
 	"ids",
 }
-var CombinedIdentifiersFieldPathsNested = []string{
-	"entity_identifiers",
-}
-
-var CombinedIdentifiersFieldPathsTopLevel = []string{
-	"entity_identifiers",
-}

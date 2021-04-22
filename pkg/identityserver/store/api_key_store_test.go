@@ -55,27 +55,27 @@ func TestAPIKeyStore(t *testing.T) {
 
 		for _, tt := range []struct {
 			Name        string
-			Identifiers ttnpb.Identifiers
+			Identifiers *ttnpb.EntityIdentifiers
 			Rights      []ttnpb.Right
 		}{
 			{
 				Name:        "Application",
-				Identifiers: appIDs,
+				Identifiers: appIDs.GetEntityIdentifiers(),
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			},
 			{
 				Name:        "Gateway",
-				Identifiers: gtwIDs,
+				Identifiers: gtwIDs.GetEntityIdentifiers(),
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			},
 			{
 				Name:        "Organization",
-				Identifiers: orgIDs,
+				Identifiers: orgIDs.GetEntityIdentifiers(),
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_GATEWAY_ALL},
 			},
 			{
 				Name:        "User",
-				Identifiers: userIDs,
+				Identifiers: userIDs.GetEntityIdentifiers(),
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_GATEWAY_ALL},
 			},
 		} {
@@ -165,13 +165,13 @@ func TestAPIKeyStore(t *testing.T) {
 					Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 				}
 
-				store.CreateAPIKey(ctx, userIDs, key)
+				store.CreateAPIKey(ctx, userIDs.GetEntityIdentifiers(), key)
 			}
-			err := store.DeleteEntityAPIKeys(ctx, userIDs)
+			err := store.DeleteEntityAPIKeys(ctx, userIDs.GetEntityIdentifiers())
 
 			a.So(err, should.BeNil)
 
-			keys, err := store.FindAPIKeys(ctx, userIDs)
+			keys, err := store.FindAPIKeys(ctx, userIDs.GetEntityIdentifiers())
 
 			// Check if all API keys are deleted
 			a.So(err, should.BeNil)

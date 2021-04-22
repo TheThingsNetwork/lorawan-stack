@@ -327,7 +327,7 @@ var (
 		if cliID == nil {
 			return nil, errNoClientID
 		}
-		return cliID.EntityIdentifiers(), nil
+		return cliID.GetEntityIdentifiers(), nil
 	})
 )
 

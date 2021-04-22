@@ -60,7 +60,7 @@ func (d *Data) SetUser(user *ttnpb.User) {
 }
 
 // SetEntity sets the entity that the email is about.
-func (d *Data) SetEntity(ids *ttnpb.EntityIdentifiers) {
+func (d *Data) SetEntity(ids ttnpb.IDStringer) {
 	d.Entity.Type = ids.EntityType()
 	d.Entity.ID = ids.IDString()
 }

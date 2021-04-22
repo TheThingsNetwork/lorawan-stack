@@ -32,7 +32,7 @@ type apiKeyStore struct {
 	*store
 }
 
-func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID ttnpb.Identifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error) {
+func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "create api key").End()
 	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
@@ -52,7 +52,7 @@ func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID ttnpb.Identifie
 	return model.toPB(), nil
 }
 
-func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID ttnpb.Identifiers) ([]*ttnpb.APIKey, error) {
+func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "find api keys").End()
 	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
@@ -81,7 +81,7 @@ func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID ttnpb.Identifier
 
 var errAPIKeyEntity = errors.DefineCorruption("api_key_entity", "API key not linked to an entity")
 
-func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (ttnpb.Identifiers, *ttnpb.APIKey, error) {
+func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "get api key").End()
 	query := s.query(ctx, APIKey{})
 	var keyModel APIKey
@@ -106,7 +106,7 @@ func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (ttnpb.Identifie
 	return ids, keyModel.toPB(), nil
 }
 
-func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID ttnpb.Identifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error) {
+func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "update api key").End()
 	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
@@ -136,7 +136,7 @@ func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID ttnpb.Identifie
 	return keyModel.toPB(), nil
 }
 
-func (s *apiKeyStore) DeleteEntityAPIKeys(ctx context.Context, entityID ttnpb.Identifiers) error {
+func (s *apiKeyStore) DeleteEntityAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete entity api keys").End()
 	entity, err := s.findDeletedEntity(ctx, entityID, "id")
 	if err != nil {

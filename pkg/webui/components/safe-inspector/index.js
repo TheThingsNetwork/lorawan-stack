@@ -54,6 +54,15 @@ const m = defineMessages({
   byteOrder: 'Switch byte order',
 })
 
+const MSB = 'msb'
+const LSB = 'lsb'
+const UINT32_T = 'uint32_t'
+const representationRotateMap = {
+  [MSB]: LSB,
+  [LSB]: UINT32_T,
+  [UINT32_T]: MSB,
+}
+
 @injectIntl
 export class SafeInspector extends Component {
   static propTypes = {
@@ -63,6 +72,8 @@ export class SafeInspector extends Component {
     data: PropTypes.string.isRequired,
     /** Whether the component should resize when its data is truncated. */
     disableResize: PropTypes.bool,
+    /** Whether uint32_t notation should be enabled for byte representation. */
+    enableUint32: PropTypes.bool,
     /** Whether the data can be hidden (like passwords). */
     hideable: PropTypes.bool,
     /** Whether the data is initially visible. */
@@ -96,6 +107,14 @@ export class SafeInspector extends Component {
     small: false,
     noTransform: false,
     noCopy: false,
+    enableUint32: false,
+  }
+
+  _getNextRepresentation(current) {
+    const { enableUint32 } = this.props
+    const next = representationRotateMap[current]
+
+    return next === UINT32_T && !enableUint32 ? representationRotateMap[next] : next
   }
 
   constructor(props) {
@@ -108,7 +127,7 @@ export class SafeInspector extends Component {
       byteStyle: true,
       copied: false,
       copyIcon: 'file_copy',
-      msb: true,
+      representation: MSB,
       truncated: false,
     }
 
@@ -134,7 +153,9 @@ export class SafeInspector extends Component {
 
   @bind
   handleSwapToggle() {
-    this.setState(prev => ({ msb: !prev.msb }))
+    this.setState(({ representation }) => ({
+      representation: this._getNextRepresentation(representation),
+    }))
   }
 
   @bind
@@ -212,7 +233,7 @@ export class SafeInspector extends Component {
   }
 
   render() {
-    const { hidden, byteStyle, msb, copied, copyIcon } = this.state
+    const { hidden, byteStyle, representation, copied, copyIcon } = this.state
 
     const {
       className,
@@ -232,8 +253,12 @@ export class SafeInspector extends Component {
     if (isBytes) {
       const chunks = chunkArray(data.toUpperCase().split(''), 2)
       if (!byteStyle) {
-        const orderedChunks = msb ? chunks : chunks.reverse()
-        formattedData = display = orderedChunks.map(chunk => `0x${chunk.join('')}`).join(', ')
+        if (representation === UINT32_T) {
+          formattedData = display = `0x${data}`
+        } else {
+          const orderedChunks = representation === MSB ? chunks : chunks.reverse()
+          formattedData = display = orderedChunks.map(chunk => `0x${chunk.join('')}`).join(', ')
+        }
       } else {
         display = chunks.map((chunk, index) => (
           <span key={`${data}_chunk_${index}`}>{hidden ? '••' : chunk}</span>
@@ -265,7 +290,7 @@ export class SafeInspector extends Component {
         <div ref={this.buttonsElem} className={style.buttons}>
           {!hidden && !byteStyle && isBytes && (
             <React.Fragment>
-              <span>{msb ? 'msb' : 'lsb'}</span>
+              <span>{representation}</span>
               <button
                 title={intl.formatMessage(m.byteOrder)}
                 className={style.buttonSwap}

@@ -79,6 +79,7 @@ func TestPba(t *testing.T) {
 							TechnicalContact: &packetbroker.ContactInfo{
 								Email: "tech@example.com",
 							},
+							Listed: true,
 						},
 					}, nil
 				}
@@ -117,6 +118,7 @@ func TestPba(t *testing.T) {
 								Value:         "tech@example.com",
 							},
 						},
+						Listed: true,
 					},
 					ForwarderEnabled:   true,
 					HomeNetworkEnabled: true,
@@ -150,6 +152,7 @@ func TestPba(t *testing.T) {
 						TechnicalContact: &packetbroker.ContactInfo{
 							Email: "tech@example.com",
 						},
+						Listed: true,
 					})
 					return &iampb.CreateTenantResponse{
 						Tenant: req.Tenant,
@@ -189,6 +192,7 @@ func TestPba(t *testing.T) {
 							Value:         "tech@example.com",
 						},
 					},
+					Listed: true,
 				})
 			},
 		},
@@ -216,6 +220,7 @@ func TestPba(t *testing.T) {
 							TechnicalContact: &packetbroker.ContactInfo{
 								Email: "tech@example.com",
 							},
+							Listed: false,
 						},
 					}, nil
 				}
@@ -247,6 +252,9 @@ func TestPba(t *testing.T) {
 							Value: &packetbroker.ContactInfo{
 								Email: "tech@example.com",
 							},
+						},
+						Listed: &pbtypes.BoolValue{
+							Value: true,
 						},
 					})
 					return ttnpb.Empty, nil
@@ -285,6 +293,7 @@ func TestPba(t *testing.T) {
 							Value:         "tech@example.com",
 						},
 					},
+					Listed: true,
 				})
 			},
 		},
@@ -648,6 +657,7 @@ func TestPba(t *testing.T) {
 					TechnicalContact: ContactInfoConfig{
 						Email: "tech@example.com",
 					},
+					Listed: true,
 				},
 				Forwarder: ForwarderConfig{
 					Enable: true,

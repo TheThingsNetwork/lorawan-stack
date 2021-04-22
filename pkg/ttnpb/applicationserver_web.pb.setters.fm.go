@@ -122,6 +122,16 @@ func (dst *ApplicationWebhookTemplateField) SetFields(src *ApplicationWebhookTem
 				var zero string
 				dst.DefaultValue = zero
 			}
+		case "optional":
+			if len(subs) > 0 {
+				return fmt.Errorf("'optional' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Optional = src.Optional
+			} else {
+				var zero bool
+				dst.Optional = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

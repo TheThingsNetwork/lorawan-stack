@@ -14,8 +14,6 @@
 
 import React from 'react'
 
-import glossaryId from '@console/constants/glossary-ids'
-
 import Input from '@ttn-lw/components/input'
 import Wizard from '@ttn-lw/components/wizard'
 import Form from '@ttn-lw/components/form'
@@ -24,6 +22,7 @@ import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
 import JoinEUIPRefixesInput from '@console/components/join-eui-prefixes-input'
 
+import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -55,6 +54,7 @@ const BasicSettingsForm = props => {
   const lwVersion = parseLorawanMacVersion(lorawanVersion)
   const isNone = activationMode === ACTIVATION_MODES.NONE
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
+  const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
 
   return (
     <Wizard.Form
@@ -69,6 +69,7 @@ const BasicSettingsForm = props => {
         name="ids.device_id"
         placeholder={sharedMessages.deviceIdPlaceholder}
         component={Input}
+        glossaryId={glossaryIds.DEVICE_ID}
       />
       {!isNone && (
         <>
@@ -77,28 +78,24 @@ const BasicSettingsForm = props => {
               title={lwVersion < 104 ? sharedMessages.appEUI : sharedMessages.joinEUI}
               component={JoinEUIPRefixesInput}
               name="ids.join_eui"
-              description={
-                lwVersion < 104
-                  ? sharedMessages.appEUIDescription
-                  : sharedMessages.joinEUIDescription
-              }
               prefixes={prefixes}
               required
               showPrefixes
-              glossaryId={lwVersion < 104 ? glossaryId.APP_EUI : glossaryId.JOIN_EUI}
+              glossaryId={glossaryIds.JOIN_EUI}
             />
           )}
-          <Form.Field
-            title={sharedMessages.devEUI}
-            name="ids.dev_eui"
-            type="byte"
-            min={8}
-            max={8}
-            description={sharedMessages.deviceEUIDescription}
-            required={isOTAA || lwVersion === 104}
-            component={Input}
-            glossaryId={glossaryId.DEV_EUI}
-          />
+          {!isMulticast && (
+            <Form.Field
+              title={sharedMessages.devEUI}
+              name="ids.dev_eui"
+              type="byte"
+              min={8}
+              max={8}
+              required={isOTAA || lwVersion === 104}
+              component={Input}
+              glossaryId={glossaryIds.DEV_EUI}
+            />
+          )}
         </>
       )}
       <Form.Field

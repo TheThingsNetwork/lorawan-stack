@@ -14,6 +14,7 @@
 
 import Overview from '@account/views/overview'
 import ProfileSettings from '@account/views/profile-settings'
+import Code from '@account/views/code'
 
 export default [
   {
@@ -25,5 +26,10 @@ export default [
     path: '/profile-settings',
     exact: true,
     component: ProfileSettings,
+  },
+  {
+    path: '/code',
+    exact: true,
+    component: Code,
   },
 ]

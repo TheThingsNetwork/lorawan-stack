@@ -71,6 +71,7 @@ type Config struct {
 	LinkMode         string                    `name:"link-mode" description:"Deprecated - mode to link applications to their Network Server (all, explicit)"`
 	Devices          DeviceRegistry            `name:"-"`
 	Links            LinkRegistry              `name:"-"`
+	UplinkStorage    UplinkStorageConfig       `name:"uplink-storage" description:"Application uplinks storage configuration"`
 	Distribution     DistributionConfig        `name:"distribution" description:"Distribution configuration"`
 	EndDeviceFetcher EndDeviceFetcherConfig    `name:"fetcher" description:"End Device fetcher configuration"`
 	MQTT             config.MQTT               `name:"mqtt" description:"MQTT configuration"`
@@ -91,6 +92,12 @@ var (
 	errWebhooksRegistry = errors.DefineInvalidArgument("webhooks_registry", "invalid webhooks registry")
 	errWebhooksTarget   = errors.DefineInvalidArgument("webhooks_target", "invalid webhooks target `{target}`")
 )
+
+// UplinkStorageConfig defines the configuration of the application uplinks storage used by integrations.
+type UplinkStorageConfig struct {
+	Registry ApplicationUplinkRegistry `name:"-"`
+	Limit    int64                     `name:"limit" description:"Number of application uplinks to be stored"`
+}
 
 // WebhooksConfig defines the configuration of the webhooks integration.
 type WebhooksConfig struct {

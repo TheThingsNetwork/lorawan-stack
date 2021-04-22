@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,4 +30,14 @@ func (p JoinRequestPayload) ValidateContext(context.Context) error {
 		return errMissing("DevEUI")
 	}
 	return p.ValidateFields()
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (req *GatewayUplinkMessage) ValidateContext(context.Context) error {
+	return req.ValidateFields()
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (req *DownlinkQueueRequest) ValidateContext(context.Context) error {
+	return req.ValidateFields()
 }

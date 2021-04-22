@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ttnpb
+.code
+  margin-bottom: $cs.m
 
-import "context"
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (m *UpdateApplicationRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
-		return m.ValidateFields()
-	}
-	return m.ValidateFields(append(FieldsWithPrefix("application", m.FieldMask.Paths...),
-		"application.ids",
-	)...)
-}
+.code-description
+  text-margin-bottom($cs.xl)
+  display: block

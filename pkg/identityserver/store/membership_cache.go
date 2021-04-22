@@ -44,11 +44,11 @@ func GetMembershipCache(store MembershipStore, redis *redis.Client, ttl time.Dur
 
 // TODO: Add FindIndirectMemberships (https://github.com/TheThingsNetwork/lorawan-stack/issues/443).
 
-func (c *membershipCache) cacheKey(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers) string {
+func (c *membershipCache) cacheKey(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers) string {
 	return c.redis.Key("membership", id.EntityType(), unique.ID(ctx, id), entityID.EntityType(), unique.ID(ctx, entityID))
 }
 
-func (c *membershipCache) GetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers) (*ttnpb.Rights, error) {
+func (c *membershipCache) GetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
 	cacheKey := c.cacheKey(ctx, id, entityID)
 	if cached, err := c.redis.Get(ctx, cacheKey).Bytes(); err == nil {
 		if len(cached) == 0 {
@@ -80,7 +80,7 @@ func (c *membershipCache) GetMember(ctx context.Context, id *ttnpb.OrganizationO
 	return rights, err
 }
 
-func (c *membershipCache) SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers, rights *ttnpb.Rights) error {
+func (c *membershipCache) SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) error {
 	err := c.MembershipStore.SetMember(ctx, id, entityID, rights)
 	if err != nil {
 		return err

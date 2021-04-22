@@ -264,12 +264,12 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 func registerGatewayConnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, protocol string) {
-	events.Publish(evtGatewayConnect.NewWithIdentifiersAndData(ctx, ids, nil))
+	events.Publish(evtGatewayConnect.NewWithIdentifiersAndData(ctx, &ids, nil))
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Inc()
 }
 
 func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, protocol string) {
-	events.Publish(evtGatewayDisconnect.NewWithIdentifiersAndData(ctx, ids, nil))
+	events.Publish(evtGatewayDisconnect.NewWithIdentifiersAndData(ctx, &ids, nil))
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Dec()
 }
 

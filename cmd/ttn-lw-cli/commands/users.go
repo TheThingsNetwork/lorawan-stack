@@ -461,7 +461,7 @@ var (
 		if usrID == nil {
 			return nil, errNoUserID
 		}
-		return usrID.EntityIdentifiers(), nil
+		return usrID.GetEntityIdentifiers(), nil
 	})
 
 	usersPurgeCommand = &cobra.Command{

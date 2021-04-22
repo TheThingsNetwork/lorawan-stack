@@ -61,11 +61,11 @@ func (d *definition) New(ctx context.Context, opts ...Option) Event {
 	return d.With(defaultOptions...).New(ctx, opts...)
 }
 
-type CombinedIdentifiers interface {
-	CombinedIdentifiers() *ttnpb.CombinedIdentifiers
+type EntityIdentifiers interface {
+	GetEntityIdentifiers() *ttnpb.EntityIdentifiers
 }
 
-func (d *definition) NewWithIdentifiersAndData(ctx context.Context, ids CombinedIdentifiers, data interface{}) Event {
+func (d *definition) NewWithIdentifiersAndData(ctx context.Context, ids EntityIdentifiers, data interface{}) Event {
 	return d.With(defaultOptions...).NewWithIdentifiersAndData(ctx, ids, data)
 }
 

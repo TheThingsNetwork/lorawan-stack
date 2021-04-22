@@ -93,7 +93,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 		}
 		return nil, err
 	}
-	events.Publish(evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDeviceIdentifiers, nil))
+	events.Publish(evtCreateEndDevice.NewWithIdentifiersAndData(ctx, &req.EndDeviceIdentifiers, nil))
 	return dev, nil
 }
 
@@ -208,7 +208,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, &req.EndDeviceIdentifiers, req.FieldMask.Paths))
 	return dev, nil
 }
 

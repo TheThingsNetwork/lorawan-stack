@@ -317,7 +317,7 @@ var (
 		if orgID == nil {
 			return nil, errNoOrganizationID
 		}
-		return orgID.EntityIdentifiers(), nil
+		return orgID.GetEntityIdentifiers(), nil
 	})
 )
 

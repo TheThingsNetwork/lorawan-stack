@@ -266,7 +266,6 @@
 - [File `lorawan-stack/api/identifiers.proto`](#lorawan-stack/api/identifiers.proto)
   - [Message `ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers)
   - [Message `ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers)
-  - [Message `CombinedIdentifiers`](#ttn.lorawan.v3.CombinedIdentifiers)
   - [Message `EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers)
   - [Message `EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers)
   - [Message `GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers)
@@ -626,7 +625,7 @@ Application is the message that defines an Application in the network.
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
-| `rights` | <p>`repeated.items.enum.defined_only`: `true`</p> |
+| `rights` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateApplicationRequest">Message `CreateApplicationRequest`</a>
 
@@ -1759,6 +1758,7 @@ The fields are meant to be replaced inside the URLs and headers when the webhook
 | `description` | [`string`](#string) |  |  |
 | `secret` | [`bool`](#bool) |  | Secret decides if the field should be shown in plain-text or should stay hidden. |
 | `default_value` | [`string`](#string) |  |  |
+| `optional` | [`bool`](#bool) |  |  |
 
 #### Field Rules
 
@@ -3054,7 +3054,7 @@ This is used internally by the Network Server.
 
 | Field | Validations |
 | ----- | ----------- |
-| `uplink_frequency` | <p>`uint64.gte`: `100000`</p> |
+| `uplink_frequency` | <p>`uint64.lte`: `0`</p><p>`uint64.gte`: `100000`</p> |
 | `downlink_frequency` | <p>`uint64.gte`: `100000`</p> |
 | `min_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 | `max_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
@@ -3466,7 +3466,7 @@ The Events service serves events from the cluster.
 | ----- | ----------- |
 | `gateway_ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
-| `rights` | <p>`repeated.items.enum.defined_only`: `true`</p> |
+| `rights` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateGatewayRequest">Message `CreateGatewayRequest`</a>
 
@@ -4054,15 +4054,6 @@ The NsGs service connects a Network Server to a Gateway Server.
 | Field | Validations |
 | ----- | ----------- |
 | `client_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-
-### <a name="ttn.lorawan.v3.CombinedIdentifiers">Message `CombinedIdentifiers`</a>
-
-Combine the identifiers of multiple entities.
-The main purpose of this message is its use in events.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `entity_identifiers` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.EndDeviceIdentifiers">Message `EndDeviceIdentifiers`</a>
 
@@ -6520,7 +6511,7 @@ is used to manage OAuth client authorizations for users.
 | ----- | ----------- |
 | `organization_ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
-| `rights` | <p>`repeated.items.enum.defined_only`: `true`</p> |
+| `rights` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateOrganizationRequest">Message `CreateOrganizationRequest`</a>
 
@@ -6830,6 +6821,7 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | `name` | [`string`](#string) |  | Name of the network. |
 | `dev_addr_blocks` | [`PacketBrokerDevAddrBlock`](#ttn.lorawan.v3.PacketBrokerDevAddrBlock) | repeated | DevAddr blocks that are assigned to this registration. |
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information. |
+| `listed` | [`bool`](#bool) |  | Whether the network is listed so it can be viewed by other networks. |
 
 ### <a name="ttn.lorawan.v3.PacketBrokerNetworkIdentifier">Message `PacketBrokerNetworkIdentifier`</a>
 
@@ -7597,7 +7589,7 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | ----- | ----------- |
 | `user_ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
-| `rights` | <p>`repeated.items.enum.defined_only`: `true`</p> |
+| `rights` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateUserRequest">Message `CreateUserRequest`</a>
 

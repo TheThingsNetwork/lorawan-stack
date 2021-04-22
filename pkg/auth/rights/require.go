@@ -198,54 +198,54 @@ func RequireUser(ctx context.Context, id ttnpb.UserIdentifiers, required ...ttnp
 // the given entity identifiers.
 func RequireAny(ctx context.Context, ids ...*ttnpb.EntityIdentifiers) error {
 	for _, entityIDs := range ids {
-		switch ids := entityIDs.Identifiers().(type) {
-		case *ttnpb.ApplicationIdentifiers:
-			list, err := ListApplication(ctx, *ids)
+		switch ids := entityIDs.GetIds().(type) {
+		case *ttnpb.EntityIdentifiers_ApplicationIDs:
+			list, err := ListApplication(ctx, *ids.ApplicationIDs)
 			if err != nil {
 				return err
 			}
 			if len(list.GetRights()) == 0 {
-				return ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids))
+				return ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids.ApplicationIDs))
 			}
-		case *ttnpb.ClientIdentifiers:
-			list, err := ListClient(ctx, *ids)
+		case *ttnpb.EntityIdentifiers_ClientIDs:
+			list, err := ListClient(ctx, *ids.ClientIDs)
 			if err != nil {
 				return err
 			}
 			if len(list.GetRights()) == 0 {
-				return ErrNoClientRights.WithAttributes("uid", unique.ID(ctx, ids))
+				return ErrNoClientRights.WithAttributes("uid", unique.ID(ctx, ids.ClientIDs))
 			}
-		case *ttnpb.EndDeviceIdentifiers:
-			list, err := ListApplication(ctx, ids.ApplicationIdentifiers)
+		case *ttnpb.EntityIdentifiers_DeviceIDs:
+			list, err := ListApplication(ctx, ids.DeviceIDs.ApplicationIdentifiers)
 			if err != nil {
 				return err
 			}
 			if len(list.GetRights()) == 0 {
-				return ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids.ApplicationIdentifiers))
+				return ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids.DeviceIDs.ApplicationIdentifiers))
 			}
-		case *ttnpb.GatewayIdentifiers:
-			list, err := ListGateway(ctx, *ids)
+		case *ttnpb.EntityIdentifiers_GatewayIDs:
+			list, err := ListGateway(ctx, *ids.GatewayIDs)
 			if err != nil {
 				return err
 			}
 			if len(list.GetRights()) == 0 {
-				return ErrNoGatewayRights.WithAttributes("uid", unique.ID(ctx, ids))
+				return ErrNoGatewayRights.WithAttributes("uid", unique.ID(ctx, ids.GatewayIDs))
 			}
-		case *ttnpb.OrganizationIdentifiers:
-			list, err := ListOrganization(ctx, *ids)
+		case *ttnpb.EntityIdentifiers_OrganizationIDs:
+			list, err := ListOrganization(ctx, *ids.OrganizationIDs)
 			if err != nil {
 				return err
 			}
 			if len(list.GetRights()) == 0 {
-				return ErrNoOrganizationRights.WithAttributes("uid", unique.ID(ctx, ids))
+				return ErrNoOrganizationRights.WithAttributes("uid", unique.ID(ctx, ids.OrganizationIDs))
 			}
-		case *ttnpb.UserIdentifiers:
-			list, err := ListUser(ctx, *ids)
+		case *ttnpb.EntityIdentifiers_UserIDs:
+			list, err := ListUser(ctx, *ids.UserIDs)
 			if err != nil {
 				return err
 			}
 			if len(list.GetRights()) == 0 {
-				return ErrNoUserRights.WithAttributes("uid", unique.ID(ctx, ids))
+				return ErrNoUserRights.WithAttributes("uid", unique.ID(ctx, ids.UserIDs))
 			}
 		}
 	}

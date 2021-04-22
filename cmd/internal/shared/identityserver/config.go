@@ -59,6 +59,7 @@ func init() {
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MaxLength = 1000
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinUppercase = 1
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinDigits = 1
+	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.RejectUserID = true
 	DefaultIdentityServerConfig.Email.Network.Name = DefaultIdentityServerConfig.OAuth.UI.SiteName
 	DefaultIdentityServerConfig.Email.Network.IdentityServerURL = shared.DefaultOAuthPublicURL
 	DefaultIdentityServerConfig.Email.Network.ConsoleURL = shared.DefaultConsolePublicURL

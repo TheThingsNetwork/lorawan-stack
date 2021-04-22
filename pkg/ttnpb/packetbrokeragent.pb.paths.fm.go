@@ -28,6 +28,7 @@ var PacketBrokerNetworkFieldPathsNested = []string{
 	"id",
 	"id.net_id",
 	"id.tenant_id",
+	"listed",
 	"name",
 }
 
@@ -35,6 +36,7 @@ var PacketBrokerNetworkFieldPathsTopLevel = []string{
 	"contact_info",
 	"dev_addr_blocks",
 	"id",
+	"listed",
 	"name",
 }
 var PacketBrokerNetworksFieldPathsNested = []string{
@@ -53,6 +55,7 @@ var PacketBrokerInfoFieldPathsNested = []string{
 	"registration.id",
 	"registration.id.net_id",
 	"registration.id.tenant_id",
+	"registration.listed",
 	"registration.name",
 }
 

@@ -34,6 +34,7 @@ type server struct {
 	downlinkQueueMu sync.RWMutex
 	downlinkQueue   map[string][]*ttnpb.ApplicationDownlink
 	subscribeError  error
+	applicationUps  map[string][]*ttnpb.ApplicationUplink
 }
 
 // Server represents a mock io.Server.
@@ -42,6 +43,8 @@ type Server interface {
 
 	SetSubscribeError(error)
 	Subscriptions() <-chan *io.Subscription
+
+	SetUplinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, ups ...*ttnpb.ApplicationUplink)
 }
 
 // NewServer instantiates a new Server.
@@ -134,4 +137,21 @@ func (s *server) Subscriptions() <-chan *io.Subscription {
 
 func (s *server) RateLimiter() ratelimit.Interface {
 	return &ratelimit.NoopRateLimiter{}
+}
+
+func (s *server) SetUplinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, ups ...*ttnpb.ApplicationUplink) {
+	s.applicationUps[unique.ID(ctx, ids)] = ups
+}
+
+func (s *server) RangeUplinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(ctx context.Context, up *ttnpb.ApplicationUplink) bool) error {
+	for _, up := range s.applicationUps[unique.ID(ctx, ids)] {
+		dst := &ttnpb.ApplicationUplink{}
+		if err := dst.SetFields(up, paths...); err != nil {
+			return err
+		}
+		if !f(ctx, dst) {
+			break
+		}
+	}
+	return nil
 }

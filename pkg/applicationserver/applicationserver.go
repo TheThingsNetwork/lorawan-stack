@@ -64,6 +64,7 @@ type ApplicationServer struct {
 
 	linkRegistry     LinkRegistry
 	deviceRegistry   DeviceRegistry
+	appUpsRegistry   ApplicationUplinkRegistry
 	formatters       messageprocessors.MapPayloadProcessor
 	webhooks         web.Webhooks
 	webhookTemplates web.TemplateStore
@@ -124,6 +125,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		config:         conf,
 		linkRegistry:   conf.Links,
 		deviceRegistry: wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
+		appUpsRegistry: conf.UplinkStorage.Registry,
 		formatters: messageprocessors.MapPayloadProcessor{
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
@@ -148,6 +150,17 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		iogrpc.WithMQTTConfigProvider(as),
 		iogrpc.WithEndDeviceFetcher(as.endDeviceFetcher),
 		iogrpc.WithPayloadProcessor(as.formatters),
+		iogrpc.WithSkipPayloadCrypto(func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (bool, error) {
+			link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{"skip_payload_crypto"})
+			if err != nil {
+				return false, err
+			}
+			dev, err := as.deviceRegistry.Get(ctx, ids, []string{"skip_payload_crypto_override"})
+			if err != nil {
+				return false, err
+			}
+			return as.skipPayloadCrypto(ctx, link, dev, nil), nil
+		}),
 	)
 
 	ctx, cancel := context.WithCancel(as.Context())
@@ -431,7 +444,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	for _, item := range items {
 		registerReceiveDownlink(ctx, ids, item)
 	}
-	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
 		return err
 	}
@@ -600,7 +613,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if err != nil {
 		return nil, err
 	}
-	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
 		return nil, err
 	}
@@ -645,7 +658,7 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 		DevEUI:       *ids.DevEUI,
 		JoinEUI:      *ids.JoinEUI,
 	}
-	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, ids); err == nil {
+	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, &ids); err == nil {
 		cc, err := js.Conn()
 		if err != nil {
 			return ttnpb.KeyEnvelope{}, err
@@ -779,7 +792,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 // resetInvalidDownlinkQueue clears the invalid downlink queue of the provided device and publishes the appropriate events.
 func (as *ApplicationServer) resetInvalidDownlinkQueue(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
 	logger := log.FromContext(ctx)
-	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
 		return err
 	}
@@ -790,9 +803,9 @@ func (as *ApplicationServer) resetInvalidDownlinkQueue(ctx context.Context, ids 
 	_, err = client.DownlinkQueueReplace(ctx, req, as.WithClusterAuth())
 	if err != nil {
 		logger.WithError(err).Warn("Failed to clear the downlink queue; any queued items in the Network Server are invalid")
-		events.Publish(evtInvalidQueueDataDown.NewWithIdentifiersAndData(ctx, ids, err))
+		events.Publish(evtInvalidQueueDataDown.NewWithIdentifiersAndData(ctx, &ids, err))
 	} else {
-		events.Publish(evtLostQueueDataDown.NewWithIdentifiersAndData(ctx, ids, err))
+		events.Publish(evtLostQueueDataDown.NewWithIdentifiersAndData(ctx, &ids, err))
 	}
 	return err
 }
@@ -879,7 +892,7 @@ func (as *ApplicationServer) recalculatePendingDownlinkQueue(ctx context.Context
 			return err
 		}
 
-		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, dev.ApplicationIdentifiers)
+		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &dev.ApplicationIdentifiers)
 		if err != nil {
 			return err
 		}
@@ -923,7 +936,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			return nil
 		}
 
-		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, dev.ApplicationIdentifiers)
+		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &dev.ApplicationIdentifiers)
 		if err != nil {
 			return err
 		}
@@ -1040,7 +1053,7 @@ matchSession:
 		// Next AFCntDown 1 is assumed. If this is a LoRaWAN 1.0.x end device and the Network Server sent MAC layer
 		// downlink already, the Network Server will trigger the DownlinkQueueInvalidated event. Therefore, this
 		// recalculation may result in another recalculation.
-		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+		pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 		if err != nil {
 			return nil, err
 		}
@@ -1088,6 +1101,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	}
 	if !as.skipPayloadCrypto(ctx, link, dev, dev.Session) {
 		if err := as.decryptAndDecodeUplink(ctx, dev, uplink, link.DefaultFormatters); err != nil {
+			return err
+		}
+		if err := as.appUpsRegistry.Push(ctx, ids, uplink); err != nil {
 			return err
 		}
 	} else if dev.Session != nil && dev.Session.AppSKey != nil {
@@ -1181,7 +1197,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 
 func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *ttnpb.ApplicationLink) error {
 	logger := log.FromContext(ctx)
-	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
 		return err
 	}
@@ -1274,4 +1290,9 @@ func (as *ApplicationServer) GetMQTTConfig(ctx context.Context) (*config.MQTT, e
 		return nil, err
 	}
 	return &config.MQTT, nil
+}
+
+// RangeUplinks ranges the application uplinks and calls the callback function, until false is returned.
+func (as *ApplicationServer) RangeUplinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(ctx context.Context, up *ttnpb.ApplicationUplink) bool) error {
+	return as.appUpsRegistry.Range(ctx, ids, paths, f)
 }

@@ -18,7 +18,6 @@ import classnames from 'classnames'
 import { getIn } from 'formik'
 
 import Icon from '@ttn-lw/components/icon'
-import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -26,6 +25,8 @@ import from from '@ttn-lw/lib/from'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import FormContext from '../context'
+
+import Tooltip from './tooltip'
 
 import style from './field.styl'
 
@@ -59,6 +60,7 @@ class FormField extends React.Component {
   static contextType = FormContext
 
   static propTypes = {
+    autoWidth: PropTypes.bool,
     className: PropTypes.string,
     component: PropTypes.oneOfType([
       PropTypes.func,
@@ -72,7 +74,6 @@ class FormField extends React.Component {
     disabled: PropTypes.bool,
     encode: PropTypes.func,
     glossaryId: PropTypes.string,
-    glossaryTerm: PropTypes.message,
     name: PropTypes.string.isRequired,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
@@ -83,6 +84,7 @@ class FormField extends React.Component {
   }
 
   static defaultProps = {
+    autoWidth: false,
     className: undefined,
     disabled: false,
     encode: value => value,
@@ -91,7 +93,6 @@ class FormField extends React.Component {
     onBlur: () => null,
     warning: '',
     description: '',
-    glossaryTerm: '',
     glossaryId: '',
     readOnly: false,
     required: false,
@@ -176,8 +177,8 @@ class FormField extends React.Component {
       disabled,
       required,
       readOnly,
-      glossaryTerm,
       glossaryId,
+      autoWidth,
       component: Component,
     } = this.props
     const { disabled: formDisabled } = this.context
@@ -217,15 +218,10 @@ class FormField extends React.Component {
       <Message className={style.description} content={description} id={describedBy} />
     ) : null
 
-    const glossaryIcon = hasGlossaryTerm ? (
-      <Link.GlossaryLink
-        hideTerm
-        secondary
-        term={glossaryTerm || title}
-        glossaryId={glossaryId}
-        className={style.glossaryLink}
-      />
-    ) : null
+    let tooltipIcon = null
+    if (hasGlossaryTerm) {
+      tooltipIcon = <Tooltip glossaryId={glossaryId} glossaryTerm={title} />
+    }
 
     const fieldComponentProps = {
       value: fieldValue,
@@ -247,6 +243,7 @@ class FormField extends React.Component {
         required,
         readOnly,
         hasGlossaryTerm,
+        autoWidth,
       }),
     )
 
@@ -260,14 +257,13 @@ class FormField extends React.Component {
               className={style.title}
               htmlFor={fieldComponentProps.id}
             />
-            {glossaryIcon}
+            {tooltipIcon}
           </div>
         )}
         <div className={style.componentArea}>
           <Component
             aria-invalid={showError}
             aria-describedby={describedBy}
-            children={hasTitle ? null : glossaryIcon}
             {...fieldComponentProps}
             {...getPassThroughProps(this.props, FormField.propTypes)}
           />

@@ -54,7 +54,7 @@ var requestAccessKey requestAccessKeyType
 
 type requestAccess struct {
 	authInfo     *ttnpb.AuthInfoResponse
-	entityRights map[ttnpb.Identifiers]*ttnpb.Rights
+	entityRights map[*ttnpb.EntityIdentifiers]*ttnpb.Rights
 }
 
 func (is *IdentityServer) withRequestAccessCache(ctx context.Context) context.Context {
@@ -126,11 +126,11 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			res.AccessMethod = &ttnpb.AuthInfoResponse_APIKey{
 				APIKey: &ttnpb.AuthInfoResponse_APIKeyAccess{
 					APIKey:    *apiKey,
-					EntityIDs: *ids.EntityIdentifiers(),
+					EntityIDs: *ids.GetEntityIdentifiers(),
 				},
 			}
 			if ids.EntityType() == "user" {
-				user, err = store.GetUserStore(db).GetUser(ctx, ids.Identifiers().(*ttnpb.UserIdentifiers), userFieldMask)
+				user, err = store.GetUserStore(db).GetUser(ctx, ids.GetUserIDs(), userFieldMask)
 				if err != nil {
 					if errors.IsNotFound(err) {
 						return errAPIKeyNotFound.WithCause(err)

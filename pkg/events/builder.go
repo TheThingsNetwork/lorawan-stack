@@ -59,10 +59,10 @@ func (b *builder) New(ctx context.Context, opts ...Option) Event {
 	return evt
 }
 
-func (b *builder) NewWithIdentifiersAndData(ctx context.Context, ids CombinedIdentifiers, data interface{}) Event {
+func (b *builder) NewWithIdentifiersAndData(ctx context.Context, ids EntityIdentifiers, data interface{}) Event {
 	e := local(b.New(ctx))
 	if ids != nil {
-		e.innerEvent.Identifiers = ids.CombinedIdentifiers().GetEntityIdentifiers()
+		e.innerEvent.Identifiers = append(e.innerEvent.Identifiers, ids.GetEntityIdentifiers())
 	}
 	if data != nil {
 		e.data = data
@@ -82,7 +82,7 @@ type Builder interface {
 	New(ctx context.Context, opts ...Option) Event
 
 	// Convenience function for legacy code. Same as New(ctx, WithIdentifiers(ids), WithData(data)).
-	NewWithIdentifiersAndData(ctx context.Context, ids CombinedIdentifiers, data interface{}) Event
+	NewWithIdentifiersAndData(ctx context.Context, ids EntityIdentifiers, data interface{}) Event
 	// Convenience function for legacy code. Same as With(WithData(data)).
 	BindData(data interface{}) Builder
 }

@@ -137,6 +137,16 @@ func (dst *PacketBrokerNetwork) SetFields(src *PacketBrokerNetwork, paths ...str
 			} else {
 				dst.ContactInfo = nil
 			}
+		case "listed":
+			if len(subs) > 0 {
+				return fmt.Errorf("'listed' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Listed = src.Listed
+			} else {
+				var zero bool
+				dst.Listed = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

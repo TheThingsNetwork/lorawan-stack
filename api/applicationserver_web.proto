@@ -45,6 +45,7 @@ message ApplicationWebhookTemplateField {
   // Secret decides if the field should be shown in plain-text or should stay hidden.
   bool secret = 4;
   string default_value = 5 [(validate.rules).string.max_len = 100];
+  bool optional = 6;
 }
 
 message ApplicationWebhookTemplate {

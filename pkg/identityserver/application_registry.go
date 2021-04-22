@@ -62,8 +62,10 @@ var (
 	)
 )
 
-var errAdminsCreateApplications = errors.DefinePermissionDenied("admins_create_applications", "applications may only be created by admins, or in organizations")
-var errAdminsPurgeApplications = errors.DefinePermissionDenied("admins_purge_applications", "applications may only be purged by admins")
+var (
+	errAdminsCreateApplications = errors.DefinePermissionDenied("admins_create_applications", "applications may only be created by admins, or in organizations")
+	errAdminsPurgeApplications  = errors.DefinePermissionDenied("admins_purge_applications", "applications may only be purged by admins")
+)
 
 func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
 	if err = blacklist.Check(ctx, req.ApplicationID); err != nil {
@@ -92,7 +94,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
-			app.ApplicationIdentifiers,
+			app.ApplicationIdentifiers.GetEntityIdentifiers(),
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
@@ -109,7 +111,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtCreateApplication.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, nil))
+	events.Publish(evtCreateApplication.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, nil))
 	return app, nil
 }
 
@@ -190,7 +192,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		}
 		appIDs := make([]*ttnpb.ApplicationIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if appID := id.EntityIdentifiers().GetApplicationIDs(); appID != nil {
+			if appID := id.GetEntityIdentifiers().GetApplicationIDs(); appID != nil {
 				appIDs = append(appIDs, appID)
 			}
 		}
@@ -243,7 +245,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateApplication.NewWithIdentifiersAndData(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateApplication.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, req.FieldMask.Paths))
 	return app, nil
 }
 
@@ -308,12 +310,12 @@ func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.Appli
 			return errApplicationHasDevices.WithAttributes("count", int(total))
 		}
 		// delete related API keys before purging the application
-		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids)
+		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}
 		// delete related memberships before purging the application
-		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids)
+		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

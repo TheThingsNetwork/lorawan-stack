@@ -57,7 +57,7 @@ type rightsFetcher struct {
 
 func newContextWithRightsFetcher(ctx context.Context) context.Context {
 	return rights.NewContextWithFetcher(ctx, &rightsFetcher{
-		EntityFetcher: rights.EntityFetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+		EntityFetcher: rights.EntityFetcherFunc(func(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
 			md := rpcmetadata.FromIncomingContext(ctx)
 			if md.AuthType != "Bearer" {
 				return nil, nil

@@ -15,8 +15,6 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import glossaryId from '@console/constants/glossary-ids'
-
 import Spinner from '@ttn-lw/components/spinner'
 import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
@@ -29,6 +27,7 @@ import JoinEUIPRefixesInput from '@console/components/join-eui-prefixes-input'
 
 import DevAddrInput from '@console/containers/dev-addr-input'
 
+import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -72,12 +71,19 @@ const Registration = props => {
   const isOTAA = supports_join
   const lwVersion = parseLorawanMacVersion(lorawan_version)
 
+  let appKeyPlaceholder = undefined
+  let nwkKeyPlaceholder = undefined
+  if (!mayEditKeys) {
+    appKeyPlaceholder = sharedMessages.insufficientAppKeyRights
+    nwkKeyPlaceholder = sharedMessages.insufficientNwkKeyRights
+  }
+
   return (
     <Overlay visible={fetching} loading={fetching} spinnerMessage={m.fetching}>
       <div data-test-id="device-registration">
         <FreqPlansSelect
           required
-          glossaryId={glossaryId.FREQUENCY_PLAN}
+          glossaryId={glossaryIds.FREQUENCY_PLAN}
           name="frequency_plan_id"
           bandId={band}
         />
@@ -87,15 +93,10 @@ const Registration = props => {
               title={lwVersion < 104 ? sharedMessages.appEUI : sharedMessages.joinEUI}
               component={JoinEUIPRefixesInput}
               name="ids.join_eui"
-              description={
-                lwVersion < 104
-                  ? sharedMessages.appEUIDescription
-                  : sharedMessages.joinEUIDescription
-              }
               prefixes={prefixes}
               required
               showPrefixes
-              glossaryId={lwVersion < 104 ? glossaryId.APP_EUI : glossaryId.JOIN_EUI}
+              glossaryId={glossaryIds.JOIN_EUI}
             />
             <Form.Field
               title={sharedMessages.devEUI}
@@ -103,10 +104,9 @@ const Registration = props => {
               type="byte"
               min={8}
               max={8}
-              description={sharedMessages.deviceEUIDescription}
               required
               component={Input}
-              glossaryId={glossaryId.DEV_EUI}
+              glossaryId={glossaryIds.DEV_EUI}
               onBlur={onIdPrefill}
             />
             <Form.Field
@@ -116,16 +116,12 @@ const Registration = props => {
               type="byte"
               min={16}
               max={16}
-              description={
-                lwVersion >= 110
-                  ? sharedMessages.appKeyNewDescription
-                  : sharedMessages.appKeyDescription
-              }
               component={Input.Generate}
               disabled={!mayEditKeys}
               mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
-              glossaryId={glossaryId.APP_KEY}
+              glossaryId={glossaryIds.APP_KEY}
+              placeholder={appKeyPlaceholder}
             />
             {lwVersion >= 110 && (
               <Form.Field
@@ -135,23 +131,19 @@ const Registration = props => {
                 type="byte"
                 min={16}
                 max={16}
-                description={sharedMessages.nwkKeyDescription}
                 component={Input.Generate}
                 disabled={!mayEditKeys}
                 mayGenerateValue={mayEditKeys}
                 onGenerateValue={generate16BytesKey}
+                placeholder={nwkKeyPlaceholder}
+                glossaryId={glossaryIds.NETWORK_KEY}
               />
             )}
           </>
         )}
         {!isOTAA && (
           <>
-            <DevAddrInput
-              title={sharedMessages.devAddr}
-              name="session.dev_addr"
-              description={sharedMessages.deviceAddrDescription}
-              required
-            />
+            <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
             {lwVersion === 104 && (
               <Form.Field
                 title={sharedMessages.devEUI}
@@ -159,10 +151,9 @@ const Registration = props => {
                 type="byte"
                 min={8}
                 max={8}
-                description={sharedMessages.deviceEUIDescription}
                 required
                 component={Input}
-                glossaryId={glossaryId.DEV_EUI}
+                glossaryId={glossaryIds.DEV_EUI}
               />
             )}
             <Form.Field
@@ -172,10 +163,10 @@ const Registration = props => {
               type="byte"
               min={16}
               max={16}
-              description={sharedMessages.appSKeyDescription}
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
+              glossaryId={glossaryIds.APP_SESSION_KEY}
             />
             <Form.Field
               mayGenerateValue
@@ -185,17 +176,12 @@ const Registration = props => {
               min={16}
               max={16}
               required
-              description={
-                lwVersion >= 110
-                  ? sharedMessages.fNwkSIntKeyDescription
-                  : sharedMessages.nwkSKeyDescription
-              }
               component={Input.Generate}
               onGenerateValue={generate16BytesKey}
               glossaryId={
                 lwVersion >= 110
-                  ? glossaryId.NETWORK_SESSION_KEY
-                  : glossaryId.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
+                  ? glossaryIds.NETWORK_SESSION_KEY
+                  : glossaryIds.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
               }
             />
             {lwVersion >= 110 && (
@@ -210,7 +196,7 @@ const Registration = props => {
                 description={sharedMessages.sNwkSIKeyDescription}
                 component={Input.Generate}
                 onGenerateValue={generate16BytesKey}
-                glossaryId={glossaryId.SERVING_NETWORK_SESSION_INTEGRITY_KEY}
+                glossaryId={glossaryIds.SERVING_NETWORK_SESSION_INTEGRITY_KEY}
               />
             )}
             {lwVersion >= 110 && (
@@ -225,7 +211,7 @@ const Registration = props => {
                 description={sharedMessages.nwkSEncKeyDescription}
                 component={Input.Generate}
                 onGenerateValue={generate16BytesKey}
-                glossaryId={glossaryId.NETWORK_SESSION_ENCRYPTION_KEY}
+                glossaryId={glossaryIds.NETWORK_SESSION_ENCRYPTION_KEY}
               />
             )}
           </>
@@ -238,6 +224,7 @@ const Registration = props => {
           component={Input}
           onFocus={handleIdFocus}
           inputRef={idInputRef}
+          glossaryId={glossaryIds.DEVICE_ID}
         />
         <Form.Field title={m.afterRegistration} name="_registration" component={Radio.Group}>
           <Radio label={m.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />

@@ -121,7 +121,7 @@ func TestContactInfoValidation(t *testing.T) {
 		_, err = s.CreateValidation(ctx, &ttnpb.ContactInfoValidation{
 			ID:          "validation-id",
 			Token:       "validation-token",
-			Entity:      usr.EntityIdentifiers(),
+			Entity:      usr.GetEntityIdentifiers(),
 			ContactInfo: info,
 			ExpiresAt:   &expiresAt,
 		})
@@ -131,7 +131,7 @@ func TestContactInfoValidation(t *testing.T) {
 		_, err = s.CreateValidation(ctx, &ttnpb.ContactInfoValidation{
 			ID:          "validation-id",
 			Token:       "other-token",
-			Entity:      usr.EntityIdentifiers(),
+			Entity:      usr.GetEntityIdentifiers(),
 			ContactInfo: info,
 			ExpiresAt:   &expiresAt,
 		})

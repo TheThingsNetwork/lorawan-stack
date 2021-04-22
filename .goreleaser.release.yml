@@ -70,7 +70,7 @@ archives:
     files:
       - LICENSE
       - README.md
-      - public/**/*
+      - public/**
       - config/completion/*/*
     wrap_in_directory: true
     format_overrides:
