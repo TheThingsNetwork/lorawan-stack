@@ -105,6 +105,8 @@ const JoinServerForm = React.memo(props => {
   let appKeyPlaceholder
   if (externalJs) {
     appKeyPlaceholder = sharedMessages.provisionedOnExternalJoinServer
+  } else if (!mayEditKeys) {
+    appKeyPlaceholder = sharedMessages.insufficientAppKeyRights
   } else if (appKeyHidden) {
     appKeyPlaceholder = sharedMessages.unexposed
   }
@@ -112,6 +114,8 @@ const JoinServerForm = React.memo(props => {
   let nwkKeyPlaceholder
   if (externalJs) {
     nwkKeyPlaceholder = sharedMessages.provisionedOnExternalJoinServer
+  } else if (!mayEditKeys) {
+    nwkKeyPlaceholder = sharedMessages.insufficientNwkKeyRights
   } else if (nwkKeyHidden) {
     nwkKeyPlaceholder = sharedMessages.unexposed
   }

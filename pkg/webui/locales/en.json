@@ -719,6 +719,8 @@
   "lib.shared-messages.importDevices": "Import end devices",
   "lib.shared-messages.integrations": "Integrations",
   "lib.shared-messages.joinAccept": "Join accept",
+  "lib.shared-messages.insufficientAppKeyRights": "Insufficient rights to set an AppKey",
+  "lib.shared-messages.insufficientNwkKeyRights": "Insufficient rights to set a NwkKey",
   "lib.shared-messages.joinEUI": "JoinEUI",
   "lib.shared-messages.joinEUIDescription": "The JoinEUI identifies the Join Server. If no JoinEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.",
   "lib.shared-messages.joinServerAddress": "Join Server address",

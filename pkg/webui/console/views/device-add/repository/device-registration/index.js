@@ -72,6 +72,13 @@ const Registration = props => {
   const isOTAA = supports_join
   const lwVersion = parseLorawanMacVersion(lorawan_version)
 
+  let appKeyPlaceholder = undefined
+  let nwkKeyPlaceholder = undefined
+  if (!mayEditKeys) {
+    appKeyPlaceholder = sharedMessages.insufficientAppKeyRights
+    nwkKeyPlaceholder = sharedMessages.insufficientNwkKeyRights
+  }
+
   return (
     <Overlay visible={fetching} loading={fetching} spinnerMessage={m.fetching}>
       <div data-test-id="device-registration">
@@ -126,6 +133,7 @@ const Registration = props => {
               mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
               glossaryId={glossaryId.APP_KEY}
+              placeholder={appKeyPlaceholder}
             />
             {lwVersion >= 110 && (
               <Form.Field
@@ -140,6 +148,7 @@ const Registration = props => {
                 disabled={!mayEditKeys}
                 mayGenerateValue={mayEditKeys}
                 onGenerateValue={generate16BytesKey}
+                placeholder={nwkKeyPlaceholder}
               />
             )}
           </>

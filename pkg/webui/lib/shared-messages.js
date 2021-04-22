@@ -200,6 +200,8 @@ export default defineMessages({
   importDevices: 'Import end devices',
   integrations: 'Integrations',
   joinAccept: 'Join accept',
+  insufficientAppKeyRights: 'Insufficient rights to set an AppKey',
+  insufficientNwkKeyRights: 'Insufficient rights to set a NwkKey',
   joinEUI: 'JoinEUI',
   joinEUIDescription:
     'The JoinEUI identifies the Join Server. If no JoinEUI is provided by the device manufacturer (usually for development), it can be filled with zeros.',

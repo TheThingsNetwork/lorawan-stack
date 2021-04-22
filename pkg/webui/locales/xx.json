@@ -719,6 +719,8 @@
   "lib.shared-messages.importDevices": "Xxxxxx xxx xxxxxxx",
   "lib.shared-messages.integrations": "Xxxxxxxxxxxx",
   "lib.shared-messages.joinAccept": "Xxxx xxxxxx",
+  "lib.shared-messages.insufficientAppKeyRights": "Xxxxxxxxxxxx xxxxxx xx xxx xx XxxXxx",
+  "lib.shared-messages.insufficientNwkKeyRights": "Xxxxxxxxxxxx xxxxxx xx xxx x XxxXxx",
   "lib.shared-messages.joinEUI": "XxxxXXX",
   "lib.shared-messages.joinEUIDescription": "Xxx XxxxXXX xxxxxxxxxx xxx Xxxx Xxxxxx. Xx xx XxxxXXX xx xxxxxxxx xx xxx xxxxxx xxxxxxxxxxxx (xxxxxxx xxx xxxxxxxxxxx), xx xxx xx xxxxxx xxxx xxxxx.",
   "lib.shared-messages.joinServerAddress": "Xxxx Xxxxxx xxxxxxx",
