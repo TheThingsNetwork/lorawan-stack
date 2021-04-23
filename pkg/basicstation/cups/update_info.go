@@ -47,9 +47,6 @@ const (
 
 var (
 	errUnauthenticated       = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
-	errInvalidToken          = errors.DefinePermissionDenied("invalid_token", "invalid provisioning token")
-	errInvalidCUPSURI        = errors.DefineInvalidArgument("invalid_cups_uri", "Invalid CUPS URI `{uri}`")
-	errInvalidCUPSRequest    = errors.DefineInvalidArgument("invalid_cups_request", "Invalid CUPS request")
 	errTargetCUPSCredentials = errors.DefineNotFound("target_cups_credentials_not_found", "Target CUPS credentials not found for gateway `{gateway_uid}`")
 	errLNSCredentials        = errors.DefineNotFound("lns_credentials_not_found", "LNS credentials not found for gateway `{gateway_uid}`")
 	errServerTrust           = errors.Define("server_trust", "failed to fetch server trust for address `{address}`")
@@ -161,8 +158,8 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		return err
 	}
 
-	if req.Router.IsZero() {
-		return errInvalidCUPSRequest
+	if err := req.ValidateContext(c.Request().Context()); err != nil {
+		return err
 	}
 
 	ctx := getContext(c)
