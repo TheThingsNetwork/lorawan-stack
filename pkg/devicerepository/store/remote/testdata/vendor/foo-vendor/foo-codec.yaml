@@ -6,25 +6,37 @@ uplinkDecoder:
         fPort: 10
         bytes: [1, 1, 100]
       output:
-        type: BATTERY_STATUS
-        value: 100
+        data:
+          type: BATTERY_STATUS
+          nested:
+            key: value
+            list: [1, 2, 3]
+          value: 100
+        warnings: [warn1]
+        errors: [err1]
 downlinkDecoder:
   fileName: b.js
   examples:
     - description: downlink decode example
       input:
-        action: DIM
-        value: 5
-      output:
         fPort: 20
         bytes: [1, 5]
+      output:
+        data:
+          action: DIM
+          value: 5
+        warnings: [warn1]
+        errors: [err1]
 downlinkEncoder:
   fileName: c.js
   examples:
     - description: downlink encode example
       input:
+        data:
+          action: DIM
+          value: 5
+      output:
         fPort: 20
         bytes: [1, 5]
-      output:
-        action: DIM
-        value: 5
+        warnings: [warn1]
+        errors: [err1]

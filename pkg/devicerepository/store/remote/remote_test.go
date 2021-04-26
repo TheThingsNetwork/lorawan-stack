@@ -381,23 +381,32 @@ func TestRemoteStore(t *testing.T) {
 		})
 		for _, tc := range []struct {
 			name  string
-			f     func(store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error)
-			codec string
+			f     func(store.GetCodecRequest) (interface{}, error)
+			codec interface{}
 		}{
 			{
-				name:  "UplinkDecoder",
-				f:     s.GetUplinkDecoder,
-				codec: "// uplink decoder\n",
+				name: "UplinkDecoder",
+				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetUplinkDecoder(req) },
+				codec: &ttnpb.MessagePayloadDecoder{
+					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+					FormatterParameter: "// uplink decoder\n",
+				},
 			},
 			{
-				name:  "DownlinkDecoder",
-				f:     s.GetDownlinkDecoder,
-				codec: "// downlink decoder\n",
+				name: "DownlinkDecoder",
+				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkDecoder(req) },
+				codec: &ttnpb.MessagePayloadDecoder{
+					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+					FormatterParameter: "// downlink decoder\n",
+				},
 			},
 			{
-				name:  "DownlinkEncoder",
-				f:     s.GetDownlinkEncoder,
-				codec: "// downlink encoder\n",
+				name: "DownlinkEncoder",
+				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkEncoder(req) },
+				codec: &ttnpb.MessagePayloadEncoder{
+					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+					FormatterParameter: "// downlink encoder\n",
+				},
 			},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
@@ -411,67 +420,88 @@ func TestRemoteStore(t *testing.T) {
 				}
 				codec, err := tc.f(store.GetCodecRequest{VersionIDs: versionIDs})
 				a.So(err, should.BeNil)
-				a.So(codec, should.Resemble, &ttnpb.MessagePayloadFormatter{
-					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
-					FormatterParameter: tc.codec,
-				})
+				a.So(codec, should.Resemble, tc.codec)
 			})
 		}
 
 		t.Run("Examples", func(t *testing.T) {
 			for _, tc := range []struct {
-				name     string
-				codec    string
-				f        func(store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error)
-				examples []*ttnpb.MessagePayloadFormatter_Example
+				name  string
+				f     func(store.GetCodecRequest) (interface{}, error)
+				codec interface{}
 			}{
 				{
-					name:  "UplinkDecoder",
-					codec: "// uplink decoder\n",
-					f:     s.GetUplinkDecoder,
-					examples: []*ttnpb.MessagePayloadFormatter_Example{{
-						Description: "dummy example",
-						Input: mustStruct(map[string]interface{}{
-							"fPort": 10,
-							"bytes": []int{1, 1, 100},
-						}),
-						Output: mustStruct(map[string]interface{}{
-							"type":  "BATTERY_STATUS",
-							"value": 100,
-						}),
-					}},
+					name: "UplinkDecoder",
+					f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetUplinkDecoder(req) },
+					codec: &ttnpb.MessagePayloadDecoder{
+						Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+						FormatterParameter: "// uplink decoder\n",
+						Examples: []*ttnpb.MessagePayloadDecoder_Example{{
+							Description: "dummy example",
+							Input: &ttnpb.EncodedMessagePayload{
+								FPort:      10,
+								FRMPayload: []byte{1, 1, 100},
+							},
+							Output: &ttnpb.DecodedMessagePayload{
+								Data: mustStruct(map[string]interface{}{
+									"type":  "BATTERY_STATUS",
+									"value": 100,
+									"nested": map[string]interface{}{
+										"key":  "value",
+										"list": []int{1, 2, 3},
+									},
+								}),
+								Warnings: []string{"warn1"},
+								Errors:   []string{"err1"},
+							},
+						}},
+					},
 				},
 				{
-					name:  "DownlinkDecoder",
-					codec: "// downlink decoder\n",
-					f:     s.GetDownlinkDecoder,
-					examples: []*ttnpb.MessagePayloadFormatter_Example{{
-						Description: "downlink decode example",
-						Input: mustStruct(map[string]interface{}{
-							"action": "DIM",
-							"value":  5,
-						}),
-						Output: mustStruct(map[string]interface{}{
-							"fPort": 20,
-							"bytes": []int{1, 5},
-						}),
-					}},
+					name: "DownlinkDecoder",
+					f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkDecoder(req) },
+					codec: &ttnpb.MessagePayloadDecoder{
+						Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+						FormatterParameter: "// downlink decoder\n",
+						Examples: []*ttnpb.MessagePayloadDecoder_Example{{
+							Description: "downlink decode example",
+							Input: &ttnpb.EncodedMessagePayload{
+								FPort:      20,
+								FRMPayload: []byte{1, 5},
+							},
+							Output: &ttnpb.DecodedMessagePayload{
+								Data: mustStruct(map[string]interface{}{
+									"action": "DIM",
+									"value":  5,
+								}),
+								Warnings: []string{"warn1"},
+								Errors:   []string{"err1"},
+							},
+						}},
+					},
 				},
 				{
-					name:  "DownlinkEncoder",
-					codec: "// downlink encoder\n",
-					f:     s.GetDownlinkEncoder,
-					examples: []*ttnpb.MessagePayloadFormatter_Example{{
-						Description: "downlink encode example",
-						Input: mustStruct(map[string]interface{}{
-							"fPort": 20,
-							"bytes": []int{1, 5},
-						}),
-						Output: mustStruct(map[string]interface{}{
-							"action": "DIM",
-							"value":  5,
-						}),
-					}},
+					name: "DownlinkEncoder",
+					f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkEncoder(req) },
+					codec: &ttnpb.MessagePayloadEncoder{
+						Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+						FormatterParameter: "// downlink encoder\n",
+						Examples: []*ttnpb.MessagePayloadEncoder_Example{{
+							Description: "downlink encode example",
+							Input: &ttnpb.DecodedMessagePayload{
+								Data: mustStruct(map[string]interface{}{
+									"action": "DIM",
+									"value":  5,
+								}),
+							},
+							Output: &ttnpb.EncodedMessagePayload{
+								FPort:      20,
+								FRMPayload: []byte{1, 5},
+								Warnings:   []string{"warn1"},
+								Errors:     []string{"err1"},
+							},
+						}},
+					},
 				},
 			} {
 				t.Run(tc.name, func(t *testing.T) {
@@ -488,57 +518,9 @@ func TestRemoteStore(t *testing.T) {
 						Paths:      []string{"examples"},
 					})
 					a.So(err, should.BeNil)
-					a.So(codec, should.Resemble, &ttnpb.MessagePayloadFormatter{
-						Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
-						FormatterParameter: tc.codec,
-						Examples:           tc.examples,
-					})
+					a.So(codec, should.Resemble, tc.codec)
 				})
 			}
-		})
-	})
-
-	t.Run("GetTemplate", func(t *testing.T) {
-		t.Run("Missing", func(t *testing.T) {
-			a := assertions.New(t)
-
-			for _, ids := range []ttnpb.EndDeviceVersionIdentifiers{
-				{
-					BrandID: "unknown-vendor",
-				},
-				{
-					BrandID: "foo-vendor",
-					ModelID: "unknown-model",
-				},
-				{
-					BrandID:         "foo-vendor",
-					ModelID:         "dev1",
-					FirmwareVersion: "unknown-version",
-				},
-				{
-					BrandID:         "foo-vendor",
-					ModelID:         "dev1",
-					FirmwareVersion: "1.0",
-					BandID:          "unknown-band",
-				},
-			} {
-				tmpl, err := s.GetTemplate(&ids)
-				a.So(errors.IsNotFound(err), should.BeTrue)
-				a.So(tmpl, should.BeNil)
-			}
-		})
-
-		t.Run("Success", func(t *testing.T) {
-			a := assertions.New(t)
-			tmpl, err := s.GetTemplate(&ttnpb.EndDeviceVersionIdentifiers{
-				BrandID:         "foo-vendor",
-				ModelID:         "dev2",
-				FirmwareVersion: "1.1",
-				HardwareVersion: "2.0",
-				BandID:          "EU_433",
-			})
-			a.So(err, should.BeNil)
-			a.So(tmpl, should.NotBeNil)
 		})
 	})
 }

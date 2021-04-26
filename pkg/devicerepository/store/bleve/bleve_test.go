@@ -439,23 +439,32 @@ func TestBleve(t *testing.T) {
 		})
 		for _, tc := range []struct {
 			name  string
-			f     func(store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error)
-			codec string
+			f     func(store.GetCodecRequest) (interface{}, error)
+			codec interface{}
 		}{
 			{
-				name:  "UplinkDecoder",
-				f:     s.GetUplinkDecoder,
-				codec: "// uplink decoder\n",
+				name: "UplinkDecoder",
+				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetUplinkDecoder(req) },
+				codec: &ttnpb.MessagePayloadDecoder{
+					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+					FormatterParameter: "// uplink decoder\n",
+				},
 			},
 			{
-				name:  "DownlinkDecoder",
-				f:     s.GetDownlinkDecoder,
-				codec: "// downlink decoder\n",
+				name: "DownlinkDecoder",
+				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkDecoder(req) },
+				codec: &ttnpb.MessagePayloadDecoder{
+					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+					FormatterParameter: "// downlink decoder\n",
+				},
 			},
 			{
-				name:  "DownlinkEncoder",
-				f:     s.GetDownlinkEncoder,
-				codec: "// downlink encoder\n",
+				name: "DownlinkEncoder",
+				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkEncoder(req) },
+				codec: &ttnpb.MessagePayloadEncoder{
+					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+					FormatterParameter: "// downlink encoder\n",
+				},
 			},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
@@ -469,10 +478,7 @@ func TestBleve(t *testing.T) {
 				}
 				codec, err := tc.f(store.GetCodecRequest{VersionIDs: versionIDs})
 				a.So(err, should.BeNil)
-				a.So(codec, should.Resemble, &ttnpb.MessagePayloadFormatter{
-					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
-					FormatterParameter: tc.codec,
-				})
+				a.So(codec, should.Resemble, tc.codec)
 			})
 		}
 	})
