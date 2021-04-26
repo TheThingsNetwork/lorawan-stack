@@ -198,14 +198,51 @@ var ListEndDeviceModelsResponseFieldPathsNested = []string{
 var ListEndDeviceModelsResponseFieldPathsTopLevel = []string{
 	"models",
 }
-var MessagePayloadFormatterFieldPathsNested = []string{
+var EncodedMessagePayloadFieldPathsNested = []string{
+	"errors",
+	"f_port",
+	"frm_payload",
+	"warnings",
+}
+
+var EncodedMessagePayloadFieldPathsTopLevel = []string{
+	"errors",
+	"f_port",
+	"frm_payload",
+	"warnings",
+}
+var DecodedMessagePayloadFieldPathsNested = []string{
+	"data",
+	"errors",
+	"warnings",
+}
+
+var DecodedMessagePayloadFieldPathsTopLevel = []string{
+	"data",
+	"errors",
+	"warnings",
+}
+var MessagePayloadDecoderFieldPathsNested = []string{
 	"codec_id",
 	"examples",
 	"formatter",
 	"formatter_parameter",
 }
 
-var MessagePayloadFormatterFieldPathsTopLevel = []string{
+var MessagePayloadDecoderFieldPathsTopLevel = []string{
+	"codec_id",
+	"examples",
+	"formatter",
+	"formatter_parameter",
+}
+var MessagePayloadEncoderFieldPathsNested = []string{
+	"codec_id",
+	"examples",
+	"formatter",
+	"formatter_parameter",
+}
+
+var MessagePayloadEncoderFieldPathsTopLevel = []string{
 	"codec_id",
 	"examples",
 	"formatter",
@@ -341,13 +378,38 @@ var EndDeviceModel_Compliances_ComplianceFieldPathsTopLevel = []string{
 	"standard",
 	"version",
 }
-var MessagePayloadFormatter_ExampleFieldPathsNested = []string{
+var MessagePayloadDecoder_ExampleFieldPathsNested = []string{
+	"description",
+	"input",
+	"input.errors",
+	"input.f_port",
+	"input.frm_payload",
+	"input.warnings",
+	"output",
+	"output.data",
+	"output.errors",
+	"output.warnings",
+}
+
+var MessagePayloadDecoder_ExampleFieldPathsTopLevel = []string{
 	"description",
 	"input",
 	"output",
 }
+var MessagePayloadEncoder_ExampleFieldPathsNested = []string{
+	"description",
+	"input",
+	"input.data",
+	"input.errors",
+	"input.warnings",
+	"output",
+	"output.errors",
+	"output.f_port",
+	"output.frm_payload",
+	"output.warnings",
+}
 
-var MessagePayloadFormatter_ExampleFieldPathsTopLevel = []string{
+var MessagePayloadEncoder_ExampleFieldPathsTopLevel = []string{
 	"description",
 	"input",
 	"output",

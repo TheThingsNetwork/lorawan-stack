@@ -910,9 +910,9 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 	"/ttn.lorawan.v3.DeviceRepository/ListBrands":         {All: EndDeviceBrandFieldPathsNested, Allowed: EndDeviceBrandFieldPathsNested},
 	"/ttn.lorawan.v3.DeviceRepository/GetModel":           {All: EndDeviceModelFieldPathsNested, Allowed: EndDeviceModelFieldPathsNested},
 	"/ttn.lorawan.v3.DeviceRepository/ListModels":         {All: EndDeviceModelFieldPathsNested, Allowed: EndDeviceModelFieldPathsNested},
-	"/ttn.lorawan.v3.DeviceRepository/GetUplinkDecoder":   {All: MessagePayloadFormatterFieldPathsNested, Allowed: MessagePayloadFormatterFieldPathsNested},
-	"/ttn.lorawan.v3.DeviceRepository/GetDownlinkDecoder": {All: MessagePayloadFormatterFieldPathsNested, Allowed: MessagePayloadFormatterFieldPathsNested},
-	"/ttn.lorawan.v3.DeviceRepository/GetDownlinkEncoder": {All: MessagePayloadFormatterFieldPathsNested, Allowed: MessagePayloadFormatterFieldPathsNested},
+	"/ttn.lorawan.v3.DeviceRepository/GetUplinkDecoder":   {All: MessagePayloadDecoderFieldPathsNested, Allowed: MessagePayloadDecoderFieldPathsNested},
+	"/ttn.lorawan.v3.DeviceRepository/GetDownlinkDecoder": {All: MessagePayloadDecoderFieldPathsNested, Allowed: MessagePayloadDecoderFieldPathsNested},
+	"/ttn.lorawan.v3.DeviceRepository/GetDownlinkEncoder": {All: MessagePayloadEncoderFieldPathsNested, Allowed: MessagePayloadEncoderFieldPathsNested},
 }
 
 func omitFields(fields []string, fieldsToOmit ...string) []string {

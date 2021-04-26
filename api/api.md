@@ -144,6 +144,8 @@
   - [Service `EndDeviceClaimingServer`](#ttn.lorawan.v3.EndDeviceClaimingServer)
   - [Service `GatewayClaimingServer`](#ttn.lorawan.v3.GatewayClaimingServer)
 - [File `lorawan-stack/api/devicerepository.proto`](#lorawan-stack/api/devicerepository.proto)
+  - [Message `DecodedMessagePayload`](#ttn.lorawan.v3.DecodedMessagePayload)
+  - [Message `EncodedMessagePayload`](#ttn.lorawan.v3.EncodedMessagePayload)
   - [Message `EndDeviceBrand`](#ttn.lorawan.v3.EndDeviceBrand)
   - [Message `EndDeviceModel`](#ttn.lorawan.v3.EndDeviceModel)
   - [Message `EndDeviceModel.Battery`](#ttn.lorawan.v3.EndDeviceModel.Battery)
@@ -167,8 +169,10 @@
   - [Message `ListEndDeviceBrandsResponse`](#ttn.lorawan.v3.ListEndDeviceBrandsResponse)
   - [Message `ListEndDeviceModelsRequest`](#ttn.lorawan.v3.ListEndDeviceModelsRequest)
   - [Message `ListEndDeviceModelsResponse`](#ttn.lorawan.v3.ListEndDeviceModelsResponse)
-  - [Message `MessagePayloadFormatter`](#ttn.lorawan.v3.MessagePayloadFormatter)
-  - [Message `MessagePayloadFormatter.Example`](#ttn.lorawan.v3.MessagePayloadFormatter.Example)
+  - [Message `MessagePayloadDecoder`](#ttn.lorawan.v3.MessagePayloadDecoder)
+  - [Message `MessagePayloadDecoder.Example`](#ttn.lorawan.v3.MessagePayloadDecoder.Example)
+  - [Message `MessagePayloadEncoder`](#ttn.lorawan.v3.MessagePayloadEncoder)
+  - [Message `MessagePayloadEncoder.Example`](#ttn.lorawan.v3.MessagePayloadEncoder.Example)
   - [Enum `KeyProvisioning`](#ttn.lorawan.v3.KeyProvisioning)
   - [Enum `KeySecurity`](#ttn.lorawan.v3.KeySecurity)
   - [Service `DeviceRepository`](#ttn.lorawan.v3.DeviceRepository)
@@ -2387,6 +2391,29 @@ and allows clients to claim end devices.
 
 ## <a name="lorawan-stack/api/devicerepository.proto">File `lorawan-stack/api/devicerepository.proto`</a>
 
+### <a name="ttn.lorawan.v3.DecodedMessagePayload">Message `DecodedMessagePayload`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+| `warnings` | [`string`](#string) | repeated |  |
+| `errors` | [`string`](#string) | repeated |  |
+
+### <a name="ttn.lorawan.v3.EncodedMessagePayload">Message `EncodedMessagePayload`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `f_port` | [`uint32`](#uint32) |  |  |
+| `frm_payload` | [`bytes`](#bytes) |  |  |
+| `warnings` | [`string`](#string) | repeated |  |
+| `errors` | [`string`](#string) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `f_port` | <p>`uint32.lte`: `255`</p> |
+
 ### <a name="ttn.lorawan.v3.EndDeviceBrand">Message `EndDeviceBrand`</a>
 
 | Field | Type | Label | Description |
@@ -2638,14 +2665,14 @@ and allows clients to claim end devices.
 | ----- | ---- | ----- | ----------- |
 | `models` | [`EndDeviceModel`](#ttn.lorawan.v3.EndDeviceModel) | repeated |  |
 
-### <a name="ttn.lorawan.v3.MessagePayloadFormatter">Message `MessagePayloadFormatter`</a>
+### <a name="ttn.lorawan.v3.MessagePayloadDecoder">Message `MessagePayloadDecoder`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  | Payload formatter type. |
 | `formatter_parameter` | [`string`](#string) |  | Parameter for the formatter, must be set together. |
 | `codec_id` | [`string`](#string) |  |  |
-| `examples` | [`MessagePayloadFormatter.Example`](#ttn.lorawan.v3.MessagePayloadFormatter.Example) | repeated | Examples |
+| `examples` | [`MessagePayloadDecoder.Example`](#ttn.lorawan.v3.MessagePayloadDecoder.Example) | repeated | Examples |
 
 #### Field Rules
 
@@ -2654,13 +2681,37 @@ and allows clients to claim end devices.
 | `formatter` | <p>`enum.defined_only`: `true`</p> |
 | `codec_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$`</p> |
 
-### <a name="ttn.lorawan.v3.MessagePayloadFormatter.Example">Message `MessagePayloadFormatter.Example`</a>
+### <a name="ttn.lorawan.v3.MessagePayloadDecoder.Example">Message `MessagePayloadDecoder.Example`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `description` | [`string`](#string) |  |  |
-| `input` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
-| `output` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
+| `input` | [`EncodedMessagePayload`](#ttn.lorawan.v3.EncodedMessagePayload) |  |  |
+| `output` | [`DecodedMessagePayload`](#ttn.lorawan.v3.DecodedMessagePayload) |  |  |
+
+### <a name="ttn.lorawan.v3.MessagePayloadEncoder">Message `MessagePayloadEncoder`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  | Payload formatter type. |
+| `formatter_parameter` | [`string`](#string) |  | Parameter for the formatter, must be set together. |
+| `codec_id` | [`string`](#string) |  |  |
+| `examples` | [`MessagePayloadEncoder.Example`](#ttn.lorawan.v3.MessagePayloadEncoder.Example) | repeated | Examples |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `formatter` | <p>`enum.defined_only`: `true`</p> |
+| `codec_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$`</p> |
+
+### <a name="ttn.lorawan.v3.MessagePayloadEncoder.Example">Message `MessagePayloadEncoder.Example`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `description` | [`string`](#string) |  |  |
+| `input` | [`DecodedMessagePayload`](#ttn.lorawan.v3.DecodedMessagePayload) |  |  |
+| `output` | [`EncodedMessagePayload`](#ttn.lorawan.v3.EncodedMessagePayload) |  |  |
 
 ### <a name="ttn.lorawan.v3.KeyProvisioning">Enum `KeyProvisioning`</a>
 
@@ -2689,9 +2740,9 @@ and allows clients to claim end devices.
 | `ListModels` | [`ListEndDeviceModelsRequest`](#ttn.lorawan.v3.ListEndDeviceModelsRequest) | [`ListEndDeviceModelsResponse`](#ttn.lorawan.v3.ListEndDeviceModelsResponse) |  |
 | `GetModel` | [`GetEndDeviceModelRequest`](#ttn.lorawan.v3.GetEndDeviceModelRequest) | [`EndDeviceModel`](#ttn.lorawan.v3.EndDeviceModel) |  |
 | `GetTemplate` | [`GetTemplateRequest`](#ttn.lorawan.v3.GetTemplateRequest) | [`EndDeviceTemplate`](#ttn.lorawan.v3.EndDeviceTemplate) |  |
-| `GetUplinkDecoder` | [`GetPayloadFormatterRequest`](#ttn.lorawan.v3.GetPayloadFormatterRequest) | [`MessagePayloadFormatter`](#ttn.lorawan.v3.MessagePayloadFormatter) |  |
-| `GetDownlinkDecoder` | [`GetPayloadFormatterRequest`](#ttn.lorawan.v3.GetPayloadFormatterRequest) | [`MessagePayloadFormatter`](#ttn.lorawan.v3.MessagePayloadFormatter) |  |
-| `GetDownlinkEncoder` | [`GetPayloadFormatterRequest`](#ttn.lorawan.v3.GetPayloadFormatterRequest) | [`MessagePayloadFormatter`](#ttn.lorawan.v3.MessagePayloadFormatter) |  |
+| `GetUplinkDecoder` | [`GetPayloadFormatterRequest`](#ttn.lorawan.v3.GetPayloadFormatterRequest) | [`MessagePayloadDecoder`](#ttn.lorawan.v3.MessagePayloadDecoder) |  |
+| `GetDownlinkDecoder` | [`GetPayloadFormatterRequest`](#ttn.lorawan.v3.GetPayloadFormatterRequest) | [`MessagePayloadDecoder`](#ttn.lorawan.v3.MessagePayloadDecoder) |  |
+| `GetDownlinkEncoder` | [`GetPayloadFormatterRequest`](#ttn.lorawan.v3.GetPayloadFormatterRequest) | [`MessagePayloadEncoder`](#ttn.lorawan.v3.MessagePayloadEncoder) |  |
 
 #### HTTP bindings
 
