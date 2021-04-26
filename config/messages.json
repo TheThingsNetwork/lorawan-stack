@@ -3302,6 +3302,24 @@
       "file": "remote.go"
     }
   },
+  "error:pkg/devicerepository/store/remote:no_decoder": {
+    "translations": {
+      "en": "no decoder defined for codec `{codec_id}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "remote.go"
+    }
+  },
+  "error:pkg/devicerepository/store/remote:no_encoder": {
+    "translations": {
+      "en": "no encoder defined for codec `{codec_id}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "remote.go"
+    }
+  },
   "error:pkg/devicerepository/store/remote:no_profile_for_band": {
     "translations": {
       "en": "device does not have a profile for band `{band_id}`"
