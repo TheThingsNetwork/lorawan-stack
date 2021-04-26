@@ -46,8 +46,8 @@ type mockStore struct {
 	models   []*ttnpb.EndDeviceModel
 	template *ttnpb.EndDeviceTemplate
 	uplinkDecoder,
-	downlinkDecoder,
-	downlinkEncoder *ttnpb.MessagePayloadFormatter
+	downlinkDecoder *ttnpb.MessagePayloadDecoder
+	downlinkEncoder *ttnpb.MessagePayloadEncoder
 
 	// mock errors
 	err error
@@ -94,19 +94,19 @@ func (s *mockStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
-func (s *mockStore) GetUplinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+func (s *mockStore) GetUplinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error) {
 	s.lastVersionIDs = req.VersionIDs
 	return s.uplinkDecoder, s.err
 }
 
 // GetDownlinkDecoder retrieves the codec for decoding downlink messages.
-func (s *mockStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+func (s *mockStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error) {
 	s.lastVersionIDs = req.VersionIDs
 	return s.downlinkDecoder, s.err
 }
 
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
-func (s *mockStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+func (s *mockStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadEncoder, error) {
 	s.lastVersionIDs = req.VersionIDs
 	return s.downlinkEncoder, s.err
 }
@@ -647,7 +647,7 @@ func TestGRPC(t *testing.T) {
 
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
-			st.uplinkDecoder = &ttnpb.MessagePayloadFormatter{
+			st.uplinkDecoder = &ttnpb.MessagePayloadDecoder{
 				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 				FormatterParameter: "uplink decoder",
 			}
@@ -693,7 +693,7 @@ func TestGRPC(t *testing.T) {
 
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
-			st.downlinkDecoder = &ttnpb.MessagePayloadFormatter{
+			st.downlinkDecoder = &ttnpb.MessagePayloadDecoder{
 				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 				FormatterParameter: "downlink decoder script",
 			}
@@ -739,7 +739,7 @@ func TestGRPC(t *testing.T) {
 
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
-			st.downlinkEncoder = &ttnpb.MessagePayloadFormatter{
+			st.downlinkEncoder = &ttnpb.MessagePayloadEncoder{
 				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 				FormatterParameter: "downlink encoder script",
 			}

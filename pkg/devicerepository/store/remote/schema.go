@@ -17,7 +17,7 @@ package remote
 import (
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/gogo/protobuf/types"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -200,26 +200,26 @@ func (d EndDeviceModel) ToPB(brandID, modelID string, paths ...string) (*ttnpb.E
 	if dim := d.Dimensions; dim != nil {
 		pb.Dimensions = &ttnpb.EndDeviceModel_Dimensions{}
 		if w := d.Dimensions.Width; w > 0 {
-			pb.Dimensions.Width = &pbtypes.FloatValue{Value: w}
+			pb.Dimensions.Width = &types.FloatValue{Value: w}
 		}
 		if h := d.Dimensions.Height; h > 0 {
-			pb.Dimensions.Height = &pbtypes.FloatValue{Value: h}
+			pb.Dimensions.Height = &types.FloatValue{Value: h}
 		}
 		if d := d.Dimensions.Diameter; d > 0 {
-			pb.Dimensions.Diameter = &pbtypes.FloatValue{Value: d}
+			pb.Dimensions.Diameter = &types.FloatValue{Value: d}
 		}
 		if l := d.Dimensions.Length; l > 0 {
-			pb.Dimensions.Length = &pbtypes.FloatValue{Value: l}
+			pb.Dimensions.Length = &types.FloatValue{Value: l}
 		}
 	}
 
 	if w := d.Weight; w > 0 {
-		pb.Weight = &pbtypes.FloatValue{Value: w}
+		pb.Weight = &types.FloatValue{Value: w}
 	}
 
 	if battery := d.Battery; battery != nil {
 		pb.Battery = &ttnpb.EndDeviceModel_Battery{
-			Replaceable: &pbtypes.BoolValue{Value: d.Battery.Replaceable},
+			Replaceable: &types.BoolValue{Value: d.Battery.Replaceable},
 			Type:        d.Battery.Type,
 		}
 	}
@@ -229,15 +229,15 @@ func (d EndDeviceModel) ToPB(brandID, modelID string, paths ...string) (*ttnpb.E
 
 		if rh := oc.RelativeHumidity; rh != nil {
 			pb.OperatingConditions.RelativeHumidity = &ttnpb.EndDeviceModel_OperatingConditions_Limits{
-				Min: &pbtypes.FloatValue{Value: rh.Min},
-				Max: &pbtypes.FloatValue{Value: rh.Max},
+				Min: &types.FloatValue{Value: rh.Min},
+				Max: &types.FloatValue{Value: rh.Max},
 			}
 		}
 
 		if temp := oc.Temperature; temp != nil {
 			pb.OperatingConditions.Temperature = &ttnpb.EndDeviceModel_OperatingConditions_Limits{
-				Min: &pbtypes.FloatValue{Value: temp.Min},
-				Max: &pbtypes.FloatValue{Value: temp.Max},
+				Min: &types.FloatValue{Value: temp.Min},
+				Max: &types.FloatValue{Value: temp.Max},
 			}
 		}
 	}
@@ -438,26 +438,51 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 	}
 	return &ttnpb.EndDeviceTemplate{
 		EndDevice: dev,
-		FieldMask: pbtypes.FieldMask{
+		FieldMask: types.FieldMask{
 			Paths: paths,
 		},
 	}, nil
 }
 
-type EndDeviceCodecExample struct {
-	Description string                 `yaml:"description"`
-	Input       map[string]interface{} `yaml:"input"`
-	Output      map[string]interface{} `yaml:"output"`
+type EncodedCodecData struct {
+	FPort    uint32   `yaml:"fPort"`
+	Bytes    []byte   `yaml:"bytes"`
+	Warnings []string `yaml:"warnings"`
+	Errors   []string `yaml:"errors"`
+}
+
+type DecodedCodecData struct {
+	Data     map[string]interface{} `yaml:"data"`
+	Warnings []string               `yaml:"warnings"`
+	Errors   []string               `yaml:"errors"`
+}
+
+type DecoderCodecExample struct {
+	Description string           `yaml:"description"`
+	Input       EncodedCodecData `yaml:"input"`
+	Output      DecodedCodecData `yaml:"output"`
+}
+
+type EncoderCodecExample struct {
+	Description string           `yaml:"description"`
+	Input       DecodedCodecData `yaml:"input"`
+	Output      EncodedCodecData `yaml:"output"`
+}
+
+type EndDeviceEncoderCodec struct {
+	FileName string                `yaml:"fileName"`
+	Examples []EncoderCodecExample `yaml:"examples"`
+}
+
+type EndDeviceDecoderCodec struct {
+	FileName string                `yaml:"fileName"`
+	Examples []DecoderCodecExample `yaml:"examples"`
 }
 
 // EndDeviceCodecs is the format of the `vendor/<vendor>/<codec-id>.yaml` files.
 type EndDeviceCodecs struct {
-	UplinkDecoder   EndDeviceCodec `yaml:"uplinkDecoder"`
-	DownlinkEncoder EndDeviceCodec `yaml:"downlinkEncoder"`
-	DownlinkDecoder EndDeviceCodec `yaml:"downlinkDecoder"`
-}
-
-type EndDeviceCodec struct {
-	FileName string                  `yaml:"fileName"`
-	Examples []EndDeviceCodecExample `yaml:"examples"`
+	CodecID         string
+	UplinkDecoder   EndDeviceDecoderCodec `yaml:"uplinkDecoder"`
+	DownlinkDecoder EndDeviceDecoderCodec `yaml:"downlinkDecoder"`
+	DownlinkEncoder EndDeviceEncoderCodec `yaml:"downlinkEncoder"`
 }

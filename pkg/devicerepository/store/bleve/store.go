@@ -184,17 +184,17 @@ func (s *bleveStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
-func (s *bleveStore) GetUplinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+func (s *bleveStore) GetUplinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error) {
 	return s.store.GetUplinkDecoder(req)
 }
 
 // GetDownlinkDecoder retrieves the codec for decoding downlink messages.
-func (s *bleveStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+func (s *bleveStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error) {
 	return s.store.GetDownlinkDecoder(req)
 }
 
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
-func (s *bleveStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadFormatter, error) {
+func (s *bleveStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadEncoder, error) {
 	return s.store.GetDownlinkEncoder(req)
 }
 
