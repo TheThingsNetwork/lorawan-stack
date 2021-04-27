@@ -167,6 +167,18 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids ttnpb.EndD
 	return resp.AbstractResponse(), nil
 }
 
+func (p *GeolocationPackage) wifiQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
+	req := api.BuildWiFiRequest(ctx, up.RxMetadata, up.DecodedPayload)
+	if len(req.WiFiAccessPoints) == 0 && len(req.LoRaWAN) < 3 {
+		return nil, nil
+	}
+	resp, err := client.SolveWiFi(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return resp.AbstractResponse(), nil
+}
+
 func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data) error {
 	var runQuery func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationUplink, *Data, *api.Client) (api.AbstractLocationSolverResponse, error)
 	switch data.Query {
@@ -178,6 +190,8 @@ func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceI
 		}
 	case QUERY_GNSS:
 		runQuery = p.gnssQuery
+	case QUERY_TDOAWIFI:
+		runQuery = p.wifiQuery
 	default:
 		return nil
 	}
