@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useRef, useEffect } from 'react'
 import { defineMessages } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -54,12 +54,12 @@ const m = defineMessages({
   queryType: 'Query type',
   queryTypeDescription: 'What kind of geolocation query should be used',
   multiFrame: 'Multiframe',
-  multiFrameDescription: 'Enable multiframe lookups',
+  multiFrameDescription: 'Enable multiframe lookups to improve accuracy',
   multiFrameWindowSize: 'Multiframe window size',
   multiFrameWindowSizeDescription:
-    'How many historical message to send as part of the request. A window size of 0 automatically determines this based on the first byte of the payload.',
+    'How many historical messages to send as part of the request. Using 0 will automatically determine this based on the first byte of the payload',
   multiFrameTimeWindow: 'Multiframe time window',
-  multiFrameTimeWindowDescription: 'How recent the historical messages should be, in minutes.',
+  multiFrameTimeWindowDescription: 'The maximum age of considered historical messages in minutes',
 })
 
 const LORACLOUD_GLS_QUERY_LABELS = Object.freeze([{ value: 'TDOARSSI', label: 'LoRa® TOA/RSSI' }])
@@ -74,29 +74,36 @@ const validationSchema = Yup.object()
       token: Yup.string().required(sharedMessages.validateRequired),
       query: Yup.string()
         .oneOf(LORACLOUD_GLS_QUERY_VALUES)
+        .default(LORACLOUD_GLS_QUERY_TYPES.TDOARSSI)
         .required(sharedMessages.validateRequired),
-      multi_frame: Yup.boolean().required(sharedMessages.validateRequired),
-      multi_frame_window_size: Yup.number()
-        .min(0, Yup.passValues(sharedMessages.validateNumberGte))
-        .max(16, Yup.passValues(sharedMessages.validateNumberLte))
-        .required(sharedMessages.validateRequired),
-      multi_frame_window_age: Yup.number()
-        .min(1, Yup.passValues(sharedMessages.validateNumberGte))
-        .max(7 * 24 * 60, Yup.passValues(sharedMessages.validateNumberLte))
-        .required(sharedMessages.validateRequired),
+      multi_frame: Yup.boolean().when('query', {
+        is: LORACLOUD_GLS_QUERY_TYPES.TDOARSSI,
+        then: schema => schema.default(false).required(sharedMessages.validateRequired),
+        otherwise: schema => schema.strip(),
+      }),
+      multi_frame_window_size: Yup.number().when('multi_frame', {
+        is: true,
+        then: schema =>
+          schema
+            .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+            .max(16, Yup.passValues(sharedMessages.validateNumberLte))
+            .default(0)
+            .required(sharedMessages.validateRequired),
+        otherwise: schema => schema.strip(),
+      }),
+      multi_frame_window_age: Yup.number().when('multi_frame', {
+        is: true,
+        then: schema =>
+          schema
+            .min(1, Yup.passValues(sharedMessages.validateNumberGte))
+            .max(7 * 24 * 60, Yup.passValues(sharedMessages.validateNumberLte))
+            .default(24 * 60)
+            .required(sharedMessages.validateRequired),
+        otherwise: schema => schema.strip(),
+      }),
     }),
   })
   .noUnknown()
-
-const defaultValues = {
-  data: {
-    token: '',
-    query: LORACLOUD_GLS_QUERY_TYPES.TDOARSSI,
-    multi_frame: false,
-    multi_frame_window_size: 0,
-    multi_frame_window_age: 1440,
-  },
-}
 
 const promisifiedSetAppPkgDefaultAssoc = attachPromise(setAppPkgDefaultAssoc)
 const promisifiedDeleteAppPkgDefaultAssoc = attachPromise(deleteAppPkgDefaultAssoc)
@@ -105,21 +112,23 @@ const LoRaCloudGLSForm = () => {
   const [error, setError] = useState('')
   const appId = useSelector(selectSelectedApplicationId)
   const selector = ['data']
+  const formRef = useRef(null)
 
   const dispatch = useDispatch()
   const defaultAssociation = useSelector(state =>
     selectApplicationPackageDefaultAssociation(state, LORA_CLOUD_GLS.DEFAULT_PORT),
   )
   const packageError = useSelector(selectGetApplicationPackagesError)
-  const initialValues = validationSchema.cast(defaultAssociation || defaultValues)
+  const initialValues = validationSchema.cast(defaultAssociation)
 
   const handleSubmit = useCallback(
     async values => {
       try {
+        const castedValues = validationSchema.cast(values)
         await dispatch(
           promisifiedSetAppPkgDefaultAssoc(appId, LORA_CLOUD_GLS.DEFAULT_PORT, {
             package_name: LORA_CLOUD_GLS.DEFAULT_PACKAGE_NAME,
-            ...values,
+            ...castedValues,
           }),
         )
         toast({
@@ -155,14 +164,30 @@ const LoRaCloudGLSForm = () => {
     throw error
   }
 
-  const initialQuery = initialValues.data.query
-  const [queryType, setQueryType] = useState(initialQuery)
+  const [queryType, setQueryType] = useState()
+  const handleQueryTypeChange = useCallback(
+    value => {
+      setQueryType(value)
+      const { setValues, values } = formRef.current
+      setValues(validationSchema.cast(values))
+    },
+    [setQueryType, formRef],
+  )
 
-  const initialMultiFrame = initialValues.data.multi_frame
-  const [multiFrame, setMultiFrame] = useState(initialMultiFrame)
-  const handleMultiFrameChange = useCallback(evt => setMultiFrame(evt.target.checked), [
-    setMultiFrame,
-  ])
+  const [multiFrame, setMultiFrame] = useState()
+  const handleMultiFrameChange = useCallback(
+    evt => {
+      setMultiFrame(evt.target.checked)
+      const { setValues, values } = formRef.current
+      setValues(validationSchema.cast(values))
+    },
+    [setMultiFrame, formRef],
+  )
+
+  useEffect(() => {
+    setQueryType(initialValues.data.query)
+    setMultiFrame(initialValues.data.multi_frame)
+  }, [initialValues.data.query, initialValues.data.multi_frame])
 
   return (
     <RequireRequest
@@ -173,7 +198,7 @@ const LoRaCloudGLSForm = () => {
         validationSchema={validationSchema}
         initialValues={initialValues}
         onSubmit={handleSubmit}
-        enableReinitialize
+        formikRef={formRef}
       >
         <Form.Field
           component={Input}
@@ -188,7 +213,8 @@ const LoRaCloudGLSForm = () => {
           description={m.queryTypeDescription}
           name="data.query"
           options={LORACLOUD_GLS_QUERY_LABELS}
-          onChange={setQueryType}
+          disabled={LORACLOUD_GLS_QUERY_LABELS.length === 1}
+          onChange={handleQueryTypeChange}
           required
         />
         {queryType === LORACLOUD_GLS_QUERY_TYPES.TDOARSSI && (
@@ -211,6 +237,7 @@ const LoRaCloudGLSForm = () => {
                   type="number"
                   min={0}
                   max={16}
+                  inputWidth="xs"
                   required
                 />
                 <Form.Field
@@ -221,6 +248,7 @@ const LoRaCloudGLSForm = () => {
                   type="number"
                   min={1}
                   max={7 * 24 * 60}
+                  inputWidth="xs"
                   required
                 />
               </>
