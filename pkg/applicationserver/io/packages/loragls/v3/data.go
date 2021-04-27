@@ -63,7 +63,7 @@ func (t *QueryType) FromValue(v *types.Value) error {
 
 const (
 	// QUERY_TOARSSI uses the TOA and RSSI information from the gateway metadata to compute the location of the end device.
-	QUERY_TOARSSI QueryType = 1 << 0
+	QUERY_TOARSSI QueryType = iota
 )
 
 // Data contains the package configuration.
@@ -135,7 +135,7 @@ func (d *Data) Struct() *types.Struct {
 		st.Fields[multiFrameWindowSize] = toFloat64(float64(d.MultiFrameWindowSize))
 	}
 	if d.MultiFrameWindowAge > 0 {
-		st.Fields[multiFrameWindowAge] = toFloat64(float64(d.MultiFrameWindowAge))
+		st.Fields[multiFrameWindowAge] = toFloat64(float64(d.MultiFrameWindowAge / time.Minute))
 	}
 	return st
 }
@@ -203,7 +203,7 @@ func (d *Data) FromStruct(st *types.Struct) error {
 			if err != nil {
 				return err
 			}
-			d.MultiFrameWindowAge = time.Duration(windowAge)
+			d.MultiFrameWindowAge = time.Duration(windowAge) * time.Minute
 		}
 	}
 	{
