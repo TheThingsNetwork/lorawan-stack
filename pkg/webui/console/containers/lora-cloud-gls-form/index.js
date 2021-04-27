@@ -65,10 +65,12 @@ const m = defineMessages({
 const LORACLOUD_GLS_QUERY_LABELS = Object.freeze([
   { value: 'TDOARSSI', label: 'LoRa® TOA/RSSI' },
   { value: 'GNSS', label: 'GNSS' },
+  { value: 'TDOAWIFI', label: 'Wi-Fi/TDOA' },
 ])
 const LORACLOUD_GLS_QUERY_TYPES = Object.freeze({
   TDOARSSI: 'TDOARSSI',
   GNSS: 'GNSS',
+  TDOAWIFI: 'TDOAWIFI',
 })
 const LORACLOUD_GLS_QUERY_VALUES = Object.freeze(Object.values(LORACLOUD_GLS_QUERY_TYPES))
 
