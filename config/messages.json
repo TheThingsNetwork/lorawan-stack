@@ -1763,6 +1763,33 @@
       "file": "session.go"
     }
   },
+  "error:pkg/account:missing_password": {
+    "translations": {
+      "en": "missing password"
+    },
+    "description": {
+      "package": "pkg/account",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/account:missing_token": {
+    "translations": {
+      "en": "missing token"
+    },
+    "description": {
+      "package": "pkg/account",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/account:missing_user_id": {
+    "translations": {
+      "en": "missing user_id"
+    },
+    "description": {
+      "package": "pkg/account",
+      "file": "user.go"
+    }
+  },
   "error:pkg/account:no_user_id_password_match": {
     "translations": {
       "en": "incorrect password or user ID"
@@ -6938,6 +6965,15 @@
       "file": "server.go"
     }
   },
+  "error:pkg/oauth:invalid_grant_type": {
+    "translations": {
+      "en": "invalid grant type `{grant_type}`"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
   "error:pkg/oauth:invalid_logout_redirect_uri": {
     "translations": {
       "en": "the redirect URI did not match the one(s) defined in the client"
@@ -6974,6 +7010,42 @@
       "file": "server.go"
     }
   },
+  "error:pkg/oauth:missing_authorization_code": {
+    "translations": {
+      "en": "missing authorization code"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
+  "error:pkg/oauth:missing_client_id": {
+    "translations": {
+      "en": "missing client id"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
+  "error:pkg/oauth:missing_client_secret": {
+    "translations": {
+      "en": "missing client secret"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
+  "error:pkg/oauth:missing_grant_type": {
+    "translations": {
+      "en": "missing grant type"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
   "error:pkg/oauth:missing_param_access_token_id": {
     "translations": {
       "en": "access token ID was not provided"
@@ -6981,6 +7053,15 @@
     "description": {
       "package": "pkg/oauth",
       "file": "user.go"
+    }
+  },
+  "error:pkg/oauth:missing_refresh_token": {
+    "translations": {
+      "en": "missing refresh token"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
     }
   },
   "error:pkg/oauth:no_access_token": {

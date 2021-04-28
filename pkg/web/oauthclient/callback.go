@@ -15,6 +15,7 @@
 package oauthclient
 
 import (
+	"context"
 	"encoding/json"
 	stderrors "errors"
 	"net/http"
@@ -32,31 +33,35 @@ var (
 	errExchange     = errors.DefinePermissionDenied("exchange", "token exchange refused")
 )
 
+type oauthAuthorizeResponse struct {
+	Error            string `form:"error" query:"error"`
+	ErrorDescription string `form:"error_description" query:"error_description"`
+	State            string `form:"state" query:"state"`
+	Code             string `form:"code" query:"code"`
+}
+
+func (res *oauthAuthorizeResponse) ValidateContext(c context.Context) error {
+	if res.Error != "" {
+		return errRefused.WithAttributes("reason", res.ErrorDescription)
+	}
+	if res.State == "" {
+		return errNoStateParam.New()
+	}
+	if res.Code == "" {
+		return errNoCodeParam.New()
+	}
+	return nil
+}
+
 // HandleCallback is a handler that takes the auth code and exchanges it for the
 // access token.
 func (oc *OAuthClient) HandleCallback(c echo.Context) error {
-	response := &struct {
-		Error            string `form:"error" query:"error"`
-		ErrorDescription string `form:"error_description" query:"error_description"`
-		State            string `form:"state" query:"state"`
-		Code             string `form:"code" query:"code"`
-	}{}
-	if err := c.Bind(response); err != nil {
+	var response oauthAuthorizeResponse
+	if err := c.Bind(&response); err != nil {
 		return err
 	}
-
-	if response.Error != "" {
-		return errRefused.WithAttributes("reason", response.ErrorDescription)
-	}
-
-	state := response.State
-	if state == "" {
-		return errNoStateParam.New()
-	}
-
-	code := response.Code
-	if code == "" {
-		return errNoCodeParam.New()
+	if err := response.ValidateContext(c.Request().Context()); err != nil {
+		return err
 	}
 
 	stateCookie, err := oc.getStateCookie(c)
@@ -72,8 +77,7 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 		}
 		return err
 	}
-
-	if stateCookie.Secret != state {
+	if stateCookie.Secret != response.State {
 		return errInvalidState.New()
 	}
 
@@ -86,7 +90,7 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	token, err := conf.Exchange(ctx, code)
+	token, err := conf.Exchange(ctx, response.Code)
 	if err != nil {
 		var retrieveError *oauth2.RetrieveError
 		if stderrors.As(err, &retrieveError) {
