@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -96,7 +97,7 @@ func TestAuth(t *testing.T) {
 }
 
 var (
-	singleFrameRequest = api.BuildSingleFrameRequest([]*ttnpb.RxMetadata{
+	singleFrameRequest = api.BuildSingleFrameRequest(test.Context(), []*ttnpb.RxMetadata{
 		{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "gtw1",
@@ -123,8 +124,7 @@ var (
 			SNR:           789.1,
 		},
 	})
-
-	singleFrameResponse = api.SingleFrameResponse{
+	singleFrameResponse = api.LocationSolverResponse{
 		Result: &api.LocationSolverResult{
 			UsedGateways: 2,
 			HDOP:         float64Ptr(123.4),
@@ -136,32 +136,139 @@ var (
 			},
 		},
 	}
+
+	multiFrameRequest = api.BuildMultiFrameRequest(test.Context(), [][]*ttnpb.RxMetadata{
+		{
+			{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "gtw1",
+				},
+				Location: &ttnpb.Location{
+					Latitude:  123.4,
+					Longitude: 234.5,
+					Altitude:  345,
+				},
+				RSSI: 567.8,
+				SNR:  678.9,
+			},
+			{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "gtw2",
+				},
+				Location: &ttnpb.Location{
+					Latitude:  234.5,
+					Longitude: 345.6,
+					Altitude:  456,
+				},
+				FineTimestamp: 890,
+				RSSI:          678.9,
+				SNR:           789.1,
+			},
+		},
+		{
+			{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "gtw1",
+				},
+				Location: &ttnpb.Location{
+					Latitude:  123.4,
+					Longitude: 234.5,
+					Altitude:  345,
+				},
+				RSSI: 890.1,
+				SNR:  910.1,
+			},
+			{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "gtw2",
+				},
+				Location: &ttnpb.Location{
+					Latitude:  234.5,
+					Longitude: 345.6,
+					Altitude:  456,
+				},
+				FineTimestamp: 910,
+				RSSI:          789.1,
+				SNR:           890.1,
+			},
+		},
+	})
+	multiFrameResponse = api.LocationSolverResponse{
+		Result: &api.LocationSolverResult{
+			UsedGateways: 2,
+			HDOP:         float64Ptr(345.6),
+			Algorithm:    api.Algorithm_RSSITDOA,
+			Location: api.Location{
+				Latitude:  234.5,
+				Longitude: 678.9,
+				Tolerance: 234,
+			},
+		},
+	}
 )
 
-func TestSingleFrame(t *testing.T) {
+func TestClient(t *testing.T) {
 	withClient(test.Context(), t, nil,
 		func(ctx context.Context, t *testing.T, reqChan <-chan *http.Request, respChan chan<- *http.Response, errChan chan<- error, cl *api.Client) {
-			a := assertions.New(t)
+			for _, tc := range []struct {
+				name          string
+				request       interface{}
+				response      interface{}
+				do            func(ctx context.Context, a *assertions.Assertion)
+				assertRequest func(t *testing.T, a *assertions.Assertion, body io.Reader)
+			}{
+				{
+					name:     "SingleFrameRequest",
+					request:  singleFrameRequest,
+					response: singleFrameResponse,
+					do: func(ctx context.Context, a *assertions.Assertion) {
+						resp, err := cl.SolveSingleFrame(ctx, singleFrameRequest)
+						if a.So(err, should.BeNil) {
+							a.So(resp.LocationSolverResponse, should.Resemble, singleFrameResponse)
+						}
+					},
+					assertRequest: func(t *testing.T, a *assertions.Assertion, body io.Reader) {
+						request := &api.SingleFrameRequest{}
+						a.So(json.NewDecoder(body).Decode(request), should.BeNil)
+						a.So(request, should.Resemble, singleFrameRequest)
+					},
+				},
+				{
+					name:     "MultiFrameRequest",
+					request:  multiFrameRequest,
+					response: multiFrameResponse,
+					do: func(ctx context.Context, a *assertions.Assertion) {
+						resp, err := cl.SolveMultiFrame(ctx, multiFrameRequest)
+						if a.So(err, should.BeNil) {
+							a.So(resp.LocationSolverResponse, should.Resemble, multiFrameResponse)
+						}
+					},
+					assertRequest: func(t *testing.T, a *assertions.Assertion, body io.Reader) {
+						request := &api.MultiFrameRequest{}
+						a.So(json.NewDecoder(body).Decode(request), should.BeNil)
+						a.So(request, should.Resemble, multiFrameRequest)
+					},
+				},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					a := assertions.New(t)
 
-			b := bytes.NewBuffer(nil)
-			a.So(json.NewEncoder(b).Encode(singleFrameResponse), should.BeNil)
+					b := bytes.NewBuffer(nil)
+					a.So(json.NewEncoder(b).Encode(tc.response), should.BeNil)
 
-			respChan <- &http.Response{
-				StatusCode: http.StatusOK,
-				Body:       ioutil.NopCloser(b),
-			}
-			errChan <- nil
+					respChan <- &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(b),
+					}
+					errChan <- nil
 
-			resp, err := cl.SolveSingleFrame(ctx, singleFrameRequest)
-			req := <-reqChan
-			if a.So(err, should.BeNil) {
-				a.So(resp.SingleFrameResponse, should.Resemble, singleFrameResponse)
-			}
+					tc.do(ctx, a)
 
-			if a.So(req, should.NotBeNil) {
-				request := &api.SingleFrameRequest{}
-				a.So(json.NewDecoder(req.Body).Decode(request), should.BeNil)
-				a.So(request, should.Resemble, singleFrameRequest)
+					req := <-reqChan
+					if a.So(req, should.NotBeNil) {
+						tc.assertRequest(t, a, req.Body)
+					}
+				})
 			}
 		})
 }

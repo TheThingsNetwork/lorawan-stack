@@ -100,30 +100,80 @@ func New(server io.Server, registry packages.Registry) packages.ApplicationPacka
 	}
 }
 
+func (p *GeolocationPackage) singleFrameQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (*api.ExtendedLocationSolverResponse, error) {
+	req := api.BuildSingleFrameRequest(ctx, up.RxMetadata)
+	if len(req.Gateways) < 3 {
+		return nil, nil
+	}
+	return client.SolveSingleFrame(ctx, req)
+}
+
+func minInt(a int, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
+}
+
+func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (*api.ExtendedLocationSolverResponse, error) {
+	count := data.MultiFrameWindowSize
+	if count == 0 && len(up.FRMPayload) > 0 {
+		count = int(up.FRMPayload[0])
+		count = minInt(count, 16)
+	}
+	if count == 0 {
+		return nil, nil
+	}
+
+	now := time.Now()
+	var mds [][]*ttnpb.RxMetadata
+	if err := p.server.RangeUplinks(ctx, ids, []string{"rx_metadata", "received_at"},
+		func(ctx context.Context, up *ttnpb.ApplicationUplink) bool {
+			if now.Sub(up.ReceivedAt) > data.MultiFrameWindowAge {
+				return true
+			}
+			mds = append(mds, up.RxMetadata)
+			if len(mds) == count {
+				return false
+			}
+			return true
+		}); err != nil {
+		return nil, err
+	}
+
+	req := api.BuildMultiFrameRequest(ctx, mds)
+	if len(req.Gateways) < 3 {
+		return nil, nil
+	}
+	return client.SolveMultiFrame(ctx, req)
+}
+
 func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data) error {
-	logger := log.FromContext(ctx)
+	var runQuery func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationUplink, *Data, *api.Client) (*api.ExtendedLocationSolverResponse, error)
+	switch data.Query {
+	case QUERY_TOARSSI:
+		if data.MultiFrame {
+			runQuery = p.multiFrameQuery
+		} else {
+			runQuery = p.singleFrameQuery
+		}
+	default:
+		return nil
+	}
 
 	httpClient, err := p.server.HTTPClient(ctx)
 	if err != nil {
 		return err
 	}
-
-	req := api.BuildSingleFrameRequest(up.RxMetadata)
-	if len(req.Gateways) < 3 {
-		logger.Debug("Not enough gateways available")
-		return nil
-	}
 	client, err := api.New(httpClient, api.WithToken(data.Token), api.WithBaseURL(data.ServerURL))
 	if err != nil {
-		logger.WithError(err).Debug("Failed to create API client")
 		return err
 	}
-	resp, err := client.SolveSingleFrame(ctx, req)
-	if err != nil {
-		logger.WithError(err).Debug("Query failed")
+
+	resp, err := runQuery(ctx, ids, up, data, client)
+	if err != nil || resp == nil {
 		return err
 	}
-	logger.Debug("Query sent to Geolocation services")
 
 	resultStruct, err := toStruct(resp.Raw)
 	if err != nil {
