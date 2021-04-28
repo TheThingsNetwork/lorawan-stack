@@ -178,10 +178,7 @@ func getDecoder(ctx context.Context, req *ttnpb.GetPayloadFormatterRequest, f fu
 			return nil, err
 		}
 	}
-	return f(store.GetCodecRequest{
-		VersionIDs: req.VersionIDs,
-		Paths:      ttnpb.AddFields(req.FieldMask.Paths, "formatter", "formatter_parameter"),
-	})
+	return f(req)
 }
 
 // GetUplinkDecoder implements the ttnpb.DeviceRepositoryServer interface.
@@ -201,8 +198,5 @@ func (dr *DeviceRepository) GetDownlinkEncoder(ctx context.Context, req *ttnpb.G
 			return nil, err
 		}
 	}
-	return dr.store.GetDownlinkEncoder(store.GetCodecRequest{
-		VersionIDs: req.VersionIDs,
-		Paths:      ttnpb.AddFields(req.FieldMask.Paths, "formatter", "formatter_parameter"),
-	})
+	return dr.store.GetDownlinkEncoder(req)
 }

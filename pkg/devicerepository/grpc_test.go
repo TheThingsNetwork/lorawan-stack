@@ -96,22 +96,22 @@ func (s *mockStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
 func (s *mockStore) GetUplinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error) {
-	s.lastVersionIDs = req.VersionIDs
-	s.lastCodecPaths = req.Paths
+	s.lastVersionIDs = req.GetVersionIDs()
+	s.lastCodecPaths = req.GetFieldMask().Paths
 	return s.uplinkDecoder, s.err
 }
 
 // GetDownlinkDecoder retrieves the codec for decoding downlink messages.
 func (s *mockStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error) {
-	s.lastVersionIDs = req.VersionIDs
-	s.lastCodecPaths = req.Paths
+	s.lastVersionIDs = req.GetVersionIDs()
+	s.lastCodecPaths = req.GetFieldMask().Paths
 	return s.downlinkDecoder, s.err
 }
 
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
 func (s *mockStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadEncoder, error) {
-	s.lastVersionIDs = req.VersionIDs
-	s.lastCodecPaths = req.Paths
+	s.lastVersionIDs = req.GetVersionIDs()
+	s.lastCodecPaths = req.GetFieldMask().Paths
 	return s.downlinkEncoder, s.err
 }
 
@@ -649,7 +649,6 @@ func TestGRPC(t *testing.T) {
 			a.So(c, should.BeNil)
 			a.So(err.Error(), should.ContainSubstring, st.err.Error())
 			a.So(st.lastVersionIDs, should.Resemble, ids)
-			a.So(st.lastCodecPaths, should.HaveSameElementsDeep, []string{"formatter", "formatter_parameter"})
 		})
 
 		t.Run("Success", func(t *testing.T) {
@@ -698,7 +697,6 @@ func TestGRPC(t *testing.T) {
 			a.So(c, should.BeNil)
 			a.So(err.Error(), should.ContainSubstring, st.err.Error())
 			a.So(st.lastVersionIDs, should.Resemble, ids)
-			a.So(st.lastCodecPaths, should.HaveSameElementsDeep, []string{"formatter", "formatter_parameter"})
 		})
 
 		t.Run("Success", func(t *testing.T) {
@@ -747,7 +745,6 @@ func TestGRPC(t *testing.T) {
 			a.So(c, should.BeNil)
 			a.So(err.Error(), should.ContainSubstring, st.err.Error())
 			a.So(st.lastVersionIDs, should.Resemble, ids)
-			a.So(st.lastCodecPaths, should.HaveSameElementsDeep, []string{"formatter", "formatter_parameter"})
 		})
 
 		t.Run("Success", func(t *testing.T) {

@@ -287,7 +287,7 @@ var (
 )
 
 func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *EndDeviceCodecs) *EndDeviceDecoderCodec) (*ttnpb.MessagePayloadDecoder, error) {
-	codecs, err := s.getCodecs(req.VersionIDs)
+	codecs, err := s.getCodecs(req.GetVersionIDs())
 	if err != nil {
 		return nil, err
 	}
@@ -296,12 +296,14 @@ func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *
 		return nil, errNoDecoder.WithAttributes("codec_id", codecs.CodecID)
 	}
 
-	b, err := s.fetcher.File("vendor", req.VersionIDs.BrandID, codec.FileName)
+	b, err := s.fetcher.File("vendor", req.GetVersionIDs().BrandID, codec.FileName)
 	if err != nil {
 		return nil, err
 	}
+
+	paths := ttnpb.AddFields(req.GetFieldMask().Paths, "formatter", "formatter_parameter")
 	var examples []*ttnpb.MessagePayloadDecoder_Example
-	if len(codec.Examples) > 0 {
+	if ttnpb.HasAnyField([]string{"examples"}, paths...) && len(codec.Examples) > 0 {
 		examples = make([]*ttnpb.MessagePayloadDecoder_Example, 0, len(codec.Examples))
 		for _, e := range codec.Examples {
 			pb := &ttnpb.MessagePayloadDecoder_Example{
@@ -328,7 +330,7 @@ func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *
 		CodecID:            codecs.CodecID,
 	}
 	pb := &ttnpb.MessagePayloadDecoder{}
-	if err := pb.SetFields(formatter, ttnpb.AddFields(req.Paths, "formatter", "formatter_parameter")...); err != nil {
+	if err := pb.SetFields(formatter, paths...); err != nil {
 		return nil, err
 	}
 	return pb, nil
@@ -346,22 +348,23 @@ func (s *remoteStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.Mess
 
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
 func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadEncoder, error) {
-	codecs, err := s.getCodecs(req.VersionIDs)
+	codecs, err := s.getCodecs(req.GetVersionIDs())
 	if err != nil {
 		return nil, err
 	}
 	codec := codecs.DownlinkEncoder
 
 	if codec.FileName == "" {
-		return nil, errNoEncoder.WithAttributes("firmware_version", req.VersionIDs.FirmwareVersion, "band_id", req.VersionIDs.BandID)
+		return nil, errNoEncoder.WithAttributes("firmware_version", req.GetVersionIDs().FirmwareVersion, "band_id", req.GetVersionIDs().BandID)
 	}
 
-	b, err := s.fetcher.File("vendor", req.VersionIDs.BrandID, codec.FileName)
+	b, err := s.fetcher.File("vendor", req.GetVersionIDs().BrandID, codec.FileName)
 	if err != nil {
 		return nil, err
 	}
+	paths := ttnpb.AddFields(req.GetFieldMask().Paths, "formatter", "formatter_parameter")
 	var examples []*ttnpb.MessagePayloadEncoder_Example
-	if len(codec.Examples) > 0 {
+	if ttnpb.HasAnyField([]string{"examples"}, paths...) && len(codec.Examples) > 0 {
 		examples = make([]*ttnpb.MessagePayloadEncoder_Example, 0, len(codec.Examples))
 		for _, e := range codec.Examples {
 			pb := &ttnpb.MessagePayloadEncoder_Example{
@@ -387,7 +390,7 @@ func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.Mess
 		CodecID:            codecs.CodecID,
 	}
 	pb := &ttnpb.MessagePayloadEncoder{}
-	if err := pb.SetFields(formatter, ttnpb.AddFields(req.Paths, "formatter", "formatter_parameter")...); err != nil {
+	if err := pb.SetFields(formatter, paths...); err != nil {
 		return nil, err
 	}
 	return pb, nil

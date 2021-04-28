@@ -15,6 +15,7 @@
 package store
 
 import (
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -56,9 +57,9 @@ type GetModelsResponse struct {
 }
 
 // GetCodecRequest is a request to retrieve the codec of
-type GetCodecRequest struct {
-	VersionIDs *ttnpb.EndDeviceVersionIdentifiers
-	Paths      []string
+type GetCodecRequest interface {
+	GetVersionIDs() *ttnpb.EndDeviceVersionIdentifiers
+	GetFieldMask() pbtypes.FieldMask
 }
 
 // Store contains end device definitions.

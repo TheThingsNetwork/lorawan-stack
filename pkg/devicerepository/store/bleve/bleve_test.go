@@ -432,7 +432,7 @@ func TestBleve(t *testing.T) {
 					BandID:          "unknown-band",
 				},
 			} {
-				codec, err := s.GetDownlinkDecoder(store.GetCodecRequest{VersionIDs: &ids})
+				codec, err := s.GetDownlinkDecoder(&ttnpb.GetPayloadFormatterRequest{VersionIDs: &ids})
 				a.So(errors.IsNotFound(err), should.BeTrue)
 				a.So(codec, should.Equal, nil)
 			}
@@ -476,7 +476,7 @@ func TestBleve(t *testing.T) {
 					FirmwareVersion: "1.1",
 					BandID:          "EU_433",
 				}
-				codec, err := tc.f(store.GetCodecRequest{VersionIDs: versionIDs})
+				codec, err := tc.f(&ttnpb.GetPayloadFormatterRequest{VersionIDs: versionIDs})
 				a.So(err, should.BeNil)
 				a.So(codec, should.Resemble, tc.codec)
 			})
