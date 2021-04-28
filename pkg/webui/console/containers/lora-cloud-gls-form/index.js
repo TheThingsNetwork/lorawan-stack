@@ -62,9 +62,13 @@ const m = defineMessages({
   multiFrameTimeWindowDescription: 'The maximum age of considered historical messages in minutes',
 })
 
-const LORACLOUD_GLS_QUERY_LABELS = Object.freeze([{ value: 'TDOARSSI', label: 'LoRa® TOA/RSSI' }])
+const LORACLOUD_GLS_QUERY_LABELS = Object.freeze([
+  { value: 'TDOARSSI', label: 'LoRa® TOA/RSSI' },
+  { value: 'GNSS', label: 'GNSS' },
+])
 const LORACLOUD_GLS_QUERY_TYPES = Object.freeze({
   TDOARSSI: 'TDOARSSI',
+  GNSS: 'GNSS',
 })
 const LORACLOUD_GLS_QUERY_VALUES = Object.freeze(Object.values(LORACLOUD_GLS_QUERY_TYPES))
 

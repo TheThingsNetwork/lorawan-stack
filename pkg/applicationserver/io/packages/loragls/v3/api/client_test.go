@@ -205,6 +205,16 @@ var (
 			},
 		},
 	}
+
+	gnssRequest = &api.GNSSRequest{
+		Payload: []byte{0x01, 0x02, 0x03},
+	}
+	gnssResponse = api.GNSSLocationSolverResponse{
+		Result: &api.GNSSLocationSolverResult{
+			LLH:      []float64{123.4, 456.8, 567.9},
+			Accuracy: 678.8,
+		},
+	}
 )
 
 func TestClient(t *testing.T) {
@@ -247,6 +257,22 @@ func TestClient(t *testing.T) {
 						request := &api.MultiFrameRequest{}
 						a.So(json.NewDecoder(body).Decode(request), should.BeNil)
 						a.So(request, should.Resemble, multiFrameRequest)
+					},
+				},
+				{
+					name:     "GNSSRequest",
+					request:  gnssRequest,
+					response: gnssResponse,
+					do: func(ctx context.Context, a *assertions.Assertion) {
+						resp, err := cl.SolveGNSS(ctx, gnssRequest)
+						if a.So(err, should.BeNil) {
+							a.So(resp.GNSSLocationSolverResponse, should.Resemble, gnssResponse)
+						}
+					},
+					assertRequest: func(t *testing.T, a *assertions.Assertion, body io.Reader) {
+						request := &api.GNSSRequest{}
+						a.So(json.NewDecoder(body).Decode(request), should.BeNil)
+						a.So(request, should.Resemble, gnssRequest)
 					},
 				},
 			} {

@@ -20,6 +20,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -209,4 +210,71 @@ func (r *ExtendedLocationSolverResponse) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	return json.Unmarshal(b, &r.LocationSolverResponse)
+}
+
+// Hex represents hex encoded bytes.
+type Hex []byte
+
+// MarshalJSON implements json.Marshaler.
+func (h Hex) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("\"%s\"", hex.EncodeToString(h))), nil
+}
+
+// String implements fmt.Stringer.
+func (h Hex) String() string {
+	return hex.EncodeToString(h)
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (h *Hex) UnmarshalJSON(b []byte) (err error) {
+	s := strings.TrimSuffix(strings.TrimPrefix(string(b), "\""), "\"")
+	*h, err = hex.DecodeString(s)
+	return
+}
+
+// GNSSRequest contains the location query request based on a GNSS payload.
+// https://www.loracloud.com/documentation/geolocation?url=gnss.html#single-capture-http-request
+type GNSSRequest struct {
+	Payload Hex `json:"payload"`
+}
+
+// GNSSLocationSolverResult contains the result of a GNSS location query.
+// https://www.loracloud.com/documentation/geolocation?url=gnss.html#locationsolverresult
+type GNSSLocationSolverResult struct {
+	LLH      []float64 `json:"llh"`
+	Accuracy float64   `json:"accuracy"`
+}
+
+// LocationSolverResponse contains the GNSS location query response.
+// https://www.loracloud.com/documentation/geolocation?url=gnss.html#single-capture-http-request
+type GNSSLocationSolverResponse struct {
+	Result   *GNSSLocationSolverResult `json:"result"`
+	Errors   []string                  `json:"errors"`
+	Warnings []string                  `json:"warnings"`
+}
+
+// ExtendedGNSSLocationSolverResponse extends GNSSLocationSolverResponse with the raw JSON representation.
+type ExtendedGNSSLocationSolverResponse struct {
+	GNSSLocationSolverResponse
+
+	Raw *json.RawMessage
+}
+
+// MarshalJSON implements json.Marshaler.
+// Note that the Raw representation takes precedence
+// in the marshaling process, if it is available.
+func (r ExtendedGNSSLocationSolverResponse) MarshalJSON() ([]byte, error) {
+	if r.Raw != nil {
+		return r.Raw.MarshalJSON()
+	}
+	return json.Marshal(r.GNSSLocationSolverResponse)
+}
+
+// UnmarshalJSON implements json.Marshaler.
+func (r *ExtendedGNSSLocationSolverResponse) UnmarshalJSON(b []byte) error {
+	r.Raw = &json.RawMessage{}
+	if err := r.Raw.UnmarshalJSON(b); err != nil {
+		return err
+	}
+	return json.Unmarshal(b, &r.GNSSLocationSolverResponse)
 }
