@@ -150,6 +150,7 @@ const LoRaCloudGLSForm = () => {
           package_name: LORA_CLOUD_GLS.DEFAULT_PACKAGE_NAME,
         }),
       )
+      formRef.current.resetForm({ values: validationSchema.getDefault() })
       toast({
         title: 'LoRa Cloud',
         message: sharedMessages.tokenDeleted,
