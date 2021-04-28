@@ -2843,24 +2843,6 @@
       "file": "messages.go"
     }
   },
-  "error:pkg/basicstation/cups:invalid_cups_uri": {
-    "translations": {
-      "en": "Invalid CUPS URI `{uri}`"
-    },
-    "description": {
-      "package": "pkg/basicstation/cups",
-      "file": "update_info.go"
-    }
-  },
-  "error:pkg/basicstation/cups:invalid_token": {
-    "translations": {
-      "en": "invalid provisioning token"
-    },
-    "description": {
-      "package": "pkg/basicstation/cups",
-      "file": "update_info.go"
-    }
-  },
   "error:pkg/basicstation/cups:lns_credentials_not_found": {
     "translations": {
       "en": "LNS credentials not found for gateway `{gateway_uid}`"
@@ -2868,6 +2850,15 @@
     "description": {
       "package": "pkg/basicstation/cups",
       "file": "update_info.go"
+    }
+  },
+  "error:pkg/basicstation/cups:missing_router": {
+    "translations": {
+      "en": "missing router"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "messages.go"
     }
   },
   "error:pkg/basicstation/cups:no_trust": {

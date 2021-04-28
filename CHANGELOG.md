@@ -25,6 +25,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Occasional crashes in the ratelimit middleware.
+- Handling of zero EUI CUPS update-info requests.
 
 ### Security
 

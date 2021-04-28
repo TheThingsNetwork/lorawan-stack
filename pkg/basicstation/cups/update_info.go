@@ -47,8 +47,6 @@ const (
 
 var (
 	errUnauthenticated       = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
-	errInvalidToken          = errors.DefinePermissionDenied("invalid_token", "invalid provisioning token")
-	errInvalidCUPSURI        = errors.DefineInvalidArgument("invalid_cups_uri", "Invalid CUPS URI `{uri}`")
 	errTargetCUPSCredentials = errors.DefineNotFound("target_cups_credentials_not_found", "Target CUPS credentials not found for gateway `{gateway_uid}`")
 	errLNSCredentials        = errors.DefineNotFound("lns_credentials_not_found", "LNS credentials not found for gateway `{gateway_uid}`")
 	errServerTrust           = errors.Define("server_trust", "failed to fetch server trust for address `{address}`")
@@ -152,12 +150,15 @@ var getGatewayMask = pbtypes.FieldMask{Paths: []string{
 
 // UpdateInfo implements the CUPS update-info handler.
 func (s *Server) UpdateInfo(c echo.Context) error {
-	if c.Request().Header.Get(echo.HeaderContentType) == "" {
-		c.Request().Header.Set(echo.HeaderContentType, "application/json")
-	}
+	// This is to account for older LBS gateways that don't set this header.
+	c.Request().Header.Set(echo.HeaderContentType, "application/json")
 
 	var req UpdateInfoRequest
 	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	if err := req.ValidateContext(c.Request().Context()); err != nil {
 		return err
 	}
 
