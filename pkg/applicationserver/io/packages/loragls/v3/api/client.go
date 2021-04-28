@@ -48,7 +48,7 @@ type Client struct {
 const (
 	contentType      = "application/json"
 	defaultServerURL = "https://gls.loracloud.com"
-	basePath         = "/api/v3"
+	basePath         = "/api"
 )
 
 var (
@@ -56,9 +56,9 @@ var (
 	DefaultServerURL *url.URL
 )
 
-func (c *Client) newRequest(ctx context.Context, method, category, operation string, body io.Reader) (*http.Request, error) {
+func (c *Client) newRequest(ctx context.Context, version, method, category, operation string, body io.Reader) (*http.Request, error) {
 	u := urlutil.CloneURL(c.baseURL)
-	u.Path = path.Join(basePath, category, operation)
+	u.Path = path.Join(basePath, version, category, operation)
 	req, err := http.NewRequestWithContext(ctx, method, u.String(), body)
 	if err != nil {
 		return nil, err
@@ -72,8 +72,8 @@ func (c *Client) newRequest(ctx context.Context, method, category, operation str
 }
 
 // Do executes a new HTTP request with the given parameters and body and returns the response.
-func (c *Client) Do(ctx context.Context, method, category, operation string, body io.Reader) (*http.Response, error) {
-	req, err := c.newRequest(ctx, method, category, operation, body)
+func (c *Client) Do(ctx context.Context, version, method, category, operation string, body io.Reader) (*http.Response, error) {
+	req, err := c.newRequest(ctx, version, method, category, operation, body)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (c *Client) SolveSingleFrame(ctx context.Context, request *SingleFrameReque
 	if err := json.NewEncoder(buffer).Encode(request); err != nil {
 		return nil, err
 	}
-	resp, err := c.Do(ctx, http.MethodPost, "solve", "singleframe", buffer)
+	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "singleframe", buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (c *Client) SolveMultiFrame(ctx context.Context, request *MultiFrameRequest
 	if err := json.NewEncoder(buffer).Encode(request); err != nil {
 		return nil, err
 	}
-	resp, err := c.Do(ctx, http.MethodPost, "solve", "multiframe", buffer)
+	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "multiframe", buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -136,11 +136,29 @@ func (c *Client) SolveGNSS(ctx context.Context, request *GNSSRequest) (*Extended
 	if err := json.NewEncoder(buffer).Encode(request); err != nil {
 		return nil, err
 	}
-	resp, err := c.Do(ctx, http.MethodPost, "solve", "gnss_lr1110_singleframe", buffer)
+	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "gnss_lr1110_singleframe", buffer)
 	if err != nil {
 		return nil, err
 	}
 	response := &ExtendedGNSSLocationSolverResponse{}
+	err = parse(&response, resp)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+// SolveWiFi attempts to solve the location of the end-device using the provided WiFi request.
+func (c *Client) SolveWiFi(ctx context.Context, request *WiFiRequest) (*ExtendedWiFiLocationSolverResponse, error) {
+	buffer := bytes.NewBuffer(nil)
+	if err := json.NewEncoder(buffer).Encode(request); err != nil {
+		return nil, err
+	}
+	resp, err := c.Do(ctx, http.MethodPost, "v2", "", "loraWifi", buffer)
+	if err != nil {
+		return nil, err
+	}
+	response := &ExtendedWiFiLocationSolverResponse{}
 	err = parse(&response, resp)
 	if err != nil {
 		return nil, err

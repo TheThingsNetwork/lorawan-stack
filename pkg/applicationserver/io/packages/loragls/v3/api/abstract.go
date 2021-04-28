@@ -122,3 +122,29 @@ func (r *ExtendedGNSSLocationSolverResponse) AbstractResponse() AbstractLocation
 		raw:      r.Raw,
 	}
 }
+
+func (r *WiFiLocationSolverResult) abstractResult() AbstractLocationSolverResult {
+	if r == nil {
+		return nil
+	}
+	return abstractLocationSolverResult{
+		algorithm: r.Algorithm,
+		location: ttnpb.Location{
+			Latitude:  r.Latitude,
+			Longitude: r.Longitude,
+			Altitude:  int32(r.Altitude),
+			Accuracy:  int32(r.Accuracy),
+			Source:    ttnpb.SOURCE_WIFI_RSSI_GEOLOCATION,
+		},
+	}
+}
+
+// AbstractResponse converts the WiFi location solver response to the abstract location response format.
+func (r *ExtendedWiFiLocationSolverResponse) AbstractResponse() abstractLocationSolverResponse {
+	return abstractLocationSolverResponse{
+		result:   r.Result.abstractResult(),
+		errors:   r.Errors[:],
+		warnings: r.Warnings[:],
+		raw:      r.Raw,
+	}
+}

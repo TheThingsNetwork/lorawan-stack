@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
 - Gateway Configuration Server to the cluster package.
 - LoRaCloud GLS multi frame request support.
 - LoRaCloud GNSS request support.
+- LoRaCloud WiFi request support.
 
 ### Changed
 

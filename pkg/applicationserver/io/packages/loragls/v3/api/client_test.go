@@ -68,7 +68,7 @@ func TestNoAuth(t *testing.T) {
 			}
 			errChan <- nil
 
-			resp, err := cl.Do(ctx, "foo", "bar", http.MethodGet, nil)
+			resp, err := cl.Do(ctx, "v3", "foo", "bar", http.MethodGet, nil)
 			req := <-reqChan
 			a.So(resp, should.NotBeNil)
 			a.So(err, should.BeNil)
@@ -86,7 +86,7 @@ func TestAuth(t *testing.T) {
 			}
 			errChan <- nil
 
-			resp, err := cl.Do(ctx, "foo", "bar", http.MethodGet, nil)
+			resp, err := cl.Do(ctx, "v3", "foo", "bar", http.MethodGet, nil)
 			req := <-reqChan
 			a.So(resp, should.NotBeNil)
 			a.So(err, should.BeNil)
@@ -215,6 +215,54 @@ var (
 			Accuracy: 678.8,
 		},
 	}
+
+	wifiRequest = &api.WiFiRequest{
+		LoRaWAN: []api.TDOAUplink{
+			{
+				GatewayID: "gtw1",
+				RSSI:      123.4,
+				SNR:       234.5,
+				TOA:       float64Ptr(234.5),
+				AntennaLocation: api.AntennaLocation{
+					Latitude:  234.5,
+					Longitude: 678.9,
+					Altitude:  345.7,
+				},
+			},
+			{
+				GatewayID: "gtw2",
+				RSSI:      234.5,
+				SNR:       345.7,
+				TOA:       float64Ptr(456.7),
+				AntennaLocation: api.AntennaLocation{
+					Latitude:  345.5,
+					Longitude: 567.9,
+					Altitude:  789.7,
+				},
+			},
+		},
+		WiFiAccessPoints: []api.AccessPoint{
+			{
+				MACAddress:     "00:02:01:53:8B:50",
+				SignalStrength: -20,
+			},
+			{
+				MACAddress:     "00:02:13:44:55:20",
+				SignalStrength: -80,
+			},
+		},
+	}
+	wifiResponse = api.WiFiLocationSolverResponse{
+		Result: &api.WiFiLocationSolverResult{
+			Latitude:         234.5,
+			Longitude:        678.9,
+			Altitude:         123.4,
+			Accuracy:         23,
+			Algorithm:        "Wifi",
+			GatewaysReceived: 2,
+			GatewaysUsed:     2,
+		},
+	}
 )
 
 func TestClient(t *testing.T) {
@@ -273,6 +321,22 @@ func TestClient(t *testing.T) {
 						request := &api.GNSSRequest{}
 						a.So(json.NewDecoder(body).Decode(request), should.BeNil)
 						a.So(request, should.Resemble, gnssRequest)
+					},
+				},
+				{
+					name:     "WiFiRequest",
+					request:  wifiRequest,
+					response: wifiResponse,
+					do: func(ctx context.Context, a *assertions.Assertion) {
+						resp, err := cl.SolveWiFi(ctx, wifiRequest)
+						if a.So(err, should.BeNil) {
+							a.So(resp.WiFiLocationSolverResponse, should.Resemble, wifiResponse)
+						}
+					},
+					assertRequest: func(t *testing.T, a *assertions.Assertion, body io.Reader) {
+						request := &api.WiFiRequest{}
+						a.So(json.NewDecoder(body).Decode(request), should.BeNil)
+						a.So(request, should.Resemble, wifiRequest)
 					},
 				},
 			} {

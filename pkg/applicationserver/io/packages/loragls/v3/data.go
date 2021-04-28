@@ -39,6 +39,8 @@ func (t QueryType) Value() *types.Value {
 		s = "TOARSSI"
 	case QUERY_GNSS:
 		s = "GNSS"
+	case QUERY_TOAWIFI:
+		s = "TOAWIFI"
 	default:
 		panic("invalid query type")
 	}
@@ -59,6 +61,8 @@ func (t *QueryType) FromValue(v *types.Value) error {
 		*t = QUERY_TOARSSI
 	case "GNSS":
 		*t = QUERY_GNSS
+	case "TOAWIFI":
+		*t = QUERY_TOAWIFI
 	default:
 		return errInvalidValue.WithAttributes("value", sv.StringValue)
 	}
@@ -70,6 +74,8 @@ const (
 	QUERY_TOARSSI QueryType = iota
 	// QUERY_GNSS uses the GNSS scan operations payload of the LR1110 transceiver.
 	QUERY_GNSS
+	// QUERY_TOAWIFI uses the TOA and RSSI information, in addition to nearby WiFi access points.
+	QUERY_TOAWIFI
 )
 
 // Data contains the package configuration.
