@@ -190,7 +190,7 @@ func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceI
 		}
 	case QUERY_GNSS:
 		runQuery = p.gnssQuery
-	case QUERY_TDOAWIFI:
+	case QUERY_TOAWIFI:
 		runQuery = p.wifiQuery
 	default:
 		return nil
