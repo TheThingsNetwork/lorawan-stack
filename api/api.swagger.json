@@ -15211,8 +15211,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3MessagePayloadDecoderExample"
-          },
-          "title": "Examples"
+          }
         }
       }
     },
@@ -15248,8 +15247,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3MessagePayloadEncoderExample"
-          },
-          "title": "Examples"
+          }
         }
       }
     },

@@ -8279,7 +8279,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             },
             {
               "name": "errors",
@@ -8289,7 +8301,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             }
           ]
         },
@@ -8338,7 +8362,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             },
             {
               "name": "errors",
@@ -8348,7 +8384,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             }
           ]
         },
@@ -9738,13 +9786,21 @@
             },
             {
               "name": "examples",
-              "description": "Examples",
+              "description": "",
               "label": "repeated",
               "type": "Example",
               "longType": "MessagePayloadDecoder.Example",
               "fullType": "ttn.lorawan.v3.MessagePayloadDecoder.Example",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
             }
           ]
         },
@@ -9765,7 +9821,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 200
+                  }
+                ]
+              }
             },
             {
               "name": "input",
@@ -9850,13 +9914,21 @@
             },
             {
               "name": "examples",
-              "description": "Examples",
+              "description": "",
               "label": "repeated",
               "type": "Example",
               "longType": "MessagePayloadEncoder.Example",
               "fullType": "ttn.lorawan.v3.MessagePayloadEncoder.Example",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
             }
           ]
         },
@@ -9877,7 +9949,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 200
+                  }
+                ]
+              }
             },
             {
               "name": "input",

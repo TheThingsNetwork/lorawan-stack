@@ -1449,7 +1449,31 @@ func (m *EncodedMessagePayload) ValidateFields(paths ...string) error {
 			// no validation rules for FRMPayload
 		case "warnings":
 
+			for idx, item := range m.GetWarnings() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return EncodedMessagePayloadValidationError{
+						field:  fmt.Sprintf("warnings[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
 		case "errors":
+
+			for idx, item := range m.GetErrors() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return EncodedMessagePayloadValidationError{
+						field:  fmt.Sprintf("errors[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
 
 		default:
 			return EncodedMessagePayloadValidationError{
@@ -1546,7 +1570,31 @@ func (m *DecodedMessagePayload) ValidateFields(paths ...string) error {
 
 		case "warnings":
 
+			for idx, item := range m.GetWarnings() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return DecodedMessagePayloadValidationError{
+						field:  fmt.Sprintf("warnings[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
 		case "errors":
+
+			for idx, item := range m.GetErrors() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return DecodedMessagePayloadValidationError{
+						field:  fmt.Sprintf("errors[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
 
 		default:
 			return DecodedMessagePayloadValidationError{
@@ -1657,6 +1705,13 @@ func (m *MessagePayloadDecoder) ValidateFields(paths ...string) error {
 			}
 
 		case "examples":
+
+			if len(m.GetExamples()) > 20 {
+				return MessagePayloadDecoderValidationError{
+					field:  "examples",
+					reason: "value must contain no more than 20 item(s)",
+				}
+			}
 
 			for idx, item := range m.GetExamples() {
 				_, _ = idx, item
@@ -1784,6 +1839,13 @@ func (m *MessagePayloadEncoder) ValidateFields(paths ...string) error {
 			}
 
 		case "examples":
+
+			if len(m.GetExamples()) > 20 {
+				return MessagePayloadEncoderValidationError{
+					field:  "examples",
+					reason: "value must contain no more than 20 item(s)",
+				}
+			}
 
 			for idx, item := range m.GetExamples() {
 				_, _ = idx, item
@@ -3067,7 +3129,14 @@ func (m *MessagePayloadDecoder_Example) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "description":
-			// no validation rules for Description
+
+			if utf8.RuneCountInString(m.GetDescription()) > 200 {
+				return MessagePayloadDecoder_ExampleValidationError{
+					field:  "description",
+					reason: "value length must be at most 200 runes",
+				}
+			}
+
 		case "input":
 
 			if v, ok := interface{}(m.GetInput()).(interface{ ValidateFields(...string) error }); ok {
@@ -3175,7 +3244,14 @@ func (m *MessagePayloadEncoder_Example) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "description":
-			// no validation rules for Description
+
+			if utf8.RuneCountInString(m.GetDescription()) > 200 {
+				return MessagePayloadEncoder_ExampleValidationError{
+					field:  "description",
+					reason: "value length must be at most 200 runes",
+				}
+			}
+
 		case "input":
 
 			if v, ok := interface{}(m.GetInput()).(interface{ ValidateFields(...string) error }); ok {

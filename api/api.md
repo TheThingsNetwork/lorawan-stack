@@ -2399,6 +2399,13 @@ and allows clients to claim end devices.
 | `warnings` | [`string`](#string) | repeated |  |
 | `errors` | [`string`](#string) | repeated |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `warnings` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.max_len`: `100`</p> |
+| `errors` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.max_len`: `100`</p> |
+
 ### <a name="ttn.lorawan.v3.EncodedMessagePayload">Message `EncodedMessagePayload`</a>
 
 | Field | Type | Label | Description |
@@ -2413,6 +2420,8 @@ and allows clients to claim end devices.
 | Field | Validations |
 | ----- | ----------- |
 | `f_port` | <p>`uint32.lte`: `255`</p> |
+| `warnings` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.max_len`: `100`</p> |
+| `errors` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDeviceBrand">Message `EndDeviceBrand`</a>
 
@@ -2672,7 +2681,7 @@ and allows clients to claim end devices.
 | `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  | Payload formatter type. |
 | `formatter_parameter` | [`string`](#string) |  | Parameter for the formatter, must be set together. |
 | `codec_id` | [`string`](#string) |  |  |
-| `examples` | [`MessagePayloadDecoder.Example`](#ttn.lorawan.v3.MessagePayloadDecoder.Example) | repeated | Examples |
+| `examples` | [`MessagePayloadDecoder.Example`](#ttn.lorawan.v3.MessagePayloadDecoder.Example) | repeated |  |
 
 #### Field Rules
 
@@ -2680,6 +2689,7 @@ and allows clients to claim end devices.
 | ----- | ----------- |
 | `formatter` | <p>`enum.defined_only`: `true`</p> |
 | `codec_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$`</p> |
+| `examples` | <p>`repeated.max_items`: `20`</p> |
 
 ### <a name="ttn.lorawan.v3.MessagePayloadDecoder.Example">Message `MessagePayloadDecoder.Example`</a>
 
@@ -2689,6 +2699,12 @@ and allows clients to claim end devices.
 | `input` | [`EncodedMessagePayload`](#ttn.lorawan.v3.EncodedMessagePayload) |  |  |
 | `output` | [`DecodedMessagePayload`](#ttn.lorawan.v3.DecodedMessagePayload) |  |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `description` | <p>`string.max_len`: `200`</p> |
+
 ### <a name="ttn.lorawan.v3.MessagePayloadEncoder">Message `MessagePayloadEncoder`</a>
 
 | Field | Type | Label | Description |
@@ -2696,7 +2712,7 @@ and allows clients to claim end devices.
 | `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  | Payload formatter type. |
 | `formatter_parameter` | [`string`](#string) |  | Parameter for the formatter, must be set together. |
 | `codec_id` | [`string`](#string) |  |  |
-| `examples` | [`MessagePayloadEncoder.Example`](#ttn.lorawan.v3.MessagePayloadEncoder.Example) | repeated | Examples |
+| `examples` | [`MessagePayloadEncoder.Example`](#ttn.lorawan.v3.MessagePayloadEncoder.Example) | repeated |  |
 
 #### Field Rules
 
@@ -2704,6 +2720,7 @@ and allows clients to claim end devices.
 | ----- | ----------- |
 | `formatter` | <p>`enum.defined_only`: `true`</p> |
 | `codec_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$`</p> |
+| `examples` | <p>`repeated.max_items`: `20`</p> |
 
 ### <a name="ttn.lorawan.v3.MessagePayloadEncoder.Example">Message `MessagePayloadEncoder.Example`</a>
 
@@ -2712,6 +2729,12 @@ and allows clients to claim end devices.
 | `description` | [`string`](#string) |  |  |
 | `input` | [`DecodedMessagePayload`](#ttn.lorawan.v3.DecodedMessagePayload) |  |  |
 | `output` | [`EncodedMessagePayload`](#ttn.lorawan.v3.EncodedMessagePayload) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `description` | <p>`string.max_len`: `200`</p> |
 
 ### <a name="ttn.lorawan.v3.KeyProvisioning">Enum `KeyProvisioning`</a>
 
