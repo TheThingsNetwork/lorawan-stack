@@ -431,11 +431,12 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 		paths = append(paths, "mac_settings.max_duty_cycle")
 	}
 
-	if p.MaxEIRP > 0 {
+	if !p.SupportsJoin && p.MaxEIRP > 0 {
 		dev.MACState = &ttnpb.MACState{
-			DesiredParameters: ttnpb.MACParameters{},
+			DesiredParameters: ttnpb.MACParameters{
+				MaxEIRP: p.MaxEIRP,
+			},
 		}
-		dev.MACState.DesiredParameters.MaxEIRP = p.MaxEIRP
 		paths = append(paths, "mac_state.desired_parameters.max_eirp")
 	}
 	return &ttnpb.EndDeviceTemplate{
