@@ -179,7 +179,7 @@ func (k JsSDK) AllowedFieldMaskPaths() error {
 func (k JsSDK) DeviceFieldMasks() error {
 	ok, err := target.Path(
 		filepath.Join("sdk", "js", "generated", "device-entity-map.json"),
-		filepath.Join("sdk", "js", "generated", "device-field-masks.json"),
+		filepath.Join("sdk", "js", "generated", "allowed-field-mask-paths.json"),
 	)
 	if err != nil {
 		return targetError(err)
