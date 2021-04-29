@@ -31,6 +31,12 @@ const messages = defineMessages({
   sessionKeyId: 'Session key ID',
   selectedMacVersion: 'Selected MAC version',
   rx1Delay: 'Rx1 Delay',
+  rx1DataRateIndex: 'Rx1 Data Rate Index',
+  rx1Frequency: 'Rx1 Frequency',
+  rx2DataRateIndex: 'Rx2 Data Rate Index',
+  rx2Frequency: 'Rx2 Frequency',
+  gatewayEUI: 'Gtw EUI',
+  class: 'Class',
   // Generic messages
   eventDetails: 'Event details',
   rawEvent: 'Raw event',

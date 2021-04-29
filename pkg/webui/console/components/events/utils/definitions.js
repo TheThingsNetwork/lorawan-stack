@@ -54,7 +54,7 @@ export const eventIconMap = [
   },
   {
     test: /^gs\.down(\.[a-z0-9](?:[-_]?[a-z0-9]){2,})+$/,
-    icon: 'event_uplink',
+    icon: 'event_downlink',
   },
   {
     test: /^gs.gateway.connect$/,
