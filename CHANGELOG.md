@@ -30,6 +30,7 @@ For details about compatibility between different releases, see the **Commitment
 - Occasional crashes in the ratelimit middleware.
 - Handling of zero EUI CUPS update-info requests.
 - Backend validation messages for some forms.
+- Gateway downlink message previews not displaying correctly in the event view of the Console.
 
 ### Security
 
