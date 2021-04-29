@@ -38,6 +38,27 @@ const DownLinkMessagePreview = React.memo(({ event }) => {
   }
 
   if ('request' in data) {
+    const { name } = event
+    if (name.startsWith('gs')) {
+      const gatewayEUI = event.identifiers[0].gateway_ids.eui
+      const lorawanClass = getByPath(data, 'request.class')
+      const rx1Delay = getByPath(data, 'request.rx1_delay')
+      const rx1DataRateIndex = getByPath(data, 'request.rx1_data_rate_index')
+      const rx1Frequency = getByPath(data, 'request.rx1_frequency')
+      const rx2Frequency = getByPath(data, 'request.rx2_frequency')
+      const rx2DataRateIndex = getByPath(data, 'request.rx2_data_rate_index')
+      return (
+        <DescriptionList>
+          <DescriptionList.Byte title={messages.gatewayEUI} data={gatewayEUI} />
+          <DescriptionList.Item title={messages.class} data={lorawanClass} />
+          <DescriptionList.Item title={messages.rx1Delay} data={rx1Delay} />
+          <DescriptionList.Item title={messages.rx1DataRateIndex} data={rx1DataRateIndex} />
+          <DescriptionList.Item title={messages.rx1Frequency} data={rx1Frequency} />
+          <DescriptionList.Item title={messages.rx2Frequency} data={rx2Frequency} />
+          <DescriptionList.Item title={messages.rx2DataRateIndex} data={rx2DataRateIndex} />
+        </DescriptionList>
+      )
+    }
     const devAddr = event.identifiers[0].device_ids.dev_addr
     const frmPayload = getByPath(data, 'payload.mac_payload.frm_payload')
     const rx1Delay = getByPath(data, 'request.rx1_delay')
