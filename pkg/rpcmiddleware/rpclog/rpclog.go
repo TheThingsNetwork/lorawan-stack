@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"google.golang.org/grpc/grpclog"
 )
@@ -99,3 +100,7 @@ func (l *ttnGrpcLogger) Fatalf(format string, args ...interface{}) {
 func (l *ttnGrpcLogger) V(int) bool {
 	return true
 } // TODO: Use when log.Interface supports this
+
+func shouldSuppressError(err error) bool {
+	return errors.IsResourceExhausted(err)
+}

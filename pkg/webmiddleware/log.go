@@ -25,6 +25,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
+func shouldSuppressError(httpStatus int) bool {
+	return httpStatus == http.StatusTooManyRequests
+}
+
 // Log returns a middleware that logs requests.
 // If logger is nil, the logger will be extracted from the context.
 func Log(logger log.Interface, ignorePathsArray []string) MiddlewareFunc {
@@ -58,6 +62,9 @@ func Log(logger log.Interface, ignorePathsArray []string) MiddlewareFunc {
 				if _, ignore := ignorePaths[r.URL.Path]; ignore {
 					return
 				}
+			}
+			if shouldSuppressError(metrics.Code) {
+				return
 			}
 
 			logFields = logFields.With(map[string]interface{}{
