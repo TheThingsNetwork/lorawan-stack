@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Validation of OAuth token exchange requests from the CLI.
+
 ### Security
 
 ## [3.12.2] - 2021-04-30
