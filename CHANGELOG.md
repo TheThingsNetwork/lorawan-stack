@@ -12,7 +12,10 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Contextual tooltips to form fields in the Console.
+- C-Style uint32_t representation for end device address field.
 - Gateway Configuration Server to the cluster package.
+  - This introduces a new config option `cluster.gateway-configuration-server` that needs to be set in multi-instance deployments.
+- Uplink storage for integrations in the Application Server. The number of uplinks stored per end device may be configured via the config option `as.uplink-storage.limit`.
 - LoRaCloud GLS multi frame request support.
 - LoRaCloud GNSS request support.
 - LoRaCloud WiFi request support.
@@ -41,7 +44,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - Payload formatter testing functionality in the Console.
 - Options in the Identity Server to reject passwords that contain the user ID (`is.user-registration.password-requirements.reject-user-id`) or common passwords (`is.user-registration.password-requirements.reject-common`).
-- C-Style uint32_t representation for end device address field.
 
 ### Changed
 
