@@ -13,7 +13,6 @@
     "lorawan_phy_version": "1.0.2-b",
     "supports_join": true,
     "mac_settings": { "supports_32_bit_f_cnt": true },
-    "mac_state": { "current_parameters": {}, "desired_parameters": { "max_eirp": 16 } },
     "formatters": {
       "up_formatter": "FORMATTER_REPOSITORY",
       "down_formatter": "FORMATTER_REPOSITORY"
@@ -28,8 +27,7 @@
       "lorawan_version",
       "lorawan_phy_version",
       "formatters",
-      "mac_settings.supports_32_bit_f_cnt",
-      "mac_state.desired_parameters.max_eirp"
+      "mac_settings.supports_32_bit_f_cnt"
     ]
   }
 }

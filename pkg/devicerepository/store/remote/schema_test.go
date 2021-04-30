@@ -76,11 +76,6 @@ func TestSchema(t *testing.T) {
 					MACSettings: &ttnpb.MACSettings{
 						Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
 					},
-					MACState: &ttnpb.MACState{
-						DesiredParameters: ttnpb.MACParameters{
-							MaxEIRP: 14,
-						},
-					},
 				},
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{
@@ -91,7 +86,6 @@ func TestSchema(t *testing.T) {
 						"lorawan_version",
 						"lorawan_phy_version",
 						"mac_settings.supports_32_bit_f_cnt",
-						"mac_state.desired_parameters.max_eirp",
 					},
 				},
 			},
@@ -111,16 +105,16 @@ func TestSchema(t *testing.T) {
 						Rx1Delay:          &ttnpb.RxDelayValue{Value: ttnpb.RX_DELAY_1},
 						Rx1DataRateOffset: &ttnpb.DataRateOffsetValue{Value: ttnpb.DataRateOffset_DATA_RATE_OFFSET_0},
 						Rx2DataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
-						Rx2Frequency:      &ttnpb.FrequencyValue{Value: 86952500},
+						Rx2Frequency:      &ttnpb.FrequencyValue{Value: 869525000},
 						FactoryPresetFrequencies: []uint64{
-							86810000,
-							86830000,
-							86850000,
-							86710000,
-							86730000,
-							86750000,
-							86770000,
-							86790000,
+							868100000,
+							868300000,
+							868500000,
+							867100000,
+							867300000,
+							867500000,
+							867700000,
+							867900000,
 						},
 						Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
 					},
@@ -162,7 +156,7 @@ func TestSchema(t *testing.T) {
 						ClassBTimeout:         durationPtr(8 * time.Second),
 						PingSlotPeriodicity:   &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
 						PingSlotDataRateIndex: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
-						PingSlotFrequency:     &ttnpb.FrequencyValue{Value: 86830000},
+						PingSlotFrequency:     &ttnpb.FrequencyValue{Value: 868300000},
 					},
 				},
 				FieldMask: pbtypes.FieldMask{

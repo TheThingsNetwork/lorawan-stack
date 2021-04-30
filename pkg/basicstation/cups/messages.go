@@ -16,6 +16,7 @@ package cups
 
 import (
 	"bytes"
+	"context"
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/tls"
@@ -42,6 +43,16 @@ type UpdateInfoRequest struct {
 	Model              string           `json:"model"`
 	Package            string           `json:"package"`
 	KeyCRCs            []uint32         `json:"keys"`
+}
+
+var errMissingRouter = errors.DefineInvalidArgument("missing_router", "missing router")
+
+// ValidateContext validates the update info request.
+func (req *UpdateInfoRequest) ValidateContext(ctx context.Context) error {
+	if req.Router.IsZero() {
+		return errMissingRouter.New()
+	}
+	return nil
 }
 
 // UpdateInfoResponse is the response to the update-info request.

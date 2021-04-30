@@ -1763,6 +1763,33 @@
       "file": "session.go"
     }
   },
+  "error:pkg/account:missing_password": {
+    "translations": {
+      "en": "missing password"
+    },
+    "description": {
+      "package": "pkg/account",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/account:missing_token": {
+    "translations": {
+      "en": "missing token"
+    },
+    "description": {
+      "package": "pkg/account",
+      "file": "user.go"
+    }
+  },
+  "error:pkg/account:missing_user_id": {
+    "translations": {
+      "en": "missing user_id"
+    },
+    "description": {
+      "package": "pkg/account",
+      "file": "user.go"
+    }
+  },
   "error:pkg/account:no_user_id_password_match": {
     "translations": {
       "en": "incorrect password or user ID"
@@ -2843,24 +2870,6 @@
       "file": "messages.go"
     }
   },
-  "error:pkg/basicstation/cups:invalid_cups_uri": {
-    "translations": {
-      "en": "Invalid CUPS URI `{uri}`"
-    },
-    "description": {
-      "package": "pkg/basicstation/cups",
-      "file": "update_info.go"
-    }
-  },
-  "error:pkg/basicstation/cups:invalid_token": {
-    "translations": {
-      "en": "invalid provisioning token"
-    },
-    "description": {
-      "package": "pkg/basicstation/cups",
-      "file": "update_info.go"
-    }
-  },
   "error:pkg/basicstation/cups:lns_credentials_not_found": {
     "translations": {
       "en": "LNS credentials not found for gateway `{gateway_uid}`"
@@ -2868,6 +2877,15 @@
     "description": {
       "package": "pkg/basicstation/cups",
       "file": "update_info.go"
+    }
+  },
+  "error:pkg/basicstation/cups:missing_router": {
+    "translations": {
+      "en": "missing router"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "messages.go"
     }
   },
   "error:pkg/basicstation/cups:no_trust": {
@@ -3305,6 +3323,24 @@
   "error:pkg/devicerepository/store/remote:no_codec": {
     "translations": {
       "en": "no codec defined for firmware version `{firmware_version}` and band `{band_id}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "remote.go"
+    }
+  },
+  "error:pkg/devicerepository/store/remote:no_decoder": {
+    "translations": {
+      "en": "no decoder defined for codec `{codec_id}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/remote",
+      "file": "remote.go"
+    }
+  },
+  "error:pkg/devicerepository/store/remote:no_encoder": {
+    "translations": {
+      "en": "no encoder defined for codec `{codec_id}`"
     },
     "description": {
       "package": "pkg/devicerepository/store/remote",
@@ -6947,6 +6983,15 @@
       "file": "server.go"
     }
   },
+  "error:pkg/oauth:invalid_grant_type": {
+    "translations": {
+      "en": "invalid grant type `{grant_type}`"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
   "error:pkg/oauth:invalid_logout_redirect_uri": {
     "translations": {
       "en": "the redirect URI did not match the one(s) defined in the client"
@@ -6983,6 +7028,42 @@
       "file": "server.go"
     }
   },
+  "error:pkg/oauth:missing_authorization_code": {
+    "translations": {
+      "en": "missing authorization code"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
+  "error:pkg/oauth:missing_client_id": {
+    "translations": {
+      "en": "missing client id"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
+  "error:pkg/oauth:missing_client_secret": {
+    "translations": {
+      "en": "missing client secret"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
+  "error:pkg/oauth:missing_grant_type": {
+    "translations": {
+      "en": "missing grant type"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
   "error:pkg/oauth:missing_param_access_token_id": {
     "translations": {
       "en": "access token ID was not provided"
@@ -6990,6 +7071,15 @@
     "description": {
       "package": "pkg/oauth",
       "file": "user.go"
+    }
+  },
+  "error:pkg/oauth:missing_refresh_token": {
+    "translations": {
+      "en": "missing refresh token"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
     }
   },
   "error:pkg/oauth:no_access_token": {

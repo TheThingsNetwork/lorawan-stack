@@ -15,6 +15,7 @@
 package store
 
 import (
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -55,12 +56,10 @@ type GetModelsResponse struct {
 	Models []*ttnpb.EndDeviceModel
 }
 
-// DefinitionIdentifiers is a request to retrieve an end device template for an end device definition.
-type DefinitionIdentifiers struct {
-	BrandID,
-	ModelID,
-	FirmwareVersion,
-	BandID string
+// GetCodecRequest is a request to retrieve the codec of
+type GetCodecRequest interface {
+	GetVersionIDs() *ttnpb.EndDeviceVersionIdentifiers
+	GetFieldMask() pbtypes.FieldMask
 }
 
 // Store contains end device definitions.
@@ -72,11 +71,11 @@ type Store interface {
 	// GetTemplate retrieves an end device template for an end device definition.
 	GetTemplate(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.EndDeviceTemplate, error)
 	// GetUplinkDecoder retrieves the codec for decoding uplink messages.
-	GetUplinkDecoder(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error)
+	GetUplinkDecoder(GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error)
 	// GetDownlinkDecoder retrieves the codec for decoding downlink messages.
-	GetDownlinkDecoder(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error)
+	GetDownlinkDecoder(GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error)
 	// GetDownlinkEncoder retrieves the codec for encoding downlink messages.
-	GetDownlinkEncoder(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error)
+	GetDownlinkEncoder(GetCodecRequest) (*ttnpb.MessagePayloadEncoder, error)
 	// Close closes the store.
 	Close() error
 }

@@ -1021,6 +1021,60 @@ export const events = [
 
 export const gatewayEvents = [
   {
+    name: 'gs.down.send',
+    time: '2021-04-29T10:14:05.406196093Z',
+    identifiers: [
+      {
+        gateway_ids: {
+          gateway_id: 'tektelic-adrian-ci392',
+          eui: '647FDAFFFE0078B8',
+        },
+      },
+    ],
+    data: {
+      '@type': 'type.googleapis.com/ttn.lorawan.v3.DownlinkMessage',
+      raw_payload: 'oGJQCCaAcgUBIGSB4tU=',
+      request: {
+        downlink_paths: [
+          {
+            uplink_token:
+              'ChsKGQoNdGVrdGVsaWMta29uYRIIZH/a//4Ae9QQ/OH4swwaDAjrjaqEBhCPxrzRAyDgsL3n9a0R',
+          },
+        ],
+        rx1_delay: 5,
+        rx1_data_rate_index: 5,
+        rx1_frequency: '868100000',
+        rx2_data_rate_index: 3,
+        rx2_frequency: '869525000',
+        frequency_plan_id: 'EU_863_870_TTN',
+      },
+      correlation_ids: [
+        'as:downlink:01F4EHY37VFHS2NH33XWQZ7K8T',
+        'gs:conn:01F4C94B13YZRGP62GET7TP2GR',
+        'gs:up:host:01F4C94B1BM14V4Y6MER7VA470',
+        'gs:uplink:01F4EHY2E8PRMKEQWCB2DV96M5',
+        'ns:downlink:01F4EHY3TWB2HBDQ6YBMFV2TZ6',
+        'ns:uplink:01F4EHY2F2SQ93K4KPGEHBQT7T',
+        'rpc:/ttn.lorawan.v3.AppAs/DownlinkQueueReplace:5f808fba-45f1-44c9-a496-b7d3a516c20e',
+        'rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01F4EHY2F2EQ9F0RKDWHSCK5RG',
+        'gs:conn:01F4C94B13YZRGP62GET7TP2GR',
+        'rpc:/ttn.lorawan.v3.NsGs/ScheduleDownlink:01F4EHY3TYKZV59V52SJEMVQMW',
+      ],
+    },
+    correlation_ids: [
+      'gs:conn:01F4C94B13YZRGP62GET7TP2GR',
+      'rpc:/ttn.lorawan.v3.NsGs/ScheduleDownlink:01F4EHY3TYKZV59V52SJEMVQMW',
+    ],
+    origin: 'ip-10-23-13-196.eu-west-1.compute.internal',
+    context: {
+      'tenant-id': '',
+    },
+    visibility: {
+      rights: ['RIGHT_GATEWAY_TRAFFIC_READ'],
+    },
+    unique_id: '01F4EHY3TYN2ESW7P5TKNFQ7T7',
+  },
+  {
     name: 'gs.up.forward',
     time: '2020-09-25T13:22:00.095877998Z',
     identifiers: [

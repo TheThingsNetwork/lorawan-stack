@@ -15,6 +15,7 @@
 package oauth
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -170,6 +171,46 @@ type tokenRequest struct {
 	ClientSecret string `json:"client_secret" form:"client_secret"`
 }
 
+var (
+	errMissingGrantType         = errors.DefineInvalidArgument("missing_grant_type", "missing grant type")
+	errInvalidGrantType         = errors.DefineInvalidArgument("invalid_grant_type", "invalid grant type `{grant_type}`")
+	errMissingAuthorizationCode = errors.DefineInvalidArgument("missing_authorization_code", "missing authorization code")
+	errMissingRefreshToken      = errors.DefineInvalidArgument("missing_refresh_token", "missing refresh token")
+	errMissingClientID          = errors.DefineInvalidArgument("missing_client_id", "missing client id")
+	errMissingClientSecret      = errors.DefineInvalidArgument("missing_client_secret", "missing client secret")
+)
+
+// ValidateContext validates the token request.
+func (req *tokenRequest) ValidateContext(ctx context.Context) error {
+	if strings.TrimSpace(req.GrantType) == "" {
+		return errMissingGrantType.New()
+	}
+	switch req.GrantType {
+	case "authorization_code":
+		if strings.TrimSpace(req.Code) == "" {
+			return errMissingAuthorizationCode.New()
+		}
+	case "refresh_token":
+		if strings.TrimSpace(req.RefreshToken) == "" {
+			return errMissingRefreshToken.New()
+		}
+	default:
+		return errInvalidGrantType.WithAttributes("grant_type", req.GrantType)
+	}
+	if strings.TrimSpace(req.ClientID) == "" {
+		return errMissingClientID.New()
+	}
+	if strings.TrimSpace(req.ClientSecret) == "" {
+		return errMissingClientSecret.New()
+	}
+	if err := (&ttnpb.ClientIdentifiers{
+		ClientID: req.ClientID,
+	}).ValidateFields("client_id"); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r tokenRequest) Values() (values url.Values) {
 	values = make(url.Values)
 	if r.GrantType != "" {
@@ -197,6 +238,10 @@ func (s *server) Token(c echo.Context) error {
 	if err := c.Bind(&tokenRequest); err != nil {
 		return err
 	}
+	if err := tokenRequest.ValidateContext(c.Request().Context()); err != nil {
+		return err
+	}
+
 	req.Form = tokenRequest.Values()
 	req.PostForm = req.Form
 
