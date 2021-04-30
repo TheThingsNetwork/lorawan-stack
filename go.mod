@@ -79,7 +79,7 @@ require (
 	github.com/kr/pretty v0.2.0
 	github.com/labstack/echo/v4 v4.1.16
 	github.com/labstack/gommon v0.3.0
-	github.com/lib/pq v1.5.2
+	github.com/lib/pq v1.10.1
 	github.com/mattn/go-isatty v0.0.12
 	github.com/mitchellh/mapstructure v1.3.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
