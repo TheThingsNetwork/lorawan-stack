@@ -200,7 +200,8 @@ func (req *tokenRequest) ValidateContext(ctx context.Context) error {
 	if strings.TrimSpace(req.ClientID) == "" {
 		return errMissingClientID.New()
 	}
-	if strings.TrimSpace(req.ClientSecret) == "" {
+	if strings.TrimSpace(req.ClientSecret) == "" &&
+		req.ClientID != "cli" { // NOTE: Compatibility: The CLI does not have a client secret.
 		return errMissingClientSecret.New()
 	}
 	if err := (&ttnpb.ClientIdentifiers{
