@@ -1144,6 +1144,18 @@ func (m *GetPayloadFormatterRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetPayloadFormatterRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return GetPayloadFormatterRequestValidationError{
 				field:  name,
@@ -1409,34 +1421,62 @@ var _ interface {
 	ErrorName() string
 } = ListEndDeviceModelsResponseValidationError{}
 
-// ValidateFields checks the field values on MessagePayloadFormatter with the
+// ValidateFields checks the field values on EncodedMessagePayload with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *MessagePayloadFormatter) ValidateFields(paths ...string) error {
+func (m *EncodedMessagePayload) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = MessagePayloadFormatterFieldPathsNested
+		paths = EncodedMessagePayloadFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "formatter":
+		case "f_port":
 
-			if _, ok := PayloadFormatter_name[int32(m.GetFormatter())]; !ok {
-				return MessagePayloadFormatterValidationError{
-					field:  "formatter",
-					reason: "value must be one of the defined enum values",
+			if m.GetFPort() > 255 {
+				return EncodedMessagePayloadValidationError{
+					field:  "f_port",
+					reason: "value must be less than or equal to 255",
 				}
 			}
 
-		case "formatter_parameter":
-			// no validation rules for FormatterParameter
+		case "frm_payload":
+			// no validation rules for FRMPayload
+		case "warnings":
+
+			for idx, item := range m.GetWarnings() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return EncodedMessagePayloadValidationError{
+						field:  fmt.Sprintf("warnings[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
+		case "errors":
+
+			for idx, item := range m.GetErrors() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return EncodedMessagePayloadValidationError{
+						field:  fmt.Sprintf("errors[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
 		default:
-			return MessagePayloadFormatterValidationError{
+			return EncodedMessagePayloadValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -1445,9 +1485,9 @@ func (m *MessagePayloadFormatter) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// MessagePayloadFormatterValidationError is the validation error returned by
-// MessagePayloadFormatter.ValidateFields if the designated constraints aren't met.
-type MessagePayloadFormatterValidationError struct {
+// EncodedMessagePayloadValidationError is the validation error returned by
+// EncodedMessagePayload.ValidateFields if the designated constraints aren't met.
+type EncodedMessagePayloadValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1455,24 +1495,24 @@ type MessagePayloadFormatterValidationError struct {
 }
 
 // Field function returns field value.
-func (e MessagePayloadFormatterValidationError) Field() string { return e.field }
+func (e EncodedMessagePayloadValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e MessagePayloadFormatterValidationError) Reason() string { return e.reason }
+func (e EncodedMessagePayloadValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e MessagePayloadFormatterValidationError) Cause() error { return e.cause }
+func (e EncodedMessagePayloadValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e MessagePayloadFormatterValidationError) Key() bool { return e.key }
+func (e EncodedMessagePayloadValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e MessagePayloadFormatterValidationError) ErrorName() string {
-	return "MessagePayloadFormatterValidationError"
+func (e EncodedMessagePayloadValidationError) ErrorName() string {
+	return "EncodedMessagePayloadValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e MessagePayloadFormatterValidationError) Error() string {
+func (e EncodedMessagePayloadValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1484,14 +1524,14 @@ func (e MessagePayloadFormatterValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sMessagePayloadFormatter.%s: %s%s",
+		"invalid %sEncodedMessagePayload.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = MessagePayloadFormatterValidationError{}
+var _ error = EncodedMessagePayloadValidationError{}
 
 var _ interface {
 	Field() string
@@ -1499,7 +1539,396 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = MessagePayloadFormatterValidationError{}
+} = EncodedMessagePayloadValidationError{}
+
+// ValidateFields checks the field values on DecodedMessagePayload with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DecodedMessagePayload) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DecodedMessagePayloadFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "data":
+
+			if v, ok := interface{}(m.GetData()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return DecodedMessagePayloadValidationError{
+						field:  "data",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "warnings":
+
+			for idx, item := range m.GetWarnings() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return DecodedMessagePayloadValidationError{
+						field:  fmt.Sprintf("warnings[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
+		case "errors":
+
+			for idx, item := range m.GetErrors() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return DecodedMessagePayloadValidationError{
+						field:  fmt.Sprintf("errors[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
+		default:
+			return DecodedMessagePayloadValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// DecodedMessagePayloadValidationError is the validation error returned by
+// DecodedMessagePayload.ValidateFields if the designated constraints aren't met.
+type DecodedMessagePayloadValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DecodedMessagePayloadValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DecodedMessagePayloadValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DecodedMessagePayloadValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DecodedMessagePayloadValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DecodedMessagePayloadValidationError) ErrorName() string {
+	return "DecodedMessagePayloadValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DecodedMessagePayloadValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDecodedMessagePayload.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DecodedMessagePayloadValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DecodedMessagePayloadValidationError{}
+
+// ValidateFields checks the field values on MessagePayloadDecoder with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MessagePayloadDecoder) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MessagePayloadDecoderFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "formatter":
+
+			if _, ok := PayloadFormatter_name[int32(m.GetFormatter())]; !ok {
+				return MessagePayloadDecoderValidationError{
+					field:  "formatter",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		case "formatter_parameter":
+			// no validation rules for FormatterParameter
+		case "codec_id":
+
+			if utf8.RuneCountInString(m.GetCodecID()) > 36 {
+				return MessagePayloadDecoderValidationError{
+					field:  "codec_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_MessagePayloadDecoder_CodecID_Pattern.MatchString(m.GetCodecID()) {
+				return MessagePayloadDecoderValidationError{
+					field:  "codec_id",
+					reason: "value does not match regex pattern \"^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$\"",
+				}
+			}
+
+		case "examples":
+
+			if len(m.GetExamples()) > 20 {
+				return MessagePayloadDecoderValidationError{
+					field:  "examples",
+					reason: "value must contain no more than 20 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetExamples() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return MessagePayloadDecoderValidationError{
+							field:  fmt.Sprintf("examples[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return MessagePayloadDecoderValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MessagePayloadDecoderValidationError is the validation error returned by
+// MessagePayloadDecoder.ValidateFields if the designated constraints aren't met.
+type MessagePayloadDecoderValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MessagePayloadDecoderValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MessagePayloadDecoderValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MessagePayloadDecoderValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MessagePayloadDecoderValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MessagePayloadDecoderValidationError) ErrorName() string {
+	return "MessagePayloadDecoderValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MessagePayloadDecoderValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMessagePayloadDecoder.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MessagePayloadDecoderValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MessagePayloadDecoderValidationError{}
+
+var _MessagePayloadDecoder_CodecID_Pattern = regexp.MustCompile("^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$")
+
+// ValidateFields checks the field values on MessagePayloadEncoder with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MessagePayloadEncoder) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MessagePayloadEncoderFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "formatter":
+
+			if _, ok := PayloadFormatter_name[int32(m.GetFormatter())]; !ok {
+				return MessagePayloadEncoderValidationError{
+					field:  "formatter",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		case "formatter_parameter":
+			// no validation rules for FormatterParameter
+		case "codec_id":
+
+			if utf8.RuneCountInString(m.GetCodecID()) > 36 {
+				return MessagePayloadEncoderValidationError{
+					field:  "codec_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_MessagePayloadEncoder_CodecID_Pattern.MatchString(m.GetCodecID()) {
+				return MessagePayloadEncoderValidationError{
+					field:  "codec_id",
+					reason: "value does not match regex pattern \"^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$\"",
+				}
+			}
+
+		case "examples":
+
+			if len(m.GetExamples()) > 20 {
+				return MessagePayloadEncoderValidationError{
+					field:  "examples",
+					reason: "value must contain no more than 20 item(s)",
+				}
+			}
+
+			for idx, item := range m.GetExamples() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return MessagePayloadEncoderValidationError{
+							field:  fmt.Sprintf("examples[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return MessagePayloadEncoderValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MessagePayloadEncoderValidationError is the validation error returned by
+// MessagePayloadEncoder.ValidateFields if the designated constraints aren't met.
+type MessagePayloadEncoderValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MessagePayloadEncoderValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MessagePayloadEncoderValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MessagePayloadEncoderValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MessagePayloadEncoderValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MessagePayloadEncoderValidationError) ErrorName() string {
+	return "MessagePayloadEncoderValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MessagePayloadEncoderValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMessagePayloadEncoder.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MessagePayloadEncoderValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MessagePayloadEncoderValidationError{}
+
+var _MessagePayloadEncoder_CodecID_Pattern = regexp.MustCompile("^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$")
 
 // ValidateFields checks the field values on EndDeviceModel_HardwareVersion
 // with the rules defined in the proto definition for this message. If any
@@ -2683,3 +3112,233 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = EndDeviceModel_Compliances_ComplianceValidationError{}
+
+// ValidateFields checks the field values on MessagePayloadDecoder_Example with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *MessagePayloadDecoder_Example) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MessagePayloadDecoder_ExampleFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "description":
+
+			if utf8.RuneCountInString(m.GetDescription()) > 200 {
+				return MessagePayloadDecoder_ExampleValidationError{
+					field:  "description",
+					reason: "value length must be at most 200 runes",
+				}
+			}
+
+		case "input":
+
+			if v, ok := interface{}(m.GetInput()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MessagePayloadDecoder_ExampleValidationError{
+						field:  "input",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "output":
+
+			if v, ok := interface{}(m.GetOutput()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MessagePayloadDecoder_ExampleValidationError{
+						field:  "output",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return MessagePayloadDecoder_ExampleValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MessagePayloadDecoder_ExampleValidationError is the validation error
+// returned by MessagePayloadDecoder_Example.ValidateFields if the designated
+// constraints aren't met.
+type MessagePayloadDecoder_ExampleValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MessagePayloadDecoder_ExampleValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MessagePayloadDecoder_ExampleValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MessagePayloadDecoder_ExampleValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MessagePayloadDecoder_ExampleValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MessagePayloadDecoder_ExampleValidationError) ErrorName() string {
+	return "MessagePayloadDecoder_ExampleValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MessagePayloadDecoder_ExampleValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMessagePayloadDecoder_Example.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MessagePayloadDecoder_ExampleValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MessagePayloadDecoder_ExampleValidationError{}
+
+// ValidateFields checks the field values on MessagePayloadEncoder_Example with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *MessagePayloadEncoder_Example) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MessagePayloadEncoder_ExampleFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "description":
+
+			if utf8.RuneCountInString(m.GetDescription()) > 200 {
+				return MessagePayloadEncoder_ExampleValidationError{
+					field:  "description",
+					reason: "value length must be at most 200 runes",
+				}
+			}
+
+		case "input":
+
+			if v, ok := interface{}(m.GetInput()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MessagePayloadEncoder_ExampleValidationError{
+						field:  "input",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "output":
+
+			if v, ok := interface{}(m.GetOutput()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MessagePayloadEncoder_ExampleValidationError{
+						field:  "output",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return MessagePayloadEncoder_ExampleValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MessagePayloadEncoder_ExampleValidationError is the validation error
+// returned by MessagePayloadEncoder_Example.ValidateFields if the designated
+// constraints aren't met.
+type MessagePayloadEncoder_ExampleValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MessagePayloadEncoder_ExampleValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MessagePayloadEncoder_ExampleValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MessagePayloadEncoder_ExampleValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MessagePayloadEncoder_ExampleValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MessagePayloadEncoder_ExampleValidationError) ErrorName() string {
+	return "MessagePayloadEncoder_ExampleValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MessagePayloadEncoder_ExampleValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMessagePayloadEncoder_Example.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MessagePayloadEncoder_ExampleValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MessagePayloadEncoder_ExampleValidationError{}

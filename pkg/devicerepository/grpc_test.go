@@ -40,14 +40,15 @@ type mockStore struct {
 	lastGetBrandsRequest store.GetBrandsRequest
 	lastGetModelsRequest store.GetModelsRequest
 	lastVersionIDs       *ttnpb.EndDeviceVersionIdentifiers
+	lastCodecPaths       []string
 
 	// mock responses
 	brands   []*ttnpb.EndDeviceBrand
 	models   []*ttnpb.EndDeviceModel
 	template *ttnpb.EndDeviceTemplate
 	uplinkDecoder,
-	downlinkDecoder,
-	downlinkEncoder *ttnpb.MessagePayloadFormatter
+	downlinkDecoder *ttnpb.MessagePayloadDecoder
+	downlinkEncoder *ttnpb.MessagePayloadEncoder
 
 	// mock errors
 	err error
@@ -94,20 +95,23 @@ func (s *mockStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
-func (s *mockStore) GetUplinkDecoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	s.lastVersionIDs = ids
+func (s *mockStore) GetUplinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error) {
+	s.lastVersionIDs = req.GetVersionIDs()
+	s.lastCodecPaths = req.GetFieldMask().Paths
 	return s.uplinkDecoder, s.err
 }
 
 // GetDownlinkDecoder retrieves the codec for decoding downlink messages.
-func (s *mockStore) GetDownlinkDecoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	s.lastVersionIDs = ids
+func (s *mockStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error) {
+	s.lastVersionIDs = req.GetVersionIDs()
+	s.lastCodecPaths = req.GetFieldMask().Paths
 	return s.downlinkDecoder, s.err
 }
 
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
-func (s *mockStore) GetDownlinkEncoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	s.lastVersionIDs = ids
+func (s *mockStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadEncoder, error) {
+	s.lastVersionIDs = req.GetVersionIDs()
+	s.lastCodecPaths = req.GetFieldMask().Paths
 	return s.downlinkEncoder, s.err
 }
 
@@ -635,19 +639,24 @@ func TestGRPC(t *testing.T) {
 	t.Run("GetUplinkDecoder", func(t *testing.T) {
 		t.Run("StoreError", func(t *testing.T) {
 			a := assertions.New(t)
+			st.lastVersionIDs = nil
+			st.lastCodecPaths = nil
 			st.err = fmt.Errorf("store error")
-			models, err := cl.GetUplinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
+			c, err := cl.GetUplinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
 				ApplicationIDs: registeredApplicationID,
 				VersionIDs:     ids,
 			}, creds)
-			a.So(models, should.BeNil)
+			a.So(c, should.BeNil)
 			a.So(err.Error(), should.ContainSubstring, st.err.Error())
 			a.So(st.lastVersionIDs, should.Resemble, ids)
 		})
 
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
-			st.uplinkDecoder = ttnpb.NewPopulatedMessagePayloadFormatter(test.Randy, true)
+			st.uplinkDecoder = &ttnpb.MessagePayloadDecoder{
+				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+				FormatterParameter: "uplink decoder",
+			}
 			st.err = nil
 
 			c, err := cl.GetUplinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
@@ -678,19 +687,24 @@ func TestGRPC(t *testing.T) {
 	t.Run("GetDownlinkDecoder", func(t *testing.T) {
 		t.Run("StoreError", func(t *testing.T) {
 			a := assertions.New(t)
+			st.lastVersionIDs = nil
+			st.lastCodecPaths = nil
 			st.err = fmt.Errorf("store error")
-			models, err := cl.GetDownlinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
+			c, err := cl.GetDownlinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
 				ApplicationIDs: registeredApplicationID,
 				VersionIDs:     ids,
 			}, creds)
-			a.So(models, should.BeNil)
+			a.So(c, should.BeNil)
 			a.So(err.Error(), should.ContainSubstring, st.err.Error())
 			a.So(st.lastVersionIDs, should.Resemble, ids)
 		})
 
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
-			st.downlinkDecoder = ttnpb.NewPopulatedMessagePayloadFormatter(test.Randy, true)
+			st.downlinkDecoder = &ttnpb.MessagePayloadDecoder{
+				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+				FormatterParameter: "downlink decoder script",
+			}
 			st.err = nil
 
 			c, err := cl.GetDownlinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
@@ -721,19 +735,24 @@ func TestGRPC(t *testing.T) {
 	t.Run("GetDownlinkEncoder", func(t *testing.T) {
 		t.Run("StoreError", func(t *testing.T) {
 			a := assertions.New(t)
+			st.lastVersionIDs = nil
+			st.lastCodecPaths = nil
 			st.err = fmt.Errorf("store error")
-			models, err := cl.GetDownlinkEncoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
+			c, err := cl.GetDownlinkEncoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
 				ApplicationIDs: registeredApplicationID,
 				VersionIDs:     ids,
 			}, creds)
-			a.So(models, should.BeNil)
+			a.So(c, should.BeNil)
 			a.So(err.Error(), should.ContainSubstring, st.err.Error())
 			a.So(st.lastVersionIDs, should.Resemble, ids)
 		})
 
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
-			st.downlinkEncoder = ttnpb.NewPopulatedMessagePayloadFormatter(test.Randy, true)
+			st.downlinkEncoder = &ttnpb.MessagePayloadEncoder{
+				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+				FormatterParameter: "downlink encoder script",
+			}
 			st.err = nil
 
 			c, err := cl.GetDownlinkEncoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{

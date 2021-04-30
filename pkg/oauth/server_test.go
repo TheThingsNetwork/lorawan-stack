@@ -575,6 +575,90 @@ func TestTokenExchange(t *testing.T) {
 		ExpectedBody string
 	}{
 		{
+			Name:   "Empty Grant Type",
+			Method: "POST",
+			Path:   "/oauth/token",
+			Body: map[string]string{
+				"grant_type": "",
+			},
+			ExpectedCode: http.StatusBadRequest,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.NotContain, "GetAuthorizationCode")
+				a.So(s.calls, should.NotContain, "DeleteAuthorizationCode")
+				a.So(s.calls, should.NotContain, "CreateAccessToken")
+			},
+		},
+		{
+			Name:   "Empty Authorization Code",
+			Method: "POST",
+			Path:   "/oauth/token",
+			Body: map[string]string{
+				"grant_type": "authorization_code",
+				"code":       "",
+			},
+			ExpectedCode: http.StatusBadRequest,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.NotContain, "GetAuthorizationCode")
+				a.So(s.calls, should.NotContain, "DeleteAuthorizationCode")
+				a.So(s.calls, should.NotContain, "CreateAccessToken")
+			},
+		},
+		{
+			Name:   "Empty Refresh Token",
+			Method: "POST",
+			Path:   "/oauth/token",
+			Body: map[string]string{
+				"grant_type":    "refresh_token",
+				"refresh_token": "",
+			},
+			ExpectedCode: http.StatusBadRequest,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.NotContain, "GetAuthorizationCode")
+				a.So(s.calls, should.NotContain, "DeleteAuthorizationCode")
+				a.So(s.calls, should.NotContain, "CreateAccessToken")
+			},
+		},
+		{
+			Name:   "Empty Client ID",
+			Method: "POST",
+			Path:   "/oauth/token",
+			Body: map[string]string{
+				"grant_type":   "authorization_code",
+				"code":         "the code",
+				"redirect_uri": "http://uri/callback",
+				"client_id":    "",
+			},
+			ExpectedCode: http.StatusBadRequest,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.NotContain, "GetAuthorizationCode")
+				a.So(s.calls, should.NotContain, "DeleteAuthorizationCode")
+				a.So(s.calls, should.NotContain, "CreateAccessToken")
+			},
+		},
+		{
+			Name:   "Empty Client Secret",
+			Method: "POST",
+			Path:   "/oauth/token",
+			Body: map[string]string{
+				"grant_type":    "authorization_code",
+				"code":          "the code",
+				"redirect_uri":  "http://uri/callback",
+				"client_id":     "client",
+				"client_secret": "",
+			},
+			ExpectedCode: http.StatusBadRequest,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.NotContain, "GetAuthorizationCode")
+				a.So(s.calls, should.NotContain, "DeleteAuthorizationCode")
+				a.So(s.calls, should.NotContain, "CreateAccessToken")
+			},
+		},
+		{
 			Name: "Exchange Authorization Code",
 			StoreSetup: func(s *mockStore) {
 				s.res.client = mockClient

@@ -8253,6 +8253,154 @@
       "extensions": [],
       "messages": [
         {
+          "name": "DecodedMessagePayload",
+          "longName": "DecodedMessagePayload",
+          "fullName": "ttn.lorawan.v3.DecodedMessagePayload",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "data",
+              "description": "",
+              "label": "",
+              "type": "Struct",
+              "longType": "google.protobuf.Struct",
+              "fullType": "google.protobuf.Struct",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "warnings",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "errors",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "EncodedMessagePayload",
+          "longName": "EncodedMessagePayload",
+          "fullName": "ttn.lorawan.v3.EncodedMessagePayload",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "f_port",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
+            },
+            {
+              "name": "frm_payload",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "warnings",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "errors",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "EndDeviceBrand",
           "longName": "EndDeviceBrand",
           "fullName": "ttn.lorawan.v3.EndDeviceBrand",
@@ -9265,6 +9413,16 @@
               "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "field_mask",
+              "description": "Field mask paths.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -9568,9 +9726,9 @@
           ]
         },
         {
-          "name": "MessagePayloadFormatter",
-          "longName": "MessagePayloadFormatter",
-          "fullName": "ttn.lorawan.v3.MessagePayloadFormatter",
+          "name": "MessagePayloadDecoder",
+          "longName": "MessagePayloadDecoder",
+          "fullName": "ttn.lorawan.v3.MessagePayloadDecoder",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -9601,6 +9759,223 @@
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "codec_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "examples",
+              "description": "",
+              "label": "repeated",
+              "type": "Example",
+              "longType": "MessagePayloadDecoder.Example",
+              "fullType": "ttn.lorawan.v3.MessagePayloadDecoder.Example",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Example",
+          "longName": "MessagePayloadDecoder.Example",
+          "fullName": "ttn.lorawan.v3.MessagePayloadDecoder.Example",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "description",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 200
+                  }
+                ]
+              }
+            },
+            {
+              "name": "input",
+              "description": "",
+              "label": "",
+              "type": "EncodedMessagePayload",
+              "longType": "EncodedMessagePayload",
+              "fullType": "ttn.lorawan.v3.EncodedMessagePayload",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "output",
+              "description": "",
+              "label": "",
+              "type": "DecodedMessagePayload",
+              "longType": "DecodedMessagePayload",
+              "fullType": "ttn.lorawan.v3.DecodedMessagePayload",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MessagePayloadEncoder",
+          "longName": "MessagePayloadEncoder",
+          "fullName": "ttn.lorawan.v3.MessagePayloadEncoder",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "formatter",
+              "description": "Payload formatter type.",
+              "label": "",
+              "type": "PayloadFormatter",
+              "longType": "PayloadFormatter",
+              "fullType": "ttn.lorawan.v3.PayloadFormatter",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "formatter_parameter",
+              "description": "Parameter for the formatter, must be set together.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "codec_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "examples",
+              "description": "",
+              "label": "repeated",
+              "type": "Example",
+              "longType": "MessagePayloadEncoder.Example",
+              "fullType": "ttn.lorawan.v3.MessagePayloadEncoder.Example",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 20
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Example",
+          "longName": "MessagePayloadEncoder.Example",
+          "fullName": "ttn.lorawan.v3.MessagePayloadEncoder.Example",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "description",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 200
+                  }
+                ]
+              }
+            },
+            {
+              "name": "input",
+              "description": "",
+              "label": "",
+              "type": "DecodedMessagePayload",
+              "longType": "DecodedMessagePayload",
+              "fullType": "ttn.lorawan.v3.DecodedMessagePayload",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "output",
+              "description": "",
+              "label": "",
+              "type": "EncodedMessagePayload",
+              "longType": "EncodedMessagePayload",
+              "fullType": "ttn.lorawan.v3.EncodedMessagePayload",
               "ismap": false,
               "defaultValue": ""
             }
@@ -9735,9 +10110,9 @@
               "requestLongType": "GetPayloadFormatterRequest",
               "requestFullType": "ttn.lorawan.v3.GetPayloadFormatterRequest",
               "requestStreaming": false,
-              "responseType": "MessagePayloadFormatter",
-              "responseLongType": "MessagePayloadFormatter",
-              "responseFullType": "ttn.lorawan.v3.MessagePayloadFormatter",
+              "responseType": "MessagePayloadDecoder",
+              "responseLongType": "MessagePayloadDecoder",
+              "responseFullType": "ttn.lorawan.v3.MessagePayloadDecoder",
               "responseStreaming": false,
               "options": {
                 "google.api.http": {
@@ -9757,9 +10132,9 @@
               "requestLongType": "GetPayloadFormatterRequest",
               "requestFullType": "ttn.lorawan.v3.GetPayloadFormatterRequest",
               "requestStreaming": false,
-              "responseType": "MessagePayloadFormatter",
-              "responseLongType": "MessagePayloadFormatter",
-              "responseFullType": "ttn.lorawan.v3.MessagePayloadFormatter",
+              "responseType": "MessagePayloadDecoder",
+              "responseLongType": "MessagePayloadDecoder",
+              "responseFullType": "ttn.lorawan.v3.MessagePayloadDecoder",
               "responseStreaming": false,
               "options": {
                 "google.api.http": {
@@ -9779,9 +10154,9 @@
               "requestLongType": "GetPayloadFormatterRequest",
               "requestFullType": "ttn.lorawan.v3.GetPayloadFormatterRequest",
               "requestStreaming": false,
-              "responseType": "MessagePayloadFormatter",
-              "responseLongType": "MessagePayloadFormatter",
-              "responseFullType": "ttn.lorawan.v3.MessagePayloadFormatter",
+              "responseType": "MessagePayloadEncoder",
+              "responseLongType": "MessagePayloadEncoder",
+              "responseFullType": "ttn.lorawan.v3.MessagePayloadEncoder",
               "responseStreaming": false,
               "options": {
                 "google.api.http": {

@@ -15,8 +15,10 @@
 package account
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	echo "github.com/labstack/echo/v4"
@@ -56,17 +58,40 @@ func (s *server) CurrentUser(c echo.Context) error {
 	})
 }
 
-var errIncorrectPasswordOrUserID = errors.DefineInvalidArgument("no_user_id_password_match", "incorrect password or user ID")
+var (
+	errMissingUserID             = errors.DefineInvalidArgument("missing_user_id", "missing user_id")
+	errMissingPassword           = errors.DefineInvalidArgument("missing_password", "missing password")
+	errIncorrectPasswordOrUserID = errors.DefineInvalidArgument("no_user_id_password_match", "incorrect password or user ID")
+)
 
 type loginRequest struct {
 	UserID   string `json:"user_id" form:"user_id"`
 	Password string `json:"password" form:"password"`
 }
 
+// ValidateContext validates the login request.
+func (req *loginRequest) ValidateContext(ctx context.Context) error {
+	if strings.TrimSpace(req.UserID) == "" {
+		return errMissingUserID.New()
+	}
+	if strings.TrimSpace(req.Password) == "" {
+		return errMissingPassword.New()
+	}
+	if err := (&ttnpb.UserIdentifiers{
+		UserID: req.UserID,
+	}).ValidateFields("user_id"); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *server) Login(c echo.Context) error {
 	ctx := c.Request().Context()
 	req := new(loginRequest)
 	if err := c.Bind(req); err != nil {
+		return err
+	}
+	if err := req.ValidateContext(c.Request().Context()); err != nil {
 		return err
 	}
 	if err := s.session.DoLogin(ctx, req.UserID, req.Password); err != nil {
@@ -82,10 +107,23 @@ type tokenLoginRequest struct {
 	Token string `json:"token" form:"token"`
 }
 
+var errMissingToken = errors.DefineInvalidArgument("missing_token", "missing token")
+
+// ValidateContext validates the token login request.
+func (req *tokenLoginRequest) ValidateContext(ctx context.Context) error {
+	if strings.TrimSpace(req.Token) == "" {
+		return errMissingToken.New()
+	}
+	return nil
+}
+
 func (s *server) TokenLogin(c echo.Context) error {
 	ctx := c.Request().Context()
 	req := new(tokenLoginRequest)
 	if err := c.Bind(req); err != nil {
+		return err
+	}
+	if err := req.ValidateContext(c.Request().Context()); err != nil {
 		return err
 	}
 	loginToken, err := s.store.ConsumeLoginToken(ctx, req.Token)

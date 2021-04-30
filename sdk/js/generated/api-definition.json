@@ -2141,6 +2141,12 @@
             "version_ids.band_id"
           ]
         }
+      ],
+      "allowedFieldMaskPaths": [
+        "codec_id",
+        "examples",
+        "formatter",
+        "formatter_parameter"
       ]
     },
     "GetDownlinkDecoder": {
@@ -2157,6 +2163,12 @@
             "version_ids.band_id"
           ]
         }
+      ],
+      "allowedFieldMaskPaths": [
+        "codec_id",
+        "examples",
+        "formatter",
+        "formatter_parameter"
       ]
     },
     "GetDownlinkEncoder": {
@@ -2173,6 +2185,12 @@
             "version_ids.band_id"
           ]
         }
+      ],
+      "allowedFieldMaskPaths": [
+        "codec_id",
+        "examples",
+        "formatter",
+        "formatter_parameter"
       ]
     }
   },

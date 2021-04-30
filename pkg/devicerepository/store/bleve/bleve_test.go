@@ -432,30 +432,39 @@ func TestBleve(t *testing.T) {
 					BandID:          "unknown-band",
 				},
 			} {
-				codec, err := s.GetDownlinkDecoder(&ids)
+				codec, err := s.GetDownlinkDecoder(&ttnpb.GetPayloadFormatterRequest{VersionIDs: &ids})
 				a.So(errors.IsNotFound(err), should.BeTrue)
 				a.So(codec, should.Equal, nil)
 			}
 		})
 		for _, tc := range []struct {
 			name  string
-			f     func(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error)
-			codec string
+			f     func(store.GetCodecRequest) (interface{}, error)
+			codec interface{}
 		}{
 			{
-				name:  "UplinkDecoder",
-				f:     s.GetUplinkDecoder,
-				codec: "// uplink decoder\n",
+				name: "UplinkDecoder",
+				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetUplinkDecoder(req) },
+				codec: &ttnpb.MessagePayloadDecoder{
+					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+					FormatterParameter: "// uplink decoder\n",
+				},
 			},
 			{
-				name:  "DownlinkDecoder",
-				f:     s.GetDownlinkDecoder,
-				codec: "// downlink decoder\n",
+				name: "DownlinkDecoder",
+				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkDecoder(req) },
+				codec: &ttnpb.MessagePayloadDecoder{
+					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+					FormatterParameter: "// downlink decoder\n",
+				},
 			},
 			{
-				name:  "DownlinkEncoder",
-				f:     s.GetDownlinkEncoder,
-				codec: "// downlink encoder\n",
+				name: "DownlinkEncoder",
+				f:    func(req store.GetCodecRequest) (interface{}, error) { return s.GetDownlinkEncoder(req) },
+				codec: &ttnpb.MessagePayloadEncoder{
+					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+					FormatterParameter: "// downlink encoder\n",
+				},
 			},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
@@ -467,12 +476,9 @@ func TestBleve(t *testing.T) {
 					FirmwareVersion: "1.1",
 					BandID:          "EU_433",
 				}
-				codec, err := tc.f(versionIDs)
+				codec, err := tc.f(&ttnpb.GetPayloadFormatterRequest{VersionIDs: versionIDs})
 				a.So(err, should.BeNil)
-				a.So(codec, should.Resemble, &ttnpb.MessagePayloadFormatter{
-					Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
-					FormatterParameter: tc.codec,
-				})
+				a.So(codec, should.Resemble, tc.codec)
 			})
 		}
 	})

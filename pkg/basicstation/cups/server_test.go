@@ -17,6 +17,7 @@ package cups
 import (
 	"context"
 	"crypto/tls"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -233,6 +234,20 @@ func TestServer(t *testing.T) {
 			},
 			AssertError: func(err error) bool {
 				return errors.IsUnauthenticated(err)
+			},
+		},
+		{
+			Name: "Zero EUI",
+			StoreSetup: func(c *mockGatewayClient) {
+				c.res.Get = mockGateway(false, false, false)
+				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+			},
+			RequestSetup: func(req *http.Request) {
+				req.Body = io.NopCloser(strings.NewReader(`{
+					"router": "00:00:00:00:00:00:00:00"}`))
+			},
+			AssertError: func(err error) bool {
+				return errors.IsInvalidArgument(err)
 			},
 		},
 		{

@@ -11,11 +11,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Contextual tooltips to form fields in the Console.
-
 ### Changed
-
-- Allow the LinkADRReq commands to lower the data rate used by the end devices.
 
 ### Deprecated
 
@@ -23,9 +19,32 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Occasional crashes in the ratelimit middleware.
-
 ### Security
+
+## [3.12.2] - 2021-04-30
+
+### Added
+
+- Contextual tooltips to form fields in the Console.
+- C-Style uint32_t representation for end device address field.
+- Gateway Configuration Server to the cluster package.
+  - This introduces a new config option `cluster.gateway-configuration-server` that needs to be set in multi-instance deployments.
+- Uplink storage for integrations in the Application Server. The number of uplinks stored per end device may be configured via the config option `as.uplink-storage.limit`.
+- LoRaCloud GLS multi frame request support.
+- LoRaCloud GNSS request support.
+- LoRaCloud WiFi request support.
+
+### Changed
+
+- Allow the LinkADRReq commands to lower the data rate used by the end devices.
+
+### Fixed
+
+- Occasional crashes in the ratelimit middleware.
+- Handling of zero EUI CUPS update-info requests.
+- Backend validation messages for some forms.
+- Gateway downlink message previews not displaying correctly in the event view of the Console.
+- Importing end devices from the Console would occasionally ignore some device MAC settings fields.
 
 ## [3.12.1] - 2021-04-15
 
@@ -33,7 +52,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - Payload formatter testing functionality in the Console.
 - Options in the Identity Server to reject passwords that contain the user ID (`is.user-registration.password-requirements.reject-user-id`) or common passwords (`is.user-registration.password-requirements.reject-common`).
-- C-Style uint32_t representation for end device address field.
 
 ### Changed
 
@@ -1438,7 +1456,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.1...v3.12
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.2...v3.12
+[3.12.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.1...v3.12.2
 [3.12.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.0...v3.12.1
 [3.12.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.3...v3.12.0
 [3.11.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.2...v3.11.3

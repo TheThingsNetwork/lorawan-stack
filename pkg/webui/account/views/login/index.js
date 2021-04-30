@@ -57,7 +57,8 @@ const validationSchema = Yup.object().shape({
     .min(3, Yup.passValues(sharedMessages.validateTooShort))
     .max(36, Yup.passValues(sharedMessages.validateTooLong))
     .matches(userRegexp, Yup.passValues(sharedMessages.validateIdFormat))
-    .required(sharedMessages.validateRequired),
+    .required(sharedMessages.validateRequired)
+    .trim(),
   password: Yup.string().required(sharedMessages.validateRequired),
 })
 
@@ -81,7 +82,9 @@ const Login = () => {
     async (values, { setSubmitting }) => {
       try {
         setError(undefined)
-        await api.account.login(values)
+
+        const castedValues = validationSchema.cast(values)
+        await api.account.login(castedValues)
 
         window.location = url(location)
       } catch (error) {

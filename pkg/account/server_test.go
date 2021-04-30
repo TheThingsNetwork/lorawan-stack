@@ -199,6 +199,20 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 		{
+			Name:         "login no user_id",
+			Method:       "POST",
+			Path:         "/oauth/api/auth/login",
+			Body:         loginFormData{"json", "", "pass"},
+			ExpectedCode: http.StatusBadRequest,
+		},
+		{
+			Name:         "login no password",
+			Method:       "POST",
+			Path:         "/oauth/api/auth/login",
+			Body:         loginFormData{"json", "user", ""},
+			ExpectedCode: http.StatusBadRequest,
+		},
+		{
 			Name: "login wrong password",
 			StoreSetup: func(s *mockStore) {
 				s.res.user = mockUser
@@ -261,6 +275,18 @@ func TestAuthentication(t *testing.T) {
 				a.So(s.calls, should.Contain, "DeleteSession")
 				a.So(s.req.userIDs.GetUserID(), should.Equal, "user")
 				a.So(s.req.sessionID, should.Equal, "session_id")
+			},
+		},
+		{
+			Name:         "invalid token login",
+			Method:       "POST",
+			Path:         "/oauth/api/auth/token-login",
+			Body:         tokenFormData{"form", ""},
+			ExpectedCode: http.StatusBadRequest,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.NotContain, "ConsumeLoginToken")
+				a.So(s.calls, should.NotContain, "CreateSession")
 			},
 		},
 		{

@@ -14,8 +14,8 @@
     "mac_settings": {
       "rx1_delay": 1,
       "rx1_data_rate_offset": 0,
-      "rx2_frequency": "86952500",
-      "factory_preset_frequencies": ["86810000", "86830000", "86850000"],
+      "rx2_frequency": "869525000",
+      "factory_preset_frequencies": ["868100000", "868300000", "868500000"],
       "supports_32_bit_f_cnt": true
     },
     "mac_state": { "current_parameters": {}, "desired_parameters": { "max_eirp": 16 } },
