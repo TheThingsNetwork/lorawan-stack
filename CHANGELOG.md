@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.12.2] - 2021-04-30
+
+### Added
+
 - Contextual tooltips to form fields in the Console.
 - C-Style uint32_t representation for end device address field.
 - Gateway Configuration Server to the cluster package.
@@ -24,10 +38,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - Allow the LinkADRReq commands to lower the data rate used by the end devices.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Occasional crashes in the ratelimit middleware.
@@ -35,8 +45,6 @@ For details about compatibility between different releases, see the **Commitment
 - Backend validation messages for some forms.
 - Gateway downlink message previews not displaying correctly in the event view of the Console.
 - Importing end devices from the Console would occasionally ignore some device MAC settings fields.
-
-### Security
 
 ## [3.12.1] - 2021-04-15
 
@@ -1448,7 +1456,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.1...v3.12
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.2...v3.12
+[3.12.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.1...v3.12.2
 [3.12.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.0...v3.12.1
 [3.12.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.3...v3.12.0
 [3.11.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.2...v3.11.3
