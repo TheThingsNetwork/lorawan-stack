@@ -154,8 +154,16 @@ const DeviceRepository = props => {
         const { _registration, ...castedValues } = validationSchema.cast(values, {
           context: validationContext,
         })
-        const { ids, supports_join } = castedValues
+        const { ids, supports_join, mac_state = {} } = castedValues
         ids.application_ids = { application_id: appId }
+
+        //  Do not attempt to set empty current_parameters on device creation.
+        if (
+          mac_state.current_parameters &&
+          Object.keys(mac_state.current_parameters).length === 0
+        ) {
+          delete mac_state.current_parameters
+        }
 
         await createDevice(appId, castedValues)
         switch (_registration) {

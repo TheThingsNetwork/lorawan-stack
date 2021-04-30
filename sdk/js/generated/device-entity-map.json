@@ -110,10 +110,11 @@
     ],
     "dev_addr": [
       [
+        "as",
         "ns",
         "js"
       ],
-      "js"
+      "read_only"
     ]
   },
   "join_server_address": [
@@ -151,6 +152,18 @@
   ],
   "version_ids": {
     "_root": [
+      [
+        "is",
+        "as",
+        "ns"
+      ],
+      [
+        "is",
+        "as",
+        "ns"
+      ]
+    ],
+    "band_id": [
       [
         "is",
         "as",
@@ -211,6 +224,10 @@
       ]
     ]
   },
+  "picture": [
+    "is",
+    "is"
+  ],
   "formatters": {
     "_root": [
       "as",
@@ -239,14 +256,14 @@
         "as",
         "ns"
       ],
-      "read_only"
+      "ns"
     ],
     "dev_addr": [
       [
         "as",
         "ns"
       ],
-      "read_only"
+      "ns"
     ],
     "keys": {
       "_root": [
@@ -254,7 +271,7 @@
           "as",
           "ns"
         ],
-        "read_only"
+        "ns"
       ],
       "app_s_key": {
         "_root": [
@@ -271,53 +288,41 @@
           "as",
           "ns"
         ],
-        "read_only"
+        "ns"
       ],
       "f_nwk_s_int_key": {
         "_root": [
           "ns",
-          "read_only"
+          "ns"
         ],
         "key": [
           "ns",
-          "read_only"
+          "ns"
         ]
       },
       "nwk_s_enc_key": {
         "_root": [
           "ns",
-          "read_only"
+          "ns"
         ],
         "key": [
           "ns",
-          "read_only"
+          "ns"
         ]
       },
       "s_nwk_s_int_key": {
         "_root": [
           "ns",
-          "read_only"
+          "ns"
         ],
         "key": [
           "ns",
-          "read_only"
+          "ns"
         ]
       }
     },
     "last_a_f_cnt_down": [
       "as",
-      "read_only"
-    ],
-    "last_conf_f_cnt_down": [
-      "ns",
-      "read_only"
-    ],
-    "last_f_cnt_up": [
-      "ns",
-      "read_only"
-    ],
-    "last_n_f_cnt_down": [
-      "ns",
       "read_only"
     ]
   },
@@ -327,7 +332,7 @@
         "as",
         "ns"
       ],
-      "read_only"
+      "ns"
     ],
     "dev_addr": [
       [
@@ -345,7 +350,7 @@
           "as",
           "ns"
         ],
-        "read_only"
+        "ns"
       ],
       "app_s_key": {
         "_root": [
@@ -423,6 +428,10 @@
     "as",
     "as"
   ],
+  "skip_payload_crypto_override": [
+    "as",
+    "as"
+  ],
   "battery_percentage": [
     "ns",
     "ns"
@@ -432,6 +441,10 @@
     "ns"
   ],
   "frequency_plan_id": [
+    "ns",
+    "ns"
+  ],
+  "last_dev_status_received_at": [
     "ns",
     "ns"
   ],
@@ -452,6 +465,16 @@
       "ns",
       "ns"
     ],
+    "beacon_frequency": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
     "class_b_timeout": [
       "ns",
       "ns"
@@ -460,10 +483,76 @@
       "ns",
       "ns"
     ],
-    "desired_rx1_data_rate_offset": [
-      "ns",
-      "ns"
-    ],
+    "desired_adr_ack_delay_exponent": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
+    "desired_adr_ack_limit_exponent": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
+    "desired_beacon_frequency": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
+    "desired_max_duty_cycle": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
+    "desired_ping_slot_data_rate_index": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
+    "desired_ping_slot_frequency": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
+    "desired_rx1_data_rate_offset": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
     "desired_rx1_delay": {
       "_root": [
         "ns",
@@ -484,10 +573,16 @@
         "ns"
       ]
     },
-    "desired_rx2_frequency": [
-      "ns",
-      "ns"
-    ],
+    "desired_rx2_frequency": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
     "factory_preset_frequencies": [
       "ns",
       "ns"
@@ -512,10 +607,16 @@
         "ns"
       ]
     },
-    "ping_slot_frequency": [
-      "ns",
-      "ns"
-    ],
+    "ping_slot_frequency": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
     "ping_slot_periodicity": {
       "_root": [
         "ns",
@@ -526,14 +627,26 @@
         "ns"
       ]
     },
-    "resets_f_cnt": [
-      "ns",
-      "ns"
-    ],
-    "rx1_data_rate_offset": [
-      "ns",
-      "ns"
-    ],
+    "resets_f_cnt": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
+    "rx1_data_rate_offset": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
     "rx1_delay": {
       "_root": [
         "ns",
@@ -554,10 +667,16 @@
         "ns"
       ]
     },
-    "rx2_frequency": [
-      "ns",
-      "ns"
-    ],
+    "rx2_frequency": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
     "status_count_periodicity": [
       "ns",
       "ns"
@@ -566,195 +685,279 @@
       "ns",
       "ns"
     ],
-    "supports_32_bit_f_cnt": [
-      "ns",
-      "ns"
-    ],
-    "use_adr": [
-      "ns",
-      "ns"
-    ]
+    "supports_32_bit_f_cnt": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
+    "use_adr": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    }
   },
   "mac_state": {
     "_root": [
       "ns",
-      "read_only"
+      "ns"
     ],
     "current_parameters": {
       "_root": [
         "ns",
-        "read_only"
+        "ns"
       ],
-      "adr_ack_delay": [
-        "ns",
-        "read_only"
-      ],
-      "adr_ack_limit": [
-        "ns",
-        "read_only"
-      ],
+      "adr_ack_delay_exponent": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
+      "adr_ack_limit_exponent": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
       "adr_data_rate_index": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "adr_nb_trans": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "adr_tx_power_index": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "beacon_frequency": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "channels": [
         "ns",
-        "read_only"
+        "ns"
       ],
-      "downlink_dwell_time": [
-        "ns",
-        "read_only"
-      ],
+      "downlink_dwell_time": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
       "max_duty_cycle": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "max_eirp": [
         "ns",
-        "read_only"
+        "ns"
       ],
-      "ping_slot_data_rate_index": [
-        "ns",
-        "read_only"
-      ],
+      "ping_slot_data_rate_index_value": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
       "ping_slot_frequency": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rejoin_count_periodicity": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rejoin_time_periodicity": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rx1_data_rate_offset": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rx1_delay": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rx2_data_rate_index": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rx2_frequency": [
         "ns",
-        "read_only"
+        "ns"
       ],
-      "uplink_dwell_time": [
-        "ns",
-        "read_only"
-      ]
+      "uplink_dwell_time": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      }
     },
     "desired_parameters": {
       "_root": [
         "ns",
-        "read_only"
+        "ns"
       ],
-      "adr_ack_delay": [
-        "ns",
-        "read_only"
-      ],
-      "adr_ack_limit": [
-        "ns",
-        "read_only"
-      ],
+      "adr_ack_delay_exponent": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
+      "adr_ack_limit_exponent": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
       "adr_data_rate_index": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "adr_nb_trans": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "adr_tx_power_index": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "beacon_frequency": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "channels": [
         "ns",
-        "read_only"
+        "ns"
       ],
-      "downlink_dwell_time": [
-        "ns",
-        "read_only"
-      ],
+      "downlink_dwell_time": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
       "max_duty_cycle": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "max_eirp": [
         "ns",
-        "read_only"
+        "ns"
       ],
-      "ping_slot_data_rate_index": [
-        "ns",
-        "read_only"
-      ],
+      "ping_slot_data_rate_index_value": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
       "ping_slot_frequency": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rejoin_count_periodicity": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rejoin_time_periodicity": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rx1_data_rate_offset": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rx1_delay": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rx2_data_rate_index": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "rx2_frequency": [
         "ns",
-        "read_only"
+        "ns"
       ],
-      "uplink_dwell_time": [
-        "ns",
-        "read_only"
-      ]
+      "uplink_dwell_time": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      }
     },
     "device_class": [
       "ns",
       "ns"
     ],
+    "last_adr_change_f_cnt_up": [
+      "ns",
+      "ns"
+    ],
     "last_confirmed_downlink_at": [
       "ns",
-      "read_only"
+      "ns"
     ],
     "last_dev_status_f_cnt_up": [
       "ns",
-      "read_only"
+      "ns"
+    ],
+    "last_downlink_at": [
+      "ns",
+      "ns"
+    ],
+    "last_network_initiated_downlink_at": [
+      "ns",
+      "ns"
     ],
     "lorawan_version": [
       "ns",
@@ -763,658 +966,96 @@
     "pending_application_downlink": {
       "_root": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "class_b_c": {
         "_root": [
           "ns",
-          "read_only"
+          "ns"
         ],
         "absolute_time": [
           "ns",
-          "read_only"
+          "ns"
         ],
         "gateways": [
           "ns",
-          "read_only"
+          "ns"
         ]
       },
       "confirmed": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "correlation_ids": [
         "ns",
-        "read_only"
-      ],
-      "decoded_payload": [
-        "ns",
-        "read_only"
+        "ns"
       ],
       "f_cnt": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "f_port": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "frm_payload": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "priority": [
         "ns",
-        "read_only"
+        "ns"
       ],
       "session_key_id": [
         "ns",
-        "read_only"
-      ]
-    },
-    "pending_join_request": {
-      "_root": [
-        "ns",
-        "read_only"
-      ],
-      "cf_list": {
-        "_root": [
-          "ns",
-          "read_only"
-        ],
-        "ch_masks": [
-          "ns",
-          "read_only"
-        ],
-        "freq": [
-          "ns",
-          "read_only"
-        ],
-        "type": [
-          "ns",
-          "read_only"
-        ]
-      },
-      "correlation_ids": [
-        "ns",
-        "read_only"
-      ],
-      "dev_addr": [
-        "ns",
-        "read_only"
-      ],
-      "downlink_settings": {
-        "_root": [
-          "ns",
-          "read_only"
-        ],
-        "opt_neg": [
-          "ns",
-          "read_only"
-        ],
-        "rx1_dr_offset": [
-          "ns",
-          "read_only"
-        ],
-        "rx2_dr": [
-          "ns",
-          "read_only"
-        ]
-      },
-      "net_id": [
-        "ns",
-        "read_only"
-      ],
-      "payload": {
-        "_root": [
-          "ns",
-          "read_only"
-        ],
-        "Payload": {
-          "_root": [
-            "ns",
-            "read_only"
-          ],
-          "join_accept_payload": {
-            "_root": [
-              "ns",
-              "read_only"
-            ],
-            "cf_list": {
-              "_root": [
-                "ns",
-                "read_only"
-              ],
-              "ch_masks": [
-                "ns",
-                "read_only"
-              ],
-              "freq": [
-                "ns",
-                "read_only"
-              ],
-              "type": [
-                "ns",
-                "read_only"
-              ]
-            },
-            "dev_addr": [
-              "ns",
-              "read_only"
-            ],
-            "dl_settings": {
-              "_root": [
-                "ns",
-                "read_only"
-              ],
-              "opt_neg": [
-                "ns",
-                "read_only"
-              ],
-              "rx1_dr_offset": [
-                "ns",
-                "read_only"
-              ],
-              "rx2_dr": [
-                "ns",
-                "read_only"
-              ]
-            },
-            "encrypted": [
-              "ns",
-              "read_only"
-            ],
-            "join_nonce": [
-              "ns",
-              "read_only"
-            ],
-            "net_id": [
-              "ns",
-              "read_only"
-            ],
-            "rx_delay": [
-              "ns",
-              "read_only"
-            ]
-          },
-          "join_request_payload": {
-            "_root": [
-              "ns",
-              "read_only"
-            ],
-            "dev_eui": [
-              "ns",
-              "read_only"
-            ],
-            "dev_nonce": [
-              "ns",
-              "read_only"
-            ],
-            "join_eui": [
-              "ns",
-              "read_only"
-            ]
-          },
-          "mac_payload": {
-            "_root": [
-              "ns",
-              "read_only"
-            ],
-            "decoded_payload": [
-              "ns",
-              "read_only"
-            ],
-            "f_hdr": {
-              "_root": [
-                "ns",
-                "read_only"
-              ],
-              "dev_addr": [
-                "ns",
-                "read_only"
-              ],
-              "f_cnt": [
-                "ns",
-                "read_only"
-              ],
-              "f_ctrl": {
-                "_root": [
-                  "ns",
-                  "read_only"
-                ],
-                "ack": [
-                  "ns",
-                  "read_only"
-                ],
-                "adr": [
-                  "ns",
-                  "read_only"
-                ],
-                "adr_ack_req": [
-                  "ns",
-                  "read_only"
-                ],
-                "class_b": [
-                  "ns",
-                  "read_only"
-                ],
-                "f_pending": [
-                  "ns",
-                  "read_only"
-                ]
-              },
-              "f_opts": [
-                "ns",
-                "read_only"
-              ]
-            },
-            "f_port": [
-              "ns",
-              "read_only"
-            ],
-            "frm_payload": [
-              "ns",
-              "read_only"
-            ]
-          },
-          "rejoin_request_payload": {
-            "_root": [
-              "ns",
-              "read_only"
-            ],
-            "dev_eui": [
-              "ns",
-              "read_only"
-            ],
-            "join_eui": [
-              "ns",
-              "read_only"
-            ],
-            "net_id": [
-              "ns",
-              "read_only"
-            ],
-            "rejoin_cnt": [
-              "ns",
-              "read_only"
-            ],
-            "rejoin_type": [
-              "ns",
-              "read_only"
-            ]
-          }
-        },
-        "m_hdr": {
-          "_root": [
-            "ns",
-            "read_only"
-          ],
-          "m_type": [
-            "ns",
-            "read_only"
-          ],
-          "major": [
-            "ns",
-            "read_only"
-          ]
-        },
-        "mic": [
-          "ns",
-          "read_only"
-        ]
-      },
-      "raw_payload": [
-        "ns",
-        "read_only"
-      ],
-      "rx_delay": [
-        "ns",
-        "read_only"
-      ],
-      "selected_mac_version": [
-        "ns",
-        "read_only"
+        "ns"
       ]
     },
     "pending_requests": [
       "ns",
-      "read_only"
-    ],
-    "ping_slot_periodicity": [
-      "ns",
       "ns"
     ],
-    "queued_join_accept": {
+    "ping_slot_periodicity": {
       "_root": [
         "ns",
-        "read_only"
+        "ns"
       ],
-      "keys": {
-        "_root": [
-          "ns",
-          "read_only"
-        ],
-        "app_s_key": {
-          "_root": [
-            "ns",
-            "read_only"
-          ],
-          "key": [
-            "ns",
-            "read_only"
-          ]
-        },
-        "f_nwk_s_int_key": {
-          "_root": [
-            "ns",
-            "read_only"
-          ],
-          "key": [
-            "ns",
-            "read_only"
-          ]
-        },
-        "nwk_s_enc_key": {
-          "_root": [
-            "ns",
-            "read_only"
-          ],
-          "key": [
-            "ns",
-            "read_only"
-          ]
-        },
-        "s_nwk_s_int_key": {
-          "_root": [
-            "ns",
-            "read_only"
-          ],
-          "key": [
-            "ns",
-            "read_only"
-          ]
-        },
-        "session_key_id": [
-          "ns",
-          "read_only"
-        ]
-      },
-      "payload": [
+      "value": [
         "ns",
-        "read_only"
-      ],
-      "request": {
-        "_root": [
-          "ns",
-          "read_only"
-        ],
-        "cf_list": {
-          "_root": [
-            "ns",
-            "read_only"
-          ],
-          "ch_masks": [
-            "ns",
-            "read_only"
-          ],
-          "freq": [
-            "ns",
-            "read_only"
-          ],
-          "type": [
-            "ns",
-            "read_only"
-          ]
-        },
-        "correlation_ids": [
-          "ns",
-          "read_only"
-        ],
-        "dev_addr": [
-          "ns",
-          "read_only"
-        ],
-        "downlink_settings": {
-          "_root": [
-            "ns",
-            "read_only"
-          ],
-          "opt_neg": [
-            "ns",
-            "read_only"
-          ],
-          "rx1_dr_offset": [
-            "ns",
-            "read_only"
-          ],
-          "rx2_dr": [
-            "ns",
-            "read_only"
-          ]
-        },
-        "net_id": [
-          "ns",
-          "read_only"
-        ],
-        "payload": {
-          "_root": [
-            "ns",
-            "read_only"
-          ],
-          "Payload": {
-            "_root": [
-              "ns",
-              "read_only"
-            ],
-            "join_accept_payload": {
-              "_root": [
-                "ns",
-                "read_only"
-              ],
-              "cf_list": {
-                "_root": [
-                  "ns",
-                  "read_only"
-                ],
-                "ch_masks": [
-                  "ns",
-                  "read_only"
-                ],
-                "freq": [
-                  "ns",
-                  "read_only"
-                ],
-                "type": [
-                  "ns",
-                  "read_only"
-                ]
-              },
-              "dev_addr": [
-                "ns",
-                "read_only"
-              ],
-              "dl_settings": {
-                "_root": [
-                  "ns",
-                  "read_only"
-                ],
-                "opt_neg": [
-                  "ns",
-                  "read_only"
-                ],
-                "rx1_dr_offset": [
-                  "ns",
-                  "read_only"
-                ],
-                "rx2_dr": [
-                  "ns",
-                  "read_only"
-                ]
-              },
-              "encrypted": [
-                "ns",
-                "read_only"
-              ],
-              "join_nonce": [
-                "ns",
-                "read_only"
-              ],
-              "net_id": [
-                "ns",
-                "read_only"
-              ],
-              "rx_delay": [
-                "ns",
-                "read_only"
-              ]
-            },
-            "join_request_payload": {
-              "_root": [
-                "ns",
-                "read_only"
-              ],
-              "dev_eui": [
-                "ns",
-                "read_only"
-              ],
-              "dev_nonce": [
-                "ns",
-                "read_only"
-              ],
-              "join_eui": [
-                "ns",
-                "read_only"
-              ]
-            },
-            "mac_payload": {
-              "_root": [
-                "ns",
-                "read_only"
-              ],
-              "decoded_payload": [
-                "ns",
-                "read_only"
-              ],
-              "f_hdr": {
-                "_root": [
-                  "ns",
-                  "read_only"
-                ],
-                "dev_addr": [
-                  "ns",
-                  "read_only"
-                ],
-                "f_cnt": [
-                  "ns",
-                  "read_only"
-                ],
-                "f_ctrl": {
-                  "_root": [
-                    "ns",
-                    "read_only"
-                  ],
-                  "ack": [
-                    "ns",
-                    "read_only"
-                  ],
-                  "adr": [
-                    "ns",
-                    "read_only"
-                  ],
-                  "adr_ack_req": [
-                    "ns",
-                    "read_only"
-                  ],
-                  "class_b": [
-                    "ns",
-                    "read_only"
-                  ],
-                  "f_pending": [
-                    "ns",
-                    "read_only"
-                  ]
-                },
-                "f_opts": [
-                  "ns",
-                  "read_only"
-                ]
-              },
-              "f_port": [
-                "ns",
-                "read_only"
-              ],
-              "frm_payload": [
-                "ns",
-                "read_only"
-              ]
-            },
-            "rejoin_request_payload": {
-              "_root": [
-                "ns",
-                "read_only"
-              ],
-              "dev_eui": [
-                "ns",
-                "read_only"
-              ],
-              "join_eui": [
-                "ns",
-                "read_only"
-              ],
-              "net_id": [
-                "ns",
-                "read_only"
-              ],
-              "rejoin_cnt": [
-                "ns",
-                "read_only"
-              ],
-              "rejoin_type": [
-                "ns",
-                "read_only"
-              ]
-            }
-          },
-          "m_hdr": {
-            "_root": [
-              "ns",
-              "read_only"
-            ],
-            "m_type": [
-              "ns",
-              "read_only"
-            ],
-            "major": [
-              "ns",
-              "read_only"
-            ]
-          },
-          "mic": [
-            "ns",
-            "read_only"
-          ]
-        },
-        "raw_payload": [
-          "ns",
-          "read_only"
-        ],
-        "rx_delay": [
-          "ns",
-          "read_only"
-        ],
-        "selected_mac_version": [
-          "ns",
-          "read_only"
-        ]
-      }
+        "ns"
+      ]
     },
     "queued_responses": [
       "ns",
-      "read_only"
+      "ns"
+    ],
+    "recent_downlinks": [
+      "ns",
+      "ns"
+    ],
+    "recent_uplinks": [
+      "ns",
+      "ns"
+    ],
+    "rejected_adr_data_rate_indexes": [
+      "ns",
+      "ns"
+    ],
+    "rejected_adr_tx_power_indexes": [
+      "ns",
+      "ns"
+    ],
+    "rejected_data_rate_ranges": [
+      "ns",
+      "ns"
+    ],
+    "rejected_frequencies": [
+      "ns",
+      "ns"
     ],
     "rx_windows_available": [
       "ns",
-      "read_only"
+      "ns"
     ]
   },
   "max_frequency": [
@@ -1429,23 +1070,475 @@
     "ns",
     "ns"
   ],
+  "pending_mac_state": {
+    "_root": [
+      "ns",
+      "ns"
+    ],
+    "current_parameters": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "adr_ack_delay_exponent": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
+      "adr_ack_limit_exponent": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
+      "adr_data_rate_index": [
+        "ns",
+        "ns"
+      ],
+      "adr_nb_trans": [
+        "ns",
+        "ns"
+      ],
+      "adr_tx_power_index": [
+        "ns",
+        "ns"
+      ],
+      "beacon_frequency": [
+        "ns",
+        "ns"
+      ],
+      "channels": [
+        "ns",
+        "ns"
+      ],
+      "downlink_dwell_time": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
+      "max_duty_cycle": [
+        "ns",
+        "ns"
+      ],
+      "max_eirp": [
+        "ns",
+        "ns"
+      ],
+      "ping_slot_data_rate_index_value": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
+      "ping_slot_frequency": [
+        "ns",
+        "ns"
+      ],
+      "rejoin_count_periodicity": [
+        "ns",
+        "ns"
+      ],
+      "rejoin_time_periodicity": [
+        "ns",
+        "ns"
+      ],
+      "rx1_data_rate_offset": [
+        "ns",
+        "ns"
+      ],
+      "rx1_delay": [
+        "ns",
+        "ns"
+      ],
+      "rx2_data_rate_index": [
+        "ns",
+        "ns"
+      ],
+      "rx2_frequency": [
+        "ns",
+        "ns"
+      ],
+      "uplink_dwell_time": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      }
+    },
+    "desired_parameters": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "adr_ack_delay_exponent": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
+      "adr_ack_limit_exponent": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
+      "adr_data_rate_index": [
+        "ns",
+        "ns"
+      ],
+      "adr_nb_trans": [
+        "ns",
+        "ns"
+      ],
+      "adr_tx_power_index": [
+        "ns",
+        "ns"
+      ],
+      "beacon_frequency": [
+        "ns",
+        "ns"
+      ],
+      "channels": [
+        "ns",
+        "ns"
+      ],
+      "downlink_dwell_time": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
+      "max_duty_cycle": [
+        "ns",
+        "ns"
+      ],
+      "max_eirp": [
+        "ns",
+        "ns"
+      ],
+      "ping_slot_data_rate_index_value": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      },
+      "ping_slot_frequency": [
+        "ns",
+        "ns"
+      ],
+      "rejoin_count_periodicity": [
+        "ns",
+        "ns"
+      ],
+      "rejoin_time_periodicity": [
+        "ns",
+        "ns"
+      ],
+      "rx1_data_rate_offset": [
+        "ns",
+        "ns"
+      ],
+      "rx1_delay": [
+        "ns",
+        "ns"
+      ],
+      "rx2_data_rate_index": [
+        "ns",
+        "ns"
+      ],
+      "rx2_frequency": [
+        "ns",
+        "ns"
+      ],
+      "uplink_dwell_time": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "value": [
+          "ns",
+          "ns"
+        ]
+      }
+    },
+    "device_class": [
+      "ns",
+      "ns"
+    ],
+    "last_adr_change_f_cnt_up": [
+      "ns",
+      "ns"
+    ],
+    "last_confirmed_downlink_at": [
+      "ns",
+      "ns"
+    ],
+    "last_dev_status_f_cnt_up": [
+      "ns",
+      "ns"
+    ],
+    "last_downlink_at": [
+      "ns",
+      "ns"
+    ],
+    "last_network_initiated_downlink_at": [
+      "ns",
+      "ns"
+    ],
+    "lorawan_version": [
+      "ns",
+      "ns"
+    ],
+    "pending_join_request": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "cf_list": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "ch_masks": [
+          "ns",
+          "ns"
+        ],
+        "freq": [
+          "ns",
+          "ns"
+        ],
+        "type": [
+          "ns",
+          "ns"
+        ]
+      },
+      "downlink_settings": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "opt_neg": [
+          "ns",
+          "ns"
+        ],
+        "rx1_dr_offset": [
+          "ns",
+          "ns"
+        ],
+        "rx2_dr": [
+          "ns",
+          "ns"
+        ]
+      },
+      "rx_delay": [
+        "ns",
+        "ns"
+      ]
+    },
+    "ping_slot_periodicity": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
+    "queued_join_accept": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "correlation_ids": [
+        "ns",
+        "ns"
+      ],
+      "dev_addr": [
+        "ns",
+        "ns"
+      ],
+      "keys": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "app_s_key": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "encrypted_key": [
+            "ns",
+            "ns"
+          ],
+          "kek_label": [
+            "ns",
+            "ns"
+          ],
+          "key": [
+            "ns",
+            "ns"
+          ]
+        },
+        "f_nwk_s_int_key": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "key": [
+            "ns",
+            "ns"
+          ]
+        },
+        "nwk_s_enc_key": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "key": [
+            "ns",
+            "ns"
+          ]
+        },
+        "s_nwk_s_int_key": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "key": [
+            "ns",
+            "ns"
+          ]
+        },
+        "session_key_id": [
+          "ns",
+          "ns"
+        ]
+      },
+      "net_id": [
+        "ns",
+        "ns"
+      ],
+      "payload": [
+        "ns",
+        "ns"
+      ],
+      "request": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "cf_list": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "ch_masks": [
+            "ns",
+            "ns"
+          ],
+          "freq": [
+            "ns",
+            "ns"
+          ],
+          "type": [
+            "ns",
+            "ns"
+          ]
+        },
+        "downlink_settings": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "opt_neg": [
+            "ns",
+            "ns"
+          ],
+          "rx1_dr_offset": [
+            "ns",
+            "ns"
+          ],
+          "rx2_dr": [
+            "ns",
+            "ns"
+          ]
+        },
+        "rx_delay": [
+          "ns",
+          "ns"
+        ]
+      }
+    },
+    "recent_downlinks": [
+      "ns",
+      "ns"
+    ],
+    "recent_uplinks": [
+      "ns",
+      "ns"
+    ],
+    "rejected_adr_data_rate_indexes": [
+      "ns",
+      "ns"
+    ],
+    "rejected_adr_tx_power_indexes": [
+      "ns",
+      "ns"
+    ],
+    "rejected_data_rate_ranges": [
+      "ns",
+      "ns"
+    ],
+    "rejected_frequencies": [
+      "ns",
+      "ns"
+    ],
+    "rx_windows_available": [
+      "ns",
+      "ns"
+    ]
+  },
   "power_state": [
-    "ns",
-    "ns"
-  ],
-  "queued_application_downlinks": [
-    "ns",
-    "read_only"
-  ],
-  "recent_adr_uplinks": [
-    "ns",
-    "read_only"
-  ],
-  "recent_downlinks": [
-    "ns",
-    "read_only"
-  ],
-  "recent_uplinks": [
     "ns",
     "read_only"
   ],
@@ -1469,10 +1562,24 @@
     "js",
     "js"
   ],
-  "claim_authentication_code": [
-    "js",
-    "js"
-  ],
+  "claim_authentication_code": {
+    "_root": [
+      "js",
+      "js"
+    ],
+    "value": [
+      "js",
+      "js"
+    ],
+    "valid_to": [
+      "js",
+      "js"
+    ],
+    "valid_from": [
+      "js",
+      "js"
+    ]
+  },
   "last_dev_nonce": [
     "js",
     "js"

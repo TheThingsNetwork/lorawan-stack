@@ -324,6 +324,8 @@ type EndDeviceProfile struct {
 
 var errRegionalParametersVersion = errors.DefineNotFound("regional_parameters_version", "unknown Regional Parameters version `{phy_version}`")
 
+const mhz = 1000000
+
 // ToTemplatePB returns a ttnpb.EndDeviceTemplate from an end device profile.
 func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, info *ttnpb.EndDeviceModel_FirmwareVersion_Profile) (*ttnpb.EndDeviceTemplate, error) {
 	phyVersion, ok := regionalParametersToPB[p.RegionalParametersVersion]
@@ -375,7 +377,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 	}
 	if p.PingSlotFrequency > 0 {
 		dev.MACSettings.PingSlotFrequency = &ttnpb.FrequencyValue{
-			Value: uint64(p.PingSlotFrequency * 100000),
+			Value: uint64(p.PingSlotFrequency * mhz),
 		}
 		paths = append(paths, "mac_settings.ping_slot_frequency")
 	}
@@ -405,7 +407,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 	}
 	if p.Rx2Frequency > 0 {
 		dev.MACSettings.Rx2Frequency = &ttnpb.FrequencyValue{
-			Value: uint64(p.Rx2Frequency * 100000),
+			Value: uint64(p.Rx2Frequency * mhz),
 		}
 		paths = append(paths, "mac_settings.rx2_frequency")
 	}
@@ -418,7 +420,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 	if fs := p.FactoryPresetFrequencies; len(fs) > 0 {
 		dev.MACSettings.FactoryPresetFrequencies = make([]uint64, 0, len(fs))
 		for _, freq := range fs {
-			dev.MACSettings.FactoryPresetFrequencies = append(dev.MACSettings.FactoryPresetFrequencies, uint64(freq*100000))
+			dev.MACSettings.FactoryPresetFrequencies = append(dev.MACSettings.FactoryPresetFrequencies, uint64(freq*mhz))
 		}
 		paths = append(paths, "mac_settings.factory_preset_frequencies")
 	}
@@ -429,11 +431,12 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 		paths = append(paths, "mac_settings.max_duty_cycle")
 	}
 
-	if p.MaxEIRP > 0 {
+	if !p.SupportsJoin && p.MaxEIRP > 0 {
 		dev.MACState = &ttnpb.MACState{
-			DesiredParameters: ttnpb.MACParameters{},
+			DesiredParameters: ttnpb.MACParameters{
+				MaxEIRP: p.MaxEIRP,
+			},
 		}
-		dev.MACState.DesiredParameters.MaxEIRP = p.MaxEIRP
 		paths = append(paths, "mac_state.desired_parameters.max_eirp")
 	}
 	return &ttnpb.EndDeviceTemplate{
