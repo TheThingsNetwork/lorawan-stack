@@ -36,13 +36,14 @@ import (
 
 // mockProcessor is a mock messageprocessors.PayloadEncodeDecoder
 type mockProcessor struct {
-	ch  chan *ttnpb.MessagePayloadFormatter
+	ch chan dr_processor.PayloadFormatter
+
 	err error
 }
 
-func (p *mockProcessor) handle(formatter ttnpb.PayloadFormatter, parameter string) error {
+func (p *mockProcessor) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
 	if p.err == nil {
-		p.ch <- &ttnpb.MessagePayloadFormatter{
+		p.ch <- &ttnpb.MessagePayloadEncoder{
 			Formatter:          formatter,
 			FormatterParameter: parameter,
 		}
@@ -50,22 +51,30 @@ func (p *mockProcessor) handle(formatter ttnpb.PayloadFormatter, parameter strin
 	return p.err
 }
 
-func (p *mockProcessor) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
-	return p.handle(formatter, parameter)
-}
-
 func (p *mockProcessor) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
-	return p.handle(formatter, parameter)
+	if p.err == nil {
+		p.ch <- &ttnpb.MessagePayloadDecoder{
+			Formatter:          formatter,
+			FormatterParameter: parameter,
+		}
+	}
+	return p.err
 }
 
 func (p *mockProcessor) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
-	return p.handle(formatter, parameter)
+	if p.err == nil {
+		p.ch <- &ttnpb.MessagePayloadDecoder{
+			Formatter:          formatter,
+			FormatterParameter: parameter,
+		}
+	}
+	return p.err
 }
 
 type mockDR struct {
 	uplinkDecoders,
-	downlinkDecoders,
-	downlinkEncoders map[string]*ttnpb.MessagePayloadFormatter
+	downlinkDecoders map[string]*ttnpb.MessagePayloadDecoder
+	downlinkEncoders map[string]*ttnpb.MessagePayloadEncoder
 }
 
 func (dr *mockDR) ListBrands(_ context.Context, _ *ttnpb.ListEndDeviceBrandsRequest) (*ttnpb.ListEndDeviceBrandsResponse, error) {
@@ -93,29 +102,29 @@ func (dr *mockDR) key(ids *ttnpb.EndDeviceVersionIdentifiers) string {
 }
 
 var (
-	mockError = fmt.Errorf("mock_error")
+	errMock = fmt.Errorf("mock_error")
 )
 
-func (dr *mockDR) GetUplinkDecoder(_ context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadFormatter, error) {
+func (dr *mockDR) GetUplinkDecoder(_ context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadDecoder, error) {
 	f, ok := dr.uplinkDecoders[dr.key(req.VersionIDs)]
 	if !ok {
-		return nil, mockError
+		return nil, errMock
 	}
 	return f, nil
 }
 
-func (dr *mockDR) GetDownlinkDecoder(_ context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadFormatter, error) {
+func (dr *mockDR) GetDownlinkDecoder(_ context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadDecoder, error) {
 	f, ok := dr.downlinkDecoders[dr.key(req.VersionIDs)]
 	if !ok {
-		return nil, mockError
+		return nil, errMock
 	}
 	return f, nil
 }
 
-func (dr *mockDR) GetDownlinkEncoder(_ context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadFormatter, error) {
+func (dr *mockDR) GetDownlinkEncoder(_ context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadEncoder, error) {
 	f, ok := dr.downlinkEncoders[dr.key(req.VersionIDs)]
 	if !ok {
-		return nil, mockError
+		return nil, errMock
 	}
 	return f, nil
 }
@@ -165,19 +174,19 @@ func TestDeviceRepository(t *testing.T) {
 	}
 
 	dr := &mockDR{
-		uplinkDecoders:   make(map[string]*ttnpb.MessagePayloadFormatter),
-		downlinkDecoders: make(map[string]*ttnpb.MessagePayloadFormatter),
-		downlinkEncoders: make(map[string]*ttnpb.MessagePayloadFormatter),
+		uplinkDecoders:   make(map[string]*ttnpb.MessagePayloadDecoder),
+		downlinkDecoders: make(map[string]*ttnpb.MessagePayloadDecoder),
+		downlinkEncoders: make(map[string]*ttnpb.MessagePayloadEncoder),
 	}
-	dr.uplinkDecoders[dr.key(ids)] = &ttnpb.MessagePayloadFormatter{
+	dr.uplinkDecoders[dr.key(ids)] = &ttnpb.MessagePayloadDecoder{
 		Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 		FormatterParameter: "uplink decoder",
 	}
-	dr.downlinkDecoders[dr.key(ids)] = &ttnpb.MessagePayloadFormatter{
+	dr.downlinkDecoders[dr.key(ids)] = &ttnpb.MessagePayloadDecoder{
 		Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 		FormatterParameter: "downlink decoder",
 	}
-	dr.downlinkEncoders[dr.key(ids)] = &ttnpb.MessagePayloadFormatter{
+	dr.downlinkEncoders[dr.key(ids)] = &ttnpb.MessagePayloadEncoder{
 		Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 		FormatterParameter: "downlink encoder",
 	}
@@ -185,7 +194,7 @@ func TestDeviceRepository(t *testing.T) {
 
 	ctx := test.Context()
 	mockProcessor := &mockProcessor{
-		ch:  make(chan *ttnpb.MessagePayloadFormatter, 1),
+		ch:  make(chan dr_processor.PayloadFormatter, 1),
 		err: nil,
 	}
 
@@ -223,7 +232,7 @@ func TestDeviceRepository(t *testing.T) {
 	t.Run("DeviceNotFound", func(t *testing.T) {
 		err := p.DecodeDownlink(test.Context(), devID, idsNotFound, nil, "")
 		a := assertions.New(t)
-		a.So(err.Error(), should.ContainSubstring, mockError.Error())
+		a.So(err.Error(), should.ContainSubstring, errMock.Error())
 
 		select {
 		case <-mockProcessor.ch:
@@ -240,7 +249,7 @@ func TestDeviceRepository(t *testing.T) {
 
 		select {
 		case f := <-mockProcessor.ch:
-			a.So(f, should.Resemble, &ttnpb.MessagePayloadFormatter{
+			a.So(f, should.Resemble, &ttnpb.MessagePayloadDecoder{
 				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 				FormatterParameter: "uplink decoder",
 			})
@@ -257,7 +266,7 @@ func TestDeviceRepository(t *testing.T) {
 
 		select {
 		case f := <-mockProcessor.ch:
-			a.So(f, should.Resemble, &ttnpb.MessagePayloadFormatter{
+			a.So(f, should.Resemble, &ttnpb.MessagePayloadDecoder{
 				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 				FormatterParameter: "downlink decoder",
 			})
@@ -273,7 +282,7 @@ func TestDeviceRepository(t *testing.T) {
 
 		select {
 		case f := <-mockProcessor.ch:
-			a.So(f, should.Resemble, &ttnpb.MessagePayloadFormatter{
+			a.So(f, should.Resemble, &ttnpb.MessagePayloadEncoder{
 				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 				FormatterParameter: "downlink encoder",
 			})
@@ -284,15 +293,15 @@ func TestDeviceRepository(t *testing.T) {
 	})
 
 	t.Run("ProcessorError", func(t *testing.T) {
-		mockProcessor.err = mockError
+		mockProcessor.err = errMock
 		a := assertions.New(t)
 
 		err := p.DecodeDownlink(test.Context(), devID, ids, nil, "")
-		a.So(err.Error(), should.ContainSubstring, mockError.Error())
+		a.So(err.Error(), should.ContainSubstring, errMock.Error())
 		err = p.DecodeUplink(test.Context(), devID, ids, nil, "")
-		a.So(err.Error(), should.ContainSubstring, mockError.Error())
+		a.So(err.Error(), should.ContainSubstring, errMock.Error())
 		err = p.EncodeDownlink(test.Context(), devID, ids, nil, "")
-		a.So(err.Error(), should.ContainSubstring, mockError.Error())
+		a.So(err.Error(), should.ContainSubstring, errMock.Error())
 
 		mockProcessor.err = nil
 	})

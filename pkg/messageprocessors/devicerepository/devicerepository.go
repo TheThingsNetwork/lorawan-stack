@@ -44,19 +44,9 @@ const (
 	cacheSize = 500
 )
 
-type getCodecFunc func(ctx context.Context, req *ttnpb.GetPayloadFormatterRequest, opts ...grpc.CallOption) (*ttnpb.MessagePayloadFormatter, error)
-
-func (c codecType) codecFunc(client ttnpb.DeviceRepositoryClient) getCodecFunc {
-	switch c {
-	case downlinkDecoder:
-		return client.GetDownlinkDecoder
-	case downlinkEncoder:
-		return client.GetDownlinkEncoder
-	case uplinkDecoder:
-		return client.GetUplinkDecoder
-	default:
-		panic(fmt.Sprintf("Invalid codec type: %v", c))
-	}
+type PayloadFormatter interface {
+	GetFormatter() ttnpb.PayloadFormatter
+	GetFormatterParameter() string
 }
 
 // Cluster represents the interface the cluster.
@@ -67,7 +57,7 @@ type Cluster interface {
 
 // cacheItem stores the payload formatter as well as the error response.
 type cacheItem struct {
-	formatter *ttnpb.MessagePayloadFormatter
+	formatter PayloadFormatter
 	err       error
 }
 
@@ -98,7 +88,7 @@ func cacheKey(codec codecType, version *ttnpb.EndDeviceVersionIdentifiers) strin
 
 var errNoVersionIdentifiers = errors.DefineInvalidArgument("no_version_identifiers", "no version identifiers for device")
 
-func (h *host) retrieve(ctx context.Context, codec codecType, ids ttnpb.ApplicationIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
+func (h *host) retrieve(ctx context.Context, codec codecType, ids ttnpb.ApplicationIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers) (PayloadFormatter, error) {
 	if version == nil {
 		return nil, errNoVersionIdentifiers.New()
 	}
@@ -112,11 +102,25 @@ func (h *host) retrieve(ctx context.Context, codec codecType, ids ttnpb.Applicat
 		return nil, err
 	}
 	result, err, _ := h.singleflight.Do(key, func() (interface{}, error) {
-		f := codec.codecFunc(ttnpb.NewDeviceRepositoryClient(cc))
-		formatter, err := f(ctx, &ttnpb.GetPayloadFormatterRequest{
+		var (
+			formatter PayloadFormatter
+			err       error
+		)
+		req := &ttnpb.GetPayloadFormatterRequest{
 			ApplicationIDs: ids,
 			VersionIDs:     version,
-		}, h.cluster.WithClusterAuth())
+		}
+		client := ttnpb.NewDeviceRepositoryClient(cc)
+		switch codec {
+		case downlinkDecoder:
+			formatter, err = client.GetDownlinkDecoder(ctx, req, h.cluster.WithClusterAuth())
+		case downlinkEncoder:
+			formatter, err = client.GetDownlinkEncoder(ctx, req, h.cluster.WithClusterAuth())
+		case uplinkDecoder:
+			formatter, err = client.GetUplinkDecoder(ctx, req, h.cluster.WithClusterAuth())
+		default:
+			panic(fmt.Sprintf("Invalid codec type: %v", codec))
+		}
 
 		expire := cacheTTL
 		if err != nil {
@@ -130,7 +134,7 @@ func (h *host) retrieve(ctx context.Context, codec codecType, ids ttnpb.Applicat
 	if err != nil {
 		return nil, err
 	}
-	return result.(*ttnpb.MessagePayloadFormatter), nil
+	return result.(PayloadFormatter), nil
 }
 
 // EncodeDownlink encodes a downlink message.
@@ -139,7 +143,7 @@ func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 	if err != nil {
 		return err
 	}
-	return h.processor.EncodeDownlink(ctx, ids, version, message, res.Formatter, res.FormatterParameter)
+	return h.processor.EncodeDownlink(ctx, ids, version, message, res.GetFormatter(), res.GetFormatterParameter())
 }
 
 // DecodeUplink decodes an uplink message.
@@ -148,7 +152,7 @@ func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 	if err != nil {
 		return err
 	}
-	return h.processor.DecodeUplink(ctx, ids, version, message, res.Formatter, res.FormatterParameter)
+	return h.processor.DecodeUplink(ctx, ids, version, message, res.GetFormatter(), res.GetFormatterParameter())
 }
 
 // DecodeDownlink decodes a downlink message.
@@ -157,5 +161,5 @@ func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 	if err != nil {
 		return err
 	}
-	return h.processor.DecodeDownlink(ctx, ids, version, message, res.Formatter, res.FormatterParameter)
+	return h.processor.DecodeDownlink(ctx, ids, version, message, res.GetFormatter(), res.GetFormatterParameter())
 }

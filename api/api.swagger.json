@@ -3847,7 +3847,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v3MessagePayloadFormatter"
+              "$ref": "#/definitions/v3MessagePayloadDecoder"
             }
           },
           "default": {
@@ -3893,6 +3893,17 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -3907,7 +3918,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v3MessagePayloadFormatter"
+              "$ref": "#/definitions/v3MessagePayloadEncoder"
             }
           },
           "default": {
@@ -3953,6 +3964,17 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -3967,7 +3989,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v3MessagePayloadFormatter"
+              "$ref": "#/definitions/v3MessagePayloadDecoder"
             }
           },
           "default": {
@@ -4013,6 +4035,17 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -13037,6 +13070,26 @@
         }
       }
     },
+    "v3DecodedMessagePayload": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "v3DevAddrPrefix": {
       "type": "object",
       "properties": {
@@ -13163,6 +13216,31 @@
       "properties": {
         "downlink": {
           "$ref": "#/definitions/v3ApplicationDownlink"
+        }
+      }
+    },
+    "v3EncodedMessagePayload": {
+      "type": "object",
+      "properties": {
+        "f_port": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "frm_payload": {
+          "type": "string",
+          "format": "byte"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -15115,7 +15193,7 @@
       ],
       "default": "LORAWAN_R1"
     },
-    "v3MessagePayloadFormatter": {
+    "v3MessagePayloadDecoder": {
       "type": "object",
       "properties": {
         "formatter": {
@@ -15125,6 +15203,65 @@
         "formatter_parameter": {
           "type": "string",
           "description": "Parameter for the formatter, must be set together."
+        },
+        "codec_id": {
+          "type": "string"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3MessagePayloadDecoderExample"
+          }
+        }
+      }
+    },
+    "v3MessagePayloadDecoderExample": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "input": {
+          "$ref": "#/definitions/v3EncodedMessagePayload"
+        },
+        "output": {
+          "$ref": "#/definitions/v3DecodedMessagePayload"
+        }
+      }
+    },
+    "v3MessagePayloadEncoder": {
+      "type": "object",
+      "properties": {
+        "formatter": {
+          "$ref": "#/definitions/v3PayloadFormatter",
+          "description": "Payload formatter type."
+        },
+        "formatter_parameter": {
+          "type": "string",
+          "description": "Parameter for the formatter, must be set together."
+        },
+        "codec_id": {
+          "type": "string"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3MessagePayloadEncoderExample"
+          }
+        }
+      }
+    },
+    "v3MessagePayloadEncoderExample": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "input": {
+          "$ref": "#/definitions/v3DecodedMessagePayload"
+        },
+        "output": {
+          "$ref": "#/definitions/v3EncodedMessagePayload"
         }
       }
     },

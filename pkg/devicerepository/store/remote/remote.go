@@ -18,6 +18,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"gopkg.in/yaml.v2"
 )
@@ -223,8 +224,7 @@ var (
 	errNoCodec = errors.DefineNotFound("no_codec", "no codec defined for firmware version `{firmware_version}` and band `{band_id}`")
 )
 
-// getCodec retrieves codec information for a specific model and returns.
-func (s *remoteStore) getCodec(ids *ttnpb.EndDeviceVersionIdentifiers, chooseFile func(EndDeviceCodec) string) (*ttnpb.MessagePayloadFormatter, error) {
+func (s *remoteStore) getCodecs(ids *ttnpb.EndDeviceVersionIdentifiers) (*EndDeviceCodecs, error) {
 	models, err := s.GetModels(store.GetModelsRequest{
 		BrandID: ids.BrandID,
 		ModelID: ids.ModelID,
@@ -239,65 +239,161 @@ func (s *remoteStore) getCodec(ids *ttnpb.EndDeviceVersionIdentifiers, chooseFil
 		return nil, errModelNotFound.WithAttributes("brand_id", ids.BrandID, "model_id", ids.ModelID)
 	}
 	model := models.Models[0]
+	var version *ttnpb.EndDeviceModel_FirmwareVersion = nil
 	for _, ver := range model.FirmwareVersions {
-		if ver.Version != ids.FirmwareVersion {
-			continue
-		}
-
-		if _, ok := bandIDToRegion[ids.BandID]; !ok {
-			return nil, errBandNotFound.WithAttributes("unknown_band", ids.BandID)
-		}
-		profileInfo, ok := ver.Profiles[ids.BandID]
-		if !ok {
-			return nil, errNoProfileForBand.WithAttributes(
-				"band_id", ids.BandID,
-			)
-		}
-
-		if profileInfo.CodecID == "" {
-			return nil, errNoCodec.WithAttributes("firmware_version", ids.FirmwareVersion, "band_id", ids.BandID)
-		}
-
-		codec := EndDeviceCodec{}
-		b, err := s.fetcher.File("vendor", ids.BrandID, profileInfo.CodecID+".yaml")
-		if err != nil {
-			return nil, err
-		}
-		if err := yaml.Unmarshal(b, &codec); err != nil {
-			return nil, err
-		}
-		if file := chooseFile(codec); file != "" {
-			b, err := s.fetcher.File("vendor", ids.BrandID, file)
-			if err != nil {
-				return nil, err
-			}
-			return &ttnpb.MessagePayloadFormatter{
-				Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
-				FormatterParameter: string(b),
-			}, nil
+		if ver.Version == ids.FirmwareVersion {
+			version = ver
+			break
 		}
 	}
 
-	return nil, errFirmwareVersionNotFound.WithAttributes(
-		"brand_id", ids.BrandID,
-		"model_id", ids.ModelID,
-		"firmware_version", ids.FirmwareVersion,
-	)
+	if version == nil {
+		return nil, errFirmwareVersionNotFound.WithAttributes(
+			"brand_id", ids.BrandID,
+			"model_id", ids.ModelID,
+			"firmware_version", ids.FirmwareVersion,
+		)
+	}
+
+	if _, ok := bandIDToRegion[ids.BandID]; !ok {
+		return nil, errBandNotFound.WithAttributes("band_id", ids.BandID)
+	}
+	profileInfo, ok := version.Profiles[ids.BandID]
+	if !ok {
+		return nil, errNoProfileForBand.WithAttributes(
+			"band_id", ids.BandID,
+		)
+	}
+	if profileInfo.CodecID == "" {
+		return nil, errNoCodec.WithAttributes("firmware_version", ids.FirmwareVersion, "band_id", ids.BandID)
+	}
+
+	codecs := &EndDeviceCodecs{
+		CodecID: profileInfo.CodecID,
+	}
+	b, err := s.fetcher.File("vendor", ids.BrandID, codecs.CodecID+".yaml")
+	if err != nil {
+		return nil, err
+	}
+	if err := yaml.Unmarshal(b, codecs); err != nil {
+		return nil, err
+	}
+	return codecs, nil
+}
+
+var (
+	errNoDecoder = errors.DefineNotFound("no_decoder", "no decoder defined for codec `{codec_id}`")
+	errNoEncoder = errors.DefineNotFound("no_encoder", "no encoder defined for codec `{codec_id}`")
+)
+
+func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *EndDeviceCodecs) *EndDeviceDecoderCodec) (*ttnpb.MessagePayloadDecoder, error) {
+	codecs, err := s.getCodecs(req.GetVersionIDs())
+	if err != nil {
+		return nil, err
+	}
+	codec := choose(codecs)
+	if codec.FileName == "" {
+		return nil, errNoDecoder.WithAttributes("codec_id", codecs.CodecID)
+	}
+
+	b, err := s.fetcher.File("vendor", req.GetVersionIDs().BrandID, codec.FileName)
+	if err != nil {
+		return nil, err
+	}
+
+	paths := ttnpb.AddFields(req.GetFieldMask().Paths, "formatter", "formatter_parameter")
+	var examples []*ttnpb.MessagePayloadDecoder_Example
+	if ttnpb.HasAnyField([]string{"examples"}, paths...) && len(codec.Examples) > 0 {
+		examples = make([]*ttnpb.MessagePayloadDecoder_Example, 0, len(codec.Examples))
+		for _, e := range codec.Examples {
+			pb := &ttnpb.MessagePayloadDecoder_Example{
+				Description: e.Description,
+				Input: &ttnpb.EncodedMessagePayload{
+					FPort:      e.Input.FPort,
+					FRMPayload: e.Input.Bytes,
+				},
+				Output: &ttnpb.DecodedMessagePayload{
+					Warnings: e.Output.Warnings,
+					Errors:   e.Output.Errors,
+				},
+			}
+			if pb.Output.Data, err = gogoproto.Struct(e.Output.Data); err != nil {
+				return nil, err
+			}
+			examples = append(examples, pb)
+		}
+	}
+	formatter := &ttnpb.MessagePayloadDecoder{
+		Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+		FormatterParameter: string(b),
+		Examples:           examples,
+		CodecID:            codecs.CodecID,
+	}
+	pb := &ttnpb.MessagePayloadDecoder{}
+	if err := pb.SetFields(formatter, paths...); err != nil {
+		return nil, err
+	}
+	return pb, nil
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
-func (s *remoteStore) GetUplinkDecoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	return s.getCodec(ids, func(c EndDeviceCodec) string { return c.UplinkDecoder.FileName })
+func (s *remoteStore) GetUplinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error) {
+	return s.getDecoder(req, func(codecs *EndDeviceCodecs) *EndDeviceDecoderCodec { return &codecs.UplinkDecoder })
 }
 
 // GetDownlinkDecoder retrieves the codec for decoding downlink messages.
-func (s *remoteStore) GetDownlinkDecoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	return s.getCodec(ids, func(c EndDeviceCodec) string { return c.DownlinkDecoder.FileName })
+func (s *remoteStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error) {
+	return s.getDecoder(req, func(codecs *EndDeviceCodecs) *EndDeviceDecoderCodec { return &codecs.DownlinkDecoder })
 }
 
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
-func (s *remoteStore) GetDownlinkEncoder(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.MessagePayloadFormatter, error) {
-	return s.getCodec(ids, func(c EndDeviceCodec) string { return c.DownlinkEncoder.FileName })
+func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadEncoder, error) {
+	codecs, err := s.getCodecs(req.GetVersionIDs())
+	if err != nil {
+		return nil, err
+	}
+	codec := codecs.DownlinkEncoder
+
+	if codec.FileName == "" {
+		return nil, errNoEncoder.WithAttributes("firmware_version", req.GetVersionIDs().FirmwareVersion, "band_id", req.GetVersionIDs().BandID)
+	}
+
+	b, err := s.fetcher.File("vendor", req.GetVersionIDs().BrandID, codec.FileName)
+	if err != nil {
+		return nil, err
+	}
+	paths := ttnpb.AddFields(req.GetFieldMask().Paths, "formatter", "formatter_parameter")
+	var examples []*ttnpb.MessagePayloadEncoder_Example
+	if ttnpb.HasAnyField([]string{"examples"}, paths...) && len(codec.Examples) > 0 {
+		examples = make([]*ttnpb.MessagePayloadEncoder_Example, 0, len(codec.Examples))
+		for _, e := range codec.Examples {
+			pb := &ttnpb.MessagePayloadEncoder_Example{
+				Description: e.Description,
+				Input:       &ttnpb.DecodedMessagePayload{},
+				Output: &ttnpb.EncodedMessagePayload{
+					FPort:      e.Output.FPort,
+					FRMPayload: e.Output.Bytes,
+					Warnings:   e.Output.Warnings,
+					Errors:     e.Output.Errors,
+				},
+			}
+			if pb.Input.Data, err = gogoproto.Struct(e.Input.Data); err != nil {
+				return nil, err
+			}
+			examples = append(examples, pb)
+		}
+	}
+	formatter := &ttnpb.MessagePayloadEncoder{
+		Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+		FormatterParameter: string(b),
+		Examples:           examples,
+		CodecID:            codecs.CodecID,
+	}
+	pb := &ttnpb.MessagePayloadEncoder{}
+	if err := pb.SetFields(formatter, paths...); err != nil {
+		return nil, err
+	}
+	return pb, nil
 }
 
 // Close closes the store.
