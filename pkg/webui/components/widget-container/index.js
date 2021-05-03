@@ -35,11 +35,7 @@ const WidgetContainer = ({ children, title, toAllUrl, linkMessage, className }) 
         <Message content={linkMessage} /> →
       </Link>
     </div>
-    <div className={style.body}>
-      <Link className={style.bodyLink} to={toAllUrl}>
-        {children}
-      </Link>
-    </div>
+    <div className={style.body}>{children}</div>
   </aside>
 )
 
