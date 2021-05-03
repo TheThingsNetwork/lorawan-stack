@@ -149,11 +149,17 @@ func TestMarshalers(t *testing.T) {
 		FrequencyValue{Value: 30000000},
 	})
 
-	var rejoins []interface{}
-	for i := range RejoinType_name {
-		rejoins = append(rejoins, RejoinType(i))
+	var joinRequestTypes []interface{}
+	for i := range JoinRequestType_name {
+		joinRequestTypes = append(joinRequestTypes, JoinRequestType(i))
 	}
-	vals = append(vals, rejoins)
+	vals = append(vals, joinRequestTypes)
+
+	var rejoinRequestTypes []interface{}
+	for i := range RejoinRequestType_name {
+		rejoinRequestTypes = append(rejoinRequestTypes, RejoinRequestType(i))
+	}
+	vals = append(vals, rejoinRequestTypes)
 
 	var cfLists []interface{}
 	for i := range CFListType_name {
@@ -442,7 +448,7 @@ func TestMarshalers(t *testing.T) {
 	sort.Strings(outLines)
 	out := fmt.Sprintf(`Format | Type | Value | Encoding
 :---: | :---: | :---: | :---:
-%s`,
+%s`+"\n",
 		strings.Join(outLines, "\n"),
 	)
 	goldenPath := filepath.Join("testdata", "ttnpb_encoding_golden.md")

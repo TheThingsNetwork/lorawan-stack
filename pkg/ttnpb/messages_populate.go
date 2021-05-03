@@ -34,7 +34,7 @@ func NewPopulatedUplinkMessage(r randyMessages, easy bool) (msg *UplinkMessage) 
 	case 1:
 		return NewPopulatedUplinkMessageJoinRequest(r)
 	case 2:
-		return NewPopulatedUplinkMessageRejoinRequest(r, RejoinType(r.Intn(3)))
+		return NewPopulatedUplinkMessageRejoinRequest(r, RejoinRequestType(r.Intn(3)))
 	}
 	panic("unreachable")
 }
@@ -75,7 +75,7 @@ func NewPopulatedUplinkMessageJoinRequest(r randyLorawan) *UplinkMessage {
 	return out
 }
 
-func NewPopulatedUplinkMessageRejoinRequest(r randyLorawan, typ RejoinType) *UplinkMessage {
+func NewPopulatedUplinkMessageRejoinRequest(r randyLorawan, typ RejoinRequestType) *UplinkMessage {
 	out := &UplinkMessage{}
 	out.Settings = *NewPopulatedTxSettings(r, false)
 	out.RxMetadata = make([]*RxMetadata, 1+r.Intn(5))

@@ -731,7 +731,7 @@ func (m *RejoinRequestPayload) ValidateFields(paths ...string) error {
 		switch name {
 		case "rejoin_type":
 
-			if _, ok := RejoinType_name[int32(m.GetRejoinType())]; !ok {
+			if _, ok := RejoinRequestType_name[int32(m.GetRejoinType())]; !ok {
 				return RejoinRequestPayloadValidationError{
 					field:  "rejoin_type",
 					reason: "value must be one of the defined enum values",
@@ -5298,7 +5298,7 @@ func (m *MACCommand_ForceRejoinReq) ValidateFields(paths ...string) error {
 		switch name {
 		case "rejoin_type":
 
-			if _, ok := RejoinType_name[int32(m.GetRejoinType())]; !ok {
+			if _, ok := RejoinRequestType_name[int32(m.GetRejoinType())]; !ok {
 				return MACCommand_ForceRejoinReqValidationError{
 					field:  "rejoin_type",
 					reason: "value must be one of the defined enum values",

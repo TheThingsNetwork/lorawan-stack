@@ -393,6 +393,7 @@
   - [Enum `DataRateIndex`](#ttn.lorawan.v3.DataRateIndex)
   - [Enum `DataRateOffset`](#ttn.lorawan.v3.DataRateOffset)
   - [Enum `DeviceEIRP`](#ttn.lorawan.v3.DeviceEIRP)
+  - [Enum `JoinRequestType`](#ttn.lorawan.v3.JoinRequestType)
   - [Enum `MACCommandIdentifier`](#ttn.lorawan.v3.MACCommandIdentifier)
   - [Enum `MACVersion`](#ttn.lorawan.v3.MACVersion)
   - [Enum `MType`](#ttn.lorawan.v3.MType)
@@ -402,8 +403,8 @@
   - [Enum `PingSlotPeriod`](#ttn.lorawan.v3.PingSlotPeriod)
   - [Enum `RejoinCountExponent`](#ttn.lorawan.v3.RejoinCountExponent)
   - [Enum `RejoinPeriodExponent`](#ttn.lorawan.v3.RejoinPeriodExponent)
+  - [Enum `RejoinRequestType`](#ttn.lorawan.v3.RejoinRequestType)
   - [Enum `RejoinTimeExponent`](#ttn.lorawan.v3.RejoinTimeExponent)
-  - [Enum `RejoinType`](#ttn.lorawan.v3.RejoinType)
   - [Enum `RxDelay`](#ttn.lorawan.v3.RxDelay)
   - [Enum `TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority)
 - [File `lorawan-stack/api/message_services.proto`](#lorawan-stack/api/message_services.proto)
@@ -4498,7 +4499,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `payload_request` | [`CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  | Request data for the cryptographic operation. |
-| `join_request_type` | [`RejoinType`](#ttn.lorawan.v3.RejoinType) |  | LoRaWAN rejoin-request type. |
+| `join_request_type` | [`JoinRequestType`](#ttn.lorawan.v3.JoinRequestType) |  | LoRaWAN join-request type. |
 | `dev_nonce` | [`bytes`](#bytes) |  | LoRaWAN DevNonce. |
 
 #### Field Rules
@@ -5112,7 +5113,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `rejoin_type` | [`RejoinType`](#ttn.lorawan.v3.RejoinType) |  |  |
+| `rejoin_type` | [`RejoinRequestType`](#ttn.lorawan.v3.RejoinRequestType) |  |  |
 | `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  |  |
 | `max_retries` | [`uint32`](#uint32) |  |  |
 | `period_exponent` | [`RejoinPeriodExponent`](#ttn.lorawan.v3.RejoinPeriodExponent) |  | Exponent e that configures the rejoin period = 32 * 2^e + rand(0,32) seconds. |
@@ -5411,7 +5412,7 @@ Message represents a LoRaWAN message
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `rejoin_type` | [`RejoinType`](#ttn.lorawan.v3.RejoinType) |  |  |
+| `rejoin_type` | [`RejoinRequestType`](#ttn.lorawan.v3.RejoinRequestType) |  |  |
 | `net_id` | [`bytes`](#bytes) |  |  |
 | `join_eui` | [`bytes`](#bytes) |  |  |
 | `dev_eui` | [`bytes`](#bytes) |  |  |
@@ -5648,6 +5649,15 @@ Transmission settings for downlink.
 | `DEVICE_EIRP_33` | 14 | 33 dBm. |
 | `DEVICE_EIRP_36` | 15 | 36 dBm. |
 
+### <a name="ttn.lorawan.v3.JoinRequestType">Enum `JoinRequestType`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `REJOIN_CONTEXT` | 0 | Resets DevAddr, Session Keys, Frame Counters, Radio Parameters. |
+| `REJOIN_SESSION` | 1 | Equivalent to the initial JoinRequest. |
+| `REJOIN_KEYS` | 2 | Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters. |
+| `JOIN` | 255 | Normal join-request. |
+
 ### <a name="ttn.lorawan.v3.MACCommandIdentifier">Enum `MACCommandIdentifier`</a>
 
 | Name | Number | Description |
@@ -5786,6 +5796,14 @@ Transmission settings for downlink.
 | `REJOIN_PERIOD_6` | 6 | Every 2048 to 2080 seconds. |
 | `REJOIN_PERIOD_7` | 7 | Every 4096 to 4128 seconds. |
 
+### <a name="ttn.lorawan.v3.RejoinRequestType">Enum `RejoinRequestType`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `CONTEXT` | 0 | Resets DevAddr, Session Keys, Frame Counters, Radio Parameters. |
+| `SESSION` | 1 | Equivalent to the initial JoinRequest. |
+| `KEYS` | 2 | Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters. |
+
 ### <a name="ttn.lorawan.v3.RejoinTimeExponent">Enum `RejoinTimeExponent`</a>
 
 | Name | Number | Description |
@@ -5806,14 +5824,6 @@ Transmission settings for downlink.
 | `REJOIN_TIME_13` | 13 | Every ~3.2 months. |
 | `REJOIN_TIME_14` | 14 | Every ~6.4 months. |
 | `REJOIN_TIME_15` | 15 | Every ~1.1 year. |
-
-### <a name="ttn.lorawan.v3.RejoinType">Enum `RejoinType`</a>
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| `CONTEXT` | 0 | Resets DevAddr, Session Keys, Frame Counters, Radio Parameters. |
-| `SESSION` | 1 | Equivalent to the initial JoinRequest. |
-| `KEYS` | 2 | Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters. |
 
 ### <a name="ttn.lorawan.v3.RxDelay">Enum `RxDelay`</a>
 

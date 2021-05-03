@@ -656,7 +656,7 @@ var DefaultMACCommands = MACCommandSpec{
 				ForceRejoinReq: &ttnpb.MACCommand_ForceRejoinReq{
 					PeriodExponent: ttnpb.RejoinPeriodExponent(uint32(b[0] >> 3)),
 					MaxRetries:     uint32(b[0] & 0x7),
-					RejoinType:     ttnpb.RejoinType(b[1] >> 4),
+					RejoinType:     ttnpb.RejoinRequestType(b[1] >> 4),
 					DataRateIndex:  ttnpb.DataRateIndex(b[1] & 0xf),
 				},
 			}

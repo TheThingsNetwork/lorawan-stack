@@ -165,6 +165,10 @@ Binary | ttnpb.DeviceEIRP | DEVICE_EIRP_30 | [13]
 Binary | ttnpb.DeviceEIRP | DEVICE_EIRP_33 | [14]
 Binary | ttnpb.DeviceEIRP | DEVICE_EIRP_36 | [15]
 Binary | ttnpb.DeviceEIRP | DEVICE_EIRP_8 | [0]
+Binary | ttnpb.JoinRequestType | JOIN | [255]
+Binary | ttnpb.JoinRequestType | REJOIN_CONTEXT | [0]
+Binary | ttnpb.JoinRequestType | REJOIN_KEYS | [2]
+Binary | ttnpb.JoinRequestType | REJOIN_SESSION | [1]
 Binary | ttnpb.MACCommandIdentifier | CID_ADR_PARAM_SETUP | [12]
 Binary | ttnpb.MACCommandIdentifier | CID_BEACON_FREQ | [19]
 Binary | ttnpb.MACCommandIdentifier | CID_BEACON_TIMING | [18]
@@ -266,6 +270,9 @@ Binary | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_4 | [4]
 Binary | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_5 | [5]
 Binary | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_6 | [6]
 Binary | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_7 | [7]
+Binary | ttnpb.RejoinRequestType | CONTEXT | [0]
+Binary | ttnpb.RejoinRequestType | KEYS | [2]
+Binary | ttnpb.RejoinRequestType | SESSION | [1]
 Binary | ttnpb.RejoinTimeExponent | REJOIN_TIME_0 | [0]
 Binary | ttnpb.RejoinTimeExponent | REJOIN_TIME_1 | [1]
 Binary | ttnpb.RejoinTimeExponent | REJOIN_TIME_10 | [10]
@@ -282,9 +289,6 @@ Binary | ttnpb.RejoinTimeExponent | REJOIN_TIME_6 | [6]
 Binary | ttnpb.RejoinTimeExponent | REJOIN_TIME_7 | [7]
 Binary | ttnpb.RejoinTimeExponent | REJOIN_TIME_8 | [8]
 Binary | ttnpb.RejoinTimeExponent | REJOIN_TIME_9 | [9]
-Binary | ttnpb.RejoinType | CONTEXT | [0]
-Binary | ttnpb.RejoinType | KEYS | [2]
-Binary | ttnpb.RejoinType | SESSION | [1]
 Binary | ttnpb.RxDelay | 0 | [0]
 Binary | ttnpb.RxDelay | 1 | [1]
 Binary | ttnpb.RxDelay | 10 | [10]
@@ -494,6 +498,10 @@ JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_8 | "DEVICE_EIRP_8"
 JSON | ttnpb.FrequencyValue | {100000 {} 0} | "100000"
 JSON | ttnpb.FrequencyValue | {2000000 {} 0} | "2000000"
 JSON | ttnpb.FrequencyValue | {30000000 {} 0} | "30000000"
+JSON | ttnpb.JoinRequestType | JOIN | "JOIN"
+JSON | ttnpb.JoinRequestType | REJOIN_CONTEXT | "REJOIN_CONTEXT"
+JSON | ttnpb.JoinRequestType | REJOIN_KEYS | "REJOIN_KEYS"
+JSON | ttnpb.JoinRequestType | REJOIN_SESSION | "REJOIN_SESSION"
 JSON | ttnpb.MACCommandIdentifier | CID_ADR_PARAM_SETUP | "CID_ADR_PARAM_SETUP"
 JSON | ttnpb.MACCommandIdentifier | CID_BEACON_FREQ | "CID_BEACON_FREQ"
 JSON | ttnpb.MACCommandIdentifier | CID_BEACON_TIMING | "CID_BEACON_TIMING"
@@ -595,6 +603,9 @@ JSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_4 | "REJOIN_PERIOD_4"
 JSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_5 | "REJOIN_PERIOD_5"
 JSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_6 | "REJOIN_PERIOD_6"
 JSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_7 | "REJOIN_PERIOD_7"
+JSON | ttnpb.RejoinRequestType | CONTEXT | "CONTEXT"
+JSON | ttnpb.RejoinRequestType | KEYS | "KEYS"
+JSON | ttnpb.RejoinRequestType | SESSION | "SESSION"
 JSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_0 | "REJOIN_TIME_0"
 JSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_1 | "REJOIN_TIME_1"
 JSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_10 | "REJOIN_TIME_10"
@@ -611,9 +622,6 @@ JSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_6 | "REJOIN_TIME_6"
 JSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_7 | "REJOIN_TIME_7"
 JSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_8 | "REJOIN_TIME_8"
 JSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_9 | "REJOIN_TIME_9"
-JSON | ttnpb.RejoinType | CONTEXT | "CONTEXT"
-JSON | ttnpb.RejoinType | KEYS | "KEYS"
-JSON | ttnpb.RejoinType | SESSION | "SESSION"
 JSON | ttnpb.RxDelay | 0 | 0
 JSON | ttnpb.RxDelay | 1 | 1
 JSON | ttnpb.RxDelay | 10 | 10
@@ -1021,6 +1029,10 @@ Text | ttnpb.FrequencyValue | {30000000 {} 0} | 30000000
 Text | ttnpb.GrantType | GRANT_AUTHORIZATION_CODE | GRANT_AUTHORIZATION_CODE
 Text | ttnpb.GrantType | GRANT_PASSWORD | GRANT_PASSWORD
 Text | ttnpb.GrantType | GRANT_REFRESH_TOKEN | GRANT_REFRESH_TOKEN
+Text | ttnpb.JoinRequestType | JOIN | JOIN
+Text | ttnpb.JoinRequestType | REJOIN_CONTEXT | REJOIN_CONTEXT
+Text | ttnpb.JoinRequestType | REJOIN_KEYS | REJOIN_KEYS
+Text | ttnpb.JoinRequestType | REJOIN_SESSION | REJOIN_SESSION
 Text | ttnpb.LocationSource | SOURCE_BT_RSSI_GEOLOCATION | SOURCE_BT_RSSI_GEOLOCATION
 Text | ttnpb.LocationSource | SOURCE_COMBINED_GEOLOCATION | SOURCE_COMBINED_GEOLOCATION
 Text | ttnpb.LocationSource | SOURCE_GPS | SOURCE_GPS
@@ -1131,6 +1143,9 @@ Text | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_4 | REJOIN_PERIOD_4
 Text | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_5 | REJOIN_PERIOD_5
 Text | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_6 | REJOIN_PERIOD_6
 Text | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_7 | REJOIN_PERIOD_7
+Text | ttnpb.RejoinRequestType | CONTEXT | CONTEXT
+Text | ttnpb.RejoinRequestType | KEYS | KEYS
+Text | ttnpb.RejoinRequestType | SESSION | SESSION
 Text | ttnpb.RejoinTimeExponent | REJOIN_TIME_0 | REJOIN_TIME_0
 Text | ttnpb.RejoinTimeExponent | REJOIN_TIME_1 | REJOIN_TIME_1
 Text | ttnpb.RejoinTimeExponent | REJOIN_TIME_10 | REJOIN_TIME_10
@@ -1147,9 +1162,6 @@ Text | ttnpb.RejoinTimeExponent | REJOIN_TIME_6 | REJOIN_TIME_6
 Text | ttnpb.RejoinTimeExponent | REJOIN_TIME_7 | REJOIN_TIME_7
 Text | ttnpb.RejoinTimeExponent | REJOIN_TIME_8 | REJOIN_TIME_8
 Text | ttnpb.RejoinTimeExponent | REJOIN_TIME_9 | REJOIN_TIME_9
-Text | ttnpb.RejoinType | CONTEXT | CONTEXT
-Text | ttnpb.RejoinType | KEYS | KEYS
-Text | ttnpb.RejoinType | SESSION | SESSION
 Text | ttnpb.Right | RIGHT_ALL | RIGHT_ALL
 Text | ttnpb.Right | RIGHT_APPLICATION_ALL | RIGHT_APPLICATION_ALL
 Text | ttnpb.Right | RIGHT_APPLICATION_DELETE | RIGHT_APPLICATION_DELETE

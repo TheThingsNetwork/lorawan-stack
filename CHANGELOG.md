@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Validation of OAuth token exchange requests from the CLI.
+- Validation of join-request types when using the Crypto Server backend.
 
 ### Security
 
