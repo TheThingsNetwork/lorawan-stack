@@ -53,9 +53,14 @@ func init() {
 	defineEnum(MType_REJOIN_REQUEST, "rejoin request")
 	defineEnum(MType_PROPRIETARY, "proprietary")
 
-	defineEnum(RejoinType_CONTEXT, "renew context")
-	defineEnum(RejoinType_SESSION, "renew session")
-	defineEnum(RejoinType_KEYS, "renew keys")
+	defineEnum(JoinRequestType_REJOIN_CONTEXT, "rejoin to renew context")
+	defineEnum(JoinRequestType_REJOIN_SESSION, "rejoin to renew session")
+	defineEnum(JoinRequestType_REJOIN_KEYS, "rejoin to renew keys")
+	defineEnum(JoinRequestType_JOIN, "join")
+
+	defineEnum(RejoinRequestType_CONTEXT, "renew context")
+	defineEnum(RejoinRequestType_SESSION, "renew session")
+	defineEnum(RejoinRequestType_KEYS, "renew keys")
 
 	defineEnum(CFListType_FREQUENCIES, "frequencies")
 	defineEnum(CFListType_CHANNEL_MASKS, "channel masks")

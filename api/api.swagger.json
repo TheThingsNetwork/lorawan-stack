@@ -10619,7 +10619,7 @@
       "type": "object",
       "properties": {
         "rejoin_type": {
-          "$ref": "#/definitions/v3RejoinType"
+          "$ref": "#/definitions/v3RejoinRequestType"
         },
         "data_rate_index": {
           "$ref": "#/definitions/v3DataRateIndex"
@@ -14459,6 +14459,16 @@
         }
       }
     },
+    "v3JoinRequestType": {
+      "type": "string",
+      "enum": [
+        "REJOIN_CONTEXT",
+        "REJOIN_SESSION",
+        "REJOIN_KEYS",
+        "JOIN"
+      ],
+      "default": "REJOIN_CONTEXT"
+    },
     "v3JoinResponse": {
       "type": "object",
       "properties": {
@@ -15909,7 +15919,7 @@
       "type": "object",
       "properties": {
         "rejoin_type": {
-          "$ref": "#/definitions/v3RejoinType"
+          "$ref": "#/definitions/v3RejoinRequestType"
         },
         "net_id": {
           "type": "string",
@@ -15928,6 +15938,15 @@
           "format": "int64"
         }
       }
+    },
+    "v3RejoinRequestType": {
+      "type": "string",
+      "enum": [
+        "CONTEXT",
+        "SESSION",
+        "KEYS"
+      ],
+      "default": "CONTEXT"
     },
     "v3RejoinTimeExponent": {
       "type": "string",
@@ -15950,15 +15969,6 @@
         "REJOIN_TIME_15"
       ],
       "default": "REJOIN_TIME_0"
-    },
-    "v3RejoinType": {
-      "type": "string",
-      "enum": [
-        "CONTEXT",
-        "SESSION",
-        "KEYS"
-      ],
-      "default": "CONTEXT"
     },
     "v3ResetAndGetEndDeviceRequest": {
       "type": "object",

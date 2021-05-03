@@ -258,7 +258,7 @@ func (dst *JoinAcceptMICRequest) SetFields(src *JoinAcceptMICRequest, paths ...s
 			if src != nil {
 				dst.JoinRequestType = src.JoinRequestType
 			} else {
-				var zero RejoinType
+				var zero JoinRequestType
 				dst.JoinRequestType = zero
 			}
 		case "dev_nonce":

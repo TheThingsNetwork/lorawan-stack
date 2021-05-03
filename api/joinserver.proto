@@ -88,8 +88,8 @@ message CryptoServicePayloadResponse {
 message JoinAcceptMICRequest {
   // Request data for the cryptographic operation.
   CryptoServicePayloadRequest payload_request = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
-  // LoRaWAN rejoin-request type.
-  RejoinType join_request_type = 2 [(validate.rules).enum.defined_only = true];
+  // LoRaWAN join-request type.
+  JoinRequestType join_request_type = 2 [(validate.rules).enum.defined_only = true];
   // LoRaWAN DevNonce.
   bytes dev_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevNonce"];
 }

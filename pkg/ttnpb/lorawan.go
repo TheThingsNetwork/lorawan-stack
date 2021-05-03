@@ -595,50 +595,97 @@ func (v *FrequencyValue) FieldIsZero(p string) bool {
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
-func (v RejoinType) MarshalBinary() ([]byte, error) {
+func (v JoinRequestType) MarshalBinary() ([]byte, error) {
 	return marshalBinaryEnum(int32(v)), nil
 }
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v RejoinType) MarshalText() ([]byte, error) {
+func (v JoinRequestType) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
 // MarshalJSON implements json.Marshaler interface.
-func (v RejoinType) MarshalJSON() ([]byte, error) {
-	return marshalJSONEnum(RejoinType_name, int32(v))
+func (v JoinRequestType) MarshalJSON() ([]byte, error) {
+	return marshalJSONEnum(JoinRequestType_name, int32(v))
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
-func (v *RejoinType) UnmarshalBinary(b []byte) error {
-	i, err := unmarshalEnumFromBinary("RejoinType", RejoinType_name, b)
+func (v *JoinRequestType) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("JoinRequestType", JoinRequestType_name, b)
 	if err != nil {
 		return err
 	}
-	*v = RejoinType(i)
+	*v = JoinRequestType(i)
 	return nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *RejoinType) UnmarshalText(b []byte) error {
-	i, err := unmarshalEnumFromText("RejoinType", RejoinType_value, b)
+func (v *JoinRequestType) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromText("JoinRequestType", JoinRequestType_value, b)
 	if err != nil {
 		return err
 	}
-	*v = RejoinType(i)
+	*v = JoinRequestType(i)
 	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
-func (v *RejoinType) UnmarshalJSON(b []byte) error {
+func (v *JoinRequestType) UnmarshalJSON(b []byte) error {
 	if bt, ok := unmarshalJSONString(b); ok {
 		return v.UnmarshalText(bt)
 	}
-	i, err := unmarshalEnumFromNumber("RejoinType", RejoinType_name, b)
+	i, err := unmarshalEnumFromNumber("JoinRequestType", JoinRequestType_name, b)
 	if err != nil {
 		return err
 	}
-	*v = RejoinType(i)
+	*v = JoinRequestType(i)
+	return nil
+}
+
+func (v RejoinRequestType) MarshalBinary() ([]byte, error) {
+	return marshalBinaryEnum(int32(v)), nil
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v RejoinRequestType) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v RejoinRequestType) MarshalJSON() ([]byte, error) {
+	return marshalJSONEnum(RejoinRequestType_name, int32(v))
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *RejoinRequestType) UnmarshalBinary(b []byte) error {
+	i, err := unmarshalEnumFromBinary("RejoinRequestType", RejoinRequestType_name, b)
+	if err != nil {
+		return err
+	}
+	*v = RejoinRequestType(i)
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *RejoinRequestType) UnmarshalText(b []byte) error {
+	i, err := unmarshalEnumFromText("RejoinRequestType", RejoinRequestType_value, b)
+	if err != nil {
+		return err
+	}
+	*v = RejoinRequestType(i)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *RejoinRequestType) UnmarshalJSON(b []byte) error {
+	if bt, ok := unmarshalJSONString(b); ok {
+		return v.UnmarshalText(bt)
+	}
+	i, err := unmarshalEnumFromNumber("RejoinRequestType", RejoinRequestType_name, b)
+	if err != nil {
+		return err
+	}
+	*v = RejoinRequestType(i)
 	return nil
 }
 

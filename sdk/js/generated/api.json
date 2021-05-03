@@ -18467,11 +18467,11 @@
             },
             {
               "name": "join_request_type",
-              "description": "LoRaWAN rejoin-request type.",
+              "description": "LoRaWAN join-request type.",
               "label": "",
-              "type": "RejoinType",
-              "longType": "RejoinType",
-              "fullType": "ttn.lorawan.v3.RejoinType",
+              "type": "JoinRequestType",
+              "longType": "JoinRequestType",
+              "fullType": "ttn.lorawan.v3.JoinRequestType",
               "ismap": false,
               "defaultValue": "",
               "options": {
@@ -19976,6 +19976,34 @@
           ]
         },
         {
+          "name": "JoinRequestType",
+          "longName": "JoinRequestType",
+          "fullName": "ttn.lorawan.v3.JoinRequestType",
+          "description": "",
+          "values": [
+            {
+              "name": "REJOIN_CONTEXT",
+              "number": "0",
+              "description": "Resets DevAddr, Session Keys, Frame Counters, Radio Parameters."
+            },
+            {
+              "name": "REJOIN_SESSION",
+              "number": "1",
+              "description": "Equivalent to the initial JoinRequest."
+            },
+            {
+              "name": "REJOIN_KEYS",
+              "number": "2",
+              "description": "Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters."
+            },
+            {
+              "name": "JOIN",
+              "number": "255",
+              "description": "Normal join-request."
+            }
+          ]
+        },
+        {
           "name": "MACCommandIdentifier",
           "longName": "MACCommandIdentifier",
           "fullName": "ttn.lorawan.v3.MACCommandIdentifier",
@@ -20513,6 +20541,29 @@
           ]
         },
         {
+          "name": "RejoinRequestType",
+          "longName": "RejoinRequestType",
+          "fullName": "ttn.lorawan.v3.RejoinRequestType",
+          "description": "",
+          "values": [
+            {
+              "name": "CONTEXT",
+              "number": "0",
+              "description": "Resets DevAddr, Session Keys, Frame Counters, Radio Parameters."
+            },
+            {
+              "name": "SESSION",
+              "number": "1",
+              "description": "Equivalent to the initial JoinRequest."
+            },
+            {
+              "name": "KEYS",
+              "number": "2",
+              "description": "Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters."
+            }
+          ]
+        },
+        {
           "name": "RejoinTimeExponent",
           "longName": "RejoinTimeExponent",
           "fullName": "ttn.lorawan.v3.RejoinTimeExponent",
@@ -20597,29 +20648,6 @@
               "name": "REJOIN_TIME_15",
               "number": "15",
               "description": "Every ~1.1 year."
-            }
-          ]
-        },
-        {
-          "name": "RejoinType",
-          "longName": "RejoinType",
-          "fullName": "ttn.lorawan.v3.RejoinType",
-          "description": "",
-          "values": [
-            {
-              "name": "CONTEXT",
-              "number": "0",
-              "description": "Resets DevAddr, Session Keys, Frame Counters, Radio Parameters."
-            },
-            {
-              "name": "SESSION",
-              "number": "1",
-              "description": "Equivalent to the initial JoinRequest."
-            },
-            {
-              "name": "KEYS",
-              "number": "2",
-              "description": "Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters."
             }
           ]
         },
@@ -22215,9 +22243,9 @@
               "name": "rejoin_type",
               "description": "",
               "label": "",
-              "type": "RejoinType",
-              "longType": "RejoinType",
-              "fullType": "ttn.lorawan.v3.RejoinType",
+              "type": "RejoinRequestType",
+              "longType": "RejoinRequestType",
+              "fullType": "ttn.lorawan.v3.RejoinRequestType",
               "ismap": false,
               "defaultValue": "",
               "options": {
@@ -23340,9 +23368,9 @@
               "name": "rejoin_type",
               "description": "",
               "label": "",
-              "type": "RejoinType",
-              "longType": "RejoinType",
-              "fullType": "ttn.lorawan.v3.RejoinType",
+              "type": "RejoinRequestType",
+              "longType": "RejoinRequestType",
+              "fullType": "ttn.lorawan.v3.RejoinRequestType",
               "ismap": false,
               "defaultValue": "",
               "options": {

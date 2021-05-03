@@ -468,7 +468,7 @@ func (dst *RejoinRequestPayload) SetFields(src *RejoinRequestPayload, paths ...s
 			if src != nil {
 				dst.RejoinType = src.RejoinType
 			} else {
-				var zero RejoinType
+				var zero RejoinRequestType
 				dst.RejoinType = zero
 			}
 		case "net_id":
@@ -3139,7 +3139,7 @@ func (dst *MACCommand_ForceRejoinReq) SetFields(src *MACCommand_ForceRejoinReq, 
 			if src != nil {
 				dst.RejoinType = src.RejoinType
 			} else {
-				var zero RejoinType
+				var zero RejoinRequestType
 				dst.RejoinType = zero
 			}
 		case "data_rate_index":

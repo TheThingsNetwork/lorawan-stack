@@ -407,7 +407,7 @@ var errEncryptedJoinAcceptPayloadLength = unexpectedValue(
 
 // UnmarshalRejoinRequestPayload unmarshals b into msg.
 func UnmarshalRejoinRequestPayload(b []byte, msg *ttnpb.RejoinRequestPayload) error {
-	msg.RejoinType = ttnpb.RejoinType(b[0])
+	msg.RejoinType = ttnpb.RejoinRequestType(b[0])
 	switch msg.RejoinType {
 	case 0, 2:
 		if len(b) != 14 {
