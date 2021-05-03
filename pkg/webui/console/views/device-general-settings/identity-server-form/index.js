@@ -38,8 +38,7 @@ import validationSchema from './validation-schema'
 
 const messages = defineMessages({
   deleteDevice: 'Delete end device',
-  deleteWarning:
-    'Are you sure you want to delete "{deviceId}"? This action cannot be undone and it will not be possible to reuse the end device ID.',
+  deleteWarning: 'Are you sure you want to delete "{deviceId}"? This action cannot be undone.',
 })
 
 const IdentityServerForm = React.memo(props => {
