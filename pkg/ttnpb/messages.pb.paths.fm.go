@@ -487,6 +487,12 @@ var ApplicationUplinkFieldPathsNested = []string{
 	"settings.frequency",
 	"settings.time",
 	"settings.timestamp",
+	"version_ids",
+	"version_ids.band_id",
+	"version_ids.brand_id",
+	"version_ids.firmware_version",
+	"version_ids.hardware_version",
+	"version_ids.model_id",
 }
 
 var ApplicationUplinkFieldPathsTopLevel = []string{
@@ -504,6 +510,7 @@ var ApplicationUplinkFieldPathsTopLevel = []string{
 	"rx_metadata",
 	"session_key_id",
 	"settings",
+	"version_ids",
 }
 var ApplicationLocationFieldPathsNested = []string{
 	"attributes",
@@ -796,6 +803,12 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.uplink_message.settings.frequency",
 	"up.uplink_message.settings.time",
 	"up.uplink_message.settings.timestamp",
+	"up.uplink_message.version_ids",
+	"up.uplink_message.version_ids.band_id",
+	"up.uplink_message.version_ids.brand_id",
+	"up.uplink_message.version_ids.firmware_version",
+	"up.uplink_message.version_ids.hardware_version",
+	"up.uplink_message.version_ids.model_id",
 }
 
 var ApplicationUpFieldPathsTopLevel = []string{

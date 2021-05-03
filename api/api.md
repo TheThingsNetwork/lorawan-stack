@@ -190,7 +190,6 @@
   - [Message `EndDeviceTemplateFormats`](#ttn.lorawan.v3.EndDeviceTemplateFormats)
   - [Message `EndDeviceTemplateFormats.FormatsEntry`](#ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry)
   - [Message `EndDeviceVersion`](#ttn.lorawan.v3.EndDeviceVersion)
-  - [Message `EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers)
   - [Message `EndDevices`](#ttn.lorawan.v3.EndDevices)
   - [Message `GetEndDeviceIdentifiersForEUIsRequest`](#ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest)
   - [Message `GetEndDeviceRequest`](#ttn.lorawan.v3.GetEndDeviceRequest)
@@ -272,6 +271,7 @@
   - [Message `ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers)
   - [Message `ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers)
   - [Message `EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers)
+  - [Message `EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers)
   - [Message `EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers)
   - [Message `GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers)
   - [Message `OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers)
@@ -3015,28 +3015,6 @@ Template for creating end devices.
 | `photos` | <p>`repeated.max_items`: `10`</p> |
 | `default_formatters` | <p>`message.required`: `true`</p> |
 
-### <a name="ttn.lorawan.v3.EndDeviceVersionIdentifiers">Message `EndDeviceVersionIdentifiers`</a>
-
-Identifies an end device model with version information.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `brand_id` | [`string`](#string) |  |  |
-| `model_id` | [`string`](#string) |  |  |
-| `hardware_version` | [`string`](#string) |  |  |
-| `firmware_version` | [`string`](#string) |  |  |
-| `band_id` | [`string`](#string) |  |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-| `model_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
-| `hardware_version` | <p>`string.max_len`: `32`</p> |
-| `firmware_version` | <p>`string.max_len`: `32`</p> |
-| `band_id` | <p>`string.max_len`: `32`</p> |
-
 ### <a name="ttn.lorawan.v3.EndDevices">Message `EndDevices`</a>
 
 | Field | Type | Label | Description |
@@ -4160,6 +4138,28 @@ The NsGs service connects a Network Server to a Gateway Server.
 | ----- | ----------- |
 | `device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `application_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.EndDeviceVersionIdentifiers">Message `EndDeviceVersionIdentifiers`</a>
+
+Identifies an end device model with version information.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `brand_id` | [`string`](#string) |  |  |
+| `model_id` | [`string`](#string) |  |  |
+| `hardware_version` | [`string`](#string) |  |  |
+| `firmware_version` | [`string`](#string) |  |  |
+| `band_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `model_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `hardware_version` | <p>`string.max_len`: `32`</p> |
+| `firmware_version` | <p>`string.max_len`: `32`</p> |
+| `band_id` | <p>`string.max_len`: `32`</p> |
 
 ### <a name="ttn.lorawan.v3.EntityIdentifiers">Message `EntityIdentifiers`</a>
 
@@ -6083,6 +6083,7 @@ Application uplink message.
 | `confirmed` | [`bool`](#bool) |  |  |
 | `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings. |
 | `locations` | [`ApplicationUplink.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplink.LocationsEntry) | repeated | End device location metadata, set by the Application Server while handling the message. |
+| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version identifiers, set by the Application Server while handling the message. |
 
 #### Field Rules
 

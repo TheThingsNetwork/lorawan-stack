@@ -973,3 +973,156 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = EntityIdentifiersValidationError{}
+
+// ValidateFields checks the field values on EndDeviceVersionIdentifiers with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = EndDeviceVersionIdentifiersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "brand_id":
+
+			if m.GetBrandID() != "" {
+
+				if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+					return EndDeviceVersionIdentifiersValidationError{
+						field:  "brand_id",
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_EndDeviceVersionIdentifiers_BrandID_Pattern.MatchString(m.GetBrandID()) {
+					return EndDeviceVersionIdentifiersValidationError{
+						field:  "brand_id",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+			}
+
+		case "model_id":
+
+			if m.GetModelID() != "" {
+
+				if utf8.RuneCountInString(m.GetModelID()) > 36 {
+					return EndDeviceVersionIdentifiersValidationError{
+						field:  "model_id",
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_EndDeviceVersionIdentifiers_ModelID_Pattern.MatchString(m.GetModelID()) {
+					return EndDeviceVersionIdentifiersValidationError{
+						field:  "model_id",
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+			}
+
+		case "hardware_version":
+
+			if utf8.RuneCountInString(m.GetHardwareVersion()) > 32 {
+				return EndDeviceVersionIdentifiersValidationError{
+					field:  "hardware_version",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
+		case "firmware_version":
+
+			if utf8.RuneCountInString(m.GetFirmwareVersion()) > 32 {
+				return EndDeviceVersionIdentifiersValidationError{
+					field:  "firmware_version",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
+		case "band_id":
+
+			if utf8.RuneCountInString(m.GetBandID()) > 32 {
+				return EndDeviceVersionIdentifiersValidationError{
+					field:  "band_id",
+					reason: "value length must be at most 32 runes",
+				}
+			}
+
+		default:
+			return EndDeviceVersionIdentifiersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// EndDeviceVersionIdentifiersValidationError is the validation error returned
+// by EndDeviceVersionIdentifiers.ValidateFields if the designated constraints
+// aren't met.
+type EndDeviceVersionIdentifiersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EndDeviceVersionIdentifiersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EndDeviceVersionIdentifiersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EndDeviceVersionIdentifiersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EndDeviceVersionIdentifiersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EndDeviceVersionIdentifiersValidationError) ErrorName() string {
+	return "EndDeviceVersionIdentifiersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EndDeviceVersionIdentifiersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEndDeviceVersionIdentifiers.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EndDeviceVersionIdentifiersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EndDeviceVersionIdentifiersValidationError{}
+
+var _EndDeviceVersionIdentifiers_BrandID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+var _EndDeviceVersionIdentifiers_ModelID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")

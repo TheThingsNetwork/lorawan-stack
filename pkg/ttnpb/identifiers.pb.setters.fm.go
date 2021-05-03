@@ -521,3 +521,64 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 	}
 	return nil
 }
+
+func (dst *EndDeviceVersionIdentifiers) SetFields(src *EndDeviceVersionIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "brand_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BrandID = src.BrandID
+			} else {
+				var zero string
+				dst.BrandID = zero
+			}
+		case "model_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'model_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ModelID = src.ModelID
+			} else {
+				var zero string
+				dst.ModelID = zero
+			}
+		case "hardware_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'hardware_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.HardwareVersion = src.HardwareVersion
+			} else {
+				var zero string
+				dst.HardwareVersion = zero
+			}
+		case "firmware_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'firmware_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FirmwareVersion = src.FirmwareVersion
+			} else {
+				var zero string
+				dst.FirmwareVersion = zero
+			}
+		case "band_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'band_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BandID = src.BandID
+			} else {
+				var zero string
+				dst.BandID = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

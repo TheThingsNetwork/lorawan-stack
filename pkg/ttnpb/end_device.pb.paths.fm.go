@@ -101,21 +101,6 @@ var MACParametersFieldPathsTopLevel = []string{
 	"rx2_frequency",
 	"uplink_dwell_time",
 }
-var EndDeviceVersionIdentifiersFieldPathsNested = []string{
-	"band_id",
-	"brand_id",
-	"firmware_version",
-	"hardware_version",
-	"model_id",
-}
-
-var EndDeviceVersionIdentifiersFieldPathsTopLevel = []string{
-	"band_id",
-	"brand_id",
-	"firmware_version",
-	"hardware_version",
-	"model_id",
-}
 var EndDeviceVersionFieldPathsNested = []string{
 	"default_formatters",
 	"default_formatters.down_formatter",
