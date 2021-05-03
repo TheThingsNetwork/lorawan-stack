@@ -102,7 +102,7 @@ func NewPopulatedMACCommand_DLChannelReq(r randyLorawan, easy bool) *MACCommand_
 
 func NewPopulatedMACCommand_ForceRejoinReq(r randyLorawan, easy bool) *MACCommand_ForceRejoinReq {
 	out := &MACCommand_ForceRejoinReq{}
-	out.RejoinType = RejoinType(r.Intn(3))
+	out.RejoinType = RejoinRequestType(r.Intn(3))
 	out.DataRateIndex = NewPopulatedDataRateIndex(r, easy)
 	out.MaxRetries = r.Uint32() % 8
 	out.PeriodExponent = RejoinPeriodExponent(r.Intn(8))
@@ -404,7 +404,7 @@ func NewPopulatedMessage_JoinAcceptPayload(r randyLorawan) *Message_JoinAcceptPa
 	return &Message_JoinAcceptPayload{NewPopulatedJoinAcceptPayload(r, false)}
 }
 
-func NewPopulatedRejoinRequestPayloadType(r randyLorawan, typ RejoinType) *RejoinRequestPayload {
+func NewPopulatedRejoinRequestPayloadType(r randyLorawan, typ RejoinRequestType) *RejoinRequestPayload {
 	out := &RejoinRequestPayload{}
 	out.RejoinType = typ
 	switch typ {
@@ -423,14 +423,14 @@ func NewPopulatedRejoinRequestPayloadType(r randyLorawan, typ RejoinType) *Rejoi
 }
 
 func NewPopulatedRejoinRequestPayload(r randyLorawan, easy bool) *RejoinRequestPayload {
-	return NewPopulatedRejoinRequestPayloadType(r, RejoinType(r.Intn(3)))
+	return NewPopulatedRejoinRequestPayloadType(r, RejoinRequestType(r.Intn(3)))
 }
 
 func NewPopulatedMessage_RejoinRequestPayload(r randyLorawan) *Message_RejoinRequestPayload {
 	return &Message_RejoinRequestPayload{NewPopulatedRejoinRequestPayload(r, false)}
 }
 
-func NewPopulatedMessage_RejoinRequestPayloadType(r randyLorawan, typ RejoinType) *Message_RejoinRequestPayload {
+func NewPopulatedMessage_RejoinRequestPayloadType(r randyLorawan, typ RejoinRequestType) *Message_RejoinRequestPayload {
 	return &Message_RejoinRequestPayload{NewPopulatedRejoinRequestPayloadType(r, typ)}
 }
 
@@ -548,7 +548,7 @@ func NewPopulatedMessageJoinAccept(r randyLorawan, decrypted bool) *Message {
 	return out
 }
 
-func NewPopulatedMessageRejoinRequest(r randyLorawan, typ RejoinType) *Message {
+func NewPopulatedMessageRejoinRequest(r randyLorawan, typ RejoinRequestType) *Message {
 	out := &Message{}
 	out.MHDR = *NewPopulatedMHDR(r, false)
 	out.MHDR.MType = MType_REJOIN_REQUEST
@@ -582,7 +582,7 @@ func NewPopulatedMessage(r randyLorawan, easy bool) *Message {
 	case MType_JOIN_ACCEPT:
 		return NewPopulatedMessageJoinAccept(r, false)
 	case MType_REJOIN_REQUEST:
-		return NewPopulatedMessageRejoinRequest(r, RejoinType(r.Intn(3)))
+		return NewPopulatedMessageRejoinRequest(r, RejoinRequestType(r.Intn(3)))
 	}
 	panic("unreachable")
 }

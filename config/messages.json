@@ -368,6 +368,15 @@
       "file": "i18n.go"
     }
   },
+  "enum:JOIN": {
+    "translations": {
+      "en": "join"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:JOIN_ACCEPT": {
     "translations": {
       "en": "join accept"
@@ -404,9 +413,36 @@
       "file": "i18n.go"
     }
   },
+  "enum:REJOIN_CONTEXT": {
+    "translations": {
+      "en": "rejoin to renew context"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:REJOIN_KEYS": {
+    "translations": {
+      "en": "rejoin to renew keys"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:REJOIN_REQUEST": {
     "translations": {
       "en": "rejoin request"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:REJOIN_SESSION": {
+    "translations": {
+      "en": "rejoin to renew session"
     },
     "description": {
       "package": "pkg/ttnpb",

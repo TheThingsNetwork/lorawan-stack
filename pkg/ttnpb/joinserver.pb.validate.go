@@ -590,7 +590,7 @@ func (m *JoinAcceptMICRequest) ValidateFields(paths ...string) error {
 
 		case "join_request_type":
 
-			if _, ok := RejoinType_name[int32(m.GetJoinRequestType())]; !ok {
+			if _, ok := JoinRequestType_name[int32(m.GetJoinRequestType())]; !ok {
 				return JoinAcceptMICRequestValidationError{
 					field:  "join_request_type",
 					reason: "value must be one of the defined enum values",

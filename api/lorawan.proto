@@ -166,7 +166,14 @@ message JoinRequestPayload {
   bytes dev_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevNonce"];
 }
 
-enum RejoinType {
+enum JoinRequestType {
+  REJOIN_CONTEXT = 0; // Resets DevAddr, Session Keys, Frame Counters, Radio Parameters.
+  REJOIN_SESSION = 1; // Equivalent to the initial JoinRequest.
+  REJOIN_KEYS = 2; // Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters.
+  JOIN = 255; // Normal join-request.
+}
+
+enum RejoinRequestType {
   CONTEXT = 0; // Resets DevAddr, Session Keys, Frame Counters, Radio Parameters.
   SESSION = 1; // Equivalent to the initial JoinRequest.
   KEYS = 2; // Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters.
@@ -175,7 +182,7 @@ enum RejoinType {
 message RejoinRequestPayload {
   option (gogoproto.populate) = false;
 
-  RejoinType rejoin_type = 1 [(validate.rules).enum.defined_only = true];
+  RejoinRequestType rejoin_type = 1 [(validate.rules).enum.defined_only = true];
   bytes net_id = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
   bytes join_eui = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "JoinEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
   bytes dev_eui = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "DevEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
@@ -536,7 +543,7 @@ message MACCommand {
   message ForceRejoinReq {
     option (gogoproto.populate) = false;
 
-    RejoinType rejoin_type = 1 [(validate.rules).enum.defined_only = true];
+    RejoinRequestType rejoin_type = 1 [(validate.rules).enum.defined_only = true];
     DataRateIndex data_rate_index = 2 [(validate.rules).enum.defined_only = true];
     uint32 max_retries = 3 [(validate.rules).uint32.lte = 7];
     // Exponent e that configures the rejoin period = 32 * 2^e + rand(0,32) seconds.
