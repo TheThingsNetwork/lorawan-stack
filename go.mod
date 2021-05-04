@@ -53,7 +53,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/felixge/httpsnoop v1.0.1
 	github.com/getsentry/sentry-go v0.10.0
-	github.com/go-redis/redis/v8 v8.3.2
+	github.com/go-redis/redis/v8 v8.8.2
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/gddo v0.0.0-20200519224240-a4ebd2f7e574
@@ -112,6 +112,7 @@ require (
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.0.0-beta.1
 	go.opencensus.io v0.22.3
+	go.opentelemetry.io/otel v0.20.0 // indirect
 	go.packetbroker.org/api/iam v1.2.2-tts
 	go.packetbroker.org/api/iam/v2 v2.1.2-tts
 	go.packetbroker.org/api/routing v1.2.2-tts
