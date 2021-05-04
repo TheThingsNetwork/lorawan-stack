@@ -179,6 +179,7 @@ func isAtomicType(t reflect.Type, maskOnly bool) bool {
 			"BoolValue",
 			"DataRateIndexValue",
 			"DataRateOffsetValue",
+			"DeviceEIRPValue",
 			"FrequencyValue",
 			"GatewayAntennaIdentifiers",
 			"Picture",
@@ -297,6 +298,7 @@ func AddField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			"AggregatedDutyCycleValue",
 			"DataRateIndexValue",
 			"DataRateOffsetValue",
+			"DeviceEIRPValue",
 			"PingSlotPeriodValue",
 			"RxDelayValue":
 			fv, ok := t.FieldByName("Value")
@@ -659,6 +661,17 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 						var enum ttnpb.RxDelay
 						if err := enum.UnmarshalText([]byte(v.String())); err != nil {
 							field.Set(reflect.ValueOf(ttnpb.RxDelayValue{Value: enum}))
+							break
+						}
+						return fmt.Errorf(`invalid value "%s" for %s`, v.String(), typeName)
+					case "DeviceEIRPValue":
+						if enumValue, ok := proto.EnumValueMap(unwrapLoRaWANEnumType(typeName))[v.String()]; ok {
+							field.Set(reflect.ValueOf(ttnpb.DeviceEIRPValue{Value: ttnpb.DeviceEIRP(enumValue)}))
+							break
+						}
+						var enum ttnpb.DeviceEIRP
+						if err := enum.UnmarshalText([]byte(v.String())); err != nil {
+							field.Set(reflect.ValueOf(ttnpb.DeviceEIRPValue{Value: enum}))
 							break
 						}
 						return fmt.Errorf(`invalid value "%s" for %s`, v.String(), typeName)
