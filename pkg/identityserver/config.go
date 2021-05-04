@@ -96,6 +96,11 @@ type Config struct {
 	Delete struct {
 		Restore time.Duration `name:"restore" description:"How long after soft-deletion an entity can be restored"`
 	} `name:"delete"`
+	DevEUIBlock struct {
+		Enabled          bool   `name:"enabled" description:"Enable DevEUI address issuing from IEEE MAC block"`
+		MaxAddressPerApp int    `name:"max-address-per-app" description:"Maximum DevEUI addresses to be issued per application"`
+		AddressBlock     string `name:"address-block" description:"DevEUI address block with prefix length"`
+	} `name:"dev-eui-block" description:"IEEE MAC block used to issue DevEUI's to devices that are not yet programmed"`
 }
 
 type emailTemplatesConfig struct {

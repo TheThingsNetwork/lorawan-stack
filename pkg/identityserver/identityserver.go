@@ -102,6 +102,13 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		return nil, err
 	}
 
+	if is.config.DevEUIBlock.Enabled {
+		err = store.CreateEUIBlock(is.Context(), is.db, "dev_eui", is.config.DevEUIBlock.AddressBlock)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
 	is.config.OAuth.UI.FrontendConfig.EnableUserRegistration = is.config.UserRegistration.Enabled
 	is.oauth, err = oauth.NewServer(c, struct {
