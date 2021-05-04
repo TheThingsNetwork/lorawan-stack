@@ -40,7 +40,7 @@ require (
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/TheThingsIndustries/mystique v0.0.0-20200127144137-4aa959111fe7
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
-	github.com/aws/aws-sdk-go v1.31.1
+	github.com/aws/aws-sdk-go v1.38.31
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.13
 	github.com/bluele/gcache v0.0.0-20190518031135-bc40bd653833
