@@ -117,7 +117,7 @@ require (
 	github.com/throttled/throttled v2.2.5+incompatible
 	github.com/throttled/throttled/v2 v2.7.1
 	github.com/valyala/fasttemplate v1.1.0 // indirect
-	github.com/vmihailenco/msgpack/v5 v5.0.0-beta.1
+	github.com/vmihailenco/msgpack/v5 v5.3.1
 	go.opencensus.io v0.22.3
 	go.opentelemetry.io/otel v0.20.0 // indirect
 	go.packetbroker.org/api/iam v1.2.2-tts
