@@ -57,7 +57,7 @@ require (
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
-	github.com/golang/protobuf v1.3.5
+	github.com/golang/protobuf v1.5.0
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
@@ -89,7 +89,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.1.4
-	github.com/nats-io/nats.go v1.9.2
+	github.com/nats-io/nats.go v1.11.0
 	github.com/oklog/ulid/v2 v2.0.2
 	github.com/olekukonko/tablewriter v0.0.4 // indirect
 	github.com/openshift/osin v1.0.1
@@ -121,7 +121,7 @@ require (
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
 	gocloud.dev v0.20.0
 	gocloud.dev/pubsub/natspubsub v0.19.0
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/crypto v0.0.0-20210503195802-e9a32991a82e
 	golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
@@ -130,6 +130,8 @@ require (
 	google.golang.org/api v0.24.0
 	google.golang.org/genproto v0.0.0-20200513103714-09dca8ec2884
 	google.golang.org/grpc v1.33.1
+	// NOTE: google.golang.org/protobuf is a test dependency of a dependency. It is not, and should not be used.
+	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1
