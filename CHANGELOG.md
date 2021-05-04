@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Application Server uplink storage will now store only uplink metadata.
+
 ### Deprecated
 
 ### Removed
