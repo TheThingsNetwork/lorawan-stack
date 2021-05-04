@@ -100,9 +100,7 @@ const overviewFetchingSelector = createFetchingSelector([GET_APPS_LIST_BASE, GET
     },
   }),
 )
-@withBreadcrumb('overview', props => {
-  return <Breadcrumb path="/" content={sharedMessages.overview} />
-})
+@withBreadcrumb('overview', props => <Breadcrumb path="/" content={sharedMessages.overview} />)
 @withEnv
 export default class Overview extends React.Component {
   static propTypes = {
@@ -287,21 +285,19 @@ export default class Overview extends React.Component {
   }
 }
 
-const ComponentCard = ({ name, enabled, host }) => {
-  return (
-    <div className={style.componentCard}>
-      <img src={ServerIcon} className={style.componentCardIcon} />
-      <div className={style.componentCardDesc}>
-        <div className={style.componentCardName}>
-          <Status label={name} status={enabled ? 'good' : 'unknown'} flipped />
-        </div>
-        <span className={style.componentCardHost} title={host}>
-          {enabled ? host : <Message content={sharedMessages.disabled} />}
-        </span>
+const ComponentCard = ({ name, enabled, host }) => (
+  <div className={style.componentCard}>
+    <img src={ServerIcon} className={style.componentCardIcon} />
+    <div className={style.componentCardDesc}>
+      <div className={style.componentCardName}>
+        <Status label={name} status={enabled ? 'good' : 'unknown'} flipped />
       </div>
+      <span className={style.componentCardHost} title={host}>
+        {enabled ? host : <Message content={sharedMessages.disabled} />}
+      </span>
     </div>
-  )
-}
+  </div>
+)
 
 ComponentCard.propTypes = {
   enabled: PropTypes.bool.isRequired,

@@ -150,7 +150,7 @@ PropTypes.user = PropTypes.shape({
 
 PropTypes.profilePicture = PropTypes.shape({
   sizes: PropTypes.shape({
-    '0': PropTypes.string,
+    0: PropTypes.string,
   }),
 })
 

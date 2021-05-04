@@ -28,12 +28,10 @@ const initialState = {
   selectedUser: null,
 }
 
-const user = (state = {}, user) => {
-  return {
-    ...state,
-    ...user,
-  }
-}
+const user = (state = {}, user) => ({
+  ...state,
+  ...user,
+})
 
 const users = (state = initialState, { type, payload, meta }) => {
   switch (type) {

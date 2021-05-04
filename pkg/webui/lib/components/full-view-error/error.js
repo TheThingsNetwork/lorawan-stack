@@ -90,17 +90,15 @@ const FullViewErrorInner = ({ error }) => {
   )
 }
 
-const FullViewError = ({ error, header, onlineStatus }) => {
-  return (
-    <div className={style.wrapper}>
-      {Boolean(header) && header}
-      <div className={style.flexWrapper}>
-        <FullViewErrorInner error={error} />
-      </div>
-      <Footer onlineStatus={onlineStatus} />
+const FullViewError = ({ error, header, onlineStatus }) => (
+  <div className={style.wrapper}>
+    {Boolean(header) && header}
+    <div className={style.flexWrapper}>
+      <FullViewErrorInner error={error} />
     </div>
-  )
-}
+    <Footer onlineStatus={onlineStatus} />
+  </div>
+)
 
 FullViewErrorInner.propTypes = {
   error: PropTypes.error.isRequired,

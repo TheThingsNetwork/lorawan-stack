@@ -70,9 +70,7 @@ storiesOf('Wizard', module).add('Basic', () => (
       <Wizard.Step title="Account settings" id="1">
         <Wizard.Form
           validationSchema={Yup.object({
-            email: Yup.string()
-              .email()
-              .required(),
+            email: Yup.string().email().required(),
             password: Yup.string().required(),
           }).noUnknown()}
           initialValues={{ email: '', password: '' }}
@@ -86,10 +84,7 @@ storiesOf('Wizard', module).add('Basic', () => (
         <Wizard.Form
           onSubmit={stepSubmit('step2')}
           validationSchema={Yup.object({
-            year: Yup.number()
-              .min(1900)
-              .max(1999)
-              .required(),
+            year: Yup.number().min(1900).max(1999).required(),
             gender: Yup.string().required(),
           }).noUnknown()}
           initialValues={{ year: 0, gender: '' }}

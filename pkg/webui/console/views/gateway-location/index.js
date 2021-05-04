@@ -27,18 +27,16 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewOrEditGatewayLocation } from '@console/lib/feature-checks'
 
-const GatewayLocation = () => {
-  return (
-    <Container>
-      <PageTitle title={sharedMessages.location} />
-      <Row>
-        <Col lg={8} md={12}>
-          <GatewayLocationForm />
-        </Col>
-      </Row>
-    </Container>
-  )
-}
+const GatewayLocation = () => (
+  <Container>
+    <PageTitle title={sharedMessages.location} />
+    <Row>
+      <Col lg={8} md={12}>
+        <GatewayLocationForm />
+      </Col>
+    </Row>
+  </Container>
+)
 
 export default withBreadcrumb('gateway.single.data', props => {
   const { gtwId } = props

@@ -75,15 +75,15 @@ const validationSchema = Yup.object({
       }
 
       const strippedSchema = Yup.object().strip()
-      const keySchema = Yup.lazy(() => {
-        return mayEditKeys
+      const keySchema = Yup.lazy(() =>
+        mayEditKeys
           ? Yup.object().shape({
               key: Yup.string()
                 .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
                 .required(sharedMessages.validateRequired),
             })
-          : Yup.object().strip()
-      })
+          : Yup.object().strip(),
+      )
 
       if (parseLorawanMacVersion(version) < 110) {
         return schema.shape({

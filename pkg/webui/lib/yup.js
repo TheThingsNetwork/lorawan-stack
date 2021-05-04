@@ -50,7 +50,7 @@ const passValues = message => values => ({
   values,
 })
 
-Yup.addMethod(Yup.string, 'emptyOrLength', function(length, message) {
+Yup.addMethod(Yup.string, 'emptyOrLength', function (length, message) {
   let m = message
   if (typeof message === 'function') {
     m = message({ length })

@@ -98,11 +98,7 @@ export default {
   },
   paginatedExample: {
     headers,
-    rows: rows
-      .concat(rows)
-      .concat(rows)
-      .concat(rows)
-      .concat(rows),
+    rows: rows.concat(rows).concat(rows).concat(rows).concat(rows),
   },
   clickableRowsExample: {
     headers,

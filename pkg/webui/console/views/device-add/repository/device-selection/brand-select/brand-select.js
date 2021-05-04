@@ -52,9 +52,9 @@ const BrandSelect = props => {
     },
     [onChange, options],
   )
-  const handleNoOptions = React.useCallback(() => {
-    return formatMessage(m.noOptionsMessage)
-  }, [formatMessage])
+  const handleNoOptions = React.useCallback(() => formatMessage(m.noOptionsMessage), [
+    formatMessage,
+  ])
 
   return (
     <Field

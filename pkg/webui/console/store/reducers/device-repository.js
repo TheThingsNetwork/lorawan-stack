@@ -83,9 +83,7 @@ const handleGetModel = (state, payload) => {
     },
   }
 }
-const handleGetTemplate = (state, payload) => {
-  return { ...state, template: payload }
-}
+const handleGetTemplate = (state, payload) => ({ ...state, template: payload })
 
 export default handleActions(
   {

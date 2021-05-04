@@ -50,12 +50,10 @@ class Api {
             throw new Error(`Invalid component argument type: ${typeof componentType}`)
           }
 
-          const paramSignature = Object.keys(routeParams)
-            .sort()
-            .join()
-          const endpoint = rpc.http.find(prospect => {
-            return prospect.parameters.sort().join() === paramSignature
-          })
+          const paramSignature = Object.keys(routeParams).sort().join()
+          const endpoint = rpc.http.find(
+            prospect => prospect.parameters.sort().join() === paramSignature,
+          )
 
           if (!endpoint) {
             throw new Error(`The parameter signature did not match the one of the rpc.

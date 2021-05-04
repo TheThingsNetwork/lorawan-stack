@@ -3,3 +3,4 @@ semi: false
 trailingComma: 'all'
 singleQuote: true
 bracketSpacing: true
+arrowParens: 'avoid'

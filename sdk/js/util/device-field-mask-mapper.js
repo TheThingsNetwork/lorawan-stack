@@ -79,7 +79,7 @@ for (const component in fieldMasks) {
 }
 
 // Rewrite single `_root` entries as plain array leaf.
-traverse(result).forEach(function() {
+traverse(result).forEach(function () {
   if (Object.keys(this.node).length === 1 && this.node._root) {
     this.update(this.node._root)
   }

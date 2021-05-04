@@ -54,11 +54,7 @@ class Example extends React.Component {
 }
 
 const generateRandomValue = () => `random-value-${Math.floor(Math.random() * 100)}`
-const generateRandom16Bytes = () =>
-  crypto
-    .randomBytes(16)
-    .toString('hex')
-    .toUpperCase()
+const generateRandom16Bytes = () => crypto.randomBytes(16).toString('hex').toUpperCase()
 
 storiesOf('Input', module)
   .add('Default', () => (

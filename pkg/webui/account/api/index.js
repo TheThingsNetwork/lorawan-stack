@@ -25,9 +25,7 @@ const instance = axios.create({
 })
 
 instance.interceptors.response.use(
-  response => {
-    return response
-  },
+  response => response,
   async error => {
     if (isPermissionDeniedError(error) && error.response.data.includes('CSRF')) {
       // If the CSRF token is invalid, it likely means that the CSRF cookie

@@ -17,30 +17,28 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { ACTIVATION_MODES, parseLorawanMacVersion } from '@console/lib/device-utils'
 
-const factoryPresetFreqNumericTest = frequencies => {
-  return frequencies.every(freq => {
+const factoryPresetFreqNumericTest = frequencies =>
+  frequencies.every(freq => {
     if (typeof freq !== 'undefined') {
       return !isNaN(parseInt(freq))
     }
 
     return true
   })
-}
 
-const factoryPresetFreqRequiredTest = frequencies => {
-  return frequencies.every(freq => typeof freq !== 'undefined' && freq !== '')
-}
+const factoryPresetFreqRequiredTest = frequencies =>
+  frequencies.every(freq => typeof freq !== 'undefined' && freq !== '')
 
 const validationSchema = Yup.object({
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
   lorawan_version: Yup.string().required(sharedMessages.validateRequired),
   lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
-  supports_class_b: Yup.boolean().when(['_device_classes'], (deviceClasses = {}, schema) => {
-    return schema.transform(() => undefined).default(deviceClasses.class_b || false)
-  }),
-  supports_class_c: Yup.boolean().when(['_device_classes'], (deviceClasses = {}, schema) => {
-    return schema.transform(() => undefined).default(deviceClasses.class_c || false)
-  }),
+  supports_class_b: Yup.boolean().when(['_device_classes'], (deviceClasses = {}, schema) =>
+    schema.transform(() => undefined).default(deviceClasses.class_b || false),
+  ),
+  supports_class_c: Yup.boolean().when(['_device_classes'], (deviceClasses = {}, schema) =>
+    schema.transform(() => undefined).default(deviceClasses.class_c || false),
+  ),
   _device_classes: Yup.object({
     class_b: Yup.boolean(),
     class_c: Yup.boolean(),
