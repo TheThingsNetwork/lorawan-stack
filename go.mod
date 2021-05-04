@@ -38,6 +38,10 @@ replace github.com/throttled/throttled/v2 => github.com/TheThingsIndustries/thro
 // See https://github.com/TheThingsNetwork/lorawan-stack/issues/3736.
 replace github.com/mitchellh/mapstructure => github.com/mitchellh/mapstructure v1.3.0
 
+// Do not upgrade Redis beyond v8.4.0.
+// See https://github.com/TheThingsNetwork/lorawan-stack/pull/3848.
+replace github.com/go-redis/redis/v8 => github.com/go-redis/redis/v8 v8.4.0
+
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
 	github.com/PuerkitoBio/purell v1.1.1
@@ -57,7 +61,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/felixge/httpsnoop v1.0.2
 	github.com/getsentry/sentry-go v0.10.0
-	github.com/go-redis/redis/v8 v8.8.2
+	github.com/go-redis/redis/v8 v8.4.0
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
