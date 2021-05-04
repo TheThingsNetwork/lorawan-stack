@@ -28,9 +28,6 @@ replace gopkg.in/DATA-DOG/go-sqlmock.v1 => gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.
 // Versions higher trigger google/protobuf update past v1.3.5.
 replace gocloud.dev => gocloud.dev v0.19.0
 
-// Use the latest master in order to avoid accidental downgrades to v1.2.0.
-replace github.com/eclipse/paho.mqtt.golang => github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200918111050-ba85050a1f23
-
 // Versions higher trigger google/protobuf update past v1.3.5.
 replace github.com/onsi/gomega => github.com/onsi/gomega v1.10.0
 
@@ -53,7 +50,7 @@ require (
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/dop251/goja v0.0.0-20200824171909-536f9d946569
 	github.com/dustin/go-humanize v1.0.0
-	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200918111050-ba85050a1f23
+	github.com/eclipse/paho.mqtt.golang v1.3.4
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/felixge/httpsnoop v1.0.1
 	github.com/getsentry/sentry-go v0.10.0
@@ -125,7 +122,7 @@ require (
 	gocloud.dev v0.20.0
 	gocloud.dev/pubsub/natspubsub v0.19.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-	golang.org/x/net v0.0.0-20201021035429-f5854403a974
+	golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	golang.org/x/tools v0.1.0 // indirect
