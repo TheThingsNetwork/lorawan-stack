@@ -81,15 +81,11 @@ require (
 	github.com/jaytaylor/html2text v0.0.0-20200412013138-3577fbdbcff7
 	github.com/jinzhu/gorm v1.9.16
 	github.com/jmhodges/levigo v1.0.0 // indirect
-	github.com/klauspost/compress v1.12.2 // indirect
 	github.com/kr/pretty v0.2.1
 	github.com/labstack/echo/v4 v4.1.16
 	github.com/labstack/gommon v0.3.0
 	github.com/lib/pq v1.10.1
-	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-isatty v0.0.12
-	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
-	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.2.2
@@ -97,8 +93,6 @@ require (
 	github.com/oklog/ulid/v2 v2.0.2
 	github.com/olekukonko/tablewriter v0.0.4 // indirect
 	github.com/openshift/osin v1.0.1
-	github.com/pborman/uuid v1.2.1 // indirect
-	github.com/pelletier/go-toml v1.9.0 // indirect
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.10.0
@@ -107,20 +101,16 @@ require (
 	github.com/sendgrid/sendgrid-go v3.9.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/smartystreets/assertions v1.2.0
-	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.1.3
-	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/throttled/throttled v2.2.5+incompatible
 	github.com/throttled/throttled/v2 v2.7.1
-	github.com/valyala/fasttemplate v1.1.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.1
 	go.opencensus.io v0.23.0
-	go.opentelemetry.io/otel v0.20.0 // indirect
 	go.packetbroker.org/api/iam v1.2.2-tts
 	go.packetbroker.org/api/iam/v2 v2.1.2-tts
 	go.packetbroker.org/api/routing v1.2.2-tts
@@ -129,22 +119,16 @@ require (
 	gocloud.dev v0.20.0
 	gocloud.dev/pubsub/natspubsub v0.19.0
 	golang.org/x/crypto v0.0.0-20210503195802-e9a32991a82e
-	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20210504132125-bbd867fde50d
 	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6 // indirect
-	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	google.golang.org/api v0.46.0
 	// NOTE: google.golang.org/genproto is actually pinned to v0.0.0-20200513103714-09dca8ec2884 above.
 	google.golang.org/genproto v0.0.0-20210429181445-86c259c2b4ab
 	// NOTE: google.golang.org/grpc is actually pinned to v1.33.1 above.
 	google.golang.org/grpc v1.37.0
-	// NOTE: google.golang.org/protobuf is a test dependency of a dependency. It is not, and should not be used.
-	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
-	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v2 v2.4.0
