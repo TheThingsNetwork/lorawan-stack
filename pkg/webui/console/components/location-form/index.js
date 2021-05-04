@@ -268,7 +268,6 @@ class LocationForm extends Component {
               markers={marker}
               onClick={this.handleClick}
               clickable
-              mapRef="map"
             />
           </Overlay>
           <Form.Field

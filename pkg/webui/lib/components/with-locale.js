@@ -155,7 +155,7 @@ export default class UserLocale extends React.PureComponent {
     if (!window.Intl.RelativeTimeFormat) {
       log(`Polyfilling Intl.RelativeTimeFormat data for language ${language}`)
       promises.push(import('@formatjs/intl-relativetimeformat/polyfill'))
-      promises.push(import(`@formatjs/intl-relativetimeformat/dist/locale-data/${language}`))
+      promises.push(import(`@formatjs/intl-relativetimeformat/locale-data/${language}`))
     }
 
     return CancelablePromise.resolve(Promise.all(promises))
