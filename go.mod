@@ -118,7 +118,7 @@ require (
 	github.com/throttled/throttled/v2 v2.7.1
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.1
-	go.opencensus.io v0.22.3
+	go.opencensus.io v0.23.0
 	go.opentelemetry.io/otel v0.20.0 // indirect
 	go.packetbroker.org/api/iam v1.2.2-tts
 	go.packetbroker.org/api/iam/v2 v2.1.2-tts
@@ -136,7 +136,7 @@ require (
 	golang.org/x/tools v0.1.0 // indirect
 	google.golang.org/api v0.24.0
 	google.golang.org/genproto v0.0.0-20200513103714-09dca8ec2884
-	google.golang.org/grpc v1.33.1
+	google.golang.org/grpc v1.33.2
 	// NOTE: google.golang.org/protobuf is a test dependency of a dependency. It is not, and should not be used.
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.0.0-00010101000000-000000000000 // indirect
