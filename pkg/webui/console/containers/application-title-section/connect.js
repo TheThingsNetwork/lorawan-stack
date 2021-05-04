@@ -106,4 +106,9 @@ export default TitleSection =>
     mapStateToProps,
     mapDispatchToProps,
     mergeProps,
-  )(withRequest(({ appId, loadData }) => loadData(appId), () => false)(TitleSection))
+  )(
+    withRequest(
+      ({ appId, loadData }) => loadData(appId),
+      () => false,
+    )(TitleSection),
+  )

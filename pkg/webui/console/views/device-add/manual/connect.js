@@ -42,8 +42,4 @@ const mapDispatchToProps = (dispatch, { match }) => ({
   redirectToConfiguration: () => dispatch(replace(match.url)),
 })
 
-export default Manual =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(Manual)
+export default Manual => connect(mapStateToProps, mapDispatchToProps)(Manual)

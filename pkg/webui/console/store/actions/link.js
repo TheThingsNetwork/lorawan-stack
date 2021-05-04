@@ -22,7 +22,11 @@ export const [
     success: getApplicationLinkSuccess,
     failure: getApplicationLinkFailure,
   },
-] = createRequestActions(GET_APP_LINK_BASE, id => ({ id }), (id, selector) => ({ selector }))
+] = createRequestActions(
+  GET_APP_LINK_BASE,
+  id => ({ id }),
+  (id, selector) => ({ selector }),
+)
 
 export const UPDATE_APP_LINK_SUCCESS = 'UPDATE_APPLICATION_LINK_SUCCESS'
 export const DELETE_APP_LINK_SUCCESS = 'DELETE_APPLICATION_LINK_SUCCESS'

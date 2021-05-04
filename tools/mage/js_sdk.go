@@ -17,6 +17,7 @@ package ttnmage
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/magefile/mage/mg"
@@ -50,6 +51,14 @@ func (k JsSDK) Deps() error {
 	}
 	if mg.Verbose() {
 		fmt.Println("Installing JS SDK dependencies")
+	}
+	mg.Deps(Js.deps)
+
+	// On initial installs, the dependency installation will cause the SDK itself
+	// to be installed in an unbuilt state. In that case we need to remove the
+	// module altogether so it can be properly reinstalled later.
+	if _, err := os.Stat(filepath.Join("node_modules", "ttn-lw", "dist")); os.IsNotExist(err) {
+		sh.Rm(filepath.Join("node_modules", "ttn-lw"))
 	}
 	return k.runYarnV("install", "--no-progress", "--production=false")
 }

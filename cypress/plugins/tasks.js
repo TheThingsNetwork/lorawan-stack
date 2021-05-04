@@ -32,7 +32,7 @@ client.connect()
 const stackConfigTask = (_, config) => {
   try {
     const out = execSync('go run ./cmd/ttn-lw-stack config --yml')
-    const yml = yaml.safeLoad(out)
+    const yml = yaml.load(out)
 
     // Cluster.
     config.asBaseUrl = yml.console.ui.as['base-url']

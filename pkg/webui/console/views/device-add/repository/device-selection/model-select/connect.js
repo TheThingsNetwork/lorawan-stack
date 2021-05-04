@@ -36,8 +36,4 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = { listModels }
 
-export default ModelSelect =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(ModelSelect)
+export default ModelSelect => connect(mapStateToProps, mapDispatchToProps)(ModelSelect)

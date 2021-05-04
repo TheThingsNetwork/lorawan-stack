@@ -78,4 +78,9 @@ export default UserApiKeyEdit =>
     mapStateToProps,
     mapDispatchToProps,
     mergeProps,
-  )(withRequest(({ loadData }) => loadData(), ({ fetching }) => fetching)(UserApiKeyEdit))
+  )(
+    withRequest(
+      ({ loadData }) => loadData(),
+      ({ fetching }) => fetching,
+    )(UserApiKeyEdit),
+  )

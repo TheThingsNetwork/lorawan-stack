@@ -44,8 +44,4 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
       : dispatch(pauseOrganizationEventsStream(ownProps.orgId)),
 })
 
-export default Events =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(Events)
+export default Events => connect(mapStateToProps, mapDispatchToProps)(Events)

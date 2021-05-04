@@ -21,7 +21,7 @@ import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin'
-import CleanWebpackPlugin from 'clean-webpack-plugin'
+import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import ShellPlugin from 'webpack-shell-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import HashOutput from 'webpack-plugin-hash-output'
@@ -115,19 +115,22 @@ export const styleConfig = {
     {
       loader: 'css-loader',
       options: {
-        camelCase: true,
-        localIdentName: env({
-          production: '[hash:base64:10]',
-          development: '[path][local]-[hash:base64:10]',
-        }),
-        modules: true,
+        modules: {
+          exportLocalsConvention: 'camelCase',
+          localIdentName: env({
+            production: '[hash:base64:10]',
+            development: '[path][local]-[hash:base64:10]',
+          }),
+        },
       },
     },
     {
       loader: 'stylus-loader',
       options: {
-        import: [path.resolve(context, 'pkg/webui/styles/include.styl')],
-        use: [nib()],
+        stylusOptions: {
+          import: [path.resolve(context, 'pkg/webui/styles/include.styl')],
+          use: nib(),
+        },
       },
     },
   ],
@@ -262,6 +265,7 @@ export default {
         filename: `manifest.yaml`,
         showErrors: false,
         template: path.resolve('config', 'manifest-template.yaml'),
+        minify: false,
       }),
       new MiniCssExtractPlugin({
         filename: env({
@@ -269,17 +273,16 @@ export default {
           production: '[name].[contenthash].css',
         }),
       }),
-      new CleanWebpackPlugin(path.resolve(CONTEXT, PUBLIC_DIR), {
-        root: context,
-        verbose: false,
+      new CleanWebpackPlugin({
         dry: WEBPACK_IS_DEV_SERVER_BUILD,
-        exclude: env({
-          production: [],
-          development: ['libs.bundle.js', 'libs.bundle.js.map'],
+        verbose: false,
+        cleanOnceBeforeBuildPatterns: env({
+          production: ['**/*'],
+          development: ['**/*', '!libs.bundle.js', '!libs.bundle.js.map'],
         }),
       }),
-      // Copy static assets to output directory
-      new CopyWebpackPlugin([`${src}/assets/static`]),
+      // Copy static assets to output directory.
+      new CopyWebpackPlugin({ patterns: [{ from: `${src}/assets/static` }] }),
     ],
     production: [
       new webpack.SourceMapDevToolPlugin({

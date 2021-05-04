@@ -26,7 +26,11 @@ export const GET_USER_BASE = 'GET_USER'
 export const [
   { request: GET_USER, success: GET_USER_SUCCESS, failure: GET_USER_FAILURE },
   { request: getUser, success: getUserSuccess, failure: getUserFailure },
-] = createRequestActions(GET_USER_BASE, id => ({ id }), (id, selector) => ({ selector }))
+] = createRequestActions(
+  GET_USER_BASE,
+  id => ({ id }),
+  (id, selector) => ({ selector }),
+)
 
 export const GET_USERS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [
