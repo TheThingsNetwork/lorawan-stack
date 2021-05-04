@@ -43,7 +43,7 @@ require (
 	github.com/aws/aws-sdk-go v1.38.31
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.13
-	github.com/bluele/gcache v0.0.0-20190518031135-bc40bd653833
+	github.com/bluele/gcache v0.0.2
 	github.com/chrj/smtpd v0.1.2
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/disintegration/imaging v1.6.2
