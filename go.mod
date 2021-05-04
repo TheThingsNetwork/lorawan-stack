@@ -96,7 +96,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.4 // indirect
 	github.com/openshift/osin v1.0.1
 	github.com/pborman/uuid v1.2.1 // indirect
-	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
+	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.5.1
 	github.com/satori/go.uuid v1.2.0
