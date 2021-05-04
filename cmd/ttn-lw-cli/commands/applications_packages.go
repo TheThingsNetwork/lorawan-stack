@@ -22,6 +22,7 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
@@ -146,6 +147,7 @@ var (
 		Use:     "packages",
 		Aliases: []string{"package", "pkg", "pkgs"},
 		Short:   "Application packages commands",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	applicationsPackagesListCommand = &cobra.Command{
 		Use:     "list",
@@ -172,6 +174,7 @@ var (
 		Use:     "associations",
 		Aliases: []string{"assoc", "assocs"},
 		Short:   "Application packages associations commands",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	applicationsPackageAssociationGetCommand = &cobra.Command{
 		Use:     "get [application-id] [device-id] [f-port]",
@@ -317,6 +320,7 @@ var (
 		Use:     "default-associations",
 		Aliases: []string{"def-assoc", "def-assocs"},
 		Short:   "Application packages default associations commands",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	applicationsPackageDefaultAssociationGetCommand = &cobra.Command{
 		Use:     "get [application-id] [f-port]",

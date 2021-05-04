@@ -59,6 +59,7 @@ var (
 		SilenceUsage:      true,
 		Short:             "The Things Network Command-line Interface",
 		PersistentPreRunE: preRun(checkAuth, refreshToken, requireAuth),
+		RunE:              commands.NeedSubcommandRunE,
 		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
 			// clean up the API
 			api.CloseAll()

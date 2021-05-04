@@ -21,6 +21,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack/v5"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	nsredis "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -31,6 +32,7 @@ var (
 	nsDBCommand = &cobra.Command{
 		Use:   "ns-db",
 		Short: "Manage Network Server database",
+		RunE:  commands.NeedSubcommandRunE,
 	}
 	nsDBPruneCommand = &cobra.Command{
 		Use:   "prune",

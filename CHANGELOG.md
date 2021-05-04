@@ -21,6 +21,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Validation of OAuth token exchange requests from the CLI.
 - Validation of join-request types when using the Crypto Server backend.
+- The CLI now properly returns a non-zero exit status code for invalid commands.
 
 ### Security
 

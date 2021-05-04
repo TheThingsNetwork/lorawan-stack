@@ -19,6 +19,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -57,10 +58,12 @@ var (
 	oauthCommand = &cobra.Command{
 		Use:   "oauth",
 		Short: "Manage OAuth authorizations and access tokens",
+		RunE:  commands.NeedSubcommandRunE,
 	}
 	oauthAuthorizationsCommand = &cobra.Command{
 		Use:   "authorizations",
 		Short: "Manage OAuth authorizations",
+		RunE:  commands.NeedSubcommandRunE,
 	}
 	oauthAuthorizationsListCommand = &cobra.Command{
 		Use:     "list [user-id]",
@@ -133,6 +136,7 @@ var (
 		Use:     "access-tokens",
 		Aliases: []string{"tokens"},
 		Short:   "Manage OAuth tokens",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	oauthAccessTokensListCommand = &cobra.Command{
 		Use:     "list [user-id] [client-id]",

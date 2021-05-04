@@ -17,6 +17,7 @@ package commands
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store/migrations"
 )
@@ -25,6 +26,7 @@ var (
 	isDBCommand = &cobra.Command{
 		Use:   "is-db",
 		Short: "Manage the Identity Server database",
+		RunE:  commands.NeedSubcommandRunE,
 	}
 	isDBInitCommand = &cobra.Command{
 		Use:   "init",

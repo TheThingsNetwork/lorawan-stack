@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -63,6 +64,7 @@ var (
 		Use:     "collaborators",
 		Aliases: []string{"collaborator", "members", "member"},
 		Short:   "Manage application collaborators",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	applicationCollaboratorsList = &cobra.Command{
 		Use:     "list [application-id]",
@@ -191,6 +193,7 @@ var (
 		Use:     "api-keys",
 		Aliases: []string{"api-key"},
 		Short:   "Manage application API keys",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	applicationAPIKeysList = &cobra.Command{
 		Use:     "list [application-id]",

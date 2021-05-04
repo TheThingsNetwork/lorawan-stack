@@ -21,6 +21,7 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
@@ -73,6 +74,7 @@ var (
 		Use:     "clients",
 		Aliases: []string{"client", "cli", "c"},
 		Short:   "Client commands",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	clientsListCommand = &cobra.Command{
 		Use:     "list",

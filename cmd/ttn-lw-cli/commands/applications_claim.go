@@ -16,6 +16,7 @@ package commands
 
 import (
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -24,6 +25,7 @@ var (
 	applicationClaim = &cobra.Command{
 		Use:   "claim",
 		Short: "Manage claim settings in applications",
+		RunE:  commands.NeedSubcommandRunE,
 	}
 	applicationClaimAuthorize = &cobra.Command{
 		Use:   "authorize [application-id]",

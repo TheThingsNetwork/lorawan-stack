@@ -16,12 +16,14 @@ package commands
 
 import (
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 )
 
 var (
 	drDBCommand = &cobra.Command{
 		Use:   "dr-db",
 		Short: "Device Repository commands",
+		RunE:  commands.NeedSubcommandRunE,
 	}
 	drInitCommand = &cobra.Command{
 		Use:   "init",

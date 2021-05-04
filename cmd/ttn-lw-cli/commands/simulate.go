@@ -23,6 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
@@ -449,6 +450,7 @@ var (
 		Use:     "simulate",
 		Aliases: []string{"sim"},
 		Short:   "Simulation commands",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	simulateJoinRequestCommand = &cobra.Command{
 		Use:    "gateway-join-request",

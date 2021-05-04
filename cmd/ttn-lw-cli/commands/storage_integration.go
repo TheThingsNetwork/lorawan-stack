@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -58,6 +59,7 @@ var (
 	endDevicesStorageCommand = &cobra.Command{
 		Use:   "storage",
 		Short: "Storage Integration",
+		RunE:  commands.NeedSubcommandRunE,
 	}
 	endDeviceStorageGetCommand = &cobra.Command{
 		Use:   "get [application-id] [device-id]",
@@ -88,6 +90,7 @@ var (
 	applicationsStorageCommand = &cobra.Command{
 		Use:   "storage",
 		Short: "Storage Integration",
+		RunE:  commands.NeedSubcommandRunE,
 	}
 	applicationsStorageGetCommand = &cobra.Command{
 		Use:   "get [application-id]",

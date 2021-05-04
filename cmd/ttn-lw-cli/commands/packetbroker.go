@@ -19,6 +19,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -136,6 +137,7 @@ var (
 		Use:     "packetbroker",
 		Aliases: []string{"pb"},
 		Short:   "Packet Broker commands",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	packetBrokerInfoCommand = &cobra.Command{
 		Use:   "info",
@@ -186,11 +188,13 @@ var (
 		Use:     "home-networks",
 		Aliases: []string{"home-network", "homenetworks", "homenetwork", "hn"},
 		Short:   "Home Network commands",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	packetBrokerHomeNetworksPoliciesCommand = &cobra.Command{
 		Use:     "policies",
 		Aliases: []string{"policy", "po"},
 		Short:   "Manage Home Network routing policies",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	packetBrokerHomeNetworksPolicyListCommand = &cobra.Command{
 		Use:     "list",
@@ -351,11 +355,13 @@ for the Home Network (by NetID and tenant ID).`,
 		Use:     "forwarders",
 		Aliases: []string{"forwarder", "fwd"},
 		Short:   "Forwarder commands",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	packetBrokerForwardersPoliciesCommand = &cobra.Command{
 		Use:     "policies",
 		Aliases: []string{"policy", "po"},
 		Short:   "Manage Forwarder routing policies",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	packetBrokerForwardersPoliciesListCommand = &cobra.Command{
 		Use:   "list",

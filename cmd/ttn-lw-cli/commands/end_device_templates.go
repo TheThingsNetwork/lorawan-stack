@@ -24,6 +24,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
@@ -70,6 +71,7 @@ var (
 		Use:     "templates",
 		Aliases: []string{"template", "tmpl"},
 		Short:   "End Device template commands",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	endDeviceTemplatesExtendCommand = &cobra.Command{
 		Use:               "extend [flags]",

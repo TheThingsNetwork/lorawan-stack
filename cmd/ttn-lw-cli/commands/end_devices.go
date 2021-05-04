@@ -29,6 +29,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
@@ -189,6 +190,7 @@ var (
 		Use:     "end-devices",
 		Aliases: []string{"end-device", "devices", "device", "dev", "ed", "d"},
 		Short:   "End Device commands",
+		RunE:    commands.NeedSubcommandRunE,
 	}
 	endDevicesListFrequencyPlans = &cobra.Command{
 		Use:               "list-frequency-plans",
