@@ -8,6 +8,15 @@ replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries
 // Use our fork of gogo/protobuf.
 replace github.com/gogo/protobuf => github.com/TheThingsIndustries/gogoprotobuf v1.3.1
 
+// Do not upgrade Protobuf beyond v1.3.5
+replace github.com/golang/protobuf => github.com/golang/protobuf v1.3.5
+
+// Do not upgrade gRPC beyond v1.33.1
+replace google.golang.org/grpc => google.golang.org/grpc v1.33.1
+
+// Do not upgrade genproto beyond v0.0.0-20200513103714-09dca8ec2884
+replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20200513103714-09dca8ec2884
+
 // Do not upgrade Echo beyond v4.1.2.
 // See https://github.com/TheThingsNetwork/lorawan-stack/issues/977.
 replace github.com/labstack/echo/v4 => github.com/labstack/echo/v4 v4.1.2
@@ -122,7 +131,7 @@ require (
 	golang.org/x/tools v0.1.0 // indirect
 	google.golang.org/api v0.24.0
 	google.golang.org/genproto v0.0.0-20200513103714-09dca8ec2884
-	google.golang.org/grpc v1.32.0
+	google.golang.org/grpc v1.33.1
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1
