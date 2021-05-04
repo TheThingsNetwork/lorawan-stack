@@ -194,6 +194,7 @@ var startCommand = &cobra.Command{
 			&config.ServiceBase.FrequencyPlans.HTTPClient,
 			&config.ServiceBase.Interop.SenderClientCA.HTTPClient,
 			&config.ServiceBase.KeyVault.HTTPClient,
+			&config.ServiceBase.RateLimiting.HTTPClient,
 			&config.ServiceBase.Blob.HTTPClient,
 			&config.AS.Interop.InteropClient.BlobConfig.HTTPClient,
 			&config.NS.Interop.BlobConfig.HTTPClient,

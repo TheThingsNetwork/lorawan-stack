@@ -43,7 +43,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
-	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -1528,8 +1527,8 @@ func TestPingPong(t *testing.T) {
 func TestRateLimit(t *testing.T) {
 	t.Run("Accept", func(t *testing.T) {
 		maxRate := uint(3)
-		conf := ratelimit.Config{
-			Profiles: []ratelimit.Profile{{
+		conf := config.RateLimiting{
+			Profiles: []config.RateLimitingProfile{{
 				Name:         "accept connections",
 				MaxPerMin:    maxRate,
 				MaxBurst:     maxRate,

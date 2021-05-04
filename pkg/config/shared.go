@@ -32,7 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"gocloud.dev/blob"
 )
@@ -434,7 +433,7 @@ type ServiceBase struct {
 	FrequencyPlans FrequencyPlansConfig `name:"frequency-plans" description:"Source of the frequency plans"`
 	Rights         Rights               `name:"rights"`
 	KeyVault       KeyVault             `name:"key-vault"`
-	RateLimiting   ratelimit.Config     `name:"rate-limiting" description:"Rate limiting configuration"`
+	RateLimiting   RateLimiting         `name:"rate-limiting" description:"Rate limiting configuration"`
 }
 
 // FrequencyPlansFetcher returns a fetch.Interface based on the frequency plans configuration.
@@ -462,4 +461,49 @@ type MQTTConfigProviderFunc func(context.Context) (*MQTT, error)
 // GetMQTTConfig implements MQTTConfigProvider.
 func (f MQTTConfigProviderFunc) GetMQTTConfig(ctx context.Context) (*MQTT, error) {
 	return f(ctx)
+}
+
+// RateLimitingProfile represents configuration for a rate limiting class.
+type RateLimitingProfile struct {
+	Name         string   `name:"name" description:"Rate limiting class name"`
+	MaxPerMin    uint     `name:"max-per-min" yaml:"max-per-min" description:"Maximum allowed rate (per minute)"`
+	MaxBurst     uint     `name:"max-burst" yaml:"max-burst" description:"Maximum rate allowed for short bursts"`
+	Associations []string `name:"associations" description:"List of classes to apply this profile on"`
+}
+
+// RateLimitingMemory represents configuration for the in-memory rate limiting store.
+type RateLimitingMemory struct {
+	MaxSize uint `name:"max-size" description:"Maximum store size for the rate limiter"`
+}
+
+// RateLimiting represents configuration for rate limiting.
+type RateLimiting struct {
+	ConfigSource string         `name:"config-source" description:"Source of rate-limiting.yml (directory, url, blob)"`
+	Directory    string         `name:"directory" description:"OS filesystem directory, which contains rate limiting configuration"`
+	URL          string         `name:"url" description:"URL, which contains rate limiting configuration"`
+	Blob         BlobPathConfig `name:"blob"`
+
+	HTTPClient *http.Client `name:"-"`
+
+	Memory   RateLimitingMemory    `name:"memory" description:"In-memory rate limiting store configuration"`
+	Profiles []RateLimitingProfile `name:"profiles" description:"Rate limiting profiles"`
+}
+
+// Fetcher returns fetch.Interface defined by conf.
+// If no configuration source is set, this method returns nil, nil.
+func (c RateLimiting) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
+	switch c.ConfigSource {
+	case "directory":
+		return fetch.FromFilesystem(c.Directory), nil
+	case "url":
+		return fetch.FromHTTP(c.HTTPClient, c.URL, true)
+	case "blob":
+		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
+		if err != nil {
+			return nil, err
+		}
+		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
+	default:
+		return nil, nil
+	}
 }

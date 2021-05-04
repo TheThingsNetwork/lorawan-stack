@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
@@ -54,7 +55,7 @@ func (*srv) SupportsDownlinkClaim() bool { return true }
 
 var (
 	errUDPFrontendRecovered      = errors.DefineInternal("udp_frontend_recovered", "internal server error")
-	limitLogsConfig              = ratelimit.Profile{MaxPerMin: 1}
+	limitLogsConfig              = config.RateLimitingProfile{MaxPerMin: 1}
 	limitLogsSize           uint = 1 << 13
 )
 
@@ -68,7 +69,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 	if config.RateLimiting.Enable {
 		firewall = NewRateLimitingFirewall(firewall, config.RateLimiting.Messages, config.RateLimiting.Threshold)
 	}
-	limitLogs, err := limitLogsConfig.New(ctx, limitLogsSize)
+	limitLogs, err := ratelimit.NewProfile(ctx, limitLogsConfig, limitLogsSize)
 	if err != nil {
 		return err
 	}

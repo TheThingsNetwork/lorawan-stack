@@ -7541,6 +7541,15 @@
       "file": "qrcodegenerator.go"
     }
   },
+  "error:pkg/ratelimit:invalid_rate": {
+    "translations": {
+      "en": "invalid rate `{rate}` for profile `{name}`"
+    },
+    "description": {
+      "package": "pkg/ratelimit",
+      "file": "config.go"
+    }
+  },
   "error:pkg/ratelimit:rate_limit_exceeded": {
     "translations": {
       "en": "rate limit of `{rate}` accesses per minute exceeded for resource `{key}`"

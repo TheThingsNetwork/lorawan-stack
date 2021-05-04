@@ -28,7 +28,6 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -586,7 +585,7 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				}
 				flags.StringP(name, shorthand, def, description)
 
-			case []ratelimit.Profile:
+			case []RateLimitingProfile:
 				// Can only be set in the config file. Do not add command-line options
 
 			default:

@@ -19,49 +19,51 @@ import (
 
 	"github.com/throttled/throttled"
 	"github.com/throttled/throttled/v2/store/memstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"gopkg.in/yaml.v2"
 )
 
 // defaultMaxSize for the rate limiter store.
 const defaultMaxSize = 1 << 12
 
-// Profile represents configuration for a rate limiting class.
-type Profile struct {
-	Name         string   `name:"name" description:"Rate limiting class name"`
-	MaxPerMin    uint     `name:"max-per-min" description:"Maximum allowed rate (per minute)"`
-	MaxBurst     uint     `name:"max-burst" description:"Maximum rate allowed for short bursts"`
-	Associations []string `name:"associations" description:"List of classes to apply this profile on"`
-}
-
-// MemoryConfig represents configuration for the in-memory rate limiting store.
-type MemoryConfig struct {
-	MaxSize uint `name:"max-size" description:"Maximum store size for the rate limiter"`
-}
-
-// Config represents configuration for rate limiting.
-type Config struct {
-	Memory   MemoryConfig `name:"memory" description:"In-memory rate limiting store configuration"`
-	Profiles []Profile    `name:"profiles" description:"Rate limiting profiles"`
-}
-
 var errRateLimitExceeded = errors.DefineResourceExhausted("rate_limit_exceeded", "rate limit of `{rate}` accesses per minute exceeded for resource `{key}`")
 
 // New creates a new ratelimit.Interface from configuration.
-func (c Config) New(ctx context.Context) (Interface, error) {
+func New(ctx context.Context, conf config.RateLimiting, blobConf config.BlobConfig) (Interface, error) {
 	defaultLimiter := &NoopRateLimiter{}
-	if len(c.Profiles) == 0 {
+	profiles := conf.Profiles
+
+	fetcher, err := conf.Fetcher(ctx, blobConf)
+	if err != nil {
+		return nil, err
+	}
+	if fetcher != nil {
+		b, err := fetcher.File("rate-limiting.yml")
+		if err != nil {
+			return nil, err
+		}
+		var overrideProfiles struct {
+			Profiles []config.RateLimitingProfile `yaml:"profiles"`
+		}
+		if err := yaml.Unmarshal(b, &overrideProfiles); err != nil {
+			return nil, err
+		}
+		profiles = append(profiles, overrideProfiles.Profiles...)
+	}
+	if len(profiles) == 0 {
 		return defaultLimiter, nil
 	}
 
 	l := &muxRateLimiter{
 		defaultLimiter: defaultLimiter,
-		limiters:       make(map[string]Interface, len(c.Profiles)),
+		limiters:       make(map[string]Interface, len(profiles)),
 	}
-	for _, profile := range c.Profiles {
+	for _, profile := range profiles {
 		if len(profile.Associations) == 0 {
 			continue
 		}
-		limiter, err := profile.New(ctx, c.Memory.MaxSize)
+		limiter, err := NewProfile(ctx, profile, conf.Memory.MaxSize)
 		if err != nil {
 			return nil, err
 		}
@@ -72,21 +74,26 @@ func (c Config) New(ctx context.Context) (Interface, error) {
 	return l, nil
 }
 
-// New creates a new ratelimit.Interface from configuration.
-func (c Profile) New(ctx context.Context, size uint) (Interface, error) {
+var errInvalidRate = errors.DefineInvalidArgument("invalid_rate", "invalid rate `{rate}` for profile `{name}`")
+
+// NewProfile returns a new ratelimit.Interface from profile configuration.
+func NewProfile(ctx context.Context, conf config.RateLimitingProfile, size uint) (Interface, error) {
 	if size == 0 {
 		size = defaultMaxSize
+	}
+	if conf.MaxPerMin == 0 {
+		return nil, errInvalidRate.WithAttributes("rate", conf.MaxPerMin, "name", conf.Name)
 	}
 	store, err := memstore.New(int(size))
 	if err != nil {
 		return nil, err
 	}
-	if c.MaxBurst == 0 {
-		c.MaxBurst = c.MaxPerMin
+	if conf.MaxBurst == 0 {
+		conf.MaxBurst = conf.MaxPerMin
 	}
 	quota := throttled.RateQuota{
-		MaxRate:  throttled.PerMin(int(c.MaxPerMin)),
-		MaxBurst: int(c.MaxBurst - 1),
+		MaxRate:  throttled.PerMin(int(conf.MaxPerMin)),
+		MaxBurst: int(conf.MaxBurst - 1),
 	}
 	limiter, err := throttled.NewGCRARateLimiter(store, quota)
 	if err != nil {
