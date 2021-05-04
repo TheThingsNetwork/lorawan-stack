@@ -58,7 +58,7 @@ const validationSchema = Yup.object({
   ),
 })
 
-const DownlinkForm = ({ appId, devId, device, downlinkQueue }) => {
+const DownlinkForm = ({ appId, devId, device, downlinkQueue, skipPayloadCrypto }) => {
   const [error, setError] = useState('')
   const handleSubmit = useCallback(
     async (vals, { setSubmitting, resetForm }) => {
@@ -88,9 +88,14 @@ const DownlinkForm = ({ appId, devId, device, downlinkQueue }) => {
   }
 
   const validSession = device.session || device.pending_session
+  const payloadCryptoSkipped = device.skip_payload_crypto_override || skipPayloadCrypto
+  const deviceSimulationDisabled = !validSession || payloadCryptoSkipped
 
   return (
     <>
+      {payloadCryptoSkipped && (
+        <Notification content={sharedMessages.deviceSimulationDisabledWarning} warning small />
+      )}
       {!validSession && <Notification content={m.invalidSessionWarning} warning small />}
       <IntlHelmet title={m.scheduleDownlink} />
       <Form
@@ -98,7 +103,7 @@ const DownlinkForm = ({ appId, devId, device, downlinkQueue }) => {
         onSubmit={handleSubmit}
         initialValues={initialValues}
         validationSchema={validationSchema}
-        disabled={!validSession}
+        disabled={deviceSimulationDisabled}
       >
         <Form.SubTitle title={m.scheduleDownlink} />
         <Form.Field name="_mode" title={m.insertMode} component={RadioButton.Group}>
@@ -140,6 +145,7 @@ DownlinkForm.propTypes = {
     push: PropTypes.func.isRequired,
     replace: PropTypes.func.isRequired,
   }).isRequired,
+  skipPayloadCrypto: PropTypes.bool.isRequired,
 }
 
 export default DownlinkForm

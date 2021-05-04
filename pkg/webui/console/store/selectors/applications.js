@@ -90,3 +90,9 @@ export const selectApplicationLinkFormatters = state => {
 
   return link.default_formatters
 }
+
+export const selectApplicationLinkSkipPayloadCrypto = state => {
+  const link = selectApplicationLink(state) || {}
+
+  return link.skip_payload_crypto || false
+}

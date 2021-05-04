@@ -49,13 +49,17 @@ import {
 } from '@console/lib/feature-checks'
 
 import { getDevice, stopDeviceEventsStream } from '@console/store/actions/devices'
+import { getApplicationLink } from '@console/store/actions/link'
 
 import {
   selectSelectedDevice,
   selectDeviceFetching,
   selectDeviceError,
 } from '@console/store/selectors/devices'
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import {
+  selectApplicationLinkFetching,
+  selectSelectedApplicationId,
+} from '@console/store/selectors/applications'
 
 import style from './device.styl'
 
@@ -72,18 +76,20 @@ import style from './device.styl'
       mayReadKeys: checkFromState(mayReadApplicationDeviceKeys, state),
       mayScheduleDownlinks: checkFromState(mayScheduleDownlinks, state),
       maySendUplink: checkFromState(maySendUplink, state),
-      fetching: selectDeviceFetching(state),
+      fetching: selectDeviceFetching(state) && selectApplicationLinkFetching(state),
       error: selectDeviceError(state),
     }
   },
   dispatch => ({
-    getDevice: (appId, devId, selectors, config) =>
-      dispatch(getDevice(appId, devId, selectors, config)),
+    loadDeviceData: (appId, devId, selectors, config) => {
+      dispatch(getDevice(appId, devId, selectors, config))
+      dispatch(getApplicationLink(appId, ['skip_payload_crypto']))
+    },
     stopStream: id => dispatch(stopDeviceEventsStream(id)),
   }),
 )
 @withRequest(
-  ({ appId, devId, getDevice, mayReadKeys }) => {
+  ({ appId, devId, loadDeviceData, mayReadKeys }) => {
     const selector = [
       'name',
       'description',
@@ -110,6 +116,7 @@ import style from './device.styl'
       'mac_state.recent_uplinks',
       'attributes',
       'skip_payload_crypto',
+      'skip_payload_crypto_override',
     ]
 
     if (mayReadKeys) {
@@ -118,7 +125,7 @@ import style from './device.styl'
       selector.push('root_keys')
     }
 
-    return getDevice(appId, devId, selector, { ignoreNotFound: true })
+    return loadDeviceData(appId, devId, selector, { ignoreNotFound: true })
   },
   ({ fetching, device }) => fetching || !Boolean(device),
 )

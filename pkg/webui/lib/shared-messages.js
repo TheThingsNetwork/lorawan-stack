@@ -121,6 +121,7 @@ export default defineMessages({
   deviceDescPlaceholder: 'Description for my new end device',
   deviceIdPlaceholder: 'my-new-device',
   deviceNamePlaceholder: 'My new end device',
+  deviceSimulationDisabledWarning: 'Simulation is disabled for devices that skip payload crypto',
   device: 'End device',
   devices: 'End devices',
   devID: 'End device ID',
