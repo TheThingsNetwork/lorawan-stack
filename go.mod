@@ -47,15 +47,13 @@ require (
 	github.com/chrj/smtpd v0.1.2
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/disintegration/imaging v1.6.2
-	github.com/dlclark/regexp2 v1.4.0 // indirect
-	github.com/dop251/goja v0.0.0-20200824171909-536f9d946569
+	github.com/dop251/goja v0.0.0-20210427212725-462d53687b0d
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eclipse/paho.mqtt.golang v1.3.4
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/felixge/httpsnoop v1.0.1
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/go-redis/redis/v8 v8.3.2
-	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/gddo v0.0.0-20200519224240-a4ebd2f7e574
@@ -82,7 +80,7 @@ require (
 	github.com/jaytaylor/html2text v0.0.0-20200412013138-3577fbdbcff7
 	github.com/jinzhu/gorm v1.9.12
 	github.com/jmhodges/levigo v1.0.0 // indirect
-	github.com/kr/pretty v0.2.0
+	github.com/kr/pretty v0.2.1
 	github.com/labstack/echo/v4 v4.1.16
 	github.com/labstack/gommon v0.3.0
 	github.com/lib/pq v1.10.1
@@ -133,5 +131,5 @@ require (
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/square/go-jose.v2 v2.5.1
-	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/yaml.v2 v2.4.0
 )
