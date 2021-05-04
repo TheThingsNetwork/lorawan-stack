@@ -339,7 +339,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 						break
 					}
 					if nbTrans >= maxNbTrans {
-						log.FromContext(ctx).Warn("Transmission number exceeds maximum")
+						log.FromContext(ctx).Info("Transmission number exceeds maximum")
 						return nil, false, nil
 					}
 					nbTrans++
