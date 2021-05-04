@@ -812,3 +812,6 @@ message ADRAckLimitExponentValue {
 message ADRAckDelayExponentValue {
   ADRAckDelayExponent value = 1 [(validate.rules).enum.defined_only = true];
 }
+message DeviceEIRPValue {
+  DeviceEIRP value = 1 [(validate.rules).enum.defined_only = true];
+}

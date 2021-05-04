@@ -262,6 +262,9 @@ message MACSettings {
   // The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands.
   // If unset, the default value from Network Server configuration will be used.
   FrequencyValue desired_beacon_frequency = 29;
+  // Maximum EIRP (dBm).
+  // If unset, the default value from regional parameters specification will be used.
+  DeviceEIRPValue desired_max_eirp = 30;
 }
 
 // MACState represents the state of MAC layer of the device.

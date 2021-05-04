@@ -1036,6 +1036,18 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "desired_max_eirp":
+
+			if v, ok := interface{}(m.GetDesiredMaxEirp()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "desired_max_eirp",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return MACSettingsValidationError{
 				field:  name,

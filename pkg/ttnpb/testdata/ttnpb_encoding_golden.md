@@ -805,6 +805,22 @@ JSONPB | ttnpb.DataRateOffsetValue | {4 {} 0} | 4
 JSONPB | ttnpb.DataRateOffsetValue | {5 {} 0} | 5
 JSONPB | ttnpb.DataRateOffsetValue | {6 {} 0} | 6
 JSONPB | ttnpb.DataRateOffsetValue | {7 {} 0} | 7
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_10 | "DEVICE_EIRP_10"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_12 | "DEVICE_EIRP_12"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_13 | "DEVICE_EIRP_13"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_14 | "DEVICE_EIRP_14"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_16 | "DEVICE_EIRP_16"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_18 | "DEVICE_EIRP_18"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_20 | "DEVICE_EIRP_20"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_21 | "DEVICE_EIRP_21"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_24 | "DEVICE_EIRP_24"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_26 | "DEVICE_EIRP_26"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_27 | "DEVICE_EIRP_27"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_29 | "DEVICE_EIRP_29"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_30 | "DEVICE_EIRP_30"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_33 | "DEVICE_EIRP_33"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_36 | "DEVICE_EIRP_36"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_8 | "DEVICE_EIRP_8"
 JSONPB | ttnpb.FrequencyValue | {100000 {} 0} | "100000"
 JSONPB | ttnpb.FrequencyValue | {2000000 {} 0} | "2000000"
 JSONPB | ttnpb.FrequencyValue | {30000000 {} 0} | "30000000"
