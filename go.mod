@@ -55,7 +55,7 @@ require (
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/go-redis/redis/v8 v8.8.2
 	github.com/gobwas/glob v0.2.3
-	github.com/gogo/protobuf v1.3.1
+	github.com/gogo/protobuf v1.3.2
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	github.com/golang/protobuf v1.3.5
 	github.com/gorilla/csrf v1.7.0
@@ -66,7 +66,7 @@ require (
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect
 	github.com/gotnospirit/messageformat v0.0.0-20190719172517-c1d0bdacdea2
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
-	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.5
 	github.com/heptiolabs/healthcheck v0.0.0-20180807145615-6ff867650f40
@@ -124,6 +124,7 @@ require (
 	golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
+	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6 // indirect
 	golang.org/x/tools v0.1.0 // indirect
 	google.golang.org/api v0.24.0
 	google.golang.org/genproto v0.0.0-20200513103714-09dca8ec2884
