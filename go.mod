@@ -57,7 +57,8 @@ require (
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
-	github.com/golang/protobuf v1.5.0
+	// NOTE: github.com/golang/protobuf is actually pinned to v1.3.5 above.
+	github.com/golang/protobuf v1.5.1
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
@@ -128,15 +129,17 @@ require (
 	gocloud.dev v0.20.0
 	gocloud.dev/pubsub/natspubsub v0.19.0
 	golang.org/x/crypto v0.0.0-20210503195802-e9a32991a82e
+	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20210504132125-bbd867fde50d
 	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6 // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
-	golang.org/x/tools v0.1.0 // indirect
-	google.golang.org/api v0.30.0
-	google.golang.org/genproto v0.0.0-20200825200019-8632dd797987
-	google.golang.org/grpc v1.33.2
+	google.golang.org/api v0.46.0
+	// NOTE: google.golang.org/genproto is actually pinned to v0.0.0-20200513103714-09dca8ec2884 above.
+	google.golang.org/genproto v0.0.0-20210429181445-86c259c2b4ab
+	// NOTE: google.golang.org/grpc is actually pinned to v1.33.1 above.
+	google.golang.org/grpc v1.37.0
 	// NOTE: google.golang.org/protobuf is a test dependency of a dependency. It is not, and should not be used.
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.0.0-00010101000000-000000000000 // indirect
