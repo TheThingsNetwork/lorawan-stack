@@ -401,6 +401,12 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 	var mask []string
 	if diagnostics.DevAddr != nil {
 		switch {
+		// If the SessionKeyID and DevAddr did not change, just update the LastAFCntDown.
+		case dev.Session != nil &&
+			bytes.Equal(diagnostics.SessionKeyID, dev.Session.SessionKeyID) &&
+			dev.Session.DevAddr.Equal(*diagnostics.DevAddr):
+			dev.Session.LastAFCntDown = diagnostics.MinFCntDown
+		// If there is a SessionKeyID on the Network Server side, rebuild the session.
 		case len(diagnostics.SessionKeyID) > 0:
 			session, err := reconstructSession(diagnostics.SessionKeyID, diagnostics.DevAddr, diagnostics.MinFCntDown)
 			if err != nil {
@@ -408,8 +414,6 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 			}
 			dev.Session = session
 			dev.DevAddr = &session.DevAddr
-		case dev.Session != nil && dev.Session.DevAddr.Equal(*diagnostics.DevAddr):
-			dev.Session.LastAFCntDown = diagnostics.MinFCntDown
 		default:
 			return nil, errRebuild.New()
 		}
@@ -420,11 +424,22 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 	mask = append(mask, "session", "ids.dev_addr")
 
 	if diagnostics.PendingDevAddr != nil {
-		session, err := reconstructSession(diagnostics.PendingSessionKeyID, diagnostics.PendingDevAddr, diagnostics.PendingMinFCntDown)
-		if err != nil {
-			return nil, err
+		switch {
+		// If the SessionKeyID did not change, just update the LastAFcntDown.
+		case dev.PendingSession != nil &&
+			bytes.Equal(diagnostics.PendingSessionKeyID, dev.PendingSession.SessionKeyID) &&
+			dev.PendingSession.DevAddr.Equal(*diagnostics.PendingDevAddr):
+			dev.PendingSession.LastAFCntDown = diagnostics.PendingMinFCntDown
+		// If there is a SessionKeyID on the Network Server side, rebuild the session.
+		case len(diagnostics.PendingSessionKeyID) > 0:
+			session, err := reconstructSession(diagnostics.PendingSessionKeyID, diagnostics.PendingDevAddr, diagnostics.PendingMinFCntDown)
+			if err != nil {
+				return nil, err
+			}
+			dev.PendingSession = session
+		default:
+			return nil, errRebuild.New()
 		}
-		dev.PendingSession = session
 	} else {
 		dev.PendingSession = nil
 	}
