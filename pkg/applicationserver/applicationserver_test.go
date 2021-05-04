@@ -1099,7 +1099,7 @@ func TestApplicationServer(t *testing.T) {
 										KEKLabel:     "test",
 									},
 								},
-								LastAFCntDown: 0,
+								LastAFCntDown: 12,
 								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
@@ -1133,7 +1133,7 @@ func TestApplicationServer(t *testing.T) {
 								{
 									SessionKeyID: []byte{0x22},
 									FPort:        22,
-									FCnt:         22,
+									FCnt:         12,
 									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
@@ -1396,7 +1396,7 @@ func TestApplicationServer(t *testing.T) {
 					{
 						Name: "RegisteredDevice/DownlinkMessage/Nack",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
-						ResetQueue: []*ttnpb.ApplicationDownlink{ // Pop the first item; it will be inserted because of the nack.
+						ResetQueue: []*ttnpb.ApplicationDownlink{ // Pop the first item; it will be appended because of the nack.
 							{
 								SessionKeyID: []byte{0x33},
 								FPort:        22,
@@ -1443,31 +1443,31 @@ func TestApplicationServer(t *testing.T) {
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
 							a := assertions.New(t)
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
-								{ // The nacked item is inserted first.
-									SessionKeyID: []byte{0x33},
-									FPort:        11,
-									FCnt:         2,
-									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
-											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
-													NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
-												},
-											},
-										},
-									},
-								},
 								{
 									SessionKeyID: []byte{0x33},
 									FPort:        22,
-									FCnt:         3,
+									FCnt:         2,
 									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
 												Kind: &pbtypes.Value_NumberValue{
 													NumberValue: 8, // Payload formatter sums the bytes in FRMPayload.
+												},
+											},
+										},
+									},
+								},
+								{ // The nacked item is appended at the end of the queue.
+									SessionKeyID: []byte{0x33},
+									FPort:        11,
+									FCnt:         44,
+									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									DecodedPayload: &pbtypes.Struct{
+										Fields: map[string]*pbtypes.Value{
+											"sum": {
+												Kind: &pbtypes.Value_NumberValue{
+													NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
 												},
 											},
 										},
@@ -1674,8 +1674,9 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
-						Name: "RegisteredDevice/DownlinkQueueInvalidated/KnownSession",
-						IDs:  registeredDevice.EndDeviceIdentifiers,
+						Name:       "RegisteredDevice/DownlinkQueueInvalidated/KnownSession",
+						IDs:        registeredDevice.EndDeviceIdentifiers,
+						ResetQueue: make([]*ttnpb.ApplicationDownlink, 0),
 						Message: &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 							Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
@@ -1879,42 +1880,11 @@ func TestApplicationServer(t *testing.T) {
 										KEKLabel:     "test",
 									},
 								},
-								LastAFCntDown: 2,
+								LastAFCntDown: 0,
 								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.BeNil)
-							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
-								{
-									SessionKeyID: []byte{0x55},
-									FPort:        11,
-									FCnt:         1,
-									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
-											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
-													NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
-												},
-											},
-										},
-									},
-								},
-								{
-									SessionKeyID: []byte{0x55},
-									FPort:        22,
-									FCnt:         2,
-									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
-									DecodedPayload: &pbtypes.Struct{
-										Fields: map[string]*pbtypes.Value{
-											"sum": {
-												Kind: &pbtypes.Value_NumberValue{
-													NumberValue: 8, // Payload formatter sums the bytes in FRMPayload.
-												},
-											},
-										},
-									},
-								},
-							})
+							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{})
 						},
 					},
 					{
