@@ -148,11 +148,28 @@ message SetPacketBrokerRoutingPolicyRequest {
   PacketBrokerRoutingPolicyDownlink downlink = 3 [(validate.rules).message.required = true];
 }
 
-message ListHomeNetworksRequest {
+message ListPacketBrokerNetworksRequest {
   // Limit the number of results per page.
   uint32 limit = 1 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 2;
+  // If true, list only the Forwarders and Home Networks with whom a routing policy has been defined in either direction.
+  bool with_routing_policy = 3;
+  // Filter by tenant ID.
+  string tenant_id_contains = 4 [(validate.rules).string.max_len = 100];
+  // Filter by name.
+  string name_contains = 5 [(validate.rules).string.max_len = 100];
+}
+
+message ListPacketBrokerHomeNetworksRequest {
+  // Limit the number of results per page.
+  uint32 limit = 1 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 2;
+  // Filter by tenant ID.
+  string tenant_id_contains = 3 [(validate.rules).string.max_len = 100];
+  // Filter by name.
+  string name_contains = 4 [(validate.rules).string.max_len = 100];
 }
 
 message ListForwarderRoutingPoliciesRequest {
@@ -274,9 +291,17 @@ service Pba {
     };
   };
 
-  // List the (public) home networks for which routing policies can be configured.
+  // List all listed networks.
+  // Listing networks requires administrative access.
+  rpc ListNetworks(ListPacketBrokerNetworksRequest) returns (PacketBrokerNetworks) {
+    option (google.api.http) = {
+      get: "/pba/networks"
+    };
+  };
+
+  // List the listed home networks for which routing policies can be configured.
   // Listing home networks requires administrative access.
-  rpc ListHomeNetworks(ListHomeNetworksRequest) returns (PacketBrokerNetworks) {
+  rpc ListHomeNetworks(ListPacketBrokerHomeNetworksRequest) returns (PacketBrokerNetworks) {
     option (google.api.http) = {
       get: "/pba/home-networks"
     };

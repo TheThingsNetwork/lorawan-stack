@@ -58,7 +58,7 @@ func TestPba(t *testing.T) {
 		{
 			name: "GetInfo",
 			withIAMHandlers: func(p *mock.PBIAM) {
-				p.GetTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*iampb.GetTenantResponse, error) {
+				p.Registry.GetTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*iampb.GetTenantResponse, error) {
 					return &iampb.GetTenantResponse{
 						Tenant: &packetbroker.Tenant{
 							NetId:    0x13,
@@ -128,10 +128,10 @@ func TestPba(t *testing.T) {
 		{
 			name: "Register/Create",
 			withIAMHandlers: func(p *mock.PBIAM) {
-				p.GetTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*iampb.GetTenantResponse, error) {
+				p.Registry.GetTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*iampb.GetTenantResponse, error) {
 					return nil, status.Error(codes.NotFound, "not found")
 				}
-				p.CreateTenantHandler = func(ctx context.Context, req *iampb.CreateTenantRequest) (*iampb.CreateTenantResponse, error) {
+				p.Registry.CreateTenantHandler = func(ctx context.Context, req *iampb.CreateTenantRequest) (*iampb.CreateTenantResponse, error) {
 					_, a := test.MustNewTFromContext(ctx)
 					a.So(req.Tenant, should.Resemble, &packetbroker.Tenant{
 						NetId:    0x13,
@@ -199,7 +199,7 @@ func TestPba(t *testing.T) {
 		{
 			name: "Register/Update",
 			withIAMHandlers: func(p *mock.PBIAM) {
-				p.GetTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*iampb.GetTenantResponse, error) {
+				p.Registry.GetTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*iampb.GetTenantResponse, error) {
 					return &iampb.GetTenantResponse{
 						Tenant: &packetbroker.Tenant{
 							NetId:    0x13,
@@ -224,7 +224,7 @@ func TestPba(t *testing.T) {
 						},
 					}, nil
 				}
-				p.UpdateTenantHandler = func(ctx context.Context, req *iampb.UpdateTenantRequest) (*pbtypes.Empty, error) {
+				p.Registry.UpdateTenantHandler = func(ctx context.Context, req *iampb.UpdateTenantRequest) (*pbtypes.Empty, error) {
 					_, a := test.MustNewTFromContext(ctx)
 					a.So(req, should.Resemble, &iampb.UpdateTenantRequest{
 						NetId:    0x13,
@@ -300,7 +300,7 @@ func TestPba(t *testing.T) {
 		{
 			name: "Deregister",
 			withIAMHandlers: func(p *mock.PBIAM) {
-				p.DeleteTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*pbtypes.Empty, error) {
+				p.Registry.DeleteTenantHandler = func(ctx context.Context, req *iampb.TenantRequest) (*pbtypes.Empty, error) {
 					_, a := test.MustNewTFromContext(ctx)
 					a.So(req.NetId, should.Equal, 0x13)
 					a.So(req.TenantId, should.Equal, "foo-tenant")
@@ -514,53 +514,129 @@ func TestPba(t *testing.T) {
 			},
 		},
 		{
-			name: "HomeNetwork/List",
+			name: "Network/List",
 			withIAMHandlers: func(p *mock.PBIAM) {
-				homeNetworks := make([]*packetbroker.NetworkOrTenant, 42)
-				for i := 0; i < len(homeNetworks); i++ {
-					homeNetworks[i] = &packetbroker.NetworkOrTenant{}
-					if i%2 == 0 {
-						homeNetworks[i].Value = &packetbroker.NetworkOrTenant_Network{
-							Network: &packetbroker.Network{
-								NetId: uint32(i),
-								Name:  fmt.Sprintf("Network %06X", i),
-							},
-						}
-					} else {
-						homeNetworks[i].Value = &packetbroker.NetworkOrTenant_Tenant{
-							Tenant: &packetbroker.Tenant{
-								NetId:    uint32(i),
-								TenantId: fmt.Sprintf("tenant-%d", i),
-								Name:     fmt.Sprintf("Network %06X", i),
-								DevAddrBlocks: []*packetbroker.DevAddrBlock{
-									{
-										Prefix: &packetbroker.DevAddrPrefix{
-											Value:  uint32(i) << 16,
-											Length: 16,
-										},
-										HomeNetworkClusterId: fmt.Sprintf("cluster-%d", i),
-									},
-								},
-							},
-						}
-					}
-				}
-				p.ListHomeNetworksHandler = func(ctx context.Context, req *iampbv2.ListHomeNetworksRequest) (*iampbv2.ListHomeNetworksResponse, error) {
+				networks := generateNetworks(42)
+				p.Catalog.ListNetworksHandler = func(ctx context.Context, req *iampbv2.ListNetworksRequest) (*iampbv2.ListNetworksResponse, error) {
 					offset := int(req.Offset)
 					limit := int(req.Limit)
 					if limit == 0 {
 						limit = 1
 					}
 					var slice []*packetbroker.NetworkOrTenant
-					if len(homeNetworks) > offset {
-						slice = homeNetworks[offset:]
+					if len(networks) > offset {
+						slice = networks[offset:]
 						if len(slice) > limit {
 							slice = slice[:limit]
 						}
 					}
-					return &iampbv2.ListHomeNetworksResponse{
-						HomeNetworks: slice,
-						Total:        uint32(len(homeNetworks)),
+					return &iampbv2.ListNetworksResponse{
+						Networks: slice,
+						Total:    uint32(len(networks)),
+					}, nil
+				}
+			},
+			withControlPlaneHandlers: func(p *mock.PBControlPlane) {
+				networks := generateNetworks(21)
+				p.ListNetworksWithPolicyHandler = func(ctx context.Context, req *routingpb.ListNetworksWithPolicyRequest) (*routingpb.ListNetworksResponse, error) {
+					offset := int(req.Offset)
+					limit := int(req.Limit)
+					if limit == 0 {
+						limit = 1
+					}
+					var slice []*packetbroker.NetworkOrTenant
+					if len(networks) > offset {
+						slice = networks[offset:]
+						if len(slice) > limit {
+							slice = slice[:limit]
+						}
+					}
+					return &routingpb.ListNetworksResponse{
+						Networks: slice,
+						Total:    uint32(len(networks)),
+					}, nil
+				}
+			},
+			do: func(ctx context.Context, client ttnpb.PbaClient) {
+				t := test.MustTFromContext(ctx)
+				for i, req := range []struct {
+					withPolicy    bool
+					limit         int
+					expectedTotal int
+				}{
+					{
+						withPolicy:    false,
+						limit:         1,
+						expectedTotal: 42,
+					},
+					{
+						withPolicy:    true,
+						limit:         100,
+						expectedTotal: 21,
+					},
+				} {
+					t.Run(strconv.FormatInt(int64(i), 10), func(t *testing.T) {
+						a := assertions.New(t)
+						var networks []*ttnpb.PacketBrokerNetwork
+						for page := 1; ; page++ {
+							md := &metadata.MD{}
+							res, err := client.ListNetworks(ctx, &ttnpb.ListPacketBrokerNetworksRequest{
+								Limit:             uint32(req.limit),
+								Page:              uint32(page),
+								WithRoutingPolicy: req.withPolicy,
+							}, grpc.Header(md))
+							if !a.So(err, should.BeNil) {
+								t.FailNow()
+							}
+							if !a.So(test.Must(strconv.ParseInt(md.Get("x-total-count")[0], 10, 32)).(int64), should.Equal, req.expectedTotal) {
+								t.FailNow()
+							}
+							if !a.So(len(res.Networks), should.BeLessThanOrEqualTo, req.limit) {
+								t.FailNow()
+							}
+							if len(res.Networks) == 0 {
+								break
+							}
+							networks = append(networks, res.Networks...)
+						}
+						a.So(networks, should.HaveLength, req.expectedTotal)
+						for i, n := range networks {
+							if i%2 == 0 {
+								a.So(n.Id, should.Resemble, &ttnpb.PacketBrokerNetworkIdentifier{
+									NetID: uint32(i),
+								})
+							} else {
+								a.So(n.Id, should.Resemble, &ttnpb.PacketBrokerNetworkIdentifier{
+									NetID:    uint32(i),
+									TenantID: fmt.Sprintf("tenant-%d", i),
+								})
+							}
+							a.So(n.Name, should.Equal, fmt.Sprintf("Network %06X", i))
+						}
+					})
+				}
+			},
+		},
+		{
+			name: "HomeNetwork/List",
+			withIAMHandlers: func(p *mock.PBIAM) {
+				networks := generateNetworks(42)
+				p.Catalog.ListHomeNetworksHandler = func(ctx context.Context, req *iampbv2.ListNetworksRequest) (*iampbv2.ListNetworksResponse, error) {
+					offset := int(req.Offset)
+					limit := int(req.Limit)
+					if limit == 0 {
+						limit = 1
+					}
+					var slice []*packetbroker.NetworkOrTenant
+					if len(networks) > offset {
+						slice = networks[offset:]
+						if len(slice) > limit {
+							slice = slice[:limit]
+						}
+					}
+					return &iampbv2.ListNetworksResponse{
+						Networks: slice,
+						Total:    uint32(len(networks)),
 					}, nil
 				}
 			},
@@ -572,7 +648,7 @@ func TestPba(t *testing.T) {
 						var networks []*ttnpb.PacketBrokerNetwork
 						for page := 1; ; page++ {
 							md := &metadata.MD{}
-							res, err := client.ListHomeNetworks(ctx, &ttnpb.ListHomeNetworksRequest{
+							res, err := client.ListHomeNetworks(ctx, &ttnpb.ListPacketBrokerHomeNetworksRequest{
 								Limit: uint32(limit),
 								Page:  uint32(page),
 							}, grpc.Header(md))
@@ -683,4 +759,37 @@ func TestPba(t *testing.T) {
 			tc.do(ctx, ttnpb.NewPbaClient(c.LoopbackConn()))
 		})
 	}
+}
+
+func generateNetworks(n int) []*packetbroker.NetworkOrTenant {
+	networks := make([]*packetbroker.NetworkOrTenant, n)
+	for i := 0; i < len(networks); i++ {
+		networks[i] = &packetbroker.NetworkOrTenant{}
+		if i%2 == 0 {
+			networks[i].Value = &packetbroker.NetworkOrTenant_Network{
+				Network: &packetbroker.Network{
+					NetId: uint32(i),
+					Name:  fmt.Sprintf("Network %06X", i),
+				},
+			}
+		} else {
+			networks[i].Value = &packetbroker.NetworkOrTenant_Tenant{
+				Tenant: &packetbroker.Tenant{
+					NetId:    uint32(i),
+					TenantId: fmt.Sprintf("tenant-%d", i),
+					Name:     fmt.Sprintf("Network %06X", i),
+					DevAddrBlocks: []*packetbroker.DevAddrBlock{
+						{
+							Prefix: &packetbroker.DevAddrPrefix{
+								Value:  uint32(i) << 16,
+								Length: 16,
+							},
+							HomeNetworkClusterId: fmt.Sprintf("cluster-%d", i),
+						},
+					},
+				},
+			}
+		}
+	}
+	return networks
 }

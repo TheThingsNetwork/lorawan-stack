@@ -28557,9 +28557,9 @@
           ]
         },
         {
-          "name": "ListHomeNetworksRequest",
-          "longName": "ListHomeNetworksRequest",
-          "fullName": "ttn.lorawan.v3.ListHomeNetworksRequest",
+          "name": "ListPacketBrokerHomeNetworksRequest",
+          "longName": "ListPacketBrokerHomeNetworksRequest",
+          "fullName": "ttn.lorawan.v3.ListPacketBrokerHomeNetworksRequest",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -28592,6 +28592,127 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "tenant_id_contains",
+              "description": "Filter by tenant ID.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "name_contains",
+              "description": "Filter by name.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ListPacketBrokerNetworksRequest",
+          "longName": "ListPacketBrokerNetworksRequest",
+          "fullName": "ttn.lorawan.v3.ListPacketBrokerNetworksRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "with_routing_policy",
+              "description": "If true, list only the Forwarders and Home Networks with whom a routing policy has been defined in either direction.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "tenant_id_contains",
+              "description": "Filter by tenant ID.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "name_contains",
+              "description": "Filter by name.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             }
           ]
         },
@@ -29424,11 +29545,33 @@
               }
             },
             {
+              "name": "ListNetworks",
+              "description": "List all listed networks.\nListing networks requires administrative access.",
+              "requestType": "ListPacketBrokerNetworksRequest",
+              "requestLongType": "ListPacketBrokerNetworksRequest",
+              "requestFullType": "ttn.lorawan.v3.ListPacketBrokerNetworksRequest",
+              "requestStreaming": false,
+              "responseType": "PacketBrokerNetworks",
+              "responseLongType": "PacketBrokerNetworks",
+              "responseFullType": "ttn.lorawan.v3.PacketBrokerNetworks",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/pba/networks"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "ListHomeNetworks",
-              "description": "List the (public) home networks for which routing policies can be configured.\nListing home networks requires administrative access.",
-              "requestType": "ListHomeNetworksRequest",
-              "requestLongType": "ListHomeNetworksRequest",
-              "requestFullType": "ttn.lorawan.v3.ListHomeNetworksRequest",
+              "description": "List the listed home networks for which routing policies can be configured.\nListing home networks requires administrative access.",
+              "requestType": "ListPacketBrokerHomeNetworksRequest",
+              "requestLongType": "ListPacketBrokerHomeNetworksRequest",
+              "requestFullType": "ttn.lorawan.v3.ListPacketBrokerHomeNetworksRequest",
               "requestStreaming": false,
               "responseType": "PacketBrokerNetworks",
               "responseLongType": "PacketBrokerNetworks",

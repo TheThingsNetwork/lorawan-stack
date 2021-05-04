@@ -721,7 +721,7 @@ func (dst *SetPacketBrokerRoutingPolicyRequest) SetFields(src *SetPacketBrokerRo
 	return nil
 }
 
-func (dst *ListHomeNetworksRequest) SetFields(src *ListHomeNetworksRequest, paths ...string) error {
+func (dst *ListPacketBrokerNetworksRequest) SetFields(src *ListPacketBrokerNetworksRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "limit":
@@ -743,6 +743,87 @@ func (dst *ListHomeNetworksRequest) SetFields(src *ListHomeNetworksRequest, path
 			} else {
 				var zero uint32
 				dst.Page = zero
+			}
+		case "with_routing_policy":
+			if len(subs) > 0 {
+				return fmt.Errorf("'with_routing_policy' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.WithRoutingPolicy = src.WithRoutingPolicy
+			} else {
+				var zero bool
+				dst.WithRoutingPolicy = zero
+			}
+		case "tenant_id_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tenant_id_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TenantIdContains = src.TenantIdContains
+			} else {
+				var zero string
+				dst.TenantIdContains = zero
+			}
+		case "name_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NameContains = src.NameContains
+			} else {
+				var zero string
+				dst.NameContains = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ListPacketBrokerHomeNetworksRequest) SetFields(src *ListPacketBrokerHomeNetworksRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+		case "tenant_id_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tenant_id_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TenantIdContains = src.TenantIdContains
+			} else {
+				var zero string
+				dst.TenantIdContains = zero
+			}
+		case "name_contains":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name_contains' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NameContains = src.NameContains
+			} else {
+				var zero string
+				dst.NameContains = zero
 			}
 
 		default:
