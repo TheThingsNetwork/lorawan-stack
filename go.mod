@@ -51,7 +51,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eclipse/paho.mqtt.golang v1.3.4
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
-	github.com/felixge/httpsnoop v1.0.1
+	github.com/felixge/httpsnoop v1.0.2
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/go-redis/redis/v8 v8.8.2
 	github.com/gobwas/glob v0.2.3
