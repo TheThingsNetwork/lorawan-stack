@@ -56,7 +56,7 @@ require (
 	github.com/go-redis/redis/v8 v8.8.2
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.3.1
-	github.com/golang/gddo v0.0.0-20200519224240-a4ebd2f7e574
+	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	github.com/golang/protobuf v1.3.5
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/handlers v1.4.2
