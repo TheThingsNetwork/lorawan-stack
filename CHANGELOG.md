@@ -11,6 +11,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Searching Packet Broker networks with `--tenant-id-contains` and `--name-contains` flags.
+- Listing all listed Packet Broker networks with `ttn-lw-cli packetbroker networks list`.
+
 ### Changed
 
 - Application Server uplink storage will now store only uplink metadata.
