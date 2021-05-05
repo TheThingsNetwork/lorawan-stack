@@ -33,7 +33,7 @@ export const createPaginationByIdRequestActions = name =>
   createRequestActions(
     createPaginationBaseActionType(name),
     (id, { page, limit, query, order } = {}) => ({ id, params: { page, limit, query, order } }),
-    (id, params, selectors = []) => ({ selectors }),
+    (id, params, selectors = [], options = {}) => ({ selectors, options }),
   )
 
 export const createPaginationRequestActions = name =>
