@@ -54,7 +54,7 @@ func (ids *UserIdentifiers) ExtractRequestFields(m map[string]interface{}) {
 	if ids == nil {
 		return
 	}
-	m["user_id"] = ids.UserID
+	m["user_id"] = ids.UserId
 }
 
 func extractCollaboratorFields(m map[string]interface{}, ids *OrganizationOrUserIdentifiers) {
@@ -65,8 +65,8 @@ func extractCollaboratorFields(m map[string]interface{}, ids *OrganizationOrUser
 	case nil:
 	case *OrganizationOrUserIdentifiers_OrganizationIDs:
 		m["collaborator_organization_id"] = oneof.OrganizationIDs.OrganizationID
-	case *OrganizationOrUserIdentifiers_UserIDs:
-		m["collaborator_user_id"] = oneof.UserIDs.UserID
+	case *OrganizationOrUserIdentifiers_UserIds:
+		m["collaborator_user_id"] = oneof.UserIds.UserId
 	default:
 		panic("missed oneof type in extractCollaboratorFields()")
 	}

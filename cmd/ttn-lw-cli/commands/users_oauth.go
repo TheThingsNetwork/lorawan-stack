@@ -42,9 +42,9 @@ func getUserAndClientID(flagSet *pflag.FlagSet, args []string) (*ttnpb.UserIdent
 	}
 	switch {
 	case userID != "" && clientID != "":
-		return &ttnpb.UserIdentifiers{UserID: userID}, &ttnpb.ClientIdentifiers{ClientID: clientID}
+		return &ttnpb.UserIdentifiers{UserId: userID}, &ttnpb.ClientIdentifiers{ClientID: clientID}
 	case userID != "":
-		return &ttnpb.UserIdentifiers{UserID: userID}, nil
+		return &ttnpb.UserIdentifiers{UserId: userID}, nil
 	case clientID != "":
 		return nil, &ttnpb.ClientIdentifiers{ClientID: clientID}
 	}
@@ -107,12 +107,12 @@ var (
 			}
 
 			res, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).ListTokens(ctx, &ttnpb.ListOAuthAccessTokensRequest{
-				UserIDs:   *usrID,
+				UserIds:   *usrID,
 				ClientIDs: *cliID,
 			})
 			for _, token := range res.Tokens {
 				_, err = ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
-					UserIDs:   *usrID,
+					UserIds:   *usrID,
 					ClientIDs: *cliID,
 					ID:        token.ID,
 				})
@@ -122,7 +122,7 @@ var (
 			}
 
 			_, err = ttnpb.NewOAuthAuthorizationRegistryClient(is).Delete(ctx, &ttnpb.OAuthClientAuthorizationIdentifiers{
-				UserIDs:   *usrID,
+				UserIds:   *usrID,
 				ClientIDs: *cliID,
 			})
 
@@ -153,7 +153,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).ListTokens(ctx, &ttnpb.ListOAuthAccessTokensRequest{
-				UserIDs:   *usrID,
+				UserIds:   *usrID,
 				ClientIDs: *cliID,
 				Limit:     limit,
 				Page:      page,
@@ -190,7 +190,7 @@ var (
 			}
 
 			_, err = ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
-				UserIDs:   *usrID,
+				UserIds:   *usrID,
 				ClientIDs: *cliID,
 				ID:        tokenID,
 			})

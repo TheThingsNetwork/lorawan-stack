@@ -33,7 +33,7 @@ func init() {
 		for id, collaborators := range population.Memberships {
 			if app.IDString() == id.IDString() {
 				for i, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserId() {
 						collaborators = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
 					}
 				}
@@ -62,7 +62,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 			Application: ttnpb.Application{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"},
 			},
-			Collaborator: *ttnpb.UserIdentifiers{UserID: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -88,7 +88,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
-			Collaborator: ttnpb.UserIdentifiers{UserID: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 			FieldMask:    types.FieldMask{Paths: []string{"name"}},
 		})
 

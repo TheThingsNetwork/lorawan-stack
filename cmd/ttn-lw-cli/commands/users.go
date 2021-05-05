@@ -59,7 +59,7 @@ func getUserID(flagSet *pflag.FlagSet, args []string) *ttnpb.UserIdentifiers {
 	if userID == "" {
 		return nil
 	}
-	return &ttnpb.UserIdentifiers{UserID: userID}
+	return &ttnpb.UserIdentifiers{UserId: userID}
 }
 
 func printPasswordRequirements(msg *ttnpb.IsConfiguration_UserRegistration_PasswordRequirements) {
@@ -206,10 +206,10 @@ var (
 				return err
 			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
-			if usrID != nil && usrID.UserID != "" {
-				user.UserID = usrID.UserID
+			if usrID != nil && usrID.UserId != "" {
+				user.UserId = usrID.UserId
 			}
-			if user.UserID == "" {
+			if user.UserId == "" {
 				return errNoUserID
 			}
 

@@ -70,8 +70,8 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
 				return true, nil
 			}
-		case *ttnpb.EntityIdentifiers_UserIDs:
-			rights, err := rights.ListUser(ctx, *ids.UserIDs)
+		case *ttnpb.EntityIdentifiers_UserIds:
+			rights, err := rights.ListUser(ctx, *ids.UserIds)
 			if err != nil {
 				return false, err
 			}

@@ -42,7 +42,7 @@ func TestAPIKeyStore(t *testing.T) {
 		store := GetAPIKeyStore(db)
 
 		s.createEntity(ctx, &User{Account: Account{UID: "test-user"}})
-		userIDs := &ttnpb.UserIdentifiers{UserID: "test-user"}
+		userIDs := &ttnpb.UserIdentifiers{UserId: "test-user"}
 
 		s.createEntity(ctx, &Organization{Account: Account{UID: "test-org"}})
 		orgIDs := &ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"}

@@ -102,7 +102,7 @@ func TestUserCreate(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		is.config.UserRegistration.Enabled = false
-		userID := ttnpb.UserIdentifiers{UserID: "test-user-id"}
+		userID := ttnpb.UserIdentifiers{UserId: "test-user-id"}
 		reg := ttnpb.NewUserRegistryClient(cc)
 		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
 			User: ttnpb.User{
@@ -118,7 +118,7 @@ func TestUserCreate(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		is.config.UserRegistration.Invitation.Required = true
-		userID := ttnpb.UserIdentifiers{UserID: "test-user-id"}
+		userID := ttnpb.UserIdentifiers{UserId: "test-user-id"}
 		reg := ttnpb.NewUserRegistryClient(cc)
 		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
 			User: ttnpb.User{
@@ -133,7 +133,7 @@ func TestUserCreate(t *testing.T) {
 	})
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := ttnpb.UserIdentifiers{UserID: "test-user-id"}
+		userID := ttnpb.UserIdentifiers{UserId: "test-user-id"}
 		reg := ttnpb.NewUserRegistryClient(cc)
 		created, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
 			User: ttnpb.User{
@@ -229,7 +229,7 @@ func TestUsersWeakPassword(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
 			User: ttnpb.User{
-				UserIdentifiers: ttnpb.UserIdentifiers{UserID: "test-user-id"},
+				UserIdentifiers: ttnpb.UserIdentifiers{UserId: "test-user-id"},
 				Password:        weakPassword,
 			},
 		})

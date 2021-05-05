@@ -42,7 +42,7 @@ func (sess UserSession) toPB(pb *ttnpb.UserSession) {
 	pb.UpdatedAt = cleanTime(sess.UpdatedAt)
 	pb.ExpiresAt = cleanTimePtr(sess.ExpiresAt)
 	if sess.User != nil {
-		pb.UserID = sess.User.Account.UID
+		pb.UserId = sess.User.Account.UID
 	}
 }
 

@@ -75,7 +75,7 @@ func TestFindIndirectMemberships(t *testing.T) {
 			Rights:     Rights{Rights: []ttnpb.Right{6, 7}},
 		})
 
-		common, err := store.FindIndirectMemberships(ctx, &ttnpb.UserIdentifiers{UserID: "test-user"}, (&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}).GetEntityIdentifiers())
+		common, err := store.FindIndirectMemberships(ctx, &ttnpb.UserIdentifiers{UserId: "test-user"}, (&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}).GetEntityIdentifiers())
 
 		if a.So(err, should.BeNil) {
 			a.So(common, should.HaveLength, 2)
@@ -309,8 +309,8 @@ func TestMembershipStore(t *testing.T) {
 			}
 		})
 
-		userNotFoundIDs := ttnpb.UserIdentifiers{UserID: "test-usr-not-found"}.OrganizationOrUserIdentifiers()
-		organizationNotFoundIDs := ttnpb.UserIdentifiers{UserID: "test-usr-not-found"}.OrganizationOrUserIdentifiers()
+		userNotFoundIDs := ttnpb.UserIdentifiers{UserId: "test-usr-not-found"}.OrganizationOrUserIdentifiers()
+		organizationNotFoundIDs := ttnpb.UserIdentifiers{UserId: "test-usr-not-found"}.OrganizationOrUserIdentifiers()
 
 		for _, tt := range []struct {
 			Name              string

@@ -35,7 +35,7 @@ func init() {
 		for id, collaborators := range population.Memberships {
 			if gw.IDString() == id.IDString() {
 				for i, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserId() {
 						collaborators = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
 					}
 				}
@@ -64,7 +64,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gtw"},
 			},
-			Collaborator: *ttnpb.UserIdentifiers{UserID: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -90,7 +90,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			Collaborator: ttnpb.UserIdentifiers{UserID: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 			FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
 		})
 

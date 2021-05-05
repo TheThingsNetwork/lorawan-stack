@@ -59,12 +59,12 @@ type authorizeFormData struct {
 
 var (
 	mockSession = &ttnpb.UserSession{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
+		UserIdentifiers: ttnpb.UserIdentifiers{UserId: "user"},
 		SessionID:       "session_id",
 		CreatedAt:       time.Now().Truncate(time.Second),
 	}
 	mockUser = &ttnpb.User{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
+		UserIdentifiers: ttnpb.UserIdentifiers{UserId: "user"},
 	}
 )
 
@@ -177,7 +177,7 @@ func TestAuthentication(t *testing.T) {
 				a := assertions.New(t)
 				a.So(s.calls, should.Contain, "GetUser")
 				if a.So(s.req.userIDs, should.NotBeNil) {
-					a.So(s.req.userIDs.UserID, should.Equal, "user")
+					a.So(s.req.userIDs.UserId, should.Equal, "user")
 				}
 			},
 		},
@@ -194,7 +194,7 @@ func TestAuthentication(t *testing.T) {
 				a := assertions.New(t)
 				a.So(s.calls, should.Contain, "GetUser")
 				if a.So(s.req.userIDs, should.NotBeNil) {
-					a.So(s.req.userIDs.UserID, should.Equal, "user")
+					a.So(s.req.userIDs.UserId, should.Equal, "user")
 				}
 			},
 		},
@@ -246,7 +246,7 @@ func TestAuthentication(t *testing.T) {
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
 				a.So(s.calls, should.Contain, "GetUser")
-				a.So(s.req.userIDs.GetUserID(), should.Equal, "user")
+				a.So(s.req.userIDs.GetUserId(), should.Equal, "user")
 				a.So(s.req.sessionID, should.Equal, "session_id") // actually the before-last call.
 			},
 		},
@@ -273,7 +273,7 @@ func TestAuthentication(t *testing.T) {
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
 				a.So(s.calls, should.Contain, "DeleteSession")
-				a.So(s.req.userIDs.GetUserID(), should.Equal, "user")
+				a.So(s.req.userIDs.GetUserId(), should.Equal, "user")
 				a.So(s.req.sessionID, should.Equal, "session_id")
 			},
 		},

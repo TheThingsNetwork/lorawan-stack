@@ -73,7 +73,7 @@ func requireRights(ctx context.Context, id string) (res struct {
 		wg.Done()
 	}()
 	go func() {
-		res.UsrErr = RequireUser(ctx, ttnpb.UserIdentifiers{UserID: id}, ttnpb.RIGHT_USER_INFO)
+		res.UsrErr = RequireUser(ctx, ttnpb.UserIdentifiers{UserId: id}, ttnpb.RIGHT_USER_INFO)
 		wg.Done()
 	}()
 	wg.Wait()
@@ -120,7 +120,7 @@ func TestRequire(t *testing.T) {
 			unique.ID(fooCtx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_INFO),
 		},
 		UserRights: map[string]*ttnpb.Rights{
-			unique.ID(fooCtx, ttnpb.UserIdentifiers{UserID: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO),
+			unique.ID(fooCtx, ttnpb.UserIdentifiers{UserId: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO),
 		},
 	})
 	fooCtx = NewContextWithAuthInfo(fooCtx, &ttnpb.AuthInfoResponse{

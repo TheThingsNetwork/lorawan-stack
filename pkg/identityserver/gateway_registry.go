@@ -75,7 +75,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	if err = blacklist.Check(ctx, req.GatewayID); err != nil {
 		return nil, err
 	}
-	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
+	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
 		if !is.IsAdmin(ctx) && !is.configFromContext(ctx).UserRights.CreateGateways {
 			return nil, errAdminsCreateGateways
 		}
@@ -316,7 +316,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		req.Collaborator = collaborator
 		includeIndirect = true
 	}
-	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
+	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_GATEWAYS_LIST); err != nil {
 			return nil, err
 		}

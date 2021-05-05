@@ -77,8 +77,8 @@ func (ids *UserIdentifiers) GetEntityIdentifiers() *EntityIdentifiers {
 	if ids == nil {
 		return nil
 	}
-	return &EntityIdentifiers{Ids: &EntityIdentifiers_UserIDs{
-		UserIDs: ids,
+	return &EntityIdentifiers{Ids: &EntityIdentifiers_UserIds{
+		UserIds: ids,
 	}}
 }
 
@@ -95,8 +95,8 @@ func (ids *OrganizationOrUserIdentifiers) GetEntityIdentifiers() *EntityIdentifi
 		return nil
 	case *OrganizationOrUserIdentifiers_OrganizationIDs:
 		return oneof.OrganizationIDs.GetEntityIdentifiers()
-	case *OrganizationOrUserIdentifiers_UserIDs:
-		return oneof.UserIDs.GetEntityIdentifiers()
+	case *OrganizationOrUserIdentifiers_UserIds:
+		return oneof.UserIds.GetEntityIdentifiers()
 	default:
 		panic("missed oneof type in OrganizationOrUserIdentifiers.GetEntityIdentifiers()")
 	}
@@ -120,7 +120,7 @@ func (ids GatewayIdentifiers) IDString() string { return ids.GatewayID }
 func (ids OrganizationIdentifiers) IDString() string { return ids.OrganizationID }
 
 // IDString returns the ID string of this Identifier.
-func (ids UserIdentifiers) IDString() string { return ids.UserID }
+func (ids UserIdentifiers) IDString() string { return ids.UserId }
 
 // IDString returns the ID string of the Identifiers inside the oneof.
 func (ids EntityIdentifiers) IDString() string {
@@ -135,8 +135,8 @@ func (ids EntityIdentifiers) IDString() string {
 		return oneof.GatewayIDs.IDString()
 	case *EntityIdentifiers_OrganizationIDs:
 		return oneof.OrganizationIDs.IDString()
-	case *EntityIdentifiers_UserIDs:
-		return oneof.UserIDs.IDString()
+	case *EntityIdentifiers_UserIds:
+		return oneof.UserIds.IDString()
 	default:
 		panic("missed oneof type in EntityIdentifiers.IDString()")
 	}
@@ -147,8 +147,8 @@ func (ids OrganizationOrUserIdentifiers) IDString() string {
 	switch oneof := ids.Ids.(type) {
 	case *OrganizationOrUserIdentifiers_OrganizationIDs:
 		return oneof.OrganizationIDs.IDString()
-	case *OrganizationOrUserIdentifiers_UserIDs:
-		return oneof.UserIDs.IDString()
+	case *OrganizationOrUserIdentifiers_UserIds:
+		return oneof.UserIds.IDString()
 	default:
 		panic("missed oneof type in OrganizationOrUserIdentifiers.IDString()")
 	}
@@ -185,8 +185,8 @@ func (ids EntityIdentifiers) EntityType() string {
 		return oneof.GatewayIDs.EntityType()
 	case *EntityIdentifiers_OrganizationIDs:
 		return oneof.OrganizationIDs.EntityType()
-	case *EntityIdentifiers_UserIDs:
-		return oneof.UserIDs.EntityType()
+	case *EntityIdentifiers_UserIds:
+		return oneof.UserIds.EntityType()
 	default:
 		panic("missed oneof type in EntityIdentifiers.EntityType()")
 	}
@@ -197,8 +197,8 @@ func (ids OrganizationOrUserIdentifiers) EntityType() string {
 	switch oneof := ids.Ids.(type) {
 	case *OrganizationOrUserIdentifiers_OrganizationIDs:
 		return oneof.OrganizationIDs.EntityType()
-	case *OrganizationOrUserIdentifiers_UserIDs:
-		return oneof.UserIDs.EntityType()
+	case *OrganizationOrUserIdentifiers_UserIds:
+		return oneof.UserIds.EntityType()
 	default:
 		panic("missed oneof type in OrganizationOrUserIdentifiers.EntityType()")
 	}

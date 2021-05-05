@@ -73,7 +73,7 @@ func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fiel
 func (s *userStore) CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.User, error) {
 	defer trace.StartRegion(ctx, "create user").End()
 	userModel := User{
-		Account: Account{UID: usr.UserID}, // The ID is not mutated by fromPB.
+		Account: Account{UID: usr.UserId}, // The ID is not mutated by fromPB.
 	}
 	fieldMask := &types.FieldMask{Paths: append(defaultUserFieldMask.Paths, passwordField)}
 	userModel.fromPB(usr, fieldMask)
@@ -89,7 +89,7 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 	defer trace.StartRegion(ctx, "find users").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
-		idStrings[i] = id.GetUserID()
+		idStrings[i] = id.GetUserId()
 	}
 	query := s.query(ctx, User{}, withUserID(idStrings...))
 	query = selectUserFields(ctx, query, fieldMask)
@@ -140,7 +140,7 @@ func (s *userStore) ListAdmins(ctx context.Context, fieldMask *types.FieldMask) 
 
 func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *types.FieldMask) (*ttnpb.User, error) {
 	defer trace.StartRegion(ctx, "get user").End()
-	query := s.query(ctx, User{}, withUserID(id.GetUserID()))
+	query := s.query(ctx, User{}, withUserID(id.GetUserId()))
 	query = selectUserFields(ctx, query, fieldMask)
 	var userModel userWithUID
 	if err := query.First(&userModel).Error; err != nil {
@@ -156,7 +156,7 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 
 func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *types.FieldMask) (updated *ttnpb.User, err error) {
 	defer trace.StartRegion(ctx, "update user").End()
-	query := s.query(ctx, User{}, withUserID(usr.GetUserID()))
+	query := s.query(ctx, User{}, withUserID(usr.GetUserId()))
 	query = selectUserFields(ctx, query, fieldMask)
 	var userModel userWithUID
 	if err = query.First(&userModel).Error; err != nil {
@@ -211,7 +211,7 @@ func (s *userStore) RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) 
 
 func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "purge user").End()
-	query := s.query(ctx, User{}, withSoftDeleted(), withUserID(id.GetUserID()))
+	query := s.query(ctx, User{}, withSoftDeleted(), withUserID(id.GetUserId()))
 	query = selectUserFields(ctx, query, nil)
 	var userModel userWithUID
 	if err = query.First(&userModel).Error; err != nil {

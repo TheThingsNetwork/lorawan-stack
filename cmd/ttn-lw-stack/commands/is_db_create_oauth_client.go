@@ -26,144 +26,142 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var (
-	createOAuthClient = &cobra.Command{
-		Use:   "create-oauth-client",
-		Short: "Create an OAuth client in the Identity Server database",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-			defer cancel()
+var createOAuthClient = &cobra.Command{
+	Use:   "create-oauth-client",
+	Short: "Create an OAuth client in the Identity Server database",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
 
-			logger.Info("Connecting to Identity Server database...")
-			db, err := store.Open(ctx, config.IS.DatabaseURI)
-			if err != nil {
-				return err
-			}
-			defer db.Close()
+		logger.Info("Connecting to Identity Server database...")
+		db, err := store.Open(ctx, config.IS.DatabaseURI)
+		if err != nil {
+			return err
+		}
+		defer db.Close()
 
-			clientID, err := cmd.Flags().GetString("id")
+		clientID, err := cmd.Flags().GetString("id")
+		if err != nil {
+			return err
+		}
+		name, err := cmd.Flags().GetString("name")
+		if err != nil {
+			return err
+		}
+		owner, err := cmd.Flags().GetString("owner")
+		if err != nil {
+			return err
+		}
+		secret, err := cmd.Flags().GetString("secret")
+		if err != nil {
+			return err
+		}
+		if secret == "" {
+			noSecret, err := cmd.Flags().GetBool("no-secret")
 			if err != nil {
 				return err
 			}
-			name, err := cmd.Flags().GetString("name")
-			if err != nil {
-				return err
-			}
-			owner, err := cmd.Flags().GetString("owner")
-			if err != nil {
-				return err
-			}
-			secret, err := cmd.Flags().GetString("secret")
-			if err != nil {
-				return err
-			}
-			if secret == "" {
-				noSecret, err := cmd.Flags().GetBool("no-secret")
-				if err != nil {
-					return err
-				}
-				if !noSecret {
-					secret, err = auth.GenerateKey(ctx)
-					if err != nil {
-						return err
-					}
-				}
-			}
-			var hashedSecret string
-			if secret != "" {
-				hashedSecret, err = auth.Hash(ctx, secret)
+			if !noSecret {
+				secret, err = auth.GenerateKey(ctx)
 				if err != nil {
 					return err
 				}
 			}
-			redirectURIs, err := cmd.Flags().GetStringSlice("redirect-uri")
+		}
+		var hashedSecret string
+		if secret != "" {
+			hashedSecret, err = auth.Hash(ctx, secret)
 			if err != nil {
 				return err
 			}
-			logoutRedirectURIs, err := cmd.Flags().GetStringSlice("logout-redirect-uri")
-			if err != nil {
-				return err
-			}
-			authorized, err := cmd.Flags().GetBool("authorized")
-			if err != nil {
-				return err
-			}
-			endorsed, err := cmd.Flags().GetBool("endorsed")
-			if err != nil {
-				return err
-			}
+		}
+		redirectURIs, err := cmd.Flags().GetStringSlice("redirect-uri")
+		if err != nil {
+			return err
+		}
+		logoutRedirectURIs, err := cmd.Flags().GetStringSlice("logout-redirect-uri")
+		if err != nil {
+			return err
+		}
+		authorized, err := cmd.Flags().GetBool("authorized")
+		if err != nil {
+			return err
+		}
+		endorsed, err := cmd.Flags().GetBool("endorsed")
+		if err != nil {
+			return err
+		}
 
-			cliFieldMask := &pbtypes.FieldMask{Paths: []string{
-				"name",
-				"secret",
-				"redirect_uris",
-				"logout_redirect_uris",
-				"state",
-				"skip_authorization",
-				"endorsed",
-				"grants",
-				"rights",
-			}}
-			cli := &ttnpb.Client{
-				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: clientID},
+		cliFieldMask := &pbtypes.FieldMask{Paths: []string{
+			"name",
+			"secret",
+			"redirect_uris",
+			"logout_redirect_uris",
+			"state",
+			"skip_authorization",
+			"endorsed",
+			"grants",
+			"rights",
+		}}
+		cli := &ttnpb.Client{
+			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: clientID},
+		}
+
+		err = store.Transact(ctx, db, func(db *gorm.DB) error {
+			cliStore := store.GetClientStore(db)
+
+			var cliExists bool
+			if _, err := cliStore.GetClient(ctx, &cli.ClientIdentifiers, cliFieldMask); err == nil {
+				cliExists = true
 			}
+			cli.Name = name
+			cli.Secret = hashedSecret
+			cli.RedirectURIs = redirectURIs
+			cli.LogoutRedirectURIs = logoutRedirectURIs
+			cli.State = ttnpb.STATE_APPROVED
+			cli.SkipAuthorization = authorized
+			cli.Endorsed = endorsed
+			cli.Grants = []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN}
+			cli.Rights = []ttnpb.Right{ttnpb.RIGHT_ALL}
 
-			err = store.Transact(ctx, db, func(db *gorm.DB) error {
-				cliStore := store.GetClientStore(db)
-
-				var cliExists bool
-				if _, err := cliStore.GetClient(ctx, &cli.ClientIdentifiers, cliFieldMask); err == nil {
-					cliExists = true
+			if cliExists {
+				logger.Info("Updating OAuth client...")
+				if _, err = cliStore.UpdateClient(ctx, cli, cliFieldMask); err != nil {
+					return err
 				}
-				cli.Name = name
-				cli.Secret = hashedSecret
-				cli.RedirectURIs = redirectURIs
-				cli.LogoutRedirectURIs = logoutRedirectURIs
-				cli.State = ttnpb.STATE_APPROVED
-				cli.SkipAuthorization = authorized
-				cli.Endorsed = endorsed
-				cli.Grants = []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN}
-				cli.Rights = []ttnpb.Right{ttnpb.RIGHT_ALL}
-
-				if cliExists {
-					logger.Info("Updating OAuth client...")
-					if _, err = cliStore.UpdateClient(ctx, cli, cliFieldMask); err != nil {
-						return err
-					}
-					logger.WithField("secret", secret).Info("Updated OAuth client")
-				} else {
-					logger.Info("Creating OAuth client...")
-					if _, err = cliStore.CreateClient(ctx, cli); err != nil {
-						return err
-					}
-					logger.WithField("secret", secret).Info("Created OAuth client")
+				logger.WithField("secret", secret).Info("Updated OAuth client")
+			} else {
+				logger.Info("Creating OAuth client...")
+				if _, err = cliStore.CreateClient(ctx, cli); err != nil {
+					return err
 				}
-
-				if owner != "" {
-					logger.Info("Setting owner rights...")
-					memberStore := store.GetMembershipStore(db)
-					err = memberStore.SetMember(
-						ctx,
-						ttnpb.UserIdentifiers{UserID: owner}.OrganizationOrUserIdentifiers(),
-						cli.ClientIdentifiers.GetEntityIdentifiers(),
-						ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
-					)
-					if err != nil {
-						return err
-					}
-					logger.Info("Set owner rights")
-				}
-				return nil
-			})
-
-			if err != nil {
-				return err
+				logger.WithField("secret", secret).Info("Created OAuth client")
 			}
 
+			if owner != "" {
+				logger.Info("Setting owner rights...")
+				memberStore := store.GetMembershipStore(db)
+				err = memberStore.SetMember(
+					ctx,
+					ttnpb.UserIdentifiers{UserId: owner}.OrganizationOrUserIdentifiers(),
+					cli.ClientIdentifiers.GetEntityIdentifiers(),
+					ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
+				)
+				if err != nil {
+					return err
+				}
+				logger.Info("Set owner rights")
+			}
 			return nil
-		},
-	}
-)
+		})
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	},
+}
 
 func init() {
 	createOAuthClient.Flags().String("id", "console", "OAuth client ID")

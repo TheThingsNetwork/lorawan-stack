@@ -94,7 +94,7 @@ func buildIdentifiers(entityType, id string) *ttnpb.EntityIdentifiers {
 	case "organization":
 		return (&ttnpb.OrganizationIdentifiers{OrganizationID: id}).GetEntityIdentifiers()
 	case "user":
-		return (&ttnpb.UserIdentifiers{UserID: id}).GetEntityIdentifiers()
+		return (&ttnpb.UserIdentifiers{UserId: id}).GetEntityIdentifiers()
 	default:
 		panic(fmt.Sprintf("can't build identifiers for entity type %q", entityType))
 	}

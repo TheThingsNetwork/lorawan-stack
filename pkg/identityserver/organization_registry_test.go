@@ -34,7 +34,7 @@ func init() {
 		for id, collaborators := range population.Memberships {
 			if organization.IDString() == id.IDString() {
 				for i, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserId() {
 						population.Memberships[id] = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
 					}
 				}
@@ -97,7 +97,7 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 			Organization: ttnpb.Organization{
 				OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo-org"},
 			},
-			Collaborator: *ttnpb.UserIdentifiers{UserID: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -123,7 +123,7 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
-			Collaborator: ttnpb.UserIdentifiers{UserID: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 			FieldMask:    types.FieldMask{Paths: []string{"name"}},
 		})
 

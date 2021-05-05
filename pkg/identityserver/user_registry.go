@@ -179,7 +179,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	createdByAdmin := is.IsAdmin(ctx)
 	config := is.configFromContext(ctx)
 
-	if err = blacklist.Check(ctx, req.UserID); err != nil {
+	if err = blacklist.Check(ctx, req.UserId); err != nil {
 		return nil, err
 	}
 	if req.InvitationToken == "" && config.UserRegistration.Invitation.Required && !createdByAdmin {
@@ -230,7 +230,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		})
 	}
 
-	if err := is.validatePasswordStrength(ctx, req.UserID, req.User.Password); err != nil {
+	if err := is.validatePasswordStrength(ctx, req.UserId, req.User.Password); err != nil {
 		return nil, err
 	}
 	hashedPassword, err := auth.Hash(ctx, req.User.Password)
@@ -285,7 +285,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 	if usr.State == ttnpb.STATE_REQUESTED {
 		err = is.SendAdminsEmail(ctx, func(data emails.Data) email.MessageData {
-			data.Entity.Type, data.Entity.ID = "user", usr.UserID
+			data.Entity.Type, data.Entity.ID = "user", usr.UserId
 			return &emails.UserRequested{
 				Data: data,
 			}
@@ -554,7 +554,7 @@ var (
 )
 
 func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*types.Empty, error) {
-	if err := is.validatePasswordStrength(ctx, req.UserID, req.New); err != nil {
+	if err := is.validatePasswordStrength(ctx, req.UserId, req.New); err != nil {
 		return nil, err
 	}
 	if req.Old == req.New {
@@ -620,7 +620,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 				return err
 			}
 			for _, auth := range authorizations {
-				tokens, err := oauthStore.ListAccessTokens(ctx, &auth.UserIDs, &auth.ClientIDs)
+				tokens, err := oauthStore.ListAccessTokens(ctx, &auth.UserIds, &auth.ClientIDs)
 				if err != nil {
 					return err
 				}

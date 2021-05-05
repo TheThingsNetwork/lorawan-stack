@@ -14,18 +14,18 @@ func (dst *OAuthClientAuthorizationIdentifiers) SetFields(src *OAuthClientAuthor
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIDs
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIDs
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIDs = src.UserIDs
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIDs = zero
+					dst.UserIds = zero
 				}
 			}
 		case "client_ids":
@@ -61,18 +61,18 @@ func (dst *OAuthClientAuthorization) SetFields(src *OAuthClientAuthorization, pa
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIDs
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIDs
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIDs = src.UserIDs
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIDs = zero
+					dst.UserIds = zero
 				}
 			}
 		case "client_ids":
@@ -216,18 +216,18 @@ func (dst *OAuthAuthorizationCode) SetFields(src *OAuthAuthorizationCode, paths 
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIDs
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIDs
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIDs = src.UserIDs
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIDs = zero
+					dst.UserIds = zero
 				}
 			}
 		case "user_session_id":
@@ -332,18 +332,18 @@ func (dst *OAuthAccessTokenIdentifiers) SetFields(src *OAuthAccessTokenIdentifie
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIDs
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIDs
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIDs = src.UserIDs
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIDs = zero
+					dst.UserIds = zero
 				}
 			}
 		case "client_ids":
@@ -389,18 +389,18 @@ func (dst *OAuthAccessToken) SetFields(src *OAuthAccessToken, paths ...string) e
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIDs
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIDs
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIDs = src.UserIDs
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIDs = zero
+					dst.UserIds = zero
 				}
 			}
 		case "user_session_id":
@@ -525,18 +525,18 @@ func (dst *ListOAuthAccessTokensRequest) SetFields(src *ListOAuthAccessTokensReq
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIDs
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIDs
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIDs = src.UserIDs
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIDs = zero
+					dst.UserIds = zero
 				}
 			}
 		case "client_ids":

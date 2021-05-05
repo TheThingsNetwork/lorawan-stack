@@ -61,7 +61,7 @@ func fetchEntityRights(ctx context.Context, id string, f EntityFetcher) (res str
 		wg.Done()
 	}()
 	go func() {
-		res.UsrRights, res.UsrErr = f.UserRights(ctx, ttnpb.UserIdentifiers{UserID: id})
+		res.UsrRights, res.UsrErr = f.UserRights(ctx, ttnpb.UserIdentifiers{UserId: id})
 		wg.Done()
 	}()
 	wg.Wait()
@@ -196,7 +196,7 @@ func TestEntityFetcherFunc(t *testing.T) {
 		a.So(fetcher.ids, should.Contain, (&ttnpb.ClientIdentifiers{ClientID: "foo"}).GetEntityIdentifiers())
 		a.So(fetcher.ids, should.Contain, (&ttnpb.GatewayIdentifiers{GatewayID: "foo"}).GetEntityIdentifiers())
 		a.So(fetcher.ids, should.Contain, (&ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}).GetEntityIdentifiers())
-		a.So(fetcher.ids, should.Contain, (&ttnpb.UserIdentifiers{UserID: "foo"}).GetEntityIdentifiers())
+		a.So(fetcher.ids, should.Contain, (&ttnpb.UserIdentifiers{UserId: "foo"}).GetEntityIdentifiers())
 	}
 }
 
