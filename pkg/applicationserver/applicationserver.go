@@ -1087,6 +1087,26 @@ matchSession:
 	return mask, nil
 }
 
+func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink) error {
+	cleanUplink := &ttnpb.ApplicationUplink{
+		RxMetadata: make([]*ttnpb.RxMetadata, 0, len(uplink.RxMetadata)),
+		ReceivedAt: uplink.ReceivedAt,
+	}
+	for _, md := range uplink.RxMetadata {
+		cleanUplink.RxMetadata = append(cleanUplink.RxMetadata, &ttnpb.RxMetadata{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+				GatewayID: md.GatewayID,
+			},
+			AntennaIndex:  md.AntennaIndex,
+			FineTimestamp: md.FineTimestamp,
+			Location:      md.Location,
+			RSSI:          md.RSSI,
+			SNR:           md.SNR,
+		})
+	}
+	return as.appUpsRegistry.Push(ctx, ids, cleanUplink)
+}
+
 func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
 	dev, err := as.deviceRegistry.Set(ctx, ids,
@@ -1118,7 +1138,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		if err := as.decryptAndDecodeUplink(ctx, dev, uplink, link.DefaultFormatters); err != nil {
 			return err
 		}
-		if err := as.appUpsRegistry.Push(ctx, ids, uplink); err != nil {
+		if err := as.storeUplink(ctx, ids, uplink); err != nil {
 			return err
 		}
 	} else if dev.Session != nil && dev.Session.AppSKey != nil {
