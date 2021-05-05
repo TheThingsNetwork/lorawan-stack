@@ -55,13 +55,13 @@ type authorizeFormData struct {
 
 var (
 	mockSession = &ttnpb.UserSession{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
+		UserIdentifiers: ttnpb.UserIdentifiers{UserId: "user"},
 		SessionID:       "session_id",
 		CreatedAt:       time.Now().Truncate(time.Second),
 		SessionSecret:   "secret-1234",
 	}
 	mockUser = &ttnpb.User{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "user"},
+		UserIdentifiers: ttnpb.UserIdentifiers{UserId: "user"},
 	}
 	mockClient = &ttnpb.Client{
 		ClientIdentifiers:  ttnpb.ClientIdentifiers{ClientID: "client"},
@@ -72,7 +72,7 @@ var (
 		Rights:             []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
 	}
 	mockAccessToken = &ttnpb.OAuthAccessToken{
-		UserIDs:       ttnpb.UserIdentifiers{UserID: "user"},
+		UserIds:       ttnpb.UserIdentifiers{UserId: "user"},
 		UserSessionID: "session_id",
 	}
 )
@@ -338,10 +338,10 @@ func TestOAuthFlow(t *testing.T) {
 			StoreCheck: func(t *testing.T, s *mockStore) {
 				a := assertions.New(t)
 				a.So(s.calls, should.Contain, "Authorize")
-				a.So(s.req.authorization.UserIDs, should.Resemble, mockUser.UserIdentifiers)
+				a.So(s.req.authorization.UserIds, should.Resemble, mockUser.UserIdentifiers)
 				a.So(s.req.authorization.ClientIDs, should.Resemble, mockClient.ClientIdentifiers)
 				a.So(s.calls, should.Contain, "CreateAuthorizationCode")
-				a.So(s.req.authorizationCode.UserIDs, should.Resemble, mockUser.UserIdentifiers)
+				a.So(s.req.authorizationCode.UserIds, should.Resemble, mockUser.UserIdentifiers)
 				a.So(s.req.authorizationCode.ClientIDs, should.Resemble, mockClient.ClientIdentifiers)
 				a.So(s.req.authorizationCode.UserSessionID, should.Equal, mockSession.SessionID)
 				a.So(s.req.authorizationCode.Rights, should.Resemble, mockClient.Rights)
@@ -663,7 +663,7 @@ func TestTokenExchange(t *testing.T) {
 			StoreSetup: func(s *mockStore) {
 				s.res.client = mockClient
 				s.res.authorizationCode = &ttnpb.OAuthAuthorizationCode{
-					UserIDs:       mockUser.UserIdentifiers,
+					UserIds:       mockUser.UserIdentifiers,
 					ClientIDs:     mockClient.ClientIdentifiers,
 					UserSessionID: mockSession.SessionID,
 					Rights:        mockClient.Rights,
@@ -690,7 +690,7 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.calls, should.Contain, "DeleteAuthorizationCode")
 				a.So(s.req.code, should.Equal, "the code")
 				a.So(s.calls, should.Contain, "CreateAccessToken")
-				a.So(s.req.token.UserIDs, should.Resemble, mockUser.UserIdentifiers)
+				a.So(s.req.token.UserIds, should.Resemble, mockUser.UserIdentifiers)
 				a.So(s.req.token.ClientIDs, should.Resemble, mockClient.ClientIdentifiers)
 				a.So(s.req.token.UserSessionID, should.Equal, mockSession.SessionID)
 				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
@@ -704,7 +704,7 @@ func TestTokenExchange(t *testing.T) {
 			StoreSetup: func(s *mockStore) {
 				s.res.client = mockClient
 				s.res.accessToken = &ttnpb.OAuthAccessToken{
-					UserIDs:       mockUser.UserIdentifiers,
+					UserIds:       mockUser.UserIdentifiers,
 					ClientIDs:     mockClient.ClientIdentifiers,
 					UserSessionID: mockSession.SessionID,
 					ID:            "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
@@ -729,7 +729,7 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.calls, should.Contain, "DeleteAccessToken")
 				a.So(s.req.tokenID, should.Equal, "IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A")
 				a.So(s.calls, should.Contain, "CreateAccessToken")
-				a.So(s.req.token.UserIDs, should.Resemble, mockUser.UserIdentifiers)
+				a.So(s.req.token.UserIds, should.Resemble, mockUser.UserIdentifiers)
 				a.So(s.req.token.ClientIDs, should.Resemble, mockClient.ClientIdentifiers)
 				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.token.AccessToken, should.NotBeEmpty)

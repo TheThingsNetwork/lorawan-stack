@@ -42,7 +42,7 @@ func TestLoginTokenStore(t *testing.T) {
 		s.createEntity(ctx, usr)
 
 		loginToken, err := store.CreateLoginToken(ctx, &ttnpb.LoginToken{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserID: usr.Account.UID},
+			UserIdentifiers: ttnpb.UserIdentifiers{UserId: usr.Account.UID},
 			ExpiresAt:       cleanTime(now.Add(-1 * time.Minute)),
 			Token:           "test-expired-login-token",
 		})
@@ -54,23 +54,23 @@ func TestLoginTokenStore(t *testing.T) {
 		}
 
 		loginToken, err = store.CreateLoginToken(ctx, &ttnpb.LoginToken{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserID: usr.Account.UID},
+			UserIdentifiers: ttnpb.UserIdentifiers{UserId: usr.Account.UID},
 			ExpiresAt:       cleanTime(now.Add(time.Hour)),
 			Token:           "test-login-token",
 		})
 		a.So(err, should.BeNil)
 
-		tokens, err := store.FindActiveLoginTokens(ctx, &ttnpb.UserIdentifiers{UserID: usr.Account.UID})
+		tokens, err := store.FindActiveLoginTokens(ctx, &ttnpb.UserIdentifiers{UserId: usr.Account.UID})
 		if a.So(err, should.BeNil) && a.So(tokens, should.HaveLength, 1) {
 			a.So(tokens[0].Token, should.Equal, loginToken.Token)
 		}
 
 		consumedToken, err := store.ConsumeLoginToken(ctx, loginToken.Token)
 		if a.So(err, should.BeNil) {
-			a.So(consumedToken.UserIdentifiers, should.Resemble, ttnpb.UserIdentifiers{UserID: usr.Account.UID})
+			a.So(consumedToken.UserIdentifiers, should.Resemble, ttnpb.UserIdentifiers{UserId: usr.Account.UID})
 		}
 
-		tokens, err = store.FindActiveLoginTokens(ctx, &ttnpb.UserIdentifiers{UserID: usr.Account.UID})
+		tokens, err = store.FindActiveLoginTokens(ctx, &ttnpb.UserIdentifiers{UserId: usr.Account.UID})
 		if a.So(err, should.BeNil) {
 			a.So(tokens, should.BeEmpty)
 		}

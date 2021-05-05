@@ -34,7 +34,7 @@ func allPotentialRights(eIDs *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) *tt
 		return ttnpb.AllGatewayRights.Intersect(rights)
 	case *ttnpb.EntityIdentifiers_OrganizationIDs:
 		return ttnpb.AllEntityRights.Union(ttnpb.AllOrganizationRights).Intersect(rights)
-	case *ttnpb.EntityIdentifiers_UserIDs:
+	case *ttnpb.EntityIdentifiers_UserIds:
 		return ttnpb.AllEntityRights.Union(ttnpb.AllOrganizationRights, ttnpb.AllUserRights).Intersect(rights)
 	}
 	return nil
@@ -92,7 +92,7 @@ func (is *IdentityServer) getRights(ctx context.Context, entityID *ttnpb.EntityI
 		}
 
 		// If the caller is not a user, there's nothing more to do.
-		usrID := ouID.GetUserIDs()
+		usrID := ouID.GetUserIds()
 		if usrID == nil {
 			return nil
 		}

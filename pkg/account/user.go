@@ -78,7 +78,7 @@ func (req *loginRequest) ValidateContext(ctx context.Context) error {
 		return errMissingPassword.New()
 	}
 	if err := (&ttnpb.UserIdentifiers{
-		UserID: req.UserID,
+		UserId: req.UserID,
 	}).ValidateFields("user_id"); err != nil {
 		return err
 	}
@@ -97,7 +97,7 @@ func (s *server) Login(c echo.Context) error {
 	if err := s.session.DoLogin(ctx, req.UserID, req.Password); err != nil {
 		return err
 	}
-	if err := s.CreateUserSession(c, ttnpb.UserIdentifiers{UserID: req.UserID}); err != nil {
+	if err := s.CreateUserSession(c, ttnpb.UserIdentifiers{UserId: req.UserID}); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)
@@ -155,7 +155,7 @@ func (s *server) CreateUserSession(c echo.Context, userIDs ttnpb.UserIdentifiers
 	}
 	events.Publish(oauth.EvtUserLogin.NewWithIdentifiersAndData(ctx, &userIDs, nil))
 	return s.session.UpdateAuthCookie(c, func(cookie *auth.CookieShape) error {
-		cookie.UserID = session.UserIdentifiers.UserID
+		cookie.UserID = session.UserIdentifiers.UserId
 		cookie.SessionID = session.SessionID
 		cookie.SessionSecret = tokenSecret
 		return nil

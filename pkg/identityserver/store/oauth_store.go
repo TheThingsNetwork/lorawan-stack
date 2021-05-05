@@ -54,7 +54,7 @@ func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.User
 	authProtos := make([]*ttnpb.OAuthClientAuthorization, len(authModels))
 	for i, authModel := range authModels {
 		authProto := authModel.toPB()
-		authProto.UserIDs.UserID = userIDs.UserID
+		authProto.UserIds.UserId = userIDs.UserId
 		authProtos[i] = authProto
 	}
 	return authProtos, nil
@@ -77,13 +77,13 @@ func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserId
 	}).First(&authModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errAuthorizationNotFound.WithAttributes("user_id", userIDs.UserID, "client_id", clientIDs.ClientID)
+			return nil, errAuthorizationNotFound.WithAttributes("user_id", userIDs.UserId, "client_id", clientIDs.ClientID)
 		}
 		return nil, err
 	}
 	authProto := authModel.toPB()
 	authProto.ClientIDs.ClientID = clientIDs.ClientID
-	authProto.UserIDs.UserID = userIDs.UserID
+	authProto.UserIds.UserId = userIDs.UserId
 	return authProto, nil
 }
 
@@ -93,7 +93,7 @@ func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthCl
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.findEntity(ctx, authorization.UserIDs, "id")
+	user, err := s.findEntity(ctx, authorization.UserIds, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthCl
 	}
 	authProto := authModel.toPB()
 	authProto.ClientIDs = authorization.ClientIDs
-	authProto.UserIDs = authorization.UserIDs
+	authProto.UserIds = authorization.UserIds
 	return authProto, nil
 }
 
@@ -192,7 +192,7 @@ func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OA
 	if err != nil {
 		return err
 	}
-	user, err := s.findEntity(ctx, code.UserIDs, "id")
+	user, err := s.findEntity(ctx, code.UserIds, "id")
 	if err != nil {
 		return err
 	}
@@ -252,7 +252,7 @@ func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAc
 	if err != nil {
 		return err
 	}
-	user, err := s.findEntity(ctx, token.UserIDs, "id")
+	user, err := s.findEntity(ctx, token.UserIds, "id")
 	if err != nil {
 		return err
 	}
@@ -302,7 +302,7 @@ func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserId
 	for i, tokenModel := range tokenModels {
 		tokenProto := tokenModel.toPB()
 		tokenProto.ClientIDs.ClientID = clientIDs.ClientID
-		tokenProto.UserIDs.UserID = userIDs.UserID
+		tokenProto.UserIds.UserId = userIDs.UserId
 		tokenProtos[i] = tokenProto
 	}
 	return tokenProtos, nil
@@ -330,7 +330,7 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 	}
 	tokenProto := tokenModel.AccessToken.toPB()
 	tokenProto.ClientIDs.ClientID = tokenModel.FriendlyClientID
-	tokenProto.UserIDs.UserID = tokenModel.FriendlyUserID
+	tokenProto.UserIds.UserId = tokenModel.FriendlyUserID
 	return tokenProto, nil
 }
 

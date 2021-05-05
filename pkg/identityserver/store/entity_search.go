@@ -243,7 +243,7 @@ func (s *entitySearch) FindUsers(ctx context.Context, member *ttnpb.Organization
 	}
 	identifiers := make([]*ttnpb.UserIdentifiers, len(results))
 	for i, result := range results {
-		identifiers[i] = &ttnpb.UserIdentifiers{UserID: result.FriendlyID}
+		identifiers[i] = &ttnpb.UserIdentifiers{UserId: result.FriendlyID}
 	}
 	return identifiers, nil
 }

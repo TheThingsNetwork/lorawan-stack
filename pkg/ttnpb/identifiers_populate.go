@@ -76,7 +76,7 @@ func NewPopulatedOrganizationIdentifiers(r randyIdentifiers, _ bool) *Organizati
 func NewPopulatedUserIdentifiers(r randyIdentifiers, _ bool) *UserIdentifiers {
 	id := NewPopulatedID(r)
 	return &UserIdentifiers{
-		UserID: id,
+		UserId: id,
 		Email:  fmt.Sprintf("%s@example.com", id),
 	}
 }

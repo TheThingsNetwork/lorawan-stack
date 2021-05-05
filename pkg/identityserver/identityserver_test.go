@@ -77,7 +77,7 @@ func init() {
 	defaultUser.TemporaryPasswordExpiresAt = nil
 
 	for id, apiKeys := range population.APIKeys {
-		if id.GetUserIDs().GetUserID() == defaultUser.GetUserID() {
+		if id.GetUserIds().GetUserId() == defaultUser.GetUserId() {
 			population.APIKeys[id] = append(
 				apiKeys,
 				&ttnpb.APIKey{
@@ -109,7 +109,7 @@ func getTestUser() (*ttnpb.User, int) {
 
 func userCreds(idx int, preferredNames ...string) grpc.CallOption {
 	for id, apiKeys := range population.APIKeys {
-		if id.GetUserIDs().GetUserID() == population.Users[idx].GetUserID() {
+		if id.GetUserIds().GetUserId() == population.Users[idx].GetUserId() {
 			selectedIdx := 0
 			if len(preferredNames) == 0 {
 				preferredNames = []string{"default key"}
@@ -135,7 +135,7 @@ func userCreds(idx int, preferredNames ...string) grpc.CallOption {
 
 func userAPIKeys(userID *ttnpb.UserIdentifiers) ttnpb.APIKeys {
 	for id, apiKeys := range population.APIKeys {
-		if id.GetUserIDs().GetUserID() == userID.GetUserID() {
+		if id.GetUserIds().GetUserId() == userID.GetUserId() {
 			return ttnpb.APIKeys{
 				APIKeys: apiKeys,
 			}
@@ -195,7 +195,7 @@ func userApplications(userID *ttnpb.UserIdentifiers) ttnpb.Applications {
 		for id, collaborators := range population.Memberships {
 			if app.IDString() == id.IDString() {
 				for _, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserId() {
 						applications = append(applications, app)
 					}
 				}
@@ -214,7 +214,7 @@ func userClients(userID *ttnpb.UserIdentifiers) ttnpb.Clients {
 		for id, collaborators := range population.Memberships {
 			if client.IDString() == id.IDString() {
 				for _, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserId() {
 						clients = append(clients, client)
 					}
 				}
@@ -233,7 +233,7 @@ func userGateways(userID *ttnpb.UserIdentifiers) ttnpb.Gateways {
 		for id, collaborators := range population.Memberships {
 			if gateway.IDString() == id.IDString() {
 				for _, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserId() {
 						gateways = append(gateways, gateway)
 					}
 				}
@@ -252,7 +252,7 @@ func userOrganizations(userID *ttnpb.UserIdentifiers) ttnpb.Organizations {
 		for id, collaborators := range population.Memberships {
 			if organization.IDString() == id.IDString() {
 				for _, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserId() {
 						organizations = append(organizations, organization)
 					}
 				}

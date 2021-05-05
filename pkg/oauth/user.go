@@ -55,12 +55,12 @@ func (s *server) ClientLogout(c echo.Context) error {
 		if err = s.store.DeleteAccessToken(ctx, accessTokenID); err != nil {
 			return err
 		}
-		events.Publish(evtAccessTokenDeleted.NewWithIdentifiersAndData(ctx, &at.UserIDs, nil))
-		err = s.store.DeleteSession(ctx, &at.UserIDs, at.UserSessionID)
+		events.Publish(evtAccessTokenDeleted.NewWithIdentifiersAndData(ctx, &at.UserIds, nil))
+		err = s.store.DeleteSession(ctx, &at.UserIds, at.UserSessionID)
 		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
-		events.Publish(EvtUserLogout.NewWithIdentifiersAndData(ctx, &at.UserIDs, nil))
+		events.Publish(EvtUserLogout.NewWithIdentifiersAndData(ctx, &at.UserIds, nil))
 		redirectParam := c.QueryParam("post_logout_redirect_uri")
 		if redirectParam == "" {
 			if len(client.LogoutRedirectURIs) != 0 {

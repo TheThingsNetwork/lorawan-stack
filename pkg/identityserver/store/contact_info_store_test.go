@@ -103,7 +103,7 @@ func TestContactInfoValidation(t *testing.T) {
 		usrStore := GetUserStore(db)
 
 		usr, err := usrStore.CreateUser(ctx, &ttnpb.User{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "foo"},
+			UserIdentifiers: ttnpb.UserIdentifiers{UserId: "foo"},
 		})
 
 		a.So(err, should.BeNil)

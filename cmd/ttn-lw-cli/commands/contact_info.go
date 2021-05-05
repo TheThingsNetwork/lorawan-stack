@@ -43,8 +43,8 @@ func listContactInfo(entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, e
 		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id.GatewayIDs, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_OrganizationIDs:
 		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id.OrganizationIDs, FieldMask: fieldMask})
-	case *ttnpb.EntityIdentifiers_UserIDs:
-		res, err = ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{UserIdentifiers: *id.UserIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_UserIds:
+		res, err = ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{UserIdentifiers: *id.UserIds, FieldMask: fieldMask})
 	default:
 		panic(fmt.Errorf("no contact info in %T", id))
 	}
@@ -70,8 +70,8 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id.GatewayIDs, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_OrganizationIDs:
 		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id.OrganizationIDs, FieldMask: fieldMask})
-	case *ttnpb.EntityIdentifiers_UserIDs:
-		res, err = ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{UserIdentifiers: *id.UserIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_UserIds:
+		res, err = ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{UserIdentifiers: *id.UserIds, FieldMask: fieldMask})
 	default:
 		panic(fmt.Errorf("no contact info in %T", id))
 	}

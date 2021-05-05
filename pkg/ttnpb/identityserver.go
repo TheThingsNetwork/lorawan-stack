@@ -23,7 +23,7 @@ func (m *AuthInfoResponse) GetEntityIdentifiers() *EntityIdentifiers {
 	case *AuthInfoResponse_APIKey:
 		return &accessMethod.APIKey.EntityIDs
 	case *AuthInfoResponse_OAuthAccessToken:
-		return accessMethod.OAuthAccessToken.UserIDs.GetEntityIdentifiers()
+		return accessMethod.OAuthAccessToken.UserIds.GetEntityIdentifiers()
 	case *AuthInfoResponse_UserSession:
 		return accessMethod.UserSession.UserIdentifiers.GetEntityIdentifiers()
 	}
@@ -55,7 +55,7 @@ func (m *AuthInfoResponse) GetOrganizationOrUserIdentifiers() *OrganizationOrUse
 	if ids := ids.GetOrganizationIDs(); ids != nil {
 		return ids.OrganizationOrUserIdentifiers()
 	}
-	if ids := ids.GetUserIDs(); ids != nil {
+	if ids := ids.GetUserIds(); ids != nil {
 		return ids.OrganizationOrUserIdentifiers()
 	}
 	return nil

@@ -567,14 +567,14 @@ func (m *UserIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_id":
 
-			if utf8.RuneCountInString(m.GetUserID()) > 36 {
+			if utf8.RuneCountInString(m.GetUserId()) > 36 {
 				return UserIdentifiersValidationError{
 					field:  "user_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_UserIdentifiers_UserID_Pattern.MatchString(m.GetUserID()) {
+			if !_UserIdentifiers_UserId_Pattern.MatchString(m.GetUserId()) {
 				return UserIdentifiersValidationError{
 					field:  "user_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -647,7 +647,7 @@ var _ interface {
 	ErrorName() string
 } = UserIdentifiersValidationError{}
 
-var _UserIdentifiers_UserID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _UserIdentifiers_UserId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on OrganizationOrUserIdentifiers with
 // the rules defined in the proto definition for this message. If any rules
@@ -696,12 +696,12 @@ func (m *OrganizationOrUserIdentifiers) ValidateFields(paths ...string) error {
 					}
 
 				case "user_ids":
-					w, ok := m.Ids.(*OrganizationOrUserIdentifiers_UserIDs)
+					w, ok := m.Ids.(*OrganizationOrUserIdentifiers_UserIds)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetUserIDs()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return OrganizationOrUserIdentifiersValidationError{
 								field:  "user_ids",
@@ -891,12 +891,12 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 					}
 
 				case "user_ids":
-					w, ok := m.Ids.(*EntityIdentifiers_UserIDs)
+					w, ok := m.Ids.(*EntityIdentifiers_UserIds)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetUserIDs()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return EntityIdentifiersValidationError{
 								field:  "user_ids",

@@ -201,7 +201,7 @@ func TestUserAccessCRUD(t *testing.T) {
 		}
 
 		modifiedUserID := user.UserIdentifiers
-		modifiedUserID.UserID = reverse(modifiedUserID.UserID)
+		modifiedUserID.UserId = reverse(modifiedUserID.UserId)
 
 		rights, err = reg.ListRights(ctx, &modifiedUserID, creds)
 

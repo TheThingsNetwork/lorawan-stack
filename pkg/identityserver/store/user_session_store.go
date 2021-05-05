@@ -71,7 +71,7 @@ func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.User
 	sessionProtos := make([]*ttnpb.UserSession, len(sessionModels))
 	for i, sessionModel := range sessionModels {
 		sessionProto := &ttnpb.UserSession{}
-		sessionProto.UserID = userIDs.UserID
+		sessionProto.UserId = userIDs.UserId
 		sessionModel.toPB(sessionProto)
 		sessionProtos[i] = sessionProto
 	}
@@ -88,12 +88,12 @@ func (s *userSessionStore) GetSession(ctx context.Context, userIDs *ttnpb.UserId
 	var sessionModel UserSession
 	if err = query.Find(&sessionModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errSessionNotFound.WithAttributes("user_id", userIDs.UserID, "session_id", sessionID)
+			return nil, errSessionNotFound.WithAttributes("user_id", userIDs.UserId, "session_id", sessionID)
 		}
 		return nil, err
 	}
 	sessionProto := &ttnpb.UserSession{}
-	sessionProto.UserID = userIDs.UserID
+	sessionProto.UserId = userIDs.UserId
 	sessionModel.toPB(sessionProto)
 	return sessionProto, nil
 }
@@ -120,7 +120,7 @@ func (s *userSessionStore) GetSessionByID(ctx context.Context, sessionID string)
 		return nil, err
 	}
 	sessionProto := &ttnpb.UserSession{}
-	sessionProto.UserID = accountModel.UID
+	sessionProto.UserId = accountModel.UID
 	sessionModel.toPB(sessionProto)
 	return sessionProto, nil
 }
@@ -135,7 +135,7 @@ func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSe
 	var sessionModel UserSession
 	if err = query.Find(&sessionModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errSessionNotFound.WithAttributes("user_id", sess.UserID, "session_id", sess.SessionID)
+			return nil, errSessionNotFound.WithAttributes("user_id", sess.UserId, "session_id", sess.SessionID)
 		}
 		return nil, err
 	}

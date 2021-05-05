@@ -130,7 +130,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 				},
 			}
 			if ids.EntityType() == "user" {
-				user, err = store.GetUserStore(db).GetUser(ctx, ids.GetUserIDs(), userFieldMask)
+				user, err = store.GetUserStore(db).GetUser(ctx, ids.GetUserIds(), userFieldMask)
 				if err != nil {
 					if errors.IsNotFound(err) {
 						return errAPIKeyNotFound.WithCause(err)
@@ -167,7 +167,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			res.AccessMethod = &ttnpb.AuthInfoResponse_OAuthAccessToken{
 				OAuthAccessToken: accessToken,
 			}
-			user, err = store.GetUserStore(db).GetUser(ctx, &accessToken.UserIDs, userFieldMask)
+			user, err = store.GetUserStore(db).GetUser(ctx, &accessToken.UserIds, userFieldMask)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)
@@ -253,7 +253,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	}
 
 	if user != nil {
-		rpclog.AddField(ctx, "auth.user_id", user.UserIdentifiers.UserID)
+		rpclog.AddField(ctx, "auth.user_id", user.UserIdentifiers.UserId)
 
 		if is.configFromContext(ctx).UserRegistration.ContactInfoValidation.Required && user.PrimaryEmailAddressValidatedAt == nil {
 			// Go to profile page, edit basic settings (such as email), delete account.
@@ -315,7 +315,7 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 		return err
 	}
 
-	if userID := authInfo.GetEntityIdentifiers().GetUserIDs(); userID != nil {
+	if userID := authInfo.GetEntityIdentifiers().GetUserIds(); userID != nil {
 		err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 			user, err := store.GetUserStore(db).GetUser(ctx, userID, &types.FieldMask{Paths: []string{
 				"state",

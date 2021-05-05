@@ -56,7 +56,7 @@ func TestIdentifiersIsZero(t *testing.T) {
 		GatewayIdentifiers{GatewayID: "foo"},
 		GatewayIdentifiers{EUI: &eui},
 		OrganizationIdentifiers{OrganizationID: "foo"},
-		UserIdentifiers{UserID: "foo"},
+		UserIdentifiers{UserId: "foo"},
 		UserIdentifiers{Email: "foo@example.com"},
 	} {
 		a.So(ids.IsZero(), should.BeFalse)
@@ -69,7 +69,7 @@ func TestOrganizationOrUserIdentifiers(t *testing.T) {
 	usrID := NewPopulatedUserIdentifiers(test.Randy, true)
 	ouID := usrID.OrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
-	a.So(ouID.GetUserIDs(), should.Resemble, usrID)
+	a.So(ouID.GetUserIds(), should.Resemble, usrID)
 
 	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
 	ouID = orgID.OrganizationOrUserIdentifiers()
@@ -113,25 +113,25 @@ func TestEntityIdentifiers(t *testing.T) {
 	usrID := NewPopulatedUserIdentifiers(test.Randy, true)
 	eID = usrID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.GetUserIDs(), should.Resemble, usrID)
+	a.So(eID.GetUserIds(), should.Resemble, usrID)
 
 	ouID = usrID.OrganizationOrUserIdentifiers()
 	eID = ouID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.GetUserIDs(), should.Resemble, usrID)
+	a.So(eID.GetUserIds(), should.Resemble, usrID)
 }
 
 func TestUserIdentifiersValidate(t *testing.T) {
 	a := assertions.New(t)
 
 	ids := UserIdentifiers{
-		UserID: "foo",
+		UserId: "foo",
 		Email:  "foo@bar.com",
 	}
 	a.So(ids.ValidateFields(), should.BeNil)
 
 	ids = UserIdentifiers{
-		UserID: "foo",
+		UserId: "foo",
 	}
 	a.So(ids.ValidateFields(), should.BeNil)
 
@@ -145,13 +145,13 @@ func TestUserIdentifiersValidate(t *testing.T) {
 	a.So(err, should.NotBeNil)
 
 	ids = UserIdentifiers{
-		UserID: "foo",
+		UserId: "foo",
 		Email:  "foobar.com",
 	}
 	a.So(ids.ValidateFields(), should.BeNil)
 
 	ids = UserIdentifiers{
-		UserID: "_foo",
+		UserId: "_foo",
 		Email:  "foo@bar.com",
 	}
 	a.So(ids.ValidateFields(), should.NotBeNil)

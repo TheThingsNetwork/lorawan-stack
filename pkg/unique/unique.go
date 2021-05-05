@@ -98,7 +98,7 @@ func ToOrganizationID(uid string) (id ttnpb.OrganizationIdentifiers, err error) 
 
 // ToUserID returns the user identifier of the specified unique ID.
 func ToUserID(uid string) (id ttnpb.UserIdentifiers, err error) {
-	id.UserID = uid
+	id.UserId = uid
 	if err := id.ValidateFields("user_id"); err != nil {
 		return ttnpb.UserIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}

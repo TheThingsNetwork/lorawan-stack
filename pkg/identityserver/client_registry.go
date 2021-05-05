@@ -77,7 +77,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 	if err = blacklist.Check(ctx, req.ClientID); err != nil {
 		return nil, err
 	}
-	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
+	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
 		if !createdByAdmin && !is.configFromContext(ctx).UserRights.CreateClients {
 			return nil, errAdminsCreateClients
 		}
@@ -192,7 +192,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 		req.Collaborator = collaborator
 		includeIndirect = true
 	}
-	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
+	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_CLIENTS_LIST); err != nil {
 			return nil, err
 		}

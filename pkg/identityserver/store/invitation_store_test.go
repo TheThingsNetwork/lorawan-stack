@@ -68,7 +68,7 @@ func TestInvitationStore(t *testing.T) {
 			a.So(invitations[0].Email, should.Equal, invitation.Email)
 		}
 
-		newUser, err := GetUserStore(db).CreateUser(ctx, &ttnpb.User{UserIdentifiers: ttnpb.UserIdentifiers{UserID: "new-user"}, PrimaryEmailAddress: "new-user@example.com"})
+		newUser, err := GetUserStore(db).CreateUser(ctx, &ttnpb.User{UserIdentifiers: ttnpb.UserIdentifiers{UserId: "new-user"}, PrimaryEmailAddress: "new-user@example.com"})
 		if err != nil {
 			panic(err)
 		}

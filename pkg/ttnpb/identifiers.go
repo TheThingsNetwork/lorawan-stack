@@ -87,7 +87,7 @@ func (ids OrganizationIdentifiers) IsZero() bool {
 
 // IsZero returns true if all identifiers have zero-values.
 func (ids UserIdentifiers) IsZero() bool {
-	return ids.UserID == "" && ids.Email == ""
+	return ids.UserId == "" && ids.Email == ""
 }
 
 // GetOrganizationOrUserIdentifiers returns the OrganizationIdentifiers as *OrganizationOrUserIdentifiers.
@@ -115,8 +115,8 @@ func (ids *UserIdentifiers) GetOrganizationOrUserIdentifiers() *OrganizationOrUs
 
 // OrganizationOrUserIdentifiers returns the UserIdentifiers as *OrganizationOrUserIdentifiers.
 func (ids UserIdentifiers) OrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
-	return &OrganizationOrUserIdentifiers{Ids: &OrganizationOrUserIdentifiers_UserIDs{
-		UserIDs: &ids,
+	return &OrganizationOrUserIdentifiers{Ids: &OrganizationOrUserIdentifiers_UserIds{
+		UserIds: &ids,
 	}}
 }
 

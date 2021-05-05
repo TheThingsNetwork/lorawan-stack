@@ -100,7 +100,7 @@ func (s *Session) Get(c echo.Context) (*ttnpb.UserSession, error) {
 	}
 	session, err := s.Store.GetSession(
 		c.Request().Context(),
-		&ttnpb.UserIdentifiers{UserID: cookie.UserID},
+		&ttnpb.UserIdentifiers{UserId: cookie.UserID},
 		cookie.SessionID,
 	)
 	if err != nil {
@@ -131,7 +131,7 @@ func (s *Session) GetUser(c echo.Context) (*ttnpb.User, error) {
 	}
 	user, err := s.Store.GetUser(
 		c.Request().Context(),
-		&ttnpb.UserIdentifiers{UserID: session.UserIdentifiers.UserID},
+		&ttnpb.UserIdentifiers{UserId: session.UserIdentifiers.UserId},
 		nil,
 	)
 	if err != nil {
@@ -143,7 +143,7 @@ func (s *Session) GetUser(c echo.Context) (*ttnpb.User, error) {
 
 // DoLogin performs the authentication using user id and password.
 func (s *Session) DoLogin(ctx context.Context, userID, password string) error {
-	ids := &ttnpb.UserIdentifiers{UserID: userID}
+	ids := &ttnpb.UserIdentifiers{UserId: userID}
 	if err := ids.ValidateContext(ctx); err != nil {
 		return err
 	}

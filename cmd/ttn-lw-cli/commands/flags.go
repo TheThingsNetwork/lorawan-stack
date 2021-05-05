@@ -56,7 +56,7 @@ func getCollaborator(flagSet *pflag.FlagSet) *ttnpb.OrganizationOrUserIdentifier
 		logger.Warn("Don't set organization ID and user ID at the same time, assuming user ID")
 	}
 	if userID != "" {
-		return ttnpb.UserIdentifiers{UserID: userID}.OrganizationOrUserIdentifiers()
+		return ttnpb.UserIdentifiers{UserId: userID}.OrganizationOrUserIdentifiers()
 	}
 	return ttnpb.OrganizationIdentifiers{OrganizationID: organizationID}.OrganizationOrUserIdentifiers()
 }
@@ -199,7 +199,7 @@ func getEntityIdentifiersSlice(flagSet *pflag.FlagSet) []*ttnpb.EntityIdentifier
 		ids = append(ids, (&ttnpb.OrganizationIdentifiers{OrganizationID: organizationID}).GetEntityIdentifiers())
 	}
 	for _, userID := range userIDs {
-		ids = append(ids, (&ttnpb.UserIdentifiers{UserID: userID}).GetEntityIdentifiers())
+		ids = append(ids, (&ttnpb.UserIdentifiers{UserId: userID}).GetEntityIdentifiers())
 	}
 
 	return ids
