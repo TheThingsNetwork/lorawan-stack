@@ -46,6 +46,20 @@ var StreamEventsRequestFieldPathsTopLevel = []string{
 	"identifiers",
 	"tail",
 }
+var FindRelatedEventsRequestFieldPathsNested = []string{
+	"correlation_id",
+}
+
+var FindRelatedEventsRequestFieldPathsTopLevel = []string{
+	"correlation_id",
+}
+var FindRelatedEventsResponseFieldPathsNested = []string{
+	"events",
+}
+
+var FindRelatedEventsResponseFieldPathsTopLevel = []string{
+	"events",
+}
 var Event_AuthenticationFieldPathsNested = []string{
 	"token_id",
 	"token_type",

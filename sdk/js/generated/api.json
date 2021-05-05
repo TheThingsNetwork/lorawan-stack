@@ -13921,6 +13921,60 @@
           ]
         },
         {
+          "name": "FindRelatedEventsRequest",
+          "longName": "FindRelatedEventsRequest",
+          "fullName": "ttn.lorawan.v3.FindRelatedEventsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "correlation_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.min_len",
+                    "value": 1
+                  },
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FindRelatedEventsResponse",
+          "longName": "FindRelatedEventsResponse",
+          "fullName": "ttn.lorawan.v3.FindRelatedEventsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "events",
+              "description": "",
+              "label": "repeated",
+              "type": "Event",
+              "longType": "Event",
+              "fullType": "ttn.lorawan.v3.Event",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "StreamEventsRequest",
           "longName": "StreamEventsRequest",
           "fullName": "ttn.lorawan.v3.StreamEventsRequest",
@@ -13987,6 +14041,28 @@
                       "method": "POST",
                       "pattern": "/events",
                       "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "FindRelated",
+              "description": "",
+              "requestType": "FindRelatedEventsRequest",
+              "requestLongType": "FindRelatedEventsRequest",
+              "requestFullType": "ttn.lorawan.v3.FindRelatedEventsRequest",
+              "requestStreaming": false,
+              "responseType": "FindRelatedEventsResponse",
+              "responseLongType": "FindRelatedEventsResponse",
+              "responseFullType": "ttn.lorawan.v3.FindRelatedEventsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/events/related"
                     }
                   ]
                 }

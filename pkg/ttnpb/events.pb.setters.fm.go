@@ -203,6 +203,47 @@ func (dst *StreamEventsRequest) SetFields(src *StreamEventsRequest, paths ...str
 	return nil
 }
 
+func (dst *FindRelatedEventsRequest) SetFields(src *FindRelatedEventsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "correlation_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'correlation_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CorrelationID = src.CorrelationID
+			} else {
+				var zero string
+				dst.CorrelationID = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *FindRelatedEventsResponse) SetFields(src *FindRelatedEventsResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "events":
+			if len(subs) > 0 {
+				return fmt.Errorf("'events' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Events = src.Events
+			} else {
+				dst.Events = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *Event_Authentication) SetFields(src *Event_Authentication, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

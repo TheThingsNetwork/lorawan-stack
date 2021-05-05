@@ -73,6 +73,20 @@ message StreamEventsRequest {
   google.protobuf.Timestamp after = 3 [(gogoproto.stdtime) = true];
 }
 
+message FindRelatedEventsRequest {
+  string correlation_id = 1 [
+    (gogoproto.customname) = "CorrelationID",
+    (validate.rules).string = {
+      min_len: 1,
+      max_len: 100,
+    }
+  ];
+}
+
+message FindRelatedEventsResponse {
+  repeated Event events = 1;
+}
+
 // The Events service serves events from the cluster.
 service Events {
   // Stream live events, optionally with a tail of historical events (depending on server support and retention policy).
@@ -83,4 +97,10 @@ service Events {
       body: "*"
     };
   };
+
+  rpc FindRelated(FindRelatedEventsRequest) returns (FindRelatedEventsResponse) {
+    option (google.api.http) = {
+      get: "/events/related"
+    };
+  }
 }

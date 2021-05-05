@@ -17,6 +17,7 @@ For details about compatibility between different releases, see the **Commitment
 - Reporting uplink and downlink message delivery state changes to Packet Broker. This will be used for statistical purposes (e.g. which message is processed successfully or why it errored) as well as LoRaWAN roaming (the `XmitDataAns` result code).
 - Setting API key expiry via `--api-key-expiry` flag using RFC3339 format.
 - Events storage in the Redis events backend. This can be enabled with the new `events.redis.store.enable` option. The new options `events.redis.store.ttl`, `events.redis.store.entity-ttl`, `events.redis.store.entity-count` and `events.redis.store.correlation-id-count` can be used to configure retention.
+- RPC to find related events by correlation ID.
 
 ### Changed
 

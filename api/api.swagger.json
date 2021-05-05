@@ -4401,6 +4401,36 @@
         ]
       }
     },
+    "/events/related": {
+      "get": {
+        "operationId": "Events_FindRelated",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3FindRelatedEventsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "correlation_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Events"
+        ]
+      }
+    },
     "/gateways": {
       "get": {
         "summary": "List gateways where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the gateways the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
@@ -14012,6 +14042,17 @@
           "type": "integer",
           "format": "int64",
           "description": "Bit rate (bps)."
+        }
+      }
+    },
+    "v3FindRelatedEventsResponse": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3Event"
+          }
         }
       }
     },

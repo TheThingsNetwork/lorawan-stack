@@ -2392,6 +2392,16 @@
           "stream": true
         }
       ]
+    },
+    "FindRelated": {
+      "file": "lorawan-stack/api/events.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/events/related",
+          "parameters": []
+        }
+      ]
     }
   },
   "GatewayAccess": {

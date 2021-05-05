@@ -78,7 +78,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		})
 	} else {
 		if req.Tail > 0 || req.After != nil {
-			warning.Add(ctx, "Historical events not implemented")
+			warning.Add(ctx, "Events storage is not enabled")
 		}
 		if err := srv.pubsub.Subscribe(ctx, nil, req.Identifiers, handler); err != nil {
 			return err
@@ -133,6 +133,59 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 			}
 		}
 	}
+}
+
+var errStorageDisabled = errors.DefineFailedPrecondition("storage_disabled", "events storage is not not enabled")
+
+// FindRelated implements the EventsServer interface.
+func (srv *EventsServer) FindRelated(ctx context.Context, req *ttnpb.FindRelatedEventsRequest) (*ttnpb.FindRelatedEventsResponse, error) {
+	store, hasStore := srv.pubsub.(events.Store)
+	if !hasStore {
+		return nil, errStorageDisabled.New()
+	}
+	_, err := rights.AuthInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	evts, err := store.FindRelated(ctx, req.GetCorrelationID())
+	if err != nil {
+		return nil, err
+	}
+
+	var res ttnpb.FindRelatedEventsResponse
+
+	for _, evt := range evts {
+		evtProto, err := events.Proto(evt)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to convert event to proto")
+			continue
+		}
+		isVisible, err := rightsutil.EventIsVisible(ctx, evt)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to check event visibility")
+			continue
+		}
+		if isVisible {
+			res.Events = append(res.Events, evtProto)
+		} else {
+			res.Events = append(res.Events, &ttnpb.Event{
+				Name:        evtProto.Name,
+				Time:        evtProto.Time,
+				Identifiers: evtProto.Identifiers,
+				// Data is private
+				// CorrelationIDs is private
+				Origin: evtProto.Origin,
+				// Context is private
+				Visibility: evtProto.Visibility,
+				// Authentication is private
+				// RemoteIP is private
+				// UserAgent is private
+				UniqueID: evtProto.UniqueID,
+			})
+		}
+	}
+	return &res, nil
 }
 
 // Roles implements rpcserver.Registerer.

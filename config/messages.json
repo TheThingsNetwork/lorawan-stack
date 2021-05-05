@@ -3824,6 +3824,15 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/events/grpc:storage_disabled": {
+    "translations": {
+      "en": "events storage is not not enabled"
+    },
+    "description": {
+      "package": "pkg/events/grpc",
+      "file": "grpc.go"
+    }
+  },
   "error:pkg/events/redis:channel_closed": {
     "translations": {
       "en": "channel closed"
