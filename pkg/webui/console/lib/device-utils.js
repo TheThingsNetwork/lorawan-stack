@@ -129,3 +129,30 @@ export const fCntWidthEncode = value => value === FRAME_WIDTH_COUNT.SUPPORTS_32_
  */
 export const fCntWidthDecode = value =>
   value ? FRAME_WIDTH_COUNT.SUPPORTS_32_BIT : FRAME_WIDTH_COUNT.SUPPORTS_16_BIT
+
+/**
+ * Gets the datetime string of the latest uplink within the `mac_state`
+ * of the end device.
+ *
+ * @param {object} device - The end device.
+ * @returns {string} - The datetime string of the latest uplink of the
+ * end device or `undefined` if no uplinks or `mac_state` is present.
+ */
+export const getLastSeen = device => {
+  if (!device) {
+    return
+  }
+
+  const { mac_state } = device
+  if (mac_state) {
+    const { recent_uplinks } = mac_state
+    if (recent_uplinks) {
+      const last_uplink = Boolean(recent_uplinks)
+        ? recent_uplinks[recent_uplinks.length - 1]
+        : undefined
+      if (last_uplink) {
+        return last_uplink.received_at
+      }
+    }
+  }
+}
