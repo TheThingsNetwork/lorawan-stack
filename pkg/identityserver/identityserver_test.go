@@ -177,7 +177,7 @@ func gatewayAPIKeys(gatewayID *ttnpb.GatewayIdentifiers) ttnpb.APIKeys {
 
 func organizationAPIKeys(organizationID *ttnpb.OrganizationIdentifiers) ttnpb.APIKeys {
 	for id, apiKeys := range population.APIKeys {
-		if id.GetOrganizationIDs().GetOrganizationID() == organizationID.GetOrganizationID() {
+		if id.GetOrganizationIds().GetOrganizationId() == organizationID.GetOrganizationId() {
 			return ttnpb.APIKeys{
 				APIKeys: apiKeys,
 			}

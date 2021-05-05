@@ -29,7 +29,7 @@ func TestEntityType(t *testing.T) {
 	clientID := ClientIdentifiers{ClientID: "foo"}
 	endDeviceID := EndDeviceIdentifiers{DeviceID: "foo", ApplicationIdentifiers: applicationID}
 	gatewayID := GatewayIdentifiers{GatewayID: "foo"}
-	organizationID := OrganizationIdentifiers{OrganizationID: "foo"}
+	organizationID := OrganizationIdentifiers{OrganizationId: "foo"}
 	userID := UserIdentifiers{UserId: "foo"}
 
 	a.So(applicationID.EntityType(), should.Equal, "application")

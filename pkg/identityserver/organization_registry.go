@@ -69,7 +69,7 @@ var (
 )
 
 func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.CreateOrganizationRequest) (org *ttnpb.Organization, err error) {
-	if err = blacklist.Check(ctx, req.OrganizationID); err != nil {
+	if err = blacklist.Check(ctx, req.OrganizationId); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
@@ -79,7 +79,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_ORGANIZATIONS_CREATE); err != nil {
 			return nil, err
 		}
-	} else if orgIDs := req.Collaborator.GetOrganizationIDs(); orgIDs != nil {
+	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
 		return nil, errNestedOrganizations.New()
 	}
 	if err := validateContactInfo(req.Organization.ContactInfo); err != nil {
@@ -164,7 +164,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_ORGANIZATIONS_LIST); err != nil {
 			return nil, err
 		}
-	} else if orgIDs := req.Collaborator.GetOrganizationIDs(); orgIDs != nil {
+	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
 		return nil, errNestedOrganizations.New()
 	}
 	if req.Deleted {
@@ -189,7 +189,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 		}
 		orgIDs := make([]*ttnpb.OrganizationIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if orgID := id.GetEntityIdentifiers().GetOrganizationIDs(); orgID != nil {
+			if orgID := id.GetEntityIdentifiers().GetOrganizationIds(); orgID != nil {
 				orgIDs = append(orgIDs, orgID)
 			}
 		}

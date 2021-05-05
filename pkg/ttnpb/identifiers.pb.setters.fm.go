@@ -150,10 +150,10 @@ func (dst *OrganizationIdentifiers) SetFields(src *OrganizationIdentifiers, path
 				return fmt.Errorf("'organization_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.OrganizationID = src.OrganizationID
+				dst.OrganizationId = src.OrganizationId
 			} else {
 				var zero string
-				dst.OrganizationID = zero
+				dst.OrganizationId = zero
 			}
 
 		default:
@@ -214,11 +214,11 @@ func (dst *OrganizationOrUserIdentifiers) SetFields(src *OrganizationOrUserIdent
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "organization_ids":
-					_, srcOk := src.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs)
+					_, srcOk := src.Ids.(*OrganizationOrUserIdentifiers_OrganizationIds)
 					if !srcOk && src.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'organization_ids', while different oneof is set in source")
 					}
-					_, dstOk := dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs)
+					_, dstOk := dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIds)
 					if !dstOk && dst.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'organization_ids', while different oneof is set in destination")
 					}
@@ -228,13 +228,13 @@ func (dst *OrganizationOrUserIdentifiers) SetFields(src *OrganizationOrUserIdent
 							continue
 						}
 						if srcOk {
-							newSrc = src.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs).OrganizationIDs
+							newSrc = src.Ids.(*OrganizationOrUserIdentifiers_OrganizationIds).OrganizationIds
 						}
 						if dstOk {
-							newDst = dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs).OrganizationIDs
+							newDst = dst.Ids.(*OrganizationOrUserIdentifiers_OrganizationIds).OrganizationIds
 						} else {
 							newDst = &OrganizationIdentifiers{}
-							dst.Ids = &OrganizationOrUserIdentifiers_OrganizationIDs{OrganizationIDs: newDst}
+							dst.Ids = &OrganizationOrUserIdentifiers_OrganizationIds{OrganizationIds: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
@@ -444,11 +444,11 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 						}
 					}
 				case "organization_ids":
-					_, srcOk := src.Ids.(*EntityIdentifiers_OrganizationIDs)
+					_, srcOk := src.Ids.(*EntityIdentifiers_OrganizationIds)
 					if !srcOk && src.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'organization_ids', while different oneof is set in source")
 					}
-					_, dstOk := dst.Ids.(*EntityIdentifiers_OrganizationIDs)
+					_, dstOk := dst.Ids.(*EntityIdentifiers_OrganizationIds)
 					if !dstOk && dst.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'organization_ids', while different oneof is set in destination")
 					}
@@ -458,13 +458,13 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 							continue
 						}
 						if srcOk {
-							newSrc = src.Ids.(*EntityIdentifiers_OrganizationIDs).OrganizationIDs
+							newSrc = src.Ids.(*EntityIdentifiers_OrganizationIds).OrganizationIds
 						}
 						if dstOk {
-							newDst = dst.Ids.(*EntityIdentifiers_OrganizationIDs).OrganizationIDs
+							newDst = dst.Ids.(*EntityIdentifiers_OrganizationIds).OrganizationIds
 						} else {
 							newDst = &OrganizationIdentifiers{}
-							dst.Ids = &EntityIdentifiers_OrganizationIDs{OrganizationIDs: newDst}
+							dst.Ids = &EntityIdentifiers_OrganizationIds{OrganizationIds: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err

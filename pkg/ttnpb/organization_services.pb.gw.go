@@ -369,7 +369,7 @@ func request_OrganizationRegistry_Delete_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
 	}
 
-	protoReq.OrganizationID, err = runtime.String(val)
+	protoReq.OrganizationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
@@ -396,7 +396,7 @@ func local_request_OrganizationRegistry_Delete_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
 	}
 
-	protoReq.OrganizationID, err = runtime.String(val)
+	protoReq.OrganizationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
@@ -423,7 +423,7 @@ func request_OrganizationRegistry_Restore_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
 	}
 
-	protoReq.OrganizationID, err = runtime.String(val)
+	protoReq.OrganizationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
@@ -450,7 +450,7 @@ func local_request_OrganizationRegistry_Restore_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
 	}
 
-	protoReq.OrganizationID, err = runtime.String(val)
+	protoReq.OrganizationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
@@ -477,7 +477,7 @@ func request_OrganizationRegistry_Purge_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
 	}
 
-	protoReq.OrganizationID, err = runtime.String(val)
+	protoReq.OrganizationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
@@ -504,7 +504,7 @@ func local_request_OrganizationRegistry_Purge_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
 	}
 
-	protoReq.OrganizationID, err = runtime.String(val)
+	protoReq.OrganizationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
@@ -531,7 +531,7 @@ func request_OrganizationAccess_ListRights_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
 	}
 
-	protoReq.OrganizationID, err = runtime.String(val)
+	protoReq.OrganizationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
@@ -558,7 +558,7 @@ func local_request_OrganizationAccess_ListRights_0(ctx context.Context, marshale
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
 	}
 
-	protoReq.OrganizationID, err = runtime.String(val)
+	protoReq.OrganizationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)

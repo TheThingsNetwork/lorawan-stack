@@ -52,7 +52,7 @@ func (m *AuthInfoResponse) GetOrganizationOrUserIdentifiers() *OrganizationOrUse
 	if ids == nil {
 		return nil
 	}
-	if ids := ids.GetOrganizationIDs(); ids != nil {
+	if ids := ids.GetOrganizationIds(); ids != nil {
 		return ids.OrganizationOrUserIdentifiers()
 	}
 	if ids := ids.GetUserIds(); ids != nil {

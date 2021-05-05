@@ -60,7 +60,7 @@ message OrganizationIdentifiers {
   option (gogoproto.populate) = false;
 
   // This ID shares namespace with user IDs.
-  string organization_id = 1 [(gogoproto.customname) = "OrganizationID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+  string organization_id = 1 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
 message UserIdentifiers {
@@ -77,7 +77,7 @@ message UserIdentifiers {
 message OrganizationOrUserIdentifiers {
   oneof ids {
     option (validate.required) = true;
-    OrganizationIdentifiers organization_ids = 1 [(gogoproto.customname) = "OrganizationIDs"];
+    OrganizationIdentifiers organization_ids = 1;
     UserIdentifiers user_ids = 2;
   }
 }
@@ -90,7 +90,7 @@ message EntityIdentifiers {
     ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs"];
     EndDeviceIdentifiers device_ids = 3 [(gogoproto.customname) = "DeviceIDs"];
     GatewayIdentifiers gateway_ids = 4 [(gogoproto.customname) = "GatewayIDs"];
-    OrganizationIdentifiers organization_ids = 5 [(gogoproto.customname) = "OrganizationIDs"];
+    OrganizationIdentifiers organization_ids = 5;
     UserIdentifiers user_ids = 6;
   }
 }

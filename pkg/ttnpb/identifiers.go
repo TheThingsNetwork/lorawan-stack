@@ -82,7 +82,7 @@ func (ids GatewayIdentifiers) IsZero() bool {
 
 // IsZero returns true if all identifiers have zero-values.
 func (ids OrganizationIdentifiers) IsZero() bool {
-	return ids.OrganizationID == ""
+	return ids.OrganizationId == ""
 }
 
 // IsZero returns true if all identifiers have zero-values.
@@ -100,8 +100,8 @@ func (ids *OrganizationIdentifiers) GetOrganizationOrUserIdentifiers() *Organiza
 
 // OrganizationOrUserIdentifiers returns the OrganizationIdentifiers as *OrganizationOrUserIdentifiers.
 func (ids OrganizationIdentifiers) OrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
-	return &OrganizationOrUserIdentifiers{Ids: &OrganizationOrUserIdentifiers_OrganizationIDs{
-		OrganizationIDs: &ids,
+	return &OrganizationOrUserIdentifiers{Ids: &OrganizationOrUserIdentifiers_OrganizationIds{
+		OrganizationIds: &ids,
 	}}
 }
 

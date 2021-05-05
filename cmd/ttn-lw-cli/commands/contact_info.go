@@ -41,8 +41,8 @@ func listContactInfo(entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, e
 		res, err = ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{ClientIdentifiers: *id.ClientIDs, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_GatewayIDs:
 		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id.GatewayIDs, FieldMask: fieldMask})
-	case *ttnpb.EntityIdentifiers_OrganizationIDs:
-		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id.OrganizationIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_OrganizationIds:
+		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id.OrganizationIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_UserIds:
 		res, err = ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{UserIdentifiers: *id.UserIds, FieldMask: fieldMask})
 	default:
@@ -68,8 +68,8 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 		res, err = ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{ClientIdentifiers: *id.ClientIDs, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_GatewayIDs:
 		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id.GatewayIDs, FieldMask: fieldMask})
-	case *ttnpb.EntityIdentifiers_OrganizationIDs:
-		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id.OrganizationIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_OrganizationIds:
+		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id.OrganizationIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_UserIds:
 		res, err = ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{UserIdentifiers: *id.UserIds, FieldMask: fieldMask})
 	default:

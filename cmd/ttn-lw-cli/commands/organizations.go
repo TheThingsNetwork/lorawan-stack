@@ -56,7 +56,7 @@ func getOrganizationID(flagSet *pflag.FlagSet, args []string) *ttnpb.Organizatio
 	if organizationID == "" {
 		return nil
 	}
-	return &ttnpb.OrganizationIdentifiers{OrganizationID: organizationID}
+	return &ttnpb.OrganizationIdentifiers{OrganizationId: organizationID}
 }
 
 var searchOrganizationsFlags = func() *pflag.FlagSet {
@@ -181,10 +181,10 @@ var (
 				return err
 			}
 			organization.Attributes = mergeAttributes(organization.Attributes, cmd.Flags())
-			if orgID != nil && orgID.OrganizationID != "" {
-				organization.OrganizationID = orgID.OrganizationID
+			if orgID != nil && orgID.OrganizationId != "" {
+				organization.OrganizationId = orgID.OrganizationId
 			}
-			if organization.OrganizationID == "" {
+			if organization.OrganizationId == "" {
 				return errNoOrganizationID
 			}
 

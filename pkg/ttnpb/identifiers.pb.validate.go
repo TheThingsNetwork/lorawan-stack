@@ -468,14 +468,14 @@ func (m *OrganizationIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "organization_id":
 
-			if utf8.RuneCountInString(m.GetOrganizationID()) > 36 {
+			if utf8.RuneCountInString(m.GetOrganizationId()) > 36 {
 				return OrganizationIdentifiersValidationError{
 					field:  "organization_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_OrganizationIdentifiers_OrganizationID_Pattern.MatchString(m.GetOrganizationID()) {
+			if !_OrganizationIdentifiers_OrganizationId_Pattern.MatchString(m.GetOrganizationId()) {
 				return OrganizationIdentifiersValidationError{
 					field:  "organization_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -548,7 +548,7 @@ var _ interface {
 	ErrorName() string
 } = OrganizationIdentifiersValidationError{}
 
-var _OrganizationIdentifiers_OrganizationID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _OrganizationIdentifiers_OrganizationId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on UserIdentifiers with the rules
 // defined in the proto definition for this message. If any rules are
@@ -680,12 +680,12 @@ func (m *OrganizationOrUserIdentifiers) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "organization_ids":
-					w, ok := m.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs)
+					w, ok := m.Ids.(*OrganizationOrUserIdentifiers_OrganizationIds)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetOrganizationIDs()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetOrganizationIds()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return OrganizationOrUserIdentifiersValidationError{
 								field:  "organization_ids",
@@ -875,12 +875,12 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 					}
 
 				case "organization_ids":
-					w, ok := m.Ids.(*EntityIdentifiers_OrganizationIDs)
+					w, ok := m.Ids.(*EntityIdentifiers_OrganizationIds)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetOrganizationIDs()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetOrganizationIds()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return EntityIdentifiersValidationError{
 								field:  "organization_ids",

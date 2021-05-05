@@ -154,8 +154,8 @@ func (cir *contactInfoRegistry) RequestValidation(ctx context.Context, ids *ttnp
 		err = rights.RequireClient(ctx, *id.ClientIDs, ttnpb.RIGHT_CLIENT_ALL)
 	case *ttnpb.EntityIdentifiers_GatewayIDs:
 		err = rights.RequireGateway(ctx, *id.GatewayIDs, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC)
-	case *ttnpb.EntityIdentifiers_OrganizationIDs:
-		err = rights.RequireOrganization(ctx, *id.OrganizationIDs, ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC)
+	case *ttnpb.EntityIdentifiers_OrganizationIds:
+		err = rights.RequireOrganization(ctx, *id.OrganizationIds, ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC)
 	case *ttnpb.EntityIdentifiers_UserIds:
 		err = rights.RequireUser(ctx, *id.UserIds, ttnpb.RIGHT_USER_SETTINGS_BASIC)
 	default:

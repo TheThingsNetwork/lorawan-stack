@@ -89,7 +89,7 @@ func ToGatewayID(uid string) (id ttnpb.GatewayIdentifiers, err error) {
 
 // ToOrganizationID returns the organization identifier of the specified unique ID.
 func ToOrganizationID(uid string) (id ttnpb.OrganizationIdentifiers, err error) {
-	id.OrganizationID = uid
+	id.OrganizationId = uid
 	if err := id.ValidateFields("organization_id"); err != nil {
 		return ttnpb.OrganizationIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}

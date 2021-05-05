@@ -127,7 +127,7 @@ func (s *membershipStore) FindIndirectMemberships(ctx context.Context, userID *t
 		usrRights, entityRights := ttnpb.Rights(res.UsrRights), ttnpb.Rights(res.EntityRights)
 		commonOrganizations[i] = IndirectMembership{
 			RightsOnOrganization:    &usrRights,
-			OrganizationIdentifiers: &ttnpb.OrganizationIdentifiers{OrganizationID: res.OrganizationID},
+			OrganizationIdentifiers: &ttnpb.OrganizationIdentifiers{OrganizationId: res.OrganizationID},
 			OrganizationRights:      &entityRights,
 		}
 	}

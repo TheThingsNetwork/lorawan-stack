@@ -231,13 +231,13 @@ func RequireAny(ctx context.Context, ids ...*ttnpb.EntityIdentifiers) error {
 			if len(list.GetRights()) == 0 {
 				return ErrNoGatewayRights.WithAttributes("uid", unique.ID(ctx, ids.GatewayIDs))
 			}
-		case *ttnpb.EntityIdentifiers_OrganizationIDs:
-			list, err := ListOrganization(ctx, *ids.OrganizationIDs)
+		case *ttnpb.EntityIdentifiers_OrganizationIds:
+			list, err := ListOrganization(ctx, *ids.OrganizationIds)
 			if err != nil {
 				return err
 			}
 			if len(list.GetRights()) == 0 {
-				return ErrNoOrganizationRights.WithAttributes("uid", unique.ID(ctx, ids.OrganizationIDs))
+				return ErrNoOrganizationRights.WithAttributes("uid", unique.ID(ctx, ids.OrganizationIds))
 			}
 		case *ttnpb.EntityIdentifiers_UserIds:
 			list, err := ListUser(ctx, *ids.UserIds)
