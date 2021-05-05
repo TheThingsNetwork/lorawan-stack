@@ -523,6 +523,16 @@
         "ns"
       ]
     },
+    "desired_max_eirp": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "value": [
+        "ns",
+        "ns"
+      ]
+    },
     "desired_ping_slot_data_rate_index": {
       "_root": [
         "ns",
