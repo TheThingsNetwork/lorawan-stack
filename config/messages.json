@@ -2519,6 +2519,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/applicationserver:formatter_script_too_large": {
+    "translations": {
+      "en": "formatter script size exceeds maximum allowed size"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
   "error:pkg/applicationserver:invalid_threshold": {
     "translations": {
       "en": "invalid threshold `{threshold}`"
