@@ -76,4 +76,7 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 			Workers: 16,
 		},
 	},
+	Formatters: applicationserver.FormattersConfig{
+		MaxParameterLength: 4096,
+	},
 }

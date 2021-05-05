@@ -66,12 +66,17 @@ type EndDeviceFetcherCircuitBreakerConfig struct {
 	Threshold int           `name:"threshold" description:"Number of failed fetching attempts after which the circuit breaker opens"`
 }
 
+type FormattersConfig struct {
+	MaxParameterLength int `name:"max-parameter-length" description:"Maximum allowed size for length of formatter parameters (payload formatter scripts)"`
+}
+
 // Config represents the ApplicationServer configuration.
 type Config struct {
 	LinkMode         string                    `name:"link-mode" description:"Deprecated - mode to link applications to their Network Server (all, explicit)"`
 	Devices          DeviceRegistry            `name:"-"`
 	Links            LinkRegistry              `name:"-"`
 	UplinkStorage    UplinkStorageConfig       `name:"uplink-storage" description:"Application uplinks storage configuration"`
+	Formatters       FormattersConfig          `name:"formatters" description:"Payload formatters configuration"`
 	Distribution     DistributionConfig        `name:"distribution" description:"Distribution configuration"`
 	EndDeviceFetcher EndDeviceFetcherConfig    `name:"fetcher" description:"End Device fetcher configuration"`
 	MQTT             config.MQTT               `name:"mqtt" description:"MQTT configuration"`
