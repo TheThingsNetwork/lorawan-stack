@@ -447,24 +447,39 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 	return mask, nil
 }
 
+type downlinkQueueOperation struct {
+	Items             []*ttnpb.ApplicationDownlink
+	Operation         func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)
+	SkipSessionKeyIDs [][]byte
+}
+
+func (d downlinkQueueOperation) shouldSkip(sessionKeyID []byte) bool {
+	for _, id := range d.SkipSessionKeyIDs {
+		if bytes.Equal(id, sessionKeyID) {
+			return true
+		}
+	}
+	return false
+}
+
 const maxDownlinkQueueOperationAttempts = 50
 
-func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error), link *ttnpb.ApplicationLink, peer cluster.Peer) ([]string, error) {
+func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, peer cluster.Peer, op downlinkQueueOperation) ([]string, error) {
 	pc, err := peer.Conn()
 	if err != nil {
 		return nil, err
 	}
 	mask := make([]string, 0, 2)
-	attempt := 0
+	attempt := 1
 	for {
 		ctx := log.NewContextWithField(ctx, "attempt", attempt)
 
 		sessions := make([]*ttnpb.Session, 0, 2)
-		if dev.Session != nil {
+		if dev.Session != nil && !op.shouldSkip(dev.Session.SessionKeyID) {
 			sessions = append(sessions, dev.Session)
 			mask = append(mask, "session.last_a_f_cnt_down")
 		}
-		if dev.PendingSession != nil {
+		if dev.PendingSession != nil && !op.shouldSkip(dev.PendingSession.SessionKeyID) {
 			// Downlink can be encrypted with the pending session while the device first joined but not confirmed the
 			// session by sending an uplink.
 			sessions = append(sessions, dev.PendingSession)
@@ -474,12 +489,12 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, ids ttn
 			return nil, errNoDeviceSession.New()
 		}
 
-		encryptedItems, err := as.encodeAndEncryptDownlinks(ctx, dev, link, items, sessions)
+		encryptedItems, err := as.encodeAndEncryptDownlinks(ctx, dev, link, op.Items, sessions)
 		if err != nil {
 			return nil, err
 		}
-		_, err = op(ttnpb.NewAsNsClient(pc), ctx, &ttnpb.DownlinkQueueRequest{
-			EndDeviceIdentifiers: ids,
+		_, err = op.Operation(ttnpb.NewAsNsClient(pc), ctx, &ttnpb.DownlinkQueueRequest{
+			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 			Downlinks:            encryptedItems,
 		}, as.WithClusterAuth())
 		if err == nil {
@@ -525,7 +540,10 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
-			mask, err := as.attemptDownlinkQueueOp(ctx, ids, dev, items, op, link, peer)
+			mask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
+				Items:     items,
+				Operation: op,
+			})
 			if err != nil {
 				return nil, nil, err
 			}
@@ -757,17 +775,18 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				return dev, mask, nil
 			}
 
-			if session := dev.Session; session != nil {
-				session.LastAFCntDown = items[0].FCnt - 1
-				mask = append(mask, "session.last_a_f_cnt_down")
-			}
-
-			replaceMask, err := as.attemptDownlinkQueueOp(ctx, ids, dev, items, ttnpb.AsNsClient.DownlinkQueueReplace, link, peer)
+			pushMask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
+				Items:     items,
+				Operation: ttnpb.AsNsClient.DownlinkQueuePush,
+				// The session from which the downlinks originate already contains them. As such
+				// we don't need to push them there.
+				SkipSessionKeyIDs: [][]byte{items[0].SessionKeyID},
+			})
 			if err != nil {
 				as.registerDropDownlinks(ctx, ids, items, err)
 				return nil, nil, err
 			}
-			mask = append(mask, replaceMask...)
+			mask = append(mask, pushMask...)
 
 			return dev, mask, nil
 		},
@@ -932,7 +951,10 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 				return dev, mask, nil
 			}
 
-			pushMask, err := as.attemptDownlinkQueueOp(ctx, ids, dev, items, ttnpb.AsNsClient.DownlinkQueuePush, link, peer)
+			pushMask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
+				Items:     items,
+				Operation: ttnpb.AsNsClient.DownlinkQueuePush,
+			})
 			if err != nil {
 				as.registerDropDownlinks(ctx, ids, items, err)
 				return nil, nil, err
@@ -978,7 +1000,10 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 			}
 
 			items := []*ttnpb.ApplicationDownlink{msg}
-			pushMask, err := as.attemptDownlinkQueueOp(ctx, ids, dev, items, ttnpb.AsNsClient.DownlinkQueuePush, link, peer)
+			pushMask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
+				Items:     items,
+				Operation: ttnpb.AsNsClient.DownlinkQueuePush,
+			})
 			if err != nil {
 				as.registerDropDownlinks(ctx, ids, items, err)
 				return nil, nil, err
