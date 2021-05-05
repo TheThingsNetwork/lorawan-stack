@@ -23,8 +23,12 @@ import (
 )
 
 func main() {
-	if err := commands.Root.Execute(); err != nil {
+	cmd, err := commands.Root.ExecuteC()
+	if err != nil {
 		errors.PrintStack(os.Stderr, err)
 		os.Exit(-1)
+	}
+	if cmd.Run == nil && cmd.RunE == nil {
+		os.Exit(2)
 	}
 }

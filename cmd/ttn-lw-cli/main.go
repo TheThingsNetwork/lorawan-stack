@@ -24,11 +24,15 @@ import (
 )
 
 func main() {
-	if err := commands.Root.Execute(); err != nil {
+	cmd, err := commands.Root.ExecuteC()
+	if err != nil {
 		if errors.IsCanceled(err) {
 			os.Exit(130)
 		}
 		cli_errors.PrintStack(os.Stderr, err)
 		os.Exit(-1)
+	}
+	if cmd.Run == nil && cmd.RunE == nil {
+		os.Exit(2)
 	}
 }
