@@ -15,6 +15,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import Link from '@ttn-lw/components/link'
 import LocationMap from '@ttn-lw/components/map'
 import WidgetContainer from '@ttn-lw/components/widget-container'
 
@@ -73,7 +74,7 @@ export default class MapWidget extends React.Component {
   }
 
   render() {
-    const { path } = this.props
+    const { path, markers } = this.props
 
     return (
       <WidgetContainer
@@ -81,7 +82,9 @@ export default class MapWidget extends React.Component {
         toAllUrl={path}
         linkMessage={sharedMessages.changeLocation}
       >
-        {this.Map}
+        <Link to={path} disabled={markers && markers.length > 0}>
+          {this.Map}
+        </Link>
       </WidgetContainer>
     )
   }

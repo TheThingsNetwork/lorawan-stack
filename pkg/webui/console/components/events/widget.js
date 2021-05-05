@@ -15,6 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
+import Link from '@ttn-lw/components/link'
 import WidgetContainer from '@ttn-lw/components/widget-container'
 import Status from '@ttn-lw/components/status'
 
@@ -43,18 +44,22 @@ const EventsWidget = ({ toAllUrl, className, events, scoped, entityId }) => {
       linkMessage={m.seeAllActivity}
       className={className}
     >
-      <div className={classnames(style.body, style.widgetContainer)} data-test-id="events-widget">
-        {events.length === 0 ? (
-          <EmptyMessage entityId={entityId} />
-        ) : (
-          <ol>
-            {events.slice(0, 6).map(event => {
-              const eventId = getEventId(event)
-              return <Event event={event} eventId={eventId} key={eventId} scoped={scoped} widget />
-            })}
-          </ol>
-        )}
-      </div>
+      <Link to={toAllUrl}>
+        <div className={classnames(style.body, style.widgetContainer)} data-test-id="events-widget">
+          {events.length === 0 ? (
+            <EmptyMessage entityId={entityId} />
+          ) : (
+            <ol>
+              {events.slice(0, 6).map(event => {
+                const eventId = getEventId(event)
+                return (
+                  <Event event={event} eventId={eventId} key={eventId} scoped={scoped} widget />
+                )
+              })}
+            </ol>
+          )}
+        </div>
+      </Link>
     </WidgetContainer>
   )
 }
