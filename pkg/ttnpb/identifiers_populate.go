@@ -69,7 +69,7 @@ func NewPopulatedEndDeviceIdentifiers(r randyIdentifiers, easy bool) *EndDeviceI
 
 func NewPopulatedOrganizationIdentifiers(r randyIdentifiers, _ bool) *OrganizationIdentifiers {
 	return &OrganizationIdentifiers{
-		OrganizationID: NewPopulatedID(r),
+		OrganizationId: NewPopulatedID(r),
 	}
 }
 

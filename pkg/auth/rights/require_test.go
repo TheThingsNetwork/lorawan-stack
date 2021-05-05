@@ -69,7 +69,7 @@ func requireRights(ctx context.Context, id string) (res struct {
 		wg.Done()
 	}()
 	go func() {
-		res.OrgErr = RequireOrganization(ctx, ttnpb.OrganizationIdentifiers{OrganizationID: id}, ttnpb.RIGHT_ORGANIZATION_INFO)
+		res.OrgErr = RequireOrganization(ctx, ttnpb.OrganizationIdentifiers{OrganizationId: id}, ttnpb.RIGHT_ORGANIZATION_INFO)
 		wg.Done()
 	}()
 	go func() {
@@ -117,7 +117,7 @@ func TestRequire(t *testing.T) {
 			unique.ID(fooCtx, ttnpb.GatewayIdentifiers{GatewayID: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO),
 		},
 		OrganizationRights: map[string]*ttnpb.Rights{
-			unique.ID(fooCtx, ttnpb.OrganizationIdentifiers{OrganizationID: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_INFO),
+			unique.ID(fooCtx, ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_INFO),
 		},
 		UserRights: map[string]*ttnpb.Rights{
 			unique.ID(fooCtx, ttnpb.UserIdentifiers{UserId: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO),

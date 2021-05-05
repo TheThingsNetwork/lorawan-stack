@@ -55,7 +55,7 @@ func TestIdentifiersIsZero(t *testing.T) {
 		EndDeviceIdentifiers{DevAddr: &devAddr},
 		GatewayIdentifiers{GatewayID: "foo"},
 		GatewayIdentifiers{EUI: &eui},
-		OrganizationIdentifiers{OrganizationID: "foo"},
+		OrganizationIdentifiers{OrganizationId: "foo"},
 		UserIdentifiers{UserId: "foo"},
 		UserIdentifiers{Email: "foo@example.com"},
 	} {
@@ -74,7 +74,7 @@ func TestOrganizationOrUserIdentifiers(t *testing.T) {
 	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
 	ouID = orgID.OrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
-	a.So(ouID.GetOrganizationIDs(), should.Resemble, orgID)
+	a.So(ouID.GetOrganizationIds(), should.Resemble, orgID)
 }
 
 func TestEntityIdentifiers(t *testing.T) {
@@ -103,12 +103,12 @@ func TestEntityIdentifiers(t *testing.T) {
 	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
 	eID = orgID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.GetOrganizationIDs(), should.Resemble, orgID)
+	a.So(eID.GetOrganizationIds(), should.Resemble, orgID)
 
 	ouID := orgID.OrganizationOrUserIdentifiers()
 	eID = ouID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.GetOrganizationIDs(), should.Resemble, orgID)
+	a.So(eID.GetOrganizationIds(), should.Resemble, orgID)
 
 	usrID := NewPopulatedUserIdentifiers(test.Randy, true)
 	eID = usrID.GetEntityIdentifiers()

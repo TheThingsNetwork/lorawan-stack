@@ -84,7 +84,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_CLIENTS_CREATE); err != nil {
 			return nil, err
 		}
-	} else if orgIDs := req.Collaborator.GetOrganizationIDs(); orgIDs != nil {
+	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
 		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.RIGHT_ORGANIZATION_CLIENTS_CREATE); err != nil {
 			return nil, err
 		}
@@ -196,7 +196,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_CLIENTS_LIST); err != nil {
 			return nil, err
 		}
-	} else if orgIDs := req.Collaborator.GetOrganizationIDs(); orgIDs != nil {
+	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
 		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.RIGHT_ORGANIZATION_CLIENTS_LIST); err != nil {
 			return nil, err
 		}

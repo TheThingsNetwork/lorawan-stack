@@ -62,8 +62,8 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
 				return true, nil
 			}
-		case *ttnpb.EntityIdentifiers_OrganizationIDs:
-			rights, err := rights.ListOrganization(ctx, *ids.OrganizationIDs)
+		case *ttnpb.EntityIdentifiers_OrganizationIds:
+			rights, err := rights.ListOrganization(ctx, *ids.OrganizationIds)
 			if err != nil {
 				return false, err
 			}

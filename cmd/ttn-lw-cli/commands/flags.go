@@ -58,7 +58,7 @@ func getCollaborator(flagSet *pflag.FlagSet) *ttnpb.OrganizationOrUserIdentifier
 	if userID != "" {
 		return ttnpb.UserIdentifiers{UserId: userID}.OrganizationOrUserIdentifiers()
 	}
-	return ttnpb.OrganizationIdentifiers{OrganizationID: organizationID}.OrganizationOrUserIdentifiers()
+	return ttnpb.OrganizationIdentifiers{OrganizationId: organizationID}.OrganizationOrUserIdentifiers()
 }
 
 func attributesFlags() *pflag.FlagSet {
@@ -196,7 +196,7 @@ func getEntityIdentifiersSlice(flagSet *pflag.FlagSet) []*ttnpb.EntityIdentifier
 		ids = append(ids, (&ttnpb.GatewayIdentifiers{GatewayID: gatewayID}).GetEntityIdentifiers())
 	}
 	for _, organizationID := range organizationIDs {
-		ids = append(ids, (&ttnpb.OrganizationIdentifiers{OrganizationID: organizationID}).GetEntityIdentifiers())
+		ids = append(ids, (&ttnpb.OrganizationIdentifiers{OrganizationId: organizationID}).GetEntityIdentifiers())
 	}
 	for _, userID := range userIDs {
 		ids = append(ids, (&ttnpb.UserIdentifiers{UserId: userID}).GetEntityIdentifiers())

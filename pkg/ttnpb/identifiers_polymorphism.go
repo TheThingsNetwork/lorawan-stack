@@ -67,8 +67,8 @@ func (ids *OrganizationIdentifiers) GetEntityIdentifiers() *EntityIdentifiers {
 	if ids == nil {
 		return nil
 	}
-	return &EntityIdentifiers{Ids: &EntityIdentifiers_OrganizationIDs{
-		OrganizationIDs: ids,
+	return &EntityIdentifiers{Ids: &EntityIdentifiers_OrganizationIds{
+		OrganizationIds: ids,
 	}}
 }
 
@@ -93,8 +93,8 @@ func (ids *OrganizationOrUserIdentifiers) GetEntityIdentifiers() *EntityIdentifi
 	switch oneof := ids.Ids.(type) {
 	case nil:
 		return nil
-	case *OrganizationOrUserIdentifiers_OrganizationIDs:
-		return oneof.OrganizationIDs.GetEntityIdentifiers()
+	case *OrganizationOrUserIdentifiers_OrganizationIds:
+		return oneof.OrganizationIds.GetEntityIdentifiers()
 	case *OrganizationOrUserIdentifiers_UserIds:
 		return oneof.UserIds.GetEntityIdentifiers()
 	default:
@@ -117,7 +117,7 @@ func (ids EndDeviceIdentifiers) IDString() string {
 func (ids GatewayIdentifiers) IDString() string { return ids.GatewayID }
 
 // IDString returns the ID string of this Identifier.
-func (ids OrganizationIdentifiers) IDString() string { return ids.OrganizationID }
+func (ids OrganizationIdentifiers) IDString() string { return ids.OrganizationId }
 
 // IDString returns the ID string of this Identifier.
 func (ids UserIdentifiers) IDString() string { return ids.UserId }
@@ -133,8 +133,8 @@ func (ids EntityIdentifiers) IDString() string {
 		return oneof.DeviceIDs.IDString()
 	case *EntityIdentifiers_GatewayIDs:
 		return oneof.GatewayIDs.IDString()
-	case *EntityIdentifiers_OrganizationIDs:
-		return oneof.OrganizationIDs.IDString()
+	case *EntityIdentifiers_OrganizationIds:
+		return oneof.OrganizationIds.IDString()
 	case *EntityIdentifiers_UserIds:
 		return oneof.UserIds.IDString()
 	default:
@@ -145,8 +145,8 @@ func (ids EntityIdentifiers) IDString() string {
 // IDString returns the ID string of the Identifiers inside the oneof.
 func (ids OrganizationOrUserIdentifiers) IDString() string {
 	switch oneof := ids.Ids.(type) {
-	case *OrganizationOrUserIdentifiers_OrganizationIDs:
-		return oneof.OrganizationIDs.IDString()
+	case *OrganizationOrUserIdentifiers_OrganizationIds:
+		return oneof.OrganizationIds.IDString()
 	case *OrganizationOrUserIdentifiers_UserIds:
 		return oneof.UserIds.IDString()
 	default:
@@ -183,8 +183,8 @@ func (ids EntityIdentifiers) EntityType() string {
 		return oneof.DeviceIDs.EntityType()
 	case *EntityIdentifiers_GatewayIDs:
 		return oneof.GatewayIDs.EntityType()
-	case *EntityIdentifiers_OrganizationIDs:
-		return oneof.OrganizationIDs.EntityType()
+	case *EntityIdentifiers_OrganizationIds:
+		return oneof.OrganizationIds.EntityType()
 	case *EntityIdentifiers_UserIds:
 		return oneof.UserIds.EntityType()
 	default:
@@ -195,8 +195,8 @@ func (ids EntityIdentifiers) EntityType() string {
 // EntityType returns the entity type for the Identifiers inside the oneof.
 func (ids OrganizationOrUserIdentifiers) EntityType() string {
 	switch oneof := ids.Ids.(type) {
-	case *OrganizationOrUserIdentifiers_OrganizationIDs:
-		return oneof.OrganizationIDs.EntityType()
+	case *OrganizationOrUserIdentifiers_OrganizationIds:
+		return oneof.OrganizationIds.EntityType()
 	case *OrganizationOrUserIdentifiers_UserIds:
 		return oneof.UserIds.EntityType()
 	default:

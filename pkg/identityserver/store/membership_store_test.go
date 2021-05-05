@@ -164,7 +164,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Organization",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: (&ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.OrganizationIdentifiers{OrganizationId: "test-org"}).GetEntityIdentifiers(),
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_ALL,
 					ttnpb.RIGHT_GATEWAY_ALL,
@@ -300,7 +300,7 @@ func TestMembershipStore(t *testing.T) {
 
 			err := store.SetMember(ctx,
 				orgIDs,
-				(&ttnpb.OrganizationIdentifiers{OrganizationID: "other-org"}).GetEntityIdentifiers(),
+				(&ttnpb.OrganizationIdentifiers{OrganizationId: "other-org"}).GetEntityIdentifiers(),
 				ttnpb.RightsFrom([]ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL}...),
 			)
 
@@ -339,7 +339,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Organization - user not found",
 				Identifiers:       userNotFoundIDs,
-				MemberIdentifiers: (&ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.OrganizationIdentifiers{OrganizationId: "test-org"}).GetEntityIdentifiers(),
 				EntityType:        "organization",
 			},
 			{
@@ -409,7 +409,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Organization - organization not found",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: (&ttnpb.OrganizationIdentifiers{OrganizationID: "test-org-not-found"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.OrganizationIdentifiers{OrganizationId: "test-org-not-found"}).GetEntityIdentifiers(),
 				EntityType:        "organization",
 			},
 			{
@@ -513,12 +513,12 @@ func TestDeleteEntityAndAccountMemberships(t *testing.T) {
 		err = store.DeleteAccountMembers(ctx, usrIDs)
 		a.So(err, should.BeNil)
 
-		_, err = store.GetMember(ctx, usrIDs, (&ttnpb.OrganizationIdentifiers{OrganizationID: org1.Account.UID}).GetEntityIdentifiers())
+		_, err = store.GetMember(ctx, usrIDs, (&ttnpb.OrganizationIdentifiers{OrganizationId: org1.Account.UID}).GetEntityIdentifiers())
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		_, err = store.GetMember(ctx, usrIDs, (&ttnpb.OrganizationIdentifiers{OrganizationID: org2.Account.UID}).GetEntityIdentifiers())
+		_, err = store.GetMember(ctx, usrIDs, (&ttnpb.OrganizationIdentifiers{OrganizationId: org2.Account.UID}).GetEntityIdentifiers())
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}

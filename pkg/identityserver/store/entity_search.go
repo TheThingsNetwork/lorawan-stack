@@ -212,7 +212,7 @@ func (s *entitySearch) FindOrganizations(ctx context.Context, member *ttnpb.Orga
 	}
 	identifiers := make([]*ttnpb.OrganizationIdentifiers, len(results))
 	for i, result := range results {
-		identifiers[i] = &ttnpb.OrganizationIdentifiers{OrganizationID: result.FriendlyID}
+		identifiers[i] = &ttnpb.OrganizationIdentifiers{OrganizationId: result.FriendlyID}
 	}
 	return identifiers, nil
 }

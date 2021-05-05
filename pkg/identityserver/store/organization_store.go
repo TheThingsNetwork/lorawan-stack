@@ -70,7 +70,7 @@ func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *ty
 func (s *organizationStore) CreateOrganization(ctx context.Context, org *ttnpb.Organization) (*ttnpb.Organization, error) {
 	defer trace.StartRegion(ctx, "create organization").End()
 	orgModel := Organization{
-		Account: Account{UID: org.OrganizationID}, // The ID is not mutated by fromPB.
+		Account: Account{UID: org.OrganizationId}, // The ID is not mutated by fromPB.
 	}
 	orgModel.fromPB(org, nil)
 	if err := s.createEntity(ctx, &orgModel); err != nil {
@@ -85,7 +85,7 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 	defer trace.StartRegion(ctx, "find organizations").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
-		idStrings[i] = id.GetOrganizationID()
+		idStrings[i] = id.GetOrganizationId()
 	}
 	query := s.query(ctx, Organization{}, withOrganizationID(idStrings...))
 	query = selectOrganizationFields(ctx, query, fieldMask)
@@ -111,7 +111,7 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 
 func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Organization, error) {
 	defer trace.StartRegion(ctx, "get organization").End()
-	query := s.query(ctx, Organization{}, withOrganizationID(id.GetOrganizationID()))
+	query := s.query(ctx, Organization{}, withOrganizationID(id.GetOrganizationId()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
 	var orgModel organizationWithUID
 	if err := query.First(&orgModel).Error; err != nil {
@@ -127,7 +127,7 @@ func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.Organ
 
 func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.Organization, fieldMask *types.FieldMask) (updated *ttnpb.Organization, err error) {
 	defer trace.StartRegion(ctx, "update organization").End()
-	query := s.query(ctx, Organization{}, withOrganizationID(org.GetOrganizationID()))
+	query := s.query(ctx, Organization{}, withOrganizationID(org.GetOrganizationId()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
 	var orgModel organizationWithUID
 	if err = query.First(&orgModel).Error; err != nil {
@@ -167,7 +167,7 @@ func (s *organizationStore) RestoreOrganization(ctx context.Context, id *ttnpb.O
 func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "purge organization").End()
 
-	query := s.query(ctx, Organization{}, withSoftDeleted(), withOrganizationID(id.GetOrganizationID()))
+	query := s.query(ctx, Organization{}, withSoftDeleted(), withOrganizationID(id.GetOrganizationId()))
 	query = selectOrganizationFields(ctx, query, nil)
 	var orgModel organizationWithUID
 	if err = query.First(&orgModel).Error; err != nil {

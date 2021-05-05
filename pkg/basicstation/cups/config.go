@@ -48,7 +48,7 @@ func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option)
 	case "user":
 		registerUnknownTo = ttnpb.UserIdentifiers{UserId: conf.RegisterUnknown.ID}.OrganizationOrUserIdentifiers()
 	case "organization":
-		registerUnknownTo = ttnpb.OrganizationIdentifiers{OrganizationID: conf.RegisterUnknown.ID}.OrganizationOrUserIdentifiers()
+		registerUnknownTo = ttnpb.OrganizationIdentifiers{OrganizationId: conf.RegisterUnknown.ID}.OrganizationOrUserIdentifiers()
 	}
 	if registerUnknownTo != nil && conf.RegisterUnknown.APIKey != "" {
 		opts = append(opts,

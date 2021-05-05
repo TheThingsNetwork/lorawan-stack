@@ -260,7 +260,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 		}
 
 		modifiedOrganizationID := organizationID
-		modifiedOrganizationID.OrganizationID = reverse(modifiedOrganizationID.OrganizationID)
+		modifiedOrganizationID.OrganizationId = reverse(modifiedOrganizationID.OrganizationId)
 
 		rights, err = reg.ListRights(ctx, &modifiedOrganizationID, creds)
 
@@ -350,6 +350,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 		}
 	})
 }
+
 func TestOrganizationAccessRights(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()

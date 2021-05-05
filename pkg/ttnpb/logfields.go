@@ -47,7 +47,7 @@ func (ids *OrganizationIdentifiers) ExtractRequestFields(m map[string]interface{
 	if ids == nil {
 		return
 	}
-	m["organization_id"] = ids.OrganizationID
+	m["organization_id"] = ids.OrganizationId
 }
 
 func (ids *UserIdentifiers) ExtractRequestFields(m map[string]interface{}) {
@@ -63,8 +63,8 @@ func extractCollaboratorFields(m map[string]interface{}, ids *OrganizationOrUser
 	}
 	switch oneof := ids.Ids.(type) {
 	case nil:
-	case *OrganizationOrUserIdentifiers_OrganizationIDs:
-		m["collaborator_organization_id"] = oneof.OrganizationIDs.OrganizationID
+	case *OrganizationOrUserIdentifiers_OrganizationIds:
+		m["collaborator_organization_id"] = oneof.OrganizationIds.OrganizationId
 	case *OrganizationOrUserIdentifiers_UserIds:
 		m["collaborator_user_id"] = oneof.UserIds.UserId
 	default:
