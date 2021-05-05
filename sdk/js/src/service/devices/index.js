@@ -115,7 +115,7 @@ class Devices {
     return device
   }
 
-  async _getDevice(applicationId, deviceId, paths, ignoreNotFound, mergeResult = true) {
+  async _getDevice(applicationId, deviceId, paths, ignoreNotFound, mergeResult = true, components) {
     if (!applicationId) {
       throw new Error('Missing application_id for device.')
     }
@@ -124,7 +124,7 @@ class Devices {
       throw new Error('Missing device_id for device.')
     }
 
-    const requestTree = splitGetPaths(paths)
+    const requestTree = splitGetPaths(paths, undefined, components)
 
     const params = {
       routeParams: {
@@ -246,15 +246,18 @@ class Devices {
    * @param {string} applicationId - The Application ID.
    * @param {string} deviceId - The Device ID.
    * @param {Array} selector - The list of end device fields to fetch.
+   * @param {Array} components - A whitelist of components to source the
+   * data from. Selects all by default.
    * @returns {object} - End device on successful requests, an error otherwise.
    */
-  async getById(applicationId, deviceId, selector = [['ids']]) {
+  async getById(applicationId, deviceId, selector = [['ids']], components) {
     const deviceParts = await this._getDevice(
       applicationId,
       deviceId,
       Marshaler.selectorToPaths(selector),
       false,
       false,
+      components,
     )
 
     const errors = deviceParts.filter(part => {
