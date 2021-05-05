@@ -248,7 +248,7 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 		return err
 	}
 	if len(unmatched) > 0 {
-		return errUnknownSession.New()
+		return errUnknownSession.WithDetails(makeDownlinkQueueOperationErrorDetails())
 	}
 	return nil
 }
