@@ -17,7 +17,7 @@ import { mergeWith, merge } from 'lodash'
 import { getCombinedDeviceId, combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 import getByPath from '@ttn-lw/lib/get-by-path'
 
-import { parseLorawanMacVersion } from '@console/lib/device-utils'
+import { parseLorawanMacVersion, getLastSeen } from '@console/lib/device-utils'
 
 import {
   GET_DEV,
@@ -76,21 +76,14 @@ const devices = (state = defaultState, { type, payload, event }) => {
       }
 
       // Update derived last seen value if possible.
-      const { mac_state, session } = payload
       const derived = {}
-      if (mac_state) {
-        const { recent_uplinks } = mac_state
-        if (recent_uplinks) {
-          const last_uplink = Boolean(recent_uplinks)
-            ? recent_uplinks[recent_uplinks.length - 1]
-            : undefined
-          if (last_uplink) {
-            derived.lastSeen = last_uplink.received_at
-          }
-        }
+      const lastSeen = getLastSeen(payload)
+      if (lastSeen) {
+        derived.lastSeen = lastSeen
       }
 
       // Update uplink and downlink frame counts if possible.
+      const { session } = payload
       if (session) {
         derived.uplinkFrameCount = session.last_f_cnt_up
         if (parseLorawanMacVersion(lorawanVersion) < 110) {
@@ -105,20 +98,27 @@ const devices = (state = defaultState, { type, payload, event }) => {
 
       return mergeDerived(updatedState, id, derived)
     case GET_DEVICES_LIST_SUCCESS:
-      const entities = payload.entities.reduce(
+      return payload.entities.reduce(
         (acc, dev) => {
           const id = getCombinedDeviceId(dev)
+          acc.entities[id] = dev
 
-          acc[id] = dev
+          // Update derived last seen value if possible.
+          const derived = {}
+          const lastSeen = getLastSeen(dev)
+          if (lastSeen) {
+            derived.lastSeen = lastSeen
+          }
+          if (acc.derived[id]) {
+            acc.derived[id] = { ...acc.derived[id], ...derived }
+          } else {
+            acc.derived[id] = derived
+          }
+
           return acc
         },
-        { ...state.entities },
+        { ...state },
       )
-
-      return {
-        ...state,
-        entities,
-      }
     case GET_APP_EVENT_MESSAGE_SUCCESS:
       // Detect heartbeat events to update last seen state.
       if (heartbeatEvents.includes(event.name)) {
