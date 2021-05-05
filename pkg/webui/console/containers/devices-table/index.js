@@ -18,12 +18,14 @@ import bind from 'autobind-decorator'
 
 import Button from '@ttn-lw/components/button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
+import Status from '@ttn-lw/components/status'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
-import DateTime from '@ttn-lw/lib/components/date-time'
 import withRequest from '@ttn-lw/lib/components/with-request'
+
+import LastSeen from '@console/components/last-seen'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
@@ -50,6 +52,7 @@ import {
   selectDevicesTotalCount,
   selectDevicesFetching,
   selectDevicesError,
+  selectDeviceDerivedLastSeen,
 } from '@console/store/selectors/devices'
 
 import style from './devices-table.styl'
@@ -89,24 +92,28 @@ const headers = [
       ),
   },
   {
-    name: 'created_at',
-    displayName: sharedMessages.created,
-    sortable: true,
-    width: 12,
-    render: datetime => <DateTime.Relative value={datetime} />,
+    name: '_derivedLastSeen',
+    displayName: sharedMessages.lastSeen,
+    width: 14,
+    render: lastSeen =>
+      lastSeen ? (
+        <Status status="good">
+          <LastSeen lastSeen={lastSeen} short />
+        </Status>
+      ) : (
+        <Status status="mediocre" label={sharedMessages.unknown} />
+      ),
   },
 ]
 
 @connect(
-  state => {
-    return {
-      appId: selectSelectedApplicationId(state),
-      deviceTemplateFormats: selectDeviceTemplateFormats(state),
-      mayCreateDevices: checkFromState(mayCreateOrEditApplicationDevices, state),
-      error: getDeviceTemplateFormatsError(state),
-      fetching: getDeviceTemplateFormatsFetching(state),
-    }
-  },
+  state => ({
+    appId: selectSelectedApplicationId(state),
+    deviceTemplateFormats: selectDeviceTemplateFormats(state),
+    mayCreateDevices: checkFromState(mayCreateOrEditApplicationDevices, state),
+    error: getDeviceTemplateFormatsError(state),
+    fetching: getDeviceTemplateFormatsFetching(state),
+  }),
   { getDeviceTemplateFormats },
 )
 @withFeatureRequirement(mayViewApplicationDevices)
@@ -132,14 +139,23 @@ class DevicesTable extends React.Component {
   constructor(props) {
     super(props)
 
-    this.getDevicesList = filters => getDevicesList(props.appId, filters, ['name'])
+    this.getDevicesList = filters =>
+      getDevicesList(props.appId, filters, ['name'], { withLastSeen: true })
   }
 
   @bind
   baseDataSelector(state) {
-    const { mayCreateDevices } = this.props
+    const { mayCreateDevices, appId } = this.props
+    const devices = selectDevices(state)
+    const decoratedDevices = []
+    for (const device of devices) {
+      decoratedDevices.push({
+        ...device,
+        _derivedLastSeen: selectDeviceDerivedLastSeen(state, appId, device.ids.device_id),
+      })
+    }
     return {
-      devices: selectDevices(state),
+      devices: decoratedDevices,
       totalCount: selectDevicesTotalCount(state),
       fetching: selectDevicesFetching(state),
       error: selectDevicesError(state),
