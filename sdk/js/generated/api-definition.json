@@ -62,6 +62,15 @@
             "api_key.id"
           ]
         }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "expires_at",
+        "id",
+        "key",
+        "name",
+        "rights",
+        "updated_at"
       ]
     },
     "GetCollaborator": {
@@ -2448,6 +2457,15 @@
             "api_key.id"
           ]
         }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "expires_at",
+        "id",
+        "key",
+        "name",
+        "rights",
+        "updated_at"
       ]
     },
     "GetCollaborator": {
@@ -4183,6 +4201,15 @@
             "api_key.id"
           ]
         }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "expires_at",
+        "id",
+        "key",
+        "name",
+        "rights",
+        "updated_at"
       ]
     },
     "GetCollaborator": {
@@ -4860,6 +4887,15 @@
             "api_key.id"
           ]
         }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "expires_at",
+        "id",
+        "key",
+        "name",
+        "rights",
+        "updated_at"
       ]
     },
     "CreateLoginToken": {

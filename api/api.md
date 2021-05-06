@@ -625,6 +625,7 @@ Application is the message that defines an Application in the network.
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 | `name` | [`string`](#string) |  |  |
 | `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated |  |
+| `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 
 #### Field Rules
 
@@ -633,6 +634,7 @@ Application is the message that defines an Application in the network.
 | `application_ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `rights` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+| `expires_at` | <p>`timestamp.gt_now`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateApplicationRequest">Message `CreateApplicationRequest`</a>
 
@@ -756,6 +758,7 @@ Application is the message that defines an Application in the network.
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 | `api_key` | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the api key fields that should be updated. |
 
 #### Field Rules
 
@@ -3526,6 +3529,7 @@ The Events service serves events from the cluster.
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | `name` | [`string`](#string) |  |  |
 | `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated |  |
+| `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 
 #### Field Rules
 
@@ -3534,6 +3538,7 @@ The Events service serves events from the cluster.
 | `gateway_ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `rights` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+| `expires_at` | <p>`timestamp.gt_now`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateGatewayRequest">Message `CreateGatewayRequest`</a>
 
@@ -3920,6 +3925,7 @@ Identifies an end device model with version information.
 | ----- | ---- | ----- | ----------- |
 | `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | `api_key` | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the api key fields that should be updated. |
 
 #### Field Rules
 
@@ -6606,6 +6612,7 @@ is used to manage OAuth client authorizations for users.
 | `organization_ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
 | `name` | [`string`](#string) |  |  |
 | `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated |  |
+| `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 
 #### Field Rules
 
@@ -6614,6 +6621,7 @@ is used to manage OAuth client authorizations for users.
 | `organization_ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `rights` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+| `expires_at` | <p>`timestamp.gt_now`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateOrganizationRequest">Message `CreateOrganizationRequest`</a>
 
@@ -6773,6 +6781,7 @@ is used to manage OAuth client authorizations for users.
 | ----- | ---- | ----- | ----------- |
 | `organization_ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
 | `api_key` | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the api key fields that should be updated. |
 
 #### Field Rules
 
@@ -7281,6 +7290,7 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated | Rights that are granted to this API key. |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 
 #### Field Rules
 
@@ -7288,6 +7298,7 @@ The Pba service allows clients to manage peering through Packet Broker.
 | ----- | ----------- |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `rights` | <p>`repeated.items.enum.defined_only`: `true`</p> |
+| `expires_at` | <p>`timestamp.gt_now`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.APIKeys">Message `APIKeys`</a>
 
@@ -7708,6 +7719,7 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
 | `name` | [`string`](#string) |  |  |
 | `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated |  |
+| `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 
 #### Field Rules
 
@@ -7716,6 +7728,7 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `user_ids` | <p>`message.required`: `true`</p> |
 | `name` | <p>`string.max_len`: `50`</p> |
 | `rights` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+| `expires_at` | <p>`timestamp.gt_now`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateUserRequest">Message `CreateUserRequest`</a>
 
@@ -7889,6 +7902,7 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | ----- | ---- | ----- | ----------- |
 | `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
 | `api_key` | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the api key fields that should be updated. |
 
 #### Field Rules
 

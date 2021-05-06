@@ -194,6 +194,21 @@ func (m *APIKey) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "expires_at":
+
+			if ts := m.GetExpiresAt(); ts != nil {
+
+				now := time.Now()
+
+				if ts.Sub(now) <= 0 {
+					return APIKeyValidationError{
+						field:  "expires_at",
+						reason: "value must be greater than now",
+					}
+				}
+
+			}
+
 		default:
 			return APIKeyValidationError{
 				field:  name,

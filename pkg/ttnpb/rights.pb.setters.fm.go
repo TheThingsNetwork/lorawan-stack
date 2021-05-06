@@ -89,6 +89,15 @@ func (dst *APIKey) SetFields(src *APIKey, paths ...string) error {
 				var zero time.Time
 				dst.UpdatedAt = zero
 			}
+		case "expires_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'expires_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ExpiresAt = src.ExpiresAt
+			} else {
+				dst.ExpiresAt = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

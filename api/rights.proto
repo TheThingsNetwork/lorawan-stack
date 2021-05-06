@@ -184,6 +184,7 @@ message APIKey {
 
   google.protobuf.Timestamp created_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp expires_at = 7 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true, (validate.rules).timestamp.gt_now = true];
 }
 
 message APIKeys {

@@ -1403,6 +1403,21 @@ func (m *CreateUserAPIKeyRequest) ValidateFields(paths ...string) error {
 
 			}
 
+		case "expires_at":
+
+			if ts := m.GetExpiresAt(); ts != nil {
+
+				now := time.Now()
+
+				if ts.Sub(now) <= 0 {
+					return CreateUserAPIKeyRequestValidationError{
+						field:  "expires_at",
+						reason: "value must be greater than now",
+					}
+				}
+
+			}
+
 		default:
 			return CreateUserAPIKeyRequestValidationError{
 				field:  name,
@@ -1502,6 +1517,18 @@ func (m *UpdateUserAPIKeyRequest) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateUserAPIKeyRequestValidationError{
 						field:  "api_key",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UpdateUserAPIKeyRequestValidationError{
+						field:  "field_mask",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
