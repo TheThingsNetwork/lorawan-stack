@@ -22,6 +22,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- OAuth token exchange for OAuth clients that use Basic auth.
+
 ### Security
 
 ## [3.12.3] - 2021-05-06

@@ -239,7 +239,10 @@ func (s *server) Token(c echo.Context) error {
 	if err := c.Bind(&tokenRequest); err != nil {
 		return err
 	}
-	if err := tokenRequest.ValidateContext(c.Request().Context()); err != nil {
+	if username, password, ok := req.BasicAuth(); ok {
+		tokenRequest.ClientID, tokenRequest.ClientSecret = username, password
+	}
+	if err := tokenRequest.ValidateContext(req.Context()); err != nil {
 		return err
 	}
 
