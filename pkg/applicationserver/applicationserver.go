@@ -994,6 +994,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 	}
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
+			"formatters",
 			"pending_session",
 			"session",
 			"skip_payload_crypto_override",
@@ -1015,7 +1016,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 			}
 
 			// Decrypt the message as it will be sent to upstream after handling it.
-			if err := as.decryptDownlinkMessage(ctx, ids, msg, link); err != nil {
+			if err := as.decryptAndDecodeDownlink(ctx, dev, msg, link.DefaultFormatters); err != nil {
 				return nil, nil, err
 			}
 
