@@ -733,10 +733,10 @@ func (dst *ApplicationPubSub_MQTTProvider) SetFields(src *ApplicationPubSub_MQTT
 				return fmt.Errorf("'client_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ClientID = src.ClientID
+				dst.ClientId = src.ClientId
 			} else {
 				var zero string
-				dst.ClientID = zero
+				dst.ClientId = zero
 			}
 		case "username":
 			if len(subs) > 0 {

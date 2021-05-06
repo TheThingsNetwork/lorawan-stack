@@ -142,7 +142,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Client",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientID: "test-cli"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientId: "test-cli"}).GetEntityIdentifiers(),
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_CLIENT_ALL,
@@ -192,7 +192,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Client",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientID: "test-cli"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientId: "test-cli"}).GetEntityIdentifiers(),
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_CLIENT_ALL,
@@ -327,7 +327,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Client - user not found",
 				Identifiers:       userNotFoundIDs,
-				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientID: "test-cli"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientId: "test-cli"}).GetEntityIdentifiers(),
 				EntityType:        "client",
 			},
 			{
@@ -351,7 +351,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Client - organization not found",
 				Identifiers:       organizationNotFoundIDs,
-				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientID: "test-cli"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientId: "test-cli"}).GetEntityIdentifiers(),
 				EntityType:        "client",
 			},
 			{
@@ -397,7 +397,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Client - client not found",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientID: "test-cli-not-found"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientId: "test-cli-not-found"}).GetEntityIdentifiers(),
 				EntityType:        "client",
 			},
 			{
@@ -421,7 +421,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Client - client not found",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientID: "test-cli-not-found"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ClientIdentifiers{ClientId: "test-cli-not-found"}).GetEntityIdentifiers(),
 				EntityType:        "client",
 			},
 			{

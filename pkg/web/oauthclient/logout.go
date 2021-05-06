@@ -89,7 +89,7 @@ func (oc *OAuthClient) HandleLogout(c echo.Context) error {
 			if tokenInfo := res.GetOAuthAccessToken(); tokenInfo != nil {
 				_, err := ttnpb.NewOAuthAuthorizationRegistryClient(cc).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
 					UserIds:   tokenInfo.UserIds,
-					ClientIDs: tokenInfo.ClientIDs,
+					ClientIds: tokenInfo.ClientIds,
 					ID:        tokenInfo.ID,
 				}, creds)
 				if err != nil {

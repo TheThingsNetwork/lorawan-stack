@@ -620,7 +620,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 				return err
 			}
 			for _, auth := range authorizations {
-				tokens, err := oauthStore.ListAccessTokens(ctx, &auth.UserIds, &auth.ClientIDs)
+				tokens, err := oauthStore.ListAccessTokens(ctx, &auth.UserIds, &auth.ClientIds)
 				if err != nil {
 					return err
 				}

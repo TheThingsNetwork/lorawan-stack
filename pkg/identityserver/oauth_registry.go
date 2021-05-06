@@ -54,7 +54,7 @@ func (is *IdentityServer) listOAuthAccessTokens(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 	accessToken := authInfo.GetOAuthAccessToken()
-	if accessToken == nil || accessToken.UserIds.UserId != req.UserIds.UserId || accessToken.ClientIDs.ClientID != req.ClientIDs.ClientID {
+	if accessToken == nil || accessToken.UserIds.UserId != req.UserIds.UserId || accessToken.ClientIds.ClientId != req.ClientIds.ClientId {
 		if err := rights.RequireUser(ctx, req.UserIds, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 			return nil, err
 		}
@@ -69,7 +69,7 @@ func (is *IdentityServer) listOAuthAccessTokens(ctx context.Context, req *ttnpb.
 	}()
 	tokens = &ttnpb.OAuthAccessTokens{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		tokens.Tokens, err = store.GetOAuthStore(db).ListAccessTokens(ctx, &req.UserIds, &req.ClientIDs)
+		tokens.Tokens, err = store.GetOAuthStore(db).ListAccessTokens(ctx, &req.UserIds, &req.ClientIds)
 		return err
 	})
 	for _, token := range tokens.Tokens {
@@ -86,7 +86,7 @@ func (is *IdentityServer) deleteOAuthAuthorization(ctx context.Context, req *ttn
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		return store.GetOAuthStore(db).DeleteAuthorization(ctx, &req.UserIds, &req.ClientIDs)
+		return store.GetOAuthStore(db).DeleteAuthorization(ctx, &req.UserIds, &req.ClientIds)
 	})
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 		return nil, err
 	}
 	accessToken := authInfo.GetOAuthAccessToken()
-	if accessToken == nil || accessToken.UserIds.UserId != req.UserIds.UserId || accessToken.ClientIDs.ClientID != req.ClientIDs.ClientID {
+	if accessToken == nil || accessToken.UserIds.UserId != req.UserIds.UserId || accessToken.ClientIds.ClientId != req.ClientIds.ClientId {
 		if err := rights.RequireUser(ctx, req.UserIds, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 			return nil, err
 		}
@@ -114,7 +114,7 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 			if err != nil {
 				return err
 			}
-			if accessToken.UserIds.UserId != req.UserIds.UserId || accessToken.ClientIDs.ClientID != req.ClientIDs.ClientID {
+			if accessToken.UserIds.UserId != req.UserIds.UserId || accessToken.ClientIds.ClientId != req.ClientIds.ClientId {
 				return errAccessTokenMismatch.New()
 			}
 		}

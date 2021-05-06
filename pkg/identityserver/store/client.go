@@ -116,7 +116,7 @@ var clientColumnNames = map[string][]string{
 }
 
 func (cli Client) toPB(pb *ttnpb.Client, fieldMask *types.FieldMask) {
-	pb.ClientIdentifiers.ClientID = cli.ClientID
+	pb.ClientIdentifiers.ClientId = cli.ClientID
 	pb.CreatedAt = cleanTime(cli.CreatedAt)
 	pb.UpdatedAt = cleanTime(cli.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(cli.DeletedAt)

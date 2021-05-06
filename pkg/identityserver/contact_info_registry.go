@@ -150,8 +150,8 @@ func (cir *contactInfoRegistry) RequestValidation(ctx context.Context, ids *ttnp
 	switch id := ids.GetIds().(type) {
 	case *ttnpb.EntityIdentifiers_ApplicationIDs:
 		err = rights.RequireApplication(ctx, *id.ApplicationIDs, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC)
-	case *ttnpb.EntityIdentifiers_ClientIDs:
-		err = rights.RequireClient(ctx, *id.ClientIDs, ttnpb.RIGHT_CLIENT_ALL)
+	case *ttnpb.EntityIdentifiers_ClientIds:
+		err = rights.RequireClient(ctx, *id.ClientIds, ttnpb.RIGHT_CLIENT_ALL)
 	case *ttnpb.EntityIdentifiers_GatewayIDs:
 		err = rights.RequireGateway(ctx, *id.GatewayIDs, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC)
 	case *ttnpb.EntityIdentifiers_OrganizationIds:

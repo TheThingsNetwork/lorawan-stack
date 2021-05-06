@@ -48,7 +48,7 @@ func (s *server) ClientLogout(c echo.Context) error {
 		return err
 	}
 	if at != nil {
-		client, err := s.store.GetClient(ctx, &at.ClientIDs, &types.FieldMask{Paths: []string{"logout_redirect_uris"}})
+		client, err := s.store.GetClient(ctx, &at.ClientIds, &types.FieldMask{Paths: []string{"logout_redirect_uris"}})
 		if err != nil {
 			return err
 		}

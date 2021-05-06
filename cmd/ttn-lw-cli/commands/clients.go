@@ -57,7 +57,7 @@ func getClientID(flagSet *pflag.FlagSet, args []string) *ttnpb.ClientIdentifiers
 	if clientID == "" {
 		return nil
 	}
-	return &ttnpb.ClientIdentifiers{ClientID: clientID}
+	return &ttnpb.ClientIdentifiers{ClientId: clientID}
 }
 
 var searchClientsFlags = func() *pflag.FlagSet {
@@ -187,10 +187,10 @@ var (
 				return err
 			}
 			client.Attributes = mergeAttributes(client.Attributes, cmd.Flags())
-			if cliID != nil && cliID.ClientID != "" {
-				client.ClientID = cliID.ClientID
+			if cliID != nil && cliID.ClientId != "" {
+				client.ClientId = cliID.ClientId
 			}
-			if client.ClientID == "" {
+			if client.ClientId == "" {
 				return errNoClientID
 			}
 

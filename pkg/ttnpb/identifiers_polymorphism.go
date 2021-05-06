@@ -37,8 +37,8 @@ func (ids *ClientIdentifiers) GetEntityIdentifiers() *EntityIdentifiers {
 	if ids == nil {
 		return nil
 	}
-	return &EntityIdentifiers{Ids: &EntityIdentifiers_ClientIDs{
-		ClientIDs: ids,
+	return &EntityIdentifiers{Ids: &EntityIdentifiers_ClientIds{
+		ClientIds: ids,
 	}}
 }
 
@@ -106,7 +106,7 @@ func (ids *OrganizationOrUserIdentifiers) GetEntityIdentifiers() *EntityIdentifi
 func (ids ApplicationIdentifiers) IDString() string { return ids.ApplicationID }
 
 // IDString returns the ID string of this Identifier.
-func (ids ClientIdentifiers) IDString() string { return ids.ClientID }
+func (ids ClientIdentifiers) IDString() string { return ids.ClientId }
 
 // IDString returns the ID string of this Identifier.
 func (ids EndDeviceIdentifiers) IDString() string {
@@ -127,8 +127,8 @@ func (ids EntityIdentifiers) IDString() string {
 	switch oneof := ids.Ids.(type) {
 	case *EntityIdentifiers_ApplicationIDs:
 		return oneof.ApplicationIDs.IDString()
-	case *EntityIdentifiers_ClientIDs:
-		return oneof.ClientIDs.IDString()
+	case *EntityIdentifiers_ClientIds:
+		return oneof.ClientIds.IDString()
 	case *EntityIdentifiers_DeviceIDs:
 		return oneof.DeviceIDs.IDString()
 	case *EntityIdentifiers_GatewayIDs:
@@ -177,8 +177,8 @@ func (ids EntityIdentifiers) EntityType() string {
 	switch oneof := ids.Ids.(type) {
 	case *EntityIdentifiers_ApplicationIDs:
 		return oneof.ApplicationIDs.EntityType()
-	case *EntityIdentifiers_ClientIDs:
-		return oneof.ClientIDs.EntityType()
+	case *EntityIdentifiers_ClientIds:
+		return oneof.ClientIds.EntityType()
 	case *EntityIdentifiers_DeviceIDs:
 		return oneof.DeviceIDs.EntityType()
 	case *EntityIdentifiers_GatewayIDs:

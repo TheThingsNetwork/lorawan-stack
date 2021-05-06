@@ -163,7 +163,7 @@ func (s *entitySearch) FindClients(ctx context.Context, member *ttnpb.Organizati
 	}
 	identifiers := make([]*ttnpb.ClientIdentifiers, len(results))
 	for i, result := range results {
-		identifiers[i] = &ttnpb.ClientIdentifiers{ClientID: result.FriendlyID}
+		identifiers[i] = &ttnpb.ClientIdentifiers{ClientId: result.FriendlyID}
 	}
 	return identifiers, nil
 }

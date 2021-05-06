@@ -174,7 +174,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 				}
 				return err
 			}
-			client, err := store.GetClientStore(db).GetClient(ctx, &accessToken.ClientIDs, clientFieldMask)
+			client, err := store.GetClientStore(db).GetClient(ctx, &accessToken.ClientIds, clientFieldMask)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)

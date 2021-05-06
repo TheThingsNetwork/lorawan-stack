@@ -38,8 +38,8 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
 				return true, nil
 			}
-		case *ttnpb.EntityIdentifiers_ClientIDs:
-			rights, err := rights.ListClient(ctx, *ids.ClientIDs)
+		case *ttnpb.EntityIdentifiers_ClientIds:
+			rights, err := rights.ListClient(ctx, *ids.ClientIds)
 			if err != nil {
 				return false, err
 			}

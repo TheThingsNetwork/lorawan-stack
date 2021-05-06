@@ -139,7 +139,7 @@ func TestClientAccessCRUD(t *testing.T) {
 		}
 
 		modifiedClientID := clientID
-		modifiedClientID.ClientID = reverse(modifiedClientID.ClientID)
+		modifiedClientID.ClientId = reverse(modifiedClientID.ClientId)
 
 		rights, err = reg.ListRights(ctx, &modifiedClientID, creds)
 

@@ -48,7 +48,7 @@ func logout() error {
 				logger.Info("Revoking the old OAuth token...")
 				_, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
 					UserIds:   tokenInfo.UserIds,
-					ClientIDs: tokenInfo.ClientIDs,
+					ClientIds: tokenInfo.ClientIds,
 					ID:        tokenInfo.ID,
 				})
 				if err != nil {

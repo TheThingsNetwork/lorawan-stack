@@ -33,8 +33,7 @@ import (
 
 var shutdownTimeout = (1 << 3) * time.Second
 
-type impl struct {
-}
+type impl struct{}
 
 type connection struct {
 	mqtt.Client
@@ -73,7 +72,7 @@ func (impl) OpenConnection(ctx context.Context, target provider.Target, enabler 
 	}
 	settings := Settings{
 		URL:      provider.MQTT.ServerURL,
-		ClientID: provider.MQTT.ClientID,
+		ClientID: provider.MQTT.ClientId,
 		Username: provider.MQTT.Username,
 		Password: provider.MQTT.Password,
 		TLS:      tlsConfig,

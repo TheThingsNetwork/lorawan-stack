@@ -511,7 +511,7 @@ func request_ClientRegistry_Delete_0(ctx context.Context, marshaler runtime.Mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client_id")
 	}
 
-	protoReq.ClientID, err = runtime.String(val)
+	protoReq.ClientId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_id", err)
@@ -538,7 +538,7 @@ func local_request_ClientRegistry_Delete_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client_id")
 	}
 
-	protoReq.ClientID, err = runtime.String(val)
+	protoReq.ClientId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_id", err)
@@ -565,7 +565,7 @@ func request_ClientRegistry_Restore_0(ctx context.Context, marshaler runtime.Mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client_id")
 	}
 
-	protoReq.ClientID, err = runtime.String(val)
+	protoReq.ClientId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_id", err)
@@ -592,7 +592,7 @@ func local_request_ClientRegistry_Restore_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client_id")
 	}
 
-	protoReq.ClientID, err = runtime.String(val)
+	protoReq.ClientId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_id", err)
@@ -619,7 +619,7 @@ func request_ClientRegistry_Purge_0(ctx context.Context, marshaler runtime.Marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client_id")
 	}
 
-	protoReq.ClientID, err = runtime.String(val)
+	protoReq.ClientId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_id", err)
@@ -646,7 +646,7 @@ func local_request_ClientRegistry_Purge_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client_id")
 	}
 
-	protoReq.ClientID, err = runtime.String(val)
+	protoReq.ClientId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_id", err)
@@ -673,7 +673,7 @@ func request_ClientAccess_ListRights_0(ctx context.Context, marshaler runtime.Ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client_id")
 	}
 
-	protoReq.ClientID, err = runtime.String(val)
+	protoReq.ClientId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_id", err)
@@ -700,7 +700,7 @@ func local_request_ClientAccess_ListRights_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client_id")
 	}
 
-	protoReq.ClientID, err = runtime.String(val)
+	protoReq.ClientId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_id", err)

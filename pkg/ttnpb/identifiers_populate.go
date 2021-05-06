@@ -44,7 +44,7 @@ func NewPopulatedApplicationIdentifiers(r randyIdentifiers, _ bool) *Application
 
 func NewPopulatedClientIdentifiers(r randyIdentifiers, _ bool) *ClientIdentifiers {
 	return &ClientIdentifiers{
-		ClientID: NewPopulatedID(r),
+		ClientId: NewPopulatedID(r),
 	}
 }
 

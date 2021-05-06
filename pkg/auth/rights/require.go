@@ -207,13 +207,13 @@ func RequireAny(ctx context.Context, ids ...*ttnpb.EntityIdentifiers) error {
 			if len(list.GetRights()) == 0 {
 				return ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids.ApplicationIDs))
 			}
-		case *ttnpb.EntityIdentifiers_ClientIDs:
-			list, err := ListClient(ctx, *ids.ClientIDs)
+		case *ttnpb.EntityIdentifiers_ClientIds:
+			list, err := ListClient(ctx, *ids.ClientIds)
 			if err != nil {
 				return err
 			}
 			if len(list.GetRights()) == 0 {
-				return ErrNoClientRights.WithAttributes("uid", unique.ID(ctx, ids.ClientIDs))
+				return ErrNoClientRights.WithAttributes("uid", unique.ID(ctx, ids.ClientIds))
 			}
 		case *ttnpb.EntityIdentifiers_DeviceIDs:
 			list, err := ListApplication(ctx, ids.DeviceIDs.ApplicationIdentifiers)

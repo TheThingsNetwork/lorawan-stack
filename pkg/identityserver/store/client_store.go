@@ -66,7 +66,7 @@ func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fi
 func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttnpb.Client, error) {
 	defer trace.StartRegion(ctx, "create client").End()
 	cliModel := Client{
-		ClientID: cli.ClientID, // The ID is not mutated by fromPB.
+		ClientID: cli.ClientId, // The ID is not mutated by fromPB.
 	}
 	cliModel.fromPB(cli, nil)
 	if err := s.createEntity(ctx, &cliModel); err != nil {
@@ -81,7 +81,7 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 	defer trace.StartRegion(ctx, "find clients").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
-		idStrings[i] = id.GetClientID()
+		idStrings[i] = id.GetClientId()
 	}
 	query := s.query(ctx, Client{}, withClientID(idStrings...))
 	query = selectClientFields(ctx, query, fieldMask)
@@ -107,7 +107,7 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 
 func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Client, error) {
 	defer trace.StartRegion(ctx, "get client").End()
-	query := s.query(ctx, Client{}, withClientID(id.GetClientID()))
+	query := s.query(ctx, Client{}, withClientID(id.GetClientId()))
 	query = selectClientFields(ctx, query, fieldMask)
 	var cliModel Client
 	if err := query.First(&cliModel).Error; err != nil {
@@ -123,7 +123,7 @@ func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers
 
 func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, fieldMask *types.FieldMask) (updated *ttnpb.Client, err error) {
 	defer trace.StartRegion(ctx, "update client").End()
-	query := s.query(ctx, Client{}, withClientID(cli.GetClientID()))
+	query := s.query(ctx, Client{}, withClientID(cli.GetClientId()))
 	query = selectClientFields(ctx, query, fieldMask)
 	var cliModel Client
 	if err = query.First(&cliModel).Error; err != nil {
@@ -162,7 +162,7 @@ func (s *clientStore) RestoreClient(ctx context.Context, id *ttnpb.ClientIdentif
 
 func (s *clientStore) PurgeClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
 	defer trace.StartRegion(ctx, "purge client").End()
-	query := s.query(ctx, Client{}, withSoftDeleted(), withClientID(id.GetClientID()))
+	query := s.query(ctx, Client{}, withSoftDeleted(), withClientID(id.GetClientId()))
 	query = selectClientFields(ctx, query, nil)
 	var cliModel Client
 	if err := query.First(&cliModel).Error; err != nil {
