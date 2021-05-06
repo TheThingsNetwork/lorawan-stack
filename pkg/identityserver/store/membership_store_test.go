@@ -153,7 +153,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Gateway",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayId: "test-gtw"}).GetEntityIdentifiers(),
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_INFO,
@@ -203,7 +203,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Gateway",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayId: "test-gtw"}).GetEntityIdentifiers(),
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_INFO,
@@ -333,7 +333,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Gateway - user not found",
 				Identifiers:       userNotFoundIDs,
-				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayId: "test-gtw"}).GetEntityIdentifiers(),
 				EntityType:        "gateway",
 			},
 			{
@@ -357,7 +357,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Gateway - organization not found",
 				Identifiers:       organizationNotFoundIDs,
-				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayId: "test-gtw"}).GetEntityIdentifiers(),
 				EntityType:        "gateway",
 			},
 		} {
@@ -403,7 +403,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Gateway - gateway not found",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw-not-found"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayId: "test-gtw-not-found"}).GetEntityIdentifiers(),
 				EntityType:        "gateway",
 			},
 			{
@@ -427,7 +427,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Gateway - gateway not found",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw-not-found"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.GatewayIdentifiers{GatewayId: "test-gtw-not-found"}).GetEntityIdentifiers(),
 				EntityType:        "gateway",
 			},
 		} {

@@ -69,7 +69,7 @@ func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb
 	if gatewayID == "" && requireID {
 		return nil, errNoGatewayID.New()
 	}
-	ids := &ttnpb.GatewayIdentifiers{GatewayID: gatewayID}
+	ids := &ttnpb.GatewayIdentifiers{GatewayId: gatewayID}
 	if gatewayEUIHex != "" {
 		var gatewayEUI ttntypes.EUI64
 		if err := gatewayEUI.UnmarshalText([]byte(gatewayEUIHex)); err != nil {
@@ -220,7 +220,7 @@ var (
 
 			cli := ttnpb.NewGatewayRegistryClient(is)
 
-			if gtwID.GatewayID == "" && gtwID.EUI != nil {
+			if gtwID.GatewayId == "" && gtwID.EUI != nil {
 				gtwID, err = cli.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 					EUI: *gtwID.EUI,
 				})
@@ -285,15 +285,15 @@ var (
 
 			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
 			if gtwID != nil {
-				if gtwID.GatewayID != "" {
-					gateway.GatewayID = gtwID.GatewayID
+				if gtwID.GatewayId != "" {
+					gateway.GatewayId = gtwID.GatewayId
 				}
 				if gtwID.EUI != nil {
 					gateway.EUI = gtwID.EUI
 				}
 			}
 
-			if gateway.GatewayID == "" {
+			if gateway.GatewayId == "" {
 				return errNoGatewayID.New()
 			}
 

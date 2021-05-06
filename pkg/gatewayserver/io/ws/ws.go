@@ -177,7 +177,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			auth = fmt.Sprintf("Bearer %s", auth)
 		}
 		md = metadata.New(map[string]string{
-			"id":            ids.GatewayID,
+			"id":            ids.GatewayId,
 			"authorization": auth,
 		})
 	}

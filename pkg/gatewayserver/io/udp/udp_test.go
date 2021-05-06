@@ -40,7 +40,7 @@ import (
 )
 
 var (
-	registeredGatewayID = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+	registeredGatewayID = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 
 	timeout = (1 << 4) * test.Delay
 

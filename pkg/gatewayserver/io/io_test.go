@@ -46,7 +46,7 @@ func TestFlow(t *testing.T) {
 	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	gs := mock.NewServer(c)
 
-	ids := ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}
+	ids := ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}
 	antennaGain := float32(3)
 	gtw := &ttnpb.Gateway{
 		GatewayIdentifiers: ids,
@@ -140,7 +140,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -162,7 +162,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -188,7 +188,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -219,7 +219,7 @@ func TestFlow(t *testing.T) {
 				Path: &ttnpb.DownlinkPath_Fixed{
 					Fixed: &ttnpb.GatewayAntennaIdentifiers{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "foo-gateway",
+							GatewayId: "foo-gateway",
 						},
 					},
 				},
@@ -244,7 +244,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -270,7 +270,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -297,7 +297,7 @@ func TestFlow(t *testing.T) {
 				Path: &ttnpb.DownlinkPath_Fixed{
 					Fixed: &ttnpb.GatewayAntennaIdentifiers{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "foo-gateway",
+							GatewayId: "foo-gateway",
 						},
 					},
 				},
@@ -322,7 +322,7 @@ func TestFlow(t *testing.T) {
 				Path: &ttnpb.DownlinkPath_Fixed{
 					Fixed: &ttnpb.GatewayAntennaIdentifiers{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "foo-gateway",
+							GatewayId: "foo-gateway",
 						},
 					},
 				},
@@ -365,7 +365,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -391,7 +391,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}},
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -460,7 +460,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	gs := mock.NewServer(c)
 
-	ids := ttnpb.GatewayIdentifiers{GatewayID: "bar-gateway"}
+	ids := ttnpb.GatewayIdentifiers{GatewayId: "bar-gateway"}
 	antennaGain := float32(3)
 	gtw := &ttnpb.Gateway{
 		GatewayIdentifiers: ids,
@@ -527,7 +527,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "bar-gateway"}},
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "bar-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),

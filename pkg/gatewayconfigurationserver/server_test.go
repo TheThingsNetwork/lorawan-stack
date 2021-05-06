@@ -46,7 +46,7 @@ import (
 )
 
 var (
-	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 	registeredGatewayUID = unique.ID(test.Context(), registeredGatewayID)
 	registeredGatewayKey = "test-key"
 
@@ -144,7 +144,7 @@ func TestWeb(t *testing.T) {
 			},
 			{
 				Name:       "InvalidIDAndKey",
-				ID:         ttnpb.GatewayIdentifiers{GatewayID: "--invalid-id"},
+				ID:         ttnpb.GatewayIdentifiers{GatewayId: "--invalid-id"},
 				Key:        "invalid key",
 				ExpectCode: http.StatusBadRequest,
 			},
@@ -154,7 +154,7 @@ func TestWeb(t *testing.T) {
 					a := assertions.New(t)
 					url := fmt.Sprintf(
 						"/api/v3/gcs/gateways/%s/semtechudp/global_conf.json",
-						tc.ID.GatewayID,
+						tc.ID.GatewayId,
 					)
 					body := bytes.NewReader([]byte(`{"downlinks":[]}`))
 					req := httptest.NewRequest(http.MethodGet, url, body).WithContext(test.Context())
@@ -182,7 +182,7 @@ func TestWeb(t *testing.T) {
 					a := assertions.New(t)
 					url := fmt.Sprintf(
 						"/api/v3/gcs/gateways/%s/kerlink-cpf/lorad/lorad.json",
-						tc.ID.GatewayID,
+						tc.ID.GatewayId,
 					)
 					req := httptest.NewRequest(http.MethodGet, url, nil).WithContext(test.Context())
 					req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))
@@ -208,7 +208,7 @@ func TestWeb(t *testing.T) {
 					a := assertions.New(t)
 					url := fmt.Sprintf(
 						"/api/v3/gcs/gateways/%s/kerlink-cpf/lorafwd/lorafwd.toml",
-						tc.ID.GatewayID,
+						tc.ID.GatewayId,
 					)
 					req := httptest.NewRequest(http.MethodGet, url, nil).WithContext(test.Context())
 					req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))

@@ -33,7 +33,7 @@ func timePtr(time time.Time) *time.Time { return &time }
 func TestFromDownlinkMessage(t *testing.T) {
 	var lbsLNS lbsLNS
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"})
+	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"})
 	var session ws.Session
 	session.Data = State{
 		ID: 0x11,

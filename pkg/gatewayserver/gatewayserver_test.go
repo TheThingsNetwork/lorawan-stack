@@ -143,7 +143,7 @@ func TestGatewayServer(t *testing.T) {
 	time.Sleep(timeout) // Wait for tasks to be started.
 
 	is.add(ctx, ttnpb.GatewayIdentifiers{
-		GatewayID: registeredGatewayID,
+		GatewayId: registeredGatewayID,
 		EUI:       &registeredGatewayEUI,
 	}, registeredGatewayKey, true, true)
 
@@ -163,7 +163,7 @@ func TestGatewayServer(t *testing.T) {
 			HasAuth:           true,
 			DetectsDisconnect: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
-				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
+				return ids.GatewayId == registeredGatewayID && key == registeredGatewayKey
 			},
 			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
 				conn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(ctx), grpc.WithInsecure(), grpc.WithBlock())...)
@@ -172,7 +172,7 @@ func TestGatewayServer(t *testing.T) {
 				}
 				defer conn.Close()
 				md := rpcmetadata.MD{
-					ID:            ids.GatewayID,
+					ID:            ids.GatewayId,
 					AuthType:      "Bearer",
 					AuthValue:     key,
 					AllowInsecure: true,
@@ -223,10 +223,10 @@ func TestGatewayServer(t *testing.T) {
 			DetectsDisconnect:    true,
 			TimeoutOnInvalidAuth: true, // The MQTT client keeps reconnecting on invalid auth.
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
-				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
+				return ids.GatewayId == registeredGatewayID && key == registeredGatewayKey
 			},
 			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-				if ids.GatewayID == "" {
+				if ids.GatewayId == "" {
 					t.SkipNow()
 				}
 				ctx, cancel := errorcontext.New(ctx)
@@ -545,17 +545,17 @@ func TestGatewayServer(t *testing.T) {
 			}{
 				{
 					Name: "ValidIDAndKey",
-					ID:   ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID},
+					ID:   ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayID},
 					Key:  registeredGatewayKey,
 				},
 				{
 					Name: "InvalidKey",
-					ID:   ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID},
+					ID:   ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayID},
 					Key:  "invalid-key",
 				},
 				{
 					Name: "InvalidIDAndKey",
-					ID:   ttnpb.GatewayIdentifiers{GatewayID: "invalid-gateway"},
+					ID:   ttnpb.GatewayIdentifiers{GatewayId: "invalid-gateway"},
 					Key:  "invalid-key",
 				},
 				{
@@ -629,7 +629,7 @@ func TestGatewayServer(t *testing.T) {
 			}
 
 			id := ttnpb.GatewayIdentifiers{
-				GatewayID: registeredGatewayID,
+				GatewayId: registeredGatewayID,
 				EUI:       &registeredGatewayEUI,
 			}
 
@@ -673,7 +673,7 @@ func TestGatewayServer(t *testing.T) {
 			upCh := make(chan *ttnpb.GatewayUp)
 			downCh := make(chan *ttnpb.GatewayDown)
 			ids := ttnpb.GatewayIdentifiers{
-				GatewayID: registeredGatewayID,
+				GatewayId: registeredGatewayID,
 				EUI:       &registeredGatewayEUI,
 			}
 			// Setup a stats client with independent context to query whether the gateway is connected and statistics on
@@ -684,7 +684,7 @@ func TestGatewayServer(t *testing.T) {
 			}
 			defer statsConn.Close()
 			statsCtx := metadata.AppendToOutgoingContext(test.Context(),
-				"id", ids.GatewayID,
+				"id", ids.GatewayId,
 				"authorization", fmt.Sprintf("Bearer %v", registeredGatewayKey),
 			)
 			statsClient := ttnpb.NewGsClient(statsConn)
@@ -1293,7 +1293,7 @@ func TestGatewayServer(t *testing.T) {
 											Path: &ttnpb.DownlinkPath_Fixed{
 												Fixed: &ttnpb.GatewayAntennaIdentifiers{
 													GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-														GatewayID: "not-connected",
+														GatewayId: "not-connected",
 													},
 												},
 											},
@@ -1318,7 +1318,7 @@ func TestGatewayServer(t *testing.T) {
 												UplinkToken: io.MustUplinkToken(
 													ttnpb.GatewayAntennaIdentifiers{
 														GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-															GatewayID: registeredGatewayID,
+															GatewayId: registeredGatewayID,
 														},
 													},
 													10000000,
@@ -1350,7 +1350,7 @@ func TestGatewayServer(t *testing.T) {
 												UplinkToken: io.MustUplinkToken(
 													ttnpb.GatewayAntennaIdentifiers{
 														GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-															GatewayID: registeredGatewayID,
+															GatewayId: registeredGatewayID,
 														},
 													},
 													20000000,
@@ -1381,7 +1381,7 @@ func TestGatewayServer(t *testing.T) {
 												UplinkToken: io.MustUplinkToken(
 													ttnpb.GatewayAntennaIdentifiers{
 														GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-															GatewayID: registeredGatewayID,
+															GatewayId: registeredGatewayID,
 														},
 													},
 													10000000,
@@ -1417,7 +1417,7 @@ func TestGatewayServer(t *testing.T) {
 											Path: &ttnpb.DownlinkPath_Fixed{
 												Fixed: &ttnpb.GatewayAntennaIdentifiers{
 													GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-														GatewayID: registeredGatewayID,
+														GatewayId: registeredGatewayID,
 													},
 												},
 											},
@@ -1444,7 +1444,7 @@ func TestGatewayServer(t *testing.T) {
 											Path: &ttnpb.DownlinkPath_Fixed{
 												Fixed: &ttnpb.GatewayAntennaIdentifiers{
 													GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-														GatewayID: registeredGatewayID,
+														GatewayId: registeredGatewayID,
 													},
 												},
 											},

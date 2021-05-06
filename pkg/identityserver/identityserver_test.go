@@ -163,7 +163,7 @@ func applicationAPIKeys(applicationID *ttnpb.ApplicationIdentifiers) ttnpb.APIKe
 
 func gatewayAPIKeys(gatewayID *ttnpb.GatewayIdentifiers) ttnpb.APIKeys {
 	for id, apiKeys := range population.APIKeys {
-		if id.GetGatewayIDs().GetGatewayID() == gatewayID.GetGatewayID() {
+		if id.GetGatewayIds().GetGatewayId() == gatewayID.GetGatewayId() {
 			return ttnpb.APIKeys{
 				APIKeys: apiKeys,
 			}

@@ -28,7 +28,7 @@ func TestEntityType(t *testing.T) {
 	applicationID := ApplicationIdentifiers{ApplicationID: "foo"}
 	clientID := ClientIdentifiers{ClientId: "foo"}
 	endDeviceID := EndDeviceIdentifiers{DeviceID: "foo", ApplicationIdentifiers: applicationID}
-	gatewayID := GatewayIdentifiers{GatewayID: "foo"}
+	gatewayID := GatewayIdentifiers{GatewayId: "foo"}
 	organizationID := OrganizationIdentifiers{OrganizationId: "foo"}
 	userID := UserIdentifiers{UserId: "foo"}
 

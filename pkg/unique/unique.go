@@ -80,7 +80,7 @@ func ToDeviceID(uid string) (id ttnpb.EndDeviceIdentifiers, err error) {
 
 // ToGatewayID returns the gateway identifier of the specified unique ID.
 func ToGatewayID(uid string) (id ttnpb.GatewayIdentifiers, err error) {
-	id.GatewayID = uid
+	id.GatewayId = uid
 	if err := id.ValidateFields("gateway_id"); err != nil {
 		return ttnpb.GatewayIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}

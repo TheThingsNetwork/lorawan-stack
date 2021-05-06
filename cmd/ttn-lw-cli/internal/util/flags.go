@@ -720,7 +720,7 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 						for i := 0; i < v.Len(); i++ {
 							slice.Index(i).Set(reflect.ValueOf(ttnpb.GatewayAntennaIdentifiers{
 								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-									GatewayID: v.Index(i).String(),
+									GatewayId: v.Index(i).String(),
 								},
 							}))
 						}

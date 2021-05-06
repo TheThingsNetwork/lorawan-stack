@@ -230,14 +230,14 @@ type topicAccess struct {
 
 func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
 	ids := ttnpb.GatewayIdentifiers{
-		GatewayID: info.Username,
+		GatewayId: info.Username,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err
 	}
 
 	md := metadata.New(map[string]string{
-		"id":            ids.GatewayID,
+		"id":            ids.GatewayId,
 		"authorization": fmt.Sprintf("Bearer %s", info.Password),
 	})
 	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {

@@ -31,7 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
-var ids = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+var ids = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 
 func timePtr(t time.Time) *time.Time { return &t }
 
@@ -286,7 +286,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "test-gateway",
+							GatewayId: "test-gateway",
 						},
 						AntennaIndex:                0,
 						ChannelIndex:                7,
@@ -304,7 +304,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 					},
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "test-gateway",
+							GatewayId: "test-gateway",
 						},
 						AntennaIndex:                1,
 						ChannelIndex:                23,

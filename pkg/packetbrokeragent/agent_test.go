@@ -125,7 +125,7 @@ func TestForwarder(t *testing.T) {
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
 								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-									GatewayID: "foo-gateway",
+									GatewayId: "foo-gateway",
 									EUI:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
 								},
 								ChannelRSSI: -42,
@@ -250,7 +250,7 @@ func TestForwarder(t *testing.T) {
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
 								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-									GatewayID: "foo-gateway",
+									GatewayId: "foo-gateway",
 									EUI:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
 								},
 								ChannelRSSI: 4.2,
@@ -361,7 +361,7 @@ func TestForwarder(t *testing.T) {
 		a := assertions.New(t)
 
 		token := test.Must(json.Marshal(GatewayUplinkToken{
-			GatewayUID: unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}),
+			GatewayUID: unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}),
 			Token:      []byte{0x1, 0x2, 0x3, 0x4},
 		})).([]byte)
 		tokenObj := test.Must(tokenEncrypter.Encrypt(token)).(*jose.JSONWebEncryption)

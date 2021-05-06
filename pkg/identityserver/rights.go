@@ -30,7 +30,7 @@ func allPotentialRights(eIDs *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) *tt
 		return ttnpb.AllApplicationRights.Intersect(rights)
 	case *ttnpb.EntityIdentifiers_ClientIds:
 		return ttnpb.AllClientRights.Intersect(rights)
-	case *ttnpb.EntityIdentifiers_GatewayIDs:
+	case *ttnpb.EntityIdentifiers_GatewayIds:
 		return ttnpb.AllGatewayRights.Intersect(rights)
 	case *ttnpb.EntityIdentifiers_OrganizationIds:
 		return ttnpb.AllEntityRights.Union(ttnpb.AllOrganizationRights).Intersect(rights)

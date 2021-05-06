@@ -111,7 +111,7 @@ func (h *Handler) HandleTxAck(ctx context.Context, ids ttnpb.GatewayIdentifiers,
 	}
 	_, err = ttnpb.NewGsNsClient(nsConn).ReportTxAcknowledgment(ctx, &ttnpb.GatewayTxAcknowledgment{
 		TxAck:      msg,
-		GatewayIDs: &ids,
+		GatewayIds: &ids,
 	}, h.cluster.WithClusterAuth())
 	return err
 }

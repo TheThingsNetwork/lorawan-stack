@@ -28,9 +28,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var (
-	errInsufficientSourceGatewayRights = errors.DefineInvalidArgument("insufficient_source_gateway_rights", "API Key has insufficient source gateway rights")
-)
+var errInsufficientSourceGatewayRights = errors.DefineInvalidArgument("insufficient_source_gateway_rights", "API Key has insufficient source gateway rights")
 
 var (
 	gatewayClaimCommand = &cobra.Command{
@@ -85,7 +83,7 @@ gateway should connect.
 				},
 				Collaborator:               *collaborator,
 				TargetGatewayServerAddress: targetGatewayServerAddress,
-				TargetGatewayID:            targetGatewayID,
+				TargetGatewayId:            targetGatewayID,
 			}
 			if currentGatewayKey != "" || targetCUPSURI != "" {
 				req.CUPSRedirection = &ttnpb.CUPSRedirection{

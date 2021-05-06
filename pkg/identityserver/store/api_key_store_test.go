@@ -51,7 +51,7 @@ func TestAPIKeyStore(t *testing.T) {
 		appIDs := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
 
 		s.createEntity(ctx, &Gateway{GatewayID: "test-gtw"})
-		gtwIDs := &ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}
+		gtwIDs := &ttnpb.GatewayIdentifiers{GatewayId: "test-gtw"}
 
 		for _, tt := range []struct {
 			Name        string

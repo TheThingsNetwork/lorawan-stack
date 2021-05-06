@@ -82,7 +82,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 	ctx := log.NewContextWithField(link.Context(), "namespace", "gatewayserver/io/grpc")
 
 	ids := ttnpb.GatewayIdentifiers{
-		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
+		GatewayId: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
 	ctx, ids, err := s.server.FillGatewayContext(ctx, ids)
 	if err != nil {
@@ -178,7 +178,7 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/grpc")
 
 	ids := ttnpb.GatewayIdentifiers{
-		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
+		GatewayId: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err

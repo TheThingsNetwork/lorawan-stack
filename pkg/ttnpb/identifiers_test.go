@@ -53,7 +53,7 @@ func TestIdentifiersIsZero(t *testing.T) {
 		EndDeviceIdentifiers{ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo"}, DeviceID: "foo"},
 		EndDeviceIdentifiers{JoinEUI: &eui, DevEUI: &eui},
 		EndDeviceIdentifiers{DevAddr: &devAddr},
-		GatewayIdentifiers{GatewayID: "foo"},
+		GatewayIdentifiers{GatewayId: "foo"},
 		GatewayIdentifiers{EUI: &eui},
 		OrganizationIdentifiers{OrganizationId: "foo"},
 		UserIdentifiers{UserId: "foo"},
@@ -98,7 +98,7 @@ func TestEntityIdentifiers(t *testing.T) {
 	gtwID := NewPopulatedGatewayIdentifiers(test.Randy, true)
 	eID = gtwID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.GetGatewayIDs(), should.Resemble, gtwID)
+	a.So(eID.GetGatewayIds(), should.Resemble, gtwID)
 
 	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
 	eID = orgID.GetEntityIdentifiers()
@@ -161,13 +161,13 @@ func TestGatewayIdentifiersValidate(t *testing.T) {
 	a := assertions.New(t)
 
 	ids := GatewayIdentifiers{
-		GatewayID: "foo-gtw",
+		GatewayId: "foo-gtw",
 		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
 	}
 	a.So(ids.ValidateFields(), should.BeNil)
 
 	ids = GatewayIdentifiers{
-		GatewayID: "foo-gtw",
+		GatewayId: "foo-gtw",
 	}
 	a.So(ids.ValidateFields(), should.BeNil)
 
@@ -181,13 +181,13 @@ func TestGatewayIdentifiersValidate(t *testing.T) {
 	a.So(err, should.NotBeNil)
 
 	ids = GatewayIdentifiers{
-		GatewayID: "_foo-gtw",
+		GatewayId: "_foo-gtw",
 		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
 	}
 	a.So(ids.ValidateFields(), should.NotBeNil)
 
 	ids = GatewayIdentifiers{
-		GatewayID: "foo-gtw",
+		GatewayId: "foo-gtw",
 		EUI:       &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 	}
 	a.So(ids.ValidateFields(), should.BeNil)

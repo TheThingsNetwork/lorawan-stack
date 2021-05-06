@@ -90,7 +90,7 @@ func buildIdentifiers(entityType, id string) *ttnpb.EntityIdentifiers {
 	case "client":
 		return (&ttnpb.ClientIdentifiers{ClientId: id}).GetEntityIdentifiers()
 	case "gateway":
-		return (&ttnpb.GatewayIdentifiers{GatewayID: id}).GetEntityIdentifiers()
+		return (&ttnpb.GatewayIdentifiers{GatewayId: id}).GetEntityIdentifiers()
 	case "organization":
 		return (&ttnpb.OrganizationIdentifiers{OrganizationId: id}).GetEntityIdentifiers()
 	case "user":

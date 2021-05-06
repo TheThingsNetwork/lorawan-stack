@@ -315,7 +315,7 @@ func request_GatewayClaimingServer_UnauthorizeGateway_0(ctx context.Context, mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id")
 	}
 
-	protoReq.GatewayID, err = runtime.String(val)
+	protoReq.GatewayId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
@@ -349,7 +349,7 @@ func local_request_GatewayClaimingServer_UnauthorizeGateway_0(ctx context.Contex
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id")
 	}
 
-	protoReq.GatewayID, err = runtime.String(val)
+	protoReq.GatewayId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)

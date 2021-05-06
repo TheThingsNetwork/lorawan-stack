@@ -112,12 +112,12 @@ func TestRoundtrip(t *testing.T) {
 			func(uid string) (ttnpb.IDStringer, error) { return ToDeviceID(uid) },
 		},
 		{
-			ttnpb.GatewayIdentifiers{GatewayID: "foo"},
+			ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 			"foo",
 			func(uid string) (ttnpb.IDStringer, error) { return ToGatewayID(uid) },
 		},
 		{
-			&ttnpb.GatewayIdentifiers{GatewayID: "foo"},
+			&ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 			"foo",
 			func(uid string) (ttnpb.IDStringer, error) { return ToGatewayID(uid) },
 		},
@@ -183,7 +183,7 @@ func TestValidatorForIdentifiers(t *testing.T) {
 		},
 		{
 			"GatewayID",
-			func(uid string) ttnpb.IDStringer { return ttnpb.GatewayIdentifiers{GatewayID: uid} },
+			func(uid string) ttnpb.IDStringer { return ttnpb.GatewayIdentifiers{GatewayId: uid} },
 			func(uid string) (ttnpb.IDStringer, error) { return ToGatewayID(uid) },
 		},
 		{

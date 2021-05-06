@@ -120,10 +120,10 @@ func (dst *GatewayIdentifiers) SetFields(src *GatewayIdentifiers, paths ...strin
 				return fmt.Errorf("'gateway_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.GatewayID = src.GatewayID
+				dst.GatewayId = src.GatewayId
 			} else {
 				var zero string
-				dst.GatewayID = zero
+				dst.GatewayId = zero
 			}
 		case "eui":
 			if len(subs) > 0 {
@@ -411,11 +411,11 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 						}
 					}
 				case "gateway_ids":
-					_, srcOk := src.Ids.(*EntityIdentifiers_GatewayIDs)
+					_, srcOk := src.Ids.(*EntityIdentifiers_GatewayIds)
 					if !srcOk && src.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'gateway_ids', while different oneof is set in source")
 					}
-					_, dstOk := dst.Ids.(*EntityIdentifiers_GatewayIDs)
+					_, dstOk := dst.Ids.(*EntityIdentifiers_GatewayIds)
 					if !dstOk && dst.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'gateway_ids', while different oneof is set in destination")
 					}
@@ -425,13 +425,13 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 							continue
 						}
 						if srcOk {
-							newSrc = src.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs
+							newSrc = src.Ids.(*EntityIdentifiers_GatewayIds).GatewayIds
 						}
 						if dstOk {
-							newDst = dst.Ids.(*EntityIdentifiers_GatewayIDs).GatewayIDs
+							newDst = dst.Ids.(*EntityIdentifiers_GatewayIds).GatewayIds
 						} else {
 							newDst = &GatewayIdentifiers{}
-							dst.Ids = &EntityIdentifiers_GatewayIDs{GatewayIDs: newDst}
+							dst.Ids = &EntityIdentifiers_GatewayIds{GatewayIds: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err

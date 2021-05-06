@@ -188,7 +188,7 @@ func (s *entitySearch) FindGateways(ctx context.Context, member *ttnpb.Organizat
 	}
 	identifiers := make([]*ttnpb.GatewayIdentifiers, len(results))
 	for i, result := range results {
-		identifiers[i] = &ttnpb.GatewayIdentifiers{GatewayID: result.FriendlyID}
+		identifiers[i] = &ttnpb.GatewayIdentifiers{GatewayId: result.FriendlyID}
 	}
 	return identifiers, nil
 }

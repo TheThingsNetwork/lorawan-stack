@@ -39,8 +39,8 @@ func listContactInfo(entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, e
 		res, err = ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{ApplicationIdentifiers: *id.ApplicationIDs, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_ClientIds:
 		res, err = ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{ClientIdentifiers: *id.ClientIds, FieldMask: fieldMask})
-	case *ttnpb.EntityIdentifiers_GatewayIDs:
-		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id.GatewayIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_GatewayIds:
+		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id.GatewayIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_OrganizationIds:
 		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id.OrganizationIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_UserIds:
@@ -66,8 +66,8 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 		res, err = ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{ApplicationIdentifiers: *id.ApplicationIDs, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_ClientIds:
 		res, err = ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{ClientIdentifiers: *id.ClientIds, FieldMask: fieldMask})
-	case *ttnpb.EntityIdentifiers_GatewayIDs:
-		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id.GatewayIDs, FieldMask: fieldMask})
+	case *ttnpb.EntityIdentifiers_GatewayIds:
+		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id.GatewayIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_OrganizationIds:
 		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id.OrganizationIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_UserIds:

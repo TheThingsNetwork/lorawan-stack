@@ -54,8 +54,8 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
 				return true, nil
 			}
-		case *ttnpb.EntityIdentifiers_GatewayIDs:
-			rights, err := rights.ListGateway(ctx, *ids.GatewayIDs)
+		case *ttnpb.EntityIdentifiers_GatewayIds:
+			rights, err := rights.ListGateway(ctx, *ids.GatewayIds)
 			if err != nil {
 				return false, err
 			}

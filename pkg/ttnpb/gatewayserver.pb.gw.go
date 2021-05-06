@@ -53,7 +53,7 @@ func request_GtwGs_GetMQTTConnectionInfo_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id")
 	}
 
-	protoReq.GatewayID, err = runtime.String(val)
+	protoReq.GatewayId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
@@ -87,7 +87,7 @@ func local_request_GtwGs_GetMQTTConnectionInfo_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id")
 	}
 
-	protoReq.GatewayID, err = runtime.String(val)
+	protoReq.GatewayId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
@@ -125,7 +125,7 @@ func request_GtwGs_GetMQTTV2ConnectionInfo_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id")
 	}
 
-	protoReq.GatewayID, err = runtime.String(val)
+	protoReq.GatewayId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
@@ -159,7 +159,7 @@ func local_request_GtwGs_GetMQTTV2ConnectionInfo_0(ctx context.Context, marshale
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id")
 	}
 
-	protoReq.GatewayID, err = runtime.String(val)
+	protoReq.GatewayId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
@@ -197,7 +197,7 @@ func request_Gs_GetGatewayConnectionStats_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id")
 	}
 
-	protoReq.GatewayID, err = runtime.String(val)
+	protoReq.GatewayId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
@@ -231,7 +231,7 @@ func local_request_Gs_GetGatewayConnectionStats_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id")
 	}
 
-	protoReq.GatewayID, err = runtime.String(val)
+	protoReq.GatewayId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)

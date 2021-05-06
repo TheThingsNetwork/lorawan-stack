@@ -367,14 +367,14 @@ func (m *GatewayIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "gateway_id":
 
-			if utf8.RuneCountInString(m.GetGatewayID()) > 36 {
+			if utf8.RuneCountInString(m.GetGatewayId()) > 36 {
 				return GatewayIdentifiersValidationError{
 					field:  "gateway_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_GatewayIdentifiers_GatewayID_Pattern.MatchString(m.GetGatewayID()) {
+			if !_GatewayIdentifiers_GatewayId_Pattern.MatchString(m.GetGatewayId()) {
 				return GatewayIdentifiersValidationError{
 					field:  "gateway_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -449,7 +449,7 @@ var _ interface {
 	ErrorName() string
 } = GatewayIdentifiersValidationError{}
 
-var _GatewayIdentifiers_GatewayID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GatewayIdentifiers_GatewayId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on OrganizationIdentifiers with the
 // rules defined in the proto definition for this message. If any rules are
@@ -859,12 +859,12 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 					}
 
 				case "gateway_ids":
-					w, ok := m.Ids.(*EntityIdentifiers_GatewayIDs)
+					w, ok := m.Ids.(*EntityIdentifiers_GatewayIds)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetGatewayIDs()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetGatewayIds()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return EntityIdentifiersValidationError{
 								field:  "gateway_ids",
