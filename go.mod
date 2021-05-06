@@ -119,10 +119,10 @@ require (
 	github.com/throttled/throttled/v2 v2.7.1
 	github.com/vmihailenco/msgpack/v5 v5.3.1
 	go.opencensus.io v0.23.0
-	go.packetbroker.org/api/iam v1.2.2-tts
-	go.packetbroker.org/api/iam/v2 v2.1.2-tts
-	go.packetbroker.org/api/routing v1.2.2-tts
-	go.packetbroker.org/api/v3 v3.4.2-tts
+	go.packetbroker.org/api/iam v1.4.2-tts
+	go.packetbroker.org/api/iam/v2 v2.4.1-tts
+	go.packetbroker.org/api/routing v1.5.1-tts
+	go.packetbroker.org/api/v3 v3.6.1-tts
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
 	gocloud.dev v0.20.0
 	gocloud.dev/pubsub/natspubsub v0.19.0
