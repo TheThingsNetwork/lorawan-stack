@@ -4219,7 +4219,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 | Field | Validations |
 | ----- | ----------- |
-| `user_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `user_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){1,}$`</p> |
 
 ## <a name="lorawan-stack/api/identityserver.proto">File `lorawan-stack/api/identityserver.proto`</a>
 
