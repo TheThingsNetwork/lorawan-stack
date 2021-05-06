@@ -373,26 +373,19 @@ func (s *pbaServer) DeleteHomeNetworkRoutingPolicy(ctx context.Context, req *ttn
 	return ttnpb.Empty, nil
 }
 
-func (s *pbaServer) ListHomeNetworks(ctx context.Context, req *ttnpb.ListHomeNetworksRequest) (*ttnpb.PacketBrokerNetworks, error) {
+func (s *pbaServer) listNetworks(ctx context.Context, req func() ([]*packetbroker.NetworkOrTenant, uint32, error)) (*ttnpb.PacketBrokerNetworks, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
 
-	page := req.Page
-	if page == 0 {
-		page = 1
-	}
-	networks, err := iampbv2.NewCatalogClient(s.iamConn).ListHomeNetworks(ctx, &iampbv2.ListHomeNetworksRequest{
-		Offset: (page - 1) * req.Limit,
-		Limit:  req.Limit,
-	})
+	networks, total, err := req()
 	if err != nil {
 		return nil, err
 	}
 	res := &ttnpb.PacketBrokerNetworks{
-		Networks: make([]*ttnpb.PacketBrokerNetwork, 0, len(networks.GetHomeNetworks())),
+		Networks: make([]*ttnpb.PacketBrokerNetwork, 0, len(networks)),
 	}
-	for _, n := range networks.GetHomeNetworks() {
+	for _, n := range networks {
 		var (
 			id      *ttnpb.PacketBrokerNetworkIdentifier
 			network interface {
@@ -422,8 +415,51 @@ func (s *pbaServer) ListHomeNetworks(ctx context.Context, req *ttnpb.ListHomeNet
 			ContactInfo:   asContactInfo(network.GetAdministrativeContact(), network.GetTechnicalContact()),
 		})
 	}
-	grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatInt(int64(networks.GetTotal()), 10)))
+	grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatInt(int64(total), 10)))
 	return res, nil
+}
+
+func (s *pbaServer) ListNetworks(ctx context.Context, req *ttnpb.ListPacketBrokerNetworksRequest) (*ttnpb.PacketBrokerNetworks, error) {
+	page := req.Page
+	if page == 0 {
+		page = 1
+	}
+	return s.listNetworks(ctx, func() ([]*packetbroker.NetworkOrTenant, uint32, error) {
+		if req.WithRoutingPolicy {
+			res, err := routingpb.NewPolicyManagerClient(s.cpConn).ListNetworksWithPolicy(ctx, &routingpb.ListNetworksWithPolicyRequest{
+				NetId:            s.netID.MarshalNumber(),
+				TenantId:         s.tenantIDExtractor(ctx),
+				Offset:           (page - 1) * req.Limit,
+				Limit:            req.Limit,
+				TenantIdContains: req.TenantIdContains,
+				NameContains:     req.NameContains,
+			})
+			return res.GetNetworks(), res.GetTotal(), err
+		}
+		res, err := iampbv2.NewCatalogClient(s.iamConn).ListNetworks(ctx, &iampbv2.ListNetworksRequest{
+			Offset:           (page - 1) * req.Limit,
+			Limit:            req.Limit,
+			TenantIdContains: req.TenantIdContains,
+			NameContains:     req.NameContains,
+		})
+		return res.GetNetworks(), res.GetTotal(), err
+	})
+}
+
+func (s *pbaServer) ListHomeNetworks(ctx context.Context, req *ttnpb.ListPacketBrokerHomeNetworksRequest) (*ttnpb.PacketBrokerNetworks, error) {
+	page := req.Page
+	if page == 0 {
+		page = 1
+	}
+	return s.listNetworks(ctx, func() ([]*packetbroker.NetworkOrTenant, uint32, error) {
+		res, err := iampbv2.NewCatalogClient(s.iamConn).ListHomeNetworks(ctx, &iampbv2.ListNetworksRequest{
+			Offset:           (page - 1) * req.Limit,
+			Limit:            req.Limit,
+			TenantIdContains: req.TenantIdContains,
+			NameContains:     req.NameContains,
+		})
+		return res.GetNetworks(), res.GetTotal(), err
+	})
 }
 
 func (s *pbaServer) ListForwarderRoutingPolicies(ctx context.Context, req *ttnpb.ListForwarderRoutingPoliciesRequest) (*ttnpb.PacketBrokerRoutingPolicies, error) {

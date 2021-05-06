@@ -4517,6 +4517,16 @@
         }
       ]
     },
+    "ListNetworks": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/pba/networks",
+          "parameters": []
+        }
+      ]
+    },
     "ListHomeNetworks": {
       "file": "lorawan-stack/api/packetbrokeragent.proto",
       "http": [

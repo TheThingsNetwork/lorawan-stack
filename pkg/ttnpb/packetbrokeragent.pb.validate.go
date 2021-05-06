@@ -1441,16 +1441,16 @@ var _ interface {
 	ErrorName() string
 } = SetPacketBrokerRoutingPolicyRequestValidationError{}
 
-// ValidateFields checks the field values on ListHomeNetworksRequest with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *ListHomeNetworksRequest) ValidateFields(paths ...string) error {
+// ValidateFields checks the field values on ListPacketBrokerNetworksRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *ListPacketBrokerNetworksRequest) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = ListHomeNetworksRequestFieldPathsNested
+		paths = ListPacketBrokerNetworksRequestFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
@@ -1459,7 +1459,7 @@ func (m *ListHomeNetworksRequest) ValidateFields(paths ...string) error {
 		case "limit":
 
 			if m.GetLimit() > 1000 {
-				return ListHomeNetworksRequestValidationError{
+				return ListPacketBrokerNetworksRequestValidationError{
 					field:  "limit",
 					reason: "value must be less than or equal to 1000",
 				}
@@ -1467,8 +1467,28 @@ func (m *ListHomeNetworksRequest) ValidateFields(paths ...string) error {
 
 		case "page":
 			// no validation rules for Page
+		case "with_routing_policy":
+			// no validation rules for WithRoutingPolicy
+		case "tenant_id_contains":
+
+			if utf8.RuneCountInString(m.GetTenantIdContains()) > 100 {
+				return ListPacketBrokerNetworksRequestValidationError{
+					field:  "tenant_id_contains",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
+		case "name_contains":
+
+			if utf8.RuneCountInString(m.GetNameContains()) > 100 {
+				return ListPacketBrokerNetworksRequestValidationError{
+					field:  "name_contains",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
 		default:
-			return ListHomeNetworksRequestValidationError{
+			return ListPacketBrokerNetworksRequestValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -1477,9 +1497,10 @@ func (m *ListHomeNetworksRequest) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// ListHomeNetworksRequestValidationError is the validation error returned by
-// ListHomeNetworksRequest.ValidateFields if the designated constraints aren't met.
-type ListHomeNetworksRequestValidationError struct {
+// ListPacketBrokerNetworksRequestValidationError is the validation error
+// returned by ListPacketBrokerNetworksRequest.ValidateFields if the
+// designated constraints aren't met.
+type ListPacketBrokerNetworksRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1487,24 +1508,24 @@ type ListHomeNetworksRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e ListHomeNetworksRequestValidationError) Field() string { return e.field }
+func (e ListPacketBrokerNetworksRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ListHomeNetworksRequestValidationError) Reason() string { return e.reason }
+func (e ListPacketBrokerNetworksRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ListHomeNetworksRequestValidationError) Cause() error { return e.cause }
+func (e ListPacketBrokerNetworksRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ListHomeNetworksRequestValidationError) Key() bool { return e.key }
+func (e ListPacketBrokerNetworksRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ListHomeNetworksRequestValidationError) ErrorName() string {
-	return "ListHomeNetworksRequestValidationError"
+func (e ListPacketBrokerNetworksRequestValidationError) ErrorName() string {
+	return "ListPacketBrokerNetworksRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e ListHomeNetworksRequestValidationError) Error() string {
+func (e ListPacketBrokerNetworksRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1516,14 +1537,14 @@ func (e ListHomeNetworksRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sListHomeNetworksRequest.%s: %s%s",
+		"invalid %sListPacketBrokerNetworksRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ListHomeNetworksRequestValidationError{}
+var _ error = ListPacketBrokerNetworksRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -1531,7 +1552,118 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ListHomeNetworksRequestValidationError{}
+} = ListPacketBrokerNetworksRequestValidationError{}
+
+// ValidateFields checks the field values on
+// ListPacketBrokerHomeNetworksRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *ListPacketBrokerHomeNetworksRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListPacketBrokerHomeNetworksRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "limit":
+
+			if m.GetLimit() > 1000 {
+				return ListPacketBrokerHomeNetworksRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
+		case "tenant_id_contains":
+
+			if utf8.RuneCountInString(m.GetTenantIdContains()) > 100 {
+				return ListPacketBrokerHomeNetworksRequestValidationError{
+					field:  "tenant_id_contains",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
+		case "name_contains":
+
+			if utf8.RuneCountInString(m.GetNameContains()) > 100 {
+				return ListPacketBrokerHomeNetworksRequestValidationError{
+					field:  "name_contains",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
+		default:
+			return ListPacketBrokerHomeNetworksRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListPacketBrokerHomeNetworksRequestValidationError is the validation error
+// returned by ListPacketBrokerHomeNetworksRequest.ValidateFields if the
+// designated constraints aren't met.
+type ListPacketBrokerHomeNetworksRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListPacketBrokerHomeNetworksRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListPacketBrokerHomeNetworksRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListPacketBrokerHomeNetworksRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListPacketBrokerHomeNetworksRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListPacketBrokerHomeNetworksRequestValidationError) ErrorName() string {
+	return "ListPacketBrokerHomeNetworksRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListPacketBrokerHomeNetworksRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListPacketBrokerHomeNetworksRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListPacketBrokerHomeNetworksRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListPacketBrokerHomeNetworksRequestValidationError{}
 
 // ValidateFields checks the field values on
 // ListForwarderRoutingPoliciesRequest with the rules defined in the proto

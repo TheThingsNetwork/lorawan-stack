@@ -79,6 +79,19 @@ func getPacketBrokerNetworkID(flagSet *pflag.FlagSet, args []string, allowDefaul
 	}, nil
 }
 
+func packetBrokerNetworkSearchFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.String("tenant-id-contains", "", "")
+	flagSet.String("name-contains", "", "")
+	return flagSet
+}
+
+func getPacketBrokerNetworkSearch(flagSet *pflag.FlagSet) (tenantIDContains, nameContains string) {
+	tenantIDContains, _ = flagSet.GetString("tenant-id-contains")
+	nameContains, _ = flagSet.GetString("name-contains")
+	return
+}
+
 func packetBrokerRoutingPolicyFlags() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.Bool("join", false, "join-request and join-accept")
@@ -180,6 +193,38 @@ var (
 				return err
 			}
 			return nil
+		},
+	}
+	packetBrokerNetworksCommand = &cobra.Command{
+		Use:     "networks",
+		Aliases: []string{"network", "nwk"},
+		Short:   "Network commands",
+	}
+	packetBrokerNetworksListCommand = &cobra.Command{
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "List networks",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			pba, err := api.Dial(ctx, config.PacketBrokerAgentGRPCAddress)
+			if err != nil {
+				return err
+			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
+			tenantIDContains, nameContains := getPacketBrokerNetworkSearch(cmd.Flags())
+			withRoutingPolicy, _ := cmd.Flags().GetBool("with-routing-policy")
+			res, err := ttnpb.NewPbaClient(pba).ListNetworks(ctx, &ttnpb.ListPacketBrokerNetworksRequest{
+				Limit:             limit,
+				Page:              page,
+				TenantIdContains:  tenantIDContains,
+				NameContains:      nameContains,
+				WithRoutingPolicy: withRoutingPolicy,
+			}, opt)
+			if err != nil {
+				return err
+			}
+			getTotal()
+
+			return io.Write(os.Stdout, config.OutputFormat, res.Networks)
 		},
 	}
 	packetBrokerHomeNetworksCommand = &cobra.Command{
@@ -335,9 +380,12 @@ for the Home Network (by NetID and tenant ID).`,
 				return err
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
-			res, err := ttnpb.NewPbaClient(pba).ListHomeNetworks(ctx, &ttnpb.ListHomeNetworksRequest{
-				Limit: limit,
-				Page:  page,
+			tenantIDContains, nameContains := getPacketBrokerNetworkSearch(cmd.Flags())
+			res, err := ttnpb.NewPbaClient(pba).ListHomeNetworks(ctx, &ttnpb.ListPacketBrokerHomeNetworksRequest{
+				Limit:            limit,
+				Page:             page,
+				TenantIdContains: tenantIDContains,
+				NameContains:     nameContains,
 			}, opt)
 			if err != nil {
 				return err
@@ -384,6 +432,10 @@ func init() {
 	packetBrokerCommand.AddCommand(packetBrokerInfoCommand)
 	packetBrokerCommand.AddCommand(packetBrokerRegisterCommand)
 	packetBrokerCommand.AddCommand(packetBrokerDeregisterCommand)
+	packetBrokerNetworksListCommand.Flags().AddFlagSet(paginationFlags())
+	packetBrokerNetworksListCommand.Flags().AddFlagSet(packetBrokerNetworkSearchFlags())
+	packetBrokerNetworksCommand.AddCommand(packetBrokerNetworksListCommand)
+	packetBrokerCommand.AddCommand(packetBrokerNetworksCommand)
 	packetBrokerHomeNetworksPolicyListCommand.Flags().AddFlagSet(paginationFlags())
 	packetBrokerHomeNetworksPoliciesCommand.AddCommand(packetBrokerHomeNetworksPolicyListCommand)
 	packetBrokerHomeNetworksPolicyGetCommand.Flags().AddFlagSet(packetBrokerNetworkIDFlags(true))
@@ -395,6 +447,7 @@ func init() {
 	packetBrokerHomeNetworksPoliciesCommand.AddCommand(packetBrokerHomeNetworksPolicyDeleteCommand)
 	packetBrokerHomeNetworksCommand.AddCommand(packetBrokerHomeNetworksPoliciesCommand)
 	packetBrokerHomeNetworksListCommand.Flags().AddFlagSet(paginationFlags())
+	packetBrokerHomeNetworksListCommand.Flags().AddFlagSet(packetBrokerNetworkSearchFlags())
 	packetBrokerHomeNetworksCommand.AddCommand(packetBrokerHomeNetworksListCommand)
 	packetBrokerCommand.AddCommand(packetBrokerHomeNetworksCommand)
 	packetBrokerForwardersPoliciesListCommand.Flags().AddFlagSet(paginationFlags())

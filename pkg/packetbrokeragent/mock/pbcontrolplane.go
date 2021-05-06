@@ -34,6 +34,7 @@ type PBControlPlane struct {
 	GetHomeNetworkPolicyHandler    func(ctx context.Context, req *routingpb.GetHomeNetworkPolicyRequest) (*routingpb.GetPolicyResponse, error)
 	SetHomeNetworkPolicyHandler    func(ctx context.Context, req *routingpb.SetPolicyRequest) (*pbtypes.Empty, error)
 	ListEffectivePoliciesHandler   func(ctx context.Context, req *routingpb.ListEffectivePoliciesRequest) (*routingpb.ListEffectivePoliciesResponse, error)
+	ListNetworksWithPolicyHandler  func(ctx context.Context, req *routingpb.ListNetworksWithPolicyRequest) (*routingpb.ListNetworksResponse, error)
 }
 
 // NewPBControlPlane instantiates a new mock Packet Broker Control Plane.
@@ -97,4 +98,11 @@ func (s *PBControlPlane) ListEffectivePolicies(ctx context.Context, req *routing
 		panic("ListEffectivePolicies called but not set")
 	}
 	return s.ListEffectivePoliciesHandler(ctx, req)
+}
+
+func (s *PBControlPlane) ListNetworksWithPolicy(ctx context.Context, req *routingpb.ListNetworksWithPolicyRequest) (*routingpb.ListNetworksResponse, error) {
+	if s.ListNetworksWithPolicyHandler == nil {
+		panic("ListNetworksWithPolicy called but not set")
+	}
+	return s.ListNetworksWithPolicyHandler(ctx, req)
 }

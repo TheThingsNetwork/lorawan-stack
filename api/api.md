@@ -482,7 +482,8 @@
 - [File `lorawan-stack/api/packetbrokeragent.proto`](#lorawan-stack/api/packetbrokeragent.proto)
   - [Message `ListForwarderRoutingPoliciesRequest`](#ttn.lorawan.v3.ListForwarderRoutingPoliciesRequest)
   - [Message `ListHomeNetworkRoutingPoliciesRequest`](#ttn.lorawan.v3.ListHomeNetworkRoutingPoliciesRequest)
-  - [Message `ListHomeNetworksRequest`](#ttn.lorawan.v3.ListHomeNetworksRequest)
+  - [Message `ListPacketBrokerHomeNetworksRequest`](#ttn.lorawan.v3.ListPacketBrokerHomeNetworksRequest)
+  - [Message `ListPacketBrokerNetworksRequest`](#ttn.lorawan.v3.ListPacketBrokerNetworksRequest)
   - [Message `PacketBrokerDefaultRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy)
   - [Message `PacketBrokerDevAddrBlock`](#ttn.lorawan.v3.PacketBrokerDevAddrBlock)
   - [Message `PacketBrokerInfo`](#ttn.lorawan.v3.PacketBrokerInfo)
@@ -6874,18 +6875,40 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | ----- | ----------- |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
-### <a name="ttn.lorawan.v3.ListHomeNetworksRequest">Message `ListHomeNetworksRequest`</a>
+### <a name="ttn.lorawan.v3.ListPacketBrokerHomeNetworksRequest">Message `ListPacketBrokerHomeNetworksRequest`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
 | `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `tenant_id_contains` | [`string`](#string) |  | Filter by tenant ID. |
+| `name_contains` | [`string`](#string) |  | Filter by name. |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
+| `tenant_id_contains` | <p>`string.max_len`: `100`</p> |
+| `name_contains` | <p>`string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.ListPacketBrokerNetworksRequest">Message `ListPacketBrokerNetworksRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+| `with_routing_policy` | [`bool`](#bool) |  | If true, list only the Forwarders and Home Networks with whom a routing policy has been defined in either direction. |
+| `tenant_id_contains` | [`string`](#string) |  | Filter by tenant ID. |
+| `name_contains` | [`string`](#string) |  | Filter by name. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+| `tenant_id_contains` | <p>`string.max_len`: `100`</p> |
+| `name_contains` | <p>`string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy">Message `PacketBrokerDefaultRoutingPolicy`</a>
 
@@ -7034,7 +7057,8 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `GetHomeNetworkRoutingPolicy` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) | [`PacketBrokerRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerRoutingPolicy) | Get the routing policy for the given Home Network. Getting routing policies requires administrative access. |
 | `SetHomeNetworkRoutingPolicy` | [`SetPacketBrokerRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerRoutingPolicyRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the routing policy for the given Home Network. Setting routing policies requires administrative access. |
 | `DeleteHomeNetworkRoutingPolicy` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the routing policy for the given Home Network. Deleting routing policies requires administrative access. |
-| `ListHomeNetworks` | [`ListHomeNetworksRequest`](#ttn.lorawan.v3.ListHomeNetworksRequest) | [`PacketBrokerNetworks`](#ttn.lorawan.v3.PacketBrokerNetworks) | List the (public) home networks for which routing policies can be configured. Listing home networks requires administrative access. |
+| `ListNetworks` | [`ListPacketBrokerNetworksRequest`](#ttn.lorawan.v3.ListPacketBrokerNetworksRequest) | [`PacketBrokerNetworks`](#ttn.lorawan.v3.PacketBrokerNetworks) | List all listed networks. Listing networks requires administrative access. |
+| `ListHomeNetworks` | [`ListPacketBrokerHomeNetworksRequest`](#ttn.lorawan.v3.ListPacketBrokerHomeNetworksRequest) | [`PacketBrokerNetworks`](#ttn.lorawan.v3.PacketBrokerNetworks) | List the listed home networks for which routing policies can be configured. Listing home networks requires administrative access. |
 | `ListForwarderRoutingPolicies` | [`ListForwarderRoutingPoliciesRequest`](#ttn.lorawan.v3.ListForwarderRoutingPoliciesRequest) | [`PacketBrokerRoutingPolicies`](#ttn.lorawan.v3.PacketBrokerRoutingPolicies) | List the routing policies that Forwarders configured with Packet Broker Agent as Home Network. Listing routing policies requires administrative access. |
 
 #### HTTP bindings
@@ -7058,6 +7082,7 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `SetHomeNetworkRoutingPolicy` | `POST` | `/api/v3/pba/home-networks/policies/{home_network_id.net_id}/{home_network_id.tenant_id}` | `*` |
 | `DeleteHomeNetworkRoutingPolicy` | `DELETE` | `/api/v3/pba/home-networks/policies/{net_id}` |  |
 | `DeleteHomeNetworkRoutingPolicy` | `DELETE` | `/api/v3/pba/home-networks/policies/{net_id}/{tenant_id}` |  |
+| `ListNetworks` | `GET` | `/api/v3/pba/networks` |  |
 | `ListHomeNetworks` | `GET` | `/api/v3/pba/home-networks` |  |
 | `ListForwarderRoutingPolicies` | `GET` | `/api/v3/pba/forwarders/policies` |  |
 

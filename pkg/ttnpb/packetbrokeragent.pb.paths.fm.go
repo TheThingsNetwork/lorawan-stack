@@ -190,14 +190,33 @@ var SetPacketBrokerRoutingPolicyRequestFieldPathsTopLevel = []string{
 	"home_network_id",
 	"uplink",
 }
-var ListHomeNetworksRequestFieldPathsNested = []string{
+var ListPacketBrokerNetworksRequestFieldPathsNested = []string{
 	"limit",
+	"name_contains",
 	"page",
+	"tenant_id_contains",
+	"with_routing_policy",
 }
 
-var ListHomeNetworksRequestFieldPathsTopLevel = []string{
+var ListPacketBrokerNetworksRequestFieldPathsTopLevel = []string{
 	"limit",
+	"name_contains",
 	"page",
+	"tenant_id_contains",
+	"with_routing_policy",
+}
+var ListPacketBrokerHomeNetworksRequestFieldPathsNested = []string{
+	"limit",
+	"name_contains",
+	"page",
+	"tenant_id_contains",
+}
+
+var ListPacketBrokerHomeNetworksRequestFieldPathsTopLevel = []string{
+	"limit",
+	"name_contains",
+	"page",
+	"tenant_id_contains",
 }
 var ListForwarderRoutingPoliciesRequestFieldPathsNested = []string{
 	"home_network_id",
