@@ -33,11 +33,11 @@ const computeDeltaInSeconds = (from, to) => {
 }
 
 const LastSeen = props => {
-  const { className, lastSeen } = props
+  const { className, lastSeen, short } = props
 
   return (
     <div className={classnames(className, style.container)}>
-      <Message className={style.message} content={sharedMessages.lastSeen} />
+      {!short && <Message className={style.message} content={sharedMessages.lastSeen} />}
       <DateTime.Relative value={lastSeen} computeDelta={computeDeltaInSeconds} />
     </div>
   )
@@ -50,10 +50,12 @@ LastSeen.propTypes = {
     PropTypes.number, // Support timestamps.
     PropTypes.instanceOf(Date),
   ]).isRequired,
+  short: PropTypes.bool,
 }
 
 LastSeen.defaultProps = {
   className: undefined,
+  short: false,
 }
 
 export default LastSeen

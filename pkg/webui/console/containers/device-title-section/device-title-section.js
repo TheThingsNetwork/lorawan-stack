@@ -23,6 +23,7 @@ import Spinner from '@ttn-lw/components/spinner'
 import Message from '@ttn-lw/lib/components/message'
 
 import EntityTitleSection from '@console/components/entity-title-section'
+import LastSeen from '@console/components/last-seen'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -67,7 +68,7 @@ const DeviceTitleSection = props => {
           <>
             {showLastSeen ? (
               <Status status="good" flipped>
-                <Content.LastSeen lastSeen={lastSeen} />
+                <LastSeen lastSeen={lastSeen} />
               </Status>
             ) : (
               <Status status="mediocre" label={m.lastSeenUnavailable} flipped />
