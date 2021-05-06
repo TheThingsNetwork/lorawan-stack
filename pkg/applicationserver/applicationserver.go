@@ -834,6 +834,11 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids ttnpb.EndDevi
 	return mask, nil
 }
 
+// storeUplink stores the provided *ttnpb.ApplicationUplink in the device uplink storage.
+// Only fields which are used by integrations are stored.
+// The fields which are stored are based on the following usages:
+// - io/packages/loragls/v3/package.go#multiFrameQuery
+// - io/packages/loragls/v3/api/objects.go#parseRxMetadata
 func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink) error {
 	cleanUplink := &ttnpb.ApplicationUplink{
 		RxMetadata: make([]*ttnpb.RxMetadata, 0, len(uplink.RxMetadata)),
