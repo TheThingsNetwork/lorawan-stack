@@ -19,10 +19,19 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+### Security
+
+## [3.12.3] - 2021-05-06
+
+### Changed
+
+- Optimized storage of recent application uplinks in Application Server.
+
+### Fixed
+
 - Validation of OAuth token exchange requests from the CLI.
 - Validation of join-request types when using the Crypto Server backend.
-
-### Security
+- Fetching AppSKey when the session is rebuilt but the identifier did not change.
 
 ## [3.12.2] - 2021-04-30
 
@@ -1459,7 +1468,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.2...v3.12
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.3...v3.12
+[3.12.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.2...v3.12.3
 [3.12.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.1...v3.12.2
 [3.12.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.0...v3.12.1
 [3.12.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.11.3...v3.12.0
