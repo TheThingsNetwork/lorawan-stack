@@ -15,27 +15,15 @@
 package commands
 
 import (
-	"context"
 	"os"
 	"strings"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
-
-func createApplicationAPIKey(ctx context.Context, ids ttnpb.ApplicationIdentifiers, name string, rights ...ttnpb.Right) (*ttnpb.APIKey, error) {
-	is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
-	if err != nil {
-		return nil, err
-	}
-	return ttnpb.NewApplicationAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-		ApplicationIdentifiers: ids,
-		Name:                   name,
-		Rights:                 rights,
-	})
-}
 
 var (
 	applicationRights = &cobra.Command{
@@ -263,11 +251,24 @@ var (
 				return errNoAPIKeyRights
 			}
 
-			res, err := createApplicationAPIKey(ctx, *appID, name, rights...)
+			expiryDate, err := getAPIKeyExpiry(cmd.Flags())
 			if err != nil {
 				return err
 			}
 
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewApplicationAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+				ApplicationIdentifiers: *appID,
+				Name:                   name,
+				Rights:                 rights,
+				ExpiresAt:              expiryDate,
+			})
+			if err != nil {
+				return err
+			}
 			logger.Infof("API key ID: %s", res.ID)
 			logger.Infof("API key value: %s", res.Key)
 			logger.Warn("The API key value will never be shown again")
@@ -291,9 +292,13 @@ var (
 			}
 			name, _ := cmd.Flags().GetString("name")
 
-			rights := getRights(cmd.Flags())
-			if len(rights) == 0 {
-				return errNoAPIKeyRights
+			rights, expiryDate, paths, err := getAPIKeyFields(cmd.Flags())
+			if err != nil {
+				return err
+			}
+			if len(paths) == 0 {
+				logger.Warn("No fields selected, won't update anything")
+				return nil
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -303,10 +308,12 @@ var (
 			_, err = ttnpb.NewApplicationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 				ApplicationIdentifiers: *appID,
 				APIKey: ttnpb.APIKey{
-					ID:     id,
-					Name:   name,
-					Rights: rights,
+					ID:        id,
+					Name:      name,
+					Rights:    rights,
+					ExpiresAt: expiryDate,
 				},
+				FieldMask: types.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -339,6 +346,7 @@ var (
 					ID:     id,
 					Rights: nil,
 				},
+				FieldMask: types.FieldMask{Paths: []string{"rights"}},
 			})
 			if err != nil {
 				return err
@@ -375,10 +383,12 @@ func init() {
 	applicationAPIKeys.AddCommand(applicationAPIKeysGet)
 	applicationAPIKeysCreate.Flags().String("name", "", "")
 	applicationAPIKeysCreate.Flags().AddFlagSet(applicationRightsFlags)
+	applicationAPIKeysCreate.Flags().AddFlagSet(apiKeyExpiryFlag)
 	applicationAPIKeys.AddCommand(applicationAPIKeysCreate)
 	applicationAPIKeysUpdate.Flags().String("api-key-id", "", "")
 	applicationAPIKeysUpdate.Flags().String("name", "", "")
 	applicationAPIKeysUpdate.Flags().AddFlagSet(applicationRightsFlags)
+	applicationAPIKeysUpdate.Flags().AddFlagSet(apiKeyExpiryFlag)
 	applicationAPIKeys.AddCommand(applicationAPIKeysUpdate)
 	applicationAPIKeysDelete.Flags().String("api-key-id", "", "")
 	applicationAPIKeys.AddCommand(applicationAPIKeysDelete)

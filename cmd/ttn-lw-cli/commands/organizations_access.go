@@ -18,6 +18,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
@@ -250,6 +251,11 @@ var (
 				return errNoAPIKeyRights
 			}
 
+			expiryDate, err := getAPIKeyExpiry(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
@@ -258,6 +264,7 @@ var (
 				OrganizationIdentifiers: *orgID,
 				Name:                    name,
 				Rights:                  rights,
+				ExpiresAt:               expiryDate,
 			})
 			if err != nil {
 				return err
@@ -286,9 +293,13 @@ var (
 			}
 			name, _ := cmd.Flags().GetString("name")
 
-			rights := getRights(cmd.Flags())
-			if len(rights) == 0 {
-				return errNoAPIKeyRights
+			rights, expiryDate, paths, err := getAPIKeyFields(cmd.Flags())
+			if err != nil {
+				return err
+			}
+			if len(paths) == 0 {
+				logger.Warn("No fields selected, won't update anything")
+				return nil
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -298,10 +309,12 @@ var (
 			_, err = ttnpb.NewOrganizationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 				OrganizationIdentifiers: *orgID,
 				APIKey: ttnpb.APIKey{
-					ID:     id,
-					Name:   name,
-					Rights: rights,
+					ID:        id,
+					Name:      name,
+					Rights:    rights,
+					ExpiresAt: expiryDate,
 				},
+				FieldMask: types.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -334,6 +347,7 @@ var (
 					ID:     id,
 					Rights: nil,
 				},
+				FieldMask: types.FieldMask{Paths: []string{"rights"}},
 			})
 			if err != nil {
 				return err
@@ -375,10 +389,12 @@ func init() {
 	organizationAPIKeys.AddCommand(organizationAPIKeysGet)
 	organizationAPIKeysCreate.Flags().String("name", "", "")
 	organizationAPIKeysCreate.Flags().AddFlagSet(organizationRightsFlags)
+	organizationAPIKeysCreate.Flags().AddFlagSet(apiKeyExpiryFlag)
 	organizationAPIKeys.AddCommand(organizationAPIKeysCreate)
 	organizationAPIKeysUpdate.Flags().String("api-key-id", "", "")
 	organizationAPIKeysUpdate.Flags().String("name", "", "")
 	organizationAPIKeysUpdate.Flags().AddFlagSet(organizationRightsFlags)
+	organizationAPIKeysUpdate.Flags().AddFlagSet(apiKeyExpiryFlag)
 	organizationAPIKeys.AddCommand(organizationAPIKeysUpdate)
 	organizationAPIKeysDelete.Flags().String("api-key-id", "", "")
 	organizationAPIKeys.AddCommand(organizationAPIKeysDelete)

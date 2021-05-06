@@ -19,10 +19,12 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"reflect"
 	"strings"
 	"time"
 
 	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -119,8 +121,10 @@ func getRights(flagSet *pflag.FlagSet) (rights []ttnpb.Right) {
 }
 
 var (
-	errNoAPIKeyID     = errors.DefineInvalidArgument("no_api_key_id", "no API key ID set")
-	errNoAPIKeyRights = errors.DefineInvalidArgument("no_api_key_rights", "no API key rights set")
+	errNoAPIKeyID        = errors.DefineInvalidArgument("no_api_key_id", "no API key ID set")
+	errNoAPIKeyRights    = errors.DefineInvalidArgument("no_api_key_rights", "no API key rights set")
+	errExpiryDateInPast  = errors.DefineInvalidArgument("expiry_date_invalid", "expiry date is in the past")
+	errInvalidDateFormat = errors.DefineInvalidArgument("expiry_date_format_invalid", "invalid expiry date format (RFC3339: YYYY-MM-DDTHH:MM:SSZ)")
 )
 
 func getAPIKeyID(flagSet *pflag.FlagSet, args []string, i int) string {
@@ -134,6 +138,46 @@ func getAPIKeyID(flagSet *pflag.FlagSet, args []string, i int) string {
 		apiKeyID, _ = flagSet.GetString("api-key-id")
 	}
 	return apiKeyID
+}
+
+var apiKeyExpiryFlag = func() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	util.AddField(flagSet, "api-key-expiry", reflect.TypeOf(time.Time{}), false)
+	return flagSet
+}()
+
+func getAPIKeyExpiry(flagSet *pflag.FlagSet) (*time.Time, error) {
+	expiry, _ := flagSet.GetString("api-key-expiry")
+	if expiry != "" {
+		expiryDate, err := time.Parse(time.RFC3339, expiry)
+		if err != nil {
+			return nil, errInvalidDateFormat
+		}
+		if expiryDate.Before(time.Now()) {
+			return nil, errExpiryDateInPast
+		}
+		return &expiryDate, nil
+	}
+	return nil, nil
+}
+
+func getAPIKeyFields(flagSet *pflag.FlagSet) ([]ttnpb.Right, *time.Time, []string, error) {
+	rights := getRights(flagSet)
+	paths := []string{}
+	if len(rights) > 0 {
+		paths = append(paths, "rights")
+	}
+	expiryDate, err := getAPIKeyExpiry(flagSet)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if flagSet.Changed("api-key-expiry") {
+		paths = append(paths, "expires_at")
+	}
+	if flagSet.Changed("name") {
+		paths = append(paths, "name")
+	}
+	return rights, expiryDate, paths, nil
 }
 
 var searchFlags = func() *pflag.FlagSet {

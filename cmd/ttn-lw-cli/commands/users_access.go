@@ -18,6 +18,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
@@ -122,6 +123,11 @@ var (
 				return errNoAPIKeyRights
 			}
 
+			expiryDate, err := getAPIKeyExpiry(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
@@ -130,6 +136,7 @@ var (
 				UserIdentifiers: *usrID,
 				Name:            name,
 				Rights:          rights,
+				ExpiresAt:       expiryDate,
 			})
 			if err != nil {
 				return err
@@ -158,9 +165,13 @@ var (
 			}
 			name, _ := cmd.Flags().GetString("name")
 
-			rights := getRights(cmd.Flags())
-			if len(rights) == 0 {
-				return errNoAPIKeyRights
+			rights, expiryDate, paths, err := getAPIKeyFields(cmd.Flags())
+			if err != nil {
+				return err
+			}
+			if len(paths) == 0 {
+				logger.Warn("No fields selected, won't update anything")
+				return nil
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -170,10 +181,12 @@ var (
 			_, err = ttnpb.NewUserAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 				UserIdentifiers: *usrID,
 				APIKey: ttnpb.APIKey{
-					ID:     id,
-					Name:   name,
-					Rights: rights,
+					ID:        id,
+					Name:      name,
+					Rights:    rights,
+					ExpiresAt: expiryDate,
 				},
+				FieldMask: types.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -206,6 +219,7 @@ var (
 					ID:     id,
 					Rights: nil,
 				},
+				FieldMask: types.FieldMask{Paths: []string{"rights"}},
 			})
 			if err != nil {
 				return err
@@ -257,10 +271,12 @@ func init() {
 	userAPIKeys.AddCommand(userAPIKeysGet)
 	userAPIKeysCreate.Flags().String("name", "", "")
 	userAPIKeysCreate.Flags().AddFlagSet(userRightsFlags)
+	userAPIKeysCreate.Flags().AddFlagSet(apiKeyExpiryFlag)
 	userAPIKeys.AddCommand(userAPIKeysCreate)
 	userAPIKeysUpdate.Flags().String("api-key-id", "", "")
 	userAPIKeysUpdate.Flags().String("name", "", "")
 	userAPIKeysUpdate.Flags().AddFlagSet(userRightsFlags)
+	userAPIKeysUpdate.Flags().AddFlagSet(apiKeyExpiryFlag)
 	userAPIKeys.AddCommand(userAPIKeysUpdate)
 	userAPIKeysDelete.Flags().String("api-key-id", "", "")
 	userAPIKeys.AddCommand(userAPIKeysDelete)
