@@ -25,7 +25,7 @@ func (ids *ClientIdentifiers) ExtractRequestFields(m map[string]interface{}) {
 	if ids == nil {
 		return
 	}
-	m["client_id"] = ids.ClientID
+	m["client_id"] = ids.ClientId
 }
 
 func (ids *EndDeviceIdentifiers) ExtractRequestFields(m map[string]interface{}) {

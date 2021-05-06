@@ -46,7 +46,7 @@ func TestOAuthStore(t *testing.T) {
 		userIDs := &ttnpb.UserIdentifiers{UserId: "test-user"}
 
 		s.createEntity(ctx, &Client{ClientID: "test-client"})
-		clientIDs := &ttnpb.ClientIdentifiers{ClientID: "test-client"}
+		clientIDs := &ttnpb.ClientIdentifiers{ClientId: "test-client"}
 
 		rights := []ttnpb.Right{ttnpb.RIGHT_ALL}
 
@@ -63,7 +63,7 @@ func TestOAuthStore(t *testing.T) {
 			start := cleanTime(time.Now())
 
 			created, err := store.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
-				ClientIDs: *clientIDs,
+				ClientIds: *clientIDs,
 				UserIds:   *userIDs,
 				Rights:    rights,
 			})
@@ -72,7 +72,7 @@ func TestOAuthStore(t *testing.T) {
 			a.So(created, should.NotBeNil)
 			if a.So(created, should.NotBeNil) {
 				a.So(created.UserIds.UserId, should.Equal, "test-user")
-				a.So(created.ClientIDs.ClientID, should.Equal, "test-client")
+				a.So(created.ClientIds.ClientId, should.Equal, "test-client")
 				a.So(created.CreatedAt, should.HappenOnOrAfter, start)
 				a.So(created.UpdatedAt, should.HappenOnOrAfter, start)
 			}
@@ -83,7 +83,7 @@ func TestOAuthStore(t *testing.T) {
 			a.So(got, should.NotBeNil)
 			if a.So(got, should.NotBeNil) {
 				a.So(created.UserIds.UserId, should.Equal, "test-user")
-				a.So(created.ClientIDs.ClientID, should.Equal, "test-client")
+				a.So(created.ClientIds.ClientId, should.Equal, "test-client")
 				a.So(got.CreatedAt, should.HappenOnOrAfter, start)
 				a.So(got.UpdatedAt, should.HappenOnOrAfter, start)
 			}
@@ -137,7 +137,7 @@ func TestOAuthStore(t *testing.T) {
 			start := cleanTime(time.Now())
 
 			err = store.CreateAuthorizationCode(ctx, &ttnpb.OAuthAuthorizationCode{
-				ClientIDs:   *clientIDs,
+				ClientIds:   *clientIDs,
 				UserIds:     *userIDs,
 				Rights:      rights,
 				Code:        code,
@@ -152,7 +152,7 @@ func TestOAuthStore(t *testing.T) {
 			a.So(err, should.BeNil)
 			if a.So(got, should.NotBeNil) {
 				a.So(got.UserIds.UserId, should.Equal, userIDs.UserId)
-				a.So(got.ClientIDs.ClientID, should.Equal, clientIDs.ClientID)
+				a.So(got.ClientIds.ClientId, should.Equal, clientIDs.ClientId)
 				a.So(got.Code, should.Equal, code)
 				a.So(got.RedirectURI, should.Equal, redirectURI)
 				a.So(got.State, should.Equal, state)
@@ -208,7 +208,7 @@ func TestOAuthStore(t *testing.T) {
 
 			err = store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 				UserIds:      *userIDs,
-				ClientIDs:    *clientIDs,
+				ClientIds:    *clientIDs,
 				ID:           tokenID,
 				AccessToken:  access,
 				RefreshToken: refresh,
@@ -222,7 +222,7 @@ func TestOAuthStore(t *testing.T) {
 			a.So(err, should.BeNil)
 			if a.So(got, should.NotBeNil) {
 				a.So(got.UserIds.UserId, should.Equal, userIDs.UserId)
-				a.So(got.ClientIDs.ClientID, should.Equal, clientIDs.ClientID)
+				a.So(got.ClientIds.ClientId, should.Equal, clientIDs.ClientId)
 				a.So(got.ID, should.Equal, tokenID)
 				a.So(got.AccessToken, should.Equal, access)
 				a.So(got.RefreshToken, should.Equal, refresh)
@@ -266,7 +266,7 @@ func TestOAuthStore(t *testing.T) {
 			prevID := ""
 
 			store.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
-				ClientIDs: *clientIDs,
+				ClientIds: *clientIDs,
 				UserIds:   *userIDs,
 				Rights:    rights,
 			})
@@ -275,7 +275,7 @@ func TestOAuthStore(t *testing.T) {
 			a.So(authorizationList, should.HaveLength, 1)
 
 			store.CreateAuthorizationCode(ctx, &ttnpb.OAuthAuthorizationCode{
-				ClientIDs:   *clientIDs,
+				ClientIds:   *clientIDs,
 				UserIds:     *userIDs,
 				Rights:      rights,
 				Code:        code,
@@ -287,7 +287,7 @@ func TestOAuthStore(t *testing.T) {
 
 			store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 				UserIds:      *userIDs,
-				ClientIDs:    *clientIDs,
+				ClientIds:    *clientIDs,
 				ID:           tokenID,
 				AccessToken:  access,
 				RefreshToken: refresh,

@@ -49,7 +49,7 @@ func TestIdentifiersIsZero(t *testing.T) {
 
 	for _, ids := range []interface{ IsZero() bool }{
 		ApplicationIdentifiers{ApplicationID: "foo"},
-		ClientIdentifiers{ClientID: "foo"},
+		ClientIdentifiers{ClientId: "foo"},
 		EndDeviceIdentifiers{ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo"}, DeviceID: "foo"},
 		EndDeviceIdentifiers{JoinEUI: &eui, DevEUI: &eui},
 		EndDeviceIdentifiers{DevAddr: &devAddr},
@@ -88,7 +88,7 @@ func TestEntityIdentifiers(t *testing.T) {
 	cliID := NewPopulatedClientIdentifiers(test.Randy, true)
 	eID = cliID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
-	a.So(eID.GetClientIDs(), should.Resemble, cliID)
+	a.So(eID.GetClientIds(), should.Resemble, cliID)
 
 	devID := NewPopulatedEndDeviceIdentifiers(test.Randy, true)
 	eID = devID.GetEntityIdentifiers()

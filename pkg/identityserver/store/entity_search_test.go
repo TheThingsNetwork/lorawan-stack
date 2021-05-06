@@ -320,7 +320,7 @@ func TestEntitySearch(t *testing.T) {
 		})
 
 		store.deleteEntity(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: fmt.Sprintf("the-foo-app")})
-		store.deleteEntity(ctx, &ttnpb.ClientIdentifiers{ClientID: fmt.Sprintf("the-foo-cli")})
+		store.deleteEntity(ctx, &ttnpb.ClientIdentifiers{ClientId: fmt.Sprintf("the-foo-cli")})
 		store.deleteEntity(ctx, &ttnpb.GatewayIdentifiers{GatewayID: fmt.Sprintf("the-foo-gtw")})
 		store.deleteEntity(ctx, &ttnpb.UserIdentifiers{UserId: fmt.Sprintf("the-foo-usr")})
 		store.deleteEntity(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: fmt.Sprintf("the-foo-org")})

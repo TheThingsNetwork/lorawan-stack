@@ -33,10 +33,10 @@ func (dst *ClientIdentifiers) SetFields(src *ClientIdentifiers, paths ...string)
 				return fmt.Errorf("'client_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ClientID = src.ClientID
+				dst.ClientId = src.ClientId
 			} else {
 				var zero string
-				dst.ClientID = zero
+				dst.ClientId = zero
 			}
 
 		default:
@@ -345,11 +345,11 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 						}
 					}
 				case "client_ids":
-					_, srcOk := src.Ids.(*EntityIdentifiers_ClientIDs)
+					_, srcOk := src.Ids.(*EntityIdentifiers_ClientIds)
 					if !srcOk && src.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'client_ids', while different oneof is set in source")
 					}
-					_, dstOk := dst.Ids.(*EntityIdentifiers_ClientIDs)
+					_, dstOk := dst.Ids.(*EntityIdentifiers_ClientIds)
 					if !dstOk && dst.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'client_ids', while different oneof is set in destination")
 					}
@@ -359,13 +359,13 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 							continue
 						}
 						if srcOk {
-							newSrc = src.Ids.(*EntityIdentifiers_ClientIDs).ClientIDs
+							newSrc = src.Ids.(*EntityIdentifiers_ClientIds).ClientIds
 						}
 						if dstOk {
-							newDst = dst.Ids.(*EntityIdentifiers_ClientIDs).ClientIDs
+							newDst = dst.Ids.(*EntityIdentifiers_ClientIds).ClientIds
 						} else {
 							newDst = &ClientIdentifiers{}
-							dst.Ids = &EntityIdentifiers_ClientIDs{ClientIDs: newDst}
+							dst.Ids = &EntityIdentifiers_ClientIds{ClientIds: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err

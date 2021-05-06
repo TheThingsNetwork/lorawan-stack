@@ -1129,7 +1129,7 @@ func (m *ApplicationPubSub_MQTTProvider) ValidateFields(paths ...string) error {
 
 		case "client_id":
 
-			if utf8.RuneCountInString(m.GetClientID()) > 23 {
+			if utf8.RuneCountInString(m.GetClientId()) > 23 {
 				return ApplicationPubSub_MQTTProviderValidationError{
 					field:  "client_id",
 					reason: "value length must be at most 23 runes",

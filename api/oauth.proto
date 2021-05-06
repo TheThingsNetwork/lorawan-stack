@@ -26,12 +26,12 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 message OAuthClientAuthorizationIdentifiers {
   UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message OAuthClientAuthorization {
   UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated Right rights = 3;
   google.protobuf.Timestamp created_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -57,7 +57,7 @@ message ListOAuthClientAuthorizationsRequest {
 message OAuthAuthorizationCode {
   UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string user_session_id = 9 [(gogoproto.customname) = "UserSessionID", (validate.rules).string.max_len = 64];
-  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated Right rights = 3;
   string code = 4;
   string redirect_uri = 5 [(gogoproto.customname) = "RedirectURI", (validate.rules).string.uri_ref = true];
@@ -68,14 +68,14 @@ message OAuthAuthorizationCode {
 
 message OAuthAccessTokenIdentifiers {
   UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   string id = 3 [(gogoproto.customname) = "ID"];
 }
 
 message OAuthAccessToken {
   UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string user_session_id = 9 [(gogoproto.customname) = "UserSessionID", (validate.rules).string.max_len = 64];
-  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   string id = 3 [(gogoproto.customname) = "ID"];
   string access_token = 4;
   string refresh_token = 5;
@@ -90,7 +90,7 @@ message OAuthAccessTokens {
 
 message ListOAuthAccessTokensRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 3 [

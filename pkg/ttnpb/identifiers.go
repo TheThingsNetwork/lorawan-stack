@@ -41,7 +41,7 @@ func (v *ApplicationIdentifiers) FieldIsZero(p string) bool {
 
 // IsZero returns true if all identifiers have zero-values.
 func (ids ClientIdentifiers) IsZero() bool {
-	return ids.ClientID == ""
+	return ids.ClientId == ""
 }
 
 // IsZero reports whether ids represent zero identifiers.

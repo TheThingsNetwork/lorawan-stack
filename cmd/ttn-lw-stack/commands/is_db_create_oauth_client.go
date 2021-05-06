@@ -104,7 +104,7 @@ var createOAuthClient = &cobra.Command{
 			"rights",
 		}}
 		cli := &ttnpb.Client{
-			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: clientID},
+			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: clientID},
 		}
 
 		err = store.Transact(ctx, db, func(db *gorm.DB) error {

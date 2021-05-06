@@ -60,7 +60,7 @@ func TestClientsPermissionDenied(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo-cli"},
+				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
 			},
 			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 		})
@@ -70,7 +70,7 @@ func TestClientsPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetClientRequest{
-			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo-cli"},
+			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
 			FieldMask:         types.FieldMask{Paths: []string{"name"}},
 		})
 
@@ -98,7 +98,7 @@ func TestClientsPermissionDenied(t *testing.T) {
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo-cli"},
+				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
 				Name:              "Updated Name",
 			},
 			FieldMask: types.FieldMask{Paths: []string{"name"}},
@@ -108,7 +108,7 @@ func TestClientsPermissionDenied(t *testing.T) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.Delete(ctx, &ttnpb.ClientIdentifiers{ClientID: "foo-cli"})
+		_, err = reg.Delete(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo-cli"})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -130,7 +130,7 @@ func TestClientsCRUD(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo"},
+				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo"},
 				Name:              "Foo Client",
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
@@ -144,7 +144,7 @@ func TestClientsCRUD(t *testing.T) {
 
 		created, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo"},
+				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo"},
 				Name:              "Foo Client",
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),

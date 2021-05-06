@@ -49,7 +49,7 @@ message ApplicationPubSub {
   // The MQTT provider settings.
   message MQTTProvider {
     string server_url = 1 [(gogoproto.customname) = "ServerURL", (validate.rules).string.uri = true];
-    string client_id = 2 [(gogoproto.customname) = "ClientID", (validate.rules).string.max_len = 23];
+    string client_id = 2 [(validate.rules).string.max_len = 23];
     string username = 3 [(validate.rules).string.max_len = 100];
     string password = 4 [(validate.rules).string.max_len = 100];
 

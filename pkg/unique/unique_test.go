@@ -82,14 +82,14 @@ func TestRoundtrip(t *testing.T) {
 			func(uid string) (ttnpb.IDStringer, error) { return ToApplicationID(uid) },
 		},
 		{
-			ttnpb.ClientIdentifiers{ClientID: "foo"},
+			ttnpb.ClientIdentifiers{ClientId: "foo"},
 			"foo",
-			func(uid string) (ttnpb.IDStringer, error) { return ToClientID(uid) },
+			func(uid string) (ttnpb.IDStringer, error) { return ToClientId(uid) },
 		},
 		{
-			&ttnpb.ClientIdentifiers{ClientID: "foo"},
+			&ttnpb.ClientIdentifiers{ClientId: "foo"},
 			"foo",
-			func(uid string) (ttnpb.IDStringer, error) { return ToClientID(uid) },
+			func(uid string) (ttnpb.IDStringer, error) { return ToClientId(uid) },
 		},
 		{
 			ttnpb.EndDeviceIdentifiers{
@@ -177,9 +177,9 @@ func TestValidatorForIdentifiers(t *testing.T) {
 			func(uid string) (ttnpb.IDStringer, error) { return ToApplicationID(uid) },
 		},
 		{
-			"ClientID",
-			func(uid string) ttnpb.IDStringer { return ttnpb.ClientIdentifiers{ClientID: uid} },
-			func(uid string) (ttnpb.IDStringer, error) { return ToClientID(uid) },
+			"ClientId",
+			func(uid string) ttnpb.IDStringer { return ttnpb.ClientIdentifiers{ClientId: uid} },
+			func(uid string) (ttnpb.IDStringer, error) { return ToClientId(uid) },
 		},
 		{
 			"GatewayID",

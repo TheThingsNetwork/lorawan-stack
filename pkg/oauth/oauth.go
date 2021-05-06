@@ -205,7 +205,7 @@ func (req *tokenRequest) ValidateContext(ctx context.Context) error {
 		return errMissingClientSecret.New()
 	}
 	if err := (&ttnpb.ClientIdentifiers{
-		ClientID: req.ClientID,
+		ClientId: req.ClientID,
 	}).ValidateFields("client_id"); err != nil {
 		return err
 	}

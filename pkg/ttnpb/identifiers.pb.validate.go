@@ -151,14 +151,14 @@ func (m *ClientIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "client_id":
 
-			if utf8.RuneCountInString(m.GetClientID()) > 36 {
+			if utf8.RuneCountInString(m.GetClientId()) > 36 {
 				return ClientIdentifiersValidationError{
 					field:  "client_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_ClientIdentifiers_ClientID_Pattern.MatchString(m.GetClientID()) {
+			if !_ClientIdentifiers_ClientId_Pattern.MatchString(m.GetClientId()) {
 				return ClientIdentifiersValidationError{
 					field:  "client_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -231,7 +231,7 @@ var _ interface {
 	ErrorName() string
 } = ClientIdentifiersValidationError{}
 
-var _ClientIdentifiers_ClientID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _ClientIdentifiers_ClientId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on EndDeviceIdentifiers with the
 // rules defined in the proto definition for this message. If any rules are
@@ -827,12 +827,12 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 					}
 
 				case "client_ids":
-					w, ok := m.Ids.(*EntityIdentifiers_ClientIDs)
+					w, ok := m.Ids.(*EntityIdentifiers_ClientIds)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetClientIDs()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetClientIds()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return EntityIdentifiersValidationError{
 								field:  "client_ids",

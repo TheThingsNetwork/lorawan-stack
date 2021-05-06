@@ -74,7 +74,7 @@ var (
 
 func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateClientRequest) (cli *ttnpb.Client, err error) {
 	createdByAdmin := is.IsAdmin(ctx)
-	if err = blacklist.Check(ctx, req.ClientID); err != nil {
+	if err = blacklist.Check(ctx, req.ClientId); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
@@ -223,7 +223,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 		}
 		cliIDs := make([]*ttnpb.ClientIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if cliID := id.GetEntityIdentifiers().GetClientIDs(); cliID != nil {
+			if cliID := id.GetEntityIdentifiers().GetClientIds(); cliID != nil {
 				cliIDs = append(cliIDs, cliID)
 			}
 		}
