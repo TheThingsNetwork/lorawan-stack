@@ -40,6 +40,7 @@ var (
 	errInvalidAuthorization     = errors.DefineUnauthenticated("invalid_authorization", "invalid authorization")
 	errTokenNotFound            = errors.DefineUnauthenticated("token_not_found", "token not found")
 	errTokenExpired             = errors.DefineUnauthenticated("token_expired", "token expired")
+	errAPIKeyExpired            = errors.DefineUnauthenticated("api_key_expired", "api key expired")
 	errUserRejected             = errors.DefinePermissionDenied("user_rejected", "user account was rejected", "description")
 	errUserRequested            = errors.DefinePermissionDenied("user_requested", "user account approval is pending", "description")
 	errUserSuspended            = errors.DefinePermissionDenied("user_suspended", "user account was suspended", "description")
@@ -120,6 +121,9 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			}
 			if !valid {
 				return errInvalidAuthorization.New()
+			}
+			if apiKey.ExpiresAt != nil && apiKey.ExpiresAt.Before(time.Now()) {
+				return errAPIKeyExpired.New()
 			}
 			apiKey.Key = ""
 			apiKey.Rights = ttnpb.RightsFrom(apiKey.Rights...).Implied().GetRights()

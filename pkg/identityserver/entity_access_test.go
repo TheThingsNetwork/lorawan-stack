@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -93,6 +94,16 @@ func TestEntityAccess(t *testing.T) {
 
 			a.So(err, should.BeNil)
 			a.So(authInfo.GetUniversalRights().GetRights(), should.NotBeEmpty)
+		})
+
+		t.Run("Expired API Key User", func(t *testing.T) {
+			a := assertions.New(t)
+			var md metadata.MD
+			_, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(defaultUserIdx, "expired key"), grpc.Header(&md))
+
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsUnauthenticated(err), should.BeTrue)
+			}
 		})
 	})
 }

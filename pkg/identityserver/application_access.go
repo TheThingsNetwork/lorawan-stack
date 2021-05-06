@@ -85,7 +85,7 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, req.Rights...); err != nil {
 		return nil, err
 	}
-	key, token, err := GenerateAPIKey(ctx, req.Name, req.Rights...)
+	key, token, err := GenerateAPIKey(ctx, req.Name, req.ExpiresAt, req.Rights...)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +179,7 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.ApplicationIdentifiers.GetEntityIdentifiers(), &req.APIKey)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.ApplicationIdentifiers.GetEntityIdentifiers(), &req.APIKey, &req.FieldMask)
 		return err
 	})
 	if err != nil {

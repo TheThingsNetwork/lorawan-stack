@@ -153,7 +153,7 @@ type APIKeyStore interface {
 	// Get an API key by its ID.
 	GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error)
 	// Update key rights on an entity. Rights can be deleted by not passing any rights, in which case the returned API key will be nil.
-	UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error)
+	UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey, fieldMask *types.FieldMask) (*ttnpb.APIKey, error)
 	// Delete api keys deletes all api keys tied to an entity. Used when purging entities.
 	DeleteEntityAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error
 }

@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
@@ -30,7 +31,7 @@ var apiKeyHashSettings auth.HashValidator = pbkdf2.PBKDF2{
 }
 
 // GenerateAPIKey generates a new API key with the given name for the set of rights
-func GenerateAPIKey(ctx context.Context, name string, rights ...ttnpb.Right) (key *ttnpb.APIKey, token string, err error) {
+func GenerateAPIKey(ctx context.Context, name string, expiresAt *time.Time, rights ...ttnpb.Right) (key *ttnpb.APIKey, token string, err error) {
 	token, err = auth.APIKey.Generate(ctx, "")
 	if err != nil {
 		return nil, "", err
@@ -44,10 +45,11 @@ func GenerateAPIKey(ctx context.Context, name string, rights ...ttnpb.Right) (ke
 		return nil, "", err
 	}
 	key = &ttnpb.APIKey{
-		ID:     generatedID,
-		Key:    hashedKey,
-		Name:   name,
-		Rights: rights,
+		ID:        generatedID,
+		Key:       hashedKey,
+		Name:      name,
+		Rights:    rights,
+		ExpiresAt: expiresAt,
 	}
 	return key, token, nil
 }

@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -53,6 +54,8 @@ func TestAPIKeyStore(t *testing.T) {
 		s.createEntity(ctx, &Gateway{GatewayID: "test-gtw"})
 		gtwIDs := &ttnpb.GatewayIdentifiers{GatewayId: "test-gtw"}
 
+		expiryTime := time.Now().Add(24 * time.Hour)
+
 		for _, tt := range []struct {
 			Name        string
 			Identifiers *ttnpb.EntityIdentifiers
@@ -83,12 +86,12 @@ func TestAPIKeyStore(t *testing.T) {
 				a := assertions.New(t)
 
 				key := &ttnpb.APIKey{
-					ID:     strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
-					Key:    strings.ToUpper(fmt.Sprintf("%sKEY", tt.Name)),
-					Name:   fmt.Sprintf("%s API key", tt.Name),
-					Rights: tt.Rights,
+					ID:        strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
+					Key:       strings.ToUpper(fmt.Sprintf("%sKEY", tt.Name)),
+					Name:      fmt.Sprintf("%s API key", tt.Name),
+					Rights:    tt.Rights,
+					ExpiresAt: &expiryTime,
 				}
-
 				created, err := store.CreateAPIKey(ctx, tt.Identifiers, key)
 
 				a.So(err, should.BeNil)
@@ -118,7 +121,8 @@ func TestAPIKeyStore(t *testing.T) {
 					ID:     strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
 					Name:   fmt.Sprintf("Updated %s API key", tt.Name),
 					Rights: tt.Rights,
-				})
+				},
+					&types.FieldMask{Paths: []string{"rights", "name"}})
 
 				a.So(err, should.BeNil)
 
@@ -134,8 +138,9 @@ func TestAPIKeyStore(t *testing.T) {
 
 				updated, err = store.UpdateAPIKey(ctx, tt.Identifiers, &ttnpb.APIKey{
 					ID: strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
-					// Empty rights
-				})
+					// Empty rights,
+				},
+					&types.FieldMask{Paths: []string{"rights"}})
 
 				a.So(err, should.BeNil)
 				a.So(updated, should.BeNil)
