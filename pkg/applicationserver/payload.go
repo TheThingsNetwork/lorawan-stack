@@ -28,6 +28,40 @@ import (
 
 var errNoPayload = errors.Define("no_payload", "no payload")
 
+func (as *ApplicationServer) encodeAndEncryptDownlinks(ctx context.Context, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, items []*ttnpb.ApplicationDownlink, sessions []*ttnpb.Session) ([]*ttnpb.ApplicationDownlink, error) {
+	var encryptedItems []*ttnpb.ApplicationDownlink
+	for _, session := range sessions {
+		skipPayloadCrypto := as.skipPayloadCrypto(ctx, link, dev, session)
+		for _, item := range items {
+			fCnt := session.LastAFCntDown + 1
+			if skipPayloadCrypto {
+				fCnt = item.FCnt
+			}
+			encryptedItem := &ttnpb.ApplicationDownlink{
+				SessionKeyID:   session.SessionKeyID,
+				FPort:          item.FPort,
+				FCnt:           fCnt,
+				FRMPayload:     item.FRMPayload,
+				DecodedPayload: item.DecodedPayload,
+				Confirmed:      item.Confirmed,
+				ClassBC:        item.ClassBC,
+				Priority:       item.Priority,
+				CorrelationIDs: item.CorrelationIDs,
+			}
+			if !skipPayloadCrypto {
+				if err := as.encodeAndEncryptDownlink(ctx, dev, session, encryptedItem, link.DefaultFormatters); err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Encoding and encryption of downlink message failed; drop item")
+					return nil, err
+				}
+			}
+			encryptedItem.DecodedPayload = nil
+			session.LastAFCntDown = encryptedItem.FCnt
+			encryptedItems = append(encryptedItems, encryptedItem)
+		}
+	}
+	return encryptedItems, nil
+}
+
 func (as *ApplicationServer) encodeAndEncryptDownlink(ctx context.Context, dev *ttnpb.EndDevice, session *ttnpb.Session, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
 	if session == nil || session.AppSKey == nil {
 		return errNoAppSKey.New()
@@ -108,19 +142,21 @@ func (as *ApplicationServer) decodeUplink(ctx context.Context, dev *ttnpb.EndDev
 }
 
 func (as *ApplicationServer) decryptAndDecodeDownlink(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
-	if err := as.decryptDownlink(ctx, dev, downlink); err != nil {
+	if err := as.decryptDownlink(ctx, dev, downlink, nil); err != nil {
 		return err
 	}
 	return as.decodeDownlink(ctx, dev, downlink, defaultFormatters)
 }
 
-func (as *ApplicationServer) decryptDownlink(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink) error {
+func (as *ApplicationServer) decryptDownlink(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink, ternarySession *ttnpb.Session) error {
 	var session *ttnpb.Session
 	switch {
 	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyID, downlink.SessionKeyID):
 		session = dev.Session
 	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, downlink.SessionKeyID):
 		session = dev.PendingSession
+	case ternarySession != nil && bytes.Equal(ternarySession.SessionKeyID, downlink.SessionKeyID):
+		session = ternarySession
 	default:
 		return errUnknownSession.New()
 	}

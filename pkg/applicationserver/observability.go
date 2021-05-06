@@ -20,6 +20,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc/peer"
@@ -268,6 +269,12 @@ func registerReceiveDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.ApplicationID).Inc()
 }
 
+func registerReceiveDownlinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) {
+	for _, item := range items {
+		registerReceiveDownlink(ctx, ids, item)
+	}
+}
+
 func registerForwardDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, ns string) {
 	events.Publish(evtForwardDataDown.NewWithIdentifiersAndData(ctx, &ids, msg))
 	asMetrics.downlinkForwarded.WithLabelValues(ctx, ns).Inc()
@@ -279,5 +286,42 @@ func registerDropDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, m
 		asMetrics.downlinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {
 		asMetrics.downlinkDropped.WithLabelValues(ctx, unknown).Inc()
+	}
+}
+
+func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, err error) {
+	var errorDetails ttnpb.ErrorDetails
+	if ttnErr, ok := err.(errors.ErrorDetails); ok {
+		errorDetails = *ttnpb.ErrorDetailsToProto(ttnErr)
+	}
+	for _, item := range items {
+		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
+			EndDeviceIdentifiers: ids,
+			CorrelationIDs:       item.CorrelationIDs,
+			Up: &ttnpb.ApplicationUp_DownlinkFailed{
+				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+					ApplicationDownlink: *item,
+					Error:               errorDetails,
+				},
+			},
+		}); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to send upstream message")
+		}
+		registerDropDownlink(ctx, ids, item, err)
+	}
+}
+
+func (as *ApplicationServer) registerForwardDownlinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, peerName string) {
+	for _, item := range items {
+		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
+			EndDeviceIdentifiers: ids,
+			CorrelationIDs:       item.CorrelationIDs,
+			Up: &ttnpb.ApplicationUp_DownlinkQueued{
+				DownlinkQueued: item,
+			},
+		}); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to send upstream message")
+		}
+		registerForwardDownlink(ctx, ids, item, peerName)
 	}
 }
