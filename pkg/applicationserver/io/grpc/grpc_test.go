@@ -606,7 +606,7 @@ func TestMessageProcessors(t *testing.T) {
 			},
 			Uplink: &ttnpb.ApplicationUplink{
 				FRMPayload: []byte{1, 0, 255},
-				RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gtw"}}},
+				RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 				Settings:   ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
 				FPort:      1,
 			},

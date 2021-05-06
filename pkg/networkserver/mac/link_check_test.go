@@ -115,7 +115,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "test",
+							GatewayId: "test",
 						},
 						SNR: 25,
 					},
@@ -167,7 +167,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "test",
+							GatewayId: "test",
 						},
 						SNR: 25,
 					},
@@ -219,19 +219,19 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "test",
+							GatewayId: "test",
 						},
 						SNR: 24,
 					},
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "test2",
+							GatewayId: "test2",
 						},
 						SNR: 25,
 					},
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "test3",
+							GatewayId: "test3",
 						},
 						SNR: 2,
 					},
@@ -283,13 +283,13 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "test",
+							GatewayId: "test",
 						},
 						SNR: 24,
 					},
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "test2",
+							GatewayId: "test2",
 						},
 						SNR: 25,
 					},
@@ -304,7 +304,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "test3",
+							GatewayId: "test3",
 						},
 						SNR: 2,
 					},

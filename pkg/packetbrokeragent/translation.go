@@ -271,13 +271,13 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				up.GatewayId = &packetbroker.GatewayIdentifier{}
 			}
 			if config.HashGatewayID {
-				hash := sha256.Sum256([]byte(md.GatewayID))
+				hash := sha256.Sum256([]byte(md.GatewayId))
 				up.GatewayId.Id = &packetbroker.GatewayIdentifier_Hash{
 					Hash: hash[:],
 				}
 			} else {
 				up.GatewayId.Id = &packetbroker.GatewayIdentifier_Plain{
-					Plain: md.GatewayID,
+					Plain: md.GatewayId,
 				}
 			}
 		}

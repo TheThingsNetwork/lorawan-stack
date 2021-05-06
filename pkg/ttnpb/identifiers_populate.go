@@ -50,7 +50,7 @@ func NewPopulatedClientIdentifiers(r randyIdentifiers, _ bool) *ClientIdentifier
 
 func NewPopulatedGatewayIdentifiers(r randyIdentifiers, _ bool) *GatewayIdentifiers {
 	return &GatewayIdentifiers{
-		GatewayID: NewPopulatedID(r),
+		GatewayId: NewPopulatedID(r),
 		EUI:       types.NewPopulatedEUI64(r),
 	}
 }

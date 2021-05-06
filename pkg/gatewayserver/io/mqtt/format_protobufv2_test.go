@@ -33,7 +33,7 @@ func TestProtobufV2Downlink(t *testing.T) {
 	a := assertions.New(t)
 	pld, _ := base64.RawStdEncoding.DecodeString("YHBhYUoAAgABj9/clY414A")
 	ids := ttnpb.GatewayIdentifiers{
-		GatewayID: "gateway-id",
+		GatewayId: "gateway-id",
 	}
 	input := &ttnpb.DownlinkMessage{
 		RawPayload: pld,
@@ -132,7 +132,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 	}
 	nilTime := time.Unix(0, 0)
 	ids := ttnpb.GatewayIdentifiers{
-		GatewayID: "gateway-id",
+		GatewayId: "gateway-id",
 	}
 	validV3Metadata := []*ttnpb.RxMetadata{
 		{
@@ -242,7 +242,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 
 func TestProtobufV2Status(t *testing.T) {
 	ids := ttnpb.GatewayIdentifiers{
-		GatewayID: "gateway-id",
+		GatewayId: "gateway-id",
 	}
 	for _, tc := range []struct {
 		Name           string

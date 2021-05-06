@@ -259,7 +259,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		}
 
 		modifiedGatewayID := gatewayID
-		modifiedGatewayID.GatewayID = reverse(modifiedGatewayID.GatewayID)
+		modifiedGatewayID.GatewayId = reverse(modifiedGatewayID.GatewayId)
 
 		rights, err = reg.ListRights(ctx, &modifiedGatewayID, creds)
 
@@ -516,7 +516,6 @@ func TestGatewayAccessRights(t *testing.T) {
 
 		if a.So(err, should.BeNil) {
 			a.So(res.Rights, should.Resemble, newRights.Rights)
-
 		}
 
 		// Delete collaborator with more rights

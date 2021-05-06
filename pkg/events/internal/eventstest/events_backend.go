@@ -50,7 +50,7 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 		DevAddr:                &devAddr,
 	}
 	gtwID := ttnpb.GatewayIdentifiers{
-		GatewayID: "test-gtw",
+		GatewayId: "test-gtw",
 		EUI:       &eui,
 	}
 
@@ -112,7 +112,7 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 		a.So(e.Name(), should.Equal, "test.other.evt2")
 		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 2) {
 			a.So(e.Identifiers()[0].GetDeviceIDs(), should.Resemble, &devID)
-			a.So(e.Identifiers()[1].GetGatewayIDs(), should.Resemble, &gtwID)
+			a.So(e.Identifiers()[1].GetGatewayIds(), should.Resemble, &gtwID)
 		}
 	}
 

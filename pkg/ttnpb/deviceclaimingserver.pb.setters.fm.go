@@ -283,10 +283,10 @@ func (dst *ClaimGatewayRequest) SetFields(src *ClaimGatewayRequest, paths ...str
 				return fmt.Errorf("'target_gateway_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TargetGatewayID = src.TargetGatewayID
+				dst.TargetGatewayId = src.TargetGatewayId
 			} else {
 				var zero string
-				dst.TargetGatewayID = zero
+				dst.TargetGatewayId = zero
 			}
 		case "target_gateway_server_address":
 			if len(subs) > 0 {

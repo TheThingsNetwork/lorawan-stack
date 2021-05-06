@@ -53,7 +53,7 @@ import (
 var (
 	serverAddress          = "127.0.0.1:0"
 	registeredGatewayUID   = "eui-0101010101010101"
-	registeredGatewayID    = ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayUID}
+	registeredGatewayID    = ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayUID}
 	registeredGateway      = ttnpb.Gateway{GatewayIdentifiers: registeredGatewayID, FrequencyPlanID: "EU_863_870"}
 	registeredGatewayToken = "secrettoken"
 
@@ -136,20 +136,20 @@ func TestClientTokenAuth(t *testing.T) {
 		}{
 			{
 				Name:           "RegisteredGatewayAndValidKey",
-				GatewayID:      registeredGatewayID.GatewayID,
+				GatewayID:      registeredGatewayID.GatewayId,
 				AuthToken:      registeredGatewayToken,
 				ErrorAssertion: nil,
 			},
 			{
 				Name:           "RegisteredGatewayAndValidKey",
-				GatewayID:      registeredGatewayID.GatewayID,
+				GatewayID:      registeredGatewayID.GatewayId,
 				AuthToken:      registeredGatewayToken,
 				TokenPrefix:    "Bearer ",
 				ErrorAssertion: nil,
 			},
 			{
 				Name:      "RegisteredGatewayAndInValidKey",
-				GatewayID: registeredGatewayID.GatewayID,
+				GatewayID: registeredGatewayID.GatewayId,
 				AuthToken: "invalidToken",
 				ErrorAssertion: func(err error) bool {
 					if err == nil {
@@ -160,7 +160,7 @@ func TestClientTokenAuth(t *testing.T) {
 			},
 			{
 				Name:      "RegisteredGatewayAndNoKey",
-				GatewayID: registeredGatewayID.GatewayID,
+				GatewayID: registeredGatewayID.GatewayId,
 				ErrorAssertion: func(err error) bool {
 					if ttc.AllowUnauthenticated && err == nil {
 						return true
@@ -822,7 +822,7 @@ func TestTraffic(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-						GatewayID: "eui-0101010101010101",
+						GatewayId: "eui-0101010101010101",
 						EUI:       &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
 					},
 					Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
@@ -886,7 +886,7 @@ func TestTraffic(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "eui-0101010101010101",
+							GatewayId: "eui-0101010101010101",
 							EUI:       &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
 						},
 						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],

@@ -53,7 +53,7 @@ func fetchEntityRights(ctx context.Context, id string, f EntityFetcher) (res str
 		wg.Done()
 	}()
 	go func() {
-		res.GtwRights, res.GtwErr = f.GatewayRights(ctx, ttnpb.GatewayIdentifiers{GatewayID: id})
+		res.GtwRights, res.GtwErr = f.GatewayRights(ctx, ttnpb.GatewayIdentifiers{GatewayId: id})
 		wg.Done()
 	}()
 	go func() {
@@ -194,7 +194,7 @@ func TestEntityFetcherFunc(t *testing.T) {
 	if a.So(fetcher.ids, should.HaveLength, 5) {
 		a.So(fetcher.ids, should.Contain, (&ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}).GetEntityIdentifiers())
 		a.So(fetcher.ids, should.Contain, (&ttnpb.ClientIdentifiers{ClientId: "foo"}).GetEntityIdentifiers())
-		a.So(fetcher.ids, should.Contain, (&ttnpb.GatewayIdentifiers{GatewayID: "foo"}).GetEntityIdentifiers())
+		a.So(fetcher.ids, should.Contain, (&ttnpb.GatewayIdentifiers{GatewayId: "foo"}).GetEntityIdentifiers())
 		a.So(fetcher.ids, should.Contain, (&ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}).GetEntityIdentifiers())
 		a.So(fetcher.ids, should.Contain, (&ttnpb.UserIdentifiers{UserId: "foo"}).GetEntityIdentifiers())
 	}

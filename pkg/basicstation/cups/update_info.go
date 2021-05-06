@@ -66,7 +66,7 @@ func getAuthHeader(ctx context.Context) string {
 func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*ttnpb.Gateway, error) {
 	logger := log.FromContext(ctx)
 	ids := ttnpb.GatewayIdentifiers{
-		GatewayID: fmt.Sprintf("eui-%s", strings.ToLower(req.Router.EUI64.String())),
+		GatewayId: fmt.Sprintf("eui-%s", strings.ToLower(req.Router.EUI64.String())),
 		EUI:       &req.Router.EUI64,
 	}
 	logger = logger.WithField("gateway_uid", unique.ID(ctx, ids))
@@ -187,7 +187,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 			ids = &gtw.GatewayIdentifiers
 			// Use the generated CUPS API Key for authenticating subsequent calls.
 			md := metadata.New(map[string]string{
-				"id":            ids.GatewayID,
+				"id":            ids.GatewayId,
 				"authorization": fmt.Sprintf("Bearer %s", string(gtw.TargetCUPSKey.Value)),
 			})
 			if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
@@ -211,7 +211,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 			auth = fmt.Sprintf("Bearer %s", auth)
 		}
 		md = metadata.New(map[string]string{
-			"id":            ids.GatewayID,
+			"id":            ids.GatewayId,
 			"authorization": auth,
 		})
 	}
@@ -285,7 +285,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		logger := logger.WithField("lns_uri", gtw.GatewayServerAddress)
 		logger.Debug("Configure LNS")
 		if gtw.LBSLNSSecret == nil {
-			return errLNSCredentials.WithAttributes("gateway_uid", gtw.GatewayID)
+			return errLNSCredentials.WithAttributes("gateway_uid", gtw.GatewayId)
 		}
 		if gtw.GatewayServerAddress == "" {
 			if req.LNSURI != "" {

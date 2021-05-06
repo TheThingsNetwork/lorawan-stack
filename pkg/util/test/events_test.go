@@ -37,7 +37,7 @@ func TestSetDefaultEventPubSub(t *testing.T) {
 		events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}),
 	)
 	testEvent2 := events.New(ctx, "test-set-default-event-pub-sub-2", "test-event-2",
-		events.WithIdentifiers(&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}),
+		events.WithIdentifiers(&ttnpb.GatewayIdentifiers{GatewayId: "test-gtw"}),
 	)
 
 	events.Publish(testEvent1)
@@ -79,7 +79,7 @@ func TestCollectEvents(t *testing.T) {
 		events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}),
 	)
 	testEvent2 := events.New(ctx, "test-collect-events-2", "test-event-2",
-		events.WithIdentifiers(&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}),
+		events.WithIdentifiers(&ttnpb.GatewayIdentifiers{GatewayId: "test-gtw"}),
 	)
 	assertions.New(t).So(CollectEvents(func() {
 		events.Publish(testEvent1)
@@ -98,7 +98,7 @@ func TestRedirectEvents(t *testing.T) {
 		events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}),
 	)
 	testEvent2 := events.New(ctx, "test-redirect-events-2", "test-event-2",
-		events.WithIdentifiers(&ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}),
+		events.WithIdentifiers(&ttnpb.GatewayIdentifiers{GatewayId: "test-gtw"}),
 	)
 	ch := make(chan events.Event, 2)
 	defer RedirectEvents(ch)()

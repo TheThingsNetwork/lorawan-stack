@@ -189,7 +189,7 @@ func TestServer(t *testing.T) {
 		}
 		gtw := ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayID: "test-gateway",
+				GatewayId: "test-gateway",
 				EUI:       &mockGatewayEUI,
 			},
 			Attributes: map[string]string{
@@ -268,7 +268,7 @@ func TestServer(t *testing.T) {
 				c.err.GetIdentifiersForEUI = mockErrNotFound
 				c.res.Create = &ttnpb.Gateway{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-						GatewayID: "eui-58a0cbfffe800019",
+						GatewayId: "eui-58a0cbfffe800019",
 						EUI:       &mockGatewayEUI,
 					},
 					LBSLNSSecret: &ttnpb.Secret{
@@ -309,11 +309,11 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Create, should.NotBeNil) {
-					a.So(s.req.Create.GatewayIdentifiers.GatewayID, should.Equal, "eui-58a0cbfffe800019")
+					a.So(s.req.Create.GatewayIdentifiers.GatewayId, should.Equal, "eui-58a0cbfffe800019")
 					a.So(s.req.Create.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
 				}
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GatewayIdentifiers.GatewayID, should.Equal, "eui-58a0cbfffe800019")
+					a.So(s.req.Update.GatewayIdentifiers.GatewayId, should.Equal, "eui-58a0cbfffe800019")
 					a.So(s.req.Update.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(false, false, false).Attributes
 					for _, attr := range []string{
@@ -355,7 +355,7 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GatewayIdentifiers.GatewayID, should.Equal, "test-gateway")
+					a.So(s.req.Update.GatewayIdentifiers.GatewayId, should.Equal, "test-gateway")
 					a.So(s.req.Update.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(true, false, false).Attributes
 					for _, attr := range []string{
@@ -397,7 +397,7 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GatewayIdentifiers.GatewayID, should.Equal, "test-gateway")
+					a.So(s.req.Update.GatewayIdentifiers.GatewayId, should.Equal, "test-gateway")
 					a.So(s.req.Update.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(true, false, false).Attributes
 					for _, attr := range []string{
@@ -455,7 +455,7 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GatewayIdentifiers.GatewayID, should.Equal, "test-gateway")
+					a.So(s.req.Update.GatewayIdentifiers.GatewayId, should.Equal, "test-gateway")
 					a.So(s.req.Update.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(false, true, false).Attributes
 					for _, attr := range []string{
@@ -497,7 +497,7 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GatewayIdentifiers.GatewayID, should.Equal, "test-gateway")
+					a.So(s.req.Update.GatewayIdentifiers.GatewayId, should.Equal, "test-gateway")
 					a.So(s.req.Update.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(false, false, true).Attributes
 					for _, attr := range []string{

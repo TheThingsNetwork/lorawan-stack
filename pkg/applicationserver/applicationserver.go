@@ -842,7 +842,7 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDevic
 	for _, md := range uplink.RxMetadata {
 		cleanUplink.RxMetadata = append(cleanUplink.RxMetadata, &ttnpb.RxMetadata{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayID: md.GatewayID,
+				GatewayId: md.GatewayId,
 			},
 			AntennaIndex:  md.AntennaIndex,
 			FineTimestamp: md.FineTimestamp,

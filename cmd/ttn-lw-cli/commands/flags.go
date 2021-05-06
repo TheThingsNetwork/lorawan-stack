@@ -193,7 +193,7 @@ func getEntityIdentifiersSlice(flagSet *pflag.FlagSet) []*ttnpb.EntityIdentifier
 		ids = append(ids, (&ttnpb.ClientIdentifiers{ClientId: clientID}).GetEntityIdentifiers())
 	}
 	for _, gatewayID := range gatewayIDs {
-		ids = append(ids, (&ttnpb.GatewayIdentifiers{GatewayID: gatewayID}).GetEntityIdentifiers())
+		ids = append(ids, (&ttnpb.GatewayIdentifiers{GatewayId: gatewayID}).GetEntityIdentifiers())
 	}
 	for _, organizationID := range organizationIDs {
 		ids = append(ids, (&ttnpb.OrganizationIdentifiers{OrganizationId: organizationID}).GetEntityIdentifiers())

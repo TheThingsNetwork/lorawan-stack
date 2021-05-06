@@ -40,7 +40,7 @@ func (ids *GatewayIdentifiers) ExtractRequestFields(m map[string]interface{}) {
 	if ids == nil {
 		return
 	}
-	m["gateway_id"] = ids.GatewayID
+	m["gateway_id"] = ids.GatewayId
 }
 
 func (ids *OrganizationIdentifiers) ExtractRequestFields(m map[string]interface{}) {

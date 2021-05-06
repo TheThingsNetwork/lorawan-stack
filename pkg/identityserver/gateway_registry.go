@@ -72,7 +72,7 @@ var (
 )
 
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
-	if err = blacklist.Check(ctx, req.GatewayID); err != nil {
+	if err = blacklist.Check(ctx, req.GatewayId); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
@@ -169,7 +169,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 			}); err == nil {
 				return nil, errGatewayEUITaken.WithAttributes(
 					"gateway_eui", req.EUI.String(),
-					"gateway_id", ids.GetGatewayID(),
+					"gateway_id", ids.GetGatewayId(),
 				)
 			}
 		}
@@ -347,7 +347,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		}
 		gtwIDs := make([]*ttnpb.GatewayIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if gtwID := id.GetEntityIdentifiers().GetGatewayIDs(); gtwID != nil {
+			if gtwID := id.GetEntityIdentifiers().GetGatewayIds(); gtwID != nil {
 				gtwIDs = append(gtwIDs, gtwID)
 			}
 		}

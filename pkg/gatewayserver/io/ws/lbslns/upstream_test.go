@@ -110,14 +110,14 @@ func TestMarshalJSON(t *testing.T) {
 
 func TestJoinRequest(t *testing.T) {
 	gtwID := ttnpb.GatewayIdentifiers{
-		GatewayID: "eui-1122334455667788",
+		GatewayId: "eui-1122334455667788",
 		EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
 	}
 
 	for _, tc := range []struct {
 		Name                  string
 		JoinRequest           JoinRequest
-		GatewayIDs            ttnpb.GatewayIdentifiers
+		GatewayIds            ttnpb.GatewayIdentifiers
 		BandID                string
 		ExpectedUplinkMessage ttnpb.UplinkMessage
 		ErrorAssertion        func(err error) bool
@@ -141,7 +141,7 @@ func TestJoinRequest(t *testing.T) {
 					},
 				},
 			},
-			GatewayIDs:     gtwID,
+			GatewayIds:     gtwID,
 			BandID:         "EU_86_870",
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
@@ -164,14 +164,14 @@ func TestJoinRequest(t *testing.T) {
 					},
 				},
 			},
-			GatewayIDs:     gtwID,
+			GatewayIds:     gtwID,
 			BandID:         "EU_868_870",
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name:        "EmptyJoinRequest",
 			JoinRequest: JoinRequest{},
-			GatewayIDs:  gtwID,
+			GatewayIds:  gtwID,
 			BandID:      "EU_863_870",
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
@@ -214,7 +214,7 @@ func TestJoinRequest(t *testing.T) {
 					},
 				},
 			},
-			GatewayIDs: gtwID,
+			GatewayIds: gtwID,
 			BandID:     "EU_863_870",
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
@@ -251,7 +251,7 @@ func TestJoinRequest(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			msg, err := tc.JoinRequest.toUplinkMessage(tc.GatewayIDs, tc.BandID, time.Time{})
+			msg, err := tc.JoinRequest.toUplinkMessage(tc.GatewayIds, tc.BandID, time.Time{})
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -275,14 +275,14 @@ func TestJoinRequest(t *testing.T) {
 
 func TestUplinkDataFrame(t *testing.T) {
 	gtwID := ttnpb.GatewayIdentifiers{
-		GatewayID: "eui-1122334455667788",
+		GatewayId: "eui-1122334455667788",
 		EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
 	}
 
 	for _, tc := range []struct {
 		Name                  string
 		UplinkDataFrame       UplinkDataFrame
-		GatewayIDs            ttnpb.GatewayIdentifiers
+		GatewayIds            ttnpb.GatewayIdentifiers
 		FrequencyPlanID       string
 		ExpectedUplinkMessage ttnpb.UplinkMessage
 		ErrorAssertion        func(err error) bool
@@ -290,7 +290,7 @@ func TestUplinkDataFrame(t *testing.T) {
 		{
 			Name:                  "Empty",
 			UplinkDataFrame:       UplinkDataFrame{},
-			GatewayIDs:            gtwID,
+			GatewayIds:            gtwID,
 			FrequencyPlanID:       "EU_863_870",
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
@@ -319,7 +319,7 @@ func TestUplinkDataFrame(t *testing.T) {
 					},
 				},
 			},
-			GatewayIDs:      gtwID,
+			GatewayIds:      gtwID,
 			FrequencyPlanID: "EU_863_870",
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
@@ -383,7 +383,7 @@ func TestUplinkDataFrame(t *testing.T) {
 					},
 				},
 			},
-			GatewayIDs:      gtwID,
+			GatewayIds:      gtwID,
 			FrequencyPlanID: "EU_863_870",
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
@@ -428,7 +428,7 @@ func TestUplinkDataFrame(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			msg, err := tc.UplinkDataFrame.toUplinkMessage(tc.GatewayIDs, tc.FrequencyPlanID, time.Time{})
+			msg, err := tc.UplinkDataFrame.toUplinkMessage(tc.GatewayIds, tc.FrequencyPlanID, time.Time{})
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -447,14 +447,14 @@ func TestUplinkDataFrame(t *testing.T) {
 
 func TestFromUplinkDataFrame(t *testing.T) {
 	gtwID := ttnpb.GatewayIdentifiers{
-		GatewayID: "eui-1122334455667788",
+		GatewayId: "eui-1122334455667788",
 		EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
 	}
 
 	for _, tc := range []struct {
 		Name                    string
 		UplinkMessage           ttnpb.UplinkMessage
-		GatewayIDs              ttnpb.GatewayIdentifiers
+		GatewayIds              ttnpb.GatewayIdentifiers
 		FrequencyPlanID         string
 		ExpectedUplinkDataFrame UplinkDataFrame
 		ErrorAssertion          func(err error) bool
@@ -553,7 +553,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 
 func TestJreqFromUplinkDataFrame(t *testing.T) {
 	gtwID := ttnpb.GatewayIdentifiers{
-		GatewayID: "eui-1122334455667788",
+		GatewayId: "eui-1122334455667788",
 		EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
 	}
 

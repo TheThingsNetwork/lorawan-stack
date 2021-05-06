@@ -77,7 +77,7 @@ func (v *EndDeviceIdentifiers) FieldIsZero(p string) bool {
 
 // IsZero returns true if all identifiers have zero-values.
 func (ids GatewayIdentifiers) IsZero() bool {
-	return ids.GatewayID == "" && ids.EUI == nil
+	return ids.GatewayId == "" && ids.EUI == nil
 }
 
 // IsZero returns true if all identifiers have zero-values.

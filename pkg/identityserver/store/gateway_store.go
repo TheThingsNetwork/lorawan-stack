@@ -68,7 +68,7 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.F
 func (s *gatewayStore) CreateGateway(ctx context.Context, gtw *ttnpb.Gateway) (*ttnpb.Gateway, error) {
 	defer trace.StartRegion(ctx, "create gateway").End()
 	gtwModel := Gateway{
-		GatewayID: gtw.GatewayID, // The ID is not mutated by fromPB.
+		GatewayID: gtw.GatewayId, // The ID is not mutated by fromPB.
 	}
 	gtwModel.fromPB(gtw, nil)
 	if err := s.createEntity(ctx, &gtwModel); err != nil {
@@ -83,7 +83,7 @@ func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIde
 	defer trace.StartRegion(ctx, "find gateways").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
-		idStrings[i] = id.GetGatewayID()
+		idStrings[i] = id.GetGatewayId()
 	}
 	query := s.query(ctx, Gateway{}, withGatewayID(idStrings...))
 	query = selectGatewayFields(ctx, query, fieldMask)
@@ -109,7 +109,7 @@ func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIde
 
 func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Gateway, error) {
 	defer trace.StartRegion(ctx, "get gateway").End()
-	query := s.query(ctx, Gateway{}, withGatewayID(id.GetGatewayID()))
+	query := s.query(ctx, Gateway{}, withGatewayID(id.GetGatewayId()))
 	if id.EUI != nil {
 		query = query.Scopes(withGatewayEUI(EUI64(*id.EUI)))
 	}
@@ -128,7 +128,7 @@ func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifi
 
 func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fieldMask *types.FieldMask) (updated *ttnpb.Gateway, err error) {
 	defer trace.StartRegion(ctx, "update gateway").End()
-	query := s.query(ctx, Gateway{}, withGatewayID(gtw.GetGatewayID()))
+	query := s.query(ctx, Gateway{}, withGatewayID(gtw.GetGatewayId()))
 	query = selectGatewayFields(ctx, query, fieldMask)
 	var gtwModel Gateway
 	if err = query.First(&gtwModel).Error; err != nil {
@@ -172,7 +172,7 @@ func (s *gatewayStore) RestoreGateway(ctx context.Context, id *ttnpb.GatewayIden
 
 func (s *gatewayStore) PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
 	defer trace.StartRegion(ctx, "purge gateway").End()
-	query := s.query(ctx, Gateway{}, withSoftDeleted(), withGatewayID(id.GetGatewayID()))
+	query := s.query(ctx, Gateway{}, withSoftDeleted(), withGatewayID(id.GetGatewayId()))
 	query = selectGatewayFields(ctx, query, nil)
 	var gtwModel Gateway
 	if err := query.First(&gtwModel).Error; err != nil {

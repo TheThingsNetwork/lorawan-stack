@@ -71,7 +71,7 @@ func TestGatewayStore(t *testing.T) {
 
 		created, err := store.CreateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayID: "foo",
+				GatewayId: "foo",
 				EUI:       eui,
 			},
 			Name:        "Foo Gateway",
@@ -94,7 +94,7 @@ func TestGatewayStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(created, should.NotBeNil) {
-			a.So(created.GatewayID, should.Equal, "foo")
+			a.So(created.GatewayId, should.Equal, "foo")
 			a.So(created.Name, should.Equal, "Foo Gateway")
 			a.So(created.Description, should.Equal, "The Amazing Foo Gateway")
 			a.So(created.Attributes, should.HaveLength, 3)
@@ -114,11 +114,11 @@ func TestGatewayStore(t *testing.T) {
 			a.So(created.TargetCUPSKey, should.Resemble, secret)
 		}
 
-		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}})
+		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.GatewayID, should.Equal, "foo")
+			a.So(got.GatewayId, should.Equal, "foo")
 			a.So(got.Name, should.Equal, "Foo Gateway")
 			a.So(got.Description, should.BeEmpty)
 			a.So(got.Attributes, should.HaveLength, 3)
@@ -134,14 +134,14 @@ func TestGatewayStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(byEUI, should.NotBeNil) {
-			a.So(byEUI.GatewayID, should.Equal, got.GatewayID)
+			a.So(byEUI.GatewayId, should.Equal, got.GatewayId)
 			a.So(byEUI.LBSLNSSecret, should.BeNil)
 			a.So(byEUI.ClaimAuthenticationCode, should.BeNil)
 			a.So(byEUI.TargetCUPSKey, should.BeNil)
 		}
 
 		_, err = store.UpdateGateway(ctx, &ttnpb.Gateway{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "bar"},
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "bar"},
 		}, nil)
 
 		if a.So(err, should.NotBeNil) {
@@ -149,7 +149,7 @@ func TestGatewayStore(t *testing.T) {
 		}
 
 		updated, err := store.UpdateGateway(ctx, &ttnpb.Gateway{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo"},
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 			Name:               "Foobar Gateway",
 			Description:        "The Amazing Foobar Gateway",
 			Attributes: map[string]string{
@@ -189,11 +189,11 @@ func TestGatewayStore(t *testing.T) {
 			a.So(updated.TargetCUPSURI, should.Resemble, otherTargetCUPSURI)
 		}
 
-		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, nil)
+		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, nil)
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.GatewayID, should.Equal, created.GatewayID)
+			a.So(got.GatewayId, should.Equal, created.GatewayId)
 			a.So(got.Name, should.Equal, created.Name)
 			a.So(got.Description, should.Equal, updated.Description)
 			a.So(got.Attributes, should.Resemble, updated.Attributes)
@@ -213,7 +213,7 @@ func TestGatewayStore(t *testing.T) {
 		}
 
 		updated, err = store.UpdateGateway(ctx, &ttnpb.Gateway{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo"},
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 			Antennas:           []ttnpb.GatewayAntenna{},
 		}, &pbtypes.FieldMask{Paths: []string{"antennas"}})
 
@@ -223,29 +223,29 @@ func TestGatewayStore(t *testing.T) {
 		}
 
 		_, _ = store.UpdateGateway(ctx, &ttnpb.Gateway{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo"},
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 			Antennas: []ttnpb.GatewayAntenna{
 				{Gain: 6, Location: ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "west"}},
 			},
 		}, &pbtypes.FieldMask{Paths: []string{"antennas"}})
 
-		err = store.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"})
+		err = store.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		err = store.RestoreGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"})
+		err = store.RestoreGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, nil)
+		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, nil)
 
 		a.So(err, should.BeNil)
 
-		err = store.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"})
+		err = store.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, nil)
+		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, nil)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
@@ -263,20 +263,20 @@ func TestGatewayStore(t *testing.T) {
 
 		got, err = store.CreateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayID: "reuse-foo-eui",
+				GatewayId: "reuse-foo-eui",
 				EUI:       eui,
 			},
 		})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.GatewayID, should.Equal, "reuse-foo-eui")
+			a.So(got.GatewayId, should.Equal, "reuse-foo-eui")
 			a.So(got.EUI, should.Resemble, eui)
 		}
 
-		entity, _ := s.findDeletedEntity(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"}, "id")
+		entity, _ := s.findDeletedEntity(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, "id")
 
-		err = store.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "foo"})
+		err = store.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
 
 		a.So(err, should.BeNil)
 
@@ -293,14 +293,14 @@ func TestGatewayStore(t *testing.T) {
 
 		a.So(attribute, should.HaveLength, 0)
 
-		err = store.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: "reuse-foo-eui"})
+		err = store.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "reuse-foo-eui"})
 
 		a.So(err, should.BeNil)
 
 		// Check that gateway ids are released after purge
 		got, err = store.CreateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayID: "foo",
+				GatewayId: "foo",
 				EUI:       eui,
 			},
 		})

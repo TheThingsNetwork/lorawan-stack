@@ -387,7 +387,7 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 	if ids.IsZero() {
 		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers.New()
 	}
-	if ids.GatewayID == "" {
+	if ids.GatewayId == "" {
 		registry, err := gs.getRegistry(ctx, nil)
 		if err != nil {
 			return nil, ttnpb.GatewayIdentifiers{}, err
@@ -401,7 +401,7 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 			if gs.requireRegisteredGateways {
 				return nil, ttnpb.GatewayIdentifiers{}, errGatewayEUINotRegistered.WithAttributes("eui", *ids.EUI).WithCause(err)
 			}
-			ids.GatewayID = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
+			ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
 		} else {
 			return nil, ttnpb.GatewayIdentifiers{}, err
 		}
@@ -550,7 +550,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		handler := handler
 		gs.StartTask(&component.TaskConfig{
 			Context: conn.Context(),
-			ID:      fmt.Sprintf("%s_connect_gateway_%s", name, ids.GatewayID),
+			ID:      fmt.Sprintf("%s_connect_gateway_%s", name, ids.GatewayId),
 			Func: func(ctx context.Context) error {
 				return handler.ConnectGateway(ctx, ids, conn)
 			},

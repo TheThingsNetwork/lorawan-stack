@@ -344,26 +344,26 @@ func (dst *GatewayTxAcknowledgment) SetFields(src *GatewayTxAcknowledgment, path
 		case "gateway_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
-				if (src == nil || src.GatewayIDs == nil) && dst.GatewayIDs == nil {
+				if (src == nil || src.GatewayIds == nil) && dst.GatewayIds == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.GatewayIDs
+					newSrc = src.GatewayIds
 				}
-				if dst.GatewayIDs != nil {
-					newDst = dst.GatewayIDs
+				if dst.GatewayIds != nil {
+					newDst = dst.GatewayIds
 				} else {
 					newDst = &GatewayIdentifiers{}
-					dst.GatewayIDs = newDst
+					dst.GatewayIds = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIDs = src.GatewayIDs
+					dst.GatewayIds = src.GatewayIds
 				} else {
-					dst.GatewayIDs = nil
+					dst.GatewayIds = nil
 				}
 			}
 		case "tx_ack":

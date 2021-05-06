@@ -311,7 +311,7 @@ var gatewayColumnNames = map[string][]string{
 }
 
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {
-	pb.GatewayIdentifiers.GatewayID = gtw.GatewayID
+	pb.GatewayIdentifiers.GatewayId = gtw.GatewayID
 	pb.GatewayIdentifiers.EUI = gtw.GatewayEUI.toPB() // Always present.
 	pb.CreatedAt = cleanTime(gtw.CreatedAt)
 	pb.UpdatedAt = cleanTime(gtw.UpdatedAt)

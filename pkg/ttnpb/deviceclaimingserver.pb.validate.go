@@ -467,14 +467,14 @@ func (m *ClaimGatewayRequest) ValidateFields(paths ...string) error {
 
 		case "target_gateway_id":
 
-			if utf8.RuneCountInString(m.GetTargetGatewayID()) > 36 {
+			if utf8.RuneCountInString(m.GetTargetGatewayId()) > 36 {
 				return ClaimGatewayRequestValidationError{
 					field:  "target_gateway_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_ClaimGatewayRequest_TargetGatewayID_Pattern.MatchString(m.GetTargetGatewayID()) {
+			if !_ClaimGatewayRequest_TargetGatewayId_Pattern.MatchString(m.GetTargetGatewayId()) {
 				return ClaimGatewayRequestValidationError{
 					field:  "target_gateway_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$\"",
@@ -614,7 +614,7 @@ var _ interface {
 	ErrorName() string
 } = ClaimGatewayRequestValidationError{}
 
-var _ClaimGatewayRequest_TargetGatewayID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+var _ClaimGatewayRequest_TargetGatewayId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
 
 var _ClaimGatewayRequest_TargetGatewayServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
 

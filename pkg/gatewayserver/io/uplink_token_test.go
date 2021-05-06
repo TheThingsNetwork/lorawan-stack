@@ -30,7 +30,7 @@ func TestUplinkToken(t *testing.T) {
 
 	ids := ttnpb.GatewayAntennaIdentifiers{
 		GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-			GatewayID: "foo-gateway",
+			GatewayId: "foo-gateway",
 		},
 		AntennaIndex: 0,
 	}

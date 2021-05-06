@@ -100,7 +100,7 @@ var (
 	singleFrameRequest = api.BuildSingleFrameRequest(test.Context(), []*ttnpb.RxMetadata{
 		{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayID: "gtw1",
+				GatewayId: "gtw1",
 			},
 			Location: &ttnpb.Location{
 				Latitude:  123.4,
@@ -112,7 +112,7 @@ var (
 		},
 		{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayID: "gtw2",
+				GatewayId: "gtw2",
 			},
 			Location: &ttnpb.Location{
 				Latitude:  234.5,
@@ -141,7 +141,7 @@ var (
 		{
 			{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-					GatewayID: "gtw1",
+					GatewayId: "gtw1",
 				},
 				Location: &ttnpb.Location{
 					Latitude:  123.4,
@@ -153,7 +153,7 @@ var (
 			},
 			{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-					GatewayID: "gtw2",
+					GatewayId: "gtw2",
 				},
 				Location: &ttnpb.Location{
 					Latitude:  234.5,
@@ -168,7 +168,7 @@ var (
 		{
 			{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-					GatewayID: "gtw1",
+					GatewayId: "gtw1",
 				},
 				Location: &ttnpb.Location{
 					Latitude:  123.4,
@@ -180,7 +180,7 @@ var (
 			},
 			{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-					GatewayID: "gtw2",
+					GatewayId: "gtw2",
 				},
 				Location: &ttnpb.Location{
 					Latitude:  234.5,

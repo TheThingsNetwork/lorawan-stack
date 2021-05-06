@@ -43,7 +43,7 @@ import (
 )
 
 var (
-	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 	registeredGatewayUID = unique.ID(test.Context(), registeredGatewayID)
 	registeredGatewayKey = "test-key"
 
@@ -98,7 +98,7 @@ func TestAuthentication(t *testing.T) {
 			OK:  false,
 		},
 		{
-			ID:  ttnpb.GatewayIdentifiers{GatewayID: "invalid-gateway"},
+			ID:  ttnpb.GatewayIdentifiers{GatewayId: "invalid-gateway"},
 			Key: "invalid-key",
 			OK:  false,
 		},
@@ -108,14 +108,14 @@ func TestAuthentication(t *testing.T) {
 			OK:  false,
 		},
 	} {
-		t.Run(fmt.Sprintf("%v:%v", tc.ID.GatewayID, tc.Key), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%v:%v", tc.ID.GatewayId, tc.Key), func(t *testing.T) {
 			a := assertions.New(t)
 
 			ctx, cancel := context.WithTimeout(ctx, timeout)
 			defer cancel()
 
 			ctx = rpcmetadata.MD{
-				ID: tc.ID.GatewayID,
+				ID: tc.ID.GatewayId,
 			}.ToOutgoingContext(ctx)
 			creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 				AuthType:      "Bearer",
@@ -179,7 +179,7 @@ func TestTraffic(t *testing.T) {
 	client := ttnpb.NewGtwGsClient(c.LoopbackConn())
 
 	ctx = rpcmetadata.MD{
-		ID: registeredGatewayID.GatewayID,
+		ID: registeredGatewayID.GatewayId,
 	}.ToOutgoingContext(ctx)
 	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 		AuthType:      "Bearer",
@@ -544,7 +544,7 @@ func TestConcentratorConfig(t *testing.T) {
 	client := ttnpb.NewGtwGsClient(c.LoopbackConn())
 
 	ctx = rpcmetadata.MD{
-		ID: registeredGatewayID.GatewayID,
+		ID: registeredGatewayID.GatewayId,
 	}.ToOutgoingContext(ctx)
 	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 		AuthType:      "Bearer",
@@ -610,7 +610,7 @@ func TestMQTTConfig(t *testing.T) {
 	client := ttnpb.NewGtwGsClient(c.LoopbackConn())
 
 	ctx = rpcmetadata.MD{
-		ID: registeredGatewayID.GatewayID,
+		ID: registeredGatewayID.GatewayId,
 	}.ToOutgoingContext(ctx)
 	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 		AuthType:      "Bearer",

@@ -811,7 +811,7 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 			for range paths {
 				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (test.ClusterGetPeerResponse, bool) {
 					_, a := test.MustNewTFromContext(ctx)
-					gtwIDs := ids.GetEntityIdentifiers().GetGatewayIDs()
+					gtwIDs := ids.GetEntityIdentifiers().GetGatewayIds()
 					if !test.AllTrue(
 						a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
 						a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER),
@@ -982,7 +982,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 			for range downlinkPaths {
 				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (test.ClusterGetPeerResponse, bool) {
 					_, a := test.MustNewTFromContext(ctx)
-					gtwIDs := ids.GetEntityIdentifiers().GetGatewayIDs()
+					gtwIDs := ids.GetEntityIdentifiers().GetGatewayIds()
 					if !test.AllTrue(
 						a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
 						a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER),

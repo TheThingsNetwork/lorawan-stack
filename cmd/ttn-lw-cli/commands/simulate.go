@@ -240,7 +240,7 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 	linkCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 	md := rpcmetadata.MD{
-		ID: gtwID.GatewayID,
+		ID: gtwID.GatewayId,
 	}
 	if apiKey, _ := cmd.Flags().GetString("gateway-api-key"); apiKey != "" {
 		md.AuthType = "Bearer"

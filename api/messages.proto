@@ -168,7 +168,7 @@ message TxAcknowledgment {
 }
 
 message GatewayTxAcknowledgment {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.customname) = "GatewayIDs"];
+  GatewayIdentifiers gateway_ids = 1;
   TxAcknowledgment tx_ack = 2;
 }
 

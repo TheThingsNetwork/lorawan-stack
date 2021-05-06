@@ -330,7 +330,7 @@ func (c *cluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]Peer,
 func overridePeerRole(ctx context.Context, role ttnpb.ClusterRole, ids *ttnpb.EntityIdentifiers) ttnpb.ClusterRole {
 	switch role {
 	case ttnpb.ClusterRole_GATEWAY_SERVER:
-		if ids := ids.GetGatewayIDs(); ids != nil && ids.GetGatewayID() == PacketBrokerGatewayID.GatewayID {
+		if ids := ids.GetGatewayIds(); ids != nil && ids.GetGatewayId() == PacketBrokerGatewayID.GatewayId {
 			return ttnpb.ClusterRole_PACKET_BROKER_AGENT
 		}
 	default:
