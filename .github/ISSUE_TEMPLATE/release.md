@@ -107,7 +107,6 @@ This is a checklist for releases. This is filled in by both the releaser and the
 
 #### Post Release
 
-- [ ] Edit the release notes on the Github releases page, which is typically copied from `CHANGELOG.md`.
 - [ ] For non RC releases, push the Docker latest tag.
     ```bash
     $ versionDockerTag=${version#"v"} # v3.6.1 -> 3.6.1

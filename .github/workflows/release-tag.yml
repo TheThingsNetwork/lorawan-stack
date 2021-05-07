@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - 'v3.[0-9]+.[0-9]+'
-      - 'v3.[0-9]+.[0-9]+-rc[0-9]'
 
 env:
   NODE_ENV: production
@@ -72,15 +71,22 @@ jobs:
     - name: Determine date
       id: date
       run: echo "::set-output name=value::$(date +%Y-%m-%d)"
-    - name: Generate CHANGELOG reference
-      uses: actions/github-script@v2
-      id: changelog_reference
+    - name: Get version from tag
+      id: version
+      uses: actions/github-script@v3
       with:
-        result-encoding: string
         script: |
-          const tag = context.ref.slice('refs/tags/v'.length);
-          const tagParts = tag.split('.');
-          require('fs').writeFileSync('/tmp/release-notes.md', `[Release notes](https://github.com/TheThingsNetwork/lorawan-stack/blob/${tag}/CHANGELOG.md#${tagParts[0]}${tagParts[1]}${tagParts[2]}---${{ steps.date.outputs.value }})`);
+          const tag = context.ref.slice("refs/tags/".length);
+          const majorMinorPatchRegex = /^v([0-9]+)\.([0-9]+)\.([0-9]+)$/;
+          const majorMinorPatch = tag.match(majorMinorPatchRegex);
+          if (!majorMinorPatch) {
+            throw `invalid version tag: ${tag}`;
+          }
+          return majorMinorPatch[0].slice(1);
+        result-encoding: string
+    - name: Generate Release Notes
+      run: |
+        awk '/^## \[${{ steps.version.outputs.result }}\]/{flag=1;next} /^## \[/{flag=0} flag' CHANGELOG.md > /tmp/release-notes.md
     - name: Run Goreleaser
       uses: goreleaser/goreleaser-action@v2
       with:
