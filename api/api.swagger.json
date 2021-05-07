@@ -15429,7 +15429,7 @@
         },
         "up_formatter_parameter": {
           "type": "string",
-          "description": "Parameter for the up_formatter, must be set together."
+          "description": "Parameter for the up_formatter, must be set together. The API enforces a maximum length of 16KB, but the size may be restricted further by deployment configuration."
         },
         "down_formatter": {
           "$ref": "#/definitions/v3PayloadFormatter",
@@ -15437,7 +15437,7 @@
         },
         "down_formatter_parameter": {
           "type": "string",
-          "description": "Parameter for the down_formatter, must be set together."
+          "description": "Parameter for the down_formatter, must be set together. The API enforces a maximum length of 16KB, but the size may be restricted further by deployment configuration."
         }
       }
     },

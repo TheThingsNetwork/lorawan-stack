@@ -2196,7 +2196,14 @@ func (m *MessagePayloadFormatters) ValidateFields(paths ...string) error {
 			}
 
 		case "up_formatter_parameter":
-			// no validation rules for UpFormatterParameter
+
+			if utf8.RuneCountInString(m.GetUpFormatterParameter()) > 16384 {
+				return MessagePayloadFormattersValidationError{
+					field:  "up_formatter_parameter",
+					reason: "value length must be at most 16384 runes",
+				}
+			}
+
 		case "down_formatter":
 
 			if _, ok := PayloadFormatter_name[int32(m.GetDownFormatter())]; !ok {
@@ -2207,7 +2214,14 @@ func (m *MessagePayloadFormatters) ValidateFields(paths ...string) error {
 			}
 
 		case "down_formatter_parameter":
-			// no validation rules for DownFormatterParameter
+
+			if utf8.RuneCountInString(m.GetDownFormatterParameter()) > 16384 {
+				return MessagePayloadFormattersValidationError{
+					field:  "down_formatter_parameter",
+					reason: "value length must be at most 16384 runes",
+				}
+			}
+
 		default:
 			return MessagePayloadFormattersValidationError{
 				field:  name,
