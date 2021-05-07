@@ -16,6 +16,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- User IDs now have a minimum length of 2 instead of 3, so that more users coming from v2 can keep their username.
+
 ### Deprecated
 
 ### Removed

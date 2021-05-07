@@ -250,7 +250,12 @@ func TestValidatorForIdentifiers(t *testing.T) {
 			{
 				"InvalidMinLength",
 				"id",
-				errors.IsInvalidArgument,
+				func(err error) bool {
+					if run.Name == "UserID" {
+						return err == nil
+					}
+					return errors.IsInvalidArgument(err)
+				},
 			},
 			{
 				"InvalidMaxLength",

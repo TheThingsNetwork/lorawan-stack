@@ -577,7 +577,7 @@ func (m *UserIdentifiers) ValidateFields(paths ...string) error {
 			if !_UserIdentifiers_UserId_Pattern.MatchString(m.GetUserId()) {
 				return UserIdentifiersValidationError{
 					field:  "user_id",
-					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){1,}$\"",
 				}
 			}
 
@@ -647,7 +647,7 @@ var _ interface {
 	ErrorName() string
 } = UserIdentifiersValidationError{}
 
-var _UserIdentifiers_UserId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _UserIdentifiers_UserId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){1,}$")
 
 // ValidateFields checks the field values on OrganizationOrUserIdentifiers with
 // the rules defined in the proto definition for this message. If any rules
