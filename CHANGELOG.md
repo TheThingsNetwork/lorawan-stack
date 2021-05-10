@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 - RPC to find related events by correlation ID.
 - CLI command `events find-related`.
 - Support for loading Device Repository profiles from different vendors if specified. This allows reusing standard end device profiles from module makers and LoRaWAN end device stack vendors.
+- Filtering out verbose events in the event views in the Console.
 
 ### Changed
 
