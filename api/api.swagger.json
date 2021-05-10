@@ -693,6 +693,37 @@
         ]
       }
     },
+    "/applications/{application_id}/dev-eui": {
+      "post": {
+        "summary": "Request DevEUI from the configured address block for a device inside the application.\nThe maximum number of DevEUI's issued per application can be configured.",
+        "operationId": "ApplicationRegistry_RequestDevEUI",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3DevEUI"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationRegistry"
+        ]
+      }
+    },
     "/applications/{application_id}/purge": {
       "delete": {
         "summary": "Purge the application. This will release the application ID for reuse.\nAll end devices must be deleted from the application before it can be deleted.\nThe application owner is responsible for clearing data from any (external) integrations\nthat may store and expose data by application ID",
@@ -13236,6 +13267,15 @@
           "type": "integer",
           "format": "int64",
           "description": "Number of most significant bits from dev_addr that are used as prefix."
+        }
+      }
+    },
+    "v3DevEUI": {
+      "type": "object",
+      "properties": {
+        "dev_eui": {
+          "type": "string",
+          "format": "byte"
         }
       }
     },

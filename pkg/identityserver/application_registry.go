@@ -333,6 +333,25 @@ func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.Appli
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) requestDevEUI(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.DevEUI, error) {
+	if err := rights.RequireApplication(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+		return nil, err
+	}
+	res := &ttnpb.DevEUI{}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		devEUI, err := is.EUIStore.IssueDevEUIForApplication(ctx, ids, is.config.DevEUIBlock.MaxAddressPerApp)
+		if err != nil {
+			return err
+		}
+		res.DevEUI = *devEUI
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 type applicationRegistry struct {
 	*IdentityServer
 }

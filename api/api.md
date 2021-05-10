@@ -11,6 +11,7 @@
   - [Message `Applications`](#ttn.lorawan.v3.Applications)
   - [Message `CreateApplicationAPIKeyRequest`](#ttn.lorawan.v3.CreateApplicationAPIKeyRequest)
   - [Message `CreateApplicationRequest`](#ttn.lorawan.v3.CreateApplicationRequest)
+  - [Message `DevEUI`](#ttn.lorawan.v3.DevEUI)
   - [Message `GetApplicationAPIKeyRequest`](#ttn.lorawan.v3.GetApplicationAPIKeyRequest)
   - [Message `GetApplicationCollaboratorRequest`](#ttn.lorawan.v3.GetApplicationCollaboratorRequest)
   - [Message `GetApplicationRequest`](#ttn.lorawan.v3.GetApplicationRequest)
@@ -652,6 +653,12 @@ Application is the message that defines an Application in the network.
 | `application` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.DevEUI">Message `DevEUI`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `dev_eui` | [`bytes`](#bytes) |  |  |
+
 ### <a name="ttn.lorawan.v3.GetApplicationAPIKeyRequest">Message `GetApplicationAPIKeyRequest`</a>
 
 | Field | Type | Label | Description |
@@ -831,6 +838,7 @@ application registrations.
 
 Deployment configuration may specify if, and for how long after deletion, entities can be restored. |
 | `Purge` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Purge the application. This will release the application ID for reuse. All end devices must be deleted from the application before it can be deleted. The application owner is responsible for clearing data from any (external) integrations that may store and expose data by application ID |
+| `RequestDevEUI` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`DevEUI`](#ttn.lorawan.v3.DevEUI) | Request DevEUI from the configured address block for a device inside the application. The maximum number of DevEUI's issued per application can be configured. |
 
 #### HTTP bindings
 
@@ -846,6 +854,7 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | `Delete` | `DELETE` | `/api/v3/applications/{application_id}` |  |
 | `Restore` | `POST` | `/api/v3/applications/{application_id}/restore` |  |
 | `Purge` | `DELETE` | `/api/v3/applications/{application_id}/purge` |  |
+| `RequestDevEUI` | `POST` | `/api/v3/applications/{application_id}/dev-eui` |  |
 
 ## <a name="lorawan-stack/api/applicationserver.proto">File `lorawan-stack/api/applicationserver.proto`</a>
 

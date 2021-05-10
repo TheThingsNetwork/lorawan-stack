@@ -101,6 +101,14 @@ service ApplicationRegistry {
       delete: "/applications/{application_id}/purge"
     };
   };
+
+  // Request DevEUI from the configured address block for a device inside the application.
+  // The maximum number of DevEUI's issued per application can be configured.
+  rpc RequestDevEUI(ApplicationIdentifiers) returns (DevEUI) {
+    option (google.api.http) = {
+      post: "/applications/{application_id}/dev-eui"
+    };
+  };
 }
 
 // The ApplicationAcces service, exposed by the Identity Server, is used to manage
