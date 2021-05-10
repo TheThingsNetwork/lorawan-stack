@@ -571,6 +571,7 @@ func TestTokenExchange(t *testing.T) {
 		Method       string
 		Path         string
 		Body         interface{}
+		RequestSetup func(*http.Request)
 		ExpectedCode int
 		ExpectedBody string
 	}{
@@ -656,6 +657,48 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.calls, should.NotContain, "GetAuthorizationCode")
 				a.So(s.calls, should.NotContain, "DeleteAuthorizationCode")
 				a.So(s.calls, should.NotContain, "CreateAccessToken")
+			},
+		},
+		{
+			Name: "Exchange Authorization Code - Basic Auth",
+			StoreSetup: func(s *mockStore) {
+				s.res.client = mockClient
+				s.res.authorizationCode = &ttnpb.OAuthAuthorizationCode{
+					UserIds:       mockUser.UserIdentifiers,
+					ClientIds:     mockClient.ClientIdentifiers,
+					UserSessionID: mockSession.SessionID,
+					Rights:        mockClient.Rights,
+					Code:          "the code",
+					RedirectURI:   "http://uri/callback",
+					State:         "foo",
+					CreatedAt:     time.Now().Truncate(time.Second),
+					ExpiresAt:     time.Now().Truncate(time.Second).Add(time.Hour),
+				}
+			},
+			Method: "POST",
+			Path:   "/oauth/token",
+			Body: map[string]string{
+				"grant_type":   "authorization_code",
+				"code":         "the code",
+				"redirect_uri": "http://uri/callback",
+			},
+			RequestSetup: func(r *http.Request) {
+				r.SetBasicAuth("client", "secret")
+			},
+			ExpectedCode: http.StatusOK,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.Contain, "GetAuthorizationCode")
+				a.So(s.calls, should.Contain, "DeleteAuthorizationCode")
+				a.So(s.req.code, should.Equal, "the code")
+				a.So(s.calls, should.Contain, "CreateAccessToken")
+				a.So(s.req.token.UserIds, should.Resemble, mockUser.UserIdentifiers)
+				a.So(s.req.token.ClientIds, should.Resemble, mockClient.ClientIdentifiers)
+				a.So(s.req.token.UserSessionID, should.Equal, mockSession.SessionID)
+				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
+				a.So(s.req.token.AccessToken, should.NotBeEmpty)
+				a.So(s.req.token.AccessToken, should.NotBeEmpty)
+				a.So(s.req.token.RefreshToken, should.NotBeEmpty)
 			},
 		},
 		{
@@ -766,6 +809,9 @@ func TestTokenExchange(t *testing.T) {
 
 			req := httptest.NewRequest(tt.Method, tt.Path, body)
 			req.URL.Scheme, req.URL.Host = "http", req.Host
+			if tt.RequestSetup != nil {
+				tt.RequestSetup(req)
+			}
 
 			if contentType != "" {
 				req.Header.Set("Content-Type", contentType)
