@@ -56,6 +56,16 @@ export const eventMessages = defineMessages({
   'synthetic.status.resumed:preview': 'The event stream has been resumed after being paused',
   'synthetic.status.resumed:details':
     'The event stream has been resumed by the user and will receive new subsequent event data. Note that event data which was possibly emitted during the stream pause will not be re-delivered.',
+
+  'synthetic.status.verbose_enabled:type': 'Verbose stream activated',
+  'synthetic.status.verbose_enabled:preview': 'The event stream has been set to verbose',
+  'synthetic.status.verbose_enabled:details':
+    'The event stream verbosity has been set to verbose. The stream will now start to ingest all event types related to your entity. This can be helpful during debugging.',
+
+  'synthetic.status.verbose_disabled:type': 'Verbose stream deactivated',
+  'synthetic.status.verbose_disabled:preview': 'The event stream has been set to non-verbose',
+  'synthetic.status.verbose_disabled:details':
+    'The event stream verbosity has been set to normal. The stream will now start to discard certain advanced event types. This will help reducing noise in the event stream. You can see the currently applied filter in the raw data of this event.',
 })
 
 export const EVENT_UNKNOWN_ERROR = 'synthetic.error.unknown'
@@ -66,6 +76,8 @@ export const EVENT_STATUS_CLOSED = 'synthetic.status.closed'
 export const EVENT_STATUS_CLEARED = 'synthetic.status.cleared'
 export const EVENT_STATUS_PAUSED = 'synthetic.status.paused'
 export const EVENT_STATUS_RESUMED = 'synthetic.status.resumed'
+export const EVENT_STATUS_VERBOSE_ENABLED = 'synthetic.status.verbose_enabled'
+export const EVENT_STATUS_VERBOSE_DISABLED = 'synthetic.status.verbose_disabled'
 
 export const createUnknownErrorEvent = defineSyntheticEvent(EVENT_UNKNOWN_ERROR)
 export const createNetworkErrorEvent = defineSyntheticEvent(EVENT_NETWORK_ERROR)
@@ -75,3 +87,5 @@ export const createStatusClosedEvent = defineSyntheticEvent(EVENT_STATUS_CLOSED)
 export const createStatusClearedEvent = defineSyntheticEvent(EVENT_STATUS_CLEARED)
 export const createStatusPausedEvent = defineSyntheticEvent(EVENT_STATUS_PAUSED)
 export const createStatusResumedEvent = defineSyntheticEvent(EVENT_STATUS_RESUMED)
+export const createStatusVerboseEnabled = defineSyntheticEvent(EVENT_STATUS_VERBOSE_ENABLED)
+export const createStatusVerboseDisabled = defineSyntheticEvent(EVENT_STATUS_VERBOSE_DISABLED)
