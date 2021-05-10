@@ -50,6 +50,7 @@ type IdentityServer struct {
 	emailTemplates *email.TemplateRegistry
 	account        account.Server
 	oauth          oauth.Server
+	EUIStore       store.EUIStore
 }
 
 // Context returns the context of the Identity Server.
@@ -103,7 +104,8 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	}
 
 	if is.config.DevEUIBlock.Enabled {
-		err = store.CreateEUIBlock(is.Context(), is.db, "dev_eui", is.config.DevEUIBlock.AddressBlock)
+		is.EUIStore = store.GetEUIStore(is.db)
+		err = is.EUIStore.CreateEUIBlock(is.Context(), "dev_eui", is.config.DevEUIBlock.AddressBlock)
 		if err != nil {
 			return nil, err
 		}

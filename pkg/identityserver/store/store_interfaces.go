@@ -19,6 +19,7 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // ApplicationStore interface for storing Applications.
@@ -221,4 +222,10 @@ type MigrationStore interface {
 	FindMigrations(ctx context.Context) ([]*Migration, error)
 	GetMigration(ctx context.Context, id string) (*Migration, error)
 	DeleteMigration(ctx context.Context, id string) error
+}
+
+// EUIStore interface for assigning DevEUI blocks and addresses
+type EUIStore interface {
+	CreateEUIBlock(ctx context.Context, euiType string, block string) (err error)
+	IssueDevEUIForApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, maxAddressPerApp int) (ttntypes.EUI64, error)
 }

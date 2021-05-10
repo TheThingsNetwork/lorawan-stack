@@ -17,10 +17,21 @@ package store
 import (
 	"context"
 	"runtime/trace"
+	"sync"
 
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
+
+func GetEUIStore(db *gorm.DB) EUIStore {
+	return &euiStore{store: newStore(db)}
+}
+
+type euiStore struct {
+	*store
+	mutex sync.Mutex
+}
 
 func getMaxAddress(addressBlock types.EUI64Prefix) *EUI64 {
 	var maxAddress types.EUI64
@@ -30,7 +41,7 @@ func getMaxAddress(addressBlock types.EUI64Prefix) *EUI64 {
 }
 
 // CreateEUIBlock configures the identity server with a new block of EUI addresses to be issued.
-func CreateEUIBlock(ctx context.Context, db *gorm.DB, euiType string, block string) (err error) {
+func (s *euiStore) CreateEUIBlock(ctx context.Context, euiType string, block string) (err error) {
 	defer trace.StartRegion(ctx, "create eui block").End()
 
 	var addressBlock types.EUI64Prefix
@@ -40,7 +51,7 @@ func CreateEUIBlock(ctx context.Context, db *gorm.DB, euiType string, block stri
 	}
 
 	var currentAddressBlock EUIBlock
-	query := db.Where(EUIBlock{Type: euiType})
+	query := s.query(ctx, EUIBlock{}).Where(EUIBlock{Type: euiType})
 	// Check if there is already an address block of same EUI type configured.
 	err = query.First(&currentAddressBlock).Error
 	if err == nil {
@@ -58,7 +69,7 @@ func CreateEUIBlock(ctx context.Context, db *gorm.DB, euiType string, block stri
 		).Error
 		// If no block found, create a new block in the database.
 	} else if gorm.IsRecordNotFoundError(err) {
-		return db.Save(
+		return s.query(ctx, EUIBlock{}).Save(
 			&EUIBlock{
 				Type:           euiType,
 				StartAddress:   eui(&addressBlock.EUI64),
@@ -68,4 +79,10 @@ func CreateEUIBlock(ctx context.Context, db *gorm.DB, euiType string, block stri
 		).Error
 	}
 	return err
+}
+
+func (s *euiStore) IssueDevEUIForApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, maxAddressPerApp int) (types.EUI64, error) {
+	defer trace.StartRegion(ctx, "assign dev eui address to application").End()
+
+	return types.EUI64{}, nil
 }

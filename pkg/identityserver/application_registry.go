@@ -343,7 +343,7 @@ func (is *IdentityServer) requestDevEUI(ctx context.Context, ids *ttnpb.Applicat
 		if err != nil {
 			return err
 		}
-		res.DevEUI = *devEUI
+		res.DevEUI = devEUI
 		return nil
 	})
 	if err != nil {
@@ -382,4 +382,8 @@ func (ar *applicationRegistry) Purge(ctx context.Context, req *ttnpb.Application
 
 func (ar *applicationRegistry) Restore(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
 	return ar.restoreApplication(ctx, req)
+}
+
+func (ar *applicationRegistry) RequestDevEUI(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*ttnpb.DevEUI, error) {
+	return ar.requestDevEUI(ctx, req)
 }
