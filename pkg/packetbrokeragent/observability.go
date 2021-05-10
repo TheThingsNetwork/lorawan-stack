@@ -79,6 +79,36 @@ var pbaMetrics = &messageMetrics{
 			"forwarder_cluster_id",
 		},
 	),
+	uplinkStateReported: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "uplink_state_reported_total",
+			Help:      "Total number of uplink message delivery state changes reported to Packet Broker",
+		},
+		[]string{
+			"forwarder_net_id",
+			"forwarder_tenant_id",
+			"forwarder_cluster_id",
+			"home_network_net_id",
+			"home_network_tenant_id",
+			"home_network_cluster_id",
+		},
+	),
+	downlinkStateReported: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "downlink_state_reported_total",
+			Help:      "Total number of downlink message delivery state changes reported to Packet Broker",
+		},
+		[]string{
+			"home_network_net_id",
+			"home_network_tenant_id",
+			"home_network_cluster_id",
+			"forwarder_net_id",
+			"forwarder_tenant_id",
+			"forwarder_cluster_id",
+		},
+	),
 }
 
 func init() {
@@ -86,10 +116,12 @@ func init() {
 }
 
 type messageMetrics struct {
-	uplinkReceived    *metrics.ContextualCounterVec
-	downlinkReceived  *metrics.ContextualCounterVec
-	uplinkForwarded   *metrics.ContextualCounterVec
-	downlinkForwarded *metrics.ContextualCounterVec
+	uplinkReceived        *metrics.ContextualCounterVec
+	downlinkReceived      *metrics.ContextualCounterVec
+	uplinkForwarded       *metrics.ContextualCounterVec
+	downlinkForwarded     *metrics.ContextualCounterVec
+	uplinkStateReported   *metrics.ContextualCounterVec
+	downlinkStateReported *metrics.ContextualCounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -97,6 +129,8 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.downlinkReceived.Describe(ch)
 	m.uplinkForwarded.Describe(ch)
 	m.downlinkForwarded.Describe(ch)
+	m.uplinkStateReported.Describe(ch)
+	m.downlinkStateReported.Describe(ch)
 }
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
@@ -104,4 +138,6 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.downlinkReceived.Collect(ch)
 	m.uplinkForwarded.Collect(ch)
 	m.downlinkForwarded.Collect(ch)
+	m.uplinkStateReported.Collect(ch)
+	m.downlinkStateReported.Collect(ch)
 }
