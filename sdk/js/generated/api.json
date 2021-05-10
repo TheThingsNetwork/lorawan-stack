@@ -16568,6 +16568,36 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "downlink_path",
+              "description": "Downlink path chosen by the Gateway Server.",
+              "label": "",
+              "type": "DownlinkPath",
+              "longType": "DownlinkPath",
+              "fullType": "ttn.lorawan.v3.DownlinkPath",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "rx1",
+              "description": "Whether RX1 has been chosen for the downlink message.\nBoth RX1 and RX2 can be used for transmitting the same message by the same gateway.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "rx2",
+              "description": "Whether RX2 has been chosen for the downlink message.\nBoth RX1 and RX2 can be used for transmitting the same message by the same gateway.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         }

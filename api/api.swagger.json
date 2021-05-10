@@ -16283,6 +16283,18 @@
         "delay": {
           "type": "string",
           "description": "The amount of time between the message has been scheduled and it will be transmitted by the gateway."
+        },
+        "downlink_path": {
+          "$ref": "#/definitions/v3DownlinkPath",
+          "description": "Downlink path chosen by the Gateway Server."
+        },
+        "rx1": {
+          "type": "boolean",
+          "description": "Whether RX1 has been chosen for the downlink message.\nBoth RX1 and RX2 can be used for transmitting the same message by the same gateway."
+        },
+        "rx2": {
+          "type": "boolean",
+          "description": "Whether RX2 has been chosen for the downlink message.\nBoth RX1 and RX2 can be used for transmitting the same message by the same gateway."
         }
       }
     },

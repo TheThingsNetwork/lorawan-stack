@@ -202,10 +202,23 @@ var GatewayDownFieldPathsTopLevel = []string{
 }
 var ScheduleDownlinkResponseFieldPathsNested = []string{
 	"delay",
+	"downlink_path",
+	"downlink_path.path",
+	"downlink_path.path.fixed",
+	"downlink_path.path.fixed.antenna_index",
+	"downlink_path.path.fixed.gateway_ids",
+	"downlink_path.path.fixed.gateway_ids.eui",
+	"downlink_path.path.fixed.gateway_ids.gateway_id",
+	"downlink_path.path.uplink_token",
+	"rx1",
+	"rx2",
 }
 
 var ScheduleDownlinkResponseFieldPathsTopLevel = []string{
 	"delay",
+	"downlink_path",
+	"rx1",
+	"rx2",
 }
 var ScheduleDownlinkErrorDetailsFieldPathsNested = []string{
 	"path_errors",

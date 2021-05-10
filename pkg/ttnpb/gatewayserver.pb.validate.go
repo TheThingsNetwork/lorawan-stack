@@ -263,6 +263,22 @@ func (m *ScheduleDownlinkResponse) ValidateFields(paths ...string) error {
 		switch name {
 		case "delay":
 
+		case "downlink_path":
+
+			if v, ok := interface{}(m.GetDownlinkPath()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ScheduleDownlinkResponseValidationError{
+						field:  "downlink_path",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "rx1":
+			// no validation rules for Rx1
+		case "rx2":
+			// no validation rules for Rx2
 		default:
 			return ScheduleDownlinkResponseValidationError{
 				field:  name,
