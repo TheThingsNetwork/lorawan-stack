@@ -211,12 +211,91 @@ dockers:
     binaries:
       - ttn-lw-cli
       - ttn-lw-stack
+    use_buildx: true
+    build_flag_templates:
+      - --platform=linux/amd64
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.vendor=The Things Network Foundation"
+      - "--label=org.opencontainers.image.title=The Things Stack"
+      - "--label=org.opencontainers.image.url=https://www.thethingsindustries.com/docs"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     image_templates:
-      - 'thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}'
-      - 'thethingsnetwork/lorawan-stack:{{ .Version }}'
-      - 'ghcr.io/thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}'
-      - 'ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}'
+      - 'thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-amd64'
+      - 'thethingsnetwork/lorawan-stack:{{ .Version }}-amd64'
+      - 'ghcr.io/thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-amd64'
+      - 'ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}-amd64'
     skip_push: false
     extra_files:
       - data
       - public
+  - goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile
+    binaries:
+      - ttn-lw-cli
+      - ttn-lw-stack
+    use_buildx: true
+    build_flag_templates:
+      - --platform=linux/arm64/v8
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.vendor=The Things Network Foundation"
+      - "--label=org.opencontainers.image.title=The Things Stack"
+      - "--label=org.opencontainers.image.url=https://www.thethingsindustries.com/docs"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    image_templates:
+      - 'thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-arm64'
+      - 'thethingsnetwork/lorawan-stack:{{ .Version }}-arm64'
+      - 'ghcr.io/thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-arm64'
+      - 'ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}-arm64'
+    skip_push: false
+    extra_files:
+      - data
+      - public
+  - goos: linux
+    goarch: arm
+    goarm: 7
+    dockerfile: Dockerfile
+    binaries:
+      - ttn-lw-cli
+      - ttn-lw-stack
+    use_buildx: true
+    build_flag_templates:
+      - --platform=linux/arm/v7
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.vendor=The Things Network Foundation"
+      - "--label=org.opencontainers.image.title=The Things Stack"
+      - "--label=org.opencontainers.image.url=https://www.thethingsindustries.com/docs"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    image_templates:
+      - 'thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-armv7'
+      - 'thethingsnetwork/lorawan-stack:{{ .Version }}-armv7'
+      - 'ghcr.io/thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-armv7'
+      - 'ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}-armv7'
+    skip_push: false
+    extra_files:
+      - data
+      - public
+docker_manifests:
+  - name_template: thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}
+    image_templates:
+      - thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-amd64
+      - thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-arm64
+      - thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-armv7
+  - name_template: thethingsnetwork/lorawan-stack:{{ .Version }}
+    image_templates:
+      - thethingsnetwork/lorawan-stack:{{ .Version }}-amd64
+      - thethingsnetwork/lorawan-stack:{{ .Version }}-arm64
+      - thethingsnetwork/lorawan-stack:{{ .Version }}-armv7
+  - name_template: ghcr.io/thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}
+    image_templates:
+      - ghcr.io/thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-amd64
+      - ghcr.io/thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-arm64
+      - ghcr.io/thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}-armv7
+  - name_template: ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}
+    image_templates:
+      - ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}-amd64
+      - ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}-arm64
+      - ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}-armv7

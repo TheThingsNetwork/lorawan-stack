@@ -70,7 +70,7 @@ dockers:
       - ttn-lw-cli
       - ttn-lw-stack
     build_flag_templates:
-      - --platform=linux/arm64
+      - --platform=linux/arm64/v8
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.vendor=The Things Network Foundation"
       - "--label=org.opencontainers.image.title=The Things Stack"
