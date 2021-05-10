@@ -1067,7 +1067,7 @@ func TestTraffic(t *testing.T) {
 			}
 
 			if tc.InputNetworkDownstream != nil {
-				if _, err := gsConn.ScheduleDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
+				if _, _, _, err := gsConn.ScheduleDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
 					t.Fatalf("Failed to send downlink: %v", err)
 				}
 
@@ -1393,7 +1393,7 @@ func TestRTT(t *testing.T) {
 			}
 
 			if tc.InputNetworkDownstream != nil {
-				if _, err := gsConn.ScheduleDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
+				if _, _, _, err := gsConn.ScheduleDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
 					t.Fatalf("Failed to send downlink: %v", err)
 				}
 
