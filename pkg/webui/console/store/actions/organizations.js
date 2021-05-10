@@ -35,6 +35,8 @@ import {
   createStopEventsStreamActionType,
   clearEvents,
   createClearEventsActionType,
+  createSetEventsFilterActionType,
+  setEventsFilter,
 } from './events'
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
 
@@ -111,6 +113,7 @@ export const PAUSE_ORG_EVENT_STREAM = createPauseEventsStreamActionType(SHARED_N
 export const RESUME_ORG_EVENT_STREAM = createResumeEventsStreamActionType(SHARED_NAME)
 export const STOP_ORG_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_ORG_EVENTS = createClearEventsActionType(SHARED_NAME)
+export const SET_ORG_EVENTS_FILTER = createSetEventsFilterActionType(SHARED_NAME)
 
 export const startOrganizationEventsStream = startEventsStream(SHARED_NAME)
 export const startOrganizationEventsStreamSuccess = startEventsStreamSuccess(SHARED_NAME)
@@ -119,3 +122,4 @@ export const pauseOrganizationEventsStream = pauseEventsStream(SHARED_NAME)
 export const resumeOrganizationEventsStream = resumeEventsStream(SHARED_NAME)
 export const stopOrganizationEventsStream = stopEventsStream(SHARED_NAME)
 export const clearOrganizationEventsStream = clearEvents(SHARED_NAME)
+export const setOrganizationEventsFilter = setEventsFilter(SHARED_NAME)
