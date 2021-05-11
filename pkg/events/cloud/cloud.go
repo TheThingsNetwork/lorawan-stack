@@ -146,15 +146,15 @@ func (ps *PubSub) getMetadata(evt events.Event) map[string]string {
 		k := id.EntityType() + "_id"
 		ids[k] = append(ids[k], id.IDString())
 		if gtwID := id.GetGatewayIds(); gtwID != nil {
-			ids["gateway_eui"] = append(ids["gateway_eui"], gtwID.EUI.String())
+			ids["gateway_eui"] = append(ids["gateway_eui"], gtwID.Eui.String())
 		}
 		if devID := id.GetDeviceIds(); devID != nil {
 			ids["application_id"] = append(ids["application_id"], devID.ApplicationId)
-			if devID.DevEUI != nil {
-				ids["dev_eui"] = append(ids["dev_eui"], devID.DevEUI.String())
+			if devID.DevEui != nil {
+				ids["dev_eui"] = append(ids["dev_eui"], devID.DevEui.String())
 			}
-			if devID.JoinEUI != nil {
-				ids["join_eui"] = append(ids["join_eui"], devID.JoinEUI.String())
+			if devID.JoinEui != nil {
+				ids["join_eui"] = append(ids["join_eui"], devID.JoinEui.String())
 			}
 			if devID.DevAddr != nil {
 				ids["dev_addr"] = append(ids["dev_addr"], devID.DevAddr.String())

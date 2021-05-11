@@ -64,7 +64,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 		return errNoAssociation.New()
 	}
 
-	if up.DevEUI == nil || up.DevEUI.IsZero() {
+	if up.DevEui == nil || up.DevEui.IsZero() {
 		logger.Debug("Package configured for end device with no device EUI")
 		return nil
 	}
@@ -113,7 +113,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.ApplicationUp, loraUp *objects.LoRaUplink, data *packageData) error {
 	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loraclouddmsv1:%s", events.NewCorrelationID()))...)
 	logger := log.FromContext(ctx)
-	eui := objects.EUI(*up.DevEUI)
+	eui := objects.EUI(*up.DevEui)
 
 	httpClient, err := p.server.HTTPClient(ctx)
 	if err != nil {
@@ -136,7 +136,7 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 
 	response, ok := resp[eui]
 	if !ok {
-		return errDeviceEUIMissing.WithAttributes("dev_eui", up.DevEUI)
+		return errDeviceEUIMissing.WithAttributes("dev_eui", up.DevEui)
 	}
 	if response.Error != "" {
 		return errUplinkRequestFailed.WithCause(errors.New(response.Error))

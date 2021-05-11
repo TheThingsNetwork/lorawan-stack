@@ -110,8 +110,8 @@ func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIde
 func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Gateway, error) {
 	defer trace.StartRegion(ctx, "get gateway").End()
 	query := s.query(ctx, Gateway{}, withGatewayID(id.GetGatewayId()))
-	if id.EUI != nil {
-		query = query.Scopes(withGatewayEUI(EUI64(*id.EUI)))
+	if id.Eui != nil {
+		query = query.Scopes(withGatewayEUI(EUI64(*id.Eui)))
 	}
 	query = selectGatewayFields(ctx, query, fieldMask)
 	var gtwModel Gateway

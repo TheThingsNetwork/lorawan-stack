@@ -49,8 +49,8 @@ func (ids EndDeviceIdentifiers) IsZero() bool {
 	return ids.GetDeviceId() == "" &&
 		ids.GetApplicationId() == "" &&
 		(ids.DevAddr == nil || ids.DevAddr.IsZero()) &&
-		(ids.DevEUI == nil || ids.DevEUI.IsZero()) &&
-		ids.JoinEUI == nil
+		(ids.DevEui == nil || ids.DevEui.IsZero()) &&
+		ids.JoinEui == nil
 }
 
 // FieldIsZero returns whether path p is zero.
@@ -66,18 +66,18 @@ func (v *EndDeviceIdentifiers) FieldIsZero(p string) bool {
 	case "dev_addr":
 		return v.DevAddr == nil
 	case "dev_eui":
-		return v.DevEUI == nil
+		return v.DevEui == nil
 	case "device_id":
 		return v.DeviceId == ""
 	case "join_eui":
-		return v.JoinEUI == nil
+		return v.JoinEui == nil
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
 
 // IsZero returns true if all identifiers have zero-values.
 func (ids GatewayIdentifiers) IsZero() bool {
-	return ids.GatewayId == "" && ids.EUI == nil
+	return ids.GatewayId == "" && ids.Eui == nil
 }
 
 // IsZero returns true if all identifiers have zero-values.
@@ -129,11 +129,11 @@ func (ids EndDeviceIdentifiers) Copy(x *EndDeviceIdentifiers) *EndDeviceIdentifi
 		},
 		XXX_sizecache: ids.XXX_sizecache,
 	}
-	if ids.DevEUI != nil {
-		x.DevEUI = ids.DevEUI.Copy(&types.EUI64{})
+	if ids.DevEui != nil {
+		x.DevEui = ids.DevEui.Copy(&types.EUI64{})
 	}
-	if ids.JoinEUI != nil {
-		x.JoinEUI = ids.JoinEUI.Copy(&types.EUI64{})
+	if ids.JoinEui != nil {
+		x.JoinEui = ids.JoinEui.Copy(&types.EUI64{})
 	}
 	if ids.DevAddr != nil {
 		x.DevAddr = ids.DevAddr.Copy(&types.DevAddr{})

@@ -702,7 +702,7 @@ var (
 		"supports_join": {
 			{
 				Func: func(m map[string]*ttnpb.EndDevice) (bool, string) {
-					if dev, ok := m["ids.dev_eui"]; ok && dev.DevEUI != nil && !dev.DevEUI.IsZero() {
+					if dev, ok := m["ids.dev_eui"]; ok && dev.DevEui != nil && !dev.DevEui.IsZero() {
 						return true, ""
 					}
 					if m["lorawan_version"].LoRaWANVersion.RequireDevEUIForABP() && !m["multicast"].GetMulticast() {
@@ -951,12 +951,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"ids.application_ids",
 		"ids.device_id",
 	)
-	if st.Device.JoinEUI != nil {
+	if st.Device.JoinEui != nil {
 		st.AddSetFields(
 			"ids.join_eui",
 		)
 	}
-	if st.Device.DevEUI != nil {
+	if st.Device.DevEui != nil {
 		st.AddSetFields(
 			"ids.dev_eui",
 		)

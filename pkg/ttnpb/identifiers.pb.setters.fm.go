@@ -82,18 +82,18 @@ func (dst *EndDeviceIdentifiers) SetFields(src *EndDeviceIdentifiers, paths ...s
 				return fmt.Errorf("'dev_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.DevEUI = src.DevEUI
+				dst.DevEui = src.DevEui
 			} else {
-				dst.DevEUI = nil
+				dst.DevEui = nil
 			}
 		case "join_eui":
 			if len(subs) > 0 {
 				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.JoinEUI = src.JoinEUI
+				dst.JoinEui = src.JoinEui
 			} else {
-				dst.JoinEUI = nil
+				dst.JoinEui = nil
 			}
 		case "dev_addr":
 			if len(subs) > 0 {
@@ -130,9 +130,9 @@ func (dst *GatewayIdentifiers) SetFields(src *GatewayIdentifiers, paths ...strin
 				return fmt.Errorf("'eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.EUI = src.EUI
+				dst.Eui = src.Eui
 			} else {
-				dst.EUI = nil
+				dst.Eui = nil
 			}
 
 		default:

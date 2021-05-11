@@ -136,7 +136,7 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayId: "foo",
-					EUI:       &eui,
+					Eui:       &eui,
 				},
 				Name: "Foo Gateway",
 			},
@@ -149,7 +149,7 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayId: "foo",
-					EUI:       &eui,
+					Eui:       &eui,
 				},
 				Name: "Foo Gateway",
 			},
@@ -169,13 +169,13 @@ func TestGatewaysCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
 			a.So(got.Name, should.Equal, created.Name)
-			if a.So(got.EUI, should.NotBeNil) {
-				a.So(*got.EUI, should.Equal, eui)
+			if a.So(got.Eui, should.NotBeNil) {
+				a.So(*got.Eui, should.Equal, eui)
 			}
 		}
 
 		ids, err := reg.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-			EUI: eui,
+			Eui: eui,
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
@@ -187,7 +187,7 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayId: "bar",
-					EUI:       &eui,
+					Eui:       &eui,
 				},
 				Name: "Bar Gateway",
 			},
@@ -349,7 +349,7 @@ func TestGatewaysSecrets(t *testing.T) {
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayId: gatewayID,
-					EUI:       &eui,
+					Eui:       &eui,
 				},
 				Name: gatewayName,
 			},
@@ -368,7 +368,7 @@ func TestGatewaysSecrets(t *testing.T) {
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayId: gatewayIDWithoutEncKey,
-					EUI:       &euiWithoutEncKey,
+					Eui:       &euiWithoutEncKey,
 				},
 				Name:                    gatewayNameWithoutEncKey,
 				LBSLNSSecret:            secret,
@@ -395,8 +395,8 @@ func TestGatewaysSecrets(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
 			a.So(got.Name, should.Equal, createdWithoutEncKey.Name)
-			if a.So(got.EUI, should.NotBeNil) {
-				a.So(*got.EUI, should.Equal, euiWithoutEncKey)
+			if a.So(got.Eui, should.NotBeNil) {
+				a.So(*got.Eui, should.Equal, euiWithoutEncKey)
 			}
 			a.So(got.LBSLNSSecret.Value, should.Resemble, secret.Value)
 			a.So(got.ClaimAuthenticationCode, should.NotBeNil)
@@ -413,7 +413,7 @@ func TestGatewaysSecrets(t *testing.T) {
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayId: gatewayID,
-					EUI:       &eui,
+					Eui:       &eui,
 				},
 				Name:                    gatewayName,
 				LBSLNSSecret:            secret,
@@ -440,8 +440,8 @@ func TestGatewaysSecrets(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
 			a.So(got.Name, should.Equal, created.Name)
-			if a.So(got.EUI, should.NotBeNil) {
-				a.So(*got.EUI, should.Equal, eui)
+			if a.So(got.Eui, should.NotBeNil) {
+				a.So(*got.Eui, should.Equal, eui)
 			}
 			a.So(got.LBSLNSSecret, should.Resemble, secret)
 			a.So(got.ClaimAuthenticationCode, should.NotBeNil)
@@ -507,7 +507,7 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		// Get By EUI
 		ids, err := reg.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-			EUI: eui,
+			Eui: eui,
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
@@ -519,7 +519,7 @@ func TestGatewaysSecrets(t *testing.T) {
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayId: "bar",
-					EUI:       &eui,
+					Eui:       &eui,
 				},
 				Name: "Bar Gateway",
 			},
@@ -584,8 +584,8 @@ func TestGatewaysSecrets(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
 			a.So(got.Name, should.Equal, created.Name)
-			if a.So(got.EUI, should.NotBeNil) {
-				a.So(*got.EUI, should.Equal, eui)
+			if a.So(got.Eui, should.NotBeNil) {
+				a.So(*got.Eui, should.Equal, eui)
 			}
 			if a.So(got.LBSLNSSecret, should.NotBeNil) {
 				a.So(got.LBSLNSSecret.Value, should.Resemble, []byte("my new secret value"))

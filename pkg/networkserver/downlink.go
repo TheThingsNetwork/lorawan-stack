@@ -1674,8 +1674,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 							ApplicationIdentifiers: dev.ApplicationIdentifiers,
 							DeviceId:               dev.DeviceId,
-							DevEUI:                 dev.DevEUI,
-							JoinEUI:                dev.JoinEUI,
+							DevEui:                 dev.DevEui,
+							JoinEui:                dev.JoinEui,
 							DevAddr:                &dev.PendingMACState.QueuedJoinAccept.DevAddr,
 						},
 						CorrelationIDs: events.CorrelationIDsFromContext(ctx),

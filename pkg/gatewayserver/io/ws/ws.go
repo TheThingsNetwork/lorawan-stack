@@ -162,7 +162,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	var eui types.EUI64
 	eui.UnmarshalBinary(hexValue)
 
-	ctx, ids, err := s.server.FillGatewayContext(ctx, ttnpb.GatewayIdentifiers{EUI: &eui})
+	ctx, ids, err := s.server.FillGatewayContext(ctx, ttnpb.GatewayIdentifiers{Eui: &eui})
 	if err != nil {
 		return err
 	}

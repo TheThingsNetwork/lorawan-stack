@@ -1016,11 +1016,11 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 		return errMessageIdentifiers.New()
 	}
 
-	if ids.JoinEUI != nil {
-		logger = logger.WithField("join_eui", *ids.JoinEUI)
+	if ids.JoinEui != nil {
+		logger = logger.WithField("join_eui", *ids.JoinEui)
 	}
-	if ids.DevEUI != nil && !ids.DevEUI.IsZero() {
-		logger = logger.WithField("dev_eui", *ids.DevEUI)
+	if ids.DevEui != nil && !ids.DevEui.IsZero() {
+		logger = logger.WithField("dev_eui", *ids.DevEui)
 	}
 	if ids.DevAddr != nil && !ids.DevAddr.IsZero() {
 		logger = logger.WithField("dev_addr", *ids.DevAddr)

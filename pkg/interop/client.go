@@ -214,16 +214,16 @@ func parseResult(r Result) error {
 // GetAppSKey performs AppSKey request according to LoRaWAN Backend Interfaces specification.
 func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	interopAns := &AppSKeyAns{}
-	if err := cl.exchange(ctx, req.JoinEUI, jsRPCPaths.appSKey, &AppSKeyReq{
+	if err := cl.exchange(ctx, req.JoinEui, jsRPCPaths.appSKey, &AppSKeyReq{
 		AsJsMessageHeader: AsJsMessageHeader{
 			MessageHeader: MessageHeader{
 				ProtocolVersion: cl.Protocol.BackendInterfacesVersion(),
 				MessageType:     MessageTypeAppSKeyReq,
 			},
 			SenderID:   asID,
-			ReceiverID: EUI64(req.JoinEUI),
+			ReceiverID: EUI64(req.JoinEui),
 		},
-		DevEUI:       EUI64(req.DevEUI),
+		DevEUI:       EUI64(req.DevEui),
 		SessionKeyID: Buffer(req.SessionKeyID),
 	}, interopAns); err != nil {
 		return nil, err
@@ -264,19 +264,19 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}
 
 	interopAns := &JoinAns{}
-	if err := cl.exchange(ctx, pld.JoinEUI, jsRPCPaths.join, &JoinReq{
+	if err := cl.exchange(ctx, pld.JoinEui, jsRPCPaths.join, &JoinReq{
 		NsJsMessageHeader: NsJsMessageHeader{
 			MessageHeader: MessageHeader{
 				ProtocolVersion: cl.Protocol.BackendInterfacesVersion(),
 				MessageType:     MessageTypeJoinReq,
 			},
 			SenderID:   NetID(netID),
-			ReceiverID: EUI64(pld.JoinEUI),
+			ReceiverID: EUI64(pld.JoinEui),
 			SenderNSID: NetID(netID),
 		},
 		MACVersion: MACVersion(req.SelectedMACVersion),
 		PHYPayload: Buffer(req.RawPayload),
-		DevEUI:     EUI64(pld.DevEUI),
+		DevEUI:     EUI64(pld.DevEui),
 		DevAddr:    DevAddr(req.DevAddr),
 		DLSettings: Buffer(dlSettings),
 		RxDelay:    req.RxDelay,
@@ -472,7 +472,7 @@ func (cl Client) joinServer(joinEUI types.EUI64) (joinServerClient, bool) {
 
 // GetAppSKey performs AppSKey request to Join Server associated with req.JoinEUI.
 func (cl Client) GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
-	js, ok := cl.joinServer(req.JoinEUI)
+	js, ok := cl.joinServer(req.JoinEui)
 	if !ok {
 		return nil, errNotRegistered.New()
 	}
@@ -485,7 +485,7 @@ func (cl Client) HandleJoinRequest(ctx context.Context, netID types.NetID, req *
 	if pld == nil {
 		return nil, ErrMalformedMessage.New()
 	}
-	js, ok := cl.joinServer(pld.JoinEUI)
+	js, ok := cl.joinServer(pld.JoinEui)
 	if !ok {
 		return nil, errNotRegistered.New()
 	}

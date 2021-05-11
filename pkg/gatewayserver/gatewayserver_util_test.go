@@ -110,10 +110,10 @@ func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (
 }
 
 func (is *mockIS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
-	if req.EUI == registeredGatewayEUI {
+	if req.Eui == registeredGatewayEUI {
 		return &ttnpb.GatewayIdentifiers{
 			GatewayId: registeredGatewayID,
-			EUI:       &registeredGatewayEUI,
+			Eui:       &registeredGatewayEUI,
 		}, nil
 	}
 	return nil, errNotFound.New()
@@ -155,8 +155,8 @@ func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 			},
 			Payload: &ttnpb.Message_JoinRequestPayload{
 				JoinRequestPayload: &ttnpb.JoinRequestPayload{
-					JoinEUI:  joinEUI,
-					DevEUI:   devEUI,
+					JoinEui:  joinEUI,
+					DevEui:   devEUI,
 					DevNonce: devNonce,
 				},
 			},

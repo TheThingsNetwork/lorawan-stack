@@ -351,8 +351,8 @@ func UnmarshalJoinAcceptPayload(b []byte, msg *ttnpb.JoinAcceptPayload) error {
 
 // AppendJoinRequestPayload appends encoded msg to dst.
 func AppendJoinRequestPayload(dst []byte, msg ttnpb.JoinRequestPayload) ([]byte, error) {
-	dst = appendReverse(dst, msg.JoinEUI[:]...)
-	dst = appendReverse(dst, msg.DevEUI[:]...)
+	dst = appendReverse(dst, msg.JoinEui[:]...)
+	dst = appendReverse(dst, msg.DevEui[:]...)
 	dst = appendReverse(dst, msg.DevNonce[:]...)
 	return dst, nil
 }
@@ -367,8 +367,8 @@ func UnmarshalJoinRequestPayload(b []byte, msg *ttnpb.JoinRequestPayload) error 
 	if len(b) != 18 {
 		return errExpectedLengthEncodedEqual("JoinRequestPayload", 18)(len(b))
 	}
-	copyReverse(msg.JoinEUI[:], b[0:8])
-	copyReverse(msg.DevEUI[:], b[8:16])
+	copyReverse(msg.JoinEui[:], b[0:8])
+	copyReverse(msg.DevEui[:], b[8:16])
 	copyReverse(msg.DevNonce[:], b[16:18])
 	return nil
 }
@@ -379,10 +379,10 @@ func AppendRejoinRequestPayload(dst []byte, msg ttnpb.RejoinRequestPayload) ([]b
 	switch msg.RejoinType {
 	case 0, 2:
 		dst = appendReverse(dst, msg.NetID[:]...)
-		dst = appendReverse(dst, msg.DevEUI[:]...)
+		dst = appendReverse(dst, msg.DevEui[:]...)
 	case 1:
-		dst = appendReverse(dst, msg.JoinEUI[:]...)
-		dst = appendReverse(dst, msg.DevEUI[:]...)
+		dst = appendReverse(dst, msg.JoinEui[:]...)
+		dst = appendReverse(dst, msg.DevEui[:]...)
 	default:
 		return nil, errUnknown("RejoinType")(msg.RejoinType)
 	}
@@ -414,14 +414,14 @@ func UnmarshalRejoinRequestPayload(b []byte, msg *ttnpb.RejoinRequestPayload) er
 			return errExpectedLengthEqual("RejoinRequestPayload", 14)(len(b))
 		}
 		copyReverse(msg.NetID[:], b[1:4])
-		copyReverse(msg.DevEUI[:], b[4:12])
+		copyReverse(msg.DevEui[:], b[4:12])
 		msg.RejoinCnt = byteutil.ParseUint32(b[12:14])
 	case 1:
 		if len(b) != 19 {
 			return errExpectedLengthEqual("RejoinRequestPayload", 19)(len(b))
 		}
-		copyReverse(msg.JoinEUI[:], b[1:9])
-		copyReverse(msg.DevEUI[:], b[9:17])
+		copyReverse(msg.JoinEui[:], b[1:9])
+		copyReverse(msg.DevEui[:], b[9:17])
 		msg.RejoinCnt = byteutil.ParseUint32(b[17:19])
 	default:
 		return errUnknown("RejoinType")(msg.RejoinType.String())
@@ -608,8 +608,8 @@ func GetUplinkMessageIdentifiers(phyPayload []byte) (ttnpb.EndDeviceIdentifiers,
 		var joinEUI, devEUI types.EUI64
 		copyReverse(joinEUI[:], phyPayload[1:9])
 		copyReverse(devEUI[:], phyPayload[9:17])
-		ids.JoinEUI = &joinEUI
-		ids.DevEUI = &devEUI
+		ids.JoinEui = &joinEUI
+		ids.DevEui = &devEUI
 		return ids, nil
 	case ttnpb.MType_REJOIN_REQUEST:
 		if n != 19 && n != 24 {
@@ -622,7 +622,7 @@ func GetUplinkMessageIdentifiers(phyPayload []byte) (ttnpb.EndDeviceIdentifiers,
 			}
 			var devEUI types.EUI64
 			copyReverse(devEUI[:], phyPayload[5:13])
-			ids.DevEUI = &devEUI
+			ids.DevEui = &devEUI
 		case 1:
 			if n != 24 {
 				return ttnpb.EndDeviceIdentifiers{}, errExpectedLengthEqual("RejoinRequestPHYPayload", 24)(n)
@@ -630,8 +630,8 @@ func GetUplinkMessageIdentifiers(phyPayload []byte) (ttnpb.EndDeviceIdentifiers,
 			var joinEUI, devEUI types.EUI64
 			copyReverse(joinEUI[:], phyPayload[2:10])
 			copyReverse(devEUI[:], phyPayload[10:18])
-			ids.JoinEUI = &joinEUI
-			ids.DevEUI = &devEUI
+			ids.JoinEui = &joinEUI
+			ids.DevEui = &devEUI
 		default:
 			return ttnpb.EndDeviceIdentifiers{}, errUnknown("RejoinType")(phyPayload[1])
 		}

@@ -235,8 +235,8 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 	case *ttnpb.Message_JoinRequestPayload:
 		up.PhyPayload.Teaser.Payload = &packetbroker.PHYPayloadTeaser_JoinRequest{
 			JoinRequest: &packetbroker.PHYPayloadTeaser_JoinRequestTeaser{
-				JoinEui:  pld.JoinRequestPayload.JoinEUI.MarshalNumber(),
-				DevEui:   pld.JoinRequestPayload.DevEUI.MarshalNumber(),
+				JoinEui:  pld.JoinRequestPayload.JoinEui.MarshalNumber(),
+				DevEui:   pld.JoinRequestPayload.DevEui.MarshalNumber(),
 				DevNonce: uint32(pld.JoinRequestPayload.DevNonce.MarshalNumber()),
 			},
 		}
@@ -259,10 +259,10 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 	var gatewayUplinkToken []byte
 	if len(msg.RxMetadata) > 0 {
 		md := msg.RxMetadata[0]
-		if config.IncludeGatewayEUI && md.EUI != nil {
+		if config.IncludeGatewayEUI && md.Eui != nil {
 			up.GatewayId = &packetbroker.GatewayIdentifier{
 				Eui: &pbtypes.UInt64Value{
-					Value: md.EUI.MarshalNumber(),
+					Value: md.Eui.MarshalNumber(),
 				},
 			}
 		}

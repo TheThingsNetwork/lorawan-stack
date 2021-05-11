@@ -306,10 +306,10 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		var devEUI, joinEUI types.EUI64
 		var devNonce types.DevNonce
 		if joinReq := lastUpMsg.GetJoinRequestPayload(); joinReq != nil {
-			devEUI, joinEUI = joinReq.DevEUI, joinReq.JoinEUI
+			devEUI, joinEUI = joinReq.DevEui, joinReq.JoinEui
 			devNonce = joinReq.DevNonce
 		} else if rejoinReq := lastUpMsg.GetRejoinRequestPayload(); rejoinReq != nil {
-			devEUI, joinEUI = rejoinReq.DevEUI, rejoinReq.JoinEUI
+			devEUI, joinEUI = rejoinReq.DevEui, rejoinReq.JoinEui
 			devNonce = types.DevNonce{byte(rejoinReq.RejoinCnt), byte(rejoinReq.RejoinCnt >> 8)}
 		}
 
@@ -339,7 +339,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 			expectedMIC, err = crypto.ComputeJoinAcceptMIC(
 				jsIntKey,
 				0xFF,
-				*dev.JoinEUI,
+				*dev.JoinEui,
 				lastUpMsg.GetJoinRequestPayload().DevNonce,
 				append([]byte{downMsg.RawPayload[0]}, joinAcceptBytes...),
 			)
@@ -485,8 +485,8 @@ var (
 						},
 						Payload: &ttnpb.Message_JoinRequestPayload{
 							JoinRequestPayload: &ttnpb.JoinRequestPayload{
-								JoinEUI:  joinParams.JoinEUI,
-								DevEUI:   joinParams.DevEUI,
+								JoinEui:  joinParams.JoinEUI,
+								DevEui:   joinParams.DevEUI,
 								DevNonce: joinParams.DevNonce,
 							},
 						},
@@ -516,8 +516,8 @@ var (
 						LoRaWANPHYVersion: uplinkParams.LoRaWANPHYVersion,
 						FrequencyPlanID:   uplinkParams.BandID,
 						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-							JoinEUI: &joinParams.JoinEUI,
-							DevEUI:  &joinParams.DevEUI,
+							JoinEui: &joinParams.JoinEUI,
+							DevEui:  &joinParams.DevEUI,
 						},
 						RootKeys: &ttnpb.RootKeys{
 							NwkKey: &ttnpb.KeyEnvelope{Key: &joinParams.NwkKey},

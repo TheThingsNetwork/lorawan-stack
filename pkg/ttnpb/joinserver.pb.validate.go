@@ -60,9 +60,9 @@ func (m *SessionKeyRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "dev_eui":
-			// no validation rules for DevEUI
+			// no validation rules for DevEui
 		case "join_eui":
-			// no validation rules for JoinEUI
+			// no validation rules for JoinEui
 		default:
 			return SessionKeyRequestValidationError{
 				field:  name,
@@ -1548,7 +1548,7 @@ func (m *JoinEUIPrefix) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEUI
+			// no validation rules for JoinEui
 		case "length":
 			// no validation rules for Length
 		default:
@@ -1727,7 +1727,7 @@ func (m *ProvisionEndDevicesRequest_IdentifiersList) ValidateFields(paths ...str
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEUI
+			// no validation rules for JoinEui
 		case "end_device_ids":
 
 			for idx, item := range m.EndDeviceIds {
@@ -1828,9 +1828,9 @@ func (m *ProvisionEndDevicesRequest_IdentifiersRange) ValidateFields(paths ...st
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEUI
+			// no validation rules for JoinEui
 		case "start_dev_eui":
-			// no validation rules for StartDevEUI
+			// no validation rules for StartDevEui
 		default:
 			return ProvisionEndDevicesRequest_IdentifiersRangeValidationError{
 				field:  name,
@@ -1916,7 +1916,7 @@ func (m *ProvisionEndDevicesRequest_IdentifiersFromData) ValidateFields(paths ..
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEUI
+			// no validation rules for JoinEui
 		default:
 			return ProvisionEndDevicesRequest_IdentifiersFromDataValidationError{
 				field:  name,

@@ -188,7 +188,7 @@ message GetGatewayRequest {
 }
 
 message GetGatewayIdentifiersForEUIRequest {
-  bytes eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.nullable) = false, (gogoproto.customname) = "EUI"];
+  bytes eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.nullable) = false];
 }
 
 message ListGatewaysRequest {

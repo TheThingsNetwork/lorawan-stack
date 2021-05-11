@@ -498,7 +498,7 @@ func (EndDeviceIdentifiersOptionNamespace) WithApplicationIdentifiers(v ttnpb.Ap
 // WithDevEUI returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with DevEUI set to v.
 func (EndDeviceIdentifiersOptionNamespace) WithDevEUI(v *types.EUI64) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
-		x.DevEUI = v
+		x.DevEui = v
 		return x
 	}
 }
@@ -506,7 +506,7 @@ func (EndDeviceIdentifiersOptionNamespace) WithDevEUI(v *types.EUI64) EndDeviceI
 // WithJoinEUI returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with JoinEUI set to v.
 func (EndDeviceIdentifiersOptionNamespace) WithJoinEUI(v *types.EUI64) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
-		x.JoinEUI = v
+		x.JoinEui = v
 		return x
 	}
 }

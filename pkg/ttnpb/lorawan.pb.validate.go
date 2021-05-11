@@ -643,9 +643,9 @@ func (m *JoinRequestPayload) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEUI
+			// no validation rules for JoinEui
 		case "dev_eui":
-			// no validation rules for DevEUI
+			// no validation rules for DevEui
 		case "dev_nonce":
 			// no validation rules for DevNonce
 		default:
@@ -741,9 +741,9 @@ func (m *RejoinRequestPayload) ValidateFields(paths ...string) error {
 		case "net_id":
 			// no validation rules for NetID
 		case "join_eui":
-			// no validation rules for JoinEUI
+			// no validation rules for JoinEui
 		case "dev_eui":
-			// no validation rules for DevEUI
+			// no validation rules for DevEui
 		case "rejoin_cnt":
 			// no validation rules for RejoinCnt
 		default:

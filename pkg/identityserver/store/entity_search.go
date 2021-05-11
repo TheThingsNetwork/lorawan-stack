@@ -179,7 +179,7 @@ func (s *entitySearch) FindGateways(ctx context.Context, member *ttnpb.Organizat
 	query = query.Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, gateway))
 	query = s.queryMembership(ctx, query, gateway, member)
 	query = s.queryMetaFields(ctx, query, gateway, req)
-	if v := req.EUIContains; v != "" {
+	if v := req.EuiContains; v != "" {
 		query = query.Where(fmt.Sprintf(`"%[1]ss"."gateway_eui" ILIKE ?`, gateway), fmt.Sprintf("%%%s%%", v))
 	}
 	results, err := s.runPaginatedQuery(ctx, query, gateway)
@@ -256,10 +256,10 @@ func (s *entitySearch) FindEndDevices(ctx context.Context, req *ttnpb.SearchEndD
 		Select(`"end_devices"."device_id" AS "friendly_id"`)
 	query = s.queryMetaFields(ctx, query, "end_device", req)
 
-	if v := req.DevEUIContains; v != "" {
+	if v := req.DevEuiContains; v != "" {
 		query = query.Where("dev_eui ILIKE ?", fmt.Sprintf("%%%s%%", v))
 	}
-	if v := req.JoinEUIContains; v != "" {
+	if v := req.JoinEuiContains; v != "" {
 		query = query.Where("join_eui ILIKE ?", fmt.Sprintf("%%%s%%", v))
 	}
 	// DevAddrContains

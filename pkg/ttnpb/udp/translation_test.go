@@ -128,7 +128,7 @@ func TestToGatewayUp(t *testing.T) {
 func TestToGatewayUpRoundtrip(t *testing.T) {
 	expectedMd := udp.UpstreamMetadata{
 		ID: ttnpb.GatewayIdentifiers{
-			EUI: &types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			Eui: &types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 		},
 		IP: "1.1.1.1",
 	}

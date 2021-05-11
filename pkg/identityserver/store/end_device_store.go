@@ -139,11 +139,11 @@ func (s *deviceStore) FindEndDevices(ctx context.Context, ids []*ttnpb.EndDevice
 func (s *deviceStore) GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers, fieldMask *types.FieldMask) (*ttnpb.EndDevice, error) {
 	defer trace.StartRegion(ctx, "get end device").End()
 	query := s.query(ctx, EndDevice{}, withApplicationID(id.GetApplicationId()), withDeviceID(id.GetDeviceId()))
-	if id.JoinEUI != nil {
-		query = query.Scopes(withJoinEUI(EUI64(*id.JoinEUI)))
+	if id.JoinEui != nil {
+		query = query.Scopes(withJoinEUI(EUI64(*id.JoinEui)))
 	}
-	if id.DevEUI != nil {
-		query = query.Scopes(withDevEUI(EUI64(*id.DevEUI)))
+	if id.DevEui != nil {
+		query = query.Scopes(withDevEUI(EUI64(*id.DevEui)))
 	}
 	query = selectEndDeviceFields(ctx, query, fieldMask)
 	var devModel EndDevice

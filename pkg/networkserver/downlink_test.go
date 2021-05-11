@@ -2358,8 +2358,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					ApplicationIdentifiers: appID,
 					DeviceId:               devID,
 					DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					JoinEui:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEui:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -2467,8 +2467,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				ids := ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: dev.ApplicationIdentifiers,
 					DeviceId:               dev.DeviceId,
-					DevEUI:                 dev.DevEUI,
-					JoinEUI:                dev.JoinEUI,
+					DevEui:                 dev.DevEui,
+					JoinEui:                dev.JoinEui,
 					DevAddr:                &dev.PendingMACState.QueuedJoinAccept.DevAddr,
 				}
 				cids := LastUplink(dev.PendingMACState.RecentUplinks...).CorrelationIDs

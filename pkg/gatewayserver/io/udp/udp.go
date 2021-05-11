@@ -218,7 +218,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 			cs.io, cs.ioErr = io, err
 			close(cs.ioWait)
 		}()
-		ids := ttnpb.GatewayIdentifiers{EUI: &eui}
+		ids := ttnpb.GatewayIdentifiers{Eui: &eui}
 		ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
 		if err != nil {
 			return nil, err

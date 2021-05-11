@@ -350,8 +350,8 @@ func NewPopulatedMessage_MACPayload(r randyLorawan) *Message_MACPayload {
 
 func NewPopulatedJoinRequestPayload(r randyLorawan, easy bool) *JoinRequestPayload {
 	out := &JoinRequestPayload{}
-	out.JoinEUI = *types.NewPopulatedEUI64(r)
-	out.DevEUI = *types.NewPopulatedEUI64(r)
+	out.JoinEui = *types.NewPopulatedEUI64(r)
+	out.DevEui = *types.NewPopulatedEUI64(r)
 	out.DevNonce = *types.NewPopulatedDevNonce(r)
 	return out
 }
@@ -409,14 +409,14 @@ func NewPopulatedRejoinRequestPayloadType(r randyLorawan, typ RejoinRequestType)
 	out.RejoinType = typ
 	switch typ {
 	case 0, 2:
-		out.JoinEUI = types.EUI64{}
+		out.JoinEui = types.EUI64{}
 		out.NetID = *types.NewPopulatedNetID(r)
-		out.DevEUI = *types.NewPopulatedEUI64(r)
+		out.DevEui = *types.NewPopulatedEUI64(r)
 		out.RejoinCnt = uint32(uint16(r.Uint32()))
 	case 1:
 		out.NetID = types.NetID{}
-		out.JoinEUI = *types.NewPopulatedEUI64(r)
-		out.DevEUI = *types.NewPopulatedEUI64(r)
+		out.JoinEui = *types.NewPopulatedEUI64(r)
+		out.DevEui = *types.NewPopulatedEUI64(r)
 		out.RejoinCnt = uint32(uint16(r.Uint32()))
 	}
 	return out

@@ -282,17 +282,17 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	if pld == nil {
 		return nil, errNoJoinRequest.New()
 	}
-	if pld.DevEUI.IsZero() {
+	if pld.DevEui.IsZero() {
 		return nil, errNoDevEUI.New()
 	}
 	logger = logger.WithFields(log.Fields(
-		"join_eui", pld.JoinEUI,
-		"dev_eui", pld.DevEUI,
+		"join_eui", pld.JoinEui,
+		"dev_eui", pld.DevEui,
 	))
 
 	var match bool
 	for _, p := range js.euiPrefixes {
-		if p.Matches(pld.JoinEUI) {
+		if p.Matches(pld.JoinEui) {
 			match = true
 			break
 		}
@@ -302,7 +302,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	var handled bool
-	dev, err := js.devices.SetByEUI(ctx, pld.JoinEUI, pld.DevEUI,
+	dev, err := js.devices.SetByEUI(ctx, pld.JoinEui, pld.DevEui,
 		[]string{
 			"application_server_address",
 			"application_server_id",
@@ -565,7 +565,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				SNwkSIntKey:  sNwkSIntKeyEnvelope,
 				AppSKey:      appSKeyEnvelope,
 			}
-			_, err = js.keys.SetByID(ctx, *dev.JoinEUI, *dev.DevEUI, sk.SessionKeyID,
+			_, err = js.keys.SetByID(ctx, *dev.JoinEui, *dev.DevEui, sk.SessionKeyID,
 				[]string{
 					"session_key_id",
 					"f_nwk_s_int_key",
@@ -623,7 +623,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 // GetNwkSKeys returns the requested network session keys.
 func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
 	if dn, ok := auth.X509DNFromContext(ctx); ok {
-		dev, err := js.devices.GetByEUI(ctx, req.JoinEUI, req.DevEUI,
+		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, req.DevEui,
 			[]string{
 				"network_server_address",
 			},
@@ -640,7 +640,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		return nil, err
 	}
 
-	ks, err := js.keys.GetByID(ctx, req.JoinEUI, req.DevEUI, req.SessionKeyID,
+	ks, err := js.keys.GetByID(ctx, req.JoinEui, req.DevEui, req.SessionKeyID,
 		[]string{
 			"f_nwk_s_int_key",
 			"nwk_s_enc_key",
@@ -671,7 +671,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 // GetAppSKey returns the requested application session key.
 func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	if dn, ok := auth.X509DNFromContext(ctx); ok {
-		dev, err := js.devices.GetByEUI(ctx, req.JoinEUI, req.DevEUI,
+		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, req.DevEui,
 			[]string{
 				"application_server_address",
 				"application_server_id",
@@ -709,7 +709,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		return nil, err
 	}
 
-	ks, err := js.keys.GetByID(ctx, req.JoinEUI, req.DevEUI, req.SessionKeyID,
+	ks, err := js.keys.GetByID(ctx, req.JoinEui, req.DevEui, req.SessionKeyID,
 		[]string{
 			"app_s_key",
 		},

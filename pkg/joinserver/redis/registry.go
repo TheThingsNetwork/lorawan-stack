@@ -174,8 +174,8 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 	if pb == nil && len(sets) == 0 {
 		pipelined = func(p redis.Pipeliner) error {
 			p.Del(ctx, uk)
-			if stored.JoinEUI != nil && stored.DevEUI != nil {
-				p.Del(ctx, r.euiKey(*stored.JoinEUI, *stored.DevEUI))
+			if stored.JoinEui != nil && stored.DevEui != nil {
+				p.Del(ctx, r.euiKey(*stored.JoinEui, *stored.DevEui))
 			}
 			pid, err := provisionerUniqueID(stored)
 			if err != nil {
@@ -219,7 +219,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			if err != nil {
 				return nil, err
 			}
-			if updated.JoinEUI == nil || updated.DevEUI == nil || updated.DevEUI.IsZero() {
+			if updated.JoinEui == nil || updated.DevEui == nil || updated.DevEui.IsZero() {
 				return nil, errInvalidIdentifiers.New()
 			}
 		} else {
@@ -229,10 +229,10 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceId != stored.DeviceId {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.device_id")
 			}
-			if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.JoinEUI, stored.JoinEUI) {
+			if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.JoinEui, stored.JoinEui) {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.join_eui")
 			}
-			if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.DevEUI, stored.DevEUI) {
+			if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.DevEui, stored.DevEui) {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.dev_eui")
 			}
 			if ttnpb.HasAnyField(sets, "provisioner_id") && pb.ProvisionerID != stored.ProvisionerID {
@@ -255,7 +255,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 
 		pipelined = func(p redis.Pipeliner) error {
 			if stored == nil {
-				ek := r.euiKey(*updated.JoinEUI, *updated.DevEUI)
+				ek := r.euiKey(*updated.JoinEui, *updated.DevEui)
 				if err := tx.Watch(ctx, ek).Err(); err != nil {
 					return err
 				}

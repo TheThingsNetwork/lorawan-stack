@@ -432,11 +432,11 @@ func (w *webhooks) handleDown(op func(io.Server, context.Context, ttnpb.EndDevic
 
 func expandVariables(url *url.URL, up *ttnpb.ApplicationUp) {
 	var joinEUI, devEUI, devAddr string
-	if up.JoinEUI != nil {
-		joinEUI = up.JoinEUI.String()
+	if up.JoinEui != nil {
+		joinEUI = up.JoinEui.String()
 	}
-	if up.DevEUI != nil {
-		devEUI = up.DevEUI.String()
+	if up.DevEui != nil {
+		devEUI = up.DevEui.String()
 	}
 	if up.DevAddr != nil {
 		devAddr = up.DevAddr.String()

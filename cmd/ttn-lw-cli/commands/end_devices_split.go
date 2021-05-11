@@ -315,7 +315,7 @@ func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) err
 	}
 
 	if config.JoinServerEnabled {
-		if devID.JoinEUI != nil && devID.DevEUI != nil {
+		if devID.JoinEui != nil && devID.DevEui != nil {
 			js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
 			if err != nil {
 				return err

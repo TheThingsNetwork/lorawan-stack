@@ -147,8 +147,8 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		MHDR: parsedMHDR,
 		MIC:  micBytes,
 		Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
-			JoinEUI:  req.JoinEUI.EUI64,
-			DevEUI:   req.DevEUI.EUI64,
+			JoinEui:  req.JoinEUI.EUI64,
+			DevEui:   req.DevEUI.EUI64,
 			DevNonce: [2]byte{byte(req.DevNonce >> 8), byte(req.DevNonce)},
 		}},
 	}
@@ -214,11 +214,11 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	}
 
 	req.DevEUI = basicstation.EUI{
-		EUI64: jreqPayload.DevEUI,
+		EUI64: jreqPayload.DevEui,
 	}
 
 	req.JoinEUI = basicstation.EUI{
-		EUI64: jreqPayload.JoinEUI,
+		EUI64: jreqPayload.JoinEui,
 	}
 
 	devNonce, err := jreqPayload.DevNonce.Marshal()
