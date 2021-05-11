@@ -87,6 +87,35 @@ describe('End device messaging', () => {
 
       cy.findByTestId('error-notification').should('not.exist')
     })
+
+    it('disables uplink simulation when skip payload crypto is enabled', () => {
+      cy.visit(
+        `${Cypress.config(
+          'consoleRootPath',
+        )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
+      )
+
+      const response = {
+        skip_payload_crypto_override: true,
+        session: {},
+      }
+
+      cy.intercept(
+        'GET',
+        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto,skip_payload_crypto_override,session,pending_session`,
+        response,
+      )
+
+      cy.findByTestId('notification')
+        .should('be.visible')
+        .findByText(`Simulation is disabled for devices that skip payload crypto`)
+        .should('be.visible')
+
+      cy.findByLabelText('FPort').should('be.disabled')
+      cy.findByLabelText('Payload').should('be.disabled')
+
+      cy.findByRole('button', { name: 'Simulate uplink' }).should('be.disabled')
+    })
   })
 
   describe('Downlink', () => {
@@ -106,6 +135,38 @@ describe('End device messaging', () => {
         .findByText(
           `Downlinks can only be scheduled for end devices with a valid session. Please make sure your end device is properly connected to the network.`,
         )
+        .should('be.visible')
+
+      cy.findByLabelText('Replace downlink queue').should('be.disabled')
+      cy.findByLabelText('Push to downlink queue (append)').should('be.disabled')
+      cy.findByLabelText('FPort').should('be.disabled')
+      cy.findByLabelText('Payload').should('be.disabled')
+      cy.findByLabelText('Confirmed downlink').should('be.disabled')
+
+      cy.findByRole('button', { name: 'Schedule downlink' }).should('be.disabled')
+    })
+
+    it('disables downlink messaging when skip payload crypto is enabled', () => {
+      cy.visit(
+        `${Cypress.config(
+          'consoleRootPath',
+        )}/applications/${applicationId}/devices/${endDeviceId}/messaging/downlink`,
+      )
+
+      const response = {
+        skip_payload_crypto_override: true,
+        session: {},
+      }
+
+      cy.intercept(
+        'GET',
+        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto,skip_payload_crypto_override,session,pending_session`,
+        response,
+      )
+
+      cy.findByTestId('notification')
+        .should('be.visible')
+        .findByText(`Simulation is disabled for devices that skip payload crypto`)
         .should('be.visible')
 
       cy.findByLabelText('Replace downlink queue').should('be.disabled')

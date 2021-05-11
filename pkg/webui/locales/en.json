@@ -698,6 +698,7 @@
   "lib.shared-messages.deviceDescPlaceholder": "Description for my new end device",
   "lib.shared-messages.deviceIdPlaceholder": "my-new-device",
   "lib.shared-messages.deviceNamePlaceholder": "My new end device",
+  "lib.shared-messages.deviceSimulationDisabledWarning": "Simulation is disabled for devices that skip payload crypto",
   "lib.shared-messages.device": "End device",
   "lib.shared-messages.devices": "End devices",
   "lib.shared-messages.devID": "End device ID",

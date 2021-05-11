@@ -698,6 +698,7 @@
   "lib.shared-messages.deviceDescPlaceholder": "Xxxxxxxxxxx xxx xx xxx xxx xxxxxx",
   "lib.shared-messages.deviceIdPlaceholder": "xx-xxx-xxxxxx",
   "lib.shared-messages.deviceNamePlaceholder": "Xx xxx xxx xxxxxx",
+  "lib.shared-messages.deviceSimulationDisabledWarning": "Xxxxxxxxxx xx xxxxxxxx xxx xxxxxxx xxxx xxxx xxxxxxx xxxxxx",
   "lib.shared-messages.device": "Xxx xxxxxx",
   "lib.shared-messages.devices": "Xxx xxxxxxx",
   "lib.shared-messages.devID": "Xxx xxxxxx XX",
