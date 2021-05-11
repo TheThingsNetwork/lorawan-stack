@@ -384,7 +384,7 @@ var (
 // This method should only be used for request contexts.
 func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
 	ctx = gs.FillContext(ctx)
-	if ids.IsZero() || ids.EUI.IsZero() {
+	if ids.IsZero() || ids.EUI != nil && ids.EUI.IsZero() {
 		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers.New()
 	}
 	if ids.GatewayId == "" {
