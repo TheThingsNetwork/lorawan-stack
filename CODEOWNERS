@@ -7,48 +7,48 @@
 /pkg
 
 # Dependencies
-/go.mod @johanstokking @htdvisser @rvolosatovs
-/go.sum @johanstokking @htdvisser @rvolosatovs
+/go.mod @johanstokking @htdvisser
+/go.sum @johanstokking @htdvisser
 /package.json @bafonins @kschiffer @asmulko
 /yarn.lock @bafonins @kschiffer @asmulko
 /sdk/js/package.json @bafonins @kschiffer @asmulko
 /sdk/js/yarn.lock @bafonins @kschiffer @asmulko
 
 # Build pipeline and tooling
-/Makefile @htdvisser @rvolosatovs @johanstokking
-/tools @htdvisser @rvolosatovs @johanstokking
-/.github/workflows @htdvisser @rvolosatovs @johanstokking
+/Makefile @htdvisser @johanstokking
+/tools @htdvisser @johanstokking
+/.github/workflows @htdvisser @johanstokking
 /config @bafonins @kschiffer @asmulko
 /config/stack @benolayinka @neoaggelos
 /cypress @bafonins @kschiffer @asmulko
 
 # API, configuration, CLI and storage compatibility
-/api @johanstokking @htdvisser @rvolosatovs
-/cmd @johanstokking @htdvisser @rvolosatovs
-/pkg/**/config.go @johanstokking @htdvisser @rvolosatovs
-/pkg/**/registry.go @johanstokking @htdvisser @rvolosatovs
-/pkg/config/shared.go @johanstokking @htdvisser @rvolosatovs
-/pkg/gogoproto @johanstokking @htdvisser @rvolosatovs
-/pkg/goproto @johanstokking @htdvisser @rvolosatovs
-/pkg/identityserver/store @johanstokking @htdvisser @rvolosatovs
-/pkg/jsonpb @johanstokking @htdvisser @rvolosatovs
-/pkg/ttnpb @johanstokking @htdvisser @rvolosatovs
+/api @johanstokking @htdvisser
+/cmd @adriansmares @htdvisser
+/pkg/**/config.go @adriansmares @htdvisser
+/pkg/**/registry.go @adriansmares @htdvisser
+/pkg/config/shared.go @adriansmares @htdvisser
+/pkg/gogoproto @johanstokking @htdvisser
+/pkg/goproto @johanstokking @htdvisser
+/pkg/identityserver/store @johanstokking @htdvisser
+/pkg/jsonpb @johanstokking @htdvisser
+/pkg/ttnpb @johanstokking @htdvisser
 
 # Security
 /pkg/auth @johanstokking @htdvisser
-/pkg/crypto @johanstokking @htdvisser @rvolosatovs
+/pkg/crypto @johanstokking @htdvisser
 
 # Shared components
-/pkg/band @johanstokking @htdvisser @rvolosatovs @KrishnaIyer
+/pkg/band @johanstokking @htdvisser @KrishnaIyer
 /pkg/cluster @htdvisser @johanstokking @adriansmares
 /pkg/component @johanstokking @htdvisser
 /pkg/errors @johanstokking @htdvisser
-/pkg/events @htdvisser @rvolosatovs @adriansmares
-/pkg/frequencyplans @johanstokking @htdvisser @rvolosatovs @KrishnaIyer
-/pkg/interop @johanstokking @rvolosatovs @adriansmares
+/pkg/events @htdvisser @adriansmares
+/pkg/frequencyplans @johanstokking @htdvisser @KrishnaIyer
+/pkg/interop @johanstokking @adriansmares
 /pkg/rpcmiddleware @htdvisser @johanstokking @adriansmares
 /pkg/rpcserver @htdvisser @johanstokking @adriansmares
-/pkg/types @johanstokking @htdvisser @rvolosatovs
+/pkg/types @johanstokking @htdvisser
 /pkg/web @bafonins @kschiffer @asmulko
 /pkg/webmiddleware @htdvisser @bafonins @kschiffer
 /pkg/webui @bafonins @kschiffer @asmulko
@@ -63,29 +63,29 @@
 /pkg/web/oauthclient @htdvisser @bafonins @kschiffer
 
 /pkg/gatewayserver @johanstokking @KrishnaIyer @adriansmares
-/pkg/gatewayconfigurationserver @rvolosatovs @KrishnaIyer @htdvisser
-/pkg/pfconfig @rvolosatovs @KrishnaIyer
+/pkg/gatewayconfigurationserver @KrishnaIyer @htdvisser
+/pkg/pfconfig @KrishnaIyer @htdvisser
 /pkg/basicstation @KrishnaIyer @htdvisser
 
-/pkg/networkserver @johanstokking @rvolosatovs @adriansmares
-/pkg/encoding/lorawan @rvolosatovs @johanstokking @adriansmares
+/pkg/networkserver @johanstokking @adriansmares
+/pkg/encoding/lorawan @johanstokking @adriansmares
 
 /pkg/applicationserver @johanstokking @adriansmares @KrishnaIyer
 /pkg/messageprocessors @johanstokking @adriansmares @KrishnaIyer
 /pkg/scripting @johanstokking @adriansmares @KrishnaIyer
 
-/pkg/joinserver @johanstokking @rvolosatovs @adriansmares
+/pkg/joinserver @johanstokking @adriansmares
 
 /pkg/console @bafonins @kschiffer @asmulko
 
 /pkg/packetbrokeragent @johanstokking @adriansmares
 
-/pkg/devicetemplateconverter @johanstokking @adriansmares @neoaggelos
-/pkg/devicetemplates @johanstokking @adriansmares @neoaggelos
-/pkg/qrcode @johanstokking @adriansmares @neoaggelos
-/pkg/qrcodegenerator @johanstokking @adriansmares @neoaggelos
+/pkg/devicetemplateconverter @adriansmares @neoaggelos
+/pkg/devicetemplates @adriansmares @neoaggelos
+/pkg/qrcode @adriansmares @neoaggelos
+/pkg/qrcodegenerator @adriansmares @neoaggelos
 
-/pkg/devicerepository @johanstokking @neoaggelos
+/pkg/devicerepository @adriansmares @neoaggelos
 
 # SDKs
 /sdk/js @bafonins @kschiffer @asmulko
