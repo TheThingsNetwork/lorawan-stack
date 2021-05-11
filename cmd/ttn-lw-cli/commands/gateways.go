@@ -75,7 +75,7 @@ func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb
 		if err := gatewayEUI.UnmarshalText([]byte(gatewayEUIHex)); err != nil {
 			return nil, err
 		}
-		ids.EUI = &gatewayEUI
+		ids.Eui = &gatewayEUI
 	}
 	return ids, nil
 }
@@ -99,7 +99,7 @@ func getGatewayEUI(flagSet *pflag.FlagSet, args []string, requireEUI bool) (*ttn
 		if err := gatewayEUI.UnmarshalText([]byte(gatewayEUIHex)); err != nil {
 			return nil, err
 		}
-		ids.EUI = &gatewayEUI
+		ids.Eui = &gatewayEUI
 	}
 	return ids, nil
 }
@@ -220,9 +220,9 @@ var (
 
 			cli := ttnpb.NewGatewayRegistryClient(is)
 
-			if gtwID.GatewayId == "" && gtwID.EUI != nil {
+			if gtwID.GatewayId == "" && gtwID.Eui != nil {
 				gtwID, err = cli.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-					EUI: *gtwID.EUI,
+					Eui: *gtwID.Eui,
 				})
 				if err != nil {
 					return err
@@ -288,8 +288,8 @@ var (
 				if gtwID.GatewayId != "" {
 					gateway.GatewayId = gtwID.GatewayId
 				}
-				if gtwID.EUI != nil {
-					gateway.EUI = gtwID.EUI
+				if gtwID.Eui != nil {
+					gateway.Eui = gtwID.Eui
 				}
 			}
 
@@ -332,7 +332,7 @@ var (
 			antennaPaths := util.UpdateFieldMask(cmd.Flags(), setGatewayAntennaFlags)
 			paths = append(paths, ttnpb.FlattenPaths(paths, gatewayFlattenPaths)...)
 
-			if gtwID.EUI != nil {
+			if gtwID.Eui != nil {
 				paths = append(paths, "ids.eui")
 			}
 			if len(paths)+len(antennaPaths) == 0 {

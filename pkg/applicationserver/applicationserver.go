@@ -632,8 +632,8 @@ var errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join
 func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, sessionKeyID []byte) (ttnpb.KeyEnvelope, error) {
 	req := &ttnpb.SessionKeyRequest{
 		SessionKeyID: sessionKeyID,
-		DevEUI:       *ids.DevEUI,
-		JoinEUI:      *ids.JoinEUI,
+		DevEui:       *ids.DevEui,
+		JoinEui:      *ids.JoinEui,
 	}
 	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, &ids); err == nil {
 		cc, err := js.Conn()
@@ -657,7 +657,7 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 			return ttnpb.KeyEnvelope{}, err
 		}
 	}
-	return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEUI)
+	return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEui)
 }
 
 func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) (pass bool, err error) {
@@ -706,8 +706,8 @@ var errFetchAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
 // in the given join-accept message is reset.
 func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) error {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"join_eui", ids.JoinEUI,
-		"dev_eui", ids.DevEUI,
+		"join_eui", ids.JoinEui,
+		"dev_eui", ids.DevEui,
 		"session_key_id", joinAccept.SessionKeyID,
 	))
 	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)

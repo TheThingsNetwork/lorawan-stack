@@ -144,7 +144,7 @@ func TestGatewayServer(t *testing.T) {
 
 	is.add(ctx, ttnpb.GatewayIdentifiers{
 		GatewayId: registeredGatewayID,
-		EUI:       &registeredGatewayEUI,
+		Eui:       &registeredGatewayEUI,
 	}, registeredGatewayKey, true, true)
 
 	for _, ptc := range []struct {
@@ -308,10 +308,10 @@ func TestGatewayServer(t *testing.T) {
 			Protocol:       "udp",
 			SupportsStatus: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
-				return ids.EUI != nil
+				return ids.Eui != nil
 			},
 			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-				if ids.EUI == nil {
+				if ids.Eui == nil {
 					t.SkipNow()
 				}
 				upConn, err := net.Dial("udp", ":1700")
@@ -334,7 +334,7 @@ func TestGatewayServer(t *testing.T) {
 						case up := <-upCh:
 							token++
 							packet := encoding.Packet{
-								GatewayEUI:      ids.EUI,
+								GatewayEUI:      ids.Eui,
 								ProtocolVersion: encoding.Version1,
 								Token:           [2]byte{0x00, token},
 								PacketType:      encoding.PushData,
@@ -380,7 +380,7 @@ func TestGatewayServer(t *testing.T) {
 						case <-ticker.C:
 							token++
 							pull := encoding.Packet{
-								GatewayEUI:      ids.EUI,
+								GatewayEUI:      ids.Eui,
 								ProtocolVersion: encoding.Version1,
 								Token:           [2]byte{0x01, token},
 								PacketType:      encoding.PullData,
@@ -438,10 +438,10 @@ func TestGatewayServer(t *testing.T) {
 			DetectsInvalidMessages: true,
 			HasAuth:                true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
-				return ids.EUI != nil
+				return ids.Eui != nil
 			},
 			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-				if ids.EUI == nil {
+				if ids.Eui == nil {
 					t.SkipNow()
 				}
 				wsConn, _, err := websocket.DefaultDialer.Dial("ws://0.0.0.0:1887/traffic/"+registeredGatewayID, nil)
@@ -560,11 +560,11 @@ func TestGatewayServer(t *testing.T) {
 				},
 				{
 					Name: "RegisteredEUI",
-					ID:   ttnpb.GatewayIdentifiers{EUI: &registeredGatewayEUI},
+					ID:   ttnpb.GatewayIdentifiers{Eui: &registeredGatewayEUI},
 				},
 				{
 					Name: "UnregisteredEUI",
-					ID:   ttnpb.GatewayIdentifiers{EUI: &unregisteredGatewayEUI},
+					ID:   ttnpb.GatewayIdentifiers{Eui: &unregisteredGatewayEUI},
 				},
 			} {
 				t.Run(ctc.Name, func(t *testing.T) {
@@ -630,7 +630,7 @@ func TestGatewayServer(t *testing.T) {
 
 			id := ttnpb.GatewayIdentifiers{
 				GatewayId: registeredGatewayID,
-				EUI:       &registeredGatewayEUI,
+				Eui:       &registeredGatewayEUI,
 			}
 
 			ctx1, fail1 := errorcontext.New(ctx)
@@ -674,7 +674,7 @@ func TestGatewayServer(t *testing.T) {
 			downCh := make(chan *ttnpb.GatewayDown)
 			ids := ttnpb.GatewayIdentifiers{
 				GatewayId: registeredGatewayID,
-				EUI:       &registeredGatewayEUI,
+				Eui:       &registeredGatewayEUI,
 			}
 			// Setup a stats client with independent context to query whether the gateway is connected and statistics on
 			// upstream and downstream.

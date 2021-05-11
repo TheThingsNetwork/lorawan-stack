@@ -133,14 +133,14 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 		if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
 			return nil, err
 		}
-		ids.JoinEUI = &joinEUI
+		ids.JoinEui = &joinEUI
 	}
 	if devEUIHex, _ := flagSet.GetString("dev-eui"); devEUIHex != "" {
 		var devEUI types.EUI64
 		if err := devEUI.UnmarshalText([]byte(devEUIHex)); err != nil {
 			return nil, err
 		}
-		ids.DevEUI = &devEUI
+		ids.DevEui = &devEUI
 	}
 	return ids, nil
 }
@@ -509,11 +509,11 @@ var (
 				if devID.ApplicationId != "" {
 					device.ApplicationId = devID.ApplicationId
 				}
-				if device.SupportsJoin && devID.JoinEUI != nil {
-					device.JoinEUI = devID.JoinEUI
+				if device.SupportsJoin && devID.JoinEui != nil {
+					device.JoinEui = devID.JoinEui
 				}
-				if devID.DevEUI != nil {
-					device.DevEUI = devID.DevEUI
+				if devID.DevEui != nil {
+					device.DevEui = devID.DevEui
 				}
 			}
 			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())
@@ -532,7 +532,7 @@ var (
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(device.SupportsJoin, paths...)
 
 			// Require EUIs for devices that need to be added to the Join Server.
-			if len(jsPaths) > 0 && (device.JoinEUI == nil || device.DevEUI == nil) {
+			if len(jsPaths) > 0 && (device.JoinEui == nil || device.DevEui == nil) {
 				return errNoEndDeviceEUI
 			}
 
@@ -657,23 +657,23 @@ var (
 			}
 
 			// EUIs can not be updated, so we only accept EUI flags if they are equal to the existing ones.
-			if device.JoinEUI != nil {
-				if existingDevice.JoinEUI != nil && *device.JoinEUI != *existingDevice.JoinEUI {
+			if device.JoinEui != nil {
+				if existingDevice.JoinEui != nil && *device.JoinEui != *existingDevice.JoinEui {
 					return errEndDeviceEUIUpdate
 				}
 			} else {
-				device.JoinEUI = existingDevice.JoinEUI
+				device.JoinEui = existingDevice.JoinEui
 			}
-			if device.DevEUI != nil {
-				if existingDevice.DevEUI != nil && *device.DevEUI != *existingDevice.DevEUI {
+			if device.DevEui != nil {
+				if existingDevice.DevEui != nil && *device.DevEui != *existingDevice.DevEui {
 					return errEndDeviceEUIUpdate
 				}
 			} else {
-				device.DevEUI = existingDevice.DevEUI
+				device.DevEui = existingDevice.DevEui
 			}
 
 			// Require EUIs for devices that need to be updated in the Join Server.
-			if len(jsPaths) > 0 && (device.JoinEUI == nil || device.DevEUI == nil) {
+			if len(jsPaths) > 0 && (device.JoinEui == nil || device.DevEui == nil) {
 				return errNoEndDeviceEUI
 			}
 
@@ -727,7 +727,7 @@ var (
 			}
 			if inputDecoder != nil {
 				list := &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
-					JoinEUI: &joinEUI,
+					JoinEui: &joinEUI,
 				}
 				for {
 					var ids ttnpb.EndDeviceIdentifiers
@@ -752,14 +752,14 @@ var (
 					}
 					req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_Range{
 						Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-							StartDevEUI: startDevEUI,
-							JoinEUI:     &joinEUI,
+							StartDevEui: startDevEUI,
+							JoinEui:     &joinEUI,
 						},
 					}
 				} else {
 					req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_FromData{
 						FromData: &ttnpb.ProvisionEndDevicesRequest_IdentifiersFromData{
-							JoinEUI: &joinEUI,
+							JoinEui: &joinEUI,
 						},
 					}
 				}
@@ -869,19 +869,19 @@ var (
 			}
 
 			// EUIs must match registered EUIs if set.
-			if devID.JoinEUI != nil {
-				if existingDevice.JoinEUI != nil && *devID.JoinEUI != *existingDevice.JoinEUI {
+			if devID.JoinEui != nil {
+				if existingDevice.JoinEui != nil && *devID.JoinEui != *existingDevice.JoinEui {
 					return errInconsistentEndDeviceEUI
 				}
 			} else {
-				devID.JoinEUI = existingDevice.JoinEUI
+				devID.JoinEui = existingDevice.JoinEui
 			}
-			if devID.DevEUI != nil {
-				if existingDevice.DevEUI != nil && *devID.DevEUI != *existingDevice.DevEUI {
+			if devID.DevEui != nil {
+				if existingDevice.DevEui != nil && *devID.DevEui != *existingDevice.DevEui {
 					return errInconsistentEndDeviceEUI
 				}
 			} else {
-				devID.DevEUI = existingDevice.DevEUI
+				devID.DevEui = existingDevice.DevEui
 			}
 
 			if nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
@@ -943,8 +943,8 @@ values will be stored in the Join Server.`,
 				authenticationCode, _ := cmd.Flags().GetString("source-authentication-code")
 				req.SourceDevice = &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
 					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-						JoinEUI:            *joinEUI,
-						DevEUI:             *devEUI,
+						JoinEui:            *joinEUI,
+						DevEui:             *devEUI,
 						AuthenticationCode: authenticationCode,
 					},
 				}

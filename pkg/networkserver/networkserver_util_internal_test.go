@@ -136,8 +136,8 @@ func MakeJoinRequestDecodedPayload(joinEUI, devEUI types.EUI64, devNonce types.D
 		MIC: CopyBytes(mic[:]),
 		Payload: &ttnpb.Message_JoinRequestPayload{
 			JoinRequestPayload: &ttnpb.JoinRequestPayload{
-				JoinEUI:  *joinEUI.Copy(&types.EUI64{}),
-				DevEUI:   *devEUI.Copy(&types.EUI64{}),
+				JoinEui:  *joinEUI.Copy(&types.EUI64{}),
+				DevEui:   *devEUI.Copy(&types.EUI64{}),
 				DevNonce: deepcopy.Copy(devNonce).(types.DevNonce),
 			},
 		},
@@ -1457,8 +1457,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 	start := time.Now().UTC()
 
 	upConf := JoinRequestConfig{
-		JoinEUI:        *conf.Device.JoinEUI,
-		DevEUI:         *conf.Device.DevEUI,
+		JoinEUI:        *conf.Device.JoinEui,
+		DevEUI:         *conf.Device.DevEui,
 		DevNonce:       devNonce,
 		DataRate:       upDR,
 		Frequency:      upCh.Frequency,
@@ -1515,8 +1515,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 							a.So(req.DevAddr.NetIDType(), should.Equal, env.Config.NetID.Type()),
 							a.So(req.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIDs),
 							a.So(req, should.Resemble, MakeNsJsJoinRequest(NsJsJoinRequestConfig{
-								JoinEUI:            *conf.Device.JoinEUI,
-								DevEUI:             *conf.Device.DevEUI,
+								JoinEUI:            *conf.Device.JoinEui,
+								DevEUI:             *conf.Device.DevEui,
 								DevNonce:           devNonce,
 								MIC:                mic,
 								DevAddr:            req.DevAddr,
@@ -2070,8 +2070,8 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 			MACStateOptions.WithRecentUplinks(
 				MakeJoinRequest(JoinRequestConfig{
 					DecodePayload:  true,
-					JoinEUI:        *x.JoinEUI,
-					DevEUI:         *x.DevEUI,
+					JoinEUI:        *x.JoinEui,
+					DevEUI:         *x.DevEui,
 					CorrelationIDs: []string{"join-request"},
 					MIC:            [4]byte{0x42, 0xff, 0xff, 0xff},
 					DataRateIndex:  drIdx,
@@ -2216,7 +2216,7 @@ func MakeABPEndDevice(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []t
 	return MakeEndDevice(
 		EndDeviceOptions.Compose(opts...),
 		func(x ttnpb.EndDevice) ttnpb.EndDevice {
-			if x.Multicast || x.DevEUI != nil && !x.DevEUI.IsZero() || !x.LoRaWANVersion.RequireDevEUIForABP() {
+			if x.Multicast || x.DevEui != nil && !x.DevEui.IsZero() || !x.LoRaWANVersion.RequireDevEUIForABP() {
 				return x
 			}
 			return EndDeviceOptions.WithDefaultDevEUI()(x)

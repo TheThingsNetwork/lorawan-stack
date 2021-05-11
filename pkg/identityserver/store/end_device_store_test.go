@@ -38,8 +38,8 @@ func TestEndDeviceStore(t *testing.T) {
 
 		deviceID := ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test"},
-			JoinEUI:                &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
-			DevEUI:                 &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
+			JoinEui:                &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
+			DevEui:                 &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
 			DeviceId:               "foo",
 		}
 

@@ -484,7 +484,7 @@ func (m *SearchGatewaysRequest) ValidateFields(paths ...string) error {
 
 		case "eui_contains":
 
-			if utf8.RuneCountInString(m.GetEUIContains()) > 16 {
+			if utf8.RuneCountInString(m.GetEuiContains()) > 16 {
 				return SearchGatewaysRequestValidationError{
 					field:  "eui_contains",
 					reason: "value length must be at most 16 runes",
@@ -1047,7 +1047,7 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 
 		case "dev_eui_contains":
 
-			if utf8.RuneCountInString(m.GetDevEUIContains()) > 16 {
+			if utf8.RuneCountInString(m.GetDevEuiContains()) > 16 {
 				return SearchEndDevicesRequestValidationError{
 					field:  "dev_eui_contains",
 					reason: "value length must be at most 16 runes",
@@ -1056,7 +1056,7 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 
 		case "join_eui_contains":
 
-			if utf8.RuneCountInString(m.GetJoinEUIContains()) > 16 {
+			if utf8.RuneCountInString(m.GetJoinEuiContains()) > 16 {
 				return SearchEndDevicesRequestValidationError{
 					field:  "join_eui_contains",
 					reason: "value length must be at most 16 runes",

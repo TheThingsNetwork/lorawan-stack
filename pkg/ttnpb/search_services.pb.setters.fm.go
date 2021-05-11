@@ -264,10 +264,10 @@ func (dst *SearchGatewaysRequest) SetFields(src *SearchGatewaysRequest, paths ..
 				return fmt.Errorf("'eui_contains' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.EUIContains = src.EUIContains
+				dst.EuiContains = src.EuiContains
 			} else {
 				var zero string
-				dst.EUIContains = zero
+				dst.EuiContains = zero
 			}
 		case "field_mask":
 			if len(subs) > 0 {
@@ -601,20 +601,20 @@ func (dst *SearchEndDevicesRequest) SetFields(src *SearchEndDevicesRequest, path
 				return fmt.Errorf("'dev_eui_contains' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.DevEUIContains = src.DevEUIContains
+				dst.DevEuiContains = src.DevEuiContains
 			} else {
 				var zero string
-				dst.DevEUIContains = zero
+				dst.DevEuiContains = zero
 			}
 		case "join_eui_contains":
 			if len(subs) > 0 {
 				return fmt.Errorf("'join_eui_contains' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.JoinEUIContains = src.JoinEUIContains
+				dst.JoinEuiContains = src.JoinEuiContains
 			} else {
 				var zero string
-				dst.JoinEUIContains = zero
+				dst.JoinEuiContains = zero
 			}
 		case "dev_addr_contains":
 			if len(subs) > 0 {

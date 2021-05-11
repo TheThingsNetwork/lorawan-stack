@@ -425,20 +425,20 @@ func (dst *JoinRequestPayload) SetFields(src *JoinRequestPayload, paths ...strin
 				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.JoinEUI = src.JoinEUI
+				dst.JoinEui = src.JoinEui
 			} else {
 				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.JoinEUI = zero
+				dst.JoinEui = zero
 			}
 		case "dev_eui":
 			if len(subs) > 0 {
 				return fmt.Errorf("'dev_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.DevEUI = src.DevEUI
+				dst.DevEui = src.DevEui
 			} else {
 				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.DevEUI = zero
+				dst.DevEui = zero
 			}
 		case "dev_nonce":
 			if len(subs) > 0 {
@@ -486,20 +486,20 @@ func (dst *RejoinRequestPayload) SetFields(src *RejoinRequestPayload, paths ...s
 				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.JoinEUI = src.JoinEUI
+				dst.JoinEui = src.JoinEui
 			} else {
 				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.JoinEUI = zero
+				dst.JoinEui = zero
 			}
 		case "dev_eui":
 			if len(subs) > 0 {
 				return fmt.Errorf("'dev_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.DevEUI = src.DevEUI
+				dst.DevEui = src.DevEui
 			} else {
 				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.DevEUI = zero
+				dst.DevEui = zero
 			}
 		case "rejoin_cnt":
 			if len(subs) > 0 {

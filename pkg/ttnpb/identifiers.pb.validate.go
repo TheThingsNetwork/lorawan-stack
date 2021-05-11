@@ -277,9 +277,9 @@ func (m *EndDeviceIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "dev_eui":
-			// no validation rules for DevEUI
+			// no validation rules for DevEui
 		case "join_eui":
-			// no validation rules for JoinEUI
+			// no validation rules for JoinEui
 		case "dev_addr":
 			// no validation rules for DevAddr
 		default:
@@ -382,7 +382,7 @@ func (m *GatewayIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "eui":
-			// no validation rules for EUI
+			// no validation rules for Eui
 		default:
 			return GatewayIdentifiersValidationError{
 				field:  name,

@@ -737,9 +737,9 @@ func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) ValidateFields(paths ..
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEUI
+			// no validation rules for JoinEui
 		case "dev_eui":
-			// no validation rules for DevEUI
+			// no validation rules for DevEui
 		case "authentication_code":
 
 			if !_ClaimEndDeviceRequest_AuthenticatedIdentifiers_AuthenticationCode_Pattern.MatchString(m.GetAuthenticationCode()) {
@@ -837,7 +837,7 @@ func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) ValidateFields(paths ...s
 		_ = subs
 		switch name {
 		case "gateway_eui":
-			// no validation rules for GatewayEUI
+			// no validation rules for GatewayEui
 		case "authentication_code":
 
 			if len(m.GetAuthenticationCode()) > 2048 {

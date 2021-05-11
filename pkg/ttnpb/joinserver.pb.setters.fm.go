@@ -26,20 +26,20 @@ func (dst *SessionKeyRequest) SetFields(src *SessionKeyRequest, paths ...string)
 				return fmt.Errorf("'dev_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.DevEUI = src.DevEUI
+				dst.DevEui = src.DevEui
 			} else {
 				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.DevEUI = zero
+				dst.DevEui = zero
 			}
 		case "join_eui":
 			if len(subs) > 0 {
 				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.JoinEUI = src.JoinEUI
+				dst.JoinEui = src.JoinEui
 			} else {
 				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.JoinEUI = zero
+				dst.JoinEui = zero
 			}
 
 		default:
@@ -781,10 +781,10 @@ func (dst *JoinEUIPrefix) SetFields(src *JoinEUIPrefix, paths ...string) error {
 				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.JoinEUI = src.JoinEUI
+				dst.JoinEui = src.JoinEui
 			} else {
 				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.JoinEUI = zero
+				dst.JoinEui = zero
 			}
 		case "length":
 			if len(subs) > 0 {
@@ -832,9 +832,9 @@ func (dst *ProvisionEndDevicesRequest_IdentifiersList) SetFields(src *ProvisionE
 				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.JoinEUI = src.JoinEUI
+				dst.JoinEui = src.JoinEui
 			} else {
-				dst.JoinEUI = nil
+				dst.JoinEui = nil
 			}
 		case "end_device_ids":
 			if len(subs) > 0 {
@@ -861,19 +861,19 @@ func (dst *ProvisionEndDevicesRequest_IdentifiersRange) SetFields(src *Provision
 				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.JoinEUI = src.JoinEUI
+				dst.JoinEui = src.JoinEui
 			} else {
-				dst.JoinEUI = nil
+				dst.JoinEui = nil
 			}
 		case "start_dev_eui":
 			if len(subs) > 0 {
 				return fmt.Errorf("'start_dev_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.StartDevEUI = src.StartDevEUI
+				dst.StartDevEui = src.StartDevEui
 			} else {
 				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.StartDevEUI = zero
+				dst.StartDevEui = zero
 			}
 
 		default:
@@ -891,9 +891,9 @@ func (dst *ProvisionEndDevicesRequest_IdentifiersFromData) SetFields(src *Provis
 				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.JoinEUI = src.JoinEUI
+				dst.JoinEui = src.JoinEui
 			} else {
-				dst.JoinEUI = nil
+				dst.JoinEui = nil
 			}
 
 		default:

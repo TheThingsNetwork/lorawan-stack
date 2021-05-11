@@ -126,7 +126,7 @@ func TestForwarder(t *testing.T) {
 							{
 								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 									GatewayId: "foo-gateway",
-									EUI:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
+									Eui:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
 								},
 								ChannelRSSI: -42,
 								RSSI:        -42,
@@ -251,7 +251,7 @@ func TestForwarder(t *testing.T) {
 							{
 								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 									GatewayId: "foo-gateway",
-									EUI:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
+									Eui:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
 								},
 								ChannelRSSI: 4.2,
 								RSSI:        4.2,

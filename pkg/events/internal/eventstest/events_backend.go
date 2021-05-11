@@ -45,13 +45,13 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 	devID := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
 		DeviceId:               "test-dev",
-		DevEUI:                 &eui,
-		JoinEUI:                &eui,
+		DevEui:                 &eui,
+		JoinEui:                &eui,
 		DevAddr:                &devAddr,
 	}
 	gtwID := ttnpb.GatewayIdentifiers{
 		GatewayId: "test-gtw",
-		EUI:       &eui,
+		Eui:       &eui,
 	}
 
 	ch0 := make(events.Channel, 10)

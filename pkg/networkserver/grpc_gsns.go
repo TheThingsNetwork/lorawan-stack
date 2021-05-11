@@ -1006,11 +1006,11 @@ func (ns *NetworkServer) deduplicationDone(ctx context.Context, up *ttnpb.Uplink
 func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
 	pld := up.Payload.GetJoinRequestPayload()
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"dev_eui", pld.DevEUI,
-		"join_eui", pld.JoinEUI,
+		"dev_eui", pld.DevEui,
+		"join_eui", pld.JoinEui,
 	))
 
-	matched, matchedCtx, err := ns.devices.GetByEUI(ctx, pld.JoinEUI, pld.DevEUI,
+	matched, matchedCtx, err := ns.devices.GetByEUI(ctx, pld.JoinEui, pld.DevEui,
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",

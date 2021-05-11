@@ -39,7 +39,7 @@ func TestEncode(t *testing.T) {
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
-		DevEUI:   &eui,
+		DevEui:   &eui,
 	}
 
 	// Happy flow.
@@ -123,7 +123,7 @@ func TestDecode(t *testing.T) {
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
-		DevEUI:   &eui,
+		DevEui:   &eui,
 	}
 
 	message := &ttnpb.ApplicationUplink{

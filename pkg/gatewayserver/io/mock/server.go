@@ -69,7 +69,7 @@ func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdenti
 	if ids.GatewayId != "" {
 		return ctx, ids, nil
 	}
-	ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
+	ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(ids.Eui.String()))
 	return ctx, ids, nil
 }
 

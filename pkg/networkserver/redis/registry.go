@@ -856,8 +856,8 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			if pb == nil && len(sets) == 0 {
 				p.Del(ctx, uk)
 				p.Del(ctx, uidLastInvalidationKey(r.Redis, uid))
-				if stored.JoinEUI != nil && stored.DevEUI != nil {
-					p.Del(ctx, r.euiKey(*stored.JoinEUI, *stored.DevEUI))
+				if stored.JoinEui != nil && stored.DevEui != nil {
+					p.Del(ctx, r.euiKey(*stored.JoinEui, *stored.DevEui))
 				}
 				if stored.PendingSession != nil {
 					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(stored.PendingSession.DevAddr)), uid)
@@ -881,8 +881,8 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				if pb.ApplicationIdentifiers != appID || pb.DeviceId != devID {
 					return errInvalidIdentifiers.New()
 				}
-				if pb.JoinEUI != nil && pb.DevEUI != nil {
-					ek := r.euiKey(*pb.JoinEUI, *pb.DevEUI)
+				if pb.JoinEui != nil && pb.DevEui != nil {
+					ek := r.euiKey(*pb.JoinEui, *pb.DevEui)
 
 					if err := ttnredis.LockMutex(ctx, tx, ek, lockIDStr, r.LockTTL); err != nil {
 						return err
@@ -907,10 +907,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceId != stored.DeviceId {
 					return errReadOnlyField.WithAttributes("field", "ids.device_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.JoinEUI, stored.JoinEUI) {
+				if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.JoinEui, stored.JoinEui) {
 					return errReadOnlyField.WithAttributes("field", "ids.join_eui")
 				}
-				if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.DevEUI, stored.DevEUI) {
+				if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.DevEui, stored.DevEui) {
 					return errReadOnlyField.WithAttributes("field", "ids.dev_eui")
 				}
 			}

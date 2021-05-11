@@ -2096,11 +2096,11 @@ func (v *JoinRequestPayload) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "dev_eui":
-		return v.DevEUI == types.EUI64{}
+		return v.DevEui == types.EUI64{}
 	case "dev_nonce":
 		return v.DevNonce == types.DevNonce{}
 	case "join_eui":
-		return v.JoinEUI == types.EUI64{}
+		return v.JoinEui == types.EUI64{}
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -2198,9 +2198,9 @@ func (v *RejoinRequestPayload) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "dev_eui":
-		return v.DevEUI == types.EUI64{}
+		return v.DevEui == types.EUI64{}
 	case "join_eui":
-		return v.JoinEUI == types.EUI64{}
+		return v.JoinEui == types.EUI64{}
 	case "net_id":
 		return v.NetID == types.NetID{}
 	case "rejoin_cnt":

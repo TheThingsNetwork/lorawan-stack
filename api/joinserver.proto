@@ -34,9 +34,9 @@ message SessionKeyRequest {
   // Join Server issued identifier for the session keys.
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
   // LoRaWAN DevEUI.
-  bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+  bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
   // The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).
-  bytes join_eui = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  bytes join_eui = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
 }
 
 message NwkSKeysResponse {
@@ -155,16 +155,16 @@ message ProvisionEndDevicesRequest {
   bytes provisioning_data = 3;
 
   message IdentifiersList {
-    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
     repeated EndDeviceIdentifiers end_device_ids = 2 [(gogoproto.nullable) = false];
   }
   message IdentifiersRange {
-    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
     // DevEUI to start issuing from.
-    bytes start_dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "StartDevEUI"];
+    bytes start_dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
   }
   message IdentifiersFromData {
-    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
   }
   oneof end_devices {
     // List of device identifiers that will be provisioned.
@@ -275,7 +275,7 @@ service ApplicationActivationSettingRegistry {
 }
 
 message JoinEUIPrefix {
-  bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
   uint32 length = 2;
 }
 

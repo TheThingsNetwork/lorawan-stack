@@ -384,7 +384,7 @@ var (
 // This method should only be used for request contexts.
 func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
 	ctx = gs.FillContext(ctx)
-	if ids.IsZero() || ids.EUI != nil && ids.EUI.IsZero() {
+	if ids.IsZero() || ids.Eui != nil && ids.Eui.IsZero() {
 		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers.New()
 	}
 	if ids.GatewayId == "" {
@@ -393,15 +393,15 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 			return nil, ttnpb.GatewayIdentifiers{}, err
 		}
 		extIDs, err := registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-			EUI: *ids.EUI,
+			Eui: *ids.Eui,
 		}, gs.WithClusterAuth())
 		if err == nil {
 			ids = *extIDs
 		} else if errors.IsNotFound(err) {
 			if gs.requireRegisteredGateways {
-				return nil, ttnpb.GatewayIdentifiers{}, errGatewayEUINotRegistered.WithAttributes("eui", *ids.EUI).WithCause(err)
+				return nil, ttnpb.GatewayIdentifiers{}, errGatewayEUINotRegistered.WithAttributes("eui", *ids.Eui).WithCause(err)
 			}
-			ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
+			ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(ids.Eui.String()))
 		} else {
 			return nil, ttnpb.GatewayIdentifiers{}, err
 		}
@@ -634,11 +634,11 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 					msg.CorrelationIDs = append(msg.CorrelationIDs, host.correlationID)
 					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 						logger := logger.WithError(err)
-						if ids.JoinEUI != nil {
-							logger = logger.WithField("join_eui", *ids.JoinEUI)
+						if ids.JoinEui != nil {
+							logger = logger.WithField("join_eui", *ids.JoinEui)
 						}
-						if ids.DevEUI != nil && !ids.DevEUI.IsZero() {
-							logger = logger.WithField("dev_eui", *ids.DevEUI)
+						if ids.DevEui != nil && !ids.DevEui.IsZero() {
+							logger = logger.WithField("dev_eui", *ids.DevEui)
 						}
 						if ids.DevAddr != nil && !ids.DevAddr.IsZero() {
 							logger = logger.WithField("dev_addr", *ids.DevAddr)

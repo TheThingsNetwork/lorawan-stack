@@ -38,15 +38,15 @@ type LoRaAllianceTR005Draft3 struct {
 
 // Encode implements the Data interface.
 func (m *LoRaAllianceTR005Draft3) Encode(dev *ttnpb.EndDevice) error {
-	if dev.JoinEUI == nil {
+	if dev.JoinEui == nil {
 		return errNoJoinEUI.New()
 	}
-	if dev.DevEUI == nil {
+	if dev.DevEui == nil {
 		return errNoDevEUI.New()
 	}
 	*m = LoRaAllianceTR005Draft3{
-		JoinEUI:              *dev.JoinEUI,
-		DevEUI:               *dev.DevEUI,
+		JoinEUI:              *dev.JoinEui,
+		DevEUI:               *dev.DevEui,
 		DeviceValidationCode: dev.GetClaimAuthenticationCode().GetValue(),
 	}
 	return nil
@@ -149,8 +149,7 @@ func (m *LoRaAllianceTR005Draft3) AuthenticatedEndDeviceIdentifiers() (joinEUI, 
 	return m.JoinEUI, m.DevEUI, m.DeviceValidationCode
 }
 
-type loRaAllianceTR005Draft3Format struct {
-}
+type loRaAllianceTR005Draft3Format struct{}
 
 func (loRaAllianceTR005Draft3Format) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{

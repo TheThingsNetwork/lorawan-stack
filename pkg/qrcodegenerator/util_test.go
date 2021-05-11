@@ -52,13 +52,12 @@ func (m *mock) Encode(dev *ttnpb.EndDevice) error {
 }
 
 func (m mock) MarshalText() ([]byte, error) {
-	return []byte(fmt.Sprintf("%s:%s", m.ids.JoinEUI, m.ids.DevEUI)), nil
+	return []byte(fmt.Sprintf("%s:%s", m.ids.JoinEui, m.ids.DevEui)), nil
 }
 
 func (*mock) UnmarshalText([]byte) error { return nil }
 
-type mockFormat struct {
-}
+type mockFormat struct{}
 
 func (mockFormat) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{

@@ -51,10 +51,10 @@ func TestIdentifiersIsZero(t *testing.T) {
 		ApplicationIdentifiers{ApplicationId: "foo"},
 		ClientIdentifiers{ClientId: "foo"},
 		EndDeviceIdentifiers{ApplicationIdentifiers: ApplicationIdentifiers{ApplicationId: "foo"}, DeviceId: "foo"},
-		EndDeviceIdentifiers{JoinEUI: &eui, DevEUI: &eui},
+		EndDeviceIdentifiers{JoinEui: &eui, DevEui: &eui},
 		EndDeviceIdentifiers{DevAddr: &devAddr},
 		GatewayIdentifiers{GatewayId: "foo"},
-		GatewayIdentifiers{EUI: &eui},
+		GatewayIdentifiers{Eui: &eui},
 		OrganizationIdentifiers{OrganizationId: "foo"},
 		UserIdentifiers{UserId: "foo"},
 		UserIdentifiers{Email: "foo@example.com"},
@@ -162,7 +162,7 @@ func TestGatewayIdentifiersValidate(t *testing.T) {
 
 	ids := GatewayIdentifiers{
 		GatewayId: "foo-gtw",
-		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+		Eui:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
 	}
 	a.So(ids.ValidateFields(), should.BeNil)
 
@@ -172,7 +172,7 @@ func TestGatewayIdentifiersValidate(t *testing.T) {
 	a.So(ids.ValidateFields(), should.BeNil)
 
 	ids = GatewayIdentifiers{
-		EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+		Eui: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
 	}
 	a.So(ids.ValidateFields(), should.NotBeNil)
 
@@ -182,18 +182,18 @@ func TestGatewayIdentifiersValidate(t *testing.T) {
 
 	ids = GatewayIdentifiers{
 		GatewayId: "_foo-gtw",
-		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+		Eui:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
 	}
 	a.So(ids.ValidateFields(), should.NotBeNil)
 
 	ids = GatewayIdentifiers{
 		GatewayId: "foo-gtw",
-		EUI:       &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		Eui:       &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 	}
 	a.So(ids.ValidateFields(), should.BeNil)
 
 	ids = GatewayIdentifiers{
-		EUI: new(types.EUI64),
+		Eui: new(types.EUI64),
 	}
 	a.So(ids.ValidateFields(), should.NotBeNil)
 }

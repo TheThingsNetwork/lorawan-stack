@@ -77,7 +77,7 @@ gateway should connect.
 			req := &ttnpb.ClaimGatewayRequest{
 				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
 					AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
-						GatewayEUI:         *gtwIDs.EUI,
+						GatewayEui:         *gtwIDs.Eui,
 						AuthenticationCode: authenticationCode,
 					},
 				},

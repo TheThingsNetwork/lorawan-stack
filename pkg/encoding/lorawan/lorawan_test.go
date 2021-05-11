@@ -109,8 +109,8 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			&ttnpb.Message{
 				MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: 0},
 				Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
-					JoinEUI:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevEUI:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEui:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevEui:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevNonce: types.DevNonce{0x42, 0xff},
 				}},
 				MIC: []byte{0x42, 0xff, 0xff, 0xff},
@@ -385,7 +385,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 0,
 					NetID:      types.NetID{0x42, 0xff, 0xff},
-					DevEUI:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					RejoinCnt:  0xff42,
 				}},
 				MIC: []byte{0x42, 0xff, 0xff, 0xff},
@@ -414,8 +414,8 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHDR: ttnpb.MHDR{MType: ttnpb.MType_REJOIN_REQUEST, Major: 0},
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 1,
-					JoinEUI:    types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevEUI:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEui:    types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					RejoinCnt:  0xff42,
 				}},
 				MIC: []byte{0x42, 0xff, 0xff, 0xff},
@@ -445,7 +445,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 2,
 					NetID:      types.NetID{0x42, 0xff, 0xff},
-					DevEUI:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					RejoinCnt:  0xff42,
 				}},
 				MIC: []byte{0x42, 0xff, 0xff, 0xff},
@@ -518,8 +518,8 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				0x42, 0xff, 0xff, 0xff,
 			},
 			&ttnpb.EndDeviceIdentifiers{
-				JoinEUI: &joinEUI,
-				DevEUI:  &devEUI,
+				JoinEui: &joinEUI,
+				DevEui:  &devEUI,
 			},
 		},
 		{
@@ -564,7 +564,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				0x42, 0xff, 0xff, 0xff,
 			},
 			&ttnpb.EndDeviceIdentifiers{
-				DevEUI: &devEUI,
+				DevEui: &devEUI,
 			},
 		},
 		{
@@ -584,8 +584,8 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				0x42, 0xff, 0xff, 0xff,
 			},
 			&ttnpb.EndDeviceIdentifiers{
-				JoinEUI: &joinEUI,
-				DevEUI:  &devEUI,
+				JoinEui: &joinEUI,
+				DevEui:  &devEUI,
 			},
 		},
 		{
@@ -605,7 +605,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 				0x42, 0xff, 0xff, 0xff,
 			},
 			&ttnpb.EndDeviceIdentifiers{
-				DevEUI: &devEUI,
+				DevEui: &devEUI,
 			},
 		},
 	} {

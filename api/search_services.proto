@@ -129,7 +129,6 @@ message SearchGatewaysRequest {
 
   // Find gateways where the (hexadecimal) EUI contains this substring.
   string eui_contains = 5 [
-    (gogoproto.customname) = "EUIContains",
     (validate.rules).string.max_len = 16
   ];
 
@@ -290,12 +289,10 @@ message SearchEndDevicesRequest {
 
   // Find end devices where the (hexadecimal) DevEUI contains this substring.
   string dev_eui_contains = 6 [
-    (gogoproto.customname) = "DevEUIContains",
     (validate.rules).string.max_len = 16
   ];
   // Find end devices where the (hexadecimal) JoinEUI contains this substring.
   string join_eui_contains = 7 [
-    (gogoproto.customname) = "JoinEUIContains",
     (validate.rules).string.max_len = 16
   ];
   // Find end devices where the (hexadecimal) DevAddr contains this substring.

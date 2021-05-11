@@ -67,7 +67,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	logger := log.FromContext(ctx)
 	ids := ttnpb.GatewayIdentifiers{
 		GatewayId: fmt.Sprintf("eui-%s", strings.ToLower(req.Router.EUI64.String())),
-		EUI:       &req.Router.EUI64,
+		Eui:       &req.Router.EUI64,
 	}
 	logger = logger.WithField("gateway_uid", unique.ID(ctx, ids))
 	registry, err := s.getRegistry(ctx, &ids)
@@ -176,7 +176,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 
 	var ids *ttnpb.GatewayIdentifiers
 	ids, err = registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-		EUI: req.Router.EUI64,
+		Eui: req.Router.EUI64,
 	}, serverAuth)
 	if err != nil {
 		if errors.IsNotFound(err) && s.registerUnknown {

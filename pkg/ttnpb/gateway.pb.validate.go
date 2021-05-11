@@ -1319,7 +1319,7 @@ func (m *GetGatewayIdentifiersForEUIRequest) ValidateFields(paths ...string) err
 		_ = subs
 		switch name {
 		case "eui":
-			// no validation rules for EUI
+			// no validation rules for Eui
 		default:
 			return GetGatewayIdentifiersForEUIRequestValidationError{
 				field:  name,

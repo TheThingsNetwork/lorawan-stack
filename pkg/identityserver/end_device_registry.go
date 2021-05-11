@@ -80,12 +80,12 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	if err != nil {
 		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
 			if ids, err := is.getEndDeviceIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
-				JoinEUI: *req.JoinEUI,
-				DevEUI:  *req.DevEUI,
+				JoinEui: *req.JoinEui,
+				DevEui:  *req.DevEui,
 			}); err == nil {
 				return nil, errEndDeviceEUIsTaken.WithAttributes(
-					"join_eui", req.JoinEUI.String(),
-					"dev_eui", req.DevEUI.String(),
+					"join_eui", req.JoinEui.String(),
+					"dev_eui", req.DevEui.String(),
 					"device_id", ids.GetDeviceId(),
 					"application_id", ids.GetApplicationId(),
 				)
@@ -123,8 +123,8 @@ func (is *IdentityServer) getEndDeviceIdentifiersForEUIs(ctx context.Context, re
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		dev, err := store.GetEndDeviceStore(db).GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
-			JoinEUI: &req.JoinEUI,
-			DevEUI:  &req.DevEUI,
+			JoinEui: &req.JoinEui,
+			DevEui:  &req.DevEui,
 		}, &types.FieldMask{Paths: []string{"ids.application_ids.application_id", "ids.device_id", "ids.join_eui", "ids.dev_eui"}})
 		if err != nil {
 			return err

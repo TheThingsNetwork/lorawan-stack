@@ -72,7 +72,7 @@ func TestGatewayStore(t *testing.T) {
 		created, err := store.CreateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayId: "foo",
-				EUI:       eui,
+				Eui:       eui,
 			},
 			Name:        "Foo Gateway",
 			Description: "The Amazing Foo Gateway",
@@ -130,7 +130,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.TargetCUPSKey, should.Resemble, created.TargetCUPSKey)
 		}
 
-		byEUI, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}}, &pbtypes.FieldMask{Paths: []string{"name"}})
+		byEUI, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{Eui: &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}}, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		if a.So(byEUI, should.NotBeNil) {
@@ -264,14 +264,14 @@ func TestGatewayStore(t *testing.T) {
 		got, err = store.CreateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayId: "reuse-foo-eui",
-				EUI:       eui,
+				Eui:       eui,
 			},
 		})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
 			a.So(got.GatewayId, should.Equal, "reuse-foo-eui")
-			a.So(got.EUI, should.Resemble, eui)
+			a.So(got.Eui, should.Resemble, eui)
 		}
 
 		entity, _ := s.findDeletedEntity(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, "id")
@@ -301,7 +301,7 @@ func TestGatewayStore(t *testing.T) {
 		got, err = store.CreateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayId: "foo",
-				EUI:       eui,
+				Eui:       eui,
 			},
 		})
 

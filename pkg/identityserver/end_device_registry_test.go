@@ -68,8 +68,8 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.GetIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
-			JoinEUI: joinEUI,
-			DevEUI:  devEUI,
+			JoinEui: joinEUI,
+			DevEui:  devEUI,
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -137,8 +137,8 @@ func TestEndDevicesCRUD(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-device-id",
 					ApplicationIdentifiers: app.ApplicationIdentifiers,
-					JoinEUI:                &joinEUI,
-					DevEUI:                 &devEUI,
+					JoinEui:                &joinEUI,
+					DevEui:                 &devEUI,
 				},
 				Name: "test-device-name",
 			},
@@ -165,8 +165,8 @@ func TestEndDevicesCRUD(t *testing.T) {
 		}
 
 		ids, err := reg.GetIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
-			JoinEUI: joinEUI,
-			DevEUI:  devEUI,
+			JoinEui: joinEUI,
+			DevEui:  devEUI,
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -179,8 +179,8 @@ func TestEndDevicesCRUD(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "other-test-device-id",
 					ApplicationIdentifiers: app.ApplicationIdentifiers,
-					JoinEUI:                &joinEUI,
-					DevEUI:                 &devEUI,
+					JoinEui:                &joinEUI,
+					DevEui:                 &devEUI,
 				},
 				Name: "test-device-name",
 			},

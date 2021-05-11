@@ -432,7 +432,7 @@ func TestSimulateUplink(t *testing.T) {
 	registeredDeviceID := ttnpb.EndDeviceIdentifiers{
 		DeviceId:               "dev1",
 		ApplicationIdentifiers: registeredApplicationID,
-		DevEUI:                 &types.EUI64{0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01},
+		DevEui:                 &types.EUI64{0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01},
 	}
 
 	as := mock.NewServer(c)
