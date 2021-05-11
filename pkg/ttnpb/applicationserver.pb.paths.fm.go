@@ -197,6 +197,12 @@ var DecodeUplinkRequestFieldPathsNested = []string{
 	"uplink.settings.frequency",
 	"uplink.settings.time",
 	"uplink.settings.timestamp",
+	"uplink.version_ids",
+	"uplink.version_ids.band_id",
+	"uplink.version_ids.brand_id",
+	"uplink.version_ids.firmware_version",
+	"uplink.version_ids.hardware_version",
+	"uplink.version_ids.model_id",
 	"version_ids",
 	"version_ids.band_id",
 	"version_ids.brand_id",
@@ -248,6 +254,12 @@ var DecodeUplinkResponseFieldPathsNested = []string{
 	"uplink.settings.frequency",
 	"uplink.settings.time",
 	"uplink.settings.timestamp",
+	"uplink.version_ids",
+	"uplink.version_ids.band_id",
+	"uplink.version_ids.brand_id",
+	"uplink.version_ids.firmware_version",
+	"uplink.version_ids.hardware_version",
+	"uplink.version_ids.model_id",
 }
 
 var DecodeUplinkResponseFieldPathsTopLevel = []string{

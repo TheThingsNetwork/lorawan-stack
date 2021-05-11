@@ -11496,115 +11496,6 @@
           ]
         },
         {
-          "name": "EndDeviceVersionIdentifiers",
-          "longName": "EndDeviceVersionIdentifiers",
-          "fullName": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
-          "description": "Identifies an end device model with version information.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "brand_id",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "string.max_len",
-                    "value": 36
-                  },
-                  {
-                    "name": "string.pattern",
-                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
-                  }
-                ]
-              }
-            },
-            {
-              "name": "model_id",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "string.max_len",
-                    "value": 36
-                  },
-                  {
-                    "name": "string.pattern",
-                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
-                  }
-                ]
-              }
-            },
-            {
-              "name": "hardware_version",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "string.max_len",
-                    "value": 32
-                  }
-                ]
-              }
-            },
-            {
-              "name": "firmware_version",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "string.max_len",
-                    "value": 32
-                  }
-                ]
-              }
-            },
-            {
-              "name": "band_id",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "string.max_len",
-                    "value": 32
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
           "name": "EndDevices",
           "longName": "EndDevices",
           "fullName": "ttn.lorawan.v3.EndDevices",
@@ -16965,6 +16856,115 @@
               "fullType": "bytes",
               "ismap": false,
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EndDeviceVersionIdentifiers",
+          "longName": "EndDeviceVersionIdentifiers",
+          "fullName": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
+          "description": "Identifies an end device model with version information.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "brand_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "model_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "hardware_version",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
+            },
+            {
+              "name": "firmware_version",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
+            },
+            {
+              "name": "band_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 32
+                  }
+                ]
+              }
             }
           ]
         },
@@ -25089,6 +25089,16 @@
               "longType": "ApplicationUplink.LocationsEntry",
               "fullType": "ttn.lorawan.v3.ApplicationUplink.LocationsEntry",
               "ismap": true,
+              "defaultValue": ""
+            },
+            {
+              "name": "version_ids",
+              "description": "End device version identifiers, set by the Application Server while handling the message.",
+              "label": "",
+              "type": "EndDeviceVersionIdentifiers",
+              "longType": "EndDeviceVersionIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
+              "ismap": false,
               "defaultValue": ""
             }
           ]

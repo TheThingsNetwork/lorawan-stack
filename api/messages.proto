@@ -223,7 +223,10 @@ message ApplicationUplink {
   // End device location metadata, set by the Application Server while handling the message.
   map<string,Location> locations = 14;
 
-  // next: 15
+  // End device version identifiers, set by the Application Server while handling the message.
+  EndDeviceVersionIdentifiers version_ids = 15 [(gogoproto.customname) = "VersionIDs"];
+
+  // next: 16
 }
 
 message ApplicationLocation {

@@ -12118,6 +12118,10 @@
             "$ref": "#/definitions/lorawanv3Location"
           },
           "description": "End device location metadata, set by the Application Server while handling the message."
+        },
+        "version_ids": {
+          "$ref": "#/definitions/v3EndDeviceVersionIdentifiers",
+          "description": "End device version identifiers, set by the Application Server while handling the message."
         }
       }
     },

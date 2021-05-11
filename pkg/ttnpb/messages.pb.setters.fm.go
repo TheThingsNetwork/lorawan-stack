@@ -604,6 +604,31 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 			} else {
 				dst.Locations = nil
 			}
+		case "version_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceVersionIdentifiers
+				if (src == nil || src.VersionIDs == nil) && dst.VersionIDs == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.VersionIDs
+				}
+				if dst.VersionIDs != nil {
+					newDst = dst.VersionIDs
+				} else {
+					newDst = &EndDeviceVersionIdentifiers{}
+					dst.VersionIDs = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.VersionIDs = src.VersionIDs
+				} else {
+					dst.VersionIDs = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

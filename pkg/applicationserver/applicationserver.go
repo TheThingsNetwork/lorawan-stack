@@ -899,6 +899,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	} else {
 		uplink.Locations = isDev.GetLocations()
 	}
+	if dev.VersionIDs != nil {
+		uplink.VersionIDs = dev.VersionIDs
+	}
 
 	return nil
 }

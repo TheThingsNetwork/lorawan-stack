@@ -90,6 +90,12 @@ var DecodeUplinkMessageRequestFieldPathsNested = []string{
 	"message.settings.frequency",
 	"message.settings.time",
 	"message.settings.timestamp",
+	"message.version_ids",
+	"message.version_ids.band_id",
+	"message.version_ids.brand_id",
+	"message.version_ids.firmware_version",
+	"message.version_ids.hardware_version",
+	"message.version_ids.model_id",
 	"parameter",
 }
 
