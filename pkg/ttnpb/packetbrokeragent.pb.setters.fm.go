@@ -22,10 +22,10 @@ func (dst *PacketBrokerNetworkIdentifier) SetFields(src *PacketBrokerNetworkIden
 				return fmt.Errorf("'tenant_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TenantID = src.TenantID
+				dst.TenantId = src.TenantId
 			} else {
 				var zero string
-				dst.TenantID = zero
+				dst.TenantId = zero
 			}
 
 		default:
