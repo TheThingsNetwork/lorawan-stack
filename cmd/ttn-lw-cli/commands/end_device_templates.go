@@ -32,9 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-var (
-	endDeviceTemplateFlattenPaths = []string{"end_device.provisioning_data"}
-)
+var endDeviceTemplateFlattenPaths = []string{"end_device.provisioning_data"}
 
 func templateFormatIDFlags() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
@@ -405,7 +403,7 @@ command to assign EUIs to map to end device templates.`,
 				for _, e := range mapping {
 					switch {
 					case e.MappingKey != "" && e.MappingKey == inputEntry.MappingKey:
-					case e.EndDevice.ApplicationID != "" && e.EndDevice.ApplicationID == inputEntry.EndDevice.ApplicationID &&
+					case e.EndDevice.ApplicationId != "" && e.EndDevice.ApplicationId == inputEntry.EndDevice.ApplicationId &&
 						e.EndDevice.DeviceID != "" && e.EndDevice.DeviceID == inputEntry.EndDevice.DeviceID:
 					case e.EndDevice.DevEUI != nil && inputEntry.EndDevice.DevEUI != nil && e.EndDevice.DevEUI.Equal(*inputEntry.EndDevice.DevEUI):
 					case e.EndDevice.EndDeviceIdentifiers.IsZero():

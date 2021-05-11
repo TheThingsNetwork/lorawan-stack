@@ -231,7 +231,7 @@ func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.Applic
 	}
 	return fmt.Sprintf(downlinkOperationURLFormat,
 		baseURL,
-		webhookID.ApplicationID,
+		webhookID.ApplicationId,
 		webhookID.WebhookID,
 		devID.DeviceID,
 		op,
@@ -391,7 +391,7 @@ func (w *webhooks) handleDown(op func(io.Server, context.Context, ttnpb.EndDevic
 		devID := deviceIDFromContext(ctx)
 		hookID := webhookIDFromContext(ctx)
 		logger := log.FromContext(ctx).WithFields(log.Fields(
-			"application_id", devID.ApplicationID,
+			"application_id", devID.ApplicationId,
 			"device_id", devID.DeviceID,
 			"webhook_id", hookID.WebhookID,
 		))
@@ -442,8 +442,8 @@ func expandVariables(url *url.URL, up *ttnpb.ApplicationUp) {
 		devAddr = up.DevAddr.String()
 	}
 	googleapi.Expand(url, map[string]string{
-		"appID":         up.ApplicationID,
-		"applicationID": up.ApplicationID,
+		"appID":         up.ApplicationId,
+		"applicationID": up.ApplicationId,
 		"appEUI":        joinEUI,
 		"joinEUI":       joinEUI,
 		"devID":         up.DeviceID,

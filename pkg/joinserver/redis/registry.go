@@ -223,7 +223,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 				return nil, errInvalidIdentifiers.New()
 			}
 		} else {
-			if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationID != stored.ApplicationID {
+			if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 			}
 			if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceID != stored.DeviceID {

@@ -42,7 +42,7 @@ var (
 	ErrNotFound = errors.DefineNotFound("test_not_found", "test error")
 
 	DefaultApplicationIdentifiers = ttnpb.ApplicationIdentifiers{
-		ApplicationID: DefaultApplicationID,
+		ApplicationId: DefaultApplicationID,
 	}
 
 	DefaultJoinEUI = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}

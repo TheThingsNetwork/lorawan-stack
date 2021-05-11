@@ -66,7 +66,7 @@ func getApplicationWebhookID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appl
 		return nil, errNoWebhookID
 	}
 	return &ttnpb.ApplicationWebhookIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: applicationID},
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
 		WebhookID:              webhookID,
 	}, nil
 }

@@ -125,7 +125,7 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 		return nil, errNoEndDeviceID
 	}
 	ids := &ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: applicationID},
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
 		DeviceID:               deviceID,
 	}
 	if joinEUIHex, _ := flagSet.GetString("join-eui"); joinEUIHex != "" {
@@ -506,8 +506,8 @@ var (
 				if devID.DeviceID != "" {
 					device.DeviceID = devID.DeviceID
 				}
-				if devID.ApplicationID != "" {
-					device.ApplicationID = devID.ApplicationID
+				if devID.ApplicationId != "" {
+					device.ApplicationId = devID.ApplicationId
 				}
 				if device.SupportsJoin && devID.JoinEUI != nil {
 					device.JoinEUI = devID.JoinEUI
@@ -522,7 +522,7 @@ var (
 			}
 			paths = append(paths, newPaths...)
 
-			if device.ApplicationID == "" {
+			if device.ApplicationId == "" {
 				return errNoApplicationID
 			}
 			if device.DeviceID == "" {
@@ -923,7 +923,7 @@ values will be stored in the Join Server.`,
 			}
 
 			req := &ttnpb.ClaimEndDeviceRequest{
-				TargetApplicationIDs: *targetAppID,
+				TargetApplicationIds: *targetAppID,
 			}
 
 			var joinEUI, devEUI *types.EUI64
@@ -1039,7 +1039,7 @@ This command may take end device identifiers from stdin.`,
 				if _, err := inputDecoder.Decode(&dev); err != nil {
 					return err
 				}
-				if dev.ApplicationID == "" {
+				if dev.ApplicationId == "" {
 					return errNoApplicationID
 				}
 				if dev.DeviceID == "" {

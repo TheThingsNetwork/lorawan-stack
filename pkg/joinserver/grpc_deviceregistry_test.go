@@ -58,7 +58,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 	registeredDevice := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: registeredApplicationID,
+				ApplicationId: registeredApplicationID,
 			},
 			DeviceID: registeredDeviceID,
 			JoinEUI:  registeredJoinEUI,
@@ -92,7 +92,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): nil,
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): nil,
 					},
 				})
 			},
@@ -117,7 +117,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 						),
 					},
@@ -126,7 +126,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
-					ApplicationID: registeredApplicationID,
+					ApplicationId: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, unregisteredDeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
@@ -135,7 +135,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-						ApplicationID: registeredApplicationID,
+						ApplicationId: registeredApplicationID,
 					},
 					DeviceID: unregisteredDeviceID,
 					JoinEUI:  unregisteredJoinEUI,
@@ -157,7 +157,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "bar-application"}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "bar-application"}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 						),
 					},
@@ -166,7 +166,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
-					ApplicationID: "bar-application",
+					ApplicationId: "bar-application",
 				})
 				a.So(devID, should.Equal, "bar-device")
 				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
@@ -177,7 +177,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-						ApplicationID: "bar-application",
+						ApplicationId: "bar-application",
 					},
 					DeviceID: "bar-device",
 					JoinEUI:  registeredJoinEUI,
@@ -199,7 +199,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 						),
 					},
@@ -208,7 +208,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
-					ApplicationID: registeredApplicationID,
+					ApplicationId: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
@@ -235,7 +235,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 						),
 					},
@@ -262,7 +262,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 							ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
 						),
@@ -272,7 +272,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
-					ApplicationID: registeredApplicationID,
+					ApplicationId: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -323,7 +323,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 							ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
 						),
@@ -333,7 +333,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
-					ApplicationID: registeredApplicationID,
+					ApplicationId: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -445,7 +445,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 	registeredDevice := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: registeredApplicationID,
+				ApplicationId: registeredApplicationID,
 			},
 			DeviceID: registeredDeviceID,
 			JoinEUI:  registeredJoinEUI,
@@ -477,7 +477,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): nil,
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): nil,
 					},
 				})
 			},
@@ -509,7 +509,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-							ApplicationID: registeredApplicationID,
+							ApplicationId: registeredApplicationID,
 						},
 						DeviceID: registeredDeviceID,
 						DevEUI:   registeredDevEUI,
@@ -541,7 +541,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-							ApplicationID: registeredApplicationID,
+							ApplicationId: registeredApplicationID,
 						},
 						DeviceID: registeredDeviceID,
 						JoinEUI:  registeredJoinEUI,
@@ -563,7 +563,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
@@ -573,7 +573,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-							ApplicationID: registeredApplicationID,
+							ApplicationId: registeredApplicationID,
 						},
 						DeviceID: "new-device",
 						JoinEUI:  unregisteredJoinEUI,
@@ -584,7 +584,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
-					ApplicationID: registeredApplicationID,
+					ApplicationId: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, "new-device")
 				a.So(gets, should.BeEmpty)
@@ -598,7 +598,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-							ApplicationID: registeredApplicationID,
+							ApplicationId: registeredApplicationID,
 						},
 						DeviceID: "new-device",
 						JoinEUI:  unregisteredJoinEUI,
@@ -612,7 +612,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-							ApplicationID: registeredApplicationID,
+							ApplicationId: registeredApplicationID,
 						},
 						DeviceID: "new-device",
 						JoinEUI:  unregisteredJoinEUI,
@@ -628,7 +628,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
@@ -646,7 +646,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
-					ApplicationID: registeredApplicationID,
+					ApplicationId: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
 				a.So(gets, should.HaveSameElementsDeep, []string{
@@ -679,7 +679,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
@@ -706,7 +706,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 						),
@@ -732,7 +732,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
-					ApplicationID: registeredApplicationID,
+					ApplicationId: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
 				a.So(gets, should.HaveSameElementsDeep, []string{
@@ -844,7 +844,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 	registeredDevice := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: registeredApplicationID,
+				ApplicationId: registeredApplicationID,
 			},
 			DeviceID: registeredDeviceID,
 			JoinEUI:  registeredJoinEUI,
@@ -875,7 +875,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): nil,
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): nil,
 					},
 				})
 			},
@@ -895,7 +895,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
@@ -903,7 +903,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: registeredApplicationID,
+					ApplicationId: registeredApplicationID,
 				},
 				DeviceID: unregisteredDeviceID,
 				JoinEUI:  unregisteredJoinEUI,
@@ -912,7 +912,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
-					ApplicationID: registeredApplicationID,
+					ApplicationId: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, unregisteredDeviceID)
 				a.So(paths, should.BeNil)
@@ -930,7 +930,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
@@ -940,7 +940,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
-					ApplicationID: registeredApplicationID,
+					ApplicationId: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
 				a.So(paths, should.BeNil)

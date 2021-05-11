@@ -39,10 +39,10 @@ import (
 )
 
 var (
-	registeredApplicationID   = ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
+	registeredApplicationID   = ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}
 	registeredApplicationUID  = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey  = "test-key"
-	unregisteredApplicationID = ttnpb.ApplicationIdentifiers{ApplicationID: "invalid-app"}
+	unregisteredApplicationID = ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-app"}
 	registeredDeviceID        = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: registeredApplicationID, DeviceID: "test-dev"}
 	unregisteredDeviceID      = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: unregisteredApplicationID, DeviceID: "invalid-dev"}
 	registeredAssociationID   = ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIdentifiers: registeredDeviceID, FPort: 123}
@@ -130,7 +130,7 @@ func TestAuthentication(t *testing.T) {
 			OK:  false,
 		},
 	} {
-		t.Run(fmt.Sprintf("%v:%v", tc.ID.ApplicationID, tc.Key), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%v:%v", tc.ID.ApplicationId, tc.Key), func(t *testing.T) {
 			a := assertions.New(t)
 
 			ctx, cancel := context.WithTimeout(ctx, timeout)

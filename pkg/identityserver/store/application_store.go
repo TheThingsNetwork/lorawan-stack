@@ -66,7 +66,7 @@ func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *typ
 func (s *applicationStore) CreateApplication(ctx context.Context, app *ttnpb.Application) (*ttnpb.Application, error) {
 	defer trace.StartRegion(ctx, "create application").End()
 	appModel := Application{
-		ApplicationID: app.ApplicationID, // The ID is not mutated by fromPB.
+		ApplicationID: app.ApplicationId, // The ID is not mutated by fromPB.
 	}
 	appModel.fromPB(app, nil)
 	if err := s.createEntity(ctx, &appModel); err != nil {
@@ -81,7 +81,7 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 	defer trace.StartRegion(ctx, "find applications").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
-		idStrings[i] = id.GetApplicationID()
+		idStrings[i] = id.GetApplicationId()
 	}
 	query := s.query(ctx, Application{}, withApplicationID(idStrings...))
 	query = selectApplicationFields(ctx, query, fieldMask)
@@ -107,7 +107,7 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 
 func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Application, error) {
 	defer trace.StartRegion(ctx, "get application").End()
-	query := s.query(ctx, Application{}, withApplicationID(id.GetApplicationID()))
+	query := s.query(ctx, Application{}, withApplicationID(id.GetApplicationId()))
 	query = selectApplicationFields(ctx, query, fieldMask)
 	var appModel Application
 	if err := query.First(&appModel).Error; err != nil {
@@ -123,7 +123,7 @@ func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.Applica
 
 func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.Application, fieldMask *types.FieldMask) (updated *ttnpb.Application, err error) {
 	defer trace.StartRegion(ctx, "update application").End()
-	query := s.query(ctx, Application{}, withApplicationID(app.GetApplicationID()))
+	query := s.query(ctx, Application{}, withApplicationID(app.GetApplicationId()))
 	query = selectApplicationFields(ctx, query, fieldMask)
 	var appModel Application
 	if err = query.First(&appModel).Error; err != nil {
@@ -162,7 +162,7 @@ func (s *applicationStore) RestoreApplication(ctx context.Context, id *ttnpb.App
 
 func (s *applicationStore) PurgeApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error {
 	defer trace.StartRegion(ctx, "purge application").End()
-	query := s.query(ctx, Application{}, withSoftDeleted(), withApplicationID(id.GetApplicationID()))
+	query := s.query(ctx, Application{}, withSoftDeleted(), withApplicationID(id.GetApplicationId()))
 	query = selectApplicationFields(ctx, query, nil)
 	var appModel Application
 	if err := query.First(&appModel).Error; err != nil {

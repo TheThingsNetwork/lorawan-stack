@@ -45,7 +45,7 @@ func fetchEntityRights(ctx context.Context, id string, f EntityFetcher) (res str
 	var wg sync.WaitGroup
 	wg.Add(5)
 	go func() {
-		res.AppRights, res.AppErr = f.ApplicationRights(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: id})
+		res.AppRights, res.AppErr = f.ApplicationRights(ctx, ttnpb.ApplicationIdentifiers{ApplicationId: id})
 		wg.Done()
 	}()
 	go func() {
@@ -192,7 +192,7 @@ func TestEntityFetcherFunc(t *testing.T) {
 	a.So(res.UsrErr, should.Resemble, fetcher.err)
 
 	if a.So(fetcher.ids, should.HaveLength, 5) {
-		a.So(fetcher.ids, should.Contain, (&ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}).GetEntityIdentifiers())
+		a.So(fetcher.ids, should.Contain, (&ttnpb.ApplicationIdentifiers{ApplicationId: "foo"}).GetEntityIdentifiers())
 		a.So(fetcher.ids, should.Contain, (&ttnpb.ClientIdentifiers{ClientId: "foo"}).GetEntityIdentifiers())
 		a.So(fetcher.ids, should.Contain, (&ttnpb.GatewayIdentifiers{GatewayId: "foo"}).GetEntityIdentifiers())
 		a.So(fetcher.ids, should.Contain, (&ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}).GetEntityIdentifiers())

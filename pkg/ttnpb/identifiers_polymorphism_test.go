@@ -25,7 +25,7 @@ import (
 func TestEntityType(t *testing.T) {
 	a := assertions.New(t)
 
-	applicationID := ApplicationIdentifiers{ApplicationID: "foo"}
+	applicationID := ApplicationIdentifiers{ApplicationId: "foo"}
 	clientID := ClientIdentifiers{ClientId: "foo"}
 	endDeviceID := EndDeviceIdentifiers{DeviceID: "foo", ApplicationIdentifiers: applicationID}
 	gatewayID := GatewayIdentifiers{GatewayId: "foo"}

@@ -38,11 +38,11 @@ func TestValidity(t *testing.T) {
 		(*ttnpb.EndDeviceIdentifiers)(nil),
 		ttnpb.EndDeviceIdentifiers{},
 		&ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 			DevEUI:                 &eui,
 		},
 		ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 			DevEUI:                 &eui,
 		},
 		(*ttnpb.GatewayIdentifiers)(nil),
@@ -72,12 +72,12 @@ func TestRoundtrip(t *testing.T) {
 		Parser   func(string) (ttnpb.IDStringer, error)
 	}{
 		{
-			ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
+			ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 			"foo",
 			func(uid string) (ttnpb.IDStringer, error) { return ToApplicationID(uid) },
 		},
 		{
-			&ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
+			&ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 			"foo",
 			func(uid string) (ttnpb.IDStringer, error) { return ToApplicationID(uid) },
 		},
@@ -94,7 +94,7 @@ func TestRoundtrip(t *testing.T) {
 		{
 			ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "foo-app",
+					ApplicationId: "foo-app",
 				},
 				DeviceID: "foo-device",
 			},
@@ -104,7 +104,7 @@ func TestRoundtrip(t *testing.T) {
 		{
 			&ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "foo-app",
+					ApplicationId: "foo-app",
 				},
 				DeviceID: "foo-device",
 			},
@@ -173,7 +173,7 @@ func TestValidatorForIdentifiers(t *testing.T) {
 	}{
 		{
 			"ApplicationID",
-			func(uid string) ttnpb.IDStringer { return ttnpb.ApplicationIdentifiers{ApplicationID: uid} },
+			func(uid string) ttnpb.IDStringer { return ttnpb.ApplicationIdentifiers{ApplicationId: uid} },
 			func(uid string) (ttnpb.IDStringer, error) { return ToApplicationID(uid) },
 		},
 		{
@@ -296,7 +296,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 			"foo-app.foo-device",
 			ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "foo-app",
+					ApplicationId: "foo-app",
 				},
 				DeviceID: "foo-device",
 			},
@@ -307,7 +307,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 			"foo-app.foo",
 			ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "foo-app",
+					ApplicationId: "foo-app",
 				},
 				DeviceID: "foo",
 			},
@@ -318,7 +318,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 			"foo-app.ozaj8qs0sait7oudxqbfyx6b14yuahcfrdlb",
 			ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "foo-app",
+					ApplicationId: "foo-app",
 				},
 				DeviceID: "ozaj8qs0sait7oudxqbfyx6b14yuahcfrdlb",
 			},
@@ -329,7 +329,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 			"foo-app.1d1",
 			ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "foo-app",
+					ApplicationId: "foo-app",
 				},
 				DeviceID: "1d1",
 			},

@@ -141,7 +141,7 @@ func TestWebhooks(t *testing.T) {
 			}
 
 			t.Run("Upstream", func(t *testing.T) {
-				baseURL := fmt.Sprintf("https://myapp.com/api/ttn/v3/%s/%s", registeredApplicationID.ApplicationID, registeredDeviceID.DeviceID)
+				baseURL := fmt.Sprintf("https://myapp.com/api/ttn/v3/%s/%s", registeredApplicationID.ApplicationId, registeredDeviceID.DeviceID)
 				testSink := &mockSink{
 					ch: make(chan *http.Request, 1),
 				}
@@ -472,7 +472,7 @@ func TestWebhooks(t *testing.T) {
 				},
 				{
 					Name:       "InvalidIDAndKey",
-					ID:         ttnpb.ApplicationIdentifiers{ApplicationID: "--invalid-id"},
+					ID:         ttnpb.ApplicationIdentifiers{ApplicationId: "--invalid-id"},
 					Key:        "invalid key",
 					ExpectCode: http.StatusBadRequest,
 				},
@@ -480,7 +480,7 @@ func TestWebhooks(t *testing.T) {
 				t.Run(tc.Name, func(t *testing.T) {
 					a := assertions.New(t)
 					url := fmt.Sprintf("http://%s/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/replace",
-						httpAddress, tc.ID.ApplicationID, registeredWebhookID, registeredDeviceID.DeviceID,
+						httpAddress, tc.ID.ApplicationId, registeredWebhookID, registeredDeviceID.DeviceID,
 					)
 					body := bytes.NewReader([]byte(`{"downlinks":[]}`))
 					req, err := http.NewRequest(http.MethodPost, url, body)

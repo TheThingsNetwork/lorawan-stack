@@ -40,7 +40,7 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 	eui := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 	devAddr := types.DevAddr{1, 2, 3, 4}
 	appID := ttnpb.ApplicationIdentifiers{
-		ApplicationID: "test-app",
+		ApplicationId: "test-app",
 	}
 	devID := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
@@ -102,7 +102,7 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 		checkEvent(e)
 		a.So(e.Name(), should.Equal, "test.some.evt1")
 		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
-			a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, &appID)
+			a.So(e.Identifiers()[0].GetApplicationIds(), should.Resemble, &appID)
 		}
 	}
 

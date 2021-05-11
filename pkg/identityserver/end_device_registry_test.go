@@ -43,7 +43,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceID: "test-device-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-						ApplicationID: "test-app-id",
+						ApplicationId: "test-app-id",
 					},
 				},
 			},
@@ -58,7 +58,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID: "test-device-id",
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "test-app-id",
+					ApplicationId: "test-app-id",
 				},
 			},
 		})
@@ -79,7 +79,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 		_, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
 			FieldMask: pbtypes.FieldMask{Paths: []string{"name"}},
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "test-app-id",
+				ApplicationId: "test-app-id",
 			},
 		})
 
@@ -93,7 +93,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceID: "test-device-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-						ApplicationID: "test-app-id",
+						ApplicationId: "test-app-id",
 					},
 				},
 			},
@@ -106,7 +106,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 		_, err = reg.Delete(ctx, &ttnpb.EndDeviceIdentifiers{
 			DeviceID: "test-device-id",
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "test-app-id",
+				ApplicationId: "test-app-id",
 			},
 		})
 

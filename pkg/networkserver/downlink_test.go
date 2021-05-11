@@ -45,7 +45,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	// TODO: Refactor. (https://github.com/TheThingsNetwork/lorawan-stack/issues/2475)
 
 	const appIDString = "process-downlink-test-app-id"
-	appID := ttnpb.ApplicationIdentifiers{ApplicationID: appIDString}
+	appID := ttnpb.ApplicationIdentifiers{ApplicationId: appIDString}
 	const devID = "process-downlink-test-dev-id"
 
 	joinAcceptBytes := append([]byte{0b001_000_00}, bytes.Repeat([]byte{0x42}, 32)...)

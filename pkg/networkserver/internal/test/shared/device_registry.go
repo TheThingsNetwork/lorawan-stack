@@ -215,7 +215,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 			DeviceID:               "test-dev",
 		},
 		Session: &ttnpb.Session{

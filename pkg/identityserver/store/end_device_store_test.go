@@ -37,14 +37,14 @@ func TestEndDeviceStore(t *testing.T) {
 		store := GetEndDeviceStore(db)
 
 		deviceID := ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test"},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test"},
 			JoinEUI:                &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
 			DevEUI:                 &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
 			DeviceID:               "foo",
 		}
 
 		deviceNewID := ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test"},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test"},
 			DeviceID:               "bar",
 		}
 
@@ -270,7 +270,7 @@ func TestEndDeviceStore(t *testing.T) {
 			[]*ttnpb.EndDeviceIdentifiers{
 				&deviceID,
 				{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-another"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-another"},
 					DeviceID:               "baz",
 				},
 			},

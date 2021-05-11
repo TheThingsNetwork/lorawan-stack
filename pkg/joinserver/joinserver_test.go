@@ -146,7 +146,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -250,7 +250,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -375,7 +375,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -506,7 +506,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -620,7 +620,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -724,7 +724,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -828,7 +828,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -879,7 +879,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -964,7 +964,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1049,7 +1049,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1134,7 +1134,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1221,7 +1221,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1308,7 +1308,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1398,7 +1398,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1488,7 +1488,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1541,7 +1541,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1593,7 +1593,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1644,7 +1644,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1693,7 +1693,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1727,7 +1727,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1767,7 +1767,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1808,7 +1808,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1853,7 +1853,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
@@ -1890,7 +1890,7 @@ func TestHandleJoin(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 					DeviceID:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{

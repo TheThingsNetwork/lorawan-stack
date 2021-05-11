@@ -99,7 +99,7 @@ func getApplicationPackageAssociationID(flagSet *pflag.FlagSet, args []string) (
 	}
 	return &ttnpb.ApplicationPackageAssociationIdentifiers{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: applicationID},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
 			DeviceID:               deviceID,
 		},
 		FPort: uint32(fport),
@@ -136,7 +136,7 @@ func getApplicationPackageDefaultAssociationID(flagSet *pflag.FlagSet, args []st
 		return nil, errNoFPort
 	}
 	return &ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: applicationID},
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
 		FPort:                  uint32(fport),
 	}, nil
 }

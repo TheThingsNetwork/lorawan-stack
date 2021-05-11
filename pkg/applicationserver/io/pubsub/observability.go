@@ -29,7 +29,7 @@ import (
 
 var withIdentifiersOption = events.WithDataType(&ttnpb.ApplicationPubSubIdentifiers{
 	ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-		ApplicationID: "application-id",
+		ApplicationId: "application-id",
 	},
 	PubSubID: "pubsub-id",
 })

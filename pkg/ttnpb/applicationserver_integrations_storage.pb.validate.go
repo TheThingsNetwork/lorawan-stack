@@ -52,7 +52,7 @@ func (m *GetStoredApplicationUpRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(m.GetApplicationIDs()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetStoredApplicationUpRequestValidationError{
 						field:  "application_ids",

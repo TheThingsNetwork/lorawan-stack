@@ -86,7 +86,7 @@ func TestUnmarshalJSON(t *testing.T) {
 	{
 		evt := events.New(
 			context.Background(), "name", "description",
-			events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "application_id"}),
+			events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationId: "application_id"}),
 			events.WithData("data"),
 			events.WithVisibility(ttnpb.RIGHT_ALL),
 		)
@@ -101,7 +101,7 @@ func TestUnmarshalJSON(t *testing.T) {
 		var fieldmask []string
 		evt := events.New(
 			context.Background(), "name", "description",
-			events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "application_id"}),
+			events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationId: "application_id"}),
 			events.WithData(fieldmask),
 			events.WithVisibility(ttnpb.RIGHT_ALL),
 		)

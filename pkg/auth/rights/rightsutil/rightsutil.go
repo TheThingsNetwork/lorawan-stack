@@ -30,8 +30,8 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 	}
 	for _, entityIDs := range ev.Identifiers() {
 		switch ids := entityIDs.GetIds().(type) {
-		case *ttnpb.EntityIdentifiers_ApplicationIDs:
-			rights, err := rights.ListApplication(ctx, *ids.ApplicationIDs)
+		case *ttnpb.EntityIdentifiers_ApplicationIds:
+			rights, err := rights.ListApplication(ctx, *ids.ApplicationIds)
 			if err != nil {
 				return false, err
 			}

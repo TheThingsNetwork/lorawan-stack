@@ -66,7 +66,7 @@ func (w *webhooks) validateAndFillIDs(next http.Handler) http.Handler {
 		ctx := r.Context()
 		vars := mux.Vars(r)
 		appID := ttnpb.ApplicationIdentifiers{
-			ApplicationID: vars["application_id"],
+			ApplicationId: vars["application_id"],
 		}
 
 		devID := ttnpb.EndDeviceIdentifiers{

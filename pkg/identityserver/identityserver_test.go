@@ -149,7 +149,7 @@ func userAPIKeys(userID *ttnpb.UserIdentifiers) ttnpb.APIKeys {
 
 func applicationAPIKeys(applicationID *ttnpb.ApplicationIdentifiers) ttnpb.APIKeys {
 	for id, apiKeys := range population.APIKeys {
-		if id.GetApplicationIDs().GetApplicationID() == applicationID.GetApplicationID() {
+		if id.GetApplicationIds().GetApplicationId() == applicationID.GetApplicationId() {
 			return ttnpb.APIKeys{
 				APIKeys: apiKeys,
 			}

@@ -31,8 +31,7 @@ import (
 	"gocloud.dev/pubsub"
 )
 
-type allEnabled struct {
-}
+type allEnabled struct{}
 
 // Enabled implements provider.Enabler.
 func (e *allEnabled) Enabled(context.Context, ttnpb.ApplicationPubSub_Provider) error {
@@ -69,7 +68,7 @@ func TestOpenConnection(t *testing.T) {
 	pb := &ttnpb.ApplicationPubSub{
 		ApplicationPubSubIdentifiers: ttnpb.ApplicationPubSubIdentifiers{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "app1",
+				ApplicationId: "app1",
 			},
 			PubSubID: "ps1",
 		},

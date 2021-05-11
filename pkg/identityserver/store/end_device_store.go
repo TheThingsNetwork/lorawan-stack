@@ -72,7 +72,7 @@ func selectEndDeviceFields(ctx context.Context, query *gorm.DB, fieldMask *types
 func (s *deviceStore) CreateEndDevice(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
 	defer trace.StartRegion(ctx, "create end device").End()
 	devModel := EndDevice{
-		ApplicationID: dev.ApplicationID, // The ApplicationID is not mutated by fromPB.
+		ApplicationID: dev.ApplicationId, // The ApplicationID is not mutated by fromPB.
 		DeviceID:      dev.DeviceID,      // The DeviceID is not mutated by fromPB.
 	}
 	devModel.fromPB(dev, nil)
@@ -109,13 +109,13 @@ func (s *deviceStore) findEndDevices(ctx context.Context, query *gorm.DB, fieldM
 
 func (s *deviceStore) CountEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (total uint64, err error) {
 	defer trace.StartRegion(ctx, "count end devices").End()
-	err = s.query(ctx, EndDevice{}, withApplicationID(ids.GetApplicationID())).Count(&total).Error
+	err = s.query(ctx, EndDevice{}, withApplicationID(ids.GetApplicationId())).Count(&total).Error
 	return
 }
 
 func (s *deviceStore) ListEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.EndDevice, error) {
 	// NOTE: tracing done in s.findEndDevices.
-	query := s.query(ctx, EndDevice{}, withApplicationID(ids.GetApplicationID()))
+	query := s.query(ctx, EndDevice{}, withApplicationID(ids.GetApplicationId()))
 	return s.findEndDevices(ctx, query, fieldMask)
 }
 
@@ -126,10 +126,10 @@ func (s *deviceStore) FindEndDevices(ctx context.Context, ids []*ttnpb.EndDevice
 	idStrings := make([]string, len(ids))
 	var applicationID string
 	for i, id := range ids {
-		if applicationID != "" && applicationID != id.GetApplicationID() {
+		if applicationID != "" && applicationID != id.GetApplicationId() {
 			return nil, errMultipleApplicationIDs.New()
 		}
-		applicationID = id.GetApplicationID()
+		applicationID = id.GetApplicationId()
 		idStrings[i] = id.GetDeviceID()
 	}
 	query := s.query(ctx, EndDevice{}, withApplicationID(applicationID), withDeviceID(idStrings...))
@@ -138,7 +138,7 @@ func (s *deviceStore) FindEndDevices(ctx context.Context, ids []*ttnpb.EndDevice
 
 func (s *deviceStore) GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers, fieldMask *types.FieldMask) (*ttnpb.EndDevice, error) {
 	defer trace.StartRegion(ctx, "get end device").End()
-	query := s.query(ctx, EndDevice{}, withApplicationID(id.GetApplicationID()), withDeviceID(id.GetDeviceID()))
+	query := s.query(ctx, EndDevice{}, withApplicationID(id.GetApplicationId()), withDeviceID(id.GetDeviceID()))
 	if id.JoinEUI != nil {
 		query = query.Scopes(withJoinEUI(EUI64(*id.JoinEUI)))
 	}
@@ -160,7 +160,7 @@ func (s *deviceStore) GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 
 func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice, fieldMask *types.FieldMask) (updated *ttnpb.EndDevice, err error) {
 	defer trace.StartRegion(ctx, "update end device").End()
-	query := s.query(ctx, EndDevice{}, withApplicationID(dev.GetApplicationID()), withDeviceID(dev.GetDeviceID()))
+	query := s.query(ctx, EndDevice{}, withApplicationID(dev.GetApplicationId()), withDeviceID(dev.GetDeviceID()))
 	query = selectEndDeviceFields(ctx, query, fieldMask)
 	var devModel EndDevice
 	if err = query.First(&devModel).Error; err != nil {

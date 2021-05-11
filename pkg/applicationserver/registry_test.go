@@ -45,7 +45,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 			DeviceID:               "test-dev",
 		},
 		Session: &ttnpb.Session{
@@ -220,7 +220,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 	a := assertions.New(t)
 	ctx := test.Context()
 	app1IDs := ttnpb.ApplicationIdentifiers{
-		ApplicationID: "app-1",
+		ApplicationId: "app-1",
 	}
 	app1 := &ttnpb.ApplicationLink{
 		SkipPayloadCrypto: &pbtypes.BoolValue{
@@ -228,7 +228,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 		},
 	}
 	app2IDs := ttnpb.ApplicationIdentifiers{
-		ApplicationID: "app-2",
+		ApplicationId: "app-2",
 	}
 	app2 := &ttnpb.ApplicationLink{
 		SkipPayloadCrypto: &pbtypes.BoolValue{
@@ -354,7 +354,7 @@ func TestApplicationUplinksRegistry(t *testing.T) {
 			}
 
 			ids := ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 				DeviceID:               "test-dev",
 			}
 

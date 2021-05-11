@@ -76,7 +76,7 @@ var applicationColumnNames = map[string][]string{
 }
 
 func (app Application) toPB(pb *ttnpb.Application, fieldMask *types.FieldMask) {
-	pb.ApplicationIdentifiers.ApplicationID = app.ApplicationID
+	pb.ApplicationIdentifiers.ApplicationId = app.ApplicationID
 	pb.CreatedAt = cleanTime(app.CreatedAt)
 	pb.UpdatedAt = cleanTime(app.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(app.DeletedAt)

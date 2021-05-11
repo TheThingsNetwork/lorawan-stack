@@ -122,11 +122,11 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 	}
 
 	appID1 := ttnpb.ApplicationIdentifiers{
-		ApplicationID: "application-uplink-queue-app-1",
+		ApplicationId: "application-uplink-queue-app-1",
 	}
 
 	appID2 := ttnpb.ApplicationIdentifiers{
-		ApplicationID: "application-uplink-queue-app-2",
+		ApplicationId: "application-uplink-queue-app-2",
 	}
 
 	invalidations := [...]*ttnpb.ApplicationUp{

@@ -191,7 +191,7 @@ func request_As_DeleteLink_0(ctx context.Context, marshaler runtime.Marshaler, c
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -218,7 +218,7 @@ func local_request_As_DeleteLink_0(ctx context.Context, marshaler runtime.Marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -245,7 +245,7 @@ func request_As_GetLinkStats_0(ctx context.Context, marshaler runtime.Marshaler,
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -272,7 +272,7 @@ func local_request_As_GetLinkStats_0(ctx context.Context, marshaler runtime.Mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -595,7 +595,7 @@ func request_AppAs_GetMQTTConnectionInfo_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -622,7 +622,7 @@ func local_request_AppAs_GetMQTTConnectionInfo_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)

@@ -24,7 +24,7 @@ import (
 
 // IsZero returns true if all identifiers have zero-values.
 func (ids ApplicationIdentifiers) IsZero() bool {
-	return ids.ApplicationID == ""
+	return ids.ApplicationId == ""
 }
 
 // FieldIsZero returns whether path p is zero.
@@ -34,7 +34,7 @@ func (v *ApplicationIdentifiers) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "application_id":
-		return v.ApplicationID == ""
+		return v.ApplicationId == ""
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -47,7 +47,7 @@ func (ids ClientIdentifiers) IsZero() bool {
 // IsZero reports whether ids represent zero identifiers.
 func (ids EndDeviceIdentifiers) IsZero() bool {
 	return ids.GetDeviceID() == "" &&
-		ids.GetApplicationID() == "" &&
+		ids.GetApplicationId() == "" &&
 		(ids.DevAddr == nil || ids.DevAddr.IsZero()) &&
 		(ids.DevEUI == nil || ids.DevEUI.IsZero()) &&
 		ids.JoinEUI == nil
@@ -125,7 +125,7 @@ func (ids EndDeviceIdentifiers) Copy(x *EndDeviceIdentifiers) *EndDeviceIdentifi
 	*x = EndDeviceIdentifiers{
 		DeviceID: ids.DeviceID,
 		ApplicationIdentifiers: ApplicationIdentifiers{
-			ApplicationID: ids.ApplicationID,
+			ApplicationId: ids.ApplicationId,
 		},
 		XXX_sizecache: ids.XXX_sizecache,
 	}
