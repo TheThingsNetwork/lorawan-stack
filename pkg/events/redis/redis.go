@@ -163,7 +163,7 @@ func (ps *PubSub) eventChannelPatterns(ctx context.Context, name string, ids []*
 		if appID := id.GetApplicationIds(); appID != nil {
 			pattern := ps.eventChannel(ctx, name, (&ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: *appID,
-				DeviceID:               "*",
+				DeviceId:               "*",
 			}).GetEntityIdentifiers())
 			patterns = append(patterns, pattern)
 		}

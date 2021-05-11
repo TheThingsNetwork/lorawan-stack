@@ -841,9 +841,9 @@ func (dst *ProvisionEndDevicesRequest_IdentifiersList) SetFields(src *ProvisionE
 				return fmt.Errorf("'end_device_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.EndDeviceIDs = src.EndDeviceIDs
+				dst.EndDeviceIds = src.EndDeviceIds
 			} else {
-				dst.EndDeviceIDs = nil
+				dst.EndDeviceIds = nil
 			}
 
 		default:

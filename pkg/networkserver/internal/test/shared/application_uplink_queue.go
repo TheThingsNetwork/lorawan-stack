@@ -133,7 +133,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
-				DeviceID:               "test-dev2",
+				DeviceId:               "test-dev2",
 			},
 			CorrelationIDs: []string{"invalidations[0]"},
 			Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
@@ -143,7 +143,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
-				DeviceID:               "test-dev2",
+				DeviceId:               "test-dev2",
 			},
 			CorrelationIDs: []string{"invalidations[1]"},
 			Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
@@ -155,7 +155,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
-				DeviceID:               "test-dev",
+				DeviceId:               "test-dev",
 			},
 			CorrelationIDs: []string{"joinAccepts[0]"},
 			Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -165,7 +165,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
-				DeviceID:               "test-dev2",
+				DeviceId:               "test-dev2",
 			},
 			CorrelationIDs: []string{"joinAccepts[1]"},
 			Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -177,7 +177,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
-				DeviceID:               "test-dev",
+				DeviceId:               "test-dev",
 			},
 			CorrelationIDs: []string{"genericApp1Ups[0]"},
 			Up: &ttnpb.ApplicationUp_DownlinkFailed{
@@ -187,7 +187,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
-				DeviceID:               "test-dev",
+				DeviceId:               "test-dev",
 			},
 			CorrelationIDs: []string{"genericApp1Ups[1]"},
 			Up: &ttnpb.ApplicationUp_LocationSolved{
@@ -197,7 +197,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
-				DeviceID:               "test-dev2",
+				DeviceId:               "test-dev2",
 			},
 			CorrelationIDs: []string{"genericApp1Ups[2]"},
 			Up: &ttnpb.ApplicationUp_DownlinkFailed{
@@ -207,7 +207,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
-				DeviceID:               "test-dev",
+				DeviceId:               "test-dev",
 			},
 			CorrelationIDs: []string{"genericApp1Ups[3]"},
 			Up: &ttnpb.ApplicationUp_DownlinkAck{
@@ -217,7 +217,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
-				DeviceID:               "test-dev2",
+				DeviceId:               "test-dev2",
 			},
 			CorrelationIDs: []string{"genericApp1Ups[4]"},
 			Up: &ttnpb.ApplicationUp_DownlinkAck{
@@ -230,7 +230,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID2,
-				DeviceID:               "test-dev2",
+				DeviceId:               "test-dev2",
 			},
 			CorrelationIDs: []string{"genericApp2Ups[0]"},
 			Up: &ttnpb.ApplicationUp_LocationSolved{
@@ -240,7 +240,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID2,
-				DeviceID:               "test-dev",
+				DeviceId:               "test-dev",
 			},
 			CorrelationIDs: []string{"genericApp2Ups[1]"},
 			Up: &ttnpb.ApplicationUp_DownlinkFailed{

@@ -148,7 +148,7 @@ func (ps *PubSub) getMetadata(evt events.Event) map[string]string {
 		if gtwID := id.GetGatewayIds(); gtwID != nil {
 			ids["gateway_eui"] = append(ids["gateway_eui"], gtwID.EUI.String())
 		}
-		if devID := id.GetDeviceIDs(); devID != nil {
+		if devID := id.GetDeviceIds(); devID != nil {
 			ids["application_id"] = append(ids["application_id"], devID.ApplicationId)
 			if devID.DevEUI != nil {
 				ids["dev_eui"] = append(ids["dev_eui"], devID.DevEUI.String())

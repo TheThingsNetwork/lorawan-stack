@@ -364,7 +364,7 @@ func request_JsEndDeviceRegistry_Delete_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device_id")
 	}
 
-	protoReq.DeviceID, err = runtime.String(val)
+	protoReq.DeviceId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device_id", err)
@@ -409,7 +409,7 @@ func local_request_JsEndDeviceRegistry_Delete_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device_id")
 	}
 
-	protoReq.DeviceID, err = runtime.String(val)
+	protoReq.DeviceId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device_id", err)

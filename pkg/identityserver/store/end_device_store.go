@@ -73,7 +73,7 @@ func (s *deviceStore) CreateEndDevice(ctx context.Context, dev *ttnpb.EndDevice)
 	defer trace.StartRegion(ctx, "create end device").End()
 	devModel := EndDevice{
 		ApplicationID: dev.ApplicationId, // The ApplicationID is not mutated by fromPB.
-		DeviceID:      dev.DeviceID,      // The DeviceID is not mutated by fromPB.
+		DeviceID:      dev.DeviceId,      // The DeviceID is not mutated by fromPB.
 	}
 	devModel.fromPB(dev, nil)
 	if err := s.createEntity(ctx, &devModel); err != nil {
@@ -130,7 +130,7 @@ func (s *deviceStore) FindEndDevices(ctx context.Context, ids []*ttnpb.EndDevice
 			return nil, errMultipleApplicationIDs.New()
 		}
 		applicationID = id.GetApplicationId()
-		idStrings[i] = id.GetDeviceID()
+		idStrings[i] = id.GetDeviceId()
 	}
 	query := s.query(ctx, EndDevice{}, withApplicationID(applicationID), withDeviceID(idStrings...))
 	return s.findEndDevices(ctx, query, fieldMask)
@@ -138,7 +138,7 @@ func (s *deviceStore) FindEndDevices(ctx context.Context, ids []*ttnpb.EndDevice
 
 func (s *deviceStore) GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers, fieldMask *types.FieldMask) (*ttnpb.EndDevice, error) {
 	defer trace.StartRegion(ctx, "get end device").End()
-	query := s.query(ctx, EndDevice{}, withApplicationID(id.GetApplicationId()), withDeviceID(id.GetDeviceID()))
+	query := s.query(ctx, EndDevice{}, withApplicationID(id.GetApplicationId()), withDeviceID(id.GetDeviceId()))
 	if id.JoinEUI != nil {
 		query = query.Scopes(withJoinEUI(EUI64(*id.JoinEUI)))
 	}
@@ -160,7 +160,7 @@ func (s *deviceStore) GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 
 func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice, fieldMask *types.FieldMask) (updated *ttnpb.EndDevice, err error) {
 	defer trace.StartRegion(ctx, "update end device").End()
-	query := s.query(ctx, EndDevice{}, withApplicationID(dev.GetApplicationId()), withDeviceID(dev.GetDeviceID()))
+	query := s.query(ctx, EndDevice{}, withApplicationID(dev.GetApplicationId()), withDeviceID(dev.GetDeviceId()))
 	query = selectEndDeviceFields(ctx, query, fieldMask)
 	var devModel EndDevice
 	if err = query.First(&devModel).Error; err != nil {

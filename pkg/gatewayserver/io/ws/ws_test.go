@@ -912,8 +912,8 @@ func TestTraffic(t *testing.T) {
 			Name: "Downlink",
 			InputNetworkDownstream: &ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
-				EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-					DeviceID: "testdevice",
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
+					DeviceId: "testdevice",
 					DevEUI:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
 				},
 				Settings: &ttnpb.DownlinkMessage_Request{
@@ -961,8 +961,8 @@ func TestTraffic(t *testing.T) {
 			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{
 				DownlinkMessage: &ttnpb.DownlinkMessage{
 					RawPayload: []byte("Ymxhamthc25kJ3M=="),
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						DeviceID: "testdevice",
+					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
+						DeviceId: "testdevice",
 						DevEUI:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
 					},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
@@ -985,8 +985,8 @@ func TestTraffic(t *testing.T) {
 			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{
 				DownlinkMessage: &ttnpb.DownlinkMessage{
 					RawPayload: []byte("Ymxhamthc25kJ3M=="),
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						DeviceID: "testdevice",
+					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
+						DeviceId: "testdevice",
 						DevEUI:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
 					},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
@@ -1214,8 +1214,8 @@ func TestRTT(t *testing.T) {
 			Name: "Downlink",
 			InputNetworkDownstream: &ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
-				EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-					DeviceID: "testdevice",
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
+					DeviceId: "testdevice",
 					DevEUI:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
 				},
 				Settings: &ttnpb.DownlinkMessage_Request{

@@ -257,7 +257,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		return nil, err
 	}
 
-	dev, ctx, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, addDeviceGetPaths(req.FieldMask.Paths...))
+	dev, ctx, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceId, addDeviceGetPaths(req.FieldMask.Paths...))
 	if err != nil {
 		logRegistryRPCError(ctx, err, "Failed to get device from registry")
 		return nil, err
@@ -2191,7 +2191,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	var evt events.Event
-	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.EndDeviceIdentifiers.ApplicationIdentifiers, st.Device.EndDeviceIdentifiers.DeviceID, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
+	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.EndDeviceIdentifiers.ApplicationIdentifiers, st.Device.EndDeviceIdentifiers.DeviceId, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
 		if hasSession {
 			macVersion := stored.GetMACState().GetLoRaWANVersion()
 			if stored.GetMACState() == nil && !st.HasSetField("mac_state") {
@@ -2315,7 +2315,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 		return nil, err
 	}
 
-	dev, _, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, addDeviceGetPaths(ttnpb.AddFields(append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...),
+	dev, _, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceId, addDeviceGetPaths(ttnpb.AddFields(append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...),
 		"frequency_plan_id",
 		"lorawan_phy_version",
 		"lorawan_version",
@@ -2382,7 +2382,7 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 		return nil, err
 	}
 	var evt events.Event
-	_, _, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, nil, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	_, _, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceId, nil, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil {
 			return nil, nil, errDeviceNotFound.New()
 		}

@@ -46,7 +46,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 			JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-			DeviceID:               "test-dev",
+			DeviceId:               "test-dev",
 		},
 		Session: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
@@ -355,7 +355,7 @@ func TestApplicationUplinksRegistry(t *testing.T) {
 
 			ids := ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-				DeviceID:               "test-dev",
+				DeviceId:               "test-dev",
 			}
 
 			assertEmpty := func() {

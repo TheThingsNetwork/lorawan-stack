@@ -1730,7 +1730,7 @@ func (m *ProvisionEndDevicesRequest_IdentifiersList) ValidateFields(paths ...str
 			// no validation rules for JoinEUI
 		case "end_device_ids":
 
-			for idx, item := range m.EndDeviceIDs {
+			for idx, item := range m.EndDeviceIds {
 				_, _ = idx, item
 
 				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {

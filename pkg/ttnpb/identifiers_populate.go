@@ -57,7 +57,7 @@ func NewPopulatedGatewayIdentifiers(r randyIdentifiers, _ bool) *GatewayIdentifi
 
 func NewPopulatedEndDeviceIdentifiers(r randyIdentifiers, easy bool) *EndDeviceIdentifiers {
 	out := &EndDeviceIdentifiers{}
-	out.DeviceID = NewPopulatedID(r)
+	out.DeviceId = NewPopulatedID(r)
 	out.ApplicationIdentifiers = *NewPopulatedApplicationIdentifiers(r, easy)
 	out.DevEUI = types.NewPopulatedEUI64(r)
 	out.JoinEUI = types.NewPopulatedEUI64(r)

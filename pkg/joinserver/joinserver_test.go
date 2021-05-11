@@ -147,7 +147,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -251,7 +251,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -376,7 +376,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -507,7 +507,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -621,7 +621,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -725,7 +725,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -829,7 +829,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -880,7 +880,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -965,7 +965,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1050,7 +1050,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1135,7 +1135,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1222,7 +1222,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1309,7 +1309,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1399,7 +1399,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1489,7 +1489,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1542,7 +1542,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1594,7 +1594,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1645,7 +1645,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1694,7 +1694,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1728,7 +1728,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1768,7 +1768,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1809,7 +1809,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1854,7 +1854,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1891,7 +1891,7 @@ func TestHandleJoin(t *testing.T) {
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-					DeviceID:               "test-dev",
+					DeviceId:               "test-dev",
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
@@ -1976,7 +1976,7 @@ func TestHandleJoin(t *testing.T) {
 
 				start := time.Now()
 
-				ret, err := devReg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
+				ret, err := devReg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceId,
 					[]string{
 						"application_server_address",
 						"application_server_id",

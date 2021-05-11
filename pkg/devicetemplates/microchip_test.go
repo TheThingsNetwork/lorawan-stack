@@ -129,7 +129,7 @@ func TestMicrochipATECC608ATNGLORA(t *testing.T) {
 			t.FailNow()
 		}
 
-		a.So(entry.EndDevice.DeviceID, should.Equal, "eui-0004a310001ff9da")
+		a.So(entry.EndDevice.DeviceId, should.Equal, "eui-0004a310001ff9da")
 		a.So(entry.EndDevice.JoinEUI, should.Resemble, &types.EUI64{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x00, 0x00})
 		a.So(entry.EndDevice.DevEUI, should.Resemble, &types.EUI64{0x00, 0x04, 0xA3, 0x10, 0x00, 0x1F, 0xF9, 0xDA})
 		a.So(entry.EndDevice.ProvisionerID, should.Equal, provisioning.Microchip)
@@ -160,7 +160,7 @@ func TestMicrochipATECC608ATNGLORA(t *testing.T) {
 			t.FailNow()
 		}
 
-		a.So(entry.EndDevice.DeviceID, should.Equal, "eui-0004a310001aa90a")
+		a.So(entry.EndDevice.DeviceId, should.Equal, "eui-0004a310001aa90a")
 		a.So(entry.EndDevice.JoinEUI, should.Resemble, &types.EUI64{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x00, 0x00})
 		a.So(entry.EndDevice.DevEUI, should.Resemble, &types.EUI64{0x00, 0x04, 0xA3, 0x10, 0x00, 0x1A, 0xA9, 0x0A})
 		a.So(entry.EndDevice.ProvisionerID, should.Equal, provisioning.Microchip)

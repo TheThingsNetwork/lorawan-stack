@@ -37,7 +37,7 @@ func TestLegacyEncodeDownlink(t *testing.T) {
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
-		DeviceID: "foo-device",
+		DeviceId: "foo-device",
 		DevEUI:   &eui,
 	}
 
@@ -106,7 +106,7 @@ func TestEncodeDownlink(t *testing.T) {
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
-		DeviceID: "foo-device",
+		DeviceId: "foo-device",
 		DevEUI:   &eui,
 	}
 
@@ -241,7 +241,7 @@ func TestLegacyDecodeUplink(t *testing.T) {
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
-		DeviceID: "foo-device",
+		DeviceId: "foo-device",
 		DevEUI:   &eui,
 	}
 
@@ -319,7 +319,7 @@ func TestDecodeUplink(t *testing.T) {
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
-		DeviceID: "foo-device",
+		DeviceId: "foo-device",
 		DevEUI:   &eui,
 	}
 
@@ -454,7 +454,7 @@ func TestDecodeDownlink(t *testing.T) {
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
-		DeviceID: "foo-device",
+		DeviceId: "foo-device",
 		DevEUI:   &eui,
 	}
 

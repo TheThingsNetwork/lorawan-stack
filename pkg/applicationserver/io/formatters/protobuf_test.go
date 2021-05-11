@@ -38,7 +38,7 @@ func TestProtobufUpstream(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 						ApplicationId: "foo-app",
 					},
-					DeviceID: "foo-device",
+					DeviceId: "foo-device",
 				},
 				Up: &ttnpb.ApplicationUp_UplinkMessage{
 					UplinkMessage: &ttnpb.ApplicationUplink{
@@ -65,7 +65,7 @@ func TestProtobufUpstream(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 						ApplicationId: "foo-app",
 					},
-					DeviceID: "foo-device",
+					DeviceId: "foo-device",
 				},
 				Up: &ttnpb.ApplicationUp_JoinAccept{
 					JoinAccept: &ttnpb.ApplicationJoinAccept{
@@ -159,7 +159,7 @@ func TestProtobufDownstream(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationId: "foo-app",
 						},
-						DeviceID: "foo-device",
+						DeviceId: "foo-device",
 					},
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{

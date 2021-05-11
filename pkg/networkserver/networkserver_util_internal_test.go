@@ -1503,7 +1503,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					func(ctx, reqCtx context.Context, peerIDs cluster.EntityIdentifiers) bool {
 						return test.AllTrue(
 							a.So(events.CorrelationIDsFromContext(reqCtx), should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIDs),
-							a.So(peerIDs.GetEntityIdentifiers().GetDeviceIDs(), should.Resemble, &conf.Device.EndDeviceIdentifiers),
+							a.So(peerIDs.GetEntityIdentifiers().GetDeviceIds(), should.Resemble, &conf.Device.EndDeviceIdentifiers),
 						)
 					},
 					func(ctx, reqCtx context.Context, req *ttnpb.JoinRequest) bool {
@@ -2138,7 +2138,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 							},
 						},
 					},
-					EndDeviceIDs: &x.EndDeviceIdentifiers,
+					EndDeviceIds: &x.EndDeviceIdentifiers,
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,

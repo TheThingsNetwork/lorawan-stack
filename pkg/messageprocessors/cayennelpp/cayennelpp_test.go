@@ -38,7 +38,7 @@ func TestEncode(t *testing.T) {
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
-		DeviceID: "foo-device",
+		DeviceId: "foo-device",
 		DevEUI:   &eui,
 	}
 
@@ -122,7 +122,7 @@ func TestDecode(t *testing.T) {
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
-		DeviceID: "foo-device",
+		DeviceId: "foo-device",
 		DevEUI:   &eui,
 	}
 

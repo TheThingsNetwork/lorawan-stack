@@ -59,13 +59,13 @@ func TestEndDeviceFetcher(t *testing.T) {
 		cache := gcache.New(-1).Clock(fakeClock).Expiration(time.Second).Build()
 
 		dev1 := ttnpb.EndDeviceIdentifiers{
-			DeviceID: "dev1",
+			DeviceId: "dev1",
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app1",
 			},
 		}
 		dev2 := ttnpb.EndDeviceIdentifiers{
-			DeviceID: "dev2",
+			DeviceId: "dev2",
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app2",
 			},
@@ -133,7 +133,7 @@ func TestEndDeviceFetcher(t *testing.T) {
 		cf := applicationserver.NewTimeoutEndDeviceFetcher(f, timeout)
 
 		dev := ttnpb.EndDeviceIdentifiers{
-			DeviceID: "dev1",
+			DeviceId: "dev1",
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app1",
 			},
@@ -156,7 +156,7 @@ func TestEndDeviceFetcher(t *testing.T) {
 		cf := applicationserver.NewCircuitBreakerEndDeviceFetcher(f, threshold, timeout)
 
 		dev := ttnpb.EndDeviceIdentifiers{
-			DeviceID: "dev1",
+			DeviceId: "dev1",
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app1",
 			},

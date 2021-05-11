@@ -255,7 +255,7 @@ This command takes end device templates from stdin.`,
 					binary.BigEndian.PutUint64(devEUI[:], devEUIInt)
 					devEUIInt++
 
-					res.EndDevice.DeviceID = fmt.Sprintf("eui-%s", strings.ToLower(devEUI.String()))
+					res.EndDevice.DeviceId = fmt.Sprintf("eui-%s", strings.ToLower(devEUI.String()))
 					res.EndDevice.JoinEUI = &joinEUI
 					res.EndDevice.DevEUI = &devEUI
 					res.FieldMask.Paths = ttnpb.BottomLevelFields(append(res.FieldMask.Paths,
@@ -404,7 +404,7 @@ command to assign EUIs to map to end device templates.`,
 					switch {
 					case e.MappingKey != "" && e.MappingKey == inputEntry.MappingKey:
 					case e.EndDevice.ApplicationId != "" && e.EndDevice.ApplicationId == inputEntry.EndDevice.ApplicationId &&
-						e.EndDevice.DeviceID != "" && e.EndDevice.DeviceID == inputEntry.EndDevice.DeviceID:
+						e.EndDevice.DeviceId != "" && e.EndDevice.DeviceId == inputEntry.EndDevice.DeviceId:
 					case e.EndDevice.DevEUI != nil && inputEntry.EndDevice.DevEUI != nil && e.EndDevice.DevEUI.Equal(*inputEntry.EndDevice.DevEUI):
 					case e.EndDevice.EndDeviceIdentifiers.IsZero():
 					default:

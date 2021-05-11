@@ -54,10 +54,10 @@ func (dst *EndDeviceIdentifiers) SetFields(src *EndDeviceIdentifiers, paths ...s
 				return fmt.Errorf("'device_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.DeviceID = src.DeviceID
+				dst.DeviceId = src.DeviceId
 			} else {
 				var zero string
-				dst.DeviceID = zero
+				dst.DeviceId = zero
 			}
 		case "application_ids":
 			if len(subs) > 0 {
@@ -378,11 +378,11 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 						}
 					}
 				case "device_ids":
-					_, srcOk := src.Ids.(*EntityIdentifiers_DeviceIDs)
+					_, srcOk := src.Ids.(*EntityIdentifiers_DeviceIds)
 					if !srcOk && src.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'device_ids', while different oneof is set in source")
 					}
-					_, dstOk := dst.Ids.(*EntityIdentifiers_DeviceIDs)
+					_, dstOk := dst.Ids.(*EntityIdentifiers_DeviceIds)
 					if !dstOk && dst.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'device_ids', while different oneof is set in destination")
 					}
@@ -392,13 +392,13 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 							continue
 						}
 						if srcOk {
-							newSrc = src.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs
+							newSrc = src.Ids.(*EntityIdentifiers_DeviceIds).DeviceIds
 						}
 						if dstOk {
-							newDst = dst.Ids.(*EntityIdentifiers_DeviceIDs).DeviceIDs
+							newDst = dst.Ids.(*EntityIdentifiers_DeviceIds).DeviceIds
 						} else {
 							newDst = &EndDeviceIdentifiers{}
-							dst.Ids = &EntityIdentifiers_DeviceIDs{DeviceIDs: newDst}
+							dst.Ids = &EntityIdentifiers_DeviceIds{DeviceIds: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err

@@ -154,25 +154,25 @@ func (c *connection) setup(ctx context.Context) error {
 				var topicParts []string
 				switch up.Up.(type) {
 				case *ttnpb.ApplicationUp_UplinkMessage:
-					topicParts = c.format.UplinkTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.UplinkTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
 				case *ttnpb.ApplicationUp_JoinAccept:
-					topicParts = c.format.JoinAcceptTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.JoinAcceptTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
 				case *ttnpb.ApplicationUp_DownlinkAck:
-					topicParts = c.format.DownlinkAckTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.DownlinkAckTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
 				case *ttnpb.ApplicationUp_DownlinkNack:
-					topicParts = c.format.DownlinkNackTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.DownlinkNackTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
 				case *ttnpb.ApplicationUp_DownlinkSent:
-					topicParts = c.format.DownlinkSentTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.DownlinkSentTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
 				case *ttnpb.ApplicationUp_DownlinkFailed:
-					topicParts = c.format.DownlinkFailedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.DownlinkFailedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
 				case *ttnpb.ApplicationUp_DownlinkQueued:
-					topicParts = c.format.DownlinkQueuedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.DownlinkQueuedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
 				case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
-					topicParts = c.format.DownlinkQueueInvalidatedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.DownlinkQueueInvalidatedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
 				case *ttnpb.ApplicationUp_LocationSolved:
-					topicParts = c.format.LocationSolvedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.LocationSolvedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
 				case *ttnpb.ApplicationUp_ServiceData:
-					topicParts = c.format.ServiceDataTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.ServiceDataTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
 				}
 				if topicParts == nil {
 					continue
@@ -364,7 +364,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 	}
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: *c.io.ApplicationIDs(),
-		DeviceID:               deviceID,
+		DeviceId:               deviceID,
 	}
 	if err := ids.ValidateContext(c.io.Context()); err != nil {
 		logger.WithError(err).Warn("Failed to validate message identifiers")

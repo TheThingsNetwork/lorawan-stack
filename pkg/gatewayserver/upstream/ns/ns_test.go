@@ -93,7 +93,7 @@ func TestNSHandler(t *testing.T) {
 				},
 			},
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				DeviceID: "test-device",
+				DeviceId: "test-device",
 			},
 		},
 	} {

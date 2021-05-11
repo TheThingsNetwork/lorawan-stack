@@ -186,7 +186,7 @@ var deviceColumnNames = map[string][]string{
 
 func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *types.FieldMask) {
 	pb.EndDeviceIdentifiers.ApplicationId = dev.ApplicationID
-	pb.EndDeviceIdentifiers.DeviceID = dev.DeviceID
+	pb.EndDeviceIdentifiers.DeviceId = dev.DeviceID
 	pb.EndDeviceIdentifiers.JoinEUI = dev.JoinEUI.toPB() // Always present.
 	pb.EndDeviceIdentifiers.DevEUI = dev.DevEUI.toPB()   // Always present.
 	pb.CreatedAt = cleanTime(dev.CreatedAt)

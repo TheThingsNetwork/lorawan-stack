@@ -67,7 +67,7 @@ func (s *Subscription) matchIdentifiers(evt events.Event) bool {
 				return true
 			}
 			if evtEntityType == "end device" && subEntityType == "application" &&
-				unique.ID(evt.Context(), evtIDs.GetDeviceIDs().ApplicationIdentifiers) == unique.ID(s.ctx, subIDs) {
+				unique.ID(evt.Context(), evtIDs.GetDeviceIds().ApplicationIdentifiers) == unique.ID(s.ctx, subIDs) {
 				return true
 			}
 		}

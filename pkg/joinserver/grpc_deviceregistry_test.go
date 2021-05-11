@@ -60,7 +60,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
-			DeviceID: registeredDeviceID,
+			DeviceId: registeredDeviceID,
 			JoinEUI:  registeredJoinEUI,
 			DevEUI:   registeredDevEUI,
 		},
@@ -137,7 +137,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 						ApplicationId: registeredApplicationID,
 					},
-					DeviceID: unregisteredDeviceID,
+					DeviceId: unregisteredDeviceID,
 					JoinEUI:  unregisteredJoinEUI,
 					DevEUI:   unregisteredDevEUI,
 				},
@@ -179,7 +179,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 						ApplicationId: "bar-application",
 					},
-					DeviceID: "bar-device",
+					DeviceId: "bar-device",
 					JoinEUI:  registeredJoinEUI,
 					DevEUI:   registeredDevEUI,
 				},
@@ -447,7 +447,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
-			DeviceID: registeredDeviceID,
+			DeviceId: registeredDeviceID,
 			JoinEUI:  registeredJoinEUI,
 			DevEUI:   registeredDevEUI,
 		},
@@ -511,7 +511,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
-						DeviceID: registeredDeviceID,
+						DeviceId: registeredDeviceID,
 						DevEUI:   registeredDevEUI,
 					},
 				},
@@ -543,7 +543,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
-						DeviceID: registeredDeviceID,
+						DeviceId: registeredDeviceID,
 						JoinEUI:  registeredJoinEUI,
 					},
 				},
@@ -575,7 +575,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
-						DeviceID: "new-device",
+						DeviceId: "new-device",
 						JoinEUI:  unregisteredJoinEUI,
 						DevEUI:   unregisteredDevEUI,
 					},
@@ -600,7 +600,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
-						DeviceID: "new-device",
+						DeviceId: "new-device",
 						JoinEUI:  unregisteredJoinEUI,
 						DevEUI:   unregisteredDevEUI,
 					},
@@ -614,7 +614,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
-						DeviceID: "new-device",
+						DeviceId: "new-device",
 						JoinEUI:  unregisteredJoinEUI,
 						DevEUI:   unregisteredDevEUI,
 					},
@@ -846,7 +846,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
-			DeviceID: registeredDeviceID,
+			DeviceId: registeredDeviceID,
 			JoinEUI:  registeredJoinEUI,
 			DevEUI:   registeredDevEUI,
 		},
@@ -905,7 +905,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 					ApplicationId: registeredApplicationID,
 				},
-				DeviceID: unregisteredDeviceID,
+				DeviceId: unregisteredDeviceID,
 				JoinEUI:  unregisteredJoinEUI,
 				DevEUI:   unregisteredDevEUI,
 			},

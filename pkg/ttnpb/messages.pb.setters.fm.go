@@ -157,26 +157,26 @@ func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) err
 		case "end_device_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceIdentifiers
-				if (src == nil || src.EndDeviceIDs == nil) && dst.EndDeviceIDs == nil {
+				if (src == nil || src.EndDeviceIds == nil) && dst.EndDeviceIds == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.EndDeviceIDs
+					newSrc = src.EndDeviceIds
 				}
-				if dst.EndDeviceIDs != nil {
-					newDst = dst.EndDeviceIDs
+				if dst.EndDeviceIds != nil {
+					newDst = dst.EndDeviceIds
 				} else {
 					newDst = &EndDeviceIdentifiers{}
-					dst.EndDeviceIDs = newDst
+					dst.EndDeviceIds = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceIDs = src.EndDeviceIDs
+					dst.EndDeviceIds = src.EndDeviceIds
 				} else {
-					dst.EndDeviceIDs = nil
+					dst.EndDeviceIds = nil
 				}
 			}
 		case "correlation_ids":

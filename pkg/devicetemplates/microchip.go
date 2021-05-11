@@ -374,7 +374,7 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 		tmpl := &ttnpb.EndDeviceTemplate{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceID: strings.ToLower(fmt.Sprintf("eui-%s", devEUI)),
+					DeviceId: strings.ToLower(fmt.Sprintf("eui-%s", devEUI)),
 					JoinEUI:  &joinEUI,
 					DevEUI:   &devEUI,
 				},

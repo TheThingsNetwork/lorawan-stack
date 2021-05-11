@@ -38,14 +38,14 @@ var (
 	registeredApplicationKey = "secret"
 	registeredDeviceID       = ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,
-		DeviceID:               "foo-device",
+		DeviceId:               "foo-device",
 		DevAddr:                devAddrPtr(types.DevAddr{0x42, 0xff, 0xff, 0xff}),
 	}
 	unregisteredDeviceID = ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationId: "bar-app",
 		},
-		DeviceID: "bar-device",
+		DeviceId: "bar-device",
 		DevAddr:  devAddrPtr(types.DevAddr{0x42, 0x42, 0x42, 0x42}),
 	}
 	registeredWebhookID = "foo-hook"
