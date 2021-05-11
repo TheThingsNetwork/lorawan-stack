@@ -55,8 +55,8 @@ func ToApplicationID(uid string) (id ttnpb.ApplicationIdentifiers, err error) {
 	return id, nil
 }
 
-// ToClientId returns the client identifier of the specified unique ID.
-func ToClientId(uid string) (id ttnpb.ClientIdentifiers, err error) {
+// ToClientID returns the client identifier of the specified unique ID.
+func ToClientID(uid string) (id ttnpb.ClientIdentifiers, err error) {
 	id.ClientId = uid
 	if err := id.ValidateFields("client_id"); err != nil {
 		return ttnpb.ClientIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
