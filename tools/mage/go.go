@@ -232,7 +232,7 @@ func (Go) TestBinaries() error {
 		fmt.Println("Testing Go binaries")
 	}
 	for _, binary := range goBinaries {
-		_, err := outputGo("run", binary, "--help")
+		_, err := outputGo("run", binary, "config")
 		if err != nil {
 			return err
 		}

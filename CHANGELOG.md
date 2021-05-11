@@ -26,6 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - OAuth token exchange for OAuth clients that use Basic auth.
+- The CLI now properly returns a non-zero exit status code on invalid commands.
 
 ### Security
 
