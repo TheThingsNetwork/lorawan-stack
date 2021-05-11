@@ -21,7 +21,7 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Wizard, { useWizardContext } from '@ttn-lw/components/wizard'
 
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -85,7 +85,7 @@ const ApplicationSettingsForm = props => {
           component={Input.Generate}
           mayGenerateValue={mayEditKeys && !skipCrypto}
           onGenerateValue={generate16BytesKey}
-          glossaryId={glossaryIds.APP_SESSION_KEY}
+          tooltipId={tooltipIds.APP_SESSION_KEY}
         />
       )}
     </Wizard.Form>

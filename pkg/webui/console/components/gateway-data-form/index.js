@@ -30,7 +30,7 @@ import Message from '@ttn-lw/lib/components/message'
 import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import OwnersSelect from '@console/containers/owners-select'
 
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -138,6 +138,7 @@ class GatewayDataForm extends React.Component {
           required
           disabled={update}
           component={Input}
+          tooltipId={tooltipIds.GATEWAY_ID}
         />
         <Form.Field
           title={sharedMessages.gatewayEUI}
@@ -147,12 +148,14 @@ class GatewayDataForm extends React.Component {
           max={8}
           placeholder={sharedMessages.gatewayEUI}
           component={Input}
+          tooltipId={tooltipIds.GATEWAY_EUI}
         />
         <Form.Field
           title={sharedMessages.gatewayName}
           placeholder={sharedMessages.gatewayNamePlaceholder}
           name="name"
           component={Input}
+          tooltipId={tooltipIds.GATEWAY_NAME}
         />
         <Form.Field
           title={sharedMessages.gatewayDescription}
@@ -161,6 +164,7 @@ class GatewayDataForm extends React.Component {
           name="description"
           type="textarea"
           component={Input}
+          tooltipId={tooltipIds.GATEWAY_DESCRIPTION}
         />
         <Form.Field
           title={sharedMessages.gatewayServerAddress}
@@ -175,6 +179,7 @@ class GatewayDataForm extends React.Component {
           component={Checkbox}
           label={sharedMessages.enabled}
           description={sharedMessages.requireAuthenticatedConnectionDescription}
+          tooltipId={tooltipIds.REQUIRE_AUTHENTICATED_CONNECTION}
         />
         <Form.Field
           title={sharedMessages.gatewayStatus}
@@ -182,6 +187,7 @@ class GatewayDataForm extends React.Component {
           component={Checkbox}
           label={sharedMessages.public}
           description={sharedMessages.statusDescription}
+          tooltipId={tooltipIds.GATEWAY_STATUS}
         />
         <Form.Field
           name="attributes"
@@ -191,13 +197,14 @@ class GatewayDataForm extends React.Component {
           addMessage={sharedMessages.addAttributes}
           component={KeyValueMap}
           description={sharedMessages.attributeDescription}
+          tooltipId={tooltipIds.GATEWAY_ATTRIBUTES}
         />
         <Message component="h4" content={sharedMessages.lorawanOptions} />
         <GsFrequencyPlansSelect
           name="frequency_plan_id"
           menuPlacement="top"
           onChange={this.handleFrequencyPlanChange}
-          glossaryId={glossaryIds.FREQUENCY_PLAN}
+          tooltipId={tooltipIds.FREQUENCY_PLAN}
           warning={showFrequencyPlanWarning ? sharedMessages.frequencyPlanWarning : undefined}
         />
         <Form.Field
@@ -205,13 +212,15 @@ class GatewayDataForm extends React.Component {
           name="schedule_downlink_late"
           component={Checkbox}
           description={sharedMessages.scheduleDownlinkLateDescription}
+          tooltipId={tooltipIds.SCHEDULE_DOWNLINK_LATE}
         />
         <Form.Field
-          title={sharedMessages.dutyCycle}
+          title={sharedMessages.enforceDutyCycle}
           name="enforce_duty_cycle"
           component={Checkbox}
-          label={sharedMessages.enforced}
+          label={sharedMessages.enabled}
           description={sharedMessages.enforceDutyCycleDescription}
+          tooltipId={tooltipIds.ENFORCE_DUTY_CYCLE}
         />
         <Form.Field
           title={sharedMessages.scheduleAnyTimeDelay}
@@ -241,6 +250,7 @@ class GatewayDataForm extends React.Component {
               : undefined
           }
           required
+          tooltipId={tooltipIds.SCHEDULE_ANYTIME_DELAY}
         />
         <Form.SubTitle title={sharedMessages.gatewayUpdateOptions} />
         <Form.Field

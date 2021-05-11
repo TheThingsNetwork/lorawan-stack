@@ -21,7 +21,7 @@ import Wizard from '@ttn-lw/components/wizard'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -90,7 +90,7 @@ const JoinSettingsForm = React.memo(props => {
         mayGenerateValue={mayEditKeys}
         onGenerateValue={generate16BytesKey}
         placeholder={appKeyPlaceholder}
-        glossaryId={glossaryIds.APP_KEY}
+        tooltipId={tooltipIds.APP_KEY}
       />
       {lwVersion >= 110 && (
         <Form.Field
@@ -105,7 +105,7 @@ const JoinSettingsForm = React.memo(props => {
           mayGenerateValue={mayEditKeys}
           onGenerateValue={generate16BytesKey}
           placeholder={nwkKeyPlaceholder}
-          glossaryId={glossaryIds.NETWORK_KEY}
+          tooltipId={tooltipIds.NETWORK_KEY}
         />
       )}
       <Form.CollapseSection

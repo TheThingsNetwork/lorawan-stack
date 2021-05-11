@@ -17,7 +17,7 @@ import { defineMessages } from 'react-intl'
 
 import Field from '@ttn-lw/components/form/field'
 
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import DevAddrInput from './dev-addr-input'
@@ -59,7 +59,7 @@ const DevAddrField = props => {
       generatedError={generatedError}
       generatedLoading={generatedLoading}
       generatedValue={generatedValue}
-      glossaryId={glossaryIds.DEVICE_ADDRESS}
+      tooltipId={tooltipIds.DEVICE_ADDRESS}
     />
   )
 }

@@ -26,6 +26,7 @@ import Require from '@console/lib/components/require'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { mapAttributesToFormValue } from '@console/lib/attributes'
 
@@ -100,6 +101,7 @@ const BasicSettingsForm = React.memo(props => {
         required
         disabled
         component={Input}
+        tooltipId={tooltipIds.GATEWAY_ID}
       />
       <Form.Field
         title={sharedMessages.gatewayEUI}
@@ -109,12 +111,14 @@ const BasicSettingsForm = React.memo(props => {
         max={8}
         placeholder={sharedMessages.gatewayEUI}
         component={Input}
+        tooltipId={tooltipIds.GATEWAY_EUI}
       />
       <Form.Field
         title={sharedMessages.gatewayName}
         placeholder={sharedMessages.gatewayNamePlaceholder}
         name="name"
         component={Input}
+        tooltipId={tooltipIds.GATEWAY_NAME}
       />
       <Form.Field
         title={sharedMessages.gatewayDescription}
@@ -123,6 +127,7 @@ const BasicSettingsForm = React.memo(props => {
         name="description"
         type="textarea"
         component={Input}
+        tooltipId={tooltipIds.GATEWAY_DESCRIPTION}
       />
       <Form.Field
         title={sharedMessages.gatewayServerAddress}
@@ -137,6 +142,7 @@ const BasicSettingsForm = React.memo(props => {
         component={Checkbox}
         label={sharedMessages.enabled}
         description={sharedMessages.requireAuthenticatedConnectionDescription}
+        tooltipId={tooltipIds.REQUIRE_AUTHENTICATED_CONNECTION}
       />
       <Form.Field
         title={sharedMessages.lbsLNSSecret}
@@ -150,6 +156,7 @@ const BasicSettingsForm = React.memo(props => {
         component={Checkbox}
         label={sharedMessages.public}
         description={sharedMessages.statusDescription}
+        tooltipId={tooltipIds.GATEWAY_STATUS}
       />
       <Form.Field
         name="attributes"
@@ -159,6 +166,7 @@ const BasicSettingsForm = React.memo(props => {
         addMessage={sharedMessages.addAttributes}
         component={KeyValueMap}
         description={sharedMessages.attributeDescription}
+        tooltipId={tooltipIds.GATEWAY_ATTRIBUTES}
       />
       <Form.Field
         title={sharedMessages.automaticUpdates}

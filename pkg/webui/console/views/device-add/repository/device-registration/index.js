@@ -27,7 +27,7 @@ import JoinEUIPRefixesInput from '@console/components/join-eui-prefixes-input'
 
 import DevAddrInput from '@console/containers/dev-addr-input'
 
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -83,7 +83,7 @@ const Registration = props => {
       <div data-test-id="device-registration">
         <FreqPlansSelect
           required
-          glossaryId={glossaryIds.FREQUENCY_PLAN}
+          tooltipId={tooltipIds.FREQUENCY_PLAN}
           name="frequency_plan_id"
           bandId={band}
         />
@@ -96,7 +96,7 @@ const Registration = props => {
               prefixes={prefixes}
               required
               showPrefixes
-              glossaryId={glossaryIds.JOIN_EUI}
+              tooltipId={tooltipIds.JOIN_EUI}
             />
             <Form.Field
               title={sharedMessages.devEUI}
@@ -106,7 +106,7 @@ const Registration = props => {
               max={8}
               required
               component={Input}
-              glossaryId={glossaryIds.DEV_EUI}
+              tooltipId={tooltipIds.DEV_EUI}
               onBlur={onIdPrefill}
             />
             <Form.Field
@@ -120,7 +120,7 @@ const Registration = props => {
               disabled={!mayEditKeys}
               mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
-              glossaryId={glossaryIds.APP_KEY}
+              tooltipId={tooltipIds.APP_KEY}
               placeholder={appKeyPlaceholder}
             />
             {lwVersion >= 110 && (
@@ -136,7 +136,7 @@ const Registration = props => {
                 mayGenerateValue={mayEditKeys}
                 onGenerateValue={generate16BytesKey}
                 placeholder={nwkKeyPlaceholder}
-                glossaryId={glossaryIds.NETWORK_KEY}
+                tooltipId={tooltipIds.NETWORK_KEY}
               />
             )}
           </>
@@ -153,7 +153,7 @@ const Registration = props => {
                 max={8}
                 required
                 component={Input}
-                glossaryId={glossaryIds.DEV_EUI}
+                tooltipId={tooltipIds.DEV_EUI}
               />
             )}
             <Form.Field
@@ -166,7 +166,7 @@ const Registration = props => {
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
-              glossaryId={glossaryIds.APP_SESSION_KEY}
+              tooltipId={tooltipIds.APP_SESSION_KEY}
             />
             <Form.Field
               mayGenerateValue
@@ -178,11 +178,7 @@ const Registration = props => {
               required
               component={Input.Generate}
               onGenerateValue={generate16BytesKey}
-              glossaryId={
-                lwVersion >= 110
-                  ? glossaryIds.NETWORK_SESSION_KEY
-                  : glossaryIds.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
-              }
+              tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
             />
             {lwVersion >= 110 && (
               <Form.Field
@@ -196,7 +192,6 @@ const Registration = props => {
                 description={sharedMessages.sNwkSIKeyDescription}
                 component={Input.Generate}
                 onGenerateValue={generate16BytesKey}
-                glossaryId={glossaryIds.SERVING_NETWORK_SESSION_INTEGRITY_KEY}
               />
             )}
             {lwVersion >= 110 && (
@@ -211,7 +206,6 @@ const Registration = props => {
                 description={sharedMessages.nwkSEncKeyDescription}
                 component={Input.Generate}
                 onGenerateValue={generate16BytesKey}
-                glossaryId={glossaryIds.NETWORK_SESSION_ENCRYPTION_KEY}
               />
             )}
           </>
@@ -224,7 +218,7 @@ const Registration = props => {
           component={Input}
           onFocus={handleIdFocus}
           inputRef={idInputRef}
-          glossaryId={glossaryIds.DEVICE_ID}
+          tooltipId={tooltipIds.DEVICE_ID}
         />
         <Form.Field title={m.afterRegistration} name="_registration" component={Radio.Group}>
           <Radio label={m.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />

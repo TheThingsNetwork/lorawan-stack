@@ -64,7 +64,7 @@ describe('Gateway create', () => {
     cy.findByRole('button', { name: /Add attributes/ }).should('be.visible')
     cy.findByLabelText('Frequency plan').should('be.visible')
     cy.findByLabelText('Schedule downlink late').should('exist')
-    cy.findByLabelText('Duty cycle').should('exist')
+    cy.findByLabelText('Enforce duty cycle').should('exist')
     cy.findByTestId('schedule_anytime_delay').should('be.visible')
     cy.findByLabelText('Automatic updates').should('exist')
     cy.findDescriptionByLabelText('Automatic updates')

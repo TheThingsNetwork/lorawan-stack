@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- More contextual tooltips to end device and gateway form fields in the Console.
+
 ### Changed
 
 ### Deprecated

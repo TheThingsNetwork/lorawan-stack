@@ -73,13 +73,13 @@ class FormField extends React.Component {
     description: PropTypes.message,
     disabled: PropTypes.bool,
     encode: PropTypes.func,
-    glossaryId: PropTypes.string,
     name: PropTypes.string.isRequired,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
     readOnly: PropTypes.bool,
     required: PropTypes.bool,
     title: PropTypes.message,
+    tooltipId: PropTypes.string,
     warning: PropTypes.message,
   }
 
@@ -93,10 +93,10 @@ class FormField extends React.Component {
     onBlur: () => null,
     warning: '',
     description: '',
-    glossaryId: '',
     readOnly: false,
     required: false,
     title: undefined,
+    tooltipId: '',
   }
 
   componentDidMount() {
@@ -177,7 +177,7 @@ class FormField extends React.Component {
       disabled,
       required,
       readOnly,
-      glossaryId,
+      tooltipId,
       autoWidth,
       component: Component,
     } = this.props
@@ -191,7 +191,7 @@ class FormField extends React.Component {
     const hasError = Boolean(fieldError)
     const hasWarning = Boolean(warning)
     const hasDescription = Boolean(description)
-    const hasGlossaryTerm = Boolean(glossaryId)
+    const hasTooltip = Boolean(tooltipId)
     const hasTitle = Boolean(title)
 
     const showError = fieldTouched && hasError
@@ -219,8 +219,8 @@ class FormField extends React.Component {
     ) : null
 
     let tooltipIcon = null
-    if (hasGlossaryTerm) {
-      tooltipIcon = <Tooltip glossaryId={glossaryId} glossaryTerm={title} />
+    if (hasTooltip) {
+      tooltipIcon = <Tooltip id={tooltipId} glossaryTerm={title} />
     }
 
     const fieldComponentProps = {
@@ -242,7 +242,7 @@ class FormField extends React.Component {
         warning: showWarning,
         required,
         readOnly,
-        hasGlossaryTerm,
+        hasTooltip,
         autoWidth,
       }),
     )

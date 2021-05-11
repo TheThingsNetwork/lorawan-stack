@@ -22,7 +22,7 @@ import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
 import JoinEUIPRefixesInput from '@console/components/join-eui-prefixes-input'
 
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -69,7 +69,7 @@ const BasicSettingsForm = props => {
         name="ids.device_id"
         placeholder={sharedMessages.deviceIdPlaceholder}
         component={Input}
-        glossaryId={glossaryIds.DEVICE_ID}
+        tooltipId={tooltipIds.DEVICE_ID}
       />
       {!isNone && (
         <>
@@ -81,7 +81,7 @@ const BasicSettingsForm = props => {
               prefixes={prefixes}
               required
               showPrefixes
-              glossaryId={glossaryIds.JOIN_EUI}
+              tooltipId={tooltipIds.JOIN_EUI}
             />
           )}
           {!isMulticast && (
@@ -93,7 +93,7 @@ const BasicSettingsForm = props => {
               max={8}
               required={isOTAA || lwVersion === 104}
               component={Input}
-              glossaryId={glossaryIds.DEV_EUI}
+              tooltipId={tooltipIds.DEV_EUI}
             />
           )}
         </>
@@ -104,6 +104,7 @@ const BasicSettingsForm = props => {
         placeholder={sharedMessages.deviceNamePlaceholder}
         description={sharedMessages.deviceNameDescription}
         component={Input}
+        tooltipId={tooltipIds.DEVICE_NAME}
       />
       <Form.Field
         title={sharedMessages.devDesc}
@@ -112,6 +113,7 @@ const BasicSettingsForm = props => {
         placeholder={sharedMessages.deviceDescPlaceholder}
         description={sharedMessages.deviceDescDescription}
         component={Input}
+        tooltipId={tooltipIds.DEVICE_DESCRIPTION}
       />
     </Wizard.Form>
   )

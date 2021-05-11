@@ -29,6 +29,7 @@ import style from './link.styl'
 
 const m = defineMessages({
   glossaryTitle: 'See "{term}" in the glossary',
+  defaultGlossaryTitle: 'See in the glossary',
 })
 
 const appRoot = selectApplicationRootPath()
@@ -191,7 +192,7 @@ DocLink.propTypes = {
       pathname: PropTypes.string,
       search: PropTypes.string,
       hash: PropTypes.string,
-      state: PropTypes.object,
+      state: PropTypes.shape({}),
     }),
   ]),
 }
@@ -209,14 +210,16 @@ Link.DocLink = DocLink
 
 const GlossaryLink = ({ title, glossaryId, term, primary, secondary, className }) => {
   const { formatMessage } = useIntl()
+  const hasTerm = Boolean(term)
+
   return (
     <Link.DocLink
       primary={primary}
       secondary={secondary}
       className={className}
       path={`/reference/glossary#${glossaryId}`}
-      title={m.glossaryTitle}
-      titleValues={{ term: formatTitle(term, undefined, formatMessage) }}
+      title={hasTerm ? m.glossaryTitle : m.defaultGlossaryTitle}
+      titleValues={hasTerm ? { term: formatTitle(term, undefined, formatMessage) } : undefined}
       tabIndex="-1"
       external
     >
@@ -230,7 +233,7 @@ GlossaryLink.propTypes = {
   glossaryId: PropTypes.string.isRequired,
   primary: PropTypes.bool,
   secondary: PropTypes.bool,
-  term: PropTypes.message.isRequired,
+  term: PropTypes.message,
   title: PropTypes.message.isRequired,
 }
 
@@ -238,6 +241,7 @@ GlossaryLink.defaultProps = {
   className: '',
   primary: false,
   secondary: false,
+  term: undefined,
 }
 
 Link.GlossaryLink = GlossaryLink
