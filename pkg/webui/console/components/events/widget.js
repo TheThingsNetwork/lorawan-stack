@@ -44,7 +44,7 @@ const EventsWidget = ({ toAllUrl, className, events, scoped, entityId }) => {
       linkMessage={m.seeAllActivity}
       className={className}
     >
-      <Link to={toAllUrl}>
+      <Link className={style.bodyLink} to={toAllUrl}>
         <div className={classnames(style.body, style.widgetContainer)} data-test-id="events-widget">
           {events.length === 0 ? (
             <EmptyMessage entityId={entityId} />
