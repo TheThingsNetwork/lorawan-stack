@@ -94,7 +94,7 @@ func TestPba(t *testing.T) {
 					Registration: &ttnpb.PacketBrokerNetwork{
 						Id: &ttnpb.PacketBrokerNetworkIdentifier{
 							NetID:    0x13,
-							TenantID: "foo-tenant",
+							TenantId: "foo-tenant",
 						},
 						Name: "Test Network",
 						DevAddrBlocks: []*ttnpb.PacketBrokerDevAddrBlock{
@@ -168,7 +168,7 @@ func TestPba(t *testing.T) {
 				a.So(res, should.Resemble, &ttnpb.PacketBrokerNetwork{
 					Id: &ttnpb.PacketBrokerNetworkIdentifier{
 						NetID:    0x13,
-						TenantID: "foo-tenant",
+						TenantId: "foo-tenant",
 					},
 					Name: "Test Network",
 					DevAddrBlocks: []*ttnpb.PacketBrokerDevAddrBlock{
@@ -269,7 +269,7 @@ func TestPba(t *testing.T) {
 				a.So(res, should.Resemble, &ttnpb.PacketBrokerNetwork{
 					Id: &ttnpb.PacketBrokerNetworkIdentifier{
 						NetID:    0x13,
-						TenantID: "foo-tenant",
+						TenantId: "foo-tenant",
 					},
 					Name: "Test Network",
 					DevAddrBlocks: []*ttnpb.PacketBrokerDevAddrBlock{
@@ -489,7 +489,7 @@ func TestPba(t *testing.T) {
 							a.So(policies[i], should.Resemble, &ttnpb.PacketBrokerRoutingPolicy{
 								ForwarderId: &ttnpb.PacketBrokerNetworkIdentifier{
 									NetID:    0x13,
-									TenantID: "foo-tenant",
+									TenantId: "foo-tenant",
 								},
 								HomeNetworkId: &ttnpb.PacketBrokerNetworkIdentifier{
 									NetID: uint32(i) + 1,
@@ -608,7 +608,7 @@ func TestPba(t *testing.T) {
 							} else {
 								a.So(n.Id, should.Resemble, &ttnpb.PacketBrokerNetworkIdentifier{
 									NetID:    uint32(i),
-									TenantID: fmt.Sprintf("tenant-%d", i),
+									TenantId: fmt.Sprintf("tenant-%d", i),
 								})
 							}
 							a.So(n.Name, should.Equal, fmt.Sprintf("Network %06X", i))
@@ -675,7 +675,7 @@ func TestPba(t *testing.T) {
 							} else {
 								a.So(n.Id, should.Resemble, &ttnpb.PacketBrokerNetworkIdentifier{
 									NetID:    uint32(i),
-									TenantID: fmt.Sprintf("tenant-%d", i),
+									TenantId: fmt.Sprintf("tenant-%d", i),
 								})
 							}
 							a.So(n.Name, should.Equal, fmt.Sprintf("Network %06X", i))

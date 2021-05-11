@@ -54,14 +54,14 @@ func (m *PacketBrokerNetworkIdentifier) ValidateFields(paths ...string) error {
 			// no validation rules for NetID
 		case "tenant_id":
 
-			if utf8.RuneCountInString(m.GetTenantID()) > 36 {
+			if utf8.RuneCountInString(m.GetTenantId()) > 36 {
 				return PacketBrokerNetworkIdentifierValidationError{
 					field:  "tenant_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_PacketBrokerNetworkIdentifier_TenantID_Pattern.MatchString(m.GetTenantID()) {
+			if !_PacketBrokerNetworkIdentifier_TenantId_Pattern.MatchString(m.GetTenantId()) {
 				return PacketBrokerNetworkIdentifierValidationError{
 					field:  "tenant_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$\"",
@@ -135,7 +135,7 @@ var _ interface {
 	ErrorName() string
 } = PacketBrokerNetworkIdentifierValidationError{}
 
-var _PacketBrokerNetworkIdentifier_TenantID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+var _PacketBrokerNetworkIdentifier_TenantId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
 
 // ValidateFields checks the field values on PacketBrokerDevAddrBlock with the
 // rules defined in the proto definition for this message. If any rules are

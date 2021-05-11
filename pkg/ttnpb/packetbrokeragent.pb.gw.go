@@ -345,7 +345,7 @@ func request_Pba_GetHomeNetworkRoutingPolicy_1(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tenant_id")
 	}
 
-	protoReq.TenantID, err = runtime.String(val)
+	protoReq.TenantId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tenant_id", err)
@@ -383,7 +383,7 @@ func local_request_Pba_GetHomeNetworkRoutingPolicy_1(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tenant_id")
 	}
 
-	protoReq.TenantID, err = runtime.String(val)
+	protoReq.TenantId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tenant_id", err)
@@ -817,7 +817,7 @@ func request_Pba_DeleteHomeNetworkRoutingPolicy_1(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tenant_id")
 	}
 
-	protoReq.TenantID, err = runtime.String(val)
+	protoReq.TenantId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tenant_id", err)
@@ -855,7 +855,7 @@ func local_request_Pba_DeleteHomeNetworkRoutingPolicy_1(ctx context.Context, mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tenant_id")
 	}
 
-	protoReq.TenantID, err = runtime.String(val)
+	protoReq.TenantId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tenant_id", err)

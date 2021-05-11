@@ -118,13 +118,13 @@ func asRoutingPolicy(policy *packetbroker.RoutingPolicy) *ttnpb.PacketBrokerRout
 	if policy.HomeNetworkNetId != 0 || policy.HomeNetworkTenantId != "" {
 		homeNetworkID = &ttnpb.PacketBrokerNetworkIdentifier{
 			NetID:    policy.GetHomeNetworkNetId(),
-			TenantID: policy.GetHomeNetworkTenantId(),
+			TenantId: policy.GetHomeNetworkTenantId(),
 		}
 	}
 	return &ttnpb.PacketBrokerRoutingPolicy{
 		ForwarderId: &ttnpb.PacketBrokerNetworkIdentifier{
 			NetID:    policy.GetForwarderNetId(),
-			TenantID: policy.GetForwarderTenantId(),
+			TenantId: policy.GetForwarderTenantId(),
 		},
 		HomeNetworkId: homeNetworkID,
 		UpdatedAt:     policy.GetUpdatedAt(),
