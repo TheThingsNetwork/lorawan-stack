@@ -71,7 +71,7 @@ func ToDeviceID(uid string) (id ttnpb.EndDeviceIdentifiers, err error) {
 		return ttnpb.EndDeviceIdentifiers{}, errFormat.WithAttributes("value", uid)
 	}
 	id.ApplicationIdentifiers.ApplicationId = uid[:sepIdx]
-	id.DeviceID = uid[sepIdx+1:]
+	id.DeviceId = uid[sepIdx+1:]
 	if err := id.ValidateFields("device_id", "application_ids"); err != nil {
 		return ttnpb.EndDeviceIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}

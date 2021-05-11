@@ -47,8 +47,8 @@ func TestFromDownlinkMessage(t *testing.T) {
 			Name: "SampleDownlink",
 			DownlinkMessage: ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
-				EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-					DeviceID: "testdevice",
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
+					DeviceId: "testdevice",
 				},
 				Settings: &ttnpb.DownlinkMessage_Scheduled{
 					Scheduled: &ttnpb.TxSettings{
@@ -79,8 +79,8 @@ func TestFromDownlinkMessage(t *testing.T) {
 			Name: "WithAbsoluteTime",
 			DownlinkMessage: ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
-				EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-					DeviceID: "testdevice",
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
+					DeviceId: "testdevice",
 				},
 				Settings: &ttnpb.DownlinkMessage_Scheduled{
 					Scheduled: &ttnpb.TxSettings{

@@ -53,7 +53,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 			matched = reflect.DeepEqual(match, &UplinkMatch{
 				ApplicationIdentifiers: expectedMatch.ApplicationIdentifiers,
-				DeviceID:               expectedMatch.DeviceID,
+				DeviceID:               expectedMatch.DeviceId,
 				LoRaWANVersion:         expectedMACState.LoRaWANVersion,
 				FNwkSIntKey:            expectedSession.FNwkSIntKey,
 				LastFCnt:               expectedSession.LastFCntUp,
@@ -99,7 +99,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
 
-		stored, storedCtx, err := reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+		stored, storedCtx, err := reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel)
 		if !test.AllTrue(
 			a.So(err, should.NotBeNil),
 			a.So(errors.IsNotFound(err), should.BeTrue),
@@ -121,7 +121,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			return false
 		}
 
-		stored, storedCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel,
+		stored, storedCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel,
 			func(storedCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 				a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 				if !a.So(stored, should.BeNil) {
@@ -166,7 +166,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		}
 		ctx = storedCtx
 
-		stored, storedCtx, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
+		stored, storedCtx, err = reg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel)
 		if !test.AllTrue(
 			a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
@@ -188,7 +188,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		}
 		ctx = storedCtx
 
-		stored, storedCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID, fields,
+		stored, storedCtx, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceId, fields,
 			func(storedCtx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 				a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 				a.So(stored, should.Resemble, pb)
@@ -216,7 +216,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-			DeviceID:               "test-dev",
+			DeviceId:               "test-dev",
 		},
 		Session: &ttnpb.Session{
 			DevAddr:    types.DevAddr{0x42, 0xff, 0xff, 0xff},
@@ -301,7 +301,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	pbOther.Session.LastFCntUp = pbCurrentUp.Payload.GetMACPayload().FCnt
 	pbOther.Session.FNwkSIntKey.Key = &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe}
 	pbOther.PendingSession = nil
-	pbOther.EndDeviceIdentifiers.DeviceID = "test-dev-other"
+	pbOther.EndDeviceIdentifiers.DeviceId = "test-dev-other"
 	pbOther.EndDeviceIdentifiers.DevEUI = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
 	pbOtherCurrentUp := MakeDataUplink(WithDeviceDataUplinkConfig(pbOther, false, ttnpb.DATA_RATE_2, 1, 0)(DataUplinkConfig{
@@ -343,7 +343,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		t.Fatal("cached pbOther current session uplink matching assertion failed")
 	}
 
-	err := DeleteDevice(ctx, reg, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID)
+	err := DeleteDevice(ctx, reg, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceId)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("pb deletion failed with: %s", errors.Stack(err))
 	}
@@ -360,7 +360,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		t.Fatal("pbOther current session uplink matching assertion failed")
 	}
 
-	err = DeleteDevice(ctx, reg, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceID)
+	err = DeleteDevice(ctx, reg, pbOther.EndDeviceIdentifiers.ApplicationIdentifiers, pbOther.EndDeviceIdentifiers.DeviceId)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("pbOther deletion failed with: %s", errors.Stack(err))
 	}

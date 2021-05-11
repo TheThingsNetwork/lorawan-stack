@@ -35,19 +35,19 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: "test-app",
 			},
-			DeviceID: "test-dev",
+			DeviceId: "test-dev",
 		},
 		{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: "test-app2",
 			},
-			DeviceID: "test-dev",
+			DeviceId: "test-dev",
 		},
 		{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: "test-app2",
 			},
-			DeviceID: "test-dev2",
+			DeviceId: "test-dev2",
 		},
 	}
 

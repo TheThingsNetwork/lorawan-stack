@@ -96,7 +96,7 @@ func TestRoundtrip(t *testing.T) {
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
-				DeviceID: "foo-device",
+				DeviceId: "foo-device",
 			},
 			"foo-app.foo-device",
 			func(uid string) (ttnpb.IDStringer, error) { return ToDeviceID(uid) },
@@ -106,7 +106,7 @@ func TestRoundtrip(t *testing.T) {
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
-				DeviceID: "foo-device",
+				DeviceId: "foo-device",
 			},
 			"foo-app.foo-device",
 			func(uid string) (ttnpb.IDStringer, error) { return ToDeviceID(uid) },
@@ -298,7 +298,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
-				DeviceID: "foo-device",
+				DeviceId: "foo-device",
 			},
 			nil,
 		},
@@ -309,7 +309,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
-				DeviceID: "foo",
+				DeviceId: "foo",
 			},
 			nil,
 		},
@@ -320,7 +320,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
-				DeviceID: "ozaj8qs0sait7oudxqbfyx6b14yuahcfrdlb",
+				DeviceId: "ozaj8qs0sait7oudxqbfyx6b14yuahcfrdlb",
 			},
 			nil,
 		},
@@ -331,7 +331,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
-				DeviceID: "1d1",
+				DeviceId: "1d1",
 			},
 			nil,
 		},

@@ -342,7 +342,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -355,7 +355,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -400,7 +400,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -431,7 +431,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -465,7 +465,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -515,7 +515,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -564,7 +564,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -649,7 +649,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -725,7 +725,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -876,7 +876,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -1037,7 +1037,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -1192,7 +1192,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -1350,7 +1350,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -1489,7 +1489,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -1652,7 +1652,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -1788,7 +1788,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:         test.EUFrequencyPlanID,
@@ -1921,7 +1921,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -2081,7 +2081,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -2221,7 +2221,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -2283,7 +2283,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -2356,7 +2356,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
 					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
@@ -2466,7 +2466,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				ids := ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: dev.ApplicationIdentifiers,
-					DeviceID:               dev.DeviceID,
+					DeviceId:               dev.DeviceId,
 					DevEUI:                 dev.DevEUI,
 					JoinEUI:                dev.JoinEUI,
 					DevAddr:                &dev.PendingMACState.QueuedJoinAccept.DevAddr,
@@ -2535,7 +2535,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 				test.Must(nil, env.DownlinkTasks.Add(ctx, ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 				}, time.Now(), true))
 
 				var (

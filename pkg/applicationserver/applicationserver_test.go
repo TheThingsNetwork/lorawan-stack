@@ -82,7 +82,7 @@ func TestApplicationServer(t *testing.T) {
 	registeredDevice := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: registeredApplicationID,
-			DeviceID:               "foo-device",
+			DeviceId:               "foo-device",
 			JoinEUI:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 		},
@@ -137,7 +137,7 @@ func TestApplicationServer(t *testing.T) {
 	// and on uplink.
 	unregisteredDeviceID := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,
-		DeviceID:               "bar-device",
+		DeviceId:               "bar-device",
 		JoinEUI:                eui64Ptr(types.EUI64{0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 		DevEUI:                 eui64Ptr(types.EUI64{0x24, 0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 	}
@@ -419,7 +419,7 @@ func TestApplicationServer(t *testing.T) {
 							chs.downErr <- err
 							continue
 						}
-						token := client.Publish(fmt.Sprintf(topicFmt, unique.ID(ctx, req.ApplicationIdentifiers), req.DeviceID), 1, false, buf)
+						token := client.Publish(fmt.Sprintf(topicFmt, unique.ID(ctx, req.ApplicationIdentifiers), req.DeviceId), 1, false, buf)
 						token.Wait()
 						chs.downErr <- token.Error()
 					}
@@ -811,7 +811,7 @@ func TestApplicationServer(t *testing.T) {
 							continue
 						}
 						url := fmt.Sprintf("http://127.0.0.1:8099/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/%s",
-							data.ApplicationId, registeredApplicationWebhookID.WebhookID, data.DeviceID, action,
+							data.ApplicationId, registeredApplicationWebhookID.WebhookID, data.DeviceId, action,
 						)
 						req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
 						if err != nil {
@@ -2225,7 +2225,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	registeredDevice := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: registeredApplicationID,
-			DeviceID:               "foo-device",
+			DeviceId:               "foo-device",
 			JoinEUI:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 		},

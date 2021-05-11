@@ -75,7 +75,7 @@ var (
 			if err != nil {
 				return err
 			}
-			req = req.WithEndDeviceIDs(ids)
+			req = req.WithEndDeviceIds(ids)
 			client, err := ttnpb.NewApplicationUpStorageClient(as).GetStoredApplicationUp(ctx, req)
 			if err != nil {
 				return err

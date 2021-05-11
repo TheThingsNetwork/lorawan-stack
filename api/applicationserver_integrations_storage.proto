@@ -31,7 +31,7 @@ message GetStoredApplicationUpRequest {
   // Query upstream messages from all end devices of an application. Cannot be used in conjunction with end_device_ids.
   ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = true];
   // Query upstream messages from a single end device. Cannot be used in conjunction with application_ids.
-  EndDeviceIdentifiers end_device_ids = 2 [(gogoproto.nullable) = true, (gogoproto.customname) = "EndDeviceIDs"];
+  EndDeviceIdentifiers end_device_ids = 2 [(gogoproto.nullable) = true];
 
   // Query upstream messages of a specific type. If not set, then all upstream messages are returned.
   string type = 3 [(validate.rules).string = { in: [

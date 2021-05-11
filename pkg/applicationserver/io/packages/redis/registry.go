@@ -219,14 +219,14 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 				if err != nil {
 					return err
 				}
-				if updated.ApplicationId != ids.ApplicationId || updated.DeviceID != ids.DeviceID || updated.FPort != ids.FPort {
+				if updated.ApplicationId != ids.ApplicationId || updated.DeviceId != ids.DeviceId || updated.FPort != ids.FPort {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
 				if ttnpb.HasAnyField(sets, "ids.end_device_ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {
 					return errReadOnlyField.WithAttributes("field", "ids.end_device_ids.application_ids.application_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.end_device_ids.device_id") && pb.DeviceID != stored.DeviceID {
+				if ttnpb.HasAnyField(sets, "ids.end_device_ids.device_id") && pb.DeviceId != stored.DeviceId {
 					return errReadOnlyField.WithAttributes("field", "ids.end_device_ids.device_id")
 				}
 				if ttnpb.HasAnyField(sets, "ids.f_port") && pb.FPort != stored.FPort {

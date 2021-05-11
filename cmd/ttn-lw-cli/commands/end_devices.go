@@ -126,7 +126,7 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 	}
 	ids := &ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
-		DeviceID:               deviceID,
+		DeviceId:               deviceID,
 	}
 	if joinEUIHex, _ := flagSet.GetString("join-eui"); joinEUIHex != "" {
 		var joinEUI types.EUI64
@@ -503,8 +503,8 @@ var (
 
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
 			if devID != nil {
-				if devID.DeviceID != "" {
-					device.DeviceID = devID.DeviceID
+				if devID.DeviceId != "" {
+					device.DeviceId = devID.DeviceId
 				}
 				if devID.ApplicationId != "" {
 					device.ApplicationId = devID.ApplicationId
@@ -525,7 +525,7 @@ var (
 			if device.ApplicationId == "" {
 				return errNoApplicationID
 			}
-			if device.DeviceID == "" {
+			if device.DeviceId == "" {
 				return errNoEndDeviceID
 			}
 
@@ -739,7 +739,7 @@ var (
 						return err
 					}
 					ids.ApplicationIdentifiers = *appID
-					list.EndDeviceIDs = append(list.EndDeviceIDs, ids)
+					list.EndDeviceIds = append(list.EndDeviceIds, ids)
 				}
 				req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_List{
 					List: list,
@@ -968,7 +968,7 @@ values will be stored in the Join Server.`,
 				}
 			}
 
-			req.TargetDeviceID, _ = cmd.Flags().GetString("target-device-id")
+			req.TargetDeviceId, _ = cmd.Flags().GetString("target-device-id")
 			if netIDHex, _ := cmd.Flags().GetString("target-net-id"); netIDHex != "" {
 				if err := req.TargetNetID.UnmarshalText([]byte(netIDHex)); err != nil {
 					return err
@@ -1042,7 +1042,7 @@ This command may take end device identifiers from stdin.`,
 				if dev.ApplicationId == "" {
 					return errNoApplicationID
 				}
-				if dev.DeviceID == "" {
+				if dev.DeviceId == "" {
 					return errNoEndDeviceID
 				}
 				ids = &dev.EndDeviceIdentifiers
@@ -1134,7 +1134,7 @@ This command may take end device identifiers from stdin.`,
 			if exts, err := mime.ExtensionsByType(res.Image.Embedded.MimeType); err == nil && len(exts) > 0 {
 				ext = exts[0]
 			}
-			filename := path.Join(folder, device.DeviceID+ext)
+			filename := path.Join(folder, device.DeviceId+ext)
 			if err := ioutil.WriteFile(filename, res.Image.Embedded.Data, 0o644); err != nil {
 				return err
 			}

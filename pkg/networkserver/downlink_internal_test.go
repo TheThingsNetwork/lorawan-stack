@@ -155,7 +155,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
@@ -180,7 +180,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{
@@ -212,7 +212,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{
@@ -241,7 +241,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
@@ -308,7 +308,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
+						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
 					MACState: &ttnpb.MACState{
@@ -358,7 +358,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
@@ -428,7 +428,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
+						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
 					MACState: &ttnpb.MACState{
@@ -465,7 +465,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
@@ -543,7 +543,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
+						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
 					MACState: &ttnpb.MACState{
@@ -587,7 +587,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
@@ -660,7 +660,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
+						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
 					MACState: &ttnpb.MACState{
@@ -696,7 +696,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
@@ -778,7 +778,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
+						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
 					MACState: &ttnpb.MACState{
@@ -822,7 +822,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{
@@ -893,7 +893,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
+						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
 					MACSettings: &ttnpb.MACSettings{
@@ -943,7 +943,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
-					DeviceID:               devID,
+					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{
@@ -1012,7 +1012,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
+						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
 					MACSettings: &ttnpb.MACSettings{

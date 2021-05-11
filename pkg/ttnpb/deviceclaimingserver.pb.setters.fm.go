@@ -34,10 +34,10 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 				return fmt.Errorf("'target_device_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TargetDeviceID = src.TargetDeviceID
+				dst.TargetDeviceId = src.TargetDeviceId
 			} else {
 				var zero string
-				dst.TargetDeviceID = zero
+				dst.TargetDeviceId = zero
 			}
 		case "target_network_server_address":
 			if len(subs) > 0 {

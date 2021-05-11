@@ -64,7 +64,7 @@ func (m *GetStoredApplicationUpRequest) ValidateFields(paths ...string) error {
 
 		case "end_device_ids":
 
-			if v, ok := interface{}(m.GetEndDeviceIDs()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetEndDeviceIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetStoredApplicationUpRequestValidationError{
 						field:  "end_device_ids",

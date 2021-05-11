@@ -284,7 +284,7 @@ func (s *entitySearch) FindEndDevices(ctx context.Context, req *ttnpb.SearchEndD
 	for i, result := range results {
 		identifiers[i] = &ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: req.ApplicationId},
-			DeviceID:               result.FriendlyID,
+			DeviceId:               result.FriendlyID,
 		}
 	}
 	return identifiers, nil

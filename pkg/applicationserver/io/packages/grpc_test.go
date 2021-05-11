@@ -43,8 +43,8 @@ var (
 	registeredApplicationUID  = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey  = "test-key"
 	unregisteredApplicationID = ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-app"}
-	registeredDeviceID        = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: registeredApplicationID, DeviceID: "test-dev"}
-	unregisteredDeviceID      = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: unregisteredApplicationID, DeviceID: "invalid-dev"}
+	registeredDeviceID        = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: registeredApplicationID, DeviceId: "test-dev"}
+	unregisteredDeviceID      = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: unregisteredApplicationID, DeviceId: "invalid-dev"}
 	registeredAssociationID   = ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIdentifiers: registeredDeviceID, FPort: 123}
 	unregisteredAssociationID = ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIdentifiers: unregisteredDeviceID, FPort: 123}
 	registeredApplicationUp1  = ttnpb.ApplicationUp{

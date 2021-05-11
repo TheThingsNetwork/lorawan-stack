@@ -59,7 +59,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	if err = rights.RequireApplication(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	if err = blacklist.Check(ctx, req.DeviceID); err != nil {
+	if err = blacklist.Check(ctx, req.DeviceId); err != nil {
 		return nil, err
 	}
 
@@ -86,7 +86,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 				return nil, errEndDeviceEUIsTaken.WithAttributes(
 					"join_eui", req.JoinEUI.String(),
 					"dev_eui", req.DevEUI.String(),
-					"device_id", ids.GetDeviceID(),
+					"device_id", ids.GetDeviceId(),
 					"application_id", ids.GetApplicationId(),
 				)
 			}

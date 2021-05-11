@@ -33,7 +33,7 @@ func (ids *EndDeviceIdentifiers) ExtractRequestFields(m map[string]interface{}) 
 		return
 	}
 	m["application_id"] = ids.ApplicationId
-	m["device_id"] = ids.DeviceID
+	m["device_id"] = ids.DeviceId
 }
 
 func (ids *GatewayIdentifiers) ExtractRequestFields(m map[string]interface{}) {

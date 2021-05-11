@@ -46,7 +46,7 @@ func (ids ClientIdentifiers) IsZero() bool {
 
 // IsZero reports whether ids represent zero identifiers.
 func (ids EndDeviceIdentifiers) IsZero() bool {
-	return ids.GetDeviceID() == "" &&
+	return ids.GetDeviceId() == "" &&
 		ids.GetApplicationId() == "" &&
 		(ids.DevAddr == nil || ids.DevAddr.IsZero()) &&
 		(ids.DevEUI == nil || ids.DevEUI.IsZero()) &&
@@ -68,7 +68,7 @@ func (v *EndDeviceIdentifiers) FieldIsZero(p string) bool {
 	case "dev_eui":
 		return v.DevEUI == nil
 	case "device_id":
-		return v.DeviceID == ""
+		return v.DeviceId == ""
 	case "join_eui":
 		return v.JoinEUI == nil
 	}
@@ -123,7 +123,7 @@ func (ids UserIdentifiers) OrganizationOrUserIdentifiers() *OrganizationOrUserId
 // Copy stores a copy of ids in x and returns it.
 func (ids EndDeviceIdentifiers) Copy(x *EndDeviceIdentifiers) *EndDeviceIdentifiers {
 	*x = EndDeviceIdentifiers{
-		DeviceID: ids.DeviceID,
+		DeviceId: ids.DeviceId,
 		ApplicationIdentifiers: ApplicationIdentifiers{
 			ApplicationId: ids.ApplicationId,
 		},

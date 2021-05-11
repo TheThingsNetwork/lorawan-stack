@@ -71,7 +71,7 @@ func (r *DeviceRegistry) provisionerKey(provisionerID, pid string) string {
 func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
-		DeviceID:               devID,
+		DeviceId:               devID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err
@@ -226,7 +226,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 			}
-			if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceID != stored.DeviceID {
+			if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceId != stored.DeviceId {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.device_id")
 			}
 			if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.JoinEUI, stored.JoinEUI) {
@@ -337,7 +337,7 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
-		DeviceID:               devID,
+		DeviceId:               devID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err
@@ -354,7 +354,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			if err != nil {
 				return nil, nil, err
 			}
-			if stored == nil && updated != nil && (updated.ApplicationIdentifiers != appID || updated.DeviceID != devID) {
+			if stored == nil && updated != nil && (updated.ApplicationIdentifiers != appID || updated.DeviceId != devID) {
 				return nil, nil, errInvalidIdentifiers.New()
 			}
 			return updated, sets, nil

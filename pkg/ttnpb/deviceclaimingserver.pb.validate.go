@@ -64,14 +64,14 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 
 		case "target_device_id":
 
-			if utf8.RuneCountInString(m.GetTargetDeviceID()) > 36 {
+			if utf8.RuneCountInString(m.GetTargetDeviceId()) > 36 {
 				return ClaimEndDeviceRequestValidationError{
 					field:  "target_device_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_ClaimEndDeviceRequest_TargetDeviceID_Pattern.MatchString(m.GetTargetDeviceID()) {
+			if !_ClaimEndDeviceRequest_TargetDeviceId_Pattern.MatchString(m.GetTargetDeviceId()) {
 				return ClaimEndDeviceRequestValidationError{
 					field:  "target_device_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$\"",
@@ -239,7 +239,7 @@ var _ interface {
 	ErrorName() string
 } = ClaimEndDeviceRequestValidationError{}
 
-var _ClaimEndDeviceRequest_TargetDeviceID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+var _ClaimEndDeviceRequest_TargetDeviceId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
 
 var _ClaimEndDeviceRequest_TargetNetworkServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
 

@@ -482,7 +482,7 @@ type (
 // WithDeviceID returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with DeviceID set to v.
 func (EndDeviceIdentifiersOptionNamespace) WithDeviceID(v string) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
-		x.DeviceID = v
+		x.DeviceId = v
 		return x
 	}
 }

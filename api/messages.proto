@@ -134,7 +134,7 @@ message DownlinkMessage {
 
   bytes raw_payload = 1;
   Message payload = 2;
-  EndDeviceIdentifiers end_device_ids = 3 [(gogoproto.customname) = "EndDeviceIDs"];
+  EndDeviceIdentifiers end_device_ids = 3;
   oneof settings {
     option (validate.required) = true;
 

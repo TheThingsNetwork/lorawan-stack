@@ -135,7 +135,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				pb = &ttnpb.EndDevice{}
 			}
 
-			if pb.ApplicationIdentifiers != ids.ApplicationIdentifiers || pb.DeviceID != ids.DeviceID {
+			if pb.ApplicationIdentifiers != ids.ApplicationIdentifiers || pb.DeviceId != ids.DeviceId {
 				return errInvalidIdentifiers.New()
 			}
 
@@ -160,14 +160,14 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				if err != nil {
 					return err
 				}
-				if updated.ApplicationIdentifiers != ids.ApplicationIdentifiers || updated.DeviceID != ids.DeviceID {
+				if updated.ApplicationIdentifiers != ids.ApplicationIdentifiers || updated.DeviceId != ids.DeviceId {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
 				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceID != stored.DeviceID {
+				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceId != stored.DeviceId {
 					return errReadOnlyField.WithAttributes("field", "ids.device_id")
 				}
 				if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.JoinEUI, stored.JoinEUI) {

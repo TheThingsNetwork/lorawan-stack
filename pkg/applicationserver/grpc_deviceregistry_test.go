@@ -44,7 +44,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
-			DeviceID: registeredDeviceID,
+			DeviceId: registeredDeviceID,
 		},
 		Formatters: &ttnpb.MessagePayloadFormatters{
 			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
@@ -193,7 +193,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 						ApplicationId: registeredApplicationID,
 					},
-					DeviceID: registeredDeviceID,
+					DeviceId: registeredDeviceID,
 				})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"formatters",
@@ -262,7 +262,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 						ApplicationId: registeredApplicationID,
 					},
-					DeviceID: registeredDeviceID,
+					DeviceId: registeredDeviceID,
 				})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"formatters",
@@ -350,7 +350,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
-			DeviceID: registeredDeviceID,
+			DeviceId: registeredDeviceID,
 		},
 		Formatters: &ttnpb.MessagePayloadFormatters{
 			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
@@ -437,7 +437,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
-						DeviceID: "new-device",
+						DeviceId: "new-device",
 					},
 					Formatters: &ttnpb.MessagePayloadFormatters{
 						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
@@ -454,7 +454,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 						ApplicationId: registeredApplicationID,
 					},
-					DeviceID: "new-device",
+					DeviceId: "new-device",
 				})
 				a.So(gets, should.HaveSameElementsDeep, []string{
 					"formatters",
@@ -470,7 +470,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
-						DeviceID: "new-device",
+						DeviceId: "new-device",
 					},
 					Formatters: &ttnpb.MessagePayloadFormatters{
 						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
@@ -486,7 +486,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
-						DeviceID: "new-device",
+						DeviceId: "new-device",
 					},
 					Formatters: &ttnpb.MessagePayloadFormatters{
 						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
@@ -584,7 +584,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
-			DeviceID: registeredDeviceID,
+			DeviceId: registeredDeviceID,
 		},
 	}
 	for _, tc := range []struct {

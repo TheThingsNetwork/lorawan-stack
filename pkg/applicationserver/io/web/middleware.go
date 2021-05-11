@@ -71,7 +71,7 @@ func (w *webhooks) validateAndFillIDs(next http.Handler) http.Handler {
 
 		devID := ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: appID,
-			DeviceID:               vars["device_id"],
+			DeviceId:               vars["device_id"],
 		}
 		if err := devID.ValidateContext(ctx); err != nil {
 			webhandlers.Error(w, r, err)

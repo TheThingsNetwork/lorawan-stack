@@ -44,7 +44,7 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 	}
 	devID := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
-		DeviceID:               "test-dev",
+		DeviceId:               "test-dev",
 		DevEUI:                 &eui,
 		JoinEUI:                &eui,
 		DevAddr:                &devAddr,
@@ -111,7 +111,7 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 		checkEvent(e)
 		a.So(e.Name(), should.Equal, "test.other.evt2")
 		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 2) {
-			a.So(e.Identifiers()[0].GetDeviceIDs(), should.Resemble, &devID)
+			a.So(e.Identifiers()[0].GetDeviceIds(), should.Resemble, &devID)
 			a.So(e.Identifiers()[1].GetGatewayIds(), should.Resemble, &gtwID)
 		}
 	}

@@ -64,7 +64,7 @@ func request_ApplicationPackageRegistry_List_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device_id")
 	}
 
-	protoReq.DeviceID, err = runtime.String(val)
+	protoReq.DeviceId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device_id", err)
@@ -109,7 +109,7 @@ func local_request_ApplicationPackageRegistry_List_0(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device_id")
 	}
 
-	protoReq.DeviceID, err = runtime.String(val)
+	protoReq.DeviceId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device_id", err)

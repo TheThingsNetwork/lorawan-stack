@@ -38,7 +38,7 @@ var (
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 			ApplicationId: "bar",
 		},
-		DeviceID: "foo",
+		DeviceId: "foo",
 	}
 	downlinkQueueReq = &ttnpb.DownlinkQueueRequest{
 		EndDeviceIdentifiers: deviceID,
