@@ -1178,7 +1178,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		)
 	}
 	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Failed to generate class A downlink, skip class A downlink slot")
+		log.FromContext(ctx).WithError(err).Warn("Failed to generate class A downlink, skip class A downlink slot")
 		if genState.ApplicationDownlink != nil {
 			dev.Session.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.Session.QueuedApplicationDownlinks...)
 		}
