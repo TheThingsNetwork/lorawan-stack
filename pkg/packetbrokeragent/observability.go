@@ -86,9 +86,6 @@ var pbaMetrics = &messageMetrics{
 			Help:      "Total number of uplink message delivery state changes reported to Packet Broker",
 		},
 		[]string{
-			"forwarder_net_id",
-			"forwarder_tenant_id",
-			"forwarder_cluster_id",
 			"home_network_net_id",
 			"home_network_tenant_id",
 			"home_network_cluster_id",
@@ -101,9 +98,6 @@ var pbaMetrics = &messageMetrics{
 			Help:      "Total number of downlink message delivery state changes reported to Packet Broker",
 		},
 		[]string{
-			"home_network_net_id",
-			"home_network_tenant_id",
-			"home_network_cluster_id",
 			"forwarder_net_id",
 			"forwarder_tenant_id",
 			"forwarder_cluster_id",

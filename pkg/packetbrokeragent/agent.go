@@ -599,7 +599,6 @@ func (a *Agent) reportDownlinkMessageDeliveryState(ctx context.Context, client r
 			logger.Debug("Received downlink message delivery state change")
 
 			pbaMetrics.downlinkStateReported.WithLabelValues(ctx,
-				homeNetworkNetID.String(), rep.HomeNetworkTenantId, rep.HomeNetworkClusterId,
 				forwarderNetID.String(), rep.ForwarderTenantId, rep.ForwarderClusterId,
 			).Inc()
 
@@ -940,7 +939,6 @@ func (a *Agent) reportUplinkMessageDeliveryState(ctx context.Context, client rou
 			logger.Debug("Received uplink message delivery state change")
 
 			pbaMetrics.uplinkStateReported.WithLabelValues(ctx,
-				forwarderNetID.String(), rep.ForwarderTenantId, rep.ForwarderClusterId,
 				homeNetworkNetID.String(), rep.HomeNetworkTenantId, rep.HomeNetworkClusterId,
 			).Inc()
 
