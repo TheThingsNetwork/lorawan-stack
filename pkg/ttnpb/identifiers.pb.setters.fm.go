@@ -12,10 +12,10 @@ func (dst *ApplicationIdentifiers) SetFields(src *ApplicationIdentifiers, paths 
 				return fmt.Errorf("'application_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ApplicationID = src.ApplicationID
+				dst.ApplicationId = src.ApplicationId
 			} else {
 				var zero string
-				dst.ApplicationID = zero
+				dst.ApplicationId = zero
 			}
 
 		default:
@@ -312,11 +312,11 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "application_ids":
-					_, srcOk := src.Ids.(*EntityIdentifiers_ApplicationIDs)
+					_, srcOk := src.Ids.(*EntityIdentifiers_ApplicationIds)
 					if !srcOk && src.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'application_ids', while different oneof is set in source")
 					}
-					_, dstOk := dst.Ids.(*EntityIdentifiers_ApplicationIDs)
+					_, dstOk := dst.Ids.(*EntityIdentifiers_ApplicationIds)
 					if !dstOk && dst.Ids != nil {
 						return fmt.Errorf("attempt to set oneof 'application_ids', while different oneof is set in destination")
 					}
@@ -326,13 +326,13 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 							continue
 						}
 						if srcOk {
-							newSrc = src.Ids.(*EntityIdentifiers_ApplicationIDs).ApplicationIDs
+							newSrc = src.Ids.(*EntityIdentifiers_ApplicationIds).ApplicationIds
 						}
 						if dstOk {
-							newDst = dst.Ids.(*EntityIdentifiers_ApplicationIDs).ApplicationIDs
+							newDst = dst.Ids.(*EntityIdentifiers_ApplicationIds).ApplicationIds
 						} else {
 							newDst = &ApplicationIdentifiers{}
-							dst.Ids = &EntityIdentifiers_ApplicationIDs{ApplicationIDs: newDst}
+							dst.Ids = &EntityIdentifiers_ApplicationIds{ApplicationIds: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err

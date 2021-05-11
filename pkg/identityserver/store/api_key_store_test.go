@@ -48,7 +48,7 @@ func TestAPIKeyStore(t *testing.T) {
 		orgIDs := &ttnpb.OrganizationIdentifiers{OrganizationId: "test-org"}
 
 		s.createEntity(ctx, &Application{ApplicationID: "test-app"})
-		appIDs := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
+		appIDs := &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}
 
 		s.createEntity(ctx, &Gateway{GatewayID: "test-gtw"})
 		gtwIDs := &ttnpb.GatewayIdentifiers{GatewayId: "test-gtw"}

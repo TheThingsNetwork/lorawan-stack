@@ -38,7 +38,7 @@ func NewPopulatedID(r randyIdentifiers) string {
 
 func NewPopulatedApplicationIdentifiers(r randyIdentifiers, _ bool) *ApplicationIdentifiers {
 	return &ApplicationIdentifiers{
-		ApplicationID: NewPopulatedID(r),
+		ApplicationId: NewPopulatedID(r),
 	}
 }
 

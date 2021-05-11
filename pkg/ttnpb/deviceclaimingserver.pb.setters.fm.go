@@ -15,18 +15,18 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.TargetApplicationIDs
+					newSrc = &src.TargetApplicationIds
 				}
-				newDst = &dst.TargetApplicationIDs
+				newDst = &dst.TargetApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.TargetApplicationIDs = src.TargetApplicationIDs
+					dst.TargetApplicationIds = src.TargetApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.TargetApplicationIDs = zero
+					dst.TargetApplicationIds = zero
 				}
 			}
 		case "target_device_id":

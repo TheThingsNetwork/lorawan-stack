@@ -87,7 +87,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 					"join_eui", req.JoinEUI.String(),
 					"dev_eui", req.DevEUI.String(),
 					"device_id", ids.GetDeviceID(),
-					"application_id", ids.GetApplicationID(),
+					"application_id", ids.GetApplicationId(),
 				)
 			}
 		}

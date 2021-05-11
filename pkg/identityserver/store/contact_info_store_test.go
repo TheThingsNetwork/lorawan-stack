@@ -38,7 +38,7 @@ func TestContactInfoStore(t *testing.T) {
 		appStore := GetApplicationStore(db)
 
 		app, err := appStore.CreateApplication(ctx, &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 		})
 
 		a.So(err, should.BeNil)

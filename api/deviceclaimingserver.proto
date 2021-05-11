@@ -43,7 +43,7 @@ message ClaimEndDeviceRequest {
   }
 
   // Application identifiers of the target end device.
-  ApplicationIdentifiers target_application_ids = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true, (gogoproto.customname) = "TargetApplicationIDs"];
+  ApplicationIdentifiers target_application_ids = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // End device ID of the target end device. If empty, use the source device ID.
   string target_device_id = 4 [(gogoproto.customname) = "TargetDeviceID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$" , max_len: 36}];
   reserved 6; // target_join_eui

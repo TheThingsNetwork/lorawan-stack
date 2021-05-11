@@ -319,7 +319,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 1)
 		})
 
-		store.deleteEntity(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: fmt.Sprintf("the-foo-app")})
+		store.deleteEntity(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: fmt.Sprintf("the-foo-app")})
 		store.deleteEntity(ctx, &ttnpb.ClientIdentifiers{ClientId: fmt.Sprintf("the-foo-cli")})
 		store.deleteEntity(ctx, &ttnpb.GatewayIdentifiers{GatewayId: fmt.Sprintf("the-foo-gtw")})
 		store.deleteEntity(ctx, &ttnpb.UserIdentifiers{UserId: fmt.Sprintf("the-foo-usr")})
@@ -462,7 +462,7 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("end_device", func(t *testing.T) {
 			ids, err := s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "the-foo-app"},
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
 				IDContains:             "baz",
 				NameContains:           "baz",
 				DescriptionContains:    "baz",
@@ -475,7 +475,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "the-foo-app"},
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
 				IDContains:             "baz",
 			})
 
@@ -483,7 +483,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "the-foo-app"},
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
 				NameContains:           "baz",
 			})
 
@@ -491,7 +491,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "the-foo-app"},
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
 				DescriptionContains:    "baz",
 			})
 
@@ -499,7 +499,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "the-foo-app"},
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
 				AttributesContain: map[string]string{
 					"test": "baz",
 				},

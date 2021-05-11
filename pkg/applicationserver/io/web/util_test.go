@@ -33,7 +33,7 @@ import (
 )
 
 var (
-	registeredApplicationID  = ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}
+	registeredApplicationID  = ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
 	registeredApplicationUID = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey = "secret"
 	registeredDeviceID       = ttnpb.EndDeviceIdentifiers{
@@ -43,7 +43,7 @@ var (
 	}
 	unregisteredDeviceID = ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-			ApplicationID: "bar-app",
+			ApplicationId: "bar-app",
 		},
 		DeviceID: "bar-device",
 		DevAddr:  devAddrPtr(types.DevAddr{0x42, 0x42, 0x42, 0x42}),

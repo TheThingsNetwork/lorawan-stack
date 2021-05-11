@@ -57,7 +57,7 @@ func requireRights(ctx context.Context, id string) (res struct {
 	var wg sync.WaitGroup
 	wg.Add(5)
 	go func() {
-		res.AppErr = RequireApplication(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: id}, ttnpb.RIGHT_APPLICATION_INFO)
+		res.AppErr = RequireApplication(ctx, ttnpb.ApplicationIdentifiers{ApplicationId: id}, ttnpb.RIGHT_APPLICATION_INFO)
 		wg.Done()
 	}()
 	go func() {
@@ -108,7 +108,7 @@ func TestRequire(t *testing.T) {
 	fooCtx := test.Context()
 	fooCtx = NewContext(fooCtx, Rights{
 		ApplicationRights: map[string]*ttnpb.Rights{
-			unique.ID(fooCtx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO),
+			unique.ID(fooCtx, ttnpb.ApplicationIdentifiers{ApplicationId: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO),
 		},
 		ClientRights: map[string]*ttnpb.Rights{
 			unique.ID(fooCtx, ttnpb.ClientIdentifiers{ClientId: "foo"}): ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),

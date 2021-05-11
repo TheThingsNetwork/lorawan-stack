@@ -245,7 +245,7 @@ func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	default:
 		return
 	}
-	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.ApplicationID).Inc()
+	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.ApplicationId).Inc()
 }
 
 func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
@@ -266,7 +266,7 @@ func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 
 func registerReceiveDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) {
 	events.Publish(evtReceiveDataDown.NewWithIdentifiersAndData(ctx, &ids, msg))
-	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.ApplicationID).Inc()
+	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.ApplicationId).Inc()
 }
 
 func registerReceiveDownlinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) {

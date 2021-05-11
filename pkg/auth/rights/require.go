@@ -199,13 +199,13 @@ func RequireUser(ctx context.Context, id ttnpb.UserIdentifiers, required ...ttnp
 func RequireAny(ctx context.Context, ids ...*ttnpb.EntityIdentifiers) error {
 	for _, entityIDs := range ids {
 		switch ids := entityIDs.GetIds().(type) {
-		case *ttnpb.EntityIdentifiers_ApplicationIDs:
-			list, err := ListApplication(ctx, *ids.ApplicationIDs)
+		case *ttnpb.EntityIdentifiers_ApplicationIds:
+			list, err := ListApplication(ctx, *ids.ApplicationIds)
 			if err != nil {
 				return err
 			}
 			if len(list.GetRights()) == 0 {
-				return ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids.ApplicationIDs))
+				return ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids.ApplicationIds))
 			}
 		case *ttnpb.EntityIdentifiers_ClientIds:
 			list, err := ListClient(ctx, *ids.ClientIds)

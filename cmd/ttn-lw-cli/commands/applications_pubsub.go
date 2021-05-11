@@ -99,7 +99,7 @@ func getApplicationPubSubID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appli
 		return nil, errNoPubSubID
 	}
 	return &ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: applicationID},
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
 		PubSubID:               pubsubID,
 	}, nil
 }

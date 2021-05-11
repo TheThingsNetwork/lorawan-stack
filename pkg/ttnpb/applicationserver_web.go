@@ -17,5 +17,5 @@ package ttnpb
 // IsZero reports whether ids represent zero identifiers.
 func (ids ApplicationWebhookIdentifiers) IsZero() bool {
 	return ids.GetWebhookID() == "" &&
-		ids.GetApplicationID() == ""
+		ids.GetApplicationId() == ""
 }

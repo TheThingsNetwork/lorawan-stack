@@ -113,7 +113,7 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 		},
 		{
 			fields:   []string{"ids.application_ids.application_id"},
-			expected: []string{"EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID"},
+			expected: []string{"EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationId"},
 		},
 	} {
 		goFields := goproto.GoFieldsPaths(&field_mask.FieldMask{Paths: tc.fields}, ttnpb.EndDevice{

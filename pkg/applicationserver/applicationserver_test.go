@@ -66,7 +66,7 @@ func TestApplicationServer(t *testing.T) {
 
 	// This application will be added to the Entity Registry and to the link registry of the Application Server so that it
 	// links automatically on start to the Network Server.
-	registeredApplicationID := ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}
+	registeredApplicationID := ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
 	registeredApplicationKey := "secret"
 	registeredApplicationFormatter := ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
 	registeredApplicationWebhookID := ttnpb.ApplicationWebhookIdentifiers{
@@ -811,7 +811,7 @@ func TestApplicationServer(t *testing.T) {
 							continue
 						}
 						url := fmt.Sprintf("http://127.0.0.1:8099/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/%s",
-							data.ApplicationID, registeredApplicationWebhookID.WebhookID, data.DeviceID, action,
+							data.ApplicationId, registeredApplicationWebhookID.WebhookID, data.DeviceID, action,
 						)
 						req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
 						if err != nil {
@@ -850,7 +850,7 @@ func TestApplicationServer(t *testing.T) {
 				},
 				{
 					Name: "InvalidIDAndKey",
-					ID:   ttnpb.ApplicationIdentifiers{ApplicationID: "invalid-application"},
+					ID:   ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-application"},
 					Key:  "invalid-key",
 				},
 			} {
@@ -2218,7 +2218,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 
 	// This application will be added to the Entity Registry and to the link registry of the Application Server so that it
 	// links automatically on start to the Network Server.
-	registeredApplicationID := ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}
+	registeredApplicationID := ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
 	registeredApplicationKey := "secret"
 
 	// This device gets registered in the device registry of the Application Server.

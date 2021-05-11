@@ -148,8 +148,8 @@ var errNoContactInfoForEntity = errors.DefineInvalidArgument("no_contact_info", 
 func (cir *contactInfoRegistry) RequestValidation(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.ContactInfoValidation, error) {
 	var err error
 	switch id := ids.GetIds().(type) {
-	case *ttnpb.EntityIdentifiers_ApplicationIDs:
-		err = rights.RequireApplication(ctx, *id.ApplicationIDs, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC)
+	case *ttnpb.EntityIdentifiers_ApplicationIds:
+		err = rights.RequireApplication(ctx, *id.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC)
 	case *ttnpb.EntityIdentifiers_ClientIds:
 		err = rights.RequireClient(ctx, *id.ClientIds, ttnpb.RIGHT_CLIENT_ALL)
 	case *ttnpb.EntityIdentifiers_GatewayIds:

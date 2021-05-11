@@ -52,14 +52,14 @@ func (m *ApplicationIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_id":
 
-			if utf8.RuneCountInString(m.GetApplicationID()) > 36 {
+			if utf8.RuneCountInString(m.GetApplicationId()) > 36 {
 				return ApplicationIdentifiersValidationError{
 					field:  "application_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_ApplicationIdentifiers_ApplicationID_Pattern.MatchString(m.GetApplicationID()) {
+			if !_ApplicationIdentifiers_ApplicationId_Pattern.MatchString(m.GetApplicationId()) {
 				return ApplicationIdentifiersValidationError{
 					field:  "application_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -132,7 +132,7 @@ var _ interface {
 	ErrorName() string
 } = ApplicationIdentifiersValidationError{}
 
-var _ApplicationIdentifiers_ApplicationID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _ApplicationIdentifiers_ApplicationId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on ClientIdentifiers with the rules
 // defined in the proto definition for this message. If any rules are
@@ -811,12 +811,12 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "application_ids":
-					w, ok := m.Ids.(*EntityIdentifiers_ApplicationIDs)
+					w, ok := m.Ids.(*EntityIdentifiers_ApplicationIds)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetApplicationIDs()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return EntityIdentifiersValidationError{
 								field:  "application_ids",

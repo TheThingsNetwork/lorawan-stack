@@ -106,7 +106,7 @@ func TestAppendRecentDownlink(t *testing.T) {
 
 func TestGenerateDataDownlink(t *testing.T) {
 	const appIDString = "generate-data-downlink-test-app-id"
-	appID := ttnpb.ApplicationIdentifiers{ApplicationID: appIDString}
+	appID := ttnpb.ApplicationIdentifiers{ApplicationId: appIDString}
 	const devID = "generate-data-downlink-test-dev-id"
 
 	devAddr := types.DevAddr{0x42, 0xff, 0xff, 0xff}

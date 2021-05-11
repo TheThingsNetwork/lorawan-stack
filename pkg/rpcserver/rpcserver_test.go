@@ -36,7 +36,7 @@ import (
 var (
 	deviceID = ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-			ApplicationID: "bar",
+			ApplicationId: "bar",
 		},
 		DeviceID: "foo",
 	}
@@ -112,7 +112,7 @@ func TestNewRPCServer(t *testing.T) {
 		a := assertions.New(t)
 
 		sub, err := cli.Subscribe(ctx, &ttnpb.ApplicationIdentifiers{
-			ApplicationID: "bar",
+			ApplicationId: "bar",
 		})
 		a.So(sub, should.NotBeNil)
 		a.So(err, should.BeNil)
@@ -136,8 +136,10 @@ func TestNewRPCServer(t *testing.T) {
 	})
 }
 
-type mockKey struct{}
-type mockKey2 struct{}
+type (
+	mockKey  struct{}
+	mockKey2 struct{}
+)
 
 type mockServer struct {
 	ttnpb.AppAsServer

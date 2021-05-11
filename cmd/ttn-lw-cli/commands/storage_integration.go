@@ -105,7 +105,7 @@ var (
 			if ids == nil {
 				return err
 			}
-			req = req.WithApplicationIDs(ids)
+			req = req.WithApplicationIds(ids)
 			client, err := ttnpb.NewApplicationUpStorageClient(as).GetStoredApplicationUp(ctx, req)
 			if err != nil {
 				return err

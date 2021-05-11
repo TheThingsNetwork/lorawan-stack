@@ -33,19 +33,19 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 	pbs := [...]ttnpb.EndDeviceIdentifiers{
 		{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "test-app",
+				ApplicationId: "test-app",
 			},
 			DeviceID: "test-dev",
 		},
 		{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "test-app2",
+				ApplicationId: "test-app2",
 			},
 			DeviceID: "test-dev",
 		},
 		{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "test-app2",
+				ApplicationId: "test-app2",
 			},
 			DeviceID: "test-dev2",
 		},

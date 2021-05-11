@@ -511,7 +511,7 @@ func request_ApplicationRegistry_Delete_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -538,7 +538,7 @@ func local_request_ApplicationRegistry_Delete_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -565,7 +565,7 @@ func request_ApplicationRegistry_Restore_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -592,7 +592,7 @@ func local_request_ApplicationRegistry_Restore_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -619,7 +619,7 @@ func request_ApplicationRegistry_Purge_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -646,7 +646,7 @@ func local_request_ApplicationRegistry_Purge_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -673,7 +673,7 @@ func request_ApplicationAccess_ListRights_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
@@ -700,7 +700,7 @@ func local_request_ApplicationAccess_ListRights_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	protoReq.ApplicationId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)

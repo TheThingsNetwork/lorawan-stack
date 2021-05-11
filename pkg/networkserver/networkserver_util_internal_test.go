@@ -713,7 +713,7 @@ func (env TestEnvironment) AssertNsAsHandleUplink(ctx context.Context, appID ttn
 							}),
 						}, test.AllTrue(
 							a.So(role, should.Equal, ttnpb.ClusterRole_APPLICATION_SERVER),
-							a.So(ids.GetEntityIdentifiers().GetApplicationIDs(), should.Resemble, &appID),
+							a.So(ids.GetEntityIdentifiers().GetApplicationIds(), should.Resemble, &appID),
 						)
 				},
 			), should.BeTrue) {

@@ -52,7 +52,7 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "target_application_ids":
 
-			if v, ok := interface{}(&m.TargetApplicationIDs).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.TargetApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ClaimEndDeviceRequestValidationError{
 						field:  "target_application_ids",

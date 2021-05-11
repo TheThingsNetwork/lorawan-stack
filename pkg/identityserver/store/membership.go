@@ -86,7 +86,7 @@ func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphi
 func buildIdentifiers(entityType, id string) *ttnpb.EntityIdentifiers {
 	switch entityType {
 	case "application":
-		return (&ttnpb.ApplicationIdentifiers{ApplicationID: id}).GetEntityIdentifiers()
+		return (&ttnpb.ApplicationIdentifiers{ApplicationId: id}).GetEntityIdentifiers()
 	case "client":
 		return (&ttnpb.ClientIdentifiers{ClientId: id}).GetEntityIdentifiers()
 	case "gateway":

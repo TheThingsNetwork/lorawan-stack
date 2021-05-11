@@ -60,7 +60,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
 			Application: ttnpb.Application{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"},
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
 			},
 			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 		})
@@ -70,7 +70,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetApplicationRequest{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
 			FieldMask:              types.FieldMask{Paths: []string{"name"}},
 		})
 
@@ -98,7 +98,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
 			Application: ttnpb.Application{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"},
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
 				Name:                   "Updated Name",
 			},
 			FieldMask: types.FieldMask{Paths: []string{"name"}},
@@ -108,7 +108,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.Delete(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"})
+		_, err = reg.Delete(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -130,7 +130,7 @@ func TestApplicationsCRUD(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
 			Application: ttnpb.Application{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 				Name:                   "Foo Application",
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
@@ -144,7 +144,7 @@ func TestApplicationsCRUD(t *testing.T) {
 
 		created, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
 			Application: ttnpb.Application{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo"},
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 				Name:                   "Foo Application",
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),

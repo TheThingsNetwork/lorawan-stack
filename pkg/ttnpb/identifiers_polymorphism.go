@@ -27,8 +27,8 @@ func (ids *ApplicationIdentifiers) GetEntityIdentifiers() *EntityIdentifiers {
 	if ids == nil {
 		return nil
 	}
-	return &EntityIdentifiers{Ids: &EntityIdentifiers_ApplicationIDs{
-		ApplicationIDs: ids,
+	return &EntityIdentifiers{Ids: &EntityIdentifiers_ApplicationIds{
+		ApplicationIds: ids,
 	}}
 }
 
@@ -103,7 +103,7 @@ func (ids *OrganizationOrUserIdentifiers) GetEntityIdentifiers() *EntityIdentifi
 }
 
 // IDString returns the ID string of this Identifier.
-func (ids ApplicationIdentifiers) IDString() string { return ids.ApplicationID }
+func (ids ApplicationIdentifiers) IDString() string { return ids.ApplicationId }
 
 // IDString returns the ID string of this Identifier.
 func (ids ClientIdentifiers) IDString() string { return ids.ClientId }
@@ -125,8 +125,8 @@ func (ids UserIdentifiers) IDString() string { return ids.UserId }
 // IDString returns the ID string of the Identifiers inside the oneof.
 func (ids EntityIdentifiers) IDString() string {
 	switch oneof := ids.Ids.(type) {
-	case *EntityIdentifiers_ApplicationIDs:
-		return oneof.ApplicationIDs.IDString()
+	case *EntityIdentifiers_ApplicationIds:
+		return oneof.ApplicationIds.IDString()
 	case *EntityIdentifiers_ClientIds:
 		return oneof.ClientIds.IDString()
 	case *EntityIdentifiers_DeviceIDs:
@@ -175,8 +175,8 @@ func (UserIdentifiers) EntityType() string { return "user" }
 // EntityType returns the entity type for the Identifiers inside the oneof.
 func (ids EntityIdentifiers) EntityType() string {
 	switch oneof := ids.Ids.(type) {
-	case *EntityIdentifiers_ApplicationIDs:
-		return oneof.ApplicationIDs.EntityType()
+	case *EntityIdentifiers_ApplicationIds:
+		return oneof.ApplicationIds.EntityType()
 	case *EntityIdentifiers_ClientIds:
 		return oneof.ClientIds.EntityType()
 	case *EntityIdentifiers_DeviceIDs:

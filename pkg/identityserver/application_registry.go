@@ -68,7 +68,7 @@ var (
 )
 
 func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
-	if err = blacklist.Check(ctx, req.ApplicationID); err != nil {
+	if err = blacklist.Check(ctx, req.ApplicationId); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
@@ -192,7 +192,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		}
 		appIDs := make([]*ttnpb.ApplicationIdentifiers, 0, len(ids))
 		for _, id := range ids {
-			if appID := id.GetEntityIdentifiers().GetApplicationIDs(); appID != nil {
+			if appID := id.GetEntityIdentifiers().GetApplicationIds(); appID != nil {
 				appIDs = append(appIDs, appID)
 			}
 		}

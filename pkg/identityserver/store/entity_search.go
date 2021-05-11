@@ -134,7 +134,7 @@ func (s *entitySearch) FindApplications(ctx context.Context, member *ttnpb.Organ
 	}
 	identifiers := make([]*ttnpb.ApplicationIdentifiers, len(results))
 	for i, result := range results {
-		identifiers[i] = &ttnpb.ApplicationIdentifiers{ApplicationID: result.FriendlyID}
+		identifiers[i] = &ttnpb.ApplicationIdentifiers{ApplicationId: result.FriendlyID}
 	}
 	return identifiers, nil
 }
@@ -252,7 +252,7 @@ func (s *entitySearch) FindEndDevices(ctx context.Context, req *ttnpb.SearchEndD
 	defer trace.StartRegion(ctx, "find end devices").End()
 
 	query := s.query(ctx, &EndDevice{}).
-		Where(&EndDevice{ApplicationID: req.ApplicationID}).
+		Where(&EndDevice{ApplicationID: req.ApplicationId}).
 		Select(`"end_devices"."device_id" AS "friendly_id"`)
 	query = s.queryMetaFields(ctx, query, "end_device", req)
 
@@ -283,7 +283,7 @@ func (s *entitySearch) FindEndDevices(ctx context.Context, req *ttnpb.SearchEndD
 	identifiers := make([]*ttnpb.EndDeviceIdentifiers, len(results))
 	for i, result := range results {
 		identifiers[i] = &ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: req.ApplicationID},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: req.ApplicationId},
 			DeviceID:               result.FriendlyID,
 		}
 	}

@@ -219,11 +219,11 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 				if err != nil {
 					return err
 				}
-				if updated.ApplicationID != ids.ApplicationID || updated.DeviceID != ids.DeviceID || updated.FPort != ids.FPort {
+				if updated.ApplicationId != ids.ApplicationId || updated.DeviceID != ids.DeviceID || updated.FPort != ids.FPort {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.end_device_ids.application_ids.application_id") && pb.ApplicationID != stored.ApplicationID {
+				if ttnpb.HasAnyField(sets, "ids.end_device_ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {
 					return errReadOnlyField.WithAttributes("field", "ids.end_device_ids.application_ids.application_id")
 				}
 				if ttnpb.HasAnyField(sets, "ids.end_device_ids.device_id") && pb.DeviceID != stored.DeviceID {
@@ -403,11 +403,11 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 				if err != nil {
 					return err
 				}
-				if updated.ApplicationID != ids.ApplicationID || updated.FPort != ids.FPort {
+				if updated.ApplicationId != ids.ApplicationId || updated.FPort != ids.FPort {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationID != stored.ApplicationID {
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
 				if ttnpb.HasAnyField(sets, "ids.f_port") && pb.FPort != stored.FPort {

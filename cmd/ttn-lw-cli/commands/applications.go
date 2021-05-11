@@ -59,7 +59,7 @@ func getApplicationID(flagSet *pflag.FlagSet, args []string) *ttnpb.ApplicationI
 	if applicationID == "" {
 		return nil
 	}
-	return &ttnpb.ApplicationIdentifiers{ApplicationID: applicationID}
+	return &ttnpb.ApplicationIdentifiers{ApplicationId: applicationID}
 }
 
 var searchApplicationsFlags = func() *pflag.FlagSet {
@@ -184,10 +184,10 @@ var (
 				return err
 			}
 			application.Attributes = mergeAttributes(application.Attributes, cmd.Flags())
-			if appID != nil && appID.ApplicationID != "" {
-				application.ApplicationID = appID.ApplicationID
+			if appID != nil && appID.ApplicationId != "" {
+				application.ApplicationId = appID.ApplicationId
 			}
-			if application.ApplicationID == "" {
+			if application.ApplicationId == "" {
 				return errNoApplicationID
 			}
 

@@ -178,7 +178,7 @@ func getEntityIdentifiersSlice(flagSet *pflag.FlagSet) []*ttnpb.EntityIdentifier
 		for _, deviceID := range deviceIDs {
 			for _, applicationID := range applicationIDs {
 				ids = append(ids, (&ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: applicationID},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
 					DeviceID:               deviceID,
 				}).GetEntityIdentifiers())
 			}
@@ -187,7 +187,7 @@ func getEntityIdentifiersSlice(flagSet *pflag.FlagSet) []*ttnpb.EntityIdentifier
 	}
 
 	for _, applicationID := range applicationIDs {
-		ids = append(ids, (&ttnpb.ApplicationIdentifiers{ApplicationID: applicationID}).GetEntityIdentifiers())
+		ids = append(ids, (&ttnpb.ApplicationIdentifiers{ApplicationId: applicationID}).GetEntityIdentifiers())
 	}
 	for _, clientID := range clientIDs {
 		ids = append(ids, (&ttnpb.ClientIdentifiers{ClientId: clientID}).GetEntityIdentifiers())

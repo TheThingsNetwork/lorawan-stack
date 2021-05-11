@@ -75,7 +75,7 @@ func TestFindIndirectMemberships(t *testing.T) {
 			Rights:     Rights{Rights: []ttnpb.Right{6, 7}},
 		})
 
-		common, err := store.FindIndirectMemberships(ctx, &ttnpb.UserIdentifiers{UserId: "test-user"}, (&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}).GetEntityIdentifiers())
+		common, err := store.FindIndirectMemberships(ctx, &ttnpb.UserIdentifiers{UserId: "test-user"}, (&ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}).GetEntityIdentifiers())
 
 		if a.So(err, should.BeNil) {
 			a.So(common, should.HaveLength, 2)
@@ -131,7 +131,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Application",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}).GetEntityIdentifiers(),
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_INFO,
@@ -181,7 +181,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Application",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}).GetEntityIdentifiers(),
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_INFO,
@@ -321,7 +321,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Application - user not found",
 				Identifiers:       userNotFoundIDs,
-				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}).GetEntityIdentifiers(),
 				EntityType:        "application",
 			},
 			{
@@ -345,7 +345,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Application - organization not found",
 				Identifiers:       organizationNotFoundIDs,
-				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}).GetEntityIdentifiers(),
 				EntityType:        "application",
 			},
 			{
@@ -391,7 +391,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Application - application not found",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-not-found"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-not-found"}).GetEntityIdentifiers(),
 				EntityType:        "application",
 			},
 			{
@@ -415,7 +415,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Application - application not found",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-not-found"}).GetEntityIdentifiers(),
+				MemberIdentifiers: (&ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-not-found"}).GetEntityIdentifiers(),
 				EntityType:        "application",
 			},
 			{
@@ -502,10 +502,10 @@ func TestDeleteEntityAndAccountMemberships(t *testing.T) {
 			Rights:     Rights{Rights: []ttnpb.Right{6, 7}},
 		})
 
-		err := store.DeleteEntityMembers(ctx, (&ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID}).GetEntityIdentifiers())
+		err := store.DeleteEntityMembers(ctx, (&ttnpb.ApplicationIdentifiers{ApplicationId: app.ApplicationID}).GetEntityIdentifiers())
 		a.So(err, should.BeNil)
 
-		members, err := store.FindMembers(ctx, (&ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID}).GetEntityIdentifiers())
+		members, err := store.FindMembers(ctx, (&ttnpb.ApplicationIdentifiers{ApplicationId: app.ApplicationID}).GetEntityIdentifiers())
 		if a.So(err, should.BeNil) {
 			a.So(members, should.BeEmpty)
 		}

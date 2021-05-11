@@ -101,9 +101,7 @@ func (dr *mockDR) key(ids *ttnpb.EndDeviceVersionIdentifiers) string {
 	return fmt.Sprintf("%s:%s:%s:%s", ids.BrandID, ids.ModelID, ids.FirmwareVersion, ids.BandID)
 }
 
-var (
-	errMock = fmt.Errorf("mock_error")
-)
+var errMock = fmt.Errorf("mock_error")
 
 func (dr *mockDR) GetUplinkDecoder(_ context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadDecoder, error) {
 	f, ok := dr.uplinkDecoders[dr.key(req.VersionIDs)]
@@ -169,7 +167,7 @@ func TestDeviceRepository(t *testing.T) {
 	devID := ttnpb.EndDeviceIdentifiers{
 		DeviceID: "dev1",
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-			ApplicationID: "app1",
+			ApplicationId: "app1",
 		},
 	}
 

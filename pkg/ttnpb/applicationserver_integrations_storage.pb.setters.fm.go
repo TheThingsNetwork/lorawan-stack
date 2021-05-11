@@ -14,26 +14,26 @@ func (dst *GetStoredApplicationUpRequest) SetFields(src *GetStoredApplicationUpR
 		case "application_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
-				if (src == nil || src.ApplicationIDs == nil) && dst.ApplicationIDs == nil {
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.ApplicationIDs
+					newSrc = src.ApplicationIds
 				}
-				if dst.ApplicationIDs != nil {
-					newDst = dst.ApplicationIDs
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
 				} else {
 					newDst = &ApplicationIdentifiers{}
-					dst.ApplicationIDs = newDst
+					dst.ApplicationIds = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIDs = src.ApplicationIDs
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
-					dst.ApplicationIDs = nil
+					dst.ApplicationIds = nil
 				}
 			}
 		case "end_device_ids":

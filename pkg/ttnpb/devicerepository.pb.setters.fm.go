@@ -409,18 +409,18 @@ func (dst *GetEndDeviceBrandRequest) SetFields(src *GetEndDeviceBrandRequest, pa
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIDs
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIDs
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIDs = src.ApplicationIDs
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIDs = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "brand_id":
@@ -458,18 +458,18 @@ func (dst *ListEndDeviceBrandsRequest) SetFields(src *ListEndDeviceBrandsRequest
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIDs
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIDs
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIDs = src.ApplicationIDs
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIDs = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "limit":
@@ -537,18 +537,18 @@ func (dst *GetEndDeviceModelRequest) SetFields(src *GetEndDeviceModelRequest, pa
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIDs
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIDs
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIDs = src.ApplicationIDs
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIDs = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "brand_id":
@@ -596,18 +596,18 @@ func (dst *ListEndDeviceModelsRequest) SetFields(src *ListEndDeviceModelsRequest
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIDs
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIDs
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIDs = src.ApplicationIDs
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIDs = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "brand_id":
@@ -685,18 +685,18 @@ func (dst *GetTemplateRequest) SetFields(src *GetTemplateRequest, paths ...strin
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIDs
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIDs
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIDs = src.ApplicationIDs
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIDs = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "version_ids":
@@ -739,18 +739,18 @@ func (dst *GetPayloadFormatterRequest) SetFields(src *GetPayloadFormatterRequest
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIDs
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIDs
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIDs = src.ApplicationIDs
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIDs = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "version_ids":

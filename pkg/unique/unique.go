@@ -48,7 +48,7 @@ func WithContext(ctx context.Context, uid string) (context.Context, error) {
 
 // ToApplicationID returns the application identifier of the specified unique ID.
 func ToApplicationID(uid string) (id ttnpb.ApplicationIdentifiers, err error) {
-	id.ApplicationID = uid
+	id.ApplicationId = uid
 	if err := id.ValidateFields("application_id"); err != nil {
 		return ttnpb.ApplicationIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
@@ -70,7 +70,7 @@ func ToDeviceID(uid string) (id ttnpb.EndDeviceIdentifiers, err error) {
 	if sepIdx == -1 {
 		return ttnpb.EndDeviceIdentifiers{}, errFormat.WithAttributes("value", uid)
 	}
-	id.ApplicationIdentifiers.ApplicationID = uid[:sepIdx]
+	id.ApplicationIdentifiers.ApplicationId = uid[:sepIdx]
 	id.DeviceID = uid[sepIdx+1:]
 	if err := id.ValidateFields("device_id", "application_ids"); err != nil {
 		return ttnpb.EndDeviceIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
