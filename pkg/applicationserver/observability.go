@@ -114,16 +114,6 @@ var (
 		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
 	)
-	evtLostQueueDataDown = events.Define(
-		"as.down.data.queue.lost", "lose downlink data queue",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
-		events.WithErrorDataType(),
-	)
-	evtInvalidQueueDataDown = events.Define(
-		"as.down.data.queue.invalid", "invalid downlink data queue",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
-		events.WithErrorDataType(),
-	)
 )
 
 const (

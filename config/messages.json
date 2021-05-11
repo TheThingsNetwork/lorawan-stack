@@ -8396,24 +8396,6 @@
       "file": "observability.go"
     }
   },
-  "event:as.down.data.queue.invalid": {
-    "translations": {
-      "en": "invalid downlink data queue"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "observability.go"
-    }
-  },
-  "event:as.down.data.queue.lost": {
-    "translations": {
-      "en": "lose downlink data queue"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "observability.go"
-    }
-  },
   "event:as.down.data.receive": {
     "translations": {
       "en": "receive downlink data message"

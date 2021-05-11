@@ -834,6 +834,11 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids ttnpb.EndDevi
 	return mask, nil
 }
 
+// storeUplink stores the provided *ttnpb.ApplicationUplink in the device uplink storage.
+// Only fields which are used by integrations are stored.
+// The fields which are stored are based on the following usages:
+// - io/packages/loragls/v3/package.go#multiFrameQuery
+// - io/packages/loragls/v3/api/objects.go#parseRxMetadata
 func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink) error {
 	cleanUplink := &ttnpb.ApplicationUplink{
 		RxMetadata: make([]*ttnpb.RxMetadata, 0, len(uplink.RxMetadata)),
@@ -997,6 +1002,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 	}
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
+			"formatters",
 			"pending_session",
 			"session",
 			"skip_payload_crypto_override",
@@ -1018,7 +1024,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 			}
 
 			// Decrypt the message as it will be sent to upstream after handling it.
-			if err := as.decryptDownlinkMessage(ctx, ids, msg, link); err != nil {
+			if err := as.decryptAndDecodeDownlink(ctx, dev, msg, link.DefaultFormatters); err != nil {
 				return nil, nil, err
 			}
 
