@@ -126,6 +126,51 @@ func (dst *ScheduleDownlinkResponse) SetFields(src *ScheduleDownlinkResponse, pa
 				var zero time.Duration
 				dst.Delay = zero
 			}
+		case "downlink_path":
+			if len(subs) > 0 {
+				var newDst, newSrc *DownlinkPath
+				if (src == nil || src.DownlinkPath == nil) && dst.DownlinkPath == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DownlinkPath
+				}
+				if dst.DownlinkPath != nil {
+					newDst = dst.DownlinkPath
+				} else {
+					newDst = &DownlinkPath{}
+					dst.DownlinkPath = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkPath = src.DownlinkPath
+				} else {
+					dst.DownlinkPath = nil
+				}
+			}
+		case "rx1":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx1' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx1 = src.Rx1
+			} else {
+				var zero bool
+				dst.Rx1 = zero
+			}
+		case "rx2":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2 = src.Rx2
+			} else {
+				var zero bool
+				dst.Rx2 = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

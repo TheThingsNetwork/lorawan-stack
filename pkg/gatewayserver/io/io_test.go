@@ -415,7 +415,11 @@ func TestFlow(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			_, err := conn.ScheduleDown(tc.Path, tc.Message)
+
+			hasRX1 := tc.Message.GetRequest().GetRx1Frequency() != 0
+			hasRX2 := tc.Message.GetRequest().GetRx2Frequency() != 0
+
+			rx1, rx2, _, err := conn.ScheduleDown(tc.Path, tc.Message)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -434,6 +438,8 @@ func TestFlow(t *testing.T) {
 			} else if tc.ErrorAssertion != nil {
 				t.Fatal("Expected error but got none")
 			}
+			a.So(rx1, should.Equal, hasRX1)
+			a.So(rx2, should.Equal, hasRX2)
 
 			received++
 			select {
@@ -552,7 +558,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			_, err := conn.ScheduleDown(tc.Path, tc.Message)
+			_, _, _, err := conn.ScheduleDown(tc.Path, tc.Message)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}

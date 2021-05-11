@@ -22,6 +22,7 @@ import "google/protobuf/empty.proto";
 import "lorawan-stack/api/error.proto";
 import "lorawan-stack/api/gateway.proto";
 import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/lorawan.proto";
 import "lorawan-stack/api/messages.proto";
 import "lorawan-stack/api/mqtt.proto";
 import "lorawan-stack/api/regional.proto";
@@ -69,6 +70,14 @@ service GtwGs {
 message ScheduleDownlinkResponse {
   // The amount of time between the message has been scheduled and it will be transmitted by the gateway.
   google.protobuf.Duration delay = 1 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false, (validate.rules).duration.required = true];
+  // Downlink path chosen by the Gateway Server.
+  DownlinkPath downlink_path = 2;
+  // Whether RX1 has been chosen for the downlink message.
+  // Both RX1 and RX2 can be used for transmitting the same message by the same gateway.
+  bool rx1 = 3;
+  // Whether RX2 has been chosen for the downlink message.
+  // Both RX1 and RX2 can be used for transmitting the same message by the same gateway.
+  bool rx2 = 4;
 }
 
 message ScheduleDownlinkErrorDetails {

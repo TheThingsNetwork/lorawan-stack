@@ -98,7 +98,7 @@ func TestForwarder(t *testing.T) {
 		Forwarder: ForwarderConfig{
 			Enable: true,
 			WorkerPool: WorkerPoolConfig{
-				Limit: 1,
+				Limit: 2,
 			},
 			TokenKey:          tokenKey,
 			TokenEncrypter:    tokenEncrypter,
@@ -348,9 +348,8 @@ func TestForwarder(t *testing.T) {
 				select {
 				case pbMsg = <-dp.ForwarderUp:
 				case <-time.After(timeout):
-					t.Fatal("Expected uplink message from Forwarder")
+					t.Fatal("Expected uplink message from Home Network")
 				}
-
 				pbMsg.Message.GatewayUplinkToken = nil // JWE, tested by TestWrapGatewayUplinkToken
 				a.So(pbMsg, should.Resemble, tc.RoutedUplinkMessage)
 			})
@@ -395,7 +394,7 @@ func TestForwarder(t *testing.T) {
 		select {
 		case gtwMsg = <-gs.Downlink:
 		case <-time.After(timeout):
-			t.Fatal("Expected downlink message from Forwarder")
+			t.Fatal("Expected downlink message from Home Network")
 		}
 		a.So(gtwMsg, should.Resemble, &ttnpb.DownlinkMessage{
 			RawPayload:     []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
@@ -419,6 +418,14 @@ func TestForwarder(t *testing.T) {
 				},
 			},
 		})
+
+		var stateChange *packetbroker.DownlinkMessageDeliveryStateChange
+		select {
+		case stateChange = <-dp.ForwarderDownStateChange:
+		case <-time.After(timeout):
+			t.Fatal("Expected downlink message delivery state change from Home Network")
+		}
+		a.So(stateChange.GetSuccess(), should.NotBeNil)
 	})
 }
 
@@ -453,7 +460,7 @@ func TestHomeNetwork(t *testing.T) {
 		HomeNetwork: HomeNetworkConfig{
 			Enable: true,
 			WorkerPool: WorkerPoolConfig{
-				Limit: 1,
+				Limit: 2,
 			},
 		},
 	}, testOptions...))
@@ -730,13 +737,19 @@ func TestHomeNetwork(t *testing.T) {
 				case <-time.After(timeout):
 					t.Fatal("Expected uplink message from Forwarder")
 				}
-
 				a.So(nsMsg.CorrelationIDs, should.HaveLength, 2)
 				nsMsg.CorrelationIDs = nil
 				a.So(nsMsg.ReceivedAt, should.HappenBetween, before, time.Now()) // Packet Broker Agent sets local time on receive.
 				nsMsg.ReceivedAt = time.Time{}
-
 				a.So(nsMsg, should.Resemble, tc.UplinkMessage)
+
+				var stateChange *packetbroker.UplinkMessageDeliveryStateChange
+				select {
+				case stateChange = <-dp.HomeNetworkUpStateChange:
+				case <-time.After(timeout):
+					t.Fatal("Expected uplink message delivery state change from Forwarder")
+				}
+				a.So(stateChange.Error, should.BeNil)
 			})
 		}
 	})

@@ -347,21 +347,20 @@ var (
 
 // ScheduleDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
-func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) (time.Duration, error) {
+func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) (rx1, rx2 bool, delay time.Duration, err error) {
 	if c.gateway.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
-		return 0, errNotAllowed.New()
+		return false, false, 0, errNotAllowed.New()
 	}
 	request := msg.GetRequest()
 	if request == nil {
-		return 0, errNotTxRequest.New()
+		return false, false, 0, errNotTxRequest.New()
 	}
-	var delay time.Duration
 
 	logger := log.FromContext(c.ctx).WithField("class", request.Class)
 	logger.Debug("Attempt to schedule downlink on gateway")
 	ids, uplinkToken, err := getDownlinkPath(path, request.Class)
 	if err != nil {
-		return 0, err
+		return false, false, 0, err
 	}
 
 	var fp *frequencyplans.FrequencyPlan
@@ -372,16 +371,16 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			// The requested frequency plan is not configured for the gateway. Load the plan and enforce that it's in the same band.
 			fp, err = c.fps.GetByID(fpID)
 			if err != nil {
-				return 0, errFrequencyPlanNotConfigured.WithCause(err).WithAttributes("id", request.FrequencyPlanID)
+				return false, false, 0, errFrequencyPlanNotConfigured.WithCause(err).WithAttributes("id", request.FrequencyPlanID)
 			}
 			if fp.BandID != c.bandID {
-				return 0, errFrequencyPlansNotFromSameBand.New()
+				return false, false, 0, errFrequencyPlansNotFromSameBand.New()
 			}
 		}
 	} else {
 		// Backwards compatibility. If there's no FrequencyPlanID in the TxRequest, then there must be only one Frequency Plan configured.
 		if len(c.gatewayFPs) != 1 {
-			return 0, errNoFrequencyPlanIDInTxRequest.New()
+			return false, false, 0, errNoFrequencyPlanIDInTxRequest.New()
 		}
 		for _, v := range c.gatewayFPs {
 			fp = v
@@ -390,7 +389,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	}
 	phy, err := band.GetByID(fp.BandID)
 	if err != nil {
-		return 0, err
+		return false, false, 0, err
 	}
 	var rxErrs []errors.ErrorDetails
 	for i, rx := range []struct {
@@ -421,12 +420,12 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		logger.Debug("Attempt to schedule downlink in receive window")
 		dr, ok := phy.DataRates[rx.dataRateIndex]
 		if !ok {
-			return 0, errDataRate.WithAttributes("index", rx.dataRateIndex)
+			return false, false, 0, errDataRate.WithAttributes("index", rx.dataRateIndex)
 		}
 		// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
 		maxPHYLength := dr.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()) + 5
 		if len(msg.RawPayload) > int(maxPHYLength) {
-			return 0, errTooLong.WithAttributes(
+			return false, false, 0, errTooLong.WithAttributes(
 				"payload_length", len(msg.RawPayload),
 				"maximum_length", maxPHYLength,
 				"data_rate_index", rx.dataRateIndex,
@@ -463,12 +462,12 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		case ttnpb.CLASS_A:
 			f = c.scheduler.ScheduleAt
 			if request.Rx1Delay == ttnpb.RX_DELAY_0 {
-				return 0, errNoRxDelay.New()
+				return false, false, 0, errNoRxDelay.New()
 			}
 			settings.Timestamp = uplinkToken.Timestamp + uint32((time.Duration(request.Rx1Delay)*time.Second+rx.delay)/time.Microsecond)
 		case ttnpb.CLASS_B:
 			if request.AbsoluteTime == nil {
-				return 0, errNoAbsoluteTime.New()
+				return false, false, 0, errNoAbsoluteTime.New()
 			}
 			if !c.scheduler.IsGatewayTimeSynced() {
 				rxErrs = append(rxErrs, errNoGPSSync)
@@ -507,12 +506,15 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &settings,
 		}
+		rx1 = i == 0
+		rx2 = i == 1
 		rxErrs = nil
 		if now, ok := c.scheduler.Now(); ok {
 			logger = logger.WithField("now", now)
 			delay = time.Duration(em.Starts() - now)
 		}
 		logger.WithFields(log.Fields(
+			"rx_window", i+1,
 			"starts", em.Starts(),
 			"duration", em.Duration(),
 		)).Debug("Scheduled downlink")
@@ -523,15 +525,15 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		for _, rxErr := range rxErrs {
 			protoErrs = append(protoErrs, ttnpb.ErrorDetailsToProto(rxErr))
 		}
-		return 0, errTxSchedule.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
+		return false, false, 0, errTxSchedule.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 			PathErrors: protoErrs,
 		})
 	}
 	err = c.SendDown(msg)
 	if err != nil {
-		return 0, err
+		return false, false, 0, err
 	}
-	return delay, nil
+	return
 }
 
 // Status returns the status channel.

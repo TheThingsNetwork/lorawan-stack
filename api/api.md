@@ -4051,6 +4051,9 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | The amount of time between the message has been scheduled and it will be transmitted by the gateway. |
+| `downlink_path` | [`DownlinkPath`](#ttn.lorawan.v3.DownlinkPath) |  | Downlink path chosen by the Gateway Server. |
+| `rx1` | [`bool`](#bool) |  | Whether RX1 has been chosen for the downlink message. Both RX1 and RX2 can be used for transmitting the same message by the same gateway. |
+| `rx2` | [`bool`](#bool) |  | Whether RX2 has been chosen for the downlink message. Both RX1 and RX2 can be used for transmitting the same message by the same gateway. |
 
 #### Field Rules
 
