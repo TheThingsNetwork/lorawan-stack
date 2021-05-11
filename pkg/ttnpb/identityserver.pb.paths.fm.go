@@ -7,6 +7,7 @@ var AuthInfoResponseFieldPathsNested = []string{
 	"access_method.api_key",
 	"access_method.api_key.api_key",
 	"access_method.api_key.api_key.created_at",
+	"access_method.api_key.api_key.expires_at",
 	"access_method.api_key.api_key.id",
 	"access_method.api_key.api_key.key",
 	"access_method.api_key.api_key.name",
@@ -136,6 +137,7 @@ var GetIsConfigurationResponseFieldPathsTopLevel = []string{
 var AuthInfoResponse_APIKeyAccessFieldPathsNested = []string{
 	"api_key",
 	"api_key.created_at",
+	"api_key.expires_at",
 	"api_key.id",
 	"api_key.key",
 	"api_key.name",

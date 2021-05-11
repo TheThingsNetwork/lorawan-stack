@@ -342,6 +342,7 @@ var GetGatewayAPIKeyRequestFieldPathsTopLevel = []string{
 	"key_id",
 }
 var CreateGatewayAPIKeyRequestFieldPathsNested = []string{
+	"expires_at",
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
@@ -350,6 +351,7 @@ var CreateGatewayAPIKeyRequestFieldPathsNested = []string{
 }
 
 var CreateGatewayAPIKeyRequestFieldPathsTopLevel = []string{
+	"expires_at",
 	"gateway_ids",
 	"name",
 	"rights",
@@ -357,11 +359,13 @@ var CreateGatewayAPIKeyRequestFieldPathsTopLevel = []string{
 var UpdateGatewayAPIKeyRequestFieldPathsNested = []string{
 	"api_key",
 	"api_key.created_at",
+	"api_key.expires_at",
 	"api_key.id",
 	"api_key.key",
 	"api_key.name",
 	"api_key.rights",
 	"api_key.updated_at",
+	"field_mask",
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
@@ -369,6 +373,7 @@ var UpdateGatewayAPIKeyRequestFieldPathsNested = []string{
 
 var UpdateGatewayAPIKeyRequestFieldPathsTopLevel = []string{
 	"api_key",
+	"field_mask",
 	"gateway_ids",
 }
 var ListGatewayCollaboratorsRequestFieldPathsNested = []string{

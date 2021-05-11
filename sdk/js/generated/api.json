@@ -289,6 +289,24 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "expires_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.gt_now",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -764,6 +782,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the api key fields that should be updated.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -14049,6 +14077,24 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "expires_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.gt_now",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -15953,6 +15999,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the api key fields that should be updated.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -27417,6 +27473,24 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "expires_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.gt_now",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -28087,6 +28161,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the api key fields that should be updated.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -30802,6 +30886,24 @@
               "fullType": "google.protobuf.Timestamp",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "expires_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.gt_now",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -32571,6 +32673,24 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "expires_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.gt_now",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -33248,6 +33368,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the api key fields that should be updated.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

@@ -11443,6 +11443,10 @@
         "updated_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -12849,6 +12853,10 @@
           "items": {
             "$ref": "#/definitions/v3Right"
           }
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -12898,6 +12906,10 @@
           "items": {
             "$ref": "#/definitions/v3Right"
           }
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -12936,6 +12948,10 @@
           "items": {
             "$ref": "#/definitions/v3Right"
           }
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -12965,6 +12981,10 @@
           "items": {
             "$ref": "#/definitions/v3Right"
           }
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -16719,6 +16739,10 @@
         },
         "api_key": {
           "$ref": "#/definitions/v3APIKey"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the api key fields that should be updated."
         }
       }
     },
@@ -16766,6 +16790,10 @@
         },
         "api_key": {
           "$ref": "#/definitions/v3APIKey"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the api key fields that should be updated."
         }
       }
     },
@@ -16789,6 +16817,10 @@
         },
         "api_key": {
           "$ref": "#/definitions/v3APIKey"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the api key fields that should be updated."
         }
       }
     },
@@ -16812,6 +16844,10 @@
         },
         "api_key": {
           "$ref": "#/definitions/v3APIKey"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "The names of the api key fields that should be updated."
         }
       }
     },

@@ -78,11 +78,17 @@ func init() {
 
 	for id, apiKeys := range population.APIKeys {
 		if id.GetUserIds().GetUserId() == defaultUser.GetUserId() {
+			expiredTime := time.Now().Add(-1 * time.Hour)
 			population.APIKeys[id] = append(
 				apiKeys,
 				&ttnpb.APIKey{
 					Name:   "key without rights",
 					Rights: []ttnpb.Right{ttnpb.RIGHT_SEND_INVITES},
+				},
+				&ttnpb.APIKey{
+					Name:      "expired key",
+					Rights:    []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
+					ExpiresAt: &expiredTime,
 				},
 			)
 		}

@@ -11,6 +11,7 @@ var RightsFieldPathsTopLevel = []string{
 }
 var APIKeyFieldPathsNested = []string{
 	"created_at",
+	"expires_at",
 	"id",
 	"key",
 	"name",
@@ -20,6 +21,7 @@ var APIKeyFieldPathsNested = []string{
 
 var APIKeyFieldPathsTopLevel = []string{
 	"created_at",
+	"expires_at",
 	"id",
 	"key",
 	"name",

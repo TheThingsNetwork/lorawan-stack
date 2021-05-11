@@ -15,11 +15,13 @@ For details about compatibility between different releases, see the **Commitment
 - Listing all listed Packet Broker networks with `ttn-lw-cli packetbroker networks list`.
 - Include end device version identifiers in upstream messages (see `uplink_message.version_ids.brand_id`, `uplink_message.version_ids.model_id`, `uplink_message.version_ids.firmware_version`, `uplink_message.version_ids.hardware_version` and `uplink_message.version_ids.band_id` fields).
 - Reporting uplink and downlink message delivery state changes to Packet Broker. This will be used for statistical purposes (e.g. which message is processed successfully or why it errored) as well as LoRaWAN roaming (the `XmitDataAns` result code).
+- Setting API key expiry via `--api-key-expiry` flag using RFC3339 format.
 
 ### Changed
 
 - User IDs now have a minimum length of 2 instead of 3, so that more users coming from v2 can keep their username.
 - Disabled device uplink simulation and downlink message sending when skipping payload crypto.
+- The UpdateAPIKey RPCs now take a fieldmask.
 
 ### Deprecated
 

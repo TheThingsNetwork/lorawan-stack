@@ -120,11 +120,14 @@ message CreateOrganizationAPIKeyRequest {
       items: { enum: { defined_only: true } }
     }
   ];
+  google.protobuf.Timestamp expires_at = 4 [(gogoproto.stdtime) = true, (validate.rules).timestamp.gt_now = true];
 }
 
 message UpdateOrganizationAPIKeyRequest {
   OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // The names of the api key fields that should be updated.
+  google.protobuf.FieldMask field_mask = 3 [(gogoproto.nullable) = false];
 }
 
 message ListOrganizationCollaboratorsRequest {
