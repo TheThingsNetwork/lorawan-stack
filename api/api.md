@@ -2529,6 +2529,7 @@ and allows clients to claim end devices.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `vendor_id` | [`string`](#string) |  | Vendor ID of the profile, as defined in the Device Repository. If this value is set, the profile is loaded from this vendor's folder. If this value is not set, the profile is loaded from the current (end device's) vendor. |
 | `profile_id` | [`string`](#string) |  | Profile identifier, as defined in the Device Repository. |
 | `lorawan_certified` | [`bool`](#bool) |  | Whether the device is LoRaWAN certified. |
 | `codec_id` | [`string`](#string) |  | Payload formatter codec identifier, as defined in the Device Repository. |

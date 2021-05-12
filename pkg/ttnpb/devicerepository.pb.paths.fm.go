@@ -349,12 +349,14 @@ var EndDeviceModel_FirmwareVersion_ProfileFieldPathsNested = []string{
 	"codec_id",
 	"lorawan_certified",
 	"profile_id",
+	"vendor_id",
 }
 
 var EndDeviceModel_FirmwareVersion_ProfileFieldPathsTopLevel = []string{
 	"codec_id",
 	"lorawan_certified",
 	"profile_id",
+	"vendor_id",
 }
 var EndDeviceModel_OperatingConditions_LimitsFieldPathsNested = []string{
 	"max",

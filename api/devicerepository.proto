@@ -97,6 +97,10 @@ message EndDeviceModel {
 
   message FirmwareVersion {
     message Profile {
+      // Vendor ID of the profile, as defined in the Device Repository.
+      // If this value is set, the profile is loaded from this vendor's folder.
+      // If this value is not set, the profile is loaded from the current (end device's) vendor.
+      string vendor_id = 4 [(gogoproto.customname) = "VendorID"];
       // Profile identifier, as defined in the Device Repository.
       string profile_id = 1 [(gogoproto.customname) = "ProfileID"];
       // Whether the device is LoRaWAN certified.

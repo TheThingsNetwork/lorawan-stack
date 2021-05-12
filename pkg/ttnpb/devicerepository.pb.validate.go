@@ -2844,6 +2844,8 @@ func (m *EndDeviceModel_FirmwareVersion_Profile) ValidateFields(paths ...string)
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
+		case "vendor_id":
+			// no validation rules for VendorID
 		case "profile_id":
 			// no validation rules for ProfileID
 		case "lorawan_certified":

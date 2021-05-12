@@ -1382,6 +1382,16 @@ func (dst *EndDeviceModel_Compliances) SetFields(src *EndDeviceModel_Compliances
 func (dst *EndDeviceModel_FirmwareVersion_Profile) SetFields(src *EndDeviceModel_FirmwareVersion_Profile, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
+		case "vendor_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'vendor_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.VendorID = src.VendorID
+			} else {
+				var zero string
+				dst.VendorID = zero
+			}
 		case "profile_id":
 			if len(subs) > 0 {
 				return fmt.Errorf("'profile_id' has no subfields, but %s were specified", subs)
