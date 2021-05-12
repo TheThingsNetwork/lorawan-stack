@@ -19,6 +19,7 @@ For details about compatibility between different releases, see the **Commitment
 - Events storage in the Redis events backend. This can be enabled with the new `events.redis.store.enable` option. The new options `events.redis.store.ttl`, `events.redis.store.entity-ttl`, `events.redis.store.entity-count` and `events.redis.store.correlation-id-count` can be used to configure retention.
 - RPC to find related events by correlation ID.
 - CLI command `events find-related`.
+- Support for loading Device Repository profiles from different vendors if specified. This allows reusing standard end device profiles from module makers and LoRaWAN end device stack vendors.
 
 ### Changed
 
