@@ -27,16 +27,28 @@ import {
   clearGatewayEventsStream,
   pauseGatewayEventsStream,
   resumeGatewayEventsStream,
+  setGatewayEventsFilter,
 } from '@console/store/actions/gateways'
 
 import {
   selectGatewayEvents,
   selectGatewayEventsPaused,
   selectGatewayEventsTruncated,
+  selectGatewayEventsFilter,
 } from '@console/store/selectors/gateways'
 
 const GatewayEvents = props => {
-  const { gtwId, events, widget, paused, onPauseToggle, onClear, truncated } = props
+  const {
+    gtwId,
+    events,
+    widget,
+    paused,
+    onPauseToggle,
+    onClear,
+    onFilterChange,
+    truncated,
+    filter,
+  } = props
 
   if (widget) {
     return (
@@ -51,7 +63,9 @@ const GatewayEvents = props => {
       paused={paused}
       onClear={onClear}
       onPauseToggle={onPauseToggle}
+      onFilterChange={onFilterChange}
       truncated={truncated}
+      filter={filter}
       scoped
     />
   )
@@ -59,8 +73,10 @@ const GatewayEvents = props => {
 
 GatewayEvents.propTypes = {
   events: PropTypes.events,
+  filter: PropTypes.string,
   gtwId: PropTypes.string.isRequired,
   onClear: PropTypes.func.isRequired,
+  onFilterChange: PropTypes.func.isRequired,
   onPauseToggle: PropTypes.func.isRequired,
   paused: PropTypes.bool.isRequired,
   truncated: PropTypes.bool.isRequired,
@@ -70,6 +86,7 @@ GatewayEvents.propTypes = {
 GatewayEvents.defaultProps = {
   widget: false,
   events: [],
+  filter: undefined,
 }
 
 export default withFeatureRequirement(mayViewGatewayEvents)(
@@ -81,6 +98,7 @@ export default withFeatureRequirement(mayViewGatewayEvents)(
         events: selectGatewayEvents(state, gtwId),
         paused: selectGatewayEventsPaused(state, gtwId),
         truncated: selectGatewayEventsTruncated(state, gtwId),
+        filter: selectGatewayEventsFilter(state, gtwId),
       }
     },
     (dispatch, ownProps) => ({
@@ -89,6 +107,7 @@ export default withFeatureRequirement(mayViewGatewayEvents)(
         paused
           ? dispatch(resumeGatewayEventsStream(ownProps.gtwId))
           : dispatch(pauseGatewayEventsStream(ownProps.gtwId)),
+      onFilterChange: filter => dispatch(setGatewayEventsFilter(ownProps.gtwId, filter)),
     }),
   )(GatewayEvents),
 )

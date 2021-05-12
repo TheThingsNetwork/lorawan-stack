@@ -29,6 +29,7 @@ import {
   createEventsInterruptedSelector,
   createEventsPausedSelector,
   createEventsTruncatedSelector,
+  createEventsFilterSelector,
 } from './events'
 
 const ENTITY = 'devices'
@@ -88,3 +89,4 @@ export const selectDeviceEventsStatus = createEventsStatusSelector(ENTITY)
 export const selectDeviceEventsInterruptted = createEventsInterruptedSelector(ENTITY)
 export const selectDeviceEventsPaused = createEventsPausedSelector(ENTITY)
 export const selectDeviceEventsTruncated = createEventsTruncatedSelector(ENTITY)
+export const selectDeviceEventsFilter = createEventsFilterSelector(ENTITY)

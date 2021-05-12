@@ -27,16 +27,28 @@ import {
   clearApplicationEventsStream,
   pauseApplicationEventsStream,
   resumeApplicationEventsStream,
+  setApplicationEventsFilter,
 } from '@console/store/actions/applications'
 
 import {
   selectApplicationEvents,
   selectApplicationEventsPaused,
   selectApplicationEventsTruncated,
+  selectApplicationEventsFilter,
 } from '@console/store/selectors/applications'
 
 const ApplicationEvents = props => {
-  const { appId, events, widget, paused, onClear, onPauseToggle, truncated } = props
+  const {
+    appId,
+    events,
+    widget,
+    paused,
+    onClear,
+    onPauseToggle,
+    truncated,
+    onFilterChange,
+    filter,
+  } = props
 
   if (widget) {
     return (
@@ -51,7 +63,9 @@ const ApplicationEvents = props => {
       paused={paused}
       onClear={onClear}
       truncated={truncated}
+      filter={filter}
       onPauseToggle={onPauseToggle}
+      onFilterChange={onFilterChange}
     />
   )
 }
@@ -59,7 +73,9 @@ const ApplicationEvents = props => {
 ApplicationEvents.propTypes = {
   appId: PropTypes.string.isRequired,
   events: PropTypes.events,
+  filter: PropTypes.string,
   onClear: PropTypes.func.isRequired,
+  onFilterChange: PropTypes.func.isRequired,
   onPauseToggle: PropTypes.func.isRequired,
   paused: PropTypes.bool.isRequired,
   truncated: PropTypes.bool.isRequired,
@@ -69,6 +85,7 @@ ApplicationEvents.propTypes = {
 ApplicationEvents.defaultProps = {
   widget: false,
   events: [],
+  filter: undefined,
 }
 
 export default withFeatureRequirement(mayViewApplicationEvents)(
@@ -80,6 +97,7 @@ export default withFeatureRequirement(mayViewApplicationEvents)(
         events: selectApplicationEvents(state, appId),
         paused: selectApplicationEventsPaused(state, appId),
         truncated: selectApplicationEventsTruncated(state, appId),
+        filter: selectApplicationEventsFilter(state, appId),
       }
     },
     (dispatch, ownProps) => ({
@@ -88,6 +106,7 @@ export default withFeatureRequirement(mayViewApplicationEvents)(
         paused
           ? dispatch(resumeApplicationEventsStream(ownProps.appId))
           : dispatch(pauseApplicationEventsStream(ownProps.appId)),
+      onFilterChange: filter => dispatch(setApplicationEventsFilter(ownProps.appId, filter)),
     }),
   )(ApplicationEvents),
 )

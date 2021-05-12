@@ -32,6 +32,7 @@ import {
   createEventsInterruptedSelector,
   createEventsPausedSelector,
   createEventsTruncatedSelector,
+  createEventsFilterSelector,
 } from './events'
 import { createRightsSelector, createPseudoRightsSelector } from './rights'
 
@@ -73,3 +74,4 @@ export const selectOrganizationEventsStatus = createEventsStatusSelector(ENTITY)
 export const selectOrganizationEventsInterrupted = createEventsInterruptedSelector(ENTITY)
 export const selectOrganizationEventsPaused = createEventsPausedSelector(ENTITY)
 export const selectOrganizationEventsTruncated = createEventsTruncatedSelector(ENTITY)
+export const selectOrganizationEventsFilter = createEventsFilterSelector(ENTITY)

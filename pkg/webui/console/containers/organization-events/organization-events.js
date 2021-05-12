@@ -40,6 +40,7 @@ const OrganizationEvents = props => {
       onPauseToggle={onPauseToggle}
       truncated={truncated}
       entityId={orgId}
+      disableFiltering
     />
   )
 }

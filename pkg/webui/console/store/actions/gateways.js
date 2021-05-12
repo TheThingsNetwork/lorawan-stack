@@ -38,6 +38,8 @@ import {
   createClearEventsActionType,
   createGetEventMessageSuccessActionType,
   getEventMessageSuccess,
+  createSetEventsFilterActionType,
+  setEventsFilter,
 } from './events'
 
 export const SHARED_NAME = 'GATEWAY'
@@ -127,6 +129,7 @@ export const RESUME_GTW_EVENT_STREAM = createResumeEventsStreamActionType(SHARED
 export const STOP_GTW_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_GTW_EVENTS = createClearEventsActionType(SHARED_NAME)
 export const GET_GTW_EVENT_MESSAGE_SUCCESS = createGetEventMessageSuccessActionType(SHARED_NAME)
+export const SET_GTW_EVENTS_FILTER = createSetEventsFilterActionType(SHARED_NAME)
 
 export const startGatewayEventsStream = startEventsStream(SHARED_NAME)
 export const startGatewayEventsStreamSuccess = startEventsStreamSuccess(SHARED_NAME)
@@ -136,3 +139,4 @@ export const resumeGatewayEventsStream = resumeEventsStream(SHARED_NAME)
 export const stopGatewayEventsStream = stopEventsStream(SHARED_NAME)
 export const clearGatewayEventsStream = clearEvents(SHARED_NAME)
 export const getGatewayEventMessageSuccess = getEventMessageSuccess(SHARED_NAME)
+export const setGatewayEventsFilter = setEventsFilter(SHARED_NAME)

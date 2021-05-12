@@ -24,16 +24,29 @@ import {
   clearDeviceEventsStream,
   pauseDeviceEventsStream,
   resumeDeviceEventsStream,
+  setDeviceEventsFilter,
 } from '@console/store/actions/devices'
 
 import {
   selectDeviceEvents,
   selectDeviceEventsPaused,
   selectDeviceEventsTruncated,
+  selectDeviceEventsFilter,
 } from '@console/store/selectors/devices'
 
 const DeviceEvents = props => {
-  const { appId, devId, events, widget, paused, onClear, onPauseToggle, truncated } = props
+  const {
+    appId,
+    devId,
+    events,
+    widget,
+    paused,
+    onClear,
+    onPauseToggle,
+    onFilterChange,
+    truncated,
+    filter,
+  } = props
 
   if (widget) {
     return (
@@ -51,8 +64,10 @@ const DeviceEvents = props => {
       events={events}
       entityId={devId}
       paused={paused}
+      filter={filter}
       onClear={onClear}
       onPauseToggle={onPauseToggle}
+      onFilterChange={onFilterChange}
       truncated={truncated}
       scoped
       widget
@@ -70,7 +85,9 @@ DeviceEvents.propTypes = {
     }),
   }).isRequired,
   events: PropTypes.events,
+  filter: PropTypes.string,
   onClear: PropTypes.func.isRequired,
+  onFilterChange: PropTypes.func.isRequired,
   onPauseToggle: PropTypes.func.isRequired,
   paused: PropTypes.bool.isRequired,
   truncated: PropTypes.bool.isRequired,
@@ -80,6 +97,7 @@ DeviceEvents.propTypes = {
 DeviceEvents.defaultProps = {
   widget: false,
   events: [],
+  filter: undefined,
 }
 
 export default connect(
@@ -96,6 +114,7 @@ export default connect(
       events: selectDeviceEvents(state, combinedId),
       paused: selectDeviceEventsPaused(state, combinedId),
       truncated: selectDeviceEventsTruncated(state, combinedId),
+      filter: selectDeviceEventsFilter(state, combinedId),
     }
   },
   (dispatch, ownProps) => {
@@ -107,6 +126,7 @@ export default connect(
         paused
           ? dispatch(resumeDeviceEventsStream(devIds))
           : dispatch(pauseDeviceEventsStream(devIds)),
+      onFilterChange: filter => dispatch(setDeviceEventsFilter(devIds, filter)),
     }
   },
 )(DeviceEvents)

@@ -73,3 +73,9 @@ export const createInterruptedStreamsSelector = entity => state => {
     return acc
   }, {})
 }
+
+export const createEventsFilterSelector = entity => (state, entityId) => {
+  const store = selectEventsStore(state.events[entity], entityId)
+
+  return store.filter
+}

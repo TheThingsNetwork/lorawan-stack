@@ -32,6 +32,8 @@ export const createGetEventMessageFailureActionType = name => `GET_${name}_EVENT
 
 export const createClearEventsActionType = name => `CLEAR_${name}_EVENTS`
 
+export const createSetEventsFilterActionType = name => `SET_${name}_EVENTS_FILTER`
+
 export const startEventsStream = name => id => ({
   type: createStartEventsStreamActionType(name),
   id,
@@ -78,3 +80,9 @@ export const getEventMessageFailure = name => (id, error) => ({
 })
 
 export const clearEvents = name => id => ({ type: createClearEventsActionType(name), id })
+
+export const setEventsFilter = name => (id, filter) => ({
+  type: createSetEventsFilterActionType(name),
+  id,
+  filter,
+})
