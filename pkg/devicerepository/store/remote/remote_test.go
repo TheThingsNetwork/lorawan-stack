@@ -260,12 +260,13 @@ func TestRemoteStore(t *testing.T) {
 						SupportedHardwareVersions: []string{"0.1", "0.2"},
 						Profiles: map[string]*ttnpb.EndDeviceModel_FirmwareVersion_Profile{
 							"EU_863_870": {
+								VendorID:  "module-maker",
+								ProfileID: "module-profile",
 								CodecID:   "",
-								ProfileID: "full-profile2",
 							},
 							"US_902_928": {
-								CodecID:   "codec",
 								ProfileID: "full-profile",
+								CodecID:   "codec",
 							},
 						},
 					},

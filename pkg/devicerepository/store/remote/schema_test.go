@@ -60,7 +60,7 @@ func TestDutyCycleFromFloat(t *testing.T) {
 	}
 }
 
-func TestSchema(t *testing.T) {
+func TestProfile(t *testing.T) {
 	for _, tc := range []struct {
 		profile  string
 		codec    string

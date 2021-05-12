@@ -202,7 +202,11 @@ func (s *remoteStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnp
 			)
 		}
 
-		b, err := s.fetcher.File("vendor", ids.BrandID, profileInfo.ProfileID+".yaml")
+		profileVendorID := ids.BrandID
+		if id := profileInfo.VendorID; id != "" {
+			profileVendorID = id
+		}
+		b, err := s.fetcher.File("vendor", profileVendorID, profileInfo.ProfileID+".yaml")
 		if err != nil {
 			return nil, err
 		}

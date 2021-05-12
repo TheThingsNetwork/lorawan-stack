@@ -91,6 +91,7 @@ type EndDeviceModel struct {
 		Numeric          uint32   `yaml:"numeric"`
 		HardwareVersions []string `yaml:"hardwareVersions"`
 		Profiles         map[string]struct {
+			VendorID         string `yaml:"vendorID"`
 			ID               string `yaml:"id"`
 			Codec            string `yaml:"codec"`
 			LoRaWANCertified bool   `yaml:"lorawanCertified"`
@@ -189,9 +190,10 @@ func (d EndDeviceModel) ToPB(brandID, modelID string, paths ...string) (*ttnpb.E
 		pbver.Profiles = make(map[string]*ttnpb.EndDeviceModel_FirmwareVersion_Profile, len(ver.Profiles))
 		for region, profile := range ver.Profiles {
 			pbver.Profiles[regionToBandID[region]] = &ttnpb.EndDeviceModel_FirmwareVersion_Profile{
-				CodecID:          profile.Codec,
+				VendorID:         profile.VendorID,
 				ProfileID:        profile.ID,
 				LoRaWANCertified: profile.LoRaWANCertified,
+				CodecID:          profile.Codec,
 			}
 		}
 		pb.FirmwareVersions = append(pb.FirmwareVersions, pbver)

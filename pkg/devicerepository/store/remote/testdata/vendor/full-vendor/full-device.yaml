@@ -11,7 +11,7 @@ firmwareVersions:
   - version: 1.0
     hardwareVersions: [0.1, 0.2]
     profiles:
-      EU863-870: {id: full-profile2}
+      EU863-870: {vendorID: module-maker, id: module-profile}
       US902-928: {id: full-profile, codec: codec}
 sensors: [temperature, gas]
 dimensions:
