@@ -1130,13 +1130,13 @@ func TestGatewayServer(t *testing.T) {
 						a := assertions.New(t)
 
 						upEvents := map[string]events.Channel{}
-						for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.status.forward"} {
+						for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive"} {
 							upEvents[event] = make(events.Channel, 5)
 						}
 						defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
 							PublishFunc: func(ev events.Event) {
 								switch name := ev.Name(); name {
-								case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.status.forward":
+								case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive":
 									go func() {
 										upEvents[name] <- ev
 									}()
@@ -1214,12 +1214,6 @@ func TestGatewayServer(t *testing.T) {
 							case <-upEvents["gs.status.receive"]:
 							case <-time.After(timeout):
 								t.Fatal("Expected gateway status event timeout")
-							}
-
-							select {
-							case <-upEvents["gs.status.forward"]:
-							case <-time.After(timeout):
-								t.Fatal("Expected gateway status forward event timeout")
 							}
 						}
 

@@ -46,11 +46,6 @@ var (
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
 		events.WithDataType(&ttnpb.GatewayStatus{}),
 	)
-	evtForwardStatus = events.Define(
-		"gs.status.forward", "forward gateway status",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
-		events.WithDataType(&ttnpb.GatewayStatus{}),
-	)
 	evtDropStatus = events.Define(
 		"gs.status.drop", "drop gateway status",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
@@ -287,7 +282,6 @@ func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnp
 }
 
 func registerForwardStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, host string) {
-	events.Publish(evtForwardStatus.NewWithIdentifiersAndData(ctx, gtw, status))
 	gsMetrics.statusForwarded.WithLabelValues(ctx, host).Inc()
 }
 

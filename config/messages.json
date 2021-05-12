@@ -8891,15 +8891,6 @@
       "file": "observability.go"
     }
   },
-  "event:gs.status.forward": {
-    "translations": {
-      "en": "forward gateway status"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "observability.go"
-    }
-  },
   "event:gs.status.receive": {
     "translations": {
       "en": "receive gateway status"
