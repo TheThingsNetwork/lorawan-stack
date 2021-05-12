@@ -305,7 +305,7 @@ func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.U
 }
 
 func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, host string) {
-	events.Publish(evtForwardUp.NewWithIdentifiersAndData(ctx, gtw, nil))
+	events.Publish(evtForwardUp.NewWithIdentifiersAndData(ctx, gtw, host))
 	gsMetrics.uplinkForwarded.WithLabelValues(ctx, host).Inc()
 }
 
