@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    commit-message:
+      prefix: 'dev'
+
+  - package-ecosystem: 'npm'
+    directory: '/sdk/js'
+    schedule:
+      interval: 'monthly'
+    commit-message:
+      prefix: 'dev'
