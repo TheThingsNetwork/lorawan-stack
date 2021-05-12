@@ -44,7 +44,7 @@ func TestRemoteStore(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(list.Brands, should.Resemble, []*ttnpb.EndDeviceBrand{
 				{
-					BrandID: "foo-vendor",
+					BrandId: "foo-vendor",
 					Name:    "Foo Vendor",
 				},
 			})
@@ -62,7 +62,7 @@ func TestRemoteStore(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(list.Brands, should.Resemble, []*ttnpb.EndDeviceBrand{
 				{
-					BrandID: "full-vendor",
+					BrandId: "full-vendor",
 					Name:    "Full Vendor",
 				},
 			})
@@ -75,14 +75,14 @@ func TestRemoteStore(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(list.Brands, should.Resemble, []*ttnpb.EndDeviceBrand{
 				{
-					BrandID:              "foo-vendor",
+					BrandId:              "foo-vendor",
 					Name:                 "Foo Vendor",
-					LoRaAllianceVendorID: 42,
+					LoraAllianceVendorId: 42,
 				},
 				{
-					BrandID:                       "full-vendor",
+					BrandId:                       "full-vendor",
 					Name:                          "Full Vendor",
-					LoRaAllianceVendorID:          44,
+					LoraAllianceVendorId:          44,
 					Email:                         "mail@example.com",
 					Website:                       "example.org",
 					PrivateEnterpriseNumber:       42,
@@ -105,18 +105,18 @@ func TestRemoteStore(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(list.Models, should.Resemble, []*ttnpb.EndDeviceModel{
 				{
-					BrandID: "foo-vendor",
-					ModelID: "dev1",
+					BrandId: "foo-vendor",
+					ModelId: "dev1",
 					Name:    "Device 1",
 				},
 				{
-					BrandID: "foo-vendor",
-					ModelID: "dev2",
+					BrandId: "foo-vendor",
+					ModelId: "dev2",
 					Name:    "Device 2",
 				},
 				{
-					BrandID: "full-vendor",
-					ModelID: "full-device",
+					BrandId: "full-vendor",
+					ModelId: "full-device",
 					Name:    "Full Device",
 				},
 			})
@@ -135,8 +135,8 @@ func TestRemoteStore(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(list.Models, should.Resemble, []*ttnpb.EndDeviceModel{
 				{
-					BrandID: "foo-vendor",
-					ModelID: "dev1",
+					BrandId: "foo-vendor",
+					ModelId: "dev1",
 					Name:    "Device 1",
 				},
 			})
@@ -156,8 +156,8 @@ func TestRemoteStore(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(list.Models, should.Resemble, []*ttnpb.EndDeviceModel{
 				{
-					BrandID: "foo-vendor",
-					ModelID: "dev2",
+					BrandId: "foo-vendor",
+					ModelId: "dev2",
 					Name:    "Device 2",
 				},
 			})
@@ -171,8 +171,8 @@ func TestRemoteStore(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(list.Models, should.Resemble, []*ttnpb.EndDeviceModel{
 				{
-					BrandID:     "foo-vendor",
-					ModelID:     "dev1",
+					BrandId:     "foo-vendor",
+					ModelId:     "dev1",
 					Name:        "Device 1",
 					Description: "My Description",
 					HardwareVersions: []*ttnpb.EndDeviceModel_HardwareVersion{
@@ -188,21 +188,21 @@ func TestRemoteStore(t *testing.T) {
 							SupportedHardwareVersions: []string{"1.0"},
 							Profiles: map[string]*ttnpb.EndDeviceModel_FirmwareVersion_Profile{
 								"EU_863_870": {
-									ProfileID:        "profile1",
-									LoRaWANCertified: true,
+									ProfileId:        "profile1",
+									LorawanCertified: true,
 								},
 								"US_902_928": {
-									CodecID:          "foo-codec",
-									ProfileID:        "profile2",
-									LoRaWANCertified: true,
+									CodecId:          "foo-codec",
+									ProfileId:        "profile2",
+									LorawanCertified: true,
 								},
 							},
 						},
 					},
 				},
 				{
-					BrandID:     "foo-vendor",
-					ModelID:     "dev2",
+					BrandId:     "foo-vendor",
+					ModelId:     "dev2",
 					Name:        "Device 2",
 					Description: "My Description 2",
 					HardwareVersions: []*ttnpb.EndDeviceModel_HardwareVersion{
@@ -218,9 +218,9 @@ func TestRemoteStore(t *testing.T) {
 							SupportedHardwareVersions: []string{"2.0"},
 							Profiles: map[string]*ttnpb.EndDeviceModel_FirmwareVersion_Profile{
 								"EU_433": {
-									CodecID:          "foo-codec",
-									ProfileID:        "profile2",
-									LoRaWANCertified: true,
+									CodecId:          "foo-codec",
+									ProfileId:        "profile2",
+									LorawanCertified: true,
 								},
 							},
 						},
@@ -238,8 +238,8 @@ func TestRemoteStore(t *testing.T) {
 			})
 			a.So(err, should.BeNil)
 			a.So(list.Models[0], should.Resemble, &ttnpb.EndDeviceModel{
-				BrandID:     "full-vendor",
-				ModelID:     "full-device",
+				BrandId:     "full-vendor",
+				ModelId:     "full-device",
 				Name:        "Full Device",
 				Description: "A description",
 				HardwareVersions: []*ttnpb.EndDeviceModel_HardwareVersion{
@@ -260,12 +260,13 @@ func TestRemoteStore(t *testing.T) {
 						SupportedHardwareVersions: []string{"0.1", "0.2"},
 						Profiles: map[string]*ttnpb.EndDeviceModel_FirmwareVersion_Profile{
 							"EU_863_870": {
-								CodecID:   "",
-								ProfileID: "full-profile2",
+								VendorId:  "module-maker",
+								ProfileId: "module-profile",
+								CodecId:   "",
 							},
 							"US_902_928": {
-								CodecID:   "codec",
-								ProfileID: "full-profile",
+								ProfileId: "full-profile",
+								CodecId:   "codec",
 							},
 						},
 					},
@@ -292,7 +293,7 @@ func TestRemoteStore(t *testing.T) {
 						Max: &pbtypes.FloatValue{Value: 4},
 					},
 				},
-				IPCode:          "IP67",
+				IpCode:          "IP67",
 				KeyProvisioning: []ttnpb.KeyProvisioning{ttnpb.KEY_PROVISIONING_CUSTOM},
 				KeySecurity:     ttnpb.KEY_SECURITY_READ_PROTECTED,
 				Photos: &ttnpb.EndDeviceModel_Photos{
@@ -303,18 +304,18 @@ func TestRemoteStore(t *testing.T) {
 					Main:  "a.mp4",
 					Other: []string{"b.mp4", "https://youtube.com/watch?v=c.mp4"},
 				},
-				ProductURL:   "https://product.vendor.io",
-				DatasheetURL: "https://production.vendor.io/datasheet.pdf",
+				ProductUrl:   "https://product.vendor.io",
+				DatasheetUrl: "https://production.vendor.io/datasheet.pdf",
 				Resellers: []*ttnpb.EndDeviceModel_Reseller{
 					{
 						Name:   "Reseller 1",
 						Region: []string{"European Union"},
-						URL:    "https://example.com/eu",
+						Url:    "https://example.com/eu",
 					},
 					{
 						Name:   "Reseller 2",
 						Region: []string{"United States", "Canada"},
-						URL:    "https://example.com/na",
+						Url:    "https://example.com/na",
 					},
 				},
 				Compliances: &ttnpb.EndDeviceModel_Compliances{
@@ -440,7 +441,7 @@ func TestRemoteStore(t *testing.T) {
 							Description: "dummy example",
 							Input: &ttnpb.EncodedMessagePayload{
 								FPort:      10,
-								FRMPayload: []byte{1, 1, 100},
+								FrmPayload: []byte{1, 1, 100},
 							},
 							Output: &ttnpb.DecodedMessagePayload{
 								Data: mustStruct(map[string]interface{}{
@@ -467,7 +468,7 @@ func TestRemoteStore(t *testing.T) {
 							Description: "downlink decode example",
 							Input: &ttnpb.EncodedMessagePayload{
 								FPort:      20,
-								FRMPayload: []byte{1, 5},
+								FrmPayload: []byte{1, 5},
 							},
 							Output: &ttnpb.DecodedMessagePayload{
 								Data: mustStruct(map[string]interface{}{
@@ -496,7 +497,7 @@ func TestRemoteStore(t *testing.T) {
 							},
 							Output: &ttnpb.EncodedMessagePayload{
 								FPort:      20,
-								FRMPayload: []byte{1, 5},
+								FrmPayload: []byte{1, 5},
 								Warnings:   []string{"warn1"},
 								Errors:     []string{"err1"},
 							},

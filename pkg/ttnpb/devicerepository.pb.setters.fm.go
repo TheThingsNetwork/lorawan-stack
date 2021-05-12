@@ -16,10 +16,10 @@ func (dst *EndDeviceBrand) SetFields(src *EndDeviceBrand, paths ...string) error
 				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.BrandID = src.BrandID
+				dst.BrandId = src.BrandId
 			} else {
 				var zero string
-				dst.BrandID = zero
+				dst.BrandId = zero
 			}
 		case "name":
 			if len(subs) > 0 {
@@ -55,10 +55,10 @@ func (dst *EndDeviceBrand) SetFields(src *EndDeviceBrand, paths ...string) error
 				return fmt.Errorf("'lora_alliance_vendor_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LoRaAllianceVendorID = src.LoRaAllianceVendorID
+				dst.LoraAllianceVendorId = src.LoraAllianceVendorId
 			} else {
 				var zero uint32
-				dst.LoRaAllianceVendorID = zero
+				dst.LoraAllianceVendorId = zero
 			}
 		case "website":
 			if len(subs) > 0 {
@@ -106,20 +106,20 @@ func (dst *EndDeviceModel) SetFields(src *EndDeviceModel, paths ...string) error
 				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.BrandID = src.BrandID
+				dst.BrandId = src.BrandId
 			} else {
 				var zero string
-				dst.BrandID = zero
+				dst.BrandId = zero
 			}
 		case "model_id":
 			if len(subs) > 0 {
 				return fmt.Errorf("'model_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ModelID = src.ModelID
+				dst.ModelId = src.ModelId
 			} else {
 				var zero string
-				dst.ModelID = zero
+				dst.ModelId = zero
 			}
 		case "name":
 			if len(subs) > 0 {
@@ -257,10 +257,10 @@ func (dst *EndDeviceModel) SetFields(src *EndDeviceModel, paths ...string) error
 				return fmt.Errorf("'ip_code' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.IPCode = src.IPCode
+				dst.IpCode = src.IpCode
 			} else {
 				var zero string
-				dst.IPCode = zero
+				dst.IpCode = zero
 			}
 		case "key_provisioning":
 			if len(subs) > 0 {
@@ -336,20 +336,20 @@ func (dst *EndDeviceModel) SetFields(src *EndDeviceModel, paths ...string) error
 				return fmt.Errorf("'product_url' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ProductURL = src.ProductURL
+				dst.ProductUrl = src.ProductUrl
 			} else {
 				var zero string
-				dst.ProductURL = zero
+				dst.ProductUrl = zero
 			}
 		case "datasheet_url":
 			if len(subs) > 0 {
 				return fmt.Errorf("'datasheet_url' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.DatasheetURL = src.DatasheetURL
+				dst.DatasheetUrl = src.DatasheetUrl
 			} else {
 				var zero string
-				dst.DatasheetURL = zero
+				dst.DatasheetUrl = zero
 			}
 		case "resellers":
 			if len(subs) > 0 {
@@ -702,26 +702,26 @@ func (dst *GetTemplateRequest) SetFields(src *GetTemplateRequest, paths ...strin
 		case "version_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceVersionIdentifiers
-				if (src == nil || src.VersionIDs == nil) && dst.VersionIDs == nil {
+				if (src == nil || src.VersionIds == nil) && dst.VersionIds == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.VersionIDs
+					newSrc = src.VersionIds
 				}
-				if dst.VersionIDs != nil {
-					newDst = dst.VersionIDs
+				if dst.VersionIds != nil {
+					newDst = dst.VersionIds
 				} else {
 					newDst = &EndDeviceVersionIdentifiers{}
-					dst.VersionIDs = newDst
+					dst.VersionIds = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.VersionIDs = src.VersionIDs
+					dst.VersionIds = src.VersionIds
 				} else {
-					dst.VersionIDs = nil
+					dst.VersionIds = nil
 				}
 			}
 
@@ -854,9 +854,9 @@ func (dst *EncodedMessagePayload) SetFields(src *EncodedMessagePayload, paths ..
 				return fmt.Errorf("'frm_payload' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.FRMPayload = src.FRMPayload
+				dst.FrmPayload = src.FrmPayload
 			} else {
-				dst.FRMPayload = nil
+				dst.FrmPayload = nil
 			}
 		case "warnings":
 			if len(subs) > 0 {
@@ -1337,10 +1337,10 @@ func (dst *EndDeviceModel_Reseller) SetFields(src *EndDeviceModel_Reseller, path
 				return fmt.Errorf("'url' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.URL = src.URL
+				dst.Url = src.Url
 			} else {
 				var zero string
-				dst.URL = zero
+				dst.Url = zero
 			}
 
 		default:
@@ -1382,35 +1382,45 @@ func (dst *EndDeviceModel_Compliances) SetFields(src *EndDeviceModel_Compliances
 func (dst *EndDeviceModel_FirmwareVersion_Profile) SetFields(src *EndDeviceModel_FirmwareVersion_Profile, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
+		case "vendor_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'vendor_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.VendorId = src.VendorId
+			} else {
+				var zero string
+				dst.VendorId = zero
+			}
 		case "profile_id":
 			if len(subs) > 0 {
 				return fmt.Errorf("'profile_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ProfileID = src.ProfileID
+				dst.ProfileId = src.ProfileId
 			} else {
 				var zero string
-				dst.ProfileID = zero
+				dst.ProfileId = zero
 			}
 		case "lorawan_certified":
 			if len(subs) > 0 {
 				return fmt.Errorf("'lorawan_certified' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LoRaWANCertified = src.LoRaWANCertified
+				dst.LorawanCertified = src.LorawanCertified
 			} else {
 				var zero bool
-				dst.LoRaWANCertified = zero
+				dst.LorawanCertified = zero
 			}
 		case "codec_id":
 			if len(subs) > 0 {
 				return fmt.Errorf("'codec_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CodecID = src.CodecID
+				dst.CodecId = src.CodecId
 			} else {
 				var zero string
-				dst.CodecID = zero
+				dst.CodecId = zero
 			}
 
 		default:

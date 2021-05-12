@@ -143,7 +143,7 @@ func (s *remoteStore) GetModels(req store.GetModelsRequest) (*store.GetModelsRes
 	for _, brand := range brands.Brands {
 		models, err := s.GetModels(store.GetModelsRequest{
 			Paths:   req.Paths,
-			BrandID: brand.BrandID,
+			BrandID: brand.BrandId,
 			Limit:   req.Limit,
 		})
 		if errors.IsNotFound(err) {
@@ -202,7 +202,11 @@ func (s *remoteStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnp
 			)
 		}
 
-		b, err := s.fetcher.File("vendor", ids.BrandID, profileInfo.ProfileID+".yaml")
+		profileVendorID := ids.BrandID
+		if id := profileInfo.VendorId; id != "" {
+			profileVendorID = id
+		}
+		b, err := s.fetcher.File("vendor", profileVendorID, profileInfo.ProfileId+".yaml")
 		if err != nil {
 			return nil, err
 		}
@@ -264,12 +268,12 @@ func (s *remoteStore) getCodecs(ids *ttnpb.EndDeviceVersionIdentifiers) (*EndDev
 			"band_id", ids.BandID,
 		)
 	}
-	if profileInfo.CodecID == "" {
+	if profileInfo.CodecId == "" {
 		return nil, errNoCodec.WithAttributes("firmware_version", ids.FirmwareVersion, "band_id", ids.BandID)
 	}
 
 	codecs := &EndDeviceCodecs{
-		CodecID: profileInfo.CodecID,
+		CodecID: profileInfo.CodecId,
 	}
 	b, err := s.fetcher.File("vendor", ids.BrandID, codecs.CodecID+".yaml")
 	if err != nil {
@@ -310,7 +314,7 @@ func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *
 				Description: e.Description,
 				Input: &ttnpb.EncodedMessagePayload{
 					FPort:      e.Input.FPort,
-					FRMPayload: e.Input.Bytes,
+					FrmPayload: e.Input.Bytes,
 				},
 				Output: &ttnpb.DecodedMessagePayload{
 					Warnings: e.Output.Warnings,
@@ -372,7 +376,7 @@ func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.Mess
 				Input:       &ttnpb.DecodedMessagePayload{},
 				Output: &ttnpb.EncodedMessagePayload{
 					FPort:      e.Output.FPort,
-					FRMPayload: e.Output.Bytes,
+					FrmPayload: e.Output.Bytes,
 					Warnings:   e.Output.Warnings,
 					Errors:     e.Output.Errors,
 				},

@@ -101,7 +101,7 @@ func TestBleve(t *testing.T) {
 					Total: 1,
 					Count: 1,
 					Brands: []*ttnpb.EndDeviceBrand{{
-						BrandID: "full-vendor",
+						BrandId: "full-vendor",
 						Name:    "Full Vendor",
 						Email:   "mail@example.com",
 					}},
@@ -132,7 +132,7 @@ func TestBleve(t *testing.T) {
 				result: &store.GetBrandsResponse{
 					Total:  2,
 					Count:  1,
-					Brands: []*ttnpb.EndDeviceBrand{{BrandID: "foo-vendor"}},
+					Brands: []*ttnpb.EndDeviceBrand{{BrandId: "foo-vendor"}},
 				},
 			},
 			{
@@ -146,7 +146,7 @@ func TestBleve(t *testing.T) {
 					Total:  2,
 					Offset: 1,
 					Count:  1,
-					Brands: []*ttnpb.EndDeviceBrand{{BrandID: "full-vendor"}},
+					Brands: []*ttnpb.EndDeviceBrand{{BrandId: "full-vendor"}},
 				},
 			},
 			{
@@ -263,7 +263,7 @@ func TestBleve(t *testing.T) {
 					Offset: 1,
 					Total:  3,
 					Models: []*ttnpb.EndDeviceModel{{
-						ModelID: "dev2",
+						ModelId: "dev2",
 					}},
 				},
 			},
@@ -301,8 +301,8 @@ func TestBleve(t *testing.T) {
 					Count: 1,
 					Total: 1,
 					Models: []*ttnpb.EndDeviceModel{{
-						BrandID:     "foo-vendor",
-						ModelID:     "dev2",
+						BrandId:     "foo-vendor",
+						ModelId:     "dev2",
 						Name:        "Device 2",
 						Description: "My Description 2",
 						Sensors:     []string{"temperature"},

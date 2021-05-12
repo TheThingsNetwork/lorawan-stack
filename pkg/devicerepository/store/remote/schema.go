@@ -50,9 +50,9 @@ type Vendor struct {
 // ToPB creates a ttnpb.EndDeviceBrand protocol buffer from a Vendor.
 func (v Vendor) ToPB(paths ...string) (*ttnpb.EndDeviceBrand, error) {
 	pb := &ttnpb.EndDeviceBrand{
-		BrandID:                       v.ID,
+		BrandId:                       v.ID,
 		Name:                          v.Name,
-		LoRaAllianceVendorID:          v.VendorID,
+		LoraAllianceVendorId:          v.VendorID,
 		Email:                         v.Email,
 		Website:                       v.Website,
 		Logo:                          v.Logo,
@@ -91,6 +91,7 @@ type EndDeviceModel struct {
 		Numeric          uint32   `yaml:"numeric"`
 		HardwareVersions []string `yaml:"hardwareVersions"`
 		Profiles         map[string]struct {
+			VendorID         string `yaml:"vendorID"`
 			ID               string `yaml:"id"`
 			Codec            string `yaml:"codec"`
 			LoRaWANCertified bool   `yaml:"lorawanCertified"`
@@ -156,17 +157,17 @@ type EndDeviceModel struct {
 // ToPB converts an EndDefinitionDefinition to a Protocol Buffer.
 func (d EndDeviceModel) ToPB(brandID, modelID string, paths ...string) (*ttnpb.EndDeviceModel, error) {
 	pb := &ttnpb.EndDeviceModel{
-		BrandID:          brandID,
-		ModelID:          modelID,
+		BrandId:          brandID,
+		ModelId:          modelID,
 		Name:             d.Name,
 		Description:      d.Description,
 		FirmwareVersions: make([]*ttnpb.EndDeviceModel_FirmwareVersion, 0, len(d.FirmwareVersions)),
 		Sensors:          d.Sensors,
-		IPCode:           d.IPCode,
+		IpCode:           d.IPCode,
 		KeyProvisioning:  d.KeyProvisioning,
 		KeySecurity:      d.KeySecurity,
-		ProductURL:       d.ProductURL,
-		DatasheetURL:     d.DatasheetURL,
+		ProductUrl:       d.ProductURL,
+		DatasheetUrl:     d.DatasheetURL,
 		AdditionalRadios: d.AdditionalRadios,
 	}
 
@@ -189,9 +190,10 @@ func (d EndDeviceModel) ToPB(brandID, modelID string, paths ...string) (*ttnpb.E
 		pbver.Profiles = make(map[string]*ttnpb.EndDeviceModel_FirmwareVersion_Profile, len(ver.Profiles))
 		for region, profile := range ver.Profiles {
 			pbver.Profiles[regionToBandID[region]] = &ttnpb.EndDeviceModel_FirmwareVersion_Profile{
-				CodecID:          profile.Codec,
-				ProfileID:        profile.ID,
-				LoRaWANCertified: profile.LoRaWANCertified,
+				VendorId:         profile.VendorID,
+				ProfileId:        profile.ID,
+				LorawanCertified: profile.LoRaWANCertified,
+				CodecId:          profile.Codec,
 			}
 		}
 		pb.FirmwareVersions = append(pb.FirmwareVersions, pbver)
@@ -261,7 +263,7 @@ func (d EndDeviceModel) ToPB(brandID, modelID string, paths ...string) (*ttnpb.E
 		for _, reseller := range rs {
 			pb.Resellers = append(pb.Resellers, &ttnpb.EndDeviceModel_Reseller{
 				Name:   reseller.Name,
-				URL:    reseller.URL,
+				Url:    reseller.URL,
 				Region: reseller.Region,
 			})
 		}
@@ -350,7 +352,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 		LoRaWANPHYVersion: phyVersion,
 	}
 
-	if info.CodecID != "" {
+	if info.CodecId != "" {
 		dev.Formatters = &ttnpb.MessagePayloadFormatters{
 			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,

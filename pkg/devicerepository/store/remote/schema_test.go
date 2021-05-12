@@ -60,7 +60,7 @@ func TestDutyCycleFromFloat(t *testing.T) {
 	}
 }
 
-func TestSchema(t *testing.T) {
+func TestProfile(t *testing.T) {
 	for _, tc := range []struct {
 		profile  string
 		codec    string
@@ -216,7 +216,7 @@ func TestSchema(t *testing.T) {
 
 			ids := &ttnpb.EndDeviceVersionIdentifiers{}
 			fwProfile := &ttnpb.EndDeviceModel_FirmwareVersion_Profile{
-				CodecID: tc.codec,
+				CodecId: tc.codec,
 			}
 
 			tc.template.EndDevice.VersionIDs = ids

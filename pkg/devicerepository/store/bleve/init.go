@@ -120,7 +120,7 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 	for _, brand := range brands.Brands {
 		models, err := s.GetModels(store.GetModelsRequest{
 			Paths:   ttnpb.EndDeviceModelFieldPathsNested,
-			BrandID: brand.BrandID,
+			BrandID: brand.BrandId,
 		})
 		if err != nil {
 			if errors.IsNotFound(err) {
@@ -134,12 +134,12 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 		if err != nil {
 			return err
 		}
-		if err := batch.Index(brand.BrandID, indexableBrand{
+		if err := batch.Index(brand.BrandId, indexableBrand{
 			Type:      brandDocumentType,
 			BrandJSON: string(brandJSON),
 			Brand:     brand,
 			Models:    models.Models,
-			BrandID:   brand.BrandID,
+			BrandID:   brand.BrandId,
 			BrandName: brand.Name,
 		}); err != nil {
 			return err
@@ -149,13 +149,13 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 			if err != nil {
 				return err
 			}
-			if err := batch.Index(fmt.Sprintf("%s:%s", model.BrandID, model.ModelID), indexableModel{
+			if err := batch.Index(fmt.Sprintf("%s:%s", model.BrandId, model.ModelId), indexableModel{
 				Type:      modelDocumentType,
 				ModelJSON: string(modelJSON),
 				Brand:     brand,
 				Model:     model,
-				BrandID:   model.BrandID,
-				ModelID:   model.ModelID,
+				BrandID:   model.BrandId,
+				ModelID:   model.ModelId,
 			}); err != nil {
 				return err
 			}
