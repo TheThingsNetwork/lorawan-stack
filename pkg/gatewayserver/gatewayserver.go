@@ -57,6 +57,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 )
 
 // GatewayServer implements the Gateway Server component.
@@ -574,7 +575,6 @@ func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIde
 var (
 	errNoNetworkServer = errors.DefineNotFound("no_network_server", "no Network Server found to handle message")
 	errHostHandle      = errors.Define("host_handle", "host `{host}` failed to handle message")
-	errNoRoute         = errors.DefineAborted("no_route", "no route for `{host}`")
 )
 
 var (
@@ -664,14 +664,16 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 						pass = true
 					}
 					if !pass {
-						drop(ids, errNoRoute.WithAttributes("host", host.name))
 						break
 					}
-					if err := host.handler.HandleUplink(ctx, gtw.GatewayIdentifiers, ids, msg); err != nil {
+					switch err := host.handler.HandleUplink(ctx, gtw.GatewayIdentifiers, ids, msg); codes.Code(errors.Code(err)) {
+					case codes.Canceled, codes.DeadlineExceeded,
+						codes.Unknown, codes.Internal,
+						codes.Unimplemented, codes.Unavailable:
 						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", host.name))
-						break
+					default:
+						registerForwardUplink(ctx, gtw, msg.UplinkMessage, host.name)
 					}
-					registerForwardUplink(ctx, gtw, msg.UplinkMessage, host.name)
 				case *ttnpb.GatewayStatus:
 					if err := host.handler.HandleStatus(ctx, gtw.GatewayIdentifiers, msg); err != nil {
 						registerDropStatus(ctx, gtw, msg, host.name, err)

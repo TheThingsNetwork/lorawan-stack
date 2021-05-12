@@ -21,16 +21,20 @@ For details about compatibility between different releases, see the **Commitment
 - CLI command `events find-related`.
 - Support for loading Device Repository profiles from different vendors if specified. This allows reusing standard end device profiles from module makers and LoRaWAN end device stack vendors.
 - Filtering out verbose events in the event views in the Console.
+- The `gs.up.forward` event now includes the host an uplink was forwarded to.
 
 ### Changed
 
 - User IDs now have a minimum length of 2 instead of 3, so that more users coming from v2 can keep their username.
 - Disabled device uplink simulation and downlink message sending when skipping payload crypto.
 - The UpdateAPIKey RPCs now take a fieldmask.
+- The Gateway Server no longer sends `gs.up.drop` event if the Network Server does not handle an uplink message, or if the uplink does not match the DevAddr prefix of an upstream.
 
 ### Deprecated
 
 ### Removed
+
+- The `gs.status.forward` event.
 
 ### Fixed
 

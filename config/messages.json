@@ -4661,15 +4661,6 @@
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:no_route": {
-    "translations": {
-      "en": "no route for `{host}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "gatewayserver.go"
-    }
-  },
   "error:pkg/gatewayserver:not_connected": {
     "translations": {
       "en": "gateway `{gateway_uid}` not connected"
@@ -8885,15 +8876,6 @@
   "event:gs.status.fail": {
     "translations": {
       "en": "fail to handle gateway status"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "observability.go"
-    }
-  },
-  "event:gs.status.forward": {
-    "translations": {
-      "en": "forward gateway status"
     },
     "description": {
       "package": "pkg/gatewayserver",
