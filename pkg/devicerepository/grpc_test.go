@@ -230,7 +230,7 @@ func TestGRPC(t *testing.T) {
 				execute: func(ids ttnpb.ApplicationIdentifiers, opts ...grpc.CallOption) (interface{}, error) {
 					response, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
 						ApplicationIds: ids,
-						VersionIDs: &ttnpb.EndDeviceVersionIdentifiers{
+						VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
 							BrandID: "brand1",
 							ModelID: "model1",
 						},
@@ -362,12 +362,12 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 			st.brands = []*ttnpb.EndDeviceBrand{
 				{
-					BrandID:                 "brand1",
+					BrandId:                 "brand1",
 					PrivateEnterpriseNumber: 100,
 					Logo:                    "item.png",
 				},
 				{
-					BrandID: "brand2",
+					BrandId: "brand2",
 				},
 			}
 			st.err = nil
@@ -380,12 +380,12 @@ func TestGRPC(t *testing.T) {
 			a.So(brands, should.Resemble, &ttnpb.ListEndDeviceBrandsResponse{
 				Brands: []*ttnpb.EndDeviceBrand{
 					{
-						BrandID:                 "brand1",
+						BrandId:                 "brand1",
 						PrivateEnterpriseNumber: 100,
 						Logo:                    "https://assets/vendor/brand1/item.png",
 					},
 					{
-						BrandID: "brand2",
+						BrandId: "brand2",
 					},
 				},
 			})
@@ -428,7 +428,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 			st.brands = []*ttnpb.EndDeviceBrand{
 				{
-					BrandID:                 "brand1",
+					BrandId:                 "brand1",
 					PrivateEnterpriseNumber: 100,
 					Logo:                    "item.png",
 				},
@@ -441,7 +441,7 @@ func TestGRPC(t *testing.T) {
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(brand, should.Resemble, &ttnpb.EndDeviceBrand{
-				BrandID:                 "brand1",
+				BrandId:                 "brand1",
 				PrivateEnterpriseNumber: 100,
 				Logo:                    "https://assets/vendor/brand1/item.png",
 			})
@@ -489,16 +489,16 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 			st.models = []*ttnpb.EndDeviceModel{
 				{
-					BrandID: "brand1",
-					ModelID: "model1",
+					BrandId: "brand1",
+					ModelId: "model1",
 					Photos: &ttnpb.EndDeviceModel_Photos{
 						Main:  "a.png",
 						Other: []string{"b.png"},
 					},
 				},
 				{
-					BrandID: "brand2",
-					ModelID: "model2",
+					BrandId: "brand2",
+					ModelId: "model2",
 				},
 			}
 			st.err = nil
@@ -511,16 +511,16 @@ func TestGRPC(t *testing.T) {
 			a.So(brands, should.Resemble, &ttnpb.ListEndDeviceModelsResponse{
 				Models: []*ttnpb.EndDeviceModel{
 					{
-						BrandID: "brand1",
-						ModelID: "model1",
+						BrandId: "brand1",
+						ModelId: "model1",
 						Photos: &ttnpb.EndDeviceModel_Photos{
 							Main:  "https://assets/vendor/brand1/a.png",
 							Other: []string{"https://assets/vendor/brand1/b.png"},
 						},
 					},
 					{
-						BrandID: "brand2",
-						ModelID: "model2",
+						BrandId: "brand2",
+						ModelId: "model2",
 					},
 				},
 			})
@@ -565,8 +565,8 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 			st.models = []*ttnpb.EndDeviceModel{
 				{
-					BrandID: "brand1",
-					ModelID: "model1",
+					BrandId: "brand1",
+					ModelId: "model1",
 					Photos: &ttnpb.EndDeviceModel_Photos{
 						Main:  "a.png",
 						Other: []string{"b.png"},
@@ -582,8 +582,8 @@ func TestGRPC(t *testing.T) {
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(model, should.Resemble, &ttnpb.EndDeviceModel{
-				BrandID: "brand1",
-				ModelID: "model1",
+				BrandId: "brand1",
+				ModelId: "model1",
 				Photos: &ttnpb.EndDeviceModel_Photos{
 					Main:  "https://assets/vendor/brand1/a.png",
 					Other: []string{"https://assets/vendor/brand1/b.png"},
@@ -606,7 +606,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 			_, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
 				ApplicationIds: registeredApplicationID,
-				VersionIDs:     ids,
+				VersionIds:     ids,
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(st.lastVersionIDs, should.Resemble, ids)
@@ -617,7 +617,7 @@ func TestGRPC(t *testing.T) {
 			st.err = fmt.Errorf("store error")
 			models, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
 				ApplicationIds: registeredApplicationID,
-				VersionIDs:     ids,
+				VersionIds:     ids,
 			}, creds)
 			a.So(models, should.BeNil)
 			a.So(err.Error(), should.ContainSubstring, st.err.Error())
@@ -629,7 +629,7 @@ func TestGRPC(t *testing.T) {
 
 			template, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
 				ApplicationIds: registeredApplicationID,
-				VersionIDs:     ids,
+				VersionIds:     ids,
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(template, should.Resemble, st.template)

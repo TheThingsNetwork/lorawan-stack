@@ -25,7 +25,7 @@ func brandsResponse(brandIDs ...string) *store.GetBrandsResponse {
 	}
 	brands := make([]*ttnpb.EndDeviceBrand, 0, len(brandIDs))
 	for _, brandID := range brandIDs {
-		brands = append(brands, &ttnpb.EndDeviceBrand{BrandID: brandID})
+		brands = append(brands, &ttnpb.EndDeviceBrand{BrandId: brandID})
 	}
 	return &store.GetBrandsResponse{
 		Count:  uint32(len(brandIDs)),
@@ -41,7 +41,7 @@ func modelsResponse(modelIDs ...string) *store.GetModelsResponse {
 	}
 	models := make([]*ttnpb.EndDeviceModel, 0, len(modelIDs))
 	for _, modelID := range modelIDs {
-		models = append(models, &ttnpb.EndDeviceModel{ModelID: modelID})
+		models = append(models, &ttnpb.EndDeviceModel{ModelId: modelID})
 	}
 	return &store.GetModelsResponse{
 		Count:  uint32(len(modelIDs)),

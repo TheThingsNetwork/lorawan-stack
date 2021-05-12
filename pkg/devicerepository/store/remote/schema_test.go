@@ -216,7 +216,7 @@ func TestProfile(t *testing.T) {
 
 			ids := &ttnpb.EndDeviceVersionIdentifiers{}
 			fwProfile := &ttnpb.EndDeviceModel_FirmwareVersion_Profile{
-				CodecID: tc.codec,
+				CodecId: tc.codec,
 			}
 
 			tc.template.EndDevice.VersionIDs = ids

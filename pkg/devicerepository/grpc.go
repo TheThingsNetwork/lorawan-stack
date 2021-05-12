@@ -50,9 +50,9 @@ func (dr *DeviceRepository) assetURL(brandID, path string) string {
 func (dr *DeviceRepository) ensureBaseAssetURLs(models []*ttnpb.EndDeviceModel) {
 	for _, model := range models {
 		if photos := model.Photos; photos != nil {
-			photos.Main = dr.assetURL(model.BrandID, photos.Main)
+			photos.Main = dr.assetURL(model.BrandId, photos.Main)
 			for idx, photo := range photos.Other {
-				photos.Other[idx] = dr.assetURL(model.BrandID, photo)
+				photos.Other[idx] = dr.assetURL(model.BrandId, photo)
 			}
 		}
 	}
@@ -79,7 +79,7 @@ func (dr *DeviceRepository) ListBrands(ctx context.Context, req *ttnpb.ListEndDe
 		return nil, err
 	}
 	for _, brand := range response.Brands {
-		brand.Logo = dr.assetURL(brand.BrandID, brand.Logo)
+		brand.Logo = dr.assetURL(brand.BrandId, brand.Logo)
 	}
 	grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(uint64(response.Total), 10)))
 	return &ttnpb.ListEndDeviceBrandsResponse{
@@ -106,7 +106,7 @@ func (dr *DeviceRepository) GetBrand(ctx context.Context, req *ttnpb.GetEndDevic
 		return nil, errBrandNotFound.WithAttributes("brand_id", req.BrandID)
 	}
 	brand := response.Brands[0]
-	brand.Logo = dr.assetURL(brand.BrandID, brand.Logo)
+	brand.Logo = dr.assetURL(brand.BrandId, brand.Logo)
 	return brand, nil
 }
 
@@ -165,7 +165,7 @@ func (dr *DeviceRepository) GetTemplate(ctx context.Context, req *ttnpb.GetTempl
 	if err := rights.RequireApplication(ctx, req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
-	return dr.store.GetTemplate(req.VersionIDs)
+	return dr.store.GetTemplate(req.VersionIds)
 }
 
 func getDecoder(ctx context.Context, req *ttnpb.GetPayloadFormatterRequest, f func(store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error)) (*ttnpb.MessagePayloadDecoder, error) {
