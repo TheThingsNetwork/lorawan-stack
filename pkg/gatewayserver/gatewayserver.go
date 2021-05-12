@@ -575,7 +575,6 @@ func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIde
 var (
 	errNoNetworkServer = errors.DefineNotFound("no_network_server", "no Network Server found to handle message")
 	errHostHandle      = errors.Define("host_handle", "host `{host}` failed to handle message")
-	errNoRoute         = errors.DefineAborted("no_route", "no route for `{host}`")
 )
 
 var (
@@ -665,7 +664,6 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 						pass = true
 					}
 					if !pass {
-						drop(ids, errNoRoute.WithAttributes("host", host.name))
 						break
 					}
 					switch err := host.handler.HandleUplink(ctx, gtw.GatewayIdentifiers, ids, msg); codes.Code(errors.Code(err)) {
