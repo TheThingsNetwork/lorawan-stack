@@ -37,8 +37,8 @@ func NewPubSub() *PubSub {
 // Subscribe starts a subscription for events that match name and identifiers.
 // The subscription lasts until the context is canceled.
 // The handler will be notified of matching events and must not block.
-func (e *PubSub) Subscribe(ctx context.Context, name string, identifiers []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
-	s, err := NewSubscription(ctx, name, identifiers, hdl)
+func (e *PubSub) Subscribe(ctx context.Context, names []string, identifiers []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
+	s, err := NewSubscription(ctx, names, identifiers, hdl)
 	if err != nil {
 		return err
 	}

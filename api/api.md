@@ -221,6 +221,8 @@
   - [Message `Event`](#ttn.lorawan.v3.Event)
   - [Message `Event.Authentication`](#ttn.lorawan.v3.Event.Authentication)
   - [Message `Event.ContextEntry`](#ttn.lorawan.v3.Event.ContextEntry)
+  - [Message `FindRelatedEventsRequest`](#ttn.lorawan.v3.FindRelatedEventsRequest)
+  - [Message `FindRelatedEventsResponse`](#ttn.lorawan.v3.FindRelatedEventsResponse)
   - [Message `StreamEventsRequest`](#ttn.lorawan.v3.StreamEventsRequest)
   - [Service `Events`](#ttn.lorawan.v3.Events)
 - [File `lorawan-stack/api/gateway.proto`](#lorawan-stack/api/gateway.proto)
@@ -3498,6 +3500,24 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 | `key` | [`string`](#string) |  |  |
 | `value` | [`bytes`](#bytes) |  |  |
 
+### <a name="ttn.lorawan.v3.FindRelatedEventsRequest">Message `FindRelatedEventsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `correlation_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `correlation_id` | <p>`string.min_len`: `1`</p><p>`string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.FindRelatedEventsResponse">Message `FindRelatedEventsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `events` | [`Event`](#ttn.lorawan.v3.Event) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.StreamEventsRequest">Message `StreamEventsRequest`</a>
 
 | Field | Type | Label | Description |
@@ -3513,12 +3533,14 @@ The Events service serves events from the cluster.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Stream` | [`StreamEventsRequest`](#ttn.lorawan.v3.StreamEventsRequest) | [`Event`](#ttn.lorawan.v3.Event) _stream_ | Stream live events, optionally with a tail of historical events (depending on server support and retention policy). Events may arrive out-of-order. |
+| `FindRelated` | [`FindRelatedEventsRequest`](#ttn.lorawan.v3.FindRelatedEventsRequest) | [`FindRelatedEventsResponse`](#ttn.lorawan.v3.FindRelatedEventsResponse) |  |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `Stream` | `POST` | `/api/v3/events` | `*` |
+| `FindRelated` | `GET` | `/api/v3/events/related` |  |
 
 ## <a name="lorawan-stack/api/gateway.proto">File `lorawan-stack/api/gateway.proto`</a>
 

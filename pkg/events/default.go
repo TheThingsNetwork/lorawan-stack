@@ -24,7 +24,7 @@ type noopPubSub struct{}
 
 func (noopPubSub) Publish(Event) {}
 
-func (noopPubSub) Subscribe(context.Context, string, []*ttnpb.EntityIdentifiers, Handler) error {
+func (noopPubSub) Subscribe(context.Context, []string, []*ttnpb.EntityIdentifiers, Handler) error {
 	return nil
 }
 
@@ -41,8 +41,8 @@ func DefaultPubSub() PubSub {
 }
 
 // Subscribe subscribes on the default PubSub.
-func Subscribe(ctx context.Context, name string, ids []*ttnpb.EntityIdentifiers, hdl Handler) error {
-	return defaultPubSub.Subscribe(ctx, name, ids, hdl)
+func Subscribe(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl Handler) error {
+	return defaultPubSub.Subscribe(ctx, names, ids, hdl)
 }
 
 // Publish emits events on the default event pubsub.

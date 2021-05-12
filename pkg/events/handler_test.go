@@ -35,7 +35,7 @@ func ExampleHandlerFunc() {
 	})
 
 	subCtx, unsubscribe := context.WithCancel(ctx)
-	events.Subscribe(subCtx, "example", nil, handler)
+	events.Subscribe(subCtx, []string{"example"}, nil, handler)
 
 	// From this moment on, "example" events will be delivered to the handler func.
 
@@ -52,7 +52,7 @@ func ExampleChannel() {
 	eventChan := make(events.Channel, 2)
 
 	subCtx, unsubscribe := context.WithCancel(ctx)
-	events.Subscribe(subCtx, "example", nil, eventChan)
+	events.Subscribe(subCtx, []string{"example"}, nil, eventChan)
 
 	// From this moment on, "example" events will be delivered to the channel.
 	// As soon as the channel is full, events will be dropped, so it's probably a
@@ -100,7 +100,7 @@ func ExampleContextHandler() {
 	eventChan := make(events.Channel, 2)
 	handler := events.ContextHandler(ctx, eventChan)
 
-	events.Subscribe(ctx, "example", nil, handler)
+	events.Subscribe(ctx, []string{"example"}, nil, handler)
 
 	// We automatically unsubscribe when he context gets canceled.
 

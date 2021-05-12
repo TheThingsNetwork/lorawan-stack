@@ -17,7 +17,6 @@ package basic
 import (
 	"context"
 
-	"github.com/gobwas/glob"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -26,33 +25,32 @@ import (
 // Subscription is a basic implementation of a PubSub subscription.
 type Subscription struct {
 	ctx         context.Context
-	glob        glob.Glob
+	names       []string
 	identifiers []*ttnpb.EntityIdentifiers
 	handler     events.Handler
 }
 
 // NewSubscription creates a new basic PubSub subscription.
-func NewSubscription(ctx context.Context, name string, identifiers []*ttnpb.EntityIdentifiers, hdl events.Handler) (*Subscription, error) {
+func NewSubscription(ctx context.Context, names []string, identifiers []*ttnpb.EntityIdentifiers, hdl events.Handler) (*Subscription, error) {
 	s := &Subscription{
 		ctx:         ctx,
+		names:       names,
 		identifiers: identifiers,
 		handler:     hdl,
-	}
-	if name != "" && name != "**" {
-		glob, err := glob.Compile(name, '.')
-		if err != nil {
-			return nil, err
-		}
-		s.glob = glob
 	}
 	return s, nil
 }
 
 func (s *Subscription) matchName(evt events.Event) bool {
-	if s.glob == nil {
+	if len(s.names) == 0 {
 		return true
 	}
-	return s.glob.Match(evt.Name())
+	for _, subName := range s.names {
+		if subName == evt.Name() {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *Subscription) matchIdentifiers(evt events.Event) bool {

@@ -25,8 +25,8 @@ func InitializeFallbacks(conf *config.ServiceBase) error {
 		conf.Cache.Redis = conf.Redis
 	}
 	// Fallback to the default Redis configuration for the events system
-	if conf.Events.Redis.IsZero() {
-		conf.Events.Redis = conf.Redis
+	if conf.Events.Redis.Config.IsZero() {
+		conf.Events.Redis.Config = conf.Redis
 	}
 	return nil
 }

@@ -20,7 +20,7 @@ import (
 )
 
 type subscription struct {
-	name     string
+	names    []string
 	ids      []*ttnpb.EntityIdentifiers
 	patterns []string
 	hdl      events.Handler

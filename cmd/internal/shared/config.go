@@ -89,9 +89,17 @@ var DefaultRedisConfig = redis.Config{
 }
 
 // DefaultEventsConfig is the default config for Events.
-var DefaultEventsConfig = config.Events{
-	Backend: "internal",
-}
+var DefaultEventsConfig = func() config.Events {
+	c := config.Events{
+		Backend: "internal",
+	}
+	c.Redis.Store.TTL = 10 * time.Minute
+	c.Redis.Store.EntityTTL = time.Hour
+	c.Redis.Store.EntityCount = 100
+	c.Redis.Store.CorrelationIDCount = 100
+	c.Redis.Workers = 16
+	return c
+}()
 
 // DefaultBlobConfig is the default config for the blob store.
 var DefaultBlobConfig = config.BlobConfig{
