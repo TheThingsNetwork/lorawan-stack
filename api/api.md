@@ -6208,16 +6208,18 @@ Downlink message from the network to the end device
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `up_formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  | Payload formatter for uplink messages, must be set together with its parameter. |
-| `up_formatter_parameter` | [`string`](#string) |  | Parameter for the up_formatter, must be set together. |
+| `up_formatter_parameter` | [`string`](#string) |  | Parameter for the up_formatter, must be set together. The API enforces a maximum length of 16KB, but the size may be restricted further by deployment configuration. |
 | `down_formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  | Payload formatter for downlink messages, must be set together with its parameter. |
-| `down_formatter_parameter` | [`string`](#string) |  | Parameter for the down_formatter, must be set together. |
+| `down_formatter_parameter` | [`string`](#string) |  | Parameter for the down_formatter, must be set together. The API enforces a maximum length of 16KB, but the size may be restricted further by deployment configuration. |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `up_formatter` | <p>`enum.defined_only`: `true`</p> |
+| `up_formatter_parameter` | <p>`string.max_len`: `16384`</p> |
 | `down_formatter` | <p>`enum.defined_only`: `true`</p> |
+| `down_formatter_parameter` | <p>`string.max_len`: `16384`</p> |
 
 ### <a name="ttn.lorawan.v3.TxAcknowledgment">Message `TxAcknowledgment`</a>
 

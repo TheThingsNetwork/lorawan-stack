@@ -16,6 +16,7 @@ package applicationserver_test
 
 import (
 	"context"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -23,6 +24,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -357,6 +359,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 		},
 	}
+	maxParameterLength := 1024
 	for _, tc := range []struct {
 		Name            string
 		ContextFunc     func(context.Context) context.Context
@@ -529,6 +532,67 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			SetCalls: 1,
 		},
+
+		{
+			Name: "Uplink formatter script size exceeds maximum allowed",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						),
+					},
+				})
+			},
+			DeviceRequest: &ttnpb.SetEndDeviceRequest{
+				EndDevice: func() ttnpb.EndDevice {
+					dev := deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice)
+					dev.Formatters.UpFormatterParameter = strings.Repeat("-", maxParameterLength+1)
+					return dev
+				}(),
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"formatters.up_formatter_parameter"},
+				},
+			},
+			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
+				return nil, errors.New("SetFunc must not be called")
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+		},
+		{
+			Name: "Downlink formatter script size exceeds maximum allowed",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						),
+					},
+				})
+			},
+			DeviceRequest: &ttnpb.SetEndDeviceRequest{
+				EndDevice: func() ttnpb.EndDevice {
+					dev := deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice)
+					dev.Formatters.DownFormatterParameter = strings.Repeat("-", maxParameterLength+1)
+					return dev
+				}(),
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"formatters.down_formatter_parameter"},
+				},
+			},
+			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
+				return nil, errors.New("SetFunc must not be called")
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
@@ -542,6 +606,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 							atomic.AddUint64(&setCalls, 1)
 							return tc.SetFunc(ctx, deviceIds, paths, cb)
 						},
+					},
+					Formatters: applicationserver.FormattersConfig{
+						MaxParameterLength: maxParameterLength,
 					},
 				})).(*ApplicationServer)
 

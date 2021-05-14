@@ -67,6 +67,20 @@ func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicat
 
 // SetLink implements ttnpb.AsServer.
 func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicationLinkRequest) (*ttnpb.ApplicationLink, error) {
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "default_formatters.up_formatter_parameter") {
+		if size := len(req.ApplicationLink.GetDefaultFormatters().GetUpFormatterParameter()); size > as.config.Formatters.MaxParameterLength {
+			return nil, errInvalidFieldValue.WithAttributes("field", "default_formatters.up_formatter_parameter").WithCause(
+				errFormatterScriptTooLarge.WithAttributes("size", size, "max_size", as.config.Formatters.MaxParameterLength),
+			)
+		}
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "default_formatters.down_formatter_parameter") {
+		if size := len(req.ApplicationLink.GetDefaultFormatters().GetDownFormatterParameter()); size > as.config.Formatters.MaxParameterLength {
+			return nil, errInvalidFieldValue.WithAttributes("field", "default_formatters.down_formatter_parameter").WithCause(
+				errFormatterScriptTooLarge.WithAttributes("size", size, "max_size", as.config.Formatters.MaxParameterLength),
+			)
+		}
+	}
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}

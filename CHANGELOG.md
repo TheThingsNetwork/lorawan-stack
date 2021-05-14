@@ -29,6 +29,10 @@ For details about compatibility between different releases, see the **Commitment
 - Disabled device uplink simulation and downlink message sending when skipping payload crypto.
 - The UpdateAPIKey RPCs now take a fieldmask.
 - The Gateway Server no longer sends `gs.up.drop` event if the Network Server does not handle an uplink message, or if the uplink does not match the DevAddr prefix of an upstream.
+- Maximum size for user-defined payload formatter scripts.
+  - The default cap is at 4KB, see the new `as.formatters.max-parameter-length` config option.
+  - A maximum cap of 16KB per script is set at the API level.
+  - This only prevents setting large payload formatter scripts for new devices and applications; it does not remove payload formatters from existing applications and devices. Scripts sourced from the Device Repository are not affected. See [issue #4053](https://github.com/TheThingsNetwork/lorawan-stack/issues/4053) for more context on this change.
 
 ### Deprecated
 

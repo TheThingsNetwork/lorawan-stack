@@ -128,7 +128,10 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
-var errInvalidFieldMask = errors.DefineInvalidArgument("field_mask", "invalid field mask")
+var (
+	errInvalidFieldMask        = errors.DefineInvalidArgument("field_mask", "invalid field mask")
+	errFormatterScriptTooLarge = errors.DefineInvalidArgument("formatter_script_too_large", "formatter script size exceeds maximum allowed size", "size", "max_size")
+)
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
 func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
@@ -138,7 +141,20 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.AppSKey.GetKey().IsZero()) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.keys.app_s_key.key")
 	}
-
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "formatters.up_formatter_parameter") {
+		if size := len(req.EndDevice.GetFormatters().GetUpFormatterParameter()); size > r.AS.config.Formatters.MaxParameterLength {
+			return nil, errInvalidFieldValue.WithAttributes("field", "formatters.up_formatter_parameter").WithCause(
+				errFormatterScriptTooLarge.WithAttributes("size", size, "max_size", r.AS.config.Formatters.MaxParameterLength),
+			)
+		}
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "formatters.down_formatter_parameter") {
+		if size := len(req.EndDevice.GetFormatters().GetDownFormatterParameter()); size > r.AS.config.Formatters.MaxParameterLength {
+			return nil, errInvalidFieldValue.WithAttributes("field", "formatters.down_formatter_parameter").WithCause(
+				errFormatterScriptTooLarge.WithAttributes("size", size, "max_size", r.AS.config.Formatters.MaxParameterLength),
+			)
+		}
+	}
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
