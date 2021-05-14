@@ -343,7 +343,7 @@ func (is *IdentityServer) requestDevEUI(ctx context.Context, ids *ttnpb.Applicat
 		if err != nil {
 			return err
 		}
-		res.DevEUI = devEUI
+		res.DevEUI = *devEUI
 		return nil
 	})
 	if err != nil {

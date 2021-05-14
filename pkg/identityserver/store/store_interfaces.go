@@ -227,5 +227,5 @@ type MigrationStore interface {
 // EUIStore interface for assigning DevEUI blocks and addresses
 type EUIStore interface {
 	CreateEUIBlock(ctx context.Context, euiType string, block string) (err error)
-	IssueDevEUIForApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, maxAddressPerApp int) (ttntypes.EUI64, error)
+	IssueDevEUIForApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, maxAddressPerApp int) (*ttntypes.EUI64, error)
 }

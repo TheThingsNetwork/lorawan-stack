@@ -20,6 +20,7 @@ import (
 	"sync"
 
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -30,7 +31,7 @@ func GetEUIStore(db *gorm.DB) EUIStore {
 
 type euiStore struct {
 	*store
-	mutex sync.Mutex
+	devEUIMu sync.Mutex
 }
 
 func getMaxAddress(addressBlock types.EUI64Prefix) *EUI64 {
@@ -38,6 +39,44 @@ func getMaxAddress(addressBlock types.EUI64Prefix) *EUI64 {
 	maxAddress64 := addressBlock.EUI64.MarshalNumber() | (^(uint64(0)) >> (64 - addressBlock.Length))
 	maxAddress.UnmarshalNumber(maxAddress64)
 	return eui(&maxAddress)
+}
+
+var (
+	errMaxGlobalEUILimitReached = errors.DefineInternal("global_eui_limit_reached", "global eui limit from address block reached")
+	errAppDevEUILimitReached    = errors.DefineInternal("application_dev_eui_limit_reached", "application dev eui limit reached")
+)
+
+func (s *euiStore) assignDevEUIAddress(ctx context.Context, devEUIBlock *EUIBlock) (*types.EUI64, error) {
+	var addrFound bool
+	var devEUI types.EUI64
+	// Loop until an unused address is found or limit reached.
+	for !addrFound {
+		// Check if the global DevEUI address block limit is reached.
+		if devEUIBlock.CurrentAddress.toPB().Equal(*devEUIBlock.EndAddress.toPB()) {
+			return nil, errMaxGlobalEUILimitReached
+		}
+		// Check if the current DevEUI address is already used by any device.
+		query := s.query(ctx, EndDevice{}, withDevEUI(*devEUIBlock.CurrentAddress))
+		if err := query.First(EndDevice{}).Error; err != nil {
+			// If the address is not used, assign the address.
+			if !gorm.IsRecordNotFoundError(err) {
+				return nil, err
+			}
+			addrFound = true
+			devEUI = *devEUIBlock.CurrentAddress.toPB()
+		}
+		// Increment the global DevEUI counter to the next address.
+		currentAddress := devEUIBlock.CurrentAddress.toPB()
+		currentAddress.Inc()
+		devEUIBlock.CurrentAddress = eui(currentAddress)
+	}
+	// Update database counter entry.
+	err := s.query(ctx, devEUIBlock).Select("current_address").Save(devEUIBlock).Error
+	if err != nil {
+		return nil, err
+	}
+	// Return the address assigned
+	return &devEUI, nil
 }
 
 // CreateEUIBlock configures the identity server with a new block of EUI addresses to be issued.
@@ -81,8 +120,38 @@ func (s *euiStore) CreateEUIBlock(ctx context.Context, euiType string, block str
 	return err
 }
 
-func (s *euiStore) IssueDevEUIForApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, maxAddressPerApp int) (types.EUI64, error) {
+func (s *euiStore) IssueDevEUIForApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, maxAddressPerApp int) (*types.EUI64, error) {
 	defer trace.StartRegion(ctx, "assign dev eui address to application").End()
-
-	return types.EUI64{}, nil
+	s.devEUIMu.Lock()
+	defer s.devEUIMu.Unlock()
+	// Check if max DevEUI per application reached.
+	query := s.query(ctx, Application{}, withApplicationID(ids.GetApplicationId()))
+	var appModel Application
+	if err := query.First(&appModel).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, errNotFoundForID(ids)
+		}
+		return nil, err
+	}
+	if appModel.DevEUIAddressCounter == maxAddressPerApp {
+		return nil, errAppDevEUILimitReached
+	}
+	// Check if DevEUI block limit reached.
+	var currentAddressBlock EUIBlock
+	query = s.query(ctx, EUIBlock{}).Where(EUIBlock{Type: "dev_eui"})
+	err := query.First(&currentAddressBlock).Error
+	if err != nil {
+		return nil, err
+	}
+	// Issue an unused DevEUI address.
+	devEUIAddress, err := s.assignDevEUIAddress(ctx, &currentAddressBlock)
+	if err != nil {
+		return nil, err
+	}
+	// Increment App DevEUI counter
+	appModel.DevEUIAddressCounter++
+	if err = s.updateEntity(ctx, &appModel, "dev_eui_counter"); err != nil {
+		return nil, err
+	}
+	return devEUIAddress, nil
 }
