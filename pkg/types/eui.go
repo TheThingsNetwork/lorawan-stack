@@ -89,6 +89,12 @@ func (eui *EUI64) UnmarshalNumber(n uint64) {
 	binary.BigEndian.PutUint64(eui[:], n)
 }
 
+func (eui *EUI64) Inc() {
+	euiValue := eui.MarshalNumber()
+	euiValue++
+	eui.UnmarshalNumber(euiValue)
+}
+
 // EUI64Prefix is an EUI64 with a prefix length.
 type EUI64Prefix struct {
 	EUI64  EUI64
