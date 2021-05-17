@@ -32,6 +32,7 @@ type Application struct {
 	APIKeys       []APIKey     `gorm:"polymorphic:Entity;polymorphic_value:application"`
 	Memberships   []Membership `gorm:"polymorphic:Entity;polymorphic_value:application"`
 	// END common fields
+	DevEUIAddressCounter int `gorm:"<-:create;type:INT;default:'0';column:dev_eui_counter"`
 }
 
 func init() {
