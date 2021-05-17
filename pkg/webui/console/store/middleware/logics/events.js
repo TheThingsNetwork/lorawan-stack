@@ -16,6 +16,7 @@ import { createLogic } from 'redux-logic'
 
 import ONLINE_STATUS from '@ttn-lw/constants/online-status'
 import CONNECTION_STATUS from '@console/constants/connection-status'
+import EVENT_TAIL from '@console/constants/event-tail'
 
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
 import { isUnauthenticatedError, isNetworkError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
@@ -42,6 +43,7 @@ import {
   createEventsStatusSelector,
   createEventsInterruptedSelector,
   createInterruptedStreamsSelector,
+  createLatestEventSelector,
 } from '@console/store/selectors/events'
 import { selectDeviceById } from '@console/store/selectors/devices'
 
@@ -71,6 +73,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
   const selectEntityEventsStatus = createEventsStatusSelector(entityName)
   const selectEntityEventsInterrupted = createEventsInterruptedSelector(entityName)
   const selectInterruptedStreams = createInterruptedStreamsSelector(entityName)
+  const selectLatestEvent = createLatestEventSelector(entityName)
 
   let channel = null
 
@@ -106,8 +109,15 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       process: async ({ getState, action }, dispatch) => {
         const { id } = action
 
+        // Only get historical events emitted after the latest event in the
+        // store to avoid duplicate historical events.
+        const latestEvent = selectLatestEvent(getState(), id)
+        const after = Boolean(latestEvent)
+          ? new Date(Date.parse(latestEvent.time) + 1).toISOString()
+          : undefined
+
         try {
-          channel = await onEventsStart([id])
+          channel = await onEventsStart([id], EVENT_TAIL, after)
 
           channel.on('start', () => dispatch(startEventsSuccess(id)))
           channel.on('chunk', message => dispatch(getEventSuccess(id, message)))
