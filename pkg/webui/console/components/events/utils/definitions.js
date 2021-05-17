@@ -22,6 +22,7 @@ import JoinRequest from '../previews/join-request'
 import JoinResponse from '../previews/join-response'
 import GatewayStatus from '../previews/gateway-status'
 import ErrorDetails from '../previews/error-details'
+import Value from '../previews/value'
 
 export const eventIconMap = [
   {
@@ -105,6 +106,7 @@ export const dataTypeMap = {
   JoinResponse,
   ErrorDetails,
   GatewayStatus,
+  Value,
 }
 
 export const applicationUpMessages = [
