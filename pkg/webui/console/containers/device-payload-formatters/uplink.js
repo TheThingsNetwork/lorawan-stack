@@ -51,16 +51,14 @@ import {
 import messages from './messages'
 
 @connect(
-  state => {
-    return {
-      appId: selectSelectedApplicationId(state),
-      device: selectSelectedDevice(state),
-      devId: selectSelectedDeviceId(state),
-      link: selectApplicationLink(state),
-      formatters: selectSelectedDeviceFormatters(state),
-      decodeUplink: api.as.decodeUplink,
-    }
-  },
+  state => ({
+    appId: selectSelectedApplicationId(state),
+    device: selectSelectedDevice(state),
+    devId: selectSelectedDeviceId(state),
+    link: selectApplicationLink(state),
+    formatters: selectSelectedDeviceFormatters(state),
+    decodeUplink: api.as.decodeUplink,
+  }),
   {
     updateDevice: attachPromise(updateDevice),
   },
