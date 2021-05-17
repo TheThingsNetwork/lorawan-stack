@@ -2220,6 +2220,16 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				dst.SkipPayloadCryptoOverride = nil
 			}
+		case "activated":
+			if len(subs) > 0 {
+				return fmt.Errorf("'activated' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Activated = src.Activated
+			} else {
+				var zero bool
+				dst.Activated = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

@@ -12362,6 +12362,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "activated",
+              "description": "Whether the device has been activated. Stored in the Entity Registry.\nThis field is set by the Application Server when an end device sends\nits first uplink.\nThe Application Server will use the field in order to avoid repeated\ncalls to the Entity Registry.\nThe field cannot be unset once set.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

@@ -2049,6 +2049,8 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "activated":
+			// no validation rules for Activated
 		default:
 			return EndDeviceValidationError{
 				field:  name,

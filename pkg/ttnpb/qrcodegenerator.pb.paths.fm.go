@@ -29,6 +29,7 @@ var GetQRCodeFormatRequestFieldPathsTopLevel = []string{
 }
 var GenerateEndDeviceQRCodeRequestFieldPathsNested = []string{
 	"end_device",
+	"end_device.activated",
 	"end_device.application_server_address",
 	"end_device.application_server_id",
 	"end_device.application_server_kek_label",
