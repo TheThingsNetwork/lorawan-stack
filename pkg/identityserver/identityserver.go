@@ -102,6 +102,19 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		return nil, err
 	}
 
+	if is.config.DevEUIBlock.Enabled {
+		err := store.Transact(is.Context(), is.db, func(db *gorm.DB) error {
+			err = store.GetEUIStore(db).CreateEUIBlock(is.Context(), "dev_eui", is.config.DevEUIBlock.Prefix, is.config.DevEUIBlock.InitCounter)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
 	is.config.OAuth.UI.FrontendConfig.EnableUserRegistration = is.config.UserRegistration.Enabled
 	is.oauth, err = oauth.NewServer(c, struct {
