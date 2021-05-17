@@ -52,6 +52,8 @@ type EndDevice struct {
 
 	Picture   *Picture
 	PictureID *string `gorm:"type:UUID;index:end_device_picture_index"`
+
+	Activated bool
 }
 
 func init() {
@@ -108,6 +110,7 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 			pb.Picture = dev.Picture.toPB()
 		}
 	},
+	activatedField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Activated = dev.Activated },
 }
 
 // functions to set fields from the device proto into the device model.
@@ -149,6 +152,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 			dev.Picture.fromPB(pb.Picture)
 		}
 	},
+	activatedField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.Activated = pb.Activated },
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -182,6 +186,7 @@ var deviceColumnNames = map[string][]string{
 	joinServerAddressField:        {joinServerAddressField},
 	serviceProfileIDField:         {serviceProfileIDField},
 	locationsField:                {},
+	activatedField:                {activatedField},
 }
 
 func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) {
