@@ -55,6 +55,10 @@ message Applications {
   repeated Application applications = 1;
 }
 
+message IssueDevEUIResponse {
+  bytes dev_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+}
+
 message GetApplicationRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the application fields that should be returned.

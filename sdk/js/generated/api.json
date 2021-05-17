@@ -483,6 +483,27 @@
           ]
         },
         {
+          "name": "IssueDevEUIResponse",
+          "longName": "IssueDevEUIResponse",
+          "fullName": "ttn.lorawan.v3.IssueDevEUIResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "dev_eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ListApplicationAPIKeysRequest",
           "longName": "ListApplicationAPIKeysRequest",
           "fullName": "ttn.lorawan.v3.ListApplicationAPIKeysRequest",
@@ -1214,6 +1235,28 @@
                     {
                       "method": "DELETE",
                       "pattern": "/applications/{application_id}/purge"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "IssueDevEUI",
+              "description": "Request DevEUI from the configured address block for a device inside the application.\nThe maximum number of DevEUI's issued per application can be configured.",
+              "requestType": "ApplicationIdentifiers",
+              "requestLongType": "ApplicationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "IssueDevEUIResponse",
+              "responseLongType": "IssueDevEUIResponse",
+              "responseFullType": "ttn.lorawan.v3.IssueDevEUIResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/applications/{application_id}/dev-eui"
                     }
                   ]
                 }

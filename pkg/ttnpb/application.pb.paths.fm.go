@@ -31,6 +31,13 @@ var ApplicationsFieldPathsNested = []string{
 var ApplicationsFieldPathsTopLevel = []string{
 	"applications",
 }
+var IssueDevEUIResponseFieldPathsNested = []string{
+	"dev_eui",
+}
+
+var IssueDevEUIResponseFieldPathsTopLevel = []string{
+	"dev_eui",
+}
 var GetApplicationRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
