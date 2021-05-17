@@ -76,6 +76,24 @@ class Devices {
       device.formatters = null
     }
 
+    if (paths.includes('formatters.up_formatter')) {
+      if (!Boolean(device.formatters)) {
+        device.formatters = { up_formatter: 'FORMATTER_NONE' }
+      }
+      if (!Boolean(device.formatters.up_formatter)) {
+        device.formatters.up_formatter = 'FORMATTER_NONE'
+      }
+    }
+
+    if (paths.includes('formatters.down_formatter')) {
+      if (!Boolean(device.formatters)) {
+        device.formatters = { down_formatter: 'FORMATTER_NONE' }
+      }
+      if (!Boolean(device.formatters.down_formatter)) {
+        device.formatters.down_formatter = 'FORMATTER_NONE'
+      }
+    }
+
     if (paths.includes('mac_settings')) {
       const { mac_settings = {} } = device
 
