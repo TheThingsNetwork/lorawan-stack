@@ -322,6 +322,27 @@ var (
 			return nil
 		},
 	}
+	applicationsIssueNewDevEUICommand = &cobra.Command{
+		Use:     "issue-dev-eui [application-id]",
+		Aliases: []string{"dev-eui"},
+		Short:   "Issue DevEUI for application",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			appID := getApplicationID(cmd.Flags(), args)
+			if appID == nil {
+				return errNoApplicationID
+			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewApplicationRegistryClient(is).IssueDevEUI(ctx, appID)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 )
 
 func init() {
@@ -359,5 +380,7 @@ func init() {
 	applicationsPurgeCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsPurgeCommand.Flags().AddFlagSet(forceFlags())
 	applicationsCommand.AddCommand(applicationsPurgeCommand)
+	applicationsIssueNewDevEUICommand.Flags().AddFlagSet(applicationIDFlags())
+	applicationsCommand.AddCommand(applicationsIssueNewDevEUICommand)
 	Root.AddCommand(applicationsCommand)
 }
