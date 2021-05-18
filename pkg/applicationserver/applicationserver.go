@@ -20,6 +20,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net"
+	"sync"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -82,6 +83,8 @@ type ApplicationServer struct {
 	interopID     string
 
 	endDeviceFetcher EndDeviceFetcher
+
+	activationTasks sync.Map
 }
 
 // Context returns the context of the Application Server.
@@ -873,10 +876,62 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDevic
 	return as.appUpsRegistry.Push(ctx, ids, cleanUplink)
 }
 
+// markEndDeviceAsActivated attempts to mark the end device as activated in the Entity Registry.
+// This method does not block - a task will be spawned that updates the device in the Entity Registry.
+// If the update fails, the task will not restart, and this function is expected to be called again
+// on a subsequent uplink from the end device.
+// If the update succeeds, the end device will be updated in the Application Server end device registry
+// in order to avoid subsequent calls.
+func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) {
+	ctx = as.FromRequestContext(ctx)
+	devUID := unique.ID(ctx, ids)
+	if _, exists := as.activationTasks.LoadOrStore(devUID, struct{}{}); exists {
+		return
+	}
+	mask := []string{"activated"}
+	f := func(ctx context.Context) error {
+		defer as.activationTasks.Delete(devUID)
+		cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, &ids)
+		if err != nil {
+			return err
+		}
+		_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
+			EndDevice: ttnpb.EndDevice{
+				EndDeviceIdentifiers: ids,
+				Activated:            true,
+			},
+			FieldMask: pbtypes.FieldMask{
+				Paths: mask,
+			},
+		}, as.WithClusterAuth())
+		if err != nil {
+			return err
+		}
+		_, err = as.deviceRegistry.Set(ctx, ids, mask,
+			func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+				if dev == nil {
+					return nil, nil, errDeviceNotFound.WithAttributes("device_uid", devUID)
+				}
+				dev.Activated = true
+				return dev, mask, nil
+			},
+		)
+		return err
+	}
+	as.StartTask(&component.TaskConfig{
+		Context: ctx,
+		ID:      fmt.Sprintf("mark_%s_activated", devUID),
+		Func:    f,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DefaultTaskBackoffConfig,
+	})
+}
+
 func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
+			"activated",
 			"formatters",
 			"pending_session",
 			"session",
@@ -945,6 +1000,10 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to process location solved message from location in payload")
 		}
+	}
+
+	if !dev.Activated {
+		as.markEndDeviceAsActivated(ctx, ids)
 	}
 
 	return nil
