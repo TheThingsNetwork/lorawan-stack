@@ -53,7 +53,7 @@ const MemoizedRegExp = memoize(RegExp)
 
 const addEvent = (state, event) => {
   const { events, filter } = state
-  const { paused, streamStartTime } = state
+  const { paused } = state
 
   if (paused && !event.name.startsWith('synthetic')) {
     return {}
@@ -73,12 +73,6 @@ const addEvent = (state, event) => {
   // timestamped before it. This is to avoid showing events before the synthetic
   // resumption event.
   if (events[0] && events[0].name === EVENT_STATUS_RESUMED && event.time < events[0].time) {
-    return {}
-  }
-
-  // When requesting historical events (with tail / after) it's possible that we
-  // still have some of those in the store, so we don't add them again.
-  if (event.time < streamStartTime && events.find(e => e.unique_id === event.unique_id)) {
     return {}
   }
 

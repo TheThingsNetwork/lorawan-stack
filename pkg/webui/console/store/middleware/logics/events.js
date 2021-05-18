@@ -112,9 +112,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         // Only get historical events emitted after the latest event in the
         // store to avoid duplicate historical events.
         const latestEvent = selectLatestEvent(getState(), id)
-        const after = Boolean(latestEvent)
-          ? new Date(Date.parse(latestEvent.time) + 1).toISOString()
-          : undefined
+        const after = Boolean(latestEvent) ? latestEvent.time : undefined
 
         try {
           channel = await onEventsStart([id], EVENT_TAIL, after)
