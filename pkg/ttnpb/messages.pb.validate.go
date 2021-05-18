@@ -753,13 +753,6 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 
 		case "rx_metadata":
 
-			if len(m.GetRxMetadata()) < 1 {
-				return ApplicationUplinkValidationError{
-					field:  "rx_metadata",
-					reason: "value must contain at least 1 item(s)",
-				}
-			}
-
 			for idx, item := range m.GetRxMetadata() {
 				_, _ = idx, item
 

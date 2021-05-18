@@ -196,7 +196,7 @@ message ApplicationUplink {
   repeated string decoded_payload_warnings = 12;
 
   // A list of metadata for each antenna of each gateway that received this message.
-  repeated RxMetadata rx_metadata = 6 [(validate.rules).repeated.min_items = 1];
+  repeated RxMetadata rx_metadata = 6;
 
   // Settings for the transmission.
   TxSettings settings = 7 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
