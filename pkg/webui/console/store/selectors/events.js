@@ -53,10 +53,10 @@ export const createEventsTruncatedSelector = entity => (state, entityId) => {
 export const createLatestEventSelector = entity => {
   const eventsSelector = createEventsSelector(entity)
 
-  const selectLatestEvent = (state, entityId) => {
+  const selectLatestEvent = (state, entityId, includeSynthetic = false) => {
     const events = eventsSelector(state, entityId)
 
-    return events[0]
+    return includeSynthetic ? events[0] : events.find(e => !e.isSynthetic)
   }
 
   return selectLatestEvent

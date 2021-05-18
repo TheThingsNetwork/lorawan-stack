@@ -195,8 +195,16 @@ func (ps *PubSubStore) tailStream(ctx context.Context, names []string, ids *ttnp
 // FetchHistory fetches the tail (optional) of historical events matching the given names (optional) and identifiers (mandatory) after the given time (optional).
 func (ps *PubSubStore) FetchHistory(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, after *time.Time, tail int) ([]events.Event, error) {
 	start := "-"
-	if after != nil && !after.IsZero() {
-		start = strconv.FormatInt(after.UnixNano()/1_000_000, 10)
+	switch {
+	case after == nil:
+	case after.IsZero():
+		after = nil
+	default:
+		// Truncate to milliseconds to be consistent with the JSON API.
+		afterMS := after.Truncate(time.Millisecond)
+		after = &afterMS
+		// Account for a clock skew on the Redis server of up to 1 second.
+		start = strconv.FormatInt(after.Add(-1*time.Second).UnixNano()/1_000_000, 10)
 	}
 	var evts []events.Event
 	for _, id := range ids {
@@ -205,6 +213,9 @@ func (ps *PubSubStore) FetchHistory(ctx context.Context, names []string, ids []*
 			return nil, err
 		}
 		for _, evtPB := range evtPBs {
+			if after != nil && !evtPB.GetTime().Truncate(time.Millisecond).After(*after) {
+				continue
+			}
 			evt, err := events.FromProto(evtPB)
 			if err != nil {
 				return nil, err
@@ -218,8 +229,16 @@ func (ps *PubSubStore) FetchHistory(ctx context.Context, names []string, ids []*
 // SubscribeWithHistory is like FetchHistory, but after fetching historical events, this continues sending live events until the context is done.
 func (ps *PubSubStore) SubscribeWithHistory(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, after *time.Time, tail int, hdl events.Handler) error {
 	start := "0-0"
-	if after != nil && !after.IsZero() {
-		start = strconv.FormatInt(after.UnixNano()/1_000_000, 10)
+	switch {
+	case after == nil:
+	case after.IsZero():
+		after = nil
+	default:
+		// Truncate to milliseconds to be consistent with the JSON API.
+		afterMS := after.Truncate(time.Millisecond)
+		after = &afterMS
+		// Account for a clock skew on the Redis server of up to 1 second.
+		start = strconv.FormatInt(after.Add(-1*time.Second).UnixNano()/1_000_000, 10)
 	}
 
 	type streamState struct {
@@ -253,6 +272,9 @@ func (ps *PubSubStore) SubscribeWithHistory(ctx context.Context, names []string,
 			return err
 		}
 		for _, evtPB := range evtPBs {
+			if after != nil && !evtPB.GetTime().Truncate(time.Millisecond).After(*after) {
+				continue
+			}
 			evt, err := events.FromProto(evtPB)
 			if err != nil {
 				return err
