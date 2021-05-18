@@ -213,6 +213,12 @@ func TestApplicationsCRUD(t *testing.T) {
 			}
 		}
 
+		// Check that returned value is not nil
+		devEUIResponse, err := reg.IssueDevEUI(ctx, &created.ApplicationIdentifiers, userCreds(adminUserIdx))
+		a.So(err, should.BeNil)
+		a.So(devEUIResponse, should.NotBeNil)
+		a.So(devEUIResponse.DevEui, should.NotBeZeroValue)
+
 		_, err = reg.Delete(ctx, &created.ApplicationIdentifiers, creds)
 		a.So(err, should.BeNil)
 
