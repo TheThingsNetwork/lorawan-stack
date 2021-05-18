@@ -4805,6 +4805,15 @@
       "file": "store.go"
     }
   },
+  "error:pkg/identityserver/store:application_dev_eui_limit_reached": {
+    "translations": {
+      "en": "application issued DevEUI limit ({dev_eui_limit}) reached"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "eui_block_store.go"
+    }
+  },
   "error:pkg/identityserver/store:application_not_found": {
     "translations": {
       "en": "application `{application_id}` not found"
@@ -4893,6 +4902,15 @@
     "description": {
       "package": "pkg/identityserver/store",
       "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/store:global_eui_limit_reached": {
+    "translations": {
+      "en": "global eui limit from address block reached"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "eui_block_store.go"
     }
   },
   "error:pkg/identityserver/store:id_taken": {
@@ -5208,6 +5226,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "identityserver.go"
+    }
+  },
+  "error:pkg/identityserver:dev_eui_issuing_not_enabled": {
+    "translations": {
+      "en": "DevEUI issuing not configured"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
     }
   },
   "error:pkg/identityserver:end_device_euis_taken": {
@@ -8372,6 +8399,15 @@
   "event:application.delete": {
     "translations": {
       "en": "delete application"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
+  "event:application.issue_dev_eui": {
+    "translations": {
+      "en": "issue DevEUI for application"
     },
     "description": {
       "package": "pkg/identityserver",
