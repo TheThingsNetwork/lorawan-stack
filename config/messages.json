@@ -7714,7 +7714,7 @@
   },
   "error:pkg/scripting/javascript:runtime": {
     "translations": {
-      "en": "runtime error"
+      "en": "{message}"
     },
     "description": {
       "package": "pkg/scripting/javascript",
