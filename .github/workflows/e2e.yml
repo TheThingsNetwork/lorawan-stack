@@ -22,6 +22,9 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       TTN_LW_LOG_LEVEL: debug
+      # TODO: Remove this after we no longer depend on cockroach dump command
+      # (https://github.com/TheThingsNetwork/lorawan-stack/issues/4184)
+      COCKROACHDB_COCKROACH_TAG: v19.2.12
     steps:
       - name: Check out code
         uses: actions/checkout@v2

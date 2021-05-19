@@ -3,7 +3,7 @@ services:
 
   # If using CockroachDB:
   cockroach:
-    image: cockroachdb/cockroach
+    image: cockroachdb/cockroach:${COCKROACHDB_COCKROACH_TAG:-latest}
     command: start-single-node --http-port 26256 --insecure
     restart: unless-stopped
     volumes:
