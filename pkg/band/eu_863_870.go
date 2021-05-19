@@ -122,6 +122,11 @@ func init() {
 			ttnpb.DATA_RATE_5: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(230)),
 			ttnpb.DATA_RATE_6: makeLoRaDataRate(7, 250000, makeConstMaxMACPayloadSizeFunc(230)),
 			ttnpb.DATA_RATE_7: makeFSKDataRate(50000, makeConstMaxMACPayloadSizeFunc(230)),
+			// TODO: define and use enums
+			ttnpb.DATA_RATE_8:  makeLR_FHSSDataRate("1/3", 137000),
+			ttnpb.DATA_RATE_9:  makeLR_FHSSDataRate("2/3", 137000),
+			ttnpb.DATA_RATE_10: makeLR_FHSSDataRate("1/3", 336000),
+			ttnpb.DATA_RATE_11: makeLR_FHSSDataRate("2/3", 336000),
 		},
 		MaxADRDataRateIndex: ttnpb.DATA_RATE_5,
 

@@ -1248,6 +1248,11 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"bandwidth", dr.LoRa.GetBandwidth(),
 			"spreading_factor", dr.LoRa.GetSpreadingFactor(),
 		))
+	case *ttnpb.DataRate_FHSS:
+		logger = logger.WithFields(log.Fields(
+			"coding_rate", dr.LR_FHSS.GetCodingRate(),
+			"ocw", dr.LR_FHSS.GetFrequencyHoppingBandwidth(),
+		))
 	default:
 		return nil, errDataRateNotFound.New()
 	}

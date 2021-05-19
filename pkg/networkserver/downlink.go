@@ -1112,6 +1112,8 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		}
 	}
 
+	// TODO: If LR-FHSS is supported and used, do not consider RX1.
+
 	var (
 		attemptRX1 bool
 		rx1Freq    uint64
@@ -1120,7 +1122,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 
 		attemptRX2 bool
 	)
-	if !slot.RX1().Before(now) {
+	if (!phy.SupportsLR_FHSS || !slot.Uplink.Settings.DataRate.IsLR_FHSS()) && !slot.RX1().Before(now) {
 		freq, drIdx, err := rx1Parameters(phy, dev.MACState, slot.Uplink)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Failed to compute RX1 parameters")
@@ -1568,6 +1570,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							"pending_mac_state.rx_windows_available",
 						}, nil
 					}
+
+					// TODO: If LR-FHSS is suported for joins and used, do not consider RX1.
 
 					rx1 := up.ReceivedAt.Add(phy.JoinAcceptDelay1)
 					now := time.Now()
