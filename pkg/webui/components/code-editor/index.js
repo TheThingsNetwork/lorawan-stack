@@ -18,6 +18,7 @@ import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import combineRefs from '@ttn-lw/lib/combine-refs'
 
 import 'brace/mode/javascript'
 import 'brace/mode/json'
@@ -32,6 +33,7 @@ class CodeEditor extends React.Component {
     commands: PropTypes.arrayOf(PropTypes.shape({})),
     /** See `https://github.com/ajaxorg/ace/wiki/Configuring-Ace`. */
     editorOptions: PropTypes.shape({}),
+    editorRef: PropTypes.shape({ current: PropTypes.shape({}) }),
     /** The height of the editor. */
     height: PropTypes.string,
     /** The language to highlight. */
@@ -74,6 +76,7 @@ class CodeEditor extends React.Component {
     scrollToBottom: false,
     showGutter: true,
     value: '',
+    editorRef: null,
   }
 
   constructor(props) {
@@ -131,6 +134,7 @@ class CodeEditor extends React.Component {
       minLines,
       maxLines,
       commands,
+      editorRef,
     } = this.props
 
     const { focus } = this.state
@@ -180,7 +184,7 @@ class CodeEditor extends React.Component {
           onBlur={this.onBlur}
           editorProps={{ $blockScrolling: Infinity }}
           commands={commands}
-          ref={this.aceRef}
+          ref={editorRef ? combineRefs([this.aceRef, editorRef]) : this.aceRef}
         />
       </div>
     )

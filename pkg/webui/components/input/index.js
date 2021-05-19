@@ -21,6 +21,7 @@ import Icon from '@ttn-lw/components/icon'
 import Spinner from '@ttn-lw/components/spinner'
 import Button from '@ttn-lw/components/button'
 
+import combineRefs from '@ttn-lw/lib/combine-refs'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import ByteInput from './byte'
@@ -28,20 +29,6 @@ import Toggled from './toggled'
 import Generate from './generate'
 
 import style from './input.styl'
-
-/**
- * Merges multiple refs.
- *
- * @param {Array<object>} refs - A list of refs to be merged.
- * @returns {Function} - The ref callback with the DOM element that is assigned to every ref in `refs`.
- */
-const mergeRefs = refs => val => {
-  refs.forEach(ref => {
-    if (typeof ref === 'object') {
-      ref.current = val
-    }
-  })
-}
 
 class Input extends React.Component {
   static propTypes = {
@@ -214,7 +201,7 @@ class Input extends React.Component {
     const passedProps = {
       ...rest,
       ...(type === 'byte' ? { showPerChar } : {}),
-      ref: inputRef ? mergeRefs([this.input, inputRef]) : this.input,
+      ref: inputRef ? combineRefs([this.input, inputRef]) : this.input,
     }
 
     return (

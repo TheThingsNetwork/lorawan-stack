@@ -104,30 +104,39 @@ export default class DeviceImporter extends Component {
     redirectToList: PropTypes.func.isRequired,
   }
 
-  state = { ...initialState }
+  constructor(props) {
+    super(props)
+
+    this.state = { ...initialState }
+    this.editorRef = React.createRef()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { status } = this.state
+
+    if (prevState.status === 'initial' && status !== 'initial') {
+      // Disable undo manager of the code editor to release old logs from the heap.
+      // Without this fix the browser can run out of memory when importing many end devices.
+      this.editorRef.current.editor.session.setUndoManager(null)
+    }
+  }
 
   @bind
   appendToLog(message) {
-    const { log } = this.state
     const text = typeof message !== 'string' ? JSON.stringify(message, null, 2) : message
-    this.setState({
-      log: `${log}\n${text}`,
-    })
+    this.setState(({ log }) => ({ log: `${log}\n${text}` }))
   }
 
   @bind
   handleCreationProgress(device) {
-    const { devicesComplete } = this.state
-
     this.appendToLog(device)
-    this.setState({ devicesComplete: devicesComplete + 1 })
+    this.setState(({ devicesComplete }) => ({ devicesComplete: devicesComplete + 1 }))
   }
 
   @bind
   handleError(error) {
-    const { log } = this.state
     const json = JSON.stringify(error, null, 2)
-    this.setState({ error, status: 'error', log: `${log}\n${json}` })
+    this.setState(({ log }) => ({ error, status: 'error', log: `${log}\n${json}` }))
   }
 
   @bind
@@ -246,6 +255,7 @@ export default class DeviceImporter extends Component {
           editorOptions={{ useWorker: false }}
           showGutter={false}
           scrollToBottom
+          editorRef={this.editorRef}
         />
         <SubmitBar>
           <Button
