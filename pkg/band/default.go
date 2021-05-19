@@ -33,6 +33,6 @@ const (
 	defaultADRAckDelay = ttnpb.ADR_ACK_DELAY_32
 
 	// Random delay between 1 and 3 seconds
-	defaultAckTimeout       time.Duration = 2 * time.Second
-	defaultAckTimeoutMargin time.Duration = 1 * time.Second
+	defaultRetransmitTimeout       time.Duration = 2 * time.Second
+	defaultRetransmitTimeoutMargin time.Duration = 1 * time.Second
 )

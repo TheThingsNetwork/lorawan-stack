@@ -170,9 +170,9 @@ type Band struct {
 	// ADRAckLimit
 	ADRAckLimit ttnpb.ADRAckLimitExponent
 	// ADRAckDelay
-	ADRAckDelay   ttnpb.ADRAckDelayExponent
-	MinAckTimeout time.Duration
-	MaxAckTimeout time.Duration
+	ADRAckDelay          ttnpb.ADRAckDelayExponent
+	MinRetransmitTimeout time.Duration
+	MaxRetransmitTimeout time.Duration
 
 	// TxOffset in dB: Tx power is computed by taking the MaxEIRP (default: +16dBm) and subtracting the offset.
 	TxOffset []float32
