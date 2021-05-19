@@ -237,6 +237,14 @@ func TestMarshalers(t *testing.T) {
 	}
 	vals = append(vals, deviceEIRPs)
 
+	var deviceEIRPVals []interface{}
+	for i := range DeviceEIRP_name {
+		deviceEIRPVals = append(deviceEIRPVals, DeviceEIRPValue{
+			Value: DeviceEIRP(i),
+		})
+	}
+	vals = append(vals, deviceEIRPVals)
+
 	var ackLimitExponents []interface{}
 	for i := range ADRAckLimitExponent_name {
 		ackLimitExponents = append(ackLimitExponents, ADRAckLimitExponent(i))

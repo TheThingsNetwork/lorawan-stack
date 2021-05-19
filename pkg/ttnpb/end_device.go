@@ -155,6 +155,10 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.DesiredMaxDutyCycle == nil
 	case "desired_max_duty_cycle.value":
 		return v.DesiredMaxDutyCycle.FieldIsZero("value")
+	case "desired_max_eirp":
+		return v.DesiredMaxEirp == nil
+	case "desired_max_eirp.value":
+		return v.DesiredMaxEirp.FieldIsZero("value")
 	case "desired_ping_slot_data_rate_index":
 		return v.DesiredPingSlotDataRateIndex == nil
 	case "desired_ping_slot_data_rate_index.value":
@@ -953,6 +957,10 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MACSettings.FieldIsZero("desired_max_duty_cycle")
 	case "mac_settings.desired_max_duty_cycle.value":
 		return v.MACSettings.FieldIsZero("desired_max_duty_cycle.value")
+	case "mac_settings.desired_max_eirp":
+		return v.MACSettings.FieldIsZero("desired_max_eirp")
+	case "mac_settings.desired_max_eirp.value":
+		return v.MACSettings.FieldIsZero("desired_max_eirp.value")
 	case "mac_settings.desired_ping_slot_data_rate_index":
 		return v.MACSettings.FieldIsZero("desired_ping_slot_data_rate_index")
 	case "mac_settings.desired_ping_slot_data_rate_index.value":

@@ -13261,6 +13261,14 @@
       ],
       "default": "DEVICE_EIRP_8"
     },
+    "v3DeviceEIRPValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3DeviceEIRP"
+        }
+      }
+    },
     "v3DownlinkMessage": {
       "type": "object",
       "properties": {
@@ -15143,6 +15151,10 @@
         "desired_beacon_frequency": {
           "$ref": "#/definitions/v3FrequencyValue",
           "description": "The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "desired_max_eirp": {
+          "$ref": "#/definitions/v3DeviceEIRPValue",
+          "description": "Maximum EIRP (dBm).\nIf unset, the default value from regional parameters specification will be used."
         }
       }
     },

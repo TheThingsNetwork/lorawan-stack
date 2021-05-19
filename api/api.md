@@ -337,6 +337,7 @@
   - [Message `DataRate`](#ttn.lorawan.v3.DataRate)
   - [Message `DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue)
   - [Message `DataRateOffsetValue`](#ttn.lorawan.v3.DataRateOffsetValue)
+  - [Message `DeviceEIRPValue`](#ttn.lorawan.v3.DeviceEIRPValue)
   - [Message `DownlinkPath`](#ttn.lorawan.v3.DownlinkPath)
   - [Message `FCtrl`](#ttn.lorawan.v3.FCtrl)
   - [Message `FHDR`](#ttn.lorawan.v3.FHDR)
@@ -3164,6 +3165,7 @@ This is used internally by the Network Server.
 | `desired_ping_slot_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | The data rate index of the class B ping slot Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
 | `desired_ping_slot_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `desired_beacon_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
+| `desired_max_eirp` | [`DeviceEIRPValue`](#ttn.lorawan.v3.DeviceEIRPValue) |  | Maximum EIRP (dBm). If unset, the default value from regional parameters specification will be used. |
 
 #### Field Rules
 
@@ -4864,6 +4866,18 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `value` | [`DataRateOffset`](#ttn.lorawan.v3.DataRateOffset) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `value` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.DeviceEIRPValue">Message `DeviceEIRPValue`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [`DeviceEIRP`](#ttn.lorawan.v3.DeviceEIRP) |  |  |
 
 #### Field Rules
 

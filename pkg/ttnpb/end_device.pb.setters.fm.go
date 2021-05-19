@@ -1212,6 +1212,31 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 					dst.DesiredBeaconFrequency = nil
 				}
 			}
+		case "desired_max_eirp":
+			if len(subs) > 0 {
+				var newDst, newSrc *DeviceEIRPValue
+				if (src == nil || src.DesiredMaxEirp == nil) && dst.DesiredMaxEirp == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DesiredMaxEirp
+				}
+				if dst.DesiredMaxEirp != nil {
+					newDst = dst.DesiredMaxEirp
+				} else {
+					newDst = &DeviceEIRPValue{}
+					dst.DesiredMaxEirp = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DesiredMaxEirp = src.DesiredMaxEirp
+				} else {
+					dst.DesiredMaxEirp = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

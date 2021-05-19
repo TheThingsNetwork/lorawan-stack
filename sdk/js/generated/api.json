@@ -12468,6 +12468,16 @@
               "fullType": "ttn.lorawan.v3.FrequencyValue",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "desired_max_eirp",
+              "description": "Maximum EIRP (dBm).\nIf unset, the default value from regional parameters specification will be used.",
+              "label": "",
+              "type": "DeviceEIRPValue",
+              "longType": "DeviceEIRPValue",
+              "fullType": "ttn.lorawan.v3.DeviceEIRPValue",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -21226,6 +21236,35 @@
               "type": "DataRateOffset",
               "longType": "DataRateOffset",
               "fullType": "ttn.lorawan.v3.DataRateOffset",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DeviceEIRPValue",
+          "longName": "DeviceEIRPValue",
+          "fullName": "ttn.lorawan.v3.DeviceEIRPValue",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "DeviceEIRP",
+              "longType": "DeviceEIRP",
+              "fullType": "ttn.lorawan.v3.DeviceEIRP",
               "ismap": false,
               "defaultValue": "",
               "options": {

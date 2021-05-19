@@ -165,6 +165,22 @@ Binary | ttnpb.DeviceEIRP | DEVICE_EIRP_30 | [13]
 Binary | ttnpb.DeviceEIRP | DEVICE_EIRP_33 | [14]
 Binary | ttnpb.DeviceEIRP | DEVICE_EIRP_36 | [15]
 Binary | ttnpb.DeviceEIRP | DEVICE_EIRP_8 | [0]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_10 {} 0} | [1]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_12 {} 0} | [2]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_13 {} 0} | [3]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_14 {} 0} | [4]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_16 {} 0} | [5]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_18 {} 0} | [6]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_20 {} 0} | [7]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_21 {} 0} | [8]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_24 {} 0} | [9]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_26 {} 0} | [10]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_27 {} 0} | [11]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_29 {} 0} | [12]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_30 {} 0} | [13]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_33 {} 0} | [14]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_36 {} 0} | [15]
+Binary | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_8 {} 0} | [0]
 Binary | ttnpb.JoinRequestType | JOIN | [255]
 Binary | ttnpb.JoinRequestType | REJOIN_CONTEXT | [0]
 Binary | ttnpb.JoinRequestType | REJOIN_KEYS | [2]
@@ -495,6 +511,22 @@ JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_30 | "DEVICE_EIRP_30"
 JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_33 | "DEVICE_EIRP_33"
 JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_36 | "DEVICE_EIRP_36"
 JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_8 | "DEVICE_EIRP_8"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_10 {} 0} | "DEVICE_EIRP_10"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_12 {} 0} | "DEVICE_EIRP_12"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_13 {} 0} | "DEVICE_EIRP_13"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_14 {} 0} | "DEVICE_EIRP_14"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_16 {} 0} | "DEVICE_EIRP_16"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_18 {} 0} | "DEVICE_EIRP_18"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_20 {} 0} | "DEVICE_EIRP_20"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_21 {} 0} | "DEVICE_EIRP_21"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_24 {} 0} | "DEVICE_EIRP_24"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_26 {} 0} | "DEVICE_EIRP_26"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_27 {} 0} | "DEVICE_EIRP_27"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_29 {} 0} | "DEVICE_EIRP_29"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_30 {} 0} | "DEVICE_EIRP_30"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_33 {} 0} | "DEVICE_EIRP_33"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_36 {} 0} | "DEVICE_EIRP_36"
+JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_8 {} 0} | "DEVICE_EIRP_8"
 JSON | ttnpb.FrequencyValue | {100000 {} 0} | "100000"
 JSON | ttnpb.FrequencyValue | {2000000 {} 0} | "2000000"
 JSON | ttnpb.FrequencyValue | {30000000 {} 0} | "30000000"
@@ -805,6 +837,38 @@ JSONPB | ttnpb.DataRateOffsetValue | {4 {} 0} | 4
 JSONPB | ttnpb.DataRateOffsetValue | {5 {} 0} | 5
 JSONPB | ttnpb.DataRateOffsetValue | {6 {} 0} | 6
 JSONPB | ttnpb.DataRateOffsetValue | {7 {} 0} | 7
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_10 | "DEVICE_EIRP_10"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_12 | "DEVICE_EIRP_12"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_13 | "DEVICE_EIRP_13"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_14 | "DEVICE_EIRP_14"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_16 | "DEVICE_EIRP_16"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_18 | "DEVICE_EIRP_18"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_20 | "DEVICE_EIRP_20"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_21 | "DEVICE_EIRP_21"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_24 | "DEVICE_EIRP_24"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_26 | "DEVICE_EIRP_26"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_27 | "DEVICE_EIRP_27"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_29 | "DEVICE_EIRP_29"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_30 | "DEVICE_EIRP_30"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_33 | "DEVICE_EIRP_33"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_36 | "DEVICE_EIRP_36"
+JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_8 | "DEVICE_EIRP_8"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_10 {} 0} | "DEVICE_EIRP_10"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_12 {} 0} | "DEVICE_EIRP_12"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_13 {} 0} | "DEVICE_EIRP_13"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_14 {} 0} | "DEVICE_EIRP_14"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_16 {} 0} | "DEVICE_EIRP_16"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_18 {} 0} | "DEVICE_EIRP_18"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_20 {} 0} | "DEVICE_EIRP_20"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_21 {} 0} | "DEVICE_EIRP_21"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_24 {} 0} | "DEVICE_EIRP_24"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_26 {} 0} | "DEVICE_EIRP_26"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_27 {} 0} | "DEVICE_EIRP_27"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_29 {} 0} | "DEVICE_EIRP_29"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_30 {} 0} | "DEVICE_EIRP_30"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_33 {} 0} | "DEVICE_EIRP_33"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_36 {} 0} | "DEVICE_EIRP_36"
+JSONPB | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_8 {} 0} | "DEVICE_EIRP_8"
 JSONPB | ttnpb.FrequencyValue | {100000 {} 0} | "100000"
 JSONPB | ttnpb.FrequencyValue | {2000000 {} 0} | "2000000"
 JSONPB | ttnpb.FrequencyValue | {30000000 {} 0} | "30000000"
@@ -1023,6 +1087,22 @@ Text | ttnpb.DeviceEIRP | DEVICE_EIRP_30 | DEVICE_EIRP_30
 Text | ttnpb.DeviceEIRP | DEVICE_EIRP_33 | DEVICE_EIRP_33
 Text | ttnpb.DeviceEIRP | DEVICE_EIRP_36 | DEVICE_EIRP_36
 Text | ttnpb.DeviceEIRP | DEVICE_EIRP_8 | DEVICE_EIRP_8
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_10 {} 0} | DEVICE_EIRP_10
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_12 {} 0} | DEVICE_EIRP_12
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_13 {} 0} | DEVICE_EIRP_13
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_14 {} 0} | DEVICE_EIRP_14
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_16 {} 0} | DEVICE_EIRP_16
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_18 {} 0} | DEVICE_EIRP_18
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_20 {} 0} | DEVICE_EIRP_20
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_21 {} 0} | DEVICE_EIRP_21
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_24 {} 0} | DEVICE_EIRP_24
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_26 {} 0} | DEVICE_EIRP_26
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_27 {} 0} | DEVICE_EIRP_27
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_29 {} 0} | DEVICE_EIRP_29
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_30 {} 0} | DEVICE_EIRP_30
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_33 {} 0} | DEVICE_EIRP_33
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_36 {} 0} | DEVICE_EIRP_36
+Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_8 {} 0} | DEVICE_EIRP_8
 Text | ttnpb.FrequencyValue | {100000 {} 0} | 100000
 Text | ttnpb.FrequencyValue | {2000000 {} 0} | 2000000
 Text | ttnpb.FrequencyValue | {30000000 {} 0} | 30000000

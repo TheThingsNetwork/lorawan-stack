@@ -25,6 +25,7 @@ For details about compatibility between different releases, see the **Commitment
 - The `gs.up.forward` event now includes the host an uplink was forwarded to.
 - Previews for `*.update` events in the Console.
 - The Console can now show recent historical events in networks that have events storage enabled.
+- Add a new `mac_settings.desired_max_eirp` field that can be configured to set the desired MaxEIRP value per device.
 
 ### Changed
 

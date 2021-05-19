@@ -59,6 +59,25 @@ func TestNewState(t *testing.T) {
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		},
 		{
+			Name: "1.0.2/EU868/DesiredMaxEirp",
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				MACSettings: &ttnpb.MACSettings{
+					DesiredMaxEirp: &ttnpb.DeviceEIRPValue{
+						Value: ttnpb.DEVICE_EIRP_18,
+					},
+				},
+			},
+			MACState: func() *ttnpb.MACState {
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
+				macState.DesiredParameters.MaxEIRP = 18
+				return macState
+			}(),
+			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
+		},
+		{
 			Name: "1.0.2/EU868/multicast/class A",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,

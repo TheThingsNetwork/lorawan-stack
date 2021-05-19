@@ -473,6 +473,13 @@ var ADRAckDelayExponentValueFieldPathsNested = []string{
 var ADRAckDelayExponentValueFieldPathsTopLevel = []string{
 	"value",
 }
+var DeviceEIRPValueFieldPathsNested = []string{
+	"value",
+}
+
+var DeviceEIRPValueFieldPathsTopLevel = []string{
+	"value",
+}
 var TxSettings_DownlinkFieldPathsNested = []string{
 	"antenna_index",
 	"invert_polarization",

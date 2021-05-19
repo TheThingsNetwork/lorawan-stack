@@ -1336,6 +1336,12 @@ func (v *DeviceEIRP) UnmarshalText(b []byte) error {
 	return nil
 }
 
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v DeviceEIRP) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
+	// NOTE: This ignores m.EnumsAsInts and always marshals as int.
+	return v.MarshalJSON()
+}
+
 // UnmarshalJSON implements json.Unmarshaler interface.
 func (v *DeviceEIRP) UnmarshalJSON(b []byte) error {
 	if bt, ok := unmarshalJSONString(b); ok {
@@ -1347,6 +1353,11 @@ func (v *DeviceEIRP) UnmarshalJSON(b []byte) error {
 	}
 	*v = DeviceEIRP(i)
 	return nil
+}
+
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *DeviceEIRP) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
+	return v.UnmarshalJSON(b)
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
@@ -2305,6 +2316,86 @@ func (v *Message) FieldIsZero(p string) bool {
 		return v.MHDR.FieldIsZero("major")
 	case "mic":
 		return v.MIC == nil
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (v DeviceEIRPValue) MarshalBinary() ([]byte, error) {
+	return v.Value.MarshalBinary()
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v DeviceEIRPValue) MarshalText() ([]byte, error) {
+	return v.Value.MarshalText()
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v DeviceEIRPValue) MarshalJSON() ([]byte, error) {
+	return v.Value.MarshalJSON()
+}
+
+// MarshalJSONPB implements jsonpb.JSONPBMarshaler interface.
+func (v DeviceEIRPValue) MarshalJSONPB(m *jsonpb.Marshaler) ([]byte, error) {
+	return v.Value.MarshalJSONPB(m)
+}
+
+// UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
+func (v *DeviceEIRPValue) UnmarshalBinary(b []byte) error {
+	var vv DeviceEIRP
+	if err := vv.UnmarshalBinary(b); err != nil {
+		return err
+	}
+	*v = DeviceEIRPValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *DeviceEIRPValue) UnmarshalText(b []byte) error {
+	var vv DeviceEIRP
+	if err := vv.UnmarshalText(b); err != nil {
+		return err
+	}
+	*v = DeviceEIRPValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *DeviceEIRPValue) UnmarshalJSON(b []byte) error {
+	var vv DeviceEIRP
+	if err := vv.UnmarshalJSON(b); err != nil {
+		return err
+	}
+	*v = DeviceEIRPValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// UnmarshalJSONPB implements jsonpb.JSONPBUnmarshaler interface.
+func (v *DeviceEIRPValue) UnmarshalJSONPB(u *jsonpb.Unmarshaler, b []byte) error {
+	var vv DeviceEIRP
+	if err := vv.UnmarshalJSONPB(u, b); err != nil {
+		return err
+	}
+	*v = DeviceEIRPValue{
+		Value: vv,
+	}
+	return nil
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *DeviceEIRPValue) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "value":
+		return v.Value == 0
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }

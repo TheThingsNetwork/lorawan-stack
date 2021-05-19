@@ -90,3 +90,17 @@ func TestDataRateIndex(t *testing.T) {
 	err = idx.UnmarshalText([]byte("4"))
 	a.So(idx, should.Equal, DATA_RATE_4)
 }
+
+func TestDeviceEIRP(t *testing.T) {
+	a := assertions.New(t)
+	a.So(DEVICE_EIRP_10.String(), should.Equal, "DEVICE_EIRP_10")
+
+	b, err := DEVICE_EIRP_10.MarshalText()
+	a.So(err, should.BeNil)
+	a.So(b, should.Resemble, []byte("DEVICE_EIRP_10"))
+
+	var v DeviceEIRP
+	err = v.UnmarshalText([]byte("DEVICE_EIRP_10"))
+	a.So(v, should.Equal, DEVICE_EIRP_10)
+	a.So(err, should.BeNil)
+}

@@ -42,6 +42,8 @@ func TestFieldIsZero(t *testing.T) {
 		(*CFList)(nil):                      CFListFieldPathsNested,
 		&DataRateIndexValue{}:               DataRateIndexValueFieldPathsNested,
 		(*DataRateIndexValue)(nil):          DataRateIndexValueFieldPathsNested,
+		&DeviceEIRPValue{}:                  DeviceEIRPValueFieldPathsNested,
+		(*DeviceEIRPValue)(nil):             DeviceEIRPValueFieldPathsNested,
 		&DLSettings{}:                       DLSettingsFieldPathsNested,
 		(*DLSettings)(nil):                  DLSettingsFieldPathsNested,
 		&EndDeviceAuthenticationCode{}:      EndDeviceAuthenticationCodeFieldPathsNested,

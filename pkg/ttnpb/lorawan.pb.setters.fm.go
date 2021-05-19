@@ -2480,6 +2480,27 @@ func (dst *ADRAckDelayExponentValue) SetFields(src *ADRAckDelayExponentValue, pa
 	return nil
 }
 
+func (dst *DeviceEIRPValue) SetFields(src *DeviceEIRPValue, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero DeviceEIRP
+				dst.Value = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *TxSettings_Downlink) SetFields(src *TxSettings_Downlink, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
