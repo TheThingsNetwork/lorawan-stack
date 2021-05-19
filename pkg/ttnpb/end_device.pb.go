@@ -7233,7 +7233,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	this.SupportsClassB = bool(r.Intn(2) == 0)
 	this.SupportsClassC = bool(r.Intn(2) == 0)
 	this.LoRaWANVersion = MACVersion([]int32{0, 1, 2, 3, 4, 5, 6}[r.Intn(7)])
-	this.LoRaWANPHYVersion = PHYVersion([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
+	this.LoRaWANPHYVersion = PHYVersion([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}[r.Intn(11)])
 	this.FrequencyPlanID = randStringEndDevice(r)
 	this.MinFrequency = uint64(r.Uint32())
 	this.MaxFrequency = uint64(r.Uint32())

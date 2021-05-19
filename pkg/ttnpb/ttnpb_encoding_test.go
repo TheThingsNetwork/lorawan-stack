@@ -55,27 +55,27 @@ func TestStringers(t *testing.T) {
 			String:   "1.1.0",
 		},
 		{
-			Stringer: PHY_V1_0,
+			Stringer: TS001_V1_0,
 			String:   "1.0.0",
 		},
 		{
-			Stringer: PHY_V1_0_1,
+			Stringer: TS001_V1_0_1,
 			String:   "1.0.1",
 		},
 		{
-			Stringer: PHY_V1_0_2_REV_A,
+			Stringer: RP001_V1_0_2,
 			String:   "1.0.2-a",
 		},
 		{
-			Stringer: PHY_V1_0_2_REV_B,
+			Stringer: RP001_V1_0_2_REV_B,
 			String:   "1.0.2-b",
 		},
 		{
-			Stringer: PHY_V1_1_REV_A,
+			Stringer: RP001_V1_1,
 			String:   "1.1.0-a",
 		},
 		{
-			Stringer: PHY_V1_1_REV_B,
+			Stringer: RP001_V1_1_REV_B,
 			String:   "1.1.0-b",
 		},
 	} {

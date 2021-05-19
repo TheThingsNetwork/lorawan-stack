@@ -245,6 +245,9 @@ Binary | ttnpb.PHYVersion | 1.0.2-b | [4]
 Binary | ttnpb.PHYVersion | 1.0.3-a | [7]
 Binary | ttnpb.PHYVersion | 1.1.0-a | [5]
 Binary | ttnpb.PHYVersion | 1.1.0-b | [6]
+Binary | ttnpb.PHYVersion | RP002_V1_0_0 | [8]
+Binary | ttnpb.PHYVersion | RP002_V1_0_1 | [9]
+Binary | ttnpb.PHYVersion | RP002_V1_0_2 | [10]
 Binary | ttnpb.PHYVersion | unknown | [0]
 Binary | ttnpb.PingSlotPeriod | PING_EVERY_128S | [7]
 Binary | ttnpb.PingSlotPeriod | PING_EVERY_16S | [4]
@@ -594,6 +597,9 @@ JSON | ttnpb.PHYVersion | 1.0.2-b | "PHY_V1_0_2_REV_B"
 JSON | ttnpb.PHYVersion | 1.0.3-a | "PHY_V1_0_3_REV_A"
 JSON | ttnpb.PHYVersion | 1.1.0-a | "PHY_V1_1_REV_A"
 JSON | ttnpb.PHYVersion | 1.1.0-b | "PHY_V1_1_REV_B"
+JSON | ttnpb.PHYVersion | RP002_V1_0_0 | "RP002_V1_0_0"
+JSON | ttnpb.PHYVersion | RP002_V1_0_1 | "RP002_V1_0_1"
+JSON | ttnpb.PHYVersion | RP002_V1_0_2 | "RP002_V1_0_2"
 JSON | ttnpb.PHYVersion | unknown | "PHY_UNKNOWN"
 JSON | ttnpb.PingSlotPeriod | PING_EVERY_128S | "PING_EVERY_128S"
 JSON | ttnpb.PingSlotPeriod | PING_EVERY_16S | "PING_EVERY_16S"
@@ -1182,6 +1188,9 @@ Text | ttnpb.PHYVersion | 1.0.2-b | 1.0.2-b
 Text | ttnpb.PHYVersion | 1.0.3-a | 1.0.3-a
 Text | ttnpb.PHYVersion | 1.1.0-a | 1.1.0-a
 Text | ttnpb.PHYVersion | 1.1.0-b | 1.1.0-b
+Text | ttnpb.PHYVersion | RP002_V1_0_0 | RP002_V1_0_0
+Text | ttnpb.PHYVersion | RP002_V1_0_1 | RP002_V1_0_1
+Text | ttnpb.PHYVersion | RP002_V1_0_2 | RP002_V1_0_2
 Text | ttnpb.PHYVersion | unknown | unknown
 Text | ttnpb.PingSlotPeriod | PING_EVERY_128S | PING_EVERY_128S
 Text | ttnpb.PingSlotPeriod | PING_EVERY_16S | PING_EVERY_16S
