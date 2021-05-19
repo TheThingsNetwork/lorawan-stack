@@ -20,3 +20,21 @@ div.toast
 
   .notification
     margin: 0
+
+.slide-in-right
+  animation: slide-in-right 0.5s cubic-bezier(0.230, 1.000, 0.320, 1.000) both
+
+.slide-out-right
+  animation: slide-in-right 0.5s cubic-bezier(0.230, 1.000, 0.320, 1.000) both reverse
+
+
+@keyframes slide-in-right
+  0%
+    -webkit-transform: translateX(70rem)
+    transform: translateX(70rem)
+    opacity: 0
+
+  100%
+    -webkit-transform: translateX(0)
+    transform: translateX(0)
+    opacity: 1
