@@ -161,8 +161,8 @@ func init() {
 		TxParamSetupReqSupport: true,
 
 		// No LoRaWAN Regional Parameters 1.0
-		regionalParameters1_0_1: bandIdentity,
-		regionalParameters1_0_2RevA: func(b Band) Band {
+		regionalParameters1_v1_0_1: bandIdentity,
+		regionalParameters1_v1_0_2: func(b Band) Band {
 			dataRates := make(map[ttnpb.DataRateIndex]DataRate, len(b.DataRates)-2)
 			for drIdx := ttnpb.DATA_RATE_0; drIdx <= ttnpb.DATA_RATE_4; drIdx++ {
 				dataRates[drIdx] = b.DataRates[drIdx+2]
@@ -184,13 +184,13 @@ func init() {
 			b.MaxADRDataRateIndex = ttnpb.DATA_RATE_3
 			return b
 		},
-		regionalParameters1_0_2RevB: composeSwaps(
+		regionalParameters1_v1_0_2RevB: composeSwaps(
 			disableCFList,
 			disableChMaskCntl5,
 			disableTxParamSetupReq,
 			makeSetMaxTxPowerIndexFunc(10),
 		),
-		regionalParameters1_0_3RevA: composeSwaps(
+		regionalParameters1_v1_0_3RevA: composeSwaps(
 			enableTxParamSetupReq,
 			makeAddTxPowerFunc(-22),
 			makeAddTxPowerFunc(-24),
@@ -198,7 +198,7 @@ func init() {
 			makeAddTxPowerFunc(-28),
 			makeAddTxPowerFunc(-30),
 		),
-		regionalParameters1_1RevA: composeSwaps(
+		regionalParameters1_v1_1: composeSwaps(
 			disableTxParamSetupReq,
 			makeSetBeaconDataRateIndex(ttnpb.DATA_RATE_10),
 			makeSetMaxTxPowerIndexFunc(10),

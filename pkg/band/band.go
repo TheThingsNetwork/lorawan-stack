@@ -206,12 +206,12 @@ type Band struct {
 	// DefaultRx2Parameters are the default parameters that determine the settings for a Tx sent during Rx2.
 	DefaultRx2Parameters Rx2Parameters
 
-	regionalParameters1_0       versionSwap
-	regionalParameters1_0_1     versionSwap
-	regionalParameters1_0_2RevA versionSwap
-	regionalParameters1_0_2RevB versionSwap
-	regionalParameters1_0_3RevA versionSwap
-	regionalParameters1_1RevA   versionSwap
+	regionalParameters1_v1_0       versionSwap
+	regionalParameters1_v1_0_1     versionSwap
+	regionalParameters1_v1_0_2     versionSwap
+	regionalParameters1_v1_0_2RevB versionSwap
+	regionalParameters1_v1_0_3RevA versionSwap
+	regionalParameters1_v1_1       versionSwap
 }
 
 func (b Band) MaxTxPowerIndex() uint8 {
@@ -258,13 +258,14 @@ type swapParameters struct {
 
 func (b Band) downgrades() []swapParameters {
 	return []swapParameters{
-		{version: ttnpb.PHY_V1_1_REV_B, downgrade: bandIdentity},
-		{version: ttnpb.PHY_V1_1_REV_A, downgrade: b.regionalParameters1_1RevA},
-		{version: ttnpb.PHY_V1_0_3_REV_A, downgrade: b.regionalParameters1_0_3RevA},
-		{version: ttnpb.PHY_V1_0_2_REV_B, downgrade: b.regionalParameters1_0_2RevB},
-		{version: ttnpb.PHY_V1_0_2_REV_A, downgrade: b.regionalParameters1_0_2RevA},
-		{version: ttnpb.PHY_V1_0_1, downgrade: b.regionalParameters1_0_1},
-		{version: ttnpb.PHY_V1_0, downgrade: b.regionalParameters1_0},
+		// TODO: Add Regional Parameters for LoRaWAN version 1.0.4 (https://github.com/TheThingsNetwork/lorawan-stack/issues/3513)
+		{version: ttnpb.RP001_V1_1_REV_B, downgrade: bandIdentity},
+		{version: ttnpb.RP001_V1_1, downgrade: b.regionalParameters1_v1_1},
+		{version: ttnpb.RP001_V1_0_3_REV_A, downgrade: b.regionalParameters1_v1_0_3RevA},
+		{version: ttnpb.RP001_V1_0_2_REV_B, downgrade: b.regionalParameters1_v1_0_2RevB},
+		{version: ttnpb.RP001_V1_0_2, downgrade: b.regionalParameters1_v1_0_2},
+		{version: ttnpb.TS001_V1_0_1, downgrade: b.regionalParameters1_v1_0_1},
+		{version: ttnpb.TS001_V1_0, downgrade: b.regionalParameters1_v1_0},
 	}
 }
 

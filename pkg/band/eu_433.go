@@ -137,12 +137,12 @@ func init() {
 		},
 		PingSlotFrequency: uint64Ptr(beaconFrequency),
 
-		regionalParameters1_0:       bandIdentity,
-		regionalParameters1_0_1:     bandIdentity,
-		regionalParameters1_0_2RevA: bandIdentity,
-		regionalParameters1_0_2RevB: bandIdentity,
-		regionalParameters1_0_3RevA: bandIdentity,
-		regionalParameters1_1RevA:   bandIdentity,
+		regionalParameters1_v1_0:       bandIdentity,
+		regionalParameters1_v1_0_1:     bandIdentity,
+		regionalParameters1_v1_0_2:     bandIdentity,
+		regionalParameters1_v1_0_2RevB: bandIdentity,
+		regionalParameters1_v1_0_3RevA: bandIdentity,
+		regionalParameters1_v1_1:       bandIdentity,
 	}
 	All[EU_433] = eu_433
 }

@@ -136,7 +136,7 @@ func init() {
 
 		// No LoRaWAN 1.0
 		// No LoRaWAN 1.0.1
-		regionalParameters1_0_2RevA: func(b Band) Band {
+		regionalParameters1_v1_0_2: func(b Band) Band {
 			b.DefaultMaxEIRP = 20
 			b.TxOffset = []float32{
 				0,
@@ -149,9 +149,9 @@ func init() {
 			}
 			return b
 		},
-		regionalParameters1_0_2RevB: bandIdentity,
-		regionalParameters1_0_3RevA: bandIdentity,
-		regionalParameters1_1RevA:   bandIdentity,
+		regionalParameters1_v1_0_2RevB: bandIdentity,
+		regionalParameters1_v1_0_3RevA: bandIdentity,
+		regionalParameters1_v1_1:       bandIdentity,
 	}
 	All[KR_920_923] = kr_920_923
 }
