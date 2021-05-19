@@ -7460,6 +7460,15 @@
       "file": "lbslns.go"
     }
   },
+  "error:pkg/pfconfig/lbslns:invalid_key": {
+    "translations": {
+      "en": "key `{key}` invalid"
+    },
+    "description": {
+      "package": "pkg/pfconfig/lbslns",
+      "file": "lbslns.go"
+    }
+  },
   "error:pkg/pfconfig/shared:empty_gateway_server_address": {
     "translations": {
       "en": "gateway server address is empty"

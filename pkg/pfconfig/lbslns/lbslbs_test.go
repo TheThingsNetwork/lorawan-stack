@@ -100,21 +100,16 @@ func TestGetRouterConfig(t *testing.T) {
 				NoCCA:       true,
 				NoDutyCycle: true,
 				NoDwellTime: true,
-				SX1301Config: []shared.SX1301Config{
+				SX1301Config: []LBSSX1301Config{
 					{
-						LoRaWANPublic: true,
-						ClockSource:   0,
-						AntennaGain:   0,
-						Radios: []shared.RFConfig{
+						Radios: []LBSRFConfig{
 							{
 								Enable:    true,
 								Frequency: 922300000,
-								TxEnable:  true,
 							},
 							{
 								Enable:    false,
 								Frequency: 923000000,
-								TxEnable:  false,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -175,21 +170,16 @@ func TestGetRouterConfig(t *testing.T) {
 					[3]int{8, 500, 0},
 					[3]int{7, 500, 0},
 				},
-				SX1301Config: []shared.SX1301Config{
+				SX1301Config: []LBSSX1301Config{
 					{
-						LoRaWANPublic: true,
-						ClockSource:   0,
-						AntennaGain:   0,
-						Radios: []shared.RFConfig{
+						Radios: []LBSRFConfig{
 							{
 								Enable:    true,
 								Frequency: 922300000,
-								TxEnable:  true,
 							},
 							{
 								Enable:    false,
 								Frequency: 923000000,
-								TxEnable:  false,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -303,21 +293,16 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 				NoCCA:       true,
 				NoDutyCycle: true,
 				NoDwellTime: true,
-				SX1301Config: []shared.SX1301Config{
+				SX1301Config: []LBSSX1301Config{
 					{
-						LoRaWANPublic: true,
-						ClockSource:   0,
-						AntennaGain:   0,
-						Radios: []shared.RFConfig{
+						Radios: []LBSRFConfig{
 							{
 								Enable:    true,
 								Frequency: 924300000,
-								TxEnable:  true,
 							},
 							{
 								Enable:    false,
 								Frequency: 925000000,
-								TxEnable:  false,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -334,19 +319,14 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 						FSKChannel:          &shared.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 					},
 					{
-						LoRaWANPublic: true,
-						ClockSource:   0,
-						AntennaGain:   0,
-						Radios: []shared.RFConfig{
+						Radios: []LBSRFConfig{
 							{
 								Enable:    true,
 								Frequency: 924300000,
-								TxEnable:  true,
 							},
 							{
 								Enable:    false,
 								Frequency: 925000000,
-								TxEnable:  false,
 							},
 						},
 						Channels: []shared.IFConfig{

@@ -16,6 +16,7 @@
 package lbslns
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -32,7 +33,46 @@ const (
 	configHardwareSpecPrefix = "sx1301"
 )
 
-var errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan `{name}`")
+var (
+	errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan `{name}`")
+	errInvalidKey    = errors.DefineInvalidArgument("invalid_key", "key `{key}` invalid")
+)
+
+type kv struct {
+	key   string
+	value interface{}
+}
+
+type orderedMap struct {
+	kv []kv
+}
+
+func (m *orderedMap) add(k string, v interface{}) {
+	m.kv = append(m.kv, kv{key: k, value: v})
+}
+
+func (m orderedMap) MarshalJSON() ([]byte, error) {
+	var b bytes.Buffer
+	b.WriteString("{")
+	for i, kv := range m.kv {
+		if i != 0 {
+			b.WriteString(",")
+		}
+		key, err := json.Marshal(kv.key)
+		if err != nil {
+			return nil, err
+		}
+		b.Write(key)
+		b.WriteString(":")
+		val, err := json.Marshal(kv.value)
+		if err != nil {
+			return nil, err
+		}
+		b.Write(val)
+	}
+	b.WriteString("}")
+	return b.Bytes(), nil
+}
 
 // DataRates encodes the available datarates of the channel plan for the Station in the format below:
 // [0] -> SF (Spreading Factor; Range: 7...12 for LoRa, 0 for FSK)
@@ -40,16 +80,134 @@ var errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid f
 // [2] -> DNONLY (Downlink Only; 1 = true, 0 = false)
 type DataRates [16][3]int
 
+// LBSRFConfig contains the configuration for one of the radios only fields used for LoRa Basics Station gateways.
+// The other fields of RFConfig (in pkg/pfconfig/shared) are hardware specific and are left out here.
+// - `type`, `rssi_offset`, `tx_enable` and `tx_notch_freq` are set in the gateway.
+// - `tx_freq_min` and `tx_freq_max` are defined in the  `freq_range` parameter of `router_config`.
+type LBSRFConfig struct {
+	Enable    bool   `json:"enable"`
+	Frequency uint64 `json:"freq"`
+}
+
+// LBSSX1301Config contains the configuration for the SX1301 concentrator for the LoRa Basics Station `router_config` message.
+// This structure incorporates modifications for the `v1.5` and `v2` concentrator reference.
+// https://doc.sm.tc/station/gw_v1.5.html
+// https://doc.sm.tc/station/gw_v2.html
+// The fields `lorawan_public` and `clock_source` are omitted as they should be present in the gateway's `station.conf`.
+type LBSSX1301Config struct {
+	LBTConfig           *shared.LBTConfig
+	Radios              []LBSRFConfig
+	Channels            []shared.IFConfig
+	LoRaStandardChannel *shared.IFConfig
+	FSKChannel          *shared.IFConfig
+}
+
+// MarshalJSON implements json.Marshaler.
+func (c LBSSX1301Config) MarshalJSON() ([]byte, error) {
+	var m orderedMap
+	if c.LBTConfig != nil {
+		m.add("lbt_cfg", *c.LBTConfig)
+	}
+	for i, radio := range c.Radios {
+		m.add(fmt.Sprintf("radio_%d", i), radio)
+	}
+	for i, channel := range c.Channels {
+		m.add(fmt.Sprintf("chan_multiSF_%d", i), channel)
+	}
+	if c.LoRaStandardChannel != nil {
+		m.add("chan_Lora_std", *c.LoRaStandardChannel)
+	}
+	if c.FSKChannel != nil {
+		m.add("chan_FSK", *c.FSKChannel)
+	}
+	return json.Marshal(m)
+}
+
+// fromSX1301Conf updates fields from shared.SX1301Config.
+func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf shared.SX1301Config) error {
+	c.LoRaStandardChannel = sx1301Conf.LoRaStandardChannel
+	c.FSKChannel = sx1301Conf.FSKChannel
+	c.LBTConfig = sx1301Conf.LBTConfig
+
+	for _, radio := range sx1301Conf.Radios {
+		c.Radios = append(c.Radios, LBSRFConfig{
+			Enable:    radio.Enable,
+			Frequency: radio.Frequency,
+		})
+	}
+
+	for _, channel := range sx1301Conf.Channels {
+		c.Channels = append(c.Channels, channel)
+	}
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (c *LBSSX1301Config) UnmarshalJSON(msg []byte) error {
+	var root map[string]json.RawMessage
+	if err := json.Unmarshal(msg, &root); err != nil {
+		return err
+	}
+	radioMap, chanMap := make(map[int]LBSRFConfig), make(map[int]shared.IFConfig)
+	for key, value := range root {
+		switch {
+		case key == "lbt_cfg":
+			if err := json.Unmarshal(value, &c.LBTConfig); err != nil {
+				return err
+			}
+		case key == "chan_Lora_std":
+			if err := json.Unmarshal(value, &c.LoRaStandardChannel); err != nil {
+				return err
+			}
+		case key == "chan_FSK":
+			if err := json.Unmarshal(value, &c.FSKChannel); err != nil {
+				return err
+			}
+		case strings.HasPrefix(key, "chan_multiSF_"):
+			var channel shared.IFConfig
+			if err := json.Unmarshal(value, &channel); err != nil {
+				return err
+			}
+			var index int
+			if _, err := fmt.Sscanf(key, "chan_multiSF_%d", &index); err == nil {
+				chanMap[index] = channel
+			} else {
+				return err
+			}
+		case strings.HasPrefix(key, "radio_"):
+			var radio LBSRFConfig
+			if err := json.Unmarshal(value, &radio); err != nil {
+				return err
+			}
+			var index int
+			if _, err := fmt.Sscanf(key, "radio_%d", &index); err == nil {
+				radioMap[index] = radio
+			} else {
+				return err
+			}
+		}
+	}
+
+	c.Radios, c.Channels = make([]LBSRFConfig, len(radioMap)), make([]shared.IFConfig, len(chanMap))
+	for key, value := range radioMap {
+		c.Radios[key] = value
+	}
+	for key, value := range chanMap {
+		c.Channels[key] = value
+	}
+	return nil
+}
+
 // RouterConfig contains the router configuration.
 // This message is sent by the Gateway Server.
 type RouterConfig struct {
-	NetID          []int                 `json:"NetID"`
-	JoinEUI        [][]int               `json:"JoinEui"`
-	Region         string                `json:"region"`
-	HardwareSpec   string                `json:"hwspec"`
-	FrequencyRange []int                 `json:"freq_range"`
-	DataRates      DataRates             `json:"DRs"`
-	SX1301Config   []shared.SX1301Config `json:"sx1301_conf"`
+	NetID          []int             `json:"NetID"`
+	JoinEUI        [][]int           `json:"JoinEui"`
+	Region         string            `json:"region"`
+	HardwareSpec   string            `json:"hwspec"`
+	FrequencyRange []int             `json:"freq_range"`
+	DataRates      DataRates         `json:"DRs"`
+	SX1301Config   []LBSSX1301Config `json:"sx1301_conf"`
 
 	// These are debug options to be unset in production gateways.
 	NoCCA       bool `json:"nocca"`
@@ -116,18 +274,15 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 			continue
 		}
 		sx1301Conf, err := shared.BuildSX1301Config(fp)
-		// These fields are not defined in the v1.5 ref design https://doc.sm.tc/station/gw_v1.5.html#rfconf-object and would cause a parsing error.
-		sx1301Conf.Radios[0].TxFreqMin = 0
-		sx1301Conf.Radios[0].TxFreqMax = 0
-		// Remove hardware specific values that are not necessary.
-		sx1301Conf.TxLUTConfigs = nil
-		for i := range sx1301Conf.Radios {
-			sx1301Conf.Radios[i].Type = ""
-		}
 		if err != nil {
 			return RouterConfig{}, err
 		}
-		conf.SX1301Config = append(conf.SX1301Config, *sx1301Conf)
+		var lbsSX1301Config LBSSX1301Config
+		err = lbsSX1301Config.fromSX1301Conf(*sx1301Conf)
+		if err != nil {
+			return RouterConfig{}, err
+		}
+		conf.SX1301Config = append(conf.SX1301Config, lbsSX1301Config)
 	}
 
 	// Add the MuxTime for RTT measurement.
