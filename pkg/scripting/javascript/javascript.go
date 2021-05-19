@@ -37,9 +37,9 @@ func New(options scripting.Options) scripting.Engine {
 var (
 	errScriptTimeout      = errors.DefineDeadlineExceeded("script_timeout", "script timeout")
 	errScriptInterrupt    = errors.DefineAborted("script_interrupt", "script interrupt")
-	errScript             = errors.Define("script", "{message}")
+	errScript             = errors.DefineAborted("script", "{message}")
 	errNoScriptOutput     = errors.DefineAborted("no_script_output", "no script output")
-	errRuntime            = errors.Define("runtime", "runtime error")
+	errRuntime            = errors.DefineAborted("runtime", "{message}")
 	errEntrypointNotFound = errors.DefineNotFound("entrypoint_not_found", "entrypoint `{entrypoint}` not found")
 )
 
@@ -56,7 +56,7 @@ func convertError(err error) error {
 	case *goja.Exception:
 		return errScript.WithAttributes("message", gojaErr.Error()).WithCause(err)
 	default:
-		return errRuntime.WithCause(err)
+		return errRuntime.WithAttributes("message", err.Error()).WithCause(err)
 	}
 }
 
@@ -87,9 +87,9 @@ func (j *js) Run(ctx context.Context, script, fn string, params ...interface{}) 
 		if caught := recover(); caught != nil {
 			switch val := caught.(type) {
 			case error:
-				err = errRuntime.WithCause(val)
+				err = errRuntime.WithAttributes("message", val.Error()).WithCause(val)
 			default:
-				err = errRuntime.New()
+				err = errRuntime.WithAttributes("message", "runtime error")
 			}
 		}
 	}()
@@ -118,9 +118,9 @@ func (j *js) Run(ctx context.Context, script, fn string, params ...interface{}) 
 			if caught := recover(); caught != nil {
 				switch val := caught.(type) {
 				case error:
-					err = errRuntime.WithCause(val)
+					err = errRuntime.WithAttributes("message", val.Error()).WithCause(val)
 				default:
-					err = errRuntime.New()
+					err = errRuntime.WithAttributes("message", "runtime error")
 				}
 			}
 		}()
