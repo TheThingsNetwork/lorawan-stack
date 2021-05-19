@@ -79,24 +79,10 @@ func (c Config) NewStore(ctx context.Context) (store.Store, error) {
 var errCannotOpenIndex = errors.DefineNotFound("cannot_open_index", "cannot open index")
 
 func openIndex(ctx context.Context, path string) (bleve.Index, error) {
-	var (
-		err   error
-		index bleve.Index
-	)
-	done := make(chan struct{}, 1)
-	defer close(done)
 	log.FromContext(ctx).WithField("path", path).Debug("Loading index")
-	go func() {
-		index, err = bleve.Open(path)
-		done <- struct{}{}
-	}()
-	select {
-	case <-done:
-		if err != nil {
-			return nil, errCannotOpenIndex.WithAttributes("path", path).WithCause(err)
-		}
-		return index, nil
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	index, err := bleve.OpenUsing(path, map[string]interface{}{"read_only": true, "bolt_timeout": "60s"})
+	if err != nil {
+		return nil, errCannotOpenIndex.WithAttributes("path", path).WithCause(err)
 	}
+	return index, nil
 }
