@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.13.0] - 2021-05-20
+
+### Added
+
 - Searching Packet Broker networks with `--tenant-id-contains` and `--name-contains` flags.
 - Listing all listed Packet Broker networks with `ttn-lw-cli packetbroker networks list`.
 - Include end device version identifiers in upstream messages (see `uplink_message.version_ids.brand_id`, `uplink_message.version_ids.model_id`, `uplink_message.version_ids.firmware_version`, `uplink_message.version_ids.hardware_version` and `uplink_message.version_ids.band_id` fields).
@@ -45,8 +59,6 @@ For details about compatibility between different releases, see the **Commitment
 - LoRa Basics Station `router_config` message omits hardware specific fields.
 - Showing "Last seen" information in end device tables (replacing "Created").
 
-### Deprecated
-
 ### Removed
 
 - The `gs.status.forward` event.
@@ -58,8 +70,6 @@ For details about compatibility between different releases, see the **Commitment
 - Gateway connection requests with zero EUI are rejected.
 - End device payload formatter reset to `FORMATTER_NONE` in the Console.
 - Memory issues when importing end devices in the Console.
-
-### Security
 
 ## [3.12.3] - 2021-05-06
 
@@ -1509,7 +1519,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.3...v3.12
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.0...v3.13
+[3.13.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.3...v3.13.0
 [3.12.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.2...v3.12.3
 [3.12.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.1...v3.12.2
 [3.12.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.0...v3.12.1
