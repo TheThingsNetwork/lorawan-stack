@@ -542,25 +542,16 @@ func TestVersion(t *testing.T) {
 					{7, 250, 0},
 					{0, 0, 0},
 				},
-				SX1301Config: []shared.SX1301Config{
+				SX1301Config: []pfconfig.LBSSX1301Config{
 					{
-						LoRaWANPublic: true,
-						ClockSource:   1,
-						AntennaGain:   0,
-						Radios: []shared.RFConfig{
+						Radios: []pfconfig.LBSRFConfig{
 							{
-								Enable:     true,
-								Frequency:  867500000,
-								TxEnable:   true,
-								RSSIOffset: -166,
+								Enable:    true,
+								Frequency: 867500000,
 							},
 							{
-								Enable:     true,
-								Frequency:  868500000,
-								TxEnable:   false,
-								TxFreqMin:  0,
-								TxFreqMax:  0,
-								RSSIOffset: -166,
+								Enable:    true,
+								Frequency: 868500000,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -575,7 +566,6 @@ func TestVersion(t *testing.T) {
 						},
 						LoRaStandardChannel: &shared.IFConfig{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
 						FSKChannel:          &shared.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 125000, SpreadFactor: 0, Datarate: 50000},
-						TxLUTConfigs:        []shared.TxLUTConfig{},
 					},
 				},
 			},
@@ -625,25 +615,16 @@ func TestVersion(t *testing.T) {
 				NoCCA:       true,
 				NoDwellTime: true,
 				NoDutyCycle: true,
-				SX1301Config: []shared.SX1301Config{
+				SX1301Config: []pfconfig.LBSSX1301Config{
 					{
-						LoRaWANPublic: true,
-						ClockSource:   1,
-						AntennaGain:   0,
-						Radios: []shared.RFConfig{
+						Radios: []pfconfig.LBSRFConfig{
 							{
-								Enable:     true,
-								Frequency:  867500000,
-								TxEnable:   true,
-								RSSIOffset: -166,
+								Enable:    true,
+								Frequency: 867500000,
 							},
 							{
-								Enable:     true,
-								Frequency:  868500000,
-								TxEnable:   false,
-								TxFreqMin:  0,
-								TxFreqMax:  0,
-								RSSIOffset: -166,
+								Enable:    true,
+								Frequency: 868500000,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -658,7 +639,6 @@ func TestVersion(t *testing.T) {
 						},
 						LoRaStandardChannel: &shared.IFConfig{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
 						FSKChannel:          &shared.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 125000, SpreadFactor: 0, Datarate: 50000},
-						TxLUTConfigs:        []shared.TxLUTConfig{},
 					},
 				},
 			},

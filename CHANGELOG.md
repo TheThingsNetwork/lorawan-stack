@@ -37,6 +37,7 @@ For details about compatibility between different releases, see the **Commitment
   - The default cap is at 4KB, see the new `as.formatters.max-parameter-length` config option.
   - A maximum cap of 16KB per script is set at the API level.
   - This only prevents setting large payload formatter scripts for new devices and applications; it does not remove payload formatters from existing applications and devices. Scripts sourced from the Device Repository are not affected. See [issue #4053](https://github.com/TheThingsNetwork/lorawan-stack/issues/4053) for more context on this change.
+- LoRa Basics Station `router_config` message omits hardware specific fields.
 
 ### Deprecated
 
