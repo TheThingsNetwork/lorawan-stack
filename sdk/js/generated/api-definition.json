@@ -264,6 +264,18 @@
           ]
         }
       ]
+    },
+    "IssueDevEUI": {
+      "file": "lorawan-stack/api/application_services.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/applications/{application_id}/dev-eui",
+          "parameters": [
+            "application_id"
+          ]
+        }
+      ]
     }
   },
   "AppAs": {

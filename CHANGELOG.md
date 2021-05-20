@@ -27,6 +27,10 @@ For details about compatibility between different releases, see the **Commitment
 - The Console can now show recent historical events in networks that have events storage enabled.
 - Add a new `mac_settings.desired_max_eirp` field that can be configured to set the desired MaxEIRP value per device.
 - Support loading rate limiting profile configuration from external sources. When set, they will override embedded configuration. See `rate-limiting.config-source`, `rate-limiting.directory`, `rate-limiting.url` and `rate-limiting.blob.*` configuration options.
+- `IssueDevEUI` RPC for requesting a DevEUI from a configured IEEE MAC block for devices per application.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added `eui_blocks` table and `dev_eui_counter`
+    column in applications table.
+  - This requires a new `dev-eui-block` configuration setting.
 
 ### Changed
 

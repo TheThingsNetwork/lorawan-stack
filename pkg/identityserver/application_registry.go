@@ -60,11 +60,18 @@ var (
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
+	evtIssueDevEUIForApplication = events.Define(
+		"application.issue_dev_eui", "issue DevEUI for application",
+		events.WithVisibility(ttnpb.RIGHT_APPLICATION_INFO),
+		events.WithAuthFromContext(),
+		events.WithClientInfoFromContext(),
+	)
 )
 
 var (
 	errAdminsCreateApplications = errors.DefinePermissionDenied("admins_create_applications", "applications may only be created by admins, or in organizations")
 	errAdminsPurgeApplications  = errors.DefinePermissionDenied("admins_purge_applications", "applications may only be purged by admins")
+	errDevEUIIssuingNotEnabled  = errors.DefineInvalidArgument("dev_eui_issuing_not_enabled", "DevEUI issuing not configured")
 )
 
 func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
@@ -333,6 +340,29 @@ func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.Appli
 	return ttnpb.Empty, nil
 }
 
+func (is *IdentityServer) issueDevEUI(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.IssueDevEUIResponse, error) {
+	if err := rights.RequireApplication(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+		return nil, err
+	}
+	if !is.config.DevEUIBlock.Enabled {
+		return nil, errDevEUIIssuingNotEnabled.New()
+	}
+	res := &ttnpb.IssueDevEUIResponse{}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		devEUI, err := store.GetEUIStore(db).IssueDevEUIForApplication(ctx, ids, is.config.DevEUIBlock.ApplicationLimit)
+		if err != nil {
+			return err
+		}
+		res.DevEui = *devEUI
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtIssueDevEUIForApplication.NewWithIdentifiersAndData(ctx, ids, nil))
+	return res, nil
+}
+
 type applicationRegistry struct {
 	*IdentityServer
 }
@@ -363,4 +393,8 @@ func (ar *applicationRegistry) Purge(ctx context.Context, req *ttnpb.Application
 
 func (ar *applicationRegistry) Restore(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
 	return ar.restoreApplication(ctx, req)
+}
+
+func (ar *applicationRegistry) IssueDevEUI(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*ttnpb.IssueDevEUIResponse, error) {
+	return ar.issueDevEUI(ctx, req)
 }

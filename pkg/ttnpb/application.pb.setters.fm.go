@@ -7,6 +7,7 @@ import (
 	time "time"
 
 	types "github.com/gogo/protobuf/types"
+	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func (dst *Application) SetFields(src *Application, paths ...string) error {
@@ -116,6 +117,27 @@ func (dst *Applications) SetFields(src *Applications, paths ...string) error {
 				dst.Applications = src.Applications
 			} else {
 				dst.Applications = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *IssueDevEUIResponse) SetFields(src *IssueDevEUIResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "dev_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevEui = src.DevEui
+			} else {
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
+				dst.DevEui = zero
 			}
 
 		default:

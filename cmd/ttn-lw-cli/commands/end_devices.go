@@ -516,6 +516,21 @@ var (
 					device.DevEui = devID.DevEui
 				}
 			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			requestDevEUI, _ := cmd.Flags().GetBool("request-dev-eui")
+			if requestDevEUI {
+				logger.Debug("request-dev-eui flag set, requesting a DevEUI")
+				devEUIResponse, err := ttnpb.NewApplicationRegistryClient(is).IssueDevEUI(ctx, &devID.ApplicationIdentifiers)
+				if err != nil {
+					return err
+				}
+				logger.WithField("dev_eui", devEUIResponse.DevEui.String()).
+					Debug("successfully obtained DevEUI")
+				device.DevEui = &devEUIResponse.DevEui
+			}
 			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())
 			if err != nil {
 				return err
@@ -534,11 +549,6 @@ var (
 			// Require EUIs for devices that need to be added to the Join Server.
 			if len(jsPaths) > 0 && (device.JoinEui == nil || device.DevEui == nil) {
 				return errNoEndDeviceEUI
-			}
-
-			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
-			if err != nil {
-				return err
 			}
 			var isDevice ttnpb.EndDevice
 			logger.WithField("paths", isPaths).Debug("Create end device on Identity Server")
@@ -1253,6 +1263,7 @@ func init() {
 	endDevicesCreateCommand.Flags().Bool("abp", false, "configure end device as ABP")
 	endDevicesCreateCommand.Flags().Bool("with-session", false, "generate ABP session DevAddr and keys")
 	endDevicesCreateCommand.Flags().Bool("with-claim-authentication-code", false, "generate claim authentication code of 4 bytes")
+	endDevicesCreateCommand.Flags().Bool("request-dev-eui", false, "request a new DevEUI")
 	endDevicesCreateCommand.Flags().AddFlagSet(endDevicePictureFlags)
 	endDevicesCreateCommand.Flags().AddFlagSet(endDeviceLocationFlags)
 	endDevicesCommand.AddCommand(endDevicesCreateCommand)

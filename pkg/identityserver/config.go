@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // Config for the Identity Server
@@ -96,6 +97,12 @@ type Config struct {
 	Delete struct {
 		Restore time.Duration `name:"restore" description:"How long after soft-deletion an entity can be restored"`
 	} `name:"delete"`
+	DevEUIBlock struct {
+		Enabled          bool                 `name:"enabled" description:"Enable DevEUI address issuing from IEEE MAC block"`
+		ApplicationLimit int                  `name:"application-limit" description:"Maximum DevEUI addresses to be issued per application"`
+		Prefix           ttntypes.EUI64Prefix `name:"prefix" description:"DevEUI block prefix"`
+		InitCounter      int64                `name:"init-counter" description:"Initial counter value for the addresses to be issued (default 0)"`
+	} `name:"dev-eui-block" description:"IEEE MAC block used to issue DevEUI's to devices that are not yet programmed"`
 }
 
 type emailTemplatesConfig struct {
