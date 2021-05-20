@@ -85,7 +85,7 @@ const headers = [
         indicator = 'unknown'
         label = sharedMessages.otherCluster
       } else if (status === 'unknown') {
-        indicator = 'unknown'
+        indicator = 'mediocre'
         label = sharedMessages.unknown
       }
 

@@ -52,19 +52,19 @@ export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
 export const selectDeviceError = createErrorSelector(GET_DEV_BASE)
 
 // Derived.
-export const selectDeviceUplinkFrameCount = (state, appId, devId) => {
+export const selectDeviceDerivedUplinkFrameCount = (state, appId, devId) => {
   const derived = selectDeviceDerivedById(state, combineDeviceIds(appId, devId))
   if (!Boolean(derived)) return undefined
 
   return derived.uplinkFrameCount
 }
-export const selectDeviceDownlinkFrameCount = (state, appId, devId) => {
+export const selectDeviceDerivedDownlinkFrameCount = (state, appId, devId) => {
   const derived = selectDeviceDerivedById(state, combineDeviceIds(appId, devId))
   if (!Boolean(derived)) return undefined
 
   return derived.downlinkFrameCount
 }
-export const selectDeviceLastSeen = (state, appId, devId) => {
+export const selectDeviceDerivedLastSeen = (state, appId, devId) => {
   const derived = selectDeviceDerivedById(state, combineDeviceIds(appId, devId))
   if (!Boolean(derived)) return undefined
 

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { STACK_COMPONENTS_MAP } from 'ttn-lw'
+
 import api from '@console/api'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
@@ -26,9 +28,9 @@ const getDeviceLogic = createRequestLogic({
   process: async ({ action }, dispatch) => {
     const {
       payload: { appId, deviceId },
-      meta: { selector, options },
+      meta: { selector },
     } = action
-    const dev = await api.device.get(appId, deviceId, selector, options)
+    const dev = await api.device.get(appId, deviceId, selector)
     dispatch(devices.startDeviceEventsStream(dev.ids))
     return dev
   },
@@ -56,7 +58,7 @@ const getDevicesListLogic = createRequestLogic({
       id: appId,
       params: { page, limit, order, query },
     } = action.payload
-    const { selectors } = action.meta
+    const { selectors, options } = action.meta
 
     const data = query
       ? await api.devices.search(
@@ -70,6 +72,19 @@ const getDevicesListLogic = createRequestLogic({
           selectors,
         )
       : await api.devices.list(appId, { page, limit, order }, selectors)
+
+    if (options.withLastSeen) {
+      const macStateFetching = data.end_devices.map(async device => {
+        const deviceResult = await api.device.get(appId, device.ids.device_id, 'mac_state', [
+          STACK_COMPONENTS_MAP.ns,
+        ])
+        if ('mac_state' in deviceResult) {
+          device.mac_state = deviceResult.mac_state
+        }
+      })
+
+      await Promise.all(macStateFetching)
+    }
 
     return { entities: data.end_devices, totalCount: data.totalCount }
   },

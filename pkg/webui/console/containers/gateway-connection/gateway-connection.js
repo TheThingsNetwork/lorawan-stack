@@ -21,15 +21,13 @@ import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import EntityTitleSection from '@console/components/entity-title-section'
+import LastSeen from '@console/components/last-seen'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { isNotFoundError, isTranslated } from '@ttn-lw/lib/errors/utils'
 
 import style from './gateway-connection.styl'
-
-const { Content } = EntityTitleSection
 
 class GatewayConnection extends React.PureComponent {
   static propTypes = {
@@ -94,7 +92,7 @@ class GatewayConnection extends React.PureComponent {
     return (
       <Status className={style.status} status={statusIndicator} flipped>
         {statusIndicator === 'good' && hasLastSeen ? (
-          <Content.LastSeen lastSeen={lastSeen} />
+          <LastSeen lastSeen={lastSeen} />
         ) : (
           <Message content={message} />
         )}

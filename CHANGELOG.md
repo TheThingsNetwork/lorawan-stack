@@ -39,6 +39,7 @@ For details about compatibility between different releases, see the **Commitment
   - A maximum cap of 16KB per script is set at the API level.
   - This only prevents setting large payload formatter scripts for new devices and applications; it does not remove payload formatters from existing applications and devices. Scripts sourced from the Device Repository are not affected. See [issue #4053](https://github.com/TheThingsNetwork/lorawan-stack/issues/4053) for more context on this change.
 - LoRa Basics Station `router_config` message omits hardware specific fields.
+- Showing "Last seen" information in end device tables (replacing "Created").
 
 ### Deprecated
 
