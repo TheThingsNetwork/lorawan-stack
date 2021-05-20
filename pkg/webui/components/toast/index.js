@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { ToastContainer as Container, Slide } from 'react-toastify'
+import { ToastContainer as Container, cssTransition } from 'react-toastify'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -49,7 +49,7 @@ class ToastContainer extends React.Component {
     pauseOnHover: true,
     closeOnClick: true,
     pauseOnFocusLoss: true,
-    transition: Slide,
+    transition: cssTransition({ enter: style.slideInRight, exit: style.slideOutRight }),
   }
 
   render() {
