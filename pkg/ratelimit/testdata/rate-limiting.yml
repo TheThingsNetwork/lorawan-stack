@@ -1,0 +1,6 @@
+---
+profiles:
+  - name: override
+    max-per-min: 200
+    associations:
+      - assoc1

@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -35,8 +36,8 @@ func (r *mockResource) Classes() []string { return r.classes }
 func TestRateLimit(t *testing.T) {
 	a := assertions.New(t)
 
-	limiter, err := ratelimit.Config{
-		Profiles: []ratelimit.Profile{
+	limiter, err := ratelimit.New(test.Context(), config.RateLimiting{
+		Profiles: []config.RateLimitingProfile{
 			{
 				Name:         "Default profile",
 				MaxPerMin:    maxRate,
@@ -56,7 +57,7 @@ func TestRateLimit(t *testing.T) {
 				Associations: []string{"override"},
 			},
 		},
-	}.New(test.Context())
+	}, config.BlobConfig{})
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -144,5 +145,30 @@ func TestRateLimit(t *testing.T) {
 				a.So(tc.assertErr(ratelimit.Require(tc.limiter, resource)), should.BeTrue)
 			})
 		}
+	})
+
+	t.Run("ExternalConfig", func(t *testing.T) {
+		conf := config.RateLimiting{
+			ConfigSource: "directory",
+			Directory:    "testdata",
+			Memory: config.RateLimitingMemory{
+				MaxSize: 1024,
+			},
+			Profiles: []config.RateLimitingProfile{
+				{
+					MaxPerMin:    100,
+					Associations: []string{"assoc1"},
+				},
+			},
+		}
+
+		a := assertions.New(t)
+		limiter, err := ratelimit.New(test.Context(), conf, config.BlobConfig{})
+		a.So(err, should.BeNil)
+
+		resource := &mockResource{key: "key", classes: []string{"assoc1"}}
+		limit, result := limiter.RateLimit(resource)
+		a.So(limit, should.BeFalse)
+		a.So(result.Limit, should.Equal, 200)
 	})
 }

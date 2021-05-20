@@ -164,7 +164,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		taskStarter: StartTaskFunc(DefaultStartTask),
 	}
 
-	c.limiter, err = config.RateLimiting.New(ctx)
+	c.limiter, err = ratelimit.New(ctx, config.RateLimiting, config.Blob)
 	if err != nil {
 		return nil, err
 	}

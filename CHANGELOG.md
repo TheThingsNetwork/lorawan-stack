@@ -26,6 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 - Previews for `*.update` events in the Console.
 - The Console can now show recent historical events in networks that have events storage enabled.
 - Add a new `mac_settings.desired_max_eirp` field that can be configured to set the desired MaxEIRP value per device.
+- Support loading rate limiting profile configuration from external sources. When set, they will override embedded configuration. See `rate-limiting.config-source`, `rate-limiting.directory`, `rate-limiting.url` and `rate-limiting.blob.*` configuration options.
 
 ### Changed
 

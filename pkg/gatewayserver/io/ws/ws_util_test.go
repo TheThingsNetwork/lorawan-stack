@@ -31,7 +31,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
@@ -46,7 +45,7 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 	panic("could not connect to peer")
 }
 
-func withServer(t *testing.T, wsConfig ws.Config, rateLimitConf ratelimit.Config, f func(t *testing.T, is *mock.IdentityServer, serverAddress string)) {
+func withServer(t *testing.T, wsConfig ws.Config, rateLimitConf config.RateLimiting, f func(t *testing.T, is *mock.IdentityServer, serverAddress string)) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
