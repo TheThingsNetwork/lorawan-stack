@@ -45,12 +45,12 @@ func NewJSONDecoder(r io.Reader) Decoder {
 }
 
 func (r *jsonDecoder) Decode(data interface{}) (paths []string, err error) {
-	t, err := r.rd.ReadByte()
+	t, _, err := r.rd.ReadRune()
 	if err != nil {
 		return nil, err
 	}
 	if t == '{' {
-		if err := r.rd.UnreadByte(); err != nil {
+		if err := r.rd.UnreadRune(); err != nil {
 			return nil, err
 		}
 	}

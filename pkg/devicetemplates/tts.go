@@ -21,6 +21,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttnio "go.thethings.network/lorawan-stack/v3/pkg/util/io"
+	"golang.org/x/net/html/charset"
 )
 
 // TTS is the device template converter id.
@@ -40,6 +41,11 @@ func (t *tts) Format() *ttnpb.EndDeviceTemplateFormat {
 // Convert implements the devicetemplates.Converter interface.
 func (t *tts) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
 	defer close(ch)
+
+	r, err := charset.NewReader(r, "application/json")
+	if err != nil {
+		return err
+	}
 
 	dec := ttnio.NewJSONDecoder(r)
 	for {
