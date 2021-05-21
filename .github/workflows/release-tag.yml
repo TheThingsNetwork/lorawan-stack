@@ -95,7 +95,7 @@ jobs:
       uses: goreleaser/goreleaser-action@v2
       with:
         version: 'v0.161.1'
-        args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md
+        args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m
       env:
         AWS_REGION: ${{ secrets.AWS_REGION }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
