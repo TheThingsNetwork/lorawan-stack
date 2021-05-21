@@ -30,7 +30,7 @@ import (
 )
 
 func TestLoRaWANEncodingMAC(t *testing.T) {
-	phy := test.Must(test.Must(band.GetByID(band.EU_863_870)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band)
+	phy := test.Must(test.Must(band.GetByID(band.EU_863_870)).(band.Band).Version(ttnpb.RP001_V1_1_REV_B)).(band.Band)
 
 	for _, tc := range []struct {
 		Name    string

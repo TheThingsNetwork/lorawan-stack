@@ -74,7 +74,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/no rejections",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						ADRNbTrans:      1,
@@ -105,7 +105,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/rejected DR:(1,4)",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						ADRNbTrans:      1,
@@ -136,7 +136,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/rejected TXPower:(1)",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						ADRNbTrans:      1,
@@ -167,7 +167,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/rejected TXPower:(0,1)",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						ADRNbTrans:      1,
@@ -198,7 +198,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/rejected DR:(1,4), rejected TXPower:(0,2,3)",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						ADRNbTrans:      1,
@@ -232,7 +232,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/rejected DR:(3), rejected TXPower:(0,1)",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						ADRNbTrans:      1,

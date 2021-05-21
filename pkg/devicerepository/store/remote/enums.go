@@ -38,16 +38,16 @@ var bandIDToRegion map[string]string
 
 // regionalParametersToPB maps LoRaWAN schema regional parameters to ttnpb.PHYVersion enum values.
 var regionalParametersToPB = map[string]ttnpb.PHYVersion{
-	"TS001-1.0":        ttnpb.PHY_V1_0,
-	"TS001-1.0.1":      ttnpb.PHY_V1_0_1,
-	"RP001-1.0.2":      ttnpb.PHY_V1_0_2_REV_A,
-	"RP001-1.0.2-RevB": ttnpb.PHY_V1_0_2_REV_B,
-	"RP001-1.0.3-RevA": ttnpb.PHY_V1_0_3_REV_A,
-	// TODO: Add Regional Parameters for LoRaWAN version 1.0.4 (https://github.com/TheThingsNetwork/lorawan-stack/issues/3513)
-	// "RP002-1.0.0": ttnpb.PHY_UNKNOWN,
-	// "RP002-1.0.1": ttnpb.PHY_UNKNOWN,
-	"RP001-1.1":      ttnpb.PHY_V1_1_REV_A,
-	"RP001-1.1-RevB": ttnpb.PHY_V1_1_REV_B,
+	"TS001-1.0":        ttnpb.TS001_V1_0,
+	"TS001-1.0.1":      ttnpb.TS001_V1_0_1,
+	"RP001-1.0.2":      ttnpb.RP001_V1_0_2,
+	"RP001-1.0.2-RevB": ttnpb.RP001_V1_0_2_REV_B,
+	"RP001-1.0.3-RevA": ttnpb.RP001_V1_0_3_REV_A,
+	"RP001-1.1":        ttnpb.RP001_V1_1,
+	"RP001-1.1-RevB":   ttnpb.RP001_V1_1_REV_B,
+	"RP002-1.0.0":      ttnpb.RP002_V1_0_0,
+	"RP002-1.0.1":      ttnpb.RP002_V1_0_1,
+	"RP002-1.0.2":      ttnpb.RP002_V1_0_2,
 }
 
 // pingSlotPeriodToPB maps LoRaWAN schema ping slot period to ttnpb.PingSlotPeriod enum values.

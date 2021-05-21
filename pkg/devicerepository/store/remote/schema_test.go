@@ -71,7 +71,7 @@ func TestProfile(t *testing.T) {
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
 					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+					LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 					SupportsJoin:      true,
 					MACSettings: &ttnpb.MACSettings{
 						Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
@@ -96,7 +96,7 @@ func TestProfile(t *testing.T) {
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
 					LoRaWANVersion:    ttnpb.MAC_V1_1,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 					Formatters: &ttnpb.MessagePayloadFormatters{
 						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
@@ -149,7 +149,7 @@ func TestProfile(t *testing.T) {
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
 					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+					LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 					SupportsClassB:    true,
 					SupportsJoin:      true,
 					MACSettings: &ttnpb.MACSettings{
@@ -180,7 +180,7 @@ func TestProfile(t *testing.T) {
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
 					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+					LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 					SupportsClassC:    true,
 					SupportsJoin:      true,
 					MACSettings: &ttnpb.MACSettings{

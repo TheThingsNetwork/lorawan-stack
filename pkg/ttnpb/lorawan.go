@@ -2032,15 +2032,6 @@ func (v PHYVersion) String() string {
 	return "unknown"
 }
 
-// Compare compares PHYVersions v to o:
-// A negative result implies v is less than o
-// A zero result implies v is equal to o
-// A positive result implies v is greater than o
-// Compare panics, if v.Validate() returns non-nil error.
-func (v PHYVersion) Compare(o PHYVersion) int {
-	return int(int32(v) - int32(o))
-}
-
 // Duration returns v as time.Duration.
 func (v RxDelay) Duration() time.Duration {
 	switch v {
