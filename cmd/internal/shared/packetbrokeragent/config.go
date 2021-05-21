@@ -20,11 +20,11 @@ import (
 
 // DefaultPacketBrokerAgentConfig is the default configuration for the Packet Broker Agent.
 var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
-	IAMAddress:          "iam.packetbroker.org:443",
-	ControlPlaneAddress: "cp.packetbroker.org:443",
+	IAMAddress:          "iam.packetbroker.net:443",
+	ControlPlaneAddress: "cp.packetbroker.net:443",
 	AuthenticationMode:  "oauth2",
 	OAuth2: packetbrokeragent.OAuth2Config{
-		TokenURL: "https://iam.packetbroker.org/token",
+		TokenURL: "https://iam.packetbroker.net/token",
 	},
 	Registration: packetbrokeragent.RegistrationConfig{
 		Listed: true,
