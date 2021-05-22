@@ -200,6 +200,7 @@ export default defineMessages({
   keyEdit: 'Edit API key',
   keyId: 'Key ID',
   lastSeen: 'Last seen',
+  lastSeenUnavailable: 'Last seen info unavailable',
   latitude: 'Latitude',
   latitudeDesc: 'The north-south position in degrees, where 0 is the equator',
   lbsLNSSecret: 'LoRa Basics Station LNS Authentication Key',
