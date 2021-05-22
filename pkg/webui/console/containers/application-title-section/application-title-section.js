@@ -17,13 +17,17 @@ import React from 'react'
 import applicationIcon from '@assets/misc/application.svg'
 
 import Spinner from '@ttn-lw/components/spinner'
+import Status from '@ttn-lw/components/status'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import LastSeen from '@console/components/last-seen'
 import EntityTitleSection from '@console/components/entity-title-section'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import style from './application-title-section.styl'
 
 const { Content } = EntityTitleSection
 
@@ -38,10 +42,13 @@ const ApplicationTitleSection = props => {
     collaboratorsErrored,
     devicesTotalCount,
     devicesErrored,
+    lastSeen,
     mayViewCollaborators,
     mayViewApiKeys,
     mayViewDevices,
   } = props
+
+  const showLastSeen = Boolean(lastSeen)
 
   return (
     <EntityTitleSection
@@ -57,6 +64,18 @@ const ApplicationTitleSection = props => {
           </Spinner>
         ) : (
           <>
+            {showLastSeen ? (
+              <Status status="good" className={style.lastSeen} flipped>
+                <LastSeen lastSeen={lastSeen} />
+              </Status>
+            ) : (
+              <Status
+                status="mediocre"
+                label={sharedMessages.lastSeenUnavailable}
+                className={style.lastSeen}
+                flipped
+              />
+            )}
             {mayViewDevices && (
               <Content.EntityCount
                 icon="devices"
@@ -101,6 +120,7 @@ ApplicationTitleSection.propTypes = {
   devicesErrored: PropTypes.bool.isRequired,
   devicesTotalCount: PropTypes.number,
   fetching: PropTypes.bool.isRequired,
+  lastSeen: PropTypes.string,
   mayViewApiKeys: PropTypes.bool.isRequired,
   mayViewCollaborators: PropTypes.bool.isRequired,
   mayViewDevices: PropTypes.bool.isRequired,
@@ -110,6 +130,7 @@ ApplicationTitleSection.defaultProps = {
   apiKeysTotalCount: undefined,
   collaboratorsTotalCount: undefined,
   devicesTotalCount: undefined,
+  lastSeen: undefined,
 }
 
 export default ApplicationTitleSection

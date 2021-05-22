@@ -65,7 +65,7 @@ const addEvent = (state, event) => {
   }
 
   // Apply filter, if exists.
-  if (!event.name.startsWith('synthetic') && filter && !event.name.match(MemoizedRegExp(filter))) {
+  if (!event.name.startsWith('synthetic') && filter && !MemoizedRegExp(filter).test(event.name)) {
     return {}
   }
 
