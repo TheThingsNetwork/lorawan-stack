@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Utility function to convert filter arrays to Regular Expressions.
+const filterListToRegExpString = array =>
+  array.reduce(
+    (acc, cur, i) => `${acc}${i !== 0 ? '|' : ''}${cur.replace('.', '\\.').replace('*', '.*')}`,
+    '',
+  )
+
 export const EVENT_VERBOSE_FILTERS = [
   'as.*.drop',
   'as.down.data.forward',
@@ -35,10 +42,16 @@ export const EVENT_VERBOSE_FILTERS = [
   'oauth.*',
 ]
 
-// A RegExp converted from the glob list of filtered event names.
-export const EVENT_VERBOSE_FILTERS_REGEXP = EVENT_VERBOSE_FILTERS.reduce(
-  (acc, cur, i) => `${acc}${i !== 0 ? '|' : ''}${cur.replace('.', '\\.').replace('*', '.*')}`,
-  '',
+export const EVENT_END_DEVICE_HEARTBEAT_FILTERS = [
+  'ns.up.data.receive',
+  'ns.up.join.receive',
+  'ns.up.rejoin.receive',
+]
+
+// Converted RegExps.
+export const EVENT_VERBOSE_FILTERS_REGEXP = filterListToRegExpString(EVENT_VERBOSE_FILTERS)
+export const EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP = filterListToRegExpString(
+  EVENT_END_DEVICE_HEARTBEAT_FILTERS,
 )
 
 // A map that allows to translate back the filter list from the converted
@@ -46,4 +59,5 @@ export const EVENT_VERBOSE_FILTERS_REGEXP = EVENT_VERBOSE_FILTERS.reduce(
 // stream, which only uses the RegExp string internally.
 export const EVENT_FILTER_MAP = Object.freeze({
   [EVENT_VERBOSE_FILTERS_REGEXP]: EVENT_VERBOSE_FILTERS,
+  [EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP]: EVENT_END_DEVICE_HEARTBEAT_FILTERS,
 })
