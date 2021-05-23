@@ -16,6 +16,7 @@ import { memoize } from 'lodash'
 
 import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
 import { EVENT_VERBOSE_FILTERS_REGEXP, EVENT_FILTER_MAP } from '@console/constants/event-filters'
+import CONNECTION_STATUS from '@console/constants/connection-status'
 
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
 
@@ -44,8 +45,6 @@ import {
   createClearEventsActionType,
   createSetEventsFilterActionType,
 } from '@console/store/actions/events'
-
-import CONNECTION_STATUS from '../../constants/connection-status'
 
 // Use memoized RegExp constructor to prevent costly instantiations since
 // filters are stored as strings and need to be converted for each event.

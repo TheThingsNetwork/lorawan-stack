@@ -17,6 +17,8 @@ import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 import { Col, Row, Container } from 'react-grid-system'
 
+import CONNECTION_STATUS from '@console/constants/connection-status'
+
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Tabs from '@ttn-lw/components/tabs'
@@ -39,6 +41,7 @@ import DeviceOverview from '@console/views/device-overview'
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectJsConfig, selectAsConfig } from '@ttn-lw/lib/selectors/env'
+import { combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
@@ -55,6 +58,7 @@ import {
   selectSelectedDevice,
   selectDeviceFetching,
   selectDeviceError,
+  selectDeviceEventsStatus,
 } from '@console/store/selectors/devices'
 import {
   selectApplicationLinkFetching,
@@ -68,6 +72,14 @@ import style from './device.styl'
     const devId = props.match.params.devId
     const appId = selectSelectedApplicationId(state)
     const device = selectSelectedDevice(state)
+    const eventsInitialized =
+      selectDeviceEventsStatus(state, combineDeviceIds(appId, devId)) !== CONNECTION_STATUS.UNKNOWN
+
+    const fetching =
+      selectDeviceFetching(state) ||
+      selectApplicationLinkFetching(state) ||
+      !eventsInitialized ||
+      !Boolean(device)
 
     return {
       devId,
@@ -76,7 +88,7 @@ import style from './device.styl'
       mayReadKeys: checkFromState(mayReadApplicationDeviceKeys, state),
       mayScheduleDownlinks: checkFromState(mayScheduleDownlinks, state),
       maySendUplink: checkFromState(maySendUplink, state),
-      fetching: selectDeviceFetching(state) && selectApplicationLinkFetching(state),
+      fetching,
       error: selectDeviceError(state),
     }
   },
@@ -127,7 +139,7 @@ import style from './device.styl'
 
     return loadDeviceData(appId, devId, selector, { ignoreNotFound: true })
   },
-  ({ fetching, device }) => fetching || !Boolean(device),
+  ({ fetching, device }) => fetching,
 )
 @withBreadcrumb('device.single', props => {
   const {
