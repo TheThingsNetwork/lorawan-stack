@@ -19,6 +19,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- End device payload formatter view crashing in the Console.
+- End device overview frequently crashing in the Console.
+
 ### Security
 
 ## [3.13.0] - 2021-05-20
