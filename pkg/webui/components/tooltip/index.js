@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import Tippy from '@tippyjs/react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import './tooltip.styl'
+
+let currentInstance
 
 const popperModifiers = [
   {
@@ -36,7 +38,19 @@ const popperModifiers = [
 ]
 
 const Tooltip = props => {
-  const { className, children, content, interactive, placement, delay } = props
+  const { className, children, content, interactive, placement, delay, onShow } = props
+
+  const handleShow = useCallback(
+    instance => {
+      if (currentInstance) {
+        currentInstance.hide()
+      }
+      currentInstance = instance
+
+      onShow(instance)
+    },
+    [onShow],
+  )
   return (
     <Tippy
       className={className}
@@ -45,6 +59,9 @@ const Tooltip = props => {
       placement={placement}
       popperOptions={{ modifiers: popperModifiers }}
       delay={delay}
+      onShow={handleShow}
+      animation="fade"
+      duration={250}
     >
       {children}
     </Tippy>
@@ -57,6 +74,7 @@ Tooltip.propTypes = {
   content: PropTypes.node.isRequired,
   delay: PropTypes.oneOfType([PropTypes.number, PropTypes.arrayOf([PropTypes.number])]),
   interactive: PropTypes.bool,
+  onShow: PropTypes.func,
   placement: PropTypes.oneOf([
     'top',
     'top-start',
@@ -81,6 +99,7 @@ Tooltip.defaultProps = {
   interactive: false,
   placement: 'bottom',
   delay: 300,
+  onShow: () => null,
 }
 
 export default Tooltip
