@@ -43,6 +43,8 @@ const ENTITY = 'applications'
 // Application.
 export const selectApplicationStore = state => state.applications
 export const selectApplicationEntitiesStore = state => selectApplicationStore(state).entities
+export const selectApplicationDerivedStore = state => selectApplicationStore(state).derived
+export const selectApplicationDerivedById = (state, id) => selectApplicationDerivedStore(state)[id]
 export const selectApplicationById = (state, id) => selectApplicationEntitiesStore(state)[id]
 export const selectSelectedApplicationId = state =>
   selectApplicationStore(state).selectedApplication
@@ -54,6 +56,8 @@ export const selectApplicationDeviceCount = state =>
   selectApplicationStore(state).applicationDeviceCount
 export const selectApplicationDevicesFetching = createFetchingSelector(GET_APP_DEV_COUNT_BASE)
 export const selectApplicationDevicesError = createErrorSelector(GET_APP_DEV_COUNT_BASE)
+export const selectApplicationDerivedLastSeen = (state, id) =>
+  (selectApplicationDerivedById(state, id) || {}).lastSeen
 
 // Applications.
 const selectAppsIds = createPaginationIdsSelectorByEntity(ENTITY)

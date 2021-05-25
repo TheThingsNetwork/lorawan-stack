@@ -31,6 +31,7 @@ import {
 describe('Applications reducer', () => {
   const defaultState = {
     entities: {},
+    derived: {},
     selectedApplication: null,
   }
 

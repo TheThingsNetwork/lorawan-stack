@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP } from '@console/constants/event-filters'
+
 import { getApplicationId } from '@ttn-lw/lib/selectors/id'
+
+import getByPath from '@ttn-lw/lib/get-by-path'
 
 import {
   GET_APP,
@@ -21,22 +25,24 @@ import {
   GET_APPS_LIST_SUCCESS,
   UPDATE_APP_SUCCESS,
   DELETE_APP_SUCCESS,
+  GET_APP_EVENT_MESSAGE_SUCCESS,
 } from '@console/store/actions/applications'
 
-const application = (state = {}, application) => {
-  return {
-    ...state,
-    ...application,
-  }
-}
+const heartbeatFilterRegExp = new RegExp(EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP)
+
+const application = (state = {}, application) => ({
+  ...state,
+  ...application,
+})
 
 const defaultState = {
   entities: {},
+  derived: {},
   selectedApplication: null,
   applicationDeviceCount: undefined,
 }
 
-const applications = (state = defaultState, { type, payload }) => {
+const applications = (state = defaultState, { type, payload, event }) => {
   switch (type) {
     case GET_APP:
       return {
@@ -81,6 +87,27 @@ const applications = (state = defaultState, { type, payload }) => {
         selectedApplication: null,
         entities: rest,
       }
+    case GET_APP_EVENT_MESSAGE_SUCCESS:
+      if (heartbeatFilterRegExp.test(event.name)) {
+        const lastSeen = getByPath(event, 'data.received_at')
+        const id = getApplicationId(event.identifiers[0].device_ids)
+
+        // Update the application's derived last seen value, if the current
+        // heartbeat event is more recent than the currently stored one.
+        if (!(id in state.derived) || lastSeen > state.derived[id].lastSeen) {
+          return {
+            ...state,
+            derived: {
+              ...state.derived,
+              [id]: {
+                ...(state.derived[id] || {}),
+                lastSeen,
+              },
+            },
+          }
+        }
+      }
+      return state
     default:
       return state
   }

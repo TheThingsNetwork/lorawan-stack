@@ -32,6 +32,7 @@ import {
   selectApplicationDeviceCount,
   selectApplicationDevicesFetching,
   selectApplicationDevicesError,
+  selectApplicationDerivedLastSeen,
 } from '@console/store/selectors/applications'
 import {
   selectCollaboratorsTotalCount,
@@ -62,6 +63,7 @@ const mapStateToProps = (state, props) => {
     mayViewApiKeys: checkFromState(mayViewOrEditApplicationApiKeys, state),
     mayViewDevices: checkFromState(mayViewApplicationDevices, state),
     application: selectApplicationById(state, props.appId),
+    lastSeen: selectApplicationDerivedLastSeen(state, props.appId),
     apiKeysTotalCount,
     apiKeysErrored: Boolean(apiKeysError),
     collaboratorsTotalCount,

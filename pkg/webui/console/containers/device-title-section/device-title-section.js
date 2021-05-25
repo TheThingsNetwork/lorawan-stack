@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 
 import deviceIcon from '@assets/misc/end-device.svg'
 
@@ -29,10 +28,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './device-title-section.styl'
-
-const m = defineMessages({
-  lastSeenUnavailable: 'Last seen info unavailable',
-})
 
 const { Content } = EntityTitleSection
 
@@ -71,7 +66,7 @@ const DeviceTitleSection = props => {
                 <LastSeen lastSeen={lastSeen} />
               </Status>
             ) : (
-              <Status status="mediocre" label={m.lastSeenUnavailable} flipped />
+              <Status status="mediocre" label={sharedMessages.lastSeenUnavailable} flipped />
             )}
             <Content.MessagesCount
               icon="uplink"

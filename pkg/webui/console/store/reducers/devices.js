@@ -14,6 +14,8 @@
 
 import { mergeWith, merge } from 'lodash'
 
+import { EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP } from '@console/constants/event-filters'
+
 import { getCombinedDeviceId, combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 import getByPath from '@ttn-lw/lib/get-by-path'
 
@@ -33,7 +35,7 @@ const defaultState = {
   selectedDevice: undefined,
 }
 
-const heartbeatEvents = ['ns.up.data.receive', 'ns.up.join.receive', 'ns.up.rejoin.receive']
+const heartbeatFilterRegExp = new RegExp(EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP)
 const uplinkFrameCountEvent = 'ns.up.data.process'
 const downlinkFrameCountEvent = 'ns.down.data.schedule.attempt'
 
@@ -121,7 +123,7 @@ const devices = (state = defaultState, { type, payload, event }) => {
       )
     case GET_APP_EVENT_MESSAGE_SUCCESS:
       // Detect heartbeat events to update last seen state.
-      if (heartbeatEvents.includes(event.name)) {
+      if (heartbeatFilterRegExp.test(event.name)) {
         const id = getCombinedDeviceId(event.identifiers[0].device_ids)
         const receivedAt = getByPath(event, 'data.received_at')
         if (receivedAt) {
