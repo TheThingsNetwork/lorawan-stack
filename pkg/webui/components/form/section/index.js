@@ -42,7 +42,7 @@ const FormCollapseSection = props => {
   }, [collapsed, onCollapse])
 
   return (
-    <div className={className}>
+    <div className={classnames(style.section, className)}>
       <button
         className={style.button}
         type="button"
