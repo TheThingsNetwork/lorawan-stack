@@ -87,9 +87,10 @@ type generateDownlinkState struct {
 	baseApplicationUps        []*ttnpb.ApplicationUp
 	ifScheduledApplicationUps []*ttnpb.ApplicationUp
 
-	ApplicationDownlink      *ttnpb.ApplicationDownlink
-	EventBuilders            events.Builders
-	NeedsDownlinkQueueUpdate bool
+	ApplicationDownlink           *ttnpb.ApplicationDownlink
+	EventBuilders                 events.Builders
+	NeedsDownlinkQueueUpdate      bool
+	EvictDownlinkQueueIfScheduled bool
 }
 
 func (s generateDownlinkState) appendApplicationUplinks(ups []*ttnpb.ApplicationUp, scheduled bool) []*ttnpb.ApplicationUp {
@@ -365,19 +366,17 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 
 			case down.FCnt <= dev.Session.LastNFCntDown && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0:
 				logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Drop application downlink with too low FCnt")
-				invalid, rest := ttnpb.PartitionDownlinksBySessionKeyIDEquality(dev.Session.SessionKeyID, dev.Session.QueuedApplicationDownlinks[i:]...)
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 					CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
 					Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 						DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
-							Downlinks:    invalid,
+							Downlinks:    dev.Session.QueuedApplicationDownlinks[i:],
 							LastFCntDown: dev.Session.LastNFCntDown,
 							SessionKeyID: dev.Session.SessionKeyID,
 						},
 					},
 				})
-				appDowns = append(appDowns, rest...)
 				break outer
 
 			case down.Confirmed && dev.Multicast:
@@ -417,6 +416,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				if len(down.FRMPayload) <= int(maxDownLen)+len(cmdBuf) {
 					logger.Debug("Skip application downlink with payload length exceeding band regulations due to FOpts field being non-empty")
 					appDowns = append(appDowns, dev.Session.QueuedApplicationDownlinks[i:]...)
+					break outer
 				} else {
 					logger.Debug("Drop application downlink with payload length exceeding band regulations")
 					genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
@@ -533,6 +533,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				},
 			},
 		})
+		genState.EvictDownlinkQueueIfScheduled = true
 	}
 	if class != ttnpb.CLASS_C {
 		pld.FHDR.FCtrl.FPending = fPending || len(dev.Session.QueuedApplicationDownlinks) > 0
@@ -1264,8 +1265,11 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			QueuedEvents:             queuedEvents,
 		}
 	}
-	if genState.ApplicationDownlink != nil {
+	if genState.ApplicationDownlink != nil || genState.EvictDownlinkQueueIfScheduled {
 		sets = ttnpb.AddFields(sets, "session.queued_application_downlinks")
+	}
+	if genState.EvictDownlinkQueueIfScheduled {
+		dev.Session.QueuedApplicationDownlinks = dev.Session.QueuedApplicationDownlinks[:0:0]
 	}
 	recordDataDownlink(dev, genState, genDown.NeedsMACAnswer, down, ns.defaultMACSettings)
 	return downlinkAttemptResult{
@@ -1468,8 +1472,11 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	}
 
 	recordDataDownlink(dev, genState, genDown.NeedsMACAnswer, down, ns.defaultMACSettings)
-	if genState.ApplicationDownlink != nil {
+	if genState.ApplicationDownlink != nil || genState.EvictDownlinkQueueIfScheduled {
 		sets = ttnpb.AddFields(sets, "session.queued_application_downlinks")
+	}
+	if genState.EvictDownlinkQueueIfScheduled {
+		dev.Session.QueuedApplicationDownlinks = dev.Session.QueuedApplicationDownlinks[:0:0]
 	}
 	return downlinkAttemptResult{
 		SetPaths: ttnpb.AddFields(sets,

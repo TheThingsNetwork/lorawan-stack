@@ -19,6 +19,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Downlink queue eviction on FCnt mismatch.
 - End device payload formatter view crashing in the Console.
 - End device overview frequently crashing in the Console.
 
