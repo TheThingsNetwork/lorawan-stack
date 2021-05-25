@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const selectEventsStore = (state, entityId) => state[entityId]
+import CONNECTION_STATUS from '@console/constants/connection-status'
+
+const selectEventsStore = (state, entityId) => state[entityId] || {}
 
 export const createEventsSelector = entity => (state, entityId) => {
   const store = selectEventsStore(state.events[entity], entityId)
 
-  return store ? store.events : []
+  return store.events || []
 }
 
 export const createEventsStatusSelector = entity => (state, entityId) => {
   const store = selectEventsStore(state.events[entity], entityId)
 
-  return store ? store.status : 'unknown'
+  return store.status || CONNECTION_STATUS.UNKNOWN
 }
 
 export const createEventsPausedSelector = entity => (state, entityId) => {
@@ -41,7 +43,7 @@ export const createEventsInterruptedSelector = entity => (state, entityId) => {
 export const createEventsErrorSelector = entity => (state, entityId) => {
   const store = selectEventsStore(state.events[entity], entityId)
 
-  return store ? store.error : undefined
+  return store.error
 }
 
 export const createEventsTruncatedSelector = entity => (state, entityId) => {

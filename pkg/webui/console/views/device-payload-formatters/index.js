@@ -21,7 +21,6 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Tab from '@ttn-lw/components/tabs'
 
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
-import withRequest from '@ttn-lw/lib/components/with-request'
 
 import DeviceUplinkPayloadFormatters from '@console/containers/device-payload-formatters/uplink'
 import DeviceDownlinkPayloadFormatters from '@console/containers/device-payload-formatters/downlink'
@@ -29,32 +28,15 @@ import DeviceDownlinkPayloadFormatters from '@console/containers/device-payload-
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { getApplicationLink } from '@console/store/actions/link'
-
-import {
-  selectApplicationLink,
-  selectApplicationLinkFetching,
-  selectSelectedApplicationId,
-} from '@console/store/selectors/applications'
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { selectSelectedDeviceId } from '@console/store/selectors/devices'
 
 import style from './device-payload-formatters.styl'
 
-@connect(
-  state => {
-    const link = selectApplicationLink(state)
-    const fetching = selectApplicationLinkFetching(state)
-
-    return {
-      appId: selectSelectedApplicationId(state),
-      devId: selectSelectedDeviceId(state),
-      fetching: fetching || !link,
-    }
-  },
-  {
-    getApplicationLink,
-  },
-)
+@connect(state => ({
+  appId: selectSelectedApplicationId(state),
+  devId: selectSelectedDeviceId(state),
+}))
 @withBreadcrumb('device.single.payload-formatters', props => {
   const { appId, devId } = props
   return (
@@ -64,7 +46,6 @@ import style from './device-payload-formatters.styl'
     />
   )
 })
-@withRequest(({ getApplicationLink, appId }) => getApplicationLink(appId, ['default_formatters']))
 export default class DevicePayloadFormatters extends Component {
   static propTypes = {
     match: PropTypes.match.isRequired,
