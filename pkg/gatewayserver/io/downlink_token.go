@@ -57,7 +57,7 @@ func (t *DownlinkTokens) Next(msg *ttnpb.DownlinkMessage, time time.Time) uint16
 func (t DownlinkTokens) Get(token uint16, time time.Time) (*ttnpb.DownlinkMessage, time.Duration, bool) {
 	pos := token % downlinkTokenItems
 	item := t.items[pos]
-	if item.key != token {
+	if item.key != token || item.msg == nil {
 		return nil, 0, false
 	}
 	return item.msg, time.Sub(item.time), true
