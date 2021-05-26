@@ -140,10 +140,10 @@ func GatewayAcceptMQTTConnectionResource(remoteAddr string) Resource {
 	}
 }
 
-// GatewayUDPTrafficResource represents UDP gateway traffic from a remote IP address.
+// GatewayUDPTrafficResource represents UDP gateway traffic from a remote address.
 func GatewayUDPTrafficResource(addr *net.UDPAddr) Resource {
 	return &resource{
-		key:     fmt.Sprintf("gs:up:udp:ip:%s", addr.IP.String()),
+		key:     fmt.Sprintf("gs:up:udp:addr:%s", addr.String()),
 		classes: []string{"gs:up:udp", "gs:up"},
 	}
 }
