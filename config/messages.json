@@ -8216,6 +8216,15 @@
       "file": "validate.go"
     }
   },
+  "error:pkg/version:no_remote": {
+    "translations": {
+      "en": "no remote version found at `{url}`"
+    },
+    "description": {
+      "package": "pkg/version",
+      "file": "remote.go"
+    }
+  },
   "error:pkg/web/middleware:http_recovered": {
     "translations": {
       "en": "Internal Server Error"

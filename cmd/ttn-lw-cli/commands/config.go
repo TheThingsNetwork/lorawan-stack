@@ -53,6 +53,7 @@ type Config struct {
 	Insecure                           bool   `name:"insecure" yaml:"insecure" description:"Connect without TLS"`
 	CA                                 string `name:"ca" yaml:"ca" description:"CA certificate file"`
 	DumpRequests                       bool   `name:"dump-requests" yaml:"dump-requests" description:"When log level is set to debug, also dump request payload as JSON"`
+	SkipVersionCheck                   bool   `name:"skip-version-check" yaml:"skip-version-check" description:"Do not perform version checks"`
 }
 
 func (c Config) getHosts() []string {

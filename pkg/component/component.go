@@ -201,6 +201,10 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 
 	c.initGRPC()
 
+	if !config.ServiceBase.SkipVersionCheck {
+		c.RegisterTask(versionCheckTask(ctx, c))
+	}
+
 	return c, nil
 }
 
@@ -349,16 +353,12 @@ func (c *Component) Run() error {
 		c.logger.Debug("Left cluster")
 	}()
 
-	signal.Notify(c.terminationSignals, os.Interrupt, os.Kill, syscall.SIGTERM)
+	signal.Notify(c.terminationSignals, os.Interrupt, syscall.SIGTERM)
 
-	for {
-		select {
-		case sig := <-c.terminationSignals:
-			fmt.Println()
-			c.logger.WithField("signal", sig).Info("Received signal, exiting...")
-			return nil
-		}
-	}
+	sig := <-c.terminationSignals
+	fmt.Println()
+	c.logger.WithField("signal", sig).Info("Received signal, exiting...")
+	return nil
 }
 
 // Close closes the server.
