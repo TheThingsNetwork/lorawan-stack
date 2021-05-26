@@ -89,7 +89,7 @@ const applications = (state = defaultState, { type, payload, event }) => {
       }
     case GET_APP_EVENT_MESSAGE_SUCCESS:
       if (heartbeatFilterRegExp.test(event.name)) {
-        const lastSeen = getByPath(event, 'data.received_at')
+        const lastSeen = getByPath(event, 'data.received_at') || event.time
         const id = getApplicationId(event.identifiers[0].device_ids)
 
         // Update the application's derived last seen value, if the current
