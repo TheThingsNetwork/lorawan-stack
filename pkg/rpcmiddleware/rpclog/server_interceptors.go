@@ -41,6 +41,9 @@ func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServe
 				return resp, err
 			}
 		}
+		if shouldSuppressError(err) {
+			return resp, err
+		}
 
 		onceFields = onceFields.WithField(
 			"duration", time.Since(startTime).Round(time.Microsecond*100),
@@ -88,6 +91,9 @@ func StreamServerInterceptor(ctx context.Context, opts ...Option) grpc.StreamSer
 			if _, ok := o.ignoreMethods[info.FullMethod]; ok {
 				return err
 			}
+		}
+		if shouldSuppressError(err) {
+			return err
 		}
 
 		onceFields = onceFields.WithField(
