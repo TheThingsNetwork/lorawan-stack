@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { FormattedDate, FormattedTime } from 'react-intl'
+import bind from 'autobind-decorator'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -24,6 +25,22 @@ import { warn } from '@ttn-lw/lib/log'
 import RelativeTime from './relative'
 
 class DateTime extends React.PureComponent {
+  state = { hasError: false }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true }
+  }
+
+  @bind
+  renderUnknown() {
+    const { className, firstToLower } = this.props
+    return (
+      <time className={className}>
+        <Message content={sharedMessages.unknown} firstToLower={firstToLower} />
+      </time>
+    )
+  }
+
   renderDateTime(formattedDate, formattedTime, dateValue) {
     const { className, children, date, time } = this.props
 
@@ -42,11 +59,7 @@ class DateTime extends React.PureComponent {
 
     if (isNaN(dateValue)) {
       warn('Invalid date passed to DateTime component')
-      return (
-        <time className={className}>
-          <Message content={sharedMessages.unknown} firstToLower />
-        </time>
-      )
+      return this.renderUnknown()
     }
 
     return (
@@ -58,6 +71,11 @@ class DateTime extends React.PureComponent {
 
   render() {
     const { value, dateFormatOptions, timeFormatOptions } = this.props
+    const { hasError } = this.state
+
+    if (hasError) {
+      return this.renderUnknown()
+    }
 
     let dateValue = value
     if (!(value instanceof Date)) {
@@ -85,6 +103,8 @@ DateTime.propTypes = {
   date: PropTypes.bool,
   /** Whether to show the time. */
   dateFormatOptions: PropTypes.shape({}),
+  /** Whether to convert the first character of the resulting message to lowercase. */
+  firstToLower: PropTypes.bool,
   // See https://formatjs.io/docs/react-intl/components/#formatteddate
   time: PropTypes.bool,
   // See https://formatjs.io/docs/react-intl/components/#formattedtime
@@ -101,6 +121,7 @@ DateTime.defaultProps = {
   children: undefined,
   date: true,
   time: true,
+  firstToLower: true,
   dateFormatOptions: {
     year: 'numeric',
     month: 'short',

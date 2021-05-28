@@ -38,7 +38,11 @@ const LastSeen = props => {
   return (
     <div className={classnames(className, style.container)}>
       {!short && <Message className={style.message} content={sharedMessages.lastSeen} />}
-      <DateTime.Relative value={lastSeen} computeDelta={computeDeltaInSeconds} />
+      <DateTime.Relative
+        value={lastSeen}
+        computeDelta={computeDeltaInSeconds}
+        firstToLower={!short}
+      />
     </div>
   )
 }
