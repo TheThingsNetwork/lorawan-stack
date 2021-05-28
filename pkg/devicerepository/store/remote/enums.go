@@ -43,7 +43,7 @@ var regionalParametersToPB = map[string]ttnpb.PHYVersion{
 	"RP001-1.0.2":      ttnpb.RP001_V1_0_2,
 	"RP001-1.0.2-RevB": ttnpb.RP001_V1_0_2_REV_B,
 	"RP001-1.0.3-RevA": ttnpb.RP001_V1_0_3_REV_A,
-	"RP001-1.1":        ttnpb.RP001_V1_1,
+	"RP001-1.1-RevA":   ttnpb.RP001_V1_1_REV_A,
 	"RP001-1.1-RevB":   ttnpb.RP001_V1_1_REV_B,
 	"RP002-1.0.0":      ttnpb.RP002_V1_0_0,
 	"RP002-1.0.1":      ttnpb.RP002_V1_0_1,

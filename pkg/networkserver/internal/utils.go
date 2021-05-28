@@ -43,7 +43,7 @@ var LoRaWANVersionPairs = map[ttnpb.MACVersion]map[ttnpb.PHYVersion]struct{}{
 		ttnpb.RP001_V1_0_3_REV_A: struct{}{},
 	},
 	ttnpb.MAC_V1_1: {
-		ttnpb.RP001_V1_1:       struct{}{},
+		ttnpb.RP001_V1_1_REV_A: struct{}{},
 		ttnpb.RP001_V1_1_REV_B: struct{}{},
 	},
 }

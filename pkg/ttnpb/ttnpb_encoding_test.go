@@ -71,7 +71,7 @@ func TestStringers(t *testing.T) {
 			String:   "1.0.2-b",
 		},
 		{
-			Stringer: RP001_V1_1,
+			Stringer: RP001_V1_1_REV_A,
 			String:   "1.1.0-a",
 		},
 		{

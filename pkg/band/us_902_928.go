@@ -174,7 +174,7 @@ func init() {
 		regionalParameters1_v1_0_3RevA: composeSwaps(
 			makeAddTxPowerFunc(-30),
 		),
-		regionalParameters1_v1_1: bandIdentity,
+		regionalParameters1_v1_1RevA: bandIdentity,
 	}
 	All[US_902_928] = us_902_928
 }

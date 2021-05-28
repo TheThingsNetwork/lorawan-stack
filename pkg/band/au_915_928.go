@@ -198,7 +198,7 @@ func init() {
 			makeAddTxPowerFunc(-28),
 			makeAddTxPowerFunc(-30),
 		),
-		regionalParameters1_v1_1: composeSwaps(
+		regionalParameters1_v1_1RevA: composeSwaps(
 			disableTxParamSetupReq,
 			makeSetBeaconDataRateIndex(ttnpb.DATA_RATE_10),
 			makeSetMaxTxPowerIndexFunc(10),

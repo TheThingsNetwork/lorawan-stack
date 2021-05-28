@@ -33,71 +33,28 @@ func init() {
 	for i := range PHYVersion_name {
 		PHYVersion_value[PHYVersion(i).String()] = i
 	}
-	for _, p := range []struct {
-		Name    string
-		Version PHYVersion
-	}{
-		// 1.0 is the official version number
-		{
-			Name:    "1.0",
-			Version: TS001_V1_0,
-		},
-		// Revisions were added from 1.0.2-b
-		{
-			Name:    "1.0.2",
-			Version: RP001_V1_0_2,
-		},
-		// 1.1 is the official version number
-		{
-			Name:    "1.1-a",
-			Version: RP001_V1_1,
-		},
-		// 1.1 is the official version number
-		{
-			Name:    "1.1-b",
-			Version: RP001_V1_1_REV_B,
-		},
+	for name, version := range map[string]PHYVersion{
+		"1.0":   TS001_V1_0,       // 1.0 is the official version number
+		"1.0.2": RP001_V1_0_2,     // Revisions were added from 1.0.2-b
+		"1.1-a": RP001_V1_1_REV_A, // 1.1 is the official version number
+		"1.1-b": RP001_V1_1_REV_B, // 1.1 is the official version number
 	} {
-		PHYVersion_value[p.Name] = int32(p.Version)
+		PHYVersion_value[name] = int32(version)
 	}
-	for k, v := range PHYVersion_name {
-		PHYVersionCompatibleName[k] = v
+	for version, name := range PHYVersion_name {
+		PHYVersionCompatibleName[version] = name
 	}
-	for _, p := range []struct {
-		Name    string
-		Version PHYVersion
-	}{
-		{
-			Name:    "PHY_V1_0",
-			Version: TS001_V1_0,
-		},
-		{
-			Name:    "PHY_V1_0_1",
-			Version: TS001_V1_0_1,
-		},
-		{
-			Name:    "PHY_V1_0_2_REV_A",
-			Version: RP001_V1_0_2,
-		},
-		{
-			Name:    "PHY_V1_0_2_REV_B",
-			Version: RP001_V1_0_2_REV_B,
-		},
-		{
-			Name:    "PHY_V1_1_REV_A",
-			Version: RP001_V1_1,
-		},
-		{
-			Name:    "PHY_V1_1_REV_B",
-			Version: RP001_V1_1_REV_B,
-		},
-		{
-			Name:    "PHY_V1_0_3_REV_A",
-			Version: RP001_V1_0_3_REV_A,
-		},
+	for name, version := range map[string]PHYVersion{
+		"PHY_V1_0":         TS001_V1_0,
+		"PHY_V1_0_1":       TS001_V1_0_1,
+		"PHY_V1_0_2_REV_A": RP001_V1_0_2,
+		"PHY_V1_0_2_REV_B": RP001_V1_0_2_REV_B,
+		"PHY_V1_1_REV_A":   RP001_V1_1_REV_A,
+		"PHY_V1_1_REV_B":   RP001_V1_1_REV_B,
+		"PHY_V1_0_3_REV_A": RP001_V1_0_3_REV_A,
 	} {
-		PHYVersion_value[p.Name] = int32(p.Version)
-		PHYVersionCompatibleName[int32(p.Version)] = p.Name
+		PHYVersion_value[name] = int32(version)
+		PHYVersionCompatibleName[int32(version)] = name
 	}
 }
 
@@ -2019,7 +1976,7 @@ func (v PHYVersion) String() string {
 		return "1.0.2-b"
 	case RP001_V1_0_3_REV_A:
 		return "1.0.3-a"
-	case RP001_V1_1:
+	case RP001_V1_1_REV_A:
 		return "1.1.0-a"
 	case RP001_V1_1_REV_B:
 		return "1.1.0-b"

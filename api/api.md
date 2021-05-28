@@ -5801,7 +5801,7 @@ Transmission settings for downlink.
 | `TS001_V1_0_1` | 2 |  |
 | `RP001_V1_0_2` | 3 |  |
 | `RP001_V1_0_2_REV_B` | 4 |  |
-| `RP001_V1_1` | 5 |  |
+| `RP001_V1_1_REV_A` | 5 |  |
 | `RP001_V1_1_REV_B` | 6 |  |
 | `RP001_V1_0_3_REV_A` | 7 |  |
 | `RP002_V1_0_0` | 8 |  |

@@ -140,7 +140,7 @@ func init() {
 		regionalParameters1_v1_0_2:     bandIdentity,
 		regionalParameters1_v1_0_2RevB: bandIdentity,
 		regionalParameters1_v1_0_3RevA: bandIdentity,
-		regionalParameters1_v1_1:       bandIdentity,
+		regionalParameters1_v1_1RevA:   bandIdentity,
 	}
 	All[ISM_2400] = ism_2400
 }
