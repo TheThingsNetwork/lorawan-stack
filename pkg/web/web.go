@@ -208,53 +208,59 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		mux.MiddlewareFunc(webmiddleware.Redirect(redirectConfig)),
 	)
 
-	corsSkip := func(r *http.Request) bool {
+	canSkipCSRFCheck := func(r *http.Request) bool {
 		authVal := r.Header.Get("Authorization")
-		if authVal != "" || !(strings.HasPrefix(authVal, "Bearer ")) {
-			token := strings.TrimPrefix(authVal, "Bearer ")
-			tokenType, _, _, err := auth.SplitToken(token)
-			if err == nil {
-				if tokenType == auth.SessionToken {
-					return false
-				}
-			}
+		if !strings.HasPrefix(authVal, "Bearer ") {
+			return false
 		}
-		return true
-	}
-	csrfSkip := func(r *http.Request) bool {
-		return !corsSkip(r)
+		tokenType, _, _, err := auth.SplitToken(strings.TrimPrefix(authVal, "Bearer "))
+		if err != nil {
+			return false
+		}
+		switch tokenType {
+		case auth.APIKey, auth.AccessToken:
+			return true
+		default:
+			return false
+		}
 	}
 
 	apiRouter := mux.NewRouter()
 	apiRouter.NotFoundHandler = http.HandlerFunc(webhandlers.NotFound)
 	apiRouter.Use(
 		mux.MiddlewareFunc(webmiddleware.CookieAuth("_session")),
-		mux.MiddlewareFunc(webmiddleware.Conditional(
-			webmiddleware.CSRF(hashKey, csrf.CookieName("_csrf"), csrf.Path("/"), csrf.SameSite(csrf.SameSiteStrictMode)),
-			csrfSkip,
+		mux.MiddlewareFunc(func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if canSkipCSRFCheck(r) {
+					r = csrf.UnsafeSkipCheck(r)
+				}
+				next.ServeHTTP(w, r)
+			})
+		}),
+		mux.MiddlewareFunc(webmiddleware.CSRF(
+			hashKey,
+			csrf.CookieName("_csrf"),
+			csrf.FieldName("_csrf"),
+			csrf.Path("/"),
 		)),
 		mux.MiddlewareFunc(
-			webmiddleware.Conditional(
-				webmiddleware.CORS(webmiddleware.CORSConfig{
-					AllowedHeaders: []string{"Authorization", "Content-Type", "X-CSRF-Token"},
-					AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete},
-					AllowedOrigins: []string{"*"},
-					ExposedHeaders: []string{
-						"Date",
-						"Content-Length",
-						"X-Rate-Limit-Limit",
-						"X-Rate-Limit-Available",
-						"X-Rate-Limit-Reset",
-						"X-Rate-Limit-Retry",
-						"X-Request-Id",
-						"X-Total-Count",
-						"X-Warning",
-					},
-					MaxAge:           600,
-					AllowCredentials: true,
-				}),
-				corsSkip,
-			),
+			webmiddleware.CORS(webmiddleware.CORSConfig{
+				AllowedHeaders: []string{"Authorization", "Content-Type", "X-CSRF-Token"},
+				AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete},
+				AllowedOrigins: []string{"*"},
+				ExposedHeaders: []string{
+					"Date",
+					"Content-Length",
+					"X-Rate-Limit-Limit",
+					"X-Rate-Limit-Available",
+					"X-Rate-Limit-Reset",
+					"X-Rate-Limit-Retry",
+					"X-Request-Id",
+					"X-Total-Count",
+					"X-Warning",
+				},
+				MaxAge: 600,
+			}),
 		),
 	)
 	root.PathPrefix("/api/").Handler(apiRouter)
