@@ -23,6 +23,7 @@ import LocationForm from '@console/components/location-form'
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '@console/lib/regexp'
 
@@ -174,6 +175,7 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
         description={m.updateLocationFromStatusDescription}
         label={m.updateLocationFromStatus}
         onChange={handleUpdateLocationFromStatusChange}
+        tooltipId={tooltipIds.UPDATE_LOCATION_FROM_STATUS}
       />
     </LocationForm>
   )

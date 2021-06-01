@@ -26,9 +26,9 @@ export default Object.freeze({
   APP_SESSION_KEY: 'application-session-key',
   REGIONAL_PARAMETERS: 'regional-parameters',
   NETWORK_SESSION_KEY: 'network-session-key',
-  FORWARDING_NETWORK_SESSION_INTEGRITY_KEY: 'forwarding-network-session-integrity-key',
-  SERVING_NETWORK_SESSION_INTEGRITY_KEY: 'serving-network-session-integrity-key',
-  NETWORK_SESSION_ENCRYPTION_KEY: 'network-session-encryption-key',
   DATA_RATE_OFFSET: 'data-rate-offset',
-  DATA_RATE_INDEX: 'data-rate-index',
+  ACTIVATION_MODE: 'activation-mode',
+  GATEWAY_ID: 'gateway-id',
+  GATEWAY_EUI: 'gateway-eui',
+  ENFORCE_DUTY_CYCLE: 'duty-cycle',
 })

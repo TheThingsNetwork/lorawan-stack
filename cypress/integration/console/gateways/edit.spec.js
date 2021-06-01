@@ -81,29 +81,23 @@ describe('Gateway general settings', () => {
         'Controls whether this gateway may only connect if it uses an authenticated Basic Station or MQTT connection',
       )
       .and('be.visible')
-    cy.findByLabelText('Gateway status')
-      .should('exist')
-      .and('have.attr', 'value', 'false')
+    cy.findByLabelText('Gateway status').should('exist').and('have.attr', 'value', 'false')
     cy.findDescriptionByLabelText('Gateway status')
       .should('contain', 'The status of this gateway may be publicly displayed')
       .and('be.visible')
     cy.findByTestId('key-value-map').within(() => {
-      cy.findByTestId('attributes[0].key')
-        .should('be.visible')
-        .and('have.attr', 'value', 'key')
+      cy.findByTestId('attributes[0].key').should('be.visible').and('have.attr', 'value', 'key')
       cy.findByTestId('attributes[0].value')
         .should('be.visible')
         .and('have.attr', 'value', gateway.attributes.key)
     })
-    cy.findByLabelText('Automatic updates')
-      .should('exist')
-      .and('have.attr', 'value', 'false')
+    cy.findByLabelText('Automatic updates').should('exist').and('have.attr', 'value', 'false')
     cy.findDescriptionByLabelText('LoRa Basics Station LNS Authentication Key')
-    .should(
-      'contain',
-      'The Authentication Key for Lora Basics Station LNS connections. This field is ignored for other gateways.'
-    )
-    .and('be.visible')
+      .should(
+        'contain',
+        'The Authentication Key for Lora Basics Station LNS connections. This field is ignored for other gateways.',
+      )
+      .and('be.visible')
     cy.findDescriptionByLabelText('Automatic updates')
       .should('contain', 'Gateway can be updated automatically')
       .and('be.visible')
@@ -120,10 +114,8 @@ describe('Gateway general settings', () => {
     cy.findByLabelText('Frequency plan').should('not.exist')
     cy.findByRole('button', { name: 'Expand' }).click()
     cy.findByLabelText('Frequency plan').should('be.visible')
-    cy.findByLabelText('Duty cycle')
-      .should('exist')
-      .and('have.attr', 'value', 'true')
-    cy.findDescriptionByLabelText('Duty cycle').should('be.visible')
+    cy.findByLabelText('Enforce duty cycle').should('exist').and('have.attr', 'value', 'true')
+    cy.findDescriptionByLabelText('Enforce duty cycle').should('be.visible')
     cy.findByTestId('schedule_anytime_delay')
       .should('be.visible')
       .and('have.attr', 'value', '0.523')

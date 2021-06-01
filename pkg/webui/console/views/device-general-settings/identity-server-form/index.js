@@ -27,7 +27,7 @@ import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { mapFormValueToAttributes, mapAttributesToFormValue } from '@console/lib/attributes'
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
@@ -196,7 +196,7 @@ const IdentityServerForm = React.memo(props => {
           required
           disabled
           component={Input}
-          glossaryId={glossaryIds.JOIN_EUI}
+          tooltipId={tooltipIds.JOIN_EUI}
         />
       )}
       {hasDevEUI && (
@@ -209,7 +209,7 @@ const IdentityServerForm = React.memo(props => {
           required
           disabled
           component={Input}
-          glossaryId={glossaryIds.DEV_EUI}
+          tooltipId={tooltipIds.DEV_EUI}
         />
       )}
       <Form.Field
@@ -218,6 +218,7 @@ const IdentityServerForm = React.memo(props => {
         placeholder={sharedMessages.deviceNamePlaceholder}
         description={sharedMessages.deviceNameDescription}
         component={Input}
+        tooltipId={tooltipIds.DEVICE_NAME}
       />
       <Form.Field
         title={sharedMessages.devDesc}
@@ -225,6 +226,7 @@ const IdentityServerForm = React.memo(props => {
         type="textarea"
         description={sharedMessages.deviceDescDescription}
         component={Input}
+        tooltipId={tooltipIds.DEVICE_DESCRIPTION}
       />
       <Form.Field
         title={sharedMessages.networkServerAddress}

@@ -28,7 +28,7 @@ import MacSettingsSection from '@console/components/mac-settings-section'
 import DevAddrInput from '@console/containers/dev-addr-input'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -105,7 +105,7 @@ const NetworkSettingsForm = props => {
       <NsFrequencyPlansSelect
         required
         autoFocus
-        glossaryId={glossaryIds.FREQUENCY_PLAN}
+        tooltipId={tooltipIds.FREQUENCY_PLAN}
         name="frequency_plan_id"
       />
       <Form.Field
@@ -115,7 +115,7 @@ const NetworkSettingsForm = props => {
         name="lorawan_version"
         component={Select}
         options={LORAWAN_VERSIONS}
-        glossaryId={glossaryIds.LORAWAN_VERSION}
+        tooltipId={tooltipIds.LORAWAN_VERSION}
       />
       <Form.Field
         required
@@ -123,14 +123,14 @@ const NetworkSettingsForm = props => {
         name="lorawan_phy_version"
         component={PhyVersionInput}
         lorawanVersion={lorawanVersion}
-        glossaryId={glossaryIds.REGIONAL_PARAMETERS}
+        tooltipId={tooltipIds.REGIONAL_PARAMETERS}
       />
       <Form.Field
         title={sharedMessages.lorawanClassCapabilities}
         name="_device_classes"
         component={Checkbox.Group}
         required={isMulticast}
-        glossaryId={glossaryIds.CLASSES}
+        tooltipId={tooltipIds.CLASSES}
       >
         <Checkbox
           name="class_b"
@@ -152,10 +152,10 @@ const NetworkSettingsForm = props => {
             required
             component={Input.Generate}
             onGenerateValue={generate16BytesKey}
-            glossaryId={
+            tooltipId={
               lwVersion >= 110
-                ? glossaryIds.NETWORK_SESSION_KEY
-                : glossaryIds.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
+                ? tooltipIds.NETWORK_SESSION_KEY
+                : tooltipIds.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
             }
           />
           {lwVersion >= 110 && (
@@ -170,7 +170,7 @@ const NetworkSettingsForm = props => {
               description={sharedMessages.sNwkSIKeyDescription}
               component={Input.Generate}
               onGenerateValue={generate16BytesKey}
-              glossaryId={glossaryIds.SERVING_NETWORK_SESSION_INTEGRITY_KEY}
+              tooltipId={tooltipIds.SERVING_NETWORK_SESSION_INTEGRITY_KEY}
             />
           )}
           {lwVersion >= 110 && (
@@ -185,7 +185,7 @@ const NetworkSettingsForm = props => {
               description={sharedMessages.nwkSEncKeyDescription}
               component={Input.Generate}
               onGenerateValue={generate16BytesKey}
-              glossaryId={glossaryIds.NETWORK_SESSION_ENCRYPTION_KEY}
+              tooltipId={tooltipIds.NETWORK_SESSION_ENCRYPTION_KEY}
             />
           )}
         </>
