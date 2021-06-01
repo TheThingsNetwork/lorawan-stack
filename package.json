@@ -24,7 +24,7 @@
     "@storybook/addon-actions": "^5.3.19",
     "@storybook/addon-console": "^1.2.1",
     "@storybook/addon-info": "^5.3.19",
-    "@storybook/addon-links": "^5.3.19",
+    "@storybook/addon-links": "^6.2.9",
     "@storybook/react": "^5.3.19",
     "@testing-library/cypress": "^7.0.4",
     "add-asset-html-webpack-plugin": "^3.1.3",
