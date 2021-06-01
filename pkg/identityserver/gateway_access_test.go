@@ -43,6 +43,8 @@ func init() {
 			ttnpb.RIGHT_GATEWAY_ALL,
 		}
 	}
+	userGateways(&defaultUser.UserIdentifiers).Gateways[0].StatusPublic = false
+	userGateways(&defaultUser.UserIdentifiers).Gateways[0].LocationPublic = false
 }
 
 func TestGatewayAccessNotFound(t *testing.T) {

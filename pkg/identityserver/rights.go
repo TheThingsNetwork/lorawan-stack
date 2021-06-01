@@ -126,20 +126,19 @@ func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.Ap
 	if err != nil {
 		return nil, err
 	}
-	if entity != nil {
-		return entity.Union(universal), nil
-	}
-	if !is.IsAdmin(ctx) && universal == nil {
-		return &ttnpb.Rights{}, nil
-	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		_, err := store.GetApplicationStore(db).GetApplication(ctx, &appIDs, &types.FieldMask{Paths: []string{"ids"}})
 		return err
 	})
-	if err != nil {
+	if errors.IsNotFound(err) {
+		if is.IsAdmin(ctx) {
+			return nil, err
+		}
+		return &ttnpb.Rights{}, nil
+	} else if err != nil {
 		return nil, err
 	}
-	return universal, nil
+	return entity.Union(universal), nil
 }
 
 // ClientRights returns the rights the caller has on the given client.
@@ -148,20 +147,19 @@ func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientI
 	if err != nil {
 		return nil, err
 	}
-	if entity != nil {
-		return entity.Union(universal), nil
-	}
-	if !is.IsAdmin(ctx) && universal == nil {
-		return &ttnpb.Rights{}, nil
-	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		_, err := store.GetClientStore(db).GetClient(ctx, &cliIDs, &types.FieldMask{Paths: []string{"ids"}})
 		return err
 	})
-	if err != nil {
+	if errors.IsNotFound(err) {
+		if is.IsAdmin(ctx) {
+			return nil, err
+		}
+		return &ttnpb.Rights{}, nil
+	} else if err != nil {
 		return nil, err
 	}
-	return universal, nil
+	return entity.Union(universal), nil
 }
 
 // GatewayRights returns the rights the caller has on the given gateway.
@@ -170,23 +168,30 @@ func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.Gatewa
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
-	if entity != nil {
-		return entity.Union(universal), nil
-	}
-	if !is.IsAdmin(ctx) && universal == nil {
-		return &ttnpb.Rights{}, nil
-	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		_, err := store.GetGatewayStore(db).GetGateway(ctx, &gtwIDs, &types.FieldMask{Paths: []string{"ids"}})
-		return err
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		gtw, err := store.GetGatewayStore(db).GetGateway(ctx, &gtwIDs, &types.FieldMask{Paths: []string{
+			"ids", "status_public", "location_public",
+		}})
+		if err != nil {
+			return err
+		}
+		if gtw.StatusPublic {
+			entity = entity.Union(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_STATUS_READ))
+		}
+		if gtw.LocationPublic {
+			entity = entity.Union(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LOCATION_READ))
+		}
+		return nil
 	})
-	if err != nil {
+	if errors.IsNotFound(err) {
+		if is.IsAdmin(ctx) {
+			return nil, err
+		}
+		return &ttnpb.Rights{}, nil
+	} else if err != nil {
 		return nil, err
 	}
-	return universal, nil
+	return entity.Union(universal), nil
 }
 
 // OrganizationRights returns the rights the caller has on the given organization.
@@ -195,23 +200,19 @@ func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.O
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
-	if entity != nil {
-		return entity.Union(universal), nil
-	}
-	if !is.IsAdmin(ctx) && universal == nil {
-		return &ttnpb.Rights{}, nil
-	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		_, err := store.GetOrganizationStore(db).GetOrganization(ctx, &orgIDs, &types.FieldMask{Paths: []string{"ids"}})
 		return err
 	})
-	if err != nil {
+	if errors.IsNotFound(err) {
+		if is.IsAdmin(ctx) {
+			return nil, err
+		}
+		return &ttnpb.Rights{}, nil
+	} else if err != nil {
 		return nil, err
 	}
-	return universal, nil
+	return entity.Union(universal), nil
 }
 
 // UserRights returns the rights the caller has on the given user.
@@ -220,21 +221,17 @@ func (is *IdentityServer) UserRights(ctx context.Context, userIDs ttnpb.UserIden
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
-	if entity != nil {
-		return entity.Union(universal), nil
-	}
-	if !is.IsAdmin(ctx) && universal == nil {
-		return &ttnpb.Rights{}, nil
-	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		_, err := store.GetUserStore(db).GetUser(ctx, &userIDs, &types.FieldMask{Paths: []string{"ids"}})
 		return err
 	})
-	if err != nil {
+	if errors.IsNotFound(err) {
+		if is.IsAdmin(ctx) {
+			return nil, err
+		}
+		return &ttnpb.Rights{}, nil
+	} else if err != nil {
 		return nil, err
 	}
-	return universal, nil
+	return entity.Union(universal), nil
 }
