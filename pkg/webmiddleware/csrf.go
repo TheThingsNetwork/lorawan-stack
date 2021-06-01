@@ -18,7 +18,11 @@ import (
 	"net/http"
 
 	"github.com/gorilla/csrf"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
+
+var errInvalidCSRFToken = errors.DefinePermissionDenied("invalid_csrf_token", "invalid csrf token")
 
 // CSRF returns a middleware that enables CSRF protection via a sync token. The
 // skipCheck parameter can be used to skip CSRF protection based on the request
@@ -26,7 +30,15 @@ import (
 func CSRF(authKey []byte, opts ...csrf.Option) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			csrf.Protect(authKey, append([]csrf.Option{csrf.Secure(r.URL.Scheme == "https")}, opts...)...)(next).ServeHTTP(w, r)
+			defaultOptions := []csrf.Option{
+				csrf.SameSite(csrf.SameSiteStrictMode),
+				csrf.Secure(r.URL.Scheme == "https"),
+				csrf.ErrorHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					webhandlers.Error(w, r, errInvalidCSRFToken.New())
+				})),
+			}
+			handler := csrf.Protect(authKey, append(defaultOptions, opts...)...)(next)
+			handler.ServeHTTP(w, r)
 		})
 	}
 }
