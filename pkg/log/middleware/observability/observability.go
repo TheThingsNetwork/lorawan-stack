@@ -19,6 +19,7 @@ import (
 	"context"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 )
@@ -31,6 +32,7 @@ const (
 	subsystem = "log"
 	level     = "level"
 	namespace = "namespace"
+	errorName = "error_name"
 )
 
 func (m logMessageMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -45,10 +47,10 @@ var logMetrics = &logMessageMetrics{
 	logMessages: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "log_messages_total",
+			Name:      "messages_total",
 			Help:      "Total number of logged messages",
 		},
-		[]string{level, namespace},
+		[]string{level, namespace, errorName},
 	),
 }
 
@@ -73,7 +75,14 @@ func (o *observability) Wrap(next log.Handler) log.Handler {
 				namespace = ns
 			}
 		}
-		logMetrics.logMessages.WithLabelValues(context.Background(), entry.Level().String(), namespace).Inc()
+		errorName := "nil"
+		if err, ok := entry.Fields().Fields()["error"].(error); ok {
+			errorName = "unknown"
+			if ttnErr, ok := errors.From(err); ok {
+				errorName = ttnErr.FullName()
+			}
+		}
+		logMetrics.logMessages.WithLabelValues(context.Background(), entry.Level().String(), namespace, errorName).Inc()
 		return next.HandleLog(entry)
 	})
 }
