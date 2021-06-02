@@ -87,7 +87,10 @@ export default defineMessages({
   collaboratorEditRights: 'Edit rights of {collaboratorId}',
   collaboratorId: 'Collaborator ID',
   collaboratorIdPlaceholder: 'collaborator-id',
+  collaboratorWarningSelf: 'Changing your own rights could result in loss of access',
   collaboratorModalWarning: 'Are you sure you want to remove {collaboratorId} as a collaborator?',
+  collaboratorModalWarningSelf:
+    'Are you sure you want to remove yourself as a collaborator? Access to this entity will be lost until someone else adds you as a collaborator again.',
   collaboratorRemove: 'Collaborator remove',
   collaborators: 'Collaborators',
   collaboratorUpdateSuccess: 'Collaborator rights updated',
@@ -285,6 +288,7 @@ export default defineMessages({
   refresh: 'Refresh',
   replaceWebhook: 'Replace webhook',
   removeCollaborator: 'Remove collaborator',
+  removeCollaboratorSelf: 'Remove yourself as collaborator',
   requireAuthenticatedConnection: 'Require authenticated connection',
   requireAuthenticatedConnectionDescription:
     'Controls whether this gateway may only connect if it uses an authenticated Basic Station or MQTT connection',
