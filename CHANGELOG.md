@@ -17,6 +17,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Do not print error line logs for rate limited gRPC and HTTP API requests.
 - The `ttn_lw_log_log_messages_total` metric was renamed to `ttn_lw_log_messages_total` and has an additional `error_name` label.
+- Authenticated users now have access to gateway status and location when those are set to public.
 
 ### Deprecated
 
