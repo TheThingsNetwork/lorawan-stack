@@ -60,6 +60,26 @@ class Gateways {
       }
     }
 
+    // Handle missing boolean values.
+    if (paths.includes('location_public') && !Boolean(gateway.location_public)) {
+      gateway.location_public = false
+    }
+    if (paths.includes('auto_update') && !Boolean(gateway.auto_update)) {
+      gateway.auto_update = false
+    }
+    if (
+      paths.includes('require_authenticated_connection') &&
+      !Boolean(gateway.require_authenticated_connection)
+    ) {
+      gateway.require_authenticated_connection = false
+    }
+    if (
+      paths.includes('update_location_from_status') &&
+      !Boolean(gateway.update_location_from_status)
+    ) {
+      gateway.update_location_from_status = false
+    }
+
     return gateway
   }
 
