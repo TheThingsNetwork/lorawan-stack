@@ -41,9 +41,7 @@ func CSRF(lookupName, path string, authKey []byte) echo.MiddlewareFunc {
 					authKey,
 					csrf.CookieName(lookupName),
 					csrf.FieldName(lookupName),
-					csrf.Secure(c.Request().URL.Scheme == "https"),
 					csrf.Path(path),
-					csrf.SameSite(csrf.SameSiteStrictMode),
 				))(
 				pass(next),
 			)(c)
