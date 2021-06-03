@@ -16,8 +16,10 @@ package webmiddleware
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/csrf"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
@@ -30,10 +32,20 @@ var errInvalidCSRFToken = errors.DefinePermissionDenied("invalid_csrf_token", "i
 func CSRF(authKey []byte, opts ...csrf.Option) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if canSkipCSRFMiddleware(r) {
+				next.ServeHTTP(w, r)
+				return
+			}
 			defaultOptions := []csrf.Option{
 				csrf.SameSite(csrf.SameSiteStrictMode),
 				csrf.Secure(r.URL.Scheme == "https"),
 				csrf.ErrorHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					// In some cases we do want to execute the CSRF middleware, so that a CSRF token is set
+					// but we don't want to enforce CSRF token validation.
+					if canSkipCSRFCheck(r) {
+						next.ServeHTTP(w, r)
+						return
+					}
 					webhandlers.Error(w, r, errInvalidCSRFToken.New())
 				})),
 			}
@@ -41,4 +53,33 @@ func CSRF(authKey []byte, opts ...csrf.Option) MiddlewareFunc {
 			handler.ServeHTTP(w, r)
 		})
 	}
+}
+
+func canSkipCSRFMiddleware(r *http.Request) bool {
+	authVal := r.Header.Get("Authorization")
+	if !strings.HasPrefix(authVal, "Bearer ") {
+		return false // When using an empty Authorization header, we may still want to set the CSRF token cookie.
+	}
+	tokenType, _, _, err := auth.SplitToken(strings.TrimPrefix(authVal, "Bearer "))
+	if err != nil {
+		return false // When using an unsupported Bearer token, we may still want to set the CSRF token cookie.
+	}
+	switch tokenType {
+	case auth.APIKey, auth.AccessToken:
+		return true // When the caller uses a Bearer token of type API key or Access Token, we can skip CSRF middleware.
+	default:
+		return false
+	}
+}
+
+func canSkipCSRFCheck(r *http.Request) bool {
+	authVal := r.Header.Get("Authorization")
+	if !strings.HasPrefix(authVal, "Bearer ") {
+		return true // Unauthenticated requests don't need CSRF protection.
+	}
+	_, _, _, err := auth.SplitToken(strings.TrimPrefix(authVal, "Bearer "))
+	if err != nil {
+		return true // Unsupported Bearer tokens don't need CSRF protection.
+	}
+	return false
 }

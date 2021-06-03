@@ -30,7 +30,6 @@ import (
 	"github.com/gorilla/mux"
 	echo "github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
-	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -208,35 +207,10 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		mux.MiddlewareFunc(webmiddleware.Redirect(redirectConfig)),
 	)
 
-	canSkipCSRFCheck := func(r *http.Request) bool {
-		authVal := r.Header.Get("Authorization")
-		if !strings.HasPrefix(authVal, "Bearer ") {
-			return false
-		}
-		tokenType, _, _, err := auth.SplitToken(strings.TrimPrefix(authVal, "Bearer "))
-		if err != nil {
-			return false
-		}
-		switch tokenType {
-		case auth.APIKey, auth.AccessToken:
-			return true
-		default:
-			return false
-		}
-	}
-
 	apiRouter := mux.NewRouter()
 	apiRouter.NotFoundHandler = http.HandlerFunc(webhandlers.NotFound)
 	apiRouter.Use(
 		mux.MiddlewareFunc(webmiddleware.CookieAuth("_session")),
-		mux.MiddlewareFunc(func(next http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if canSkipCSRFCheck(r) {
-					r = csrf.UnsafeSkipCheck(r)
-				}
-				next.ServeHTTP(w, r)
-			})
-		}),
 		mux.MiddlewareFunc(webmiddleware.CSRF(
 			hashKey,
 			csrf.CookieName("_csrf"),
