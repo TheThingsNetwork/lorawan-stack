@@ -38,6 +38,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
+	er "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/entityregistry/is"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
@@ -126,7 +127,11 @@ func TestGatewayServer(t *testing.T) {
 		config.Stats = statsRegistry
 	}
 
-	gs, err := gatewayserver.New(c, config)
+	er := er.New(c)
+
+	gs, err := gatewayserver.New(c, config,
+		gatewayserver.WithRegistry(er),
+	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
