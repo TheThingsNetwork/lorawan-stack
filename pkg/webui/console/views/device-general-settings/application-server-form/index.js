@@ -25,7 +25,7 @@ import Yup from '@ttn-lw/lib/yup'
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { generate16BytesKey } from '@console/lib/device-utils'
 
@@ -181,7 +181,7 @@ const ApplicationServerForm = React.memo(props => {
         component={Input.Generate}
         mayGenerateValue={mayEditKeys && !skipCrypto}
         onGenerateValue={generate16BytesKey}
-        glossaryId={glossaryIds.APP_SESSION_KEY}
+        tooltipId={tooltipIds.APP_SESSION_KEY}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

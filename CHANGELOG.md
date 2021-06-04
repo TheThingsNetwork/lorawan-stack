@@ -13,11 +13,27 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
-- Do not print error line logs for rate limited gRPC and HTTP API requests.
-
 ### Deprecated
 
 ### Removed
+
+### Fixed
+
+### Security
+
+## [3.13.1] - 2021-06-04
+
+### Added
+
+- More contextual tooltips to end device and gateway form fields in the Console.
+- Warnings in the Console when changing or revoking your own access to an entity.
+
+### Changed
+
+- Do not print error line logs for rate limited gRPC and HTTP API requests.
+- The `ttn_lw_log_log_messages_total` metric was renamed to `ttn_lw_log_messages_total` and has an additional `error_name` label.
+- Authenticated users now have access to gateway status and location when those are set to public.
+- Cookies are no longer allowed in cross-origin requests to the HTTP API. Applications must instead use Bearer tokens in the Authorization header.
 
 ### Fixed
 
@@ -25,8 +41,6 @@ For details about compatibility between different releases, see the **Commitment
 - End device payload formatter view crashing in the Console.
 - End device overview frequently crashing in the Console.
 - Panic on empty downlink in zero indexed downlink token.
-
-### Security
 
 ## [3.13.0] - 2021-05-20
 
@@ -1526,7 +1540,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.0...v3.13
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.1...v3.13
+[3.13.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.0...v3.13.1
 [3.13.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.3...v3.13.0
 [3.12.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.2...v3.12.3
 [3.12.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.1...v3.12.2

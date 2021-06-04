@@ -21,7 +21,7 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
 
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -184,7 +184,7 @@ const JoinServerForm = React.memo(props => {
         disabled={appKeyHidden || !mayEditKeys}
         mayGenerateValue={mayEditKeys && !appKeyHidden}
         onGenerateValue={generate16BytesKey}
-        glossaryId={glossaryIds.APP_KEY}
+        tooltipId={tooltipIds.APP_KEY}
       />
       {isNewLorawanVersion && (
         <Form.Field
@@ -198,7 +198,7 @@ const JoinServerForm = React.memo(props => {
           disabled={nwkKeyHidden || !mayEditKeys}
           mayGenerateValue={mayEditKeys && !nwkKeyHidden}
           onGenerateValue={generate16BytesKey}
-          glossaryId={glossaryIds.NETWORK_KEY}
+          tooltipId={tooltipIds.NETWORK_KEY}
         />
       )}
       <SubmitBar>

@@ -29,7 +29,7 @@ import MacSettingsSection from '@console/components/mac-settings-section'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import DevAddrInput from '@console/containers/dev-addr-input'
 
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/glossary-ids'
 import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -192,7 +192,7 @@ const NetworkServerForm = React.memo(props => {
         required
         options={LORAWAN_VERSIONS}
         onChange={handleVersionChange}
-        glossaryId={glossaryIds.LORAWAN_VERSION}
+        tooltipId={tooltipIds.LORAWAN_VERSION}
       />
       <Form.Field
         title={sharedMessages.phyVersion}
@@ -200,14 +200,19 @@ const NetworkServerForm = React.memo(props => {
         component={PhyVersionInput}
         lorawanVersion={lorawanVersion}
         required
-        glossaryId={glossaryIds.REGIONAL_PARAMETERS}
+        tooltipId={tooltipIds.REGIONAL_PARAMETERS}
       />
-      <NsFrequencyPlansSelect name="frequency_plan_id" required />
+      <NsFrequencyPlansSelect
+        name="frequency_plan_id"
+        required
+        tooltipId={tooltipIds.FREQUENCY_PLAN}
+      />
       <Form.Field
         title={sharedMessages.lorawanClassCapabilities}
         name="_device_classes"
         component={Checkbox.Group}
         required={isMulticast}
+        tooltipId={tooltipIds.CLASSES}
       >
         <Checkbox
           name="class_b"
@@ -222,6 +227,7 @@ const NetworkServerForm = React.memo(props => {
         required
         name="_activation_mode"
         component={Radio.Group}
+        tooltipId={tooltipIds.ACTIVATION_MODE}
       >
         <Radio label={sharedMessages.otaa} value={ACTIVATION_MODES.OTAA} />
         <Radio label={sharedMessages.abp} value={ACTIVATION_MODES.ABP} />
@@ -246,11 +252,7 @@ const NetworkServerForm = React.memo(props => {
             component={Input.Generate}
             mayGenerateValue={mayEditKeys}
             onGenerateValue={generate16BytesKey}
-            glossaryId={
-              lwVersion >= 110
-                ? glossaryIds.NETWORK_SESSION_KEY
-                : glossaryIds.FORWARDING_NETWORK_SESSION_INTEGRITY_KEY
-            }
+            tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
           />
           {lwVersion >= 110 && (
             <Form.Field

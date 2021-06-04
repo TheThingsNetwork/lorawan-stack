@@ -152,8 +152,7 @@ func DefaultStartTask(conf *TaskConfig) {
 				done()
 			}
 		}()
-		invocation := uint(1)
-		for {
+		for invocation := uint(1); ; invocation++ {
 			if invocation == 0 {
 				logger.Warn("Invocation count rollover detected")
 				invocation = 1
@@ -195,7 +194,6 @@ func DefaultStartTask(conf *TaskConfig) {
 				return
 			case <-time.After(s):
 			}
-			invocation++
 		}
 	}()
 }

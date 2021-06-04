@@ -24,7 +24,7 @@ import Radio from '@ttn-lw/components/radio-button'
 
 import Message from '@ttn-lw/lib/components/message'
 
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -94,6 +94,7 @@ const MacSettingsSection = props => {
         component={Radio.Group}
         encode={fCntWidthEncode}
         decode={fCntWidthDecode}
+        tooltipId={tooltipIds.FRAME_COUNTER_WIDTH}
       >
         <Radio label={sharedMessages['16Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_16_BIT} />
         <Radio label={sharedMessages['32Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_32_BIT} />
@@ -116,7 +117,7 @@ const MacSettingsSection = props => {
             component={Input}
             min={0}
             max={7}
-            glossaryId={glossaryIds.DATA_RATE_OFFSET}
+            tooltipId={tooltipIds.DATA_RATE_OFFSET}
           />
           <Form.Field
             title={m.resetsFCnt}
@@ -134,7 +135,7 @@ const MacSettingsSection = props => {
         component={Input}
         min={0}
         max={15}
-        glossaryId={glossaryIds.DATA_RATE_INDEX}
+        tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
       />
       <Form.Field
         type="number"
@@ -145,6 +146,7 @@ const MacSettingsSection = props => {
         placeholder={m.frequencyPlaceholder}
         name="mac_settings.rx2_frequency"
         component={Input}
+        tooltipId={tooltipIds.RX2_FREQUENCY}
       />
       <Form.Field
         indexAsKey

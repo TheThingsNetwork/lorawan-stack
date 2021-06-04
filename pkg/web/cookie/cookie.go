@@ -39,6 +39,24 @@ type Cookie struct {
 
 	// HTTPOnly restricts the cookie to HTTP (no javascript access).
 	HTTPOnly bool
+
+	// SameSite restricts usage of the cookie in cross-site requests.
+	SameSite http.SameSite
+}
+
+func (d *Cookie) new(r *http.Request) http.Cookie {
+	sameSite := d.SameSite
+	if sameSite == 0 {
+		sameSite = http.SameSiteStrictMode
+	}
+	return http.Cookie{
+		Name:     d.Name,
+		Path:     d.Path,
+		MaxAge:   int(d.MaxAge.Nanoseconds() / 1000),
+		Secure:   r.URL.Scheme == "https",
+		HttpOnly: d.HTTPOnly,
+		SameSite: sameSite,
+	}
 }
 
 // Get decodes the cookie into the value. Returns false if the cookie is not there.
@@ -74,13 +92,9 @@ func (d *Cookie) Set(w http.ResponseWriter, r *http.Request, v interface{}) erro
 		return err
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     d.Name,
-		Path:     d.Path,
-		MaxAge:   int(d.MaxAge.Nanoseconds() / 1000),
-		HttpOnly: d.HTTPOnly,
-		Value:    str,
-	})
+	c := d.new(r)
+	c.Value = str
+	http.SetCookie(w, &c)
 
 	return nil
 }
@@ -97,23 +111,9 @@ func (d *Cookie) Remove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     d.Name,
-		Path:     d.Path,
-		HttpOnly: d.HTTPOnly,
-		Value:    tombstone,
-		Expires:  time.Unix(1, 0),
-		MaxAge:   0,
-	})
-
-	// Additionally, explicitly remove the cookie also from the current path.
-	// This can be necessary to also remove old cookies when the cookie paths
-	// have been changed.
-	http.SetCookie(w, &http.Cookie{
-		Name:     d.Name,
-		HttpOnly: d.HTTPOnly,
-		Value:    tombstone,
-		Expires:  time.Unix(1, 0),
-		MaxAge:   0,
-	})
+	c := d.new(r)
+	c.Expires = time.Unix(1, 0)
+	c.MaxAge = 0
+	c.Value = tombstone
+	http.SetCookie(w, &c)
 }

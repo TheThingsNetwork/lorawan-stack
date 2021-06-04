@@ -1326,7 +1326,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		sets = ttnpb.AddFields(sets, "session.queued_application_downlinks")
 	}
 	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Failed to generate class B/C downlink, skip downlink attempt")
+		log.FromContext(ctx).WithError(err).Warn("Failed to generate class B/C downlink, skip downlink attempt")
 		if genState.ApplicationDownlink != nil && ttnpb.HasAnyField(sets, "session.queued_application_downlinks") {
 			dev.Session.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.Session.QueuedApplicationDownlinks...)
 		}

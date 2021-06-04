@@ -83,6 +83,7 @@ var PublicGatewayFields = append(PublicEntityFields,
 	"description",
 	"frequency_plan_id",
 	"status_public",
+	"gateway_server_address", // only public if status_public=true
 	"location_public",
 	"antennas", // only public if location_public=true
 )
@@ -96,6 +97,9 @@ func (g *Gateway) PublicSafe() *Gateway {
 	var safe Gateway
 	safe.SetFields(g, PublicGatewayFields...)
 	safe.ContactInfo = onlyPublicContactInfo(safe.ContactInfo)
+	if !safe.StatusPublic {
+		safe.GatewayServerAddress = ""
+	}
 	if !safe.LocationPublic {
 		safe.Antennas = nil
 	}

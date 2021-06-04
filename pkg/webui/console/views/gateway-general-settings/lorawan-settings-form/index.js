@@ -25,7 +25,7 @@ import UnitInput from '@ttn-lw/components/unit-input'
 
 import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
-import glossaryIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -128,20 +128,21 @@ const LorawanSettingsForm = React.memo(props => {
         menuPlacement="top"
         onChange={onFrequencyPlanChange}
         warning={showFrequencyPlanWarning ? sharedMessages.frequencyPlanWarning : undefined}
-        glossaryId={glossaryIds.FREQUENCY_PLAN}
+        tooltipId={tooltipIds.FREQUENCY_PLAN}
       />
       <Form.Field
         title={sharedMessages.gatewayScheduleDownlinkLate}
         name="schedule_downlink_late"
         component={Checkbox}
         description={sharedMessages.scheduleDownlinkLateDescription}
+        tooltipId={tooltipIds.SCHEDULE_DOWNLINK_LATE}
       />
       <Form.Field
-        title={sharedMessages.dutyCycle}
         name="enforce_duty_cycle"
         component={Checkbox}
-        label={sharedMessages.enforced}
+        label={sharedMessages.enforceDutyCycle}
         description={sharedMessages.enforceDutyCycleDescription}
+        tooltipId={tooltipIds.ENFORCE_DUTY_CYCLE}
       />
       <Form.Field
         title={sharedMessages.scheduleAnyTimeDelay}
@@ -171,6 +172,7 @@ const LorawanSettingsForm = React.memo(props => {
             : undefined
         }
         required
+        tooltipId={tooltipIds.SCHEDULE_ANYTIME_DELAY}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

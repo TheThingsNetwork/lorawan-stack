@@ -22,10 +22,18 @@ import DateTime from '.'
 const formatInSeconds = (from, to) => Math.floor((from - to) / 1000)
 
 const RelativeTime = props => {
-  const { className, value, unit, computeDelta, updateIntervalInSeconds, children } = props
+  const {
+    className,
+    value,
+    unit,
+    computeDelta,
+    updateIntervalInSeconds,
+    firstToLower,
+    children,
+  } = props
 
   return (
-    <DateTime className={className} value={value}>
+    <DateTime className={className} value={value} firstToLower={firstToLower}>
       {dateTime => {
         const from = new Date(dateTime)
         const to = new Date()
@@ -53,6 +61,8 @@ RelativeTime.propTypes = {
   className: PropTypes.string,
   /** A function to compute relative delta in specified time units in the `unit` prop. */
   computeDelta: PropTypes.func,
+  /** Whether to convert the first character of the resulting message to lowercase. */
+  firstToLower: PropTypes.bool,
   /** The unit to calculate relative date time. */
   unit: PropTypes.oneOf(['second', 'minute', 'hour', 'day', 'week', 'month', 'year']),
   /** The interval that the component will re-render in seconds. */
@@ -68,6 +78,7 @@ RelativeTime.propTypes = {
 RelativeTime.defaultProps = {
   children: dateTime => dateTime,
   className: undefined,
+  firstToLower: true,
   updateIntervalInSeconds: 1,
   unit: 'second',
   computeDelta: formatInSeconds,

@@ -40,6 +40,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/entityregistry/is"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	iogrpc "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/grpc"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt"
@@ -72,7 +73,7 @@ type GatewayServer struct {
 	requireRegisteredGateways bool
 	forward                   map[string][]types.DevAddrPrefix
 
-	registry ttnpb.GatewayRegistryClient
+	entityRegistry EntityRegistry
 
 	upstreamHandlers map[string]upstream.Handler
 
@@ -82,33 +83,13 @@ type GatewayServer struct {
 	updateConnectionStatsDebounceTime time.Duration
 }
 
-func (gs *GatewayServer) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
-	if gs.registry != nil {
-		return gs.registry, nil
-	}
-	var (
-		cc  *grpc.ClientConn
-		err error
-	)
-	if ids != nil {
-		cc, err = gs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
-	} else {
-		// Don't pass a (*ttnpb.GatewayIdentifiers)(nil) to GetPeerConn.
-		cc, err = gs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
-	}
-	if err != nil {
-		return nil, err
-	}
-	return ttnpb.NewGatewayRegistryClient(cc), nil
-}
-
 // Option configures GatewayServer.
 type Option func(*GatewayServer)
 
 // WithRegistry overrides the registry.
-func WithRegistry(registry ttnpb.GatewayRegistryClient) Option {
+func WithRegistry(registry EntityRegistry) Option {
 	return func(gs *GatewayServer) {
-		gs.registry = registry
+		gs.entityRegistry = registry
 	}
 }
 
@@ -147,6 +128,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		upstreamHandlers:                  make(map[string]upstream.Handler),
 		statsRegistry:                     conf.Stats,
 		updateConnectionStatsDebounceTime: conf.UpdateConnectionStatsDebounceTime,
+		entityRegistry:                    is.New(c),
 	}
 	for _, opt := range opts {
 		opt(gs)
@@ -389,11 +371,7 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers.New()
 	}
 	if ids.GatewayId == "" {
-		registry, err := gs.getRegistry(ctx, nil)
-		if err != nil {
-			return nil, ttnpb.GatewayIdentifiers{}, err
-		}
-		extIDs, err := registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+		extIDs, err := gs.entityRegistry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 			Eui: *ids.Eui,
 		}, gs.WithClusterAuth())
 		if err == nil {
@@ -463,11 +441,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	} else {
 		isAuthenticated = true
 	}
-	registry, err := gs.getRegistry(ctx, &ids)
-	if err != nil {
-		return nil, err
-	}
-	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
+	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask: pbtypes.FieldMask{
 			Paths: []string{
@@ -835,10 +809,6 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 	if err != nil {
 		return
 	}
-	registry, err := gs.getRegistry(ctx, &conn.Gateway().GatewayIdentifiers)
-	if err != nil {
-		return
-	}
 
 	for {
 		select {
@@ -857,7 +827,7 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 				}
 				status.AntennaLocations[0].Source = ttnpb.SOURCE_GPS
 				conn.Gateway().Antennas[0].Location = *status.AntennaLocations[0]
-				_, err := registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
+				_, err := gs.entityRegistry.Update(ctx, &ttnpb.UpdateGatewayRequest{
 					Gateway: ttnpb.Gateway{
 						GatewayIdentifiers: conn.Gateway().GatewayIdentifiers,
 						Antennas:           conn.Gateway().Antennas,
@@ -893,11 +863,7 @@ func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.Gatewa
 	} else if err != nil {
 		return nil, err
 	}
-	registry, err := gs.getRegistry(ctx, &ids)
-	if err != nil {
-		return nil, err
-	}
-	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
+	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask:          pbtypes.FieldMask{Paths: []string{"frequency_plan_ids"}},
 	}, callOpt)

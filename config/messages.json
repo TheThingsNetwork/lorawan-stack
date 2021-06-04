@@ -8315,6 +8315,15 @@
       "file": "recover.go"
     }
   },
+  "error:pkg/webmiddleware:invalid_csrf_token": {
+    "translations": {
+      "en": "invalid csrf token"
+    },
+    "description": {
+      "package": "pkg/webmiddleware",
+      "file": "csrf.go"
+    }
+  },
   "error:pkg/webmiddleware:request_body_too_large": {
     "translations": {
       "en": "request body too large"
