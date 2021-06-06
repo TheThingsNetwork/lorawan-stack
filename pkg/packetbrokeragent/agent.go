@@ -402,6 +402,9 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 
 	wg := &sync.WaitGroup{}
 	defer wg.Wait()
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	var workers int32
 
 	for {
@@ -1100,6 +1103,9 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 
 	wg := &sync.WaitGroup{}
 	defer wg.Wait()
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	var workers int32
 
 	for {
