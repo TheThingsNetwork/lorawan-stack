@@ -226,6 +226,11 @@ export const mayManageUsers = {
   check: mayPerformAdminActions.check,
 }
 
+export const mayPurgeEntities = {
+  rightsSelector: selectUserIsAdmin,
+  check: mayPerformAdminActions.check,
+}
+
 // Composite feature checks.
 export const mayViewApplications = {
   rightsSelector: state => [...selectUserRights(state), ...selectOrganizationRights(state)],
