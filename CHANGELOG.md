@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Relaxed the cookie policy for cross-origin requests from Strict to Lax.
+
 ### Deprecated
 
 ### Removed
