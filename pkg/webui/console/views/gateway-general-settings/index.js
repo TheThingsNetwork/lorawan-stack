@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
 import Collapse from '@ttn-lw/components/collapse'
 
+import withRequest from '@ttn-lw/lib/components/with-request'
+
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
 import diff from '@ttn-lw/lib/diff'
@@ -37,11 +39,26 @@ import {
   mayEditBasicGatewayInformation,
   mayDeleteGateway,
   mayEditGatewaySecrets,
+  mayPurgeEntities,
+  mayViewOrEditGatewayApiKeys,
+  mayViewOrEditGatewayCollaborators,
 } from '@console/lib/feature-checks'
 import { mapFormValueToAttributes } from '@console/lib/attributes'
 
 import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
+import { getCollaboratorsList } from '@console/store/actions/collaborators'
+import { getApiKeysList } from '@console/store/actions/api-keys'
 
+import {
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+  selectCollaboratorError,
+} from '@console/store/selectors/collaborators'
+import {
+  selectApiKeysTotalCount,
+  selectApiKeysFetching,
+  selectApiKeysError,
+} from '@console/store/selectors/api-keys'
 import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
 import LorawanSettingsForm from './lorawan-settings-form'
@@ -49,25 +66,74 @@ import BasicSettingsForm from './basic-settings-form'
 import m from './messages'
 
 @connect(
-  state => ({
-    gateway: selectSelectedGateway(state),
-    gtwId: selectSelectedGatewayId(state),
-    mayEditSecrets: checkFromState(mayEditGatewaySecrets, state),
-  }),
+  state => {
+    const mayViewApiKeys = checkFromState(mayViewOrEditGatewayApiKeys, state)
+    const mayViewCollaborators = checkFromState(mayViewOrEditGatewayCollaborators, state)
+    const apiKeysCount = selectApiKeysTotalCount(state)
+    const collaboratorsCount = selectCollaboratorsTotalCount(state)
+    const mayEditSecrets = checkFromState(mayEditGatewaySecrets, state)
+    const mayPurgeGtw = checkFromState(mayPurgeEntities, state)
+    const mayDeleteGtw = checkFromState(mayDeleteGateway, state)
+
+    const entitiesFetching = selectApiKeysFetching(state) || selectCollaboratorsFetching(state)
+    const error = selectApiKeysError(state) || selectCollaboratorError(state)
+
+    const fetching =
+      entitiesFetching ||
+      (mayViewApiKeys && typeof apiKeysCount === undefined) ||
+      (mayViewCollaborators && typeof collaboratorsCount === undefined)
+    const hasApiKeys = apiKeysCount > 0
+    // Note: there is always at least one collaborator.
+    const hasAddedCollaborators = collaboratorsCount > 1
+    const isPristine = !hasAddedCollaborators && !hasApiKeys
+
+    return {
+      gateway: selectSelectedGateway(state),
+      gtwId: selectSelectedGatewayId(state),
+      mayEditSecrets,
+      mayViewApiKeys,
+      mayViewCollaborators,
+      fetching,
+      shouldPurge: mayPurgeGtw,
+      shouldConfirmDelete:
+        !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error),
+      mayDeleteGateway: mayDeleteGtw,
+    }
+  },
   dispatch => ({
     ...bindActionCreators(
       {
         updateGateway: attachPromise(updateGateway),
         deleteGateway: attachPromise(deleteGateway),
+        getApiKeysList,
+        getCollaboratorsList,
       },
       dispatch,
     ),
     onDeleteSuccess: () => dispatch(replace('/gateways')),
   }),
+  (stateProps, dispatchProps, ownProps) => ({
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps,
+    deleteGateway: id => dispatchProps.deleteGateway(id, { purge: stateProps.shouldPurge }),
+    loadData: () => {
+      if (stateProps.mayDeleteGateway) {
+        if (stateProps.mayViewApiKeys) {
+          dispatchProps.getApiKeysList('gateway', stateProps.gtwId)
+        }
+
+        if (stateProps.mayViewCollaborators) {
+          dispatchProps.getCollaboratorsList('gateway', stateProps.gtwId)
+        }
+      }
+    },
+  }),
 )
 @withFeatureRequirement(mayEditBasicGatewayInformation, {
   redirect: ({ gtwId }) => `/gateways/${gtwId}`,
 })
+@withRequest(({ loadData }) => loadData(), ({ fetching }) => fetching)
 @withBreadcrumb('gateways.single.general-settings', props => {
   const { gtwId } = props
 
@@ -85,6 +151,8 @@ export default class GatewayGeneralSettings extends React.Component {
     gtwId: PropTypes.string.isRequired,
     mayEditSecrets: PropTypes.bool.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
+    shouldConfirmDelete: PropTypes.bool.isRequired,
+    shouldPurge: PropTypes.bool.isRequired,
     updateGateway: PropTypes.func.isRequired,
   }
 
@@ -153,7 +221,7 @@ export default class GatewayGeneralSettings extends React.Component {
   }
 
   render() {
-    const { gateway, mayEditSecrets } = this.props
+    const { gtwId, gateway, shouldConfirmDelete, shouldPurge, mayEditSecrets } = this.props
 
     return (
       <Container>
@@ -167,6 +235,7 @@ export default class GatewayGeneralSettings extends React.Component {
               initialCollapsed={false}
             >
               <BasicSettingsForm
+                gtwId={gtwId}
                 gateway={gateway}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
@@ -175,6 +244,8 @@ export default class GatewayGeneralSettings extends React.Component {
                 onDeleteFailure={this.handleDeleteFailure}
                 mayDeleteGateway={mayDeleteGateway}
                 mayEditSecrets={mayEditSecrets}
+                shouldConfirmDelete={shouldConfirmDelete}
+                shouldPurge={shouldPurge}
               />
             </Collapse>
             <Collapse

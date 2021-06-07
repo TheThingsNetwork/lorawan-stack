@@ -130,7 +130,7 @@ describe('Gateway general settings', () => {
     cy.findByTestId('modal-window')
       .should('be.visible')
       .within(() => {
-        cy.findByText('Delete gateway', { selector: 'h1' }).should('be.visible')
+        cy.findByText('Confirm deletion', { selector: 'h1' }).should('be.visible')
 
         cy.findByRole('button', { name: /Cancel/ }).should('be.visible')
         cy.findByRole('button', { name: /Delete gateway/ }).should('be.visible')

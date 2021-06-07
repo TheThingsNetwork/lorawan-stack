@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
 
 import React from 'react'
 
+import DeleteModalButton from '@ttn-lw/console/components/delete-modal-button'
+
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
-import ModalButton from '@ttn-lw/components/button/modal-button'
 
 import Require from '@console/lib/components/require'
 
@@ -37,6 +38,7 @@ import validationSchema from './validation-schema'
 const BasicSettingsForm = React.memo(props => {
   const {
     gateway,
+    gtwId,
     onSubmit,
     onSubmitSuccess,
     onDelete,
@@ -44,6 +46,8 @@ const BasicSettingsForm = React.memo(props => {
     onDeleteSuccess,
     mayDeleteGateway,
     mayEditSecrets,
+    shouldConfirmDelete,
+    shouldPurge,
   } = props
 
   const [error, setError] = React.useState(undefined)
@@ -187,19 +191,13 @@ const BasicSettingsForm = React.memo(props => {
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
         <Require featureCheck={mayDeleteGateway}>
-          <ModalButton
-            type="button"
-            icon="delete"
+          <DeleteModalButton
+            entityId={gtwId}
+            entityName={gateway.name}
             message={m.deleteGateway}
-            modalData={{
-              message: {
-                values: { gtwName: gateway.name || gateway.ids.gateway_id },
-                ...m.modalWarning,
-              },
-            }}
             onApprove={onGatewayDelete}
-            naked
-            danger
+            shouldConfirm={shouldConfirmDelete}
+            shouldPurge={shouldPurge}
           />
         </Require>
       </SubmitBar>
@@ -209,6 +207,7 @@ const BasicSettingsForm = React.memo(props => {
 
 BasicSettingsForm.propTypes = {
   gateway: PropTypes.gateway.isRequired,
+  gtwId: PropTypes.string.isRequired,
   mayDeleteGateway: PropTypes.shape({}).isRequired,
   mayEditSecrets: PropTypes.bool.isRequired,
   onDelete: PropTypes.func.isRequired,
@@ -216,6 +215,8 @@ BasicSettingsForm.propTypes = {
   onDeleteSuccess: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func.isRequired,
+  shouldConfirmDelete: PropTypes.bool.isRequired,
+  shouldPurge: PropTypes.bool.isRequired,
 }
 
 export default BasicSettingsForm
