@@ -14,6 +14,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - Relaxed the cookie policy for cross-origin requests from Strict to Lax.
+- Changed the cookie policy for OAuth state to None.
 
 ### Deprecated
 

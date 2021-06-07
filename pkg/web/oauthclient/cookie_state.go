@@ -41,6 +41,7 @@ func (oc *OAuthClient) StateCookie() *cookie.Cookie {
 		HTTPOnly: true,
 		Path:     oc.getMountPath(),
 		MaxAge:   10 * time.Minute,
+		SameSite: http.SameSiteNoneMode,
 	}
 }
 
