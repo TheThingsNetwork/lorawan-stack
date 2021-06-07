@@ -402,6 +402,9 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 
 	wg := &sync.WaitGroup{}
 	defer wg.Wait()
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	var workers int32
 
 	for {
@@ -660,7 +663,10 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 				Error: packetbroker.DownlinkMessageProcessingError_DOWNLINK_INTERNAL,
 			}
 		}
-		reportCh <- report
+		select {
+		case <-ctx.Done():
+		case reportCh <- report:
+		}
 	}()
 
 	for _, filler := range a.tenantContextFillers {
@@ -1002,7 +1008,10 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 				Value: packetbroker.UplinkMessageProcessingError_UPLINK_INTERNAL,
 			}
 		}
-		reportCh <- report
+		select {
+		case <-ctx.Done():
+		case reportCh <- report:
+		}
 	}()
 
 	if err := a.decryptUplink(ctx, up.Message); err != nil {
@@ -1094,6 +1103,9 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 
 	wg := &sync.WaitGroup{}
 	defer wg.Wait()
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	var workers int32
 
 	for {
