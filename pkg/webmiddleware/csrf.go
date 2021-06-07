@@ -37,7 +37,7 @@ func CSRF(authKey []byte, opts ...csrf.Option) MiddlewareFunc {
 				return
 			}
 			defaultOptions := []csrf.Option{
-				csrf.SameSite(csrf.SameSiteStrictMode),
+				csrf.SameSite(csrf.SameSiteLaxMode),
 				csrf.Secure(r.URL.Scheme == "https"),
 				csrf.ErrorHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					// In some cases we do want to execute the CSRF middleware, so that a CSRF token is set
