@@ -23,6 +23,7 @@ package warning
 
 import (
 	"context"
+	"os"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"google.golang.org/grpc"
@@ -35,7 +36,7 @@ func logWarnings(ctx context.Context, md metadata.MD) {
 	if warnings := md.Get(warning); len(warnings) > 0 {
 		logger := log.FromContext(ctx)
 		if logger == log.Noop {
-			logger = log.Default
+			logger = log.NewLogger(log.NewCLI(os.Stderr))
 		}
 		for _, warning := range warnings {
 			logger.Warn(warning)
