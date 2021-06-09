@@ -296,7 +296,7 @@ func (Dev) StartDevStack() error {
 		return err
 	}
 	defer logFile.Close()
-	return execGo(logFile, logFile, "run", "./cmd/ttn-lw-stack", "start")
+	return execGo(logFile, logFile, "run", "./cmd/ttn-lw-stack", "start", "--log.format=json")
 }
 
 func init() {

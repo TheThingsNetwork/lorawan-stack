@@ -37,7 +37,7 @@ const loginConsole = defineSmokeTest('succeeds registering and logging into the 
 
   // Check for the validation email (via the stack logs).
   cy.task(
-    'findInStackLog',
+    'findEmailInStackLog',
     `Your email address will be used as contact for user "${user.user_id}"`,
   ).then(validationUri => {
     // eslint-disable-next-line jest/valid-expect, no-unused-expressions
@@ -80,7 +80,7 @@ const loginAccountApp = defineSmokeTest(
 
     // Check for the validation email (via the stack logs).
     cy.task(
-      'findInStackLog',
+      'findEmailInStackLog',
       `Your email address will be used as contact for user "${user.user_id}"`,
     ).then(validationUri => {
       // eslint-disable-next-line jest/valid-expect, no-unused-expressions
