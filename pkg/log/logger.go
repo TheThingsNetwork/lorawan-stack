@@ -20,19 +20,15 @@ import (
 	"sync"
 )
 
-var defaultOptions = []Option{
-	WithLevel(InfoLevel),
-	WithHandler(NewCLI(os.Stdout)),
-}
-
 // NewLogger creates a new logger with the default options.
-func NewLogger(opts ...Option) *Logger {
-	logger := &Logger{}
-
-	for _, opt := range append(defaultOptions, opts...) {
+func NewLogger(handler Handler, opts ...Option) *Logger {
+	logger := &Logger{
+		Level:   InfoLevel,
+		Handler: handler,
+	}
+	for _, opt := range opts {
 		opt(logger)
 	}
-
 	return logger
 }
 

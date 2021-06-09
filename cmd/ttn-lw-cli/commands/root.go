@@ -103,8 +103,8 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 
 		// create logger
 		logger = log.NewLogger(
+			log.NewCLI(os.Stderr),
 			log.WithLevel(config.Log.Level),
-			log.WithHandler(log.NewCLI(os.Stderr)),
 		)
 
 		ctx = log.NewContext(ctx, logger)

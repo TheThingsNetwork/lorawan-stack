@@ -63,8 +63,8 @@ func GetLogger(t testing.TB) log.Stack {
 		level = log.DebugLevel
 	}
 	logger := log.NewLogger(
+		log.NewCLI(os.Stdout, log.UseColor(colorTerm)),
 		log.WithLevel(level),
-		log.WithHandler(log.NewCLI(os.Stdout, log.UseColor(colorTerm))),
 	)
 	return &testLogger{
 		stack:     logger,

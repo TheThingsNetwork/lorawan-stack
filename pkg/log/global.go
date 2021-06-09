@@ -15,7 +15,7 @@
 package log
 
 // Default is the default logger used for the package global logging functions
-var Default = NewLogger()
+var Default = NewLogger(NewCLI(os.Stderr))
 
 // Debug calls Default.Debug
 func Debug(msg string) {

@@ -22,7 +22,7 @@ import (
 func TestLogInterface(t *testing.T) {
 	oldDefault := Default
 	defer func() { Default = oldDefault }()
-	Default = NewLogger(WithHandler(NoopHandler))
+	Default = NewLogger(NoopHandler)
 
 	Debug("test debug msg")
 	Info("test info msg")

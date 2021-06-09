@@ -68,8 +68,8 @@ var (
 
 			// create logger
 			logger = log.NewLogger(
+				log.NewCLI(os.Stdout),
 				log.WithLevel(config.Base.Log.Level),
-				log.WithHandler(log.NewCLI(os.Stdout)),
 			)
 
 			logger.Use(logobservability.New())

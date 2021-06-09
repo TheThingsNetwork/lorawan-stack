@@ -54,7 +54,7 @@ func TestLogger(t *testing.T) {
 
 	mem := memory.New()
 
-	logger := log.NewLogger(log.WithHandler(mem))
+	logger := log.NewLogger(mem)
 
 	// Component logger
 	{

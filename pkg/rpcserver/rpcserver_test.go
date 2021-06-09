@@ -63,7 +63,7 @@ func TestNewRPCServer(t *testing.T) {
 	defer cancel()
 
 	logHandler := memory.New()
-	logger := log.NewLogger(log.WithHandler(logHandler))
+	logger := log.NewLogger(logHandler)
 	ctx = log.NewContext(ctx, logger)
 
 	server := rpcserver.New(ctx,

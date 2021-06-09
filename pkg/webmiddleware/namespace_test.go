@@ -31,7 +31,7 @@ func TestNamespace(t *testing.T) {
 	a := assertions.New(t)
 
 	mem := memory.New()
-	logger := log.NewLogger(log.WithHandler(mem))
+	logger := log.NewLogger(mem)
 
 	ctx := log.NewContext(test.Context(), logger)
 
