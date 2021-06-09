@@ -21,19 +21,19 @@ var Noop = &noop{}
 type noop struct{}
 
 // Debug implements log.Interface.
-func (n noop) Debug(msg string) {}
+func (n noop) Debug(args ...interface{}) {}
 
 // Info implements log.Interface.
-func (n noop) Info(msg string) {}
+func (n noop) Info(args ...interface{}) {}
 
 // Warn implements log.Interface.
-func (n noop) Warn(msg string) {}
+func (n noop) Warn(args ...interface{}) {}
 
 // Error implements log.Interface.
-func (n noop) Error(msg string) {}
+func (n noop) Error(args ...interface{}) {}
 
 // Fatal implements log.Interface.
-func (n noop) Fatal(msg string) {}
+func (n noop) Fatal(args ...interface{}) {}
 
 // Debugf implements log.Interface.
 func (n noop) Debugf(msg string, v ...interface{}) {}

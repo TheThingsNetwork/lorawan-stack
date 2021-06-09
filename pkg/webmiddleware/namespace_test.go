@@ -30,19 +30,19 @@ type mockLogger struct {
 	fields map[string]interface{}
 }
 
-func (l *mockLogger) Debug(msg string) {
+func (l *mockLogger) Debug(args ...interface{}) {
 }
 
-func (l *mockLogger) Info(msg string) {
+func (l *mockLogger) Info(args ...interface{}) {
 }
 
-func (l *mockLogger) Warn(msg string) {
+func (l *mockLogger) Warn(args ...interface{}) {
 }
 
-func (l *mockLogger) Error(msg string) {
+func (l *mockLogger) Error(args ...interface{}) {
 }
 
-func (l *mockLogger) Fatal(msg string) {
+func (l *mockLogger) Fatal(args ...interface{}) {
 }
 
 func (l *mockLogger) Debugf(msg string, v ...interface{}) {

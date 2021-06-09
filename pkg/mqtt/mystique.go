@@ -23,6 +23,26 @@ type logWrapper struct {
 	log.Interface
 }
 
+func (m logWrapper) Debug(msg string) {
+	m.Interface.Debug(msg)
+}
+
+func (m logWrapper) Info(msg string) {
+	m.Interface.Info(msg)
+}
+
+func (m logWrapper) Warn(msg string) {
+	m.Interface.Warn(msg)
+}
+
+func (m logWrapper) Error(msg string) {
+	m.Interface.Error(msg)
+}
+
+func (m logWrapper) Fatal(msg string) {
+	m.Interface.Fatal(msg)
+}
+
 func (m logWrapper) WithField(str string, v interface{}) mqttlog.Interface {
 	return logWrapper{
 		Interface: m.Interface.WithField(str, v),
