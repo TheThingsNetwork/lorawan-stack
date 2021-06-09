@@ -1214,6 +1214,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/internal/shared:initialize_logger": {
+    "translations": {
+      "en": "could not initialize logger"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
   "error:cmd/internal/shared:initialize_network_server": {
     "translations": {
       "en": "could not initialize Network Server"
@@ -1235,6 +1244,15 @@
   "error:cmd/internal/shared:initialize_qr_code_generator": {
     "translations": {
       "en": "could not initialize QR Code Generator"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
+  "error:cmd/internal/shared:log_format": {
+    "translations": {
+      "en": "invalid log format `{format}`"
     },
     "description": {
       "package": "cmd/internal/shared",

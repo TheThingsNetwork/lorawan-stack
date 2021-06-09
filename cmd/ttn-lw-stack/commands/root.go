@@ -36,7 +36,7 @@ var errMissingFlag = errors.DefineInvalidArgument("missing_flag", "missing CLI f
 
 var (
 	ctx    = context.Background()
-	logger *log.Logger
+	logger log.Stack
 	name   = "ttn-lw-stack"
 	mgr    = conf.InitializeWithDefaults(name, "ttn_lw", DefaultConfig,
 		conf.WithDeprecatedFlag("interop.sender-client-cas", "use interop.sender-client-ca sub-fields instead"),
@@ -67,10 +67,10 @@ var (
 			}
 
 			// create logger
-			logger = log.NewLogger(
-				log.NewCLI(os.Stdout),
-				log.WithLevel(config.Base.Log.Level),
-			)
+			logger, err = shared.InitializeLogger(&config.Log)
+			if err != nil {
+				return err
+			}
 
 			logger.Use(logobservability.New())
 

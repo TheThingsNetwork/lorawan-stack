@@ -29,7 +29,9 @@ type Entry interface {
 
 // entry implements Entry.
 type entry struct {
-	logger  *Logger
+	logger interface {
+		commit(e *entry)
+	}
 	level   Level
 	message string
 	time    time.Time

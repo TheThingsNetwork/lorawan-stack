@@ -31,6 +31,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	cmdio "go.thethings.network/lorawan-stack/v3/cmd/internal/io"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared/version"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
@@ -42,7 +43,7 @@ import (
 )
 
 var (
-	logger       *log.Logger
+	logger       log.Stack
 	name         = "ttn-lw-cli"
 	mgr          = conf.InitializeWithDefaults(name, "ttn_lw", DefaultConfig)
 	config       = &Config{}
@@ -102,10 +103,10 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		cache = cache.ForID(config.CredentialsID)
 
 		// create logger
-		logger = log.NewLogger(
-			log.NewCLI(os.Stderr),
-			log.WithLevel(config.Log.Level),
-		)
+		logger, err = shared.InitializeLogger(&config.Log)
+		if err != nil {
+			return err
+		}
 
 		ctx = log.NewContext(ctx, logger)
 
