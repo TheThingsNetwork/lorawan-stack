@@ -164,6 +164,14 @@ export const mayViewGatewayConfJson = {
   rightsSelector: selectGatewayRights,
   check: rights => rights.includes('RIGHT_GATEWAY_INFO') && gcsEnabled,
 }
+export const mayViewGatewaySecrets = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_READ_SECRETS'),
+}
+export const mayEditGatewaySecrets = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_WRITE_SECRETS'),
+}
 
 // Organization related feature checks.
 export const mayViewOrganizationInformation = {

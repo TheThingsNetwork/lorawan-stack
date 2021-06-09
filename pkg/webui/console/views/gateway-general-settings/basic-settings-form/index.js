@@ -43,6 +43,7 @@ const BasicSettingsForm = React.memo(props => {
     onDeleteFailure,
     onDeleteSuccess,
     mayDeleteGateway,
+    mayEditSecrets,
   } = props
 
   const [error, setError] = React.useState(undefined)
@@ -149,6 +150,7 @@ const BasicSettingsForm = React.memo(props => {
         description={sharedMessages.lbsLNSSecretDescription}
         name="lbs_lns_secret.value"
         component={Input}
+        disabled={!mayEditSecrets}
       />
       <Form.Field
         title={sharedMessages.gatewayStatus}
@@ -208,6 +210,7 @@ const BasicSettingsForm = React.memo(props => {
 BasicSettingsForm.propTypes = {
   gateway: PropTypes.gateway.isRequired,
   mayDeleteGateway: PropTypes.shape({}).isRequired,
+  mayEditSecrets: PropTypes.bool.isRequired,
   onDelete: PropTypes.func.isRequired,
   onDeleteFailure: PropTypes.func.isRequired,
   onDeleteSuccess: PropTypes.func.isRequired,

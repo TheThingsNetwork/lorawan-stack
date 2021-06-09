@@ -22,6 +22,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Permissions issue for reading and writing gateway secrets in the Console.
+
 ### Security
 
 ## [3.13.1] - 2021-06-04
