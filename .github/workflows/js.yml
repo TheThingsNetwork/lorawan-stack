@@ -3,6 +3,7 @@ name: JS Code
 on:
   pull_request:
     paths:
+    - '.github/workflows/js.yml'
     - 'config/**'
     - '!config/stack/ttn-lw-stack.yml'
     - 'Makefile'
@@ -51,12 +52,14 @@ jobs:
         cd tools
         go mod download
     - name: Initialize tool binary cache
+      id: tools-cache
       uses: actions/cache@v2
       with:
         path: tools/bin
         key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
     - name: Make Mage
       run: make tools/bin/mage
+      if: steps.tools-cache.outputs.cache-hit != 'true'
     - name: Install JS SDK dependencies
       run: tools/bin/mage jsSDK:deps
     - name: Generate JS SDK allowed field masks
@@ -119,12 +122,14 @@ jobs:
         cd tools
         go mod download
     - name: Initialize tool binary cache
+      id: tools-cache
       uses: actions/cache@v2
       with:
         path: tools/bin
         key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
     - name: Make Mage
       run: make tools/bin/mage
+      if: steps.tools-cache.outputs.cache-hit != 'true'
     - name: Install JS SDK dependencies
       run: tools/bin/mage jsSDK:deps
     - name: Build JS SDK

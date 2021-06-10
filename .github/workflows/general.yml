@@ -40,12 +40,14 @@ jobs:
         cd tools
         go mod download
     - name: Initialize tool binary cache
+      id: tools-cache
       uses: actions/cache@v2
       with:
         path: tools/bin
         key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
     - name: Make Mage
       run: make tools/bin/mage
+      if: steps.tools-cache.outputs.cache-hit != 'true'
     - name: Editor config
       uses: snow-actions/eclint@v1.0.1
       # TODO: Fix EditorConfig errors and remove

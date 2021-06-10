@@ -3,6 +3,7 @@ name: Go Code
 on:
   pull_request:
     paths:
+    - '.github/workflows/go.yml'
     - '*.go'
     - '.revive.toml'
     - 'cmd/**'
@@ -37,12 +38,14 @@ jobs:
         cd tools
         go mod download
     - name: Initialize tool binary cache
+      id: tools-cache
       uses: actions/cache@v2
       with:
         path: tools/bin
         key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
     - name: Make Mage
       run: make tools/bin/mage
+      if: steps.tools-cache.outputs.cache-hit != 'true'
     - name: Remove unnecessary type conversions
       run: tools/bin/mage go:unconvert
     - name: Format code
@@ -107,12 +110,14 @@ jobs:
         cd tools
         go mod download
     - name: Initialize tool binary cache
+      id: tools-cache
       uses: actions/cache@v2
       with:
         path: tools/bin
         key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
     - name: Make Mage
       run: make tools/bin/mage
+      if: steps.tools-cache.outputs.cache-hit != 'true'
     - name: Test binary execution
       run: tools/bin/mage go:testBinaries
     - name: Test code and send coverage to Coveralls
