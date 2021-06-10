@@ -87,9 +87,7 @@ jobs:
       run: |
         docker tag lorawan-stack-dev:${{ github.sha }}-amd64 thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-amd64
         docker push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-amd64
-        docker tag lorawan-stack-dev:${{ github.sha }}-arm64 thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-arm64
-        docker push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-arm64
-        docker manifest create thethingsnetwork/lorawan-stack-dev:${{ github.sha }} thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-amd64 thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-arm64
+        docker manifest create thethingsnetwork/lorawan-stack-dev:${{ github.sha }} thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-amd64
         docker manifest push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}
       env:
         DOCKER_CLI_EXPERIMENTAL: enabled
