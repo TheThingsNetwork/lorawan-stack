@@ -17,7 +17,6 @@ package ttnmage
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -39,33 +38,17 @@ func yarnWorkingDirectoryArg(elem ...string) string {
 	return fmt.Sprintf("--cwd=%s", filepath.Join(elem...))
 }
 
-func installYarn() error {
-	ok, err := target.Path(
-		filepath.Join("node_modules", "yarn"),
-	)
-	if err != nil {
-		return targetError(err)
-	}
-	if !ok {
-		return nil
-	}
-	if err := sh.RunV("npm", "install", "--no-package-lock", "--no-save", "--production=false", "yarn"); err != nil {
-		return fmt.Errorf("failed to install yarn: %w", err)
-	}
-	return nil
-}
-
 func execYarn(stdout, stderr io.Writer, args ...string) error {
-	_, err := sh.Exec(nil, stdout, stderr, "npx", append([]string{"yarn"}, args...)...)
+	_, err := sh.Exec(nil, stdout, stderr, "yarn", args...)
 	return err
 }
 
 func runYarn(args ...string) error {
-	return sh.Run("npx", append([]string{"yarn"}, args...)...)
+	return sh.Run("yarn", args...)
 }
 
 func runYarnV(args ...string) error {
-	return sh.RunV("npx", append([]string{"yarn"}, args...)...)
+	return sh.RunV("yarn", args...)
 }
 
 func (Js) runYarnCommand(cmd string, args ...string) error {
@@ -147,26 +130,10 @@ func (js Js) Deps() error {
 	if err != nil {
 		return targetError(err)
 	}
-	// installYarn updates modtime of node_modules, so we not only need to check that, but also the contents of node_modules.
-	// NOTE: Getting rid of installYarn and installing both yarn and the dependencies here does not work, since JsSDK.Build
-	// depends on yarn being available.
 	if !ok {
-		files, err := ioutil.ReadDir("node_modules")
-		if err != nil {
-			return fmt.Errorf("failed to read node_modules: %w", err)
-		}
-		if len(files) > 2 ||
-			js.isProductionMode() && len(files) > 1 {
-			// Check if it's only yarn and, in development mode, ttn-lw link installed in `node_modules`.
-			// Additionally, check whether the SDK was installed correctly.
-			// NOTE: There's no link in production mode.
-			if _, err := os.Stat(filepath.Join("node_modules", "ttn-lw", "dist")); !os.IsNotExist(err) {
-				return nil
-			}
-		}
+		return nil
 	}
-
-	mg.Deps(installYarn, JsSDK.Build)
+	mg.Deps(JsSDK.Build)
 	if !js.isProductionMode() {
 		if mg.Verbose() {
 			fmt.Println("Linking ttn-lw package")
@@ -232,7 +199,7 @@ func (js Js) Messages() error {
 	mg.Deps(js.Deps)
 	ok, err := target.Dir(
 		filepath.Join(".cache", "messages"),
-		filepath.Join("pkg", "webui", "console"),
+		filepath.Join("pkg", "webui"),
 	)
 	if err != nil {
 		return targetError(err)
@@ -377,7 +344,6 @@ func (js Js) Storybook() error {
 
 // Vulnerabilities runs yarn audit to check for vulnerable node packages.
 func (js Js) Vulnerabilities() error {
-	mg.Deps(installYarn)
 	if mg.Verbose() {
 		fmt.Println("Checking for vulnerabilities")
 	}
