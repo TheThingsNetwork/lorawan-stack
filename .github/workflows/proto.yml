@@ -1,6 +1,11 @@
 name: API
 
-on: pull_request
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/proto.yml'
+      - '**.proto'
+      - 'tools/**'
 
 jobs:
   protos:
