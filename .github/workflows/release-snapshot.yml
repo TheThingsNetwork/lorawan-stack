@@ -59,6 +59,13 @@ jobs:
       run: |
         cd tools
         go mod download
+    - name: Initialize Go build cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/go-build
+        key: ${{ runner.os }}-go-build-${{ github.ref }}
+        restore-keys: |
+          ${{ runner.os }}-go-build-refs/heads/v
     - name: Initialize tool binary cache
       id: tools-cache
       uses: actions/cache@v2
