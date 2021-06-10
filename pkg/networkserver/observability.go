@@ -186,7 +186,7 @@ var nsMetrics = &messageMetrics{
 			Subsystem: subsystem,
 			Name:      "uplink_gateways",
 			Help:      "Number of gateways that forwarded the uplink (within the deduplication window)",
-			Buckets:   []float64{1, 2, 3, 4, 5, 10, 20, 30, 40, 50},
+			Buckets:   []float64{1, 2, 3, 4, 5, 10},
 		},
 		nil,
 	),
