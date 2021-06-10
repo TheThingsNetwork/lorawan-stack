@@ -122,19 +122,18 @@ jobs:
       if: steps.tools-cache.outputs.cache-hit != 'true'
     - name: Test binary execution
       run: tools/bin/mage go:testBinaries
-    - name: Test code and send coverage to Coveralls
+    - name: Test code
       env:
         SQL_DB_ADDRESS: localhost:${{ job.services.postgres.ports['5432'] }}
         SQL_DB_AUTH: 'root:root'
         REDIS_ADDRESS: localhost:${{ job.services.redis.ports['6379'] }}
         TEST_REDIS: '1'
         TEST_SLOWDOWN: '8'
-        COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_TEST_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_TEST_SECRET_ACCESS_KEY }}
         GCP_CREDENTIALS: ${{ secrets.GCP_TEST_CREDENTIALS }}
         TEST_BUCKET: lorawan-stack-test-bucket
-      run: tools/bin/mage go:coveralls
+      run: tools/bin/mage go:test
     - name: Check for diff
       run: tools/bin/mage git:diff
