@@ -47,7 +47,9 @@ const computeProps = props => {
   let derivedPseudoRight = []
   if (grantablePseudoRight && !Array.isArray(grantablePseudoRight)) {
     derivedPseudoRight = [grantablePseudoRight]
-  } else if (Boolean(grantablePseudoRight) && Array.isArray(grantablePseudoRight)) {
+  } else if (grantablePseudoRight && Array.isArray(grantablePseudoRight)) {
+    derivedPseudoRight = grantablePseudoRight
+  } else {
     derivedPseudoRight = value.filter(right => right !== RIGHT_ALL && right.endsWith('_ALL'))
   }
   // Filter out rights that the entity has but may not be granted by the user.
@@ -129,7 +131,7 @@ class RightsGroup extends React.Component {
     /** A list of rights that are outside the scope of the current user. */
     outOfOwnScopeIndividualRights: PropTypes.rights.isRequired,
     /** The pseudo right literal comprising all other rights. */
-    pseudoRight: PropTypes.string,
+    pseudoRight: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
     /** The rights value. */
     value: PropTypes.rights.isRequired,
   }
@@ -190,7 +192,7 @@ class RightsGroup extends React.Component {
     const { individualRightValue } = this.state
 
     if (val === 'pseudo') {
-      onChange([pseudoRight])
+      onChange(Array.isArray(pseudoRight) ? pseudoRight : [pseudoRight])
     } else {
       onChange(individualRightValue)
     }

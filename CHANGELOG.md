@@ -23,6 +23,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Permissions issue for reading and writing gateway secrets in the Console.
+- Current and future rights selection for organization collaborators in the Console.
+- Current and future rights selection for user api keys in the Console.
 
 ### Security
 
