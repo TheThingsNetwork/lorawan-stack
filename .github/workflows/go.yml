@@ -109,6 +109,16 @@ jobs:
       run: |
         cd tools
         go mod download
+    - name: Initialize Go build cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/go-build
+        # NOTE: head_ref only works on pull_request.
+        key: ${{ runner.os }}-go-build-refs/heads/${{ github.head_ref }}
+        # NOTE: base_ref only works on pull_request.
+        restore-keys: |
+          ${{ runner.os }}-go-build-refs/heads/${{ github.base_ref }}
+          ${{ runner.os }}-go-build-refs/heads/v
     - name: Initialize tool binary cache
       id: tools-cache
       uses: actions/cache@v2
