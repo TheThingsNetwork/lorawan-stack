@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
   - The `console` format that prints logs as more human-friendly text. This is the new default.
   - The `json` format that prints logs as JSON. This is the recommended format for production deployments.
   - The `old` format (deprecated). This can be used if you need to adapt your log analysis tooling before v3.14.
+- `ttn_lw_gs_ns_uplink_latency_seconds`, `ttn_lw_ns_as_uplink_latency_seconds` and `ttn_lw_gtw_as_uplink_latency_seconds` metrics to track latency of uplink processing.
 
 ### Changed
 

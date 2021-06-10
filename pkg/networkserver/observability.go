@@ -17,6 +17,7 @@ package networkserver
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -189,6 +190,15 @@ var nsMetrics = &messageMetrics{
 		},
 		nil,
 	),
+	gsNsUplinkLatency: metrics.NewContextualHistogramVec(
+		prometheus.HistogramOpts{
+			Subsystem: "gs_ns",
+			Name:      "uplink_latency_seconds",
+			Help:      "Histogram of uplink latency (seconds) between the Gateway Server (or Packet Broker Agent) and Network Server",
+			Buckets:   []float64{0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0},
+		},
+		nil,
+	),
 	micComputations: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
@@ -229,14 +239,15 @@ func init() {
 }
 
 type messageMetrics struct {
-	uplinkReceived   *metrics.ContextualCounterVec
-	uplinkDuplicates *metrics.ContextualCounterVec
-	uplinkProcessed  *metrics.ContextualCounterVec
-	uplinkForwarded  *metrics.ContextualCounterVec
-	uplinkDropped    *metrics.ContextualCounterVec
-	uplinkGateways   *metrics.ContextualHistogramVec
-	micComputations  *metrics.ContextualCounterVec
-	micMismatches    *metrics.ContextualCounterVec
+	uplinkReceived    *metrics.ContextualCounterVec
+	uplinkDuplicates  *metrics.ContextualCounterVec
+	uplinkProcessed   *metrics.ContextualCounterVec
+	uplinkForwarded   *metrics.ContextualCounterVec
+	uplinkDropped     *metrics.ContextualCounterVec
+	uplinkGateways    *metrics.ContextualHistogramVec
+	gsNsUplinkLatency *metrics.ContextualHistogramVec
+	micComputations   *metrics.ContextualCounterVec
+	micMismatches     *metrics.ContextualCounterVec
 
 	downlinkAttempted *metrics.ContextualCounterVec
 	downlinkForwarded *metrics.ContextualCounterVec
@@ -249,6 +260,7 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
 	m.uplinkGateways.Describe(ch)
+	m.gsNsUplinkLatency.Describe(ch)
 	m.micComputations.Describe(ch)
 	m.micMismatches.Describe(ch)
 
@@ -263,6 +275,7 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
 	m.uplinkGateways.Collect(ch)
+	m.gsNsUplinkLatency.Collect(ch)
 	m.micComputations.Collect(ch)
 	m.micMismatches.Collect(ch)
 
@@ -304,6 +317,10 @@ func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error
 		cause = ttnErr.FullName()
 	}
 	nsMetrics.uplinkDropped.WithLabelValues(ctx, mTypeLabel(msg.Payload.MType), cause).Inc()
+}
+
+func registerUplinkLatency(ctx context.Context, msg *ttnpb.UplinkMessage) {
+	nsMetrics.gsNsUplinkLatency.WithLabelValues(ctx).Observe(time.Since(msg.ReceivedAt).Seconds())
 }
 
 func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {
