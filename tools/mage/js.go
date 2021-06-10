@@ -390,6 +390,15 @@ func (js Js) CypressHeadless() error {
 	if mg.Verbose() {
 		fmt.Println("Running Cypress E2E tests in headless mode")
 	}
+	ci := os.Getenv("CI")
+	if ci == "true" {
+		hash := os.Getenv("RUN_HASH")
+		shorthash := "none"
+		if len(hash) > 7 {
+			shorthash = hash[:7]
+		}
+		return js.runCypress("run", "--record", "--parallel", "--group", fmt.Sprintf("'%s'", shorthash))
+	}
 	return js.runCypress("run")
 }
 
