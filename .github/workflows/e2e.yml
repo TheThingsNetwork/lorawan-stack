@@ -31,15 +31,15 @@ jobs:
           submodules: false
       - name: Get hash of code files
         id: get-hash
-        run: echo "::set-output name=hash::${{ hashFiles('*.go', 'go.mod', 'go.sum', 'pkg/**', 'tools/**', 'config/**', '!config/stack/ttn-lw-stack.yml', 'package.json', 'pkg/webui/**', 'sdk/js/**', 'yarn.lock', 'cypress/**', 'docker-compose.yml') }}"
+        run: echo "::set-output name=hash::${{ hashFiles('*.go', 'go.mod', 'go.sum', 'pkg/**', 'tools/**', 'config/**', 'package.json', 'pkg/webui/**', 'sdk/js/**', 'yarn.lock', 'cypress/**', 'docker-compose.yml') }}"
       - name: Get the cached result
         id: run-cache
         uses: actions/cache@v2
         with:
           path: .cache/passed
-          key: -run-cache-${{ steps.get-hash.outputs.hash }}-${{ github.run_id }}
+          key: run-cache-${{ steps.get-hash.outputs.hash }}-${{ github.run_id }}
           restore-keys: |
-            -run-cache-${{ steps.get-hash.outputs.hash }}
+            run-cache-${{ steps.get-hash.outputs.hash }}
       - name: Check cached result connected to the hashed files (if any)
         id: check-result
         continue-on-error: true
@@ -54,10 +54,10 @@ jobs:
       COCKROACHDB_COCKROACH_TAG: v19.2.12
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    # TODO: Enable next lines once parallelization is available
-    # strategy:
-    #   matrix:
-    #     machines: [1, 2, 3, 4]
+      RUN_HASH: ${{ needs.determine-if-required.outputs.hash }}
+    strategy:
+      matrix:
+        machines: [1, 2, 3, 4]
     needs: determine-if-required
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
     steps:
@@ -166,6 +166,6 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .cache/passed
-          key: -run-cache-${{ needs.determine-if-required.outputs.hash }}
+          key: run-cache-${{ needs.determine-if-required.outputs.hash }}
       - name: Create result file for caching
         run: mkdir -p .cache && echo true > .cache/passed
