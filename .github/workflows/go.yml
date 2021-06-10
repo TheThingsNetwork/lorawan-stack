@@ -1,6 +1,9 @@
 name: Go Code
 
 on:
+  push:
+    branches:
+      - 'v3.*'
   pull_request:
     paths:
     - '.github/workflows/go.yml'
@@ -105,6 +108,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           ${{ runner.os }}-go-
+    - name: Initialize Go test cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/go-build
+        key: ${{ runner.os }}-go-test-${{ github.ref }}
+        restore-keys: |
+          ${{ runner.os }}-go-test-${{ github.ref }}
+          ${{ runner.os }}-go-test-${{ github.base_ref }}
+          ${{ runner.os }}-go-test-
     - name: Download Go dependencies
       run: go mod download
     - name: Download Go tool dependencies
