@@ -20,19 +20,15 @@ import (
 	"sync"
 )
 
-var defaultOptions = []Option{
-	WithLevel(InfoLevel),
-	WithHandler(NewCLI(os.Stdout)),
-}
-
 // NewLogger creates a new logger with the default options.
-func NewLogger(opts ...Option) *Logger {
-	logger := &Logger{}
-
-	for _, opt := range append(defaultOptions, opts...) {
+func NewLogger(handler Handler, opts ...Option) *Logger {
+	logger := &Logger{
+		Level:   InfoLevel,
+		Handler: handler,
+	}
+	for _, opt := range opts {
 		opt(logger)
 	}
-
 	return logger
 }
 
@@ -85,28 +81,28 @@ func (l *Logger) commit(e *entry) {
 }
 
 // Debug implements log.Interface.
-func (l *Logger) Debug(msg string) {
-	l.entry().commit(DebugLevel, msg)
+func (l *Logger) Debug(args ...interface{}) {
+	l.entry().commit(DebugLevel, fmt.Sprint(args...))
 }
 
 // Info implements log.Interface.
-func (l *Logger) Info(msg string) {
-	l.entry().commit(InfoLevel, msg)
+func (l *Logger) Info(args ...interface{}) {
+	l.entry().commit(InfoLevel, fmt.Sprint(args...))
 }
 
 // Warn implements log.Interface.
-func (l *Logger) Warn(msg string) {
-	l.entry().commit(WarnLevel, msg)
+func (l *Logger) Warn(args ...interface{}) {
+	l.entry().commit(WarnLevel, fmt.Sprint(args...))
 }
 
 // Error implements log.Interface.
-func (l *Logger) Error(msg string) {
-	l.entry().commit(ErrorLevel, msg)
+func (l *Logger) Error(args ...interface{}) {
+	l.entry().commit(ErrorLevel, fmt.Sprint(args...))
 }
 
 // Fatal implements log.Interface.
-func (l *Logger) Fatal(msg string) {
-	l.entry().commit(FatalLevel, msg)
+func (l *Logger) Fatal(args ...interface{}) {
+	l.entry().commit(FatalLevel, fmt.Sprint(args...))
 }
 
 // Debugf implements log.Interface.

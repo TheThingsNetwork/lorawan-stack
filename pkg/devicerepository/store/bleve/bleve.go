@@ -69,7 +69,7 @@ func (c Config) NewStore(ctx context.Context) (store.Store, error) {
 	go func() {
 		<-s.ctx.Done()
 		if err := s.Close(); err != nil {
-			log.WithError(err).Warn("Failed to close index")
+			log.FromContext(ctx).WithError(err).Warn("Failed to close index")
 		}
 	}()
 

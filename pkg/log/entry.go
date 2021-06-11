@@ -29,7 +29,9 @@ type Entry interface {
 
 // entry implements Entry.
 type entry struct {
-	logger  *Logger
+	logger interface {
+		commit(e *entry)
+	}
 	level   Level
 	message string
 	time    time.Time
@@ -37,8 +39,10 @@ type entry struct {
 }
 
 // interface assertions.
-var _ Entry = &entry{}
-var _ Interface = &entry{}
+var (
+	_ Entry     = &entry{}
+	_ Interface = &entry{}
+)
 
 // Level implements Entry.
 func (e *entry) Level() Level {
@@ -71,28 +75,28 @@ func (e *entry) commit(level Level, msg string) {
 }
 
 // Debug implements log.Interface.
-func (e *entry) Debug(msg string) {
-	e.commit(DebugLevel, msg)
+func (e *entry) Debug(args ...interface{}) {
+	e.commit(DebugLevel, fmt.Sprint(args...))
 }
 
 // Info implements log.Interface.
-func (e *entry) Info(msg string) {
-	e.commit(InfoLevel, msg)
+func (e *entry) Info(args ...interface{}) {
+	e.commit(InfoLevel, fmt.Sprint(args...))
 }
 
 // Warn implements log.Interface.
-func (e *entry) Warn(msg string) {
-	e.commit(WarnLevel, msg)
+func (e *entry) Warn(args ...interface{}) {
+	e.commit(WarnLevel, fmt.Sprint(args...))
 }
 
 // Error implements log.Interface.
-func (e *entry) Error(msg string) {
-	e.commit(ErrorLevel, msg)
+func (e *entry) Error(args ...interface{}) {
+	e.commit(ErrorLevel, fmt.Sprint(args...))
 }
 
 // Fatal implements log.Interface.
-func (e *entry) Fatal(msg string) {
-	e.commit(FatalLevel, msg)
+func (e *entry) Fatal(args ...interface{}) {
+	e.commit(FatalLevel, fmt.Sprint(args...))
 }
 
 // Debugf implements log.Interface.

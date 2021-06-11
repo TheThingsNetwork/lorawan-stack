@@ -17,18 +17,6 @@ package log
 // Option for the logger
 type Option func(*Logger)
 
-// WithHandler sets the handler on the logger.
-func WithHandler(handler Handler) Option {
-	return func(logger *Logger) {
-		logger.mutex.Lock()
-		defer logger.mutex.Unlock()
-
-		if handler != nil {
-			logger.Handler = handler
-		}
-	}
-}
-
 // WithLevel sets the level on the logger.
 func WithLevel(level Level) Option {
 	return func(logger *Logger) {

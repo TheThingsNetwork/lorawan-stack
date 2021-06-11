@@ -26,7 +26,7 @@ const contactInfoValidation = defineSmokeTest('succeeds validating contact info'
 
   cy.createUser(user)
 
-  cy.task('findInStackLog', validatePasswordLinkRegExp).then(validationUri => {
+  cy.task('findEmailInStackLog', validatePasswordLinkRegExp).then(validationUri => {
     cy.log(validationUri)
     cy.visit(validationUri)
     cy.findByTestId('notification')

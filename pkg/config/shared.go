@@ -44,7 +44,8 @@ type Base struct {
 
 // Log represents configuration for the logger.
 type Log struct {
-	Level log.Level `name:"level" description:"The minimum level log messages must have to be shown"`
+	Format string    `name:"format" description:"Log format to write (old, console, json)"`
+	Level  log.Level `name:"level" description:"The minimum level log messages must have to be shown"`
 }
 
 // Sentry represents configuration for error tracking using Sentry.

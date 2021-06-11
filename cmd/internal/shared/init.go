@@ -15,10 +15,14 @@
 package shared
 
 import (
+	"os"
+	"strings"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
-// Initialize configuration fallbacks.
+// InitializeFallbacks initializes configuration fallbacks.
 func InitializeFallbacks(conf *config.ServiceBase) error {
 	// Fallback to the default Redis configuration for the cache system
 	if conf.Cache.Redis.IsZero() {
@@ -29,4 +33,33 @@ func InitializeFallbacks(conf *config.ServiceBase) error {
 		conf.Events.Redis.Config = conf.Redis
 	}
 	return nil
+}
+
+// InitializeLogger initializes the logger.
+func InitializeLogger(conf *config.Log) (log.Stack, error) {
+	var (
+		logHandler log.Handler
+		err        error
+	)
+	format := strings.ToLower(conf.Format)
+	switch format {
+	case "json", "console":
+		logHandler, err = log.NewZap(format)
+		if err != nil {
+			return nil, ErrInitializeLogger.WithCause(err)
+		}
+	case "old":
+		logHandler = log.NewCLI(os.Stderr)
+	default:
+		return nil, ErrInvalidLogFormat.WithAttributes("format", format)
+	}
+	logger := log.NewLogger(
+		logHandler,
+		log.WithLevel(conf.Level),
+	)
+	if format == "old" {
+		logger.Warn(`You are using the "old" log format.`)
+		logger.Warn(`The Things Stack v3.14 will change the default log format to "console" and remove the "old" format.`)
+	}
+	return logger, nil
 }

@@ -48,7 +48,7 @@ func invalidHandler(c echo.Context) error {
 }
 
 func TestLogging(t *testing.T) {
-	logger := log.NewLogger(log.WithHandler(log.NoopHandler))
+	logger := log.NewLogger(log.NoopHandler)
 
 	messages := []log.Entry{}
 

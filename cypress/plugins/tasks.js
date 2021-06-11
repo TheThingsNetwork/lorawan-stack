@@ -14,6 +14,7 @@
 
 const { execSync } = require('child_process')
 const fs = require('fs')
+const readline = require('readline')
 
 const { Client } = require('pg')
 const yaml = require('js-yaml')
@@ -84,11 +85,29 @@ const sqlTask = (on, _) => {
 
 const stackLogTask = (on, _) => {
   on('task', {
-    findInStackLog: (regExp, capturingGroup = 0) => {
-      // Finds the most recent occurrence of the `regExp` in the stack logs.
-      const log = fs.readFileSync('.cache/devStack.log', 'utf8')
-      const results = Array.from(log.matchAll(new RegExp(regExp, 'gm')))
+    findEmailInStackLog: async (regExp, capturingGroup = 0) => {
+      const re = new RegExp(regExp, 'm')
+      const rl = readline.createInterface({
+        input: fs.createReadStream('.cache/devStack.log', { encoding: 'utf8' }),
+        output: process.stdout,
+        terminal: false,
+      })
+      const results = []
+      for await (const line of rl) {
+        if (line === '') {
+          continue
+        }
+        const parsed = JSON.parse(line)
+        if (parsed.msg !== 'Could not send email without email provider') {
+          continue
+        }
+        const match = parsed.body.match(re)
+        if (match) {
+          results.push(match)
+        }
+      }
 
+      // Return the most recent occurrence.
       return results ? results.pop()[capturingGroup] : undefined
     },
   })
