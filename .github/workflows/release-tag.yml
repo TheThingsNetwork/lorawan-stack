@@ -112,6 +112,10 @@ jobs:
     - name: Generate Release Notes
       run: |
         awk '/^## \[${{ steps.version.outputs.result }}\]/{flag=1;next} /^## \[/{flag=0} flag' CHANGELOG.md > /tmp/release-notes.md
+    - name: Import the signing key
+      run: |
+        printf '%s' '${{ secrets.SIGNATURE_PASSPHRASE }}' >/tmp/gpg_passphrase
+        cat /tmp/gpg_passphrase | gpg --passphrase-fd 0 --no-tty --batch --import gpg_signing_key
     - name: Run Goreleaser
       uses: goreleaser/goreleaser-action@v2
       with:
@@ -122,3 +126,4 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        SIGN_KEY_NAME: ${{ secrets.SIGN_KEY_NAME }}
