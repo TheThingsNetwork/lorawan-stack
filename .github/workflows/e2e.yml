@@ -99,12 +99,6 @@ jobs:
             .cache/sqldump.sql
             .env/admin_api_key.txt
           key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go') }}
-      - name: Initialize device repository db cache
-        id: dr-db-cache
-        uses: actions/cache@v2
-        with:
-          path: data/lorawan-devices-index
-          key: db-cache-${{ hashFiles('data/lorawan-devices') }}
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -129,6 +123,15 @@ jobs:
       - name: Make Mage
         run: make tools/bin/mage
         if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Initialize device repository index cache
+        id: dr-index-cache
+        uses: actions/cache@v2
+        with:
+          path: data/lorawan-devices-index
+          key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
+      - name: Create device repository index
+        run: tools/bin/mage dev:initDeviceRepo
+        if: steps.dr-index-cache.outputs.cache-hit != 'true'
       - name: Initialize stack environment
         run: tools/bin/mage init
       - name: Run test preparations

@@ -75,6 +75,15 @@ jobs:
     - name: Make Mage
       run: make tools/bin/mage
       if: steps.tools-cache.outputs.cache-hit != 'true'
+    - name: Initialize device repository index cache
+      id: dr-index-cache
+      uses: actions/cache@v2
+      with:
+        path: data/lorawan-devices-index
+        key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
+    - name: Create device repository index
+      run: tools/bin/mage dev:initDeviceRepo
+      if: steps.dr-index-cache.outputs.cache-hit != 'true'
     - name: Install JS SDK dependencies
       run: tools/bin/mage jsSDK:deps
     - name: Build JS SDK
