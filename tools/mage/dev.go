@@ -223,15 +223,17 @@ func (Dev) DBRedisCli() error {
 	return execDockerCompose("exec", "redis", "redis-cli")
 }
 
+// InitDeviceRepo initializes the device repository.
+func (Dev) InitDeviceRepo() error {
+	return runGo("./cmd/ttn-lw-stack", "dr-db", "init")
+}
+
 // InitStack initializes the Stack.
 func (Dev) InitStack() error {
 	if mg.Verbose() {
 		fmt.Println("Initializing the Stack")
 	}
 	if err := runGo("./cmd/ttn-lw-stack", "is-db", "init"); err != nil {
-		return err
-	}
-	if err := runGo("./cmd/ttn-lw-stack", "dr-db", "init"); err != nil {
 		return err
 	}
 	if err := runGo("./cmd/ttn-lw-stack", "is-db", "create-admin-user",
@@ -300,5 +302,5 @@ func (Dev) StartDevStack() error {
 }
 
 func init() {
-	initDeps = append(initDeps, Dev.Certificates)
+	initDeps = append(initDeps, Dev.Certificates, Dev.InitDeviceRepo)
 }
