@@ -17,7 +17,6 @@ package cluster_test
 import (
 	"context"
 	"net"
-	"os"
 	"testing"
 	"time"
 
@@ -35,8 +34,12 @@ import (
 var ctx context.Context
 
 func init() {
+	logHandler, err := log.NewZap("console")
+	if err != nil {
+		panic(err)
+	}
 	logger := log.NewLogger(
-		log.NewCLI(os.Stderr),
+		logHandler,
 		log.WithLevel(log.DebugLevel),
 	)
 	ctx = log.NewContext(test.Context(), logger.WithField("namespace", "cluster"))

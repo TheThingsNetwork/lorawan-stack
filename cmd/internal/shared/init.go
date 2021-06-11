@@ -15,7 +15,6 @@
 package shared
 
 import (
-	"os"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -48,8 +47,6 @@ func InitializeLogger(conf *config.Log) (log.Stack, error) {
 		if err != nil {
 			return nil, ErrInitializeLogger.WithCause(err)
 		}
-	case "old":
-		logHandler = log.NewCLI(os.Stderr)
 	default:
 		return nil, ErrInvalidLogFormat.WithAttributes("format", format)
 	}

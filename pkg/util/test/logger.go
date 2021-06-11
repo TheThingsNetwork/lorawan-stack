@@ -17,7 +17,6 @@ package test
 import (
 	"os"
 	"sort"
-	"strconv"
 	"testing"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -57,13 +56,16 @@ func (f fields) sorted() fields {
 
 // GetLogger returns a logger for tests.
 func GetLogger(t testing.TB) log.Stack {
-	colorTerm, _ := strconv.ParseBool(os.Getenv("COLORTERM"))
 	level := log.ErrorLevel
 	if testing.Verbose() {
 		level = log.DebugLevel
 	}
+	logHandler, err := log.NewZap("console")
+	if err != nil {
+		panic(err)
+	}
 	logger := log.NewLogger(
-		log.NewCLI(os.Stdout, log.UseColor(colorTerm)),
+		logHandler,
 		log.WithLevel(level),
 	)
 	return &testLogger{
