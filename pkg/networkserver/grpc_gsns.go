@@ -1214,7 +1214,11 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		fmt.Sprintf("ns:uplink:%s", events.NewCorrelationID()),
 	)...)
 	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+
+	registerUplinkLatency(ctx, up)
+
 	up.ReceivedAt = time.Now().UTC()
+
 	up.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
