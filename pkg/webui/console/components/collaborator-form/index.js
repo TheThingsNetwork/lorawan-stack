@@ -209,7 +209,7 @@ export default class CollaboratorForm extends Component {
           required
           component={RightsGroup}
           rights={rights}
-          pseudoRight={pseudoRights[0]}
+          pseudoRight={pseudoRights}
           entityTypeMessage={sharedMessages.collaborator}
         />
         <SubmitBar>

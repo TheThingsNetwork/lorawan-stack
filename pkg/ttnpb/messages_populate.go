@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"math"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
@@ -96,7 +95,7 @@ func NewPopulatedUplinkMessageRejoinRequest(r randyLorawan, typ RejoinRequestTyp
 func NewPopulatedDownlinkMessage(r randyMessages, easy bool) *DownlinkMessage {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Errorf("NewPopulatedDownlinkMessage: %s", r)
+			panic(fmt.Errorf("NewPopulatedDownlinkMessage: %s", r))
 		}
 	}()
 

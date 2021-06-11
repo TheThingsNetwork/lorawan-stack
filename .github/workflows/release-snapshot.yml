@@ -59,13 +59,22 @@ jobs:
       run: |
         cd tools
         go mod download
+    - name: Initialize Go build cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/go-build
+        key: ${{ runner.os }}-go-build-${{ github.ref }}
+        restore-keys: |
+          ${{ runner.os }}-go-build-refs/heads/v
     - name: Initialize tool binary cache
+      id: tools-cache
       uses: actions/cache@v2
       with:
         path: tools/bin
         key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
     - name: Make Mage
       run: make tools/bin/mage
+      if: steps.tools-cache.outputs.cache-hit != 'true'
     - name: Install JS SDK dependencies
       run: tools/bin/mage jsSDK:deps
     - name: Build JS SDK
@@ -87,9 +96,7 @@ jobs:
       run: |
         docker tag lorawan-stack-dev:${{ github.sha }}-amd64 thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-amd64
         docker push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-amd64
-        docker tag lorawan-stack-dev:${{ github.sha }}-arm64 thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-arm64
-        docker push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-arm64
-        docker manifest create thethingsnetwork/lorawan-stack-dev:${{ github.sha }} thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-amd64 thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-arm64
+        docker manifest create thethingsnetwork/lorawan-stack-dev:${{ github.sha }} thethingsnetwork/lorawan-stack-dev:${{ github.sha }}-amd64
         docker manifest push thethingsnetwork/lorawan-stack-dev:${{ github.sha }}
       env:
         DOCKER_CLI_EXPERIMENTAL: enabled

@@ -15,30 +15,29 @@
 package log
 
 import (
+	"context"
 	"errors"
 	"testing"
 )
 
 func TestLogInterface(t *testing.T) {
-	oldDefault := Default
-	defer func() { Default = oldDefault }()
-	Default = NewLogger(WithHandler(NoopHandler))
+	ctx := NewContext(context.Background(), Noop)
 
-	Debug("test debug msg")
-	Info("test info msg")
-	Warn("test warn msg")
-	Error("test error msg")
-	Debugf("test debugf msg %d", 42)
-	Infof("test infof msg %d", 42)
-	Warnf("test warnf msg %d", 42)
-	Errorf("test errorf msg %d", 42)
+	Debug(ctx, "test debug msg")
+	Info(ctx, "test info msg")
+	Warn(ctx, "test warn msg")
+	Error(ctx, "test error msg")
+	Debugf(ctx, "test debugf msg %d", 42)
+	Infof(ctx, "test infof msg %d", 42)
+	Warnf(ctx, "test warnf msg %d", 42)
+	Errorf(ctx, "test errorf msg %d", 42)
 
 	for _, li := range []Interface{
 		&Logger{},
 		&noop{},
-		WithField("key", "value"),
-		WithFields(Fields("key", "value", "number", 42)),
-		WithError(errors.New("unknown error")),
+		WithField(ctx, "key", "value"),
+		WithFields(ctx, Fields("key", "value", "number", 42)),
+		WithError(ctx, errors.New("unknown error")),
 	} {
 		for _, dli := range []Interface{
 			li,

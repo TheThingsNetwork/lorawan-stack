@@ -32,7 +32,8 @@ var DefaultBaseConfig = config.Base{
 
 // DefaultLogConfig is the default log configuration.
 var DefaultLogConfig = config.Log{
-	Level: log.InfoLevel,
+	Format: "console",
+	Level:  log.InfoLevel,
 }
 
 // DefaultTLSConfig is the default TLS config.

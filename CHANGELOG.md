@@ -11,13 +11,27 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Configurable log formats with the `log.format` configuration option.
+  - The `console` format that prints logs as more human-friendly text. This is the new default.
+  - The `json` format that prints logs as JSON. This is the recommended format for production deployments.
+  - The `old` format (deprecated). This can be used if you need to adapt your log analysis tooling before v3.14.
+
 ### Changed
 
+- Relaxed the cookie policy for cross-origin requests from Strict to Lax.
+- Changed the cookie policy for OAuth state to None.
+
 ### Deprecated
+
+- The `old` log format is deprecated and will be removed in v3.14.
 
 ### Removed
 
 ### Fixed
+
+- Permissions issue for reading and writing gateway secrets in the Console.
+- Current and future rights selection for organization collaborators in the Console.
+- Current and future rights selection for user api keys in the Console.
 
 ### Security
 

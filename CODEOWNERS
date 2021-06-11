@@ -15,9 +15,9 @@
 /sdk/js/yarn.lock @bafonins @kschiffer
 
 # Build pipeline and tooling
-/Makefile @htdvisser @johanstokking
-/tools @htdvisser @johanstokking
-/.github/workflows @htdvisser @johanstokking
+/Makefile @htdvisser @adriansmares @michalborkowski96
+/tools @htdvisser @adriansmares @michalborkowski96
+/.github/workflows @htdvisser @adriansmares @michalborkowski96
 /config @bafonins @kschiffer
 /config/stack @benolayinka @neoaggelos
 /cypress @bafonins @kschiffer

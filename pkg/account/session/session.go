@@ -16,7 +16,6 @@ package session
 
 import (
 	"context"
-	"net/http"
 	"runtime/trace"
 	"time"
 
@@ -51,7 +50,6 @@ func (s *Session) authCookie() *cookie.Cookie {
 		Name:     authCookieName,
 		Path:     "/",
 		HTTPOnly: true,
-		SameSite: http.SameSiteLaxMode,
 	}
 }
 

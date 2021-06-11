@@ -83,7 +83,8 @@ func MakeDefaultConfig(clusterGRPCAddress string, oauthServerAddress string, ins
 	return Config{
 		Base: conf.Base{
 			Log: conf.Log{
-				Level: log.InfoLevel,
+				Format: "console",
+				Level:  log.InfoLevel,
 			},
 		},
 		InputFormat:                        "json",

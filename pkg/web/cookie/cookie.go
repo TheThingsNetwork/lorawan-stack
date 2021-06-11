@@ -47,7 +47,7 @@ type Cookie struct {
 func (d *Cookie) new(r *http.Request) http.Cookie {
 	sameSite := d.SameSite
 	if sameSite == 0 {
-		sameSite = http.SameSiteStrictMode
+		sameSite = http.SameSiteLaxMode
 	}
 	return http.Cookie{
 		Name:     d.Name,

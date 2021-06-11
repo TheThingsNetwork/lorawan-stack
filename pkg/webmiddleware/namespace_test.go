@@ -21,78 +21,29 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/log/handler/memory"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	. "go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 )
 
-type mockLogger struct {
-	fields map[string]interface{}
-}
-
-func (l *mockLogger) Debug(msg string) {
-}
-
-func (l *mockLogger) Info(msg string) {
-}
-
-func (l *mockLogger) Warn(msg string) {
-}
-
-func (l *mockLogger) Error(msg string) {
-}
-
-func (l *mockLogger) Fatal(msg string) {
-}
-
-func (l *mockLogger) Debugf(msg string, v ...interface{}) {
-}
-
-func (l *mockLogger) Infof(msg string, v ...interface{}) {
-}
-
-func (l *mockLogger) Warnf(msg string, v ...interface{}) {
-}
-
-func (l *mockLogger) Errorf(msg string, v ...interface{}) {
-}
-
-func (l *mockLogger) Fatalf(msg string, v ...interface{}) {
-}
-
-func (l *mockLogger) WithField(k string, v interface{}) log.Interface {
-	l.fields[k] = v
-	return l
-}
-
-func (l *mockLogger) WithFields(kv log.Fielder) log.Interface {
-	for k, v := range kv.Fields() {
-		l.fields[k] = v
-	}
-	return l
-}
-
-func (l *mockLogger) WithError(_ error) log.Interface {
-	return l
-}
-
 func TestNamespace(t *testing.T) {
 	a := assertions.New(t)
 
-	logger := &mockLogger{
-		fields: make(map[string]interface{}),
-	}
+	mem := memory.New()
+	logger := log.NewLogger(mem)
+
 	ctx := log.NewContext(test.Context(), logger)
 
 	m := Namespace("test")
 	req := httptest.NewRequest(http.MethodGet, "/", nil).WithContext(ctx)
 	rec := httptest.NewRecorder()
 	m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger, ok := log.FromContext(r.Context()).(*mockLogger)
-		if !ok {
-			t.Fatal("Unexpected logger type")
-		}
-		a.So(logger.fields, should.HaveLength, 1)
-		a.So(logger.fields["namespace"], should.Equal, "test")
+		log.FromContext(r.Context()).Info("foobar")
+		entry := mem.Entries[0]
+		a.So(entry.Message(), should.Equal, "foobar")
+		fields := entry.Fields().Fields()
+		a.So(fields, should.HaveLength, 1)
+		a.So(fields["namespace"], should.Equal, "test")
 	})).ServeHTTP(rec, req)
 }

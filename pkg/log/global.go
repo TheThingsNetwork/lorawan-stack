@@ -14,70 +14,75 @@
 
 package log
 
+import (
+	"context"
+	"os"
+)
+
 // Default is the default logger used for the package global logging functions
-var Default = NewLogger()
+var Default = NewLogger(NewCLI(os.Stderr))
 
-// Debug calls Default.Debug
-func Debug(msg string) {
-	Default.Debug(msg)
+// Debug calls FromContext(ctx).Debug
+func Debug(ctx context.Context, msg string) {
+	FromContext(ctx).Debug(msg)
 }
 
-// Info calls Default.Info
-func Info(msg string) {
-	Default.Info(msg)
+// Info calls FromContext(ctx).Info
+func Info(ctx context.Context, msg string) {
+	FromContext(ctx).Info(msg)
 }
 
-// Warn calls Default.Warn
-func Warn(msg string) {
-	Default.Warn(msg)
+// Warn calls FromContext(ctx).Warn
+func Warn(ctx context.Context, msg string) {
+	FromContext(ctx).Warn(msg)
 }
 
-// Error calls Default.Error
-func Error(msg string) {
-	Default.Error(msg)
+// Error calls FromContext(ctx).Error
+func Error(ctx context.Context, msg string) {
+	FromContext(ctx).Error(msg)
 }
 
-// Fatal calls Default.Fatal
-func Fatal(msg string) {
-	Default.Fatal(msg)
+// Fatal calls FromContext(ctx).Fatal
+func Fatal(ctx context.Context, msg string) {
+	FromContext(ctx).Fatal(msg)
 }
 
-// Debugf calls Default.Debugf
-func Debugf(msg string, v ...interface{}) {
-	Default.Debugf(msg, v...)
+// Debugf calls FromContext(ctx).Debugf
+func Debugf(ctx context.Context, msg string, v ...interface{}) {
+	FromContext(ctx).Debugf(msg, v...)
 }
 
-// Infof calls Default.Infof
-func Infof(msg string, v ...interface{}) {
-	Default.Infof(msg, v...)
+// Infof calls FromContext(ctx).Infof
+func Infof(ctx context.Context, msg string, v ...interface{}) {
+	FromContext(ctx).Infof(msg, v...)
 }
 
-// Warnf calls Default.Warnf
-func Warnf(msg string, v ...interface{}) {
-	Default.Warnf(msg, v...)
+// Warnf calls FromContext(ctx).Warnf
+func Warnf(ctx context.Context, msg string, v ...interface{}) {
+	FromContext(ctx).Warnf(msg, v...)
 }
 
-// Errorf calls Default.Errorf
-func Errorf(msg string, v ...interface{}) {
-	Default.Errorf(msg, v...)
+// Errorf calls FromContext(ctx).Errorf
+func Errorf(ctx context.Context, msg string, v ...interface{}) {
+	FromContext(ctx).Errorf(msg, v...)
 }
 
-// Fatalf calls Default.Fatalf
-func Fatalf(msg string, v ...interface{}) {
-	Default.Fatalf(msg, v...)
+// Fatalf calls FromContext(ctx).Fatalf
+func Fatalf(ctx context.Context, msg string, v ...interface{}) {
+	FromContext(ctx).Fatalf(msg, v...)
 }
 
-// WithField calls Default.WithField
-func WithField(k string, v interface{}) Interface {
-	return Default.WithField(k, v)
+// WithField calls FromContext(ctx).WithField
+func WithField(ctx context.Context, k string, v interface{}) Interface {
+	return FromContext(ctx).WithField(k, v)
 }
 
-// WithFields calls Default.WithFields
-func WithFields(f Fielder) Interface {
-	return Default.WithFields(f)
+// WithFields calls FromContext(ctx).WithFields
+func WithFields(ctx context.Context, f Fielder) Interface {
+	return FromContext(ctx).WithFields(f)
 }
 
-// WithError calls Default.WithError
-func WithError(err error) Interface {
-	return Default.WithError(err)
+// WithError calls FromContext(ctx).WithError
+func WithError(ctx context.Context, err error) Interface {
+	return FromContext(ctx).WithError(err)
 }

@@ -17,14 +17,13 @@ package ttnpb
 import (
 	"fmt"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func NewPopulatedJoinRequest(r randyJoin, easy bool) *JoinRequest {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Errorf("NewPopulatedJoinRequest: %s", r)
+			panic(fmt.Errorf("NewPopulatedJoinRequest: %s", r))
 		}
 	}()
 

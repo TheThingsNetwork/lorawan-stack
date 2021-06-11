@@ -36,8 +36,8 @@ var ctx context.Context
 
 func init() {
 	logger := log.NewLogger(
+		log.NewCLI(os.Stderr),
 		log.WithLevel(log.DebugLevel),
-		log.WithHandler(log.NewCLI(os.Stdout)),
 	)
 	ctx = log.NewContext(test.Context(), logger.WithField("namespace", "cluster"))
 	rpclog.ReplaceGrpcLogger(logger.WithField("namespace", "grpc"))

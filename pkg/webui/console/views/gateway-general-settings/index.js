@@ -32,7 +32,12 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { mayEditBasicGatewayInformation, mayDeleteGateway } from '@console/lib/feature-checks'
+import {
+  checkFromState,
+  mayEditBasicGatewayInformation,
+  mayDeleteGateway,
+  mayEditGatewaySecrets,
+} from '@console/lib/feature-checks'
 import { mapFormValueToAttributes } from '@console/lib/attributes'
 
 import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
@@ -47,6 +52,7 @@ import m from './messages'
   state => ({
     gateway: selectSelectedGateway(state),
     gtwId: selectSelectedGatewayId(state),
+    mayEditSecrets: checkFromState(mayEditGatewaySecrets, state),
   }),
   dispatch => ({
     ...bindActionCreators(
@@ -77,6 +83,7 @@ export default class GatewayGeneralSettings extends React.Component {
     deleteGateway: PropTypes.func.isRequired,
     gateway: PropTypes.gateway.isRequired,
     gtwId: PropTypes.string.isRequired,
+    mayEditSecrets: PropTypes.bool.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
     updateGateway: PropTypes.func.isRequired,
   }
@@ -146,7 +153,7 @@ export default class GatewayGeneralSettings extends React.Component {
   }
 
   render() {
-    const { gateway } = this.props
+    const { gateway, mayEditSecrets } = this.props
 
     return (
       <Container>
@@ -167,6 +174,7 @@ export default class GatewayGeneralSettings extends React.Component {
                 onDeleteSuccess={this.handleDeleteSuccess}
                 onDeleteFailure={this.handleDeleteFailure}
                 mayDeleteGateway={mayDeleteGateway}
+                mayEditSecrets={mayEditSecrets}
               />
             </Collapse>
             <Collapse

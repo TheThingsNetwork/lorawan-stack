@@ -21,24 +21,14 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/log/handler/memory"
 	"go.thethings.network/lorawan-stack/v3/pkg/mqtt"
 )
-
-// recorder is log.Handler that records the entries
-type recorder struct {
-	entries []log.Entry
-}
-
-// HandleLog implements Handler
-func (r *recorder) HandleLog(e log.Entry) error {
-	r.entries = append(r.entries, e)
-	return nil
-}
 
 func TestLogger(t *testing.T) {
 	a := assertions.New(t)
 
-	rec := &recorder{entries: []log.Entry{}}
+	rec := memory.New()
 	logger := &log.Logger{
 		Level:   log.InfoLevel,
 		Handler: rec,
@@ -46,15 +36,15 @@ func TestLogger(t *testing.T) {
 	mystiqueLogger := mqtt.Logger(logger)
 
 	mystiqueLogger.Info("Yo!")
-	a.So(rec.entries, should.HaveLength, 1)
+	a.So(rec.Entries, should.HaveLength, 1)
 
 	mystiqueLogger.WithField("test", "hi").Warn("Oops")
-	a.So(rec.entries, should.HaveLength, 2)
-	a.So(rec.entries[1].Fields().Fields()["test"], should.Equal, "hi")
+	a.So(rec.Entries, should.HaveLength, 2)
+	a.So(rec.Entries[1].Fields().Fields()["test"], should.Equal, "hi")
 
 	mystiqueLogger.WithError(errors.New("fatal")).Warn("Failure")
-	a.So(rec.entries, should.HaveLength, 3)
-	err, isError := rec.entries[2].Fields().Fields()["error"].(error)
+	a.So(rec.Entries, should.HaveLength, 3)
+	err, isError := rec.Entries[2].Fields().Fields()["error"].(error)
 	a.So(isError, should.BeTrue)
 	a.So(err.Error(), should.Equal, "fatal")
 }

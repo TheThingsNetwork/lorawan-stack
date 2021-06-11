@@ -123,6 +123,7 @@ require (
 	go.packetbroker.org/api/routing v1.5.1-tts
 	go.packetbroker.org/api/v3 v3.6.1-tts
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
+	go.uber.org/zap v1.13.0
 	gocloud.dev v0.20.0
 	gocloud.dev/pubsub/natspubsub v0.19.0
 	golang.org/x/crypto v0.0.0-20210503195802-e9a32991a82e

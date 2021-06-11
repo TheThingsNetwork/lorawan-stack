@@ -148,7 +148,7 @@ func (Dev) SQLRestore(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	return db.Exec(fmt.Sprintf(`DROP DATABASE %s;
+	return db.Exec(fmt.Sprintf(`DROP DATABASE IF EXISTS %s;
 		CREATE DATABASE %s;
 		%s`,
 		devDatabaseName, devDatabaseName, string(b)),
@@ -296,7 +296,7 @@ func (Dev) StartDevStack() error {
 		return err
 	}
 	defer logFile.Close()
-	return execGo(logFile, logFile, "run", "./cmd/ttn-lw-stack", "start")
+	return execGo(logFile, logFile, "run", "./cmd/ttn-lw-stack", "start", "--log.format=json")
 }
 
 func init() {
