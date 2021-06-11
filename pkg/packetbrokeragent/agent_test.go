@@ -98,7 +98,7 @@ func TestForwarder(t *testing.T) {
 		Forwarder: ForwarderConfig{
 			Enable: true,
 			WorkerPool: WorkerPoolConfig{
-				Limit: 2,
+				Limit: 1,
 			},
 			TokenKey:          tokenKey,
 			TokenEncrypter:    tokenEncrypter,
@@ -460,7 +460,7 @@ func TestHomeNetwork(t *testing.T) {
 		HomeNetwork: HomeNetworkConfig{
 			Enable: true,
 			WorkerPool: WorkerPoolConfig{
-				Limit: 2,
+				Limit: 1,
 			},
 		},
 	}, testOptions...))
