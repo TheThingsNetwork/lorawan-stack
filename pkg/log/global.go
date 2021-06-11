@@ -14,13 +14,7 @@
 
 package log
 
-import (
-	"context"
-	"os"
-)
-
-// Default is the default logger used for the package global logging functions
-var Default = NewLogger(NewCLI(os.Stderr))
+import "context"
 
 // Debug calls FromContext(ctx).Debug
 func Debug(ctx context.Context, msg string) {
