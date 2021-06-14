@@ -755,20 +755,21 @@ func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
 	ctx := conn.Context()
 	logger := log.FromContext(ctx)
 
-	// Initial dummy update, so that gateway appears connected
-	if err := gs.statsRegistry.Set(
-		ctx,
-		conn.Connection.Gateway().GatewayIdentifiers,
-		&ttnpb.GatewayConnectionStats{
-			ConnectedAt: func(t time.Time) *time.Time { return &t }(conn.Connection.ConnectTime()),
-			Protocol:    conn.Connection.Frontend().Protocol(),
-		}); err != nil {
+	ids := conn.Connection.Gateway().GatewayIdentifiers
+	connectTime := conn.Connection.ConnectTime()
+	stats := &ttnpb.GatewayConnectionStats{
+		ConnectedAt: &connectTime,
+		Protocol:    conn.Connection.Frontend().Protocol(),
+	}
+
+	// Initial update, so that the gateway appears connected.
+	if err := gs.statsRegistry.Set(ctx, ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel); err != nil {
 		logger.WithError(err).Error("Failed to initialize connection stats")
 	}
 
 	defer func() {
 		logger.Debug("Delete connection stats")
-		if err := gs.statsRegistry.Set(gs.FromRequestContext(ctx), conn.Gateway().GatewayIdentifiers, nil); err != nil {
+		if err := gs.statsRegistry.Set(gs.FromRequestContext(ctx), ids, nil, nil); err != nil {
 			logger.WithError(err).Error("Failed to clear connection stats")
 		}
 	}()
@@ -778,7 +779,8 @@ func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
 			return
 		case <-conn.StatsChanged():
 		}
-		if err := gs.statsRegistry.Set(ctx, conn.Gateway().GatewayIdentifiers, conn.Stats()); err != nil {
+		stats, paths := conn.Stats()
+		if err := gs.statsRegistry.Set(ctx, ids, stats, paths); err != nil {
 			logger.WithError(err).Error("Failed to update connection stats")
 		}
 		timeout := time.After(gs.updateConnectionStatsDebounceTime)

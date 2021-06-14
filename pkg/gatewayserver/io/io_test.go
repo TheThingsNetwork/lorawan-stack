@@ -38,6 +38,13 @@ var timeout = (1 << 3) * test.Delay
 
 func timePtr(t time.Time) *time.Time { return &t }
 
+func assertStatsIncludePaths(a *assertions.Assertion, conn *io.Connection, paths []string) {
+	_, statsPaths := conn.Stats()
+	for _, path := range paths {
+		a.So(statsPaths, should.Contain, path)
+	}
+}
+
 func TestFlow(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
@@ -77,6 +84,9 @@ func TestFlow(t *testing.T) {
 	a.So(conn.PrimaryFrequencyPlan(), should.NotBeNil)
 	a.So(conn.PrimaryFrequencyPlan().BandID, should.Equal, "EU_863_870")
 
+	_, paths := conn.Stats()
+	a.So(paths, should.Resemble, []string{"connected_at", "protocol"})
+
 	{
 		frontend.Up <- &ttnpb.UplinkMessage{
 			RxMetadata: []*ttnpb.RxMetadata{
@@ -101,6 +111,7 @@ func TestFlow(t *testing.T) {
 		a.So(ok, should.BeTrue)
 		a.So(total, should.Equal, 1)
 		a.So(time.Since(t), should.BeLessThan, timeout)
+		assertStatsIncludePaths(a, conn, []string{"last_uplink_received_at", "uplink_count"})
 	}
 
 	{
@@ -115,6 +126,7 @@ func TestFlow(t *testing.T) {
 		a.So(ok, should.BeTrue)
 		a.So(last, should.NotBeNil)
 		a.So(time.Since(t), should.BeLessThan, timeout)
+		assertStatsIncludePaths(a, conn, []string{"last_status_received_at", "last_status"})
 	}
 
 	{
@@ -454,6 +466,7 @@ func TestFlow(t *testing.T) {
 			a.So(ok, should.BeTrue)
 			a.So(total, should.Equal, received)
 			a.So(time.Since(last), should.BeLessThan, timeout)
+			assertStatsIncludePaths(a, conn, []string{"downlink_count", "last_downlink_received_at", "sub_bands"})
 		})
 	}
 }
