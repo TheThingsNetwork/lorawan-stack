@@ -19,6 +19,7 @@ import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 import { bindActionCreators } from 'redux'
+import { isEqual } from 'lodash'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -128,6 +129,9 @@ export default class ApplicationGeneralSettings extends React.Component {
     await this.setState({ error: '' })
 
     const appValues = mapFormValuesToApplication(values)
+    if (isEqual(application.attributes || {}, appValues.attributes)) {
+      delete appValues.attributes
+    }
 
     const changed = diff(application, appValues)
 
