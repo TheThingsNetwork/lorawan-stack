@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import { isEqual } from 'lodash'
 
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -110,12 +111,16 @@ const IdentityServerForm = React.memo(props => {
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(values, { context: validationContext })
+      const attributes = mapFormValueToAttributes(values.attributes)
+
+      if (isEqual(initialValues.attributes || {}, attributes)) {
+        delete castedValues.attributes
+      }
+
       const updatedValues = diff(initialValues, castedValues, ['_external_js'])
 
       const update =
-        'attributes' in updatedValues
-          ? { ...updatedValues, attributes: mapFormValueToAttributes(values.attributes) }
-          : updatedValues
+        'attributes' in updatedValues ? { ...updatedValues, attributes } : updatedValues
 
       setError('')
       try {
