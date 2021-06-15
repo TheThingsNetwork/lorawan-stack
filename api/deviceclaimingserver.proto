@@ -114,6 +114,22 @@ message CUPSRedirection {
 
   // The key set in the gateway to authenticate itself.
   string current_gateway_key = 2 [(validate.rules).string.max_len = 2048];
+
+  // Optional PEM encoded CA Root certificate. If this field is empty, DCS will attempt to dial the Target CUPS server and fetch the CA.
+  bytes target_cups_trust = 3;
+  message ClientTLS {
+    // PEM encoded Client Certificate.
+    bytes cert = 1 [(validate.rules).bytes.max_len = 8192];
+    // PEM encoded Client Private Key.
+    bytes key = 2 [(validate.rules).bytes.max_len = 8192];
+  }
+  // CUPS Credentials for the gateway.
+  oneof gateway_credentials{
+    // TODO: Support mTLS (https://github.com/TheThingsNetwork/lorawan-stack/issues/137)
+    ClientTLS client_tls = 4;
+    // The Device Claiming Server will fill this field with a The Things Stack API Key.
+    string auth_token = 5 [(validate.rules).string.max_len = 2048];
+  }
 }
 
 message ClaimGatewayRequest {

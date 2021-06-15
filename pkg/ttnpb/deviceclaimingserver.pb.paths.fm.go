@@ -45,11 +45,19 @@ var AuthorizeApplicationRequestFieldPathsTopLevel = []string{
 }
 var CUPSRedirectionFieldPathsNested = []string{
 	"current_gateway_key",
+	"gateway_credentials",
+	"gateway_credentials.auth_token",
+	"gateway_credentials.client_tls",
+	"gateway_credentials.client_tls.cert",
+	"gateway_credentials.client_tls.key",
+	"target_cups_trust",
 	"target_cups_uri",
 }
 
 var CUPSRedirectionFieldPathsTopLevel = []string{
 	"current_gateway_key",
+	"gateway_credentials",
+	"target_cups_trust",
 	"target_cups_uri",
 }
 var ClaimGatewayRequestFieldPathsNested = []string{
@@ -62,6 +70,12 @@ var ClaimGatewayRequestFieldPathsNested = []string{
 	"collaborator.ids.user_ids.user_id",
 	"cups_redirection",
 	"cups_redirection.current_gateway_key",
+	"cups_redirection.gateway_credentials",
+	"cups_redirection.gateway_credentials.auth_token",
+	"cups_redirection.gateway_credentials.client_tls",
+	"cups_redirection.gateway_credentials.client_tls.cert",
+	"cups_redirection.gateway_credentials.client_tls.key",
+	"cups_redirection.target_cups_trust",
 	"cups_redirection.target_cups_uri",
 	"source_gateway",
 	"source_gateway.authenticated_identifiers",
@@ -100,6 +114,15 @@ var ClaimEndDeviceRequest_AuthenticatedIdentifiersFieldPathsTopLevel = []string{
 	"authentication_code",
 	"dev_eui",
 	"join_eui",
+}
+var CUPSRedirection_ClientTLSFieldPathsNested = []string{
+	"cert",
+	"key",
+}
+
+var CUPSRedirection_ClientTLSFieldPathsTopLevel = []string{
+	"cert",
+	"key",
 }
 var ClaimGatewayRequest_AuthenticatedIdentifiersFieldPathsNested = []string{
 	"authentication_code",

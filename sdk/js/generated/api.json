@@ -7704,6 +7704,91 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "target_cups_trust",
+              "description": "Optional PEM encoded CA Root certificate. If this field is empty, DCS will attempt to dial the Target CUPS server and fetch the CA.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "client_tls",
+              "description": "TODO: Support mTLS (https://github.com/TheThingsNetwork/lorawan-stack/issues/137)",
+              "label": "",
+              "type": "ClientTLS",
+              "longType": "CUPSRedirection.ClientTLS",
+              "fullType": "ttn.lorawan.v3.CUPSRedirection.ClientTLS",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "auth_token",
+              "description": "The Device Claiming Server will fill this field with a The Things Stack API Key.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ClientTLS",
+          "longName": "CUPSRedirection.ClientTLS",
+          "fullName": "ttn.lorawan.v3.CUPSRedirection.ClientTLS",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "cert",
+              "description": "PEM encoded Client Certificate.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 8192
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key",
+              "description": "PEM encoded Client Private Key.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 8192
+                  }
+                ]
+              }
             }
           ]
         },

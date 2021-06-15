@@ -249,6 +249,86 @@ func (dst *CUPSRedirection) SetFields(src *CUPSRedirection, paths ...string) err
 				var zero string
 				dst.CurrentGatewayKey = zero
 			}
+		case "target_cups_trust":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_cups_trust' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetCupsTrust = src.TargetCupsTrust
+			} else {
+				dst.TargetCupsTrust = nil
+			}
+
+		case "gateway_credentials":
+			if len(subs) == 0 && src == nil {
+				dst.GatewayCredentials = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.GatewayCredentials = src.GatewayCredentials
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "client_tls":
+					_, srcOk := src.GatewayCredentials.(*CUPSRedirection_ClientTls)
+					if !srcOk && src.GatewayCredentials != nil {
+						return fmt.Errorf("attempt to set oneof 'client_tls', while different oneof is set in source")
+					}
+					_, dstOk := dst.GatewayCredentials.(*CUPSRedirection_ClientTls)
+					if !dstOk && dst.GatewayCredentials != nil {
+						return fmt.Errorf("attempt to set oneof 'client_tls', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *CUPSRedirection_ClientTLS
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.GatewayCredentials.(*CUPSRedirection_ClientTls).ClientTls
+						}
+						if dstOk {
+							newDst = dst.GatewayCredentials.(*CUPSRedirection_ClientTls).ClientTls
+						} else {
+							newDst = &CUPSRedirection_ClientTLS{}
+							dst.GatewayCredentials = &CUPSRedirection_ClientTls{ClientTls: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.GatewayCredentials = src.GatewayCredentials
+						} else {
+							dst.GatewayCredentials = nil
+						}
+					}
+				case "auth_token":
+					_, srcOk := src.GatewayCredentials.(*CUPSRedirection_AuthToken)
+					if !srcOk && src.GatewayCredentials != nil {
+						return fmt.Errorf("attempt to set oneof 'auth_token', while different oneof is set in source")
+					}
+					_, dstOk := dst.GatewayCredentials.(*CUPSRedirection_AuthToken)
+					if !dstOk && dst.GatewayCredentials != nil {
+						return fmt.Errorf("attempt to set oneof 'auth_token', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						return fmt.Errorf("'auth_token' has no subfields, but %s were specified", oneofSubs)
+					}
+					if src != nil {
+						dst.GatewayCredentials = src.GatewayCredentials
+					} else {
+						dst.GatewayCredentials = &CUPSRedirection_AuthToken{}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -473,6 +553,35 @@ func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimE
 			} else {
 				var zero string
 				dst.AuthenticationCode = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *CUPSRedirection_ClientTLS) SetFields(src *CUPSRedirection_ClientTLS, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "cert":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cert' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Cert = src.Cert
+			} else {
+				dst.Cert = nil
+			}
+		case "key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Key = src.Key
+			} else {
+				dst.Key = nil
 			}
 
 		default:
