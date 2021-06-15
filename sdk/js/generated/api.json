@@ -8142,6 +8142,24 @@
               "fullType": "ttn.lorawan.v3.CUPSRedirection",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "target_frequency_plan_id",
+              "description": "Frequency plan ID of the target gateway.\nThis equals the first element of the frequency_plan_ids field.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             }
           ]
         },

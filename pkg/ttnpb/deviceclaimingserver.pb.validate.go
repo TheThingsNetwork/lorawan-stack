@@ -544,6 +544,15 @@ func (m *ClaimGatewayRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "target_frequency_plan_id":
+
+			if utf8.RuneCountInString(m.GetTargetFrequencyPlanId()) > 64 {
+				return ClaimGatewayRequestValidationError{
+					field:  "target_frequency_plan_id",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		case "source_gateway":
 			if m.SourceGateway == nil {
 				return ClaimGatewayRequestValidationError{

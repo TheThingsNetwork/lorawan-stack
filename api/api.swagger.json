@@ -12673,6 +12673,10 @@
         "cups_redirection": {
           "$ref": "#/definitions/v3CUPSRedirection",
           "description": "Parameters to set CUPS redirection for the gateway."
+        },
+        "target_frequency_plan_id": {
+          "type": "string",
+          "description": "Frequency plan ID of the target gateway.\nThis equals the first element of the frequency_plan_ids field."
         }
       }
     },

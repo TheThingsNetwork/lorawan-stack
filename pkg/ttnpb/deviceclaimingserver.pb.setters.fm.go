@@ -403,6 +403,16 @@ func (dst *ClaimGatewayRequest) SetFields(src *ClaimGatewayRequest, paths ...str
 					dst.CUPSRedirection = nil
 				}
 			}
+		case "target_frequency_plan_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_frequency_plan_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetFrequencyPlanId = src.TargetFrequencyPlanId
+			} else {
+				var zero string
+				dst.TargetFrequencyPlanId = zero
+			}
 
 		case "source_gateway":
 			if len(subs) == 0 && src == nil {

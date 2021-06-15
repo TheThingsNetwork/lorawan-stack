@@ -82,6 +82,7 @@ var ClaimGatewayRequestFieldPathsNested = []string{
 	"source_gateway.authenticated_identifiers.authentication_code",
 	"source_gateway.authenticated_identifiers.gateway_eui",
 	"source_gateway.qr_code",
+	"target_frequency_plan_id",
 	"target_gateway_id",
 	"target_gateway_server_address",
 }
@@ -90,6 +91,7 @@ var ClaimGatewayRequestFieldPathsTopLevel = []string{
 	"collaborator",
 	"cups_redirection",
 	"source_gateway",
+	"target_frequency_plan_id",
 	"target_gateway_id",
 	"target_gateway_server_address",
 }

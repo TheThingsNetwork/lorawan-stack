@@ -155,6 +155,10 @@ message ClaimGatewayRequest {
 
   // Parameters to set CUPS redirection for the gateway.
   CUPSRedirection cups_redirection = 6 [(gogoproto.customname) = "CUPSRedirection"];
+
+  // Frequency plan ID of the target gateway.
+  // This equals the first element of the frequency_plan_ids field.
+  string target_frequency_plan_id = 7 [(validate.rules).string.max_len = 64];
 }
 
 message AuthorizeGatewayRequest {
