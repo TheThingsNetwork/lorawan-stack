@@ -17,6 +17,7 @@ For details about compatibility between different releases, see the **Commitment
   - The `old` format (deprecated). This can be used if you need to adapt your log analysis tooling before v3.14.
 - `ttn_lw_gs_ns_uplink_latency_seconds`, `ttn_lw_ns_as_uplink_latency_seconds` and `ttn_lw_gtw_as_uplink_latency_seconds` metrics to track latency of uplink processing.
 - Signing of releases.
+- Hard delete option to delete applications, gateways and organizations in the Console.
 
 ### Changed
 

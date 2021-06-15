@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import axios from 'axios'
+
 import TTS, { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from 'ttn-lw'
 
 import toast from '@ttn-lw/components/toast'
@@ -80,9 +81,7 @@ tts.subscribe('warning', payload => {
 
 export default {
   console: {
-    token: () => {
-      return instance.get(`${appRoot}/api/auth/token`)
-    },
+    token: () => instance.get(`${appRoot}/api/auth/token`),
     logout: async () => {
       const headers = token => ({
         headers: { 'X-CSRF-Token': token },
@@ -112,9 +111,7 @@ export default {
     },
   },
   clients: {
-    get: client_id => {
-      return instance.get(`${isBaseUrl}/is/clients/${client_id}`)
-    },
+    get: client_id => instance.get(`${isBaseUrl}/is/clients/${client_id}`),
   },
   users: {
     create: tts.Users.create.bind(tts.Users),
@@ -139,6 +136,7 @@ export default {
   application: {
     get: tts.Applications.getById.bind(tts.Applications),
     delete: tts.Applications.deleteById.bind(tts.Applications),
+    purge: tts.Applications.purgeById.bind(tts.Applications),
     create: tts.Applications.create.bind(tts.Applications),
     update: tts.Applications.updateById.bind(tts.Applications),
     eventsSubscribe: tts.Applications.openStream.bind(tts.Applications),
@@ -243,6 +241,7 @@ export default {
     get: tts.Gateways.getById.bind(tts.Gateways),
     getGlobalConf: tts.Gateways.getGlobalConf.bind(tts.Gateways),
     delete: tts.Gateways.deleteById.bind(tts.Gateways),
+    purge: tts.Gateways.purgeById.bind(tts.Gateways),
     create: tts.Gateways.create.bind(tts.Gateways),
     update: tts.Gateways.updateById.bind(tts.Gateways),
     stats: tts.Gateways.getStatisticsById.bind(tts.Gateways),
@@ -299,6 +298,7 @@ export default {
     get: tts.Organizations.getById.bind(tts.Organizations),
     eventsSubscribe: tts.Organizations.openStream.bind(tts.Organizations),
     delete: tts.Organizations.deleteById.bind(tts.Organizations),
+    purge: tts.Organizations.purgeById.bind(tts.Organizations),
     update: tts.Organizations.updateById.bind(tts.Organizations),
     apiKeys: {
       get: tts.Organizations.ApiKeys.getById.bind(tts.Organizations.ApiKeys),
