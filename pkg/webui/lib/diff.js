@@ -29,8 +29,15 @@ export default (original, updated, exclude = []) => {
   const result = {}
 
   observableDiff(original, updated, d => {
-    const entry = d.path[d.path.length - 1]
-    if (!exclude.includes(entry)) {
+    const { kind: diffKind, rhs: diffValue, path: diffPath } = d
+    const diffEntry = diffPath[diffPath.length - 1]
+
+    // Do not add new entries that are of type `undefined`.
+    if (diffKind === 'N' && typeof diffValue === 'undefined') {
+      return
+    }
+
+    if (!exclude.includes(diffEntry)) {
       applyChange(result, undefined, d)
     }
   })

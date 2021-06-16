@@ -18,6 +18,7 @@ import bind from 'autobind-decorator'
 import { Col, Row, Container } from 'react-grid-system'
 import { bindActionCreators } from 'redux'
 import { replace } from 'connected-react-router'
+import { isEqual } from 'lodash'
 
 import toast from '@ttn-lw/components/toast'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -159,13 +160,16 @@ export default class GatewayGeneralSettings extends React.Component {
   @bind
   async handleSubmit(values) {
     const { gtwId, updateGateway, gateway } = this.props
+    const formValues = { ...values }
 
-    const changed = diff(gateway, values)
+    const attributes = mapFormValueToAttributes(formValues.attributes)
+    if (isEqual(gateway.attributes || {}, attributes)) {
+      delete formValues.attributes
+    }
 
-    const update =
-      'attributes' in changed
-        ? { ...changed, attributes: mapFormValueToAttributes(values.attributes) }
-        : changed
+    const changed = diff(gateway, formValues)
+
+    const update = 'attributes' in changed ? { ...changed, attributes } : changed
     return updateGateway(gtwId, update)
   }
 
