@@ -16,7 +16,6 @@ package commands
 
 import (
 	"encoding/pem"
-	"io/ioutil"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -41,18 +40,16 @@ var (
 The claiming procedure transfers ownership of gateways using the Device
 Claiming Server.
 
-Gateways need to be authorized for claiming before they can be claimeed.
+Gateways need to be authorized for claiming before they can be claimed.
 See: "ttn-lw-cli claim authorize"
 
 Authentication of gateway claiming is by the Gateway EUI and the claim
-authentication code. For LoRa Basics Station gateways, this code is validated
-in external gateway management servers. This is currently only supported
-for The Things Indoor Gateways.
+authentication code.
 For UDP gateways, the claim authentication code is placed in the gateway
 entity, stored in the Identity Server.
 
 As part of claiming, you can optionally provide the target Gateway ID and
-Gateway Server Address and a frequency plan ID.
+Gateway Server address and a frequency plan ID.
 For LoRa Basic Station gateways, the Target CUPS URI must be specified.
 A PEM encoded CUPS trust may be included in the claim request.
 `,
@@ -72,15 +69,15 @@ A PEM encoded CUPS trust may be included in the claim request.
 			authenticationCode, _ := cmd.Flags().GetString("authentication-code")
 			targetGatewayServerAddress, _ := cmd.Flags().GetString("target-gateway-server-address")
 			targetGatewayID, _ := cmd.Flags().GetString("target-gateway-id")
-			targetCUPSTrustFile, _ := cmd.Flags().GetString("target-cups-trust-file")
 			targetCUPSURI, _ := cmd.Flags().GetString("target-cups-uri")
+			targetCUPSTrustLocalFile, _ := cmd.Flags().GetString("target-cups-trust-local-file")
 			targetFrequencyPlanId, _ := cmd.Flags().GetString("target-frequency-plan-id")
 
 			var targetCUPSTrust []byte
-			if targetCUPSTrustFile != "" {
-				raw, err := ioutil.ReadFile(targetCUPSTrustFile)
+			if targetCUPSTrustLocalFile != "" {
+				raw, err := getDataBytes("target-cups-trust", cmd.Flags())
 				if err != nil {
-					return errInvalidTargetCUPSTrust.WithCause(err)
+					return err
 				}
 				block, _ := pem.Decode(raw)
 				if block == nil || block.Type != "CERTIFICATE" {
@@ -88,7 +85,6 @@ A PEM encoded CUPS trust may be included in the claim request.
 				}
 				targetCUPSTrust = block.Bytes
 			}
-
 			req := &ttnpb.ClaimGatewayRequest{
 				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
 					AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
@@ -218,8 +214,8 @@ func init() {
 	gatewayClaimCommand.Flags().String("authentication-code", "", "(hex)")
 	gatewayClaimCommand.Flags().String("target-cups-uri", "", "")
 	gatewayClaimCommand.Flags().String("target-frequency-plan-id", "", "")
+	gatewayClaimCommand.Flags().AddFlagSet(dataFlags("target-cups-trust", "(optional) Target CUPS trust in PEM format"))
 	gatewayClaimCommand.Flags().String("target-gateway-server-address", "", "")
-	gatewayClaimCommand.Flags().String("target-cups-trust-file", "", "(optional) path to file containing the Target CUPS trust in PEM format")
 	gatewayClaimCommand.Flags().String("target-gateway-id", "", "gateway ID for the claimed gateway")
 	gatewaysCommand.AddCommand(gatewayClaimCommand)
 }
