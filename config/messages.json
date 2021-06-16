@@ -1439,6 +1439,15 @@
       "file": "gateways_claim.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:invalid_target_cups_trust": {
+    "translations": {
+      "en": "invalid target CUPS trust"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "gateways_claim.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:join_server_disabled": {
     "translations": {
       "en": "Join Server is disabled"
