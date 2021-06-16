@@ -10222,6 +10222,21 @@
         }
       }
     },
+    "CUPSRedirectionClientTLS": {
+      "type": "object",
+      "properties": {
+        "cert": {
+          "type": "string",
+          "format": "byte",
+          "description": "PEM encoded Client Certificate."
+        },
+        "key": {
+          "type": "string",
+          "format": "byte",
+          "description": "PEM encoded Client Private Key."
+        }
+      }
+    },
     "CompliancesCompliance": {
       "type": "object",
       "properties": {
@@ -12547,6 +12562,19 @@
         "current_gateway_key": {
           "type": "string",
           "description": "The key set in the gateway to authenticate itself."
+        },
+        "target_cups_trust": {
+          "type": "string",
+          "format": "byte",
+          "description": "Optional PEM encoded CA Root certificate. If this field is empty, DCS will attempt to dial the Target CUPS server and fetch the CA."
+        },
+        "client_tls": {
+          "$ref": "#/definitions/CUPSRedirectionClientTLS",
+          "title": "TODO: Support mTLS (https://github.com/TheThingsNetwork/lorawan-stack/issues/137)"
+        },
+        "auth_token": {
+          "type": "string",
+          "description": "The Device Claiming Server will fill this field with a The Things Stack API Key."
         }
       }
     },
@@ -12645,6 +12673,10 @@
         "cups_redirection": {
           "$ref": "#/definitions/v3CUPSRedirection",
           "description": "Parameters to set CUPS redirection for the gateway."
+        },
+        "target_frequency_plan_id": {
+          "type": "string",
+          "description": "Frequency plan ID of the target gateway.\nThis equals the first element of the frequency_plan_ids field."
         }
       }
     },

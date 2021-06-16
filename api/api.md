@@ -138,6 +138,7 @@
   - [Message `AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest)
   - [Message `AuthorizeGatewayRequest`](#ttn.lorawan.v3.AuthorizeGatewayRequest)
   - [Message `CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection)
+  - [Message `CUPSRedirection.ClientTLS`](#ttn.lorawan.v3.CUPSRedirection.ClientTLS)
   - [Message `ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest)
   - [Message `ClaimEndDeviceRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers)
   - [Message `ClaimGatewayRequest`](#ttn.lorawan.v3.ClaimGatewayRequest)
@@ -2288,12 +2289,30 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | ----- | ---- | ----- | ----------- |
 | `target_cups_uri` | [`string`](#string) |  | CUPS URI for LoRa Basics Station CUPS redirection. |
 | `current_gateway_key` | [`string`](#string) |  | The key set in the gateway to authenticate itself. |
+| `target_cups_trust` | [`bytes`](#bytes) |  | Optional PEM encoded CA Root certificate. If this field is empty, DCS will attempt to dial the Target CUPS server and fetch the CA. |
+| `client_tls` | [`CUPSRedirection.ClientTLS`](#ttn.lorawan.v3.CUPSRedirection.ClientTLS) |  | TODO: Support mTLS (https://github.com/TheThingsNetwork/lorawan-stack/issues/137) |
+| `auth_token` | [`string`](#string) |  | The Device Claiming Server will fill this field with a The Things Stack API Key. |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `current_gateway_key` | <p>`string.max_len`: `2048`</p> |
+| `auth_token` | <p>`string.max_len`: `2048`</p> |
+
+### <a name="ttn.lorawan.v3.CUPSRedirection.ClientTLS">Message `CUPSRedirection.ClientTLS`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `cert` | [`bytes`](#bytes) |  | PEM encoded Client Certificate. |
+| `key` | [`bytes`](#bytes) |  | PEM encoded Client Private Key. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `cert` | <p>`bytes.max_len`: `8192`</p> |
+| `key` | <p>`bytes.max_len`: `8192`</p> |
 
 ### <a name="ttn.lorawan.v3.ClaimEndDeviceRequest">Message `ClaimEndDeviceRequest`</a>
 
@@ -2348,6 +2367,7 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | `target_gateway_id` | [`string`](#string) |  | Gateway ID for the target gateway. This must be a unique value. If this is not set, the target ID for the target gateway will be set to `eui-<gateway-eui>` |
 | `target_gateway_server_address` | [`string`](#string) |  | Target Gateway Server Address for the target gateway. |
 | `cups_redirection` | [`CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection) |  | Parameters to set CUPS redirection for the gateway. |
+| `target_frequency_plan_id` | [`string`](#string) |  | Frequency plan ID of the target gateway. This equals the first element of the frequency_plan_ids field. |
 
 #### Field Rules
 
@@ -2357,6 +2377,7 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | `collaborator` | <p>`message.required`: `true`</p> |
 | `target_gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
 | `target_gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
+| `target_frequency_plan_id` | <p>`string.max_len`: `64`</p> |
 
 ### <a name="ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers">Message `ClaimGatewayRequest.AuthenticatedIdentifiers`</a>
 
