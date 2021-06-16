@@ -28,7 +28,7 @@ const headers = [
   {
     name: 'devices',
     displayName: 'Devices',
-    centered: true,
+    align: 'center',
   },
   {
     name: 'lastActivity',
@@ -114,7 +114,7 @@ export default {
       {
         name: 'options',
         displayName: 'Options',
-        centered: true,
+        align: 'center',
       },
     ],
     rows: rows.map(r => {
