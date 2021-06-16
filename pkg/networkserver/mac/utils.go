@@ -149,6 +149,9 @@ func DeviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Ba
 	if !phy.EnableADR {
 		return false
 	}
+	if dev.Multicast {
+		return false
+	}
 	if dev.MACSettings != nil && dev.MACSettings.UseADR != nil {
 		return dev.MACSettings.UseADR.Value
 	}
