@@ -36,6 +36,7 @@ For details about compatibility between different releases, see the **Commitment
 - Current and future rights selection for organization collaborators in the Console.
 - Current and future rights selection for user api keys in the Console.
 - Low or no throughput of message handling from Packet Broker when the ingress is high when Packet Broker Agent starts.
+- Unset ADR bit in downlink messages to multicast devices.
 
 ### Security
 
