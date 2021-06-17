@@ -29,18 +29,31 @@ export const createPaginationByParentRequestActions = name =>
     (parentType, parentId, params, selectors = []) => ({ selectors }),
   )
 
-export const createPaginationByIdRequestActions = name =>
+export const createPaginationByIdRequestActions = (
+  name,
+  requestPayloadCreator = (id, { page, limit, query, order } = {}) => ({
+    id,
+    params: { page, limit, query, order },
+  }),
+  requestMetaCreator = (id, params, selectors = [], options = {}) => ({ selectors, options }),
+) =>
   createRequestActions(
     createPaginationBaseActionType(name),
-    (id, { page, limit, query, order } = {}) => ({ id, params: { page, limit, query, order } }),
-    (id, params, selectors = [], options = {}) => ({ selectors, options }),
+    requestPayloadCreator,
+    requestMetaCreator,
   )
 
-export const createPaginationRequestActions = name =>
+export const createPaginationRequestActions = (
+  name,
+  requestPayloadCreator = ({ page, limit, query, order } = {}) => ({
+    params: { page, limit, query, order },
+  }),
+  requestMetaCreator = (params, selectors = [], options = {}) => ({ selectors, options }),
+) =>
   createRequestActions(
     createPaginationBaseActionType(name),
-    ({ page, limit, query, order } = {}) => ({ params: { page, limit, query, order } }),
-    (params, selectors = [], options = {}) => ({ selectors, options }),
+    requestPayloadCreator,
+    requestMetaCreator,
   )
 
 export const createPaginationDeleteActions = name =>
