@@ -12,9 +12,12 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Email sent to admins when an OAuth client is requested by a non-admin user.
-- Packet Broker UI in the Console (admin only). 
+- Packet Broker UI in the Console (admin only).
 - New config option `--console.oauth.cross-site-cookie` to control access to OAuth state cookie between origins.
   - This option needs to be set to `true` (default is `false`) in multi-cluster deployments in order to support OAuth clients that use POST callbacks.
+- Application Server forwards upstream messages of type `ApplicationDownlinkSent` for application downlink messages that were acknowledged with a TxAck message from the gateway.
+  - MQTT clients can subscribe to the topic `v3/{application-id}/devices/{device-id}/down/sent`.
+  - For HTTP webhooks, make sure that the **Downlink Sent** messages are enabled.
 
 ### Changed
 

@@ -96,10 +96,11 @@ var (
 	EvtScheduleJoinAcceptSuccess   = evtScheduleJoinAcceptSuccess
 	EvtUpdateEndDevice             = evtUpdateEndDevice
 
-	NewDeviceRegistry         func(context.Context) (DeviceRegistry, func())
-	NewApplicationUplinkQueue func(context.Context) (ApplicationUplinkQueue, func())
-	NewDownlinkTaskQueue      func(context.Context) (DownlinkTaskQueue, func())
-	NewUplinkDeduplicator     func(context.Context) (UplinkDeduplicator, func())
+	NewDeviceRegistry           func(context.Context) (DeviceRegistry, func())
+	NewApplicationUplinkQueue   func(context.Context) (ApplicationUplinkQueue, func())
+	NewDownlinkTaskQueue        func(context.Context) (DownlinkTaskQueue, func())
+	NewUplinkDeduplicator       func(context.Context) (UplinkDeduplicator, func())
+	NewScheduledDownlinkMatcher func(context.Context) (ScheduledDownlinkMatcher, func())
 )
 
 type DownlinkPath = downlinkPath
@@ -1950,6 +1951,13 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 			closeFuncs = append(closeFuncs, closeFn)
 		}
 		conf.NetworkServer.UplinkDeduplicator = v
+	}
+	if conf.NetworkServer.ScheduledDownlinkMatcher == nil {
+		v, closeFn := NewScheduledDownlinkMatcher(ctx)
+		if closeFn != nil {
+			closeFuncs = append(closeFuncs, closeFn)
+		}
+		conf.NetworkServer.ScheduledDownlinkMatcher = v
 	}
 
 	ns := test.Must(New(

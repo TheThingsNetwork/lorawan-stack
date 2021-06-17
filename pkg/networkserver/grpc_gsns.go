@@ -1276,6 +1276,37 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 // ReportTxAcknowledgment is called by the Gateway Server when a tx acknowledgment arrives.
 func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, up *ttnpb.GatewayTxAcknowledgment) (_ *pbtypes.Empty, err error) {
-	// TODO: Send ApplicationDownlinkSent event from Tx acknowledgment (https://github.com/TheThingsNetwork/lorawan-stack/issues/56)
+	ack := up.GetTxAck()
+	if ack.GetResult() != ttnpb.TxAcknowledgment_SUCCESS {
+		return ttnpb.Empty, nil
+	}
+	down, err := ns.scheduledDownlinkMatcher.Match(ctx, ack)
+	if err != nil {
+		return nil, err
+	}
+	ids := down.GetEndDeviceIds()
+	if ids == nil {
+		return ttnpb.Empty, nil
+	}
+	pld := down.GetPayload().GetMACPayload()
+	if pld == nil {
+		return ttnpb.Empty, nil
+	}
+	if pld.GetFPort() == 0 {
+		return ttnpb.Empty, nil
+	}
+	ns.enqueueApplicationUplinks(ctx, &ttnpb.ApplicationUp{
+		EndDeviceIdentifiers: *ids,
+		Up: &ttnpb.ApplicationUp_DownlinkSent{
+			DownlinkSent: &ttnpb.ApplicationDownlink{
+				SessionKeyID:   down.GetSessionKeyId(),
+				FRMPayload:     pld.GetFRMPayload(),
+				FPort:          pld.GetFPort(),
+				FCnt:           pld.GetFullFCnt(),
+				CorrelationIDs: ack.GetCorrelationIDs(),
+				Priority:       down.GetRequest().GetPriority(),
+			},
+		},
+	})
 	return ttnpb.Empty, nil
 }
