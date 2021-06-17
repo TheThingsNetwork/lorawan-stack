@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.13.2] - 2021-06-17
+
+### Added
+
 - Configurable log formats with the `log.format` configuration option.
   - The `console` format that prints logs as more human-friendly text. This is the new default.
   - The `json` format that prints logs as JSON. This is the recommended format for production deployments.
@@ -28,8 +42,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - The `old` log format is deprecated and will be removed in v3.14.
 
-### Removed
-
 ### Fixed
 
 - Permissions issue for reading and writing gateway secrets in the Console.
@@ -37,8 +49,6 @@ For details about compatibility between different releases, see the **Commitment
 - Current and future rights selection for user api keys in the Console.
 - Low or no throughput of message handling from Packet Broker when the ingress is high when Packet Broker Agent starts.
 - Unset ADR bit in downlink messages to multicast devices.
-
-### Security
 
 ## [3.13.1] - 2021-06-04
 
@@ -1559,7 +1569,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.1...v3.13
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.2...v3.13
+[3.13.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.1...v3.13.2
 [3.13.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.0...v3.13.1
 [3.13.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.3...v3.13.0
 [3.12.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.2...v3.12.3
