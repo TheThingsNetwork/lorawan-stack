@@ -6188,12 +6188,14 @@ Downlink message from the network to the end device
 | `request` | [`TxRequest`](#ttn.lorawan.v3.TxRequest) |  |  |
 | `scheduled` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  |  |
 | `correlation_ids` | [`string`](#string) | repeated |  |
+| `session_key_id` | [`bytes`](#bytes) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
+| `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
 
 ### <a name="ttn.lorawan.v3.DownlinkQueueOperationErrorDetails">Message `DownlinkQueueOperationErrorDetails`</a>
 

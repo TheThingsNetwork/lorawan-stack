@@ -13356,6 +13356,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "session_key_id": {
+          "type": "string",
+          "format": "byte"
         }
       },
       "title": "Downlink message from the network to the end device"
