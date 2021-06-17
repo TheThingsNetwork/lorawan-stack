@@ -258,3 +258,15 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		},
 	},
 }
+
+// ScheduledDownlinkMatcher matches scheduled downlinks with the TxAcknowledgement received by a gateway.
+type ScheduledDownlinkMatcher interface {
+	// Add stores metadata for a scheduled downlink message. Implementations may use the downlink
+	// message correlation IDs to uniquely identify the scheduled downlink message.
+	Add(ctx context.Context, down *ttnpb.DownlinkMessage) error
+	// Match matches metadata of a scheduled downlink message from a TxAcknowledgement that was received by a gateway.
+	// In case of a successful match, the scheduled downlink message is returned. If no downlink is matched, then an
+	// error is returned instead. Implementations are free to return an error even when a match should have been
+	// successful, for example if a long time has passed since the downlink was scheduled.
+	Match(ctx context.Context, ack *ttnpb.TxAcknowledgment) (*ttnpb.DownlinkMessage, error)
+}
