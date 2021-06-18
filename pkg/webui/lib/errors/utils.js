@@ -138,15 +138,24 @@ export const isNotFoundError = error => grpcStatusCode(error) === 5 || httpStatu
 export const isInternalError = error => grpcStatusCode(error) === 13 // NOTE: HTTP 500 can also be UnknownError.
 
 /**
- * Returns whether the grpc error represents an invalid argument or bad request
- * error.
+ * Returns whether the grpc error represents an invalid argument.
  *
  * @param {object} error - The error to be tested.
- * @returns {boolean} `true` if `error` represents an invalid argument or bad
- * request error, `false` otherwise.
+ * @returns {boolean} `true` if `error` represents an invalid argument error,
+ * `false` otherwise.
  */
 export const isInvalidArgumentError = error =>
   grpcStatusCode(error) === 3 || httpStatusCode(error) === 400
+
+/**
+ * Returns whether the grpc error represents a bad request error.
+ *
+ * @param {object} error - The error to be tested.
+ * @returns {boolean} `true` if `error` represents an bad request error,
+ * `false` otherwise.
+ */
+export const isBadRequestError = error =>
+  grpcStatusCode(error) === 9 || httpStatusCode(error) === 400
 
 /**
  * Returns whether the grpc error represents an already exists error.
