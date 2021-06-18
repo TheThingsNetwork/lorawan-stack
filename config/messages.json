@@ -7406,6 +7406,15 @@
       "file": "translation.go"
     }
   },
+  "error:pkg/packetbrokeragent:not_enabled": {
+    "translations": {
+      "en": "Packet Broker is not enabled"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "grpc_pba.go"
+    }
+  },
   "error:pkg/packetbrokeragent:registration": {
     "translations": {
       "en": "get registration information"
