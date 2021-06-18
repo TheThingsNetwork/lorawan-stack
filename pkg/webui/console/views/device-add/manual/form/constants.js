@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ManualForm from './form'
-import connect from './connect'
+/* eslint-disable import/prefer-default-export */
 
-const ConnectedManualForm = connect(ManualForm)
-
-export { ConnectedManualForm as default, ManualForm }
+export const DEVICE_CLASS_MAP = {
+  CLASS_A: 'class-a',
+  CLASS_B: 'class-b',
+  CLASS_C: 'class-c',
+  CLASS_B_C: 'class-b-c',
+}

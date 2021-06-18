@@ -13,8 +13,5 @@
 // limitations under the License.
 
 import ManualForm from './form'
-import connect from './connect'
 
-const ConnectedManualForm = connect(ManualForm)
-
-export { ConnectedManualForm as default, ManualForm }
+export default ManualForm
