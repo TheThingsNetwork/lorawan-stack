@@ -35,13 +35,19 @@ func init() {
 }
 
 // StateCookie returns the cookie storing the state of the console.
-func (oc *OAuthClient) StateCookie() *cookie.Cookie {
+func (oc *OAuthClient) StateCookie(tls bool) *cookie.Cookie {
+	sameSite := http.SameSiteNoneMode
+	if !tls {
+		// SameSite=None will be rejected when not using TLS, so we have to
+		// use SameSite=Lax in this case.
+		sameSite = http.SameSiteLaxMode
+	}
 	return &cookie.Cookie{
 		Name:     oc.config.StateCookieName,
 		HTTPOnly: true,
 		Path:     oc.getMountPath(),
 		MaxAge:   10 * time.Minute,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: sameSite,
 	}
 }
 
@@ -54,7 +60,7 @@ func newState(next string) state {
 
 func (oc *OAuthClient) getStateCookie(c echo.Context) (state, error) {
 	s := state{}
-	ok, err := oc.StateCookie().Get(c.Response(), c.Request(), &s)
+	ok, err := oc.StateCookie(c.Request().URL.Scheme == "https").Get(c.Response(), c.Request(), &s)
 	if err != nil {
 		return s, echo.NewHTTPError(http.StatusBadRequest, "Invalid state cookie")
 	}
@@ -67,9 +73,9 @@ func (oc *OAuthClient) getStateCookie(c echo.Context) (state, error) {
 }
 
 func (oc *OAuthClient) setStateCookie(c echo.Context, value state) error {
-	return oc.StateCookie().Set(c.Response(), c.Request(), value)
+	return oc.StateCookie(c.Request().URL.Scheme == "https").Set(c.Response(), c.Request(), value)
 }
 
 func (oc *OAuthClient) removeStateCookie(c echo.Context) {
-	oc.StateCookie().Remove(c.Response(), c.Request())
+	oc.StateCookie(c.Request().URL.Scheme == "https").Remove(c.Response(), c.Request())
 }
