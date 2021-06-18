@@ -29,6 +29,7 @@ import LastSeen from '@console/components/last-seen'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
+import { selectNsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -107,13 +108,20 @@ const headers = [
 ]
 
 @connect(
-  state => ({
-    appId: selectSelectedApplicationId(state),
-    deviceTemplateFormats: selectDeviceTemplateFormats(state),
-    mayCreateDevices: checkFromState(mayCreateOrEditApplicationDevices, state),
-    error: getDeviceTemplateFormatsError(state),
-    fetching: getDeviceTemplateFormatsFetching(state),
-  }),
+  state => {
+    const nsEnabled = selectNsConfig().enabled
+    const jsEnabled = selectJsConfig().enabled
+    const mayCreateDevices = checkFromState(mayCreateOrEditApplicationDevices, state)
+
+    return {
+      appId: selectSelectedApplicationId(state),
+      deviceTemplateFormats: selectDeviceTemplateFormats(state),
+      mayCreateDevices: mayCreateDevices && (nsEnabled || jsEnabled),
+      mayImportDevices: mayCreateDevices,
+      error: getDeviceTemplateFormatsError(state),
+      fetching: getDeviceTemplateFormatsFetching(state),
+    }
+  },
   { getDeviceTemplateFormats },
 )
 @withFeatureRequirement(mayViewApplicationDevices)
@@ -126,6 +134,7 @@ class DevicesTable extends React.Component {
     error: PropTypes.error,
     fetching: PropTypes.bool,
     mayCreateDevices: PropTypes.bool.isRequired,
+    mayImportDevices: PropTypes.bool.isRequired,
     totalCount: PropTypes.number,
   }
 
@@ -164,10 +173,10 @@ class DevicesTable extends React.Component {
   }
 
   get importButton() {
-    const { mayCreateDevices, appId } = this.props
+    const { mayImportDevices, appId } = this.props
 
     return (
-      mayCreateDevices && (
+      mayImportDevices && (
         <Button.Link
           message={sharedMessages.importDevices}
           icon="import_devices"

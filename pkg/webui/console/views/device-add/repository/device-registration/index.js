@@ -36,14 +36,12 @@ import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-
 import { useRepositoryContext } from '../context'
 import { selectBand } from '../reducer'
 import { REGISTRATION_TYPES } from '../../utils'
+import messages from '../../messages'
 
 import FreqPlansSelect from './freq-plans-select'
 
 const m = defineMessages({
   fetching: 'Fetching template…',
-  afterRegistration: 'After registration',
-  singleRegistration: 'View registered end device',
-  multipleRegistration: 'Register another end device of this type',
 })
 
 const Registration = props => {
@@ -219,10 +217,11 @@ const Registration = props => {
           onFocus={handleIdFocus}
           inputRef={idInputRef}
           tooltipId={tooltipIds.DEVICE_ID}
+          description={messages.deviceIdDescription}
         />
-        <Form.Field title={m.afterRegistration} name="_registration" component={Radio.Group}>
-          <Radio label={m.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />
-          <Radio label={m.multipleRegistration} value={REGISTRATION_TYPES.MULTIPLE} />
+        <Form.Field title={messages.afterRegistration} name="_registration" component={Radio.Group}>
+          <Radio label={messages.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />
+          <Radio label={messages.multipleRegistration} value={REGISTRATION_TYPES.MULTIPLE} />
         </Form.Field>
       </div>
     </Overlay>

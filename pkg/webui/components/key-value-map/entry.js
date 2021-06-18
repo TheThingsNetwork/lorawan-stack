@@ -15,6 +15,7 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
+import classnames from 'classnames'
 
 import Input from '@ttn-lw/components/input'
 import Button from '@ttn-lw/components/button'
@@ -101,7 +102,7 @@ class Entry extends React.Component {
         )}
         <Input
           data-test-id={this._getValueInputName()}
-          className={style.input}
+          className={classnames(style.input, { [style.inputIndexAsKey]: indexAsKey })}
           name={this._getValueInputName()}
           placeholder={valuePlaceholder}
           type="text"
