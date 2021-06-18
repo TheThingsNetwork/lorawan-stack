@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 )
 
@@ -48,6 +49,8 @@ func (d *Cookie) new(r *http.Request) http.Cookie {
 	sameSite := d.SameSite
 	if sameSite == 0 {
 		sameSite = http.SameSiteLaxMode
+	} else if sameSite == http.SameSiteNoneMode && r.URL.Scheme == "http" {
+		log.FromContext(r.Context()).WithField("namespace", "web").Warn("SameSite=None will be rejected when not using TLS.")
 	}
 	return http.Cookie{
 		Name:     d.Name,
