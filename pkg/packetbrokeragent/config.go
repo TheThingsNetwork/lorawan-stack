@@ -85,6 +85,7 @@ type HomeNetworkConfig struct {
 	Enable          bool                  `name:"enable" description:"Enable Home Network role"`
 	DevAddrPrefixes []types.DevAddrPrefix `name:"dev-addr-prefixes" description:"DevAddr prefixes to subscribe to"`
 	WorkerPool      WorkerPoolConfig      `name:"worker-pool" description:"Workers pool configuration"`
+	IncludeHops     bool                  `name:"include-hops" description:"Include hops in the metadata"`
 }
 
 // WorkerPoolConfig contains the worker pool configuration for a Packet Broker role.

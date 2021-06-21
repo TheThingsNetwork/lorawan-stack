@@ -34,6 +34,7 @@ var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{
 			Limit: 4096,
 		},
+		IncludeHops: false,
 	},
 	Forwarder: packetbrokeragent.ForwarderConfig{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{

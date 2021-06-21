@@ -378,7 +378,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 
 var errWrapUplinkTokens = errors.DefineAborted("wrap_uplink_tokens", "wrap uplink tokens")
 
-func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
+func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, receivedAt time.Time, includeHops bool) (*ttnpb.UplinkMessage, error) {
 	dataRate, ok := fromPBDataRate(msg.Message.GatewayRegion, int(msg.Message.DataRateIndex))
 	if !ok {
 		return nil, errUnknownDataRate.WithAttributes(
@@ -437,7 +437,6 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 			HomeNetworkNetId:     homeNetworkNetID,
 			HomeNetworkTenantId:  msg.HomeNetworkTenantId,
 			HomeNetworkClusterId: msg.HomeNetworkClusterId,
-			Hops:                 make([]*ttnpb.PacketBrokerRouteHop, 0, len(msg.Hops)),
 		}
 		if id := msg.GetMessage().GetGatewayId(); id != nil {
 			if eui := id.Eui; eui != nil {
@@ -455,18 +454,21 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 				}
 			}
 		}
-		for _, h := range msg.Hops {
-			receivedAt, err := pbtypes.TimestampFromProto(h.ReceivedAt)
-			if err != nil {
-				continue
+		if includeHops {
+			pbMD.Hops = make([]*ttnpb.PacketBrokerRouteHop, 0, len(msg.Hops))
+			for _, h := range msg.Hops {
+				receivedAt, err := pbtypes.TimestampFromProto(h.ReceivedAt)
+				if err != nil {
+					continue
+				}
+				pbMD.Hops = append(pbMD.Hops, &ttnpb.PacketBrokerRouteHop{
+					ReceivedAt:    receivedAt,
+					SenderName:    h.SenderName,
+					SenderAddress: h.SenderAddress,
+					ReceiverName:  h.ReceiverName,
+					ReceiverAgent: h.ReceiverAgent,
+				})
 			}
-			pbMD.Hops = append(pbMD.Hops, &ttnpb.PacketBrokerRouteHop{
-				ReceivedAt:    receivedAt,
-				SenderName:    h.SenderName,
-				SenderAddress: h.SenderAddress,
-				ReceiverName:  h.ReceiverName,
-				ReceiverAgent: h.ReceiverAgent,
-			})
 		}
 		if md := gtwMd.GetPlainLocalization().GetTerrestrial(); md != nil {
 			for _, ant := range md.Antennas {

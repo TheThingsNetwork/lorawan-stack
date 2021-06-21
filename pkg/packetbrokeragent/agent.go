@@ -1055,7 +1055,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 		logger = logger.WithField("dev_addr", *ids.DevAddr)
 	}
 
-	msg, err := fromPBUplink(ctx, up, receivedAt)
+	msg, err := fromPBUplink(ctx, up, receivedAt, a.homeNetworkConfig.IncludeHops)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to convert incoming uplink message")
 		return err
