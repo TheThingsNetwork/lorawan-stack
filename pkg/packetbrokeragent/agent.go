@@ -328,11 +328,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			Backoff: component.DialTaskBackoffConfig,
 		}
 	}
-	if a.forwarderConfig.Enable {
+	if a.forwarderConfig.Enable && a.dataPlaneAddress != "" {
 		c.RegisterTask(newTaskConfig("pb_publish_uplink", a.publishUplink))
 		c.RegisterTask(newTaskConfig("pb_subscribe_downlink", a.subscribeDownlink))
 	}
-	if a.homeNetworkConfig.Enable {
+	if a.homeNetworkConfig.Enable && a.dataPlaneAddress != "" {
 		c.RegisterTask(newTaskConfig("pb_subscribe_uplink", a.subscribeUplink))
 		c.RegisterTask(newTaskConfig("pb_publish_downlink", a.publishDownlink))
 	}
