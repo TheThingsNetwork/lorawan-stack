@@ -22,6 +22,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Parse error in Webhook Templates.
+- Application deletion handling in the Console.
 
 ### Security
 
