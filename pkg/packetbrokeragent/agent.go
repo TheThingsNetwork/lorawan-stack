@@ -303,6 +303,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
+	mapperConn, err := a.dialContext(ctx, conf.MapperAddress)
+	if err != nil {
+		return nil, err
+	}
 	a.grpc.pba = &pbaServer{
 		Agent:   a,
 		iamConn: iamConn,
@@ -317,6 +321,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		messageEncrypter: a,
 		contextDecoupler: a,
 		upstreamCh:       a.upstreamCh,
+		mapperConn:       mapperConn,
 	}
 
 	newTaskConfig := func(id string, fn component.TaskFunc) *component.TaskConfig {

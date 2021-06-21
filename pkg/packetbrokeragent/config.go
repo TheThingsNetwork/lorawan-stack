@@ -27,6 +27,7 @@ type Config struct {
 	IAMAddress           string               `name:"iam-address" description:"Address of Packet Broker IAM"`
 	ControlPlaneAddress  string               `name:"control-plane-address" description:"Address of Packet Broker Control Plane"`
 	DataPlaneAddress     string               `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
+	MapperAddress        string               `name:"mapper-address" description:"Address of Packet Broker Mapper"`
 	Insecure             bool                 `name:"insecure" description:"Connect without using TLS"`
 	NetID                types.NetID          `name:"net-id" description:"LoRa Alliance NetID"`
 	TenantID             string               `name:"tenant-id" description:"Tenant ID within the NetID"`

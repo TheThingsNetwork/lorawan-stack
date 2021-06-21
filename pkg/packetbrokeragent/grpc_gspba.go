@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc"
 )
 
 type messageEncrypter interface {
@@ -36,6 +37,7 @@ type gsPbaServer struct {
 	messageEncrypter messageEncrypter
 	contextDecoupler contextDecoupler
 	upstreamCh       chan *uplinkMessage
+	mapperConn       *grpc.ClientConn
 }
 
 var errForwarderDisabled = errors.DefineFailedPrecondition("forwarder_disabled", "Forwarder is disabled")
