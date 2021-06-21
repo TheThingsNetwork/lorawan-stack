@@ -600,23 +600,35 @@ func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np
 	return c.rtts.Stats(percentile, t)
 }
 
-// Stats collects and returns the gateway connection statistics.
-func (c *Connection) Stats() *ttnpb.GatewayConnectionStats {
-	stats := &ttnpb.GatewayConnectionStats{}
+// Stats collects and returns the gateway connection statistics and the field mask paths.
+func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	ct := c.ConnectTime()
-	stats.ConnectedAt = &ct
-	stats.Protocol = c.Frontend().Protocol()
+	stats := &ttnpb.GatewayConnectionStats{
+		ConnectedAt: &ct,
+		Protocol:    c.Frontend().Protocol(),
+	}
+	paths := make([]string, 0, len(ttnpb.GatewayConnectionStatsFieldPathsTopLevel))
+	paths = append(paths, "connected_at", "protocol")
+
 	if s, t, ok := c.StatusStats(); ok {
 		stats.LastStatusReceivedAt = &t
 		stats.LastStatus = s
+		paths = append(paths, "last_status_received_at", "last_status")
 	}
-	if c, t, ok := c.UpStats(); ok {
+	if count, t, ok := c.UpStats(); ok {
 		stats.LastUplinkReceivedAt = &t
-		stats.UplinkCount = c
+		stats.UplinkCount = count
+		paths = append(paths, "last_uplink_received_at", "uplink_count")
 	}
-	if c, t, ok := c.DownStats(); ok {
+	if count, t, ok := c.DownStats(); ok {
 		stats.LastDownlinkReceivedAt = &t
-		stats.DownlinkCount = c
+		stats.DownlinkCount = count
+		paths = append(paths, "last_downlink_received_at", "downlink_count")
+		if c.scheduler != nil {
+			// Usage statistics are only available for downlink.
+			stats.SubBands = c.scheduler.SubBandStats()
+			paths = append(paths, "sub_bands")
+		}
 	}
 	if min, max, median, _, count := c.RTTStats(100, time.Now()); count > 0 {
 		stats.RoundTripTimes = &ttnpb.GatewayConnectionStats_RoundTripTimes{
@@ -625,12 +637,9 @@ func (c *Connection) Stats() *ttnpb.GatewayConnectionStats {
 			Median: median,
 			Count:  uint32(count),
 		}
+		paths = append(paths, "round_trip_times")
 	}
-	if c.scheduler != nil {
-		stats.SubBands = c.scheduler.SubBandStats()
-	}
-
-	return stats
+	return stats, paths
 }
 
 // FrequencyPlans returns the frequency plans for the gateway.

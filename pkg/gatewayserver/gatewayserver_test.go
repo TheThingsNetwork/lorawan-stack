@@ -1226,9 +1226,11 @@ func TestGatewayServer(t *testing.T) {
 
 						conn, ok := gs.GetConnection(ctx, ids)
 						a.So(ok, should.BeTrue)
-						a.So(conn.Stats(), should.NotBeNil)
+
+						stats, paths := conn.Stats()
+						a.So(stats, should.NotBeNil)
 						if config.Stats != nil {
-							a.So(config.Stats.Set(conn.Context(), ids, conn.Stats()), should.BeNil)
+							a.So(config.Stats.Set(conn.Context(), ids, stats, paths), should.BeNil)
 						}
 
 						stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
@@ -1512,12 +1514,14 @@ func TestGatewayServer(t *testing.T) {
 
 						conn, ok := gs.GetConnection(ctx, ids)
 						a.So(ok, should.BeTrue)
-						a.So(conn.Stats(), should.NotBeNil)
+
+						stats, paths := conn.Stats()
+						a.So(stats, should.NotBeNil)
 						if config.Stats != nil {
-							a.So(config.Stats.Set(conn.Context(), ids, conn.Stats()), should.BeNil)
+							a.So(config.Stats.Set(conn.Context(), ids, stats, paths), should.BeNil)
 						}
 
-						stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
+						stats, err = statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
