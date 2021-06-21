@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Parse error in Webhook Templates.
+
 ### Security
 
 ## [3.13.2] - 2021-06-17
