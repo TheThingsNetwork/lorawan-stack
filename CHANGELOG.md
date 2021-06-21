@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Low-level log messages from the `go-redis` library are printed only when the log level is set to `DEBUG`.
+
 ### Deprecated
 
 ### Removed
