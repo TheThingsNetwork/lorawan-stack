@@ -4,6 +4,81 @@ package ttnpb
 
 import fmt "fmt"
 
+func (dst *UpdatePacketBrokerGatewayRequest) SetFields(src *UpdatePacketBrokerGatewayRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway":
+			if len(subs) > 0 {
+				var newDst, newSrc *Gateway
+				if (src == nil || src.Gateway == nil) && dst.Gateway == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Gateway
+				}
+				if dst.Gateway != nil {
+					newDst = dst.Gateway
+				} else {
+					newDst = &Gateway{}
+					dst.Gateway = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Gateway = src.Gateway
+				} else {
+					dst.Gateway = nil
+				}
+			}
+		case "online":
+			if len(subs) > 0 {
+				return fmt.Errorf("'online' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Online = src.Online
+			} else {
+				var zero bool
+				dst.Online = zero
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				dst.FieldMask = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *UpdatePacketBrokerGatewayResponse) SetFields(src *UpdatePacketBrokerGatewayResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "online_ttl":
+			if len(subs) > 0 {
+				return fmt.Errorf("'online_ttl' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.OnlineTtl = src.OnlineTtl
+			} else {
+				dst.OnlineTtl = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *PacketBrokerNetworkIdentifier) SetFields(src *PacketBrokerNetworkIdentifier, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

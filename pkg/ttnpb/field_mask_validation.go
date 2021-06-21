@@ -896,6 +896,21 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 			"gateway.claim_authentication_code.valid_to"),
 		Set: true,
 	},
+	"/ttn.lorawan.v3.GsPba/UpdateGateway": {
+		All: GatewayFieldPathsNested,
+		Allowed: []string{
+			"antennas",
+			"contact_info",
+			"frequency_plan_id",
+			"frequency_plan_ids",
+			"ids",
+			"ids.eui",
+			"ids.gateway_id",
+			"location_public",
+			"status_public",
+		},
+		Set: true,
+	},
 
 	// Gateway API Keys:
 	"/ttn.lorawan.v3.GatewayAccess/UpdateAPIKey": {All: APIKeyFieldPathsNested, Allowed: APIKeyFieldPathsNested, Set: true},

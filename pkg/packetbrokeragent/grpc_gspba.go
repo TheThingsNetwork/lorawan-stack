@@ -79,3 +79,12 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 		return ttnpb.Empty, nil
 	}
 }
+
+// UpdateGateway is called by Gateway Server to update a gateway.
+func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacketBrokerGatewayRequest) (*ttnpb.UpdatePacketBrokerGatewayResponse, error) {
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+
+	return &ttnpb.UpdatePacketBrokerGatewayResponse{}, nil
+}
