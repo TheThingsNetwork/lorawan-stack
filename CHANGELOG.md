@@ -7,6 +7,22 @@ with the exception that this project **does not** follow Semantic Versioning.
 
 For details about compatibility between different releases, see the **Commitments and Releases** section of our README.
 
+## [v3.14.0] - Upcoming
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+- The `old` log format.
+
+### Fixed
+
+### Security
+
 ## [Unreleased]
 
 ### Added
