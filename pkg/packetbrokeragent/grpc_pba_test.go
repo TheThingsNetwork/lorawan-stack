@@ -243,12 +243,12 @@ func TestPba(t *testing.T) {
 								},
 							},
 						},
-						AdministrativeContact: &iampb.ContactInfoValue{
+						AdministrativeContact: &packetbroker.ContactInfoValue{
 							Value: &packetbroker.ContactInfo{
 								Email: "admin@example.com",
 							},
 						},
-						TechnicalContact: &iampb.ContactInfoValue{
+						TechnicalContact: &packetbroker.ContactInfoValue{
 							Value: &packetbroker.ContactInfo{
 								Email: "tech@example.com",
 							},

@@ -109,7 +109,7 @@ func fromPBLocation(loc *packetbroker.Location) *ttnpb.Location {
 		Longitude: loc.Longitude,
 		Latitude:  loc.Latitude,
 		Altitude:  int32(loc.Altitude),
-		Accuracy:  int32(loc.Accuracy),
+		Accuracy:  int32(loc.Hdop),
 	}
 }
 
@@ -120,8 +120,8 @@ func toPBLocation(loc *ttnpb.Location) *packetbroker.Location {
 	return &packetbroker.Location{
 		Longitude: loc.Longitude,
 		Latitude:  loc.Latitude,
-		Altitude:  float32(loc.Altitude),
-		Accuracy:  float32(loc.Accuracy),
+		Altitude:  float64(loc.Altitude),
+		Hdop:      float64(loc.Accuracy),
 	}
 }
 

@@ -160,10 +160,10 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 			DevAddrBlocks: &iampb.DevAddrBlocksValue{
 				Value: devAddrBlocks,
 			},
-			AdministrativeContact: &iampb.ContactInfoValue{
+			AdministrativeContact: &packetbroker.ContactInfoValue{
 				Value: adminContact,
 			},
-			TechnicalContact: &iampb.ContactInfoValue{
+			TechnicalContact: &packetbroker.ContactInfoValue{
 				Value: technicalContact,
 			},
 			Listed: &pbtypes.BoolValue{
