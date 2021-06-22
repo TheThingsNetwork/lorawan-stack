@@ -93,6 +93,7 @@ func TestGatewayServer(t *testing.T) {
 	config := &gatewayserver.Config{
 		RequireRegisteredGateways:         false,
 		UpdateGatewayLocationDebounceTime: 0,
+		UpdateConnectionStatsDebounceTime: 0,
 		MQTT: config.MQTT{
 			Listen: ":1882",
 		},
@@ -116,7 +117,6 @@ func TestGatewayServer(t *testing.T) {
 				AllowUnauthenticated: true,
 			},
 		},
-		UpdateConnectionStatsDebounceTime: 0,
 	}
 	if os.Getenv("TEST_REDIS") == "1" {
 		statsRedisClient, statsFlush := test.NewRedis(ctx, "gatewayserver_test")
