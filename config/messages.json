@@ -9026,6 +9026,15 @@
       "file": "observability.go"
     }
   },
+  "event:gs.up.repeat": {
+    "translations": {
+      "en": "received repeated uplink message from gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "observability.go"
+    }
+  },
   "event:invitation.create": {
     "translations": {
       "en": "create invitation"
