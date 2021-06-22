@@ -2485,7 +2485,7 @@
             },
             {
               "name": "after",
-              "description": "Query upstream messages after this timestamp only.",
+              "description": "Query upstream messages after this timestamp only. Cannot be used in conjunction with last.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -2495,7 +2495,7 @@
             },
             {
               "name": "before",
-              "description": "Query upstream messages before this timestamp only.",
+              "description": "Query upstream messages before this timestamp only. Cannot be used in conjunction with last.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -2542,6 +2542,16 @@
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
               "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "last",
+              "description": "Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
               "ismap": false,
               "defaultValue": ""
             }

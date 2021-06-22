@@ -1356,7 +1356,7 @@
           },
           {
             "name": "after",
-            "description": "Query upstream messages after this timestamp only.",
+            "description": "Query upstream messages after this timestamp only. Cannot be used in conjunction with last.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1364,7 +1364,7 @@
           },
           {
             "name": "before",
-            "description": "Query upstream messages before this timestamp only.",
+            "description": "Query upstream messages before this timestamp only. Cannot be used in conjunction with last.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1395,6 +1395,13 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "last",
+            "description": "Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2076,7 +2083,7 @@
           },
           {
             "name": "after",
-            "description": "Query upstream messages after this timestamp only.",
+            "description": "Query upstream messages after this timestamp only. Cannot be used in conjunction with last.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2084,7 +2091,7 @@
           },
           {
             "name": "before",
-            "description": "Query upstream messages before this timestamp only.",
+            "description": "Query upstream messages before this timestamp only. Cannot be used in conjunction with last.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2115,6 +2122,13 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "last",
+            "description": "Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [

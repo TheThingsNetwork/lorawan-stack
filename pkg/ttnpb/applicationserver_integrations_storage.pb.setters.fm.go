@@ -2,11 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-
-	types "github.com/gogo/protobuf/types"
-)
+import fmt "fmt"
 
 func (dst *GetStoredApplicationUpRequest) SetFields(src *GetStoredApplicationUpRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -124,8 +120,16 @@ func (dst *GetStoredApplicationUpRequest) SetFields(src *GetStoredApplicationUpR
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
+			}
+		case "last":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Last = src.Last
+			} else {
+				dst.Last = nil
 			}
 
 		default:

@@ -15,10 +15,10 @@
 syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/wrappers.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
@@ -29,9 +29,9 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 message GetStoredApplicationUpRequest {
   // Query upstream messages from all end devices of an application. Cannot be used in conjunction with end_device_ids.
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = true];
+  ApplicationIdentifiers application_ids = 1;
   // Query upstream messages from a single end device. Cannot be used in conjunction with application_ids.
-  EndDeviceIdentifiers end_device_ids = 2 [(gogoproto.nullable) = true];
+  EndDeviceIdentifiers end_device_ids = 2;
 
   // Query upstream messages of a specific type. If not set, then all upstream messages are returned.
   string type = 3 [(validate.rules).string = { in: [
@@ -50,10 +50,10 @@ message GetStoredApplicationUpRequest {
 
   // Limit number of results.
   google.protobuf.UInt32Value limit = 4;
-  // Query upstream messages after this timestamp only.
-  google.protobuf.Timestamp after = 5 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
-  // Query upstream messages before this timestamp only.
-  google.protobuf.Timestamp before = 6 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
+  // Query upstream messages after this timestamp only. Cannot be used in conjunction with last.
+  google.protobuf.Timestamp after = 5;
+  // Query upstream messages before this timestamp only. Cannot be used in conjunction with last.
+  google.protobuf.Timestamp before = 6;
   // Query uplinks on a specific FPort only.
   google.protobuf.UInt32Value f_port = 7;
 
@@ -64,7 +64,10 @@ message GetStoredApplicationUpRequest {
 
   // The names of the upstream message fields that should be returned. See the API reference
   // for allowed field names for each type of upstream message.
-  google.protobuf.FieldMask field_mask = 9 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 9;
+
+  // Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.
+  google.protobuf.Duration last = 10;
 }
 
 // The ApplicationUpStorage service can be used to query stored application upstream messages.
