@@ -81,6 +81,7 @@ type generatedDownlink struct {
 	RawPayload     []byte
 	Priority       ttnpb.TxSchedulePriority
 	NeedsMACAnswer bool
+	SessionKeyID   []byte
 }
 
 type generateDownlinkState struct {
@@ -625,6 +626,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		RawPayload:     b,
 		Priority:       priority,
 		NeedsMACAnswer: len(dev.MACState.PendingRequests) > 0 && class == ttnpb.CLASS_A,
+		SessionKeyID:   dev.Session.SessionKeyID,
 	}, genState, nil
 }
 
@@ -1252,8 +1254,8 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 			Payload:              genDown.Payload,
 			RawPayload:           genDown.RawPayload,
+			SessionKeyID:         genDown.SessionKeyID,
 			DownlinkEvents:       genState.EventBuilders,
-			SessionKeyID:         dev.GetSession().GetSessionKeyID(),
 		},
 		paths...,
 	)
