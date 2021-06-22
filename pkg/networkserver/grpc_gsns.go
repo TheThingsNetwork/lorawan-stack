@@ -1282,6 +1282,10 @@ func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, up *ttnpb.G
 	}
 	down, err := ns.scheduledDownlinkMatcher.Match(ctx, ack)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			log.FromContext(ctx).Debug("Received TxAck but did not match scheduled downlink")
+			return ttnpb.Empty, nil
+		}
 		return nil, err
 	}
 	ids := down.GetEndDeviceIds()
