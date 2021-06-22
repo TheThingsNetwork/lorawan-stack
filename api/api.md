@@ -5807,6 +5807,7 @@ Transmission settings for downlink.
 | `RP002_V1_0_0` | 8 |  |
 | `RP002_V1_0_1` | 9 |  |
 | `RP002_V1_0_2` | 10 |  |
+| `RP002_V1_0_3` | 11 |  |
 
 ### <a name="ttn.lorawan.v3.PingSlotPeriod">Enum `PingSlotPeriod`</a>
 
