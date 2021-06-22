@@ -21,7 +21,7 @@ For details about compatibility between different releases, see the **Commitment
   - The new `gs_uplink_repeated_total` metric counts how many repeated uplinks have been discarded.
   - A `gs.up.repeat` event is emitted (once per minute maximum) for gateways that are stuck in a loop and forward the same uplink message.
 - For ABP sessions, the CLI now requests a DevAddr from the Network Server instead of generating one from the testing NetID.
-- Descriptions and tooltips for checkboxes for public gateway status and location in the Console.
+- Descriptions, tooltips and defaults for checkboxes for public gateway status and location in the Console.
 
 ### Deprecated
 

@@ -102,6 +102,8 @@ export default class GatewayAdd extends React.Component {
       ids: {
         gateway_id: undefined,
       },
+      status_public: true,
+      location_public: true,
       enforce_duty_cycle: true,
       gateway_server_address: stack.gs.enabled ? new URL(stack.gs.base_url).hostname : '',
       frequency_plan_id: undefined,
