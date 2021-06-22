@@ -60,7 +60,18 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 				NbTrans:       1,
 			},
 		}
-		if !otaa || phyVersion.Compare(ttnpb.PHY_V1_0_3_REV_A) < 0 {
+		beforeRP001_V1_0_3_REV_A := func(v ttnpb.PHYVersion) bool {
+			switch v {
+			case ttnpb.TS001_V1_0,
+				ttnpb.TS001_V1_0_1,
+				ttnpb.RP001_V1_0_2,
+				ttnpb.RP001_V1_0_2_REV_B:
+				return true
+			default:
+				return false
+			}
+		}
+		if !otaa || beforeRP001_V1_0_3_REV_A(phyVersion) {
 			linkADRReqs = append([]MACCommander{
 				&ttnpb.MACCommand_LinkADRReq{
 					ChannelMask:        []bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},

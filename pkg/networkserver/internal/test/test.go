@@ -743,8 +743,8 @@ func ForEachBand(tb testing.TB, f func(func(...string) string, *band.Band, ttnpb
 		}
 		for phyVersion, b := range phyVersions {
 			switch phyVersion {
-			case ttnpb.PHY_V1_0_3_REV_A, ttnpb.PHY_V1_1_REV_B:
-			case ttnpb.PHY_V1_0_2_REV_B:
+			case ttnpb.RP001_V1_0_3_REV_A, ttnpb.RP001_V1_1_REV_B:
+			case ttnpb.RP001_V1_0_2_REV_B:
 				if !testing.Short() {
 					break
 				}

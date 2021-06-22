@@ -103,15 +103,15 @@ func init() {
 		},
 		MaxADRDataRateIndex: ttnpb.DATA_RATE_3,
 
-		ReceiveDelay1:    defaultReceiveDelay1,
-		ReceiveDelay2:    defaultReceiveDelay2,
-		JoinAcceptDelay1: defaultJoinAcceptDelay1,
-		JoinAcceptDelay2: defaultJoinAcceptDelay2,
-		MaxFCntGap:       defaultMaxFCntGap,
-		ADRAckLimit:      defaultADRAckLimit,
-		ADRAckDelay:      defaultADRAckDelay,
-		MinAckTimeout:    defaultAckTimeout - defaultAckTimeoutMargin,
-		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
+		ReceiveDelay1:        defaultReceiveDelay1,
+		ReceiveDelay2:        defaultReceiveDelay2,
+		JoinAcceptDelay1:     defaultJoinAcceptDelay1,
+		JoinAcceptDelay2:     defaultJoinAcceptDelay2,
+		MaxFCntGap:           defaultMaxFCntGap,
+		ADRAckLimit:          defaultADRAckLimit,
+		ADRAckDelay:          defaultADRAckDelay,
+		MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
+		MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
 
 		DefaultMaxEIRP: 30,
 		TxOffset: []float32{
@@ -160,21 +160,21 @@ func init() {
 			ComputeFrequency: makeBeaconFrequencyFunc(usAuBeaconFrequencies),
 		},
 
-		regionalParameters1_0:   bandIdentity,
-		regionalParameters1_0_1: bandIdentity,
-		regionalParameters1_0_2RevA: func(b Band) Band {
+		regionalParameters1_v1_0:   bandIdentity,
+		regionalParameters1_v1_0_1: bandIdentity,
+		regionalParameters1_v1_0_2: func(b Band) Band {
 			b.Beacon.DataRateIndex = ttnpb.DATA_RATE_3
 			return b
 		},
-		regionalParameters1_0_2RevB: composeSwaps(
+		regionalParameters1_v1_0_2RevB: composeSwaps(
 			disableCFList,
 			disableChMaskCntl5,
 			makeSetMaxTxPowerIndexFunc(10),
 		),
-		regionalParameters1_0_3RevA: composeSwaps(
+		regionalParameters1_v1_0_3RevA: composeSwaps(
 			makeAddTxPowerFunc(-30),
 		),
-		regionalParameters1_1RevA: bandIdentity,
+		regionalParameters1_v1_1RevA: bandIdentity,
 	}
 	All[US_902_928] = us_902_928
 }

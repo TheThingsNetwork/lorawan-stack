@@ -44,7 +44,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
@@ -52,7 +52,7 @@ func TestNewState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				return macState
 			}(),
@@ -63,7 +63,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					DesiredMaxEirp: &ttnpb.DeviceEIRPValue{
 						Value: ttnpb.DEVICE_EIRP_18,
@@ -71,7 +71,7 @@ func TestNewState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
 				macState.DesiredParameters.MaxEIRP = 18
 				return macState
 			}(),
@@ -82,7 +82,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
@@ -100,7 +100,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
@@ -110,7 +110,7 @@ func TestNewState(t *testing.T) {
 				SupportsClassB: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -130,7 +130,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
@@ -140,7 +140,7 @@ func TestNewState(t *testing.T) {
 				SupportsClassC: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -160,7 +160,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_3_REV_A,
 				MACSettings: &ttnpb.MACSettings{
 					FactoryPresetFrequencies: []uint64{
 						868100000,
@@ -171,7 +171,7 @@ func TestNewState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.RP001_V1_0_3_REV_A)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -269,7 +269,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
@@ -277,7 +277,7 @@ func TestNewState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				return macState
 			}(),
@@ -288,7 +288,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
@@ -306,7 +306,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
@@ -316,7 +316,7 @@ func TestNewState(t *testing.T) {
 				SupportsClassB: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -336,7 +336,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
@@ -346,7 +346,7 @@ func TestNewState(t *testing.T) {
 				SupportsClassC: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -366,7 +366,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.USFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
@@ -374,7 +374,7 @@ func TestNewState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
+				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				return macState
 			}(),
@@ -385,7 +385,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.USFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_3_REV_A,
 				MACSettings: &ttnpb.MACSettings{
 					FactoryPresetFrequencies: []uint64{
 						904300000,
@@ -396,7 +396,7 @@ func TestNewState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A)
+				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.RP001_V1_0_3_REV_A)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -458,7 +458,7 @@ func TestNewState(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.USFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
@@ -466,7 +466,7 @@ func TestNewState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
+				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				return macState
 			}(),

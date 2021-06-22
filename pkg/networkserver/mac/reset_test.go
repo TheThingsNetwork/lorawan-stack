@@ -41,13 +41,13 @@ func TestHandleResetInd(t *testing.T) {
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
 				MACState:          &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
 				MACState:          &ttnpb.MACState{},
 			},
@@ -57,7 +57,7 @@ func TestHandleResetInd(t *testing.T) {
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
@@ -69,7 +69,7 @@ func TestHandleResetInd(t *testing.T) {
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
 					LoRaWANVersion:    ttnpb.MAC_V1_1,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 				}
@@ -102,7 +102,7 @@ func TestHandleResetInd(t *testing.T) {
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
@@ -118,7 +118,7 @@ func TestHandleResetInd(t *testing.T) {
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
 					LoRaWANVersion:    ttnpb.MAC_V1_1,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 				}

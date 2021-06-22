@@ -51,7 +51,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:              "no channels",
 			BandID:            band.US_902_928,
 			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-			LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+			LoRaWANPHYVersion: ttnpb.RP001_V1_0_3_REV_A,
 			CurrentADRNbTrans: 1,
 			DesiredADRNbTrans: 1,
 		},
@@ -59,7 +59,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:              "invalid channel",
 			BandID:            band.US_902_928,
 			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-			LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+			LoRaWANPHYVersion: ttnpb.RP001_V1_0_3_REV_A,
 			CurrentChannels:   MakeDefaultUS915FSB2DesiredChannels(),
 			CurrentADRNbTrans: 1,
 			DesiredChannels: []*ttnpb.MACParameters_Channel{
@@ -75,7 +75,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:              "invalid channel count",
 			BandID:            band.EU_863_870,
 			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-			LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+			LoRaWANPHYVersion: ttnpb.RP001_V1_0_3_REV_A,
 			CurrentChannels:   MakeDefaultEU868CurrentChannels(),
 			CurrentADRNbTrans: 1,
 			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
@@ -89,7 +89,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:              "invalid band channels",
 			BandID:            band.EU_863_870,
 			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-			LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+			LoRaWANPHYVersion: ttnpb.RP001_V1_0_3_REV_A,
 			CurrentChannels:   MakeDefaultUS915CurrentChannels(),
 			CurrentADRNbTrans: 1,
 			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
@@ -103,7 +103,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:                    "non-existent data rate",
 			BandID:                  band.EU_863_870,
 			LoRaWANVersion:          ttnpb.MAC_V1_0_3,
-			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_3_REV_A,
+			LoRaWANPHYVersion:       ttnpb.RP001_V1_0_3_REV_A,
 			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
 			CurrentADRNbTrans:       1,
 			DesiredChannels:         MakeDefaultEU868DesiredChannels(),
@@ -118,7 +118,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:                   "TX power too high",
 			BandID:                 band.EU_863_870,
 			LoRaWANVersion:         ttnpb.MAC_V1_0_3,
-			LoRaWANPHYVersion:      ttnpb.PHY_V1_0_3_REV_A,
+			LoRaWANPHYVersion:      ttnpb.RP001_V1_0_3_REV_A,
 			CurrentChannels:        MakeDefaultEU868DesiredChannels(),
 			CurrentADRNbTrans:      1,
 			DesiredChannels:        MakeDefaultEU868DesiredChannels(),
@@ -133,7 +133,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:              "ABP channel setup",
 			BandID:            band.US_902_928,
 			LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-			LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+			LoRaWANPHYVersion: ttnpb.RP001_V1_0_3_REV_A,
 			CurrentChannels:   MakeDefaultUS915CurrentChannels(),
 			CurrentADRNbTrans: 1,
 			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
@@ -160,7 +160,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:              "ABP channel setup",
 			BandID:            band.US_902_928,
 			LoRaWANVersion:    ttnpb.MAC_V1_1,
-			LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+			LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 			CurrentChannels:   MakeDefaultUS915CurrentChannels(),
 			CurrentADRNbTrans: 1,
 			DesiredChannels:   MakeDefaultUS915FSB2DesiredChannels(),
@@ -191,7 +191,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:                    "ADR",
 			BandID:                  band.US_902_928,
 			LoRaWANVersion:          ttnpb.MAC_V1_0_3,
-			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_3_REV_A,
+			LoRaWANPHYVersion:       ttnpb.RP001_V1_0_3_REV_A,
 			CurrentChannels:         MakeDefaultUS915FSB2DesiredChannels(),
 			CurrentADRNbTrans:       1,
 			DesiredChannels:         MakeDefaultUS915FSB2DesiredChannels(),
@@ -221,7 +221,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:                    "ADR",
 			BandID:                  band.EU_863_870,
 			LoRaWANVersion:          ttnpb.MAC_V1_0_1,
-			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_1,
+			LoRaWANPHYVersion:       ttnpb.TS001_V1_0_1,
 			CurrentADRDataRateIndex: ttnpb.DATA_RATE_1,
 			CurrentADRNbTrans:       1,
 			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
@@ -251,7 +251,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:                    "ADR",
 			BandID:                  band.EU_863_870,
 			LoRaWANVersion:          ttnpb.MAC_V1_0_1,
-			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_1,
+			LoRaWANPHYVersion:       ttnpb.TS001_V1_0_1,
 			CurrentADRDataRateIndex: ttnpb.DATA_RATE_5,
 			CurrentADRNbTrans:       1,
 			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
@@ -280,7 +280,7 @@ func TestLinkADRReq(t *testing.T) {
 			Name:                    "ABP channel setup + ADR",
 			BandID:                  band.US_902_928,
 			LoRaWANVersion:          ttnpb.MAC_V1_0_3,
-			LoRaWANPHYVersion:       ttnpb.PHY_V1_0_3_REV_A,
+			LoRaWANPHYVersion:       ttnpb.RP001_V1_0_3_REV_A,
 			CurrentChannels:         MakeDefaultUS915CurrentChannels(),
 			CurrentADRNbTrans:       1,
 			CurrentADRDataRateIndex: ttnpb.DATA_RATE_1,
@@ -438,14 +438,14 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
@@ -456,14 +456,14 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
@@ -486,7 +486,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name: "1 request/all ack",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
@@ -513,7 +513,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
@@ -553,7 +553,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name: "1.1/2 requests/all ack",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
@@ -601,7 +601,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
@@ -647,7 +647,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			DupCount: 1,
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_0_2,
 					CurrentParameters: ttnpb.MACParameters{
@@ -695,7 +695,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_0_2,
 					CurrentParameters: ttnpb.MACParameters{
@@ -740,7 +740,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name: "1.0/2 requests/all ack",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					CurrentParameters: ttnpb.MACParameters{
@@ -789,7 +789,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					CurrentParameters: ttnpb.MACParameters{
@@ -845,11 +845,11 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name: "1.0.2/2 requests/US915 FSB2",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.USFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.PHY_V1_0_2_REV_B),
-					DesiredParameters: MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.PHY_V1_0_2_REV_B),
+					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
+					DesiredParameters: MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.RP001_V1_0_2_REV_B),
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_LinkADRReq{
 							DataRateIndex:      ttnpb.DATA_RATE_3,
@@ -880,17 +880,17 @@ func TestHandleLinkADRAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.USFrequencyPlanID,
-				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_0_2,
 					CurrentParameters: func() ttnpb.MACParameters {
-						params := MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.PHY_V1_0_2_REV_B)
+						params := MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.RP001_V1_0_2_REV_B)
 						params.ADRDataRateIndex = ttnpb.DATA_RATE_3
 						params.ADRTxPowerIndex = 1
 						params.ADRNbTrans = 3
 						return params
 					}(),
-					DesiredParameters:   MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.PHY_V1_0_2_REV_B),
+					DesiredParameters:   MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.RP001_V1_0_2_REV_B),
 					PendingRequests:     []*ttnpb.MACCommand{},
 					LastADRChangeFCntUp: fCntUp,
 				},

@@ -27,14 +27,35 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+var PHYVersionCompatibleName = map[int32]string{}
+
 func init() {
 	for i := range PHYVersion_name {
 		PHYVersion_value[PHYVersion(i).String()] = i
 	}
-	PHYVersion_value["1.0"] = int32(PHY_V1_0)           // 1.0 is the official version number
-	PHYVersion_value["1.0.2"] = int32(PHY_V1_0_2_REV_A) // Revisions were added from 1.0.2-b
-	PHYVersion_value["1.1-a"] = int32(PHY_V1_1_REV_A)   // 1.1 is the official version number
-	PHYVersion_value["1.1-b"] = int32(PHY_V1_1_REV_B)   // 1.1 is the official version number
+	for name, version := range map[string]PHYVersion{
+		"1.0":   TS001_V1_0,       // 1.0 is the official version number
+		"1.0.2": RP001_V1_0_2,     // Revisions were added from 1.0.2-b
+		"1.1-a": RP001_V1_1_REV_A, // 1.1 is the official version number
+		"1.1-b": RP001_V1_1_REV_B, // 1.1 is the official version number
+	} {
+		PHYVersion_value[name] = int32(version)
+	}
+	for version, name := range PHYVersion_name {
+		PHYVersionCompatibleName[version] = name
+	}
+	for name, version := range map[string]PHYVersion{
+		"PHY_V1_0":         TS001_V1_0,
+		"PHY_V1_0_1":       TS001_V1_0_1,
+		"PHY_V1_0_2_REV_A": RP001_V1_0_2,
+		"PHY_V1_0_2_REV_B": RP001_V1_0_2_REV_B,
+		"PHY_V1_1_REV_A":   RP001_V1_1_REV_A,
+		"PHY_V1_1_REV_B":   RP001_V1_1_REV_B,
+		"PHY_V1_0_3_REV_A": RP001_V1_0_3_REV_A,
+	} {
+		PHYVersion_value[name] = int32(version)
+		PHYVersionCompatibleName[int32(version)] = name
+	}
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
@@ -211,7 +232,7 @@ func (v PHYVersion) MarshalText() ([]byte, error) {
 
 // MarshalJSON implements json.Marshaler interface.
 func (v PHYVersion) MarshalJSON() ([]byte, error) {
-	return marshalJSONEnum(PHYVersion_name, int32(v))
+	return marshalJSONEnum(PHYVersionCompatibleName, int32(v))
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler interface.
@@ -1939,44 +1960,33 @@ func (v PHYVersion) Validate() error {
 	if v < 1 || v >= PHYVersion(len(PHYVersion_name)) {
 		return errExpectedBetween("PHYVersion", 1, len(PHYVersion_name)-1)(v)
 	}
-
-	_, err := semver.Parse(v.String())
-	if err != nil {
-		return errParsingSemanticVersion(v.String()).WithCause(err)
-	}
 	return nil
 }
 
 // String implements fmt.Stringer.
 func (v PHYVersion) String() string {
 	switch v {
-	case PHY_V1_0:
+	case TS001_V1_0:
 		return "1.0.0"
-	case PHY_V1_0_1:
+	case TS001_V1_0_1:
 		return "1.0.1"
-	case PHY_V1_0_2_REV_A:
+	case RP001_V1_0_2:
 		return "1.0.2-a"
-	case PHY_V1_0_2_REV_B:
+	case RP001_V1_0_2_REV_B:
 		return "1.0.2-b"
-	case PHY_V1_0_3_REV_A:
+	case RP001_V1_0_3_REV_A:
 		return "1.0.3-a"
-	case PHY_V1_1_REV_A:
+	case RP001_V1_1_REV_A:
 		return "1.1.0-a"
-	case PHY_V1_1_REV_B:
+	case RP001_V1_1_REV_B:
 		return "1.1.0-b"
+	case PHY_UNKNOWN:
+		return "unknown"
+	}
+	if name, exists := PHYVersion_name[int32(v)]; exists {
+		return name
 	}
 	return "unknown"
-}
-
-// Compare compares PHYVersions v to o:
-// -1 == v is less than o
-// 0 == v is equal to o
-// 1 == v is greater than o
-// Compare panics, if v.Validate() returns non-nil error.
-func (v PHYVersion) Compare(o PHYVersion) int {
-	return semver.MustParse(v.String()).Compare(
-		semver.MustParse(o.String()),
-	)
 }
 
 // Duration returns v as time.Duration.

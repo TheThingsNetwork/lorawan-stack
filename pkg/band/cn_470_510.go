@@ -89,15 +89,15 @@ func init() {
 		},
 		MaxADRDataRateIndex: ttnpb.DATA_RATE_5,
 
-		ReceiveDelay1:    defaultReceiveDelay1,
-		ReceiveDelay2:    defaultReceiveDelay2,
-		JoinAcceptDelay1: defaultJoinAcceptDelay1,
-		JoinAcceptDelay2: defaultJoinAcceptDelay2,
-		MaxFCntGap:       defaultMaxFCntGap,
-		ADRAckLimit:      defaultADRAckLimit,
-		ADRAckDelay:      defaultADRAckDelay,
-		MinAckTimeout:    defaultAckTimeout - defaultAckTimeoutMargin,
-		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
+		ReceiveDelay1:        defaultReceiveDelay1,
+		ReceiveDelay2:        defaultReceiveDelay2,
+		JoinAcceptDelay1:     defaultJoinAcceptDelay1,
+		JoinAcceptDelay2:     defaultJoinAcceptDelay2,
+		MaxFCntGap:           defaultMaxFCntGap,
+		ADRAckLimit:          defaultADRAckLimit,
+		ADRAckDelay:          defaultADRAckDelay,
+		MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
+		MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
 
 		DefaultMaxEIRP: 19.15,
 		TxOffset: []float32{
@@ -140,8 +140,8 @@ func init() {
 		CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
 		// No LoRaWAN Regional Parameters 1.0
-		regionalParameters1_0_1: bandIdentity,
-		regionalParameters1_0_2RevA: func(b Band) Band {
+		regionalParameters1_v1_0_1: bandIdentity,
+		regionalParameters1_v1_0_2: func(b Band) Band {
 			b.DefaultMaxEIRP = 17
 			b.TxOffset = []float32{
 				0,
@@ -155,9 +155,9 @@ func init() {
 			}
 			return b
 		},
-		regionalParameters1_0_2RevB: disableCFList,
-		regionalParameters1_0_3RevA: bandIdentity,
-		regionalParameters1_1RevA:   bandIdentity,
+		regionalParameters1_v1_0_2RevB: disableCFList,
+		regionalParameters1_v1_0_3RevA: bandIdentity,
+		regionalParameters1_v1_1RevA:   bandIdentity,
 	}
 	All[CN_470_510] = cn_470_510
 }

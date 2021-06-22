@@ -50,16 +50,16 @@ func TestBands(t *testing.T) {
 	verifyCompatibility := compatibleVerifier(t)
 
 	bands := []string{band.EU_863_870, band.US_902_928, band.CN_779_787, band.EU_433}
-	verifyCompatibility(ttnpb.PHY_V1_0, "1.0", bands...)
+	verifyCompatibility(ttnpb.TS001_V1_0, "1.0", bands...)
 
 	bands = append(bands, band.AU_915_928, band.CN_470_510)
-	verifyCompatibility(ttnpb.PHY_V1_0_1, "1.0.1", bands...)
+	verifyCompatibility(ttnpb.TS001_V1_0_1, "1.0.1", bands...)
 
 	bands = append(bands, band.AS_923, band.KR_920_923, band.IN_865_867)
-	verifyCompatibility(ttnpb.PHY_V1_0_2_REV_B, "1.0.2", bands...)
+	verifyCompatibility(ttnpb.RP001_V1_0_2_REV_B, "1.0.2", bands...)
 
 	bands = append(bands, band.RU_864_870)
-	verifyCompatibility(ttnpb.PHY_V1_1_REV_A, "1.1", bands...)
+	verifyCompatibility(ttnpb.RP001_V1_1_REV_A, "1.1", bands...)
 }
 
 func TestUnsupportedBand(t *testing.T) {
@@ -68,7 +68,7 @@ func TestUnsupportedBand(t *testing.T) {
 	b, err := band.GetByID(band.IN_865_867)
 	a.So(err, should.BeNil)
 
-	_, err = b.Version(ttnpb.PHY_V1_0)
+	_, err = b.Version(ttnpb.TS001_V1_0)
 	if !a.So(err, should.NotBeNil) {
 		t.Log("LoRaWAN Regional Parameters 1.0 is not supported for the Indian band")
 	}

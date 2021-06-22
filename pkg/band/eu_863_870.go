@@ -125,15 +125,15 @@ func init() {
 		},
 		MaxADRDataRateIndex: ttnpb.DATA_RATE_5,
 
-		ReceiveDelay1:    defaultReceiveDelay1,
-		ReceiveDelay2:    defaultReceiveDelay2,
-		JoinAcceptDelay1: defaultJoinAcceptDelay1,
-		JoinAcceptDelay2: defaultJoinAcceptDelay2,
-		MaxFCntGap:       defaultMaxFCntGap,
-		ADRAckLimit:      defaultADRAckLimit,
-		ADRAckDelay:      defaultADRAckDelay,
-		MinAckTimeout:    defaultAckTimeout - defaultAckTimeoutMargin,
-		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
+		ReceiveDelay1:        defaultReceiveDelay1,
+		ReceiveDelay2:        defaultReceiveDelay2,
+		JoinAcceptDelay1:     defaultJoinAcceptDelay1,
+		JoinAcceptDelay2:     defaultJoinAcceptDelay2,
+		MaxFCntGap:           defaultMaxFCntGap,
+		ADRAckLimit:          defaultADRAckLimit,
+		ADRAckDelay:          defaultADRAckDelay,
+		MinRetransmitTimeout: defaultRetransmitTimeout - defaultRetransmitTimeoutMargin,
+		MaxRetransmitTimeout: defaultRetransmitTimeout + defaultRetransmitTimeoutMargin,
 
 		DefaultMaxEIRP: 16,
 		TxOffset: []float32{
@@ -176,14 +176,14 @@ func init() {
 		},
 		PingSlotFrequency: uint64Ptr(beaconFrequency),
 
-		regionalParameters1_0:   bandIdentity,
-		regionalParameters1_0_1: bandIdentity,
-		regionalParameters1_0_2RevA: composeSwaps(
+		regionalParameters1_v1_0:   bandIdentity,
+		regionalParameters1_v1_0_1: bandIdentity,
+		regionalParameters1_v1_0_2: composeSwaps(
 			makeSetMaxTxPowerIndexFunc(5),
 		),
-		regionalParameters1_0_2RevB: bandIdentity,
-		regionalParameters1_0_3RevA: bandIdentity,
-		regionalParameters1_1RevA:   bandIdentity,
+		regionalParameters1_v1_0_2RevB: bandIdentity,
+		regionalParameters1_v1_0_3RevA: bandIdentity,
+		regionalParameters1_v1_1RevA:   bandIdentity,
 	}
 	All[EU_863_870] = eu_863_870
 }
