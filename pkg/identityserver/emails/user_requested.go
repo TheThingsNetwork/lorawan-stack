@@ -29,17 +29,17 @@ func (u UserRequested) ConsoleURL() string {
 // TemplateName returns the name of the template to use for this email.
 func (UserRequested) TemplateName() string { return "user_requested" }
 
-const userRequestedSubject = `User {{ .Entity.ID }} is waiting for approval`
+const userRequestedSubject = `User registration of {{ .Entity.ID }} needs review`
 
 const userRequestedText = `Dear {{ .User.Name }},
 
-User "{{ .Entity.ID }}" wants to join {{ .Network.Name }}.
+A new user "{{ .Entity.ID }}" was just registered on {{ .Network.Name }} and needs admin approval.
 
 You can go to {{ .ConsoleURL }} to view and approve (or reject) the user.
 
 If you prefer to use the command-line interface, you can run the following command:
 
-ttn-lw-cli users set {{ .Entity.ID }} --state APPROVED (or --state REJECTED)
+ttn-lw-cli users set {{ .Entity.ID }} --state APPROVED (or --state REJECTED) --state-description "..."
 
 For more information on how to use the command-line interface, please refer to the documentation: {{ documentation_url "/getting-started/cli/" }}.
 `
