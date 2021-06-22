@@ -155,7 +155,7 @@ message Gateway {
   google.protobuf.Duration schedule_anytime_delay = 19 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
   // Update the location of this gateway from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported.
   bool update_location_from_status = 21;
-  // The LoRa Basics Station LNS secret.
+  // The LoRa Basics Station LNS secret, base64 encoded.
   // This is either an auth token (such as an API Key) or a TLS private certificate.
   // Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value.
   Secret lbs_lns_secret = 22 [(gogoproto.customname) = "LBSLNSSecret"];
