@@ -189,6 +189,32 @@ func unwrapGatewayUplinkToken(token, key []byte) (string, []byte, error) {
 	return t.GatewayUID, t.Token, nil
 }
 
+func toPBGatewayIdentifier(ids ttnpb.GatewayIdentifiers, config ForwarderConfig) (res *packetbroker.GatewayIdentifier) {
+	if config.IncludeGatewayEUI && ids.Eui != nil {
+		res = &packetbroker.GatewayIdentifier{
+			Eui: &pbtypes.UInt64Value{
+				Value: ids.Eui.MarshalNumber(),
+			},
+		}
+	}
+	if config.IncludeGatewayID {
+		if res == nil {
+			res = &packetbroker.GatewayIdentifier{}
+		}
+		if config.HashGatewayID {
+			hash := sha256.Sum256([]byte(ids.GatewayId))
+			res.Id = &packetbroker.GatewayIdentifier_Hash{
+				Hash: hash[:],
+			}
+		} else {
+			res.Id = &packetbroker.GatewayIdentifier_Plain{
+				Plain: ids.GatewayId,
+			}
+		}
+	}
+	return
+}
+
 var (
 	errDecodePayload             = errors.DefineInvalidArgument("decode_payload", "decode LoRaWAN payload")
 	errUnsupportedLoRaWANVersion = errors.DefineAborted("unsupported_lorawan_version", "unsupported LoRaWAN version `{version}`")
@@ -259,28 +285,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 	var gatewayUplinkToken []byte
 	if len(msg.RxMetadata) > 0 {
 		md := msg.RxMetadata[0]
-		if config.IncludeGatewayEUI && md.Eui != nil {
-			up.GatewayId = &packetbroker.GatewayIdentifier{
-				Eui: &pbtypes.UInt64Value{
-					Value: md.Eui.MarshalNumber(),
-				},
-			}
-		}
-		if config.IncludeGatewayID {
-			if up.GatewayId == nil {
-				up.GatewayId = &packetbroker.GatewayIdentifier{}
-			}
-			if config.HashGatewayID {
-				hash := sha256.Sum256([]byte(md.GatewayId))
-				up.GatewayId.Id = &packetbroker.GatewayIdentifier_Hash{
-					Hash: hash[:],
-				}
-			} else {
-				up.GatewayId.Id = &packetbroker.GatewayIdentifier_Plain{
-					Plain: md.GatewayId,
-				}
-			}
-		}
+		up.GatewayId = toPBGatewayIdentifier(md.GatewayIdentifiers, config)
 
 		var teaser packetbroker.GatewayMetadataTeaser_Terrestrial
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial

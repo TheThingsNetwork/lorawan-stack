@@ -17,27 +17,35 @@ package packetbrokeragent
 import (
 	"context"
 	"fmt"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	mappingpb "go.packetbroker.org/api/mapping/v2"
 	packetbroker "go.packetbroker.org/api/v3"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
 )
+
+const onlineTTL = 10 * time.Minute
 
 type messageEncrypter interface {
 	encryptUplink(context.Context, *packetbroker.UplinkMessage) error
 }
 
 type gsPbaServer struct {
-	config           ForwarderConfig
-	messageEncrypter messageEncrypter
-	contextDecoupler contextDecoupler
-	upstreamCh       chan *uplinkMessage
-	mapperConn       *grpc.ClientConn
+	netID             types.NetID
+	clusterID         string
+	config            ForwarderConfig
+	messageEncrypter  messageEncrypter
+	contextDecoupler  contextDecoupler
+	tenantIDExtractor TenantIDExtractor
+	upstreamCh        chan *uplinkMessage
+	mapperConn        *grpc.ClientConn
 }
 
 var errForwarderDisabled = errors.DefineFailedPrecondition("forwarder_disabled", "Forwarder is disabled")
@@ -80,11 +88,75 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 	}
 }
 
+var errNoGatewayID = errors.DefineFailedPrecondition("no_gateway_id", "no gateway identifier provided or included in configuration")
+
 // UpdateGateway is called by Gateway Server to update a gateway.
 func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacketBrokerGatewayRequest) (*ttnpb.UpdatePacketBrokerGatewayResponse, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
 
-	return &ttnpb.UpdatePacketBrokerGatewayResponse{}, nil
+	id := toPBGatewayIdentifier(req.Gateway.GatewayIdentifiers, s.config)
+	if id == nil {
+		return nil, errNoGatewayID.New()
+	}
+	updateReq := &mappingpb.UpdateGatewayRequest{
+		ForwarderNetId:     s.netID.MarshalNumber(),
+		ForwarderTenantId:  s.tenantIDExtractor(ctx),
+		ForwarderClusterId: s.clusterID,
+		ForwarderGatewayId: id,
+		RxRate:             req.RxRate,
+		TxRate:             req.TxRate,
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "location_public") {
+		updateReq.GatewayLocation = &packetbroker.GatewayLocationValue{}
+		if req.Gateway.LocationPublic && ttnpb.HasAnyField(req.FieldMask.GetPaths(), "antennas") && len(req.Gateway.Antennas) > 0 {
+			val := &packetbroker.GatewayLocation_Terrestrial{
+				AntennaCount: &pbtypes.UInt32Value{
+					Value: uint32(len(req.Gateway.Antennas)),
+				},
+			}
+			if loc := req.Gateway.Antennas[0].Location; loc.Latitude != 0 || loc.Longitude != 0 || loc.Altitude != 0 {
+				val.Location = toPBLocation(&loc)
+			}
+			updateReq.GatewayLocation.Location = &packetbroker.GatewayLocation{
+				Value: &packetbroker.GatewayLocation_Terrestrial_{
+					Terrestrial: val,
+				},
+			}
+		}
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "status_public") {
+		updateReq.Online = &pbtypes.BoolValue{}
+		if req.Gateway.StatusPublic && req.Online {
+			updateReq.Online.Value = true
+			updateReq.OnlineTtl = pbtypes.DurationProto(onlineTTL)
+		}
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
+		adminContact, techContact := toContactInfo(req.Gateway.GetContactInfo())
+		updateReq.AdministrativeContact = &packetbroker.ContactInfoValue{
+			Value: adminContact,
+		}
+		updateReq.TechnicalContact = &packetbroker.ContactInfoValue{
+			Value: techContact,
+		}
+	}
+
+	// TODO: frequency_plan_ids
+
+	_, err := mappingpb.NewMapperClient(s.mapperConn).UpdateGateway(ctx, updateReq)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to update gateway")
+		return nil, err
+	}
+
+	res := &ttnpb.UpdatePacketBrokerGatewayResponse{}
+	if updateReq.Online.GetValue() {
+		res.OnlineTtl = pbtypes.DurationProto(onlineTTL)
+	}
+	return res, nil
 }
