@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -782,4 +783,66 @@ func toPBDownlinkRoutingPolicy(policy *ttnpb.PacketBrokerRoutingPolicyDownlink) 
 		MacData:         policy.GetMacData(),
 		ApplicationData: policy.GetApplicationData(),
 	}
+}
+
+var errInconsistentBands = errors.DefineInvalidArgument("inconsistent_bands", "inconsistent bands")
+
+func toPBFrequencyPlan(fps ...*frequencyplans.FrequencyPlan) (*packetbroker.GatewayFrequencyPlan, error) {
+	if len(fps) == 0 {
+		return nil, nil
+	}
+	phy, err := band.GetByID(fps[0].BandID)
+	if err != nil {
+		return nil, err
+	}
+	res := &packetbroker.GatewayFrequencyPlan{
+		Region: toPBRegion[phy.ID],
+	}
+
+	type singleSFChannel struct {
+		frequency uint64
+		sf, bw    uint32
+	}
+	singleSFChs := make(map[singleSFChannel]struct{})
+	multiSFChs := make(map[uint64]struct{})
+
+	for _, fp := range fps {
+		if fp.BandID != phy.ID {
+			return nil, errInconsistentBands.New()
+		}
+		for _, ch := range fp.UplinkChannels {
+			if idx := ch.MinDataRate; idx == ch.MaxDataRate {
+				dr, ok := phy.DataRates[ttnpb.DataRateIndex(idx)]
+				if !ok {
+					continue
+				}
+				switch mod := dr.Rate.Modulation.(type) {
+				case *ttnpb.DataRate_FSK:
+					res.FskChannel = &packetbroker.GatewayFrequencyPlan_FSKChannel{
+						Frequency: ch.Frequency,
+					}
+				case *ttnpb.DataRate_LoRa:
+					chKey := singleSFChannel{ch.Frequency, mod.LoRa.SpreadingFactor, mod.LoRa.Bandwidth}
+					if _, ok := singleSFChs[chKey]; ok {
+						continue
+					}
+					res.LoraSingleSfChannels = append(res.LoraSingleSfChannels, &packetbroker.GatewayFrequencyPlan_LoRaSingleSFChannel{
+						Frequency:       ch.Frequency,
+						SpreadingFactor: mod.LoRa.SpreadingFactor,
+						Bandwidth:       mod.LoRa.Bandwidth,
+					})
+					singleSFChs[chKey] = struct{}{}
+				}
+			} else {
+				if _, ok := multiSFChs[ch.Frequency]; ok {
+					continue
+				}
+				res.LoraMultiSfChannels = append(res.LoraMultiSfChannels, &packetbroker.GatewayFrequencyPlan_LoRaMultiSFChannel{
+					Frequency: ch.Frequency,
+				})
+				multiSFChs[ch.Frequency] = struct{}{}
+			}
+		}
+	}
+	return res, nil
 }

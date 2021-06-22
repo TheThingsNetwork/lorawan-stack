@@ -317,11 +317,15 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		downstreamCh:     a.downstreamCh,
 	}
 	a.grpc.gsPba = &gsPbaServer{
-		config:           a.forwarderConfig,
-		messageEncrypter: a,
-		contextDecoupler: a,
-		upstreamCh:       a.upstreamCh,
-		mapperConn:       mapperConn,
+		netID:               a.netID,
+		clusterID:           a.clusterID,
+		config:              a.forwarderConfig,
+		messageEncrypter:    a,
+		contextDecoupler:    a,
+		tenantIDExtractor:   a.tenantIDExtractor,
+		frequencyPlansStore: a.FrequencyPlans,
+		upstreamCh:          a.upstreamCh,
+		mapperConn:          mapperConn,
 	}
 
 	newTaskConfig := func(id string, fn component.TaskFunc) *component.TaskConfig {

@@ -895,6 +895,7 @@ go.packetbroker.org/api/iam v1.5.3-tts h1:YWzinNqiJ38pgelaHD/THZpjuyWaBv+tFOSpi5
 go.packetbroker.org/api/iam v1.5.3-tts/go.mod h1:eeS7C76hOsdqCKCi5/2BKphA/O5aSHvFXedIkkJ/9WM=
 go.packetbroker.org/api/iam/v2 v2.6.2-tts h1:pUyFa5HZQHDpF5o0LQ0PeBCgLpKo4Q08at4g7Yxvbw8=
 go.packetbroker.org/api/iam/v2 v2.6.2-tts/go.mod h1:5v5EzF1XWTzZ3mmDOvvoKPpi3ccG1nZjAgk78Gw/EgU=
+go.packetbroker.org/api/mapping/v2 v2.1.1-tts h1:2c26L3lm6s35a7Dv4igNZAu1lpTDCmFTeGevXXB73XM=
 go.packetbroker.org/api/mapping/v2 v2.1.1-tts/go.mod h1:LS+SwfSHB2xpOZzplNSWOEPHBIoDrNjwAUmA8xIvlIA=
 go.packetbroker.org/api/routing v1.6.3-tts h1:I1p+B7hp8dp4ln1PLIT2eXoBkFH7KUWUUsZctE/uQy4=
 go.packetbroker.org/api/routing v1.6.3-tts/go.mod h1:qZc9LXO7oHFd143Akg3axT2MjwvOHJT8qqlngjrgcDk=

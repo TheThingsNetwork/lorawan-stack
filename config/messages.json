@@ -7316,6 +7316,15 @@
       "file": "grpc_nspba.go"
     }
   },
+  "error:pkg/packetbrokeragent:inconsistent_bands": {
+    "translations": {
+      "en": "inconsistent bands"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
   "error:pkg/packetbrokeragent:invalid_rx1_delay": {
     "translations": {
       "en": "invalid Rx1 delay"
@@ -7359,6 +7368,15 @@
     "description": {
       "package": "pkg/packetbrokeragent",
       "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:no_gateway_id": {
+    "translations": {
+      "en": "no gateway identifier provided or included in configuration"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "grpc_gspba.go"
     }
   },
   "error:pkg/packetbrokeragent:no_phy_payload": {

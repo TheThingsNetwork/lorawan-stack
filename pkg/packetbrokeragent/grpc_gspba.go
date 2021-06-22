@@ -25,6 +25,7 @@ import (
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -37,15 +38,20 @@ type messageEncrypter interface {
 	encryptUplink(context.Context, *packetbroker.UplinkMessage) error
 }
 
+type frequencyPlansStore interface {
+	GetByID(id string) (*frequencyplans.FrequencyPlan, error)
+}
+
 type gsPbaServer struct {
-	netID             types.NetID
-	clusterID         string
-	config            ForwarderConfig
-	messageEncrypter  messageEncrypter
-	contextDecoupler  contextDecoupler
-	tenantIDExtractor TenantIDExtractor
-	upstreamCh        chan *uplinkMessage
-	mapperConn        *grpc.ClientConn
+	netID               types.NetID
+	clusterID           string
+	config              ForwarderConfig
+	messageEncrypter    messageEncrypter
+	contextDecoupler    contextDecoupler
+	tenantIDExtractor   TenantIDExtractor
+	frequencyPlansStore frequencyPlansStore
+	upstreamCh          chan *uplinkMessage
+	mapperConn          *grpc.ClientConn
 }
 
 var errForwarderDisabled = errors.DefineFailedPrecondition("forwarder_disabled", "Forwarder is disabled")
@@ -146,7 +152,23 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 		}
 	}
 
-	// TODO: frequency_plan_ids
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_ids") {
+		fps := make([]*frequencyplans.FrequencyPlan, 0, len(req.Gateway.FrequencyPlanIDs))
+		var err error
+		for _, fpID := range req.Gateway.FrequencyPlanIDs {
+			var fp *frequencyplans.FrequencyPlan
+			fp, err = s.frequencyPlansStore.GetByID(fpID)
+			if err != nil {
+				break
+			}
+			fps = append(fps, fp)
+		}
+		if err == nil {
+			if fp, err := toPBFrequencyPlan(fps...); err == nil {
+				updateReq.FrequencyPlan = fp
+			}
+		}
+	}
 
 	_, err := mappingpb.NewMapperClient(s.mapperConn).UpdateGateway(ctx, updateReq)
 	if err != nil {
