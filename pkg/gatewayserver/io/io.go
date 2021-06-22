@@ -15,6 +15,7 @@
 package io
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"sync/atomic"
@@ -99,6 +100,15 @@ type Connection struct {
 
 	statsChangedCh chan struct{}
 	locCh          chan struct{}
+
+	lastUplink            *uplinkMessage
+	lastRepeatUpEventTime time.Time
+}
+
+type uplinkMessage struct {
+	payload   []byte
+	frequency uint64
+	antennas  []uint32
 }
 
 var (
@@ -183,8 +193,15 @@ func (c *Connection) Gateway() *ttnpb.Gateway { return c.gateway }
 
 var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 
+// Interval between emitting consecutive gs.up.repeat events for the same gateway connection.
+const consecutiveRepeatUpEventsInterval = time.Minute
+
 // HandleUp updates the uplink stats and sends the message to the upstream channel.
 func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
+	if c.discardRepeatedUplink(up) {
+		return nil
+	}
+
 	var ct scheduling.ConcentratorTime
 	if up.Settings.Time != nil {
 		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
@@ -669,4 +686,49 @@ func (c *Connection) notifyStatsChanged() {
 	case c.statsChangedCh <- struct{}{}:
 	default:
 	}
+}
+
+func uplinkMessageFromProto(pb *ttnpb.UplinkMessage) *uplinkMessage {
+	up := &uplinkMessage{
+		payload:   pb.GetRawPayload(),
+		frequency: pb.GetSettings().Frequency,
+		antennas:  make([]uint32, 0, len(pb.GetRxMetadata())),
+	}
+	for _, md := range pb.GetRxMetadata() {
+		up.antennas = append(up.antennas, md.GetAntennaIndex())
+	}
+	return up
+}
+
+func isRepeatedUplink(this *uplinkMessage, that *uplinkMessage) bool {
+	if this == nil || that == nil || this.frequency != that.frequency || len(this.antennas) != len(that.antennas) || !bytes.Equal(this.payload, that.payload) {
+		return false
+	}
+	for idx, antenna := range this.antennas {
+		if that.antennas[idx] != antenna {
+			return false
+		}
+	}
+	return true
+}
+
+// discardRepeatedUplink will discard repeated uplinks from faulty gateway
+// implementations. It returns true if the uplink message is the same as the
+// last uplink message that was received by the connection.
+//
+// discardRepeatedUplink is not goroutine safe.
+func (c *Connection) discardRepeatedUplink(up *ttnpb.UplinkMessage) bool {
+	uplink := uplinkMessageFromProto(up)
+	shouldDiscard := isRepeatedUplink(c.lastUplink, uplink)
+	c.lastUplink = uplink
+	if shouldDiscard {
+		shouldEmitEvent := false
+		if time.Since(c.lastRepeatUpEventTime) >= consecutiveRepeatUpEventsInterval {
+			log.FromContext(c.ctx).Debug("Dropped repeated gateway uplink")
+			shouldEmitEvent = true
+			c.lastRepeatUpEventTime = time.Now()
+		}
+		registerRepeatUp(c.ctx, shouldEmitEvent, c.gateway, c.frontend.Protocol())
+	}
+	return shouldDiscard
 }
