@@ -214,6 +214,8 @@ export default defineMessages({
   linked: 'Linked',
   liveData: 'Live data',
   location: 'Location',
+  locationDescription:
+    'The location of this gateway may be visible to other users and on public gateway maps',
   locationSolved: 'Location solved',
   login: 'Login',
   logout: 'Logout',
@@ -328,7 +330,7 @@ export default defineMessages({
   stateRequested: 'Requested',
   stateSuspended: 'Suspended',
   status: 'Status',
-  statusDescription: 'The status of this gateway may be publicly displayed',
+  statusDescription: 'The status of this gateway may be visible to other users',
   statusUnknown: 'Status unknown',
   success: 'Success',
   supportsClassB: 'Supports class B',

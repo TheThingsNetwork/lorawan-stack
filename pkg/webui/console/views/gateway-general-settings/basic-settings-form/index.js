@@ -165,6 +165,14 @@ const BasicSettingsForm = React.memo(props => {
         tooltipId={tooltipIds.GATEWAY_STATUS}
       />
       <Form.Field
+        title={sharedMessages.gatewayLocation}
+        name="location_public"
+        component={Checkbox}
+        label={sharedMessages.public}
+        description={sharedMessages.locationDescription}
+        tooltipId={tooltipIds.GATEWAY_LOCATION}
+      />
+      <Form.Field
         name="attributes"
         title={sharedMessages.attributes}
         keyPlaceholder={sharedMessages.key}
