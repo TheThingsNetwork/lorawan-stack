@@ -82,7 +82,11 @@ func TestGatewayStore(t *testing.T) {
 				"baz": "qux",
 			},
 			Antennas: []ttnpb.GatewayAntenna{
-				{Gain: 3, Location: &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}},
+				{
+					Gain:      3,
+					Location:  &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1},
+					Placement: ttnpb.GatewayAntennaPlacement_OUTDOOR,
+				},
 			},
 			ScheduleAnytimeDelay:     &scheduleAnytimeDelay,
 			UpdateLocationFromStatus: true,
@@ -100,6 +104,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(created.Attributes, should.HaveLength, 3)
 			if a.So(created.Antennas, should.HaveLength, 1) {
 				a.So(created.Antennas[0].Gain, should.Equal, 3)
+				a.So(created.Antennas[0].Placement, should.Equal, ttnpb.GatewayAntennaPlacement_OUTDOOR)
 			}
 			a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 			a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
@@ -158,8 +163,18 @@ func TestGatewayStore(t *testing.T) {
 				"qux": "foo",
 			},
 			Antennas: []ttnpb.GatewayAntenna{
-				{Gain: 6, Location: &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "west"}},
-				{Gain: 6, Location: &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "east"}},
+				{
+					Gain:       6,
+					Location:   &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1},
+					Attributes: map[string]string{"direction": "west"},
+					Placement:  ttnpb.GatewayAntennaPlacement_INDOOR,
+				},
+				{
+					Gain:       6,
+					Location:   &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1},
+					Attributes: map[string]string{"direction": "east"},
+					Placement:  ttnpb.GatewayAntennaPlacement_OUTDOOR,
+				},
 			},
 			ScheduleAnytimeDelay:     nil,
 			UpdateLocationFromStatus: false,
@@ -176,8 +191,10 @@ func TestGatewayStore(t *testing.T) {
 			if a.So(updated.Antennas, should.HaveLength, 2) {
 				a.So(updated.Antennas[0].Gain, should.Equal, 6)
 				a.So(updated.Antennas[0].Attributes, should.HaveLength, 1)
+				a.So(updated.Antennas[0].Placement, should.Equal, ttnpb.GatewayAntennaPlacement_INDOOR)
 				a.So(updated.Antennas[1].Gain, should.Equal, 6)
 				a.So(updated.Antennas[1].Attributes, should.HaveLength, 1)
+				a.So(updated.Antennas[1].Placement, should.Equal, ttnpb.GatewayAntennaPlacement_OUTDOOR)
 			}
 			a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 			a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
@@ -225,7 +242,12 @@ func TestGatewayStore(t *testing.T) {
 		_, _ = store.UpdateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 			Antennas: []ttnpb.GatewayAntenna{
-				{Gain: 6, Location: &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "west"}},
+				{
+					Gain:       6,
+					Location:   &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1},
+					Attributes: map[string]string{"direction": "west"},
+					Placement:  ttnpb.GatewayAntennaPlacement_OUTDOOR,
+				},
 			},
 		}, &pbtypes.FieldMask{Paths: []string{"antennas"}})
 

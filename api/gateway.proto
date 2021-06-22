@@ -67,19 +67,6 @@ message GatewayRadio {
   TxConfiguration tx_configuration = 5;
 }
 
-// Template for creating gateways.
-message GatewayVersion {
-  option (gogoproto.populate) = false;
-
-  // Version identifiers.
-  GatewayVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-
-  // Photos contains file names of gateway photos.
-  repeated string photos = 2;
-  repeated GatewayRadio radios = 3;
-  uint32 clock_source = 7;
-}
-
 // Authentication code for claiming gateways.
 message GatewayClaimAuthenticationCode {
   Secret secret = 1;
@@ -275,9 +262,15 @@ message SetGatewayCollaboratorRequest {
   Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
+enum GatewayAntennaPlacement {
+  PLACEMENT_UNKNOWN = 0;
+  INDOOR = 1;
+  OUTDOOR = 2;
+}
+
 // GatewayAntenna is the message that defines a gateway antenna.
 message GatewayAntenna {
-  // gain is the antenna gain relative to this gateway, in dBi.
+  // Antenna gain relative to the gateway, in dBi.
   float gain = 1;
   // location is the antenna's location.
   Location location = 2 [(validate.rules).message.required = true];
@@ -288,6 +281,7 @@ message GatewayAntenna {
       values: { string: { max_len: 200 } }
     }
   ];
+  GatewayAntennaPlacement placement = 4;
 }
 
 message GatewayStatus {

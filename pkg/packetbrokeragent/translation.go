@@ -126,6 +126,14 @@ func toPBLocation(loc *ttnpb.Location) *packetbroker.Location {
 	}
 }
 
+func fromPBTerrestrialAntennaPlacement(p packetbroker.TerrestrialAntennaPlacement) ttnpb.GatewayAntennaPlacement {
+	return ttnpb.GatewayAntennaPlacement(p)
+}
+
+func toPBTerrestrialAntennaPlacement(p ttnpb.GatewayAntennaPlacement) packetbroker.TerrestrialAntennaPlacement {
+	return packetbroker.TerrestrialAntennaPlacement(p)
+}
+
 type agentUplinkToken struct {
 	ForwarderNetID     types.NetID `json:"fnid"`
 	ForwarderTenantID  string      `json:"ftid,omitempty"`

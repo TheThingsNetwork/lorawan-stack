@@ -14302,7 +14302,7 @@
         "gain": {
           "type": "number",
           "format": "float",
-          "description": "gain is the antenna gain relative to this gateway, in dBi."
+          "description": "Antenna gain relative to the gateway, in dBi."
         },
         "location": {
           "$ref": "#/definitions/lorawanv3Location",
@@ -14313,6 +14313,9 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "placement": {
+          "$ref": "#/definitions/v3GatewayAntennaPlacement"
         }
       },
       "description": "GatewayAntenna is the message that defines a gateway antenna."
@@ -14328,6 +14331,15 @@
           "format": "int64"
         }
       }
+    },
+    "v3GatewayAntennaPlacement": {
+      "type": "string",
+      "enum": [
+        "PLACEMENT_UNKNOWN",
+        "INDOOR",
+        "OUTDOOR"
+      ],
+      "default": "PLACEMENT_UNKNOWN"
     },
     "v3GatewayClaimAuthenticationCode": {
       "type": "object",

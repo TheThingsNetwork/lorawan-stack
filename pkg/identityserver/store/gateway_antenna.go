@@ -29,6 +29,8 @@ type GatewayAntenna struct {
 	Gain float32
 
 	Location
+
+	Placement int
 }
 
 func init() {
@@ -50,6 +52,7 @@ func (a GatewayAntenna) toPB() ttnpb.GatewayAntenna {
 		Gain:       a.Gain,
 		Location:   loc,
 		Attributes: attributes(a.Attributes).toMap(),
+		Placement:  ttnpb.GatewayAntennaPlacement(a.Placement),
 	}
 }
 
@@ -62,4 +65,5 @@ func (a *GatewayAntenna) fromPB(pb ttnpb.GatewayAntenna) {
 		Accuracy:  pb.Location.GetAccuracy(),
 	}
 	a.Attributes = attributes(a.Attributes).updateFromMap(pb.Attributes)
+	a.Placement = int(pb.Placement)
 }

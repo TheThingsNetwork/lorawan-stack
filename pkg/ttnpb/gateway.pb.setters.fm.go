@@ -228,63 +228,6 @@ func (dst *GatewayRadio) SetFields(src *GatewayRadio, paths ...string) error {
 	return nil
 }
 
-func (dst *GatewayVersion) SetFields(src *GatewayVersion, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "ids":
-			if len(subs) > 0 {
-				var newDst, newSrc *GatewayVersionIdentifiers
-				if src != nil {
-					newSrc = &src.GatewayVersionIdentifiers
-				}
-				newDst = &dst.GatewayVersionIdentifiers
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.GatewayVersionIdentifiers = src.GatewayVersionIdentifiers
-				} else {
-					var zero GatewayVersionIdentifiers
-					dst.GatewayVersionIdentifiers = zero
-				}
-			}
-		case "photos":
-			if len(subs) > 0 {
-				return fmt.Errorf("'photos' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Photos = src.Photos
-			} else {
-				dst.Photos = nil
-			}
-		case "radios":
-			if len(subs) > 0 {
-				return fmt.Errorf("'radios' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Radios = src.Radios
-			} else {
-				dst.Radios = nil
-			}
-		case "clock_source":
-			if len(subs) > 0 {
-				return fmt.Errorf("'clock_source' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.ClockSource = src.ClockSource
-			} else {
-				var zero uint32
-				dst.ClockSource = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
 func (dst *GatewayClaimAuthenticationCode) SetFields(src *GatewayClaimAuthenticationCode, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -1318,6 +1261,16 @@ func (dst *GatewayAntenna) SetFields(src *GatewayAntenna, paths ...string) error
 				dst.Attributes = src.Attributes
 			} else {
 				dst.Attributes = nil
+			}
+		case "placement":
+			if len(subs) > 0 {
+				return fmt.Errorf("'placement' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Placement = src.Placement
+			} else {
+				var zero GatewayAntennaPlacement
+				dst.Placement = zero
 			}
 
 		default:

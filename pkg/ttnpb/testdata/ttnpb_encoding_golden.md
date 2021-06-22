@@ -1114,6 +1114,9 @@ Text | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_8 {} 0} | DEVICE_EIRP_8
 Text | ttnpb.FrequencyValue | {100000 {} 0} | 100000
 Text | ttnpb.FrequencyValue | {2000000 {} 0} | 2000000
 Text | ttnpb.FrequencyValue | {30000000 {} 0} | 30000000
+Text | ttnpb.GatewayAntennaPlacement | INDOOR | INDOOR
+Text | ttnpb.GatewayAntennaPlacement | OUTDOOR | OUTDOOR
+Text | ttnpb.GatewayAntennaPlacement | PLACEMENT_UNKNOWN | PLACEMENT_UNKNOWN
 Text | ttnpb.GrantType | GRANT_AUTHORIZATION_CODE | GRANT_AUTHORIZATION_CODE
 Text | ttnpb.GrantType | GRANT_PASSWORD | GRANT_PASSWORD
 Text | ttnpb.GrantType | GRANT_REFRESH_TOKEN | GRANT_REFRESH_TOKEN
