@@ -137,7 +137,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-		adminContact, techContact := toContactInfo(req.Gateway.GetContactInfo())
+		adminContact, techContact := toPBContactInfo(req.Gateway.GetContactInfo())
 		updateReq.AdministrativeContact = &packetbroker.ContactInfoValue{
 			Value: adminContact,
 		}

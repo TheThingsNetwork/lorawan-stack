@@ -652,3 +652,134 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 	}
 	return uid, down, nil
 }
+
+func fromPBDevAddrBlocks(blocks []*packetbroker.DevAddrBlock) []*ttnpb.PacketBrokerDevAddrBlock {
+	res := make([]*ttnpb.PacketBrokerDevAddrBlock, len(blocks))
+	for i, b := range blocks {
+		res[i] = &ttnpb.PacketBrokerDevAddrBlock{
+			DevAddrPrefix: &ttnpb.DevAddrPrefix{
+				DevAddr: &types.DevAddr{},
+				Length:  b.GetPrefix().GetLength(),
+			},
+			HomeNetworkClusterID: b.GetHomeNetworkClusterId(),
+		}
+		res[i].DevAddrPrefix.DevAddr.UnmarshalNumber(b.GetPrefix().GetValue())
+	}
+	return res
+}
+
+func toPBDevAddrBlocks(blocks []*ttnpb.PacketBrokerDevAddrBlock) []*packetbroker.DevAddrBlock {
+	res := make([]*packetbroker.DevAddrBlock, len(blocks))
+	for i, b := range blocks {
+		res[i] = &packetbroker.DevAddrBlock{
+			Prefix: &packetbroker.DevAddrPrefix{
+				Value:  b.GetDevAddrPrefix().DevAddr.MarshalNumber(),
+				Length: b.GetDevAddrPrefix().GetLength(),
+			},
+			HomeNetworkClusterId: b.GetHomeNetworkClusterID(),
+		}
+	}
+	return res
+}
+
+func fromPBContactInfo(admin, technical *packetbroker.ContactInfo) []*ttnpb.ContactInfo {
+	res := make([]*ttnpb.ContactInfo, 0, 2)
+	if email := admin.GetEmail(); email != "" {
+		res = append(res, &ttnpb.ContactInfo{
+			ContactType:   ttnpb.CONTACT_TYPE_OTHER,
+			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+			Value:         email,
+		})
+	}
+	if email := technical.GetEmail(); email != "" {
+		res = append(res, &ttnpb.ContactInfo{
+			ContactType:   ttnpb.CONTACT_TYPE_TECHNICAL,
+			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+			Value:         email,
+		})
+	}
+	return res
+}
+
+func toPBContactInfo(info []*ttnpb.ContactInfo) (admin, technical *packetbroker.ContactInfo) {
+	for _, c := range info {
+		if c.GetContactMethod() != ttnpb.CONTACT_METHOD_EMAIL || c.GetValue() == "" {
+			continue
+		}
+		switch c.GetContactType() {
+		case ttnpb.CONTACT_TYPE_OTHER:
+			admin = &packetbroker.ContactInfo{
+				Email: c.GetValue(),
+			}
+		case ttnpb.CONTACT_TYPE_TECHNICAL:
+			technical = &packetbroker.ContactInfo{
+				Email: c.GetValue(),
+			}
+		}
+	}
+	return
+}
+
+func fromPBUplinkRoutingPolicy(policy *packetbroker.RoutingPolicy_Uplink) *ttnpb.PacketBrokerRoutingPolicyUplink {
+	return &ttnpb.PacketBrokerRoutingPolicyUplink{
+		JoinRequest:     policy.GetJoinRequest(),
+		MacData:         policy.GetMacData(),
+		ApplicationData: policy.GetApplicationData(),
+		SignalQuality:   policy.GetSignalQuality(),
+		Localization:    policy.GetLocalization(),
+	}
+}
+
+func fromPBDownlinkRoutingPolicy(policy *packetbroker.RoutingPolicy_Downlink) *ttnpb.PacketBrokerRoutingPolicyDownlink {
+	return &ttnpb.PacketBrokerRoutingPolicyDownlink{
+		JoinAccept:      policy.GetJoinAccept(),
+		MacData:         policy.GetMacData(),
+		ApplicationData: policy.GetApplicationData(),
+	}
+}
+
+func fromPBDefaultRoutingPolicy(policy *packetbroker.RoutingPolicy) *ttnpb.PacketBrokerDefaultRoutingPolicy {
+	return &ttnpb.PacketBrokerDefaultRoutingPolicy{
+		UpdatedAt: policy.GetUpdatedAt(),
+		Uplink:    fromPBUplinkRoutingPolicy(policy.GetUplink()),
+		Downlink:  fromPBDownlinkRoutingPolicy(policy.GetDownlink()),
+	}
+}
+
+func fromPBRoutingPolicy(policy *packetbroker.RoutingPolicy) *ttnpb.PacketBrokerRoutingPolicy {
+	var homeNetworkID *ttnpb.PacketBrokerNetworkIdentifier
+	if policy.HomeNetworkNetId != 0 || policy.HomeNetworkTenantId != "" {
+		homeNetworkID = &ttnpb.PacketBrokerNetworkIdentifier{
+			NetID:    policy.GetHomeNetworkNetId(),
+			TenantId: policy.GetHomeNetworkTenantId(),
+		}
+	}
+	return &ttnpb.PacketBrokerRoutingPolicy{
+		ForwarderId: &ttnpb.PacketBrokerNetworkIdentifier{
+			NetID:    policy.GetForwarderNetId(),
+			TenantId: policy.GetForwarderTenantId(),
+		},
+		HomeNetworkId: homeNetworkID,
+		UpdatedAt:     policy.GetUpdatedAt(),
+		Uplink:        fromPBUplinkRoutingPolicy(policy.GetUplink()),
+		Downlink:      fromPBDownlinkRoutingPolicy(policy.GetDownlink()),
+	}
+}
+
+func toPBUplinkRoutingPolicy(policy *ttnpb.PacketBrokerRoutingPolicyUplink) *packetbroker.RoutingPolicy_Uplink {
+	return &packetbroker.RoutingPolicy_Uplink{
+		JoinRequest:     policy.GetJoinRequest(),
+		MacData:         policy.GetMacData(),
+		ApplicationData: policy.GetApplicationData(),
+		SignalQuality:   policy.GetSignalQuality(),
+		Localization:    policy.GetLocalization(),
+	}
+}
+
+func toPBDownlinkRoutingPolicy(policy *ttnpb.PacketBrokerRoutingPolicyDownlink) *packetbroker.RoutingPolicy_Downlink {
+	return &packetbroker.RoutingPolicy_Downlink{
+		JoinAccept:      policy.GetJoinAccept(),
+		MacData:         policy.GetMacData(),
+		ApplicationData: policy.GetApplicationData(),
+	}
+}
