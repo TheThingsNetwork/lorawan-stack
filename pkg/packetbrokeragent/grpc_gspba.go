@@ -123,8 +123,8 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 					Value: uint32(len(req.Gateway.Antennas)),
 				},
 			}
-			if loc := req.Gateway.Antennas[0].Location; loc.Latitude != 0 || loc.Longitude != 0 || loc.Altitude != 0 {
-				val.Location = toPBLocation(&loc)
+			if loc := req.Gateway.Antennas[0].Location; loc != nil {
+				val.Location = toPBLocation(loc)
 			}
 			updateReq.GatewayLocation.Location = &packetbroker.GatewayLocation{
 				Value: &packetbroker.GatewayLocation_Terrestrial_{

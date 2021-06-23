@@ -464,7 +464,7 @@ func TestForwarder(t *testing.T) {
 				FrequencyPlanIDs: []string{"EU_863_870"},
 				Antennas: []ttnpb.GatewayAntenna{
 					{
-						Location: ttnpb.Location{
+						Location: &ttnpb.Location{
 							Latitude:  4.85464,
 							Longitude: 52.34562,
 							Altitude:  16,
