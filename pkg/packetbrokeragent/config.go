@@ -15,6 +15,8 @@
 package packetbrokeragent
 
 import (
+	"time"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -78,6 +80,7 @@ type ForwarderConfig struct {
 	IncludeGatewayEUI bool             `name:"include-gateway-eui" description:"Include the gateway EUI in forwarded metadata"`
 	IncludeGatewayID  bool             `name:"include-gateway-id" description:"Include the gateway ID in forwarded metadata"`
 	HashGatewayID     bool             `name:"hash-gateway-id" description:"Hash the gateway ID (if forwarded in the metadata)"`
+	GatewayOnlineTTL  time.Duration    `name:"gateway-online-ttl" description:"Time-to-live of online status reported to Packet Broker"`
 }
 
 // HomeNetworkConfig defines the configuration of the Home Network role.

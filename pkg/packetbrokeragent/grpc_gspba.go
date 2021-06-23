@@ -32,7 +32,11 @@ import (
 	"google.golang.org/grpc"
 )
 
-const onlineTTL = 10 * time.Minute
+// DefaultGatewayOnlineTTL is the default time-to-live of the online status reported to Packet Broker.
+// Packet Broker Agent must bump the online status before the previous online status expires, to keep the gateway marked online.
+// A low value results in more calls to Packet Broker Mapper to keep gateways online.
+// A high value results in a longer time until gateways that go offline will be marked offline on the map.
+const DefaultGatewayOnlineTTL = 10 * time.Minute
 
 type messageEncrypter interface {
 	encryptUplink(context.Context, *packetbroker.UplinkMessage) error
@@ -138,7 +142,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 		updateReq.Online = &pbtypes.BoolValue{}
 		if req.Gateway.StatusPublic && req.Online {
 			updateReq.Online.Value = true
-			updateReq.OnlineTtl = pbtypes.DurationProto(onlineTTL)
+			updateReq.OnlineTtl = pbtypes.DurationProto(s.config.GatewayOnlineTTL)
 		}
 	}
 
@@ -178,7 +182,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 
 	res := &ttnpb.UpdatePacketBrokerGatewayResponse{}
 	if updateReq.Online.GetValue() {
-		res.OnlineTtl = pbtypes.DurationProto(onlineTTL)
+		res.OnlineTtl = pbtypes.DurationProto(s.config.GatewayOnlineTTL)
 	}
 	return res, nil
 }

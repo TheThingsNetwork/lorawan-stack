@@ -43,5 +43,6 @@ var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
 		IncludeGatewayEUI: true,
 		IncludeGatewayID:  true,
 		HashGatewayID:     false,
+		GatewayOnlineTTL:  packetbrokeragent.DefaultGatewayOnlineTTL,
 	},
 }
