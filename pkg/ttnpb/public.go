@@ -102,7 +102,9 @@ func (g *Gateway) PublicSafe() *Gateway {
 		safe.GatewayServerAddress = ""
 	}
 	if !safe.LocationPublic {
-		safe.Antennas = nil
+		for _, ant := range safe.Antennas {
+			ant.Location = nil
+		}
 	}
 	return &safe
 }

@@ -75,8 +75,8 @@ func (is IS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gate
 	return registry.Get(ctx, req, callOpt)
 }
 
-// UpdateLocation updates the gateway location.
-func (is IS) UpdateLocation(ctx context.Context, ids ttnpb.GatewayIdentifiers, location ttnpb.Location) error {
+// UpdateAntennas updates the gateway antennas.
+func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, antennas []ttnpb.GatewayAntenna) error {
 	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
 	if err != nil {
 		return err
@@ -89,11 +89,7 @@ func (is IS) UpdateLocation(ctx context.Context, ids ttnpb.GatewayIdentifiers, l
 	req := &ttnpb.UpdateGatewayRequest{
 		Gateway: ttnpb.Gateway{
 			GatewayIdentifiers: ids,
-			Antennas: []ttnpb.GatewayAntenna{
-				{
-					Location: location,
-				},
-			},
+			Antennas:           antennas,
 		},
 		FieldMask: pbtypes.FieldMask{
 			Paths: []string{"antennas"},

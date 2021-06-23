@@ -789,8 +789,29 @@ func sameLocation(a, b ttnpb.Location) bool {
 		math.Abs(a.Longitude-b.Longitude) <= allowedLocationDelta
 }
 
+func sameAntennaLocations(a, b []ttnpb.GatewayAntenna) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for _, a := range a {
+		for _, b := range b {
+			if a.Location != nil && b.Location != nil && !sameLocation(*a.Location, *b.Location) {
+				return false
+			}
+			if (a.Location == nil) != (b.Location == nil) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
-	ctx := conn.Context()
+	var (
+		ctx          = conn.Context()
+		gtw          = conn.Gateway()
+		lastAntennas []ttnpb.GatewayAntenna
+	)
 
 	for {
 		select {
@@ -799,19 +820,24 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 		case <-conn.LocationChanged():
 			status, _, ok := conn.StatusStats()
 			if ok && len(status.AntennaLocations) > 0 {
-				loc := *status.AntennaLocations[0]
-				loc.Source = ttnpb.SOURCE_GPS
-				if len(conn.Gateway().Antennas) == 0 {
-					conn.Gateway().Antennas = []ttnpb.GatewayAntenna{{}}
+				antennas := make([]ttnpb.GatewayAntenna, len(gtw.Antennas))
+				for i, ant := range gtw.Antennas {
+					antennas[i].Gain = ant.Gain
+					if i < len(status.AntennaLocations) && status.AntennaLocations[i] != nil {
+						loc := *status.AntennaLocations[i]
+						loc.Source = ttnpb.SOURCE_GPS
+						antennas[i].Location = &loc
+					}
 				}
-				if sameLocation(conn.Gateway().Antennas[0].Location, loc) {
+				if lastAntennas != nil && sameAntennaLocations(lastAntennas, antennas) {
 					break
 				}
-				err := gs.entityRegistry.UpdateLocation(ctx, conn.Gateway().GatewayIdentifiers, loc)
+
+				err := gs.entityRegistry.UpdateAntennas(ctx, gtw.GatewayIdentifiers, antennas)
 				if err != nil {
-					log.FromContext(ctx).WithError(err).Warn("Failed to update antenna location")
+					log.FromContext(ctx).WithError(err).Warn("Failed to update antennas")
 				} else {
-					conn.Gateway().Antennas[0].Location = loc
+					lastAntennas = antennas
 				}
 			}
 

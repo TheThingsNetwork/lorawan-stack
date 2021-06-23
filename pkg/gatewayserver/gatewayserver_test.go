@@ -773,7 +773,7 @@ func TestGatewayServer(t *testing.T) {
 								GatewayIdentifiers: ids,
 							})
 							a.So(err, should.BeNil)
-							gtw.Antennas[0].Location = ttnpb.Location{
+							gtw.Antennas[0].Location = &ttnpb.Location{
 								Source: ttnpb.SOURCE_GPS,
 							}
 							gtw.UpdateLocationFromStatus = tc.UpdateLocation
@@ -865,7 +865,7 @@ func TestGatewayServer(t *testing.T) {
 						a.So(err, should.BeNil)
 						a.So(gtw.LocationPublic, should.Equal, locationPublic)
 						gtw.LocationPublic = locationPublic
-						gtw.Antennas[0].Location = *location
+						gtw.Antennas[0].Location = location
 						gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
 							GatewayIdentifiers: ids,
 						})
@@ -1001,7 +1001,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -69,
 											ChannelRSSI:        -69,
 											SNR:                11,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -1035,7 +1035,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -69,
 											ChannelRSSI:        -69,
 											SNR:                11,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: duplicatePayload,
@@ -1061,7 +1061,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -69,
 											ChannelRSSI:        -69,
 											SNR:                11,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: duplicatePayload,
@@ -1087,7 +1087,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -42,
 											ChannelRSSI:        -42,
 											SNR:                11,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: duplicatePayload,
@@ -1121,7 +1121,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -69,
 											ChannelRSSI:        -69,
 											SNR:                11,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -1155,7 +1155,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -112,
 											ChannelRSSI:        -112,
 											SNR:                2,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: []byte{0xff, 0x02, 0x03}, // Garbage; doesn't get forwarded.
@@ -1181,7 +1181,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -69,
 											ChannelRSSI:        -69,
 											SNR:                11,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -1207,7 +1207,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -36,
 											ChannelRSSI:        -36,
 											SNR:                5,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: randomJoinRequestPayload(

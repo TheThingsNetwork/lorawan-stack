@@ -36,6 +36,6 @@ type EntityRegistry interface {
 	GetIdentifiersForEUI(ctx context.Context, in *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error)
 	// Get the gateway with the given identifiers, selecting the fields specified.
 	Get(ctx context.Context, in *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error)
-	// UpdateLocation updates the gateway location.
-	UpdateLocation(ctx context.Context, ids ttnpb.GatewayIdentifiers, location ttnpb.Location) error
+	// UpdateAntennas updates the gateway antennas.
+	UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, antennas []ttnpb.GatewayAntenna) error
 }
