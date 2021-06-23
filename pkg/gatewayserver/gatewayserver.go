@@ -830,11 +830,11 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 				for i, ant := range gtw.Antennas {
 					antennas[i].Gain = ant.Gain
 				}
-				for i, ant := range antennas {
+				for i := range antennas {
 					if i < len(status.AntennaLocations) && status.AntennaLocations[i] != nil {
 						loc := *status.AntennaLocations[i]
 						loc.Source = ttnpb.SOURCE_GPS
-						ant.Location = &loc
+						antennas[i].Location = &loc
 					}
 				}
 				if lastAntennas != nil && sameAntennaLocations(lastAntennas, antennas) {

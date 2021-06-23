@@ -104,8 +104,7 @@ func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (
 	if !ok {
 		return nil, errNotFound.New()
 	}
-	// Just update antennas
-	gtw.Antennas = req.Antennas
+	gtw.SetFields(&req.Gateway, req.FieldMask.Paths...)
 	return gtw, nil
 }
 

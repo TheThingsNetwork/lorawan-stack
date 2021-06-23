@@ -25,6 +25,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
@@ -708,7 +709,7 @@ func TestGatewayServer(t *testing.T) {
 						Name           string
 						UpdateLocation bool
 						Up             *ttnpb.GatewayUp
-						ExpectLocation ttnpb.Location
+						ExpectLocation *ttnpb.Location
 					}{
 						{
 							Name:           "NoUpdate",
@@ -726,7 +727,7 @@ func TestGatewayServer(t *testing.T) {
 									},
 								},
 							},
-							ExpectLocation: ttnpb.Location{
+							ExpectLocation: &ttnpb.Location{
 								Source: ttnpb.SOURCE_GPS,
 							},
 						},
@@ -738,7 +739,7 @@ func TestGatewayServer(t *testing.T) {
 									Time: time.Unix(424242, 0),
 								},
 							},
-							ExpectLocation: ttnpb.Location{
+							ExpectLocation: &ttnpb.Location{
 								Source: ttnpb.SOURCE_GPS,
 							},
 						},
@@ -758,7 +759,7 @@ func TestGatewayServer(t *testing.T) {
 									},
 								},
 							},
-							ExpectLocation: ttnpb.Location{
+							ExpectLocation: &ttnpb.Location{
 								Source:    ttnpb.SOURCE_GPS,
 								Altitude:  10,
 								Latitude:  12,
@@ -773,12 +774,19 @@ func TestGatewayServer(t *testing.T) {
 								GatewayIdentifiers: ids,
 							})
 							a.So(err, should.BeNil)
+
 							gtw.Antennas[0].Location = &ttnpb.Location{
 								Source: ttnpb.SOURCE_GPS,
 							}
 							gtw.UpdateLocationFromStatus = tc.UpdateLocation
-							gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
-								GatewayIdentifiers: ids,
+							gtw, err = is.Update(ctx, &ttnpb.UpdateGatewayRequest{
+								Gateway: *gtw,
+								FieldMask: pbtypes.FieldMask{
+									Paths: []string{
+										"antennas",
+										"update_location_from_status",
+									},
+								},
 							})
 							a.So(err, should.BeNil)
 							a.So(gtw.UpdateLocationFromStatus, should.Equal, tc.UpdateLocation)
