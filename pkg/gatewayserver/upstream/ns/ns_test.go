@@ -55,7 +55,7 @@ func TestNSHandler(t *testing.T) {
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
-	h := NewHandler(ctx, c, nil)
+	h := NewHandler(ctx, c, c, nil)
 
 	for _, tc := range []struct {
 		Name                 string

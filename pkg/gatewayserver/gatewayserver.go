@@ -145,7 +145,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		var handler upstream.Handler
 		switch name {
 		case "cluster":
-			handler = ns.NewHandler(gs.Context(), c, prefix)
+			handler = ns.NewHandler(gs.Context(), c, c, prefix)
 		case "packetbroker":
 			handler = packetbroker.NewHandler(gs.Context(), c, prefix)
 		default:
