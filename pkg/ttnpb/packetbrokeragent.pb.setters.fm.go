@@ -42,6 +42,24 @@ func (dst *UpdatePacketBrokerGatewayRequest) SetFields(src *UpdatePacketBrokerGa
 				var zero bool
 				dst.Online = zero
 			}
+		case "rx_rate":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx_rate' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RxRate = src.RxRate
+			} else {
+				dst.RxRate = nil
+			}
+		case "tx_rate":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tx_rate' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TxRate = src.TxRate
+			} else {
+				dst.TxRate = nil
+			}
 		case "field_mask":
 			if len(subs) > 0 {
 				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)

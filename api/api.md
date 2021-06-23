@@ -7117,6 +7117,8 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | ----- | ---- | ----- | ----------- |
 | `gateway` | [`Gateway`](#ttn.lorawan.v3.Gateway) |  |  |
 | `online` | [`bool`](#bool) |  |  |
+| `rx_rate` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Received packets rate (number of packets per hour). This field gets updated when a value is set. |
+| `tx_rate` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Transmitted packets rate (number of packets per hour). This field gets updated when a value is set. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that are considered for update. Supported values are: antennas, contact_info, frequency_plan_id, frequency_plan_ids, ids, status_public and location_public.
 
 Online status is only updated if status_public is set. If status_public is set and false, the status will be reset. If status_public is set and true, the online status is taken from the online field. The return message contains the duration online_ttl for how long the gateway is considered online.

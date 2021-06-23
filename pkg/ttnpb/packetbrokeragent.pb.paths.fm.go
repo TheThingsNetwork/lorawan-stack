@@ -48,12 +48,16 @@ var UpdatePacketBrokerGatewayRequestFieldPathsNested = []string{
 	"gateway.version_ids.hardware_version",
 	"gateway.version_ids.model_id",
 	"online",
+	"rx_rate",
+	"tx_rate",
 }
 
 var UpdatePacketBrokerGatewayRequestFieldPathsTopLevel = []string{
 	"field_mask",
 	"gateway",
 	"online",
+	"rx_rate",
+	"tx_rate",
 }
 var UpdatePacketBrokerGatewayResponseFieldPathsNested = []string{
 	"online_ttl",

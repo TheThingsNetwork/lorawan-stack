@@ -71,6 +71,30 @@ func (m *UpdatePacketBrokerGatewayRequest) ValidateFields(paths ...string) error
 
 		case "online":
 			// no validation rules for Online
+		case "rx_rate":
+
+			if v, ok := interface{}(m.GetRxRate()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UpdatePacketBrokerGatewayRequestValidationError{
+						field:  "rx_rate",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "tx_rate":
+
+			if v, ok := interface{}(m.GetTxRate()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UpdatePacketBrokerGatewayRequestValidationError{
+						field:  "tx_rate",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "field_mask":
 
 			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
