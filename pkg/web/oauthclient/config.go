@@ -24,6 +24,8 @@ type Config struct {
 	ClientID     string `name:"client-id" description:"The OAuth client ID"`
 	ClientSecret string `name:"client-secret" description:"The OAuth client secret" json:"-"`
 
+	CrossSiteCookie bool `name:"cross-site-cookie" description:"Whether to make OAuth cookies accessible cross-site"`
+
 	StateCookieName string `name:"-"`
 	AuthCookieName  string `name:"-"`
 
