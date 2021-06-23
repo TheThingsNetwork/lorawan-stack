@@ -458,14 +458,12 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		}
 		logger.Warn("Connect unregistered gateway")
 		gtw = &ttnpb.Gateway{
-			GatewayIdentifiers:       ids,
-			FrequencyPlanID:          fpID,
-			FrequencyPlanIDs:         []string{fpID},
-			EnforceDutyCycle:         true,
-			DownlinkPathConstraint:   ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
-			Antennas:                 []ttnpb.GatewayAntenna{},
-			LocationPublic:           false,
-			UpdateLocationFromStatus: false,
+			GatewayIdentifiers:     ids,
+			FrequencyPlanID:        fpID,
+			FrequencyPlanIDs:       []string{fpID},
+			EnforceDutyCycle:       true,
+			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+			Antennas:               []ttnpb.GatewayAntenna{},
 		}
 	} else if err != nil {
 		return nil, err
@@ -501,8 +499,10 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		}
 		existingConnEntry.tasksDone.Wait()
 	}
+
 	registerGatewayConnect(ctx, ids, frontend.Protocol())
 	logger.Info("Connected")
+
 	go gs.handleUpstream(connEntry)
 	if gs.statsRegistry != nil {
 		go gs.updateConnStats(connEntry)
