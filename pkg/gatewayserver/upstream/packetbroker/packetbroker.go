@@ -51,8 +51,8 @@ func NewHandler(ctx context.Context, cluster Cluster, devAddrPrefixes []types.De
 	}
 }
 
-// GetDevAddrPrefixes implements upstream.Handler.
-func (h *Handler) GetDevAddrPrefixes() []types.DevAddrPrefix {
+// DevAddrPrefixes implements upstream.Handler.
+func (h *Handler) DevAddrPrefixes() []types.DevAddrPrefix {
 	return h.devAddrPrefixes
 }
 

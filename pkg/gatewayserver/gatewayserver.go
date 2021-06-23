@@ -628,7 +628,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 					var pass bool
 					switch {
 					case ids.DevAddr != nil:
-						for _, prefix := range host.handler.GetDevAddrPrefixes() {
+						for _, prefix := range host.handler.DevAddrPrefixes() {
 							if ids.DevAddr.HasPrefix(prefix) {
 								pass = true
 								break
