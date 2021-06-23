@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 - Email sent to admins when an OAuth client is requested by a non-admin user.
 - Packet Broker UI in the Console (admin only). 
+- New config option `--console.oauth.cross-site-cookie` to control access to OAuth state cookie between origins.
+  - This option needs to be set to `true` (default is `false`) in multi-cluster deployments in order to support OAuth clients that use POST callbacks.
 
 ### Changed
 
@@ -30,6 +32,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Parse error in Webhook Templates.
 - Application deletion handling in the Console.
+- Error when logging into the Console when using connections without TLS.
 
 ### Security
 
