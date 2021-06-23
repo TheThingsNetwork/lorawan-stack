@@ -21,7 +21,13 @@ For details about compatibility between different releases, see the **Commitment
 - Query for the most recent application messages from the Storage Integration API with the new `last` parameter (for example, `?last=10m` or `?last=2h`). See also `--last` argument for the `ttn-lw-cli applications storage get` and `ttn-lw-cli end-devices storage get` commands.
 - A location solved message is published automatically by Application Server when the decoded payload contains coordinates (e.g. `latitude` and `longitude`, among other combinations, as well as support for accuracy and altitude).
 - Configuration option to include Packet Broker metadata in uplink messages: `pba.home-network.include-hops`. By default, this is now disabled.
-
+- Update gateway identity, status, antennas, frequency plan, location and receive and transmit rates to Packet Broker Mapper. Mapping is enabled when the Forwarder role is enabled. The following new configuration options are introduced to change the default behavior:
+  - `gs.packetbroker.update-gateway-interval`: Update gateway interval
+  - `gs.packetbroker.update-gateway-jitter`: Jitter (fraction) to apply to the update interval to randomize intervals
+  - `gs.packetbroker.online-ttl-margin`: Time to extend the online status before it expires
+  - `pba.mapper-address`: Address of Packet Broker Mapper
+  - `pba.forwarder.gateway-online-ttl`: Time-to-live of online status reported to Packet Broker
+  
 ### Changed
 
 - Low-level log messages from the `go-redis` library are printed only when the log level is set to `DEBUG`.
