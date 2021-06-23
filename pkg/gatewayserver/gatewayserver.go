@@ -105,7 +105,6 @@ var (
 	)
 	errNotConnected        = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
 	errSetupUpstream       = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{name}`")
-	errUpstreamType        = errors.DefineUnimplemented("upstream_type_not_implemented", "upstream `{name}` not implemented")
 	errInvalidUpstreamName = errors.DefineInvalidArgument("invalid_upstream_name", "upstream `{name}` is invalid")
 )
 
@@ -537,10 +536,7 @@ func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIde
 	return entry.(connectionEntry).Connection, true
 }
 
-var (
-	errNoNetworkServer = errors.DefineNotFound("no_network_server", "no Network Server found to handle message")
-	errHostHandle      = errors.Define("host_handle", "host `{host}` failed to handle message")
-)
+var errHostHandle = errors.Define("host_handle", "host `{host}` failed to handle message")
 
 var (
 	// maxUpstreamHandlers is the maximum number of goroutines per gateway connection to handle upstream messages.
