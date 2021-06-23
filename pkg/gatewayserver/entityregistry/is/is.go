@@ -18,8 +18,11 @@ package is
 import (
 	"context"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
@@ -27,12 +30,13 @@ import (
 // Cluster provides cluster operations.
 type Cluster interface {
 	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error)
+	AllowInsecureForCredentials() bool
+	WithClusterAuth() grpc.CallOption
 }
 
 // IS exposes Identity Server functions.
 type IS struct {
 	Cluster
-	gatewayRegistry ttnpb.GatewayRegistryClient
 }
 
 // New returns a new IS.
@@ -42,48 +46,64 @@ func New(c Cluster) *IS {
 	}
 }
 
-// SetGatewayRegistry overrides the gateway registry of the IS.
-func (is IS) SetGatewayRegistry(_ context.Context, registry ttnpb.GatewayRegistryClient) {
-	is.gatewayRegistry = registry
-}
-
 // AssertGatewayRights implements EntityRegistry.
 func (is IS) AssertGatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error {
 	return rights.RequireGateway(ctx, ids, required...)
 }
 
 // GetIdentifiersForEUI implements EntityRegistry.
-func (is IS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest, opts ...grpc.CallOption) (*ttnpb.GatewayIdentifiers, error) {
-	registry, err := is.getRegistry(ctx, &ttnpb.GatewayIdentifiers{Eui: &req.Eui})
+func (is IS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
+	registry, err := is.newRegistryClient(ctx, &ttnpb.GatewayIdentifiers{Eui: &req.Eui})
 	if err != nil {
 		return nil, err
 	}
-
-	return registry.GetIdentifiersForEUI(ctx, req, opts...)
+	return registry.GetIdentifiersForEUI(ctx, req, is.WithClusterAuth())
 }
 
 // Get implements EntityRegistry.
-func (is IS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest, opts ...grpc.CallOption) (*ttnpb.Gateway, error) {
-	registry, err := is.getRegistry(ctx, &req.GatewayIdentifiers)
+func (is IS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
+	if errors.IsUnauthenticated(err) {
+		callOpt = is.WithClusterAuth()
+	} else if err != nil {
+		return nil, err
+	}
+	registry, err := is.newRegistryClient(ctx, &req.GatewayIdentifiers)
 	if err != nil {
 		return nil, err
 	}
-	return registry.Get(ctx, req, opts...)
+	return registry.Get(ctx, req, callOpt)
 }
 
-// Update the gateway, changing the fields specified by the field mask to the provided values.
-func (is IS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest, opts ...grpc.CallOption) (*ttnpb.Gateway, error) {
-	registry, err := is.getRegistry(ctx, &req.GatewayIdentifiers)
+// UpdateLocation updates the gateway location.
+func (is IS) UpdateLocation(ctx context.Context, ids ttnpb.GatewayIdentifiers, location ttnpb.Location) error {
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return registry.Update(ctx, req, opts...)
+
+	registry, err := is.newRegistryClient(ctx, &ids)
+	if err != nil {
+		return err
+	}
+	req := &ttnpb.UpdateGatewayRequest{
+		Gateway: ttnpb.Gateway{
+			GatewayIdentifiers: ids,
+			Antennas: []ttnpb.GatewayAntenna{
+				{
+					Location: location,
+				},
+			},
+		},
+		FieldMask: pbtypes.FieldMask{
+			Paths: []string{"antennas"},
+		},
+	}
+	_, err = registry.Update(ctx, req, callOpt)
+	return err
 }
 
-func (is IS) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
-	if is.gatewayRegistry != nil {
-		return is.gatewayRegistry, nil
-	}
+func (is IS) newRegistryClient(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
 	var (
 		cc  *grpc.ClientConn
 		err error

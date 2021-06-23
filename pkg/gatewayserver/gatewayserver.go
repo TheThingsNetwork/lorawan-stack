@@ -373,7 +373,7 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 	if ids.GatewayId == "" {
 		extIDs, err := gs.entityRegistry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 			Eui: *ids.Eui,
-		}, gs.WithClusterAuth())
+		})
 		if err == nil {
 			ids = *extIDs
 		} else if errors.IsNotFound(err) {
@@ -428,17 +428,8 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	ctx = log.NewContext(ctx, logger)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
 
-	var (
-		err             error
-		callOpt         grpc.CallOption
-		isAuthenticated bool
-	)
-	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
-	if errors.IsUnauthenticated(err) {
-		callOpt = gs.WithClusterAuth()
-	} else if err != nil {
-		return nil, err
-	} else {
+	var isAuthenticated bool
+	if _, err := rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()); err == nil {
 		isAuthenticated = true
 	}
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
@@ -457,7 +448,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 				"update_location_from_status",
 			},
 		},
-	}, callOpt)
+	})
 	if errors.IsNotFound(err) {
 		if gs.requireRegisteredGateways {
 			return nil, errGatewayNotRegistered.WithAttributes("gateway_uid", uid).WithCause(err)
@@ -805,43 +796,26 @@ func sameLocation(a, b ttnpb.Location) bool {
 func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 	ctx := conn.Context()
 
-	var err error
-	var callOpt grpc.CallOption
-	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
-	if err != nil {
-		return
-	}
-
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-conn.LocationChanged():
 			status, _, ok := conn.StatusStats()
-			// TODO: Handle multiple antenna locations (https://github.com/TheThingsNetwork/lorawan-stack/issues/2006).
 			if ok && len(status.AntennaLocations) > 0 {
+				loc := *status.AntennaLocations[0]
+				loc.Source = ttnpb.SOURCE_GPS
 				if len(conn.Gateway().Antennas) == 0 {
-					// Add an antenna if none are present
 					conn.Gateway().Antennas = []ttnpb.GatewayAntenna{{}}
 				}
-				if sameLocation(conn.Gateway().Antennas[0].Location, *status.AntennaLocations[0]) {
+				if sameLocation(conn.Gateway().Antennas[0].Location, loc) {
 					break
 				}
-				status.AntennaLocations[0].Source = ttnpb.SOURCE_GPS
-				conn.Gateway().Antennas[0].Location = *status.AntennaLocations[0]
-				_, err := gs.entityRegistry.Update(ctx, &ttnpb.UpdateGatewayRequest{
-					Gateway: ttnpb.Gateway{
-						GatewayIdentifiers: conn.Gateway().GatewayIdentifiers,
-						Antennas:           conn.Gateway().Antennas,
-					},
-					FieldMask: pbtypes.FieldMask{
-						Paths: []string{
-							"antennas",
-						},
-					},
-				}, callOpt)
+				err := gs.entityRegistry.UpdateLocation(ctx, conn.Gateway().GatewayIdentifiers, loc)
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to update antenna location")
+				} else {
+					conn.Gateway().Antennas[0].Location = loc
 				}
 			}
 
@@ -857,18 +831,10 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 
 // GetFrequencyPlans gets the frequency plans by the gateway identifiers.
 func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
-	var err error
-	var callOpt grpc.CallOption
-	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
-	if errors.IsUnauthenticated(err) {
-		callOpt = gs.WithClusterAuth()
-	} else if err != nil {
-		return nil, err
-	}
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask:          pbtypes.FieldMask{Paths: []string{"frequency_plan_ids"}},
-	}, callOpt)
+	})
 	var fpIDs []string
 	if err == nil {
 		fpIDs = gtw.FrequencyPlanIDs
