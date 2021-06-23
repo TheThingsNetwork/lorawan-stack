@@ -22,6 +22,7 @@ const filterListToRegExpString = array =>
 export const EVENT_VERBOSE_FILTERS = [
   'as.*.drop',
   'as.down.data.forward',
+  'as.up.location.forward',
   'as.up.data.forward',
   'as.up.service.forward',
   'gs.down.send',
