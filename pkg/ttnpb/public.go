@@ -82,6 +82,7 @@ var PublicGatewayFields = append(PublicEntityFields,
 	"name",
 	"description",
 	"frequency_plan_id",
+	"frequency_plan_ids",
 	"status_public",
 	"gateway_server_address", // only public if status_public=true
 	"location_public",
