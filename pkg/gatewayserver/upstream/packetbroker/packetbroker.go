@@ -33,10 +33,19 @@ import (
 const (
 	publishUplinkTimeout = 3 * time.Second
 
-	updateGatewayInterval  = 5 * time.Minute
-	updateGatewayJitter    = 0.2
-	updateGatewayTTLMargin = 10 * time.Second
+	DefaultUpdateGatewayInterval = 5 * time.Minute
+	DefaultUpdateGatewayJitter   = 0.2
+	DefaultOnlineTTLMargin       = 10 * time.Second
 )
+
+// Config configures the Handler.
+type Config struct {
+	UpdateInterval  time.Duration
+	UpdateJitter    float64
+	OnlineTTLMargin time.Duration
+	DevAddrPrefixes []types.DevAddrPrefix
+	Cluster         Cluster
+}
 
 // Cluster represents the interface the cluster.
 type Cluster interface {
@@ -46,23 +55,21 @@ type Cluster interface {
 
 // Handler is the upstream handler.
 type Handler struct {
-	ctx             context.Context
-	cluster         Cluster
-	devAddrPrefixes []types.DevAddrPrefix
+	ctx context.Context
+	Config
 }
 
 // NewHandler returns a new upstream handler.
-func NewHandler(ctx context.Context, cluster Cluster, devAddrPrefixes []types.DevAddrPrefix) *Handler {
+func NewHandler(ctx context.Context, config Config) *Handler {
 	return &Handler{
-		ctx:             ctx,
-		cluster:         cluster,
-		devAddrPrefixes: devAddrPrefixes,
+		ctx:    ctx,
+		Config: config,
 	}
 }
 
 // DevAddrPrefixes implements upstream.Handler.
 func (h *Handler) DevAddrPrefixes() []types.DevAddrPrefix {
-	return h.devAddrPrefixes
+	return h.Config.DevAddrPrefixes
 }
 
 // Setup implements upstream.Handler.
@@ -70,12 +77,12 @@ func (h *Handler) Setup(context.Context) error {
 	return nil
 }
 
-func nextUpdateGateway(onlineTTL *pbtypes.Duration) <-chan time.Time {
-	d := random.Jitter(updateGatewayInterval, updateGatewayJitter)
+func (h *Handler) nextUpdateGateway(onlineTTL *pbtypes.Duration) <-chan time.Time {
+	d := random.Jitter(h.UpdateInterval, h.UpdateJitter)
 	if onlineTTL != nil {
 		ttl, err := pbtypes.DurationFromProto(onlineTTL)
 		if err == nil {
-			ttl -= updateGatewayTTLMargin
+			ttl -= h.OnlineTTLMargin
 			if ttl < d {
 				d = ttl
 			}
@@ -86,7 +93,7 @@ func nextUpdateGateway(onlineTTL *pbtypes.Duration) <-chan time.Time {
 
 // ConnectGateway implements upstream.Handler.
 func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, conn *io.Connection) error {
-	pbaConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, &ids)
+	pbaConn, err := h.Cluster.GetPeerConn(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, &ids)
 	if err != nil {
 		return errPacketBrokerAgentNotFound.WithCause(err)
 	}
@@ -111,7 +118,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 			},
 		},
 	}
-	res, err := pbaClient.UpdateGateway(ctx, req, h.cluster.WithClusterAuth())
+	res, err := pbaClient.UpdateGateway(ctx, req, h.Cluster.WithClusterAuth())
 	if err != nil {
 		return err
 	}
@@ -126,7 +133,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-nextUpdateGateway(onlineTTL):
+		case <-h.nextUpdateGateway(onlineTTL):
 		}
 
 		req := &ttnpb.UpdatePacketBrokerGatewayRequest{
@@ -176,7 +183,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		}
 		lastCounters = now
 
-		res, err := pbaClient.UpdateGateway(ctx, req, h.cluster.WithClusterAuth())
+		res, err := pbaClient.UpdateGateway(ctx, req, h.Cluster.WithClusterAuth())
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to update gateway")
 			onlineTTL = nil
@@ -190,13 +197,13 @@ var errPacketBrokerAgentNotFound = errors.DefineNotFound("packet_broker_agent_no
 
 // HandleUplink implements upstream.Handler.
 func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUplinkMessage) error {
-	pbaConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, &ids)
+	pbaConn, err := h.Cluster.GetPeerConn(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, &ids)
 	if err != nil {
 		return errPacketBrokerAgentNotFound.WithCause(err)
 	}
 	ctx, cancel := context.WithTimeout(ctx, publishUplinkTimeout)
 	defer cancel()
-	_, err = ttnpb.NewGsPbaClient(pbaConn).PublishUplink(ctx, msg, h.cluster.WithClusterAuth())
+	_, err = ttnpb.NewGsPbaClient(pbaConn).PublishUplink(ctx, msg, h.Cluster.WithClusterAuth())
 	return err
 }
 

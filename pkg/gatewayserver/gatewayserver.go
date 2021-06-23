@@ -146,7 +146,13 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		case "cluster":
 			handler = ns.NewHandler(gs.Context(), c, c, prefix)
 		case "packetbroker":
-			handler = packetbroker.NewHandler(gs.Context(), c, prefix)
+			handler = packetbroker.NewHandler(gs.Context(), packetbroker.Config{
+				Cluster:         c,
+				DevAddrPrefixes: prefix,
+				UpdateInterval:  conf.PacketBroker.UpdateGatewayInterval,
+				UpdateJitter:    conf.PacketBroker.UpdateGatewayJitter,
+				OnlineTTLMargin: conf.PacketBroker.OnlineTTLMargin,
+			})
 		default:
 			return nil, errInvalidUpstreamName.WithAttributes("name", name)
 		}

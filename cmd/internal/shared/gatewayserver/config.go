@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/packetbroker"
 )
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.
@@ -31,6 +32,11 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 	UpdateGatewayLocationDebounceTime: time.Hour,
 	Forward: map[string][]string{
 		"": {"00000000/0"},
+	},
+	PacketBroker: gatewayserver.PacketBrokerConfig{
+		UpdateGatewayInterval: packetbroker.DefaultUpdateGatewayInterval,
+		UpdateGatewayJitter:   packetbroker.DefaultUpdateGatewayJitter,
+		OnlineTTLMargin:       packetbroker.DefaultOnlineTTLMargin,
 	},
 	UDP: gatewayserver.UDPConfig{
 		Config: udp.DefaultConfig,
