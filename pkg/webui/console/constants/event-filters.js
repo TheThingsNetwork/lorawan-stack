@@ -23,6 +23,7 @@ export const EVENT_VERBOSE_FILTERS = [
   'as.*.drop',
   'as.down.data.forward',
   'as.up.data.forward',
+  'as.up.service.forward',
   'gs.down.send',
   'gs.gateway.connect',
   'gs.gateway.disconnect',
