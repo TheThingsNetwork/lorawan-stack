@@ -820,13 +820,21 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 		case <-conn.LocationChanged():
 			status, _, ok := conn.StatusStats()
 			if ok && len(status.AntennaLocations) > 0 {
-				antennas := make([]ttnpb.GatewayAntenna, len(gtw.Antennas))
+				// Construct the union of antennas that are in the gateway fetched from the entity registry with the antennas
+				// that are in the status message.
+				c := len(gtw.Antennas)
+				if cs := len(status.AntennaLocations); cs > c {
+					c = cs
+				}
+				antennas := make([]ttnpb.GatewayAntenna, c)
 				for i, ant := range gtw.Antennas {
 					antennas[i].Gain = ant.Gain
+				}
+				for i, ant := range antennas {
 					if i < len(status.AntennaLocations) && status.AntennaLocations[i] != nil {
 						loc := *status.AntennaLocations[i]
 						loc.Source = ttnpb.SOURCE_GPS
-						antennas[i].Location = &loc
+						ant.Location = &loc
 					}
 				}
 				if lastAntennas != nil && sameAntennaLocations(lastAntennas, antennas) {
