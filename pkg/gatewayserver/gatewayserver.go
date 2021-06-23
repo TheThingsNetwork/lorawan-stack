@@ -444,6 +444,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 				"require_authenticated_connection",
 				"schedule_anytime_delay",
 				"schedule_downlink_late",
+				"status_public",
 				"update_location_from_status",
 			},
 		},
