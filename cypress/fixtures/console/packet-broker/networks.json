@@ -1,0 +1,38 @@
+{
+  "networks": [
+    { "id": { "net_id": 19 }, "name": "The Things Network" },
+    {
+      "id": { "net_id": 19, "tenant_id": "bogdans" },
+      "name": "Bogdans",
+      "dev_addr_blocks": [
+        {
+          "dev_addr_prefix": { "dev_addr": "27CCCC00", "length": 24 },
+          "home_network_cluster_id": "dev"
+        }
+      ]
+    },
+    {
+      "id": { "net_id": 19, "tenant_id": "johan" },
+      "dev_addr_blocks": [{ "dev_addr_prefix": { "dev_addr": "27AAAA00", "length": 24 } }]
+    },
+    {
+      "id": { "net_id": 19, "tenant_id": "packet-broker-test" },
+      "name": "Packet Broker Test",
+      "dev_addr_blocks": [
+        {
+          "dev_addr_prefix": { "dev_addr": "26000000", "length": 6 },
+          "home_network_cluster_id": "dev"
+        }
+      ]
+    },
+    {
+      "id": { "net_id": 19, "tenant_id": "michal" },
+      "dev_addr_blocks": [
+        {
+          "dev_addr_prefix": { "dev_addr": "27BBBB00", "length": 24 },
+          "home_network_cluster_id": "tti-ch-staging1"
+        }
+      ]
+    }
+  ]
+}
