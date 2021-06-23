@@ -512,9 +512,10 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	}
 
 	for name, handler := range gs.upstreamHandlers {
+		connCtx := log.NewContextWithField(conn.Context(), "upstream_handler", name)
 		handler := handler
 		gs.StartTask(&component.TaskConfig{
-			Context: conn.Context(),
+			Context: connCtx,
 			ID:      fmt.Sprintf("%s_connect_gateway_%s", name, ids.GatewayId),
 			Func: func(ctx context.Context) error {
 				return handler.ConnectGateway(ctx, ids, conn)
