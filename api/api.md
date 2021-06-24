@@ -279,6 +279,7 @@
   - [Message `EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers)
   - [Message `EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers)
   - [Message `GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers)
+  - [Message `NetworkIdentifiers`](#ttn.lorawan.v3.NetworkIdentifiers)
   - [Message `OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers)
   - [Message `OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers)
   - [Message `UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers)
@@ -4259,6 +4260,23 @@ EntityIdentifiers contains one of the possible entity identifiers.
 | ----- | ----------- |
 | `gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
+### <a name="ttn.lorawan.v3.NetworkIdentifiers">Message `NetworkIdentifiers`</a>
+
+Identifies a Network Server.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `net_id` | [`string`](#string) |  | LoRa Alliance NetID. |
+| `tenant_id` | [`string`](#string) |  | Optional tenant identifier for multi-tenant deployments. |
+| `cluster_id` | [`string`](#string) |  | Cluster identifier of the Network Server. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `tenant_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
+| `cluster_id` | <p>`string.max_len`: `64`</p> |
+
 ### <a name="ttn.lorawan.v3.OrganizationIdentifiers">Message `OrganizationIdentifiers`</a>
 
 | Field | Type | Label | Description |
@@ -6182,6 +6200,7 @@ Application uplink message.
 | `consumed_airtime` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings. |
 | `locations` | [`ApplicationUplink.LocationsEntry`](#ttn.lorawan.v3.ApplicationUplink.LocationsEntry) | repeated | End device location metadata, set by the Application Server while handling the message. |
 | `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version identifiers, set by the Application Server while handling the message. |
+| `network_ids` | [`NetworkIdentifiers`](#ttn.lorawan.v3.NetworkIdentifiers) |  | Network identifiers, set by the Network Server that handles the message. |
 
 #### Field Rules
 

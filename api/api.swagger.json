@@ -12243,6 +12243,10 @@
         "version_ids": {
           "$ref": "#/definitions/v3EndDeviceVersionIdentifiers",
           "description": "End device version identifiers, set by the Application Server while handling the message."
+        },
+        "network_ids": {
+          "$ref": "#/definitions/v3NetworkIdentifiers",
+          "description": "Network identifiers, set by the Network Server that handles the message."
         }
       }
     },
@@ -15606,6 +15610,24 @@
         "MINOR_RFU_15"
       ],
       "default": "MINOR_RFU_0"
+    },
+    "v3NetworkIdentifiers": {
+      "type": "object",
+      "properties": {
+        "net_id": {
+          "type": "string",
+          "description": "LoRa Alliance NetID."
+        },
+        "tenant_id": {
+          "type": "string",
+          "description": "Optional tenant identifier for multi-tenant deployments."
+        },
+        "cluster_id": {
+          "type": "string",
+          "description": "Cluster identifier of the Network Server."
+        }
+      },
+      "description": "Identifies a Network Server."
     },
     "v3NwkSKeysResponse": {
       "type": "object",

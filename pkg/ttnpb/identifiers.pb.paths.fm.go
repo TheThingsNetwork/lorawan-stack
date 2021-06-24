@@ -110,3 +110,14 @@ var EndDeviceVersionIdentifiersFieldPathsTopLevel = []string{
 	"hardware_version",
 	"model_id",
 }
+var NetworkIdentifiersFieldPathsNested = []string{
+	"cluster_id",
+	"net_id",
+	"tenant_id",
+}
+
+var NetworkIdentifiersFieldPathsTopLevel = []string{
+	"cluster_id",
+	"net_id",
+	"tenant_id",
+}

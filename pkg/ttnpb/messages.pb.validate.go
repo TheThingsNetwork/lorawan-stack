@@ -860,6 +860,18 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "network_ids":
+
+			if v, ok := interface{}(m.GetNetworkIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationUplinkValidationError{
+						field:  "network_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return ApplicationUplinkValidationError{
 				field:  name,

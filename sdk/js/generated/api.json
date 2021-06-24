@@ -19336,6 +19336,74 @@
           ]
         },
         {
+          "name": "NetworkIdentifiers",
+          "longName": "NetworkIdentifiers",
+          "fullName": "ttn.lorawan.v3.NetworkIdentifiers",
+          "description": "Identifies a Network Server.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "net_id",
+              "description": "LoRa Alliance NetID.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tenant_id",
+              "description": "Optional tenant identifier for multi-tenant deployments.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "cluster_id",
+              "description": "Cluster identifier of the Network Server.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "OrganizationIdentifiers",
           "longName": "OrganizationIdentifiers",
           "fullName": "ttn.lorawan.v3.OrganizationIdentifiers",
@@ -28298,6 +28366,18 @@
               "type": "EndDeviceVersionIdentifiers",
               "longType": "EndDeviceVersionIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "network_ids",
+              "description": "Network identifiers, set by the Network Server that handles the message.",
+              "label": "",
+              "type": "NetworkIdentifiers",
+              "longType": "NetworkIdentifiers",
+              "fullType": "ttn.lorawan.v3.NetworkIdentifiers",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
