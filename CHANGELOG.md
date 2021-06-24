@@ -40,6 +40,7 @@ For details about compatibility between different releases, see the **Commitment
   - Use the `--force` flag to force perform migrations.
 - Any authenticated user in the network can now list the collaborators of entities in the network.
 - The search RPCs no longer require fields to be specified in the field mask when those fields are already specified as filters.
+- When generating client configuration with the CLI `use` command, automatically set the correct Identity Server and OAuth Server addresses for The Things Stack Cloud and The Things Stack Community Edition.
 
 ### Deprecated
 
