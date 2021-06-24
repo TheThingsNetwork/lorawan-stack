@@ -16,8 +16,12 @@ package component
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"runtime"
 	"time"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
 // defaultHTTPClientTimeout is the default timeout for the HTTP client.
@@ -43,5 +47,20 @@ func (c *Component) HTTPTransport(ctx context.Context) (http.RoundTripper, error
 	}
 	tr := http.DefaultTransport.(*http.Transport).Clone()
 	tr.TLSClientConfig = tlsConfig
-	return tr, nil
+	return &roundTripperWithUserAgent{
+		Transport: tr,
+		UserAgent: fmt.Sprintf("TheThingsStack/%s (%s/%s)", version.TTN, runtime.GOOS, runtime.GOARCH),
+	}, nil
+}
+
+type roundTripperWithUserAgent struct {
+	*http.Transport
+	UserAgent string
+}
+
+func (rt *roundTripperWithUserAgent) RoundTrip(r *http.Request) (*http.Response, error) {
+	if r.Header.Get("User-Agent") == "" {
+		r.Header.Set("User-Agent", rt.UserAgent)
+	}
+	return rt.Transport.RoundTrip(r)
 }

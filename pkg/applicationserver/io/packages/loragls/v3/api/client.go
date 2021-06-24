@@ -25,7 +25,6 @@ import (
 	"path"
 
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
-	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
 // Option is an option for the API client.
@@ -51,10 +50,7 @@ const (
 	basePath         = "/api"
 )
 
-var (
-	userAgent        = "ttn-lw-application-server/" + version.TTN
-	DefaultServerURL *url.URL
-)
+var DefaultServerURL *url.URL
 
 func (c *Client) newRequest(ctx context.Context, version, method, category, operation string, body io.Reader) (*http.Request, error) {
 	u := urlutil.CloneURL(c.baseURL)
@@ -64,7 +60,6 @@ func (c *Client) newRequest(ctx context.Context, version, method, category, oper
 		return nil, err
 	}
 	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("User-Agent", userAgent)
 	if c.token != "" {
 		req.Header.Set("Ocp-Apim-Subscription-Key", c.token)
 	}
