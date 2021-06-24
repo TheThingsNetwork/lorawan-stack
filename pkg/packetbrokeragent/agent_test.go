@@ -111,6 +111,7 @@ func TestForwarder(t *testing.T) {
 			IncludeGatewayEUI: true,
 			IncludeGatewayID:  true,
 			HashGatewayID:     true,
+			GatewayOnlineTTL:  10 * time.Minute,
 		},
 	}, testOptions...))
 	componenttest.StartComponent(t, c)
