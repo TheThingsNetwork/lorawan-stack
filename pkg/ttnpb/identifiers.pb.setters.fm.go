@@ -593,8 +593,7 @@ func (dst *NetworkIdentifiers) SetFields(src *NetworkIdentifiers, paths ...strin
 			if src != nil {
 				dst.NetId = src.NetId
 			} else {
-				var zero string
-				dst.NetId = zero
+				dst.NetId = nil
 			}
 		case "tenant_id":
 			if len(subs) > 0 {

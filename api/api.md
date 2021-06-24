@@ -4266,7 +4266,7 @@ Identifies a Network Server.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `net_id` | [`string`](#string) |  | LoRa Alliance NetID. |
+| `net_id` | [`bytes`](#bytes) |  | LoRa Alliance NetID. |
 | `tenant_id` | [`string`](#string) |  | Optional tenant identifier for multi-tenant deployments. |
 | `cluster_id` | [`string`](#string) |  | Cluster identifier of the Network Server. |
 

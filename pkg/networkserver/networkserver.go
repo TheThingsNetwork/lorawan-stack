@@ -105,6 +105,7 @@ type NetworkServer struct {
 	devices DeviceRegistry
 
 	netID      types.NetID
+	clusterID  string
 	newDevAddr newDevAddrFunc
 
 	applicationServers *sync.Map // string -> *applicationUpStream
@@ -213,6 +214,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		Component:                c,
 		ctx:                      ctx,
 		netID:                    conf.NetID,
+		clusterID:                conf.ClusterID,
 		newDevAddr:               makeNewDevAddrFunc(devAddrPrefixes...),
 		applicationServers:       &sync.Map{},
 		applicationUplinks:       conf.ApplicationUplinkQueue.Queue,

@@ -120,6 +120,7 @@ type Config struct {
 	UplinkDeduplicator       UplinkDeduplicator           `name:"-"`
 	ScheduledDownlinkMatcher ScheduledDownlinkMatcher     `name:"-"`
 	NetID                    types.NetID                  `name:"net-id" description:"NetID of this Network Server"`
+	ClusterID                string                       `name:"cluster-id" description:"Cluster ID of this Network Server"`
 	DevAddrPrefixes          []types.DevAddrPrefix        `name:"dev-addr-prefixes" description:"Device address prefixes of this Network Server"`
 	DeduplicationWindow      time.Duration                `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
 	CooldownWindow           time.Duration                `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
