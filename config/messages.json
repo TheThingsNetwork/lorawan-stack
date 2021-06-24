@@ -1430,6 +1430,15 @@
       "file": "gateways_claim.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:invalid_hostname": {
+    "translations": {
+      "en": "`{hostname}` is not a valid hostname"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "use.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:invalid_target_cups_trust": {
     "translations": {
       "en": "invalid target CUPS trust"
@@ -1464,6 +1473,15 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "end_device_templates.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:missing_tenant_id": {
+    "translations": {
+      "en": "missing tenant ID in hostname"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "use.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:network_server_disabled": {
