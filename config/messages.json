@@ -2519,15 +2519,6 @@
       "file": "applicationserver.go"
     }
   },
-  "error:pkg/applicationserver:duplicate_identifiers": {
-    "translations": {
-      "en": "identifiers already exists"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "registry.go"
-    }
-  },
   "error:pkg/applicationserver:field_mask": {
     "translations": {
       "en": "invalid field mask"
@@ -2625,15 +2616,6 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "payload.go"
-    }
-  },
-  "error:pkg/applicationserver:payload_crypto_disabled": {
-    "translations": {
-      "en": "payload crypto is disabled"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "applicationserver.go"
     }
   },
   "error:pkg/applicationserver:rebuild": {

@@ -195,7 +195,7 @@ func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndD
 	return nil
 }
 
-var cayenneLPPGPSKeyRegexp = regexp.MustCompile("^gps_\\d+$")
+var cayenneLPPGPSKeyRegexp = regexp.MustCompile(`^gps_\d+$`)
 
 func (as *ApplicationServer) locationFromDecodedPayload(uplink *ttnpb.ApplicationUplink) (res *ttnpb.Location) {
 	fields := uplink.DecodedPayload.GetFields()

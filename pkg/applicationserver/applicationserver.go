@@ -1095,8 +1095,6 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 	return as.decryptAndDecodeDownlink(ctx, dev, msg, link.DefaultFormatters)
 }
 
-var errPayloadCryptoDisabled = errors.DefineAborted("payload_crypto_disabled", "payload crypto is disabled")
-
 type ctxConfigKeyType struct{}
 
 // GetConfig returns the Application Server config based on the context.
