@@ -123,8 +123,7 @@ jobs:
         run: tools/bin/mage init
       - name: Run test preparations
         if: |
-          steps.db-cache.outputs.cache-hit != 'true' ||
-          steps.dr-db-cache.outputs.cache-hit != 'true'
+          steps.db-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage -v dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump
       - name: Restore initialized sql db
         if: steps.db-cache.outputs.cache-hit == 'true'
