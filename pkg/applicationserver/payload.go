@@ -17,6 +17,7 @@ package applicationserver
 import (
 	"bytes"
 	"context"
+	"regexp"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
@@ -192,4 +193,82 @@ func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndD
 		}
 	}
 	return nil
+}
+
+var cayenneLPPGPSKeyRegexp = regexp.MustCompile("^gps_\\d+$")
+
+func (as *ApplicationServer) locationFromDecodedPayload(uplink *ttnpb.ApplicationUplink) (res *ttnpb.Location) {
+	fields := uplink.DecodedPayload.GetFields()
+	if len(fields) == 0 {
+		return
+	}
+
+	// Check CayenneLPP location (field gps_#).
+	for k := range fields {
+		if cayenneLPPGPSKeyRegexp.MatchString(k) {
+			if s := fields[k].GetStructValue(); s != nil {
+				res = &ttnpb.Location{
+					Latitude:  s.Fields["latitude"].GetNumberValue(),
+					Longitude: s.Fields["longitude"].GetNumberValue(),
+					Altitude:  int32(s.Fields["altitude"].GetNumberValue()),
+					Source:    ttnpb.SOURCE_GPS,
+				}
+				break
+			}
+		}
+	}
+
+	if res == nil {
+		// Check location in fields.
+		for _, pp := range []struct {
+			latKey, lonKey, altKey string
+		}{
+			{"lat", "lon", "alt"},
+			{"lat", "lng", "alt"},
+			{"lat", "long", "alt"},
+			{"latitude", "longitude", "altitude"},
+			{"Latitude", "Longitude", "Altitude"},
+			{"latitudeDeg", "longitudeDeg", "altitude"},
+			{"latitudeDeg", "longitudeDeg", "height"},
+			{"gps_lat", "gps_lng", "gps_alt"},
+			{"gps_lat", "gps_lng", "gpsalt"},
+		} {
+			_, hasLatKey := fields[pp.latKey]
+			_, hasLonKey := fields[pp.lonKey]
+			if !hasLatKey || !hasLonKey {
+				continue
+			}
+			lat := fields[pp.latKey].GetNumberValue()
+			lon := fields[pp.lonKey].GetNumberValue()
+			alt := fields[pp.altKey].GetNumberValue()
+			if lat != 0 || lon != 0 {
+				res = &ttnpb.Location{
+					Latitude:  lat,
+					Longitude: lon,
+					Altitude:  int32(alt),
+					Source:    ttnpb.SOURCE_GPS,
+				}
+				break
+			}
+		}
+
+		if res != nil {
+			// Check accuracy in fields. Horizontal dilution of precision is considered accuracy.
+			for _, ap := range []string{
+				"acc",
+				"accuracy",
+				"hacc",
+				"hdop",
+				"gps_hdop",
+			} {
+				acc := fields[ap].GetNumberValue()
+				if acc != 0 {
+					res.Accuracy = int32(acc)
+					break
+				}
+			}
+		}
+	}
+
+	return
 }
