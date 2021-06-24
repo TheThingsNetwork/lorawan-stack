@@ -28,14 +28,12 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '@console/lib/regexp'
 
 const m = defineMessages({
-  locationDescription: 'The location of this gateway may be publicly displayed',
   updateLocationFromStatus: 'Update from status messages',
   updateLocationFromStatusDescription:
     'Update the location of this gateway based on incoming status messages',
   setGatewayLocation: 'Gateway antenna location settings',
   locationSource: 'Location source',
-  privacy: 'Privacy',
-  publishLocation: 'Publish location',
+  locationPrivacy: 'Location privacy',
 })
 
 const validationSchema = Yup.object().shape({
@@ -162,11 +160,12 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
       allowDelete={!updateLocationFromStatus}
     >
       <Form.Field
-        title={m.privacy}
+        title={m.locationPrivacy}
         name="location_public"
         component={Checkbox}
-        label={m.publishLocation}
-        description={m.locationDescription}
+        label={sharedMessages.public}
+        description={sharedMessages.locationDescription}
+        tooltipId={tooltipIds.GATEWAY_LOCATION}
       />
       <Form.Field
         title={m.locationSource}
