@@ -6632,6 +6632,15 @@
       "file": "application_uplink_queue.go"
     }
   },
+  "error:pkg/networkserver/redis:missing_downlink_correlation_id": {
+    "translations": {
+      "en": "missing identifier correlation ID on downlink message"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "scheduled_downlink_matcher.go"
+    }
+  },
   "error:pkg/networkserver/redis:missing_payload": {
     "translations": {
       "en": "missing payload"

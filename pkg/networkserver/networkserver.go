@@ -124,6 +124,8 @@ type NetworkServer struct {
 
 	deviceKEKLabel        string
 	downlinkQueueCapacity int
+
+	scheduledDownlinkMatcher ScheduledDownlinkMatcher
 }
 
 // Option configures the NetworkServer.
@@ -160,6 +162,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		panic(errInvalidConfiguration.WithCause(errors.New("DownlinkTasks is not specified")))
 	case conf.UplinkDeduplicator == nil:
 		panic(errInvalidConfiguration.WithCause(errors.New("UplinkDeduplicator is not specified")))
+	case conf.ScheduledDownlinkMatcher == nil:
+		panic(errInvalidConfiguration.WithCause(errors.New("ScheduledDownlinkMatcher is not specified")))
 	case conf.DownlinkQueueCapacity < 0:
 		return nil, errInvalidConfiguration.WithCause(errors.New("Downlink queue capacity must be greater than or equal to 0"))
 	case conf.DownlinkQueueCapacity > maxInt/2:
@@ -206,22 +210,23 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	}
 
 	ns := &NetworkServer{
-		Component:             c,
-		ctx:                   ctx,
-		netID:                 conf.NetID,
-		newDevAddr:            makeNewDevAddrFunc(devAddrPrefixes...),
-		applicationServers:    &sync.Map{},
-		applicationUplinks:    conf.ApplicationUplinkQueue.Queue,
-		deduplicationWindow:   makeWindowDurationFunc(conf.DeduplicationWindow),
-		collectionWindow:      makeWindowDurationFunc(conf.DeduplicationWindow + conf.CooldownWindow),
-		devices:               wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
-		downlinkTasks:         conf.DownlinkTasks,
-		downlinkPriorities:    downlinkPriorities,
-		defaultMACSettings:    conf.DefaultMACSettings.Parse(),
-		interopClient:         interopCl,
-		uplinkDeduplicator:    conf.UplinkDeduplicator,
-		deviceKEKLabel:        conf.DeviceKEKLabel,
-		downlinkQueueCapacity: conf.DownlinkQueueCapacity,
+		Component:                c,
+		ctx:                      ctx,
+		netID:                    conf.NetID,
+		newDevAddr:               makeNewDevAddrFunc(devAddrPrefixes...),
+		applicationServers:       &sync.Map{},
+		applicationUplinks:       conf.ApplicationUplinkQueue.Queue,
+		deduplicationWindow:      makeWindowDurationFunc(conf.DeduplicationWindow),
+		collectionWindow:         makeWindowDurationFunc(conf.DeduplicationWindow + conf.CooldownWindow),
+		devices:                  wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
+		downlinkTasks:            conf.DownlinkTasks,
+		downlinkPriorities:       downlinkPriorities,
+		defaultMACSettings:       conf.DefaultMACSettings.Parse(),
+		interopClient:            interopCl,
+		uplinkDeduplicator:       conf.UplinkDeduplicator,
+		deviceKEKLabel:           conf.DeviceKEKLabel,
+		downlinkQueueCapacity:    conf.DownlinkQueueCapacity,
+		scheduledDownlinkMatcher: conf.ScheduledDownlinkMatcher,
 	}
 	ctx = ns.Context()
 
