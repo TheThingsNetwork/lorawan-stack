@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Email sent to admins when an OAuth client is requested by a non-admin user.
+
 ### Changed
 
 - Low-level log messages from the `go-redis` library are printed only when the log level is set to `DEBUG`.

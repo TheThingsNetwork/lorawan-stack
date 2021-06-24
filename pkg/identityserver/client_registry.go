@@ -140,6 +140,20 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		return nil, err
 	}
 
+	if cli.State == ttnpb.STATE_REQUESTED {
+		err = is.SendAdminsEmail(ctx, func(data emails.Data) email.MessageData {
+			data.Entity.Type, data.Entity.ID = "client", cli.ClientId
+			return &emails.ClientRequested{
+				Data:         data,
+				Client:       cli,
+				Collaborator: &req.Collaborator,
+			}
+		})
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Error("Could not send client requested email")
+		}
+	}
+
 	cli.Secret = secret // Return the unhashed secret, in case it was generated.
 
 	events.Publish(evtCreateClient.NewWithIdentifiersAndData(ctx, &req.ClientIdentifiers, nil))
