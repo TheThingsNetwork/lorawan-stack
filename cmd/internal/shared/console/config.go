@@ -24,11 +24,12 @@ import (
 // DefaultConsoleConfig is the default configuration for the Console.
 var DefaultConsoleConfig = console.Config{
 	OAuth: oauthclient.Config{
-		AuthorizeURL: shared.DefaultOAuthPublicURL + "/authorize",
-		LogoutURL:    shared.DefaultOAuthPublicURL + "/logout",
-		TokenURL:     shared.DefaultOAuthPublicURL + "/token",
-		ClientID:     "console",
-		ClientSecret: "console",
+		AuthorizeURL:    shared.DefaultOAuthPublicURL + "/authorize",
+		LogoutURL:       shared.DefaultOAuthPublicURL + "/logout",
+		TokenURL:        shared.DefaultOAuthPublicURL + "/token",
+		ClientID:        "console",
+		ClientSecret:    "console",
+		CrossSiteCookie: false,
 	},
 	UI: console.UIConfig{
 		TemplateData: webui.TemplateData{
