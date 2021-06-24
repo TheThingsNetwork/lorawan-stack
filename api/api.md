@@ -1127,11 +1127,12 @@ The NsAs service connects a Network Server to an Application Server.
 | `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | Query upstream messages from a single end device. Cannot be used in conjunction with application_ids. |
 | `type` | [`string`](#string) |  | Query upstream messages of a specific type. If not set, then all upstream messages are returned. |
 | `limit` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Limit number of results. |
-| `after` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Query upstream messages after this timestamp only. |
-| `before` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Query upstream messages before this timestamp only. |
+| `after` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Query upstream messages after this timestamp only. Cannot be used in conjunction with last. |
+| `before` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Query upstream messages before this timestamp only. Cannot be used in conjunction with last. |
 | `f_port` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Query uplinks on a specific FPort only. |
 | `order` | [`string`](#string) |  | Order results. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the upstream message fields that should be returned. See the API reference for allowed field names for each type of upstream message. |
+| `last` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before. |
 
 #### Field Rules
 

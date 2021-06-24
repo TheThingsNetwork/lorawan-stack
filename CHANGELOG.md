@@ -18,6 +18,7 @@ For details about compatibility between different releases, see the **Commitment
 - Application Server forwards upstream messages of type `ApplicationDownlinkSent` for application downlink messages that were acknowledged with a TxAck message from the gateway.
   - MQTT clients can subscribe to the topic `v3/{application-id}/devices/{device-id}/down/sent`.
   - For HTTP webhooks, make sure that the **Downlink Sent** messages are enabled.
+- Query for the most recent application messages from the Storage Integration API with the new `last` parameter (for example, `?last=10m` or `?last=2h`). See also `--last` argument for the `ttn-lw-cli applications storage get` and `ttn-lw-cli end-devices storage get` commands.
 
 ### Changed
 
