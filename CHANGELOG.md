@@ -27,7 +27,7 @@ For details about compatibility between different releases, see the **Commitment
   - `gs.packetbroker.online-ttl-margin`: Time to extend the online status before it expires
   - `pba.mapper-address`: Address of Packet Broker Mapper
   - `pba.forwarder.gateway-online-ttl`: Time-to-live of online status reported to Packet Broker
-  
+
 ### Changed
 
 - Low-level log messages from the `go-redis` library are printed only when the log level is set to `DEBUG`.
@@ -38,6 +38,8 @@ For details about compatibility between different releases, see the **Commitment
 - Descriptions, tooltips and defaults for checkboxes for public gateway status and location in the Console.
 - All HTTP requests made by The Things Stack now contain a `User-Agent` header in the form of `TheThingsStack/{version}`.
 - No connection to Packet Broker is being made when neither the Forwarder nor the Home Network role is enabled.
+- Increase the default size limit for payload formatter scripts to 40KB (up from 4KB). The maximum size enforced at API level is 40KB (up from 16KB).
+  - For more context see [issue #4053](https://github.com/TheThingsNetwork/lorawan-stack/issues/4053) and [issue #4278](https://github.com/TheThingsNetwork/lorawan-stack/issues/4278).
 
 ### Deprecated
 
