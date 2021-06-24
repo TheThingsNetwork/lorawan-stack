@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Email sent to admins when an OAuth client is requested by a non-admin user.
+- Packet Broker UI in the Console (admin only). 
 
 ### Changed
 

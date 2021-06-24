@@ -111,6 +111,7 @@
     "react-router-dom": "^5.2.0",
     "react-select": "^4.1.0",
     "react-string-replace": "^0.4.4",
+    "react-switch": "^6.0.0",
     "react-text-mask": "^5.4.3",
     "react-toastify": "^7.0.3",
     "react-virtualized-auto-sizer": "^1.0.4",

@@ -39,9 +39,14 @@ type pbaServer struct {
 	cpConn *grpc.ClientConn
 }
 
+var errNotEnabled = errors.DefineFailedPrecondition("not_enabled", "Packet Broker is not enabled")
+
 func (s *pbaServer) GetInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.PacketBrokerInfo, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
+	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
 	}
 
 	var (
@@ -104,6 +109,9 @@ var (
 func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.PacketBrokerNetwork, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
+	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
 	}
 	tenantID := s.tenantIDExtractor(ctx)
 	if tenantID == "" {
@@ -184,6 +192,9 @@ func (s *pbaServer) Deregister(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
+	}
 	tenantID := s.tenantIDExtractor(ctx)
 	if tenantID == "" {
 		return nil, errNetwork.New()
@@ -203,6 +214,9 @@ func (s *pbaServer) GetHomeNetworkDefaultRoutingPolicy(ctx context.Context, _ *p
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
+	}
 
 	res, err := routingpb.NewPolicyManagerClient(s.cpConn).GetDefaultPolicy(ctx, &routingpb.GetDefaultPolicyRequest{
 		ForwarderNetId:    s.netID.MarshalNumber(),
@@ -217,6 +231,9 @@ func (s *pbaServer) GetHomeNetworkDefaultRoutingPolicy(ctx context.Context, _ *p
 func (s *pbaServer) SetHomeNetworkDefaultRoutingPolicy(ctx context.Context, req *ttnpb.SetPacketBrokerDefaultRoutingPolicyRequest) (*pbtypes.Empty, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
+	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
 	}
 
 	_, err := routingpb.NewPolicyManagerClient(s.cpConn).SetDefaultPolicy(ctx, &routingpb.SetPolicyRequest{
@@ -237,6 +254,9 @@ func (s *pbaServer) DeleteHomeNetworkDefaultRoutingPolicy(ctx context.Context, _
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
+	}
 
 	_, err := routingpb.NewPolicyManagerClient(s.cpConn).SetDefaultPolicy(ctx, &routingpb.SetPolicyRequest{
 		Policy: &packetbroker.RoutingPolicy{
@@ -253,6 +273,9 @@ func (s *pbaServer) DeleteHomeNetworkDefaultRoutingPolicy(ctx context.Context, _
 func (s *pbaServer) ListHomeNetworkRoutingPolicies(ctx context.Context, req *ttnpb.ListHomeNetworkRoutingPoliciesRequest) (*ttnpb.PacketBrokerRoutingPolicies, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
+	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
 	}
 
 	var (
@@ -320,6 +343,9 @@ func (s *pbaServer) GetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
+	}
 
 	res, err := routingpb.NewPolicyManagerClient(s.cpConn).GetHomeNetworkPolicy(ctx, &routingpb.GetHomeNetworkPolicyRequest{
 		ForwarderNetId:      s.netID.MarshalNumber(),
@@ -336,6 +362,9 @@ func (s *pbaServer) GetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.
 func (s *pbaServer) SetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.SetPacketBrokerRoutingPolicyRequest) (*pbtypes.Empty, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
+	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
 	}
 
 	_, err := routingpb.NewPolicyManagerClient(s.cpConn).SetHomeNetworkPolicy(ctx, &routingpb.SetPolicyRequest{
@@ -358,6 +387,9 @@ func (s *pbaServer) DeleteHomeNetworkRoutingPolicy(ctx context.Context, req *ttn
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
+	}
 
 	_, err := routingpb.NewPolicyManagerClient(s.cpConn).SetHomeNetworkPolicy(ctx, &routingpb.SetPolicyRequest{
 		Policy: &packetbroker.RoutingPolicy{
@@ -376,6 +408,9 @@ func (s *pbaServer) DeleteHomeNetworkRoutingPolicy(ctx context.Context, req *ttn
 func (s *pbaServer) listNetworks(ctx context.Context, req func() ([]*packetbroker.NetworkOrTenant, uint32, error)) (*ttnpb.PacketBrokerNetworks, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
+	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
 	}
 
 	networks, total, err := req()
@@ -465,6 +500,9 @@ func (s *pbaServer) ListHomeNetworks(ctx context.Context, req *ttnpb.ListPacketB
 func (s *pbaServer) ListForwarderRoutingPolicies(ctx context.Context, req *ttnpb.ListForwarderRoutingPoliciesRequest) (*ttnpb.PacketBrokerRoutingPolicies, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
+	}
+	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+		return nil, errNotEnabled.New()
 	}
 
 	page := req.Page

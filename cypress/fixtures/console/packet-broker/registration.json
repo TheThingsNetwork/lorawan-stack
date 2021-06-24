@@ -1,0 +1,8 @@
+{
+  "id": { "net_id": 19, "tenant_id": "packet-broker-test" },
+  "name": "Packet Broker Test",
+  "dev_addr_blocks": [
+    { "dev_addr_prefix": { "dev_addr": "26000000", "length": 6 }, "home_network_cluster_id": "dev" }
+  ],
+  "listed": true
+}

@@ -87,3 +87,26 @@ export const getWebhookTemplateId = (webhookTemplate = {}) =>
 export const getPubsubId = (pubsub = {}) => getByPath(pubsub, 'ids.pub_sub_id')
 
 export const getUserId = (user = {}) => getByPath(user, 'ids.user_id')
+
+export const combinePacketBrokerIds = (id = {}) =>
+  'tenant_id' in id ? `${id.net_id}/${id.tenant_id}` : id.net_id ? id.net_id.toString() : undefined
+export const extractPacketBrokerIdsFromCombinedId = combinedId => {
+  if (typeof combinedId === 'string') {
+    const parts = combinedId.split('/')
+    const result = { net_id: parseInt(parts[0]) }
+    if (parts.length === 2) {
+      result.tenant_id = parts[1]
+    }
+    return result
+  }
+  return combinedId
+}
+
+export const getPacketBrokerNetworkId = (networkOrPolicy = {}) =>
+  combinePacketBrokerIds(
+    networkOrPolicy.id || networkOrPolicy.forwarder_id || networkOrPolicy.home_network_id,
+  )
+export const getPacketBrokerForwarderId = (policy = {}) =>
+  combinePacketBrokerIds(policy.forwarder_id)
+export const getPacketBrokerHomeNewtorkId = (policy = {}) =>
+  combinePacketBrokerIds(policy.home_network_id)

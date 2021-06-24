@@ -29,7 +29,7 @@ const RequireRequest = ({ requestAction, children }) => {
   const [fetching] = useRequest(requestAction)
   if (fetching) {
     return (
-      <Spinner>
+      <Spinner center>
         <Message content={sharedMessages.fetching} />
       </Spinner>
     )
@@ -40,7 +40,8 @@ const RequireRequest = ({ requestAction, children }) => {
 
 RequireRequest.propTypes = {
   children: PropTypes.node.isRequired,
-  requestAction: PropTypes.shape({}).isRequired,
+  requestAction: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.arrayOf(PropTypes.shape({}))])
+    .isRequired,
 }
 
 export default RequireRequest

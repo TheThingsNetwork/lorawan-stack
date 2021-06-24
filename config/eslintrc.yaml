@@ -122,6 +122,7 @@ rules:
   jest/no-conditional-expect: off
   jest/no-try-expect: off
   jest/no-done-callback: off
+  jest/expect-expect: off
 
   # Change to `error` after https://github.com/TheThingsNetwork/lorawan-stack/issues/1086
   # is resolved.
@@ -182,6 +183,7 @@ overrides:
   - files: '*.spec.js'
     rules:
       jest/valid-expect: off
+      no-invalid-this: off
   - files: 'cypress/plugins/**/*.js'
     rules:
       import/no-commonjs: off

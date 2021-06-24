@@ -14,6 +14,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import CancelablePromise from 'cancelable-promise'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
@@ -34,7 +35,11 @@ const useRequest = requestAction => {
     if (prevIsOnline === undefined || (prevIsOnline === false && isOnline)) {
       // Make the request initially and additionally when the online state
       // has changed to `online`.
-      const promise = dispatch(attachPromise(requestAction))
+
+      const promise = (requestAction instanceof Array
+        ? CancelablePromise.all(requestAction.map(req => dispatch(attachPromise(req))))
+        : dispatch(attachPromise(requestAction))
+      )
         .then(() => {
           setResult(result)
           setFetching(false)

@@ -264,6 +264,36 @@ export default {
       create: tts.Gateways.ApiKeys.create.bind(tts.Gateways.ApiKeys),
     },
   },
+  packetBroker: {
+    getInfo: tts.PacketBrokerAgent.getInfo.bind(tts.PacketBrokerAgent),
+    register: tts.PacketBrokerAgent.register.bind(tts.PacketBrokerAgent),
+    deregister: tts.PacketBrokerAgent.deregister.bind(tts.PacketBrokerAgent),
+    getHomeNetworkDefaultRoutingPolicy: tts.PacketBrokerAgent.getHomeNetworkDefaultRoutingPolicy.bind(
+      tts.PacketBrokerAgent,
+    ),
+    setHomeNetworkDefaultRoutingPolicy: tts.PacketBrokerAgent.setHomeNetworkDefaultRoutingPolicy.bind(
+      tts.PacketBrokerAgent,
+    ),
+    deleteHomeNetworkDefaultRoutingPolicy: tts.PacketBrokerAgent.deleteHomeNetworkDefaultRoutingPolicy.bind(
+      tts.PacketBrokerAgent,
+    ),
+    getHomeNetworkRoutingPolicy: tts.PacketBrokerAgent.getHomeNetworkRoutingPolicy.bind(
+      tts.PacketBrokerAgent,
+    ),
+    setHomeNetworkRoutingPolicy: tts.PacketBrokerAgent.setHomeNetworkRoutingPolicy.bind(
+      tts.PacketBrokerAgent,
+    ),
+    deleteHomeNetworkRoutingPolicy: tts.PacketBrokerAgent.deleteHomeNetworkRoutingPolicy.bind(
+      tts.PacketBrokerAgent,
+    ),
+    listHomeNetworkRoutingPolicies: tts.PacketBrokerAgent.listHomeNetworkRoutingPolicies.bind(
+      tts.PacketBrokerAgent,
+    ),
+    listNetworks: tts.PacketBrokerAgent.listNetworks.bind(tts.PacketBrokerAgent),
+    listForwarderRoutingPolicies: tts.PacketBrokerAgent.listForwarderRoutingPolicies.bind(
+      tts.PacketBrokerAgent,
+    ),
+  },
   rights: {
     applications: tts.Applications.getRightsById.bind(tts.Applications),
     gateways: tts.Gateways.getRightsById.bind(tts.Gateways),

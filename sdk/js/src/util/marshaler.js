@@ -110,6 +110,14 @@ class Marshaler {
     return this.payloadSingleResponse(result)
   }
 
+  static unwrapPacketBrokerNetworks(result) {
+    return this.payloadListResponse('networks', result)
+  }
+
+  static unwrapPacketBrokerPolicies(result) {
+    return this.payloadListResponse('policies', result)
+  }
+
   static fieldMaskFromPatch(patch, whitelist, remaps) {
     let paths = []
 
