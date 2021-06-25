@@ -23,10 +23,10 @@ import (
 )
 
 func parseWiFiStruct(payload *types.Struct) []AccessPoint {
+	points := []AccessPoint{}
 	if payload == nil {
-		return nil
+		return points
 	}
-	var points []AccessPoint
 	accessPoints := payload.Fields["access_points"].GetListValue()
 	if accessPoints == nil {
 		return nil
@@ -54,7 +54,14 @@ func parseWiFiStruct(payload *types.Struct) []AccessPoint {
 
 // BuildSingelFrameRequest builds a SingleFrameRequest from the provided metadata and payload.
 func BuildWiFiRequest(ctx context.Context, metadata []*ttnpb.RxMetadata, payload *types.Struct) *WiFiRequest {
+	removeNil := func(v *uint64) uint64 {
+		if v == nil {
+			return 0
+		}
+		return *v
+	}
 	r := &WiFiRequest{
+		LoRaWAN:          []TDOAUplink{},
 		WiFiAccessPoints: parseWiFiStruct(payload),
 	}
 	for _, m := range metadata {
@@ -66,6 +73,7 @@ func BuildWiFiRequest(ctx context.Context, metadata []*ttnpb.RxMetadata, payload
 			GatewayID: gtw.GatewayID,
 			RSSI:      up.RSSI,
 			SNR:       up.SNR,
+			TDOA:      removeNil(up.TDOA),
 			AntennaID: up.AntennaID,
 			AntennaLocation: AntennaLocation{
 				Latitude:  gtw.Latitude,
@@ -98,7 +106,7 @@ type TDOAUplink struct {
 	GatewayID       string          `json:"gatewayId"`
 	RSSI            float64         `json:"rssi"`
 	SNR             float64         `json:"snr"`
-	TOA             *float64        `json:"toa"`
+	TDOA            uint64          `json:"toa"`
 	AntennaID       *uint32         `json:"antennaId"`
 	AntennaLocation AntennaLocation `json:"antennaLocation"`
 }

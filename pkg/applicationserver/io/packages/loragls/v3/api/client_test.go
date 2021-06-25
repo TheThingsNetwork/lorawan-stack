@@ -221,7 +221,7 @@ var (
 				GatewayID: "gtw1",
 				RSSI:      123.4,
 				SNR:       234.5,
-				TOA:       float64Ptr(234.5),
+				TDOA:      234,
 				AntennaLocation: api.AntennaLocation{
 					Latitude:  234.5,
 					Longitude: 678.9,
@@ -232,7 +232,7 @@ var (
 				GatewayID: "gtw2",
 				RSSI:      234.5,
 				SNR:       345.7,
-				TOA:       float64Ptr(456.7),
+				TDOA:      456,
 				AntennaLocation: api.AntennaLocation{
 					Latitude:  345.5,
 					Longitude: 567.9,
