@@ -24,7 +24,6 @@ var (
 	errDeriveAppSKey                  = errors.Define("derive_app_s_key", "failed to derive application session key")
 	errDeriveNwkSKeys                 = errors.Define("derive_nwk_s_keys", "failed to derive network session keys")
 	errDeviceNotFound                 = errors.DefineNotFound("device_not_found", "device not found")
-	errDevNonceTooHigh                = errors.DefineInvalidArgument("dev_nonce_too_high", "DevNonce is too high")
 	errDevNonceTooSmall               = errors.DefineInvalidArgument("dev_nonce_too_small", "DevNonce is too small")
 	errDuplicateIdentifiers           = errors.DefineAlreadyExists("duplicate_identifiers", "a device identified by the identifiers already exists")
 	errEncodePayload                  = errors.DefineInvalidArgument("encode_payload", "failed to encode payload")
