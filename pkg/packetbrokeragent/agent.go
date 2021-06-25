@@ -147,8 +147,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	logger := log.FromContext(ctx)
 
 	var devAddrPrefixes []types.DevAddrPrefix
-	if hn := conf.HomeNetwork; hn.Enable {
-		devAddrPrefixes = append(devAddrPrefixes, hn.DevAddrPrefixes...)
+	if conf.HomeNetwork.Enable {
+		devAddrPrefixes = append(devAddrPrefixes, conf.HomeNetwork.DevAddrPrefixes...)
 		if len(devAddrPrefixes) == 0 {
 			devAddr, err := types.NewDevAddr(conf.NetID, nil)
 			if err != nil {
@@ -249,8 +249,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			}, nil
 		},
 	}
+
 	if a.forwarderConfig.Enable {
 		a.upstreamCh = make(chan *uplinkMessage, upstreamBufferSize)
+		if a.forwarderConfig.WorkerPool.Limit <= 1 {
+			a.forwarderConfig.WorkerPool.Limit = 2
+		}
 		if len(a.forwarderConfig.TokenKey) == 0 {
 			a.forwarderConfig.TokenKey = random.Bytes(16)
 			logger.WithField("token_key", hex.EncodeToString(a.forwarderConfig.TokenKey)).Warn("No token key configured, generated a random one")
@@ -276,9 +280,14 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			return nil, errTokenKey.WithCause(err)
 		}
 	}
+
 	if a.homeNetworkConfig.Enable {
 		a.downstreamCh = make(chan *downlinkMessage, downstreamBufferSize)
+		if a.homeNetworkConfig.WorkerPool.Limit <= 1 {
+			a.homeNetworkConfig.WorkerPool.Limit = 2
+		}
 	}
+
 	for _, opt := range opts {
 		opt(a)
 	}
@@ -294,6 +303,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
+	mapperConn, err := a.dialContext(ctx, conf.MapperAddress)
+	if err != nil {
+		return nil, err
+	}
 	a.grpc.pba = &pbaServer{
 		Agent:   a,
 		iamConn: iamConn,
@@ -304,10 +317,15 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		downstreamCh:     a.downstreamCh,
 	}
 	a.grpc.gsPba = &gsPbaServer{
-		config:           a.forwarderConfig,
-		messageEncrypter: a,
-		contextDecoupler: a,
-		upstreamCh:       a.upstreamCh,
+		netID:               a.netID,
+		clusterID:           a.clusterID,
+		config:              a.forwarderConfig,
+		messageEncrypter:    a,
+		contextDecoupler:    a,
+		tenantIDExtractor:   a.tenantIDExtractor,
+		frequencyPlansStore: a.FrequencyPlans,
+		upstreamCh:          a.upstreamCh,
+		mapperConn:          mapperConn,
 	}
 
 	newTaskConfig := func(id string, fn component.TaskFunc) *component.TaskConfig {
@@ -319,11 +337,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			Backoff: component.DialTaskBackoffConfig,
 		}
 	}
-	if a.forwarderConfig.Enable {
+	if a.forwarderConfig.Enable && a.dataPlaneAddress != "" {
 		c.RegisterTask(newTaskConfig("pb_publish_uplink", a.publishUplink))
 		c.RegisterTask(newTaskConfig("pb_subscribe_downlink", a.subscribeDownlink))
 	}
-	if a.homeNetworkConfig.Enable {
+	if a.homeNetworkConfig.Enable && a.dataPlaneAddress != "" {
 		c.RegisterTask(newTaskConfig("pb_subscribe_uplink", a.subscribeUplink))
 		c.RegisterTask(newTaskConfig("pb_publish_downlink", a.publishDownlink))
 	}
@@ -516,10 +534,10 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	var workers int32
 
 	wg.Add(1)
 	go func() {
+		var workers int32
 		defer wg.Done()
 		for {
 			select {
@@ -529,13 +547,13 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 				select {
 				case reportWorkerCh <- rep:
 				default:
-					if int(atomic.LoadInt32(&workers)) < a.forwarderConfig.WorkerPool.Limit {
+					if int(atomic.LoadInt32(&workers)) < a.forwarderConfig.WorkerPool.Limit/2 {
 						wg.Add(1)
 						worker := atomic.AddInt32(&workers, 1)
 						logger := logger.WithField("worker", worker)
 						go func() {
 							if err := a.reportDownlinkMessageDeliveryState(log.NewContext(ctx, logger), client, reportWorkerCh); err != nil {
-								logger.WithError(err).Warn("Forwarder downlink reporter stopped")
+								logger.WithError(err).Warn("Forwarder downlink reporter worker stopped")
 							}
 							wg.Done()
 							atomic.AddInt32(&workers, -1)
@@ -544,13 +562,14 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 					select {
 					case reportWorkerCh <- rep:
 					case <-time.After(workerBusyTimeout):
-						logger.Warn("Forwarder downlink reporter busy, drop message")
+						logger.Warn("Forwarder downlink reporter workers busy, drop message")
 					}
 				}
 			}
 		}
 	}()
 
+	var workers int32
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
@@ -559,7 +578,7 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 		select {
 		case downlinkCh <- msg:
 		default:
-			if int(atomic.LoadInt32(&workers)) < a.forwarderConfig.WorkerPool.Limit {
+			if int(atomic.LoadInt32(&workers)) < a.forwarderConfig.WorkerPool.Limit/2 {
 				wg.Add(1)
 				worker := atomic.AddInt32(&workers, 1)
 				logger := logger.WithField("worker", worker)
@@ -666,6 +685,8 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 		select {
 		case <-ctx.Done():
 		case reportCh <- report:
+		case <-time.After(workerBusyTimeout):
+			logger.Warn("Forwarder downlink reporter enqueuer busy, drop message")
 		}
 	}()
 
@@ -859,11 +880,11 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	var workers int32
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		var workers int32
 		for {
 			select {
 			case <-ctx.Done():
@@ -872,13 +893,13 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 				select {
 				case reportWorkerCh <- rep:
 				default:
-					if int(atomic.LoadInt32(&workers)) < a.homeNetworkConfig.WorkerPool.Limit {
+					if int(atomic.LoadInt32(&workers)) < a.homeNetworkConfig.WorkerPool.Limit/2 {
 						wg.Add(1)
 						worker := atomic.AddInt32(&workers, 1)
 						logger := logger.WithField("worker", worker)
 						go func() {
 							if err := a.reportUplinkMessageDeliveryState(log.NewContext(ctx, logger), client, reportWorkerCh); err != nil {
-								logger.WithError(err).Warn("Home Network uplink reporter stopped")
+								logger.WithError(err).Warn("Home Network uplink reporter worker stopped")
 							}
 							wg.Done()
 							atomic.AddInt32(&workers, -1)
@@ -887,13 +908,14 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 					select {
 					case reportWorkerCh <- rep:
 					case <-time.After(workerBusyTimeout):
-						logger.Warn("Home Network uplink reporter busy, drop message")
+						logger.Warn("Home Network uplink reporter workers busy, drop message")
 					}
 				}
 			}
 		}
 	}()
 
+	var workers int32
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
@@ -902,7 +924,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 		select {
 		case uplinkCh <- msg:
 		default:
-			if int(atomic.LoadInt32(&workers)) < a.homeNetworkConfig.WorkerPool.Limit {
+			if int(atomic.LoadInt32(&workers)) < a.homeNetworkConfig.WorkerPool.Limit/2 {
 				wg.Add(1)
 				worker := atomic.AddInt32(&workers, 1)
 				logger := logger.WithField("worker", worker)
@@ -1011,6 +1033,8 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 		select {
 		case <-ctx.Done():
 		case reportCh <- report:
+		case <-time.After(workerBusyTimeout):
+			logger.Warn("Home Network uplink reporter enqueuer busy, drop message")
 		}
 	}()
 
@@ -1035,7 +1059,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 		logger = logger.WithField("dev_addr", *ids.DevAddr)
 	}
 
-	msg, err := fromPBUplink(ctx, up, receivedAt)
+	msg, err := fromPBUplink(ctx, up, receivedAt, a.homeNetworkConfig.IncludeHops)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to convert incoming uplink message")
 		return err

@@ -18,7 +18,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -29,8 +28,7 @@ import (
 var Timeout = 10 * test.Delay
 
 func TestRegistry(t *testing.T) {
-	a, ctx := test.New(t)
-
+	_, ctx := test.New(t)
 	cl, flush := test.NewRedis(ctx, "redis_test")
 	defer flush()
 	defer cl.Close()
@@ -59,18 +57,18 @@ func TestRegistry(t *testing.T) {
 		DownlinkCount:          1,
 		LastUplinkReceivedAt:   &now,
 		UplinkCount:            1,
-		LastStatusReceivedAt:   nil,
-		LastStatus:             nil,
 	}
 
 	t.Run("GetNonExisting", func(t *testing.T) {
+		a, ctx := test.New(t)
 		stats, err := registry.Get(ctx, ids)
 		a.So(stats, should.BeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
 	})
 
 	t.Run("EmptyStats", func(t *testing.T) {
-		err := registry.Set(ctx, ids3, nil)
+		a, ctx := test.New(t)
+		err := registry.Set(ctx, ids3, nil, []string{})
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids3)
 		a.So(retrieved, should.BeNil)
@@ -78,7 +76,15 @@ func TestRegistry(t *testing.T) {
 	})
 
 	t.Run("SetAndClear", func(t *testing.T) {
-		err := registry.Set(ctx, ids, initialStats)
+		a, ctx := test.New(t)
+		err := registry.Set(ctx, ids, initialStats, []string{
+			"connected_at",
+			"protocol",
+			"last_downlink_received_at",
+			"downlink_count",
+			"last_uplink_received_at",
+			"uplink_count",
+		})
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
@@ -90,7 +96,7 @@ func TestRegistry(t *testing.T) {
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		// Unset
-		err = registry.Set(ctx, ids, nil)
+		err = registry.Set(ctx, ids, nil, nil)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(errors.IsNotFound(err), should.BeTrue)
@@ -98,38 +104,57 @@ func TestRegistry(t *testing.T) {
 	})
 
 	t.Run("ClearManyTimes", func(t *testing.T) {
-		a.So(registry.Set(ctx, ids, nil), should.BeNil)
-		a.So(registry.Set(ctx, ids, nil), should.BeNil)
+		a, ctx := test.New(t)
+		a.So(registry.Set(ctx, ids, nil, nil), should.BeNil)
+		a.So(registry.Set(ctx, ids, nil, nil), should.BeNil)
 	})
 
-	t.Run("UpdateUplink", func(t *testing.T) {
-		now := time.Now().UTC().Add(time.Minute)
-		stats := deepcopy.Copy(initialStats).(*ttnpb.GatewayConnectionStats)
+	t.Run("UpdateFieldMask", func(t *testing.T) {
+		a, ctx := test.New(t)
 
-		// Update uplink stats, make sure they work
-		stats.UplinkCount = 10
-		stats.LastUplinkReceivedAt = &now
-		err := registry.Set(ctx, ids, stats)
+		stats := &ttnpb.GatewayConnectionStats{
+			LastUplinkReceivedAt: &now,
+			UplinkCount:          1,
+			DownlinkCount:        1,
+		}
+
+		err := registry.Set(ctx, ids, stats, []string{
+			"uplink_count",
+			"last_uplink_received_at",
+		})
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, stats)
+		a.So(retrieved, should.Resemble, &ttnpb.GatewayConnectionStats{
+			LastUplinkReceivedAt: &now,
+			UplinkCount:          1,
+		})
 
 		// Now update downlink also
-		stats.LastDownlinkReceivedAt = &now
-		err = registry.Set(ctx, ids, stats)
+		err = registry.Set(ctx, ids, stats, []string{"downlink_count"})
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, stats)
+		a.So(retrieved, should.Resemble, &ttnpb.GatewayConnectionStats{
+			LastUplinkReceivedAt: &now,
+			UplinkCount:          1,
+			DownlinkCount:        1,
+		})
 
-		// Unset uplink
+		// Unset
 		stats.LastUplinkReceivedAt = nil
 		stats.UplinkCount = 0
-		err = registry.Set(ctx, ids, stats)
+		stats.DownlinkCount = 2
+		err = registry.Set(ctx, ids, stats, []string{
+			"uplink_count",
+			"last_uplink_received_at",
+			"downlink_count",
+		})
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
-		a.So(retrieved, should.Resemble, stats)
+		a.So(retrieved, should.Resemble, &ttnpb.GatewayConnectionStats{
+			DownlinkCount: 2,
+		})
 	})
 }

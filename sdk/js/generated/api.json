@@ -2485,7 +2485,7 @@
             },
             {
               "name": "after",
-              "description": "Query upstream messages after this timestamp only.",
+              "description": "Query upstream messages after this timestamp only. Cannot be used in conjunction with last.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -2495,7 +2495,7 @@
             },
             {
               "name": "before",
-              "description": "Query upstream messages before this timestamp only.",
+              "description": "Query upstream messages before this timestamp only. Cannot be used in conjunction with last.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -2542,6 +2542,16 @@
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",
               "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "last",
+              "description": "Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
               "ismap": false,
               "defaultValue": ""
             }
@@ -7704,6 +7714,91 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "target_cups_trust",
+              "description": "Optional PEM encoded CA Root certificate. If this field is empty, DCS will attempt to dial the Target CUPS server and fetch the CA.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "client_tls",
+              "description": "TODO: Support mTLS (https://github.com/TheThingsNetwork/lorawan-stack/issues/137)",
+              "label": "",
+              "type": "ClientTLS",
+              "longType": "CUPSRedirection.ClientTLS",
+              "fullType": "ttn.lorawan.v3.CUPSRedirection.ClientTLS",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "auth_token",
+              "description": "The Device Claiming Server will fill this field with a The Things Stack API Key.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ClientTLS",
+          "longName": "CUPSRedirection.ClientTLS",
+          "fullName": "ttn.lorawan.v3.CUPSRedirection.ClientTLS",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "cert",
+              "description": "PEM encoded Client Certificate.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 8192
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key",
+              "description": "PEM encoded Client Private Key.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 8192
+                  }
+                ]
+              }
             }
           ]
         },
@@ -8057,6 +8152,24 @@
               "fullType": "ttn.lorawan.v3.CUPSRedirection",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "target_frequency_plan_id",
+              "description": "Frequency plan ID of the target gateway.\nThis equals the first element of the frequency_plan_ids field.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             }
           ]
         },
@@ -25476,6 +25589,24 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "session_key_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
             }
           ]
         },
@@ -29561,6 +29692,96 @@
               }
             }
           ]
+        },
+        {
+          "name": "UpdatePacketBrokerGatewayRequest",
+          "longName": "UpdatePacketBrokerGatewayRequest",
+          "fullName": "ttn.lorawan.v3.UpdatePacketBrokerGatewayRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway",
+              "description": "",
+              "label": "",
+              "type": "Gateway",
+              "longType": "Gateway",
+              "fullType": "ttn.lorawan.v3.Gateway",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "online",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "rx_rate",
+              "description": "Received packets rate (number of packets per hour).\nThis field gets updated when a value is set.",
+              "label": "",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "tx_rate",
+              "description": "Transmitted packets rate (number of packets per hour).\nThis field gets updated when a value is set.",
+              "label": "",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the gateway fields that are considered for update.\nSupported values are: antennas, contact_info, frequency_plan_id, frequency_plan_ids, ids, status_public and\nlocation_public.\n\nOnline status is only updated if status_public is set. If status_public is set and false, the status will be reset.\nIf status_public is set and true, the online status is taken from the online field. The return message contains\nthe duration online_ttl for how long the gateway is considered online.\n\nLocation is only updated if location_public is set. If location_public is set and false, the location will be reset.\nIf location_public is set and true, the first antenna location will be used as gateway location.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UpdatePacketBrokerGatewayResponse",
+          "longName": "UpdatePacketBrokerGatewayResponse",
+          "fullName": "ttn.lorawan.v3.UpdatePacketBrokerGatewayResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "online_ttl",
+              "description": "Time to live of the online status.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
         }
       ],
       "services": [
@@ -29580,6 +29801,18 @@
               "responseType": "Empty",
               "responseLongType": ".google.protobuf.Empty",
               "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateGateway",
+              "description": "Update the gateway, changing the fields specified by the field mask to the provided values.\nTo mark a gateway as online, call this rpc setting online to true, include status_public in field_mask and\nkeep calling this rpc before the returned online_ttl passes to keep the gateway online.",
+              "requestType": "UpdatePacketBrokerGatewayRequest",
+              "requestLongType": "UpdatePacketBrokerGatewayRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdatePacketBrokerGatewayRequest",
+              "requestStreaming": false,
+              "responseType": "UpdatePacketBrokerGatewayResponse",
+              "responseLongType": "UpdatePacketBrokerGatewayResponse",
+              "responseFullType": "ttn.lorawan.v3.UpdatePacketBrokerGatewayResponse",
               "responseStreaming": false
             }
           ]

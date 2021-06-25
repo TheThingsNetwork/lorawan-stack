@@ -1062,6 +1062,8 @@ The command for building a full release is:
 $ goreleaser -f .goreleaser.release.yml --rm-dist
 ```
 
+> Note: Goreleaser is configured to sign binaries, as per GitHub Action in `.github/workflows/release-*.yml`. If you're doing a release locally, you will need key's passphrase, or need to skip the signing step.
+
 > Note: You will at least need to have [`rpm`](http://rpm5.org/) and [`snapcraft`](https://snapcraft.io/) in your `PATH` if you want to build a full release.
 
 This will compile binaries for all supported platforms, `deb`, `rpm` and Snapcraft packages, release archives in `dist`, as well as Docker images.

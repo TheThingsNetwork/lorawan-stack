@@ -296,4 +296,19 @@ PropTypes.passwordRequirements = PropTypes.shape({
 
 PropTypes.euiPrefixes = PropTypes.arrayOf(PropTypes.euiPrefix)
 
+PropTypes.routingPolicy = PropTypes.shape({
+  uplink: PropTypes.shape({
+    application_data: PropTypes.bool,
+    join_request: PropTypes.bool,
+    localization: PropTypes.bool,
+    mac_data: PropTypes.bool,
+    signal_quality: PropTypes.bool,
+  }),
+  downlink: PropTypes.shape({
+    application_data: PropTypes.bool,
+    join_accept: PropTypes.bool,
+    mac_data: PropTypes.bool,
+  }),
+})
+
 export default PropTypes

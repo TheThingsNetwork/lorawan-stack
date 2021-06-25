@@ -259,6 +259,15 @@ func (m *DownlinkMessage) ValidateFields(paths ...string) error {
 
 			}
 
+		case "session_key_id":
+
+			if len(m.GetSessionKeyId()) > 2048 {
+				return DownlinkMessageValidationError{
+					field:  "session_key_id",
+					reason: "value length must be at most 2048 bytes",
+				}
+			}
+
 		case "settings":
 			if m.Settings == nil {
 				return DownlinkMessageValidationError{

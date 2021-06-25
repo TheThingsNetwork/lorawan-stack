@@ -374,6 +374,48 @@ func (m *CUPSRedirection) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "target_cups_trust":
+			// no validation rules for TargetCupsTrust
+		case "gateway_credentials":
+			if len(subs) == 0 {
+				subs = []string{
+					"client_tls", "auth_token",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "client_tls":
+					w, ok := m.GatewayCredentials.(*CUPSRedirection_ClientTls)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetClientTls()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return CUPSRedirectionValidationError{
+								field:  "client_tls",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "auth_token":
+					w, ok := m.GatewayCredentials.(*CUPSRedirection_AuthToken)
+					if !ok || w == nil {
+						continue
+					}
+
+					if utf8.RuneCountInString(m.GetAuthToken()) > 2048 {
+						return CUPSRedirectionValidationError{
+							field:  "auth_token",
+							reason: "value length must be at most 2048 runes",
+						}
+					}
+
+				}
+			}
 		default:
 			return CUPSRedirectionValidationError{
 				field:  name,
@@ -499,6 +541,15 @@ func (m *ClaimGatewayRequest) ValidateFields(paths ...string) error {
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
+				}
+			}
+
+		case "target_frequency_plan_id":
+
+			if utf8.RuneCountInString(m.GetTargetFrequencyPlanId()) > 64 {
+				return ClaimGatewayRequestValidationError{
+					field:  "target_frequency_plan_id",
+					reason: "value length must be at most 64 runes",
 				}
 			}
 
@@ -820,6 +871,106 @@ var _ interface {
 } = ClaimEndDeviceRequest_AuthenticatedIdentifiersValidationError{}
 
 var _ClaimEndDeviceRequest_AuthenticatedIdentifiers_AuthenticationCode_Pattern = regexp.MustCompile("^[A-Z0-9]{1,32}$")
+
+// ValidateFields checks the field values on CUPSRedirection_ClientTLS with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CUPSRedirection_ClientTLS) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = CUPSRedirection_ClientTLSFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "cert":
+
+			if len(m.GetCert()) > 8192 {
+				return CUPSRedirection_ClientTLSValidationError{
+					field:  "cert",
+					reason: "value length must be at most 8192 bytes",
+				}
+			}
+
+		case "key":
+
+			if len(m.GetKey()) > 8192 {
+				return CUPSRedirection_ClientTLSValidationError{
+					field:  "key",
+					reason: "value length must be at most 8192 bytes",
+				}
+			}
+
+		default:
+			return CUPSRedirection_ClientTLSValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// CUPSRedirection_ClientTLSValidationError is the validation error returned by
+// CUPSRedirection_ClientTLS.ValidateFields if the designated constraints
+// aren't met.
+type CUPSRedirection_ClientTLSValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CUPSRedirection_ClientTLSValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CUPSRedirection_ClientTLSValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CUPSRedirection_ClientTLSValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CUPSRedirection_ClientTLSValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CUPSRedirection_ClientTLSValidationError) ErrorName() string {
+	return "CUPSRedirection_ClientTLSValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CUPSRedirection_ClientTLSValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCUPSRedirection_ClientTLS.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CUPSRedirection_ClientTLSValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CUPSRedirection_ClientTLSValidationError{}
 
 // ValidateFields checks the field values on
 // ClaimGatewayRequest_AuthenticatedIdentifiers with the rules defined in the

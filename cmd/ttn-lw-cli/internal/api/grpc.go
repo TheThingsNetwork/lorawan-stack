@@ -19,6 +19,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"sync"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -122,13 +123,20 @@ var (
 func Dial(ctx context.Context, target string) (*grpc.ClientConn, error) {
 	connMu.Lock()
 	defer connMu.Unlock()
+	logger := log.FromContext(ctx).WithField("target", target)
 	if conn, ok := conns[target]; ok {
+		logger.Debug("Using existing gRPC connection")
 		return conn, nil
 	}
-	conn, err := dialContext(ctx, target)
+	logger.Debug("Connecting to gRPC server...")
+	startTime := time.Now()
+	conn, err := dialContext(ctx, target, grpc.WithBlock())
 	if err != nil {
 		return nil, err
 	}
+	logger.WithField(
+		"duration", time.Since(startTime).Round(time.Microsecond*100),
+	).Debug("Connected to gRPC server")
 	conns[target] = conn
 	return conn, nil
 }

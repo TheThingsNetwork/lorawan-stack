@@ -158,7 +158,9 @@ const m = defineMessages({
     'This will only allow a gateway to connect if it uses a TLS enabled Basic Station or MQTT connection. It will not allow connections from UDP packet forwarders.',
 
   gatewayStatusDescription:
-    'This allows information about the gateway to be shared publicly - the location, for example, to display on maps of publicly available LoRaWAN gateways.',
+    'Setting your gateway status to public allows status information about the gateway to be shared with other users in the network, and with Packet Broker if enabled by the network operator.',
+  gatewayLocationDescription:
+    'Setting your gateway location to public allows location information about the gateway to be shared with other users in the network, and with Packet Broker if enabled by the network operator.',
 
   gatewayAttributesDescription:
     'Attributes can be used to set arbitrary information about the entity, to be used by scripts, or simply for your own organization.',
@@ -320,6 +322,9 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.GATEWAY_STATUS]: {
     description: m.gatewayStatusDescription,
+  },
+  [TOOLTIP_IDS.GATEWAY_LOCATION]: {
+    description: m.gatewayLocationDescription,
   },
   [TOOLTIP_IDS.GATEWAY_ATTRIBUTES]: {
     description: m.gatewayAttributesDescription,

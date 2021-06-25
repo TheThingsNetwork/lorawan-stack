@@ -34,6 +34,7 @@ export default Object.freeze({
   GATEWAY_DESCRIPTION: 'gateway-description',
   GATEWAY_EUI: 'gateway-eui',
   GATEWAY_ID: 'gateway-id',
+  GATEWAY_LOCATION: 'gateway-location',
   GATEWAY_NAME: 'gateway-name',
   GATEWAY_STATUS: 'gateway-status',
   JOIN_EUI: 'joineui',

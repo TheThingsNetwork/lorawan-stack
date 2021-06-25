@@ -221,10 +221,9 @@ export const mayPerformAdminActions = {
   check: isAdmin => isAdmin,
 }
 
-export const mayManageUsers = {
-  rightsSelector: selectUserIsAdmin,
-  check: mayPerformAdminActions.check,
-}
+export const mayManageUsers = mayPerformAdminActions
+export const mayPurgeEntities = mayPerformAdminActions
+export const mayConfigurePacketBroker = mayPerformAdminActions
 
 // Composite feature checks.
 export const mayViewApplications = {

@@ -22,6 +22,7 @@ import (
 var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
 	IAMAddress:          "iam.packetbroker.net:443",
 	ControlPlaneAddress: "cp.packetbroker.net:443",
+	MapperAddress:       "mapper.packetbroker.net:443",
 	AuthenticationMode:  "oauth2",
 	OAuth2: packetbrokeragent.OAuth2Config{
 		TokenURL: "https://iam.packetbroker.net/token",
@@ -33,6 +34,7 @@ var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{
 			Limit: 4096,
 		},
+		IncludeHops: false,
 	},
 	Forwarder: packetbrokeragent.ForwarderConfig{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{
@@ -41,5 +43,6 @@ var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
 		IncludeGatewayEUI: true,
 		IncludeGatewayID:  true,
 		HashGatewayID:     false,
+		GatewayOnlineTTL:  packetbrokeragent.DefaultGatewayOnlineTTL,
 	},
 }

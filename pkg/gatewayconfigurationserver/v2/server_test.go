@@ -96,7 +96,7 @@ func TestGetGateway(t *testing.T) {
 					FrequencyPlanID:      "EU_863_870",
 					GatewayServerAddress: "gatewayserver",
 					Antennas: []ttnpb.GatewayAntenna{
-						{Location: ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 90}},
+						{Location: &ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 90}},
 					},
 				}, nil
 			},
@@ -121,7 +121,7 @@ func TestGetGateway(t *testing.T) {
 					FrequencyPlanID:      "EU_863_870",
 					GatewayServerAddress: "gatewayserver",
 					Antennas: []ttnpb.GatewayAntenna{
-						{Location: ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 90}},
+						{Location: &ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 90}},
 					},
 				}, nil
 			},
@@ -146,7 +146,7 @@ func TestGetGateway(t *testing.T) {
 					FrequencyPlanID:      "EU_863_870",
 					GatewayServerAddress: "gatewayserver",
 					Antennas: []ttnpb.GatewayAntenna{
-						{Location: ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 90}},
+						{Location: &ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 90}},
 					},
 				}, nil
 			},

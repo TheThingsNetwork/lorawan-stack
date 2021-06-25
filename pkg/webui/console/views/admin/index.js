@@ -21,6 +21,7 @@ import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
 import UserManagement from '@console/views/admin-user-management'
+import PacketBroker from '@console/views/admin-packet-broker'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -32,6 +33,7 @@ const AdminView = ({ match }) => (
     <IntlHelmet titleTemplate={`%s - Admin Configurations - ${selectApplicationSiteName()}`} />
     <Switch>
       <Route path={`${match.path}/user-management`} component={UserManagement} />
+      <Route path={`${match.path}/packet-broker`} component={PacketBroker} />
       <NotFoundRoute />
     </Switch>
   </React.Fragment>

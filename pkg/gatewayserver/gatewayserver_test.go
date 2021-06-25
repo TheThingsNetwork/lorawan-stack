@@ -25,6 +25,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
@@ -92,6 +93,7 @@ func TestGatewayServer(t *testing.T) {
 	config := &gatewayserver.Config{
 		RequireRegisteredGateways:         false,
 		UpdateGatewayLocationDebounceTime: 0,
+		UpdateConnectionStatsDebounceTime: 0,
 		MQTT: config.MQTT{
 			Listen: ":1882",
 		},
@@ -115,7 +117,6 @@ func TestGatewayServer(t *testing.T) {
 				AllowUnauthenticated: true,
 			},
 		},
-		UpdateConnectionStatsDebounceTime: 0,
 	}
 	if os.Getenv("TEST_REDIS") == "1" {
 		statsRedisClient, statsFlush := test.NewRedis(ctx, "gatewayserver_test")
@@ -708,7 +709,7 @@ func TestGatewayServer(t *testing.T) {
 						Name           string
 						UpdateLocation bool
 						Up             *ttnpb.GatewayUp
-						ExpectLocation ttnpb.Location
+						ExpectLocation *ttnpb.Location
 					}{
 						{
 							Name:           "NoUpdate",
@@ -726,7 +727,7 @@ func TestGatewayServer(t *testing.T) {
 									},
 								},
 							},
-							ExpectLocation: ttnpb.Location{
+							ExpectLocation: &ttnpb.Location{
 								Source: ttnpb.SOURCE_GPS,
 							},
 						},
@@ -738,7 +739,7 @@ func TestGatewayServer(t *testing.T) {
 									Time: time.Unix(424242, 0),
 								},
 							},
-							ExpectLocation: ttnpb.Location{
+							ExpectLocation: &ttnpb.Location{
 								Source: ttnpb.SOURCE_GPS,
 							},
 						},
@@ -758,7 +759,7 @@ func TestGatewayServer(t *testing.T) {
 									},
 								},
 							},
-							ExpectLocation: ttnpb.Location{
+							ExpectLocation: &ttnpb.Location{
 								Source:    ttnpb.SOURCE_GPS,
 								Altitude:  10,
 								Latitude:  12,
@@ -773,12 +774,19 @@ func TestGatewayServer(t *testing.T) {
 								GatewayIdentifiers: ids,
 							})
 							a.So(err, should.BeNil)
-							gtw.Antennas[0].Location = ttnpb.Location{
+
+							gtw.Antennas[0].Location = &ttnpb.Location{
 								Source: ttnpb.SOURCE_GPS,
 							}
 							gtw.UpdateLocationFromStatus = tc.UpdateLocation
-							gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
-								GatewayIdentifiers: ids,
+							gtw, err = is.Update(ctx, &ttnpb.UpdateGatewayRequest{
+								Gateway: *gtw,
+								FieldMask: pbtypes.FieldMask{
+									Paths: []string{
+										"antennas",
+										"update_location_from_status",
+									},
+								},
 							})
 							a.So(err, should.BeNil)
 							a.So(gtw.UpdateLocationFromStatus, should.Equal, tc.UpdateLocation)
@@ -851,7 +859,6 @@ func TestGatewayServer(t *testing.T) {
 									SNR:                11,
 								},
 							},
-							RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
 						},
 					},
 				}
@@ -866,7 +873,7 @@ func TestGatewayServer(t *testing.T) {
 						a.So(err, should.BeNil)
 						a.So(gtw.LocationPublic, should.Equal, locationPublic)
 						gtw.LocationPublic = locationPublic
-						gtw.Antennas[0].Location = *location
+						gtw.Antennas[0].Location = location
 						gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
 							GatewayIdentifiers: ids,
 						})
@@ -900,6 +907,7 @@ func TestGatewayServer(t *testing.T) {
 								} else {
 									up.UplinkMessages[0].RxMetadata[0].Location = nil
 								}
+								up.UplinkMessages[0].RawPayload = randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6)
 
 								select {
 								case upCh <- up:
@@ -948,6 +956,8 @@ func TestGatewayServer(t *testing.T) {
 			})
 			location := &gtw.Antennas[0].Location
 
+			duplicatePayload := randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6)
+
 			t.Run("Upstream", func(t *testing.T) {
 				uplinkCount := 0
 				for _, tc := range []struct {
@@ -955,6 +965,8 @@ func TestGatewayServer(t *testing.T) {
 					Up             *ttnpb.GatewayUp
 					Forwards       []uint32 // Timestamps of uplink messages in Up that are being forwarded.
 					PublicLocation bool     // If gateway location is public, it should be in RxMetadata
+					UplinkCount    int      // Number of expected uplinks
+					RepeatUpEvent  bool     // Expect event for repeated uplinks
 				}{
 					{
 						Name: "GatewayStatus",
@@ -997,7 +1009,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -69,
 											ChannelRSSI:        -69,
 											SNR:                11,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -1005,6 +1017,94 @@ func TestGatewayServer(t *testing.T) {
 							},
 						},
 						Forwards: []uint32{100},
+					},
+					{
+						Name: "OneValidLoRaAndTwoRepeated",
+						Up: &ttnpb.GatewayUp{
+							UplinkMessages: []*ttnpb.UplinkMessage{
+								{
+									Settings: ttnpb.TxSettings{
+										DataRate: ttnpb.DataRate{
+											Modulation: &ttnpb.DataRate_LoRa{
+												LoRa: &ttnpb.LoRaDataRate{
+													SpreadingFactor: 7,
+													Bandwidth:       250000,
+												},
+											},
+										},
+										CodingRate: "4/5",
+										Frequency:  867900000,
+										Timestamp:  100,
+									},
+									RxMetadata: []*ttnpb.RxMetadata{
+										{
+											GatewayIdentifiers: ids,
+											Timestamp:          100,
+											RSSI:               -69,
+											ChannelRSSI:        -69,
+											SNR:                11,
+											Location:           *location,
+										},
+									},
+									RawPayload: duplicatePayload,
+								},
+								{
+									Settings: ttnpb.TxSettings{
+										DataRate: ttnpb.DataRate{
+											Modulation: &ttnpb.DataRate_LoRa{
+												LoRa: &ttnpb.LoRaDataRate{
+													SpreadingFactor: 7,
+													Bandwidth:       250000,
+												},
+											},
+										},
+										CodingRate: "4/5",
+										Frequency:  867900000,
+										Timestamp:  100,
+									},
+									RxMetadata: []*ttnpb.RxMetadata{
+										{
+											GatewayIdentifiers: ids,
+											Timestamp:          100,
+											RSSI:               -69,
+											ChannelRSSI:        -69,
+											SNR:                11,
+											Location:           *location,
+										},
+									},
+									RawPayload: duplicatePayload,
+								},
+								{
+									Settings: ttnpb.TxSettings{
+										DataRate: ttnpb.DataRate{
+											Modulation: &ttnpb.DataRate_LoRa{
+												LoRa: &ttnpb.LoRaDataRate{
+													SpreadingFactor: 7,
+													Bandwidth:       250000,
+												},
+											},
+										},
+										CodingRate: "4/5",
+										Frequency:  867900000,
+										Timestamp:  101,
+									},
+									RxMetadata: []*ttnpb.RxMetadata{
+										{
+											GatewayIdentifiers: ids,
+											Timestamp:          101,
+											RSSI:               -42,
+											ChannelRSSI:        -42,
+											SNR:                11,
+											Location:           *location,
+										},
+									},
+									RawPayload: duplicatePayload,
+								},
+							},
+						},
+						Forwards:      []uint32{100},
+						UplinkCount:   1,
+						RepeatUpEvent: true,
 					},
 					{
 						Name: "OneValidFSK",
@@ -1029,7 +1129,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -69,
 											ChannelRSSI:        -69,
 											SNR:                11,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -1063,7 +1163,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -112,
 											ChannelRSSI:        -112,
 											SNR:                2,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: []byte{0xff, 0x02, 0x03}, // Garbage; doesn't get forwarded.
@@ -1089,7 +1189,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -69,
 											ChannelRSSI:        -69,
 											SNR:                11,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -1115,7 +1215,7 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -36,
 											ChannelRSSI:        -36,
 											SNR:                5,
-											Location:           location,
+											Location:           *location,
 										},
 									},
 									RawPayload: randomJoinRequestPayload(
@@ -1135,13 +1235,13 @@ func TestGatewayServer(t *testing.T) {
 						a := assertions.New(t)
 
 						upEvents := map[string]events.Channel{}
-						for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive"} {
+						for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.up.repeat"} {
 							upEvents[event] = make(events.Channel, 5)
 						}
 						defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
 							PublishFunc: func(ev events.Event) {
 								switch name := ev.Name(); name {
-								case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive":
+								case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.up.repeat":
 									go func() {
 										upEvents[name] <- ev
 									}()
@@ -1156,10 +1256,21 @@ func TestGatewayServer(t *testing.T) {
 						case <-time.After(timeout):
 							t.Fatalf("Failed to send message to upstream channel")
 						}
-						if ptc.DetectsInvalidMessages {
+						if tc.UplinkCount > 0 {
+							uplinkCount += tc.UplinkCount
+						} else if ptc.DetectsInvalidMessages {
 							uplinkCount += len(tc.Forwards)
 						} else {
 							uplinkCount += len(tc.Up.UplinkMessages)
+						}
+
+						if tc.RepeatUpEvent {
+							select {
+							case evt := <-upEvents["gs.up.repeat"]:
+								a.So(evt.Name(), should.Equal, "gs.up.repeat")
+							case <-time.After(timeout):
+								t.Fatal("Expected repeat uplink event timeout")
+							}
 						}
 
 						notSeen := make(map[uint32]struct{})
@@ -1226,9 +1337,11 @@ func TestGatewayServer(t *testing.T) {
 
 						conn, ok := gs.GetConnection(ctx, ids)
 						a.So(ok, should.BeTrue)
-						a.So(conn.Stats(), should.NotBeNil)
+
+						stats, paths := conn.Stats()
+						a.So(stats, should.NotBeNil)
 						if config.Stats != nil {
-							a.So(config.Stats.Set(conn.Context(), ids, conn.Stats()), should.BeNil)
+							a.So(config.Stats.Set(conn.Context(), ids, stats, paths), should.BeNil)
 						}
 
 						stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
@@ -1512,12 +1625,14 @@ func TestGatewayServer(t *testing.T) {
 
 						conn, ok := gs.GetConnection(ctx, ids)
 						a.So(ok, should.BeTrue)
-						a.So(conn.Stats(), should.NotBeNil)
+
+						stats, paths := conn.Stats()
+						a.So(stats, should.NotBeNil)
 						if config.Stats != nil {
-							a.So(config.Stats.Set(conn.Context(), ids, conn.Stats()), should.BeNil)
+							a.So(config.Stats.Set(conn.Context(), ids, stats, paths), should.BeNil)
 						}
 
-						stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
+						stats, err = statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}

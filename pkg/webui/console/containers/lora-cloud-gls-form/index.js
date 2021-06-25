@@ -63,12 +63,12 @@ const m = defineMessages({
 })
 
 const LORACLOUD_GLS_QUERY_LABELS = Object.freeze([
-  { value: 'TDOARSSI', label: 'LoRa® TOA/RSSI' },
+  { value: 'TOARSSI', label: 'LoRa® TOA/RSSI' },
   { value: 'GNSS', label: 'GNSS' },
   { value: 'TOAWIFI', label: 'TOA/WiFi' },
 ])
 const LORACLOUD_GLS_QUERY_TYPES = Object.freeze({
-  TDOARSSI: 'TDOARSSI',
+  TOARSSI: 'TOARSSI',
   GNSS: 'GNSS',
   TOAWIFI: 'TOAWIFI',
 })
@@ -80,10 +80,10 @@ const validationSchema = Yup.object()
       token: Yup.string().required(sharedMessages.validateRequired),
       query: Yup.string()
         .oneOf(LORACLOUD_GLS_QUERY_VALUES)
-        .default(LORACLOUD_GLS_QUERY_TYPES.TDOARSSI)
+        .default(LORACLOUD_GLS_QUERY_TYPES.TOARSSI)
         .required(sharedMessages.validateRequired),
       multi_frame: Yup.boolean().when('query', {
-        is: LORACLOUD_GLS_QUERY_TYPES.TDOARSSI,
+        is: LORACLOUD_GLS_QUERY_TYPES.TOARSSI,
         then: schema => schema.default(false).required(sharedMessages.validateRequired),
         otherwise: schema => schema.strip(),
       }),
@@ -224,7 +224,7 @@ const LoRaCloudGLSForm = () => {
           onChange={handleQueryTypeChange}
           required
         />
-        {queryType === LORACLOUD_GLS_QUERY_TYPES.TDOARSSI && (
+        {queryType === LORACLOUD_GLS_QUERY_TYPES.TOARSSI && (
           <>
             <Form.Field
               component={Checkbox}

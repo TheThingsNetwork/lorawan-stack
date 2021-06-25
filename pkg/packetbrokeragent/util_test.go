@@ -20,6 +20,7 @@ import (
 	"crypto/x509"
 	"io/ioutil"
 	"net"
+	"testing"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -38,7 +39,7 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 	panic("could not connect to peer")
 }
 
-func mustServePBDataPlane(ctx context.Context) (*mock.PBDataPlane, net.Addr) {
+func mustServePBDataPlane(ctx context.Context, tb testing.TB) (*mock.PBDataPlane, net.Addr) {
 	cert, err := tls.LoadX509KeyPair("testdata/servercert.pem", "testdata/serverkey.pem")
 	if err != nil {
 		panic(err)
@@ -55,13 +56,39 @@ func mustServePBDataPlane(ctx context.Context) (*mock.PBDataPlane, net.Addr) {
 	if err != nil {
 		panic(err)
 	}
-	dp := mock.NewPBDataPlane(cert, clientCAs)
+	dp := mock.NewPBDataPlane(tb, cert, clientCAs)
 	go dp.Serve(lis)
 	go func() {
 		<-ctx.Done()
 		dp.GracefulStop()
 	}()
 	return dp, lis.Addr()
+}
+
+func mustServePBMapper(ctx context.Context, tb testing.TB) (*mock.PBMapper, net.Addr) {
+	cert, err := tls.LoadX509KeyPair("testdata/servercert.pem", "testdata/serverkey.pem")
+	if err != nil {
+		panic(err)
+	}
+	clientCA, err := ioutil.ReadFile("testdata/clientca.pem")
+	if err != nil {
+		panic(err)
+	}
+	clientCAs := x509.NewCertPool()
+	if !clientCAs.AppendCertsFromPEM(clientCA) {
+		panic("failed to append client CA from PEM")
+	}
+	lis, err := net.Listen("tcp", ":0")
+	if err != nil {
+		panic(err)
+	}
+	mp := mock.NewPBMapper(tb, cert, clientCAs)
+	go mp.Serve(lis)
+	go func() {
+		<-ctx.Done()
+		mp.GracefulStop()
+	}()
+	return mp, lis.Addr()
 }
 
 func eui64Ptr(v types.EUI64) *types.EUI64 {

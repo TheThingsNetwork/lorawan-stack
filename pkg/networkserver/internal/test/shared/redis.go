@@ -102,3 +102,18 @@ func NewRedisUplinkDeduplicator(ctx context.Context) (UplinkDeduplicator, func()
 			}
 		}
 }
+
+func NewRedisScheduledDownlinkMatcher(ctx context.Context) (ScheduledDownlinkMatcher, func()) {
+	tb := test.MustTBFromContext(ctx)
+
+	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "scheduled-downlink-matcher")...)
+	return &redis.ScheduledDownlinkMatcher{
+			Redis: cl,
+		},
+		func() {
+			flush()
+			if err := cl.Close(); err != nil {
+				tb.Errorf("Failed to close Redis scheduled downlink matcher client: %s", test.FormatError(err))
+			}
+		}
+}

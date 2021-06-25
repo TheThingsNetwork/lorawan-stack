@@ -17,7 +17,7 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 require('@babel/register')
 
-const { default: bundleConfig, styleConfig } = require('../webpack.config.babel.js')
+const { default: bundleConfig, styleConfig } = require('../webpack.config.babel')
 
 // List of allowed plugins.
 const allow = [MiniCssExtractPlugin]

@@ -15,6 +15,7 @@
 package io
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"sync/atomic"
@@ -99,6 +100,15 @@ type Connection struct {
 
 	statsChangedCh chan struct{}
 	locCh          chan struct{}
+
+	lastUplink            *uplinkMessage
+	lastRepeatUpEventTime time.Time
+}
+
+type uplinkMessage struct {
+	payload   []byte
+	frequency uint64
+	antennas  []uint32
 }
 
 var (
@@ -183,8 +193,15 @@ func (c *Connection) Gateway() *ttnpb.Gateway { return c.gateway }
 
 var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 
+// Interval between emitting consecutive gs.up.repeat events for the same gateway connection.
+const consecutiveRepeatUpEventsInterval = time.Minute
+
 // HandleUp updates the uplink stats and sends the message to the upstream channel.
 func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
+	if c.discardRepeatedUplink(up) {
+		return nil
+	}
+
 	var ct scheduling.ConcentratorTime
 	if up.Settings.Time != nil {
 		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
@@ -219,8 +236,8 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 
 		if c.gateway.LocationPublic && len(c.gateway.Antennas) > int(md.AntennaIndex) {
 			location := c.gateway.Antennas[md.AntennaIndex].Location
-			if location.Source != ttnpb.SOURCE_UNKNOWN {
-				md.Location = &location
+			if location != nil && location.Source != ttnpb.SOURCE_UNKNOWN {
+				md.Location = location
 			}
 		} else if !c.gateway.LocationPublic {
 			md.Location = nil
@@ -600,23 +617,35 @@ func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np
 	return c.rtts.Stats(percentile, t)
 }
 
-// Stats collects and returns the gateway connection statistics.
-func (c *Connection) Stats() *ttnpb.GatewayConnectionStats {
-	stats := &ttnpb.GatewayConnectionStats{}
+// Stats collects and returns the gateway connection statistics and the field mask paths.
+func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	ct := c.ConnectTime()
-	stats.ConnectedAt = &ct
-	stats.Protocol = c.Frontend().Protocol()
+	stats := &ttnpb.GatewayConnectionStats{
+		ConnectedAt: &ct,
+		Protocol:    c.Frontend().Protocol(),
+	}
+	paths := make([]string, 0, len(ttnpb.GatewayConnectionStatsFieldPathsTopLevel))
+	paths = append(paths, "connected_at", "protocol")
+
 	if s, t, ok := c.StatusStats(); ok {
 		stats.LastStatusReceivedAt = &t
 		stats.LastStatus = s
+		paths = append(paths, "last_status_received_at", "last_status")
 	}
-	if c, t, ok := c.UpStats(); ok {
+	if count, t, ok := c.UpStats(); ok {
 		stats.LastUplinkReceivedAt = &t
-		stats.UplinkCount = c
+		stats.UplinkCount = count
+		paths = append(paths, "last_uplink_received_at", "uplink_count")
 	}
-	if c, t, ok := c.DownStats(); ok {
+	if count, t, ok := c.DownStats(); ok {
 		stats.LastDownlinkReceivedAt = &t
-		stats.DownlinkCount = c
+		stats.DownlinkCount = count
+		paths = append(paths, "last_downlink_received_at", "downlink_count")
+		if c.scheduler != nil {
+			// Usage statistics are only available for downlink.
+			stats.SubBands = c.scheduler.SubBandStats()
+			paths = append(paths, "sub_bands")
+		}
 	}
 	if min, max, median, _, count := c.RTTStats(100, time.Now()); count > 0 {
 		stats.RoundTripTimes = &ttnpb.GatewayConnectionStats_RoundTripTimes{
@@ -625,12 +654,9 @@ func (c *Connection) Stats() *ttnpb.GatewayConnectionStats {
 			Median: median,
 			Count:  uint32(count),
 		}
+		paths = append(paths, "round_trip_times")
 	}
-	if c.scheduler != nil {
-		stats.SubBands = c.scheduler.SubBandStats()
-	}
-
-	return stats
+	return stats, paths
 }
 
 // FrequencyPlans returns the frequency plans for the gateway.
@@ -660,4 +686,49 @@ func (c *Connection) notifyStatsChanged() {
 	case c.statsChangedCh <- struct{}{}:
 	default:
 	}
+}
+
+func uplinkMessageFromProto(pb *ttnpb.UplinkMessage) *uplinkMessage {
+	up := &uplinkMessage{
+		payload:   pb.GetRawPayload(),
+		frequency: pb.GetSettings().Frequency,
+		antennas:  make([]uint32, 0, len(pb.GetRxMetadata())),
+	}
+	for _, md := range pb.GetRxMetadata() {
+		up.antennas = append(up.antennas, md.GetAntennaIndex())
+	}
+	return up
+}
+
+func isRepeatedUplink(this *uplinkMessage, that *uplinkMessage) bool {
+	if this == nil || that == nil || this.frequency != that.frequency || len(this.antennas) != len(that.antennas) || !bytes.Equal(this.payload, that.payload) {
+		return false
+	}
+	for idx, antenna := range this.antennas {
+		if that.antennas[idx] != antenna {
+			return false
+		}
+	}
+	return true
+}
+
+// discardRepeatedUplink will discard repeated uplinks from faulty gateway
+// implementations. It returns true if the uplink message is the same as the
+// last uplink message that was received by the connection.
+//
+// discardRepeatedUplink is not goroutine safe.
+func (c *Connection) discardRepeatedUplink(up *ttnpb.UplinkMessage) bool {
+	uplink := uplinkMessageFromProto(up)
+	shouldDiscard := isRepeatedUplink(c.lastUplink, uplink)
+	c.lastUplink = uplink
+	if shouldDiscard {
+		shouldEmitEvent := false
+		if time.Since(c.lastRepeatUpEventTime) >= consecutiveRepeatUpEventsInterval {
+			log.FromContext(c.ctx).Debug("Dropped repeated gateway uplink")
+			shouldEmitEvent = true
+			c.lastRepeatUpEventTime = time.Now()
+		}
+		registerRepeatUp(c.ctx, shouldEmitEvent, c.gateway, c.frontend.Protocol())
+	}
+	return shouldDiscard
 }

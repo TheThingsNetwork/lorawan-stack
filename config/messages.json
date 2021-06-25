@@ -1439,6 +1439,15 @@
       "file": "gateways_claim.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:invalid_target_cups_trust": {
+    "translations": {
+      "en": "invalid target CUPS trust"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "gateways_claim.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:join_server_disabled": {
     "translations": {
       "en": "Join Server is disabled"
@@ -2510,15 +2519,6 @@
       "file": "applicationserver.go"
     }
   },
-  "error:pkg/applicationserver:duplicate_identifiers": {
-    "translations": {
-      "en": "identifiers already exists"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "registry.go"
-    }
-  },
   "error:pkg/applicationserver:field_mask": {
     "translations": {
       "en": "invalid field mask"
@@ -2616,15 +2616,6 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "payload.go"
-    }
-  },
-  "error:pkg/applicationserver:payload_crypto_disabled": {
-    "translations": {
-      "en": "payload crypto is disabled"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "applicationserver.go"
     }
   },
   "error:pkg/applicationserver:rebuild": {
@@ -4679,15 +4670,6 @@
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:no_network_server": {
-    "translations": {
-      "en": "no Network Server found to handle message"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "gatewayserver.go"
-    }
-  },
   "error:pkg/gatewayserver:not_connected": {
     "translations": {
       "en": "gateway `{gateway_uid}` not connected"
@@ -4745,15 +4727,6 @@
   "error:pkg/gatewayserver:upstream": {
     "translations": {
       "en": "failed to setup upstream `{name}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "gatewayserver.go"
-    }
-  },
-  "error:pkg/gatewayserver:upstream_type_not_implemented": {
-    "translations": {
-      "en": "upstream `{name}` not implemented"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -6623,6 +6596,15 @@
       "file": "application_uplink_queue.go"
     }
   },
+  "error:pkg/networkserver/redis:missing_downlink_correlation_id": {
+    "translations": {
+      "en": "missing identifier correlation ID on downlink message"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "scheduled_downlink_matcher.go"
+    }
+  },
   "error:pkg/networkserver/redis:missing_payload": {
     "translations": {
       "en": "missing payload"
@@ -7334,6 +7316,15 @@
       "file": "grpc_nspba.go"
     }
   },
+  "error:pkg/packetbrokeragent:inconsistent_bands": {
+    "translations": {
+      "en": "inconsistent bands"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
   "error:pkg/packetbrokeragent:invalid_rx1_delay": {
     "translations": {
       "en": "invalid Rx1 delay"
@@ -7379,6 +7370,15 @@
       "file": "translation.go"
     }
   },
+  "error:pkg/packetbrokeragent:no_gateway_id": {
+    "translations": {
+      "en": "no gateway identifier provided or included in configuration"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "grpc_gspba.go"
+    }
+  },
   "error:pkg/packetbrokeragent:no_phy_payload": {
     "translations": {
       "en": "no PHYPayload in message"
@@ -7395,6 +7395,15 @@
     "description": {
       "package": "pkg/packetbrokeragent",
       "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:not_enabled": {
+    "translations": {
+      "en": "Packet Broker is not enabled"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "grpc_pba.go"
     }
   },
   "error:pkg/packetbrokeragent:registration": {
@@ -9014,6 +9023,15 @@
     },
     "description": {
       "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.up.repeat": {
+    "translations": {
+      "en": "received repeated uplink message from gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
       "file": "observability.go"
     }
   },

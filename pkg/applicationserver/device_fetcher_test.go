@@ -126,7 +126,7 @@ func TestEndDeviceFetcher(t *testing.T) {
 			func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
 				deadline, ok := ctx.Deadline()
 				a.So(ok, should.BeTrue)
-				a.So(deadline.Sub(time.Now()), should.AlmostEqual, timeout, margin.Nanoseconds())
+				a.So(time.Until(deadline), should.AlmostEqual, timeout, margin.Nanoseconds())
 				return nil, nil
 			},
 		)

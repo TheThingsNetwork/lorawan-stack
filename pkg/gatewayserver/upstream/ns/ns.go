@@ -33,27 +33,33 @@ type Cluster interface {
 	WithClusterAuth() grpc.CallOption
 	ClaimIDs(ctx context.Context, ids cluster.EntityIdentifiers) error
 	UnclaimIDs(ctx context.Context, ids cluster.EntityIdentifiers) error
+}
+
+// ContextDecoupler decouples the request context from its values.
+type ContextDecoupler interface {
 	FromRequestContext(ctx context.Context) context.Context
 }
 
 // Handler is the upstream handler.
 type Handler struct {
-	ctx             context.Context
-	cluster         Cluster
-	devAddrPrefixes []types.DevAddrPrefix
+	ctx              context.Context
+	cluster          Cluster
+	contextDecoupler ContextDecoupler
+	devAddrPrefixes  []types.DevAddrPrefix
 }
 
 // NewHandler returns a new upstream handler.
-func NewHandler(ctx context.Context, cluster Cluster, devAddrPrefixes []types.DevAddrPrefix) *Handler {
+func NewHandler(ctx context.Context, cluster Cluster, contextDecoupler ContextDecoupler, devAddrPrefixes []types.DevAddrPrefix) *Handler {
 	return &Handler{
-		ctx:             ctx,
-		cluster:         cluster,
-		devAddrPrefixes: devAddrPrefixes,
+		ctx:              ctx,
+		cluster:          cluster,
+		contextDecoupler: contextDecoupler,
+		devAddrPrefixes:  devAddrPrefixes,
 	}
 }
 
-// GetDevAddrPrefixes implements upstream.Handler.
-func (h *Handler) GetDevAddrPrefixes() []types.DevAddrPrefix {
+// DevAddrPrefixes implements upstream.Handler.
+func (h *Handler) DevAddrPrefixes() []types.DevAddrPrefix {
 	return h.devAddrPrefixes
 }
 
@@ -75,7 +81,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 	}
 	logger.Info("Downlink path claimed")
 	defer func() {
-		ctx := h.cluster.FromRequestContext(ctx)
+		ctx := h.contextDecoupler.FromRequestContext(ctx)
 		if err := h.cluster.UnclaimIDs(ctx, &ids); err != nil {
 			logger.WithError(err).Error("Failed to unclaim downlink path")
 			return

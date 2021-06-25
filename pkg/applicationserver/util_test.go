@@ -46,10 +46,6 @@ func eui64Ptr(eui types.EUI64) *types.EUI64 {
 	return &eui
 }
 
-func devAddrPtr(devAddr types.DevAddr) *types.DevAddr {
-	return &devAddr
-}
-
 func withDevAddr(ids ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) ttnpb.EndDeviceIdentifiers {
 	ids.DevAddr = &devAddr
 	return ids
@@ -89,8 +85,6 @@ func startMockNS(ctx context.Context, link chan *mockNSASConn) (*mockNS, string)
 	go srv.Serve(lis)
 	return ns, lis.Addr().String()
 }
-
-var errPermissionDenied = errors.DefinePermissionDenied("permission_denied", "permission denied")
 
 func (ns *mockNS) sendTraffic(ctx context.Context, link chan *mockNSASConn) {
 	var cc *grpc.ClientConn

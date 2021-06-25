@@ -163,13 +163,12 @@ func (f logFunc) Printf(ctx context.Context, format string, v ...interface{}) {
 }
 
 func debugLogFunc(ctx context.Context, format string, v ...interface{}) {
-	log.FromContext(ctx).Debugf(format, v...)
+	log.FromContext(ctx).WithField("origin", "go-redis").Debugf(format, v...)
 }
 
 // newRedisClient returns a Redis client, which connects using correct client type.
 func newRedisClient(conf *Config) *redis.Client {
 	if conf.Failover.Enable {
-		redis.SetLogger(logFunc(debugLogFunc))
 		return redis.NewFailoverClient(&redis.FailoverOptions{
 			Dialer:        conf.makeDialer(),
 			MasterName:    conf.Failover.MasterName,
@@ -976,4 +975,8 @@ outer:
 			idsArg = append(idsArg, ">")
 		}
 	}
+}
+
+func init() {
+	redis.SetLogger(logFunc(debugLogFunc))
 }

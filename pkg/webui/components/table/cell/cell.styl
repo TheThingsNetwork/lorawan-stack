@@ -25,8 +25,9 @@
   &:first-child
     font-weight: $fw.bold
 
-  &:last-child:not(&-centered)
-    text-align: right
+  &:not(&-centered):not(&-left)
+    &:last-child
+      text-align: right
 
   &-small
     padding-top: $cs.xs
@@ -34,6 +35,12 @@
 
   &-centered
     text-align: center
+
+  &-left
+    text-align: left
+
+  &-right
+    text-align: right
 
   &-head
     font-weight: normal

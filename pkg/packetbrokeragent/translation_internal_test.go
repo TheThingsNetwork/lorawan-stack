@@ -57,3 +57,13 @@ func TestWrapGatewayUplinkToken(t *testing.T) {
 	a.So(uid, should.Resemble, unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}))
 	a.So(gtwToken, should.Resemble, []byte{0x1, 0x2, 0x3})
 }
+
+func TestFrequencyPlan(t *testing.T) {
+	a, _ := test.New(t)
+
+	fp, err := toPBFrequencyPlan(test.FrequencyPlan("EU_863_870"))
+	a.So(err, should.BeNil)
+	a.So(fp.LoraSingleSfChannels, should.BeEmpty)
+	a.So(fp.FskChannel, should.BeNil)
+	a.So(fp.LoraMultiSfChannels, should.HaveLength, 8)
+}

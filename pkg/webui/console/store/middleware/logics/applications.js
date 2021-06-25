@@ -50,8 +50,13 @@ const deleteApplicationLogic = createRequestLogic({
   type: applications.DELETE_APP,
   process: async ({ action }) => {
     const { id } = action.payload
+    const { options } = action.meta
 
-    await api.application.delete(id)
+    if (options.purge) {
+      await api.application.purge(id)
+    } else {
+      await api.application.delete(id)
+    }
 
     return { id }
   },

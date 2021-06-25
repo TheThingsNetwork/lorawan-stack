@@ -27,10 +27,58 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Email sent to admins when an OAuth client is requested by a non-admin user.
+- Packet Broker UI in the Console (admin only).
+- New config option `--console.oauth.cross-site-cookie` to control access to OAuth state cookie between origins.
+  - This option needs to be set to `true` (default is `false`) in multi-cluster deployments in order to support OAuth clients that use POST callbacks.
+- Application Server forwards upstream messages of type `ApplicationDownlinkSent` for application downlink messages that were acknowledged with a TxAck message from the gateway.
+  - MQTT clients can subscribe to the topic `v3/{application-id}/devices/{device-id}/down/sent`.
+  - For HTTP webhooks, make sure that the **Downlink Sent** messages are enabled.
+- Query for the most recent application messages from the Storage Integration API with the new `last` parameter (for example, `?last=10m` or `?last=2h`). See also `--last` argument for the `ttn-lw-cli applications storage get` and `ttn-lw-cli end-devices storage get` commands.
+- A location solved message is published automatically by Application Server when the decoded payload contains coordinates (e.g. `latitude` and `longitude`, among other combinations, as well as support for accuracy and altitude).
+- Configuration option to include Packet Broker metadata in uplink messages: `pba.home-network.include-hops`. By default, this is now disabled.
+- Update gateway identity, status, antennas, frequency plan, location and receive and transmit rates to Packet Broker Mapper. Mapping is enabled when the Forwarder role is enabled. The following new configuration options are introduced to change the default behavior:
+  - `gs.packetbroker.update-gateway-interval`: Update gateway interval
+  - `gs.packetbroker.update-gateway-jitter`: Jitter (fraction) to apply to the update interval to randomize intervals
+  - `gs.packetbroker.online-ttl-margin`: Time to extend the online status before it expires
+  - `pba.mapper-address`: Address of Packet Broker Mapper
+  - `pba.forwarder.gateway-online-ttl`: Time-to-live of online status reported to Packet Broker
+  
+### Changed
+
+- Low-level log messages from the `go-redis` library are printed only when the log level is set to `DEBUG`.
+- GS will discard repeated gateway uplink messages (often received due to buggy gateway forwarder implementations). A gateway uplink is considered to be repeated when it has the same payload, frequency and antenna index as the last one.
+  - The new `gs_uplink_repeated_total` metric counts how many repeated uplinks have been discarded.
+  - A `gs.up.repeat` event is emitted (once per minute maximum) for gateways that are stuck in a loop and forward the same uplink message.
+- For ABP sessions, the CLI now requests a DevAddr from the Network Server instead of generating one from the testing NetID.
+- Descriptions, tooltips and defaults for checkboxes for public gateway status and location in the Console.
+- All HTTP requests made by The Things Stack now contain a `User-Agent` header in the form of `TheThingsStack/{version}`.
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+- Parse error in Webhook Templates.
+- Application deletion handling in the Console.
+- Error when logging into the Console when using connections without TLS.
+- Account for antenna gain when the gateway is not authenticated (i.e. UDP gateway).
+- Preserve antenna gain when the gateway status message contains GPS coordinates.
+
+### Security
+
+## [3.13.2] - 2021-06-17
+
+### Added
+
 - Configurable log formats with the `log.format` configuration option.
   - The `console` format that prints logs as more human-friendly text. This is the new default.
   - The `json` format that prints logs as JSON. This is the recommended format for production deployments.
   - The `old` format (deprecated). This can be used if you need to adapt your log analysis tooling before v3.14.
+- `ttn_lw_gs_ns_uplink_latency_seconds`, `ttn_lw_ns_as_uplink_latency_seconds` and `ttn_lw_gtw_as_uplink_latency_seconds` metrics to track latency of uplink processing.
+- Signing of releases.
+- Hard delete option to delete applications, gateways and organizations in the Console.
 
 ### Changed
 
@@ -41,15 +89,13 @@ For details about compatibility between different releases, see the **Commitment
 
 - The `old` log format is deprecated and will be removed in v3.14.
 
-### Removed
-
 ### Fixed
 
 - Permissions issue for reading and writing gateway secrets in the Console.
 - Current and future rights selection for organization collaborators in the Console.
 - Current and future rights selection for user api keys in the Console.
-
-### Security
+- Low or no throughput of message handling from Packet Broker when the ingress is high when Packet Broker Agent starts.
+- Unset ADR bit in downlink messages to multicast devices.
 
 ## [3.13.1] - 2021-06-04
 
@@ -1570,7 +1616,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.1...v3.13
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.2...v3.13
+[3.13.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.1...v3.13.2
 [3.13.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.0...v3.13.1
 [3.13.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.3...v3.13.0
 [3.12.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.2...v3.12.3

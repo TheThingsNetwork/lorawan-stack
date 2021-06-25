@@ -83,7 +83,13 @@ describe('Gateway general settings', () => {
       .and('be.visible')
     cy.findByLabelText('Gateway status').should('exist').and('have.attr', 'value', 'false')
     cy.findDescriptionByLabelText('Gateway status')
-      .should('contain', 'The status of this gateway may be publicly displayed')
+      .should('contain', 'The status of this gateway may be visible to other users')
+      .and('be.visible')
+    cy.findDescriptionByLabelText('Gateway location')
+      .should(
+        'contain',
+        'The location of this gateway may be visible to other users and on public gateway maps',
+      )
       .and('be.visible')
     cy.findByTestId('key-value-map').within(() => {
       cy.findByTestId('attributes[0].key').should('be.visible').and('have.attr', 'value', 'key')
@@ -130,7 +136,7 @@ describe('Gateway general settings', () => {
     cy.findByTestId('modal-window')
       .should('be.visible')
       .within(() => {
-        cy.findByText('Delete gateway', { selector: 'h1' }).should('be.visible')
+        cy.findByText('Confirm deletion', { selector: 'h1' }).should('be.visible')
 
         cy.findByRole('button', { name: /Cancel/ }).should('be.visible')
         cy.findByRole('button', { name: /Delete gateway/ }).should('be.visible')

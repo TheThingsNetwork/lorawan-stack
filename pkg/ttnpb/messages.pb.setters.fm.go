@@ -188,6 +188,15 @@ func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) err
 			} else {
 				dst.CorrelationIDs = nil
 			}
+		case "session_key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionKeyId = src.SessionKeyId
+			} else {
+				dst.SessionKeyId = nil
+			}
 
 		case "settings":
 			if len(subs) == 0 && src == nil {

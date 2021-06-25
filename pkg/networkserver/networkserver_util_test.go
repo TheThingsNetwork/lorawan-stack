@@ -24,4 +24,5 @@ func init() {
 	NewDeviceRegistry = NewRedisDeviceRegistry
 	NewDownlinkTaskQueue = NewRedisDownlinkTaskQueue
 	NewUplinkDeduplicator = NewRedisUplinkDeduplicator
+	NewScheduledDownlinkMatcher = NewRedisScheduledDownlinkMatcher
 }

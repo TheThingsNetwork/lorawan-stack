@@ -15,6 +15,7 @@ on:
       - 'yarn.lock'
       - 'cypress/**'
       - 'docker-compose.yml'
+      - '.github/workflows/e2e.yml'
 
 jobs:
   determine-if-required:
@@ -77,20 +78,6 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Initialize babel cache
-        id: babel-cache
-        uses: actions/cache@v2
-        with:
-          path: .cache/babel
-          key: ${{ runner.os }}-babel-cache-${{ hashFiles('config/babel.config.json', 'config/webpack.config.babel.js') }}
-          restore-keys: |
-            ${{ runner.os }}-babel-cache-
-      - name: Initialize public folder cache
-        id: public-cache
-        uses: actions/cache@v2
-        with:
-          path: public
-          key: public-cache-${{ hashFiles('pkg/webui/**') }}-${{ hashFiles('sdk/js/**/*.js', 'sdk/js/generated/*.json') }}-${{ hashFiles('config/webpack.config.babel.js') }}-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock')}}
       - name: Initialize SQL dump cache
         id: db-cache
         uses: actions/cache@v2
@@ -99,12 +86,6 @@ jobs:
             .cache/sqldump.sql
             .env/admin_api_key.txt
           key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go') }}
-      - name: Initialize device repository db cache
-        id: dr-db-cache
-        uses: actions/cache@v2
-        with:
-          path: data/lorawan-devices-index
-          key: db-cache-${{ hashFiles('data/lorawan-devices') }}
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -129,16 +110,39 @@ jobs:
       - name: Make Mage
         run: make tools/bin/mage
         if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Initialize device repository index cache
+        id: dr-index-cache
+        uses: actions/cache@v2
+        with:
+          path: data/lorawan-devices-index
+          key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
+      - name: Create device repository index
+        run: tools/bin/mage dev:initDeviceRepo
+        if: steps.dr-index-cache.outputs.cache-hit != 'true'
       - name: Initialize stack environment
         run: tools/bin/mage init
       - name: Run test preparations
         if: |
-          steps.db-cache.outputs.cache-hit != 'true' ||
-          steps.dr-db-cache.outputs.cache-hit != 'true'
+          steps.db-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage -v dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump
       - name: Restore initialized sql db
         if: steps.db-cache.outputs.cache-hit == 'true'
         run: tools/bin/mage dev:dbStart dev:sqlRestore
+      - name: Initialize public folder cache
+        id: public-cache
+        uses: actions/cache@v2
+        with:
+          path: public
+          key: public-cache-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/webpack.config.babel.js', 'yarn.lock', 'sdk/js/yarn.lock')}}
+      - name: Initialize babel cache
+        id: babel-cache
+        uses: actions/cache@v2
+        if: steps.public-cache.outputs.cache-hit != 'true'
+        with:
+          path: .cache/babel
+          key: ${{ runner.os }}-babel-cache-${{ hashFiles('config/babel.config.json', 'config/webpack.config.babel.js') }}
+          restore-keys: |
+            ${{ runner.os }}-babel-cache-
       - name: Build frontend
         if: steps.public-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage js:build

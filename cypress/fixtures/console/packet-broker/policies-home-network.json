@@ -1,0 +1,18 @@
+{
+  "policies": [
+    {
+      "forwarder_id": { "net_id": 19, "tenant_id": "packet-broker-test" },
+      "home_network_id": { "net_id": 19, "tenant_id": "johan" },
+      "updated_at": "2021-06-22T14:06:30.966003Z",
+      "uplink": { "join_request": true, "mac_data": true },
+      "downlink": { "join_accept": true, "mac_data": true }
+    },
+    {
+      "forwarder_id": { "net_id": 19, "tenant_id": "packet-broker-test" },
+      "home_network_id": { "net_id": 19 },
+      "updated_at": "2021-06-22T14:06:31.966003Z",
+      "uplink": { "join_request": true, "mac_data": true },
+      "downlink": { "join_accept": true, "mac_data": true }
+    }
+  ]
+}

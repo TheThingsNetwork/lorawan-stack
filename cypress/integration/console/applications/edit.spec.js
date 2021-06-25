@@ -72,7 +72,7 @@ describe('Application general settings', () => {
     cy.findByTestId('modal-window')
       .should('be.visible')
       .within(() => {
-        cy.findByText('Delete application', { selector: 'h1' }).should('be.visible')
+        cy.findByText('Confirm deletion', { selector: 'h1' }).should('be.visible')
         cy.findByRole('button', { name: /Delete application/ }).click()
       })
 

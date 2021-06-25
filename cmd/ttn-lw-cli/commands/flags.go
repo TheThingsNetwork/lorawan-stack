@@ -315,8 +315,12 @@ func parseTime(s string, location *time.Location) (*time.Time, error) {
 	return &t, nil
 }
 
+func utcTimestampFlagName(name string) string {
+	return fmt.Sprintf("%s-utc", name)
+}
+
 func getTimestampFlags(flags *pflag.FlagSet, name string) (*time.Time, error) {
-	utcName := fmt.Sprintf("%s-utc", name)
+	utcName := utcTimestampFlagName(name)
 	if flags.Changed(utcName) {
 		s, _ := flags.GetString(utcName)
 		return parseTime(s, time.UTC)
@@ -326,6 +330,10 @@ func getTimestampFlags(flags *pflag.FlagSet, name string) (*time.Time, error) {
 		return parseTime(s, time.Local)
 	}
 	return nil, nil
+}
+
+func hasTimestampFlags(flags *pflag.FlagSet, name string) bool {
+	return flags.Changed(name) || flags.Changed(utcTimestampFlagName(name))
 }
 
 var deletedFlags = func() *pflag.FlagSet {

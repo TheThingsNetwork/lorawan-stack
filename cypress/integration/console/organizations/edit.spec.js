@@ -55,7 +55,7 @@ describe('Organization general settings', () => {
     cy.findByTestId('modal-window')
       .should('be.visible')
       .within(() => {
-        cy.findByText('Delete organization', { selector: 'h1' }).should('be.visible')
+        cy.findByText('Confirm deletion', { selector: 'h1' }).should('be.visible')
         cy.findByRole('button', { name: /Delete organization/ }).click()
       })
 

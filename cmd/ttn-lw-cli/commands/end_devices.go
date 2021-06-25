@@ -157,17 +157,6 @@ func generateKey() *types.AES128Key {
 	return &key
 }
 
-func generateDevAddr(netID types.NetID) (types.DevAddr, error) {
-	nwkAddr := make([]byte, types.NwkAddrLength(netID))
-	random.Read(nwkAddr)
-	nwkAddr[0] &= 0xff >> (8 - types.NwkAddrBits(netID)%8)
-	devAddr, err := types.NewDevAddr(netID, nwkAddr)
-	if err != nil {
-		return types.DevAddr{}, err
-	}
-	return devAddr, nil
-}
-
 var (
 	errJoinServerDisabled    = errors.DefineFailedPrecondition("join_server_disabled", "Join Server is disabled")
 	errNetworkServerDisabled = errors.DefineFailedPrecondition("network_server_disabled", "Network Server is disabled")
@@ -417,14 +406,17 @@ var (
 					if device.ProvisionerID != "" {
 						return errEndDeviceKeysWithProvisioner
 					}
-					// TODO: Generate DevAddr in cluster NetID (https://github.com/TheThingsNetwork/lorawan-stack/issues/47).
-					devAddr, err := generateDevAddr(types.NetID{})
+					ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
 					if err != nil {
 						return err
 					}
-					device.DevAddr = &devAddr
+					devAddrRes, err := ttnpb.NewNsClient(ns).GenerateDevAddr(ctx, ttnpb.Empty)
+					if err != nil {
+						return err
+					}
+					device.DevAddr = devAddrRes.DevAddr
 					device.Session = &ttnpb.Session{
-						DevAddr: devAddr,
+						DevAddr: *devAddrRes.DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey()},
 							AppSKey:     &ttnpb.KeyEnvelope{Key: generateKey()},

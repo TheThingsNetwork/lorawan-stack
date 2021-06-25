@@ -12,36 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const mapAttributesToFormValue = attributesType =>
-  (attributesType &&
-    Object.keys(attributesType).reduce(
-      (result, key) =>
-        result.concat({
-          key,
-          value: attributesType[key],
-        }),
-      [],
-    )) ||
-  []
+import { mapAttributesToFormValue, mapFormValueToAttributes } from '@console/lib/attributes'
 
-export const mapAttributesFormValueToAttributes = formValue =>
-  (formValue &&
-    formValue.reduce(
-      (result, { key, value }) => ({
-        ...result,
-        [key]: value,
-      }),
-      {},
-    )) ||
-  null
-
-export const mapFormValuesToApplication = values => {
-  return {
-    name: values.name,
-    description: values.description,
-    attributes: mapAttributesFormValueToAttributes(values.attributes),
-  }
-}
+export const mapFormValuesToApplication = values => ({
+  name: values.name,
+  description: values.description,
+  attributes: mapFormValueToAttributes(values.attributes),
+})
 
 export const mapApplicationToFormValues = application => ({
   ids: {
