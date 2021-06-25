@@ -16983,6 +16983,15 @@
         }
       }
     },
+    "v3UpdatePacketBrokerGatewayResponse": {
+      "type": "object",
+      "properties": {
+        "online_ttl": {
+          "type": "string",
+          "description": "Time to live of the online status."
+        }
+      }
+    },
     "v3UpdateUserAPIKeyRequest": {
       "type": "object",
       "properties": {

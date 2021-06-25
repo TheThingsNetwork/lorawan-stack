@@ -501,6 +501,8 @@
   - [Message `PacketBrokerRoutingPolicyUplink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink)
   - [Message `SetPacketBrokerDefaultRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest)
   - [Message `SetPacketBrokerRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerRoutingPolicyRequest)
+  - [Message `UpdatePacketBrokerGatewayRequest`](#ttn.lorawan.v3.UpdatePacketBrokerGatewayRequest)
+  - [Message `UpdatePacketBrokerGatewayResponse`](#ttn.lorawan.v3.UpdatePacketBrokerGatewayResponse)
   - [Service `GsPba`](#ttn.lorawan.v3.GsPba)
   - [Service `NsPba`](#ttn.lorawan.v3.NsPba)
   - [Service `Pba`](#ttn.lorawan.v3.Pba)
@@ -7109,6 +7111,32 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | `uplink` | <p>`message.required`: `true`</p> |
 | `downlink` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.UpdatePacketBrokerGatewayRequest">Message `UpdatePacketBrokerGatewayRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway` | [`Gateway`](#ttn.lorawan.v3.Gateway) |  |  |
+| `online` | [`bool`](#bool) |  |  |
+| `rx_rate` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Received packets rate (number of packets per hour). This field gets updated when a value is set. |
+| `tx_rate` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Transmitted packets rate (number of packets per hour). This field gets updated when a value is set. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that are considered for update. Supported values are: antennas, contact_info, frequency_plan_id, frequency_plan_ids, ids, status_public and location_public.
+
+Online status is only updated if status_public is set. If status_public is set and false, the status will be reset. If status_public is set and true, the online status is taken from the online field. The return message contains the duration online_ttl for how long the gateway is considered online.
+
+Location is only updated if location_public is set. If location_public is set and false, the location will be reset. If location_public is set and true, the first antenna location will be used as gateway location. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.UpdatePacketBrokerGatewayResponse">Message `UpdatePacketBrokerGatewayResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `online_ttl` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Time to live of the online status. |
+
 ### <a name="ttn.lorawan.v3.GsPba">Service `GsPba`</a>
 
 The GsPba service connects a Gateway Server to a Packet Broker Agent.
@@ -7116,6 +7144,7 @@ The GsPba service connects a Gateway Server to a Packet Broker Agent.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `PublishUplink` | [`GatewayUplinkMessage`](#ttn.lorawan.v3.GatewayUplinkMessage) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+| `UpdateGateway` | [`UpdatePacketBrokerGatewayRequest`](#ttn.lorawan.v3.UpdatePacketBrokerGatewayRequest) | [`UpdatePacketBrokerGatewayResponse`](#ttn.lorawan.v3.UpdatePacketBrokerGatewayResponse) | Update the gateway, changing the fields specified by the field mask to the provided values. To mark a gateway as online, call this rpc setting online to true, include status_public in field_mask and keep calling this rpc before the returned online_ttl passes to keep the gateway online. |
 
 ### <a name="ttn.lorawan.v3.NsPba">Service `NsPba`</a>
 

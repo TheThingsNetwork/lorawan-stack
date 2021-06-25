@@ -68,3 +68,9 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, req *ttnpb.Downli
 	}
 	return &ttnpb.ScheduleDownlinkResponse{}, nil
 }
+
+// UpdateGateway updates the gateway in Packet Broker Agent in the cluster.
+func (gs *GatewayServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacketBrokerGatewayRequest) (*ttnpb.UpdatePacketBrokerGatewayResponse, error) {
+	client := ttnpb.NewGsPbaClient(gs.LoopbackConn())
+	return client.UpdateGateway(ctx, req, gs.WithClusterAuth())
+}

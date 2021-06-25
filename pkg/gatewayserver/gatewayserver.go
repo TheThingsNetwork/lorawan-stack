@@ -146,7 +146,13 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		case "cluster":
 			handler = ns.NewHandler(gs.Context(), c, c, prefix)
 		case "packetbroker":
-			handler = packetbroker.NewHandler(gs.Context(), c, prefix)
+			handler = packetbroker.NewHandler(gs.Context(), packetbroker.Config{
+				Cluster:         c,
+				DevAddrPrefixes: prefix,
+				UpdateInterval:  conf.PacketBroker.UpdateGatewayInterval,
+				UpdateJitter:    conf.PacketBroker.UpdateGatewayJitter,
+				OnlineTTLMargin: conf.PacketBroker.OnlineTTLMargin,
+			})
 		default:
 			return nil, errInvalidUpstreamName.WithAttributes("name", name)
 		}
@@ -444,6 +450,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 				"require_authenticated_connection",
 				"schedule_anytime_delay",
 				"schedule_downlink_late",
+				"status_public",
 				"update_location_from_status",
 			},
 		},
@@ -512,9 +519,10 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	}
 
 	for name, handler := range gs.upstreamHandlers {
+		connCtx := log.NewContextWithField(conn.Context(), "upstream_handler", name)
 		handler := handler
 		gs.StartTask(&component.TaskConfig{
-			Context: conn.Context(),
+			Context: connCtx,
 			ID:      fmt.Sprintf("%s_connect_gateway_%s", name, ids.GatewayId),
 			Func: func(ctx context.Context) error {
 				return handler.ConnectGateway(ctx, ids, conn)

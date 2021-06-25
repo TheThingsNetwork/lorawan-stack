@@ -92,8 +92,8 @@ func (s *pbaServer) GetInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Packe
 				TenantId: tenantID,
 			},
 			Name:          registration.GetName(),
-			DevAddrBlocks: asDevAddrBlocks(registration.GetDevAddrBlocks()),
-			ContactInfo:   asContactInfo(registration.GetAdministrativeContact(), registration.GetTechnicalContact()),
+			DevAddrBlocks: fromPBDevAddrBlocks(registration.GetDevAddrBlocks()),
+			ContactInfo:   fromPBContactInfo(registration.GetAdministrativeContact(), registration.GetTechnicalContact()),
 			Listed:        registration.GetListed(),
 		}
 	}
@@ -135,8 +135,8 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 	if err != nil {
 		return nil, errRegistration.WithCause(err)
 	}
-	devAddrBlocks := toDevAddrBlocks(registration.DevAddrBlocks)
-	adminContact, technicalContact := toContactInfo(registration.ContactInfo)
+	devAddrBlocks := toPBDevAddrBlocks(registration.DevAddrBlocks)
+	adminContact, technicalContact := toPBContactInfo(registration.ContactInfo)
 
 	if create {
 		_, err = iampb.NewTenantRegistryClient(s.iamConn).CreateTenant(ctx, &iampb.CreateTenantRequest{
@@ -160,10 +160,10 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 			DevAddrBlocks: &iampb.DevAddrBlocksValue{
 				Value: devAddrBlocks,
 			},
-			AdministrativeContact: &iampb.ContactInfoValue{
+			AdministrativeContact: &packetbroker.ContactInfoValue{
 				Value: adminContact,
 			},
-			TechnicalContact: &iampb.ContactInfoValue{
+			TechnicalContact: &packetbroker.ContactInfoValue{
 				Value: technicalContact,
 			},
 			Listed: &pbtypes.BoolValue{
@@ -182,8 +182,8 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 			TenantId: tenantID,
 		},
 		Name:          registration.Name,
-		DevAddrBlocks: asDevAddrBlocks(devAddrBlocks),
-		ContactInfo:   asContactInfo(adminContact, technicalContact),
+		DevAddrBlocks: fromPBDevAddrBlocks(devAddrBlocks),
+		ContactInfo:   fromPBContactInfo(adminContact, technicalContact),
 		Listed:        registration.Listed,
 	}, nil
 }
@@ -225,7 +225,7 @@ func (s *pbaServer) GetHomeNetworkDefaultRoutingPolicy(ctx context.Context, _ *p
 	if err != nil {
 		return nil, err
 	}
-	return asDefaultRoutingPolicy(res.GetPolicy()), nil
+	return fromPBDefaultRoutingPolicy(res.GetPolicy()), nil
 }
 
 func (s *pbaServer) SetHomeNetworkDefaultRoutingPolicy(ctx context.Context, req *ttnpb.SetPacketBrokerDefaultRoutingPolicyRequest) (*pbtypes.Empty, error) {
@@ -240,8 +240,8 @@ func (s *pbaServer) SetHomeNetworkDefaultRoutingPolicy(ctx context.Context, req 
 		Policy: &packetbroker.RoutingPolicy{
 			ForwarderNetId:    s.netID.MarshalNumber(),
 			ForwarderTenantId: s.tenantIDExtractor(ctx),
-			Uplink:            toUplinkRoutingPolicy(req.GetUplink()),
-			Downlink:          toDownlinkRoutingPolicy(req.GetDownlink()),
+			Uplink:            toPBUplinkRoutingPolicy(req.GetUplink()),
+			Downlink:          toPBDownlinkRoutingPolicy(req.GetDownlink()),
 		},
 	})
 	if err != nil {
@@ -333,7 +333,7 @@ func (s *pbaServer) ListHomeNetworkRoutingPolicies(ctx context.Context, req *ttn
 		Policies: make([]*ttnpb.PacketBrokerRoutingPolicy, len(slice)),
 	}
 	for i, p := range slice {
-		res.Policies[i] = asRoutingPolicy(p)
+		res.Policies[i] = fromPBRoutingPolicy(p)
 	}
 	grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatInt(total, 10)))
 	return res, nil
@@ -356,7 +356,7 @@ func (s *pbaServer) GetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.
 	if err != nil {
 		return nil, err
 	}
-	return asRoutingPolicy(res.GetPolicy()), nil
+	return fromPBRoutingPolicy(res.GetPolicy()), nil
 }
 
 func (s *pbaServer) SetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.SetPacketBrokerRoutingPolicyRequest) (*pbtypes.Empty, error) {
@@ -373,8 +373,8 @@ func (s *pbaServer) SetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.
 			ForwarderTenantId:   s.tenantIDExtractor(ctx),
 			HomeNetworkNetId:    req.GetHomeNetworkId().GetNetID(),
 			HomeNetworkTenantId: req.GetHomeNetworkId().GetTenantId(),
-			Uplink:              toUplinkRoutingPolicy(req.GetUplink()),
-			Downlink:            toDownlinkRoutingPolicy(req.GetDownlink()),
+			Uplink:              toPBUplinkRoutingPolicy(req.GetUplink()),
+			Downlink:            toPBDownlinkRoutingPolicy(req.GetDownlink()),
 		},
 	})
 	if err != nil {
@@ -446,8 +446,8 @@ func (s *pbaServer) listNetworks(ctx context.Context, req func() ([]*packetbroke
 		res.Networks = append(res.Networks, &ttnpb.PacketBrokerNetwork{
 			Id:            id,
 			Name:          network.GetName(),
-			DevAddrBlocks: asDevAddrBlocks(network.GetDevAddrBlocks()),
-			ContactInfo:   asContactInfo(network.GetAdministrativeContact(), network.GetTechnicalContact()),
+			DevAddrBlocks: fromPBDevAddrBlocks(network.GetDevAddrBlocks()),
+			ContactInfo:   fromPBContactInfo(network.GetAdministrativeContact(), network.GetTechnicalContact()),
 		})
 	}
 	grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatInt(int64(total), 10)))
@@ -522,7 +522,7 @@ func (s *pbaServer) ListForwarderRoutingPolicies(ctx context.Context, req *ttnpb
 		Policies: make([]*ttnpb.PacketBrokerRoutingPolicy, len(policies.GetPolicies())),
 	}
 	for i, p := range policies.GetPolicies() {
-		res.Policies[i] = asRoutingPolicy(p)
+		res.Policies[i] = fromPBRoutingPolicy(p)
 	}
 	grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatInt(int64(policies.GetTotal()), 10)))
 	return res, nil

@@ -118,17 +118,18 @@ require (
 	github.com/throttled/throttled/v2 v2.7.1
 	github.com/vmihailenco/msgpack/v5 v5.3.1
 	go.opencensus.io v0.23.0
-	go.packetbroker.org/api/iam v1.4.2-tts
-	go.packetbroker.org/api/iam/v2 v2.4.1-tts
-	go.packetbroker.org/api/routing v1.5.1-tts
-	go.packetbroker.org/api/v3 v3.6.1-tts
+	go.packetbroker.org/api/iam v1.5.3-tts
+	go.packetbroker.org/api/iam/v2 v2.6.2-tts
+	go.packetbroker.org/api/mapping/v2 v2.1.1-tts
+	go.packetbroker.org/api/routing v1.6.3-tts
+	go.packetbroker.org/api/v3 v3.8.4-tts
 	go.thethings.network/lorawan-application-payload v0.0.0-20210625082552-27377194bcca
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
 	go.uber.org/zap v1.13.0
 	gocloud.dev v0.20.0
 	gocloud.dev/pubsub/natspubsub v0.19.0
 	golang.org/x/crypto v0.0.0-20210503195802-e9a32991a82e
-	golang.org/x/net v0.0.0-20210504132125-bbd867fde50d
+	golang.org/x/net v0.0.0-20210614182718-04defd469f4e
 	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	google.golang.org/api v0.46.0

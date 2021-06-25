@@ -17,25 +17,45 @@ package packetbrokeragent
 import (
 	"context"
 	"fmt"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	mappingpb "go.packetbroker.org/api/mapping/v2"
 	packetbroker "go.packetbroker.org/api/v3"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/grpc"
 )
+
+// DefaultGatewayOnlineTTL is the default time-to-live of the online status reported to Packet Broker.
+// Packet Broker Agent must bump the online status before the previous online status expires, to keep the gateway marked online.
+// A low value results in more calls to Packet Broker Mapper to keep gateways online.
+// A high value results in a longer time until gateways that go offline will be marked offline on the map.
+const DefaultGatewayOnlineTTL = 10 * time.Minute
 
 type messageEncrypter interface {
 	encryptUplink(context.Context, *packetbroker.UplinkMessage) error
 }
 
+type frequencyPlansStore interface {
+	GetByID(id string) (*frequencyplans.FrequencyPlan, error)
+}
+
 type gsPbaServer struct {
-	config           ForwarderConfig
-	messageEncrypter messageEncrypter
-	contextDecoupler contextDecoupler
-	upstreamCh       chan *uplinkMessage
+	netID               types.NetID
+	clusterID           string
+	config              ForwarderConfig
+	messageEncrypter    messageEncrypter
+	contextDecoupler    contextDecoupler
+	tenantIDExtractor   TenantIDExtractor
+	frequencyPlansStore frequencyPlansStore
+	upstreamCh          chan *uplinkMessage
+	mapperConn          *grpc.ClientConn
 }
 
 var errForwarderDisabled = errors.DefineFailedPrecondition("forwarder_disabled", "Forwarder is disabled")
@@ -76,4 +96,93 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 	case s.upstreamCh <- ctxMsg:
 		return ttnpb.Empty, nil
 	}
+}
+
+var errNoGatewayID = errors.DefineFailedPrecondition("no_gateway_id", "no gateway identifier provided or included in configuration")
+
+// UpdateGateway is called by Gateway Server to update a gateway.
+func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacketBrokerGatewayRequest) (*ttnpb.UpdatePacketBrokerGatewayResponse, error) {
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+
+	id := toPBGatewayIdentifier(req.Gateway.GatewayIdentifiers, s.config)
+	if id == nil {
+		return nil, errNoGatewayID.New()
+	}
+	updateReq := &mappingpb.UpdateGatewayRequest{
+		ForwarderNetId:     s.netID.MarshalNumber(),
+		ForwarderTenantId:  s.tenantIDExtractor(ctx),
+		ForwarderClusterId: s.clusterID,
+		ForwarderGatewayId: id,
+		RxRate:             req.RxRate,
+		TxRate:             req.TxRate,
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "location_public") {
+		updateReq.GatewayLocation = &packetbroker.GatewayLocationValue{}
+		if req.Gateway.LocationPublic && ttnpb.HasAnyField(req.FieldMask.GetPaths(), "antennas") && len(req.Gateway.Antennas) > 0 {
+			val := &packetbroker.GatewayLocation_Terrestrial{
+				AntennaCount: &pbtypes.UInt32Value{
+					Value: uint32(len(req.Gateway.Antennas)),
+				},
+			}
+			if loc := req.Gateway.Antennas[0].Location; loc != nil {
+				val.Location = toPBLocation(loc)
+			}
+			updateReq.GatewayLocation.Location = &packetbroker.GatewayLocation{
+				Value: &packetbroker.GatewayLocation_Terrestrial_{
+					Terrestrial: val,
+				},
+			}
+		}
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "status_public") {
+		updateReq.Online = &pbtypes.BoolValue{}
+		if req.Gateway.StatusPublic && req.Online {
+			updateReq.Online.Value = true
+			updateReq.OnlineTtl = pbtypes.DurationProto(s.config.GatewayOnlineTTL)
+		}
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
+		adminContact, techContact := toPBContactInfo(req.Gateway.GetContactInfo())
+		updateReq.AdministrativeContact = &packetbroker.ContactInfoValue{
+			Value: adminContact,
+		}
+		updateReq.TechnicalContact = &packetbroker.ContactInfoValue{
+			Value: techContact,
+		}
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_ids") {
+		fps := make([]*frequencyplans.FrequencyPlan, 0, len(req.Gateway.FrequencyPlanIDs))
+		var err error
+		for _, fpID := range req.Gateway.FrequencyPlanIDs {
+			var fp *frequencyplans.FrequencyPlan
+			fp, err = s.frequencyPlansStore.GetByID(fpID)
+			if err != nil {
+				break
+			}
+			fps = append(fps, fp)
+		}
+		if err == nil {
+			if fp, err := toPBFrequencyPlan(fps...); err == nil {
+				updateReq.FrequencyPlan = fp
+			}
+		}
+	}
+
+	_, err := mappingpb.NewMapperClient(s.mapperConn).UpdateGateway(ctx, updateReq)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to update gateway")
+		return nil, err
+	}
+
+	res := &ttnpb.UpdatePacketBrokerGatewayResponse{}
+	if updateReq.Online.GetValue() {
+		res.OnlineTtl = pbtypes.DurationProto(s.config.GatewayOnlineTTL)
+	}
+	return res, nil
 }

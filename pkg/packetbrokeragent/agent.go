@@ -303,6 +303,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
+	mapperConn, err := a.dialContext(ctx, conf.MapperAddress)
+	if err != nil {
+		return nil, err
+	}
 	a.grpc.pba = &pbaServer{
 		Agent:   a,
 		iamConn: iamConn,
@@ -313,10 +317,15 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		downstreamCh:     a.downstreamCh,
 	}
 	a.grpc.gsPba = &gsPbaServer{
-		config:           a.forwarderConfig,
-		messageEncrypter: a,
-		contextDecoupler: a,
-		upstreamCh:       a.upstreamCh,
+		netID:               a.netID,
+		clusterID:           a.clusterID,
+		config:              a.forwarderConfig,
+		messageEncrypter:    a,
+		contextDecoupler:    a,
+		tenantIDExtractor:   a.tenantIDExtractor,
+		frequencyPlansStore: a.FrequencyPlans,
+		upstreamCh:          a.upstreamCh,
+		mapperConn:          mapperConn,
 	}
 
 	newTaskConfig := func(id string, fn component.TaskFunc) *component.TaskConfig {
@@ -328,11 +337,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			Backoff: component.DialTaskBackoffConfig,
 		}
 	}
-	if a.forwarderConfig.Enable {
+	if a.forwarderConfig.Enable && a.dataPlaneAddress != "" {
 		c.RegisterTask(newTaskConfig("pb_publish_uplink", a.publishUplink))
 		c.RegisterTask(newTaskConfig("pb_subscribe_downlink", a.subscribeDownlink))
 	}
-	if a.homeNetworkConfig.Enable {
+	if a.homeNetworkConfig.Enable && a.dataPlaneAddress != "" {
 		c.RegisterTask(newTaskConfig("pb_subscribe_uplink", a.subscribeUplink))
 		c.RegisterTask(newTaskConfig("pb_publish_downlink", a.publishDownlink))
 	}
@@ -1050,7 +1059,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 		logger = logger.WithField("dev_addr", *ids.DevAddr)
 	}
 
-	msg, err := fromPBUplink(ctx, up, receivedAt)
+	msg, err := fromPBUplink(ctx, up, receivedAt, a.homeNetworkConfig.IncludeHops)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to convert incoming uplink message")
 		return err
