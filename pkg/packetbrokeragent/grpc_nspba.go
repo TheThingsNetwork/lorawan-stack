@@ -20,7 +20,6 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -31,16 +30,10 @@ type nsPbaServer struct {
 	downstreamCh     chan *downlinkMessage
 }
 
-var errHomeNetworkDisabled = errors.DefineFailedPrecondition("home_network_disabled", "Home Network is disabled")
-
 // PublishDownlink is called by the Network Server when a downlink message needs to get scheduled via Packet Broker.
 func (s *nsPbaServer) PublishDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
-	}
-
-	if s.downstreamCh == nil {
-		return nil, errHomeNetworkDisabled.New()
 	}
 
 	ctx = events.ContextWithCorrelationID(ctx, append(

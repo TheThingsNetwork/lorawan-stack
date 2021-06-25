@@ -295,37 +295,49 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		return nil, errAuthenticationMode.WithAttributes("mode", conf.AuthenticationMode)
 	}
 
-	iamConn, err := a.dialContext(ctx, conf.IAMAddress)
-	if err != nil {
-		return nil, err
+	if a.forwarderConfig.Enable || a.homeNetworkConfig.Enable {
+		iamConn, err := a.dialContext(ctx, conf.IAMAddress)
+		if err != nil {
+			return nil, err
+		}
+		cpConn, err := a.dialContext(ctx, conf.ControlPlaneAddress)
+		if err != nil {
+			return nil, err
+		}
+		a.grpc.pba = &pbaServer{
+			Agent:   a,
+			iamConn: iamConn,
+			cpConn:  cpConn,
+		}
+	} else {
+		a.grpc.pba = &disabledServer{}
 	}
-	cpConn, err := a.dialContext(ctx, conf.ControlPlaneAddress)
-	if err != nil {
-		return nil, err
+	if a.forwarderConfig.Enable {
+		mapperConn, err := a.dialContext(ctx, conf.MapperAddress)
+		if err != nil {
+			return nil, err
+		}
+		a.grpc.gsPba = &gsPbaServer{
+			netID:               a.netID,
+			clusterID:           a.clusterID,
+			config:              a.forwarderConfig,
+			messageEncrypter:    a,
+			contextDecoupler:    a,
+			tenantIDExtractor:   a.tenantIDExtractor,
+			frequencyPlansStore: a.FrequencyPlans,
+			upstreamCh:          a.upstreamCh,
+			mapperConn:          mapperConn,
+		}
+	} else {
+		a.grpc.gsPba = &disabledServer{}
 	}
-	mapperConn, err := a.dialContext(ctx, conf.MapperAddress)
-	if err != nil {
-		return nil, err
-	}
-	a.grpc.pba = &pbaServer{
-		Agent:   a,
-		iamConn: iamConn,
-		cpConn:  cpConn,
-	}
-	a.grpc.nsPba = &nsPbaServer{
-		contextDecoupler: a,
-		downstreamCh:     a.downstreamCh,
-	}
-	a.grpc.gsPba = &gsPbaServer{
-		netID:               a.netID,
-		clusterID:           a.clusterID,
-		config:              a.forwarderConfig,
-		messageEncrypter:    a,
-		contextDecoupler:    a,
-		tenantIDExtractor:   a.tenantIDExtractor,
-		frequencyPlansStore: a.FrequencyPlans,
-		upstreamCh:          a.upstreamCh,
-		mapperConn:          mapperConn,
+	if a.homeNetworkConfig.Enable {
+		a.grpc.nsPba = &nsPbaServer{
+			contextDecoupler: a,
+			downstreamCh:     a.downstreamCh,
+		}
+	} else {
+		a.grpc.nsPba = &disabledServer{}
 	}
 
 	newTaskConfig := func(id string, fn component.TaskFunc) *component.TaskConfig {
