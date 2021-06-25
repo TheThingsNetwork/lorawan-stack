@@ -2746,6 +2746,9 @@ func TestLocationFromPayload(t *testing.T) {
 		},
 	}
 
+	is, isAddr := startMockIS(ctx)
+	is.endDeviceRegistry.add(ctx, registeredDevice)
+
 	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
@@ -2787,6 +2790,9 @@ func TestLocationFromPayload(t *testing.T) {
 				Listen:                      ":9189",
 				AllowInsecureForCredentials: true,
 			},
+			Cluster: cluster.Config{
+				IdentityServer: isAddr,
+			},
 			HTTP: config.HTTP{
 				Listen: ":8100",
 			},
@@ -2818,6 +2824,8 @@ func TestLocationFromPayload(t *testing.T) {
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+
 	sub, err := as.Subscribe(ctx, "test", nil, false)
 	a.So(err, should.BeNil)
 
@@ -2835,6 +2843,18 @@ func TestLocationFromPayload(t *testing.T) {
 		},
 	})
 	a.So(err, should.BeNil)
+
+	assertLocation := func(loc *ttnpb.Location) {
+		a.So(loc.Latitude, should.AlmostEqual, 4.85564, 0.00001)
+		a.So(loc.Longitude, should.AlmostEqual, 52.3456341, 0.00001)
+		a.So(loc.Altitude, should.Equal, 16)
+		a.So(loc.Accuracy, should.Equal, 14)
+	}
+
+	assertApplicationlocation := func(loc *ttnpb.ApplicationLocation) {
+		a.So(loc.Service, should.Equal, "frm-payload")
+		assertLocation(&loc.Location)
+	}
 
 	// The uplink message and the location solved message may come out of order.
 	// Expect exactly two messages.
@@ -2854,9 +2874,14 @@ func TestLocationFromPayload(t *testing.T) {
 		t.Fatal("Expected location solved message")
 	}
 
-	a.So(loc.Latitude, should.AlmostEqual, 4.85564, 0.00001)
-	a.So(loc.Longitude, should.AlmostEqual, 52.3456341, 0.00001)
-	a.So(loc.Altitude, should.Equal, 16)
-	a.So(loc.Accuracy, should.Equal, 14)
-	a.So(loc.Service, should.Equal, "frm_payload")
+	assertApplicationlocation(loc)
+
+	dev, ok := is.endDeviceRegistry.get(ctx, registeredDevice.EndDeviceIdentifiers)
+	if !a.So(ok, should.BeTrue) {
+		t.FailNow()
+	}
+
+	if loc, ok := dev.Locations["frm-payload"]; a.So(ok, should.BeTrue) {
+		assertLocation(loc)
+	}
 }

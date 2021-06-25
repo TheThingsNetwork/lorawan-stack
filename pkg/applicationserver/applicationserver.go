@@ -916,14 +916,14 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		if uplink.Locations == nil {
 			uplink.Locations = make(map[string]*ttnpb.Location)
 		}
-		uplink.Locations["frm_payload"] = loc
+		uplink.Locations["frm-payload"] = loc
 		err := as.processUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ids,
 			CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
 			ReceivedAt:           &uplink.ReceivedAt,
 			Up: &ttnpb.ApplicationUp_LocationSolved{
 				LocationSolved: &ttnpb.ApplicationLocation{
-					Service:  "frm_payload",
+					Service:  "frm-payload",
 					Location: *loc,
 				},
 			},
