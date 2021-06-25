@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -273,7 +272,7 @@ func TestClient(t *testing.T) {
 				request       interface{}
 				response      interface{}
 				do            func(ctx context.Context, a *assertions.Assertion)
-				assertRequest func(t *testing.T, a *assertions.Assertion, body io.Reader)
+				assertRequest func(t *testing.T, a *assertions.Assertion, req *http.Request)
 			}{
 				{
 					name:     "SingleFrameRequest",
@@ -285,9 +284,11 @@ func TestClient(t *testing.T) {
 							a.So(resp.LocationSolverResponse, should.Resemble, singleFrameResponse)
 						}
 					},
-					assertRequest: func(t *testing.T, a *assertions.Assertion, body io.Reader) {
+					assertRequest: func(t *testing.T, a *assertions.Assertion, req *http.Request) {
+						a.So(req.URL.Path, should.Equal, "/api/v3/solve/singleframe")
+
 						request := &api.SingleFrameRequest{}
-						a.So(json.NewDecoder(body).Decode(request), should.BeNil)
+						a.So(json.NewDecoder(req.Body).Decode(request), should.BeNil)
 						a.So(request, should.Resemble, singleFrameRequest)
 					},
 				},
@@ -301,9 +302,11 @@ func TestClient(t *testing.T) {
 							a.So(resp.LocationSolverResponse, should.Resemble, multiFrameResponse)
 						}
 					},
-					assertRequest: func(t *testing.T, a *assertions.Assertion, body io.Reader) {
+					assertRequest: func(t *testing.T, a *assertions.Assertion, req *http.Request) {
+						a.So(req.URL.Path, should.Equal, "/api/v3/solve/multiframe")
+
 						request := &api.MultiFrameRequest{}
-						a.So(json.NewDecoder(body).Decode(request), should.BeNil)
+						a.So(json.NewDecoder(req.Body).Decode(request), should.BeNil)
 						a.So(request, should.Resemble, multiFrameRequest)
 					},
 				},
@@ -317,9 +320,11 @@ func TestClient(t *testing.T) {
 							a.So(resp.GNSSLocationSolverResponse, should.Resemble, gnssResponse)
 						}
 					},
-					assertRequest: func(t *testing.T, a *assertions.Assertion, body io.Reader) {
+					assertRequest: func(t *testing.T, a *assertions.Assertion, req *http.Request) {
+						a.So(req.URL.Path, should.Equal, "/api/v3/solve/gnss_lr1110_singleframe")
+
 						request := &api.GNSSRequest{}
-						a.So(json.NewDecoder(body).Decode(request), should.BeNil)
+						a.So(json.NewDecoder(req.Body).Decode(request), should.BeNil)
 						a.So(request, should.Resemble, gnssRequest)
 					},
 				},
@@ -333,9 +338,11 @@ func TestClient(t *testing.T) {
 							a.So(resp.WiFiLocationSolverResponse, should.Resemble, wifiResponse)
 						}
 					},
-					assertRequest: func(t *testing.T, a *assertions.Assertion, body io.Reader) {
+					assertRequest: func(t *testing.T, a *assertions.Assertion, req *http.Request) {
+						a.So(req.URL.Path, should.Equal, "/api/v2/loraWifi")
+
 						request := &api.WiFiRequest{}
-						a.So(json.NewDecoder(body).Decode(request), should.BeNil)
+						a.So(json.NewDecoder(req.Body).Decode(request), should.BeNil)
 						a.So(request, should.Resemble, wifiRequest)
 					},
 				},
@@ -356,7 +363,7 @@ func TestClient(t *testing.T) {
 
 					req := <-reqChan
 					if a.So(req, should.NotBeNil) {
-						tc.assertRequest(t, a, req.Body)
+						tc.assertRequest(t, a, req)
 					}
 				})
 			}
