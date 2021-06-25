@@ -167,7 +167,7 @@ func (f *circuitBreakerEndDeviceFetcher) circuitOpen() error {
 		return nil
 	}
 	// If the attempt timeout expired, consider the circuit as being closed.
-	if time.Now().Sub(f.lastFailedAttempt) > f.timeout {
+	if time.Since(f.lastFailedAttempt) > f.timeout {
 		return nil
 	}
 	// At this point we have a number of failures that is above the threshold, and any attempts are recent.

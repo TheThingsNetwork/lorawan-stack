@@ -18,10 +18,12 @@ import (
 	"bytes"
 	"context"
 
+	apppayload "go.thethings.network/lorawan-application-payload"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -192,4 +194,22 @@ func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndD
 		}
 	}
 	return nil
+}
+
+func (as *ApplicationServer) locationFromDecodedPayload(uplink *ttnpb.ApplicationUplink) (res *ttnpb.Location) {
+	m, err := gogoproto.Map(uplink.DecodedPayload)
+	if err != nil {
+		return nil
+	}
+	loc, ok := apppayload.InferLocation(m)
+	if !ok {
+		return nil
+	}
+	return &ttnpb.Location{
+		Latitude:  loc.Latitude,
+		Longitude: loc.Longitude,
+		Altitude:  int32(loc.Altitude),
+		Accuracy:  int32(loc.Accuracy),
+		Source:    ttnpb.SOURCE_GPS,
+	}
 }
