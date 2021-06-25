@@ -37,6 +37,7 @@ For details about compatibility between different releases, see the **Commitment
 - For ABP sessions, the CLI now requests a DevAddr from the Network Server instead of generating one from the testing NetID.
 - Descriptions, tooltips and defaults for checkboxes for public gateway status and location in the Console.
 - All HTTP requests made by The Things Stack now contain a `User-Agent` header in the form of `TheThingsStack/{version}`.
+- No connection to Packet Broker is being made when neither the Forwarder nor the Home Network role is enabled.
 
 ### Deprecated
 
