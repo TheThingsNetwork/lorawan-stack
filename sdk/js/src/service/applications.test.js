@@ -36,19 +36,17 @@ const mockApplicationData = {
   ],
 }
 
-jest.mock('../api', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      ApplicationRegistry: {
-        Get: jest.fn().mockResolvedValue({ data: mockApplicationData }),
-        List: jest.fn().mockResolvedValue({
-          data: { applications: [mockApplicationData] },
-          headers: { 'x-total-count': 1 },
-        }),
-      },
-    }
-  })
-})
+jest.mock('../api', () =>
+  jest.fn().mockImplementation(() => ({
+    ApplicationRegistry: {
+      Get: jest.fn().mockResolvedValue({ data: mockApplicationData }),
+      List: jest.fn().mockResolvedValue({
+        data: { applications: [mockApplicationData] },
+        headers: { 'x-total-count': 1 },
+      }),
+    },
+  })),
+)
 
 describe('Applications', () => {
   let applications
