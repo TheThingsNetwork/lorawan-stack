@@ -15,9 +15,7 @@
 package api
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loradms/v1/api/objects"
@@ -32,12 +30,7 @@ const uplinkEntity = "uplink"
 
 // Send sends the given uplink to the Device Management service.
 func (u *Uplinks) Send(ctx context.Context, uplinks objects.DeviceUplinks) (objects.DeviceUplinkResponses, error) {
-	buffer := bytes.NewBuffer(nil)
-	err := json.NewEncoder(buffer).Encode(uplinks)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := u.cl.Do(ctx, http.MethodPost, uplinkEntity, "", sendOperation, buffer)
+	resp, err := u.cl.Do(ctx, http.MethodPost, uplinkEntity, "", sendOperation, uplinks)
 	if err != nil {
 		return nil, err
 	}

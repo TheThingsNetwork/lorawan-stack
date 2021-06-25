@@ -24,6 +24,7 @@ import (
 	"net/url"
 	"path"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 )
 
@@ -67,8 +68,19 @@ func (c *Client) newRequest(ctx context.Context, method, version, category, oper
 }
 
 // Do executes a new HTTP request with the given parameters and body and returns the response.
-func (c *Client) Do(ctx context.Context, method, version, category, operation string, body io.Reader) (*http.Response, error) {
-	req, err := c.newRequest(ctx, method, version, category, operation, body)
+func (c *Client) Do(ctx context.Context, method, version, category, operation string, body interface{}) (*http.Response, error) {
+	buffer := bytes.NewBuffer(nil)
+	if err := json.NewEncoder(buffer).Encode(body); err != nil {
+		return nil, err
+	}
+	log.FromContext(ctx).WithFields(log.Fields(
+		"method", method,
+		"version", version,
+		"category", category,
+		"operation", operation,
+		"body", buffer.String(),
+	)).Debug("Run GLS request")
+	req, err := c.newRequest(ctx, method, version, category, operation, buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -91,11 +103,7 @@ func WithBaseURL(baseURL *url.URL) Option {
 
 // SolveSingleFrame attempts to solve the location of the end-device using the provided single frame request.
 func (c *Client) SolveSingleFrame(ctx context.Context, request *SingleFrameRequest) (*ExtendedLocationSolverResponse, error) {
-	buffer := bytes.NewBuffer(nil)
-	if err := json.NewEncoder(buffer).Encode(request); err != nil {
-		return nil, err
-	}
-	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "singleframe", buffer)
+	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "singleframe", request)
 	if err != nil {
 		return nil, err
 	}
@@ -109,11 +117,7 @@ func (c *Client) SolveSingleFrame(ctx context.Context, request *SingleFrameReque
 
 // SolveMultiFrame attempts to solve the location of the end-device using the provided multi frame request.
 func (c *Client) SolveMultiFrame(ctx context.Context, request *MultiFrameRequest) (*ExtendedLocationSolverResponse, error) {
-	buffer := bytes.NewBuffer(nil)
-	if err := json.NewEncoder(buffer).Encode(request); err != nil {
-		return nil, err
-	}
-	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "multiframe", buffer)
+	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "multiframe", request)
 	if err != nil {
 		return nil, err
 	}
@@ -127,11 +131,7 @@ func (c *Client) SolveMultiFrame(ctx context.Context, request *MultiFrameRequest
 
 // SolveGNSS attempts to solve the location of the end-device using the provided GNSS request.
 func (c *Client) SolveGNSS(ctx context.Context, request *GNSSRequest) (*ExtendedGNSSLocationSolverResponse, error) {
-	buffer := bytes.NewBuffer(nil)
-	if err := json.NewEncoder(buffer).Encode(request); err != nil {
-		return nil, err
-	}
-	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "gnss_lr1110_singleframe", buffer)
+	resp, err := c.Do(ctx, http.MethodPost, "v3", "solve", "gnss_lr1110_singleframe", request)
 	if err != nil {
 		return nil, err
 	}
@@ -145,11 +145,7 @@ func (c *Client) SolveGNSS(ctx context.Context, request *GNSSRequest) (*Extended
 
 // SolveWiFi attempts to solve the location of the end-device using the provided WiFi request.
 func (c *Client) SolveWiFi(ctx context.Context, request *WiFiRequest) (*ExtendedWiFiLocationSolverResponse, error) {
-	buffer := bytes.NewBuffer(nil)
-	if err := json.NewEncoder(buffer).Encode(request); err != nil {
-		return nil, err
-	}
-	resp, err := c.Do(ctx, http.MethodPost, "v2", "", "loraWifi", buffer)
+	resp, err := c.Do(ctx, http.MethodPost, "v2", "", "loraWifi", request)
 	if err != nil {
 		return nil, err
 	}
