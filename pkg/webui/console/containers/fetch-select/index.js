@@ -26,7 +26,7 @@ const formatOptions = options =>
 
 const { component, ...fieldPropTypes } = Field.propTypes
 
-export default function ({
+export default ({
   optionsSelector,
   errorSelector,
   fetchingSelector,
@@ -36,7 +36,7 @@ export default function ({
   optionsFormatter = formatOptions,
   defaultDescription,
   additionalOptions = [],
-}) {
+}) => {
   @storeConnect(
     state => ({
       options: optionsFormatter(optionsSelector(state)),
