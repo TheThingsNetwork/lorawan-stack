@@ -21,7 +21,6 @@ import (
 	"crypto/x509/pkix"
 	"encoding/binary"
 	"io"
-	"math"
 	"math/rand"
 	"net"
 	"net/url"
@@ -366,9 +365,6 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				if (dn != 0 || dev.LastDevNonce != 0 || dev.LastJoinNonce != 0) && !dev.ResetsJoinNonces {
 					if dn <= dev.LastDevNonce {
 						return nil, nil, errDevNonceTooSmall.New()
-					}
-					if dn == math.MaxUint32 {
-						return nil, nil, errDevNonceTooHigh.New()
 					}
 				}
 				dev.LastDevNonce = dn

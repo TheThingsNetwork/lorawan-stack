@@ -5957,15 +5957,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:dev_nonce_too_high": {
-    "translations": {
-      "en": "DevNonce is too high"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:dev_nonce_too_small": {
     "translations": {
       "en": "DevNonce is too small"
