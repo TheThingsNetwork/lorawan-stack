@@ -18,7 +18,6 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"google.golang.org/grpc"
 )
 
 // GatewayConnectionStatsRegistry stores, updates and cleans up gateway connection stats.
@@ -34,9 +33,9 @@ type EntityRegistry interface {
 	// AssertGatewayRights checks whether the gateway authentication (provied in the context) contains the required rights.
 	AssertGatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error
 	// Get the identifiers of the gateway that has the given EUI registered.
-	GetIdentifiersForEUI(ctx context.Context, in *ttnpb.GetGatewayIdentifiersForEUIRequest, opts ...grpc.CallOption) (*ttnpb.GatewayIdentifiers, error)
+	GetIdentifiersForEUI(ctx context.Context, in *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error)
 	// Get the gateway with the given identifiers, selecting the fields specified.
-	Get(ctx context.Context, in *ttnpb.GetGatewayRequest, opts ...grpc.CallOption) (*ttnpb.Gateway, error)
-	// Update the gateway, changing the fields specified by the field mask to the provided values.
-	Update(ctx context.Context, in *ttnpb.UpdateGatewayRequest, opts ...grpc.CallOption) (*ttnpb.Gateway, error)
+	Get(ctx context.Context, in *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error)
+	// UpdateAntennas updates the gateway antennas.
+	UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, antennas []ttnpb.GatewayAntenna) error
 }

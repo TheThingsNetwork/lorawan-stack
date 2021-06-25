@@ -105,7 +105,6 @@ var (
 	)
 	errNotConnected        = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
 	errSetupUpstream       = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{name}`")
-	errUpstreamType        = errors.DefineUnimplemented("upstream_type_not_implemented", "upstream `{name}` not implemented")
 	errInvalidUpstreamName = errors.DefineInvalidArgument("invalid_upstream_name", "upstream `{name}` is invalid")
 )
 
@@ -145,7 +144,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		var handler upstream.Handler
 		switch name {
 		case "cluster":
-			handler = ns.NewHandler(gs.Context(), c, prefix)
+			handler = ns.NewHandler(gs.Context(), c, c, prefix)
 		case "packetbroker":
 			handler = packetbroker.NewHandler(gs.Context(), c, prefix)
 		default:
@@ -373,7 +372,7 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 	if ids.GatewayId == "" {
 		extIDs, err := gs.entityRegistry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 			Eui: *ids.Eui,
-		}, gs.WithClusterAuth())
+		})
 		if err == nil {
 			ids = *extIDs
 		} else if errors.IsNotFound(err) {
@@ -428,17 +427,8 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	ctx = log.NewContext(ctx, logger)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
 
-	var (
-		err             error
-		callOpt         grpc.CallOption
-		isAuthenticated bool
-	)
-	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
-	if errors.IsUnauthenticated(err) {
-		callOpt = gs.WithClusterAuth()
-	} else if err != nil {
-		return nil, err
-	} else {
+	var isAuthenticated bool
+	if _, err := rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials()); err == nil {
 		isAuthenticated = true
 	}
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
@@ -457,7 +447,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 				"update_location_from_status",
 			},
 		},
-	}, callOpt)
+	})
 	if errors.IsNotFound(err) {
 		if gs.requireRegisteredGateways {
 			return nil, errGatewayNotRegistered.WithAttributes("gateway_uid", uid).WithCause(err)
@@ -468,14 +458,12 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		}
 		logger.Warn("Connect unregistered gateway")
 		gtw = &ttnpb.Gateway{
-			GatewayIdentifiers:       ids,
-			FrequencyPlanID:          fpID,
-			FrequencyPlanIDs:         []string{fpID},
-			EnforceDutyCycle:         true,
-			DownlinkPathConstraint:   ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
-			Antennas:                 []ttnpb.GatewayAntenna{},
-			LocationPublic:           false,
-			UpdateLocationFromStatus: false,
+			GatewayIdentifiers:     ids,
+			FrequencyPlanID:        fpID,
+			FrequencyPlanIDs:       []string{fpID},
+			EnforceDutyCycle:       true,
+			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+			Antennas:               []ttnpb.GatewayAntenna{},
 		}
 	} else if err != nil {
 		return nil, err
@@ -511,8 +499,10 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		}
 		existingConnEntry.tasksDone.Wait()
 	}
+
 	registerGatewayConnect(ctx, ids, frontend.Protocol())
 	logger.Info("Connected")
+
 	go gs.handleUpstream(connEntry)
 	if gs.statsRegistry != nil {
 		go gs.updateConnStats(connEntry)
@@ -546,10 +536,7 @@ func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIde
 	return entry.(connectionEntry).Connection, true
 }
 
-var (
-	errNoNetworkServer = errors.DefineNotFound("no_network_server", "no Network Server found to handle message")
-	errHostHandle      = errors.Define("host_handle", "host `{host}` failed to handle message")
-)
+var errHostHandle = errors.Define("host_handle", "host `{host}` failed to handle message")
 
 var (
 	// maxUpstreamHandlers is the maximum number of goroutines per gateway connection to handle upstream messages.
@@ -628,7 +615,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 					var pass bool
 					switch {
 					case ids.DevAddr != nil:
-						for _, prefix := range host.handler.GetDevAddrPrefixes() {
+						for _, prefix := range host.handler.DevAddrPrefixes() {
 							if ids.DevAddr.HasPrefix(prefix) {
 								pass = true
 								break
@@ -802,15 +789,29 @@ func sameLocation(a, b ttnpb.Location) bool {
 		math.Abs(a.Longitude-b.Longitude) <= allowedLocationDelta
 }
 
-func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
-	ctx := conn.Context()
-
-	var err error
-	var callOpt grpc.CallOption
-	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
-	if err != nil {
-		return
+func sameAntennaLocations(a, b []ttnpb.GatewayAntenna) bool {
+	if len(a) != len(b) {
+		return false
 	}
+	for _, a := range a {
+		for _, b := range b {
+			if a.Location != nil && b.Location != nil && !sameLocation(*a.Location, *b.Location) {
+				return false
+			}
+			if (a.Location == nil) != (b.Location == nil) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
+	var (
+		ctx          = conn.Context()
+		gtw          = conn.Gateway()
+		lastAntennas []ttnpb.GatewayAntenna
+	)
 
 	for {
 		select {
@@ -818,30 +819,33 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 			return
 		case <-conn.LocationChanged():
 			status, _, ok := conn.StatusStats()
-			// TODO: Handle multiple antenna locations (https://github.com/TheThingsNetwork/lorawan-stack/issues/2006).
 			if ok && len(status.AntennaLocations) > 0 {
-				if len(conn.Gateway().Antennas) == 0 {
-					// Add an antenna if none are present
-					conn.Gateway().Antennas = []ttnpb.GatewayAntenna{{}}
+				// Construct the union of antennas that are in the gateway fetched from the entity registry with the antennas
+				// that are in the status message.
+				c := len(gtw.Antennas)
+				if cs := len(status.AntennaLocations); cs > c {
+					c = cs
 				}
-				if sameLocation(conn.Gateway().Antennas[0].Location, *status.AntennaLocations[0]) {
+				antennas := make([]ttnpb.GatewayAntenna, c)
+				for i, ant := range gtw.Antennas {
+					antennas[i].Gain = ant.Gain
+				}
+				for i := range antennas {
+					if i < len(status.AntennaLocations) && status.AntennaLocations[i] != nil {
+						loc := *status.AntennaLocations[i]
+						loc.Source = ttnpb.SOURCE_GPS
+						antennas[i].Location = &loc
+					}
+				}
+				if lastAntennas != nil && sameAntennaLocations(lastAntennas, antennas) {
 					break
 				}
-				status.AntennaLocations[0].Source = ttnpb.SOURCE_GPS
-				conn.Gateway().Antennas[0].Location = *status.AntennaLocations[0]
-				_, err := gs.entityRegistry.Update(ctx, &ttnpb.UpdateGatewayRequest{
-					Gateway: ttnpb.Gateway{
-						GatewayIdentifiers: conn.Gateway().GatewayIdentifiers,
-						Antennas:           conn.Gateway().Antennas,
-					},
-					FieldMask: pbtypes.FieldMask{
-						Paths: []string{
-							"antennas",
-						},
-					},
-				}, callOpt)
+
+				err := gs.entityRegistry.UpdateAntennas(ctx, gtw.GatewayIdentifiers, antennas)
 				if err != nil {
-					log.FromContext(ctx).WithError(err).Warn("Failed to update antenna location")
+					log.FromContext(ctx).WithError(err).Warn("Failed to update antennas")
+				} else {
+					lastAntennas = antennas
 				}
 			}
 
@@ -857,18 +861,10 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 
 // GetFrequencyPlans gets the frequency plans by the gateway identifiers.
 func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
-	var err error
-	var callOpt grpc.CallOption
-	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
-	if errors.IsUnauthenticated(err) {
-		callOpt = gs.WithClusterAuth()
-	} else if err != nil {
-		return nil, err
-	}
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask:          pbtypes.FieldMask{Paths: []string{"frequency_plan_ids"}},
-	}, callOpt)
+	})
 	var fpIDs []string
 	if err == nil {
 		fpIDs = gtw.FrequencyPlanIDs

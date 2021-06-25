@@ -74,7 +74,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 		FrequencyPlanIDs:   []string{test.EUFrequencyPlanID},
 		Antennas: []ttnpb.GatewayAntenna{
 			{
-				Location: ttnpb.Location{
+				Location: &ttnpb.Location{
 					Source: ttnpb.SOURCE_REGISTRY,
 				},
 			},
@@ -104,8 +104,7 @@ func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (
 	if !ok {
 		return nil, errNotFound.New()
 	}
-	// Just update antennas
-	gtw.Antennas = req.Antennas
+	gtw.SetFields(&req.Gateway, req.FieldMask.Paths...)
 	return gtw, nil
 }
 

@@ -280,7 +280,7 @@ message GatewayAntenna {
   // gain is the antenna gain relative to this gateway, in dBi.
   float gain = 1;
   // location is the antenna's location.
-  Location location = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Location location = 2 [(validate.rules).message.required = true];
   map<string,string> attributes = 3 [
     (validate.rules).map = {
       max_pairs: 10,

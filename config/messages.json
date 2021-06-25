@@ -4688,15 +4688,6 @@
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:no_network_server": {
-    "translations": {
-      "en": "no Network Server found to handle message"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "gatewayserver.go"
-    }
-  },
   "error:pkg/gatewayserver:not_connected": {
     "translations": {
       "en": "gateway `{gateway_uid}` not connected"
@@ -4754,15 +4745,6 @@
   "error:pkg/gatewayserver:upstream": {
     "translations": {
       "en": "failed to setup upstream `{name}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "gatewayserver.go"
-    }
-  },
-  "error:pkg/gatewayserver:upstream_type_not_implemented": {
-    "translations": {
-      "en": "upstream `{name}` not implemented"
     },
     "description": {
       "package": "pkg/gatewayserver",
