@@ -30,9 +30,9 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
 
 @withFeatureRequirement(mayViewOrganizationsOfUser, { redirect: '/' })
-@withBreadcrumb('orgs', props => {
-  return <Breadcrumb path="/organizations" content={sharedMessages.organizations} />
-})
+@withBreadcrumb('orgs', props => (
+  <Breadcrumb path="/organizations" content={sharedMessages.organizations} />
+))
 class Organizations extends React.Component {
   static propTypes = {
     match: PropTypes.match.isRequired,

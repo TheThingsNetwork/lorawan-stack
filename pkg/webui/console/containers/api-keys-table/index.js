@@ -32,13 +32,12 @@ const m = defineMessages({
   grantedRights: 'Granted Rights',
 })
 
-const formatRight = right => {
-  return right
+const formatRight = right =>
+  right
     .split('_')
     .slice(1)
     .map(r => r.charAt(0) + r.slice(1).toLowerCase())
     .join(' ')
-}
 
 const RIGHT_TAG_MAX_WIDTH = 140
 

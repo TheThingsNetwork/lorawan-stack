@@ -23,12 +23,10 @@ import {
   DELETE_ORG_SUCCESS,
 } from '@console/store/actions/organizations'
 
-const organization = (state = {}, organization) => {
-  return {
-    ...state,
-    ...organization,
-  }
-}
+const organization = (state = {}, organization) => ({
+  ...state,
+  ...organization,
+})
 
 const defaultState = {
   entities: {},

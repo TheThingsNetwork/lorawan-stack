@@ -38,12 +38,10 @@ const defaultState = {
   statistics: defaultStatisticsState,
 }
 
-const gateway = (state = {}, gateway) => {
-  return {
-    ...state,
-    ...gateway,
-  }
-}
+const gateway = (state = {}, gateway) => ({
+  ...state,
+  ...gateway,
+})
 
 const statistics = (state = defaultStatisticsState, { type, payload }) => {
   switch (type) {

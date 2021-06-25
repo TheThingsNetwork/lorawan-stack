@@ -34,13 +34,11 @@ storiesOf('Profile Dropdown', module)
       propTables: [ProfileDropdown],
     })(story)(context),
   )
-  .add('Default', () => {
-    return (
-      <div style={{ height: '6rem' }}>
-        <ProfileDropdown style={{ marginLeft: '120px' }} userId="johndoe">
-          <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
-          <Dropdown.Item title="Logout" icon="power_settings_new" action={handleLogout} />
-        </ProfileDropdown>
-      </div>
-    )
-  })
+  .add('Default', () => (
+    <div style={{ height: '6rem' }}>
+      <ProfileDropdown style={{ marginLeft: '120px' }} userId="johndoe">
+        <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
+        <Dropdown.Item title="Logout" icon="power_settings_new" action={handleLogout} />
+      </ProfileDropdown>
+    </div>
+  ))

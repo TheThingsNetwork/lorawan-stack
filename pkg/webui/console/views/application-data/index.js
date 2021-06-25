@@ -43,9 +43,9 @@ const m = defineMessages({
 @withFeatureRequirement(mayViewApplicationEvents, {
   redirect: ({ appId }) => `/applications/${appId}`,
 })
-@withBreadcrumb('apps.single.data', props => {
-  return <Breadcrumb path={`/applications/${props.appId}/data`} content={sharedMessages.liveData} />
-})
+@withBreadcrumb('apps.single.data', props => (
+  <Breadcrumb path={`/applications/${props.appId}/data`} content={sharedMessages.liveData} />
+))
 export default class Data extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,

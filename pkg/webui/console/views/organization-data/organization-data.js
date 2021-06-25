@@ -32,11 +32,9 @@ const m = defineMessages({
   orgData: 'Organization data',
 })
 
-@withBreadcrumb('orgs.single.data', props => {
-  return (
-    <Breadcrumb path={`/organizations/${props.orgId}/data`} content={sharedMessages.liveData} />
-  )
-})
+@withBreadcrumb('orgs.single.data', props => (
+  <Breadcrumb path={`/organizations/${props.orgId}/data`} content={sharedMessages.liveData} />
+))
 export default class Data extends React.Component {
   static propTypes = {
     orgId: PropTypes.string.isRequired,
