@@ -83,7 +83,7 @@ class Tabular extends React.Component {
         {headers.map((header, key) => (
           <Table.HeadCell
             key={key}
-            centered={header.centered}
+            align={header.align}
             content={header.sortable ? undefined : header.displayName}
             name={header.name}
             width={header.width}
@@ -107,22 +107,20 @@ class Tabular extends React.Component {
     const paginatedData = this.handlePagination(data)
     const rows =
       paginatedData.length > 0 ? (
-        paginatedData.map((row, rowKey) => {
-          return (
-            <Table.Row key={rowKey} id={rowKey} onClick={onRowClick}>
-              {headers.map((header, index) => {
-                const value = headers[index].getValue
-                  ? headers[index].getValue(row)
-                  : getByPath(row, headers[index].name)
-                return (
-                  <Table.DataCell key={index} centered={header.centered} small={small}>
-                    {headers[index].render ? headers[index].render(value) : value}
-                  </Table.DataCell>
-                )
-              })}
-            </Table.Row>
-          )
-        })
+        paginatedData.map((row, rowKey) => (
+          <Table.Row key={rowKey} id={rowKey} onClick={onRowClick}>
+            {headers.map((header, index) => {
+              const value = headers[index].getValue
+                ? headers[index].getValue(row)
+                : getByPath(row, headers[index].name)
+              return (
+                <Table.DataCell key={index} align={header.align} small={small}>
+                  {headers[index].render ? headers[index].render(value) : value}
+                </Table.DataCell>
+              )
+            })}
+          </Table.Row>
+        ))
       ) : (
         <Table.Empty colSpan={headers.length} message={emptyMessage} />
       )
@@ -172,15 +170,15 @@ Tabular.propTypes = {
   /** A list of head entries to display within the table head. */
   headers: PropTypes.arrayOf(
     PropTypes.shape({
+      align: PropTypes.oneOf(['left', 'right', 'center']),
       displayName: PropTypes.message.isRequired,
       getValue: PropTypes.func,
       name: PropTypes.string,
       render: PropTypes.func,
-      centered: PropTypes.bool,
       sortable: PropTypes.bool,
       width: PropTypes.number,
     }),
-  ),
+  ).isRequired,
   /** The initial page of pagination. */
   initialPage: PropTypes.number,
   /** A flag specifying whether the table should covered with the loading overlay. */
@@ -218,7 +216,6 @@ Tabular.defaultProps = {
   className: undefined,
   data: [],
   handlesPagination: false,
-  headers: [],
   loading: false,
   onRowClick: () => null,
   onPageChange: () => null,

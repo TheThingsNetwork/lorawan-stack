@@ -36,12 +36,16 @@ func init() {
 
 // StateCookie returns the cookie storing the state of the console.
 func (oc *OAuthClient) StateCookie() *cookie.Cookie {
+	sameSite := http.SameSiteLaxMode
+	if oc.config.CrossSiteCookie {
+		sameSite = http.SameSiteNoneMode
+	}
 	return &cookie.Cookie{
 		Name:     oc.config.StateCookieName,
 		HTTPOnly: true,
 		Path:     oc.getMountPath(),
 		MaxAge:   10 * time.Minute,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: sameSite,
 	}
 }
 

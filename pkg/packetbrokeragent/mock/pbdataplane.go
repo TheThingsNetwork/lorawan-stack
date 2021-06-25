@@ -18,11 +18,13 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	routingpb "go.packetbroker.org/api/routing"
 	packetbroker "go.packetbroker.org/api/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -39,7 +41,7 @@ type PBDataPlane struct {
 }
 
 // NewPBDataPlane instantiates a new mock Packet Broker Data Plane.
-func NewPBDataPlane(cert tls.Certificate, clientCAs *x509.CertPool) *PBDataPlane {
+func NewPBDataPlane(tb testing.TB, cert tls.Certificate, clientCAs *x509.CertPool) *PBDataPlane {
 	creds := credentials.NewTLS(&tls.Config{
 		Certificates: []tls.Certificate{cert},
 		ClientAuth:   tls.RequireAndVerifyClientCert,
@@ -48,6 +50,10 @@ func NewPBDataPlane(cert tls.Certificate, clientCAs *x509.CertPool) *PBDataPlane
 	dp := &PBDataPlane{
 		Server: grpc.NewServer(
 			grpc.Creds(creds),
+			grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+				ctx = test.ContextWithTB(ctx, tb)
+				return handler(ctx, req)
+			}),
 		),
 		ForwarderUp:              make(chan *packetbroker.RoutedUplinkMessage),
 		ForwarderDown:            make(chan *packetbroker.RoutedDownlinkMessage),

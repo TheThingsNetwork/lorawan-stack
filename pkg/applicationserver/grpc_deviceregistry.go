@@ -16,12 +16,14 @@ package applicationserver
 
 import (
 	"context"
+	"fmt"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -51,6 +53,67 @@ var (
 type asEndDeviceRegistryServer struct {
 	AS       *ApplicationServer
 	kekLabel string
+}
+
+func (r asEndDeviceRegistryServer) retrieveSessionKeys(ctx context.Context, dev *ttnpb.EndDevice, paths []string) error {
+	unwrapKeys := func(ctx context.Context, session *ttnpb.Session, prefix string, paths ...string) error {
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, session.SessionKeys, prefix, paths...)
+		if err != nil {
+			return err
+		}
+		session.SessionKeys = sk
+		return nil
+	}
+
+	needsPendingAppSKey := dev.GetPendingSession() != nil && ttnpb.HasAnyField(paths,
+		"pending_session.keys.app_s_key.key",
+	)
+	needsAppSKey := dev.GetSession() != nil && ttnpb.HasAnyField(paths,
+		"session.keys.app_s_key.key",
+	)
+
+	if !needsAppSKey && !needsPendingAppSKey {
+		return nil
+	}
+
+	link, err := r.AS.getLink(ctx, dev.ApplicationIdentifiers, []string{
+		"skip_payload_crypto",
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, k := range []struct {
+		Name    string
+		Needed  bool
+		Session *ttnpb.Session
+		Prefix  string
+	}{
+		{
+			Name:    "current session",
+			Needed:  needsAppSKey,
+			Session: dev.Session,
+			Prefix:  "session.keys",
+		},
+		{
+			Name:    "pending session",
+			Needed:  needsPendingAppSKey,
+			Session: dev.PendingSession,
+			Prefix:  "pending_session.keys",
+		},
+	} {
+		if !k.Needed {
+			continue
+		}
+		if r.AS.skipPayloadCrypto(ctx, link, dev, k.Session) {
+			continue
+		}
+		if err := unwrapKeys(ctx, k.Session, k.Prefix, paths...); err != nil {
+			warning.Add(ctx, fmt.Sprintf("Failed to unwrap the session keys for the %s: %v", k.Name, err))
+		}
+	}
+
+	return nil
 }
 
 // Get implements ttnpb.AsEndDeviceRegistryServer.
@@ -91,40 +154,10 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		return nil, err
 	}
 
-	if dev.GetPendingSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
-		"pending_session.keys.app_s_key.key",
-	) {
-		link, err := r.AS.getLink(ctx, req.ApplicationIdentifiers, []string{
-			"skip_payload_crypto",
-		})
-		if err != nil {
-			return nil, err
-		}
-		if !r.AS.skipPayloadCrypto(ctx, link, dev, dev.PendingSession) {
-			sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, dev.PendingSession.SessionKeys, "pending_session.keys", req.FieldMask.Paths...)
-			if err != nil {
-				return nil, err
-			}
-			dev.PendingSession.SessionKeys = sk
-		}
+	if err := r.retrieveSessionKeys(ctx, dev, req.FieldMask.Paths); err != nil {
+		return nil, err
 	}
-	if dev.GetSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
-		"session.keys.app_s_key.key",
-	) {
-		link, err := r.AS.getLink(ctx, req.ApplicationIdentifiers, []string{
-			"skip_payload_crypto",
-		})
-		if err != nil {
-			return nil, err
-		}
-		if !r.AS.skipPayloadCrypto(ctx, link, dev, dev.Session) {
-			sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, dev.Session.SessionKeys, "session.keys", req.FieldMask.Paths...)
-			if err != nil {
-				return nil, err
-			}
-			dev.Session.SessionKeys = sk
-		}
-	}
+
 	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 

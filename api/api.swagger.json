@@ -1356,7 +1356,7 @@
           },
           {
             "name": "after",
-            "description": "Query upstream messages after this timestamp only.",
+            "description": "Query upstream messages after this timestamp only. Cannot be used in conjunction with last.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1364,7 +1364,7 @@
           },
           {
             "name": "before",
-            "description": "Query upstream messages before this timestamp only.",
+            "description": "Query upstream messages before this timestamp only. Cannot be used in conjunction with last.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1395,6 +1395,13 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "last",
+            "description": "Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2076,7 +2083,7 @@
           },
           {
             "name": "after",
-            "description": "Query upstream messages after this timestamp only.",
+            "description": "Query upstream messages after this timestamp only. Cannot be used in conjunction with last.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2084,7 +2091,7 @@
           },
           {
             "name": "before",
-            "description": "Query upstream messages before this timestamp only.",
+            "description": "Query upstream messages before this timestamp only. Cannot be used in conjunction with last.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2115,6 +2122,13 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "last",
+            "description": "Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -10222,6 +10236,21 @@
         }
       }
     },
+    "CUPSRedirectionClientTLS": {
+      "type": "object",
+      "properties": {
+        "cert": {
+          "type": "string",
+          "format": "byte",
+          "description": "PEM encoded Client Certificate."
+        },
+        "key": {
+          "type": "string",
+          "format": "byte",
+          "description": "PEM encoded Client Private Key."
+        }
+      }
+    },
     "CompliancesCompliance": {
       "type": "object",
       "properties": {
@@ -12547,6 +12576,19 @@
         "current_gateway_key": {
           "type": "string",
           "description": "The key set in the gateway to authenticate itself."
+        },
+        "target_cups_trust": {
+          "type": "string",
+          "format": "byte",
+          "description": "Optional PEM encoded CA Root certificate. If this field is empty, DCS will attempt to dial the Target CUPS server and fetch the CA."
+        },
+        "client_tls": {
+          "$ref": "#/definitions/CUPSRedirectionClientTLS",
+          "title": "TODO: Support mTLS (https://github.com/TheThingsNetwork/lorawan-stack/issues/137)"
+        },
+        "auth_token": {
+          "type": "string",
+          "description": "The Device Claiming Server will fill this field with a The Things Stack API Key."
         }
       }
     },
@@ -12645,6 +12687,10 @@
         "cups_redirection": {
           "$ref": "#/definitions/v3CUPSRedirection",
           "description": "Parameters to set CUPS redirection for the gateway."
+        },
+        "target_frequency_plan_id": {
+          "type": "string",
+          "description": "Frequency plan ID of the target gateway.\nThis equals the first element of the frequency_plan_ids field."
         }
       }
     },
@@ -13324,6 +13370,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "session_key_id": {
+          "type": "string",
+          "format": "byte"
         }
       },
       "title": "Downlink message from the network to the end device"
@@ -16934,6 +16984,15 @@
         "field_mask": {
           "$ref": "#/definitions/protobufFieldMask",
           "description": "The names of the organization fields that should be updated."
+        }
+      }
+    },
+    "v3UpdatePacketBrokerGatewayResponse": {
+      "type": "object",
+      "properties": {
+        "online_ttl": {
+          "type": "string",
+          "description": "Time to live of the online status."
         }
       }
     },

@@ -59,8 +59,13 @@ const deleteGatewayLogic = createRequestLogic({
   type: gateways.DELETE_GTW,
   process: async ({ action }) => {
     const { id } = action.payload
+    const { options } = action.meta
 
-    await api.gateway.delete(id)
+    if (options.purge) {
+      await api.gateway.purge(id)
+    } else {
+      await api.gateway.delete(id)
+    }
 
     return { id }
   },

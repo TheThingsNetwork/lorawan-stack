@@ -2,6 +2,70 @@
 
 package ttnpb
 
+var UpdatePacketBrokerGatewayRequestFieldPathsNested = []string{
+	"field_mask",
+	"gateway",
+	"gateway.antennas",
+	"gateway.attributes",
+	"gateway.auto_update",
+	"gateway.claim_authentication_code",
+	"gateway.claim_authentication_code.secret",
+	"gateway.claim_authentication_code.secret.key_id",
+	"gateway.claim_authentication_code.secret.value",
+	"gateway.claim_authentication_code.valid_from",
+	"gateway.claim_authentication_code.valid_to",
+	"gateway.contact_info",
+	"gateway.created_at",
+	"gateway.deleted_at",
+	"gateway.description",
+	"gateway.downlink_path_constraint",
+	"gateway.enforce_duty_cycle",
+	"gateway.frequency_plan_id",
+	"gateway.frequency_plan_ids",
+	"gateway.gateway_server_address",
+	"gateway.ids",
+	"gateway.ids.eui",
+	"gateway.ids.gateway_id",
+	"gateway.lbs_lns_secret",
+	"gateway.lbs_lns_secret.key_id",
+	"gateway.lbs_lns_secret.value",
+	"gateway.location_public",
+	"gateway.name",
+	"gateway.require_authenticated_connection",
+	"gateway.schedule_anytime_delay",
+	"gateway.schedule_downlink_late",
+	"gateway.status_public",
+	"gateway.target_cups_key",
+	"gateway.target_cups_key.key_id",
+	"gateway.target_cups_key.value",
+	"gateway.target_cups_uri",
+	"gateway.update_channel",
+	"gateway.update_location_from_status",
+	"gateway.updated_at",
+	"gateway.version_ids",
+	"gateway.version_ids.brand_id",
+	"gateway.version_ids.firmware_version",
+	"gateway.version_ids.hardware_version",
+	"gateway.version_ids.model_id",
+	"online",
+	"rx_rate",
+	"tx_rate",
+}
+
+var UpdatePacketBrokerGatewayRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"gateway",
+	"online",
+	"rx_rate",
+	"tx_rate",
+}
+var UpdatePacketBrokerGatewayResponseFieldPathsNested = []string{
+	"online_ttl",
+}
+
+var UpdatePacketBrokerGatewayResponseFieldPathsTopLevel = []string{
+	"online_ttl",
+}
 var PacketBrokerNetworkIdentifierFieldPathsNested = []string{
 	"net_id",
 	"tenant_id",

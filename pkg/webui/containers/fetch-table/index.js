@@ -94,17 +94,23 @@ class FetchTable extends Component {
         getValue: PropTypes.func,
         name: PropTypes.string,
         render: PropTypes.func,
-        centered: PropTypes.bool,
+        align: PropTypes.oneOf(['left', 'right', 'center']),
         sortable: PropTypes.bool,
         width: PropTypes.number,
       }),
     ),
     itemPathPrefix: PropTypes.string,
-    items: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string, ids: PropTypes.shape({}) })),
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
+        ids: PropTypes.shape({}),
+      }),
+    ),
     mayAdd: PropTypes.bool,
     pageSize: PropTypes.number,
     pathname: PropTypes.string.isRequired,
     searchItemsAction: PropTypes.func,
+    searchPlaceholderMessage: PropTypes.message,
     searchable: PropTypes.bool,
     tableTitle: PropTypes.message,
     tabs: PropTypes.arrayOf(
@@ -126,6 +132,7 @@ class FetchTable extends Component {
     itemPathPrefix: '',
     mayAdd: false,
     searchable: false,
+    searchPlaceholderMessage: sharedMessages.searchById,
     handlesPagination: false,
     fetching: false,
     totalCount: 0,
@@ -299,6 +306,7 @@ class FetchTable extends Component {
       actionItems,
       entity,
       error,
+      searchPlaceholderMessage,
     } = this.props
     const { page, query, tab, order } = this.state
     let orderDirection, orderBy
@@ -340,18 +348,23 @@ class FetchTable extends Component {
                 icon="search"
                 loading={fetchingSearch}
                 onChange={this.onQueryChange}
-                placeholder={sharedMessages.searchById}
+                placeholder={searchPlaceholderMessage}
                 className={style.searchBar}
+                inputWidth="full"
               />
             )}
-            {actionItems}
-            {mayAdd && (
-              <Button.Link
-                className={style.addButton}
-                message={addMessage}
-                icon="add"
-                to={`${pathname}${itemPathPrefix}/add`}
-              />
+            {(Boolean(actionItems) || mayAdd) && (
+              <div className={style.actionItems}>
+                {actionItems}
+                {mayAdd && (
+                  <Button.Link
+                    className={style.addButton}
+                    message={addMessage}
+                    icon="add"
+                    to={`${pathname}${itemPathPrefix}/add`}
+                  />
+                )}
+              </div>
             )}
           </div>
         </div>

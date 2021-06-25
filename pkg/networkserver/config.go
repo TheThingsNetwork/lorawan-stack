@@ -114,19 +114,20 @@ func (c DownlinkPriorityConfig) Parse() (DownlinkPriorities, error) {
 
 // Config represents the NetworkServer configuration.
 type Config struct {
-	ApplicationUplinkQueue ApplicationUplinkQueueConfig `name:"application-uplink-queue"`
-	Devices                DeviceRegistry               `name:"-"`
-	DownlinkTasks          DownlinkTaskQueue            `name:"-"`
-	UplinkDeduplicator     UplinkDeduplicator           `name:"-"`
-	NetID                  types.NetID                  `name:"net-id" description:"NetID of this Network Server"`
-	DevAddrPrefixes        []types.DevAddrPrefix        `name:"dev-addr-prefixes" description:"Device address prefixes of this Network Server"`
-	DeduplicationWindow    time.Duration                `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
-	CooldownWindow         time.Duration                `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
-	DownlinkPriorities     DownlinkPriorityConfig       `name:"downlink-priorities" description:"Downlink message priorities"`
-	DefaultMACSettings     MACSettingConfig             `name:"default-mac-settings" description:"Default MAC settings to fallback to if not specified by device, band or frequency plan"`
-	Interop                config.InteropClient         `name:"interop" description:"Interop client configuration"`
-	DeviceKEKLabel         string                       `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
-	DownlinkQueueCapacity  int                          `name:"downlink-queue-capacity" description:"Maximum downlink queue size per-session"`
+	ApplicationUplinkQueue   ApplicationUplinkQueueConfig `name:"application-uplink-queue"`
+	Devices                  DeviceRegistry               `name:"-"`
+	DownlinkTasks            DownlinkTaskQueue            `name:"-"`
+	UplinkDeduplicator       UplinkDeduplicator           `name:"-"`
+	ScheduledDownlinkMatcher ScheduledDownlinkMatcher     `name:"-"`
+	NetID                    types.NetID                  `name:"net-id" description:"NetID of this Network Server"`
+	DevAddrPrefixes          []types.DevAddrPrefix        `name:"dev-addr-prefixes" description:"Device address prefixes of this Network Server"`
+	DeduplicationWindow      time.Duration                `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
+	CooldownWindow           time.Duration                `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
+	DownlinkPriorities       DownlinkPriorityConfig       `name:"downlink-priorities" description:"Downlink message priorities"`
+	DefaultMACSettings       MACSettingConfig             `name:"default-mac-settings" description:"Default MAC settings to fallback to if not specified by device, band or frequency plan"`
+	Interop                  config.InteropClient         `name:"interop" description:"Interop client configuration"`
+	DeviceKEKLabel           string                       `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
+	DownlinkQueueCapacity    int                          `name:"downlink-queue-capacity" description:"Maximum downlink queue size per-session"`
 }
 
 // DefaultConfig is the default Network Server configuration.

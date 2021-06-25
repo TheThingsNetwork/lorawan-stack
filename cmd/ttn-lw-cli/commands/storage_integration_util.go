@@ -37,6 +37,7 @@ func getStoredUpFlags() *pflag.FlagSet {
 	flags.Uint32("limit", 0, "limit number of upstream messages to fetch")
 	flags.AddFlagSet(timestampFlags("after", "query upstream messages after specified timestamp"))
 	flags.AddFlagSet(timestampFlags("before", "query upstream messages before specified timestamp"))
+	flags.Duration("last", 0, "query upstream messages in the last hours or minutes")
 
 	flags.AddFlagSet(applicationUpFlags)
 
@@ -54,13 +55,34 @@ func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequ
 	var err error
 	req := &ttnpb.GetStoredApplicationUpRequest{}
 
-	req.After, err = getTimestampFlags(flags, "after")
+	if flags.Changed("last") && (hasTimestampFlags(flags, "after") || hasTimestampFlags(flags, "before")) {
+		return nil, fmt.Errorf("--last cannot be used with --after or --before flags")
+	}
+	after, err := getTimestampFlags(flags, "after")
 	if err != nil {
 		return nil, err
 	}
-	req.Before, err = getTimestampFlags(flags, "before")
+	if after != nil {
+		if req.After, err = pbtypes.TimestampProto(*after); err != nil {
+			return nil, err
+		}
+	}
+	before, err := getTimestampFlags(flags, "before")
 	if err != nil {
 		return nil, err
+	}
+	if before != nil {
+		if req.Before, err = pbtypes.TimestampProto(*before); err != nil {
+			return nil, err
+		}
+	}
+
+	if flags.Changed("last") {
+		d, err := flags.GetDuration("last")
+		if err != nil {
+			return nil, err
+		}
+		req.Last = pbtypes.DurationProto(d)
 	}
 	req.Order, _ = flags.GetString("order")
 	req.Type, _ = flags.GetString("type")
@@ -71,7 +93,12 @@ func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequ
 			Value: fport,
 		}
 	}
-	req.FieldMask.Paths = ttnpb.AllowedFields(util.SelectFieldMask(flags, applicationUpFlags), ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp"].Allowed)
+	req.FieldMask = &pbtypes.FieldMask{
+		Paths: ttnpb.AllowedFields(
+			util.SelectFieldMask(flags, applicationUpFlags),
+			ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp"].Allowed,
+		),
+	}
 
 	if flags.Changed("limit") {
 		limit, _ := flags.GetUint32("limit")

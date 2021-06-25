@@ -38,15 +38,24 @@ type BasicStationConfig struct {
 	ListenTLS               string        `name:"listen-tls" description:"Address for the Basic Station frontend to listen on (with TLS)"`
 }
 
+// PacketBrokerConfig configures the Packet Broker upstream.
+type PacketBrokerConfig struct {
+	UpdateGatewayInterval time.Duration `name:"update-gateway-interval" description:"Update gateway interval"`
+	UpdateGatewayJitter   float64       `name:"update-gateway-jitter" description:"Jitter (fraction) to apply to the update interval to randomize intervals"`
+	OnlineTTLMargin       time.Duration `name:"online-ttl-margin" description:"Time to extend the online status before it expires"`
+}
+
 // Config represents the Gateway Server configuration.
 type Config struct {
-	RequireRegisteredGateways         bool          `name:"require-registered-gateways" description:"Require the gateways to be registered in the Identity Server"`
+	RequireRegisteredGateways bool `name:"require-registered-gateways" description:"Require the gateways to be registered in the Identity Server"`
+
+	Stats GatewayConnectionStatsRegistry `name:"-"`
+
 	UpdateGatewayLocationDebounceTime time.Duration `name:"update-gateway-location-debounce-time" description:"Debounce time for gateway location updates from status messages"`
+	UpdateConnectionStatsDebounceTime time.Duration `name:"update-connection-stats-debounce-time" description:"Time before repeated refresh of the gateway connection stats"`
 
-	Stats                             GatewayConnectionStatsRegistry `name:"-"`
-	UpdateConnectionStatsDebounceTime time.Duration                  `name:"update-connection-stats-debounce-time" description:"Time before repeated refresh of the gateway connection stats"`
-
-	Forward map[string][]string `name:"forward" description:"Forward the DevAddr prefixes to the specified hosts"`
+	Forward      map[string][]string `name:"forward" description:"Forward the DevAddr prefixes to the specified hosts"`
+	PacketBroker PacketBrokerConfig  `name:"packetbroker" description:"Packet Broker upstream configuration"`
 
 	MQTT         config.MQTT        `name:"mqtt"`
 	MQTTV2       config.MQTT        `name:"mqtt-v2"`

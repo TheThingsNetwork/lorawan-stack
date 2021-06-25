@@ -33,7 +33,7 @@
 
       .tabs
         border-normal('bottom')
-      
+
       &.top-rule
         border: none
 
@@ -46,20 +46,22 @@
     display: flex
     justify-content: flex-end
     align-items: center
-    max-width: 32rem
+    gap: $cs.s
 
     +media-query($bp.xs)
       justify-content: flex-start
       max-width: none
       flex-basis: 100%
+      flex-wrap: wrap
 
       .search-bar
         width: 100%
 
+.action-items
+  display: flex
+
 .search-bar
-  min-width: 5rem
-  &:not(:last-child)
-    margin-right: $cs.s
+  min-width: 15rem
 
 .page
   margin-top: $ls.s

@@ -163,7 +163,9 @@ func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientI
 }
 
 // GatewayRights returns the rights the caller has on the given gateway.
+// The query for the gateway only considers the Gateway ID and not the EUI (if provided).
 func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
+	gtwIDs.Eui = nil
 	entity, universal, err := is.getRights(ctx, gtwIDs.GetEntityIdentifiers())
 	if err != nil {
 		return nil, err

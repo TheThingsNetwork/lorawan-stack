@@ -25,7 +25,6 @@ import (
 	"path"
 
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
-	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
 // Option is an option for the API client.
@@ -51,12 +50,9 @@ const (
 	basePath         = "/api"
 )
 
-var (
-	userAgent        = "ttn-lw-application-server/" + version.TTN
-	DefaultServerURL *url.URL
-)
+var DefaultServerURL *url.URL
 
-func (c *Client) newRequest(ctx context.Context, version, method, category, operation string, body io.Reader) (*http.Request, error) {
+func (c *Client) newRequest(ctx context.Context, method, version, category, operation string, body io.Reader) (*http.Request, error) {
 	u := urlutil.CloneURL(c.baseURL)
 	u.Path = path.Join(basePath, version, category, operation)
 	req, err := http.NewRequestWithContext(ctx, method, u.String(), body)
@@ -64,7 +60,6 @@ func (c *Client) newRequest(ctx context.Context, version, method, category, oper
 		return nil, err
 	}
 	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("User-Agent", userAgent)
 	if c.token != "" {
 		req.Header.Set("Ocp-Apim-Subscription-Key", c.token)
 	}
@@ -72,8 +67,8 @@ func (c *Client) newRequest(ctx context.Context, version, method, category, oper
 }
 
 // Do executes a new HTTP request with the given parameters and body and returns the response.
-func (c *Client) Do(ctx context.Context, version, method, category, operation string, body io.Reader) (*http.Response, error) {
-	req, err := c.newRequest(ctx, version, method, category, operation, body)
+func (c *Client) Do(ctx context.Context, method, version, category, operation string, body io.Reader) (*http.Response, error) {
+	req, err := c.newRequest(ctx, method, version, category, operation, body)
 	if err != nil {
 		return nil, err
 	}

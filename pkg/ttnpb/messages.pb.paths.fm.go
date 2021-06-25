@@ -139,6 +139,7 @@ var DownlinkMessageFieldPathsNested = []string{
 	"payload.m_hdr.major",
 	"payload.mic",
 	"raw_payload",
+	"session_key_id",
 	"settings",
 	"settings.request",
 	"settings.request.absolute_time",
@@ -177,6 +178,7 @@ var DownlinkMessageFieldPathsTopLevel = []string{
 	"end_device_ids",
 	"payload",
 	"raw_payload",
+	"session_key_id",
 	"settings",
 }
 var TxAcknowledgmentFieldPathsNested = []string{
@@ -236,6 +238,7 @@ var TxAcknowledgmentFieldPathsNested = []string{
 	"downlink_message.payload.m_hdr.major",
 	"downlink_message.payload.mic",
 	"downlink_message.raw_payload",
+	"downlink_message.session_key_id",
 	"downlink_message.settings",
 	"downlink_message.settings.request",
 	"downlink_message.settings.request.absolute_time",
@@ -336,6 +339,7 @@ var GatewayTxAcknowledgmentFieldPathsNested = []string{
 	"tx_ack.downlink_message.payload.m_hdr.major",
 	"tx_ack.downlink_message.payload.mic",
 	"tx_ack.downlink_message.raw_payload",
+	"tx_ack.downlink_message.session_key_id",
 	"tx_ack.downlink_message.settings",
 	"tx_ack.downlink_message.settings.request",
 	"tx_ack.downlink_message.settings.request.absolute_time",

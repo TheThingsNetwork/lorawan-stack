@@ -24,6 +24,7 @@ import Organizations from './service/organizations'
 import Users from './service/users'
 import Auth from './service/auth'
 import ContactInfo from './service/contact-info'
+import PacketBrokerAgent from './service/packet-broker-agent'
 import EventHandler from './util/events'
 import StackConfiguration from './util/stack-configuration'
 import { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from './util/constants'
@@ -52,6 +53,7 @@ class TTS {
     this.Users = new Users(this.api)
     this.Auth = new Auth(this.api.EntityAccess)
     this.ContactInfo = new ContactInfo(this.api.ContactInfoRegistry)
+    this.PacketBrokerAgent = new PacketBrokerAgent(this.api.Pba)
 
     this.subscribe = EventHandler.subscribe
     this.unsubscribe = EventHandler.unsubscribe

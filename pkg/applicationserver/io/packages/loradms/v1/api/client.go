@@ -23,7 +23,6 @@ import (
 	"path"
 
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
-	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
 // Option is an option for the API client.
@@ -51,10 +50,7 @@ const (
 	basePath         = "/api/v1"
 )
 
-var (
-	userAgent        = "ttn-lw-application-server/" + version.TTN
-	DefaultServerURL *url.URL
-)
+var DefaultServerURL *url.URL
 
 type queryParam struct {
 	key, value string
@@ -73,7 +69,6 @@ func (c *Client) newRequest(ctx context.Context, method, category, entity, opera
 		return nil, err
 	}
 	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("User-Agent", userAgent)
 	if c.token != "" {
 		req.Header.Set("Authorization", c.token)
 	}

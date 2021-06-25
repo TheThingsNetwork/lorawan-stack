@@ -81,6 +81,7 @@ type generatedDownlink struct {
 	RawPayload     []byte
 	Priority       ttnpb.TxSchedulePriority
 	NeedsMACAnswer bool
+	SessionKeyID   []byte
 }
 
 type generateDownlinkState struct {
@@ -625,6 +626,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		RawPayload:     b,
 		Priority:       priority,
 		NeedsMACAnswer: len(dev.MACState.PendingRequests) > 0 && class == ttnpb.CLASS_A,
+		SessionKeyID:   dev.Session.SessionKeyID,
 	}, genState, nil
 }
 
@@ -749,8 +751,9 @@ func nonRetryableFixedPathGatewayError(err error) bool {
 type scheduleRequest struct {
 	*ttnpb.TxRequest
 	ttnpb.EndDeviceIdentifiers
-	Payload    *ttnpb.Message
-	RawPayload []byte
+	Payload      *ttnpb.Message
+	RawPayload   []byte
+	SessionKeyID []byte
 
 	// DownlinkEvents are the event builders associated with particular downlink. Only published on success.
 	DownlinkEvents events.Builders
@@ -919,6 +922,17 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 			continue
 		}
 		transmitAt := time.Now().Add(delay)
+		if err := ns.scheduledDownlinkMatcher.Add(ctx, &ttnpb.DownlinkMessage{
+			CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+			EndDeviceIds:   &req.EndDeviceIdentifiers,
+			Payload:        req.Payload,
+			SessionKeyId:   req.SessionKeyID,
+			Settings: &ttnpb.DownlinkMessage_Request{
+				Request: req.TxRequest,
+			},
+		}); err != nil {
+			logger.WithError(err).Debug("Failed to store downlink metadata")
+		}
 		logger.WithFields(log.Fields(
 			"transmission_delay", delay,
 			"transmit_at", transmitAt,
@@ -1240,6 +1254,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 			Payload:              genDown.Payload,
 			RawPayload:           genDown.RawPayload,
+			SessionKeyID:         genDown.SessionKeyID,
 			DownlinkEvents:       genState.EventBuilders,
 		},
 		paths...,
@@ -1407,6 +1422,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			Payload:              genDown.Payload,
 			RawPayload:           genDown.RawPayload,
 			DownlinkEvents:       genState.EventBuilders,
+			SessionKeyID:         dev.GetSession().GetSessionKeyID(),
 		},
 		paths...,
 	)

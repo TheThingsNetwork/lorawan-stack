@@ -86,8 +86,13 @@ const deleteOrganizationLogic = createRequestLogic({
   type: organizations.DELETE_ORG,
   process: async ({ action }) => {
     const { id } = action.payload
+    const { options } = action.meta
 
-    await api.organization.delete(id)
+    if (options.purge) {
+      await api.organization.purge(id)
+    } else {
+      await api.organization.delete(id)
+    }
 
     return { id }
   },

@@ -30,6 +30,7 @@ import pubsubs from './pubsubs'
 import applicationPackages from './application-packages'
 import is from './identity-server'
 import deviceRepository from './device-repository'
+import packetBroker from './packet-broker'
 
 export default [
   ...status,
@@ -49,4 +50,5 @@ export default [
   ...applicationPackages,
   ...is,
   ...deviceRepository,
+  ...packetBroker,
 ]

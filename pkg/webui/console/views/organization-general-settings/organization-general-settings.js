@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@ import bind from 'autobind-decorator'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
+import DeleteModalButton from '@ttn-lw/console/components/delete-modal-button'
+
 import PageTitle from '@ttn-lw/components/page-title'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import ModalButton from '@ttn-lw/components/button/modal-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import toast from '@ttn-lw/components/toast'
@@ -42,8 +43,6 @@ import {
 
 const m = defineMessages({
   deleteOrg: 'Delete organization',
-  modalWarning:
-    'Are you sure you want to delete "{orgName}"? This action cannot be undone and it will not be possible to reuse the organization ID.',
   updateSuccess: 'Organization updated',
 })
 
@@ -62,6 +61,8 @@ class GeneralSettings extends React.PureComponent {
     deleteOrganizationSuccess: PropTypes.func.isRequired,
     orgId: PropTypes.string.isRequired,
     organization: PropTypes.organization.isRequired,
+    shouldConfirmDelete: PropTypes.bool.isRequired,
+    shouldPurge: PropTypes.bool.isRequired,
     updateOrganization: PropTypes.func.isRequired,
   }
 
@@ -116,7 +117,7 @@ class GeneralSettings extends React.PureComponent {
   }
 
   render() {
-    const { organization, orgId } = this.props
+    const { organization, orgId, shouldConfirmDelete, shouldPurge } = this.props
     const { error } = this.state
 
     const initialValues = {
@@ -144,19 +145,13 @@ class GeneralSettings extends React.PureComponent {
               <SubmitBar>
                 <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
                 <Require featureCheck={mayDeleteOrganization}>
-                  <ModalButton
-                    type="button"
-                    icon="delete"
-                    danger
-                    naked
+                  <DeleteModalButton
+                    entityId={orgId}
+                    entityName={organization.name}
                     message={m.deleteOrg}
-                    modalData={{
-                      message: {
-                        values: { orgName: organization.name || orgId },
-                        ...m.modalWarning,
-                      },
-                    }}
                     onApprove={this.handleDelete}
+                    shouldConfirm={shouldConfirmDelete}
+                    shouldPurge={shouldPurge}
                   />
                 </Require>
               </SubmitBar>

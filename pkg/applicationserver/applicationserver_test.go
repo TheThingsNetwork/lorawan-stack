@@ -2708,3 +2708,155 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		})
 	}
 }
+
+func TestLocationFromPayload(t *testing.T) {
+	a, ctx := test.New(t)
+
+	registeredApplicationID := ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
+
+	// This device gets registered in the device registry of the Application Server.
+	registeredDevice := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: registeredApplicationID,
+			DeviceId:               "foo-device",
+			JoinEui:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			DevEui:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+		},
+		Session: &ttnpb.Session{
+			DevAddr: types.DevAddr{0x11, 0x11, 0x11, 0x11},
+			SessionKeys: ttnpb.SessionKeys{
+				SessionKeyID: []byte{0x11},
+				AppSKey: &ttnpb.KeyEnvelope{
+					Key: &types.AES128Key{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
+				},
+			},
+		},
+		Formatters: &ttnpb.MessagePayloadFormatters{
+			UpFormatter: ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+			UpFormatterParameter: `function decodeUplink(input) {
+				return {
+					data: {
+						lat: 4.85564,
+						lng: 52.3456341,
+						alt: 16,
+						hdop: 14
+					}
+				};
+			}`,
+		},
+	}
+
+	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
+	defer devsFlush()
+	defer devsRedisClient.Close()
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
+	_, err := deviceRegistry.Set(ctx, registeredDevice.EndDeviceIdentifiers, nil, func(ed *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		return registeredDevice, []string{"ids", "session", "formatters"}, nil
+	})
+	if err != nil {
+		t.Fatalf("Failed to set device in registry: %s", err)
+	}
+
+	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
+	defer linksFlush()
+	defer linksRedisClient.Close()
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
+	_, err = linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+		return &ttnpb.ApplicationLink{}, nil, nil
+	})
+	if err != nil {
+		t.Fatalf("Failed to set link in registry: %s", err)
+	}
+
+	distribRedisClient, distribFlush := test.NewRedis(ctx, "applicationserver_test", "traffic")
+	defer distribFlush()
+	defer distribRedisClient.Close()
+	distribPubSub := distribredis.PubSub{Redis: distribRedisClient}
+
+	applicationUpsRedisClient, applicationUpsFlush := test.NewRedis(ctx, "applicationserver_test", "applicationups")
+	defer applicationUpsFlush()
+	defer applicationUpsRedisClient.Close()
+	applicationUpsRegistry := &redis.ApplicationUplinkRegistry{
+		Redis: applicationUpsRedisClient,
+		Limit: 16,
+	}
+
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":9189",
+				AllowInsecureForCredentials: true,
+			},
+			HTTP: config.HTTP{
+				Listen: ":8100",
+			},
+		},
+	})
+	config := &applicationserver.Config{
+		Devices: deviceRegistry,
+		Links:   linkRegistry,
+		UplinkStorage: applicationserver.UplinkStorageConfig{
+			Registry: applicationUpsRegistry,
+			Limit:    16,
+		},
+		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
+			Fetcher: &noopEndDeviceFetcher{},
+		},
+		Distribution: applicationserver.DistributionConfig{
+			PubSub: distribPubSub,
+		},
+	}
+	as, err := applicationserver.New(c, config)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	roles := as.Roles()
+	a.So(len(roles), should.Equal, 1)
+	a.So(roles[0], should.Equal, ttnpb.ClusterRole_APPLICATION_SERVER)
+
+	componenttest.StartComponent(t, c)
+	defer c.Close()
+
+	sub, err := as.Subscribe(ctx, "test", nil, false)
+	a.So(err, should.BeNil)
+
+	err = as.Publish(ctx, &ttnpb.ApplicationUp{
+		EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+		Up: &ttnpb.ApplicationUp_UplinkMessage{
+			UplinkMessage: &ttnpb.ApplicationUplink{
+				RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+				Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{}}}},
+				SessionKeyID: []byte{0x11},
+				FPort:        11,
+				FCnt:         11,
+				FRMPayload:   []byte{0x11},
+			},
+		},
+	})
+	a.So(err, should.BeNil)
+
+	// The uplink message and the location solved message may come out of order.
+	// Expect exactly two messages.
+	var loc *ttnpb.ApplicationLocation
+	for i := 0; i < 2; i++ {
+		select {
+		case msg := <-sub.Up():
+			msgLoc := msg.ApplicationUp.GetLocationSolved()
+			if msgLoc != nil {
+				loc = msgLoc
+			}
+		case <-time.After(Timeout):
+			t.Fatalf("Expected upstream message %d timed out", i)
+		}
+	}
+	if loc == nil {
+		t.Fatal("Expected location solved message")
+	}
+
+	a.So(loc.Latitude, should.AlmostEqual, 4.85564, 0.00001)
+	a.So(loc.Longitude, should.AlmostEqual, 52.3456341, 0.00001)
+	a.So(loc.Altitude, should.Equal, 16)
+	a.So(loc.Accuracy, should.Equal, 14)
+	a.So(loc.Service, should.Equal, "frm_payload")
+}

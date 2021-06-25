@@ -138,6 +138,7 @@
   - [Message `AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest)
   - [Message `AuthorizeGatewayRequest`](#ttn.lorawan.v3.AuthorizeGatewayRequest)
   - [Message `CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection)
+  - [Message `CUPSRedirection.ClientTLS`](#ttn.lorawan.v3.CUPSRedirection.ClientTLS)
   - [Message `ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest)
   - [Message `ClaimEndDeviceRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers)
   - [Message `ClaimGatewayRequest`](#ttn.lorawan.v3.ClaimGatewayRequest)
@@ -500,6 +501,8 @@
   - [Message `PacketBrokerRoutingPolicyUplink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink)
   - [Message `SetPacketBrokerDefaultRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest)
   - [Message `SetPacketBrokerRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerRoutingPolicyRequest)
+  - [Message `UpdatePacketBrokerGatewayRequest`](#ttn.lorawan.v3.UpdatePacketBrokerGatewayRequest)
+  - [Message `UpdatePacketBrokerGatewayResponse`](#ttn.lorawan.v3.UpdatePacketBrokerGatewayResponse)
   - [Service `GsPba`](#ttn.lorawan.v3.GsPba)
   - [Service `NsPba`](#ttn.lorawan.v3.NsPba)
   - [Service `Pba`](#ttn.lorawan.v3.Pba)
@@ -1126,11 +1129,12 @@ The NsAs service connects a Network Server to an Application Server.
 | `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  | Query upstream messages from a single end device. Cannot be used in conjunction with application_ids. |
 | `type` | [`string`](#string) |  | Query upstream messages of a specific type. If not set, then all upstream messages are returned. |
 | `limit` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Limit number of results. |
-| `after` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Query upstream messages after this timestamp only. |
-| `before` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Query upstream messages before this timestamp only. |
+| `after` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Query upstream messages after this timestamp only. Cannot be used in conjunction with last. |
+| `before` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Query upstream messages before this timestamp only. Cannot be used in conjunction with last. |
 | `f_port` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Query uplinks on a specific FPort only. |
 | `order` | [`string`](#string) |  | Order results. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the upstream message fields that should be returned. See the API reference for allowed field names for each type of upstream message. |
+| `last` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before. |
 
 #### Field Rules
 
@@ -2288,12 +2292,30 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | ----- | ---- | ----- | ----------- |
 | `target_cups_uri` | [`string`](#string) |  | CUPS URI for LoRa Basics Station CUPS redirection. |
 | `current_gateway_key` | [`string`](#string) |  | The key set in the gateway to authenticate itself. |
+| `target_cups_trust` | [`bytes`](#bytes) |  | Optional PEM encoded CA Root certificate. If this field is empty, DCS will attempt to dial the Target CUPS server and fetch the CA. |
+| `client_tls` | [`CUPSRedirection.ClientTLS`](#ttn.lorawan.v3.CUPSRedirection.ClientTLS) |  | TODO: Support mTLS (https://github.com/TheThingsNetwork/lorawan-stack/issues/137) |
+| `auth_token` | [`string`](#string) |  | The Device Claiming Server will fill this field with a The Things Stack API Key. |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `current_gateway_key` | <p>`string.max_len`: `2048`</p> |
+| `auth_token` | <p>`string.max_len`: `2048`</p> |
+
+### <a name="ttn.lorawan.v3.CUPSRedirection.ClientTLS">Message `CUPSRedirection.ClientTLS`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `cert` | [`bytes`](#bytes) |  | PEM encoded Client Certificate. |
+| `key` | [`bytes`](#bytes) |  | PEM encoded Client Private Key. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `cert` | <p>`bytes.max_len`: `8192`</p> |
+| `key` | <p>`bytes.max_len`: `8192`</p> |
 
 ### <a name="ttn.lorawan.v3.ClaimEndDeviceRequest">Message `ClaimEndDeviceRequest`</a>
 
@@ -2348,6 +2370,7 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | `target_gateway_id` | [`string`](#string) |  | Gateway ID for the target gateway. This must be a unique value. If this is not set, the target ID for the target gateway will be set to `eui-<gateway-eui>` |
 | `target_gateway_server_address` | [`string`](#string) |  | Target Gateway Server Address for the target gateway. |
 | `cups_redirection` | [`CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection) |  | Parameters to set CUPS redirection for the gateway. |
+| `target_frequency_plan_id` | [`string`](#string) |  | Frequency plan ID of the target gateway. This equals the first element of the frequency_plan_ids field. |
 
 #### Field Rules
 
@@ -2357,6 +2380,7 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | `collaborator` | <p>`message.required`: `true`</p> |
 | `target_gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
 | `target_gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
+| `target_frequency_plan_id` | <p>`string.max_len`: `64`</p> |
 
 ### <a name="ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers">Message `ClaimGatewayRequest.AuthenticatedIdentifiers`</a>
 
@@ -6171,12 +6195,14 @@ Downlink message from the network to the end device
 | `request` | [`TxRequest`](#ttn.lorawan.v3.TxRequest) |  |  |
 | `scheduled` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  |  |
 | `correlation_ids` | [`string`](#string) | repeated |  |
+| `session_key_id` | [`bytes`](#bytes) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
+| `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
 
 ### <a name="ttn.lorawan.v3.DownlinkQueueOperationErrorDetails">Message `DownlinkQueueOperationErrorDetails`</a>
 
@@ -7089,6 +7115,32 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | `uplink` | <p>`message.required`: `true`</p> |
 | `downlink` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.UpdatePacketBrokerGatewayRequest">Message `UpdatePacketBrokerGatewayRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway` | [`Gateway`](#ttn.lorawan.v3.Gateway) |  |  |
+| `online` | [`bool`](#bool) |  |  |
+| `rx_rate` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Received packets rate (number of packets per hour). This field gets updated when a value is set. |
+| `tx_rate` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Transmitted packets rate (number of packets per hour). This field gets updated when a value is set. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that are considered for update. Supported values are: antennas, contact_info, frequency_plan_id, frequency_plan_ids, ids, status_public and location_public.
+
+Online status is only updated if status_public is set. If status_public is set and false, the status will be reset. If status_public is set and true, the online status is taken from the online field. The return message contains the duration online_ttl for how long the gateway is considered online.
+
+Location is only updated if location_public is set. If location_public is set and false, the location will be reset. If location_public is set and true, the first antenna location will be used as gateway location. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.UpdatePacketBrokerGatewayResponse">Message `UpdatePacketBrokerGatewayResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `online_ttl` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Time to live of the online status. |
+
 ### <a name="ttn.lorawan.v3.GsPba">Service `GsPba`</a>
 
 The GsPba service connects a Gateway Server to a Packet Broker Agent.
@@ -7096,6 +7148,7 @@ The GsPba service connects a Gateway Server to a Packet Broker Agent.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `PublishUplink` | [`GatewayUplinkMessage`](#ttn.lorawan.v3.GatewayUplinkMessage) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+| `UpdateGateway` | [`UpdatePacketBrokerGatewayRequest`](#ttn.lorawan.v3.UpdatePacketBrokerGatewayRequest) | [`UpdatePacketBrokerGatewayResponse`](#ttn.lorawan.v3.UpdatePacketBrokerGatewayResponse) | Update the gateway, changing the fields specified by the field mask to the provided values. To mark a gateway as online, call this rpc setting online to true, include status_public in field_mask and keep calling this rpc before the returned online_ttl passes to keep the gateway online. |
 
 ### <a name="ttn.lorawan.v3.NsPba">Service `NsPba`</a>
 

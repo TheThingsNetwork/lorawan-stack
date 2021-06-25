@@ -15,7 +15,6 @@
 import { EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP } from '@console/constants/event-filters'
 
 import { getApplicationId } from '@ttn-lw/lib/selectors/id'
-
 import getByPath from '@ttn-lw/lib/get-by-path'
 
 import {
@@ -84,7 +83,7 @@ const applications = (state = defaultState, { type, payload, event }) => {
       const { [payload.id]: deleted, ...rest } = state.entities
 
       return {
-        selectedApplication: null,
+        ...defaultState,
         entities: rest,
       }
     case GET_APP_EVENT_MESSAGE_SUCCESS:

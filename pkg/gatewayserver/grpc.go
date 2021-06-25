@@ -46,5 +46,6 @@ func (gs *GatewayServer) GetGatewayConnectionStats(ctx context.Context, ids *ttn
 	if !ok {
 		return nil, errNotConnected.WithAttributes("gateway_uid", uid)
 	}
-	return val.(connectionEntry).Stats(), nil
+	stats, _ := val.(connectionEntry).Stats()
+	return stats, nil
 }

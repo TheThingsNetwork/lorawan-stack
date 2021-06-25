@@ -28,10 +28,12 @@ import style from './modal.styl'
 class Modal extends React.PureComponent {
   static propTypes = {
     approval: PropTypes.bool,
+    approveButtonProps: PropTypes.shape({}),
     bottomLine: PropTypes.oneOfType([PropTypes.element, PropTypes.message]),
     buttonMessage: PropTypes.message,
     buttonName: PropTypes.message,
     cancelButtonMessage: PropTypes.message,
+    cancelButtonProps: PropTypes.shape({}),
     children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.element), PropTypes.element]),
     danger: PropTypes.bool,
     formName: PropTypes.string,
@@ -62,6 +64,8 @@ class Modal extends React.PureComponent {
     subtitle: undefined,
     title: undefined,
     name: undefined,
+    approveButtonProps: {},
+    cancelButtonProps: {},
   }
 
   @bind
@@ -97,6 +101,8 @@ class Modal extends React.PureComponent {
       bottomLine,
       inline,
       danger,
+      approveButtonProps,
+      cancelButtonProps,
       ...rest
     } = this.props
 
@@ -123,7 +129,12 @@ class Modal extends React.PureComponent {
         : sharedMessages.ok
     let buttons = (
       <div>
-        <Button message={approveButtonMessage} onClick={this.handleApprove} icon="check" />
+        <Button
+          message={approveButtonMessage}
+          onClick={this.handleApprove}
+          icon="check"
+          {...approveButtonProps}
+        />
       </div>
     )
 
@@ -138,6 +149,7 @@ class Modal extends React.PureComponent {
             icon="clear"
             value="false"
             {...name}
+            {...cancelButtonProps}
           />
           <Button
             message={approveButtonMessage}
@@ -147,6 +159,7 @@ class Modal extends React.PureComponent {
             value="true"
             danger={danger}
             {...name}
+            {...approveButtonProps}
           />
         </div>
       )

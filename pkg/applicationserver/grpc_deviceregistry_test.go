@@ -25,7 +25,6 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
-	. "go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -296,7 +295,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 
 			var getCalls uint64
 
-			as := test.Must(New(
+			as := test.Must(applicationserver.New(
 				componenttest.NewComponent(t, &component.Config{
 					ServiceBase: config.ServiceBase{
 						KeyVault: config.KeyVault{
@@ -305,7 +304,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 						},
 					},
 				}),
-				&Config{
+				&applicationserver.Config{
 					Links: &MockLinkRegistry{
 						GetFunc: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
 							return nil, errNotFound
@@ -317,7 +316,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 							return tc.GetFunc(ctx, ids, paths)
 						},
 					},
-				})).(*ApplicationServer)
+				})).(*applicationserver.ApplicationServer)
 
 			as.AddContextFiller(tc.ContextFunc)
 			as.AddContextFiller(func(ctx context.Context) context.Context {
@@ -599,8 +598,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 			var setCalls uint64
 
-			as := test.Must(New(componenttest.NewComponent(t, &component.Config{}),
-				&Config{
+			as := test.Must(applicationserver.New(componenttest.NewComponent(t, &component.Config{}),
+				&applicationserver.Config{
 					Devices: &MockDeviceRegistry{
 						SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&setCalls, 1)
@@ -610,7 +609,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					Formatters: applicationserver.FormattersConfig{
 						MaxParameterLength: maxParameterLength,
 					},
-				})).(*ApplicationServer)
+				})).(*applicationserver.ApplicationServer)
 
 			as.AddContextFiller(tc.ContextFunc)
 			as.AddContextFiller(func(ctx context.Context) context.Context {
@@ -784,9 +783,9 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			var setCalls uint64
 			var upClearCalls uint64
 
-			as := test.Must(New(componenttest.NewComponent(t, &component.Config{}),
-				&Config{
-					UplinkStorage: UplinkStorageConfig{
+			as := test.Must(applicationserver.New(componenttest.NewComponent(t, &component.Config{}),
+				&applicationserver.Config{
+					UplinkStorage: applicationserver.UplinkStorageConfig{
 						Registry: &MockApplicationUplinkRegistry{
 							ClearFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
 								atomic.AddUint64(&upClearCalls, 1)
@@ -800,7 +799,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 							return tc.SetFunc(ctx, deviceIds, paths, cb)
 						},
 					},
-				})).(*ApplicationServer)
+				})).(*applicationserver.ApplicationServer)
 
 			as.AddContextFiller(tc.ContextFunc)
 			as.AddContextFiller(func(ctx context.Context) context.Context {

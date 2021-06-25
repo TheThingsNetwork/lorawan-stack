@@ -46,7 +46,7 @@
     "eslint-import-resolver-webpack": "^0.13.0",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-cypress": "^2.11.2",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-jest": "^24.1.5",
     "eslint-plugin-jsdoc": "^34.0.2",
     "eslint-plugin-prefer-arrow": "^1.2.3",
@@ -72,8 +72,7 @@
     "webpack-dev-server": "^3.11.0",
     "webpack-plugin-hash-output": "^3.1.0",
     "webpack-shell-plugin": "https://github.com/cdeutsch/webpack-shell-plugin.git#bee537d",
-    "yargs": "^16.2.0",
-    "yarn": "^1.22.10"
+    "yargs": "^16.2.0"
   },
   "dependencies": {
     "@formatjs/intl-relativetimeformat": "^8.0.6",
@@ -112,6 +111,7 @@
     "react-router-dom": "^5.2.0",
     "react-select": "^4.1.0",
     "react-string-replace": "^0.4.4",
+    "react-switch": "^6.0.0",
     "react-text-mask": "^5.4.3",
     "react-toastify": "^7.0.3",
     "react-virtualized-auto-sizer": "^1.0.4",

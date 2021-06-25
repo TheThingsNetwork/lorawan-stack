@@ -142,6 +142,7 @@ message DownlinkMessage {
     TxSettings scheduled = 5;
   }
   repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+  bytes session_key_id = 7 [(validate.rules).bytes.max_len = 2048];
 }
 
 message TxAcknowledgment {

@@ -26,6 +26,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
+	mappingpb "go.packetbroker.org/api/mapping/v2"
 	packetbroker "go.packetbroker.org/api/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -40,6 +41,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/grpc"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -76,7 +78,10 @@ func TestForwarder(t *testing.T) {
 			},
 		},
 	})
-	dp, addr := mustServePBDataPlane(ctx)
+	c.FrequencyPlans = test.FrequencyPlanStore
+
+	dp, dpAddr := mustServePBDataPlane(ctx, t)
+	mp, mpAddr := mustServePBMapper(ctx, t)
 
 	gs := test.Must(mock.NewGatewayServer(c)).(*mock.GatewayServer)
 	tokenKey := bytes.Repeat([]byte{0x42}, 16)
@@ -85,7 +90,8 @@ func TestForwarder(t *testing.T) {
 		Key:       tokenKey,
 	}, nil)).(jose.Encrypter)
 	test.Must(New(c, &Config{
-		DataPlaneAddress:   fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
+		DataPlaneAddress:   fmt.Sprintf("localhost:%d", dpAddr.(*net.TCPAddr).Port),
+		MapperAddress:      fmt.Sprintf("localhost:%d", mpAddr.(*net.TCPAddr).Port),
 		NetID:              types.NetID{0x0, 0x0, 0x13},
 		TenantID:           "foo-tenant",
 		ClusterID:          "test",
@@ -98,13 +104,14 @@ func TestForwarder(t *testing.T) {
 		Forwarder: ForwarderConfig{
 			Enable: true,
 			WorkerPool: WorkerPoolConfig{
-				Limit: 2,
+				Limit: 1,
 			},
 			TokenKey:          tokenKey,
 			TokenEncrypter:    tokenEncrypter,
 			IncludeGatewayEUI: true,
 			IncludeGatewayID:  true,
 			HashGatewayID:     true,
+			GatewayOnlineTTL:  10 * time.Minute,
 		},
 	}, testOptions...))
 	componenttest.StartComponent(t, c)
@@ -208,7 +215,7 @@ func TestForwarder(t *testing.T) {
 														Latitude:  52.5,
 														Longitude: 4.8,
 														Altitude:  2,
-														Accuracy:  0,
+														Hdop:      0,
 													},
 													SignalQuality: &packetbroker.TerrestrialGatewayAntennaSignalQuality{
 														ChannelRssi: -42,
@@ -427,6 +434,75 @@ func TestForwarder(t *testing.T) {
 		}
 		a.So(stateChange.GetSuccess(), should.NotBeNil)
 	})
+
+	t.Run("Update gateway", func(t *testing.T) {
+		a := assertions.New(t)
+
+		updateCh := make(chan *mappingpb.UpdateGatewayRequest, 1)
+		mp.UpdateGatewayHandler = func(ctx context.Context, req *mappingpb.UpdateGatewayRequest, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+			updateCh <- req
+			return ttnpb.Empty, nil
+		}
+
+		res, err := gs.UpdateGateway(ctx, &ttnpb.UpdatePacketBrokerGatewayRequest{
+			Gateway: &ttnpb.Gateway{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayId: "foo-gateway",
+					Eui:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
+				},
+				ContactInfo: []*ttnpb.ContactInfo{
+					{
+						ContactType:   ttnpb.CONTACT_TYPE_OTHER,
+						ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+						Value:         "admin@example.com",
+					},
+					{
+						ContactType:   ttnpb.CONTACT_TYPE_TECHNICAL,
+						ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+						Value:         "tech@example.com",
+					},
+				},
+				FrequencyPlanIDs: []string{"EU_863_870"},
+				Antennas: []ttnpb.GatewayAntenna{
+					{
+						Location: &ttnpb.Location{
+							Latitude:  4.85464,
+							Longitude: 52.34562,
+							Altitude:  16,
+							Accuracy:  10,
+							Source:    ttnpb.SOURCE_REGISTRY,
+						},
+					},
+				},
+				StatusPublic:   true,
+				LocationPublic: true,
+			},
+			Online: true,
+			FieldMask: &pbtypes.FieldMask{
+				Paths: []string{
+					"antennas",
+					"contact_info",
+					"frequency_plan_ids",
+					"ids",
+					"location_public",
+					"status_public",
+				},
+			},
+		})
+		a.So(err, should.BeNil)
+		a.So(test.Must(pbtypes.DurationFromProto(res.OnlineTtl)).(time.Duration), should.NotBeZeroValue)
+
+		select {
+		case update := <-updateCh:
+			a.So(update.AdministrativeContact.GetValue().GetEmail(), should.Equal, "admin@example.com")
+			a.So(update.TechnicalContact.GetValue().GetEmail(), should.Equal, "tech@example.com")
+			a.So(update.FrequencyPlan.GetLoraMultiSfChannels(), should.HaveLength, 8)
+			a.So(update.Online.GetValue(), should.BeTrue)
+			a.So(update.GatewayLocation.GetLocation().GetTerrestrial().GetAntennaCount().GetValue(), should.Equal, 1)
+		case <-time.After(timeout):
+			t.Fatal("Expected gateway update timeout")
+		}
+	})
 }
 
 func TestHomeNetwork(t *testing.T) {
@@ -443,7 +519,7 @@ func TestHomeNetwork(t *testing.T) {
 			},
 		},
 	})
-	dp, addr := mustServePBDataPlane(ctx)
+	dp, addr := mustServePBDataPlane(ctx, t)
 
 	ns := test.Must(mock.NewNetworkServer(c)).(*mock.NetworkServer)
 	test.Must(New(c, &Config{
@@ -460,7 +536,7 @@ func TestHomeNetwork(t *testing.T) {
 		HomeNetwork: HomeNetworkConfig{
 			Enable: true,
 			WorkerPool: WorkerPoolConfig{
-				Limit: 2,
+				Limit: 1,
 			},
 		},
 	}, testOptions...))
@@ -531,7 +607,7 @@ func TestHomeNetwork(t *testing.T) {
 														Latitude:  52.5,
 														Longitude: 4.8,
 														Altitude:  2,
-														Accuracy:  0,
+														Hdop:      0,
 													},
 													SignalQuality: &packetbroker.TerrestrialGatewayAntennaSignalQuality{
 														ChannelRssi: -42,

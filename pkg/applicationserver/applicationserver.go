@@ -898,14 +898,39 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		uplink.LastAFCntDown = dev.Session.LastAFCntDown
 	}
 
+	registerUplinkLatency(ctx, uplink)
+
+	if dev.VersionIDs != nil {
+		uplink.VersionIDs = dev.VersionIDs
+	}
+
 	isDev, err := as.endDeviceFetcher.Get(ctx, ids, "locations")
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
 	} else {
 		uplink.Locations = isDev.GetLocations()
 	}
-	if dev.VersionIDs != nil {
-		uplink.VersionIDs = dev.VersionIDs
+
+	loc := as.locationFromDecodedPayload(uplink)
+	if loc != nil {
+		if uplink.Locations == nil {
+			uplink.Locations = make(map[string]*ttnpb.Location)
+		}
+		uplink.Locations["frm_payload"] = loc
+		err := as.processUp(ctx, &ttnpb.ApplicationUp{
+			EndDeviceIdentifiers: ids,
+			CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+			ReceivedAt:           &uplink.ReceivedAt,
+			Up: &ttnpb.ApplicationUp_LocationSolved{
+				LocationSolved: &ttnpb.ApplicationLocation{
+					Service:  "frm_payload",
+					Location: *loc,
+				},
+			},
+		}, link)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to process location solved message from location in payload")
+		}
 	}
 
 	return nil
@@ -1069,8 +1094,6 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 	}
 	return as.decryptAndDecodeDownlink(ctx, dev, msg, link.DefaultFormatters)
 }
-
-var errPayloadCryptoDisabled = errors.DefineAborted("payload_crypto_disabled", "payload crypto is disabled")
 
 type ctxConfigKeyType struct{}
 

@@ -24,8 +24,8 @@ import (
 
 // Handler represents the upstream handler that connects to an upstream host.
 type Handler interface {
-	// GetDevAddrPrefixes returns the DevAddr prefixes for this upstream handler.
-	GetDevAddrPrefixes() []types.DevAddrPrefix
+	// DevAddrPrefixes returns the DevAddr prefixes for this upstream handler.
+	DevAddrPrefixes() []types.DevAddrPrefix
 	// Setup performs all the preparation necessary to connect the handler to a particular upstream host.
 	Setup(context.Context) error
 	// ConnectGateway informs the upstream handler that a particular gateway is connected to the frontend.

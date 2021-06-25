@@ -23,10 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var (
-	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "identifiers already exists")
-)
-
 // DeviceRegistry is a store for end devices.
 type DeviceRegistry interface {
 	// Get returns the end device by its identifiers.

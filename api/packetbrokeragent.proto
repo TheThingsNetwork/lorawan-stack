@@ -17,9 +17,13 @@ syntax = "proto3";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 import "lorawan-stack/api/contact_info.proto";
+import "lorawan-stack/api/gateway.proto";
 import "lorawan-stack/api/end_device.proto";
 import "lorawan-stack/api/messages.proto";
 
@@ -30,6 +34,39 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 // The GsPba service connects a Gateway Server to a Packet Broker Agent.
 service GsPba {
   rpc PublishUplink(GatewayUplinkMessage) returns (google.protobuf.Empty);
+
+  // Update the gateway, changing the fields specified by the field mask to the provided values.
+  // To mark a gateway as online, call this rpc setting online to true, include status_public in field_mask and
+  // keep calling this rpc before the returned online_ttl passes to keep the gateway online.
+  rpc UpdateGateway(UpdatePacketBrokerGatewayRequest) returns (UpdatePacketBrokerGatewayResponse);
+}
+
+message UpdatePacketBrokerGatewayRequest {
+  Gateway gateway = 1 [(validate.rules).message.required = true];
+  bool online = 2;
+	// Received packets rate (number of packets per hour).
+	// This field gets updated when a value is set.
+  google.protobuf.FloatValue rx_rate = 3;
+	// Transmitted packets rate (number of packets per hour).
+	// This field gets updated when a value is set.
+  google.protobuf.FloatValue tx_rate = 4;
+
+  // The names of the gateway fields that are considered for update.
+  // Supported values are: antennas, contact_info, frequency_plan_id, frequency_plan_ids, ids, status_public and
+  // location_public.
+  //
+  // Online status is only updated if status_public is set. If status_public is set and false, the status will be reset.
+  // If status_public is set and true, the online status is taken from the online field. The return message contains
+  // the duration online_ttl for how long the gateway is considered online.
+  //
+  // Location is only updated if location_public is set. If location_public is set and false, the location will be reset.
+  // If location_public is set and true, the first antenna location will be used as gateway location.
+  google.protobuf.FieldMask field_mask = 5;
+}
+
+message UpdatePacketBrokerGatewayResponse {
+  // Time to live of the online status.
+  google.protobuf.Duration online_ttl = 1;
 }
 
 // The NsPba service connects a Network Server to a Packet Broker Agent.

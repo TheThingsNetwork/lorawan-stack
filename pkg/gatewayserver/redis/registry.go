@@ -18,6 +18,8 @@ import (
 	"context"
 	"runtime/trace"
 
+	"github.com/go-redis/redis/v8"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -33,18 +35,29 @@ func (r *GatewayConnectionStatsRegistry) key(uid string) string {
 }
 
 // Set sets or clears the connection stats for a gateway.
-func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats) error {
+func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats, paths []string) error {
 	uid := unique.ID(ctx, ids)
 
 	defer trace.StartRegion(ctx, "set gateway connection stats").End()
 
+	uk := r.key(uid)
 	var err error
 	if stats == nil {
-		err = r.Redis.Del(ctx, r.key(uid)).Err()
+		err = r.Redis.Del(ctx, uk).Err()
 	} else {
-		_, err = ttnredis.SetProto(ctx, r.Redis, r.key(uid), stats, 0)
-	}
+		err = r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+			pb := &ttnpb.GatewayConnectionStats{}
+			if err := ttnredis.GetProto(ctx, tx, uk).ScanProto(pb); err != nil && !errors.IsNotFound(err) {
+				return err
+			}
 
+			if err := pb.SetFields(stats, paths...); err != nil {
+				return err
+			}
+			_, err := ttnredis.SetProto(ctx, tx, uk, pb, 0)
+			return err
+		}, uk)
+	}
 	if err != nil {
 		return ttnredis.ConvertError(err)
 	}

@@ -82,7 +82,7 @@ func TestGatewayStore(t *testing.T) {
 				"baz": "qux",
 			},
 			Antennas: []ttnpb.GatewayAntenna{
-				{Gain: 3, Location: ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}},
+				{Gain: 3, Location: &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}},
 			},
 			ScheduleAnytimeDelay:     &scheduleAnytimeDelay,
 			UpdateLocationFromStatus: true,
@@ -158,8 +158,8 @@ func TestGatewayStore(t *testing.T) {
 				"qux": "foo",
 			},
 			Antennas: []ttnpb.GatewayAntenna{
-				{Gain: 6, Location: ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "west"}},
-				{Gain: 6, Location: ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "east"}},
+				{Gain: 6, Location: &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "west"}},
+				{Gain: 6, Location: &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "east"}},
 			},
 			ScheduleAnytimeDelay:     nil,
 			UpdateLocationFromStatus: false,
@@ -225,7 +225,7 @@ func TestGatewayStore(t *testing.T) {
 		_, _ = store.UpdateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 			Antennas: []ttnpb.GatewayAntenna{
-				{Gain: 6, Location: ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "west"}},
+				{Gain: 6, Location: &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1}, Attributes: map[string]string{"direction": "west"}},
 			},
 		}, &pbtypes.FieldMask{Paths: []string{"antennas"}})
 

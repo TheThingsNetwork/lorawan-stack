@@ -4414,6 +4414,21 @@
     "PublishUplink": {
       "file": "lorawan-stack/api/packetbrokeragent.proto",
       "http": []
+    },
+    "UpdateGateway": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [],
+      "allowedFieldMaskPaths": [
+        "antennas",
+        "contact_info",
+        "frequency_plan_id",
+        "frequency_plan_ids",
+        "ids",
+        "ids.eui",
+        "ids.gateway_id",
+        "location_public",
+        "status_public"
+      ]
     }
   },
   "NsPba": {

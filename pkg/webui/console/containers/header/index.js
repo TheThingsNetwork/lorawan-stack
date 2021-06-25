@@ -31,6 +31,7 @@ import {
   mayViewOrganizationsOfUser,
   mayManageUsers,
   mayViewOrEditApiKeys,
+  mayConfigurePacketBroker,
 } from '@console/lib/feature-checks'
 
 import { logout } from '@console/store/actions/user'
@@ -161,6 +162,13 @@ class Header extends Component {
             path="/user/api-keys"
           />
         )}
+        {mayConfigurePacketBroker && (
+          <Dropdown.Item
+            title={sharedMessages.packetBroker}
+            icon="packet_broker"
+            path="/admin/packet-broker"
+          />
+        )}
         <Dropdown.Item title={sharedMessages.logout} icon="logout" action={handleLogout} />
       </React.Fragment>
     )
@@ -185,6 +193,13 @@ class Header extends Component {
             title={sharedMessages.personalApiKeys}
             icon="api_keys"
             path="/user/api-keys"
+          />
+        )}
+        {mayConfigurePacketBroker && (
+          <Dropdown.Item
+            title={sharedMessages.packetBroker}
+            icon="packet_broker"
+            path="/admin/packet-broker"
           />
         )}
       </React.Fragment>

@@ -43,9 +43,12 @@ describe('Gateway location create', () => {
 
     cy.findByText('Location', { selector: 'h1' }).should('be.visible')
     cy.findByText('Gateway antenna location settings', { selector: 'h3' }).should('be.visible')
-    cy.findByLabelText('Privacy').should('exist')
-    cy.findDescriptionByLabelText('Privacy')
-      .should('contain', 'The location of this gateway may be publicly displayed')
+    cy.findByLabelText('Location privacy').should('exist')
+    cy.findDescriptionByLabelText('Location privacy')
+      .should(
+        'contain',
+        'The location of this gateway may be visible to other users and on public gateway maps',
+      )
       .and('be.visible')
     cy.findByLabelText('Location source').should('exist')
     cy.findDescriptionByLabelText('Location source')

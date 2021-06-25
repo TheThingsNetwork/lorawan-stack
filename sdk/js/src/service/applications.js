@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -158,6 +158,14 @@ class Applications {
   async deleteById(applicationId) {
     const response = await this._api.ApplicationRegistry.Delete({
       routeParams: { application_id: applicationId },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
+  async purgeById(id) {
+    const response = await this._api.ApplicationRegistry.Purge({
+      routeParams: { application_id: id },
     })
 
     return Marshaler.payloadSingleResponse(response)

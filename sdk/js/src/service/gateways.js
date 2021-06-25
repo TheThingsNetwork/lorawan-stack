@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -64,8 +64,14 @@ class Gateways {
     if (paths.includes('location_public') && !Boolean(gateway.location_public)) {
       gateway.location_public = false
     }
+    if (paths.includes('status_public') && !Boolean(gateway.status_public)) {
+      gateway.status_public = false
+    }
     if (paths.includes('auto_update') && !Boolean(gateway.auto_update)) {
       gateway.auto_update = false
+    }
+    if (paths.includes('schedule_downlink_late') && !Boolean(gateway.schedule_downlink_late)) {
+      gateway.schedule_downlink_late = false
     }
     if (
       paths.includes('require_authenticated_connection') &&
@@ -158,6 +164,14 @@ class Gateways {
 
   async deleteById(id) {
     const response = await this._api.GatewayRegistry.Delete({
+      routeParams: { gateway_id: id },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
+  async purgeById(id) {
+    const response = await this._api.GatewayRegistry.Purge({
       routeParams: { gateway_id: id },
     })
 

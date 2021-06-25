@@ -16,7 +16,7 @@ import React from 'react'
 import classnames from 'classnames'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import tooltipIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import style from '../repository.styl'
 import { useRepositoryContext } from '../context'

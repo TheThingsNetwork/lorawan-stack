@@ -299,3 +299,8 @@ docker_manifests:
       - ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}-amd64
       - ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}-arm64
       - ghcr.io/thethingsnetwork/lorawan-stack:{{ .Version }}-armv7
+
+signs:
+  - artifacts: checksum
+    args: ["--pinentry-mode=loopback", "--no-tty", "--passphrase-fd", "0", "--batch", "--output", "${signature}", "--detach-sign", "-u", "{{ .Env.SIGN_KEY_NAME }}", "${artifact}"]
+    stdin_file: /tmp/gpg_passphrase

@@ -41,7 +41,7 @@ const mapStateToProps = (state, props) => {
   const apiKeysTotalCount = selectApiKeysTotalCount(state)
   const apiKeysFetching = selectApiKeysFetching(state)
   const apiKeysError = selectApiKeysError(state)
-  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state, { id: props.appId })
+  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state)
   const collaboratorsFetching = selectCollaboratorsFetching(state)
   const collaboratorsError = selectCollaboratorsError(state)
 

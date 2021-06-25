@@ -58,6 +58,7 @@ const hardcoded = {
   logout: 'power_settings_new',
   organization: 'people',
   overview: 'dashboard',
+  packet_broker: 'camera',
   payload_formats: 'code',
   settings: 'tune',
   sort_order_asc: 'arrow_drop_down',
