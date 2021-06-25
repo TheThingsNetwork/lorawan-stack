@@ -68,7 +68,7 @@ service EndDeviceRegistry {
     };
   };
 
-  // Update the OAuth client, changing the fields specified by the field mask to the provided values.
+  // Update the end device, changing the fields specified by the field mask to the provided values.
   rpc Update(UpdateEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       put: "/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}"
