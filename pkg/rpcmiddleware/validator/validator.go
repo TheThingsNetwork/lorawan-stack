@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -86,7 +87,7 @@ func convertError(err error) error {
 	if ttnErr, ok := errors.From(err); ok {
 		return ttnErr
 	}
-	return grpc.Errorf(codes.InvalidArgument, err.Error())
+	return status.Errorf(codes.InvalidArgument, err.Error())
 }
 
 var (
@@ -95,12 +96,21 @@ var (
 )
 
 func validateMessage(ctx context.Context, fullMethod string, msg interface{}) error {
-	if v, ok := msg.(interface {
+	var paths []string
+	switch v := msg.(type) {
+	case interface {
+		GetFieldMask() *types.FieldMask
+	}:
+		paths = v.GetFieldMask().GetPaths()
+	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/2798)
+	case interface {
 		GetFieldMask() types.FieldMask
-	}); ok {
+	}:
+		paths = v.GetFieldMask().Paths
+	}
+	if len(paths) > 0 {
 		region := trace.StartRegion(ctx, "validate field mask")
 
-		paths := v.GetFieldMask().Paths
 		if forbiddenPaths := forbiddenPaths(paths, allowedFieldMaskPaths[fullMethod]); len(forbiddenPaths) > 0 {
 			region.End()
 			return errForbiddenFieldMaskPaths.WithAttributes("forbidden_paths", forbiddenPaths)
