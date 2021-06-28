@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -26,10 +27,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-func removeDeprecatedPaths(ctx context.Context, paths []string) []string {
-	validPaths := make([]string, 0, len(paths))
+func removeDeprecatedPaths(ctx context.Context, fieldMask *pbtypes.FieldMask) *pbtypes.FieldMask {
+	validPaths := make([]string, 0, len(fieldMask.GetPaths()))
 nextPath:
-	for _, path := range paths {
+	for _, path := range fieldMask.GetPaths() {
 		for _, deprecated := range []string{
 			"api_key",
 			"network_server_address",
@@ -41,7 +42,9 @@ nextPath:
 			validPaths = append(validPaths, path)
 		}
 	}
-	return validPaths
+	return &pbtypes.FieldMask{
+		Paths: validPaths,
+	}
 }
 
 // getLink calls the underlying link registry in order to retrieve the link.
@@ -61,7 +64,7 @@ func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicat
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = removeDeprecatedPaths(ctx, req.FieldMask.Paths)
+	req.FieldMask = removeDeprecatedPaths(ctx, req.FieldMask)
 	return as.linkRegistry.Get(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths)
 }
 
@@ -84,7 +87,7 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = removeDeprecatedPaths(ctx, req.FieldMask.Paths)
+	req.FieldMask = removeDeprecatedPaths(ctx, req.FieldMask)
 	return as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, ttnpb.ApplicationLinkFieldPathsTopLevel,
 		func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 			return &req.ApplicationLink, req.FieldMask.Paths, nil

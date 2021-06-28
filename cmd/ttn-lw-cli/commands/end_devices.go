@@ -259,7 +259,7 @@ var (
 			)
 			req.Limit, req.Page, opt, getTotal = withPagination(cmd.Flags())
 			req.ApplicationIdentifiers = *appID
-			req.FieldMask.Paths = paths
+			req.FieldMask = &pbtypes.FieldMask{Paths: paths}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
