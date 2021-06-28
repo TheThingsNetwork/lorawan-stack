@@ -81,10 +81,10 @@ func (app Application) toPB(pb *ttnpb.Application, fieldMask *pbtypes.FieldMask)
 	pb.CreatedAt = cleanTime(app.CreatedAt)
 	pb.UpdatedAt = cleanTime(app.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(app.DeletedAt)
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultApplicationFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask.GetPaths() {
 		if setter, ok := applicationPBSetters[path]; ok {
 			setter(pb, &app)
 		}
@@ -92,10 +92,10 @@ func (app Application) toPB(pb *ttnpb.Application, fieldMask *pbtypes.FieldMask)
 }
 
 func (app *Application) fromPB(pb *ttnpb.Application, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultApplicationFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask.GetPaths() {
 		if setter, ok := applicationModelSetters[path]; ok {
 			setter(app, pb)
 			if columnNames, ok := applicationColumnNames[path]; ok {

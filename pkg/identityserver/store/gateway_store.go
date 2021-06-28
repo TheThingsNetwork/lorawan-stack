@@ -38,7 +38,7 @@ type gatewayStore struct {
 
 // selectGatewayFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.FieldMask) *gorm.DB {
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		return query.Preload("Attributes").Preload("Antennas")
 	}
 	var gatewayColumns []string

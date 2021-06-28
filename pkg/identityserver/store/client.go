@@ -120,7 +120,7 @@ func (cli Client) toPB(pb *ttnpb.Client, fieldMask *pbtypes.FieldMask) {
 	pb.CreatedAt = cleanTime(cli.CreatedAt)
 	pb.UpdatedAt = cleanTime(cli.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(cli.DeletedAt)
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultClientFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -131,7 +131,7 @@ func (cli Client) toPB(pb *ttnpb.Client, fieldMask *pbtypes.FieldMask) {
 }
 
 func (cli *Client) fromPB(pb *ttnpb.Client, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultClientFieldMask
 	}
 	for _, path := range fieldMask.Paths {

@@ -81,7 +81,7 @@ func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMas
 	pb.CreatedAt = cleanTime(org.CreatedAt)
 	pb.UpdatedAt = cleanTime(org.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(org.DeletedAt)
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultOrganizationFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -92,7 +92,7 @@ func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMas
 }
 
 func (org *Organization) fromPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultOrganizationFieldMask
 	}
 	for _, path := range fieldMask.Paths {

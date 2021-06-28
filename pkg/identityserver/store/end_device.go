@@ -191,7 +191,7 @@ func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) {
 	pb.EndDeviceIdentifiers.DevEui = dev.DevEUI.toPB()   // Always present.
 	pb.CreatedAt = cleanTime(dev.CreatedAt)
 	pb.UpdatedAt = cleanTime(dev.UpdatedAt)
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultEndDeviceFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -202,7 +202,7 @@ func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) {
 }
 
 func (dev *EndDevice) fromPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultEndDeviceFieldMask
 	}
 	for _, path := range fieldMask.Paths {

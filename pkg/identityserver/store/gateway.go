@@ -316,7 +316,7 @@ func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {
 	pb.CreatedAt = cleanTime(gtw.CreatedAt)
 	pb.UpdatedAt = cleanTime(gtw.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(gtw.DeletedAt)
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultGatewayFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -327,7 +327,7 @@ func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {
 }
 
 func (gtw *Gateway) fromPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultGatewayFieldMask
 	}
 	for _, path := range fieldMask.Paths {

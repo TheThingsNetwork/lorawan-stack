@@ -175,7 +175,7 @@ func (usr User) toPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) {
 	pb.CreatedAt = cleanTime(usr.CreatedAt)
 	pb.UpdatedAt = cleanTime(usr.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(usr.DeletedAt)
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultUserFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -186,7 +186,7 @@ func (usr User) toPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) {
 }
 
 func (usr *User) fromPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultUserFieldMask
 	}
 	for _, path := range fieldMask.Paths {

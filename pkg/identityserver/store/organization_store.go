@@ -38,7 +38,7 @@ type organizationStore struct {
 
 // selectOrganizationFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.FieldMask) *gorm.DB {
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		return query.Preload("Attributes").Select([]string{"accounts.uid", "organizations.*"})
 	}
 	var organizationColumns []string

@@ -38,7 +38,7 @@ type userStore struct {
 
 // selectUserFields selects relevant fields (based on fieldMask) and preloads details if needed.
 func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.FieldMask) *gorm.DB {
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		return query.Preload("Attributes").Preload("ProfilePicture").Select([]string{"accounts.uid", "users.*"})
 	}
 	var userColumns []string
