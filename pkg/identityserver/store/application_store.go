@@ -21,7 +21,7 @@ import (
 	"runtime/trace"
 	"strings"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -37,13 +37,13 @@ type applicationStore struct {
 }
 
 // selectApplicationFields selects relevant fields (based on fieldMask) and preloads details if needed.
-func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.FieldMask) *gorm.DB {
+	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
 		return query.Preload("Attributes")
 	}
 	var applicationColumns []string
 	var notFoundPaths []string
-	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
+	for _, path := range ttnpb.TopLevelFields(fieldMask.GetPaths()) {
 		switch path {
 		case "ids", "created_at", "updated_at", "deleted_at":
 			// always selected
@@ -77,7 +77,7 @@ func (s *applicationStore) CreateApplication(ctx context.Context, app *ttnpb.App
 	return &appProto, nil
 }
 
-func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.Application, error) {
+func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.ApplicationIdentifiers, fieldMask *pbtypes.FieldMask) ([]*ttnpb.Application, error) {
 	defer trace.StartRegion(ctx, "find applications").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
@@ -105,7 +105,7 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 	return appProtos, nil
 }
 
-func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Application, error) {
+func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, fieldMask *pbtypes.FieldMask) (*ttnpb.Application, error) {
 	defer trace.StartRegion(ctx, "get application").End()
 	query := s.query(ctx, Application{}, withApplicationID(id.GetApplicationId()))
 	query = selectApplicationFields(ctx, query, fieldMask)
@@ -121,7 +121,7 @@ func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.Applica
 	return appProto, nil
 }
 
-func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.Application, fieldMask *types.FieldMask) (updated *ttnpb.Application, err error) {
+func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.Application, fieldMask *pbtypes.FieldMask) (updated *ttnpb.Application, err error) {
 	defer trace.StartRegion(ctx, "update application").End()
 	query := s.query(ctx, Application{}, withApplicationID(app.GetApplicationId()))
 	query = selectApplicationFields(ctx, query, fieldMask)

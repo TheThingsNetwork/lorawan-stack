@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -163,7 +163,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIdentifiers.GetEntityIdentifiers(), &req.APIKey, &req.FieldMask)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIdentifiers.GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
 		return err
 	})
 	if err != nil {
@@ -219,7 +219,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	if is.IsAdmin(ctx) {
 		canSkipEmail = true // Admin callers can skip sending emails.
 		err := is.withDatabase(ctx, func(db *gorm.DB) error {
-			usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, &types.FieldMask{Paths: []string{"admin"}})
+			usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, &pbtypes.FieldMask{Paths: []string{"admin"}})
 			if !usr.Admin {
 				canReturnToken = true // Admin callers can get login tokens for non-admin users.
 			}

@@ -110,6 +110,10 @@ var (
 				UserIds:   *usrID,
 				ClientIds: *cliID,
 			})
+			if err != nil {
+				return err
+			}
+
 			for _, token := range res.Tokens {
 				_, err = ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
 					UserIds:   *usrID,

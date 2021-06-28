@@ -507,7 +507,7 @@ func TestApplicationServer(t *testing.T) {
 							Topic: "up.service.data",
 						},
 					},
-					FieldMask: pbtypes.FieldMask{
+					FieldMask: &pbtypes.FieldMask{
 						Paths: []string{
 							"base_topic",
 							"downlink_ack",
@@ -651,7 +651,7 @@ func TestApplicationServer(t *testing.T) {
 							Topic: "up/service/data",
 						},
 					},
-					FieldMask: pbtypes.FieldMask{
+					FieldMask: &pbtypes.FieldMask{
 						Paths: []string{
 							"base_topic",
 							"downlink_ack",
@@ -775,7 +775,7 @@ func TestApplicationServer(t *testing.T) {
 						LocationSolved:                &ttnpb.ApplicationWebhook_Message{Path: ""},
 						ServiceData:                   &ttnpb.ApplicationWebhook_Message{Path: ""},
 					},
-					FieldMask: pbtypes.FieldMask{
+					FieldMask: &pbtypes.FieldMask{
 						Paths: []string{
 							"base_url",
 							"format",

@@ -15,7 +15,7 @@
 package store
 
 import (
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -56,7 +56,7 @@ var applicationModelSetters = map[string]func(*Application, *ttnpb.Application){
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
-var defaultApplicationFieldMask = &types.FieldMask{}
+var defaultApplicationFieldMask = &pbtypes.FieldMask{}
 
 func init() {
 	paths := make([]string, 0, len(applicationPBSetters))
@@ -76,12 +76,12 @@ var applicationColumnNames = map[string][]string{
 	descriptionField: {descriptionField},
 }
 
-func (app Application) toPB(pb *ttnpb.Application, fieldMask *types.FieldMask) {
+func (app Application) toPB(pb *ttnpb.Application, fieldMask *pbtypes.FieldMask) {
 	pb.ApplicationIdentifiers.ApplicationId = app.ApplicationID
 	pb.CreatedAt = cleanTime(app.CreatedAt)
 	pb.UpdatedAt = cleanTime(app.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(app.DeletedAt)
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultApplicationFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -91,8 +91,8 @@ func (app Application) toPB(pb *ttnpb.Application, fieldMask *types.FieldMask) {
 	}
 }
 
-func (app *Application) fromPB(pb *ttnpb.Application, fieldMask *types.FieldMask) (columns []string) {
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+func (app *Application) fromPB(pb *ttnpb.Application, fieldMask *pbtypes.FieldMask) (columns []string) {
+	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultApplicationFieldMask
 	}
 	for _, path := range fieldMask.Paths {

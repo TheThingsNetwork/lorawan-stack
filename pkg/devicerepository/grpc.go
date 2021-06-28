@@ -72,7 +72,7 @@ func (dr *DeviceRepository) ListBrands(ctx context.Context, req *ttnpb.ListEndDe
 		Limit:   req.Limit,
 		Page:    req.Page,
 		OrderBy: req.OrderBy,
-		Paths:   withDefaultBrandFields(req.FieldMask.Paths),
+		Paths:   withDefaultBrandFields(req.FieldMask.GetPaths()),
 		Search:  req.Search,
 	})
 	if err != nil {
@@ -96,7 +96,7 @@ func (dr *DeviceRepository) GetBrand(ctx context.Context, req *ttnpb.GetEndDevic
 	}
 	response, err := dr.store.GetBrands(store.GetBrandsRequest{
 		BrandID: req.BrandID,
-		Paths:   withDefaultBrandFields(req.FieldMask.Paths),
+		Paths:   withDefaultBrandFields(req.FieldMask.GetPaths()),
 		Limit:   1,
 	})
 	if err != nil {
@@ -122,7 +122,7 @@ func (dr *DeviceRepository) ListModels(ctx context.Context, req *ttnpb.ListEndDe
 		BrandID: req.BrandID,
 		Limit:   req.Limit,
 		Page:    req.Page,
-		Paths:   withDefaultModelFields(req.FieldMask.Paths),
+		Paths:   withDefaultModelFields(req.FieldMask.GetPaths()),
 		Search:  req.Search,
 		OrderBy: req.OrderBy,
 	})
@@ -147,7 +147,7 @@ func (dr *DeviceRepository) GetModel(ctx context.Context, req *ttnpb.GetEndDevic
 		BrandID: req.BrandID,
 		ModelID: req.ModelID,
 		Limit:   1,
-		Paths:   withDefaultModelFields(req.FieldMask.Paths),
+		Paths:   withDefaultModelFields(req.FieldMask.GetPaths()),
 	})
 	if err != nil {
 		return nil, err

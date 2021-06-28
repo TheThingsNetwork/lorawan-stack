@@ -18,7 +18,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -86,7 +86,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 				logger.WithField("paths", jsPaths).Debug("Get end device from Join Server")
 				jsRes, err := ttnpb.NewJsEndDeviceRegistryClient(js).Get(ctx, &ttnpb.GetEndDeviceRequest{
 					EndDeviceIdentifiers: ids,
-					FieldMask:            types.FieldMask{Paths: jsPaths},
+					FieldMask:            &pbtypes.FieldMask{Paths: jsPaths},
 				})
 				if err != nil {
 					if !continueOnError {
@@ -120,7 +120,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 				logger.WithField("paths", asPaths).Debug("Get end device from Application Server")
 				asRes, err := ttnpb.NewAsEndDeviceRegistryClient(as).Get(ctx, &ttnpb.GetEndDeviceRequest{
 					EndDeviceIdentifiers: ids,
-					FieldMask:            types.FieldMask{Paths: asPaths},
+					FieldMask:            &pbtypes.FieldMask{Paths: asPaths},
 				})
 				if err != nil {
 					if !continueOnError {
@@ -154,7 +154,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 				logger.WithField("paths", nsPaths).Debug("Get end device from Network Server")
 				nsRes, err := ttnpb.NewNsEndDeviceRegistryClient(ns).Get(ctx, &ttnpb.GetEndDeviceRequest{
 					EndDeviceIdentifiers: ids,
-					FieldMask:            types.FieldMask{Paths: nsPaths},
+					FieldMask:            &pbtypes.FieldMask{Paths: nsPaths},
 				})
 				if err != nil {
 					if !continueOnError {
@@ -192,7 +192,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		isDevice.SetFields(device, append(ttnpb.ExcludeFields(isPaths, unsetPaths...), "ids")...)
 		isRes, err := ttnpb.NewEndDeviceRegistryClient(is).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 			EndDevice: isDevice,
-			FieldMask: types.FieldMask{Paths: isPaths},
+			FieldMask: &pbtypes.FieldMask{Paths: isPaths},
 		})
 		if err != nil {
 			return nil, err
@@ -218,7 +218,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		jsDevice.SetFields(device, append(ttnpb.ExcludeFields(jsPaths, unsetPaths...), "ids")...)
 		jsRes, err := ttnpb.NewJsEndDeviceRegistryClient(js).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: jsDevice,
-			FieldMask: types.FieldMask{Paths: jsPaths},
+			FieldMask: &pbtypes.FieldMask{Paths: jsPaths},
 		})
 		if err != nil {
 			return nil, err
@@ -244,7 +244,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		nsDevice.SetFields(device, append(ttnpb.ExcludeFields(nsPaths, unsetPaths...), "ids")...)
 		nsRes, err := ttnpb.NewNsEndDeviceRegistryClient(ns).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: nsDevice,
-			FieldMask: types.FieldMask{Paths: nsPaths},
+			FieldMask: &pbtypes.FieldMask{Paths: nsPaths},
 		})
 		if err != nil {
 			return nil, err
@@ -270,7 +270,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		asDevice.SetFields(device, append(ttnpb.ExcludeFields(asPaths, unsetPaths...), "ids")...)
 		asRes, err := ttnpb.NewAsEndDeviceRegistryClient(as).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: asDevice,
-			FieldMask: types.FieldMask{Paths: asPaths},
+			FieldMask: &pbtypes.FieldMask{Paths: asPaths},
 		})
 		if err != nil {
 			return nil, err

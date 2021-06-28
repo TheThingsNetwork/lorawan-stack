@@ -63,7 +63,7 @@ func (f *endDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifie
 
 	return ttnpb.NewEndDeviceRegistryClient(cc).Get(ctx, &ttnpb.GetEndDeviceRequest{
 		EndDeviceIdentifiers: ids,
-		FieldMask: pbtypes.FieldMask{
+		FieldMask: &pbtypes.FieldMask{
 			Paths: fieldMaskPaths,
 		},
 	}, f.c.WithClusterAuth())

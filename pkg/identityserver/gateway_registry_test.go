@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	ptypes "github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -73,7 +73,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 
 		_, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"},
-			FieldMask:          ptypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:          &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -81,7 +81,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 		}
 
 		listRes, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			FieldMask: ptypes.FieldMask{Paths: []string{"name"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		a.So(err, should.BeNil)
@@ -91,7 +91,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 
 		_, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
-			FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -103,7 +103,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"},
 				Name:               "Updated Name",
 			},
-			FieldMask: ptypes.FieldMask{Paths: []string{"name"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -163,7 +163,7 @@ func TestGatewaysCRUD(t *testing.T) {
 
 		got, err := reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:          &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -200,14 +200,14 @@ func TestGatewaysCRUD(t *testing.T) {
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"ids"}},
+			FieldMask:          &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"attributes"}},
+			FieldMask:          &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
 
 		if a.So(err, should.NotBeNil) {
@@ -219,7 +219,7 @@ func TestGatewaysCRUD(t *testing.T) {
 				GatewayIdentifiers: created.GatewayIdentifiers,
 				Name:               "Updated Name",
 			},
-			FieldMask: ptypes.FieldMask{Paths: []string{"name"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -229,7 +229,7 @@ func TestGatewaysCRUD(t *testing.T) {
 
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
-				FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
+				FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 				Collaborator: collaborator,
 			}, creds)
 
@@ -262,7 +262,7 @@ func TestGatewaysPagination(t *testing.T) {
 		reg := ttnpb.NewGatewayRegistryClient(cc)
 
 		list, err := reg.List(test.Context(), &ttnpb.ListGatewaysRequest{
-			FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
@@ -274,7 +274,7 @@ func TestGatewaysPagination(t *testing.T) {
 		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListGatewaysRequest{
-			FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         2,
@@ -286,7 +286,7 @@ func TestGatewaysPagination(t *testing.T) {
 		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListGatewaysRequest{
-			FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         3,
@@ -389,7 +389,7 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		got, err := reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: createdWithoutEncKey.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}},
+			FieldMask:          &pbtypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -434,7 +434,7 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}},
+			FieldMask:          &pbtypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -454,7 +454,7 @@ func TestGatewaysSecrets(t *testing.T) {
 		// Check that `claim_authentication_code` can only be updated/retrieved as a whole.
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"claim_authentication_code.valid_from"}},
+			FieldMask:          &pbtypes.FieldMask{Paths: []string{"claim_authentication_code.valid_from"}},
 		}, creds)
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -465,7 +465,7 @@ func TestGatewaysSecrets(t *testing.T) {
 				GatewayIdentifiers:      created.GatewayIdentifiers,
 				ClaimAuthenticationCode: &otherGtwClaimAuthCode,
 			},
-			FieldMask: ptypes.FieldMask{Paths: []string{"claim_authentication_code.secret"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"claim_authentication_code.secret"}},
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(cacUpdated, should.NotBeNil)
@@ -482,7 +482,7 @@ func TestGatewaysSecrets(t *testing.T) {
 					ValidTo:   &validTo,
 				},
 			},
-			FieldMask: ptypes.FieldMask{Paths: []string{"claim_authentication_code"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"claim_authentication_code"}},
 		}, creds)
 		a.So(err, should.NotBeNil)
 		a.So(cacWithoutSecret, should.BeNil)
@@ -500,7 +500,7 @@ func TestGatewaysSecrets(t *testing.T) {
 					ValidTo:   &validTo,
 				},
 			},
-			FieldMask: ptypes.FieldMask{Paths: []string{"claim_authentication_code"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"claim_authentication_code"}},
 		}, creds)
 		a.So(err, should.NotBeNil)
 		a.So(cacWithoutInvalidTime, should.BeNil)
@@ -532,14 +532,14 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"ids"}},
+			FieldMask:          &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"lbs_lns_secret"}},
+			FieldMask:          &pbtypes.FieldMask{Paths: []string{"lbs_lns_secret"}},
 		}, credsWithoutRights)
 
 		if a.So(err, should.NotBeNil) {
@@ -548,7 +548,7 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"claim_authentication_code"}},
+			FieldMask:          &pbtypes.FieldMask{Paths: []string{"claim_authentication_code"}},
 		}, credsWithoutRights)
 
 		if a.So(err, should.NotBeNil) {
@@ -567,7 +567,7 @@ func TestGatewaysSecrets(t *testing.T) {
 					Value: []byte("my new secret value"),
 				},
 			},
-			FieldMask: ptypes.FieldMask{Paths: []string{"lbs_lns_secret", "claim_authentication_code", "target_cups_key", "target_cups_uri"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"lbs_lns_secret", "claim_authentication_code", "target_cups_key", "target_cups_uri"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -578,7 +578,7 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
-			FieldMask:          ptypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code", "target_cups_key", "target_cups_uri"}},
+			FieldMask:          &pbtypes.FieldMask{Paths: []string{"name", "lbs_lns_secret", "claim_authentication_code", "target_cups_key", "target_cups_uri"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -602,7 +602,7 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{userID.OrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
-				FieldMask:    ptypes.FieldMask{Paths: []string{"lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}},
+				FieldMask:    &pbtypes.FieldMask{Paths: []string{"lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}},
 				Collaborator: collaborator,
 			}, creds)
 			a.So(err, should.BeNil)

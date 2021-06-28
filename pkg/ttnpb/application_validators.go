@@ -28,10 +28,10 @@ func (req *GetApplicationRequest) ValidateContext(context.Context) error {
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (m *UpdateApplicationRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
+	if len(m.FieldMask.GetPaths()) == 0 {
 		return m.ValidateFields()
 	}
-	return m.ValidateFields(append(FieldsWithPrefix("application", m.FieldMask.Paths...),
+	return m.ValidateFields(append(FieldsWithPrefix("application", m.FieldMask.GetPaths()...),
 		"application.ids",
 	)...)
 }

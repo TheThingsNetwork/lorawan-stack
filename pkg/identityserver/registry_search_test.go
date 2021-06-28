@@ -17,7 +17,7 @@ package identityserver
 import (
 	"testing"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -36,7 +36,7 @@ func TestRegistrySearch(t *testing.T) {
 
 		apps, err := cli.SearchApplications(ctx, &ttnpb.SearchApplicationsRequest{
 			DescriptionContains: "random",
-			FieldMask:           types.FieldMask{Paths: []string{"ids"}},
+			FieldMask:           &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -46,7 +46,7 @@ func TestRegistrySearch(t *testing.T) {
 
 		clis, err := cli.SearchClients(ctx, &ttnpb.SearchClientsRequest{
 			DescriptionContains: "random",
-			FieldMask:           types.FieldMask{Paths: []string{"ids"}},
+			FieldMask:           &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -56,7 +56,7 @@ func TestRegistrySearch(t *testing.T) {
 
 		gtws, err := cli.SearchGateways(ctx, &ttnpb.SearchGatewaysRequest{
 			DescriptionContains: "random",
-			FieldMask:           types.FieldMask{Paths: []string{"ids"}},
+			FieldMask:           &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -66,7 +66,7 @@ func TestRegistrySearch(t *testing.T) {
 
 		orgs, err := cli.SearchOrganizations(ctx, &ttnpb.SearchOrganizationsRequest{
 			DescriptionContains: "random",
-			FieldMask:           types.FieldMask{Paths: []string{"ids"}},
+			FieldMask:           &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -76,7 +76,7 @@ func TestRegistrySearch(t *testing.T) {
 
 		usrs, err := cli.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
 			DescriptionContains: "random",
-			FieldMask:           types.FieldMask{Paths: []string{"ids"}},
+			FieldMask:           &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, creds)
 
 		a.So(err, should.BeNil)

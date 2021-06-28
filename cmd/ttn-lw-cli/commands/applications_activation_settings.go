@@ -18,7 +18,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -62,7 +62,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationActivationSettingRegistryClient(js).Get(ctx, &ttnpb.GetApplicationActivationSettingsRequest{
 				ApplicationIdentifiers: *appID,
-				FieldMask:              types.FieldMask{Paths: paths},
+				FieldMask:              &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -94,7 +94,7 @@ var (
 			res, err := ttnpb.NewApplicationActivationSettingRegistryClient(js).Set(ctx, &ttnpb.SetApplicationActivationSettingsRequest{
 				ApplicationIdentifiers:        *appID,
 				ApplicationActivationSettings: aas,
-				FieldMask:                     types.FieldMask{Paths: paths},
+				FieldMask:                     &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

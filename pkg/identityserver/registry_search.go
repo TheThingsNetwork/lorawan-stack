@@ -50,7 +50,7 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 	if err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, getPaths, nil)
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
@@ -78,7 +78,7 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 			return nil
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindApplications).
-		res.Applications, err = store.GetApplicationStore(db).FindApplications(ctx, ids, &req.FieldMask)
+		res.Applications, err = store.GetApplicationStore(db).FindApplications(ctx, ids, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -95,7 +95,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 	if err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, getPaths, nil)
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
@@ -123,7 +123,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 			return nil
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindClients).
-		res.Clients, err = store.GetClientStore(db).FindClients(ctx, ids, &req.FieldMask)
+		res.Clients, err = store.GetClientStore(db).FindClients(ctx, ids, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -141,12 +141,12 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 		return nil, err
 	}
 	// Backwards compatibility for frequency_plan_id field.
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_id") {
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_ids") {
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "frequency_plan_ids")
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_id") {
+		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_ids") {
+			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "frequency_plan_ids")
 		}
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, []string{"frequency_plan_id"})
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, getPaths, []string{"frequency_plan_id"})
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
@@ -174,7 +174,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 			return nil
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindGateways).
-		res.Gateways, err = store.GetGatewayStore(db).FindGateways(ctx, ids, &req.FieldMask)
+		res.Gateways, err = store.GetGatewayStore(db).FindGateways(ctx, ids, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -197,7 +197,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	if err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
@@ -225,7 +225,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 			return nil
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindOrganizations).
-		res.Organizations, err = store.GetOrganizationStore(db).FindOrganizations(ctx, ids, &req.FieldMask)
+		res.Organizations, err = store.GetOrganizationStore(db).FindOrganizations(ctx, ids, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -245,7 +245,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 	if member != nil {
 		return nil, errSearchForbidden.New()
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, getPaths, nil)
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
@@ -273,7 +273,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 			return nil
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindUsers).
-		res.Users, err = store.GetUserStore(db).FindUsers(ctx, ids, &req.FieldMask)
+		res.Users, err = store.GetUserStore(db).FindUsers(ctx, ids, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -290,7 +290,7 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 	if err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, getPaths, nil)
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -309,7 +309,7 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 			return nil
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindEndDevices).
-		res.EndDevices, err = store.GetEndDeviceStore(db).FindEndDevices(ctx, ids, &req.FieldMask)
+		res.EndDevices, err = store.GetEndDeviceStore(db).FindEndDevices(ctx, ids, req.FieldMask)
 		if err != nil {
 			return err
 		}

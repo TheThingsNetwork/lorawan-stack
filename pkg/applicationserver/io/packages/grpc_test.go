@@ -251,7 +251,7 @@ func TestAssociations(t *testing.T) {
 		a := assertions.New(t)
 		res, err := client.SetAssociation(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
 			ApplicationPackageAssociation: association,
-			FieldMask: types.FieldMask{
+			FieldMask: &types.FieldMask{
 				Paths: []string{
 					"package_name",
 					"data",
@@ -269,7 +269,7 @@ func TestAssociations(t *testing.T) {
 		a := assertions.New(t)
 		res1, err := client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
 			ApplicationPackageAssociationIdentifiers: registeredAssociationID,
-			FieldMask: types.FieldMask{
+			FieldMask: &types.FieldMask{
 				Paths: []string{
 					"package_name",
 					"data",
@@ -281,7 +281,7 @@ func TestAssociations(t *testing.T) {
 
 		res2, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
 			EndDeviceIdentifiers: registeredDeviceID,
-			FieldMask: types.FieldMask{
+			FieldMask: &types.FieldMask{
 				Paths: []string{
 					"package_name",
 					"data",
@@ -388,7 +388,7 @@ func TestAssociations(t *testing.T) {
 			}
 			res, err := client.SetAssociation(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
 				ApplicationPackageAssociation: association,
-				FieldMask: types.FieldMask{
+				FieldMask: &types.FieldMask{
 					Paths: []string{
 						"package_name",
 					},
@@ -447,7 +447,7 @@ func TestAssociations(t *testing.T) {
 						EndDeviceIdentifiers: registeredDeviceID,
 						Limit:                tc.limit,
 						Page:                 tc.page,
-						FieldMask: types.FieldMask{
+						FieldMask: &types.FieldMask{
 							Paths: []string{
 								"package_name",
 							},

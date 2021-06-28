@@ -125,7 +125,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 				Value: []byte(cupsKey.Key),
 			},
 		},
-		FieldMask: pbtypes.FieldMask{
+		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"lbs_lns_secret"},
 		},
 	}, auth)
@@ -237,7 +237,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 
 	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: *ids,
-		FieldMask:          getGatewayMask,
+		FieldMask:          &getGatewayMask,
 	}, gatewayAuth)
 	if err != nil {
 		return err
@@ -362,7 +362,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	}
 	gtw, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
 		Gateway: *gtw,
-		FieldMask: pbtypes.FieldMask{Paths: []string{
+		FieldMask: &pbtypes.FieldMask{Paths: []string{
 			"attributes",
 		}},
 	}, gatewayAuth)

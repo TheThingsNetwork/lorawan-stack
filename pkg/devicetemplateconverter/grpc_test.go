@@ -59,7 +59,7 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 							DeviceId: fmt.Sprintf("sn-%d", b),
 						},
 					},
-					FieldMask: pbtypes.FieldMask{
+					FieldMask: &pbtypes.FieldMask{
 						Paths: []string{"ids.device_id"},
 					},
 				}
@@ -108,7 +108,7 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 					DeviceId: "sn-1",
 				},
 			},
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"ids.device_id"},
 			},
 		},
@@ -118,7 +118,7 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 					DeviceId: "sn-2",
 				},
 			},
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"ids.device_id"},
 			},
 		},

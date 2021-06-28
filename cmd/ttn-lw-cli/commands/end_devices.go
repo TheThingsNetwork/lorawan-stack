@@ -88,7 +88,6 @@ func forwardDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
 }
 
 var (
-	errActivationMode               = errors.DefineInvalidArgument("activation_mode", "invalid activation mode")
 	errConflictingPaths             = errors.DefineInvalidArgument("conflicting_paths", "conflicting set and unset field mask paths")
 	errEndDeviceEUIUpdate           = errors.DefineInvalidArgument("end_device_eui_update", "end device EUIs can not be updated")
 	errEndDeviceKeysWithProvisioner = errors.DefineInvalidArgument("end_device_keys_provisioner", "end device ABP or OTAA keys cannot be set when there is a provisioner")
@@ -98,8 +97,6 @@ var (
 	errInvalidPHYVerson             = errors.DefineInvalidArgument("phy_version", "LoRaWAN PHY version is invalid")
 	errNoEndDeviceEUI               = errors.DefineInvalidArgument("no_end_device_eui", "no end device EUIs set")
 	errNoEndDeviceID                = errors.DefineInvalidArgument("no_end_device_id", "no end device ID set")
-	errQRCodeFormat                 = errors.DefineInvalidArgument("qr_code_format", "invalid QR code format")
-	errNoQRCodeTarget               = errors.DefineInvalidArgument("no_qr_code_target", "no QR code target specified")
 )
 
 func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb.EndDeviceIdentifiers, error) {
@@ -143,12 +140,6 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 		ids.DevEui = &devEUI
 	}
 	return ids, nil
-}
-
-func generateBytes(length int) []byte {
-	b := make([]byte, length)
-	random.Read(b)
-	return b
 }
 
 func generateKey() *types.AES128Key {
@@ -224,7 +215,7 @@ var (
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewEndDeviceRegistryClient(is).List(ctx, &ttnpb.ListEndDevicesRequest{
 				ApplicationIdentifiers: *appID,
-				FieldMask:              pbtypes.FieldMask{Paths: paths},
+				FieldMask:              &pbtypes.FieldMask{Paths: paths},
 				Limit:                  limit,
 				Page:                   page,
 				Order:                  getOrder(cmd.Flags()),
@@ -306,7 +297,7 @@ var (
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
-				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
+				FieldMask:            &pbtypes.FieldMask{Paths: isPaths},
 			})
 			if err != nil {
 				return err
@@ -652,7 +643,7 @@ var (
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
-				FieldMask:            pbtypes.FieldMask{Paths: ttnpb.ExcludeFields(isPaths, unsetPaths...)},
+				FieldMask:            &pbtypes.FieldMask{Paths: ttnpb.ExcludeFields(isPaths, unsetPaths...)},
 			})
 			if err != nil {
 				return err
@@ -810,7 +801,7 @@ var (
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
-				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
+				FieldMask:            &pbtypes.FieldMask{Paths: isPaths},
 			})
 			if err != nil {
 				return err
@@ -828,7 +819,7 @@ var (
 			logger.WithField("paths", nsPaths).Debug("Reset end device to factory defaults on Network Server")
 			nsDevice, err := ttnpb.NewNsEndDeviceRegistryClient(ns).ResetFactoryDefaults(ctx, &ttnpb.ResetAndGetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
-				FieldMask:            pbtypes.FieldMask{Paths: nsPaths},
+				FieldMask:            &pbtypes.FieldMask{Paths: nsPaths},
 			})
 			if err != nil {
 				return err
@@ -860,7 +851,7 @@ var (
 			}
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
-				FieldMask: pbtypes.FieldMask{Paths: []string{
+				FieldMask: &pbtypes.FieldMask{Paths: []string{
 					"network_server_address",
 					"application_server_address",
 					"join_server_address",
@@ -1070,7 +1061,7 @@ This command may take end device identifiers from stdin.`,
 				return err
 			}
 
-			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceGetPaths(format.FieldMask.Paths...)
+			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceGetPaths(format.FieldMask.GetPaths()...)
 
 			if len(nsPaths) > 0 {
 				isPaths = append(isPaths, "network_server_address")
@@ -1089,7 +1080,7 @@ This command may take end device identifiers from stdin.`,
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *ids,
-				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
+				FieldMask:            &pbtypes.FieldMask{Paths: isPaths},
 			})
 			if err != nil {
 				return err
@@ -1167,12 +1158,15 @@ This command may take end device identifiers from stdin.`,
 			}
 			dev, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"join_server_address",
 					},
 				},
 			})
+			if err != nil {
+				return err
+			}
 			if _, _, nok := compareServerAddressesEndDevice(dev, config); nok {
 				return errAddressMismatchEndDevice
 			}
@@ -1190,7 +1184,7 @@ This command may take end device identifiers from stdin.`,
 				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: *devID,
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"join_server_address",
 					},

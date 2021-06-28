@@ -28,10 +28,10 @@ func (req *ListApplicationPackageAssociationRequest) ValidateContext(context.Con
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (req *SetApplicationPackageAssociationRequest) ValidateContext(context.Context) error {
-	if len(req.FieldMask.Paths) == 0 {
+	if len(req.FieldMask.GetPaths()) == 0 {
 		return req.ValidateFields()
 	}
-	return req.ValidateFields(append(FieldsWithPrefix("association", req.FieldMask.Paths...),
+	return req.ValidateFields(append(FieldsWithPrefix("association", req.FieldMask.GetPaths()...),
 		"association.ids",
 	)...)
 }
@@ -53,10 +53,10 @@ func (req *ListApplicationPackageDefaultAssociationRequest) ValidateContext(cont
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (req *SetApplicationPackageDefaultAssociationRequest) ValidateContext(context.Context) error {
-	if len(req.FieldMask.Paths) == 0 {
+	if len(req.FieldMask.GetPaths()) == 0 {
 		return req.ValidateFields()
 	}
-	return req.ValidateFields(append(FieldsWithPrefix("default", req.FieldMask.Paths...),
+	return req.ValidateFields(append(FieldsWithPrefix("default", req.FieldMask.GetPaths()...),
 		"default.ids",
 	)...)
 }

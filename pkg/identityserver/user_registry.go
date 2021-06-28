@@ -21,7 +21,7 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -307,22 +307,22 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 }
 
 func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest) (usr *ttnpb.User, err error) {
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_INFO); err != nil {
 		if err := is.RequireAuthenticated(ctx); err != nil {
 			return nil, err
 		}
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicUserFields...) {
+		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicUserFields...) {
 			defer func() { usr = usr.PublicSafe() }()
 		} else {
 			return nil, err
 		}
 	}
 
-	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "profile_picture") {
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "profile_picture") {
 		if is.configFromContext(ctx).ProfilePicture.UseGravatar {
-			if !ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address") {
-				req.FieldMask.Paths = append(req.FieldMask.Paths, "primary_email_address")
+			if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address") {
+				req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "primary_email_address")
 				defer func() {
 					if usr != nil {
 						usr.PrimaryEmailAddress = ""
@@ -335,11 +335,11 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		usr, err = store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, &req.FieldMask)
+		usr, err = store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, req.FieldMask)
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 			usr.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, usr.UserIdentifiers)
 			if err != nil {
 				return err
@@ -354,7 +354,7 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 }
 
 func (is *IdentityServer) listUsers(ctx context.Context, req *ttnpb.ListUsersRequest) (users *ttnpb.Users, err error) {
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = is.RequireAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -371,7 +371,7 @@ func (is *IdentityServer) listUsers(ctx context.Context, req *ttnpb.ListUsersReq
 	}()
 	users = &ttnpb.Users{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		users.Users, err = store.GetUserStore(db).FindUsers(paginateCtx, nil, &req.FieldMask)
+		users.Users, err = store.GetUserStore(db).FindUsers(paginateCtx, nil, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -407,13 +407,13 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, nil, getPaths)
-	if len(req.FieldMask.Paths) == 0 {
-		req.FieldMask.Paths = updatePaths
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, nil, getPaths)
+	if len(req.FieldMask.GetPaths()) == 0 {
+		req.FieldMask = &pbtypes.FieldMask{Paths: updatePaths}
 	}
 	updatedByAdmin := is.IsAdmin(ctx)
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address") {
 		if err := validate.Email(req.User.PrimaryEmailAddress); err != nil {
 			return nil, err
 		}
@@ -436,34 +436,34 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		cleanContactInfo(req.User.ContactInfo)
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "state_description") {
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "state_description")
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
+		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state_description") {
+			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "state_description")
 			req.StateDescription = ""
 		}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "temporary_password") {
 		hashedTemporaryPassword, err := auth.Hash(ctx, req.User.TemporaryPassword)
 		if err != nil {
 			return nil, err
 		}
 		req.User.TemporaryPassword = hashedTemporaryPassword
 		now := time.Now()
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password_created_at") {
+		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "temporary_password_created_at") {
 			req.User.TemporaryPasswordCreatedAt = &now
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "temporary_password_created_at")
+			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "temporary_password_created_at")
 		}
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password_expires_at") {
+		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "temporary_password_expires_at") {
 			expires := now.Add(36 * time.Hour)
 			req.User.TemporaryPasswordExpiresAt = &expires
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "temporary_password_expires_at")
+			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "temporary_password_expires_at")
 		}
 	}
 
-	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "profile_picture") {
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "profile_picture") {
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "profile_picture")
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "profile_picture") {
+		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "profile_picture") {
+			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "profile_picture")
 		}
 		if req.User.ProfilePicture != nil {
 			if err = is.processUserProfilePicture(ctx, &req.User); err != nil {
@@ -474,9 +474,9 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		updatingContactInfo := ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info")
+		updatingContactInfo := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
 		var contactInfo []*ttnpb.ContactInfo
-		updatingPrimaryEmailAddress := ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address")
+		updatingPrimaryEmailAddress := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address")
 		if updatingContactInfo || updatingPrimaryEmailAddress {
 			if updatingContactInfo {
 				contactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, req.User.UserIdentifiers, req.ContactInfo)
@@ -491,18 +491,18 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 						return err
 					}
 				}
-				if !ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address_validated_at") {
+				if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address_validated_at") {
 					for _, contactInfo := range contactInfo {
 						if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
 							req.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
-							req.FieldMask.Paths = append(req.FieldMask.Paths, "primary_email_address_validated_at")
+							req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "primary_email_address_validated_at")
 							break
 						}
 					}
 				}
 			}
 		}
-		usr, err = store.GetUserStore(db).UpdateUser(ctx, &req.User, &req.FieldMask)
+		usr, err = store.GetUserStore(db).UpdateUser(ctx, &req.User, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -514,11 +514,11 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, req.FieldMask.GetPaths()))
 
 	// TODO: Send emails (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	// - If primary email address changed
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
 		err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 			data.SetEntity(req)
 			return &emails.EntityStateChanged{
@@ -541,19 +541,19 @@ var (
 )
 
 var (
-	updatePasswordFieldMask = &types.FieldMask{Paths: []string{
+	updatePasswordFieldMask = &pbtypes.FieldMask{Paths: []string{
 		"password", "password_updated_at", "require_password_update",
 	}}
-	temporaryPasswordFieldMask = &types.FieldMask{Paths: []string{
+	temporaryPasswordFieldMask = &pbtypes.FieldMask{Paths: []string{
 		"password", "password_updated_at", "require_password_update",
 		"temporary_password", "temporary_password_created_at", "temporary_password_expires_at",
 	}}
-	updateTemporaryPasswordFieldMask = &types.FieldMask{Paths: []string{
+	updateTemporaryPasswordFieldMask = &pbtypes.FieldMask{Paths: []string{
 		"temporary_password", "temporary_password_created_at", "temporary_password_expires_at",
 	}}
 )
 
-func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*types.Empty, error) {
+func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*pbtypes.Empty, error) {
 	if err := is.validatePasswordStrength(ctx, req.UserId, req.New); err != nil {
 		return nil, err
 	}
@@ -652,7 +652,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 
 var errTemporaryPasswordStillValid = errors.DefineInvalidArgument("temporary_password_still_valid", "previous temporary password still valid")
 
-func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*types.Empty, error) {
+func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*pbtypes.Empty, error) {
 	temporaryPassword, err := auth.GenerateKey(ctx)
 	if err != nil {
 		return nil, err
@@ -698,7 +698,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireUser(ctx, *ids, ttnpb.RIGHT_USER_DELETE); err != nil {
 		return nil, err
 	}
@@ -717,7 +717,7 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireUser(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_USER_DELETE); err != nil {
 		return nil, err
 	}
@@ -742,7 +742,7 @@ func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdenti
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeUsers
 	}
@@ -797,22 +797,22 @@ func (ur *userRegistry) Update(ctx context.Context, req *ttnpb.UpdateUserRequest
 	return ur.updateUser(ctx, req)
 }
 
-func (ur *userRegistry) UpdatePassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*types.Empty, error) {
+func (ur *userRegistry) UpdatePassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*pbtypes.Empty, error) {
 	return ur.updateUserPassword(ctx, req)
 }
 
-func (ur *userRegistry) CreateTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*types.Empty, error) {
+func (ur *userRegistry) CreateTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*pbtypes.Empty, error) {
 	return ur.createTemporaryPassword(ctx, req)
 }
 
-func (ur *userRegistry) Delete(ctx context.Context, req *ttnpb.UserIdentifiers) (*types.Empty, error) {
+func (ur *userRegistry) Delete(ctx context.Context, req *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
 	return ur.deleteUser(ctx, req)
 }
 
-func (ur *userRegistry) Restore(ctx context.Context, req *ttnpb.UserIdentifiers) (*types.Empty, error) {
+func (ur *userRegistry) Restore(ctx context.Context, req *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
 	return ur.restoreUser(ctx, req)
 }
 
-func (ur *userRegistry) Purge(ctx context.Context, req *ttnpb.UserIdentifiers) (*types.Empty, error) {
+func (ur *userRegistry) Purge(ctx context.Context, req *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
 	return ur.purgeUser(ctx, req)
 }

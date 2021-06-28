@@ -28,10 +28,10 @@ func (req *GetGatewayRequest) ValidateContext(context.Context) error {
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (m *UpdateGatewayRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
+	if len(m.FieldMask.GetPaths()) == 0 {
 		return m.ValidateFields()
 	}
-	return m.ValidateFields(append(FieldsWithPrefix("gateway", m.FieldMask.Paths...),
+	return m.ValidateFields(append(FieldsWithPrefix("gateway", m.FieldMask.GetPaths()...),
 		"gateway.ids",
 	)...)
 }

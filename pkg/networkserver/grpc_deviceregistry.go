@@ -252,21 +252,21 @@ func unwrapSelectedSessionKeys(ctx context.Context, kv crypto.KeyVault, dev *ttn
 func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, appendRequiredDeviceReadRights(
 		make([]ttnpb.Right, 0, maxRequiredDeviceReadRightCount),
-		req.FieldMask.Paths...,
+		req.FieldMask.GetPaths()...,
 	)...); err != nil {
 		return nil, err
 	}
 
-	dev, ctx, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceId, addDeviceGetPaths(req.FieldMask.Paths...))
+	dev, ctx, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceId, addDeviceGetPaths(req.FieldMask.GetPaths()...))
 	if err != nil {
 		logRegistryRPCError(ctx, err, "Failed to get device from registry")
 		return nil, err
 	}
-	if err := unwrapSelectedSessionKeys(ctx, ns.KeyVault, dev, req.FieldMask.Paths...); err != nil {
+	if err := unwrapSelectedSessionKeys(ctx, ns.KeyVault, dev, req.FieldMask.GetPaths()...); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to unwrap selected keys")
 		return nil, err
 	}
-	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.GetPaths()...)
 }
 
 func newInvalidFieldValueError(field string) errors.Error {
@@ -918,7 +918,7 @@ var (
 
 // Set implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	st := newSetDeviceState(&req.EndDevice, req.FieldMask.Paths...)
+	st := newSetDeviceState(&req.EndDevice, req.FieldMask.GetPaths()...)
 
 	requiredRights := append(make([]ttnpb.Right, 0, 2),
 		ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
@@ -2275,7 +2275,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil
 		}
 
-		evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, &st.Device.EndDeviceIdentifiers, req.FieldMask.Paths)
+		evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, &st.Device.EndDeviceIdentifiers, req.FieldMask.GetPaths())
 		if st.HasSetField("multicast") && st.Device.Multicast != stored.Multicast {
 			return newInvalidFieldValueError("multicast")
 		}
@@ -2297,25 +2297,25 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	if !needsDownlinkCheck {
-		return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
+		return ttnpb.FilterGetEndDevice(dev, req.FieldMask.GetPaths()...)
 	}
 
 	if err := ns.updateDataDownlinkTask(ctx, dev, time.Time{}); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to update downlink task queue after device set")
 	}
-	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.GetPaths()...)
 }
 
 // ResetFactoryDefaults implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.ResetAndGetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, appendRequiredDeviceReadRights(
 		append(make([]ttnpb.Right, 0, 1+maxRequiredDeviceReadRightCount), ttnpb.RIGHT_APPLICATION_DEVICES_WRITE),
-		req.FieldMask.Paths...,
+		req.FieldMask.GetPaths()...,
 	)...); err != nil {
 		return nil, err
 	}
 
-	dev, _, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceId, addDeviceGetPaths(ttnpb.AddFields(append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...),
+	dev, _, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceId, addDeviceGetPaths(ttnpb.AddFields(append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...),
 		"frequency_plan_id",
 		"lorawan_phy_version",
 		"lorawan_version",
@@ -2369,11 +2369,11 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 		logRegistryRPCError(ctx, err, "Failed to reset device state in registry")
 		return nil, err
 	}
-	if err := unwrapSelectedSessionKeys(ctx, ns.KeyVault, dev, req.FieldMask.Paths...); err != nil {
+	if err := unwrapSelectedSessionKeys(ctx, ns.KeyVault, dev, req.FieldMask.GetPaths()...); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to unwrap selected keys")
 		return nil, err
 	}
-	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.GetPaths()...)
 }
 
 // Delete implements NsEndDeviceRegistryServer.

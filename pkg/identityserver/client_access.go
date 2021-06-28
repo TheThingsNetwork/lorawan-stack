@@ -17,7 +17,7 @@ package identityserver
 import (
 	"context"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
@@ -83,7 +83,7 @@ func (is *IdentityServer) getClientCollaborator(ctx context.Context, req *ttnpb.
 	return res, nil
 }
 
-func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*types.Empty, error) {
+func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
@@ -181,7 +181,7 @@ func (ca *clientAccess) GetCollaborator(ctx context.Context, req *ttnpb.GetClien
 	return ca.getClientCollaborator(ctx, req)
 }
 
-func (ca *clientAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*types.Empty, error) {
+func (ca *clientAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*pbtypes.Empty, error) {
 	return ca.setClientCollaborator(ctx, req)
 }
 

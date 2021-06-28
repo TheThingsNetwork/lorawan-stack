@@ -77,7 +77,7 @@ func (t *tts) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDevi
 
 		tmpl := &ttnpb.EndDeviceTemplate{
 			EndDevice: dev,
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
 		}

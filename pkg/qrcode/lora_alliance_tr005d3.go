@@ -155,7 +155,7 @@ func (loRaAllianceTR005Draft3Format) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
 		Name:        "LoRa Alliance TR005 Draft 3 (DEPRECATED)",
 		Description: "Standard QR code format defined by LoRa Alliance.",
-		FieldMask: pbtypes.FieldMask{
+		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{
 				"claim_authentication_code.value",
 				"ids.dev_eui",

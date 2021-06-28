@@ -17,7 +17,7 @@ package identityserver
 import (
 	"context"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
@@ -179,7 +179,7 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.ApplicationIdentifiers.GetEntityIdentifiers(), &req.APIKey, &req.FieldMask)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.ApplicationIdentifiers.GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
 		return err
 	})
 	if err != nil {
@@ -227,7 +227,7 @@ func (is *IdentityServer) getApplicationCollaborator(ctx context.Context, req *t
 	return res, nil
 }
 
-func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*types.Empty, error) {
+func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
@@ -341,7 +341,7 @@ func (aa *applicationAccess) GetCollaborator(ctx context.Context, req *ttnpb.Get
 	return aa.getApplicationCollaborator(ctx, req)
 }
 
-func (aa *applicationAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*types.Empty, error) {
+func (aa *applicationAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*pbtypes.Empty, error) {
 	return aa.setApplicationCollaborator(ctx, req)
 }
 

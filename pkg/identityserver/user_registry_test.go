@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -181,7 +181,7 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 
 // 		_, err := reg.Get(ctx, &ttnpb.GetUserRequest{
 // 			UserIdentifiers: userID,
-// 			FieldMask:       types.FieldMask{Paths: []string{"name"}},
+// 			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 // 		})
 
 // 		if a.So(err, should.NotBeNil) {
@@ -193,7 +193,7 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 // 				UserIdentifiers: userID,
 // 				Name:            "new name",
 // 			},
-// 			FieldMask: types.FieldMask{Paths: []string{"name"}},
+// 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 // 		})
 
 // 		if a.So(err, should.NotBeNil) {
@@ -255,7 +255,7 @@ func TestUsersWeakPassword(t *testing.T) {
 
 		afterUpdate, err := reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			FieldMask:       types.FieldMask{Paths: []string{"password_updated_at"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"password_updated_at"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -277,7 +277,7 @@ func TestUsersCRUD(t *testing.T) {
 
 		got, err := reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			FieldMask:       types.FieldMask{Paths: []string{"name", "admin", "created_at", "updated_at"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name", "admin", "created_at", "updated_at"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -289,14 +289,14 @@ func TestUsersCRUD(t *testing.T) {
 
 		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			FieldMask:       types.FieldMask{Paths: []string{"ids"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			FieldMask:       types.FieldMask{Paths: []string{"attributes"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
 
 		if a.So(err, should.NotBeNil) {
@@ -308,7 +308,7 @@ func TestUsersCRUD(t *testing.T) {
 				UserIdentifiers: user.UserIdentifiers,
 				Name:            "Updated Name",
 			},
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -322,7 +322,7 @@ func TestUsersCRUD(t *testing.T) {
 				State:            ttnpb.STATE_FLAGGED,
 				StateDescription: "something is wrong",
 			},
-			FieldMask: types.FieldMask{Paths: []string{"state", "state_description"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"state", "state_description"}},
 		}, userCreds(adminUserIdx))
 
 		a.So(err, should.BeNil)
@@ -336,7 +336,7 @@ func TestUsersCRUD(t *testing.T) {
 				UserIdentifiers: user.UserIdentifiers,
 				State:           ttnpb.STATE_APPROVED,
 			},
-			FieldMask: types.FieldMask{Paths: []string{"state"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"state"}},
 		}, userCreds(adminUserIdx))
 
 		a.So(err, should.BeNil)
@@ -346,7 +346,7 @@ func TestUsersCRUD(t *testing.T) {
 
 		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			FieldMask:       types.FieldMask{Paths: []string{"state", "state_description"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"state", "state_description"}},
 		}, creds)
 
 		if a.So(err, should.BeNil) {
@@ -368,7 +368,7 @@ func TestUsersCRUD(t *testing.T) {
 
 		afterUpdate, err := reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			FieldMask:       types.FieldMask{Paths: []string{"password_updated_at"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"password_updated_at"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -382,7 +382,7 @@ func TestUsersCRUD(t *testing.T) {
 
 		empty, err := reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			FieldMask:       types.FieldMask{Paths: []string{"name"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.NotBeNil)
@@ -394,7 +394,7 @@ func TestUsersCRUD(t *testing.T) {
 
 		empty, err = reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			FieldMask:       types.FieldMask{Paths: []string{"name"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, userCreds(adminUserIdx))
 
 		if a.So(err, should.NotBeNil) {

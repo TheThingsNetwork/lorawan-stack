@@ -28,10 +28,10 @@ func (req *ListApplicationPubSubsRequest) ValidateContext(context.Context) error
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (req *SetApplicationPubSubRequest) ValidateContext(context.Context) error {
-	if len(req.FieldMask.Paths) == 0 {
+	if len(req.FieldMask.GetPaths()) == 0 {
 		return req.ValidateFields()
 	}
-	return req.ValidateFields(append(FieldsWithPrefix("pubsub", req.FieldMask.Paths...),
+	return req.ValidateFields(append(FieldsWithPrefix("pubsub", req.FieldMask.GetPaths()...),
 		"pubsub.ids",
 	)...)
 }

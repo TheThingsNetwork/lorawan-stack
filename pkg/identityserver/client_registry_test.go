@@ -17,7 +17,7 @@ package identityserver
 import (
 	"testing"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -71,7 +71,7 @@ func TestClientsPermissionDenied(t *testing.T) {
 
 		_, err = reg.Get(ctx, &ttnpb.GetClientRequest{
 			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
-			FieldMask:         types.FieldMask{Paths: []string{"name"}},
+			FieldMask:         &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -79,7 +79,7 @@ func TestClientsPermissionDenied(t *testing.T) {
 		}
 
 		listRes, err := reg.List(ctx, &ttnpb.ListClientsRequest{
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		a.So(err, should.BeNil)
@@ -89,7 +89,7 @@ func TestClientsPermissionDenied(t *testing.T) {
 
 		_, err = reg.List(ctx, &ttnpb.ListClientsRequest{
 			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -101,7 +101,7 @@ func TestClientsPermissionDenied(t *testing.T) {
 				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
 				Name:              "Updated Name",
 			},
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -157,7 +157,7 @@ func TestClientsCRUD(t *testing.T) {
 
 		got, err := reg.Get(ctx, &ttnpb.GetClientRequest{
 			ClientIdentifiers: created.ClientIdentifiers,
-			FieldMask:         types.FieldMask{Paths: []string{"name"}},
+			FieldMask:         &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -167,14 +167,14 @@ func TestClientsCRUD(t *testing.T) {
 
 		got, err = reg.Get(ctx, &ttnpb.GetClientRequest{
 			ClientIdentifiers: created.ClientIdentifiers,
-			FieldMask:         types.FieldMask{Paths: []string{"ids"}},
+			FieldMask:         &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetClientRequest{
 			ClientIdentifiers: created.ClientIdentifiers,
-			FieldMask:         types.FieldMask{Paths: []string{"attributes"}},
+			FieldMask:         &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
 
 		if a.So(err, should.NotBeNil) {
@@ -186,7 +186,7 @@ func TestClientsCRUD(t *testing.T) {
 				ClientIdentifiers: created.ClientIdentifiers,
 				Name:              "Updated Name",
 			},
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -200,7 +200,7 @@ func TestClientsCRUD(t *testing.T) {
 				State:             ttnpb.STATE_FLAGGED,
 				StateDescription:  "something is wrong",
 			},
-			FieldMask: types.FieldMask{Paths: []string{"state", "state_description"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"state", "state_description"}},
 		}, userCreds(adminUserIdx))
 
 		a.So(err, should.BeNil)
@@ -214,7 +214,7 @@ func TestClientsCRUD(t *testing.T) {
 				ClientIdentifiers: created.ClientIdentifiers,
 				State:             ttnpb.STATE_APPROVED,
 			},
-			FieldMask: types.FieldMask{Paths: []string{"state"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"state"}},
 		}, userCreds(adminUserIdx))
 
 		a.So(err, should.BeNil)
@@ -224,7 +224,7 @@ func TestClientsCRUD(t *testing.T) {
 
 		got, err = reg.Get(ctx, &ttnpb.GetClientRequest{
 			ClientIdentifiers: created.ClientIdentifiers,
-			FieldMask:         types.FieldMask{Paths: []string{"state", "state_description"}},
+			FieldMask:         &pbtypes.FieldMask{Paths: []string{"state", "state_description"}},
 		}, creds)
 
 		if a.So(err, should.BeNil) {
@@ -234,7 +234,7 @@ func TestClientsCRUD(t *testing.T) {
 
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListClientsRequest{
-				FieldMask:    types.FieldMask{Paths: []string{"name"}},
+				FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 				Collaborator: collaborator,
 			}, creds)
 
@@ -274,7 +274,7 @@ func TestClientsPagination(t *testing.T) {
 		reg := ttnpb.NewClientRegistryClient(cc)
 
 		list, err := reg.List(test.Context(), &ttnpb.ListClientsRequest{
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
@@ -286,7 +286,7 @@ func TestClientsPagination(t *testing.T) {
 		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListClientsRequest{
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         2,
@@ -298,7 +298,7 @@ func TestClientsPagination(t *testing.T) {
 		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListClientsRequest{
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         3,

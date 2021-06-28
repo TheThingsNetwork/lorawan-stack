@@ -15,7 +15,7 @@
 package store
 
 import (
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -152,7 +152,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
-var defaultEndDeviceFieldMask = &types.FieldMask{}
+var defaultEndDeviceFieldMask = &pbtypes.FieldMask{}
 
 func init() {
 	paths := make([]string, 0, len(devicePBSetters))
@@ -184,14 +184,14 @@ var deviceColumnNames = map[string][]string{
 	locationsField:                {},
 }
 
-func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *types.FieldMask) {
+func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) {
 	pb.EndDeviceIdentifiers.ApplicationId = dev.ApplicationID
 	pb.EndDeviceIdentifiers.DeviceId = dev.DeviceID
 	pb.EndDeviceIdentifiers.JoinEui = dev.JoinEUI.toPB() // Always present.
 	pb.EndDeviceIdentifiers.DevEui = dev.DevEUI.toPB()   // Always present.
 	pb.CreatedAt = cleanTime(dev.CreatedAt)
 	pb.UpdatedAt = cleanTime(dev.UpdatedAt)
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultEndDeviceFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -201,8 +201,8 @@ func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *types.FieldMask) {
 	}
 }
 
-func (dev *EndDevice) fromPB(pb *ttnpb.EndDevice, fieldMask *types.FieldMask) (columns []string) {
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+func (dev *EndDevice) fromPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) (columns []string) {
+	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultEndDeviceFieldMask
 	}
 	for _, path := range fieldMask.Paths {

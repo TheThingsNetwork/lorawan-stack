@@ -17,7 +17,6 @@ package commands
 import (
 	"os"
 
-	"github.com/gogo/protobuf/types"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -91,7 +90,7 @@ var (
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewApplicationRegistryClient(is).List(ctx, &ttnpb.ListApplicationsRequest{
 				Collaborator: getCollaborator(cmd.Flags()),
-				FieldMask:    types.FieldMask{Paths: paths},
+				FieldMask:    &pbtypes.FieldMask{Paths: paths},
 				Limit:        limit,
 				Page:         page,
 				Order:        getOrder(cmd.Flags()),
@@ -155,7 +154,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{
 				ApplicationIdentifiers: *appID,
-				FieldMask:              types.FieldMask{Paths: paths},
+				FieldMask:              &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -234,7 +233,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationRegistryClient(is).Update(ctx, &ttnpb.UpdateApplicationRequest{
 				Application: application,
-				FieldMask:   types.FieldMask{Paths: paths},
+				FieldMask:   &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

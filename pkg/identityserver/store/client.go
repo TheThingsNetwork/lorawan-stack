@@ -15,7 +15,7 @@
 package store
 
 import (
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/lib/pq"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -86,7 +86,7 @@ var clientModelSetters = map[string]func(*Client, *ttnpb.Client){
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
-var defaultClientFieldMask = &types.FieldMask{}
+var defaultClientFieldMask = &pbtypes.FieldMask{}
 
 func init() {
 	paths := make([]string, 0, len(clientPBSetters))
@@ -115,12 +115,12 @@ var clientColumnNames = map[string][]string{
 	rightsField:             {rightsField},
 }
 
-func (cli Client) toPB(pb *ttnpb.Client, fieldMask *types.FieldMask) {
+func (cli Client) toPB(pb *ttnpb.Client, fieldMask *pbtypes.FieldMask) {
 	pb.ClientIdentifiers.ClientId = cli.ClientID
 	pb.CreatedAt = cleanTime(cli.CreatedAt)
 	pb.UpdatedAt = cleanTime(cli.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(cli.DeletedAt)
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultClientFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -130,8 +130,8 @@ func (cli Client) toPB(pb *ttnpb.Client, fieldMask *types.FieldMask) {
 	}
 }
 
-func (cli *Client) fromPB(pb *ttnpb.Client, fieldMask *types.FieldMask) (columns []string) {
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+func (cli *Client) fromPB(pb *ttnpb.Client, fieldMask *pbtypes.FieldMask) (columns []string) {
+	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultClientFieldMask
 	}
 	for _, path := range fieldMask.Paths {

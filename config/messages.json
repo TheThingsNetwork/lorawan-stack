@@ -1259,15 +1259,6 @@
       "file": "errors.go"
     }
   },
-  "error:cmd/ttn-lw-cli/commands:activation_mode": {
-    "translations": {
-      "en": "invalid activation mode"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "end_devices.go"
-    }
-  },
   "error:cmd/ttn-lw-cli/commands:antenna_index": {
     "translations": {
       "en": "index of antenna to update out of bounds"
@@ -1664,15 +1655,6 @@
       "file": "applications_pubsub.go"
     }
   },
-  "error:cmd/ttn-lw-cli/commands:no_qr_code_target": {
-    "translations": {
-      "en": "no QR code target specified"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "end_devices.go"
-    }
-  },
   "error:cmd/ttn-lw-cli/commands:no_template_format_id": {
     "translations": {
       "en": "no template format ID set"
@@ -1739,15 +1721,6 @@
   "error:cmd/ttn-lw-cli/commands:phy_version": {
     "translations": {
       "en": "LoRaWAN PHY version is invalid"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "end_devices.go"
-    }
-  },
-  "error:cmd/ttn-lw-cli/commands:qr_code_format": {
-    "translations": {
-      "en": "invalid QR code format"
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",

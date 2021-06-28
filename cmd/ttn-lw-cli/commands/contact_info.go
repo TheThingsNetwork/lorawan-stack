@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
@@ -32,7 +32,7 @@ func listContactInfo(entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, e
 	if err != nil {
 		return nil, err
 	}
-	fieldMask := types.FieldMask{Paths: []string{"contact_info"}}
+	fieldMask := &pbtypes.FieldMask{Paths: []string{"contact_info"}}
 	var res interface{}
 	switch id := entityID.GetIds().(type) {
 	case *ttnpb.EntityIdentifiers_ApplicationIds:
@@ -59,7 +59,7 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 	if err != nil {
 		return nil, err
 	}
-	fieldMask := types.FieldMask{Paths: []string{"contact_info"}}
+	fieldMask := &pbtypes.FieldMask{Paths: []string{"contact_info"}}
 	var res interface{}
 	switch id := entityID.GetIds().(type) {
 	case *ttnpb.EntityIdentifiers_ApplicationIds:

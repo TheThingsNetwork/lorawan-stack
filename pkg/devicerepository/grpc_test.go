@@ -333,7 +333,7 @@ func TestGRPC(t *testing.T) {
 				Page:           2,
 				OrderBy:        "brand_id",
 				Search:         "query string",
-				FieldMask: types.FieldMask{
+				FieldMask: &types.FieldMask{
 					Paths: []string{"lora_alliance_vendor_id"},
 				},
 			}, creds)
@@ -402,7 +402,7 @@ func TestGRPC(t *testing.T) {
 			_, err := cl.GetBrand(test.Context(), &ttnpb.GetEndDeviceBrandRequest{
 				ApplicationIds: registeredApplicationID,
 				BrandID:        "brand1",
-				FieldMask: types.FieldMask{
+				FieldMask: &types.FieldMask{
 					Paths: []string{"lora_alliance_vendor_id"},
 				},
 			}, creds)
@@ -459,7 +459,7 @@ func TestGRPC(t *testing.T) {
 				Page:           2,
 				OrderBy:        "brand_id",
 				Search:         "query string",
-				FieldMask: types.FieldMask{
+				FieldMask: &types.FieldMask{
 					Paths: []string{"firmware_versions"},
 				},
 			}, creds)
@@ -538,7 +538,7 @@ func TestGRPC(t *testing.T) {
 				ApplicationIds: registeredApplicationID,
 				BrandID:        "brand1",
 				ModelID:        "model1",
-				FieldMask: types.FieldMask{
+				FieldMask: &types.FieldMask{
 					Paths: []string{"firmware_versions"},
 				},
 			}, creds)
@@ -597,7 +597,7 @@ func TestGRPC(t *testing.T) {
 			EndDevice: ttnpb.EndDevice{
 				VersionIDs: ids,
 			},
-			FieldMask: types.FieldMask{
+			FieldMask: &types.FieldMask{
 				Paths: []string{"version_ids"},
 			},
 		}

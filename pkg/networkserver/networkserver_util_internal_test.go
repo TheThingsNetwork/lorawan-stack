@@ -578,7 +578,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 	expectedEvent := EvtCreateEndDevice.BindData(nil)
 	if !create {
 		action = "update"
-		expectedEvent = EvtUpdateEndDevice.BindData(req.FieldMask.Paths)
+		expectedEvent = EvtUpdateEndDevice.BindData(req.FieldMask.GetPaths())
 	}
 	select {
 	case <-ctx.Done():

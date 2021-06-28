@@ -645,6 +645,9 @@ var (
 							buf,
 						)
 					}
+					if err != nil {
+						return err
+					}
 					dataUplink.MIC = mic[:]
 					upMsg.RawPayload = append(buf, dataUplink.MIC...)
 					return nil

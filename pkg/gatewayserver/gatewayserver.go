@@ -439,7 +439,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	}
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
-		FieldMask: pbtypes.FieldMask{
+		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{
 				"antennas",
 				"downlink_path_constraint",
@@ -871,7 +871,7 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
-		FieldMask:          pbtypes.FieldMask{Paths: []string{"frequency_plan_ids"}},
+		FieldMask:          &pbtypes.FieldMask{Paths: []string{"frequency_plan_ids"}},
 	})
 	var fpIDs []string
 	if err == nil {

@@ -18,7 +18,6 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/gogo/protobuf/types"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/howeyc/gopass"
 	"github.com/spf13/cobra"
@@ -115,7 +114,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewUserRegistryClient(is).List(ctx, &ttnpb.ListUsersRequest{
-				FieldMask: types.FieldMask{Paths: paths},
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 				Limit:     limit,
 				Page:      page,
 				Order:     getOrder(cmd.Flags()),
@@ -179,7 +178,7 @@ var (
 			}
 			res, err := ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{
 				UserIdentifiers: *usrID,
-				FieldMask:       types.FieldMask{Paths: paths},
+				FieldMask:       &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -319,7 +318,7 @@ var (
 			}
 			res, err := ttnpb.NewUserRegistryClient(is).Update(ctx, &ttnpb.UpdateUserRequest{
 				User:      user,
-				FieldMask: types.FieldMask{Paths: paths},
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

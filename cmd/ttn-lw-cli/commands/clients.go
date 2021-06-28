@@ -18,7 +18,6 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/gogo/protobuf/types"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -90,7 +89,7 @@ var (
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewClientRegistryClient(is).List(ctx, &ttnpb.ListClientsRequest{
 				Collaborator: getCollaborator(cmd.Flags()),
-				FieldMask:    types.FieldMask{Paths: paths},
+				FieldMask:    &pbtypes.FieldMask{Paths: paths},
 				Limit:        limit,
 				Page:         page,
 				Order:        getOrder(cmd.Flags()),
@@ -154,7 +153,7 @@ var (
 			}
 			res, err := ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{
 				ClientIdentifiers: *cliID,
-				FieldMask:         types.FieldMask{Paths: paths},
+				FieldMask:         &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -241,7 +240,7 @@ var (
 			}
 			res, err := ttnpb.NewClientRegistryClient(is).Update(ctx, &ttnpb.UpdateClientRequest{
 				Client:    client,
-				FieldMask: types.FieldMask{Paths: paths},
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

@@ -76,7 +76,7 @@ func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 	}
 	gateway, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: id,
-		FieldMask: types.FieldMask{Paths: []string{
+		FieldMask: &types.FieldMask{Paths: []string{
 			"description",
 			"attributes",
 			"frequency_plan_id",

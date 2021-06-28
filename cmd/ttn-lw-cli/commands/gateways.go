@@ -17,7 +17,6 @@ package commands
 import (
 	"os"
 
-	"github.com/gogo/protobuf/types"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -154,7 +153,7 @@ var (
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewGatewayRegistryClient(is).List(ctx, &ttnpb.ListGatewaysRequest{
 				Collaborator: getCollaborator(cmd.Flags()),
-				FieldMask:    types.FieldMask{Paths: paths},
+				FieldMask:    &pbtypes.FieldMask{Paths: paths},
 				Limit:        limit,
 				Page:         page,
 				Order:        getOrder(cmd.Flags()),
@@ -232,7 +231,7 @@ var (
 
 			res, err := cli.Get(ctx, &ttnpb.GetGatewayRequest{
 				GatewayIdentifiers: *gtwID,
-				FieldMask:          types.FieldMask{Paths: paths},
+				FieldMask:          &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -250,8 +249,6 @@ var (
 			if err != nil {
 				return err
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setGatewayFlags, attributesFlags())
-			paths = append(paths, ttnpb.FlattenPaths(paths, gatewayFlattenPaths)...)
 
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
@@ -271,13 +268,6 @@ var (
 				gateway.EnforceDutyCycle = true
 				gateway.StatusPublic = true
 				gateway.LocationPublic = true
-				paths = append(paths,
-					"gateway_server_address",
-					"auto_update",
-					"enforce_duty_cycle",
-					"status_public",
-					"location_public",
-				)
 			}
 
 			if err = util.SetFields(&gateway, setGatewayFlags); err != nil {
@@ -358,7 +348,7 @@ var (
 			if len(antennaPaths) > 0 || antennaAdd || antennaRemove {
 				res, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
 					GatewayIdentifiers: gateway.GatewayIdentifiers,
-					FieldMask:          types.FieldMask{Paths: []string{"antennas"}},
+					FieldMask:          &pbtypes.FieldMask{Paths: []string{"antennas"}},
 				})
 				if err != nil {
 					return err
@@ -383,7 +373,7 @@ var (
 
 			res, err := ttnpb.NewGatewayRegistryClient(is).Update(ctx, &ttnpb.UpdateGatewayRequest{
 				Gateway:   gateway,
-				FieldMask: types.FieldMask{Paths: paths},
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -453,7 +443,7 @@ var (
 
 			gateway, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
 				GatewayIdentifiers: *gtwID,
-				FieldMask:          types.FieldMask{Paths: []string{"gateway_server_address"}},
+				FieldMask:          &pbtypes.FieldMask{Paths: []string{"gateway_server_address"}},
 			})
 			if err != nil {
 				return err

@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -57,7 +57,7 @@ func TestApplicationStore(t *testing.T) {
 			a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
-		got, err := store.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"}, &types.FieldMask{Paths: []string{"name", "attributes"}})
+		got, err := store.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -86,7 +86,7 @@ func TestApplicationStore(t *testing.T) {
 				"baz": "baz",
 				"qux": "foo",
 			},
-		}, &types.FieldMask{Paths: []string{"description", "attributes"}})
+		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes"}})
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
@@ -108,7 +108,7 @@ func TestApplicationStore(t *testing.T) {
 			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
 		}
 
-		list, err := store.FindApplications(ctx, nil, &types.FieldMask{Paths: []string{"name"}})
+		list, err := store.FindApplications(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {

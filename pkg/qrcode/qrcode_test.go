@@ -80,7 +80,7 @@ type mockFormat struct {
 func (mockFormat) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
 		Name: "test",
-		FieldMask: pbtypes.FieldMask{
+		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"ids"},
 		},
 	}

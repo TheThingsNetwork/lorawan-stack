@@ -17,7 +17,7 @@ package store
 import (
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -139,7 +139,7 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
-var defaultUserFieldMask = &types.FieldMask{}
+var defaultUserFieldMask = &pbtypes.FieldMask{}
 
 func init() {
 	paths := make([]string, 0, len(userPBSetters))
@@ -170,12 +170,12 @@ var userColumnNames = map[string][]string{
 	temporaryPasswordExpiresAtField:     {temporaryPasswordExpiresAtField},
 }
 
-func (usr User) toPB(pb *ttnpb.User, fieldMask *types.FieldMask) {
+func (usr User) toPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) {
 	pb.UserIdentifiers.UserId = usr.Account.UID
 	pb.CreatedAt = cleanTime(usr.CreatedAt)
 	pb.UpdatedAt = cleanTime(usr.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(usr.DeletedAt)
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultUserFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -185,8 +185,8 @@ func (usr User) toPB(pb *ttnpb.User, fieldMask *types.FieldMask) {
 	}
 }
 
-func (usr *User) fromPB(pb *ttnpb.User, fieldMask *types.FieldMask) (columns []string) {
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+func (usr *User) fromPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) (columns []string) {
+	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultUserFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -208,7 +208,7 @@ type userWithUID struct {
 
 func (userWithUID) TableName() string { return "users" }
 
-func (u userWithUID) toPB(pb *ttnpb.User, fieldMask *types.FieldMask) {
+func (u userWithUID) toPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) {
 	u.User.Account.UID = u.UID
 	u.User.toPB(pb, fieldMask)
 }

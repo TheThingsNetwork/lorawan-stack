@@ -65,19 +65,19 @@ func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicat
 		return nil, err
 	}
 	req.FieldMask = removeDeprecatedPaths(ctx, req.FieldMask)
-	return as.linkRegistry.Get(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths)
+	return as.linkRegistry.Get(ctx, req.ApplicationIdentifiers, req.FieldMask.GetPaths())
 }
 
 // SetLink implements ttnpb.AsServer.
 func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicationLinkRequest) (*ttnpb.ApplicationLink, error) {
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "default_formatters.up_formatter_parameter") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "default_formatters.up_formatter_parameter") {
 		if size := len(req.ApplicationLink.GetDefaultFormatters().GetUpFormatterParameter()); size > as.config.Formatters.MaxParameterLength {
 			return nil, errInvalidFieldValue.WithAttributes("field", "default_formatters.up_formatter_parameter").WithCause(
 				errFormatterScriptTooLarge.WithAttributes("size", size, "max_size", as.config.Formatters.MaxParameterLength),
 			)
 		}
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "default_formatters.down_formatter_parameter") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "default_formatters.down_formatter_parameter") {
 		if size := len(req.ApplicationLink.GetDefaultFormatters().GetDownFormatterParameter()); size > as.config.Formatters.MaxParameterLength {
 			return nil, errInvalidFieldValue.WithAttributes("field", "default_formatters.down_formatter_parameter").WithCause(
 				errFormatterScriptTooLarge.WithAttributes("size", size, "max_size", as.config.Formatters.MaxParameterLength),
@@ -90,7 +90,7 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	req.FieldMask = removeDeprecatedPaths(ctx, req.FieldMask)
 	return as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, ttnpb.ApplicationLinkFieldPathsTopLevel,
 		func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
-			return &req.ApplicationLink, req.FieldMask.Paths, nil
+			return &req.ApplicationLink, req.FieldMask.GetPaths(), nil
 		},
 	)
 }

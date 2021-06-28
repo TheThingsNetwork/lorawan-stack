@@ -48,10 +48,10 @@ func (req *GetApplicationActivationSettingsRequest) ValidateContext(context.Cont
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (req *SetApplicationActivationSettingsRequest) ValidateContext(context.Context) error {
-	if len(req.FieldMask.Paths) == 0 {
+	if len(req.FieldMask.GetPaths()) == 0 {
 		return req.ValidateFields()
 	}
-	return req.ValidateFields(append(FieldsWithPrefix("settings", req.FieldMask.Paths...),
+	return req.ValidateFields(append(FieldsWithPrefix("settings", req.FieldMask.GetPaths()...),
 		"application_ids",
 	)...)
 }

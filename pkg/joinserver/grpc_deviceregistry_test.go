@@ -102,7 +102,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids"},
 				},
 			},
@@ -141,7 +141,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					JoinEui:  unregisteredJoinEUI,
 					DevEui:   unregisteredDevEUI,
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids"},
 				},
 			},
@@ -183,7 +183,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					JoinEui:  registeredJoinEUI,
 					DevEui:   registeredDevEUI,
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids"},
 				},
 			},
@@ -218,7 +218,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids"},
 				},
 			},
@@ -247,7 +247,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
 			},
@@ -298,7 +298,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
 			},
@@ -359,7 +359,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
 			},
@@ -639,7 +639,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 					NetID:                &types.NetID{0x42, 0x00, 0x00},
 				}),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"net_id"},
 				},
 			},
@@ -687,7 +687,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: *CopyEndDevice(registeredDevice),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
 			},
@@ -725,7 +725,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						},
 					},
 				}),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
 			},

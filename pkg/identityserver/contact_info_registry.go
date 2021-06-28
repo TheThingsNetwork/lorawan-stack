@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -129,7 +129,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 	}, nil
 }
 
-func (is *IdentityServer) validateContactInfo(ctx context.Context, req *ttnpb.ContactInfoValidation) (*types.Empty, error) {
+func (is *IdentityServer) validateContactInfo(ctx context.Context, req *ttnpb.ContactInfoValidation) (*pbtypes.Empty, error) {
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		return store.GetContactInfoStore(db).Validate(ctx, req)
 	})
@@ -167,6 +167,6 @@ func (cir *contactInfoRegistry) RequestValidation(ctx context.Context, ids *ttnp
 	return cir.requestContactInfoValidation(ctx, ids)
 }
 
-func (cir *contactInfoRegistry) Validate(ctx context.Context, req *ttnpb.ContactInfoValidation) (*types.Empty, error) {
+func (cir *contactInfoRegistry) Validate(ctx context.Context, req *ttnpb.ContactInfoValidation) (*pbtypes.Empty, error) {
 	return cir.validateContactInfo(ctx, req)
 }

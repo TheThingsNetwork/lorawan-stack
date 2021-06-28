@@ -18,7 +18,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -124,7 +124,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationWebhookRegistryClient(as).Get(ctx, &ttnpb.GetApplicationWebhookRequest{
 				ApplicationWebhookIdentifiers: *webhookID,
-				FieldMask:                     types.FieldMask{Paths: paths},
+				FieldMask:                     &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -157,7 +157,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationWebhookRegistryClient(as).List(ctx, &ttnpb.ListApplicationWebhooksRequest{
 				ApplicationIdentifiers: *appID,
-				FieldMask:              types.FieldMask{Paths: paths},
+				FieldMask:              &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -191,7 +191,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationWebhookRegistryClient(as).Set(ctx, &ttnpb.SetApplicationWebhookRequest{
 				ApplicationWebhook: webhook,
-				FieldMask:          types.FieldMask{Paths: paths},
+				FieldMask:          &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

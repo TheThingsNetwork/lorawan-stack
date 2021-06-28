@@ -53,7 +53,7 @@ func (s *Server) withGateway(next func(http.ResponseWriter, *http.Request, *ttnp
 		client := ttnpb.NewGatewayRegistryClient(cc)
 		gtw, err := client.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: gtwID,
-			FieldMask: types.FieldMask{
+			FieldMask: &types.FieldMask{
 				Paths: []string{
 					"antennas",
 					"frequency_plan_id",

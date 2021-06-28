@@ -122,8 +122,8 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		return nil, err
 	}
 
-	gets := req.FieldMask.Paths
-	if ttnpb.HasAnyField(req.FieldMask.Paths,
+	gets := req.FieldMask.GetPaths()
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(),
 		"pending_session.keys.app_s_key.key",
 		"session.keys.app_s_key.key",
 	) {
@@ -131,7 +131,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 			return nil, err
 		}
 		gets = ttnpb.AddFields(gets, "skip_payload_crypto_override")
-		if ttnpb.HasAnyField(req.FieldMask.Paths,
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(),
 			"pending_session.keys.app_s_key.key",
 		) {
 			gets = ttnpb.AddFields(gets,
@@ -139,7 +139,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 				"pending_session.keys.app_s_key.kek_label",
 			)
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths,
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(),
 			"session.keys.app_s_key.key",
 		) {
 			gets = ttnpb.AddFields(gets,
@@ -154,11 +154,11 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		return nil, err
 	}
 
-	if err := r.retrieveSessionKeys(ctx, dev, req.FieldMask.Paths); err != nil {
+	if err := r.retrieveSessionKeys(ctx, dev, req.FieldMask.GetPaths()); err != nil {
 		return nil, err
 	}
 
-	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.GetPaths()...)
 }
 
 var (
@@ -168,20 +168,20 @@ var (
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
 func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && (req.EndDevice.Session == nil || req.EndDevice.Session.DevAddr.IsZero()) {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.dev_addr") && (req.EndDevice.Session == nil || req.EndDevice.Session.DevAddr.IsZero()) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.AppSKey.GetKey().IsZero()) {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.keys.app_s_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.AppSKey.GetKey().IsZero()) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.keys.app_s_key.key")
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "formatters.up_formatter_parameter") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "formatters.up_formatter_parameter") {
 		if size := len(req.EndDevice.GetFormatters().GetUpFormatterParameter()); size > r.AS.config.Formatters.MaxParameterLength {
 			return nil, errInvalidFieldValue.WithAttributes("field", "formatters.up_formatter_parameter").WithCause(
 				errFormatterScriptTooLarge.WithAttributes("size", size, "max_size", r.AS.config.Formatters.MaxParameterLength),
 			)
 		}
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "formatters.down_formatter_parameter") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "formatters.down_formatter_parameter") {
 		if size := len(req.EndDevice.GetFormatters().GetDownFormatterParameter()); size > r.AS.config.Formatters.MaxParameterLength {
 			return nil, errInvalidFieldValue.WithAttributes("field", "formatters.down_formatter_parameter").WithCause(
 				errFormatterScriptTooLarge.WithAttributes("size", size, "max_size", r.AS.config.Formatters.MaxParameterLength),
@@ -191,7 +191,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths,
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(),
 		"session.keys.app_s_key.key",
 		"session.keys.session_key_id",
 	) {
@@ -200,8 +200,8 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		}
 	}
 
-	sets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.key") {
+	sets := append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...)
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.keys.app_s_key.key") {
 		appSKey, err := cryptoutil.WrapAES128Key(ctx, *req.EndDevice.Session.AppSKey.Key, r.kekLabel, r.AS.KeyVault)
 		if err != nil {
 			return nil, err
@@ -219,9 +219,9 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	}
 
 	var evt events.Event
-	dev, err = r.AS.deviceRegistry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	dev, err = r.AS.deviceRegistry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.GetPaths(), func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
-			evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, &req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
+			evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, &req.EndDevice.EndDeviceIdentifiers, req.FieldMask.GetPaths())
 			if err := ttnpb.ProhibitFields(sets,
 				"ids.dev_addr",
 			); err != nil {
@@ -266,7 +266,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if evt != nil {
 		events.Publish(evt)
 	}
-	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.GetPaths()...)
 }
 
 // Delete implements ttnpb.AsEndDeviceRegistryServer.

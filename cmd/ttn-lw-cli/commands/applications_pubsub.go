@@ -19,7 +19,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -152,7 +152,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationPubSubRegistryClient(as).Get(ctx, &ttnpb.GetApplicationPubSubRequest{
 				ApplicationPubSubIdentifiers: *pubsubID,
-				FieldMask:                    types.FieldMask{Paths: paths},
+				FieldMask:                    &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -186,7 +186,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationPubSubRegistryClient(as).List(ctx, &ttnpb.ListApplicationPubSubsRequest{
 				ApplicationIdentifiers: *appID,
-				FieldMask:              types.FieldMask{Paths: paths},
+				FieldMask:              &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -213,7 +213,7 @@ var (
 			}
 			pubsub, err := ttnpb.NewApplicationPubSubRegistryClient(as).Get(ctx, &ttnpb.GetApplicationPubSubRequest{
 				ApplicationPubSubIdentifiers: *pubsubID,
-				FieldMask:                    types.FieldMask{Paths: paths},
+				FieldMask:                    &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil && !errors.IsNotFound(err) {
 				return err
@@ -304,7 +304,7 @@ var (
 
 			res, err := ttnpb.NewApplicationPubSubRegistryClient(as).Set(ctx, &ttnpb.SetApplicationPubSubRequest{
 				ApplicationPubSub: *pubsub,
-				FieldMask:         types.FieldMask{Paths: paths},
+				FieldMask:         &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

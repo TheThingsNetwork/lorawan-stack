@@ -28,10 +28,10 @@ func (req *ListEndDevicesRequest) ValidateContext(context.Context) error {
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (m *UpdateEndDeviceRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
+	if len(m.FieldMask.GetPaths()) == 0 {
 		return m.ValidateFields()
 	}
-	return m.ValidateFields(append(FieldsWithPrefix("end_device", m.FieldMask.Paths...),
+	return m.ValidateFields(append(FieldsWithPrefix("end_device", m.FieldMask.GetPaths()...),
 		"end_device.ids.application_ids",
 		"end_device.ids.device_id",
 	)...)
@@ -39,10 +39,10 @@ func (m *UpdateEndDeviceRequest) ValidateContext(context.Context) error {
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (m *SetEndDeviceRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
+	if len(m.FieldMask.GetPaths()) == 0 {
 		return m.ValidateFields()
 	}
-	return m.ValidateFields(append(FieldsWithPrefix("end_device", m.FieldMask.Paths...),
+	return m.ValidateFields(append(FieldsWithPrefix("end_device", m.FieldMask.GetPaths()...),
 		"end_device.ids.application_ids",
 		"end_device.ids.device_id",
 	)...)

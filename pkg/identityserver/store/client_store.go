@@ -21,7 +21,7 @@ import (
 	"runtime/trace"
 	"strings"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -37,13 +37,13 @@ type clientStore struct {
 }
 
 // selectClientFields selects relevant fields (based on fieldMask) and preloads details if needed.
-func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.FieldMask) *gorm.DB {
+	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
 		return query.Preload("Attributes")
 	}
 	var clientColumns []string
 	var notFoundPaths []string
-	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
+	for _, path := range ttnpb.TopLevelFields(fieldMask.GetPaths()) {
 		switch path {
 		case "ids", "created_at", "updated_at", "deleted_at":
 			// always selected
@@ -77,7 +77,7 @@ func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttn
 	return &cliProto, nil
 }
 
-func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.Client, error) {
+func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdentifiers, fieldMask *pbtypes.FieldMask) ([]*ttnpb.Client, error) {
 	defer trace.StartRegion(ctx, "find clients").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
@@ -105,7 +105,7 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 	return cliProtos, nil
 }
 
-func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Client, error) {
+func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask *pbtypes.FieldMask) (*ttnpb.Client, error) {
 	defer trace.StartRegion(ctx, "get client").End()
 	query := s.query(ctx, Client{}, withClientID(id.GetClientId()))
 	query = selectClientFields(ctx, query, fieldMask)
@@ -121,7 +121,7 @@ func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers
 	return cliProto, nil
 }
 
-func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, fieldMask *types.FieldMask) (updated *ttnpb.Client, err error) {
+func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, fieldMask *pbtypes.FieldMask) (updated *ttnpb.Client, err error) {
 	defer trace.StartRegion(ctx, "update client").End()
 	query := s.query(ctx, Client{}, withClientID(cli.GetClientId()))
 	query = selectClientFields(ctx, query, fieldMask)
