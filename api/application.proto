@@ -62,7 +62,7 @@ message IssueDevEUIResponse {
 message GetApplicationRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the application fields that should be returned.
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message ListApplicationsRequest {
@@ -71,7 +71,7 @@ message ListApplicationsRequest {
   // where the user or organization is collaborator on.
   OrganizationOrUserIdentifiers collaborator = 1;
   // The names of the application fields that should be returned.
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 3 [
@@ -94,7 +94,7 @@ message CreateApplicationRequest {
 message UpdateApplicationRequest {
   Application application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the application fields that should be updated.
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message ListApplicationAPIKeysRequest {
@@ -128,7 +128,7 @@ message UpdateApplicationAPIKeyRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the api key fields that should be updated.
-  google.protobuf.FieldMask field_mask = 3 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 3;
 }
 
 message ListApplicationCollaboratorsRequest {

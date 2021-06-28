@@ -6,7 +6,6 @@ import (
 	fmt "fmt"
 	time "time"
 
-	types "github.com/gogo/protobuf/types"
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
@@ -175,8 +174,7 @@ func (dst *GetApplicationRequest) SetFields(src *GetApplicationRequest, paths ..
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -221,8 +219,7 @@ func (dst *ListApplicationsRequest) SetFields(src *ListApplicationsRequest, path
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 		case "order":
 			if len(subs) > 0 {
@@ -347,8 +344,7 @@ func (dst *UpdateApplicationRequest) SetFields(src *UpdateApplicationRequest, pa
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -549,8 +545,7 @@ func (dst *UpdateApplicationAPIKeyRequest) SetFields(src *UpdateApplicationAPIKe
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:

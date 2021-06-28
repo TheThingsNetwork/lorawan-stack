@@ -5,8 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 	time "time"
-
-	types "github.com/gogo/protobuf/types"
 )
 
 func (dst *ApplicationPubSubIdentifiers) SetFields(src *ApplicationPubSubIdentifiers, paths ...string) error {
@@ -605,8 +603,7 @@ func (dst *GetApplicationPubSubRequest) SetFields(src *GetApplicationPubSubReque
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -644,8 +641,7 @@ func (dst *ListApplicationPubSubsRequest) SetFields(src *ListApplicationPubSubsR
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -683,8 +679,7 @@ func (dst *SetApplicationPubSubRequest) SetFields(src *SetApplicationPubSubReque
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:

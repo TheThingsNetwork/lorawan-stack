@@ -2,11 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-
-	types "github.com/gogo/protobuf/types"
-)
+import fmt "fmt"
 
 func (dst *SearchApplicationsRequest) SetFields(src *SearchApplicationsRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -57,8 +53,7 @@ func (dst *SearchApplicationsRequest) SetFields(src *SearchApplicationsRequest, 
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 		case "order":
 			if len(subs) > 0 {
@@ -166,8 +161,7 @@ func (dst *SearchClientsRequest) SetFields(src *SearchClientsRequest, paths ...s
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 		case "order":
 			if len(subs) > 0 {
@@ -276,8 +270,7 @@ func (dst *SearchGatewaysRequest) SetFields(src *SearchGatewaysRequest, paths ..
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 		case "order":
 			if len(subs) > 0 {
@@ -376,8 +369,7 @@ func (dst *SearchOrganizationsRequest) SetFields(src *SearchOrganizationsRequest
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 		case "order":
 			if len(subs) > 0 {
@@ -485,8 +477,7 @@ func (dst *SearchUsersRequest) SetFields(src *SearchUsersRequest, paths ...strin
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 		case "order":
 			if len(subs) > 0 {
@@ -633,8 +624,7 @@ func (dst *SearchEndDevicesRequest) SetFields(src *SearchEndDevicesRequest, path
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 		case "order":
 			if len(subs) > 0 {

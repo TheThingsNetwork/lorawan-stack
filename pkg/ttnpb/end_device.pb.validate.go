@@ -2426,7 +2426,7 @@ func (m *UpdateEndDeviceRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateEndDeviceRequestValidationError{
 						field:  "field_mask",
@@ -2531,7 +2531,7 @@ func (m *GetEndDeviceRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetEndDeviceRequestValidationError{
 						field:  "field_mask",
@@ -2722,7 +2722,7 @@ func (m *ListEndDevicesRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListEndDevicesRequestValidationError{
 						field:  "field_mask",
@@ -2863,7 +2863,7 @@ func (m *SetEndDeviceRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetEndDeviceRequestValidationError{
 						field:  "field_mask",
@@ -2968,7 +2968,7 @@ func (m *ResetAndGetEndDeviceRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ResetAndGetEndDeviceRequestValidationError{
 						field:  "field_mask",
@@ -3074,7 +3074,7 @@ func (m *EndDeviceTemplate) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceTemplateValidationError{
 						field:  "field_mask",

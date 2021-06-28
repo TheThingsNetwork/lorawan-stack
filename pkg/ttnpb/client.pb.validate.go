@@ -467,7 +467,7 @@ func (m *GetClientRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetClientRequestValidationError{
 						field:  "field_mask",
@@ -570,7 +570,7 @@ func (m *ListClientsRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListClientsRequestValidationError{
 						field:  "field_mask",
@@ -812,7 +812,7 @@ func (m *UpdateClientRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateClientRequestValidationError{
 						field:  "field_mask",

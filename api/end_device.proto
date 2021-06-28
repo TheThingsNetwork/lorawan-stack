@@ -577,14 +577,14 @@ message UpdateEndDeviceRequest {
   EndDevice end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the end device fields that should be updated.
   // See the API reference for which fields can be set on the different services.
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message GetEndDeviceRequest {
   EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the end device fields that should be returned.
   // See the API reference for which fields can be returned by the different services.
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message GetEndDeviceIdentifiersForEUIsRequest {
@@ -596,7 +596,7 @@ message ListEndDevicesRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the end device fields that should be returned.
   // See the API reference for which fields can be returned by the different services.
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 3 [
@@ -612,19 +612,19 @@ message SetEndDeviceRequest {
   EndDevice end_device = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the end device fields that should be updated.
   // See the API reference for which fields can be set on the different services.
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message ResetAndGetEndDeviceRequest {
   EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the end device fields that should be returned.
   // See the API reference for which fields can be returned by the different services.
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message EndDeviceTemplate {
   EndDevice end_device = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
   string mapping_key = 3 [(validate.rules).string.max_len = 100];
 }
 

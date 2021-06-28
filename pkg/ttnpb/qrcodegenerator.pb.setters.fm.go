@@ -2,11 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-
-	types "github.com/gogo/protobuf/types"
-)
+import fmt "fmt"
 
 func (dst *QRCodeFormat) SetFields(src *QRCodeFormat, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -38,8 +34,7 @@ func (dst *QRCodeFormat) SetFields(src *QRCodeFormat, paths ...string) error {
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:

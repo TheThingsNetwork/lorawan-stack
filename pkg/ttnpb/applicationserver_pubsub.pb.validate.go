@@ -711,7 +711,7 @@ func (m *GetApplicationPubSubRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationPubSubRequestValidationError{
 						field:  "field_mask",
@@ -817,7 +817,7 @@ func (m *ListApplicationPubSubsRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationPubSubsRequestValidationError{
 						field:  "field_mask",
@@ -923,7 +923,7 @@ func (m *SetApplicationPubSubRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationPubSubRequestValidationError{
 						field:  "field_mask",

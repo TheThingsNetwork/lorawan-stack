@@ -115,7 +115,7 @@ message Clients {
 message GetClientRequest {
   ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the client fields that should be returned.
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message ListClientsRequest {
@@ -124,7 +124,7 @@ message ListClientsRequest {
   // where the user or organization is collaborator on.
   OrganizationOrUserIdentifiers collaborator = 1;
   // The names of the client fields that should be returned.
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 3 [
@@ -147,7 +147,7 @@ message CreateClientRequest {
 message UpdateClientRequest {
   Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the client fields that should be updated.
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message ListClientCollaboratorsRequest {

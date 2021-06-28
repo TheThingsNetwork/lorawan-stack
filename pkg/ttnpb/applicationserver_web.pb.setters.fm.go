@@ -5,8 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 	time "time"
-
-	types "github.com/gogo/protobuf/types"
 )
 
 func (dst *ApplicationWebhookIdentifiers) SetFields(src *ApplicationWebhookIdentifiers, paths ...string) error {
@@ -977,8 +975,7 @@ func (dst *GetApplicationWebhookRequest) SetFields(src *GetApplicationWebhookReq
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -1016,8 +1013,7 @@ func (dst *ListApplicationWebhooksRequest) SetFields(src *ListApplicationWebhook
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -1055,8 +1051,7 @@ func (dst *SetApplicationWebhookRequest) SetFields(src *SetApplicationWebhookReq
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -1094,8 +1089,7 @@ func (dst *GetApplicationWebhookTemplateRequest) SetFields(src *GetApplicationWe
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -1115,8 +1109,7 @@ func (dst *ListApplicationWebhookTemplatesRequest) SetFields(src *ListApplicatio
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:

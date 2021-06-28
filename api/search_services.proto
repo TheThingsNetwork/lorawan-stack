@@ -53,7 +53,7 @@ message SearchApplicationsRequest {
 
   reserved 5; // Reserved for EUI or state filter.
 
-  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 6;
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
@@ -94,7 +94,7 @@ message SearchClientsRequest {
     }
   ];
 
-  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 6;
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
@@ -132,7 +132,7 @@ message SearchGatewaysRequest {
     (validate.rules).string.max_len = 16
   ];
 
-  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 6;
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
@@ -167,7 +167,7 @@ message SearchOrganizationsRequest {
 
   reserved 5; // Reserved for state filter.
 
-  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 6;
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
@@ -208,7 +208,7 @@ message SearchUsersRequest {
     }
   ];
 
-  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 6;
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
@@ -301,7 +301,7 @@ message SearchEndDevicesRequest {
     (validate.rules).string.max_len = 8
   ];
 
-  google.protobuf.FieldMask field_mask = 9 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 9;
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.

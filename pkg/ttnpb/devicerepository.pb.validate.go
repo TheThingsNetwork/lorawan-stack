@@ -473,7 +473,7 @@ func (m *GetEndDeviceBrandRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetEndDeviceBrandRequestValidationError{
 						field:  "field_mask",
@@ -610,7 +610,7 @@ func (m *ListEndDeviceBrandsRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListEndDeviceBrandsRequestValidationError{
 						field:  "field_mask",
@@ -756,7 +756,7 @@ func (m *GetEndDeviceModelRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetEndDeviceModelRequestValidationError{
 						field:  "field_mask",
@@ -911,7 +911,7 @@ func (m *ListEndDeviceModelsRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListEndDeviceModelsRequestValidationError{
 						field:  "field_mask",
@@ -1146,7 +1146,7 @@ func (m *GetPayloadFormatterRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetPayloadFormatterRequestValidationError{
 						field:  "field_mask",

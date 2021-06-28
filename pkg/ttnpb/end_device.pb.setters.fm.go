@@ -6,7 +6,6 @@ import (
 	fmt "fmt"
 	time "time"
 
-	types "github.com/gogo/protobuf/types"
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
@@ -2337,8 +2336,7 @@ func (dst *UpdateEndDeviceRequest) SetFields(src *UpdateEndDeviceRequest, paths 
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -2376,8 +2374,7 @@ func (dst *GetEndDeviceRequest) SetFields(src *GetEndDeviceRequest, paths ...str
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -2446,8 +2443,7 @@ func (dst *ListEndDevicesRequest) SetFields(src *ListEndDevicesRequest, paths ..
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 		case "order":
 			if len(subs) > 0 {
@@ -2515,8 +2511,7 @@ func (dst *SetEndDeviceRequest) SetFields(src *SetEndDeviceRequest, paths ...str
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -2554,8 +2549,7 @@ func (dst *ResetAndGetEndDeviceRequest) SetFields(src *ResetAndGetEndDeviceReque
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -2593,8 +2587,7 @@ func (dst *EndDeviceTemplate) SetFields(src *EndDeviceTemplate, paths ...string)
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 		case "mapping_key":
 			if len(subs) > 0 {

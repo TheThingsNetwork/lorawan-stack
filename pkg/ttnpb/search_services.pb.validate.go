@@ -114,7 +114,7 @@ func (m *SearchApplicationsRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SearchApplicationsRequestValidationError{
 						field:  "field_mask",
@@ -312,7 +312,7 @@ func (m *SearchClientsRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SearchClientsRequestValidationError{
 						field:  "field_mask",
@@ -493,7 +493,7 @@ func (m *SearchGatewaysRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SearchGatewaysRequestValidationError{
 						field:  "field_mask",
@@ -665,7 +665,7 @@ func (m *SearchOrganizationsRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SearchOrganizationsRequestValidationError{
 						field:  "field_mask",
@@ -863,7 +863,7 @@ func (m *SearchUsersRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SearchUsersRequestValidationError{
 						field:  "field_mask",
@@ -1074,7 +1074,7 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SearchEndDevicesRequestValidationError{
 						field:  "field_mask",
