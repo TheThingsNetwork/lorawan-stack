@@ -126,6 +126,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 				AntennaCount: &pbtypes.UInt32Value{
 					Value: uint32(len(req.Gateway.Antennas)),
 				},
+				AntennaPlacement: toPBTerrestrialAntennaPlacement(req.Gateway.Antennas[0].Placement),
 			}
 			if loc := req.Gateway.Antennas[0].Location; loc != nil {
 				val.Location = toPBLocation(loc)

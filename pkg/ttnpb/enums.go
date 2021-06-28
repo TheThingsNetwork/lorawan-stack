@@ -201,3 +201,37 @@ func (v *KeySecurity) UnmarshalJSON(b []byte) error {
 func (v *KeySecurity) UnmarshalJSONPB(u *jsonpb.Unmarshaler, b []byte) error {
 	return v.UnmarshalJSON(b)
 }
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v GatewayAntennaPlacement) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *GatewayAntennaPlacement) UnmarshalText(b []byte) error {
+	s := string(b)
+	if i, ok := GatewayAntennaPlacement_value[s]; ok {
+		*v = GatewayAntennaPlacement(i)
+		return nil
+	}
+	if !strings.HasPrefix(s, "PLACEMENT_") {
+		if i, ok := GatewayAntennaPlacement_value["PLACEMENT_"+s]; ok {
+			*v = GatewayAntennaPlacement(i)
+			return nil
+		}
+	}
+	return errCouldNotParse("GatewayAntennaPlacement")(string(b))
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *GatewayAntennaPlacement) UnmarshalJSON(b []byte) error {
+	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
+		return v.UnmarshalText(b[1 : len(b)-1])
+	}
+	i, err := strconv.Atoi(string(b))
+	if err != nil {
+		return errCouldNotParse("GatewayAntennaPlacement")(string(b)).WithCause(err)
+	}
+	*v = GatewayAntennaPlacement(i)
+	return nil
+}

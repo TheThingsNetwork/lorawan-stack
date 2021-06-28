@@ -14252,11 +14252,35 @@
       "name": "lorawan-stack/api/gateway.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
-      "hasEnums": false,
+      "hasEnums": true,
       "hasExtensions": false,
       "hasMessages": true,
       "hasServices": false,
-      "enums": [],
+      "enums": [
+        {
+          "name": "GatewayAntennaPlacement",
+          "longName": "GatewayAntennaPlacement",
+          "fullName": "ttn.lorawan.v3.GatewayAntennaPlacement",
+          "description": "",
+          "values": [
+            {
+              "name": "PLACEMENT_UNKNOWN",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "INDOOR",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "OUTDOOR",
+              "number": "2",
+              "description": ""
+            }
+          ]
+        }
+      ],
       "extensions": [],
       "messages": [
         {
@@ -14840,7 +14864,7 @@
           "fields": [
             {
               "name": "gain",
-              "description": "gain is the antenna gain relative to this gateway, in dBi.",
+              "description": "Antenna gain relative to the gateway, in dBi.",
               "label": "",
               "type": "float",
               "longType": "float",
@@ -14895,6 +14919,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "placement",
+              "description": "",
+              "label": "",
+              "type": "GatewayAntennaPlacement",
+              "longType": "GatewayAntennaPlacement",
+              "fullType": "ttn.lorawan.v3.GatewayAntennaPlacement",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -15627,65 +15661,6 @@
               "type": "string",
               "longType": "string",
               "fullType": "string",
-              "ismap": false,
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "GatewayVersion",
-          "longName": "GatewayVersion",
-          "fullName": "ttn.lorawan.v3.GatewayVersion",
-          "description": "Template for creating gateways.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "ids",
-              "description": "Version identifiers.",
-              "label": "",
-              "type": "GatewayVersionIdentifiers",
-              "longType": "GatewayVersionIdentifiers",
-              "fullType": "ttn.lorawan.v3.GatewayVersionIdentifiers",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "photos",
-              "description": "Photos contains file names of gateway photos.",
-              "label": "repeated",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "radios",
-              "description": "",
-              "label": "repeated",
-              "type": "GatewayRadio",
-              "longType": "GatewayRadio",
-              "fullType": "ttn.lorawan.v3.GatewayRadio",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "clock_source",
-              "description": "",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
             }

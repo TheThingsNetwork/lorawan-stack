@@ -57,23 +57,6 @@ var GatewayRadioFieldPathsTopLevel = []string{
 	"rssi_offset",
 	"tx_configuration",
 }
-var GatewayVersionFieldPathsNested = []string{
-	"clock_source",
-	"ids",
-	"ids.brand_id",
-	"ids.firmware_version",
-	"ids.hardware_version",
-	"ids.model_id",
-	"photos",
-	"radios",
-}
-
-var GatewayVersionFieldPathsTopLevel = []string{
-	"clock_source",
-	"ids",
-	"photos",
-	"radios",
-}
 var GatewayClaimAuthenticationCodeFieldPathsNested = []string{
 	"secret",
 	"secret.key_id",
@@ -434,12 +417,14 @@ var GatewayAntennaFieldPathsNested = []string{
 	"location.latitude",
 	"location.longitude",
 	"location.source",
+	"placement",
 }
 
 var GatewayAntennaFieldPathsTopLevel = []string{
 	"attributes",
 	"gain",
 	"location",
+	"placement",
 }
 var GatewayStatusFieldPathsNested = []string{
 	"advanced",

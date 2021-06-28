@@ -323,6 +323,12 @@ func TestMarshalers(t *testing.T) {
 	}
 	vals = append(vals, rights)
 
+	var gatewayAntennaPlacements []interface{}
+	for i := range GatewayAntennaPlacement_name {
+		gatewayAntennaPlacements = append(gatewayAntennaPlacements, GatewayAntennaPlacement(i))
+	}
+	vals = append(vals, gatewayAntennaPlacements)
+
 	var outLines []string
 	for _, vs := range vals {
 		typ := reflect.TypeOf(vs[0])

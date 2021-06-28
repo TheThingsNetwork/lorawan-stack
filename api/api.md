@@ -245,7 +245,6 @@
   - [Message `GatewayStatus`](#ttn.lorawan.v3.GatewayStatus)
   - [Message `GatewayStatus.MetricsEntry`](#ttn.lorawan.v3.GatewayStatus.MetricsEntry)
   - [Message `GatewayStatus.VersionsEntry`](#ttn.lorawan.v3.GatewayStatus.VersionsEntry)
-  - [Message `GatewayVersion`](#ttn.lorawan.v3.GatewayVersion)
   - [Message `GatewayVersionIdentifiers`](#ttn.lorawan.v3.GatewayVersionIdentifiers)
   - [Message `Gateways`](#ttn.lorawan.v3.Gateways)
   - [Message `GetGatewayAPIKeyRequest`](#ttn.lorawan.v3.GetGatewayAPIKeyRequest)
@@ -258,6 +257,7 @@
   - [Message `SetGatewayCollaboratorRequest`](#ttn.lorawan.v3.SetGatewayCollaboratorRequest)
   - [Message `UpdateGatewayAPIKeyRequest`](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest)
   - [Message `UpdateGatewayRequest`](#ttn.lorawan.v3.UpdateGatewayRequest)
+  - [Enum `GatewayAntennaPlacement`](#ttn.lorawan.v3.GatewayAntennaPlacement)
 - [File `lorawan-stack/api/gateway_services.proto`](#lorawan-stack/api/gateway_services.proto)
   - [Message `PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest)
   - [Service `GatewayAccess`](#ttn.lorawan.v3.GatewayAccess)
@@ -3677,9 +3677,10 @@ GatewayAntenna is the message that defines a gateway antenna.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `gain` | [`float`](#float) |  | gain is the antenna gain relative to this gateway, in dBi. |
+| `gain` | [`float`](#float) |  | Antenna gain relative to the gateway, in dBi. |
 | `location` | [`Location`](#ttn.lorawan.v3.Location) |  | location is the antenna's location. |
 | `attributes` | [`GatewayAntenna.AttributesEntry`](#ttn.lorawan.v3.GatewayAntenna.AttributesEntry) | repeated |  |
+| `placement` | [`GatewayAntennaPlacement`](#ttn.lorawan.v3.GatewayAntennaPlacement) |  |  |
 
 #### Field Rules
 
@@ -3825,23 +3826,6 @@ Connection stats as monitored by the Gateway Server.
 | ----- | ---- | ----- | ----------- |
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
-
-### <a name="ttn.lorawan.v3.GatewayVersion">Message `GatewayVersion`</a>
-
-Template for creating gateways.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `ids` | [`GatewayVersionIdentifiers`](#ttn.lorawan.v3.GatewayVersionIdentifiers) |  | Version identifiers. |
-| `photos` | [`string`](#string) | repeated | Photos contains file names of gateway photos. |
-| `radios` | [`GatewayRadio`](#ttn.lorawan.v3.GatewayRadio) | repeated |  |
-| `clock_source` | [`uint32`](#uint32) |  |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `ids` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayVersionIdentifiers">Message `GatewayVersionIdentifiers`</a>
 
@@ -4004,6 +3988,14 @@ Identifies an end device model with version information.
 | Field | Validations |
 | ----- | ----------- |
 | `gateway` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GatewayAntennaPlacement">Enum `GatewayAntennaPlacement`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `PLACEMENT_UNKNOWN` | 0 |  |
+| `INDOOR` | 1 |  |
+| `OUTDOOR` | 2 |  |
 
 ## <a name="lorawan-stack/api/gateway_services.proto">File `lorawan-stack/api/gateway_services.proto`</a>
 

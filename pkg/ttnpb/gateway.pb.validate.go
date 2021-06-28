@@ -490,118 +490,6 @@ var _ interface {
 	ErrorName() string
 } = GatewayRadioValidationError{}
 
-// ValidateFields checks the field values on GatewayVersion with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *GatewayVersion) ValidateFields(paths ...string) error {
-	if m == nil {
-		return nil
-	}
-
-	if len(paths) == 0 {
-		paths = GatewayVersionFieldPathsNested
-	}
-
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		_ = subs
-		switch name {
-		case "ids":
-
-			if v, ok := interface{}(&m.GatewayVersionIdentifiers).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return GatewayVersionValidationError{
-						field:  "ids",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
-		case "photos":
-
-		case "radios":
-
-			for idx, item := range m.GetRadios() {
-				_, _ = idx, item
-
-				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
-					if err := v.ValidateFields(subs...); err != nil {
-						return GatewayVersionValidationError{
-							field:  fmt.Sprintf("radios[%v]", idx),
-							reason: "embedded message failed validation",
-							cause:  err,
-						}
-					}
-				}
-
-			}
-
-		case "clock_source":
-			// no validation rules for ClockSource
-		default:
-			return GatewayVersionValidationError{
-				field:  name,
-				reason: "invalid field path",
-			}
-		}
-	}
-	return nil
-}
-
-// GatewayVersionValidationError is the validation error returned by
-// GatewayVersion.ValidateFields if the designated constraints aren't met.
-type GatewayVersionValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GatewayVersionValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GatewayVersionValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GatewayVersionValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GatewayVersionValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GatewayVersionValidationError) ErrorName() string { return "GatewayVersionValidationError" }
-
-// Error satisfies the builtin error interface
-func (e GatewayVersionValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGatewayVersion.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GatewayVersionValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GatewayVersionValidationError{}
-
 // ValidateFields checks the field values on GatewayClaimAuthenticationCode
 // with the rules defined in the proto definition for this message. If any
 // rules are violated, an error is returned.
@@ -2592,6 +2480,8 @@ func (m *GatewayAntenna) ValidateFields(paths ...string) error {
 
 			}
 
+		case "placement":
+			// no validation rules for Placement
 		default:
 			return GatewayAntennaValidationError{
 				field:  name,
