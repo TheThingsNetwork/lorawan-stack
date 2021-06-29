@@ -47,19 +47,22 @@ const BasicSettingsForm = React.memo(props => {
     mayDeleteGateway,
     mayEditSecrets,
     shouldConfirmDelete,
-    shouldPurge,
+    mayPurge,
   } = props
 
   const [error, setError] = React.useState(undefined)
 
-  const onGatewayDelete = React.useCallback(async () => {
-    try {
-      await onDelete()
-      onDeleteSuccess()
-    } catch (error) {
-      onDeleteFailure()
-    }
-  }, [onDelete, onDeleteFailure, onDeleteSuccess])
+  const onGatewayDelete = React.useCallback(
+    async shouldPurge => {
+      try {
+        await onDelete(shouldPurge)
+        onDeleteSuccess()
+      } catch (error) {
+        onDeleteFailure()
+      }
+    },
+    [onDelete, onDeleteFailure, onDeleteSuccess],
+  )
 
   const initialValues = React.useMemo(() => {
     const initialValues = {
@@ -218,7 +221,7 @@ const BasicSettingsForm = React.memo(props => {
             message={m.deleteGateway}
             onApprove={onGatewayDelete}
             shouldConfirm={shouldConfirmDelete}
-            shouldPurge={shouldPurge}
+            mayPurge={mayPurge}
           />
         </Require>
       </SubmitBar>
@@ -231,13 +234,13 @@ BasicSettingsForm.propTypes = {
   gtwId: PropTypes.string.isRequired,
   mayDeleteGateway: PropTypes.shape({}).isRequired,
   mayEditSecrets: PropTypes.bool.isRequired,
+  mayPurge: PropTypes.bool.isRequired,
   onDelete: PropTypes.func.isRequired,
   onDeleteFailure: PropTypes.func.isRequired,
   onDeleteSuccess: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func.isRequired,
   shouldConfirmDelete: PropTypes.bool.isRequired,
-  shouldPurge: PropTypes.bool.isRequired,
 }
 
 export default BasicSettingsForm
