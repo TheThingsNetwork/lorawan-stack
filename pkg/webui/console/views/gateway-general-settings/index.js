@@ -95,7 +95,7 @@ import m from './messages'
       mayViewApiKeys,
       mayViewCollaborators,
       fetching,
-      shouldPurge: mayPurgeGtw,
+      mayPurge: mayPurgeGtw,
       shouldConfirmDelete:
         !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error),
       mayDeleteGateway: mayDeleteGtw,
@@ -117,7 +117,7 @@ import m from './messages'
     ...stateProps,
     ...dispatchProps,
     ...ownProps,
-    deleteGateway: id => dispatchProps.deleteGateway(id, { purge: stateProps.shouldPurge }),
+    deleteGateway: (id, purge = false) => dispatchProps.deleteGateway(id, { purge }),
     loadData: () => {
       if (stateProps.mayDeleteGateway) {
         if (stateProps.mayViewApiKeys) {
@@ -151,9 +151,9 @@ export default class GatewayGeneralSettings extends React.Component {
     gateway: PropTypes.gateway.isRequired,
     gtwId: PropTypes.string.isRequired,
     mayEditSecrets: PropTypes.bool.isRequired,
+    mayPurge: PropTypes.bool.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
     shouldConfirmDelete: PropTypes.bool.isRequired,
-    shouldPurge: PropTypes.bool.isRequired,
     updateGateway: PropTypes.func.isRequired,
   }
 
@@ -189,10 +189,10 @@ export default class GatewayGeneralSettings extends React.Component {
   }
 
   @bind
-  async handleDelete() {
+  async handleDelete(shouldPurge) {
     const { gtwId, deleteGateway } = this.props
 
-    return deleteGateway(gtwId)
+    return deleteGateway(gtwId, shouldPurge)
   }
 
   @bind
@@ -225,7 +225,7 @@ export default class GatewayGeneralSettings extends React.Component {
   }
 
   render() {
-    const { gtwId, gateway, shouldConfirmDelete, shouldPurge, mayEditSecrets } = this.props
+    const { gtwId, gateway, shouldConfirmDelete, mayPurge, mayEditSecrets } = this.props
 
     return (
       <Container>
@@ -249,7 +249,7 @@ export default class GatewayGeneralSettings extends React.Component {
                 mayDeleteGateway={mayDeleteGateway}
                 mayEditSecrets={mayEditSecrets}
                 shouldConfirmDelete={shouldConfirmDelete}
-                shouldPurge={shouldPurge}
+                mayPurge={mayPurge}
               />
             </Collapse>
             <Collapse
