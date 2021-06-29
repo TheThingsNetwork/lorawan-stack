@@ -17,6 +17,7 @@ import { defineMessages } from 'react-intl'
 
 import Input from '@ttn-lw/components/input'
 import ModalButton from '@ttn-lw/components/button/modal-button'
+import Checkbox from '@ttn-lw/components/checkbox'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -32,13 +33,23 @@ const m = defineMessages({
     'This will <strong>PERMANENTLY DELETE THE ENTITY ITSELF AND ALL ASSOCIATED ENTITIES</strong>, including collaborator associations.',
   confirmMessage: 'Please enter <pre>{entityId}</pre> to confirm the deletion.',
   confirmDeletion: 'Confirm deletion',
+  releaseId: 'Release entity ID',
 })
 
 const DeleteModalButton = props => {
-  const { entityId, entityName, onApprove, onCancel, shouldConfirm, shouldPurge, message } = props
+  const { entityId, entityName, onApprove, onCancel, shouldConfirm, mayPurge, message } = props
   const name = entityName ? entityName : entityId
 
   const [confirmId, setConfirmId] = React.useState('')
+  const [purgeEntity, setPurgeEntity] = React.useState(false)
+  const handlePurgeEntityChange = React.useCallback(() => {
+    setPurgeEntity(purge => !purge)
+    setConfirmId('')
+  }, [])
+
+  const handleDeleteApprove = React.useCallback(() => {
+    onApprove(purgeEntity)
+  }, [onApprove, purgeEntity])
 
   return (
     <ModalButton
@@ -46,7 +57,7 @@ const DeleteModalButton = props => {
       icon="delete"
       danger
       naked
-      onApprove={onApprove}
+      onApprove={handleDeleteApprove}
       onCancel={onCancel}
       message={message}
       modalData={{
@@ -63,8 +74,17 @@ const DeleteModalButton = props => {
               values={{ entityName: name, pre: name => <pre className={style.id}>{name}</pre> }}
               component="span"
             />
+            {mayPurge && (
+              <Checkbox
+                name="purge"
+                className={style.hardDeleteCheckbox}
+                onChange={handlePurgeEntityChange}
+                value={purgeEntity}
+                label={m.releaseId}
+              />
+            )}
             <Message
-              content={shouldPurge ? m.modalPurgeWarning : m.modalDefaultWarning}
+              content={purgeEntity ? m.modalPurgeWarning : m.modalDefaultWarning}
               values={{ strong: txt => <strong>{txt}</strong> }}
               component="p"
             />
@@ -88,11 +108,11 @@ const DeleteModalButton = props => {
 DeleteModalButton.propTypes = {
   entityId: PropTypes.string.isRequired,
   entityName: PropTypes.string,
+  mayPurge: PropTypes.bool,
+  message: PropTypes.message.isRequired,
   onApprove: PropTypes.func,
   onCancel: PropTypes.func,
   shouldConfirm: PropTypes.bool,
-  shouldPurge: PropTypes.bool,
-  message: PropTypes.message.isRequired,
 }
 
 DeleteModalButton.defaultProps = {
@@ -100,7 +120,7 @@ DeleteModalButton.defaultProps = {
   onApprove: undefined,
   onCancel: undefined,
   shouldConfirm: false,
-  shouldPurge: false,
+  mayPurge: false,
 }
 
 export default DeleteModalButton

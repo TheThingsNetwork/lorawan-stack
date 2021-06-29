@@ -122,6 +122,7 @@
   "console.components.delete-modal-button.index.modalPurgeWarning": "Xxxx xxxx xxxxxxxxXXXXXXXXXXX XXXXXX XXX XXXXXX XXXXXX XXX XXX XXXXXXXXXX XXXXXXXXx/xxxxxxx, xxxxxxxxx xxxxxxxxxxxx xxxxxxxxxxxx.",
   "console.components.delete-modal-button.index.confirmMessage": "Xxxxxx xxxxx xxxxx{entityId}x/xxxx xx xxxxxxx xxx xxxxxxxx.",
   "console.components.delete-modal-button.index.confirmDeletion": "Xxxxxxx xxxxxxxx",
+  "console.components.delete-modal-button.index.releaseId": "Xxxxxxx xxxxxx XX",
   "console.components.device-import-form.index.fileImport": "Xxxx xxxxxx",
   "console.components.device-import-form.index.file": "Xxxx",
   "console.components.device-import-form.index.formatInfo": "Xxxxxx xxxxxxxxxxx",

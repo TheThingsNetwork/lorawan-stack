@@ -122,6 +122,7 @@
   "console.components.delete-modal-button.index.modalPurgeWarning": "This will <strong>PERMANENTLY DELETE THE ENTITY ITSELF AND ALL ASSOCIATED ENTITIES</strong>, including collaborator associations.",
   "console.components.delete-modal-button.index.confirmMessage": "Please enter <pre>{entityId}</pre> to confirm the deletion.",
   "console.components.delete-modal-button.index.confirmDeletion": "Confirm deletion",
+  "console.components.delete-modal-button.index.releaseId": "Release entity ID",
   "console.components.device-import-form.index.fileImport": "File import",
   "console.components.device-import-form.index.file": "File",
   "console.components.device-import-form.index.formatInfo": "Format information",
