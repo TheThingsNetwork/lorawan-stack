@@ -25826,7 +25826,7 @@
                 "validate.rules": [
                   {
                     "name": "string.max_len",
-                    "value": 16384
+                    "value": 40960
                   }
                 ]
               }
@@ -25862,7 +25862,7 @@
                 "validate.rules": [
                   {
                     "name": "string.max_len",
-                    "value": 16384
+                    "value": 40960
                   }
                 ]
               }

@@ -6265,9 +6265,9 @@ Downlink message from the network to the end device
 | Field | Validations |
 | ----- | ----------- |
 | `up_formatter` | <p>`enum.defined_only`: `true`</p> |
-| `up_formatter_parameter` | <p>`string.max_len`: `16384`</p> |
+| `up_formatter_parameter` | <p>`string.max_len`: `40960`</p> |
 | `down_formatter` | <p>`enum.defined_only`: `true`</p> |
-| `down_formatter_parameter` | <p>`string.max_len`: `16384`</p> |
+| `down_formatter_parameter` | <p>`string.max_len`: `40960`</p> |
 
 ### <a name="ttn.lorawan.v3.TxAcknowledgment">Message `TxAcknowledgment`</a>
 
