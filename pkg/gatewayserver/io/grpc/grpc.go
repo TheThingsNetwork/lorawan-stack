@@ -88,7 +88,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 	if err != nil {
 		return err
 	}
-	if err = ids.ValidateContext(ctx); err != nil {
+	if err = s.server.ValidateGatewayID(ctx, ids); err != nil {
 		return err
 	}
 	if err = rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {

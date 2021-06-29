@@ -121,6 +121,10 @@ func (s *server) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers
 	return nil
 }
 
+func (s *server) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+	return ids.ValidateContext(ctx)
+}
+
 // UnclaimDownlink implements io.Server.
 func (s *server) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
 	s.downlinkClaims.Delete(unique.ID(ctx, ids))

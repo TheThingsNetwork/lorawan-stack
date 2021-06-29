@@ -907,6 +907,10 @@ func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayI
 	return gs.UnclaimIDs(ctx, &ids)
 }
 
+func (gs *GatewayServer) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+	return gs.entityRegistry.ValidateGatewayID(ctx, ids)
+}
+
 type ctxConfigKeyType struct{}
 
 // GetConfig returns the Gateway Server config based on the context.

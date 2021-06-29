@@ -17,7 +17,6 @@ package gatewayserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -25,7 +24,7 @@ import (
 
 // GetGatewayConnectionStats returns statistics about a gateway connection.
 func (gs *GatewayServer) GetGatewayConnectionStats(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayConnectionStats, error) {
-	if err := rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_STATUS_READ); err != nil {
+	if err := gs.entityRegistry.AssertGatewayRights(ctx, *ids, ttnpb.RIGHT_GATEWAY_STATUS_READ); err != nil {
 		return nil, err
 	}
 
