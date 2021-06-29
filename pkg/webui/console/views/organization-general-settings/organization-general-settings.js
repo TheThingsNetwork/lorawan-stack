@@ -59,10 +59,10 @@ class GeneralSettings extends React.PureComponent {
   static propTypes = {
     deleteOrganization: PropTypes.func.isRequired,
     deleteOrganizationSuccess: PropTypes.func.isRequired,
+    mayPurge: PropTypes.bool.isRequired,
     orgId: PropTypes.string.isRequired,
     organization: PropTypes.organization.isRequired,
     shouldConfirmDelete: PropTypes.bool.isRequired,
-    shouldPurge: PropTypes.bool.isRequired,
     updateOrganization: PropTypes.func.isRequired,
   }
 
@@ -103,13 +103,13 @@ class GeneralSettings extends React.PureComponent {
   }
 
   @bind
-  async handleDelete() {
+  async handleDelete(shouldPurge) {
     const { orgId, deleteOrganization, deleteOrganizationSuccess } = this.props
 
     await this.setState({ error: '' })
 
     try {
-      await deleteOrganization(orgId)
+      await deleteOrganization(orgId, shouldPurge)
       deleteOrganizationSuccess()
     } catch (error) {
       this.setState({ error })
@@ -117,7 +117,7 @@ class GeneralSettings extends React.PureComponent {
   }
 
   render() {
-    const { organization, orgId, shouldConfirmDelete, shouldPurge } = this.props
+    const { organization, orgId, shouldConfirmDelete, mayPurge } = this.props
     const { error } = this.state
 
     const initialValues = {
@@ -151,7 +151,7 @@ class GeneralSettings extends React.PureComponent {
                     message={m.deleteOrg}
                     onApprove={this.handleDelete}
                     shouldConfirm={shouldConfirmDelete}
-                    shouldPurge={shouldPurge}
+                    mayPurge={mayPurge}
                   />
                 </Require>
               </SubmitBar>
