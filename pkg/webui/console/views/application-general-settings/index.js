@@ -153,7 +153,7 @@ const validationSchema = Yup.object().shape({
       mayViewApiKeys,
       mayViewCollaborators,
       fetching,
-      shouldPurge: mayPurgeApp,
+      mayPurge: mayPurgeApp,
       shouldConfirmDelete:
         !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error),
       mayDeleteApplication: mayDeleteApp,
@@ -177,7 +177,7 @@ const validationSchema = Yup.object().shape({
     ...stateProps,
     ...dispatchProps,
     ...ownProps,
-    deleteApplication: id => dispatchProps.deleteApplication(id, { purge: stateProps.shouldPurge }),
+    deleteApplication: (id, purge = false) => dispatchProps.deleteApplication(id, { purge }),
     loadData: () => {
       if (stateProps.mayDeleteApplication) {
         if (stateProps.mayViewApiKeys) {
@@ -214,9 +214,9 @@ export default class ApplicationGeneralSettings extends React.Component {
     application: PropTypes.application.isRequired,
     deleteApplication: PropTypes.func.isRequired,
     match: PropTypes.match.isRequired,
+    mayPurge: PropTypes.bool.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
     shouldConfirmDelete: PropTypes.bool.isRequired,
-    shouldPurge: PropTypes.bool.isRequired,
     updateApplication: PropTypes.func.isRequired,
   }
 
@@ -261,14 +261,14 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   @bind
-  async handleDelete() {
+  async handleDelete(shouldPurge) {
     const { deleteApplication, onDeleteSuccess } = this.props
     const { appId } = this.props.match.params
 
     await this.setState({ error: '' })
 
     try {
-      await deleteApplication(appId)
+      await deleteApplication(appId, shouldPurge)
       onDeleteSuccess()
     } catch (error) {
       await this.setState({ error })
@@ -276,7 +276,7 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   render() {
-    const { appId, application, shouldConfirmDelete, shouldPurge } = this.props
+    const { appId, application, shouldConfirmDelete, mayPurge } = this.props
     const { error } = this.state
     const initialValues = mapApplicationToFormValues(application)
 
@@ -323,7 +323,7 @@ export default class ApplicationGeneralSettings extends React.Component {
                     entityName={application.name}
                     onApprove={this.handleDelete}
                     shouldConfirm={shouldConfirmDelete}
-                    shouldPurge={shouldPurge}
+                    mayPurge={mayPurge}
                   />
                 </Require>
               </SubmitBar>
