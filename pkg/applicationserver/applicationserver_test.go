@@ -2446,6 +2446,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
+							a.So(up, should.NotBeNil)
 							if override.GetValue() {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
@@ -2509,6 +2510,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
+							a.So(up, should.NotBeNil)
 							if override.GetValue() {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
