@@ -110,7 +110,7 @@ type EndDeviceRegistryClient interface {
 	// Similar to Get, this selects the fields given by the field mask.
 	// More or less fields may be returned, depending on the rights of the caller.
 	List(ctx context.Context, in *ListEndDevicesRequest, opts ...grpc.CallOption) (*EndDevices, error)
-	// Update the OAuth client, changing the fields specified by the field mask to the provided values.
+	// Update the end device, changing the fields specified by the field mask to the provided values.
 	Update(ctx context.Context, in *UpdateEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
 	// Delete the end device with the given IDs.
 	//
@@ -201,7 +201,7 @@ type EndDeviceRegistryServer interface {
 	// Similar to Get, this selects the fields given by the field mask.
 	// More or less fields may be returned, depending on the rights of the caller.
 	List(context.Context, *ListEndDevicesRequest) (*EndDevices, error)
-	// Update the OAuth client, changing the fields specified by the field mask to the provided values.
+	// Update the end device, changing the fields specified by the field mask to the provided values.
 	Update(context.Context, *UpdateEndDeviceRequest) (*EndDevice, error)
 	// Delete the end device with the given IDs.
 	//

@@ -860,7 +860,7 @@
     },
     "/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
-        "summary": "Update the OAuth client, changing the fields specified by the field mask to the provided values.",
+        "summary": "Update the end device, changing the fields specified by the field mask to the provided values.",
         "operationId": "EndDeviceRegistry_Update",
         "responses": {
           "200": {
@@ -3078,7 +3078,7 @@
     },
     "/clients": {
       "get": {
-        "summary": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields sepcified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
+        "summary": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields specified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "ClientRegistry_List",
         "responses": {
           "200": {
@@ -6442,7 +6442,7 @@
     },
     "/organizations/{collaborator.organization_ids.organization_id}/clients": {
       "get": {
-        "summary": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields sepcified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
+        "summary": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields specified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "ClientRegistry_List3",
         "responses": {
           "200": {
@@ -8841,7 +8841,7 @@
     },
     "/users/{collaborator.user_ids.user_id}/clients": {
       "get": {
-        "summary": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields sepcified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
+        "summary": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields specified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
         "operationId": "ClientRegistry_List2",
         "responses": {
           "200": {

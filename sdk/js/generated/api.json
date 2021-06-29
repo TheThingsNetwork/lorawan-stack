@@ -6923,7 +6923,7 @@
             },
             {
               "name": "List",
-              "description": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields sepcified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
+              "description": "List OAuth clients where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the OAuth clients the caller\nhas access to.\nSimilar to Get, this selects the fields specified in the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
               "requestType": "ListClientsRequest",
               "requestLongType": "ListClientsRequest",
               "requestFullType": "ttn.lorawan.v3.ListClientsRequest",
@@ -13513,7 +13513,7 @@
             },
             {
               "name": "Update",
-              "description": "Update the OAuth client, changing the fields specified by the field mask to the provided values.",
+              "description": "Update the end device, changing the fields specified by the field mask to the provided values.",
               "requestType": "UpdateEndDeviceRequest",
               "requestLongType": "UpdateEndDeviceRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateEndDeviceRequest",
