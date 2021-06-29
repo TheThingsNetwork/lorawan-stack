@@ -50,6 +50,7 @@ For details about compatibility between different releases, see the **Commitment
 - Error when logging into the Console when using connections without TLS.
 - Account for antenna gain when the gateway is not authenticated (i.e. UDP gateway).
 - Preserve antenna gain when the gateway status message contains GPS coordinates.
+- Location map coordinate selection in the Console.
 
 ### Security
 
