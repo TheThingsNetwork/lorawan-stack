@@ -99,6 +99,11 @@ func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, a
 	return err
 }
 
+// ValidateGatewayID implements EntityRegistry.
+func (is IS) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+	return ids.ValidateContext(ctx)
+}
+
 func (is IS) newRegistryClient(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
 	var (
 		cc  *grpc.ClientConn

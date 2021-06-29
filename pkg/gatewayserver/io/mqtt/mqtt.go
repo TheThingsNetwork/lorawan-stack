@@ -232,7 +232,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	ids := ttnpb.GatewayIdentifiers{
 		GatewayId: info.Username,
 	}
-	if err := ids.ValidateContext(ctx); err != nil {
+	if err := c.server.ValidateGatewayID(ctx, ids); err != nil {
 		return nil, err
 	}
 
