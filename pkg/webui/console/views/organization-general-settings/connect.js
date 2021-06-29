@@ -73,7 +73,7 @@ const mapStateToProps = state => {
     mayViewApiKeys,
     mayViewCollaborators,
     fetching,
-    shouldPurge: mayPurgeOrg,
+    mayPurge: mayPurgeOrg,
     shouldConfirmDelete: !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error),
     mayDeleteOrganization: mayDeleteOrg,
   }
@@ -96,7 +96,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   ...stateProps,
   ...dispatchProps,
   ...ownProps,
-  deleteOrganization: id => dispatchProps.deleteOrganization(id, { purge: stateProps.shouldPurge }),
+  deleteOrganization: (id, purge = false) => dispatchProps.deleteOrganization(id, { purge }),
   loadData: () => {
     if (stateProps.mayDeleteOrganization) {
       if (stateProps.mayViewApiKeys) {
