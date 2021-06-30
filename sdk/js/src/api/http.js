@@ -141,6 +141,7 @@ class Http {
           error.request_details = {
             url: get(err, 'response.config.url'),
             method: get(err, 'response.config.method'),
+            request_id: get(err, 'response.headers.x-request-id'),
             stack_component: parsedComponent,
           }
         }
