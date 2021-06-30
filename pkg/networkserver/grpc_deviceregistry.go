@@ -71,7 +71,7 @@ func appendRequiredDeviceReadRights(rights []ttnpb.Right, gets ...string) []ttnp
 		"queued_application_downlinks",
 		"session.queued_application_downlinks",
 	) {
-		rights = append(rights, ttnpb.RIGHT_APPLICATION_LINK)
+		rights = append(rights, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)
 	}
 	if ttnpb.HasAnyField(gets,
 		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",

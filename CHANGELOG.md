@@ -53,6 +53,7 @@ For details about compatibility between different releases, see the **Commitment
 - Account for antenna gain when the gateway is not authenticated (i.e. UDP gateway).
 - Preserve antenna gain when the gateway status message contains GPS coordinates.
 - Location map coordinate selection in the Console.
+- Rights required for reading scheduled downlinks.
 
 ### Security
 
