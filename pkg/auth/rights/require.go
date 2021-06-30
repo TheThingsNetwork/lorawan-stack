@@ -31,6 +31,7 @@ var (
 	ErrInsufficientUniversalRights = errors.DefinePermissionDenied(
 		"insufficient_universal_rights",
 		"insufficient universal rights",
+		"missing",
 	)
 	ErrNoAdmin = errors.DefinePermissionDenied(
 		"no_admin",
@@ -43,6 +44,7 @@ var (
 	ErrInsufficientApplicationRights = errors.DefinePermissionDenied(
 		"insufficient_application_rights",
 		"insufficient rights for application `{uid}`",
+		"missing",
 	)
 	ErrNoClientRights = errors.DefinePermissionDenied(
 		"no_client_rights",
@@ -51,6 +53,7 @@ var (
 	ErrInsufficientClientRights = errors.DefinePermissionDenied(
 		"insufficient_client_rights",
 		"insufficient rights for client `{uid}`",
+		"missing",
 	)
 	ErrNoGatewayRights = errors.DefinePermissionDenied(
 		"no_gateway_rights",
@@ -59,6 +62,7 @@ var (
 	ErrInsufficientGatewayRights = errors.DefinePermissionDenied(
 		"insufficient_gateway_rights",
 		"insufficient rights for gateway `{uid}`",
+		"missing",
 	)
 	ErrNoOrganizationRights = errors.DefinePermissionDenied(
 		"no_organization_rights",
@@ -67,6 +71,7 @@ var (
 	ErrInsufficientOrganizationRights = errors.DefinePermissionDenied(
 		"insufficient_organization_rights",
 		"insufficient rights for organization `{uid}`",
+		"missing",
 	)
 	ErrNoUserRights = errors.DefinePermissionDenied(
 		"no_user_rights",
@@ -75,8 +80,17 @@ var (
 	ErrInsufficientUserRights = errors.DefinePermissionDenied(
 		"insufficient_user_rights",
 		"insufficient rights for user `{uid}`",
+		"missing",
 	)
 )
+
+func rightsNames(rights ...ttnpb.Right) []string {
+	names := make([]string, len(rights))
+	for i, right := range rights {
+		names[i] = right.String()
+	}
+	return names
+}
 
 // RequireUniversal checks that the context contains the required universal rights.
 func RequireUniversal(ctx context.Context, required ...ttnpb.Right) error {
@@ -87,7 +101,7 @@ func RequireUniversal(ctx context.Context, required ...ttnpb.Right) error {
 	if rights := authInfo.GetUniversalRights(); len(rights.GetRights()) == 0 {
 		return ErrNoUniversalRights.New()
 	} else if missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights(); len(missing) > 0 {
-		return ErrInsufficientUniversalRights.WithAttributes("missing", missing)
+		return ErrInsufficientUniversalRights.WithAttributes("missing", rightsNames(missing...))
 	}
 	return nil
 }
@@ -117,7 +131,7 @@ func RequireApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers, re
 	}
 	missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights()
 	if len(missing) > 0 {
-		return ErrInsufficientApplicationRights.WithAttributes("uid", uid, "missing", missing)
+		return ErrInsufficientApplicationRights.WithAttributes("uid", uid, "missing", rightsNames(missing...))
 	}
 	return nil
 }
@@ -135,7 +149,7 @@ func RequireClient(ctx context.Context, id ttnpb.ClientIdentifiers, required ...
 	}
 	missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights()
 	if len(missing) > 0 {
-		return ErrInsufficientClientRights.WithAttributes("uid", uid, "missing", missing)
+		return ErrInsufficientClientRights.WithAttributes("uid", uid, "missing", rightsNames(missing...))
 	}
 	return nil
 }
@@ -153,7 +167,7 @@ func RequireGateway(ctx context.Context, id ttnpb.GatewayIdentifiers, required .
 	}
 	missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights()
 	if len(missing) > 0 {
-		return ErrInsufficientGatewayRights.WithAttributes("uid", uid, "missing", missing)
+		return ErrInsufficientGatewayRights.WithAttributes("uid", uid, "missing", rightsNames(missing...))
 	}
 	return nil
 }
@@ -171,7 +185,7 @@ func RequireOrganization(ctx context.Context, id ttnpb.OrganizationIdentifiers, 
 	}
 	missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights()
 	if len(missing) > 0 {
-		return ErrInsufficientOrganizationRights.WithAttributes("uid", uid, "missing", missing)
+		return ErrInsufficientOrganizationRights.WithAttributes("uid", uid, "missing", rightsNames(missing...))
 	}
 	return nil
 }
@@ -189,7 +203,7 @@ func RequireUser(ctx context.Context, id ttnpb.UserIdentifiers, required ...ttnp
 	}
 	missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights()
 	if len(missing) > 0 {
-		return ErrInsufficientUserRights.WithAttributes("uid", uid, "missing", missing)
+		return ErrInsufficientUserRights.WithAttributes("uid", uid, "missing", rightsNames(missing...))
 	}
 	return nil
 }
