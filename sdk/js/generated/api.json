@@ -31054,7 +31054,7 @@
             {
               "name": "RIGHT_APPLICATION_LINK",
               "number": "27",
-              "description": "The right to link as Application to a Network Server for traffic exchange,\ni.e. read uplink and write downlink (API keys only).\nThis right is typically only given to an Application Server.\nThis right implies RIGHT_APPLICATION_INFO."
+              "description": "The right to link as Application to a Network Server for traffic exchange,\ni.e. read uplink and write downlink (API keys only).\nThis right is typically only given to an Application Server.\nThis right implies RIGHT_APPLICATION_INFO, RIGHT_APPLICATION_TRAFFIC_READ,\nand RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE."
             },
             {
               "name": "RIGHT_APPLICATION_ALL",

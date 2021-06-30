@@ -7479,7 +7479,7 @@ Right is the enum that defines all the different rights to do something in the n
 | `RIGHT_APPLICATION_TRAFFIC_READ` | 24 | The right to read application traffic (uplink and downlink). |
 | `RIGHT_APPLICATION_TRAFFIC_UP_WRITE` | 25 | The right to write uplink application traffic. |
 | `RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE` | 26 | The right to write downlink application traffic. |
-| `RIGHT_APPLICATION_LINK` | 27 | The right to link as Application to a Network Server for traffic exchange, i.e. read uplink and write downlink (API keys only). This right is typically only given to an Application Server. This right implies RIGHT_APPLICATION_INFO. |
+| `RIGHT_APPLICATION_LINK` | 27 | The right to link as Application to a Network Server for traffic exchange, i.e. read uplink and write downlink (API keys only). This right is typically only given to an Application Server. This right implies RIGHT_APPLICATION_INFO, RIGHT_APPLICATION_TRAFFIC_READ, and RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE. |
 | `RIGHT_APPLICATION_ALL` | 28 | The pseudo-right for all (current and future) application rights. |
 | `RIGHT_CLIENT_ALL` | 29 | The pseudo-right for all (current and future) OAuth client rights. |
 | `RIGHT_GATEWAY_INFO` | 30 | The right to view gateway information. |
