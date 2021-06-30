@@ -147,7 +147,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 								ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-								ttnpb.RIGHT_APPLICATION_LINK,
+								ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 							},
 						},
 					},
@@ -1025,7 +1025,6 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 				},
 				RequiredRights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-					ttnpb.RIGHT_APPLICATION_LINK,
 				},
 			},
 			{
@@ -1048,7 +1047,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 				RequiredRights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 					ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-					ttnpb.RIGHT_APPLICATION_LINK,
+					ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 				},
 			},
 			{
@@ -1065,7 +1064,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 				RequiredRights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 					ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-					ttnpb.RIGHT_APPLICATION_LINK,
+					ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 				},
 			},
 		} {
