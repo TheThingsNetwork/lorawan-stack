@@ -118,12 +118,16 @@ class Http {
 
       const response = await this[parsedComponent](config)
 
-      if ('X-Warning' in response.headers || 'x-warning' in response.headers) {
+      for (const key in response.headers) {
+        if (!(key.toLowerCase() in response.headers)) {
+          // Normalize capitalized HTTP/1 headers to lowercase HTTP/2 headers.
+          response.headers[key.toLowerCase()] = response.headers[key]
+        }
+      }
+
+      if ('x-warning' in response.headers) {
         // Dispatch a warning event when the server has set a warning header.
-        EventHandler.dispatchEvent(
-          EventHandler.EVENTS.WARNING,
-          response.headers['X-Warning'] || response.headers['x-warning'],
-        )
+        EventHandler.dispatchEvent(EventHandler.EVENTS.WARNING, response.headers['x-warning'])
       }
 
       return response
@@ -137,6 +141,7 @@ class Http {
           error.request_details = {
             url: get(err, 'response.config.url'),
             method: get(err, 'response.config.method'),
+            request_id: get(err, 'response.headers.x-request-id'),
             stack_component: parsedComponent,
           }
         }
