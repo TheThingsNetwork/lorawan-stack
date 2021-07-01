@@ -117,16 +117,16 @@ export default {
         align: 'center',
       },
     ],
-    rows: rows.map(r => {
-      return Object.assign({}, r, {
+    rows: rows.map(r =>
+      Object.assign({}, r, {
         options: (
           <div>
             <Button icon="settings" />
             <Button danger icon="delete" />
           </div>
         ),
-      })
-    }),
+      }),
+    ),
   },
   sortableExample: {
     headers: headers.map(header => {

@@ -17,7 +17,7 @@
     "test:watch": "../../node_modules/.bin/jest --watch",
     "definitions": "node util/http-mapper.js",
     "fmt": "yarn --cwd=\"../..\" prettier './sdk/js/src/**/*.js' './sdk/js/util/**/*.js' --write",
-    "lint": "yarn --cwd=\"../..\" eslint './sdk/js/src/**/**.js' './sdk/js/util/**/*.js' --no-ignore --color"
+    "lint": "yarn --cwd=\"../..\" eslint './sdk/js/src/**/**.js' './sdk/js/util/**/*.js' --no-ignore --color --max-warnings 0"
   },
   "eslintConfig": {
     "extends": "../../config/eslintrc.yaml",

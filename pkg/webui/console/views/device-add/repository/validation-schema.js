@@ -115,7 +115,7 @@ const validationSchema = Yup.object({
             .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
             .required(sharedMessages.validateRequired),
         }),
-        f_nwk_s_int_key: Yup.object({
+        f_nwk_s_int_key: Yup.object().shape({
           key: Yup.string()
             .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
             .required(sharedMessages.validateRequired),

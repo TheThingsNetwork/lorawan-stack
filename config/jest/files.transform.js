@@ -15,7 +15,5 @@
 /* eslint-disable import/no-commonjs */
 
 module.exports = {
-  process: (src, filename) => {
-    return `module.exports = "${filename}";`
-  },
+  process: (src, filename) => `module.exports = "${filename}";`,
 }

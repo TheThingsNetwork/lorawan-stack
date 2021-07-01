@@ -61,9 +61,7 @@ const r = SUPPORT_LOCALES.split(',').map(l => new RegExp(l.trim()))
 
 const filterLocales = (context, request, callback) => {
   if (context.endsWith('node_modules/intl/locale-data/jsonp')) {
-    const supported = r.reduce((acc, locale) => {
-      return acc || locale.test(request)
-    }, false)
+    const supported = r.reduce((acc, locale) => acc || locale.test(request), false)
 
     if (!supported) {
       return callback(null, `commonjs ${request}`)

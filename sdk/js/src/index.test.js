@@ -52,31 +52,29 @@ const mockDeviceData = {
   },
 }
 
-jest.mock('./api', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      ApplicationRegistry: {
-        Get: jest.fn().mockResolvedValue({ data: mockApplicationData }),
-        List: jest.fn().mockResolvedValue({
-          data: { applications: [mockApplicationData] },
-          headers: { 'x-total-count': 1 },
-        }),
-      },
-      EndDeviceRegistry: {
-        Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
-      },
-      NsEndDeviceRegistry: {
-        Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
-      },
-      AsEndDeviceRegistry: {
-        Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
-      },
-      JsEndDeviceRegistry: {
-        Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
-      },
-    }
-  })
-})
+jest.mock('./api', () =>
+  jest.fn().mockImplementation(() => ({
+    ApplicationRegistry: {
+      Get: jest.fn().mockResolvedValue({ data: mockApplicationData }),
+      List: jest.fn().mockResolvedValue({
+        data: { applications: [mockApplicationData] },
+        headers: { 'x-total-count': 1 },
+      }),
+    },
+    EndDeviceRegistry: {
+      Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
+    },
+    NsEndDeviceRegistry: {
+      Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
+    },
+    AsEndDeviceRegistry: {
+      Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
+    },
+    JsEndDeviceRegistry: {
+      Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
+    },
+  })),
+)
 
 describe('SDK class', () => {
   const token = 'faketoken'

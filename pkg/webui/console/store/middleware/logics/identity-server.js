@@ -20,9 +20,7 @@ import * as is from '@console/store/actions/identity-server'
 
 const getIsConfigurationLogic = createRequestLogic({
   type: is.GET_IS_CONFIGURATION,
-  process: async () => {
-    return api.is.getConfiguration()
-  },
+  process: async () => api.is.getConfiguration(),
 })
 
 export default [getIsConfigurationLogic]

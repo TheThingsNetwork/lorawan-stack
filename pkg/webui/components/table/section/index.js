@@ -16,19 +16,17 @@ import React from 'react'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const Section = ({ className, component: Component, children, ...rest }) => {
-  return (
-    <Component className={className} {...rest}>
-      {React.Children.map(children, row =>
-        React.cloneElement(row, {
-          head: Component === 'thead',
-          body: Component === 'tbody',
-          foot: Component === 'tfoot',
-        }),
-      )}
-    </Component>
-  )
-}
+const Section = ({ className, component: Component, children, ...rest }) => (
+  <Component className={className} {...rest}>
+    {React.Children.map(children, row =>
+      React.cloneElement(row, {
+        head: Component === 'thead',
+        body: Component === 'tbody',
+        foot: Component === 'tfoot',
+      }),
+    )}
+  </Component>
+)
 
 Section.propTypes = {
   children: PropTypes.node,

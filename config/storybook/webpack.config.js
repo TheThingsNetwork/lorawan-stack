@@ -29,9 +29,9 @@ module.exports = async ({ config, mode }) => {
   }
 
   // Filter plugins on allowed type.
-  const filteredPlugins = bundleConfig.plugins.filter(plugin => {
-    return allow.reduce((ok, klass) => ok || plugin instanceof klass, false)
-  })
+  const filteredPlugins = bundleConfig.plugins.filter(plugin =>
+    allow.reduce((ok, klass) => ok || plugin instanceof klass, false),
+  )
 
   // Compose storybook config, making use of stack webpack config.
   const cfg = {

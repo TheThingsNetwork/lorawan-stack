@@ -20,6 +20,4 @@ const style = {
   padding: '1rem',
 }
 
-export default props => {
-  return <div style={style}>{props.children}</div>
-}
+export default props => <div style={style}>{props.children}</div>

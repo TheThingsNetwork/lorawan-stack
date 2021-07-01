@@ -25,9 +25,7 @@ import NavigationLink from '../link'
 
 import style from './bar.styl'
 
-const NavigationBar = ({ className, children }) => {
-  return <nav className={className}>{children}</nav>
-}
+const NavigationBar = ({ className, children }) => <nav className={className}>{children}</nav>
 
 NavigationBar.propTypes = {
   children: PropTypes.node.isRequired,

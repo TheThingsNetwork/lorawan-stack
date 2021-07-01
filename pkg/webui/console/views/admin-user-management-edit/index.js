@@ -59,9 +59,9 @@ const m = defineMessages({
   ({ userId, getUser }) => getUser(userId, ['name', 'primary_email_address', 'state', 'admin']),
   ({ fetching, user }) => fetching || !Boolean(user),
 )
-@withBreadcrumb('admin.user-management.edit', ({ userId }) => {
-  return <Breadcrumb path={`/admin/user-management/${userId}`} content={sharedMessages.edit} />
-})
+@withBreadcrumb('admin.user-management.edit', ({ userId }) => (
+  <Breadcrumb path={`/admin/user-management/${userId}`} content={sharedMessages.edit} />
+))
 export default class UserManagementEdit extends Component {
   static propTypes = {
     deleteUser: PropTypes.func.isRequired,

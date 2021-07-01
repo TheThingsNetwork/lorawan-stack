@@ -36,18 +36,16 @@ const store = createStore(history)
 const req = require.context('../../pkg/webui/', true, /story\.js$/)
 const load = () => req.keys().forEach(req)
 
-addDecorator(story => {
-  return (
-    <EnvProvider env={env}>
-      <Provider store={store}>
-        <IntlProvider key="key" messages={{ ...messages, ...backendMessages }} locale="en-US">
-          <ConnectedRouter history={history}>
-            <Center>{story()}</Center>
-          </ConnectedRouter>
-        </IntlProvider>
-      </Provider>
-    </EnvProvider>
-  )
-})
+addDecorator(story => (
+  <EnvProvider env={env}>
+    <Provider store={store}>
+      <IntlProvider key="key" messages={{ ...messages, ...backendMessages }} locale="en-US">
+        <ConnectedRouter history={history}>
+          <Center>{story()}</Center>
+        </ConnectedRouter>
+      </IntlProvider>
+    </Provider>
+  </EnvProvider>
+))
 
 configure(load, module)

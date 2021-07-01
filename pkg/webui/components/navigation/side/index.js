@@ -130,9 +130,10 @@ export class SideNavigation extends Component {
 
   @bind
   async onToggle() {
-    await this.setState(prev => {
-      return { isMinimized: !prev.isMinimized, preferMinimized: !prev.isMinimized }
-    })
+    await this.setState(prev => ({
+      isMinimized: !prev.isMinimized,
+      preferMinimized: !prev.isMinimized,
+    }))
     this.updateAppContainerClasses()
   }
 

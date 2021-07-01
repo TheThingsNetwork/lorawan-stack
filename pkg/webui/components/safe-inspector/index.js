@@ -26,11 +26,10 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './safe-inspector.styl'
 
-const chunkArray = (array, chunkSize) => {
-  return Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, index) =>
+const chunkArray = (array, chunkSize) =>
+  Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, index) =>
     array.slice(index * chunkSize, (index + 1) * chunkSize),
   )
-}
 
 const selectText = node => {
   if (document.body.createTextRange) {

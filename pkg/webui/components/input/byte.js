@@ -50,13 +50,9 @@ const mask = (min, max, showPerChar = false) => {
   return r
 }
 
-const upper = str => {
-  return str.toUpperCase()
-}
+const upper = str => str.toUpperCase()
 
-const clean = str => {
-  return str.replace(new RegExp(`[ ${PLACEHOLDER_CHAR}]`, 'g'), '')
-}
+const clean = str => str.replace(new RegExp(`[ ${PLACEHOLDER_CHAR}]`, 'g'), '')
 
 export default class ByteInput extends React.Component {
   static propTypes = {

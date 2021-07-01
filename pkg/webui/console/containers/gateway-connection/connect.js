@@ -32,15 +32,13 @@ import withConnectionReactor from './gateway-connection-reactor'
 
 export default GatewayConnection =>
   connect(
-    (state, ownProps) => {
-      return {
-        statistics: selectGatewayStatistics(state, ownProps),
-        error: selectGatewayStatisticsError(state, ownProps),
-        fetching: selectGatewayStatisticsIsFetching(state, ownProps),
-        latestEvent: selectLatestGatewayEvent(state, ownProps.gtwId),
-        lastSeen: selectGatewayLastSeen(state),
-      }
-    },
+    (state, ownProps) => ({
+      statistics: selectGatewayStatistics(state, ownProps),
+      error: selectGatewayStatisticsError(state, ownProps),
+      fetching: selectGatewayStatisticsIsFetching(state, ownProps),
+      latestEvent: selectLatestGatewayEvent(state, ownProps.gtwId),
+      lastSeen: selectGatewayLastSeen(state),
+    }),
     (dispatch, ownProps) => ({
       startStatistics: () => dispatch(startGatewayStatistics(ownProps.gtwId)),
       stopStatistics: () => dispatch(stopGatewayStatistics()),
