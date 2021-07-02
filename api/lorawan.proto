@@ -278,12 +278,19 @@ message FSKDataRate {
   uint32 bit_rate = 1;
 }
 
+message LRFHSSDataRate {
+  uint32 modulation_type = 1;
+  // Operating Channel Width (kHz).
+  uint32 operating_channel_width = 2;
+}
+
 message DataRate {
   oneof modulation {
     option (validate.required) = true;
 
     LoRaDataRate lora = 1 [(gogoproto.customname) = "LoRa"];
     FSKDataRate fsk = 2 [(gogoproto.customname) = "FSK"];
+    LRFHSSDataRate lrfhss = 3;
   };
 }
 

@@ -753,6 +753,37 @@ func (dst *FSKDataRate) SetFields(src *FSKDataRate, paths ...string) error {
 	return nil
 }
 
+func (dst *LRFHSSDataRate) SetFields(src *LRFHSSDataRate, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "modulation_type":
+			if len(subs) > 0 {
+				return fmt.Errorf("'modulation_type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ModulationType = src.ModulationType
+			} else {
+				var zero uint32
+				dst.ModulationType = zero
+			}
+		case "operating_channel_width":
+			if len(subs) > 0 {
+				return fmt.Errorf("'operating_channel_width' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.OperatingChannelWidth = src.OperatingChannelWidth
+			} else {
+				var zero uint32
+				dst.OperatingChannelWidth = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *DataRate) SetFields(src *DataRate, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -827,6 +858,39 @@ func (dst *DataRate) SetFields(src *DataRate, paths ...string) error {
 						} else {
 							newDst = &FSKDataRate{}
 							dst.Modulation = &DataRate_FSK{FSK: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Modulation = src.Modulation
+						} else {
+							dst.Modulation = nil
+						}
+					}
+				case "lrfhss":
+					_, srcOk := src.Modulation.(*DataRate_Lrfhss)
+					if !srcOk && src.Modulation != nil {
+						return fmt.Errorf("attempt to set oneof 'lrfhss', while different oneof is set in source")
+					}
+					_, dstOk := dst.Modulation.(*DataRate_Lrfhss)
+					if !dstOk && dst.Modulation != nil {
+						return fmt.Errorf("attempt to set oneof 'lrfhss', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *LRFHSSDataRate
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Modulation.(*DataRate_Lrfhss).Lrfhss
+						}
+						if dstOk {
+							newDst = dst.Modulation.(*DataRate_Lrfhss).Lrfhss
+						} else {
+							newDst = &LRFHSSDataRate{}
+							dst.Modulation = &DataRate_Lrfhss{Lrfhss: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err

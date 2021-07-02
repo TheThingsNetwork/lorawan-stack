@@ -349,6 +349,7 @@
   - [Message `GatewayAntennaIdentifiers`](#ttn.lorawan.v3.GatewayAntennaIdentifiers)
   - [Message `JoinAcceptPayload`](#ttn.lorawan.v3.JoinAcceptPayload)
   - [Message `JoinRequestPayload`](#ttn.lorawan.v3.JoinRequestPayload)
+  - [Message `LRFHSSDataRate`](#ttn.lorawan.v3.LRFHSSDataRate)
   - [Message `LoRaDataRate`](#ttn.lorawan.v3.LoRaDataRate)
   - [Message `MACCommand`](#ttn.lorawan.v3.MACCommand)
   - [Message `MACCommand.ADRParamSetupReq`](#ttn.lorawan.v3.MACCommand.ADRParamSetupReq)
@@ -4885,6 +4886,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | ----- | ---- | ----- | ----------- |
 | `lora` | [`LoRaDataRate`](#ttn.lorawan.v3.LoRaDataRate) |  |  |
 | `fsk` | [`FSKDataRate`](#ttn.lorawan.v3.FSKDataRate) |  |  |
+| `lrfhss` | [`LRFHSSDataRate`](#ttn.lorawan.v3.LRFHSSDataRate) |  |  |
 
 ### <a name="ttn.lorawan.v3.DataRateIndexValue">Message `DataRateIndexValue`</a>
 
@@ -5013,6 +5015,13 @@ Only the components for which the keys were meant, will have the key-encryption-
 | `join_eui` | [`bytes`](#bytes) |  |  |
 | `dev_eui` | [`bytes`](#bytes) |  |  |
 | `dev_nonce` | [`bytes`](#bytes) |  |  |
+
+### <a name="ttn.lorawan.v3.LRFHSSDataRate">Message `LRFHSSDataRate`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `modulation_type` | [`uint32`](#uint32) |  |  |
+| `operating_channel_width` | [`uint32`](#uint32) |  | Operating Channel Width (kHz). |
 
 ### <a name="ttn.lorawan.v3.LoRaDataRate">Message `LoRaDataRate`</a>
 

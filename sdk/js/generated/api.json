@@ -21370,6 +21370,16 @@
               "fullType": "ttn.lorawan.v3.FSKDataRate",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "lrfhss",
+              "description": "",
+              "label": "",
+              "type": "LRFHSSDataRate",
+              "longType": "LRFHSSDataRate",
+              "fullType": "ttn.lorawan.v3.LRFHSSDataRate",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -21849,6 +21859,37 @@
               "type": "bytes",
               "longType": "bytes",
               "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LRFHSSDataRate",
+          "longName": "LRFHSSDataRate",
+          "fullName": "ttn.lorawan.v3.LRFHSSDataRate",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "modulation_type",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "operating_channel_width",
+              "description": "Operating Channel Width (kHz).",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
             }

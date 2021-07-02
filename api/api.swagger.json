@@ -13193,6 +13193,9 @@
         },
         "fsk": {
           "$ref": "#/definitions/v3FSKDataRate"
+        },
+        "lrfhss": {
+          "$ref": "#/definitions/v3LRFHSSDataRate"
         }
       }
     },
@@ -14797,6 +14800,20 @@
       ],
       "default": "KEY_SECURITY_UNKNOWN",
       "description": " - KEY_SECURITY_UNKNOWN: Unknown key security.\n - KEY_SECURITY_NONE: No key security.\n - KEY_SECURITY_READ_PROTECTED: Read Protected key security.\n - KEY_SECURITY_SECURE_ELEMENT: Key security using the Security Element."
+    },
+    "v3LRFHSSDataRate": {
+      "type": "object",
+      "properties": {
+        "modulation_type": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "operating_channel_width": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Operating Channel Width (kHz)."
+        }
+      }
     },
     "v3ListEndDeviceBrandsResponse": {
       "type": "object",
