@@ -1049,11 +1049,12 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							Settings: &ttnpb.DownlinkMessage_Request{
 								Request: func() *ttnpb.TxRequest {
 									txReq := &ttnpb.TxRequest{
-										Class:           conf.Class,
-										DownlinkPaths:   expectedAttempt.RequestPaths,
-										Priority:        conf.Priority,
-										FrequencyPlanID: conf.FrequencyPlanID,
-										AbsoluteTime:    conf.AbsoluteTime,
+										Class:             conf.Class,
+										DownlinkPaths:     expectedAttempt.RequestPaths,
+										Priority:          conf.Priority,
+										FrequencyPlanID:   conf.FrequencyPlanID,
+										AbsoluteTime:      conf.AbsoluteTime,
+										LorawanPhyVersion: conf.PHYVersion,
 									}
 									if conf.SetRX1 {
 										txReq.Rx1Delay = conf.RX1Delay
@@ -2149,12 +2150,13 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 					EndDeviceIds: &x.EndDeviceIdentifiers,
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							Class:            ttnpb.CLASS_A,
-							Priority:         priority,
-							FrequencyPlanID:  x.FrequencyPlanID,
-							Rx1Delay:         ttnpb.RxDelay(Band(x.FrequencyPlanID, x.LoRaWANPHYVersion).JoinAcceptDelay1 / time.Second),
-							Rx2DataRateIndex: x.PendingMACState.CurrentParameters.Rx2DataRateIndex,
-							Rx2Frequency:     x.PendingMACState.CurrentParameters.Rx2Frequency,
+							Class:             ttnpb.CLASS_A,
+							Priority:          priority,
+							FrequencyPlanID:   x.FrequencyPlanID,
+							Rx1Delay:          ttnpb.RxDelay(Band(x.FrequencyPlanID, x.LoRaWANPHYVersion).JoinAcceptDelay1 / time.Second),
+							Rx2DataRateIndex:  x.PendingMACState.CurrentParameters.Rx2DataRateIndex,
+							Rx2Frequency:      x.PendingMACState.CurrentParameters.Rx2Frequency,
+							LorawanPhyVersion: x.LoRaWANPHYVersion,
 							// TODO: Generate RX1 transmission parameters if necessary.
 							// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
 						},
