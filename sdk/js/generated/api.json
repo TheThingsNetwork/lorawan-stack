@@ -23965,6 +23965,24 @@
               }
             },
             {
+              "name": "lorawan_phy_version",
+              "description": "The regional parameters version used to interpret the data rate indices in this message.",
+              "label": "",
+              "type": "PHYVersion",
+              "longType": "PHYVersion",
+              "fullType": "ttn.lorawan.v3.PHYVersion",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
               "name": "advanced",
               "description": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case",
               "label": "",
