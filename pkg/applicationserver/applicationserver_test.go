@@ -2603,7 +2603,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							} else {
 								t.Fatalf("Expected no upstream message but got %v", msg)
 							}
-						case <-time.After(Timeout * 2):
+						case <-time.After(Timeout * 4):
 							if step.AssertUp != nil {
 								step.AssertUp(t, nil)
 							} else {
