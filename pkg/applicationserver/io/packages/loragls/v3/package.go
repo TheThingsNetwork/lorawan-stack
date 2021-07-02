@@ -102,7 +102,7 @@ func New(server io.Server, registry packages.Registry) packages.ApplicationPacka
 
 func (p *GeolocationPackage) singleFrameQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
 	req := api.BuildSingleFrameRequest(ctx, up.RxMetadata)
-	if len(req.Gateways) < 3 {
+	if len(req.Gateways) < 1 {
 		return nil, nil
 	}
 	resp, err := client.SolveSingleFrame(ctx, req)
@@ -157,7 +157,7 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids ttnpb.EndD
 	}
 
 	req := api.BuildMultiFrameRequest(ctx, mds)
-	if len(req.Gateways) < 3 {
+	if len(req.Gateways) < 1 {
 		return nil, nil
 	}
 	resp, err := client.SolveMultiFrame(ctx, req)
@@ -169,7 +169,7 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids ttnpb.EndD
 
 func (p *GeolocationPackage) wifiQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
 	req := api.BuildWiFiRequest(ctx, up.RxMetadata, up.DecodedPayload)
-	if len(req.WiFiAccessPoints) == 0 && len(req.LoRaWAN) < 3 {
+	if len(req.LoRaWAN) < 1 {
 		return nil, nil
 	}
 	resp, err := client.SolveWiFi(ctx, req)

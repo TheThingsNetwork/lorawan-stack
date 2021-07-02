@@ -68,6 +68,8 @@ type Server interface {
 	FromRequestContext(ctx context.Context) context.Context
 	// RateLimiter returns the rate limiter instance.
 	RateLimiter() ratelimit.Interface
+	// ValidateGatewayID validates the ID of the gateway.
+	ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 }
 
 // Connection is a connection to a gateway managed by a frontend.

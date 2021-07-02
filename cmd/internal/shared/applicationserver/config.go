@@ -77,6 +77,6 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		},
 	},
 	Formatters: applicationserver.FormattersConfig{
-		MaxParameterLength: 4096,
+		MaxParameterLength: 40960,
 	},
 }

@@ -109,7 +109,7 @@ Link.propTypes = {
       pathname: PropTypes.string,
       search: PropTypes.string,
       hash: PropTypes.string,
-      state: PropTypes.object,
+      state: PropTypes.shape({}),
     }),
   ]).isRequired,
 }

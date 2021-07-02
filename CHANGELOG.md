@@ -30,6 +30,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.13.3] - 2021-07-02
+
+### Added
+
 - Email sent to admins when an OAuth client is requested by a non-admin user.
 - Packet Broker UI in the Console (admin only).
 - New config option `--console.oauth.cross-site-cookie` to control access to OAuth state cookie between origins.
@@ -46,7 +60,7 @@ For details about compatibility between different releases, see the **Commitment
   - `gs.packetbroker.online-ttl-margin`: Time to extend the online status before it expires
   - `pba.mapper-address`: Address of Packet Broker Mapper
   - `pba.forwarder.gateway-online-ttl`: Time-to-live of online status reported to Packet Broker
-  
+
 ### Changed
 
 - Low-level log messages from the `go-redis` library are printed only when the log level is set to `DEBUG`.
@@ -56,10 +70,9 @@ For details about compatibility between different releases, see the **Commitment
 - For ABP sessions, the CLI now requests a DevAddr from the Network Server instead of generating one from the testing NetID.
 - Descriptions, tooltips and defaults for checkboxes for public gateway status and location in the Console.
 - All HTTP requests made by The Things Stack now contain a `User-Agent` header in the form of `TheThingsStack/{version}`.
-
-### Deprecated
-
-### Removed
+- No connection to Packet Broker is being made when neither the Forwarder nor the Home Network role is enabled.
+- Increase the default size limit for payload formatter scripts to 40KB (up from 4KB). The maximum size enforced at API level is 40KB (up from 16KB).
+  - For more context see [issue #4053](https://github.com/TheThingsNetwork/lorawan-stack/issues/4053) and [issue #4278](https://github.com/TheThingsNetwork/lorawan-stack/issues/4278).
 
 ### Fixed
 
@@ -68,8 +81,8 @@ For details about compatibility between different releases, see the **Commitment
 - Error when logging into the Console when using connections without TLS.
 - Account for antenna gain when the gateway is not authenticated (i.e. UDP gateway).
 - Preserve antenna gain when the gateway status message contains GPS coordinates.
-
-### Security
+- Location map coordinate selection in the Console.
+- Rights required for reading scheduled downlinks.
 
 ## [3.13.2] - 2021-06-17
 
@@ -1619,7 +1632,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.2...v3.13
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.3...v3.13
+[3.13.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.2...v3.13.3
 [3.13.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.1...v3.13.2
 [3.13.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.0...v3.13.1
 [3.13.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.12.3...v3.13.0

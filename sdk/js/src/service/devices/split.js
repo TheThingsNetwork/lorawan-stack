@@ -78,9 +78,7 @@ const splitPaths = (paths = [], direction, base = {}, components = [IS, NS, AS, 
  * @returns {object} A request tree object, consisting of resulting paths for
  * each component eg: `{ is: ['ids'], as: ['session'], js: ['root_keys'] }`.
  */
-export const splitSetPaths = (paths, base, components) => {
-  return splitPaths(paths, 'set', base, components)
-}
+export const splitSetPaths = (paths, base, components) => splitPaths(paths, 'set', base, components)
 
 /**
  * A wrapper function to obtain a request tree for reading values to a device.
@@ -93,9 +91,7 @@ export const splitSetPaths = (paths, base, components) => {
  * @returns {object} A request tree object, consisting of resulting paths for
  * each component eg: `{ is: ['ids'], as: ['session'], js: ['root_keys'] }`.
  */
-export const splitGetPaths = (paths, base, components) => {
-  return splitPaths(paths, 'get', base, components)
-}
+export const splitGetPaths = (paths, base, components) => splitPaths(paths, 'get', base, components)
 
 /**
  * `makeRequests` will make the necessary api calls based on the request tree

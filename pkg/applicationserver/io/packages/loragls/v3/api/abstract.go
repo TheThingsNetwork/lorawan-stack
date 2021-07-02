@@ -16,6 +16,7 @@ package api
 
 import (
 	"encoding/json"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -77,7 +78,7 @@ func (r *LocationSolverResult) abstractResult() AbstractLocationSolverResult {
 		source = ttnpb.SOURCE_LORA_TDOA_GEOLOCATION
 	}
 	return abstractLocationSolverResult{
-		algorithm: r.Algorithm,
+		algorithm: strings.ToLower(r.Algorithm),
 		location: ttnpb.Location{
 			Latitude:  r.Location.Latitude,
 			Longitude: r.Location.Longitude,
@@ -128,7 +129,7 @@ func (r *WiFiLocationSolverResult) abstractResult() AbstractLocationSolverResult
 		return nil
 	}
 	return abstractLocationSolverResult{
-		algorithm: r.Algorithm,
+		algorithm: strings.ToLower(r.Algorithm),
 		location: ttnpb.Location{
 			Latitude:  r.Latitude,
 			Longitude: r.Longitude,

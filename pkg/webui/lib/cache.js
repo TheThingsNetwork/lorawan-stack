@@ -39,6 +39,4 @@ export const remove = key => {
   return localStorage.removeItem(hashedKey)
 }
 
-export const clearAll = () => {
-  return localStorage.clear()
-}
+export const clearAll = () => localStorage.clear()

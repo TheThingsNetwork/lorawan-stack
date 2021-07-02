@@ -71,3 +71,7 @@ func (srv mockServer) FromRequestContext(ctx context.Context) context.Context {
 func (srv mockServer) RateLimiter() ratelimit.Interface {
 	return nil
 }
+
+func (srv mockServer) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+	return ids.ValidateContext(ctx)
+}

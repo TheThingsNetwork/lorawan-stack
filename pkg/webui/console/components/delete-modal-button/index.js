@@ -88,11 +88,11 @@ const DeleteModalButton = props => {
 DeleteModalButton.propTypes = {
   entityId: PropTypes.string.isRequired,
   entityName: PropTypes.string,
+  message: PropTypes.message.isRequired,
   onApprove: PropTypes.func,
   onCancel: PropTypes.func,
   shouldConfirm: PropTypes.bool,
   shouldPurge: PropTypes.bool,
-  message: PropTypes.message.isRequired,
 }
 
 DeleteModalButton.defaultProps = {

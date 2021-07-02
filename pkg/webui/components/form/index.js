@@ -135,7 +135,7 @@ const formRenderer = ({ children, ...rest }) => renderProps => {
 class Form extends React.PureComponent {
   static propTypes = {
     enableReinitialize: PropTypes.bool,
-    formikRef: PropTypes.shape({ current: PropTypes.any }),
+    formikRef: PropTypes.shape({ current: PropTypes.shape({}) }),
     initialValues: PropTypes.shape({}),
     onReset: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,

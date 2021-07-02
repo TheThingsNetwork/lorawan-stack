@@ -64,7 +64,7 @@ func (js Js) runWebpack(config string, args ...string) error {
 }
 
 func (js Js) runEslint(args ...string) error {
-	return js.runYarnCommand("eslint", append([]string{"--color", "--no-ignore"}, args...)...)
+	return js.runYarnCommand("eslint", append([]string{"--color", "--no-ignore", "--max-warnings", "0"}, args...)...)
 }
 
 func (js Js) waitOn() error {

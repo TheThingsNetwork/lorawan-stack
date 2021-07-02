@@ -5957,15 +5957,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:dev_nonce_too_high": {
-    "translations": {
-      "en": "DevNonce is too high"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:dev_nonce_too_small": {
     "translations": {
       "en": "DevNonce is too small"
@@ -7298,24 +7289,6 @@
       "file": "translation.go"
     }
   },
-  "error:pkg/packetbrokeragent:forwarder_disabled": {
-    "translations": {
-      "en": "Forwarder is disabled"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "grpc_gspba.go"
-    }
-  },
-  "error:pkg/packetbrokeragent:home_network_disabled": {
-    "translations": {
-      "en": "Home Network is disabled"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "grpc_nspba.go"
-    }
-  },
   "error:pkg/packetbrokeragent:inconsistent_bands": {
     "translations": {
       "en": "inconsistent bands"
@@ -7403,7 +7376,7 @@
     },
     "description": {
       "package": "pkg/packetbrokeragent",
-      "file": "grpc_pba.go"
+      "file": "grpc_disabled.go"
     }
   },
   "error:pkg/packetbrokeragent:registration": {

@@ -253,6 +253,20 @@ func (Dev) InitStack() error {
 	); err != nil {
 		return err
 	}
+	if err := runGo("./cmd/ttn-lw-stack", "is-db", "create-oauth-client",
+		"--id", "console",
+		"--name", "Console",
+		"--owner", "admin",
+		"--secret", "console",
+		"--redirect-uri", "https://localhost:8885/console/oauth/callback",
+		"--redirect-uri", "http://localhost:1885/console/oauth/callback",
+		"--redirect-uri", "/console/oauth/callback",
+		"--logout-redirect-uri", "https://localhost:8885/console",
+		"--logout-redirect-uri", "http://localhost:1885/console",
+		"--logout-redirect-uri", "/console",
+	); err != nil {
+		return err
+	}
 	var key ttnpb.APIKey
 	var jsonVal []byte
 	var err error
@@ -265,22 +279,10 @@ func (Dev) InitStack() error {
 	if err := json.Unmarshal(jsonVal, &key); err != nil {
 		return err
 	}
-
 	if err := writeToFile(filepath.Join(devDir, "admin_api_key.txt"), []byte(key.Key)); err != nil {
 		return err
 	}
-	return runGo("./cmd/ttn-lw-stack", "is-db", "create-oauth-client",
-		"--id", "console",
-		"--name", "Console",
-		"--owner", "admin",
-		"--secret", "console",
-		"--redirect-uri", "https://localhost:8885/console/oauth/callback",
-		"--redirect-uri", "http://localhost:1885/console/oauth/callback",
-		"--redirect-uri", "/console/oauth/callback",
-		"--logout-redirect-uri", "https://localhost:8885/console",
-		"--logout-redirect-uri", "http://localhost:1885/console",
-		"--logout-redirect-uri", "/console",
-	)
+	return nil
 }
 
 // StartDevStack starts TTS in end-to-end test configuration.

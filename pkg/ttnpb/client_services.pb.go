@@ -109,7 +109,7 @@ type ClientRegistryClient interface {
 	// List OAuth clients where the given user or organization is a direct collaborator.
 	// If no user or organization is given, this returns the OAuth clients the caller
 	// has access to.
-	// Similar to Get, this selects the fields sepcified in the field mask.
+	// Similar to Get, this selects the fields specified in the field mask.
 	// More or less fields may be returned, depending on the rights of the caller.
 	List(ctx context.Context, in *ListClientsRequest, opts ...grpc.CallOption) (*Clients, error)
 	// Update the OAuth client, changing the fields specified by the field mask to the provided values.
@@ -208,7 +208,7 @@ type ClientRegistryServer interface {
 	// List OAuth clients where the given user or organization is a direct collaborator.
 	// If no user or organization is given, this returns the OAuth clients the caller
 	// has access to.
-	// Similar to Get, this selects the fields sepcified in the field mask.
+	// Similar to Get, this selects the fields specified in the field mask.
 	// More or less fields may be returned, depending on the rights of the caller.
 	List(context.Context, *ListClientsRequest) (*Clients, error)
 	// Update the OAuth client, changing the fields specified by the field mask to the provided values.

@@ -29,51 +29,47 @@ const m = defineMessages({
   noData: 'No data available',
 })
 
-const DataSheet = ({ className, data }) => {
-  return (
-    <table className={classnames(className, style.table)}>
-      <tbody>
-        {data.map((group, index) => {
-          return (
-            <React.Fragment key={`${group.header}_${index}`}>
-              <tr className={style.groupHeading}>
-                <th>
-                  <Message content={group.header} />
-                </th>
-              </tr>
-              {group.items.length > 0 ? (
-                group.items.map(item => {
-                  if (!item) {
-                    return null
-                  }
-                  const keyId = typeof item.key === 'object' ? item.key.id : item.key
-                  const subItems = item.subItems
-                    ? item.subItems.map((subItem, subIndex) => (
-                        <DataSheetRow sub item={subItem} key={`${keyId}_${index}_${subIndex}`} />
-                      ))
-                    : null
+const DataSheet = ({ className, data }) => (
+  <table className={classnames(className, style.table)}>
+    <tbody>
+      {data.map((group, index) => (
+        <React.Fragment key={`${group.header}_${index}`}>
+          <tr className={style.groupHeading}>
+            <th>
+              <Message content={group.header} />
+            </th>
+          </tr>
+          {group.items.length > 0 ? (
+            group.items.map(item => {
+              if (!item) {
+                return null
+              }
+              const keyId = typeof item.key === 'object' ? item.key.id : item.key
+              const subItems = item.subItems
+                ? item.subItems.map((subItem, subIndex) => (
+                    <DataSheetRow sub item={subItem} key={`${keyId}_${index}_${subIndex}`} />
+                  ))
+                : null
 
-                  return (
-                    <React.Fragment key={`${keyId}_${index}`}>
-                      <DataSheetRow item={item} />
-                      {subItems}
-                    </React.Fragment>
-                  )
-                })
-              ) : (
-                <tr>
-                  <th colSpan={2}>
-                    <Message content={m.noData} />
-                  </th>
-                </tr>
-              )}
-            </React.Fragment>
-          )
-        })}
-      </tbody>
-    </table>
-  )
-}
+              return (
+                <React.Fragment key={`${keyId}_${index}`}>
+                  <DataSheetRow item={item} />
+                  {subItems}
+                </React.Fragment>
+              )
+            })
+          ) : (
+            <tr>
+              <th colSpan={2}>
+                <Message content={m.noData} />
+              </th>
+            </tr>
+          )}
+        </React.Fragment>
+      ))}
+    </tbody>
+  </table>
+)
 
 DataSheet.propTypes = {
   className: PropTypes.string,

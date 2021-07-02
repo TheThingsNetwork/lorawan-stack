@@ -377,11 +377,11 @@ message MessagePayloadFormatters {
   // Payload formatter for uplink messages, must be set together with its parameter.
   PayloadFormatter up_formatter = 1 [(validate.rules).enum.defined_only = true];
   // Parameter for the up_formatter, must be set together. The API enforces a maximum length of 16KB, but the size may be restricted further by deployment configuration.
-  string up_formatter_parameter = 2 [(validate.rules).string.max_len = 16384];
+  string up_formatter_parameter = 2 [(validate.rules).string.max_len = 40960];
   // Payload formatter for downlink messages, must be set together with its parameter.
   PayloadFormatter down_formatter = 3 [(validate.rules).enum.defined_only = true];
   // Parameter for the down_formatter, must be set together. The API enforces a maximum length of 16KB, but the size may be restricted further by deployment configuration.
-  string down_formatter_parameter = 4 [(validate.rules).string.max_len = 16384];
+  string down_formatter_parameter = 4 [(validate.rules).string.max_len = 40960];
 }
 
 message DownlinkQueueRequest {

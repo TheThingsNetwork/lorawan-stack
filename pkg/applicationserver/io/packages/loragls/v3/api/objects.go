@@ -114,7 +114,10 @@ func parseRxMetadata(ctx context.Context, m *ttnpb.RxMetadata) (Gateway, Uplink)
 
 // BuildSingelFrameRequest builds a SingleFrameRequest from the provided metadata.
 func BuildSingleFrameRequest(ctx context.Context, metadata []*ttnpb.RxMetadata) *SingleFrameRequest {
-	r := &SingleFrameRequest{}
+	r := &SingleFrameRequest{
+		Gateways: []Gateway{},
+		Frame:    Frame{},
+	}
 	for _, m := range metadata {
 		if m.Location == nil {
 			continue
@@ -135,7 +138,10 @@ type MultiFrameRequest struct {
 
 // BuildMultiFrameRequest builds a MultiFrameRequest from the provided metadata.
 func BuildMultiFrameRequest(ctx context.Context, mds [][]*ttnpb.RxMetadata) *MultiFrameRequest {
-	r := &MultiFrameRequest{}
+	r := &MultiFrameRequest{
+		Gateways: []Gateway{},
+		Frames:   []Frame{},
+	}
 	gateways := map[string]struct{}{}
 	for _, metadata := range mds {
 		frame := Frame{}

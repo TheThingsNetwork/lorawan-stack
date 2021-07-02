@@ -39,14 +39,9 @@ type pbaServer struct {
 	cpConn *grpc.ClientConn
 }
 
-var errNotEnabled = errors.DefineFailedPrecondition("not_enabled", "Packet Broker is not enabled")
-
 func (s *pbaServer) GetInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.PacketBrokerInfo, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
-	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
-		return nil, errNotEnabled.New()
 	}
 
 	var (
@@ -109,9 +104,6 @@ var (
 func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.PacketBrokerNetwork, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
-	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
-		return nil, errNotEnabled.New()
 	}
 	tenantID := s.tenantIDExtractor(ctx)
 	if tenantID == "" {
@@ -192,9 +184,6 @@ func (s *pbaServer) Deregister(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
-		return nil, errNotEnabled.New()
-	}
 	tenantID := s.tenantIDExtractor(ctx)
 	if tenantID == "" {
 		return nil, errNetwork.New()
@@ -214,7 +203,7 @@ func (s *pbaServer) GetHomeNetworkDefaultRoutingPolicy(ctx context.Context, _ *p
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+	if !s.forwarderConfig.Enable {
 		return nil, errNotEnabled.New()
 	}
 
@@ -232,7 +221,7 @@ func (s *pbaServer) SetHomeNetworkDefaultRoutingPolicy(ctx context.Context, req 
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+	if !s.forwarderConfig.Enable {
 		return nil, errNotEnabled.New()
 	}
 
@@ -254,7 +243,7 @@ func (s *pbaServer) DeleteHomeNetworkDefaultRoutingPolicy(ctx context.Context, _
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+	if !s.forwarderConfig.Enable {
 		return nil, errNotEnabled.New()
 	}
 
@@ -274,7 +263,7 @@ func (s *pbaServer) ListHomeNetworkRoutingPolicies(ctx context.Context, req *ttn
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+	if !s.forwarderConfig.Enable {
 		return nil, errNotEnabled.New()
 	}
 
@@ -343,7 +332,7 @@ func (s *pbaServer) GetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+	if !s.forwarderConfig.Enable {
 		return nil, errNotEnabled.New()
 	}
 
@@ -363,7 +352,7 @@ func (s *pbaServer) SetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+	if !s.forwarderConfig.Enable {
 		return nil, errNotEnabled.New()
 	}
 
@@ -387,7 +376,7 @@ func (s *pbaServer) DeleteHomeNetworkRoutingPolicy(ctx context.Context, req *ttn
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+	if !s.forwarderConfig.Enable {
 		return nil, errNotEnabled.New()
 	}
 
@@ -408,9 +397,6 @@ func (s *pbaServer) DeleteHomeNetworkRoutingPolicy(ctx context.Context, req *ttn
 func (s *pbaServer) listNetworks(ctx context.Context, req func() ([]*packetbroker.NetworkOrTenant, uint32, error)) (*ttnpb.PacketBrokerNetworks, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
-	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
-		return nil, errNotEnabled.New()
 	}
 
 	networks, total, err := req()
@@ -501,7 +487,7 @@ func (s *pbaServer) ListForwarderRoutingPolicies(ctx context.Context, req *ttnpb
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
-	if !s.forwarderConfig.Enable && !s.homeNetworkConfig.Enable {
+	if !s.homeNetworkConfig.Enable {
 		return nil, errNotEnabled.New()
 	}
 

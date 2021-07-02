@@ -97,7 +97,8 @@ const (
 	// The right to link as Application to a Network Server for traffic exchange,
 	// i.e. read uplink and write downlink (API keys only).
 	// This right is typically only given to an Application Server.
-	// This right implies RIGHT_APPLICATION_INFO.
+	// This right implies RIGHT_APPLICATION_INFO, RIGHT_APPLICATION_TRAFFIC_READ,
+	// and RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE.
 	RIGHT_APPLICATION_LINK Right = 27
 	// The pseudo-right for all (current and future) application rights.
 	RIGHT_APPLICATION_ALL Right = 28

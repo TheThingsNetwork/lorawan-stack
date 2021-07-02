@@ -19,9 +19,7 @@ const createStoreSelectorByEntity = entity => state => selectStore(state)[entity
 export const createPaginationIdsSelectorByEntity = entity => {
   const storeSelector = createStoreSelectorByEntity(entity)
 
-  return state => {
-    return storeSelector(state).ids || []
-  }
+  return state => storeSelector(state).ids || []
 }
 
 export const createPaginationIdsSelectorByEntityAndId = entity => {
@@ -38,9 +36,7 @@ export const createPaginationIdsSelectorByEntityAndId = entity => {
 export const createPaginationTotalCountSelectorByEntity = entity => {
   const storeSelector = createStoreSelectorByEntity(entity)
 
-  return state => {
-    return storeSelector(state).totalCount
-  }
+  return state => storeSelector(state).totalCount
 }
 
 export const createPaginationTotalCountSelectorByEntityAndId = entity => {

@@ -25,34 +25,31 @@ import Tab from './tab'
 
 import style from './tabs.styl'
 
-const Tabs = ({ className, active, tabs, onTabChange, divider, narrow }) => {
-  return (
-    <ul
-      className={classnames(className, style.tabs, { [style.divider]: divider })}
-      data-test-id="tabs"
-    >
-      {tabs.map(({ name, disabled, narrow: nrw, link, exact, icon, title, hidden }, index) => {
-        return (
-          !Boolean(hidden) && (
-            <Tab
-              key={index}
-              active={name === active}
-              name={name}
-              disabled={disabled}
-              onClick={onTabChange}
-              narrow={nrw || narrow}
-              link={link}
-              exact={exact}
-            >
-              {icon && <Icon icon={icon} className={style.icon} />}
-              <Message content={title} />
-            </Tab>
-          )
-        )
-      })}
-    </ul>
-  )
-}
+const Tabs = ({ className, active, tabs, onTabChange, divider, narrow }) => (
+  <ul
+    className={classnames(className, style.tabs, { [style.divider]: divider })}
+    data-test-id="tabs"
+  >
+    {tabs.map(
+      ({ name, disabled, narrow: nrw, link, exact, icon, title, hidden }, index) =>
+        !Boolean(hidden) && (
+          <Tab
+            key={index}
+            active={name === active}
+            name={name}
+            disabled={disabled}
+            onClick={onTabChange}
+            narrow={nrw || narrow}
+            link={link}
+            exact={exact}
+          >
+            {icon && <Icon icon={icon} className={style.icon} />}
+            <Message content={title} />
+          </Tab>
+        ),
+    )}
+  </ul>
+)
 
 Tabs.propTypes = {
   /** The name of the active tab. */

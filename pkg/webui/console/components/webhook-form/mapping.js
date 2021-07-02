@@ -59,32 +59,30 @@ const mapHeadersTypeFormValueToWebhookHeadersType = formValue =>
     )) ||
   null
 
-export const mapFormValuesToWebhook = (values, appId) => {
-  return {
-    ids: {
-      application_ids: {
-        application_id: appId,
-      },
-      webhook_id: values.webhook_id,
+export const mapFormValuesToWebhook = (values, appId) => ({
+  ids: {
+    application_ids: {
+      application_id: appId,
     },
-    base_url: values.base_url,
-    format: values.format,
-    headers: mapHeadersTypeFormValueToWebhookHeadersType(values.headers),
-    downlink_api_key: values.downlink_api_key,
-    uplink_message: mapMessageTypeFormValueToWebhookMessageType(values.uplink_message),
-    join_accept: mapMessageTypeFormValueToWebhookMessageType(values.join_accept),
-    downlink_ack: mapMessageTypeFormValueToWebhookMessageType(values.downlink_ack),
-    downlink_nack: mapMessageTypeFormValueToWebhookMessageType(values.downlink_nack),
-    downlink_sent: mapMessageTypeFormValueToWebhookMessageType(values.downlink_sent),
-    downlink_failed: mapMessageTypeFormValueToWebhookMessageType(values.downlink_failed),
-    downlink_queued: mapMessageTypeFormValueToWebhookMessageType(values.downlink_queued),
-    downlink_queue_invalidated: mapMessageTypeFormValueToWebhookMessageType(
-      values.downlink_queue_invalidated,
-    ),
-    location_solved: mapMessageTypeFormValueToWebhookMessageType(values.location_solved),
-    service_data: mapMessageTypeFormValueToWebhookMessageType(values.service_data),
-  }
-}
+    webhook_id: values.webhook_id,
+  },
+  base_url: values.base_url,
+  format: values.format,
+  headers: mapHeadersTypeFormValueToWebhookHeadersType(values.headers),
+  downlink_api_key: values.downlink_api_key,
+  uplink_message: mapMessageTypeFormValueToWebhookMessageType(values.uplink_message),
+  join_accept: mapMessageTypeFormValueToWebhookMessageType(values.join_accept),
+  downlink_ack: mapMessageTypeFormValueToWebhookMessageType(values.downlink_ack),
+  downlink_nack: mapMessageTypeFormValueToWebhookMessageType(values.downlink_nack),
+  downlink_sent: mapMessageTypeFormValueToWebhookMessageType(values.downlink_sent),
+  downlink_failed: mapMessageTypeFormValueToWebhookMessageType(values.downlink_failed),
+  downlink_queued: mapMessageTypeFormValueToWebhookMessageType(values.downlink_queued),
+  downlink_queue_invalidated: mapMessageTypeFormValueToWebhookMessageType(
+    values.downlink_queue_invalidated,
+  ),
+  location_solved: mapMessageTypeFormValueToWebhookMessageType(values.location_solved),
+  service_data: mapMessageTypeFormValueToWebhookMessageType(values.service_data),
+})
 
 export const blankValues = {
   webhook_id: undefined,

@@ -140,9 +140,42 @@ func (ns *mockNS) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDeviceIde
 	}, nil
 }
 
+type mockISEndDeviceRegistry struct {
+	ttnpb.EndDeviceRegistryServer
+
+	endDevices map[string]*ttnpb.EndDevice
+}
+
+func (m *mockISEndDeviceRegistry) add(ctx context.Context, dev *ttnpb.EndDevice) {
+	m.endDevices[unique.ID(ctx, dev.EndDeviceIdentifiers)] = dev
+}
+
+func (m *mockISEndDeviceRegistry) get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, bool) {
+	dev, ok := m.endDevices[unique.ID(ctx, ids)]
+	return dev, ok
+}
+
+func (m *mockISEndDeviceRegistry) Get(ctx context.Context, in *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	if dev, ok := m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)]; ok {
+		return dev, nil
+	}
+	return nil, errNotFound.New()
+}
+
+func (m *mockISEndDeviceRegistry) Update(ctx context.Context, in *ttnpb.UpdateEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	if _, ok := m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)]; !ok {
+		return nil, errNotFound.New()
+	}
+	m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)] = &in.EndDevice
+	return &in.EndDevice, nil
+}
+
 type mockIS struct {
 	ttnpb.ApplicationRegistryServer
 	ttnpb.ApplicationAccessServer
+
+	endDeviceRegistry *mockISEndDeviceRegistry
+
 	applications     map[string]*ttnpb.Application
 	applicationAuths map[string][]string
 }
@@ -151,10 +184,14 @@ func startMockIS(ctx context.Context) (*mockIS, string) {
 	is := &mockIS{
 		applications:     make(map[string]*ttnpb.Application),
 		applicationAuths: make(map[string][]string),
+		endDeviceRegistry: &mockISEndDeviceRegistry{
+			endDevices: make(map[string]*ttnpb.EndDevice),
+		},
 	}
 	srv := rpcserver.New(ctx)
 	ttnpb.RegisterApplicationRegistryServer(srv.Server, is)
 	ttnpb.RegisterApplicationAccessServer(srv.Server, is)
+	ttnpb.RegisterEndDeviceRegistryServer(srv.Server, is.endDeviceRegistry)
 	lis, err := net.Listen("tcp", ":0")
 	if err != nil {
 		panic(err)

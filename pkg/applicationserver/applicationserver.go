@@ -682,7 +682,7 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	case *ttnpb.ApplicationUp_DownlinkNack:
 		return true, as.handleDownlinkNack(ctx, up.EndDeviceIdentifiers, p.DownlinkNack, link)
 	case *ttnpb.ApplicationUp_LocationSolved:
-		return true, nil
+		return true, as.handleLocationSolved(ctx, up.EndDeviceIdentifiers, p.LocationSolved, link)
 	case *ttnpb.ApplicationUp_ServiceData:
 		return true, nil
 	default:
@@ -916,14 +916,14 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		if uplink.Locations == nil {
 			uplink.Locations = make(map[string]*ttnpb.Location)
 		}
-		uplink.Locations["frm_payload"] = loc
+		uplink.Locations["frm-payload"] = loc
 		err := as.processUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ids,
 			CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
 			ReceivedAt:           &uplink.ReceivedAt,
 			Up: &ttnpb.ApplicationUp_LocationSolved{
 				LocationSolved: &ttnpb.ApplicationLocation{
-					Service:  "frm_payload",
+					Service:  "frm-payload",
 					Location: *loc,
 				},
 			},
@@ -1068,6 +1068,45 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 		},
 	)
 	return err
+}
+
+var locationUpdateTimeout = 5 * time.Second
+
+// handleLocationSolved saves the provided *ttnpb.ApplicationLocation in the Entity Registry as part of the device locations.
+// Locations provided by other services will be maintained.
+func (as *ApplicationServer) handleLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationLocation, link *ttnpb.ApplicationLink) error {
+	fm := pbtypes.FieldMask{Paths: []string{"locations"}}
+
+	ctx, cancel := context.WithTimeout(ctx, locationUpdateTimeout)
+	defer cancel()
+
+	cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, &ids)
+	if err != nil {
+		return err
+	}
+	cl := ttnpb.NewEndDeviceRegistryClient(cc)
+
+	dev, err := cl.Get(ctx, &ttnpb.GetEndDeviceRequest{
+		EndDeviceIdentifiers: ids,
+		FieldMask:            fm,
+	}, as.WithClusterAuth())
+	if err != nil {
+		return err
+	}
+
+	if dev.Locations == nil {
+		dev.Locations = make(map[string]*ttnpb.Location)
+	}
+	dev.Locations[msg.Service] = &msg.Location
+
+	_, err = cl.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
+		EndDevice: *dev,
+		FieldMask: fm,
+	}, as.WithClusterAuth())
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // decryptDownlinkMessage decrypts the downlink message.

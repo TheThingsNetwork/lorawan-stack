@@ -2103,7 +2103,7 @@ OAuth client registrations.
 | ----------- | ------------ | ------------- | ------------|
 | `Create` | [`CreateClientRequest`](#ttn.lorawan.v3.CreateClientRequest) | [`Client`](#ttn.lorawan.v3.Client) | Create a new OAuth client. This also sets the given organization or user as first collaborator with all possible rights. |
 | `Get` | [`GetClientRequest`](#ttn.lorawan.v3.GetClientRequest) | [`Client`](#ttn.lorawan.v3.Client) | Get the OAuth client with the given identifiers, selecting the fields specified in the field mask. More or less fields may be returned, depending on the rights of the caller. |
-| `List` | [`ListClientsRequest`](#ttn.lorawan.v3.ListClientsRequest) | [`Clients`](#ttn.lorawan.v3.Clients) | List OAuth clients where the given user or organization is a direct collaborator. If no user or organization is given, this returns the OAuth clients the caller has access to. Similar to Get, this selects the fields sepcified in the field mask. More or less fields may be returned, depending on the rights of the caller. |
+| `List` | [`ListClientsRequest`](#ttn.lorawan.v3.ListClientsRequest) | [`Clients`](#ttn.lorawan.v3.Clients) | List OAuth clients where the given user or organization is a direct collaborator. If no user or organization is given, this returns the OAuth clients the caller has access to. Similar to Get, this selects the fields specified in the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateClientRequest`](#ttn.lorawan.v3.UpdateClientRequest) | [`Client`](#ttn.lorawan.v3.Client) | Update the OAuth client, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the OAuth client. This may not release the client ID for reuse. |
 | `Restore` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Restore a recently deleted client.
@@ -3407,7 +3407,7 @@ After registering an end device, it also needs to be registered in the NsEndDevi
 | `Get` | [`GetEndDeviceRequest`](#ttn.lorawan.v3.GetEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Get the end device with the given identifiers, selecting the fields specified in the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `GetIdentifiersForEUIs` | [`GetEndDeviceIdentifiersForEUIsRequest`](#ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest) | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | Get the identifiers of the end device that has the given EUIs registered. |
 | `List` | [`ListEndDevicesRequest`](#ttn.lorawan.v3.ListEndDevicesRequest) | [`EndDevices`](#ttn.lorawan.v3.EndDevices) | List end devices in the given application. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
-| `Update` | [`UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Update the OAuth client, changing the fields specified by the field mask to the provided values. |
+| `Update` | [`UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Update the end device, changing the fields specified by the field mask to the provided values. |
 | `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the end device with the given IDs.
 
 Before deleting an end device it first needs to be deleted from the NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry. This is NOT done automatically. |
@@ -6261,9 +6261,9 @@ Downlink message from the network to the end device
 | Field | Validations |
 | ----- | ----------- |
 | `up_formatter` | <p>`enum.defined_only`: `true`</p> |
-| `up_formatter_parameter` | <p>`string.max_len`: `16384`</p> |
+| `up_formatter_parameter` | <p>`string.max_len`: `40960`</p> |
 | `down_formatter` | <p>`enum.defined_only`: `true`</p> |
-| `down_formatter_parameter` | <p>`string.max_len`: `16384`</p> |
+| `down_formatter_parameter` | <p>`string.max_len`: `40960`</p> |
 
 ### <a name="ttn.lorawan.v3.TxAcknowledgment">Message `TxAcknowledgment`</a>
 
@@ -7475,7 +7475,7 @@ Right is the enum that defines all the different rights to do something in the n
 | `RIGHT_APPLICATION_TRAFFIC_READ` | 24 | The right to read application traffic (uplink and downlink). |
 | `RIGHT_APPLICATION_TRAFFIC_UP_WRITE` | 25 | The right to write uplink application traffic. |
 | `RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE` | 26 | The right to write downlink application traffic. |
-| `RIGHT_APPLICATION_LINK` | 27 | The right to link as Application to a Network Server for traffic exchange, i.e. read uplink and write downlink (API keys only). This right is typically only given to an Application Server. This right implies RIGHT_APPLICATION_INFO. |
+| `RIGHT_APPLICATION_LINK` | 27 | The right to link as Application to a Network Server for traffic exchange, i.e. read uplink and write downlink (API keys only). This right is typically only given to an Application Server. This right implies RIGHT_APPLICATION_INFO, RIGHT_APPLICATION_TRAFFIC_READ, and RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE. |
 | `RIGHT_APPLICATION_ALL` | 28 | The pseudo-right for all (current and future) application rights. |
 | `RIGHT_CLIENT_ALL` | 29 | The pseudo-right for all (current and future) OAuth client rights. |
 | `RIGHT_GATEWAY_INFO` | 30 | The right to view gateway information. |

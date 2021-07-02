@@ -133,7 +133,7 @@ Entry.propTypes = {
   value: PropTypes.oneOfType([
     PropTypes.shape({
       key: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      value: PropTypes.any,
+      value: PropTypes.shape({}),
     }),
     PropTypes.string,
   ]),
