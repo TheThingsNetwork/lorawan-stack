@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -36,7 +36,7 @@ func TestUserStore(t *testing.T) {
 		s := newStore(db)
 		store := GetUserStore(db)
 
-		list, err := store.ListAdmins(ctx, &types.FieldMask{Paths: []string{"name"}})
+		list, err := store.ListAdmins(ctx, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
@@ -71,7 +71,7 @@ func TestUserStore(t *testing.T) {
 			a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
-		got, err := store.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, &types.FieldMask{Paths: []string{"name", "attributes"}})
+		got, err := store.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -104,7 +104,7 @@ func TestUserStore(t *testing.T) {
 				Sizes: map[uint32]string{0: "https://example.com/profile_picture.jpg"},
 			},
 			Admin: true,
-		}, &types.FieldMask{Paths: []string{"description", "attributes", "profile_picture", "admin"}})
+		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "profile_picture", "admin"}})
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
@@ -129,14 +129,14 @@ func TestUserStore(t *testing.T) {
 			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
 		}
 
-		list, err = store.FindUsers(ctx, nil, &types.FieldMask{Paths: []string{"name"}})
+		list, err = store.FindUsers(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
 			a.So(list[0].Name, should.EndWith, got.Name)
 		}
 
-		list, err = store.ListAdmins(ctx, &types.FieldMask{Paths: []string{"name"}})
+		list, err = store.ListAdmins(ctx, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {

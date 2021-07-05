@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -197,7 +197,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
 				ApplicationPackageAssociationIdentifiers: *assocID,
-				FieldMask:                                types.FieldMask{Paths: paths},
+				FieldMask:                                &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -233,7 +233,7 @@ var (
 				EndDeviceIdentifiers: *devID,
 				Limit:                limit,
 				Page:                 page,
-				FieldMask:            types.FieldMask{Paths: paths},
+				FieldMask:            &pbtypes.FieldMask{Paths: paths},
 			}, opt)
 			if err != nil {
 				return err
@@ -266,7 +266,7 @@ var (
 					logger.WithError(err).Warn("Package data not available")
 				}
 			} else {
-				var st types.Struct
+				var st pbtypes.Struct
 				err := jsonpb.TTN().NewDecoder(reader).Decode(&st)
 				if err != nil {
 					return err
@@ -282,7 +282,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).SetAssociation(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
 				ApplicationPackageAssociation: association,
-				FieldMask:                     types.FieldMask{Paths: paths},
+				FieldMask:                     &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -342,7 +342,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).GetDefaultAssociation(ctx, &ttnpb.GetApplicationPackageDefaultAssociationRequest{
 				ApplicationPackageDefaultAssociationIdentifiers: *assocID,
-				FieldMask: types.FieldMask{Paths: paths},
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -378,7 +378,7 @@ var (
 				ApplicationIdentifiers: *appID,
 				Limit:                  limit,
 				Page:                   page,
-				FieldMask:              types.FieldMask{Paths: paths},
+				FieldMask:              &pbtypes.FieldMask{Paths: paths},
 			}, opt)
 			if err != nil {
 				return err
@@ -411,7 +411,7 @@ var (
 					logger.WithError(err).Warn("Package data not available")
 				}
 			} else {
-				var st types.Struct
+				var st pbtypes.Struct
 				err := jsonpb.TTN().NewDecoder(reader).Decode(&st)
 				if err != nil {
 					return err
@@ -427,7 +427,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).SetDefaultAssociation(ctx, &ttnpb.SetApplicationPackageDefaultAssociationRequest{
 				ApplicationPackageDefaultAssociation: association,
-				FieldMask:                            types.FieldMask{Paths: paths},
+				FieldMask:                            &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

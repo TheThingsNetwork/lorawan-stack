@@ -222,7 +222,7 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 				},
 				SupportsJoin: true,
 			},
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{
 					"ids.join_eui",
 					"provisioner_id",
@@ -385,7 +385,7 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 				},
 				SupportsJoin: true,
 			},
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{
 					"ids.device_id",
 					"ids.dev_eui",

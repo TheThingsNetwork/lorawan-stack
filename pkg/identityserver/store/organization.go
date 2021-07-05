@@ -15,7 +15,7 @@
 package store
 
 import (
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -56,7 +56,7 @@ var organizationModelSetters = map[string]func(*Organization, *ttnpb.Organizatio
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
-var defaultOrganizationFieldMask = &types.FieldMask{}
+var defaultOrganizationFieldMask = &pbtypes.FieldMask{}
 
 func init() {
 	paths := make([]string, 0, len(organizationPBSetters))
@@ -76,12 +76,12 @@ var organizationColumnNames = map[string][]string{
 	descriptionField: {descriptionField},
 }
 
-func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *types.FieldMask) {
+func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMask) {
 	pb.OrganizationIdentifiers.OrganizationId = org.Account.UID
 	pb.CreatedAt = cleanTime(org.CreatedAt)
 	pb.UpdatedAt = cleanTime(org.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(org.DeletedAt)
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultOrganizationFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -91,8 +91,8 @@ func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *types.FieldMask)
 	}
 }
 
-func (org *Organization) fromPB(pb *ttnpb.Organization, fieldMask *types.FieldMask) (columns []string) {
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+func (org *Organization) fromPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMask) (columns []string) {
+	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultOrganizationFieldMask
 	}
 	for _, path := range fieldMask.Paths {
@@ -114,7 +114,7 @@ type organizationWithUID struct {
 
 func (organizationWithUID) TableName() string { return "organizations" }
 
-func (u organizationWithUID) toPB(pb *ttnpb.Organization, fieldMask *types.FieldMask) {
+func (u organizationWithUID) toPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMask) {
 	u.Organization.Account.UID = u.UID
 	u.Organization.toPB(pb, fieldMask)
 }

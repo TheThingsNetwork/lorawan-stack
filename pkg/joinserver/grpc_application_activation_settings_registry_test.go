@@ -135,7 +135,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Name: "No rights",
 			Request: &ttnpb.GetApplicationActivationSettingsRequest{
 				ApplicationIdentifiers: appID,
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"kek",
 						"kek_label",
@@ -150,7 +150,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Name: "No read right",
 			Request: &ttnpb.GetApplicationActivationSettingsRequest{
 				ApplicationIdentifiers: appID,
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"kek",
 						"kek_label",
@@ -180,7 +180,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Name: "Not found/with paths",
 			Request: &ttnpb.GetApplicationActivationSettingsRequest{
 				ApplicationIdentifiers: appID,
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"kek",
 						"kek_label",
@@ -236,7 +236,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					KEKLabel: sessionKEKLabel,
 					KEK:      jsKEKEnvelopeUnwrapped,
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"kek",
 						"kek_label",
@@ -255,7 +255,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					KEKLabel: sessionKEKLabel,
 					KEK:      jsKEKEnvelopeUnwrapped,
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"kek",
 						"kek_label",
@@ -277,7 +277,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					KEKLabel: sessionKEKLabel,
 					KEK:      jsKEKEnvelopeUnwrapped,
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"kek",
 						"kek_label",
@@ -318,7 +318,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 						Key: &types.AES128Key{},
 					},
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"kek_label",
 						"kek",
@@ -340,7 +340,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
 					KEK: jsKEKEnvelopeUnwrapped,
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"kek_label",
 						"kek",
@@ -500,7 +500,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 						sets, err := cl.Set(ctx, &ttnpb.SetApplicationActivationSettingsRequest{
 							ApplicationIdentifiers:        appID,
 							ApplicationActivationSettings: *tc.CreateSettings,
-							FieldMask: pbtypes.FieldMask{
+							FieldMask: &pbtypes.FieldMask{
 								Paths: tc.CreatePaths,
 							},
 						}, credOpt)
@@ -527,7 +527,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						sets, err := cl.Get(ctx, &ttnpb.GetApplicationActivationSettingsRequest{
 							ApplicationIdentifiers: appID,
-							FieldMask: pbtypes.FieldMask{
+							FieldMask: &pbtypes.FieldMask{
 								Paths: tc.CreatePaths,
 							},
 						}, credOpt)
@@ -543,7 +543,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 						sets, err := cl.Set(ctx, &ttnpb.SetApplicationActivationSettingsRequest{
 							ApplicationIdentifiers:        appID,
 							ApplicationActivationSettings: *tc.CreateSettings,
-							FieldMask: pbtypes.FieldMask{
+							FieldMask: &pbtypes.FieldMask{
 								Paths: tc.CreatePaths,
 							},
 						}, credOpt)
@@ -558,7 +558,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						sets, err := cl.Set(ctx, &ttnpb.SetApplicationActivationSettingsRequest{
 							ApplicationIdentifiers: appID,
-							FieldMask: pbtypes.FieldMask{
+							FieldMask: &pbtypes.FieldMask{
 								Paths: []string{
 									"kek_label",
 									"kek",
@@ -587,7 +587,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						sets, err := cl.Get(ctx, &ttnpb.GetApplicationActivationSettingsRequest{
 							ApplicationIdentifiers: appID,
-							FieldMask: pbtypes.FieldMask{
+							FieldMask: &pbtypes.FieldMask{
 								Paths: tc.CreatePaths,
 							},
 						}, credOpt)

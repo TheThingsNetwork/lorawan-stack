@@ -507,7 +507,7 @@ func TestApplicationServer(t *testing.T) {
 							Topic: "up.service.data",
 						},
 					},
-					FieldMask: pbtypes.FieldMask{
+					FieldMask: &pbtypes.FieldMask{
 						Paths: []string{
 							"base_topic",
 							"downlink_ack",
@@ -651,7 +651,7 @@ func TestApplicationServer(t *testing.T) {
 							Topic: "up/service/data",
 						},
 					},
-					FieldMask: pbtypes.FieldMask{
+					FieldMask: &pbtypes.FieldMask{
 						Paths: []string{
 							"base_topic",
 							"downlink_ack",
@@ -775,7 +775,7 @@ func TestApplicationServer(t *testing.T) {
 						LocationSolved:                &ttnpb.ApplicationWebhook_Message{Path: ""},
 						ServiceData:                   &ttnpb.ApplicationWebhook_Message{Path: ""},
 					},
-					FieldMask: pbtypes.FieldMask{
+					FieldMask: &pbtypes.FieldMask{
 						Paths: []string{
 							"base_url",
 							"format",
@@ -2446,6 +2446,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
+							a.So(up, should.NotBeNil)
 							if override.GetValue() {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
@@ -2509,6 +2510,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
+							a.So(up, should.NotBeNil)
 							if override.GetValue() {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),

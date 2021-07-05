@@ -102,11 +102,6 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 		GetFieldMask() *types.FieldMask
 	}:
 		paths = v.GetFieldMask().GetPaths()
-	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/2798)
-	case interface {
-		GetFieldMask() types.FieldMask
-	}:
-		paths = v.GetFieldMask().Paths
 	}
 	if len(paths) > 0 {
 		region := trace.StartRegion(ctx, "validate field mask")

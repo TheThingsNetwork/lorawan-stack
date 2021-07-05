@@ -91,7 +91,7 @@ func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, a
 			GatewayIdentifiers: ids,
 			Antennas:           antennas,
 		},
-		FieldMask: pbtypes.FieldMask{
+		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"antennas"},
 		},
 	}

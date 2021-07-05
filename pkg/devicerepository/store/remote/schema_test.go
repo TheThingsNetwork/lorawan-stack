@@ -77,7 +77,7 @@ func TestProfile(t *testing.T) {
 						Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
 					},
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"version_ids",
 						"supports_join",
@@ -124,7 +124,7 @@ func TestProfile(t *testing.T) {
 						},
 					},
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"version_ids",
 						"supports_join",
@@ -159,7 +159,7 @@ func TestProfile(t *testing.T) {
 						PingSlotFrequency:     &ttnpb.FrequencyValue{Value: 868300000},
 					},
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"version_ids",
 						"supports_join",
@@ -187,7 +187,7 @@ func TestProfile(t *testing.T) {
 						ClassCTimeout: durationPtr(64 * time.Second),
 					},
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"version_ids",
 						"supports_join",

@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -186,33 +186,33 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	}
 
 	// Backwards compatibility for frequency_plan_id field.
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_id") {
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_ids") {
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "frequency_plan_ids")
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_id") {
+		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_ids") {
+			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "frequency_plan_ids")
 		}
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, []string{"frequency_plan_id"})
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, getPaths, []string{"frequency_plan_id"})
 
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicGatewayFields...) {
+		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicGatewayFields...) {
 			defer func() { gtw = gtw.PublicSafe() }()
 		} else {
 			return nil, err
 		}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret", "claim_authentication_code", "target_cups_key") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret", "claim_authentication_code", "target_cups_key") {
 		if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS); err != nil {
 			return nil, err
 		}
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtw, err = store.GetGatewayStore(db).GetGateway(ctx, &req.GatewayIdentifiers, &req.FieldMask)
+		gtw, err = store.GetGatewayStore(db).GetGateway(ctx, &req.GatewayIdentifiers, req.FieldMask)
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 			gtw.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, gtw.GatewayIdentifiers)
 			if err != nil {
 				return err
@@ -281,7 +281,7 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtw, err := store.GetGatewayStore(db).GetGateway(ctx, &ttnpb.GatewayIdentifiers{
 			Eui: &req.Eui,
-		}, &types.FieldMask{Paths: []string{"ids.gateway_id", "ids.eui"}})
+		}, &pbtypes.FieldMask{Paths: []string{"ids.gateway_id", "ids.eui"}})
 		if err != nil {
 			return err
 		}
@@ -296,12 +296,12 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 
 func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatewaysRequest) (gtws *ttnpb.Gateways, err error) {
 	// Backwards compatibility for frequency_plan_id field.
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_id") {
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_ids") {
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "frequency_plan_ids")
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_id") {
+		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_ids") {
+			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "frequency_plan_ids")
 		}
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, []string{"frequency_plan_id"})
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, getPaths, []string{"frequency_plan_id"})
 
 	var includeIndirect bool
 	if req.Collaborator == nil {
@@ -351,7 +351,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 				gtwIDs = append(gtwIDs, gtwID)
 			}
 		}
-		gtws.Gateways, err = store.GetGatewayStore(db).FindGateways(ctx, gtwIDs, &req.FieldMask)
+		gtws.Gateways, err = store.GetGatewayStore(db).FindGateways(ctx, gtwIDs, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -371,7 +371,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			gtws.Gateways[i] = gtw.PublicSafe()
 		}
 
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret") {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret") {
 			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
 				gtws.Gateways[i].LBSLNSSecret = nil
 			} else if gtws.Gateways[i].LBSLNSSecret != nil {
@@ -390,7 +390,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			}
 		}
 
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "target_cups_key") {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "target_cups_key") {
 			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
 				gtws.Gateways[i].TargetCUPSKey = nil
 			} else if gtws.Gateways[i].TargetCUPSKey != nil {
@@ -409,7 +409,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			}
 		}
 
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "claim_authentication_code") {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "claim_authentication_code") {
 			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
 				gtws.Gateways[i].ClaimAuthenticationCode = nil
 			} else if gtws.Gateways[i].ClaimAuthenticationCode != nil && gtws.Gateways[i].ClaimAuthenticationCode.Secret != nil {
@@ -435,31 +435,31 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC); err != nil {
 		// Allow setting only the location field with the RIGHT_GATEWAY_LINK right.
 		isLink := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_LINK) == nil
-		if topLevel := ttnpb.TopLevelFields(req.FieldMask.Paths); !isLink || len(topLevel) != 1 || topLevel[0] != "antennas" {
+		if topLevel := ttnpb.TopLevelFields(req.FieldMask.GetPaths()); !isLink || len(topLevel) != 1 || topLevel[0] != "antennas" {
 			return nil, err
 		}
 	}
 	// Backwards compatibility for frequency_plan_id field.
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_id") {
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_ids") {
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "frequency_plan_ids")
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_id") {
+		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_ids") {
+			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "frequency_plan_ids")
 		}
 	}
 	if len(req.FrequencyPlanIDs) == 0 && req.FrequencyPlanID != "" {
 		req.FrequencyPlanIDs = []string{req.FrequencyPlanID}
 	}
 
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, nil, append(getPaths, "frequency_plan_id"))
-	if len(req.FieldMask.Paths) == 0 {
-		req.FieldMask.Paths = updatePaths
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, nil, append(getPaths, "frequency_plan_id"))
+	if len(req.FieldMask.GetPaths()) == 0 {
+		req.FieldMask = &pbtypes.FieldMask{Paths: updatePaths}
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 		if err := validateContactInfo(req.Gateway.ContactInfo); err != nil {
 			return nil, err
 		}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "lbs_lns_secret") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret") {
 		if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
 			return nil, err
 		} else if req.LBSLNSSecret != nil {
@@ -478,7 +478,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "target_cups_key") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "target_cups_key") {
 		if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
 			return nil, err
 		} else if req.TargetCUPSKey != nil {
@@ -497,7 +497,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "claim_authentication_code") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "claim_authentication_code") {
 		if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
 			return nil, err
 		} else if req.ClaimAuthenticationCode != nil {
@@ -521,11 +521,11 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtw, err = store.GetGatewayStore(db).UpdateGateway(ctx, &req.Gateway, &req.FieldMask)
+		gtw, err = store.GetGatewayStore(db).UpdateGateway(ctx, &req.Gateway, req.FieldMask)
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 			cleanContactInfo(req.ContactInfo)
 			gtw.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, gtw.GatewayIdentifiers, req.ContactInfo)
 			if err != nil {
@@ -537,11 +537,11 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateGateway.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateGateway.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, req.FieldMask.GetPaths()))
 	return gtw, nil
 }
 
-func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_DELETE); err != nil {
 		return nil, err
 	}
@@ -555,7 +555,7 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireGateway(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_GATEWAY_DELETE); err != nil {
 		return nil, err
 	}
@@ -580,7 +580,7 @@ func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.Gateway
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeGateways
 	}
@@ -645,14 +645,14 @@ func (gr *gatewayRegistry) Update(ctx context.Context, req *ttnpb.UpdateGatewayR
 	return gr.updateGateway(ctx, req)
 }
 
-func (gr *gatewayRegistry) Delete(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
+func (gr *gatewayRegistry) Delete(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	return gr.deleteGateway(ctx, req)
 }
 
-func (gr *gatewayRegistry) Restore(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
+func (gr *gatewayRegistry) Restore(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	return gr.restoreGateway(ctx, req)
 }
 
-func (gr *gatewayRegistry) Purge(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
+func (gr *gatewayRegistry) Purge(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	return gr.purgeGateway(ctx, req)
 }

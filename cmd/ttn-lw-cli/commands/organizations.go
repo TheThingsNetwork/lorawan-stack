@@ -17,7 +17,7 @@ package commands
 import (
 	"os"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -87,7 +87,7 @@ var (
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOrganizationRegistryClient(is).List(ctx, &ttnpb.ListOrganizationsRequest{
 				Collaborator: getUserID(cmd.Flags(), nil).GetOrganizationOrUserIdentifiers(),
-				FieldMask:    types.FieldMask{Paths: paths},
+				FieldMask:    &pbtypes.FieldMask{Paths: paths},
 				Limit:        limit,
 				Page:         page,
 				Order:        getOrder(cmd.Flags()),
@@ -117,7 +117,7 @@ var (
 				getTotal func() uint64
 			)
 			req.Limit, req.Page, opt, getTotal = withPagination(cmd.Flags())
-			req.FieldMask.Paths = paths
+			req.FieldMask = &pbtypes.FieldMask{Paths: paths}
 			req.Deleted = getDeleted(cmd.Flags())
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -151,7 +151,7 @@ var (
 			}
 			res, err := ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{
 				OrganizationIdentifiers: *orgID,
-				FieldMask:               types.FieldMask{Paths: paths},
+				FieldMask:               &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -230,7 +230,7 @@ var (
 			}
 			res, err := ttnpb.NewOrganizationRegistryClient(is).Update(ctx, &ttnpb.UpdateOrganizationRequest{
 				Organization: organization,
-				FieldMask:    types.FieldMask{Paths: paths},
+				FieldMask:    &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

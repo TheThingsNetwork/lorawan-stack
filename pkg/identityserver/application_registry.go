@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -126,20 +126,20 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_INFO); err != nil {
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicApplicationFields...) {
+		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicApplicationFields...) {
 			defer func() { app = app.PublicSafe() }()
 		} else {
 			return nil, err
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		app, err = store.GetApplicationStore(db).GetApplication(ctx, &req.ApplicationIdentifiers, &req.FieldMask)
+		app, err = store.GetApplicationStore(db).GetApplication(ctx, &req.ApplicationIdentifiers, req.FieldMask)
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 			app.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, app.ApplicationIdentifiers)
 			if err != nil {
 				return err
@@ -154,7 +154,7 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 }
 
 func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListApplicationsRequest) (apps *ttnpb.Applications, err error) {
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, getPaths, nil)
 	var includeIndirect bool
 	if req.Collaborator == nil {
 		authInfo, err := is.authInfo(ctx)
@@ -203,7 +203,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 				appIDs = append(appIDs, appID)
 			}
 		}
-		apps.Applications, err = store.GetApplicationStore(db).FindApplications(ctx, appIDs, &req.FieldMask)
+		apps.Applications, err = store.GetApplicationStore(db).FindApplications(ctx, appIDs, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -226,21 +226,21 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask.Paths, nil, getPaths)
-	if len(req.FieldMask.Paths) == 0 {
-		req.FieldMask.Paths = updatePaths
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, nil, getPaths)
+	if len(req.FieldMask.GetPaths()) == 0 {
+		req.FieldMask = &pbtypes.FieldMask{Paths: updatePaths}
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 		if err := validateContactInfo(req.Application.ContactInfo); err != nil {
 			return nil, err
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		app, err = store.GetApplicationStore(db).UpdateApplication(ctx, &req.Application, &req.FieldMask)
+		app, err = store.GetApplicationStore(db).UpdateApplication(ctx, &req.Application, req.FieldMask)
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 			cleanContactInfo(req.ContactInfo)
 			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.ApplicationIdentifiers, req.ContactInfo)
 			if err != nil {
@@ -252,13 +252,13 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateApplication.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateApplication.NewWithIdentifiersAndData(ctx, &req.ApplicationIdentifiers, req.FieldMask.GetPaths()))
 	return app, nil
 }
 
 var errApplicationHasDevices = errors.DefineFailedPrecondition("application_has_devices", "application still has `{count}` devices")
 
-func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_DELETE); err != nil {
 		return nil, err
 	}
@@ -279,7 +279,7 @@ func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.Appl
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) restoreApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) restoreApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_APPLICATION_DELETE); err != nil {
 		return nil, err
 	}
@@ -304,7 +304,7 @@ func (is *IdentityServer) restoreApplication(ctx context.Context, ids *ttnpb.App
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeApplications
 	}
@@ -383,15 +383,15 @@ func (ar *applicationRegistry) Update(ctx context.Context, req *ttnpb.UpdateAppl
 	return ar.updateApplication(ctx, req)
 }
 
-func (ar *applicationRegistry) Delete(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+func (ar *applicationRegistry) Delete(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
 	return ar.deleteApplication(ctx, req)
 }
 
-func (ar *applicationRegistry) Purge(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+func (ar *applicationRegistry) Purge(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
 	return ar.purgeApplication(ctx, req)
 }
 
-func (ar *applicationRegistry) Restore(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
+func (ar *applicationRegistry) Restore(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
 	return ar.restoreApplication(ctx, req)
 }
 

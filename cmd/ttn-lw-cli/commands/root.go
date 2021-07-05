@@ -140,6 +140,9 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		// Drop default HTTP port numbers from OAuth server address if present.
 		// Causes issues with `--http.redirect-to-tls` stack option.
 		u, err := url.Parse(config.OAuthServerAddress)
+		if err != nil {
+			return err
+		}
 		if u.Port() == "443" && u.Scheme == "https" || u.Port() == "80" && u.Scheme == "http" {
 			u.Host = u.Hostname()
 			config.OAuthServerAddress = u.String()

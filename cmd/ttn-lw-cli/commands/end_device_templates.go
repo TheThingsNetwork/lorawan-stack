@@ -32,8 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-var endDeviceTemplateFlattenPaths = []string{"end_device.provisioning_data"}
-
 func templateFormatIDFlags() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.String("format-id", "", "")
@@ -83,7 +81,7 @@ var (
 				if err != nil {
 					return err
 				}
-				paths = append(paths, res.FieldMask.Paths...)
+				paths = append(paths, res.FieldMask.GetPaths()...)
 			}
 
 			if mappingKey, _ := cmd.Flags().GetString("mapping-key"); mappingKey != "" {
@@ -93,7 +91,7 @@ var (
 				return err
 			}
 			res.EndDevice.Attributes = mergeAttributes(res.EndDevice.Attributes, cmd.Flags())
-			res.FieldMask.Paths = ttnpb.BottomLevelFields(paths)
+			res.FieldMask = &pbtypes.FieldMask{Paths: ttnpb.BottomLevelFields(paths)}
 
 			return io.Write(os.Stdout, config.OutputFormat, &res)
 		}),
@@ -151,7 +149,7 @@ This command takes end devices from stdin.`,
 
 			mappingKey, _ := cmd.Flags().GetString("mapping-key")
 			res := &ttnpb.EndDeviceTemplate{
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: paths,
 				},
 				MappingKey: mappingKey,
@@ -183,7 +181,7 @@ This command takes end device templates from stdin.`,
 			}
 
 			var device ttnpb.EndDevice
-			device.SetFields(&input.EndDevice, input.FieldMask.Paths...)
+			device.SetFields(&input.EndDevice, input.FieldMask.GetPaths()...)
 			if err := util.SetFields(&device, setEndDeviceFlags); err != nil {
 				return err
 			}
@@ -258,11 +256,13 @@ This command takes end device templates from stdin.`,
 					res.EndDevice.DeviceId = fmt.Sprintf("eui-%s", strings.ToLower(devEUI.String()))
 					res.EndDevice.JoinEui = &joinEUI
 					res.EndDevice.DevEui = &devEUI
-					res.FieldMask.Paths = ttnpb.BottomLevelFields(append(res.FieldMask.Paths,
-						"ids.device_id",
-						"ids.join_eui",
-						"ids.dev_eui",
-					))
+					res.FieldMask = &pbtypes.FieldMask{
+						Paths: ttnpb.BottomLevelFields(append(res.FieldMask.GetPaths(),
+							"ids.device_id",
+							"ids.join_eui",
+							"ids.dev_eui",
+						)),
+					}
 
 					if err := io.Write(os.Stdout, config.OutputFormat, &res); err != nil {
 						return err
@@ -421,9 +421,9 @@ command to assign EUIs to map to end device templates.`,
 				}
 
 				var res ttnpb.EndDeviceTemplate
-				res.EndDevice.SetFields(&inputEntry.EndDevice, inputEntry.FieldMask.Paths...)
-				res.EndDevice.SetFields(&mappedEntry.EndDevice, mappedEntry.FieldMask.Paths...)
-				res.FieldMask.Paths = ttnpb.BottomLevelFields(append(inputEntry.FieldMask.Paths, mappedEntry.FieldMask.Paths...))
+				res.EndDevice.SetFields(&inputEntry.EndDevice, inputEntry.FieldMask.GetPaths()...)
+				res.EndDevice.SetFields(&mappedEntry.EndDevice, mappedEntry.FieldMask.GetPaths()...)
+				res.FieldMask = &pbtypes.FieldMask{Paths: ttnpb.BottomLevelFields(append(inputEntry.FieldMask.GetPaths(), mappedEntry.FieldMask.GetPaths()...))}
 
 				if err := io.Write(os.Stdout, config.OutputFormat, &res); err != nil {
 					return err

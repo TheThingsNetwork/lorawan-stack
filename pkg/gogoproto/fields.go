@@ -34,7 +34,7 @@ func init() {
 // This implementation does not support separation by ",", but only paths separated by ".".
 func GoFieldsPaths(pb *pbtypes.FieldMask, v interface{}) []string {
 	var newFields []string
-	if pb == nil || len(pb.Paths) == 0 {
+	if len(pb.GetPaths()) == 0 {
 		return newFields
 	}
 

@@ -74,7 +74,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"frequency_plan_id",
 					},
@@ -122,7 +122,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"frequency_plan_id",
 					},
@@ -186,7 +186,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"frequency_plan_id",
 						"session",
@@ -254,7 +254,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"pending_session.keys.f_nwk_s_int_key",
 					},
@@ -322,7 +322,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"pending_session.keys.f_nwk_s_int_key.key",
 					},
@@ -885,7 +885,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 					req := &ttnpb.SetEndDeviceRequest{
 						EndDevice: *tc.SetDevice.EndDevice,
-						FieldMask: pbtypes.FieldMask{
+						FieldMask: &pbtypes.FieldMask{
 							Paths: tc.SetDevice.Paths,
 						},
 					}
@@ -937,7 +937,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					now = clock.Add(time.Nanosecond)
 					dev, err, ok = env.AssertSetDevice(ctx, false, &ttnpb.SetEndDeviceRequest{
 						EndDevice: *expectedReturn,
-						FieldMask: pbtypes.FieldMask{
+						FieldMask: &pbtypes.FieldMask{
 							Paths: tc.SetDevice.Paths,
 						},
 					}, rights...)
@@ -1121,7 +1121,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 
 					req := &ttnpb.ResetAndGetEndDeviceRequest{
 						EndDeviceIdentifiers: *test.MakeEndDeviceIdentifiers(),
-						FieldMask: pbtypes.FieldMask{
+						FieldMask: &pbtypes.FieldMask{
 							Paths: conf.Paths,
 						},
 					}

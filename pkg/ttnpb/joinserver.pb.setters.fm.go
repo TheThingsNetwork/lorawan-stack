@@ -5,7 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 
-	types "github.com/gogo/protobuf/types"
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
@@ -676,8 +675,7 @@ func (dst *GetApplicationActivationSettingsRequest) SetFields(src *GetApplicatio
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -733,8 +731,7 @@ func (dst *SetApplicationActivationSettingsRequest) SetFields(src *SetApplicatio
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:

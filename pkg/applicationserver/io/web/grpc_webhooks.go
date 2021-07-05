@@ -72,14 +72,14 @@ func (s webhookRegistryRPC) Get(ctx context.Context, req *ttnpb.GetApplicationWe
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	return s.webhooks.Get(ctx, req.ApplicationWebhookIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.Paths...))
+	return s.webhooks.Get(ctx, req.ApplicationWebhookIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...))
 }
 
 func (s webhookRegistryRPC) List(ctx context.Context, req *ttnpb.ListApplicationWebhooksRequest) (*ttnpb.ApplicationWebhooks, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	webhooks, err := s.webhooks.List(ctx, req.ApplicationIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.Paths...))
+	webhooks, err := s.webhooks.List(ctx, req.ApplicationIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...))
 	if err != nil {
 		return nil, err
 	}
@@ -101,12 +101,12 @@ func (s webhookRegistryRPC) Set(ctx context.Context, req *ttnpb.SetApplicationWe
 	); err != nil {
 		return nil, err
 	}
-	return s.webhooks.Set(ctx, req.ApplicationWebhookIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.Paths...),
+	return s.webhooks.Set(ctx, req.ApplicationWebhookIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...),
 		func(webhook *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 			if webhook != nil {
-				return &req.ApplicationWebhook, req.FieldMask.Paths, nil
+				return &req.ApplicationWebhook, req.FieldMask.GetPaths(), nil
 			}
-			return &req.ApplicationWebhook, append(req.FieldMask.Paths,
+			return &req.ApplicationWebhook, append(req.FieldMask.GetPaths(),
 				"ids.application_ids",
 				"ids.webhook_id",
 			), nil

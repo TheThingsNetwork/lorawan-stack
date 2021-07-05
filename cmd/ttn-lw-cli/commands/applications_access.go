@@ -18,7 +18,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
@@ -313,7 +313,7 @@ var (
 					Rights:    rights,
 					ExpiresAt: expiryDate,
 				},
-				FieldMask: types.FieldMask{Paths: paths},
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -346,7 +346,7 @@ var (
 					ID:     id,
 					Rights: nil,
 				},
-				FieldMask: types.FieldMask{Paths: []string{"rights"}},
+				FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
 			})
 			if err != nil {
 				return err

@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -63,7 +63,7 @@ func TestUserAccessNotFound(t *testing.T) {
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIdentifiers: userID,
 			APIKey:          apiKey,
-			FieldMask:       types.FieldMask{Paths: []string{"name"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -99,7 +99,7 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIdentifiers: userID,
 			APIKey:          *APIKey,
-			FieldMask:       types.FieldMask{Paths: []string{"rights", "name"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -161,7 +161,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIdentifiers: userID,
 			APIKey:          *APIKey,
-			FieldMask:       types.FieldMask{Paths: []string{"rights", "name"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -259,7 +259,7 @@ func TestUserAccessCRUD(t *testing.T) {
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIdentifiers: user.UserIdentifiers,
 			APIKey:          *created,
-			FieldMask:       types.FieldMask{Paths: []string{"name"}},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)

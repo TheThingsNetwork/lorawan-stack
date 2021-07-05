@@ -21,7 +21,7 @@ import (
 	"runtime/trace"
 	"strings"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -37,8 +37,8 @@ type userStore struct {
 }
 
 // selectUserFields selects relevant fields (based on fieldMask) and preloads details if needed.
-func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) *gorm.DB {
-	if fieldMask == nil || len(fieldMask.Paths) == 0 {
+func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.FieldMask) *gorm.DB {
+	if len(fieldMask.GetPaths()) == 0 {
 		return query.Preload("Attributes").Preload("ProfilePicture").Select([]string{"accounts.uid", "users.*"})
 	}
 	var userColumns []string
@@ -47,7 +47,7 @@ func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fiel
 	for _, column := range modelColumns {
 		userColumns = append(userColumns, "users."+column)
 	}
-	for _, path := range ttnpb.TopLevelFields(fieldMask.Paths) {
+	for _, path := range ttnpb.TopLevelFields(fieldMask.GetPaths()) {
 		switch path {
 		case "ids", "created_at", "updated_at", "deleted_at":
 			// always selected
@@ -75,7 +75,7 @@ func (s *userStore) CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.Use
 	userModel := User{
 		Account: Account{UID: usr.UserId}, // The ID is not mutated by fromPB.
 	}
-	fieldMask := &types.FieldMask{Paths: append(defaultUserFieldMask.Paths, passwordField)}
+	fieldMask := &pbtypes.FieldMask{Paths: append(defaultUserFieldMask.GetPaths(), passwordField)}
 	userModel.fromPB(usr, fieldMask)
 	if err := s.createEntity(ctx, &userModel); err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func (s *userStore) CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.Use
 	return &userProto, nil
 }
 
-func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.User, error) {
+func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers, fieldMask *pbtypes.FieldMask) ([]*ttnpb.User, error) {
 	defer trace.StartRegion(ctx, "find users").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
@@ -113,7 +113,7 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 	return userProtos, nil
 }
 
-func (s *userStore) ListAdmins(ctx context.Context, fieldMask *types.FieldMask) ([]*ttnpb.User, error) {
+func (s *userStore) ListAdmins(ctx context.Context, fieldMask *pbtypes.FieldMask) ([]*ttnpb.User, error) {
 	defer trace.StartRegion(ctx, "list admins").End()
 
 	query := s.query(ctx, User{}, withUserID()).Where(&User{Admin: true})
@@ -138,7 +138,7 @@ func (s *userStore) ListAdmins(ctx context.Context, fieldMask *types.FieldMask) 
 	return userProtos, nil
 }
 
-func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *types.FieldMask) (*ttnpb.User, error) {
+func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *pbtypes.FieldMask) (*ttnpb.User, error) {
 	defer trace.StartRegion(ctx, "get user").End()
 	query := s.query(ctx, User{}, withUserID(id.GetUserId()))
 	query = selectUserFields(ctx, query, fieldMask)
@@ -154,7 +154,7 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 	return userProto, nil
 }
 
-func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *types.FieldMask) (updated *ttnpb.User, err error) {
+func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *pbtypes.FieldMask) (updated *ttnpb.User, err error) {
 	defer trace.StartRegion(ctx, "update user").End()
 	query := s.query(ctx, User{}, withUserID(usr.GetUserId()))
 	query = selectUserFields(ctx, query, fieldMask)

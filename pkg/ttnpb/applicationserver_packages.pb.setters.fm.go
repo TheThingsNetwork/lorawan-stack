@@ -5,8 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 	time "time"
-
-	types "github.com/gogo/protobuf/types"
 )
 
 func (dst *ApplicationPackage) SetFields(src *ApplicationPackage, paths ...string) error {
@@ -215,8 +213,7 @@ func (dst *GetApplicationPackageAssociationRequest) SetFields(src *GetApplicatio
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -274,8 +271,7 @@ func (dst *ListApplicationPackageAssociationRequest) SetFields(src *ListApplicat
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -313,8 +309,7 @@ func (dst *SetApplicationPackageAssociationRequest) SetFields(src *SetApplicatio
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -479,8 +474,7 @@ func (dst *GetApplicationPackageDefaultAssociationRequest) SetFields(src *GetApp
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -538,8 +532,7 @@ func (dst *ListApplicationPackageDefaultAssociationRequest) SetFields(src *ListA
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -577,8 +570,7 @@ func (dst *SetApplicationPackageDefaultAssociationRequest) SetFields(src *SetApp
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:

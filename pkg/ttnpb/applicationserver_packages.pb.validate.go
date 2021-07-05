@@ -620,7 +620,7 @@ func (m *GetApplicationPackageAssociationRequest) ValidateFields(paths ...string
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationPackageAssociationRequestValidationError{
 						field:  "field_mask",
@@ -737,7 +737,7 @@ func (m *ListApplicationPackageAssociationRequest) ValidateFields(paths ...strin
 			// no validation rules for Page
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationPackageAssociationRequestValidationError{
 						field:  "field_mask",
@@ -843,7 +843,7 @@ func (m *SetApplicationPackageAssociationRequest) ValidateFields(paths ...string
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationPackageAssociationRequestValidationError{
 						field:  "field_mask",
@@ -1306,7 +1306,7 @@ func (m *GetApplicationPackageDefaultAssociationRequest) ValidateFields(paths ..
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationPackageDefaultAssociationRequestValidationError{
 						field:  "field_mask",
@@ -1427,7 +1427,7 @@ func (m *ListApplicationPackageDefaultAssociationRequest) ValidateFields(paths .
 			// no validation rules for Page
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationPackageDefaultAssociationRequestValidationError{
 						field:  "field_mask",
@@ -1539,7 +1539,7 @@ func (m *SetApplicationPackageDefaultAssociationRequest) ValidateFields(paths ..
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationPackageDefaultAssociationRequestValidationError{
 						field:  "field_mask",

@@ -1314,7 +1314,7 @@ func (m *GetApplicationWebhookRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationWebhookRequestValidationError{
 						field:  "field_mask",
@@ -1420,7 +1420,7 @@ func (m *ListApplicationWebhooksRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationWebhooksRequestValidationError{
 						field:  "field_mask",
@@ -1526,7 +1526,7 @@ func (m *SetApplicationWebhookRequest) ValidateFields(paths ...string) error {
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationWebhookRequestValidationError{
 						field:  "field_mask",
@@ -1632,7 +1632,7 @@ func (m *GetApplicationWebhookTemplateRequest) ValidateFields(paths ...string) e
 
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationWebhookTemplateRequestValidationError{
 						field:  "field_mask",
@@ -1726,7 +1726,7 @@ func (m *ListApplicationWebhookTemplatesRequest) ValidateFields(paths ...string)
 		switch name {
 		case "field_mask":
 
-			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFieldMask()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationWebhookTemplatesRequestValidationError{
 						field:  "field_mask",

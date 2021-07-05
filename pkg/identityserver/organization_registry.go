@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -118,20 +118,20 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_INFO); err != nil {
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicOrganizationFields...) {
+		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicOrganizationFields...) {
 			defer func() { org = org.PublicSafe() }()
 		} else {
 			return nil, err
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		org, err = store.GetOrganizationStore(db).GetOrganization(ctx, &req.OrganizationIdentifiers, &req.FieldMask)
+		org, err = store.GetOrganizationStore(db).GetOrganization(ctx, &req.OrganizationIdentifiers, req.FieldMask)
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 			org.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, org.OrganizationIdentifiers)
 			if err != nil {
 				return err
@@ -146,7 +146,7 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 }
 
 func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.ListOrganizationsRequest) (orgs *ttnpb.Organizations, err error) {
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
 	var includeIndirect bool
 	if req.Collaborator == nil {
 		authInfo, err := is.authInfo(ctx)
@@ -193,7 +193,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 				orgIDs = append(orgIDs, orgID)
 			}
 		}
-		orgs.Organizations, err = store.GetOrganizationStore(db).FindOrganizations(ctx, orgIDs, &req.FieldMask)
+		orgs.Organizations, err = store.GetOrganizationStore(db).FindOrganizations(ctx, orgIDs, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -216,21 +216,21 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask.Paths, nil, getPaths)
-	if len(req.FieldMask.Paths) == 0 {
-		req.FieldMask.Paths = updatePaths
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, nil, getPaths)
+	if len(req.FieldMask.GetPaths()) == 0 {
+		req.FieldMask = &pbtypes.FieldMask{Paths: updatePaths}
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 		if err := validateContactInfo(req.Organization.ContactInfo); err != nil {
 			return nil, err
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		org, err = store.GetOrganizationStore(db).UpdateOrganization(ctx, &req.Organization, &req.FieldMask)
+		org, err = store.GetOrganizationStore(db).UpdateOrganization(ctx, &req.Organization, req.FieldMask)
 		if err != nil {
 			return err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 			cleanContactInfo(req.ContactInfo)
 			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.OrganizationIdentifiers, req.ContactInfo)
 			if err != nil {
@@ -242,11 +242,11 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateOrganization.NewWithIdentifiersAndData(ctx, &req.OrganizationIdentifiers, req.FieldMask.Paths))
+	events.Publish(evtUpdateOrganization.NewWithIdentifiersAndData(ctx, &req.OrganizationIdentifiers, req.FieldMask.GetPaths()))
 	return org, nil
 }
 
-func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_DELETE); err != nil {
 		return nil, err
 	}
@@ -260,7 +260,7 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireOrganization(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_ORGANIZATION_DELETE); err != nil {
 		return nil, err
 	}
@@ -285,7 +285,7 @@ func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.Or
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
+func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeOrganizations
 	}
@@ -332,14 +332,14 @@ func (or *organizationRegistry) Update(ctx context.Context, req *ttnpb.UpdateOrg
 	return or.updateOrganization(ctx, req)
 }
 
-func (or *organizationRegistry) Delete(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
+func (or *organizationRegistry) Delete(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
 	return or.deleteOrganization(ctx, req)
 }
 
-func (or *organizationRegistry) Restore(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
+func (or *organizationRegistry) Restore(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
 	return or.restoreOrganization(ctx, req)
 }
 
-func (or *organizationRegistry) Purge(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
+func (or *organizationRegistry) Purge(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
 	return or.purgeOrganization(ctx, req)
 }

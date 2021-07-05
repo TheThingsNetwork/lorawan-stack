@@ -64,11 +64,10 @@ type msgWithFieldMask struct {
 	testSubject
 	fieldMask types.FieldMask
 
-	fieldIsZero       map[string]bool
-	fieldIsZeroCalled bool
+	fieldIsZero map[string]bool
 }
 
-func (m *msgWithFieldMask) GetFieldMask() types.FieldMask { return m.fieldMask }
+func (m *msgWithFieldMask) GetFieldMask() *types.FieldMask { return &m.fieldMask }
 
 func (m *msgWithFieldMask) ValidateFields(...string) error { return nil }
 

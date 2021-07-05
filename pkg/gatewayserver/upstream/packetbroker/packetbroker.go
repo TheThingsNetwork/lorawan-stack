@@ -162,7 +162,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 						Location: &loc,
 					},
 				}
-				req.FieldMask.Paths = append(req.FieldMask.Paths, "antennas", "location_public")
+				req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "antennas", "location_public")
 			}
 		}
 

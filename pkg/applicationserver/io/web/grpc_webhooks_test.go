@@ -84,7 +84,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
 			ApplicationIdentifiers: registeredApplicationID,
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
 		}, creds)
@@ -102,7 +102,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 				},
 				BaseURL: "http://localhost/test",
 			},
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
 		}, creds)
@@ -113,7 +113,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
 			ApplicationIdentifiers: registeredApplicationID,
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
 		}, creds)
@@ -129,7 +129,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 				ApplicationIdentifiers: registeredApplicationID,
 				WebhookID:              registeredWebhookID,
 			},
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
 		}, creds)
@@ -150,7 +150,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
 			ApplicationIdentifiers: registeredApplicationID,
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
 		}, creds)
@@ -250,7 +250,7 @@ description: Bar`),
 			tc.assertGet(a, getRes, err)
 
 			listRes, err := client.ListTemplates(ctx, &ttnpb.ListApplicationWebhookTemplatesRequest{
-				FieldMask: types.FieldMask{
+				FieldMask: &types.FieldMask{
 					Paths: []string{
 						"name",
 						"description",

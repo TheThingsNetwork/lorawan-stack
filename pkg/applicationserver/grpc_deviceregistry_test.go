@@ -114,7 +114,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
 			},
@@ -139,7 +139,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
 			},
@@ -168,7 +168,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
 			},
@@ -206,7 +206,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
 			},
@@ -237,7 +237,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters", "session"},
 				},
 			},
@@ -275,7 +275,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters", "session"},
 				},
 			},
@@ -383,7 +383,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
 			},
@@ -410,7 +410,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
 			},
@@ -446,7 +446,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
 					},
 				},
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
 			},
@@ -512,7 +512,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
 			},
@@ -549,7 +549,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					dev.Formatters.UpFormatterParameter = strings.Repeat("-", maxParameterLength+1)
 					return dev
 				}(),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters.up_formatter_parameter"},
 				},
 			},
@@ -579,7 +579,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					dev.Formatters.DownFormatterParameter = strings.Repeat("-", maxParameterLength+1)
 					return dev
 				}(),
-				FieldMask: pbtypes.FieldMask{
+				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters.down_formatter_parameter"},
 				},
 			},

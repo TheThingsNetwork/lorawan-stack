@@ -5,8 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 	time "time"
-
-	types "github.com/gogo/protobuf/types"
 )
 
 func (dst *Organization) SetFields(src *Organization, paths ...string) error {
@@ -153,8 +151,7 @@ func (dst *GetOrganizationRequest) SetFields(src *GetOrganizationRequest, paths 
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -199,8 +196,7 @@ func (dst *ListOrganizationsRequest) SetFields(src *ListOrganizationsRequest, pa
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 		case "order":
 			if len(subs) > 0 {
@@ -325,8 +321,7 @@ func (dst *UpdateOrganizationRequest) SetFields(src *UpdateOrganizationRequest, 
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -527,8 +522,7 @@ func (dst *UpdateOrganizationAPIKeyRequest) SetFields(src *UpdateOrganizationAPI
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:

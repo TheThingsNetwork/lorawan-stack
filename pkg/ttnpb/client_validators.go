@@ -28,10 +28,10 @@ func (req *GetClientRequest) ValidateContext(context.Context) error {
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (m *UpdateClientRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
+	if len(m.FieldMask.GetPaths()) == 0 {
 		return m.ValidateFields()
 	}
-	return m.ValidateFields(append(FieldsWithPrefix("client", m.FieldMask.Paths...),
+	return m.ValidateFields(append(FieldsWithPrefix("client", m.FieldMask.GetPaths()...),
 		"client.ids",
 	)...)
 }

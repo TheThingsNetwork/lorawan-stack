@@ -36,7 +36,7 @@ func (srv applicationActivationSettingsRegistryServer) Get(ctx context.Context, 
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 		return nil, err
 	}
-	sets, err := srv.JS.applicationActivationSettings.GetByID(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths)
+	sets, err := srv.JS.applicationActivationSettings.GetByID(ctx, req.ApplicationIdentifiers, req.FieldMask.GetPaths())
 	if errors.IsNotFound(err) {
 		return nil, errApplicationActivationSettingsNotFound.WithCause(err)
 	}
@@ -58,16 +58,16 @@ var (
 
 // Set implements ttnpb.ApplicationActivationSettingsRegistryServer.
 func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, req *ttnpb.SetApplicationActivationSettingsRequest) (*ttnpb.ApplicationActivationSettings, error) {
-	if len(req.FieldMask.Paths) == 0 {
+	if len(req.FieldMask.GetPaths()) == 0 {
 		return nil, errInvalidFieldMask.WithCause(errNoPaths)
 	}
 
 	reqKEK := req.ApplicationActivationSettings.KEK
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "kek.key") && reqKEK != nil {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "kek.key") && reqKEK != nil {
 		if reqKEK.Key.IsZero() {
 			return nil, errInvalidFieldValue.WithAttributes("field", "kek.key")
 		}
-		if err := ttnpb.RequireFields(req.FieldMask.Paths, "kek_label"); err != nil {
+		if err := ttnpb.RequireFields(req.FieldMask.GetPaths(), "kek_label"); err != nil {
 			return nil, errInvalidFieldMask.WithCause(err)
 		}
 		if req.KEKLabel == "" {
@@ -79,20 +79,20 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 		return nil, err
 	}
 
-	sets := req.FieldMask.Paths
+	sets := req.FieldMask.GetPaths()
 	if ttnpb.HasAnyField(sets, "kek.key") && reqKEK != nil {
 		kek, err := cryptoutil.WrapAES128Key(ctx, *reqKEK.Key, srv.kekLabel, srv.JS.KeyVault)
 		if err != nil {
 			return nil, errWrapKey.WithCause(err)
 		}
 		req.ApplicationActivationSettings.KEK = kek
-		sets = append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
+		sets = append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...)
 		sets = ttnpb.AddFields(sets,
 			"kek.encrypted_key",
 			"kek.kek_label",
 		)
 	}
-	v, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths, func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+	v, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, req.FieldMask.GetPaths(), func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
 		return &req.ApplicationActivationSettings, sets, nil
 	})
 	if err != nil {

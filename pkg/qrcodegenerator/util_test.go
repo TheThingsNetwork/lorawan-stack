@@ -63,7 +63,7 @@ func (mockFormat) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
 		Name:        "Test",
 		Description: "Test",
-		FieldMask: pbtypes.FieldMask{
+		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"ids"},
 		},
 	}

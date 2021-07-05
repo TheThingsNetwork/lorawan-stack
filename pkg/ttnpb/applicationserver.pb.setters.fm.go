@@ -2,11 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-
-	types "github.com/gogo/protobuf/types"
-)
+import fmt "fmt"
 
 func (dst *ApplicationLink) SetFields(src *ApplicationLink, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -91,8 +87,7 @@ func (dst *GetApplicationLinkRequest) SetFields(src *GetApplicationLinkRequest, 
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -148,8 +143,7 @@ func (dst *SetApplicationLinkRequest) SetFields(src *SetApplicationLinkRequest, 
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:

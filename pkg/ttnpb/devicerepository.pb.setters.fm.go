@@ -2,11 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-
-	types "github.com/gogo/protobuf/types"
-)
+import fmt "fmt"
 
 func (dst *EndDeviceBrand) SetFields(src *EndDeviceBrand, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -440,8 +436,7 @@ func (dst *GetEndDeviceBrandRequest) SetFields(src *GetEndDeviceBrandRequest, pa
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -519,8 +514,7 @@ func (dst *ListEndDeviceBrandsRequest) SetFields(src *ListEndDeviceBrandsRequest
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -578,8 +572,7 @@ func (dst *GetEndDeviceModelRequest) SetFields(src *GetEndDeviceModelRequest, pa
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -667,8 +660,7 @@ func (dst *ListEndDeviceModelsRequest) SetFields(src *ListEndDeviceModelsRequest
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -785,8 +777,7 @@ func (dst *GetPayloadFormatterRequest) SetFields(src *GetPayloadFormatterRequest
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:

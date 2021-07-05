@@ -443,7 +443,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 	}
 	return &ttnpb.EndDeviceTemplate{
 		EndDevice: dev,
-		FieldMask: pbtypes.FieldMask{
+		FieldMask: &pbtypes.FieldMask{
 			Paths: paths,
 		},
 	}, nil

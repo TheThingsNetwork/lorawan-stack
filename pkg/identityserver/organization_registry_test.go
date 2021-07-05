@@ -17,7 +17,7 @@ package identityserver
 import (
 	"testing"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -76,7 +76,7 @@ func TestOrganizationsNestedError(t *testing.T) {
 		}
 
 		_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: org.OrganizationOrUserIdentifiers(),
 		}, creds)
 
@@ -106,7 +106,7 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 
 		_, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
 			OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
-			FieldMask:               types.FieldMask{Paths: []string{"name"}},
+			FieldMask:               &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -114,7 +114,7 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 		}
 
 		listRes, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		a.So(err, should.BeNil)
@@ -124,7 +124,7 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 
 		_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -136,7 +136,7 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 				OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
 				Name:                    "Updated Name",
 			},
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -188,7 +188,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 
 		got, err := reg.Get(ctx, &ttnpb.GetOrganizationRequest{
 			OrganizationIdentifiers: created.OrganizationIdentifiers,
-			FieldMask:               types.FieldMask{Paths: []string{"name"}},
+			FieldMask:               &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -198,14 +198,14 @@ func TestOrganizationsCRUD(t *testing.T) {
 
 		got, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
 			OrganizationIdentifiers: created.OrganizationIdentifiers,
-			FieldMask:               types.FieldMask{Paths: []string{"ids"}},
+			FieldMask:               &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
 			OrganizationIdentifiers: created.OrganizationIdentifiers,
-			FieldMask:               types.FieldMask{Paths: []string{"attributes"}},
+			FieldMask:               &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
 
 		if a.So(err, should.NotBeNil) {
@@ -217,7 +217,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 				OrganizationIdentifiers: created.OrganizationIdentifiers,
 				Name:                    "Updated Name",
 			},
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -227,7 +227,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
-				FieldMask:    types.FieldMask{Paths: []string{"name"}},
+				FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 				Collaborator: collaborator,
 			}, creds)
 
@@ -269,7 +269,7 @@ func TestOrganizationsPagination(t *testing.T) {
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
 
 		list, err := reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
@@ -281,7 +281,7 @@ func TestOrganizationsPagination(t *testing.T) {
 		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         2,
@@ -293,7 +293,7 @@ func TestOrganizationsPagination(t *testing.T) {
 		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
-			FieldMask:    types.FieldMask{Paths: []string{"name"}},
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         3,

@@ -139,7 +139,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		a.So(dev.CreatedAt, should.HappenAfter, start)
 		a.So(dev.UpdatedAt, should.Equal, dev.CreatedAt)
 		a.So([]time.Time{start, dev.CreatedAt, time.Now()}, should.BeChronological)
-		a.So(dev, should.ResembleFields, &conf.CreateDevice.EndDevice, conf.CreateDevice.FieldMask.Paths)
+		a.So(dev, should.ResembleFields, &conf.CreateDevice.EndDevice, conf.CreateDevice.FieldMask.GetPaths())
 
 		dev, ok = env.AssertJoin(ctx, JoinAssertionConfig{
 			Device:        dev,
@@ -316,7 +316,7 @@ func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				EndDeviceOptions.WithLoRaWANVersion(macVersion),
 				EndDeviceOptions.WithLoRaWANPHYVersion(phyVersion),
 			),
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{
 					"frequency_plan_id",
 					"lorawan_phy_version",
@@ -364,7 +364,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				EndDeviceOptions.WithLoRaWANPHYVersion(phyVersion),
 				EndDeviceOptions.WithSupportsClassC(true),
 			),
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{
 					"frequency_plan_id",
 					"lorawan_phy_version",

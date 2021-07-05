@@ -46,13 +46,13 @@ message ApplicationLink {
 
 message GetApplicationLinkRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2;
 }
 
 message SetApplicationLinkRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   ApplicationLink link = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  google.protobuf.FieldMask field_mask = 3 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 3;
 }
 
 // Link stats as monitored by the Application Server.

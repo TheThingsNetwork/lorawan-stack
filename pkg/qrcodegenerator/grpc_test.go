@@ -61,7 +61,7 @@ func TestGenerateEndDeviceQRCode(t *testing.T) {
 	a.So(formats.Formats["test"], should.Resemble, &ttnpb.QRCodeFormat{
 		Name:        "Test",
 		Description: "Test",
-		FieldMask: pbtypes.FieldMask{
+		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"ids"},
 		},
 	})

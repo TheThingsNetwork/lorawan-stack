@@ -21,7 +21,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
@@ -98,8 +98,8 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 
 	var fetch func(db *gorm.DB) error
 	res := &ttnpb.AuthInfoResponse{}
-	userFieldMask := &types.FieldMask{Paths: []string{"admin", "state", "state_description", "primary_email_address_validated_at"}}
-	clientFieldMask := &types.FieldMask{Paths: []string{"state", "state_description"}}
+	userFieldMask := &pbtypes.FieldMask{Paths: []string{"admin", "state", "state_description", "primary_email_address_validated_at"}}
+	clientFieldMask := &pbtypes.FieldMask{Paths: []string{"state", "state_description"}}
 	var user *ttnpb.User
 	var userRights *ttnpb.Rights
 
@@ -321,7 +321,7 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 
 	if userID := authInfo.GetEntityIdentifiers().GetUserIds(); userID != nil {
 		err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-			user, err := store.GetUserStore(db).GetUser(ctx, userID, &types.FieldMask{Paths: []string{
+			user, err := store.GetUserStore(db).GetUser(ctx, userID, &pbtypes.FieldMask{Paths: []string{
 				"state",
 			}})
 			if err != nil {
@@ -411,6 +411,6 @@ type entityAccess struct {
 	*IdentityServer
 }
 
-func (ea *entityAccess) AuthInfo(ctx context.Context, _ *types.Empty) (*ttnpb.AuthInfoResponse, error) {
+func (ea *entityAccess) AuthInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.AuthInfoResponse, error) {
 	return ea.authInfo(ctx)
 }

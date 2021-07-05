@@ -18,6 +18,7 @@ import (
 	"context"
 	"strconv"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/validate"
 	"google.golang.org/grpc"
@@ -29,12 +30,12 @@ var (
 	updatePaths = []string{"updated_at"}
 )
 
-func cleanFieldMaskPaths(allowedPaths, requestedPaths, addPaths, removePaths []string) []string {
+func cleanFieldMaskPaths(allowedPaths []string, requestedPaths *pbtypes.FieldMask, addPaths, removePaths []string) *pbtypes.FieldMask {
 	selected := make(map[string]struct{})
 	for _, path := range addPaths {
 		selected[path] = struct{}{}
 	}
-	for _, path := range requestedPaths {
+	for _, path := range requestedPaths.GetPaths() {
 		selected[path] = struct{}{}
 	}
 	for _, path := range removePaths {
@@ -46,7 +47,9 @@ func cleanFieldMaskPaths(allowedPaths, requestedPaths, addPaths, removePaths []s
 			out = append(out, path)
 		}
 	}
-	return out
+	return &pbtypes.FieldMask{
+		Paths: out,
+	}
 }
 
 func cleanContactInfo(info []*ttnpb.ContactInfo) {

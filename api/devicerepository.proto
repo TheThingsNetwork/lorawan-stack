@@ -224,7 +224,7 @@ message GetEndDeviceBrandRequest {
   string brand_id = 2 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   // Field mask paths.
-  google.protobuf.FieldMask field_mask = 3 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 3;
 }
 
 message ListEndDeviceBrandsRequest {
@@ -245,7 +245,7 @@ message ListEndDeviceBrandsRequest {
   string search = 5 [(validate.rules).string = {max_len: 100}];
 
   // Field mask paths.
-  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 6;
 }
 
 message GetEndDeviceModelRequest {
@@ -258,7 +258,7 @@ message GetEndDeviceModelRequest {
   string model_id = 3 [(gogoproto.customname) = "ModelID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   // Field mask paths.
-  google.protobuf.FieldMask field_mask = 4 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 4;
 }
 
 message ListEndDeviceModelsRequest {
@@ -281,7 +281,7 @@ message ListEndDeviceModelsRequest {
   string search = 6 [(validate.rules).string = {max_len: 100}];
 
   // Field mask paths.
-  google.protobuf.FieldMask field_mask = 7 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 7;
 }
 
 message GetTemplateRequest {
@@ -300,7 +300,7 @@ message GetPayloadFormatterRequest {
   EndDeviceVersionIdentifiers version_ids = 2 [(gogoproto.customname) = "VersionIDs"];
 
   // Field mask paths.
-  google.protobuf.FieldMask field_mask = 3 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 3;
 }
 
 message ListEndDeviceBrandsResponse {

@@ -1075,7 +1075,7 @@ var locationUpdateTimeout = 5 * time.Second
 // handleLocationSolved saves the provided *ttnpb.ApplicationLocation in the Entity Registry as part of the device locations.
 // Locations provided by other services will be maintained.
 func (as *ApplicationServer) handleLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationLocation, link *ttnpb.ApplicationLink) error {
-	fm := pbtypes.FieldMask{Paths: []string{"locations"}}
+	fm := &pbtypes.FieldMask{Paths: []string{"locations"}}
 
 	ctx, cancel := context.WithTimeout(ctx, locationUpdateTimeout)
 	defer cancel()

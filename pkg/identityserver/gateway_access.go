@@ -17,7 +17,7 @@ package identityserver
 import (
 	"context"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
@@ -179,7 +179,7 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GatewayIdentifiers.GetEntityIdentifiers(), &req.APIKey, &req.FieldMask)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GatewayIdentifiers.GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
 		return err
 	})
 	if err != nil {
@@ -227,7 +227,7 @@ func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb
 	return res, nil
 }
 
-func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*types.Empty, error) {
+func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
@@ -340,7 +340,7 @@ func (ga *gatewayAccess) GetCollaborator(ctx context.Context, req *ttnpb.GetGate
 	return ga.getGatewayCollaborator(ctx, req)
 }
 
-func (ga *gatewayAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*types.Empty, error) {
+func (ga *gatewayAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*pbtypes.Empty, error) {
 	return ga.setGatewayCollaborator(ctx, req)
 }
 

@@ -5,8 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 	time "time"
-
-	types "github.com/gogo/protobuf/types"
 )
 
 func (dst *Client) SetFields(src *Client, paths ...string) error {
@@ -239,8 +237,7 @@ func (dst *GetClientRequest) SetFields(src *GetClientRequest, paths ...string) e
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:
@@ -285,8 +282,7 @@ func (dst *ListClientsRequest) SetFields(src *ListClientsRequest, paths ...strin
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 		case "order":
 			if len(subs) > 0 {
@@ -411,8 +407,7 @@ func (dst *UpdateClientRequest) SetFields(src *UpdateClientRequest, paths ...str
 			if src != nil {
 				dst.FieldMask = src.FieldMask
 			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
+				dst.FieldMask = nil
 			}
 
 		default:

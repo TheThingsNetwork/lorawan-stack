@@ -516,7 +516,7 @@ func TestRemoteStore(t *testing.T) {
 					}
 					codec, err := tc.f(&ttnpb.GetPayloadFormatterRequest{
 						VersionIDs: versionIDs,
-						FieldMask:  pbtypes.FieldMask{Paths: []string{"examples"}},
+						FieldMask:  &pbtypes.FieldMask{Paths: []string{"examples"}},
 					})
 					a.So(err, should.BeNil)
 					a.So(codec, should.Resemble, tc.codec)

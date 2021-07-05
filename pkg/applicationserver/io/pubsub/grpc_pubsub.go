@@ -51,7 +51,7 @@ func (ps *PubSub) Get(ctx context.Context, req *ttnpb.GetApplicationPubSubReques
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	pubsub, err := ps.registry.Get(ctx, req.ApplicationPubSubIdentifiers, appendImplicitPubSubGetPaths(req.FieldMask.Paths...))
+	pubsub, err := ps.registry.Get(ctx, req.ApplicationPubSubIdentifiers, appendImplicitPubSubGetPaths(req.FieldMask.GetPaths()...))
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (ps *PubSub) List(ctx context.Context, req *ttnpb.ListApplicationPubSubsReq
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	pubsubs, err := ps.registry.List(ctx, req.ApplicationIdentifiers, appendImplicitPubSubGetPaths(req.FieldMask.Paths...))
+	pubsubs, err := ps.registry.List(ctx, req.ApplicationIdentifiers, appendImplicitPubSubGetPaths(req.FieldMask.GetPaths()...))
 	if err != nil {
 		return nil, err
 	}
@@ -91,12 +91,12 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 		return nil, err
 	}
 	// Get all the fields here for starting the integration task.
-	pubsub, err := ps.registry.Set(ctx, req.ApplicationPubSubIdentifiers, appendImplicitPubSubGetPaths(req.FieldMask.Paths...),
+	pubsub, err := ps.registry.Set(ctx, req.ApplicationPubSubIdentifiers, appendImplicitPubSubGetPaths(req.FieldMask.GetPaths()...),
 		func(pubsub *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 			if pubsub != nil {
-				return &req.ApplicationPubSub, req.FieldMask.Paths, nil
+				return &req.ApplicationPubSub, req.FieldMask.GetPaths(), nil
 			}
-			return &req.ApplicationPubSub, append(req.FieldMask.Paths,
+			return &req.ApplicationPubSub, append(req.FieldMask.GetPaths(),
 				"ids.application_ids",
 				"ids.pub_sub_id",
 			), nil

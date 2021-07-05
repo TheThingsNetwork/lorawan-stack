@@ -140,7 +140,7 @@ func TestIntegrate(t *testing.T) {
 		// Expect no integration.
 		_, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
 			ApplicationPubSubIdentifiers: ps2,
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
 		}, creds)
@@ -151,7 +151,7 @@ func TestIntegrate(t *testing.T) {
 		// Set integration, expect integration to establish.
 		_, err = ps.Set(ctx, &ttnpb.SetApplicationPubSubRequest{
 			ApplicationPubSub: integration,
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
 		}, creds)
@@ -166,7 +166,7 @@ func TestIntegrate(t *testing.T) {
 		}
 		actual, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
 			ApplicationPubSubIdentifiers: ps2,
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
 		}, creds)
@@ -190,7 +190,7 @@ func TestIntegrate(t *testing.T) {
 		}
 		_, err = ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
 			ApplicationPubSubIdentifiers: ps2,
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
 		}, creds)

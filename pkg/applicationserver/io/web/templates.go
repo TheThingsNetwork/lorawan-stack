@@ -79,7 +79,7 @@ func (ts *templateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicat
 	if err != nil {
 		return nil, err
 	}
-	template, err = applyWebhookTemplateFieldMask(nil, template, appendImplicitWebhookTemplatePaths(req.FieldMask.Paths...)...)
+	template, err = applyWebhookTemplateFieldMask(nil, template, appendImplicitWebhookTemplatePaths(req.FieldMask.GetPaths()...)...)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (ts *templateStore) ListTemplates(ctx context.Context, req *ttnpb.ListAppli
 			return nil, err
 		}
 
-		template, err = applyWebhookTemplateFieldMask(nil, template, appendImplicitWebhookTemplatePaths(req.FieldMask.Paths...)...)
+		template, err = applyWebhookTemplateFieldMask(nil, template, appendImplicitWebhookTemplatePaths(req.FieldMask.GetPaths()...)...)
 		if err != nil {
 			return nil, err
 		}

@@ -305,7 +305,7 @@ func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *
 		return nil, err
 	}
 
-	paths := ttnpb.AddFields(req.GetFieldMask().Paths, "formatter", "formatter_parameter")
+	paths := ttnpb.AddFields(req.GetFieldMask().GetPaths(), "formatter", "formatter_parameter")
 	var examples []*ttnpb.MessagePayloadDecoder_Example
 	if ttnpb.HasAnyField([]string{"examples"}, paths...) && len(codec.Examples) > 0 {
 		examples = make([]*ttnpb.MessagePayloadDecoder_Example, 0, len(codec.Examples))
@@ -366,7 +366,7 @@ func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.Mess
 	if err != nil {
 		return nil, err
 	}
-	paths := ttnpb.AddFields(req.GetFieldMask().Paths, "formatter", "formatter_parameter")
+	paths := ttnpb.AddFields(req.GetFieldMask().GetPaths(), "formatter", "formatter_parameter")
 	var examples []*ttnpb.MessagePayloadEncoder_Example
 	if ttnpb.HasAnyField([]string{"examples"}, paths...) && len(codec.Examples) > 0 {
 		examples = make([]*ttnpb.MessagePayloadEncoder_Example, 0, len(codec.Examples))
