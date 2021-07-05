@@ -82,7 +82,6 @@ describe('End device manual create 2', () => {
     describe('LoRaWAN V1.0', () => {
       it('succeeds registering a new class A end device', () => {
         const device = {
-          id: 'otaa-test-1-0-class-a',
           app_eui: generateHexValue(16),
           dev_eui: generateHexValue(16),
           lorawan_version: 'MAC_V1_0',
@@ -95,20 +94,18 @@ describe('End device manual create 2', () => {
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('AppEUI').type(device.app_eui)
         cy.findByLabelText('AppKey').type(device.app_key)
-        cy.findByLabelText('End device ID').type(device.id)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.dev_eui}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
 
       it('succeeds registering a new class B end device', () => {
         const device = {
-          id: 'otaa-test-1-0-class-b',
           app_eui: generateHexValue(16),
           dev_eui: generateHexValue(16),
           lorawan_version: 'MAC_V1_0',
@@ -127,20 +124,18 @@ describe('End device manual create 2', () => {
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('AppEUI').type(device.app_eui)
         cy.findByLabelText('AppKey').type(device.app_key)
-        cy.findByLabelText('End device ID').type(device.id)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.dev_eui}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
 
       it('succeeds registering a new class C end device', () => {
         const device = {
-          id: 'otaa-test-1-0-class-c',
           app_eui: generateHexValue(16),
           dev_eui: generateHexValue(16),
           lorawan_version: 'MAC_V1_0',
@@ -157,13 +152,12 @@ describe('End device manual create 2', () => {
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('AppEUI').type(device.app_eui)
         cy.findByLabelText('AppKey').type(device.app_key)
-        cy.findByLabelText('End device ID').type(device.id)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.dev_eui}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
@@ -172,7 +166,6 @@ describe('End device manual create 2', () => {
     describe('LoRaWAN V1.0.2', () => {
       it('succeeds registering a new class A end device', () => {
         const device = {
-          id: 'otaa-test-1-0-2-class-a',
           app_eui: generateHexValue(16),
           dev_eui: generateHexValue(16),
           lorawan_version: 'MAC_V1_0_2',
@@ -185,13 +178,12 @@ describe('End device manual create 2', () => {
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('AppEUI').type(device.app_eui)
         cy.findByLabelText('AppKey').type(device.app_key)
-        cy.findByLabelText('End device ID').type(device.id)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.dev_eui}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
@@ -200,7 +192,6 @@ describe('End device manual create 2', () => {
     describe('LoRaWAN V1.1', () => {
       it('succeeds registering a new class A end device', () => {
         const device = {
-          id: 'otaa-test-1-1-class-a',
           app_eui: generateHexValue(16),
           dev_eui: generateHexValue(16),
           lorawan_version: 'MAC_V1_1',
@@ -215,13 +206,12 @@ describe('End device manual create 2', () => {
         cy.findByLabelText('JoinEUI').type(device.app_eui)
         cy.findByLabelText('AppKey').type(device.app_key)
         cy.findByLabelText('NwkKey').type(device.nwk_key)
-        cy.findByLabelText('End device ID').type(device.id)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.dev_eui}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
@@ -646,7 +636,6 @@ describe('End device manual create 2', () => {
 
     it('succeeds registering a new OTAA end device', () => {
       const device = {
-        id: 'otaa-no-ns-1-0-class-a',
         app_eui: generateHexValue(16),
         dev_eui: generateHexValue(16),
         lorawan_version: 'MAC_V1_0',
@@ -663,13 +652,12 @@ describe('End device manual create 2', () => {
       cy.findByLabelText('DevEUI').type(device.dev_eui)
       cy.findByLabelText('AppEUI').type(device.app_eui)
       cy.findByLabelText('AppKey').type(device.app_key)
-      cy.findByLabelText('End device ID').type(device.id)
 
       cy.findByRole('button', { name: 'Register end device' }).click()
 
       cy.location('pathname').should(
         'eq',
-        `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
+        `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.dev_eui}`,
       )
       cy.findByTestId('full-error-view').should('not.exist')
     })
