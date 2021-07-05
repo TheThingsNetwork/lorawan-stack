@@ -270,7 +270,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			state.downlinkTaskDone.Add(1)
 			go func() {
 				defer state.downlinkTaskDone.Done()
-				if err := s.handleDown(ctx, state); err != nil {
+				if err := s.handleDown(ctx, state); err != nil && !errors.Is(err, errDownlinkPathExpired) {
 					logger.WithError(err).Warn("Failed to handle downstream packet")
 				}
 			}()
