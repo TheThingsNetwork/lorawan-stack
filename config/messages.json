@@ -1655,6 +1655,15 @@
       "file": "applications_pubsub.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_session_id": {
+    "translations": {
+      "en": "no session ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "users_sessions.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_template_format_id": {
     "translations": {
       "en": "no template format ID set"
