@@ -88,6 +88,8 @@ func Log(logger log.Interface, ignorePathsArray []string) MiddlewareFunc {
 			requestLogger = requestLogger.WithFields(logFields)
 
 			switch {
+			case metrics.Code == http.StatusNotImplemented:
+				requestLogger.Info("Client called unimplemented route")
 			case metrics.Code >= 500:
 				requestLogger.Error("Server error")
 			case metrics.Code >= 400:
