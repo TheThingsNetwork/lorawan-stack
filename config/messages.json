@@ -5237,15 +5237,6 @@
       "file": "gateway_registry.go"
     }
   },
-  "error:pkg/identityserver:gateway_secret_encryption_key_not_found": {
-    "translations": {
-      "en": "a gateway secret encryption key with id `{id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "gateway_registry.go"
-    }
-  },
   "error:pkg/identityserver:invalid_authorization": {
     "translations": {
       "en": "invalid authorization"
