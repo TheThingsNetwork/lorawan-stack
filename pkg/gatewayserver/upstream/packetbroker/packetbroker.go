@@ -183,7 +183,11 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		}
 		lastCounters = now
 
-		res, err := pbaClient.UpdateGateway(ctx, req, h.Cluster.WithClusterAuth())
+		pbaConn, err := h.Cluster.GetPeerConn(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, &ids)
+		if err != nil {
+			return errPacketBrokerAgentNotFound.WithCause(err)
+		}
+		res, err := ttnpb.NewGsPbaClient(pbaConn).UpdateGateway(ctx, req, h.Cluster.WithClusterAuth())
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to update gateway")
 			onlineTTL = nil
