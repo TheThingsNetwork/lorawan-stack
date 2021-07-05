@@ -44,7 +44,13 @@ type Config struct {
 	UpdateJitter    float64
 	OnlineTTLMargin time.Duration
 	DevAddrPrefixes []types.DevAddrPrefix
+	GatewayRegistry GatewayRegistry
 	Cluster         Cluster
+}
+
+// GatewayRegistry is a store with gateways.
+type GatewayRegistry interface {
+	Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error)
 }
 
 // Cluster represents the interface the cluster.
@@ -136,6 +142,23 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		case <-h.nextUpdateGateway(onlineTTL):
 		}
 
+		// Get the gateway from Identity Server. Some settings may have changed by a collaborator.
+		gtw, err := h.GatewayRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
+			GatewayIdentifiers: ids,
+			FieldMask: pbtypes.FieldMask{
+				Paths: []string{
+					"antennas",
+					"location_public",
+					"status_public",
+					"update_location_from_status",
+				},
+			},
+		})
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to get gateway")
+			return err
+		}
+
 		req := &ttnpb.UpdatePacketBrokerGatewayRequest{
 			Gateway: &ttnpb.Gateway{
 				GatewayIdentifiers: ids,
@@ -152,9 +175,17 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		// Only update the location when it is public and when it may be updated from status messages.
 		// location_public should only be in the field mask if the location is known, so only when a location in the status.
 		// This is to avoid that the location gets reset when there is no location in the status.
-		if gtw.LocationPublic && gtw.UpdateLocationFromStatus {
-			if status, _, ok := conn.StatusStats(); ok && len(status.GetAntennaLocations()) > 0 && status.AntennaLocations[0] != nil {
-				loc := *status.AntennaLocations[0]
+		if gtw.LocationPublic {
+			var (
+				loc ttnpb.Location
+				ok  bool
+			)
+			if status, _, ok := conn.StatusStats(); ok && gtw.UpdateLocationFromStatus && len(status.GetAntennaLocations()) > 0 && status.AntennaLocations[0] != nil {
+				loc, ok = *status.AntennaLocations[0], true
+			} else if len(gtw.Antennas) > 0 && gtw.Antennas[0].Location != nil {
+				loc, ok = *gtw.Antennas[0].Location, true
+			}
+			if ok {
 				loc.Source = ttnpb.SOURCE_GPS
 				req.Gateway.LocationPublic = true
 				req.Gateway.Antennas = []ttnpb.GatewayAntenna{
@@ -183,7 +214,11 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		}
 		lastCounters = now
 
-		res, err := pbaClient.UpdateGateway(ctx, req, h.Cluster.WithClusterAuth())
+		pbaConn, err := h.Cluster.GetPeerConn(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, &ids)
+		if err != nil {
+			return errPacketBrokerAgentNotFound.WithCause(err)
+		}
+		res, err := ttnpb.NewGsPbaClient(pbaConn).UpdateGateway(ctx, req, h.Cluster.WithClusterAuth())
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to update gateway")
 			onlineTTL = nil

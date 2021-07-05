@@ -7379,6 +7379,15 @@
       "file": "grpc_disabled.go"
     }
   },
+  "error:pkg/packetbrokeragent:packet_broker_internal": {
+    "translations": {
+      "en": "internal Packet Broker error"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "grpc_gspba.go"
+    }
+  },
   "error:pkg/packetbrokeragent:registration": {
     "translations": {
       "en": "get registration information"

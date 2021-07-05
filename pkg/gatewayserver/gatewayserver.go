@@ -147,6 +147,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 			handler = ns.NewHandler(gs.Context(), c, c, prefix)
 		case "packetbroker":
 			handler = packetbroker.NewHandler(gs.Context(), packetbroker.Config{
+				GatewayRegistry: gs.entityRegistry,
 				Cluster:         c,
 				DevAddrPrefixes: prefix,
 				UpdateInterval:  conf.PacketBroker.UpdateGatewayInterval,
