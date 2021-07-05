@@ -145,7 +145,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		// Get the gateway from Identity Server. Some settings may have changed by a collaborator.
 		gtw, err := h.GatewayRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: ids,
-			FieldMask: &pbtypes.FieldMask{
+			FieldMask: pbtypes.FieldMask{
 				Paths: []string{
 					"antennas",
 					"location_public",
