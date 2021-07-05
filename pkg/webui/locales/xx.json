@@ -527,6 +527,8 @@
   "console.views.device-add.messages.rx2DataRateIndexTitle": "XXx Xxxx Xxxx",
   "console.views.device-add.messages.rx2FrequencyDescription": "Xxxxxxxxx xxx XXx (Xx)",
   "console.views.device-add.messages.rx2FrequencyTitle": "XXx Xxxxxxxxx",
+  "console.views.device-add.messages.classBTimeout": "Xxxxx X xxxxxxx",
+  "console.views.device-add.messages.classCTimeout": "Xxxxx X xxxxxxx",
   "console.views.device-add.messages.otherOption": "Xxxxxx",
   "console.views.device-add.messages.typeToSearch": "Xxxx xx xxxxxxx",
   "console.views.device-add.messages.unknownHwOption": "Xxxxxxx xxx.",

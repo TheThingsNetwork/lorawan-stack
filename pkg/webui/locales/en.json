@@ -527,6 +527,8 @@
   "console.views.device-add.messages.rx2DataRateIndexTitle": "RX2 Data Rate",
   "console.views.device-add.messages.rx2FrequencyDescription": "Frequency for RX2 (Hz)",
   "console.views.device-add.messages.rx2FrequencyTitle": "RX2 Frequency",
+  "console.views.device-add.messages.classBTimeout": "Class B timeout",
+  "console.views.device-add.messages.classCTimeout": "Class C timeout",
   "console.views.device-add.messages.otherOption": "Other…",
   "console.views.device-add.messages.typeToSearch": "Type to search…",
   "console.views.device-add.messages.unknownHwOption": "Unknown ver.",
