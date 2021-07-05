@@ -34,6 +34,7 @@ For details about compatibility between different releases, see the **Commitment
 - CLI `gateway set --antenna.remove` command failing to remove gateway antennas in some cases.
 - CLI `gateway set --antenna.gain <gain>` command crashing when no gateway antennas are present.
 - Webhook template path variable expansion of query parameters.
+- LBS LNS Auth Secret displays garbage value when updated.
 
 ### Security
 

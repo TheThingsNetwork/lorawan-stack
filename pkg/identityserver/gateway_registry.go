@@ -552,7 +552,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		gtw.LBSLNSSecret.Value = ptLBSLNSSecret
 	}
 	if len(ptTargetCUPSKeySecret) != 0 {
-		gtw.TargetCUPSKey.Value = ptCACSecret
+		gtw.TargetCUPSKey.Value = ptTargetCUPSKeySecret
 	}
 
 	return gtw, nil
