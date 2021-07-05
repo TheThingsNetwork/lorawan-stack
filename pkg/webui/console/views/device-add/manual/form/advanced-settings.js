@@ -232,7 +232,7 @@ const AdvancedSettingsSection = props => {
       )}
       {!isNone && (
         <Form.Field
-          title={m.useExternalServers}
+          label={m.useExternalServers}
           name="_external_servers"
           component={Checkbox}
           onChange={handleExternalServers}
