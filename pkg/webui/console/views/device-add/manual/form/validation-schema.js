@@ -430,4 +430,11 @@ const validationSchema = Yup.object({
   .concat(sessionSchema)
   .concat(macSettingsSchema)
 
-export { validationSchema as default, rootKeysSchema, sessionSchema, idsSchema, macSettingsSchema }
+export {
+  validationSchema as default,
+  rootKeysSchema,
+  sessionSchema,
+  idsSchema,
+  macSettingsSchema,
+  devEUISchema,
+}

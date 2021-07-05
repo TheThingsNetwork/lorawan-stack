@@ -48,7 +48,7 @@ import { REGISTRATION_TYPES } from '../../utils'
 import messages from '../../messages'
 
 import AdvancedSettingsSection from './advanced-settings'
-import validationSchema from './validation-schema'
+import validationSchema, { devEUISchema } from './validation-schema'
 
 const m = defineMessages({
   register: 'Register manually',
@@ -88,6 +88,19 @@ const defaultValues = {
   _device_class: undefined,
   _external_servers: false,
   _registration: REGISTRATION_TYPES.SINGLE,
+}
+
+const generateDeviceId = (device = {}) => {
+  const { ids: idsValues = {} } = device
+
+  try {
+    devEUISchema.validateSync(idsValues.dev_eui)
+    return idsValues.dev_eui.toLowerCase()
+  } catch (e) {
+    // We dont want to use invalid `dev_eui` as `device_id`.
+  }
+
+  return defaultValues.ids.device_id || ''
 }
 
 const ManualForm = props => {
@@ -166,6 +179,18 @@ const ManualForm = props => {
   const handleDeviceClassChange = React.useCallback(devClass => {
     setDeviceClass(devClass)
   }, [])
+
+  const handleIdPrefill = React.useCallback(() => {
+    if (formRef && formRef.current) {
+      const { values, setFieldValue } = formRef.current
+
+      // Do not overwrite a value that the user has already set.
+      if (values.ids.device_id === initialValues.ids.device_id) {
+        const generatedId = generateDeviceId(values)
+        setFieldValue('ids.device_id', generatedId)
+      }
+    }
+  }, [initialValues.ids.device_id])
 
   const lwVersion = parseLorawanMacVersion(lorawanVersion)
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
@@ -299,6 +324,7 @@ const ManualForm = props => {
               required={isOTAA}
               component={Input}
               tooltipId={tooltipIds.DEV_EUI}
+              onBlur={handleIdPrefill}
             />
           )}
           {(isABP || isMulticast) && (
