@@ -164,8 +164,8 @@ const sessionSchema = Yup.object({
 
 const macSettingsSchema = Yup.object({
   mac_settings: Yup.object().when(
-    ['_activation_mode', 'supports_class_b'],
-    (mode, isClassB, schema) =>
+    ['_activation_mode', 'supports_class_b', 'supports_class_c'],
+    (mode, isClassB, isClassC, schema) =>
       schema.shape({
         rx1_data_rate_offset: Yup.lazy(value => {
           if (mode !== ACTIVATION_MODES.ABP || value === undefined) {
@@ -232,6 +232,13 @@ const macSettingsSchema = Yup.object({
         class_b_timeout: Yup.lazy(value => {
           const hasClassBTimeout = isClassB || mode === ACTIVATION_MODES.MULTICAST
           if (!hasClassBTimeout || !Boolean(value)) {
+            return Yup.string().strip()
+          }
+
+          return Yup.string()
+        }),
+        class_c_timeout: Yup.lazy(value => {
+          if (!isClassC || !Boolean(value)) {
             return Yup.string().strip()
           }
 

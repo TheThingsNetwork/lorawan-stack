@@ -47,6 +47,8 @@ const messages = defineMessages({
   rx2DataRateIndexTitle: 'RX2 Data Rate',
   rx2FrequencyDescription: 'Frequency for RX2 (Hz)',
   rx2FrequencyTitle: 'RX2 Frequency',
+  classBTimeout: 'Class B timeout',
+  classCTimeout: 'Class C timeout',
   // Device repository messages.
   otherOption: 'Other…',
   typeToSearch: 'Type to search…',

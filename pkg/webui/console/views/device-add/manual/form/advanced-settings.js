@@ -82,6 +82,8 @@ const AdvancedSettingsSection = props => {
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
   const isNone = activationMode === ACTIVATION_MODES.NONE
   const isClassB = deviceClass === DEVICE_CLASS_MAP.CLASS_B
+  const isClassC =
+    deviceClass === DEVICE_CLASS_MAP.CLASS_B_C || deviceClass === DEVICE_CLASS_MAP.CLASS_C
 
   const [externalServers, setExternalServer] = React.useState(false)
   const handleExternalServers = React.useCallback(
@@ -157,7 +159,7 @@ const AdvancedSettingsSection = props => {
           {((isClassB && !isNone) || isMulticast) && (
             <Form.FieldContainer horizontal>
               <Form.Field
-                title="Class B timeout"
+                title={messages.classBTimeout}
                 name="mac_settings.class_b_timeout"
                 encode={timeoutEncode}
                 decode={timeoutDecode}
@@ -181,6 +183,18 @@ const AdvancedSettingsSection = props => {
           {!isNone && (
             <>
               <Form.FieldContainer horizontal>
+                {isClassC && (
+                  <Form.Field
+                    title={messages.classCTimeout}
+                    name="mac_settings.class_c_timeout"
+                    encode={timeoutEncode}
+                    decode={timeoutDecode}
+                    component={Input}
+                    type="number"
+                    inputWidth="xxs"
+                    autoWidth
+                  />
+                )}
                 <Form.Field
                   title={messages.rx2DataRateIndexTitle}
                   type="number"
