@@ -92,7 +92,10 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 	}
 }
 
-var errNoGatewayID = errors.DefineFailedPrecondition("no_gateway_id", "no gateway identifier provided or included in configuration")
+var (
+	errNoGatewayID          = errors.DefineFailedPrecondition("no_gateway_id", "no gateway identifier provided or included in configuration")
+	errPacketBrokerInternal = errors.DefineAborted("packet_broker_internal", "internal Packet Broker error")
+)
 
 // UpdateGateway is called by Gateway Server to update a gateway.
 func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacketBrokerGatewayRequest) (*ttnpb.UpdatePacketBrokerGatewayResponse, error) {
@@ -171,6 +174,9 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 	_, err := mappingpb.NewMapperClient(s.mapperConn).UpdateGateway(ctx, updateReq)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to update gateway")
+		if errors.IsInternal(err) {
+			return nil, errPacketBrokerInternal.WithCause(err)
+		}
 		return nil, err
 	}
 
