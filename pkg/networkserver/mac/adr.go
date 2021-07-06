@@ -250,6 +250,8 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	}
 	if marginSteps := (margin - txPowerStep(phy, 0, minTxPowerIndex)) / drStep; marginSteps >= 0 && marginSteps < float32(maxDataRateIndex-dev.MACState.DesiredParameters.ADRDataRateIndex) {
 		maxDataRateIndex = dev.MACState.DesiredParameters.ADRDataRateIndex + ttnpb.DataRateIndex(marginSteps)
+	} else if marginSteps < 0 {
+		maxDataRateIndex = minDataRateIndex
 	}
 	for drIdx := maxDataRateIndex; drIdx > minDataRateIndex; drIdx-- {
 		if _, ok := rejectedDataRateIndexes[drIdx]; ok {
