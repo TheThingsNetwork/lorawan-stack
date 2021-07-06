@@ -1965,6 +1965,15 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "lorawan_phy_version":
+
+			if _, ok := PHYVersion_name[int32(m.GetLorawanPhyVersion())]; !ok {
+				return TxRequestValidationError{
+					field:  "lorawan_phy_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "advanced":
 
 			if v, ok := interface{}(m.GetAdvanced()).(interface{ ValidateFields(...string) error }); ok {

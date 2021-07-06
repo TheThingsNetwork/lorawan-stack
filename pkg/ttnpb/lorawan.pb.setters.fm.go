@@ -1246,6 +1246,16 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 				var zero string
 				dst.FrequencyPlanID = zero
 			}
+		case "lorawan_phy_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'lorawan_phy_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LorawanPhyVersion = src.LorawanPhyVersion
+			} else {
+				var zero PHYVersion
+				dst.LorawanPhyVersion = zero
+			}
 		case "advanced":
 			if len(subs) > 0 {
 				return fmt.Errorf("'advanced' has no subfields, but %s were specified", subs)
