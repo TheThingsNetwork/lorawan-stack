@@ -13,6 +13,7 @@
 // limitations under the License.
 
 export const id = /^[a-z0-9]+(-[a-z0-9]+)*$/
+export const userId = /^[a-z0-9](?:[-]?[a-z0-9]){1,}$/
 export const noSpaces = /^\S*$/
 export const apiKey = /^NNSXS.[A-Z0-9]{39}.[A-Z0-9]{52}$/
 export const address = new RegExp(

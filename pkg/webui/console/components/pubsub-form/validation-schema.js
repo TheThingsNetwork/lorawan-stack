@@ -14,9 +14,9 @@
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { id as idRegexp } from '@ttn-lw/lib/regexp'
 
 import {
-  id as idRegexp,
   address as addressRegexp,
   mqttUrl as mqttUrlRegexp,
   mqttPassword as mqttPasswordRegexp,
@@ -28,9 +28,9 @@ import providers from './providers'
 
 export default Yup.object().shape({
   pub_sub_id: Yup.string()
+    .min(3, Yup.passValues(sharedMessages.validateTooShort))
+    .max(36, Yup.passValues(sharedMessages.validateTooLong))
     .matches(idRegexp, Yup.passValues(sharedMessages.validateIdFormat))
-    .min(2, Yup.passValues(sharedMessages.validateTooShort))
-    .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   format: Yup.string().required(sharedMessages.validateRequired),
   base_topic: Yup.string(),
