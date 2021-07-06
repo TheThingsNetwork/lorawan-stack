@@ -51,7 +51,7 @@ const m = defineMessages({
 
   devIdDescription: 'A unique, human-readable identifier for your end device.',
   devIdLocation:
-    'You can make it up, so be creative. End device IDs can not be reused by multiple end devices within the same application.',
+    'We prefill this value using the previously entered DevEUI but you can use any other unique value you want. End device IDs can not be reused by multiple end devices within the same application.',
 
   joinServerDescription:
     "The Join Server's role is to store root keys, generate session keys, and to send those securely to the Network Server and Application Server of choice. The device contains the same root keys, which can be provisioned as part of assembly, distribution or upon installation.",

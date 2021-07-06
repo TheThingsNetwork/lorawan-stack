@@ -25,6 +25,7 @@ const messages = defineMessages({
   singleRegistration: 'View registered end device',
   multipleRegistration: 'Register another end device of this type',
   createSuccess: 'End device registered',
+  deviceIdDescription: 'This value is automatically prefilled using the DevEUI',
   // Manual messages.
   basicTitle: 'Basic settings',
   basicDescription: "End device ID's, Name and Description",

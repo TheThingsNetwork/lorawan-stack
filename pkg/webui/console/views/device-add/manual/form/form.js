@@ -424,6 +424,7 @@ const ManualForm = props => {
         placeholder={sharedMessages.deviceIdPlaceholder}
         component={Input}
         tooltipId={tooltipIds.DEVICE_ID}
+        description={messages.deviceIdDescription}
       />
       <Form.Field title={messages.afterRegistration} name="_registration" component={Radio.Group}>
         <Radio label={messages.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />

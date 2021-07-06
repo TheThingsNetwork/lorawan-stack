@@ -217,6 +217,7 @@ const Registration = props => {
           onFocus={handleIdFocus}
           inputRef={idInputRef}
           tooltipId={tooltipIds.DEVICE_ID}
+          description={messages.deviceIdDescription}
         />
         <Form.Field title={messages.afterRegistration} name="_registration" component={Radio.Group}>
           <Radio label={messages.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />
