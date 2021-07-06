@@ -176,6 +176,19 @@ const m = defineMessages({
 
   updateGtwLocationFromStatusDescription:
     'When checked, the location of this gateway will be updated from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported.',
+
+  rx1DelayDescription:
+    'The amount of time in seconds after an uplink that the downlink window opens.',
+  rx1DelayAbsence:
+    'The default value of 5 seconds will be set by The Things Stack to accomodate for high-latency backhauls and/or Packet Broker.',
+
+  pingSlotPeriodicityDescription: 'The amount of time between two receive windows (ping slots).',
+
+  classBTimeoutDescription:
+    'The amount of time after which the network server will assume a message is lost, if not confirmed. This should be set to a value less than the time between two ping slots (ping slot periodicity).',
+
+  rx2DataRateDescription:
+    'The data rate used for the RX2 window. For OTAA devices, this is configured as part of join. For ABP devices, a matching value must be programmed in the device.',
 })
 
 const descriptions = Object.freeze({
@@ -341,6 +354,16 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.UPDATE_LOCATION_FROM_STATUS]: {
     description: m.updateGtwLocationFromStatusDescription,
+  },
+  [TOOLTIP_IDS.RX1_DELAY]: {
+    description: m.rx1DelayDescription,
+    absence: m.rx1DelayAbsence,
+  },
+  [TOOLTIP_IDS.PING_SLOT_PERIODICITY]: {
+    description: m.pingSlotPeriodicityDescription,
+  },
+  [TOOLTIP_IDS.CLASS_B_TIMEOUT]: {
+    description: m.classBTimeoutDescription,
   },
 })
 

@@ -148,6 +148,7 @@ const AdvancedSettingsSection = props => {
                   type="number"
                   description={m.rx1DelayDescription}
                   name="mac_settings.rx1_delay"
+                  tooltipId={tooltipIds.RX1_DELAY}
                   component={Input}
                   min={1}
                   max={15}
@@ -162,6 +163,7 @@ const AdvancedSettingsSection = props => {
               <Form.Field
                 title={messages.classBTimeout}
                 name="mac_settings.class_b_timeout"
+                tooltipId={tooltipIds.CLASS_B_TIMEOUT}
                 encode={timeoutEncode}
                 decode={timeoutDecode}
                 component={Input}
@@ -173,6 +175,7 @@ const AdvancedSettingsSection = props => {
                 title={messages.pingSlotPeriodicityTitle}
                 description={messages.pingSlotPeriodicityDescription}
                 name="mac_settings.ping_slot_periodicity"
+                tooltipId={tooltipIds.PING_SLOT_PERIODICITY}
                 component={Select}
                 options={pingSlotPeriodicityOptions}
                 required={isClassB && (isMulticast || isABP)}
@@ -200,6 +203,7 @@ const AdvancedSettingsSection = props => {
                   title={messages.rx2DataRateIndexTitle}
                   type="number"
                   name="mac_settings.rx2_data_rate_index"
+                  tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
                   component={Input}
                   min={0}
                   max={15}
