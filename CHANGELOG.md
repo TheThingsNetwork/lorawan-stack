@@ -24,6 +24,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Network Server ADR algorithm data rate adjustment behavior on negative margin.
+
 ### Security
 
 ## [Unreleased]
