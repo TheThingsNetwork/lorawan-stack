@@ -4,33 +4,90 @@ package ttnpb
 
 import fmt "fmt"
 
-func (dst *UpdatePacketBrokerGatewayRequest) SetFields(src *UpdatePacketBrokerGatewayRequest, paths ...string) error {
+func (dst *PacketBrokerGateway) SetFields(src *PacketBrokerGateway, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "gateway":
+		case "ids":
 			if len(subs) > 0 {
-				var newDst, newSrc *Gateway
-				if (src == nil || src.Gateway == nil) && dst.Gateway == nil {
+				var newDst, newSrc *PacketBrokerGateway_GatewayIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.Gateway
+					newSrc = src.Ids
 				}
-				if dst.Gateway != nil {
-					newDst = dst.Gateway
+				if dst.Ids != nil {
+					newDst = dst.Ids
 				} else {
-					newDst = &Gateway{}
-					dst.Gateway = newDst
+					newDst = &PacketBrokerGateway_GatewayIdentifiers{}
+					dst.Ids = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.Gateway = src.Gateway
+					dst.Ids = src.Ids
 				} else {
-					dst.Gateway = nil
+					dst.Ids = nil
 				}
+			}
+		case "contact_info":
+			if len(subs) > 0 {
+				return fmt.Errorf("'contact_info' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ContactInfo = src.ContactInfo
+			} else {
+				dst.ContactInfo = nil
+			}
+		case "antennas":
+			if len(subs) > 0 {
+				return fmt.Errorf("'antennas' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Antennas = src.Antennas
+			} else {
+				dst.Antennas = nil
+			}
+		case "status_public":
+			if len(subs) > 0 {
+				return fmt.Errorf("'status_public' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.StatusPublic = src.StatusPublic
+			} else {
+				var zero bool
+				dst.StatusPublic = zero
+			}
+		case "location_public":
+			if len(subs) > 0 {
+				return fmt.Errorf("'location_public' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LocationPublic = src.LocationPublic
+			} else {
+				var zero bool
+				dst.LocationPublic = zero
+			}
+		case "frequency_plan_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_plan_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyPlanIds = src.FrequencyPlanIds
+			} else {
+				dst.FrequencyPlanIds = nil
+			}
+		case "update_location_from_status":
+			if len(subs) > 0 {
+				return fmt.Errorf("'update_location_from_status' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpdateLocationFromStatus = src.UpdateLocationFromStatus
+			} else {
+				var zero bool
+				dst.UpdateLocationFromStatus = zero
 			}
 		case "online":
 			if len(subs) > 0 {
@@ -59,6 +116,42 @@ func (dst *UpdatePacketBrokerGatewayRequest) SetFields(src *UpdatePacketBrokerGa
 				dst.TxRate = src.TxRate
 			} else {
 				dst.TxRate = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *UpdatePacketBrokerGatewayRequest) SetFields(src *UpdatePacketBrokerGatewayRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway":
+			if len(subs) > 0 {
+				var newDst, newSrc *PacketBrokerGateway
+				if (src == nil || src.Gateway == nil) && dst.Gateway == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Gateway
+				}
+				if dst.Gateway != nil {
+					newDst = dst.Gateway
+				} else {
+					newDst = &PacketBrokerGateway{}
+					dst.Gateway = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Gateway = src.Gateway
+				} else {
+					dst.Gateway = nil
+				}
 			}
 		case "field_mask":
 			if len(subs) > 0 {
@@ -973,6 +1066,36 @@ func (dst *ListForwarderRoutingPoliciesRequest) SetFields(src *ListForwarderRout
 			} else {
 				var zero uint32
 				dst.Page = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *PacketBrokerGateway_GatewayIdentifiers) SetFields(src *PacketBrokerGateway_GatewayIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayId = src.GatewayId
+			} else {
+				var zero string
+				dst.GatewayId = zero
+			}
+		case "eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Eui = src.Eui
+			} else {
+				dst.Eui = nil
 			}
 
 		default:

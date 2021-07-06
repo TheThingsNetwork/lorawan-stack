@@ -2,62 +2,53 @@
 
 package ttnpb
 
+var PacketBrokerGatewayFieldPathsNested = []string{
+	"antennas",
+	"contact_info",
+	"frequency_plan_ids",
+	"ids",
+	"ids.eui",
+	"ids.gateway_id",
+	"location_public",
+	"online",
+	"rx_rate",
+	"status_public",
+	"tx_rate",
+	"update_location_from_status",
+}
+
+var PacketBrokerGatewayFieldPathsTopLevel = []string{
+	"antennas",
+	"contact_info",
+	"frequency_plan_ids",
+	"ids",
+	"location_public",
+	"online",
+	"rx_rate",
+	"status_public",
+	"tx_rate",
+	"update_location_from_status",
+}
 var UpdatePacketBrokerGatewayRequestFieldPathsNested = []string{
 	"field_mask",
 	"gateway",
 	"gateway.antennas",
-	"gateway.attributes",
-	"gateway.auto_update",
-	"gateway.claim_authentication_code",
-	"gateway.claim_authentication_code.secret",
-	"gateway.claim_authentication_code.secret.key_id",
-	"gateway.claim_authentication_code.secret.value",
-	"gateway.claim_authentication_code.valid_from",
-	"gateway.claim_authentication_code.valid_to",
 	"gateway.contact_info",
-	"gateway.created_at",
-	"gateway.deleted_at",
-	"gateway.description",
-	"gateway.downlink_path_constraint",
-	"gateway.enforce_duty_cycle",
-	"gateway.frequency_plan_id",
 	"gateway.frequency_plan_ids",
-	"gateway.gateway_server_address",
 	"gateway.ids",
 	"gateway.ids.eui",
 	"gateway.ids.gateway_id",
-	"gateway.lbs_lns_secret",
-	"gateway.lbs_lns_secret.key_id",
-	"gateway.lbs_lns_secret.value",
 	"gateway.location_public",
-	"gateway.name",
-	"gateway.require_authenticated_connection",
-	"gateway.schedule_anytime_delay",
-	"gateway.schedule_downlink_late",
+	"gateway.online",
+	"gateway.rx_rate",
 	"gateway.status_public",
-	"gateway.target_cups_key",
-	"gateway.target_cups_key.key_id",
-	"gateway.target_cups_key.value",
-	"gateway.target_cups_uri",
-	"gateway.update_channel",
+	"gateway.tx_rate",
 	"gateway.update_location_from_status",
-	"gateway.updated_at",
-	"gateway.version_ids",
-	"gateway.version_ids.brand_id",
-	"gateway.version_ids.firmware_version",
-	"gateway.version_ids.hardware_version",
-	"gateway.version_ids.model_id",
-	"online",
-	"rx_rate",
-	"tx_rate",
 }
 
 var UpdatePacketBrokerGatewayRequestFieldPathsTopLevel = []string{
 	"field_mask",
 	"gateway",
-	"online",
-	"rx_rate",
-	"tx_rate",
 }
 var UpdatePacketBrokerGatewayResponseFieldPathsNested = []string{
 	"online_ttl",
@@ -294,4 +285,13 @@ var ListForwarderRoutingPoliciesRequestFieldPathsTopLevel = []string{
 	"home_network_id",
 	"limit",
 	"page",
+}
+var PacketBrokerGateway_GatewayIdentifiersFieldPathsNested = []string{
+	"eui",
+	"gateway_id",
+}
+
+var PacketBrokerGateway_GatewayIdentifiersFieldPathsTopLevel = []string{
+	"eui",
+	"gateway_id",
 }

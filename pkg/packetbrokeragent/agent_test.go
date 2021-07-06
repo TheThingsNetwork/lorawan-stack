@@ -445,8 +445,8 @@ func TestForwarder(t *testing.T) {
 		}
 
 		res, err := gs.UpdateGateway(ctx, &ttnpb.UpdatePacketBrokerGatewayRequest{
-			Gateway: &ttnpb.Gateway{
-				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+			Gateway: &ttnpb.PacketBrokerGateway{
+				Ids: &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
 					GatewayId: "foo-gateway",
 					Eui:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
 				},
@@ -462,8 +462,8 @@ func TestForwarder(t *testing.T) {
 						Value:         "tech@example.com",
 					},
 				},
-				FrequencyPlanIDs: []string{"EU_863_870"},
-				Antennas: []ttnpb.GatewayAntenna{
+				FrequencyPlanIds: []string{"EU_863_870"},
+				Antennas: []*ttnpb.GatewayAntenna{
 					{
 						Location: &ttnpb.Location{
 							Latitude:  4.85464,
@@ -476,8 +476,8 @@ func TestForwarder(t *testing.T) {
 				},
 				StatusPublic:   true,
 				LocationPublic: true,
+				Online:         true,
 			},
-			Online: true,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{
 					"antennas",
@@ -485,6 +485,7 @@ func TestForwarder(t *testing.T) {
 					"frequency_plan_ids",
 					"ids",
 					"location_public",
+					"online",
 					"status_public",
 				},
 			},

@@ -167,6 +167,13 @@ func (ids *GatewayIdentifiers) ValidateContext(context.Context) error {
 	return nil
 }
 
+func (ids *GatewayIdentifiers) GetEui() *types.EUI64 {
+	if ids == nil {
+		return nil
+	}
+	return ids.Eui
+}
+
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (ids *UserIdentifiers) ValidateContext(context.Context) error {
 	if err := ids.ValidateFields(); err != nil {

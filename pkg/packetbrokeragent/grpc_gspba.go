@@ -103,7 +103,7 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 		return nil, err
 	}
 
-	id := toPBGatewayIdentifier(req.Gateway.GatewayIdentifiers, s.config)
+	id := toPBGatewayIdentifier(req.Gateway.Ids, s.config)
 	if id == nil {
 		return nil, errNoGatewayID.New()
 	}
@@ -112,8 +112,6 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 		ForwarderTenantId:  s.tenantIDExtractor(ctx),
 		ForwarderClusterId: s.clusterID,
 		ForwarderGatewayId: id,
-		RxRate:             req.RxRate,
-		TxRate:             req.TxRate,
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "location_public") {
@@ -136,9 +134,9 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 		}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "status_public") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "status_public") && ttnpb.HasAnyField(req.FieldMask.GetPaths(), "online") {
 		updateReq.Online = &pbtypes.BoolValue{}
-		if req.Gateway.StatusPublic && req.Online {
+		if req.Gateway.StatusPublic && req.Gateway.Online {
 			updateReq.Online.Value = true
 			updateReq.OnlineTtl = pbtypes.DurationProto(s.config.GatewayOnlineTTL)
 		}
@@ -155,9 +153,9 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_ids") {
-		fps := make([]*frequencyplans.FrequencyPlan, 0, len(req.Gateway.FrequencyPlanIDs))
+		fps := make([]*frequencyplans.FrequencyPlan, 0, len(req.Gateway.FrequencyPlanIds))
 		var err error
-		for _, fpID := range req.Gateway.FrequencyPlanIDs {
+		for _, fpID := range req.Gateway.FrequencyPlanIds {
 			var fp *frequencyplans.FrequencyPlan
 			fp, err = s.frequencyPlansStore.GetByID(fpID)
 			if err != nil {
@@ -170,6 +168,13 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 				updateReq.FrequencyPlan = fp
 			}
 		}
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "rx_rate") {
+		updateReq.RxRate = req.Gateway.RxRate
+	}
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "tx_rate") {
+		updateReq.TxRate = req.Gateway.TxRate
 	}
 
 	_, err := mappingpb.NewMapperClient(s.mapperConn).UpdateGateway(ctx, updateReq)
