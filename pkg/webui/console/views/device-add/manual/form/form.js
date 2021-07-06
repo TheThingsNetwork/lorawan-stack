@@ -95,7 +95,7 @@ const generateDeviceId = (device = {}) => {
 
   try {
     devEUISchema.validateSync(idsValues.dev_eui)
-    return idsValues.dev_eui.toLowerCase()
+    return `eui-${idsValues.dev_eui.toLowerCase()}`
   } catch (e) {
     // We dont want to use invalid `dev_eui` as `device_id`.
   }
