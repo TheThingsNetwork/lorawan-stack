@@ -43,6 +43,7 @@ const m = defineMessages({
   classC: 'Class C (Continuous)',
   classBandC: 'Class B and class C',
   useExternalServers: 'Use external LoRaWAN backend servers',
+  multicastClassCapabilities: 'LoRaWAN Class for multicast downlinks',
 })
 
 const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
@@ -117,7 +118,7 @@ const AdvancedSettingsSection = props => {
       </Form.Field>
       {!isNone && (
         <Form.Field
-          title={messages.classCapabilities}
+          title={isMulticast ? m.multicastClassCapabilities : messages.classCapabilities}
           required={isMulticast}
           name="_device_class"
           component={Select}
