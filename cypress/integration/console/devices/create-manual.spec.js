@@ -14,7 +14,7 @@
 
 import { generateHexValue, disableJoinServer, disableNetworkServer } from '../../../support/utils'
 
-describe('End device manual create 2', () => {
+describe('End device manual create', () => {
   const user = {
     ids: { user_id: 'create-manual-test-user' },
     primary_email_address: 'create-manual-test-user@example.com',
