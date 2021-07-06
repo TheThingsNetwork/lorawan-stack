@@ -40,7 +40,7 @@
     "css-loader": "^5.0.2",
     "cypress": "6.8.0",
     "cypress-file-upload": "^5.0.2",
-    "eslint": "^7.28.0",
+    "eslint": "^7.29.0",
     "eslint-config-prettier": "^8.0.0",
     "eslint-config-ttn": "git+https://github.com/TheThingsNetwork/eslint-config-ttn.git#v1.4.0",
     "eslint-import-resolver-webpack": "^0.13.0",
@@ -72,7 +72,7 @@
     "webpack-dev-server": "^3.11.0",
     "webpack-plugin-hash-output": "^3.1.0",
     "webpack-shell-plugin": "https://github.com/cdeutsch/webpack-shell-plugin.git#bee537d",
-    "yargs": "^16.2.0"
+    "yargs": "^17.0.1"
   },
   "dependencies": {
     "@formatjs/intl-relativetimeformat": "^8.0.6",
