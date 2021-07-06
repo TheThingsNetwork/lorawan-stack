@@ -23,6 +23,7 @@ const messages = defineMessages({
   fCnt: 'FCnt',
   rawPayload: 'Raw payload',
   txPower: 'Tx Power',
+  dataRate: 'Data rate',
   bandwidth: 'Bandwidth',
   metrics: 'Metrics',
   versions: 'Versions',

@@ -146,6 +146,7 @@
   "console.components.events.messages.fCnt": "XXxx",
   "console.components.events.messages.rawPayload": "Xxx xxxxxxx",
   "console.components.events.messages.txPower": "Xx Xxxxx",
+  "console.components.events.messages.dataRate": "Xxxx xxxx",
   "console.components.events.messages.bandwidth": "Xxxxxxxxx",
   "console.components.events.messages.metrics": "Xxxxxxx",
   "console.components.events.messages.versions": "Xxxxxxxx",
