@@ -194,7 +194,7 @@ const macSettingsSchema = Yup.object({
             .default([])
             .test(
               'is-valid-frequency',
-              sharedMessages.validateFreqNumberic,
+              sharedMessages.validateFreqNumeric,
               factoryPresetFreqNumericTest,
             )
             .test(
