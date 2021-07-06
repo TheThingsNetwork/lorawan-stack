@@ -230,8 +230,7 @@ const macSettingsSchema = Yup.object({
           return Yup.string().strip()
         }),
         class_b_timeout: Yup.lazy(value => {
-          const hasClassBTimeout = isClassB || mode === ACTIVATION_MODES.MULTICAST
-          if (!hasClassBTimeout || !Boolean(value)) {
+          if (!isClassB || !Boolean(value)) {
             return Yup.string().strip()
           }
 
