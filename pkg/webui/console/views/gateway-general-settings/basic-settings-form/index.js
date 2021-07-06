@@ -66,8 +66,13 @@ const BasicSettingsForm = React.memo(props => {
       ...gateway,
       attributes: mapAttributesToFormValue(gateway.attributes),
     }
+
     if (Boolean(initialValues.lbs_lns_secret) && initialValues.lbs_lns_secret.value !== undefined) {
-      initialValues.lbs_lns_secret.value = atob(initialValues.lbs_lns_secret.value)
+      try {
+        initialValues.lbs_lns_secret.value = atob(initialValues.lbs_lns_secret.value)
+      } catch (e) {
+        initialValues.lbs_lns_secret.value = ''
+      }
     }
     return validationSchema.cast(initialValues)
   }, [gateway])
