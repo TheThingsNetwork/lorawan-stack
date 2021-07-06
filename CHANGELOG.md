@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Gateway antenna placement; unknown, indoor or outdoor. This can now be specified with CLI, e.g. for the first antenna: `ttn-lw-cli gateways set <gateway-id> --antenna.index 0 --antenna.placement OUTDOOR`. The antenna placement will be reported to Packet Broker Mapper.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+- Payload formatter length validation in the Console.
 
 ### Changed
 
