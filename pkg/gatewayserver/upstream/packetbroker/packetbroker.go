@@ -242,7 +242,6 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 			return errPacketBrokerAgentNotFound.WithCause(err)
 		}
 		ctx, cancel := context.WithTimeout(ctx, updateGatewayTimeout)
-		defer cancel()
 		res, err := ttnpb.NewGsPbaClient(pbaConn).UpdateGateway(ctx, req, h.Cluster.WithClusterAuth())
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to update gateway")
@@ -250,6 +249,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		} else {
 			onlineTTL = res.OnlineTtl
 		}
+		cancel()
 	}
 }
 
