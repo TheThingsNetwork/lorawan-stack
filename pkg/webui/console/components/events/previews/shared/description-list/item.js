@@ -32,7 +32,7 @@ const DescriptionListItem = props => {
   if (!Boolean(title)) {
     return (
       <div className={classnames(className, style.container)}>
-        <div className={style.value}>{content}</div>
+        <div className={classnames(style.value, style.onlyValue)}>{content}</div>
       </div>
     )
   }

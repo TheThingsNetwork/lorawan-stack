@@ -43,6 +43,7 @@ const DescriptionListByteItem = ({ title, data: rawData, convertToHex }) => {
         <SafeInspector
           data={data}
           hideable={false}
+          truncateAfter={8}
           initiallyVisible
           small
           noCopy
