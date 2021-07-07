@@ -5205,7 +5205,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v3GatewayIdentifiers"
+              "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
             }
           },
           "default": {
@@ -11281,6 +11281,19 @@
         }
       }
     },
+    "lorawanv3GatewayIdentifiers": {
+      "type": "object",
+      "properties": {
+        "gateway_id": {
+          "type": "string"
+        },
+        "eui": {
+          "type": "string",
+          "format": "byte",
+          "description": "Secondary identifier, which can only be used in specific requests."
+        }
+      }
+    },
     "lorawanv3Invitation": {
       "type": "object",
       "properties": {
@@ -12528,7 +12541,7 @@
       "type": "object",
       "properties": {
         "gateway_ids": {
-          "$ref": "#/definitions/v3GatewayIdentifiers"
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
         },
         "api_key": {
           "type": "string"
@@ -13007,7 +13020,7 @@
       "type": "object",
       "properties": {
         "gateway_ids": {
-          "$ref": "#/definitions/v3GatewayIdentifiers"
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
         },
         "name": {
           "type": "string"
@@ -13971,7 +13984,7 @@
           "$ref": "#/definitions/v3EndDeviceIdentifiers"
         },
         "gateway_ids": {
-          "$ref": "#/definitions/v3GatewayIdentifiers"
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
         },
         "organization_ids": {
           "$ref": "#/definitions/v3OrganizationIdentifiers"
@@ -14182,7 +14195,7 @@
       "type": "object",
       "properties": {
         "ids": {
-          "$ref": "#/definitions/v3GatewayIdentifiers"
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
         },
         "created_at": {
           "type": "string",
@@ -14324,7 +14337,7 @@
       "type": "object",
       "properties": {
         "gateway_ids": {
-          "$ref": "#/definitions/v3GatewayIdentifiers"
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
         },
         "antenna_index": {
           "type": "integer",
@@ -14413,19 +14426,6 @@
         }
       },
       "description": "GatewayDown contains downlink messages for the gateway."
-    },
-    "v3GatewayIdentifiers": {
-      "type": "object",
-      "properties": {
-        "gateway_id": {
-          "type": "string"
-        },
-        "eui": {
-          "type": "string",
-          "format": "byte",
-          "description": "Secondary identifier, which can only be used in specific requests."
-        }
-      }
     },
     "v3GatewayRadio": {
       "type": "object",
@@ -15797,6 +15797,67 @@
         }
       }
     },
+    "v3PacketBrokerGateway": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3PacketBrokerGatewayGatewayIdentifiers"
+        },
+        "contact_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ContactInfo"
+          }
+        },
+        "antennas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3GatewayAntenna"
+          }
+        },
+        "status_public": {
+          "type": "boolean"
+        },
+        "location_public": {
+          "type": "boolean"
+        },
+        "frequency_plan_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "update_location_from_status": {
+          "type": "boolean"
+        },
+        "online": {
+          "type": "boolean"
+        },
+        "rx_rate": {
+          "type": "number",
+          "format": "float",
+          "description": "Received packets rate (number of packets per hour).\nThis field gets updated when a value is set."
+        },
+        "tx_rate": {
+          "type": "number",
+          "format": "float",
+          "description": "Transmitted packets rate (number of packets per hour).\nThis field gets updated when a value is set."
+        }
+      },
+      "description": "Gateway respresentation for Packet Broker.\nThis is a subset and superset of the Gateway message using the same data types and field tags to achieve initial wire compatibility.\nThere is no (longer) wire compatibility needed; new fields may use any tag."
+    },
+    "v3PacketBrokerGatewayGatewayIdentifiers": {
+      "type": "object",
+      "properties": {
+        "gateway_id": {
+          "type": "string"
+        },
+        "eui": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
     "v3PacketBrokerInfo": {
       "type": "object",
       "properties": {
@@ -16374,7 +16435,7 @@
       "type": "object",
       "properties": {
         "gateway_ids": {
-          "$ref": "#/definitions/v3GatewayIdentifiers"
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
         },
         "packet_broker": {
           "$ref": "#/definitions/v3PacketBrokerMetadata"
@@ -16685,7 +16746,7 @@
       "type": "object",
       "properties": {
         "gateway_ids": {
-          "$ref": "#/definitions/v3GatewayIdentifiers"
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
         },
         "collaborator": {
           "$ref": "#/definitions/v3Collaborator"
@@ -16953,7 +17014,7 @@
       "type": "object",
       "properties": {
         "gateway_ids": {
-          "$ref": "#/definitions/v3GatewayIdentifiers"
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
         },
         "api_key": {
           "$ref": "#/definitions/v3APIKey"

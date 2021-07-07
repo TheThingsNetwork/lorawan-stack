@@ -29233,6 +29233,196 @@
           ]
         },
         {
+          "name": "PacketBrokerGateway",
+          "longName": "PacketBrokerGateway",
+          "fullName": "ttn.lorawan.v3.PacketBrokerGateway",
+          "description": "Gateway respresentation for Packet Broker.\nThis is a subset and superset of the Gateway message using the same data types and field tags to achieve initial wire compatibility.\nThere is no (longer) wire compatibility needed; new fields may use any tag.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "PacketBrokerGateway.GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.PacketBrokerGateway.GatewayIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "contact_info",
+              "description": "",
+              "label": "repeated",
+              "type": "ContactInfo",
+              "longType": "ContactInfo",
+              "fullType": "ttn.lorawan.v3.ContactInfo",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  }
+                ]
+              }
+            },
+            {
+              "name": "antennas",
+              "description": "",
+              "label": "repeated",
+              "type": "GatewayAntenna",
+              "longType": "GatewayAntenna",
+              "fullType": "ttn.lorawan.v3.GatewayAntenna",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 8
+                  }
+                ]
+              }
+            },
+            {
+              "name": "status_public",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "location_public",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "frequency_plan_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 8
+                  },
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
+            },
+            {
+              "name": "update_location_from_status",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "online",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "rx_rate",
+              "description": "Received packets rate (number of packets per hour).\nThis field gets updated when a value is set.",
+              "label": "",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "tx_rate",
+              "description": "Transmitted packets rate (number of packets per hour).\nThis field gets updated when a value is set.",
+              "label": "",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GatewayIdentifiers",
+          "longName": "PacketBrokerGateway.GatewayIdentifiers",
+          "fullName": "ttn.lorawan.v3.PacketBrokerGateway.GatewayIdentifiers",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[_-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "PacketBrokerInfo",
           "longName": "PacketBrokerInfo",
           "fullName": "ttn.lorawan.v3.PacketBrokerInfo",
@@ -29699,9 +29889,9 @@
               "name": "gateway",
               "description": "",
               "label": "",
-              "type": "Gateway",
-              "longType": "Gateway",
-              "fullType": "ttn.lorawan.v3.Gateway",
+              "type": "PacketBrokerGateway",
+              "longType": "PacketBrokerGateway",
+              "fullType": "ttn.lorawan.v3.PacketBrokerGateway",
               "ismap": false,
               "defaultValue": "",
               "options": {
@@ -29714,38 +29904,8 @@
               }
             },
             {
-              "name": "online",
-              "description": "",
-              "label": "",
-              "type": "bool",
-              "longType": "bool",
-              "fullType": "bool",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "rx_rate",
-              "description": "Received packets rate (number of packets per hour).\nThis field gets updated when a value is set.",
-              "label": "",
-              "type": "FloatValue",
-              "longType": "google.protobuf.FloatValue",
-              "fullType": "google.protobuf.FloatValue",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "tx_rate",
-              "description": "Transmitted packets rate (number of packets per hour).\nThis field gets updated when a value is set.",
-              "label": "",
-              "type": "FloatValue",
-              "longType": "google.protobuf.FloatValue",
-              "fullType": "google.protobuf.FloatValue",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
               "name": "field_mask",
-              "description": "The names of the gateway fields that are considered for update.\nSupported values are: antennas, contact_info, frequency_plan_id, frequency_plan_ids, ids, status_public and\nlocation_public.\n\nOnline status is only updated if status_public is set. If status_public is set and false, the status will be reset.\nIf status_public is set and true, the online status is taken from the online field. The return message contains\nthe duration online_ttl for how long the gateway is considered online.\n\nLocation is only updated if location_public is set. If location_public is set and false, the location will be reset.\nIf location_public is set and true, the first antenna location will be used as gateway location.",
+              "description": "The names of the gateway fields that are considered for update.\n\nOnline status is only updated if status_public is set. If status_public is set and false, the status will be reset.\nIf status_public is set and true, the online status is taken from the online field. The return message contains\nthe duration online_ttl for how long the gateway is considered online.\n\nLocation is only updated if location_public is set. If location_public is set and false, the location will be reset.\nIf location_public is set and true, the first antenna location will be used as gateway location.",
               "label": "",
               "type": "FieldMask",
               "longType": "google.protobuf.FieldMask",

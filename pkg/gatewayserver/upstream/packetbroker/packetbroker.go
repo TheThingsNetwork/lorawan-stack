@@ -106,21 +106,37 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 	pbaClient := ttnpb.NewGsPbaClient(pbaConn)
 
 	gtw := conn.Gateway()
+	antennas := make([]*ttnpb.GatewayAntenna, len(gtw.Antennas))
+	for i, ant := range gtw.Antennas {
+		antennas[i] = &ant
+	}
 	req := &ttnpb.UpdatePacketBrokerGatewayRequest{
-		Gateway: &ttnpb.Gateway{
-			GatewayIdentifiers: ids,
-			Antennas:           gtw.Antennas,
-			FrequencyPlanIDs:   gtw.FrequencyPlanIDs,
-			StatusPublic:       gtw.StatusPublic,
-			LocationPublic:     gtw.LocationPublic,
+		Gateway: &ttnpb.PacketBrokerGateway{
+			Ids: &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
+				GatewayId: ids.GatewayId,
+				Eui:       ids.Eui,
+			},
+			Antennas:         antennas,
+			FrequencyPlanIds: gtw.FrequencyPlanIDs,
+			StatusPublic:     gtw.StatusPublic,
+			LocationPublic:   gtw.LocationPublic,
+			Online:           true,
+			RxRate: &pbtypes.FloatValue{
+				Value: 0,
+			},
+			TxRate: &pbtypes.FloatValue{
+				Value: 0,
+			},
 		},
-		Online: true,
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{
 				"antennas",
 				"frequency_plan_ids",
 				"location_public",
+				"online",
+				"rx_rate",
 				"status_public",
+				"tx_rate",
 			},
 		},
 	}
@@ -160,13 +176,17 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		}
 
 		req := &ttnpb.UpdatePacketBrokerGatewayRequest{
-			Gateway: &ttnpb.Gateway{
-				GatewayIdentifiers: ids,
-				StatusPublic:       gtw.StatusPublic,
+			Gateway: &ttnpb.PacketBrokerGateway{
+				Ids: &ttnpb.PacketBrokerGateway_GatewayIdentifiers{
+					GatewayId: ids.GatewayId,
+					Eui:       ids.Eui,
+				},
+				Online:       true,
+				StatusPublic: gtw.StatusPublic,
 			},
-			Online: true,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{
+					"online",
 					"status_public",
 				},
 			},
@@ -188,7 +208,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 			if ok {
 				loc.Source = ttnpb.SOURCE_GPS
 				req.Gateway.LocationPublic = true
-				req.Gateway.Antennas = []ttnpb.GatewayAntenna{
+				req.Gateway.Antennas = []*ttnpb.GatewayAntenna{
 					{
 						Location: &loc,
 					},
@@ -201,15 +221,17 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		uplinkCount, _, haveUplinkCount := conn.UpStats()
 		downlinkCount, _, haveDownlinkCount := conn.DownStats()
 		if haveUplinkCount {
-			req.RxRate = &pbtypes.FloatValue{
+			req.Gateway.RxRate = &pbtypes.FloatValue{
 				Value: (float32(uplinkCount) - float32(lastUplinkCount)) * float32(time.Hour) / float32(now.Sub(lastCounters)),
 			}
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "rx_rate")
 			lastUplinkCount = uplinkCount
 		}
 		if haveDownlinkCount {
-			req.TxRate = &pbtypes.FloatValue{
+			req.Gateway.TxRate = &pbtypes.FloatValue{
 				Value: (float32(downlinkCount) - float32(lastDownlinkCount)) * float32(time.Hour) / float32(now.Sub(lastCounters)),
 			}
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "tx_rate")
 			lastDownlinkCount = downlinkCount
 		}
 		lastCounters = now

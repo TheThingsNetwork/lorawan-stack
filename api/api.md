@@ -491,6 +491,8 @@
   - [Message `ListPacketBrokerNetworksRequest`](#ttn.lorawan.v3.ListPacketBrokerNetworksRequest)
   - [Message `PacketBrokerDefaultRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy)
   - [Message `PacketBrokerDevAddrBlock`](#ttn.lorawan.v3.PacketBrokerDevAddrBlock)
+  - [Message `PacketBrokerGateway`](#ttn.lorawan.v3.PacketBrokerGateway)
+  - [Message `PacketBrokerGateway.GatewayIdentifiers`](#ttn.lorawan.v3.PacketBrokerGateway.GatewayIdentifiers)
   - [Message `PacketBrokerInfo`](#ttn.lorawan.v3.PacketBrokerInfo)
   - [Message `PacketBrokerNetwork`](#ttn.lorawan.v3.PacketBrokerNetwork)
   - [Message `PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier)
@@ -7009,6 +7011,47 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | `dev_addr_prefix` | [`DevAddrPrefix`](#ttn.lorawan.v3.DevAddrPrefix) |  |  |
 | `home_network_cluster_id` | [`string`](#string) |  |  |
 
+### <a name="ttn.lorawan.v3.PacketBrokerGateway">Message `PacketBrokerGateway`</a>
+
+Gateway respresentation for Packet Broker.
+This is a subset and superset of the Gateway message using the same data types and field tags to achieve initial wire compatibility.
+There is no (longer) wire compatibility needed; new fields may use any tag.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`PacketBrokerGateway.GatewayIdentifiers`](#ttn.lorawan.v3.PacketBrokerGateway.GatewayIdentifiers) |  |  |
+| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated |  |
+| `antennas` | [`GatewayAntenna`](#ttn.lorawan.v3.GatewayAntenna) | repeated |  |
+| `status_public` | [`bool`](#bool) |  |  |
+| `location_public` | [`bool`](#bool) |  |  |
+| `frequency_plan_ids` | [`string`](#string) | repeated |  |
+| `update_location_from_status` | [`bool`](#bool) |  |  |
+| `online` | [`bool`](#bool) |  |  |
+| `rx_rate` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Received packets rate (number of packets per hour). This field gets updated when a value is set. |
+| `tx_rate` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Transmitted packets rate (number of packets per hour). This field gets updated when a value is set. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+| `contact_info` | <p>`repeated.max_items`: `10`</p> |
+| `antennas` | <p>`repeated.max_items`: `8`</p> |
+| `frequency_plan_ids` | <p>`repeated.max_items`: `8`</p><p>`repeated.items.string.max_len`: `64`</p> |
+
+### <a name="ttn.lorawan.v3.PacketBrokerGateway.GatewayIdentifiers">Message `PacketBrokerGateway.GatewayIdentifiers`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_id` | [`string`](#string) |  |  |
+| `eui` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
+
 ### <a name="ttn.lorawan.v3.PacketBrokerInfo">Message `PacketBrokerInfo`</a>
 
 | Field | Type | Label | Description |
@@ -7113,11 +7156,8 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `gateway` | [`Gateway`](#ttn.lorawan.v3.Gateway) |  |  |
-| `online` | [`bool`](#bool) |  |  |
-| `rx_rate` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Received packets rate (number of packets per hour). This field gets updated when a value is set. |
-| `tx_rate` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Transmitted packets rate (number of packets per hour). This field gets updated when a value is set. |
-| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that are considered for update. Supported values are: antennas, contact_info, frequency_plan_id, frequency_plan_ids, ids, status_public and location_public.
+| `gateway` | [`PacketBrokerGateway`](#ttn.lorawan.v3.PacketBrokerGateway) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the gateway fields that are considered for update.
 
 Online status is only updated if status_public is set. If status_public is set and false, the status will be reset. If status_public is set and true, the online status is taken from the online field. The return message contains the duration online_ttl for how long the gateway is considered online.
 

@@ -126,10 +126,6 @@ func toPBLocation(loc *ttnpb.Location) *packetbroker.Location {
 	}
 }
 
-func fromPBTerrestrialAntennaPlacement(p packetbroker.TerrestrialAntennaPlacement) ttnpb.GatewayAntennaPlacement {
-	return ttnpb.GatewayAntennaPlacement(p)
-}
-
 func toPBTerrestrialAntennaPlacement(p ttnpb.GatewayAntennaPlacement) packetbroker.TerrestrialAntennaPlacement {
 	return packetbroker.TerrestrialAntennaPlacement(p)
 }
@@ -198,11 +194,16 @@ func unwrapGatewayUplinkToken(token, key []byte) (string, []byte, error) {
 	return t.GatewayUID, t.Token, nil
 }
 
-func toPBGatewayIdentifier(ids ttnpb.GatewayIdentifiers, config ForwarderConfig) (res *packetbroker.GatewayIdentifier) {
-	if config.IncludeGatewayEUI && ids.Eui != nil {
+type gatewayIdentifier interface {
+	GetGatewayId() string
+	GetEui() *types.EUI64
+}
+
+func toPBGatewayIdentifier(ids gatewayIdentifier, config ForwarderConfig) (res *packetbroker.GatewayIdentifier) {
+	if config.IncludeGatewayEUI && ids.GetEui() != nil {
 		res = &packetbroker.GatewayIdentifier{
 			Eui: &pbtypes.UInt64Value{
-				Value: ids.Eui.MarshalNumber(),
+				Value: ids.GetEui().MarshalNumber(),
 			},
 		}
 	}
@@ -211,13 +212,13 @@ func toPBGatewayIdentifier(ids ttnpb.GatewayIdentifiers, config ForwarderConfig)
 			res = &packetbroker.GatewayIdentifier{}
 		}
 		if config.HashGatewayID {
-			hash := sha256.Sum256([]byte(ids.GatewayId))
+			hash := sha256.Sum256([]byte(ids.GetGatewayId()))
 			res.Id = &packetbroker.GatewayIdentifier_Hash{
 				Hash: hash[:],
 			}
 		} else {
 			res.Id = &packetbroker.GatewayIdentifier_Plain{
-				Plain: ids.GatewayId,
+				Plain: ids.GetGatewayId(),
 			}
 		}
 	}
@@ -294,7 +295,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 	var gatewayUplinkToken []byte
 	if len(msg.RxMetadata) > 0 {
 		md := msg.RxMetadata[0]
-		up.GatewayId = toPBGatewayIdentifier(md.GatewayIdentifiers, config)
+		up.GatewayId = toPBGatewayIdentifier(&md.GatewayIdentifiers, config)
 
 		var teaser packetbroker.GatewayMetadataTeaser_Terrestrial
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
