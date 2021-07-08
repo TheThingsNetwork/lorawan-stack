@@ -75,6 +75,7 @@ tts.subscribe('warning', payload => {
     type: toast.types.WARNING,
     message: payload,
     preventConsecutive: true,
+    autoClose: 10000,
   })
 })
 
