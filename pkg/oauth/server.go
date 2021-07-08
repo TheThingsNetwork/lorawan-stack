@@ -117,12 +117,41 @@ func (s *server) oauth2(ctx context.Context) *osin.Server {
 	oauth2.AuthorizeTokenGen = s
 	oauth2.AccessTokenGen = s
 	oauth2.Now = s.now
-	oauth2.Logger = s
+	oauth2.Logger = &osinLogger{ctx: ctx}
 	return oauth2
 }
 
-func (s *server) Printf(format string, v ...interface{}) {
-	log.FromContext(s.c.Context()).Warnf(format, v...)
+const (
+	osinErrorFormat             = "error=%v, internal_error=%#v "
+	osinAuthCodeErrorFormat     = "auth_code_request=%s"
+	osinRefreshTokenErrorFormat = "refresh_token=%s"
+)
+
+type osinLogger struct {
+	ctx context.Context
+}
+
+func (l *osinLogger) Printf(format string, v ...interface{}) {
+	logger := log.FromContext(l.ctx)
+	if strings.HasPrefix(format, osinErrorFormat) && len(v) >= 2 {
+		format = strings.TrimPrefix(format, osinErrorFormat)
+		logger = logger.WithField("oauth_error", v[0])
+		if err, ok := v[1].(error); ok {
+			logger = logger.WithField("oauth_error_cause", err)
+		}
+		v = v[2:]
+		if len(v) >= 1 {
+			switch format {
+			case osinAuthCodeErrorFormat:
+				logger.WithField("oauth_error_message", v[0]).Warn("OAuth authorization_code error")
+				return
+			case osinRefreshTokenErrorFormat:
+				logger.WithField("oauth_error_message", v[0]).Warn("OAuth refresh_token error")
+				return
+			}
+		}
+	}
+	logger.Warnf("OAuth internal error: "+format, v...)
 }
 
 // These errors map to errors in the osin library.

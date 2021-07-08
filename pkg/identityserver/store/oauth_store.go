@@ -215,7 +215,7 @@ func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OA
 func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error) {
 	defer trace.StartRegion(ctx, "get authorization code").End()
 	if code == "" {
-		return nil, errAuthorizationCodeNotFound.New()
+		return nil, errAuthorizationCodeNotFound.WithAttributes("authorization_code", code)
 	}
 	var codeModel AuthorizationCode
 	err := s.query(ctx, AuthorizationCode{}).Where(AuthorizationCode{
@@ -223,7 +223,7 @@ func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*tt
 	}).Preload("Client").Preload("User.Account").First(&codeModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errAuthorizationCodeNotFound.New()
+			return nil, errAuthorizationCodeNotFound.WithAttributes("authorization_code", code)
 		}
 	}
 	return codeModel.toPB(), nil
@@ -231,7 +231,7 @@ func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*tt
 
 func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) error {
 	if code == "" {
-		return errAuthorizationCodeNotFound.New()
+		return errAuthorizationCodeNotFound.WithAttributes("authorization_code", code)
 	}
 	defer trace.StartRegion(ctx, "delete authorization code").End()
 	err := s.query(ctx, AuthorizationCode{}).Where(AuthorizationCode{
@@ -239,7 +239,7 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 	}).Delete(&AuthorizationCode{}).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return errAuthorizationCodeNotFound.New()
+			return errAuthorizationCodeNotFound.WithAttributes("authorization_code", code)
 		}
 		return err
 	}
@@ -310,7 +310,7 @@ func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserId
 
 func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAuthAccessToken, error) {
 	if id == "" {
-		return nil, errAccessTokenNotFound.New()
+		return nil, errAccessTokenNotFound.WithAttributes("access_token_id", id)
 	}
 	defer trace.StartRegion(ctx, "get access token").End()
 	var tokenModel struct {
@@ -325,7 +325,7 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 		Where(AccessToken{TokenID: id}).Scan(&tokenModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errAccessTokenNotFound.New()
+			return nil, errAccessTokenNotFound.WithAttributes("access_token_id", id)
 		}
 	}
 	tokenProto := tokenModel.AccessToken.toPB()
@@ -336,7 +336,7 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 
 func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 	if id == "" {
-		return errAccessTokenNotFound.New()
+		return errAccessTokenNotFound.WithAttributes("access_token_id", id)
 	}
 	defer trace.StartRegion(ctx, "delete access token").End()
 	err := s.query(ctx, AccessToken{}).Where(AccessToken{
@@ -344,7 +344,7 @@ func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 	}).Delete(&AccessToken{}).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return errAccessTokenNotFound.New()
+			return errAccessTokenNotFound.WithAttributes("access_token_id", id)
 		}
 		return err
 	}
