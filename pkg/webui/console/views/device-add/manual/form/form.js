@@ -150,6 +150,7 @@ const ManualForm = props => {
     [jsEnabled, nsEnabled, validationContext],
   )
   const formRef = React.useRef(null)
+  const deviceIdInputRef = React.useRef(null)
 
   const [error, setError] = React.useState(undefined)
   const handleSetError = React.useCallback(error => setError(error), [])
@@ -181,7 +182,7 @@ const ManualForm = props => {
   }, [])
 
   const handleIdPrefill = React.useCallback(() => {
-    if (formRef && formRef.current) {
+    if (formRef.current) {
       const { values, setFieldValue } = formRef.current
 
       // Do not overwrite a value that the user has already set.
@@ -191,6 +192,17 @@ const ManualForm = props => {
       }
     }
   }, [initialValues.ids.device_id])
+  const handleIdFocus = React.useCallback(() => {
+    if (formRef.current && deviceIdInputRef.current) {
+      const { current: inputElement } = deviceIdInputRef
+      const { values } = formRef.current
+      const generatedId = generateDeviceId(values)
+      if (generatedId === values.ids.device_id) {
+        // Select the value on focus if it was generated.
+        inputElement.setSelectionRange(0, generatedId.length)
+      }
+    }
+  }, [])
 
   const lwVersion = parseLorawanMacVersion(lorawanVersion)
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
@@ -425,6 +437,8 @@ const ManualForm = props => {
         component={Input}
         tooltipId={tooltipIds.DEVICE_ID}
         description={messages.deviceIdDescription}
+        inputRef={deviceIdInputRef}
+        onFocus={handleIdFocus}
       />
       <Form.Field title={messages.afterRegistration} name="_registration" component={Radio.Group}>
         <Radio label={messages.singleRegistration} value={REGISTRATION_TYPES.SINGLE} />
