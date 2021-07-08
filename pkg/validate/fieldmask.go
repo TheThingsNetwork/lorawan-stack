@@ -22,8 +22,7 @@ import (
 )
 
 var (
-	fieldMaskPathRegex     = regexp.MustCompile("^[a-z0-9](?:[._]?[a-z0-9]){1,}$")
-	fieldMaskPathMaxLength = 256
+	fieldMaskPathRegex = regexp.MustCompile("^[a-z0-9](?:[._]?[a-z0-9]){1,}$")
 
 	errFieldMaskPath = errors.DefineInvalidArgument("fieldmaskpath", "`{fieldmaskpath}` may consist of only lowercase letters, numbers, underscores and dots. It may not start or end with a dot or underscore, or have two or more consecutive dots or underscores. Also, it must be between 2 and 256 characters in length.")
 )
@@ -31,7 +30,7 @@ var (
 // FieldMaskPaths performs a basic sanity check on the allowed characters for valid fieldmask paths.
 // Paths of a FieldMask may only contain lowercase letters, numbers, dots, underscores and must be between 2 and 256 characters in length.
 func FieldMaskPaths(fm *types.FieldMask) error {
-	for _, path := range fm.Paths {
+	for _, path := range fm.GetPaths() {
 		if len(path) > 256 || !fieldMaskPathRegex.MatchString(path) {
 			return errFieldMaskPath.WithAttributes("fieldmaskpath", path)
 		}
