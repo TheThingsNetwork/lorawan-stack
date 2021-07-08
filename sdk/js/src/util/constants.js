@@ -33,3 +33,5 @@ export const AUTHORIZATION_MODES = Object.freeze({
   KEY: 'key',
   SESSION: 'session',
 })
+
+export const RATE_LIMIT_RETRIES = 5

@@ -21,6 +21,7 @@ import {
   URI_PREFIX_STACK_COMPONENT_MAP,
   STACK_COMPONENTS_MAP,
   AUTHORIZATION_MODES,
+  RATE_LIMIT_RETRIES,
 } from '../util/constants'
 
 import stream from './stream/stream-node'
@@ -116,7 +117,45 @@ class Http {
         config.data = payload
       }
 
-      const response = await this[parsedComponent](config)
+      let statusCode, response, retryAfter, limit
+      let retries = 0
+
+      while (statusCode === undefined || statusCode === 429) {
+        if (statusCode === 429 && retryAfter !== undefined) {
+          // Dispatch a warning event to note the user about the waiting time
+          // resulting from the rate limitation.
+          EventHandler.dispatchEvent(
+            EventHandler.EVENTS.WARNING,
+            `The rate limitation of ${limit} requests per minute was exceeded while making a request. It will be automatically retried when the rate limiter resets.`,
+          )
+
+          // Sleep until the cool down elapsed before retrying.
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise(resolve => setTimeout(resolve, retryAfter * 1000))
+        }
+
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          response = await this[parsedComponent](config)
+          statusCode = response.status
+        } catch (err) {
+          if (
+            'response' in err &&
+            'status' in err.response &&
+            err.response.status === 429 &&
+            retries <= RATE_LIMIT_RETRIES
+          ) {
+            statusCode = 429
+            // Always wait at least one second to avoid retries in quick succession.
+            retryAfter = Math.max(1, parseInt(err.response.headers['x-rate-limit-retry']))
+            limit = err.response.headers['x-rate-limit-limit']
+          } else {
+            throw err
+          }
+        }
+
+        retries++
+      }
 
       for (const key in response.headers) {
         if (!(key.toLowerCase() in response.headers)) {
