@@ -23,5 +23,4 @@ import (
 	_ "github.com/mgechev/revive"
 	_ "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/commands"
 	_ "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-stack/commands"
-	_ "golang.org/x/tools/cmd/goimports"
 )

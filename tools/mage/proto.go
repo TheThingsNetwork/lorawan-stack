@@ -122,9 +122,6 @@ func (p Proto) Go(context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to construct absolute path to pkg/ttnpb: %w", err)
 	}
-	if err := runGoTool("golang.org/x/tools/cmd/goimports", "-w", ttnpb); err != nil {
-		return fmt.Errorf("failed to run goimports on generated code: %w", err)
-	}
 	return sh.RunV("gofmt", "-w", "-s", ttnpb)
 }
 
