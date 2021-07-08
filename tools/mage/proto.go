@@ -30,7 +30,7 @@ import (
 
 const (
 	protocOut             = "/out"
-	gogoProtoImage        = "thethingsindustries/protoc:3.1.28-dev-tts"
+	gogoProtoImage        = "ghcr.io/htdvisser/protoc:gen-gogo-1.3.1"
 	fieldMaskProtoImage   = "thethingsindustries/protoc:3.1.28-dev-tts"
 	grpcGatewayProtoImage = "ghcr.io/htdvisser/protoc:gen-grpc-gateway-1.16.0"
 	swaggerProtoImage     = "ghcr.io/htdvisser/protoc:gen-grpc-gateway-1.16.0"
@@ -92,7 +92,7 @@ var gogoConvString = func() string {
 func (p Proto) gogo(context.Context) error {
 	return withProtoc(gogoProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
-			fmt.Sprintf("--gogottn_out=plugins=grpc,%s:%s", gogoConvString, protocOut),
+			fmt.Sprintf("--gogo_out=plugins=grpc,%s:%s", gogoConvString, protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
