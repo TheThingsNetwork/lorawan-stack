@@ -4091,15 +4091,15 @@ func NewPopulatedPacketBrokerGateway(r randyPacketbrokeragent, easy bool) *Packe
 			this.Antennas[i] = NewPopulatedGatewayAntenna(r, easy)
 		}
 	}
-	this.StatusPublic = bool(r.Intn(2) == 0)
-	this.LocationPublic = bool(r.Intn(2) == 0)
+	this.StatusPublic = bool(bool(r.Intn(2) == 0))
+	this.LocationPublic = bool(bool(r.Intn(2) == 0))
 	v3 := r.Intn(10)
 	this.FrequencyPlanIds = make([]string, v3)
 	for i := 0; i < v3; i++ {
-		this.FrequencyPlanIds[i] = randStringPacketbrokeragent(r)
+		this.FrequencyPlanIds[i] = string(randStringPacketbrokeragent(r))
 	}
-	this.UpdateLocationFromStatus = bool(r.Intn(2) == 0)
-	this.Online = bool(r.Intn(2) == 0)
+	this.UpdateLocationFromStatus = bool(bool(r.Intn(2) == 0))
+	this.Online = bool(bool(r.Intn(2) == 0))
 	if r.Intn(5) != 0 {
 		this.RxRate = types.NewPopulatedFloatValue(r, easy)
 	}
@@ -4113,7 +4113,7 @@ func NewPopulatedPacketBrokerGateway(r randyPacketbrokeragent, easy bool) *Packe
 
 func NewPopulatedPacketBrokerGateway_GatewayIdentifiers(r randyPacketbrokeragent, easy bool) *PacketBrokerGateway_GatewayIdentifiers {
 	this := &PacketBrokerGateway_GatewayIdentifiers{}
-	this.GatewayId = randStringPacketbrokeragent(r)
+	this.GatewayId = string(randStringPacketbrokeragent(r))
 	this.Eui = go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedEUI64(r)
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -4145,8 +4145,8 @@ func NewPopulatedUpdatePacketBrokerGatewayResponse(r randyPacketbrokeragent, eas
 
 func NewPopulatedPacketBrokerNetworkIdentifier(r randyPacketbrokeragent, easy bool) *PacketBrokerNetworkIdentifier {
 	this := &PacketBrokerNetworkIdentifier{}
-	this.NetID = r.Uint32()
-	this.TenantId = randStringPacketbrokeragent(r)
+	this.NetID = uint32(r.Uint32())
+	this.TenantId = string(randStringPacketbrokeragent(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4157,7 +4157,7 @@ func NewPopulatedPacketBrokerDevAddrBlock(r randyPacketbrokeragent, easy bool) *
 	if r.Intn(5) != 0 {
 		this.DevAddrPrefix = NewPopulatedDevAddrPrefix(r, easy)
 	}
-	this.HomeNetworkClusterID = randStringPacketbrokeragent(r)
+	this.HomeNetworkClusterID = string(randStringPacketbrokeragent(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4168,7 +4168,7 @@ func NewPopulatedPacketBrokerNetwork(r randyPacketbrokeragent, easy bool) *Packe
 	if r.Intn(5) != 0 {
 		this.Id = NewPopulatedPacketBrokerNetworkIdentifier(r, easy)
 	}
-	this.Name = randStringPacketbrokeragent(r)
+	this.Name = string(randStringPacketbrokeragent(r))
 	if r.Intn(5) != 0 {
 		v4 := r.Intn(5)
 		this.DevAddrBlocks = make([]*PacketBrokerDevAddrBlock, v4)
@@ -4183,7 +4183,7 @@ func NewPopulatedPacketBrokerNetwork(r randyPacketbrokeragent, easy bool) *Packe
 			this.ContactInfo[i] = NewPopulatedContactInfo(r, easy)
 		}
 	}
-	this.Listed = bool(r.Intn(2) == 0)
+	this.Listed = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4208,8 +4208,8 @@ func NewPopulatedPacketBrokerInfo(r randyPacketbrokeragent, easy bool) *PacketBr
 	if r.Intn(5) != 0 {
 		this.Registration = NewPopulatedPacketBrokerNetwork(r, easy)
 	}
-	this.ForwarderEnabled = bool(r.Intn(2) == 0)
-	this.HomeNetworkEnabled = bool(r.Intn(2) == 0)
+	this.ForwarderEnabled = bool(bool(r.Intn(2) == 0))
+	this.HomeNetworkEnabled = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4217,11 +4217,11 @@ func NewPopulatedPacketBrokerInfo(r randyPacketbrokeragent, easy bool) *PacketBr
 
 func NewPopulatedPacketBrokerRoutingPolicyUplink(r randyPacketbrokeragent, easy bool) *PacketBrokerRoutingPolicyUplink {
 	this := &PacketBrokerRoutingPolicyUplink{}
-	this.JoinRequest = bool(r.Intn(2) == 0)
-	this.MacData = bool(r.Intn(2) == 0)
-	this.ApplicationData = bool(r.Intn(2) == 0)
-	this.SignalQuality = bool(r.Intn(2) == 0)
-	this.Localization = bool(r.Intn(2) == 0)
+	this.JoinRequest = bool(bool(r.Intn(2) == 0))
+	this.MacData = bool(bool(r.Intn(2) == 0))
+	this.ApplicationData = bool(bool(r.Intn(2) == 0))
+	this.SignalQuality = bool(bool(r.Intn(2) == 0))
+	this.Localization = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4229,9 +4229,9 @@ func NewPopulatedPacketBrokerRoutingPolicyUplink(r randyPacketbrokeragent, easy 
 
 func NewPopulatedPacketBrokerRoutingPolicyDownlink(r randyPacketbrokeragent, easy bool) *PacketBrokerRoutingPolicyDownlink {
 	this := &PacketBrokerRoutingPolicyDownlink{}
-	this.JoinAccept = bool(r.Intn(2) == 0)
-	this.MacData = bool(r.Intn(2) == 0)
-	this.ApplicationData = bool(r.Intn(2) == 0)
+	this.JoinAccept = bool(bool(r.Intn(2) == 0))
+	this.MacData = bool(bool(r.Intn(2) == 0))
+	this.ApplicationData = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4290,8 +4290,8 @@ func NewPopulatedSetPacketBrokerDefaultRoutingPolicyRequest(r randyPacketbrokera
 
 func NewPopulatedListHomeNetworkRoutingPoliciesRequest(r randyPacketbrokeragent, easy bool) *ListHomeNetworkRoutingPoliciesRequest {
 	this := &ListHomeNetworkRoutingPoliciesRequest{}
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4329,11 +4329,11 @@ func NewPopulatedSetPacketBrokerRoutingPolicyRequest(r randyPacketbrokeragent, e
 
 func NewPopulatedListPacketBrokerNetworksRequest(r randyPacketbrokeragent, easy bool) *ListPacketBrokerNetworksRequest {
 	this := &ListPacketBrokerNetworksRequest{}
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.WithRoutingPolicy = bool(r.Intn(2) == 0)
-	this.TenantIdContains = randStringPacketbrokeragent(r)
-	this.NameContains = randStringPacketbrokeragent(r)
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.WithRoutingPolicy = bool(bool(r.Intn(2) == 0))
+	this.TenantIdContains = string(randStringPacketbrokeragent(r))
+	this.NameContains = string(randStringPacketbrokeragent(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4341,10 +4341,10 @@ func NewPopulatedListPacketBrokerNetworksRequest(r randyPacketbrokeragent, easy 
 
 func NewPopulatedListPacketBrokerHomeNetworksRequest(r randyPacketbrokeragent, easy bool) *ListPacketBrokerHomeNetworksRequest {
 	this := &ListPacketBrokerHomeNetworksRequest{}
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.TenantIdContains = randStringPacketbrokeragent(r)
-	this.NameContains = randStringPacketbrokeragent(r)
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.TenantIdContains = string(randStringPacketbrokeragent(r))
+	this.NameContains = string(randStringPacketbrokeragent(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4355,8 +4355,8 @@ func NewPopulatedListForwarderRoutingPoliciesRequest(r randyPacketbrokeragent, e
 	if r.Intn(5) != 0 {
 		this.HomeNetworkId = NewPopulatedPacketBrokerNetworkIdentifier(r, easy)
 	}
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4428,7 +4428,7 @@ func randFieldPacketbrokeragent(dAtA []byte, r randyPacketbrokeragent, fieldNumb
 }
 func encodeVarintPopulatePacketbrokeragent(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -4863,7 +4863,7 @@ func sovPacketbrokeragent(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozPacketbrokeragent(x uint64) (n int) {
-	return sovPacketbrokeragent((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovPacketbrokeragent(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *PacketBrokerGateway) String() string {
 	if this == nil {

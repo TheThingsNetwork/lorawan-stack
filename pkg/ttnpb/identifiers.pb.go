@@ -1808,11 +1808,11 @@ func NewPopulatedEntityIdentifiers_UserIds(r randyIdentifiers, easy bool) *Entit
 }
 func NewPopulatedEndDeviceVersionIdentifiers(r randyIdentifiers, easy bool) *EndDeviceVersionIdentifiers {
 	this := &EndDeviceVersionIdentifiers{}
-	this.BrandID = randStringIdentifiers(r)
-	this.ModelID = randStringIdentifiers(r)
-	this.HardwareVersion = randStringIdentifiers(r)
-	this.FirmwareVersion = randStringIdentifiers(r)
-	this.BandID = randStringIdentifiers(r)
+	this.BrandID = string(randStringIdentifiers(r))
+	this.ModelID = string(randStringIdentifiers(r))
+	this.HardwareVersion = string(randStringIdentifiers(r))
+	this.FirmwareVersion = string(randStringIdentifiers(r))
+	this.BandID = string(randStringIdentifiers(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1884,7 +1884,7 @@ func randFieldIdentifiers(dAtA []byte, r randyIdentifiers, fieldNumber int, wire
 }
 func encodeVarintPopulateIdentifiers(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2143,7 +2143,7 @@ func sovIdentifiers(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozIdentifiers(x uint64) (n int) {
-	return sovIdentifiers((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovIdentifiers(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *ApplicationIdentifiers) String() string {
 	if this == nil {

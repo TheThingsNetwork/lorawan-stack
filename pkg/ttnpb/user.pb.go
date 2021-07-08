@@ -3835,8 +3835,8 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 	this.CreatedAt = *v2
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v3
-	this.Name = randStringUser(r)
-	this.Description = randStringUser(r)
+	this.Name = string(randStringUser(r))
+	this.Description = string(randStringUser(r))
 	if r.Intn(5) != 0 {
 		v4 := r.Intn(10)
 		this.Attributes = make(map[string]string)
@@ -3851,18 +3851,18 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 			this.ContactInfo[i] = NewPopulatedContactInfo(r, easy)
 		}
 	}
-	this.PrimaryEmailAddress = randStringUser(r)
+	this.PrimaryEmailAddress = string(randStringUser(r))
 	if r.Intn(5) != 0 {
 		this.PrimaryEmailAddressValidatedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	this.Password = randStringUser(r)
+	this.Password = string(randStringUser(r))
 	if r.Intn(5) != 0 {
 		this.PasswordUpdatedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	this.RequirePasswordUpdate = bool(r.Intn(2) == 0)
+	this.RequirePasswordUpdate = bool(bool(r.Intn(2) == 0))
 	this.State = State([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.Admin = bool(r.Intn(2) == 0)
-	this.TemporaryPassword = randStringUser(r)
+	this.Admin = bool(bool(r.Intn(2) == 0))
+	this.TemporaryPassword = string(randStringUser(r))
 	if r.Intn(5) != 0 {
 		this.TemporaryPasswordCreatedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
@@ -3875,7 +3875,7 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 	if r.Intn(5) != 0 {
 		this.DeletedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	this.StateDescription = randStringUser(r)
+	this.StateDescription = string(randStringUser(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3912,10 +3912,10 @@ func NewPopulatedListUsersRequest(r randyUser, easy bool) *ListUsersRequest {
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.Order = randStringUser(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.Deleted = bool(r.Intn(2) == 0)
+	this.Order = string(randStringUser(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.Deleted = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3925,7 +3925,7 @@ func NewPopulatedCreateUserRequest(r randyUser, easy bool) *CreateUserRequest {
 	this := &CreateUserRequest{}
 	v8 := NewPopulatedUser(r, easy)
 	this.User = *v8
-	this.InvitationToken = randStringUser(r)
+	this.InvitationToken = string(randStringUser(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3956,9 +3956,9 @@ func NewPopulatedUpdateUserPasswordRequest(r randyUser, easy bool) *UpdateUserPa
 	this := &UpdateUserPasswordRequest{}
 	v11 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v11
-	this.New = randStringUser(r)
-	this.Old = randStringUser(r)
-	this.RevokeAllAccess = bool(r.Intn(2) == 0)
+	this.New = string(randStringUser(r))
+	this.Old = string(randStringUser(r))
+	this.RevokeAllAccess = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3968,8 +3968,8 @@ func NewPopulatedListUserAPIKeysRequest(r randyUser, easy bool) *ListUserAPIKeys
 	this := &ListUserAPIKeysRequest{}
 	v12 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v12
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3979,7 +3979,7 @@ func NewPopulatedGetUserAPIKeyRequest(r randyUser, easy bool) *GetUserAPIKeyRequ
 	this := &GetUserAPIKeyRequest{}
 	v13 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v13
-	this.KeyID = randStringUser(r)
+	this.KeyID = string(randStringUser(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3989,7 +3989,7 @@ func NewPopulatedCreateUserAPIKeyRequest(r randyUser, easy bool) *CreateUserAPIK
 	this := &CreateUserAPIKeyRequest{}
 	v14 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v14
-	this.Name = randStringUser(r)
+	this.Name = string(randStringUser(r))
 	v15 := r.Intn(10)
 	this.Rights = make([]Right, v15)
 	for i := 0; i < v15; i++ {
@@ -4019,8 +4019,8 @@ func NewPopulatedUpdateUserAPIKeyRequest(r randyUser, easy bool) *UpdateUserAPIK
 
 func NewPopulatedInvitation(r randyUser, easy bool) *Invitation {
 	this := &Invitation{}
-	this.Email = randStringUser(r)
-	this.Token = randStringUser(r)
+	this.Email = string(randStringUser(r))
+	this.Token = string(randStringUser(r))
 	v18 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.ExpiresAt = *v18
 	v19 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
@@ -4040,8 +4040,8 @@ func NewPopulatedInvitation(r randyUser, easy bool) *Invitation {
 
 func NewPopulatedListInvitationsRequest(r randyUser, easy bool) *ListInvitationsRequest {
 	this := &ListInvitationsRequest{}
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4063,7 +4063,7 @@ func NewPopulatedInvitations(r randyUser, easy bool) *Invitations {
 
 func NewPopulatedSendInvitationRequest(r randyUser, easy bool) *SendInvitationRequest {
 	this := &SendInvitationRequest{}
-	this.Email = randStringUser(r)
+	this.Email = string(randStringUser(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4071,7 +4071,7 @@ func NewPopulatedSendInvitationRequest(r randyUser, easy bool) *SendInvitationRe
 
 func NewPopulatedDeleteInvitationRequest(r randyUser, easy bool) *DeleteInvitationRequest {
 	this := &DeleteInvitationRequest{}
-	this.Email = randStringUser(r)
+	this.Email = string(randStringUser(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4081,7 +4081,7 @@ func NewPopulatedUserSessionIdentifiers(r randyUser, easy bool) *UserSessionIden
 	this := &UserSessionIdentifiers{}
 	v22 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v22
-	this.SessionID = randStringUser(r)
+	this.SessionID = string(randStringUser(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4091,7 +4091,7 @@ func NewPopulatedUserSession(r randyUser, easy bool) *UserSession {
 	this := &UserSession{}
 	v23 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v23
-	this.SessionID = randStringUser(r)
+	this.SessionID = string(randStringUser(r))
 	v24 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v24
 	v25 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
@@ -4099,7 +4099,7 @@ func NewPopulatedUserSession(r randyUser, easy bool) *UserSession {
 	if r.Intn(5) != 0 {
 		this.ExpiresAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	this.SessionSecret = randStringUser(r)
+	this.SessionSecret = string(randStringUser(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4123,9 +4123,9 @@ func NewPopulatedListUserSessionsRequest(r randyUser, easy bool) *ListUserSessio
 	this := &ListUserSessionsRequest{}
 	v27 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v27
-	this.Order = randStringUser(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Order = string(randStringUser(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4141,8 +4141,8 @@ func NewPopulatedLoginToken(r randyUser, easy bool) *LoginToken {
 	this.UpdatedAt = *v30
 	v31 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.ExpiresAt = *v31
-	this.Token = randStringUser(r)
-	this.Used = bool(r.Intn(2) == 0)
+	this.Token = string(randStringUser(r))
+	this.Used = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4152,7 +4152,7 @@ func NewPopulatedCreateLoginTokenRequest(r randyUser, easy bool) *CreateLoginTok
 	this := &CreateLoginTokenRequest{}
 	v32 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v32
-	this.SkipEmail = bool(r.Intn(2) == 0)
+	this.SkipEmail = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4160,7 +4160,7 @@ func NewPopulatedCreateLoginTokenRequest(r randyUser, easy bool) *CreateLoginTok
 
 func NewPopulatedCreateLoginTokenResponse(r randyUser, easy bool) *CreateLoginTokenResponse {
 	this := &CreateLoginTokenResponse{}
-	this.Token = randStringUser(r)
+	this.Token = string(randStringUser(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4232,7 +4232,7 @@ func randFieldUser(dAtA []byte, r randyUser, fieldNumber int, wire int) []byte {
 }
 func encodeVarintPopulateUser(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -4738,7 +4738,7 @@ func sovUser(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozUser(x uint64) (n int) {
-	return sovUser((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovUser(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *User) String() string {
 	if this == nil {

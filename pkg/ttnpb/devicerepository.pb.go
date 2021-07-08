@@ -5447,18 +5447,18 @@ func encodeVarintDevicerepository(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedEndDeviceBrand(r randyDevicerepository, easy bool) *EndDeviceBrand {
 	this := &EndDeviceBrand{}
-	this.BrandId = randStringDevicerepository(r)
-	this.Name = randStringDevicerepository(r)
-	this.PrivateEnterpriseNumber = r.Uint32()
+	this.BrandId = string(randStringDevicerepository(r))
+	this.Name = string(randStringDevicerepository(r))
+	this.PrivateEnterpriseNumber = uint32(r.Uint32())
 	v1 := r.Intn(10)
 	this.OrganizationUniqueIdentifiers = make([]string, v1)
 	for i := 0; i < v1; i++ {
-		this.OrganizationUniqueIdentifiers[i] = randStringDevicerepository(r)
+		this.OrganizationUniqueIdentifiers[i] = string(randStringDevicerepository(r))
 	}
-	this.LoraAllianceVendorId = r.Uint32()
-	this.Website = randStringDevicerepository(r)
-	this.Email = randStringDevicerepository(r)
-	this.Logo = randStringDevicerepository(r)
+	this.LoraAllianceVendorId = uint32(r.Uint32())
+	this.Website = string(randStringDevicerepository(r))
+	this.Email = string(randStringDevicerepository(r))
+	this.Logo = string(randStringDevicerepository(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5466,10 +5466,10 @@ func NewPopulatedEndDeviceBrand(r randyDevicerepository, easy bool) *EndDeviceBr
 
 func NewPopulatedEndDeviceModel(r randyDevicerepository, easy bool) *EndDeviceModel {
 	this := &EndDeviceModel{}
-	this.BrandId = randStringDevicerepository(r)
-	this.ModelId = randStringDevicerepository(r)
-	this.Name = randStringDevicerepository(r)
-	this.Description = randStringDevicerepository(r)
+	this.BrandId = string(randStringDevicerepository(r))
+	this.ModelId = string(randStringDevicerepository(r))
+	this.Name = string(randStringDevicerepository(r))
+	this.Description = string(randStringDevicerepository(r))
 	if r.Intn(5) != 0 {
 		v2 := r.Intn(5)
 		this.HardwareVersions = make([]*EndDeviceModel_HardwareVersion, v2)
@@ -5487,7 +5487,7 @@ func NewPopulatedEndDeviceModel(r randyDevicerepository, easy bool) *EndDeviceMo
 	v4 := r.Intn(10)
 	this.Sensors = make([]string, v4)
 	for i := 0; i < v4; i++ {
-		this.Sensors[i] = randStringDevicerepository(r)
+		this.Sensors[i] = string(randStringDevicerepository(r))
 	}
 	if r.Intn(5) != 0 {
 		this.Dimensions = NewPopulatedEndDeviceModel_Dimensions(r, easy)
@@ -5501,7 +5501,7 @@ func NewPopulatedEndDeviceModel(r randyDevicerepository, easy bool) *EndDeviceMo
 	if r.Intn(5) != 0 {
 		this.OperatingConditions = NewPopulatedEndDeviceModel_OperatingConditions(r, easy)
 	}
-	this.IpCode = randStringDevicerepository(r)
+	this.IpCode = string(randStringDevicerepository(r))
 	v5 := r.Intn(10)
 	this.KeyProvisioning = make([]KeyProvisioning, v5)
 	for i := 0; i < v5; i++ {
@@ -5514,8 +5514,8 @@ func NewPopulatedEndDeviceModel(r randyDevicerepository, easy bool) *EndDeviceMo
 	if r.Intn(5) != 0 {
 		this.Videos = NewPopulatedEndDeviceModel_Videos(r, easy)
 	}
-	this.ProductUrl = randStringDevicerepository(r)
-	this.DatasheetUrl = randStringDevicerepository(r)
+	this.ProductUrl = string(randStringDevicerepository(r))
+	this.DatasheetUrl = string(randStringDevicerepository(r))
 	if r.Intn(5) != 0 {
 		v6 := r.Intn(5)
 		this.Resellers = make([]*EndDeviceModel_Reseller, v6)
@@ -5529,7 +5529,7 @@ func NewPopulatedEndDeviceModel(r randyDevicerepository, easy bool) *EndDeviceMo
 	v7 := r.Intn(10)
 	this.AdditionalRadios = make([]string, v7)
 	for i := 0; i < v7; i++ {
-		this.AdditionalRadios[i] = randStringDevicerepository(r)
+		this.AdditionalRadios[i] = string(randStringDevicerepository(r))
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -5538,9 +5538,9 @@ func NewPopulatedEndDeviceModel(r randyDevicerepository, easy bool) *EndDeviceMo
 
 func NewPopulatedEndDeviceModel_HardwareVersion(r randyDevicerepository, easy bool) *EndDeviceModel_HardwareVersion {
 	this := &EndDeviceModel_HardwareVersion{}
-	this.Version = randStringDevicerepository(r)
-	this.Numeric = r.Uint32()
-	this.PartNumber = randStringDevicerepository(r)
+	this.Version = string(randStringDevicerepository(r))
+	this.Numeric = uint32(r.Uint32())
+	this.PartNumber = string(randStringDevicerepository(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5548,12 +5548,12 @@ func NewPopulatedEndDeviceModel_HardwareVersion(r randyDevicerepository, easy bo
 
 func NewPopulatedEndDeviceModel_FirmwareVersion(r randyDevicerepository, easy bool) *EndDeviceModel_FirmwareVersion {
 	this := &EndDeviceModel_FirmwareVersion{}
-	this.Version = randStringDevicerepository(r)
-	this.Numeric = r.Uint32()
+	this.Version = string(randStringDevicerepository(r))
+	this.Numeric = uint32(r.Uint32())
 	v8 := r.Intn(10)
 	this.SupportedHardwareVersions = make([]string, v8)
 	for i := 0; i < v8; i++ {
-		this.SupportedHardwareVersions[i] = randStringDevicerepository(r)
+		this.SupportedHardwareVersions[i] = string(randStringDevicerepository(r))
 	}
 	if r.Intn(5) != 0 {
 		v9 := r.Intn(10)
@@ -5569,10 +5569,10 @@ func NewPopulatedEndDeviceModel_FirmwareVersion(r randyDevicerepository, easy bo
 
 func NewPopulatedEndDeviceModel_FirmwareVersion_Profile(r randyDevicerepository, easy bool) *EndDeviceModel_FirmwareVersion_Profile {
 	this := &EndDeviceModel_FirmwareVersion_Profile{}
-	this.ProfileId = randStringDevicerepository(r)
-	this.LorawanCertified = bool(r.Intn(2) == 0)
-	this.CodecId = randStringDevicerepository(r)
-	this.VendorId = randStringDevicerepository(r)
+	this.ProfileId = string(randStringDevicerepository(r))
+	this.LorawanCertified = bool(bool(r.Intn(2) == 0))
+	this.CodecId = string(randStringDevicerepository(r))
+	this.VendorId = string(randStringDevicerepository(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5602,7 +5602,7 @@ func NewPopulatedEndDeviceModel_Battery(r randyDevicerepository, easy bool) *End
 	if r.Intn(5) != 0 {
 		this.Replaceable = types.NewPopulatedBoolValue(r, easy)
 	}
-	this.Type = randStringDevicerepository(r)
+	this.Type = string(randStringDevicerepository(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5636,11 +5636,11 @@ func NewPopulatedEndDeviceModel_OperatingConditions_Limits(r randyDevicereposito
 
 func NewPopulatedEndDeviceModel_Photos(r randyDevicerepository, easy bool) *EndDeviceModel_Photos {
 	this := &EndDeviceModel_Photos{}
-	this.Main = randStringDevicerepository(r)
+	this.Main = string(randStringDevicerepository(r))
 	v10 := r.Intn(10)
 	this.Other = make([]string, v10)
 	for i := 0; i < v10; i++ {
-		this.Other[i] = randStringDevicerepository(r)
+		this.Other[i] = string(randStringDevicerepository(r))
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -5649,11 +5649,11 @@ func NewPopulatedEndDeviceModel_Photos(r randyDevicerepository, easy bool) *EndD
 
 func NewPopulatedEndDeviceModel_Videos(r randyDevicerepository, easy bool) *EndDeviceModel_Videos {
 	this := &EndDeviceModel_Videos{}
-	this.Main = randStringDevicerepository(r)
+	this.Main = string(randStringDevicerepository(r))
 	v11 := r.Intn(10)
 	this.Other = make([]string, v11)
 	for i := 0; i < v11; i++ {
-		this.Other[i] = randStringDevicerepository(r)
+		this.Other[i] = string(randStringDevicerepository(r))
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -5662,13 +5662,13 @@ func NewPopulatedEndDeviceModel_Videos(r randyDevicerepository, easy bool) *EndD
 
 func NewPopulatedEndDeviceModel_Reseller(r randyDevicerepository, easy bool) *EndDeviceModel_Reseller {
 	this := &EndDeviceModel_Reseller{}
-	this.Name = randStringDevicerepository(r)
+	this.Name = string(randStringDevicerepository(r))
 	v12 := r.Intn(10)
 	this.Region = make([]string, v12)
 	for i := 0; i < v12; i++ {
-		this.Region[i] = randStringDevicerepository(r)
+		this.Region[i] = string(randStringDevicerepository(r))
 	}
-	this.Url = randStringDevicerepository(r)
+	this.Url = string(randStringDevicerepository(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5697,10 +5697,10 @@ func NewPopulatedEndDeviceModel_Compliances(r randyDevicerepository, easy bool) 
 
 func NewPopulatedEndDeviceModel_Compliances_Compliance(r randyDevicerepository, easy bool) *EndDeviceModel_Compliances_Compliance {
 	this := &EndDeviceModel_Compliances_Compliance{}
-	this.Body = randStringDevicerepository(r)
-	this.Norm = randStringDevicerepository(r)
-	this.Standard = randStringDevicerepository(r)
-	this.Version = randStringDevicerepository(r)
+	this.Body = string(randStringDevicerepository(r))
+	this.Norm = string(randStringDevicerepository(r))
+	this.Standard = string(randStringDevicerepository(r))
+	this.Version = string(randStringDevicerepository(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5710,7 +5710,7 @@ func NewPopulatedGetEndDeviceBrandRequest(r randyDevicerepository, easy bool) *G
 	this := &GetEndDeviceBrandRequest{}
 	v15 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIds = *v15
-	this.BrandID = randStringDevicerepository(r)
+	this.BrandID = string(randStringDevicerepository(r))
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
@@ -5723,10 +5723,10 @@ func NewPopulatedListEndDeviceBrandsRequest(r randyDevicerepository, easy bool) 
 	this := &ListEndDeviceBrandsRequest{}
 	v16 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIds = *v16
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.OrderBy = randStringDevicerepository(r)
-	this.Search = randStringDevicerepository(r)
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.OrderBy = string(randStringDevicerepository(r))
+	this.Search = string(randStringDevicerepository(r))
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
@@ -5739,8 +5739,8 @@ func NewPopulatedGetEndDeviceModelRequest(r randyDevicerepository, easy bool) *G
 	this := &GetEndDeviceModelRequest{}
 	v17 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIds = *v17
-	this.BrandID = randStringDevicerepository(r)
-	this.ModelID = randStringDevicerepository(r)
+	this.BrandID = string(randStringDevicerepository(r))
+	this.ModelID = string(randStringDevicerepository(r))
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
@@ -5753,11 +5753,11 @@ func NewPopulatedListEndDeviceModelsRequest(r randyDevicerepository, easy bool) 
 	this := &ListEndDeviceModelsRequest{}
 	v18 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIds = *v18
-	this.BrandID = randStringDevicerepository(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.OrderBy = randStringDevicerepository(r)
-	this.Search = randStringDevicerepository(r)
+	this.BrandID = string(randStringDevicerepository(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.OrderBy = string(randStringDevicerepository(r))
+	this.Search = string(randStringDevicerepository(r))
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
@@ -5823,7 +5823,7 @@ func NewPopulatedListEndDeviceModelsResponse(r randyDevicerepository, easy bool)
 
 func NewPopulatedEncodedMessagePayload(r randyDevicerepository, easy bool) *EncodedMessagePayload {
 	this := &EncodedMessagePayload{}
-	this.FPort = r.Uint32()
+	this.FPort = uint32(r.Uint32())
 	v23 := r.Intn(100)
 	this.FrmPayload = make([]byte, v23)
 	for i := 0; i < v23; i++ {
@@ -5832,12 +5832,12 @@ func NewPopulatedEncodedMessagePayload(r randyDevicerepository, easy bool) *Enco
 	v24 := r.Intn(10)
 	this.Warnings = make([]string, v24)
 	for i := 0; i < v24; i++ {
-		this.Warnings[i] = randStringDevicerepository(r)
+		this.Warnings[i] = string(randStringDevicerepository(r))
 	}
 	v25 := r.Intn(10)
 	this.Errors = make([]string, v25)
 	for i := 0; i < v25; i++ {
-		this.Errors[i] = randStringDevicerepository(r)
+		this.Errors[i] = string(randStringDevicerepository(r))
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -5852,12 +5852,12 @@ func NewPopulatedDecodedMessagePayload(r randyDevicerepository, easy bool) *Deco
 	v26 := r.Intn(10)
 	this.Warnings = make([]string, v26)
 	for i := 0; i < v26; i++ {
-		this.Warnings[i] = randStringDevicerepository(r)
+		this.Warnings[i] = string(randStringDevicerepository(r))
 	}
 	v27 := r.Intn(10)
 	this.Errors = make([]string, v27)
 	for i := 0; i < v27; i++ {
-		this.Errors[i] = randStringDevicerepository(r)
+		this.Errors[i] = string(randStringDevicerepository(r))
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -5867,8 +5867,8 @@ func NewPopulatedDecodedMessagePayload(r randyDevicerepository, easy bool) *Deco
 func NewPopulatedMessagePayloadDecoder(r randyDevicerepository, easy bool) *MessagePayloadDecoder {
 	this := &MessagePayloadDecoder{}
 	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.FormatterParameter = randStringDevicerepository(r)
-	this.CodecID = randStringDevicerepository(r)
+	this.FormatterParameter = string(randStringDevicerepository(r))
+	this.CodecID = string(randStringDevicerepository(r))
 	if r.Intn(5) != 0 {
 		v28 := r.Intn(5)
 		this.Examples = make([]*MessagePayloadDecoder_Example, v28)
@@ -5883,7 +5883,7 @@ func NewPopulatedMessagePayloadDecoder(r randyDevicerepository, easy bool) *Mess
 
 func NewPopulatedMessagePayloadDecoder_Example(r randyDevicerepository, easy bool) *MessagePayloadDecoder_Example {
 	this := &MessagePayloadDecoder_Example{}
-	this.Description = randStringDevicerepository(r)
+	this.Description = string(randStringDevicerepository(r))
 	if r.Intn(5) != 0 {
 		this.Input = NewPopulatedEncodedMessagePayload(r, easy)
 	}
@@ -5898,8 +5898,8 @@ func NewPopulatedMessagePayloadDecoder_Example(r randyDevicerepository, easy boo
 func NewPopulatedMessagePayloadEncoder(r randyDevicerepository, easy bool) *MessagePayloadEncoder {
 	this := &MessagePayloadEncoder{}
 	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.FormatterParameter = randStringDevicerepository(r)
-	this.CodecID = randStringDevicerepository(r)
+	this.FormatterParameter = string(randStringDevicerepository(r))
+	this.CodecID = string(randStringDevicerepository(r))
 	if r.Intn(5) != 0 {
 		v29 := r.Intn(5)
 		this.Examples = make([]*MessagePayloadEncoder_Example, v29)
@@ -5914,7 +5914,7 @@ func NewPopulatedMessagePayloadEncoder(r randyDevicerepository, easy bool) *Mess
 
 func NewPopulatedMessagePayloadEncoder_Example(r randyDevicerepository, easy bool) *MessagePayloadEncoder_Example {
 	this := &MessagePayloadEncoder_Example{}
-	this.Description = randStringDevicerepository(r)
+	this.Description = string(randStringDevicerepository(r))
 	if r.Intn(5) != 0 {
 		this.Input = NewPopulatedDecodedMessagePayload(r, easy)
 	}
@@ -5992,7 +5992,7 @@ func randFieldDevicerepository(dAtA []byte, r randyDevicerepository, fieldNumber
 }
 func encodeVarintPopulateDevicerepository(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -6725,7 +6725,7 @@ func sovDevicerepository(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozDevicerepository(x uint64) (n int) {
-	return sovDevicerepository((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovDevicerepository(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *EndDeviceBrand) String() string {
 	if this == nil {

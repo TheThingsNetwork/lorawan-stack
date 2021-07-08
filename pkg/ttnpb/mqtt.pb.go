@@ -226,9 +226,9 @@ func encodeVarintMqtt(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedMQTTConnectionInfo(r randyMqtt, easy bool) *MQTTConnectionInfo {
 	this := &MQTTConnectionInfo{}
-	this.PublicAddress = randStringMqtt(r)
-	this.PublicTLSAddress = randStringMqtt(r)
-	this.Username = randStringMqtt(r)
+	this.PublicAddress = string(randStringMqtt(r))
+	this.PublicTLSAddress = string(randStringMqtt(r))
+	this.Username = string(randStringMqtt(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -300,7 +300,7 @@ func randFieldMqtt(dAtA []byte, r randyMqtt, fieldNumber int, wire int) []byte {
 }
 func encodeVarintPopulateMqtt(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -331,7 +331,7 @@ func sovMqtt(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozMqtt(x uint64) (n int) {
-	return sovMqtt((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovMqtt(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *MQTTConnectionInfo) String() string {
 	if this == nil {

@@ -1099,8 +1099,8 @@ func NewPopulatedScheduleDownlinkResponse(r randyGatewayserver, easy bool) *Sche
 	if r.Intn(5) != 0 {
 		this.DownlinkPath = NewPopulatedDownlinkPath(r, easy)
 	}
-	this.Rx1 = bool(r.Intn(2) == 0)
-	this.Rx2 = bool(r.Intn(2) == 0)
+	this.Rx1 = bool(bool(r.Intn(2) == 0))
+	this.Rx2 = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1186,7 +1186,7 @@ func randFieldGatewayserver(dAtA []byte, r randyGatewayserver, fieldNumber int, 
 }
 func encodeVarintPopulateGatewayserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1268,7 +1268,7 @@ func sovGatewayserver(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozGatewayserver(x uint64) (n int) {
-	return sovGatewayserver((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovGatewayserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *GatewayUp) String() string {
 	if this == nil {

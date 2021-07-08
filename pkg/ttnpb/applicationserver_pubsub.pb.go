@@ -3033,7 +3033,7 @@ func NewPopulatedApplicationPubSubIdentifiers(r randyApplicationserverPubsub, ea
 	this := &ApplicationPubSubIdentifiers{}
 	v1 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v1
-	this.PubSubID = randStringApplicationserverPubsub(r)
+	this.PubSubID = string(randStringApplicationserverPubsub(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3047,8 +3047,8 @@ func NewPopulatedApplicationPubSub(r randyApplicationserverPubsub, easy bool) *A
 	this.CreatedAt = *v3
 	v4 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v4
-	this.Format = randStringApplicationserverPubsub(r)
-	this.BaseTopic = randStringApplicationserverPubsub(r)
+	this.Format = string(randStringApplicationserverPubsub(r))
+	this.BaseTopic = string(randStringApplicationserverPubsub(r))
 	if r.Intn(5) != 0 {
 		this.DownlinkPush = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
@@ -3116,7 +3116,7 @@ func NewPopulatedApplicationPubSub_AWSIoT(r randyApplicationserverPubsub, easy b
 }
 func NewPopulatedApplicationPubSub_NATSProvider(r randyApplicationserverPubsub, easy bool) *ApplicationPubSub_NATSProvider {
 	this := &ApplicationPubSub_NATSProvider{}
-	this.ServerURL = randStringApplicationserverPubsub(r)
+	this.ServerURL = string(randStringApplicationserverPubsub(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3124,13 +3124,13 @@ func NewPopulatedApplicationPubSub_NATSProvider(r randyApplicationserverPubsub, 
 
 func NewPopulatedApplicationPubSub_MQTTProvider(r randyApplicationserverPubsub, easy bool) *ApplicationPubSub_MQTTProvider {
 	this := &ApplicationPubSub_MQTTProvider{}
-	this.ServerURL = randStringApplicationserverPubsub(r)
-	this.ClientId = randStringApplicationserverPubsub(r)
-	this.Username = randStringApplicationserverPubsub(r)
-	this.Password = randStringApplicationserverPubsub(r)
+	this.ServerURL = string(randStringApplicationserverPubsub(r))
+	this.ClientId = string(randStringApplicationserverPubsub(r))
+	this.Username = string(randStringApplicationserverPubsub(r))
+	this.Password = string(randStringApplicationserverPubsub(r))
 	this.SubscribeQoS = ApplicationPubSub_MQTTProvider_QoS([]int32{0, 1, 2}[r.Intn(3)])
 	this.PublishQoS = ApplicationPubSub_MQTTProvider_QoS([]int32{0, 1, 2}[r.Intn(3)])
-	this.UseTLS = bool(r.Intn(2) == 0)
+	this.UseTLS = bool(bool(r.Intn(2) == 0))
 	v5 := r.Intn(100)
 	this.TLSCA = make([]byte, v5)
 	for i := 0; i < v5; i++ {
@@ -3160,14 +3160,14 @@ func NewPopulatedApplicationPubSub_MQTTProvider(r randyApplicationserverPubsub, 
 
 func NewPopulatedApplicationPubSub_AWSIoTProvider(r randyApplicationserverPubsub, easy bool) *ApplicationPubSub_AWSIoTProvider {
 	this := &ApplicationPubSub_AWSIoTProvider{}
-	this.Region = randStringApplicationserverPubsub(r)
+	this.Region = string(randStringApplicationserverPubsub(r))
 	if r.Intn(5) != 0 {
 		this.AccessKey = NewPopulatedApplicationPubSub_AWSIoTProvider_AccessKey(r, easy)
 	}
 	if r.Intn(5) != 0 {
 		this.AssumeRole = NewPopulatedApplicationPubSub_AWSIoTProvider_AssumeRole(r, easy)
 	}
-	this.EndpointAddress = randStringApplicationserverPubsub(r)
+	this.EndpointAddress = string(randStringApplicationserverPubsub(r))
 	oneofNumber_Deployment := []int32{5}[r.Intn(1)]
 	switch oneofNumber_Deployment {
 	case 5:
@@ -3185,9 +3185,9 @@ func NewPopulatedApplicationPubSub_AWSIoTProvider_Default(r randyApplicationserv
 }
 func NewPopulatedApplicationPubSub_AWSIoTProvider_AccessKey(r randyApplicationserverPubsub, easy bool) *ApplicationPubSub_AWSIoTProvider_AccessKey {
 	this := &ApplicationPubSub_AWSIoTProvider_AccessKey{}
-	this.AccessKeyID = randStringApplicationserverPubsub(r)
-	this.SecretAccessKey = randStringApplicationserverPubsub(r)
-	this.SessionToken = randStringApplicationserverPubsub(r)
+	this.AccessKeyID = string(randStringApplicationserverPubsub(r))
+	this.SecretAccessKey = string(randStringApplicationserverPubsub(r))
+	this.SessionToken = string(randStringApplicationserverPubsub(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3195,8 +3195,8 @@ func NewPopulatedApplicationPubSub_AWSIoTProvider_AccessKey(r randyApplicationse
 
 func NewPopulatedApplicationPubSub_AWSIoTProvider_AssumeRole(r randyApplicationserverPubsub, easy bool) *ApplicationPubSub_AWSIoTProvider_AssumeRole {
 	this := &ApplicationPubSub_AWSIoTProvider_AssumeRole{}
-	this.ARN = randStringApplicationserverPubsub(r)
-	this.ExternalID = randStringApplicationserverPubsub(r)
+	this.ARN = string(randStringApplicationserverPubsub(r))
+	this.ExternalID = string(randStringApplicationserverPubsub(r))
 	if r.Intn(5) != 0 {
 		this.SessionDuration = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
 	}
@@ -3207,7 +3207,7 @@ func NewPopulatedApplicationPubSub_AWSIoTProvider_AssumeRole(r randyApplications
 
 func NewPopulatedApplicationPubSub_AWSIoTProvider_DefaultIntegration(r randyApplicationserverPubsub, easy bool) *ApplicationPubSub_AWSIoTProvider_DefaultIntegration {
 	this := &ApplicationPubSub_AWSIoTProvider_DefaultIntegration{}
-	this.StackName = randStringApplicationserverPubsub(r)
+	this.StackName = string(randStringApplicationserverPubsub(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3215,7 +3215,7 @@ func NewPopulatedApplicationPubSub_AWSIoTProvider_DefaultIntegration(r randyAppl
 
 func NewPopulatedApplicationPubSub_Message(r randyApplicationserverPubsub, easy bool) *ApplicationPubSub_Message {
 	this := &ApplicationPubSub_Message{}
-	this.Topic = randStringApplicationserverPubsub(r)
+	this.Topic = string(randStringApplicationserverPubsub(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3351,7 +3351,7 @@ func randFieldApplicationserverPubsub(dAtA []byte, r randyApplicationserverPubsu
 }
 func encodeVarintPopulateApplicationserverPubsub(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -3738,7 +3738,7 @@ func sovApplicationserverPubsub(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozApplicationserverPubsub(x uint64) (n int) {
-	return sovApplicationserverPubsub((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovApplicationserverPubsub(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *ApplicationPubSubIdentifiers) String() string {
 	if this == nil {

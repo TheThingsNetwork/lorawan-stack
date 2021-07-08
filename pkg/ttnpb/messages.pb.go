@@ -4345,7 +4345,7 @@ func NewPopulatedTxAcknowledgment(r randyMessages, easy bool) *TxAcknowledgment 
 	v1 := r.Intn(10)
 	this.CorrelationIDs = make([]string, v1)
 	for i := 0; i < v1; i++ {
-		this.CorrelationIDs[i] = randStringMessages(r)
+		this.CorrelationIDs[i] = string(randStringMessages(r))
 	}
 	this.Result = TxAcknowledgment_Result([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8}[r.Intn(9)])
 	if r.Intn(5) != 0 {
@@ -4374,7 +4374,7 @@ func NewPopulatedGatewayUplinkMessage(r randyMessages, easy bool) *GatewayUplink
 	if r.Intn(5) != 0 {
 		this.UplinkMessage = NewPopulatedUplinkMessage(r, easy)
 	}
-	this.BandID = randStringMessages(r)
+	this.BandID = string(randStringMessages(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4387,8 +4387,8 @@ func NewPopulatedApplicationUplink(r randyMessages, easy bool) *ApplicationUplin
 	for i := 0; i < v2; i++ {
 		this.SessionKeyID[i] = byte(r.Intn(256))
 	}
-	this.FPort = r.Uint32()
-	this.FCnt = r.Uint32()
+	this.FPort = uint32(r.Uint32())
+	this.FCnt = uint32(r.Uint32())
 	v3 := r.Intn(100)
 	this.FRMPayload = make([]byte, v3)
 	for i := 0; i < v3; i++ {
@@ -4411,12 +4411,12 @@ func NewPopulatedApplicationUplink(r randyMessages, easy bool) *ApplicationUplin
 	if r.Intn(5) != 0 {
 		this.AppSKey = NewPopulatedKeyEnvelope(r, easy)
 	}
-	this.LastAFCntDown = r.Uint32()
-	this.Confirmed = bool(r.Intn(2) == 0)
+	this.LastAFCntDown = uint32(r.Uint32())
+	this.Confirmed = bool(bool(r.Intn(2) == 0))
 	v7 := r.Intn(10)
 	this.DecodedPayloadWarnings = make([]string, v7)
 	for i := 0; i < v7; i++ {
-		this.DecodedPayloadWarnings[i] = randStringMessages(r)
+		this.DecodedPayloadWarnings[i] = string(randStringMessages(r))
 	}
 	if r.Intn(5) != 0 {
 		this.ConsumedAirtime = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
@@ -4438,7 +4438,7 @@ func NewPopulatedApplicationUplink(r randyMessages, easy bool) *ApplicationUplin
 
 func NewPopulatedApplicationLocation(r randyMessages, easy bool) *ApplicationLocation {
 	this := &ApplicationLocation{}
-	this.Service = randStringMessages(r)
+	this.Service = string(randStringMessages(r))
 	v9 := NewPopulatedLocation(r, easy)
 	this.Location = *v9
 	if r.Intn(5) != 0 {
@@ -4470,7 +4470,7 @@ func NewPopulatedApplicationJoinAccept(r randyMessages, easy bool) *ApplicationJ
 			this.InvalidatedDownlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
 	}
-	this.PendingSession = bool(r.Intn(2) == 0)
+	this.PendingSession = bool(bool(r.Intn(2) == 0))
 	v13 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.ReceivedAt = *v13
 	if !easy && r.Intn(10) != 0 {
@@ -4530,7 +4530,7 @@ func NewPopulatedApplicationInvalidatedDownlinks(r randyMessages, easy bool) *Ap
 			this.Downlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
 	}
-	this.LastFCntDown = r.Uint32()
+	this.LastFCntDown = uint32(r.Uint32())
 	v20 := r.Intn(100)
 	this.SessionKeyID = make([]byte, v20)
 	for i := 0; i < v20; i++ {
@@ -4549,14 +4549,14 @@ func NewPopulatedDownlinkQueueOperationErrorDetails(r randyMessages, easy bool) 
 	for i := 0; i < v21; i++ {
 		this.SessionKeyID[i] = byte(r.Intn(256))
 	}
-	this.MinFCntDown = r.Uint32()
+	this.MinFCntDown = uint32(r.Uint32())
 	this.PendingDevAddr = go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedDevAddr(r)
 	v22 := r.Intn(100)
 	this.PendingSessionKeyID = make([]byte, v22)
 	for i := 0; i < v22; i++ {
 		this.PendingSessionKeyID[i] = byte(r.Intn(256))
 	}
-	this.PendingMinFCntDown = r.Uint32()
+	this.PendingMinFCntDown = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4564,7 +4564,7 @@ func NewPopulatedDownlinkQueueOperationErrorDetails(r randyMessages, easy bool) 
 
 func NewPopulatedApplicationServiceData(r randyMessages, easy bool) *ApplicationServiceData {
 	this := &ApplicationServiceData{}
-	this.Service = randStringMessages(r)
+	this.Service = string(randStringMessages(r))
 	if r.Intn(5) != 0 {
 		this.Data = types.NewPopulatedStruct(r, easy)
 	}
@@ -4580,7 +4580,7 @@ func NewPopulatedApplicationUp(r randyMessages, easy bool) *ApplicationUp {
 	v24 := r.Intn(10)
 	this.CorrelationIDs = make([]string, v24)
 	for i := 0; i < v24; i++ {
-		this.CorrelationIDs[i] = randStringMessages(r)
+		this.CorrelationIDs[i] = string(randStringMessages(r))
 	}
 	oneofNumber_Up := []int32{3, 4, 5, 6, 7, 8, 9, 10, 11, 13}[r.Intn(10)]
 	switch oneofNumber_Up {
@@ -4608,7 +4608,7 @@ func NewPopulatedApplicationUp(r randyMessages, easy bool) *ApplicationUp {
 	if r.Intn(5) != 0 {
 		this.ReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	this.Simulated = bool(r.Intn(2) == 0)
+	this.Simulated = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4667,9 +4667,9 @@ func NewPopulatedApplicationUp_ServiceData(r randyMessages, easy bool) *Applicat
 func NewPopulatedMessagePayloadFormatters(r randyMessages, easy bool) *MessagePayloadFormatters {
 	this := &MessagePayloadFormatters{}
 	this.UpFormatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.UpFormatterParameter = randStringMessages(r)
+	this.UpFormatterParameter = string(randStringMessages(r))
 	this.DownFormatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.DownFormatterParameter = randStringMessages(r)
+	this.DownFormatterParameter = string(randStringMessages(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4757,7 +4757,7 @@ func randFieldMessages(dAtA []byte, r randyMessages, fieldNumber int, wire int) 
 }
 func encodeVarintPopulateMessages(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -5399,7 +5399,7 @@ func sovMessages(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozMessages(x uint64) (n int) {
-	return sovMessages((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovMessages(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *UplinkMessage) String() string {
 	if this == nil {

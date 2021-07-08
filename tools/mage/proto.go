@@ -125,9 +125,6 @@ func (p Proto) Go(context.Context) error {
 	if err := runGoTool("golang.org/x/tools/cmd/goimports", "-w", ttnpb); err != nil {
 		return fmt.Errorf("failed to run goimports on generated code: %w", err)
 	}
-	if err := runUnconvert(ttnpb); err != nil {
-		return fmt.Errorf("failed to run unconvert on generated code: %w", err)
-	}
 	return sh.RunV("gofmt", "-w", "-s", ttnpb)
 }
 

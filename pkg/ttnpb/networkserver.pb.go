@@ -830,7 +830,7 @@ func randFieldNetworkserver(dAtA []byte, r randyNetworkserver, fieldNumber int, 
 }
 func encodeVarintPopulateNetworkserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -853,7 +853,7 @@ func sovNetworkserver(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozNetworkserver(x uint64) (n int) {
-	return sovNetworkserver((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovNetworkserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *GenerateDevAddrResponse) String() string {
 	if this == nil {

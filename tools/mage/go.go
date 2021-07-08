@@ -98,10 +98,6 @@ func runGoTool(args ...string) error {
 	return runGoFrom("tools", append([]string{"-exec", "go run exec_from.go -dir .."}, args...)...)
 }
 
-func runUnconvert(pkgs ...string) error {
-	return runGoTool(append([]string{"github.com/mdempsky/unconvert", "-apply", "-safe"}, pkgs...)...)
-}
-
 // CheckVersion checks the installed Go version against the minimum version we support.
 func (Go) CheckVersion() error {
 	if mg.Verbose() {
@@ -183,28 +179,9 @@ func (g Go) Lint() error {
 	return runGoTool(append([]string{"github.com/mgechev/revive", "-config=.revive.toml", "-formatter=stylish"}, dirs...)...)
 }
 
-// Unconvert removes unnecessary type conversions from Go files.
-func (g Go) Unconvert() error {
-	dirs, err := g.packageDirs()
-	if err != nil {
-		return err
-	}
-	if len(dirs) == 0 {
-		return nil
-	}
-	if mg.Verbose() {
-		fmt.Printf("Removing unnecessary type conversions from %d Go packages\n", len(dirs))
-	}
-	var args []string
-	if goTags != "" {
-		args = append(args, "-tags", strings.Join(strings.Split(goTags, ","), " "))
-	}
-	return runUnconvert(append(args, dirs...)...)
-}
-
 // Quality runs code quality checks on Go files.
 func (g Go) Quality() {
-	mg.Deps(g.Fmt, g.Unconvert)
+	mg.Deps(g.Fmt)
 	g.Lint() // Errors are allowed.
 }
 

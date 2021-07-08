@@ -2305,7 +2305,7 @@ func NewPopulatedAuthInfoResponse(r randyIdentityserver, easy bool) *AuthInfoRes
 	if r.Intn(5) != 0 {
 		this.UniversalRights = NewPopulatedRights(r, easy)
 	}
-	this.IsAdmin = bool(r.Intn(2) == 0)
+	this.IsAdmin = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2377,7 +2377,7 @@ func NewPopulatedIsConfiguration_UserRegistration(r randyIdentityserver, easy bo
 	if r.Intn(5) != 0 {
 		this.PasswordRequirements = NewPopulatedIsConfiguration_UserRegistration_PasswordRequirements(r, easy)
 	}
-	this.Enabled = bool(r.Intn(2) == 0)
+	this.Enabled = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2556,7 +2556,7 @@ func randFieldIdentityserver(dAtA []byte, r randyIdentityserver, fieldNumber int
 }
 func encodeVarintPopulateIdentityserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2836,7 +2836,7 @@ func sovIdentityserver(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozIdentityserver(x uint64) (n int) {
-	return sovIdentityserver((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovIdentityserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *AuthInfoResponse) String() string {
 	if this == nil {

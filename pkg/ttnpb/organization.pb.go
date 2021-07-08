@@ -2012,8 +2012,8 @@ func NewPopulatedOrganization(r randyOrganization, easy bool) *Organization {
 	this.CreatedAt = *v2
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v3
-	this.Name = randStringOrganization(r)
-	this.Description = randStringOrganization(r)
+	this.Name = string(randStringOrganization(r))
+	this.Description = string(randStringOrganization(r))
 	if r.Intn(5) != 0 {
 		v4 := r.Intn(10)
 		this.Attributes = make(map[string]string)
@@ -2070,10 +2070,10 @@ func NewPopulatedListOrganizationsRequest(r randyOrganization, easy bool) *ListO
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.Order = randStringOrganization(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.Deleted = bool(r.Intn(2) == 0)
+	this.Order = string(randStringOrganization(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.Deleted = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2106,8 +2106,8 @@ func NewPopulatedListOrganizationAPIKeysRequest(r randyOrganization, easy bool) 
 	this := &ListOrganizationAPIKeysRequest{}
 	v11 := NewPopulatedOrganizationIdentifiers(r, easy)
 	this.OrganizationIdentifiers = *v11
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2117,7 +2117,7 @@ func NewPopulatedGetOrganizationAPIKeyRequest(r randyOrganization, easy bool) *G
 	this := &GetOrganizationAPIKeyRequest{}
 	v12 := NewPopulatedOrganizationIdentifiers(r, easy)
 	this.OrganizationIdentifiers = *v12
-	this.KeyID = randStringOrganization(r)
+	this.KeyID = string(randStringOrganization(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2127,7 +2127,7 @@ func NewPopulatedCreateOrganizationAPIKeyRequest(r randyOrganization, easy bool)
 	this := &CreateOrganizationAPIKeyRequest{}
 	v13 := NewPopulatedOrganizationIdentifiers(r, easy)
 	this.OrganizationIdentifiers = *v13
-	this.Name = randStringOrganization(r)
+	this.Name = string(randStringOrganization(r))
 	v14 := r.Intn(10)
 	this.Rights = make([]Right, v14)
 	for i := 0; i < v14; i++ {
@@ -2159,8 +2159,8 @@ func NewPopulatedListOrganizationCollaboratorsRequest(r randyOrganization, easy 
 	this := &ListOrganizationCollaboratorsRequest{}
 	v17 := NewPopulatedOrganizationIdentifiers(r, easy)
 	this.OrganizationIdentifiers = *v17
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2254,7 +2254,7 @@ func randFieldOrganization(dAtA []byte, r randyOrganization, fieldNumber int, wi
 }
 func encodeVarintPopulateOrganization(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2511,7 +2511,7 @@ func sovOrganization(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozOrganization(x uint64) (n int) {
-	return sovOrganization((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovOrganization(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *Organization) String() string {
 	if this == nil {

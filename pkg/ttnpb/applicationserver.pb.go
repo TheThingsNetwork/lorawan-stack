@@ -2666,7 +2666,7 @@ func (m *ApplicationLinkStats) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if m.DownlinkCount != 0 {
-		i = encodeVarintApplicationserver(dAtA, i, m.DownlinkCount)
+		i = encodeVarintApplicationserver(dAtA, i, uint64(m.DownlinkCount))
 		i--
 		dAtA[i] = 0x30
 	}
@@ -2681,7 +2681,7 @@ func (m *ApplicationLinkStats) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x2a
 	}
 	if m.UpCount != 0 {
-		i = encodeVarintApplicationserver(dAtA, i, m.UpCount)
+		i = encodeVarintApplicationserver(dAtA, i, uint64(m.UpCount))
 		i--
 		dAtA[i] = 0x20
 	}
@@ -3252,7 +3252,7 @@ func NewPopulatedApplicationLink(r randyApplicationserver, easy bool) *Applicati
 	if r.Intn(5) != 0 {
 		this.DefaultFormatters = NewPopulatedMessagePayloadFormatters(r, easy)
 	}
-	this.TLS = bool(r.Intn(2) == 0)
+	this.TLS = bool(bool(r.Intn(2) == 0))
 	if r.Intn(5) != 0 {
 		this.SkipPayloadCrypto = types.NewPopulatedBoolValue(r, easy)
 	}
@@ -3292,15 +3292,15 @@ func NewPopulatedApplicationLinkStats(r randyApplicationserver, easy bool) *Appl
 	if r.Intn(5) != 0 {
 		this.LinkedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	this.NetworkServerAddress = randStringApplicationserver(r)
+	this.NetworkServerAddress = string(randStringApplicationserver(r))
 	if r.Intn(5) != 0 {
 		this.LastUpReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	this.UpCount = uint64(r.Uint32())
+	this.UpCount = uint64(uint64(r.Uint32()))
 	if r.Intn(5) != 0 {
 		this.LastDownlinkForwardedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	this.DownlinkCount = uint64(r.Uint32())
+	this.DownlinkCount = uint64(uint64(r.Uint32()))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3379,7 +3379,7 @@ func NewPopulatedEncodeDownlinkRequest(r randyApplicationserver, easy bool) *Enc
 		this.Downlink = NewPopulatedApplicationDownlink(r, easy)
 	}
 	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.Parameter = randStringApplicationserver(r)
+	this.Parameter = string(randStringApplicationserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3407,7 +3407,7 @@ func NewPopulatedDecodeUplinkRequest(r randyApplicationserver, easy bool) *Decod
 		this.Uplink = NewPopulatedApplicationUplink(r, easy)
 	}
 	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.Parameter = randStringApplicationserver(r)
+	this.Parameter = string(randStringApplicationserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3435,7 +3435,7 @@ func NewPopulatedDecodeDownlinkRequest(r randyApplicationserver, easy bool) *Dec
 		this.Downlink = NewPopulatedApplicationDownlink(r, easy)
 	}
 	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.Parameter = randStringApplicationserver(r)
+	this.Parameter = string(randStringApplicationserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3517,7 +3517,7 @@ func randFieldApplicationserver(dAtA []byte, r randyApplicationserver, fieldNumb
 }
 func encodeVarintPopulateApplicationserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -3594,14 +3594,14 @@ func (m *ApplicationLinkStats) Size() (n int) {
 		n += 1 + l + sovApplicationserver(uint64(l))
 	}
 	if m.UpCount != 0 {
-		n += 1 + sovApplicationserver(m.UpCount)
+		n += 1 + sovApplicationserver(uint64(m.UpCount))
 	}
 	if m.LastDownlinkForwardedAt != nil {
 		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDownlinkForwardedAt)
 		n += 1 + l + sovApplicationserver(uint64(l))
 	}
 	if m.DownlinkCount != 0 {
-		n += 1 + sovApplicationserver(m.DownlinkCount)
+		n += 1 + sovApplicationserver(uint64(m.DownlinkCount))
 	}
 	return n
 }
@@ -3814,7 +3814,7 @@ func sovApplicationserver(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozApplicationserver(x uint64) (n int) {
-	return sovApplicationserver((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovApplicationserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *ApplicationLink) String() string {
 	if this == nil {

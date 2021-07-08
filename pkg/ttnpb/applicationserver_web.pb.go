@@ -3120,7 +3120,7 @@ func NewPopulatedApplicationWebhookIdentifiers(r randyApplicationserverWeb, easy
 	this := &ApplicationWebhookIdentifiers{}
 	v1 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v1
-	this.WebhookID = randStringApplicationserverWeb(r)
+	this.WebhookID = string(randStringApplicationserverWeb(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3128,7 +3128,7 @@ func NewPopulatedApplicationWebhookIdentifiers(r randyApplicationserverWeb, easy
 
 func NewPopulatedApplicationWebhookTemplateIdentifiers(r randyApplicationserverWeb, easy bool) *ApplicationWebhookTemplateIdentifiers {
 	this := &ApplicationWebhookTemplateIdentifiers{}
-	this.TemplateID = randStringApplicationserverWeb(r)
+	this.TemplateID = string(randStringApplicationserverWeb(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3136,12 +3136,12 @@ func NewPopulatedApplicationWebhookTemplateIdentifiers(r randyApplicationserverW
 
 func NewPopulatedApplicationWebhookTemplateField(r randyApplicationserverWeb, easy bool) *ApplicationWebhookTemplateField {
 	this := &ApplicationWebhookTemplateField{}
-	this.ID = randStringApplicationserverWeb(r)
-	this.Name = randStringApplicationserverWeb(r)
-	this.Description = randStringApplicationserverWeb(r)
-	this.Secret = bool(r.Intn(2) == 0)
-	this.DefaultValue = randStringApplicationserverWeb(r)
-	this.Optional = bool(r.Intn(2) == 0)
+	this.ID = string(randStringApplicationserverWeb(r))
+	this.Name = string(randStringApplicationserverWeb(r))
+	this.Description = string(randStringApplicationserverWeb(r))
+	this.Secret = bool(bool(r.Intn(2) == 0))
+	this.DefaultValue = string(randStringApplicationserverWeb(r))
+	this.Optional = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3151,12 +3151,12 @@ func NewPopulatedApplicationWebhookTemplate(r randyApplicationserverWeb, easy bo
 	this := &ApplicationWebhookTemplate{}
 	v2 := NewPopulatedApplicationWebhookTemplateIdentifiers(r, easy)
 	this.ApplicationWebhookTemplateIdentifiers = *v2
-	this.Name = randStringApplicationserverWeb(r)
-	this.Description = randStringApplicationserverWeb(r)
-	this.LogoURL = randStringApplicationserverWeb(r)
-	this.InfoURL = randStringApplicationserverWeb(r)
-	this.DocumentationURL = randStringApplicationserverWeb(r)
-	this.BaseURL = randStringApplicationserverWeb(r)
+	this.Name = string(randStringApplicationserverWeb(r))
+	this.Description = string(randStringApplicationserverWeb(r))
+	this.LogoURL = string(randStringApplicationserverWeb(r))
+	this.InfoURL = string(randStringApplicationserverWeb(r))
+	this.DocumentationURL = string(randStringApplicationserverWeb(r))
+	this.BaseURL = string(randStringApplicationserverWeb(r))
 	if r.Intn(5) != 0 {
 		v3 := r.Intn(10)
 		this.Headers = make(map[string]string)
@@ -3164,7 +3164,7 @@ func NewPopulatedApplicationWebhookTemplate(r randyApplicationserverWeb, easy bo
 			this.Headers[randStringApplicationserverWeb(r)] = randStringApplicationserverWeb(r)
 		}
 	}
-	this.Format = randStringApplicationserverWeb(r)
+	this.Format = string(randStringApplicationserverWeb(r))
 	if r.Intn(5) != 0 {
 		v4 := r.Intn(5)
 		this.Fields = make([]*ApplicationWebhookTemplateField, v4)
@@ -3196,7 +3196,7 @@ func NewPopulatedApplicationWebhookTemplate(r randyApplicationserverWeb, easy bo
 	if r.Intn(5) != 0 {
 		this.LocationSolved = NewPopulatedApplicationWebhookTemplate_Message(r, easy)
 	}
-	this.CreateDownlinkAPIKey = bool(r.Intn(2) == 0)
+	this.CreateDownlinkAPIKey = bool(bool(r.Intn(2) == 0))
 	if r.Intn(5) != 0 {
 		this.ServiceData = NewPopulatedApplicationWebhookTemplate_Message(r, easy)
 	}
@@ -3210,7 +3210,7 @@ func NewPopulatedApplicationWebhookTemplate(r randyApplicationserverWeb, easy bo
 
 func NewPopulatedApplicationWebhookTemplate_Message(r randyApplicationserverWeb, easy bool) *ApplicationWebhookTemplate_Message {
 	this := &ApplicationWebhookTemplate_Message{}
-	this.Path = randStringApplicationserverWeb(r)
+	this.Path = string(randStringApplicationserverWeb(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3238,7 +3238,7 @@ func NewPopulatedApplicationWebhook(r randyApplicationserverWeb, easy bool) *App
 	this.CreatedAt = *v7
 	v8 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v8
-	this.BaseURL = randStringApplicationserverWeb(r)
+	this.BaseURL = string(randStringApplicationserverWeb(r))
 	if r.Intn(5) != 0 {
 		v9 := r.Intn(10)
 		this.Headers = make(map[string]string)
@@ -3246,7 +3246,7 @@ func NewPopulatedApplicationWebhook(r randyApplicationserverWeb, easy bool) *App
 			this.Headers[randStringApplicationserverWeb(r)] = randStringApplicationserverWeb(r)
 		}
 	}
-	this.Format = randStringApplicationserverWeb(r)
+	this.Format = string(randStringApplicationserverWeb(r))
 	if r.Intn(5) != 0 {
 		this.UplinkMessage = NewPopulatedApplicationWebhook_Message(r, easy)
 	}
@@ -3281,7 +3281,7 @@ func NewPopulatedApplicationWebhook(r randyApplicationserverWeb, easy bool) *App
 			this.TemplateFields[randStringApplicationserverWeb(r)] = randStringApplicationserverWeb(r)
 		}
 	}
-	this.DownlinkAPIKey = randStringApplicationserverWeb(r)
+	this.DownlinkAPIKey = string(randStringApplicationserverWeb(r))
 	if r.Intn(5) != 0 {
 		this.ServiceData = NewPopulatedApplicationWebhook_Message(r, easy)
 	}
@@ -3295,7 +3295,7 @@ func NewPopulatedApplicationWebhook(r randyApplicationserverWeb, easy bool) *App
 
 func NewPopulatedApplicationWebhook_Message(r randyApplicationserverWeb, easy bool) *ApplicationWebhook_Message {
 	this := &ApplicationWebhook_Message{}
-	this.Path = randStringApplicationserverWeb(r)
+	this.Path = string(randStringApplicationserverWeb(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3453,7 +3453,7 @@ func randFieldApplicationserverWeb(dAtA []byte, r randyApplicationserverWeb, fie
 }
 func encodeVarintPopulateApplicationserverWeb(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -3851,7 +3851,7 @@ func sovApplicationserverWeb(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozApplicationserverWeb(x uint64) (n int) {
-	return sovApplicationserverWeb((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovApplicationserverWeb(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *ApplicationWebhookIdentifiers) String() string {
 	if this == nil {

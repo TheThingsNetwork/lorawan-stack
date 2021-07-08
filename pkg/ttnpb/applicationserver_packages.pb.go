@@ -2378,8 +2378,8 @@ func encodeVarintApplicationserverPackages(dAtA []byte, offset int, v uint64) in
 }
 func NewPopulatedApplicationPackage(r randyApplicationserverPackages, easy bool) *ApplicationPackage {
 	this := &ApplicationPackage{}
-	this.Name = randStringApplicationserverPackages(r)
-	this.DefaultFPort = r.Uint32()
+	this.Name = string(randStringApplicationserverPackages(r))
+	this.DefaultFPort = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2403,7 +2403,7 @@ func NewPopulatedApplicationPackageAssociationIdentifiers(r randyApplicationserv
 	this := &ApplicationPackageAssociationIdentifiers{}
 	v2 := NewPopulatedEndDeviceIdentifiers(r, easy)
 	this.EndDeviceIdentifiers = *v2
-	this.FPort = r.Uint32()
+	this.FPort = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2417,7 +2417,7 @@ func NewPopulatedApplicationPackageAssociation(r randyApplicationserverPackages,
 	this.CreatedAt = *v4
 	v5 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v5
-	this.PackageName = randStringApplicationserverPackages(r)
+	this.PackageName = string(randStringApplicationserverPackages(r))
 	if r.Intn(5) != 0 {
 		this.Data = types.NewPopulatedStruct(r, easy)
 	}
@@ -2456,8 +2456,8 @@ func NewPopulatedListApplicationPackageAssociationRequest(r randyApplicationserv
 	this := &ListApplicationPackageAssociationRequest{}
 	v8 := NewPopulatedEndDeviceIdentifiers(r, easy)
 	this.EndDeviceIdentifiers = *v8
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
@@ -2482,7 +2482,7 @@ func NewPopulatedApplicationPackageDefaultAssociationIdentifiers(r randyApplicat
 	this := &ApplicationPackageDefaultAssociationIdentifiers{}
 	v10 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v10
-	this.FPort = r.Uint32()
+	this.FPort = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2496,7 +2496,7 @@ func NewPopulatedApplicationPackageDefaultAssociation(r randyApplicationserverPa
 	this.CreatedAt = *v12
 	v13 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v13
-	this.PackageName = randStringApplicationserverPackages(r)
+	this.PackageName = string(randStringApplicationserverPackages(r))
 	if r.Intn(5) != 0 {
 		this.Data = types.NewPopulatedStruct(r, easy)
 	}
@@ -2535,8 +2535,8 @@ func NewPopulatedListApplicationPackageDefaultAssociationRequest(r randyApplicat
 	this := &ListApplicationPackageDefaultAssociationRequest{}
 	v16 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v16
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
@@ -2623,7 +2623,7 @@ func randFieldApplicationserverPackages(dAtA []byte, r randyApplicationserverPac
 }
 func encodeVarintPopulateApplicationserverPackages(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2870,7 +2870,7 @@ func sovApplicationserverPackages(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozApplicationserverPackages(x uint64) (n int) {
-	return sovApplicationserverPackages((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovApplicationserverPackages(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *ApplicationPackage) String() string {
 	if this == nil {

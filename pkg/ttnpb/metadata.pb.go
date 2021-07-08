@@ -997,25 +997,25 @@ func (m *RxMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	if m.SNR != 0 {
 		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.SNR)))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.SNR))))
 		i--
 		dAtA[i] = 0x5d
 	}
 	if m.RSSIStandardDeviation != 0 {
 		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSIStandardDeviation)))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSIStandardDeviation))))
 		i--
 		dAtA[i] = 0x55
 	}
 	if m.ChannelRSSI != 0 {
 		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.ChannelRSSI)))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.ChannelRSSI))))
 		i--
 		dAtA[i] = 0x4d
 	}
 	if m.RSSI != 0 {
 		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSI)))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSI))))
 		i--
 		dAtA[i] = 0x45
 	}
@@ -1034,7 +1034,7 @@ func (m *RxMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x32
 	}
 	if m.FineTimestamp != 0 {
-		i = encodeVarintMetadata(dAtA, i, m.FineTimestamp)
+		i = encodeVarintMetadata(dAtA, i, uint64(m.FineTimestamp))
 		i--
 		dAtA[i] = 0x28
 	}
@@ -1108,13 +1108,13 @@ func (m *Location) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	if m.Longitude != 0 {
 		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], math.Float64bits(float64(m.Longitude)))
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Longitude))))
 		i--
 		dAtA[i] = 0x11
 	}
 	if m.Latitude != 0 {
 		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], math.Float64bits(float64(m.Latitude)))
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Latitude))))
 		i--
 		dAtA[i] = 0x9
 	}
@@ -1317,11 +1317,11 @@ func NewPopulatedLocation(r randyMetadata, easy bool) *Location {
 	if r.Intn(2) == 0 {
 		this.Longitude *= -1
 	}
-	this.Altitude = r.Int31()
+	this.Altitude = int32(r.Int31())
 	if r.Intn(2) == 0 {
 		this.Altitude *= -1
 	}
-	this.Accuracy = r.Int31()
+	this.Accuracy = int32(r.Int31())
 	if r.Intn(2) == 0 {
 		this.Accuracy *= -1
 	}
@@ -1333,14 +1333,14 @@ func NewPopulatedLocation(r randyMetadata, easy bool) *Location {
 
 func NewPopulatedPacketBrokerMetadata(r randyMetadata, easy bool) *PacketBrokerMetadata {
 	this := &PacketBrokerMetadata{}
-	this.MessageId = randStringMetadata(r)
+	this.MessageId = string(randStringMetadata(r))
 	v1 := go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedNetID(r)
 	this.ForwarderNetId = *v1
-	this.ForwarderTenantId = randStringMetadata(r)
-	this.ForwarderClusterId = randStringMetadata(r)
+	this.ForwarderTenantId = string(randStringMetadata(r))
+	this.ForwarderClusterId = string(randStringMetadata(r))
 	v2 := go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedNetID(r)
 	this.HomeNetworkNetId = *v2
-	this.HomeNetworkTenantId = randStringMetadata(r)
+	this.HomeNetworkTenantId = string(randStringMetadata(r))
 	if r.Intn(5) != 0 {
 		v3 := r.Intn(5)
 		this.Hops = make([]*PacketBrokerRouteHop, v3)
@@ -1348,7 +1348,7 @@ func NewPopulatedPacketBrokerMetadata(r randyMetadata, easy bool) *PacketBrokerM
 			this.Hops[i] = NewPopulatedPacketBrokerRouteHop(r, easy)
 		}
 	}
-	this.HomeNetworkClusterId = randStringMetadata(r)
+	this.HomeNetworkClusterId = string(randStringMetadata(r))
 	this.ForwarderGatewayEui = go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedEUI64(r)
 	if r.Intn(5) != 0 {
 		this.ForwarderGatewayId = types.NewPopulatedStringValue(r, easy)
@@ -1362,10 +1362,10 @@ func NewPopulatedPacketBrokerRouteHop(r randyMetadata, easy bool) *PacketBrokerR
 	this := &PacketBrokerRouteHop{}
 	v4 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.ReceivedAt = *v4
-	this.SenderName = randStringMetadata(r)
-	this.SenderAddress = randStringMetadata(r)
-	this.ReceiverName = randStringMetadata(r)
-	this.ReceiverAgent = randStringMetadata(r)
+	this.SenderName = string(randStringMetadata(r))
+	this.SenderAddress = string(randStringMetadata(r))
+	this.ReceiverName = string(randStringMetadata(r))
+	this.ReceiverAgent = string(randStringMetadata(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1437,7 +1437,7 @@ func randFieldMetadata(dAtA []byte, r randyMetadata, fieldNumber int, wire int) 
 }
 func encodeVarintPopulateMetadata(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1462,7 +1462,7 @@ func (m *RxMetadata) Size() (n int) {
 		n += 1 + sovMetadata(uint64(m.Timestamp))
 	}
 	if m.FineTimestamp != 0 {
-		n += 1 + sovMetadata(m.FineTimestamp)
+		n += 1 + sovMetadata(uint64(m.FineTimestamp))
 	}
 	l = len(m.EncryptedFineTimestamp)
 	if l > 0 {
@@ -1618,7 +1618,7 @@ func sovMetadata(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozMetadata(x uint64) (n int) {
-	return sovMetadata((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovMetadata(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *RxMetadata) String() string {
 	if this == nil {
@@ -1937,7 +1937,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
 			m.RSSI = float32(math.Float32frombits(v))
 		case 9:
@@ -1948,7 +1948,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
 			m.ChannelRSSI = float32(math.Float32frombits(v))
 		case 10:
@@ -1959,7 +1959,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
 			m.RSSIStandardDeviation = float32(math.Float32frombits(v))
 		case 11:
@@ -1970,7 +1970,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
 			m.SNR = float32(math.Float32frombits(v))
 		case 12:
@@ -2269,7 +2269,7 @@ func (m *Location) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 8) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:])
+			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
 			iNdEx += 8
 			m.Latitude = float64(math.Float64frombits(v))
 		case 2:
@@ -2280,7 +2280,7 @@ func (m *Location) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 8) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:])
+			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
 			iNdEx += 8
 			m.Longitude = float64(math.Float64frombits(v))
 		case 3:

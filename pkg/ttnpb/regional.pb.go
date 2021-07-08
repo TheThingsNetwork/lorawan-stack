@@ -735,7 +735,7 @@ func (m *ConcentratorConfig_Channel) MarshalToSizedBuffer(dAtA []byte) (int, err
 		dAtA[i] = 0x10
 	}
 	if m.Frequency != 0 {
-		i = encodeVarintRegional(dAtA, i, m.Frequency)
+		i = encodeVarintRegional(dAtA, i, uint64(m.Frequency))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -778,7 +778,7 @@ func (m *ConcentratorConfig_LoRaStandardChannel) MarshalToSizedBuffer(dAtA []byt
 		dAtA[i] = 0x10
 	}
 	if m.Frequency != 0 {
-		i = encodeVarintRegional(dAtA, i, m.Frequency)
+		i = encodeVarintRegional(dAtA, i, uint64(m.Frequency))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -811,7 +811,7 @@ func (m *ConcentratorConfig_FSKChannel) MarshalToSizedBuffer(dAtA []byte) (int, 
 		dAtA[i] = 0x10
 	}
 	if m.Frequency != 0 {
-		i = encodeVarintRegional(dAtA, i, m.Frequency)
+		i = encodeVarintRegional(dAtA, i, uint64(m.Frequency))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -848,13 +848,13 @@ func (m *ConcentratorConfig_LBTConfiguration) MarshalToSizedBuffer(dAtA []byte) 
 	dAtA[i] = 0x1a
 	if m.RSSIOffset != 0 {
 		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSIOffset)))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSIOffset))))
 		i--
 		dAtA[i] = 0x15
 	}
 	if m.RSSITarget != 0 {
 		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSITarget)))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSITarget))))
 		i--
 		dAtA[i] = 0xd
 	}
@@ -900,7 +900,7 @@ func NewPopulatedConcentratorConfig(r randyRegional, easy bool) *ConcentratorCon
 			this.Radios[i] = NewPopulatedGatewayRadio(r, easy)
 		}
 	}
-	this.ClockSource = r.Uint32()
+	this.ClockSource = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -908,8 +908,8 @@ func NewPopulatedConcentratorConfig(r randyRegional, easy bool) *ConcentratorCon
 
 func NewPopulatedConcentratorConfig_Channel(r randyRegional, easy bool) *ConcentratorConfig_Channel {
 	this := &ConcentratorConfig_Channel{}
-	this.Frequency = uint64(r.Uint32())
-	this.Radio = r.Uint32()
+	this.Frequency = uint64(uint64(r.Uint32()))
+	this.Radio = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -917,10 +917,10 @@ func NewPopulatedConcentratorConfig_Channel(r randyRegional, easy bool) *Concent
 
 func NewPopulatedConcentratorConfig_LoRaStandardChannel(r randyRegional, easy bool) *ConcentratorConfig_LoRaStandardChannel {
 	this := &ConcentratorConfig_LoRaStandardChannel{}
-	this.Frequency = uint64(r.Uint32())
-	this.Radio = r.Uint32()
-	this.Bandwidth = r.Uint32()
-	this.SpreadingFactor = r.Uint32()
+	this.Frequency = uint64(uint64(r.Uint32()))
+	this.Radio = uint32(r.Uint32())
+	this.Bandwidth = uint32(r.Uint32())
+	this.SpreadingFactor = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -928,8 +928,8 @@ func NewPopulatedConcentratorConfig_LoRaStandardChannel(r randyRegional, easy bo
 
 func NewPopulatedConcentratorConfig_FSKChannel(r randyRegional, easy bool) *ConcentratorConfig_FSKChannel {
 	this := &ConcentratorConfig_FSKChannel{}
-	this.Frequency = uint64(r.Uint32())
-	this.Radio = r.Uint32()
+	this.Frequency = uint64(uint64(r.Uint32()))
+	this.Radio = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1018,7 +1018,7 @@ func randFieldRegional(dAtA []byte, r randyRegional, fieldNumber int, wire int) 
 }
 func encodeVarintPopulateRegional(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1071,7 +1071,7 @@ func (m *ConcentratorConfig_Channel) Size() (n int) {
 	var l int
 	_ = l
 	if m.Frequency != 0 {
-		n += 1 + sovRegional(m.Frequency)
+		n += 1 + sovRegional(uint64(m.Frequency))
 	}
 	if m.Radio != 0 {
 		n += 1 + sovRegional(uint64(m.Radio))
@@ -1086,7 +1086,7 @@ func (m *ConcentratorConfig_LoRaStandardChannel) Size() (n int) {
 	var l int
 	_ = l
 	if m.Frequency != 0 {
-		n += 1 + sovRegional(m.Frequency)
+		n += 1 + sovRegional(uint64(m.Frequency))
 	}
 	if m.Radio != 0 {
 		n += 1 + sovRegional(uint64(m.Radio))
@@ -1107,7 +1107,7 @@ func (m *ConcentratorConfig_FSKChannel) Size() (n int) {
 	var l int
 	_ = l
 	if m.Frequency != 0 {
-		n += 1 + sovRegional(m.Frequency)
+		n += 1 + sovRegional(uint64(m.Frequency))
 	}
 	if m.Radio != 0 {
 		n += 1 + sovRegional(uint64(m.Radio))
@@ -1136,7 +1136,7 @@ func sovRegional(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozRegional(x uint64) (n int) {
-	return sovRegional((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovRegional(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *ConcentratorConfig) String() string {
 	if this == nil {
@@ -1851,7 +1851,7 @@ func (m *ConcentratorConfig_LBTConfiguration) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
 			m.RSSITarget = float32(math.Float32frombits(v))
 		case 2:
@@ -1862,7 +1862,7 @@ func (m *ConcentratorConfig_LBTConfiguration) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
 			m.RSSIOffset = float32(math.Float32frombits(v))
 		case 3:

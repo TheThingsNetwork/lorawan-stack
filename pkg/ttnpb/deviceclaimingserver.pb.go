@@ -2155,13 +2155,13 @@ func NewPopulatedClaimEndDeviceRequest(r randyDeviceclaimingserver, easy bool) *
 	}
 	v1 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.TargetApplicationIds = *v1
-	this.TargetDeviceId = randStringDeviceclaimingserver(r)
-	this.InvalidateAuthenticationCode = bool(r.Intn(2) == 0)
-	this.TargetNetworkServerAddress = randStringDeviceclaimingserver(r)
-	this.TargetNetworkServerKEKLabel = randStringDeviceclaimingserver(r)
-	this.TargetApplicationServerAddress = randStringDeviceclaimingserver(r)
-	this.TargetApplicationServerKEKLabel = randStringDeviceclaimingserver(r)
-	this.TargetApplicationServerID = randStringDeviceclaimingserver(r)
+	this.TargetDeviceId = string(randStringDeviceclaimingserver(r))
+	this.InvalidateAuthenticationCode = bool(bool(r.Intn(2) == 0))
+	this.TargetNetworkServerAddress = string(randStringDeviceclaimingserver(r))
+	this.TargetNetworkServerKEKLabel = string(randStringDeviceclaimingserver(r))
+	this.TargetApplicationServerAddress = string(randStringDeviceclaimingserver(r))
+	this.TargetApplicationServerKEKLabel = string(randStringDeviceclaimingserver(r))
+	this.TargetApplicationServerID = string(randStringDeviceclaimingserver(r))
 	this.TargetNetID = go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedNetID(r)
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -2188,7 +2188,7 @@ func NewPopulatedClaimEndDeviceRequest_AuthenticatedIdentifiers(r randyDevicecla
 	this.JoinEui = *v3
 	v4 := go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedEUI64(r)
 	this.DevEui = *v4
-	this.AuthenticationCode = randStringDeviceclaimingserver(r)
+	this.AuthenticationCode = string(randStringDeviceclaimingserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2198,7 +2198,7 @@ func NewPopulatedAuthorizeApplicationRequest(r randyDeviceclaimingserver, easy b
 	this := &AuthorizeApplicationRequest{}
 	v5 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v5
-	this.APIKey = randStringDeviceclaimingserver(r)
+	this.APIKey = string(randStringDeviceclaimingserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2206,8 +2206,8 @@ func NewPopulatedAuthorizeApplicationRequest(r randyDeviceclaimingserver, easy b
 
 func NewPopulatedCUPSRedirection(r randyDeviceclaimingserver, easy bool) *CUPSRedirection {
 	this := &CUPSRedirection{}
-	this.TargetCUPSURI = randStringDeviceclaimingserver(r)
-	this.CurrentGatewayKey = randStringDeviceclaimingserver(r)
+	this.TargetCUPSURI = string(randStringDeviceclaimingserver(r))
+	this.CurrentGatewayKey = string(randStringDeviceclaimingserver(r))
 	v6 := r.Intn(100)
 	this.TargetCupsTrust = make([]byte, v6)
 	for i := 0; i < v6; i++ {
@@ -2232,7 +2232,7 @@ func NewPopulatedCUPSRedirection_ClientTls(r randyDeviceclaimingserver, easy boo
 }
 func NewPopulatedCUPSRedirection_AuthToken(r randyDeviceclaimingserver, easy bool) *CUPSRedirection_AuthToken {
 	this := &CUPSRedirection_AuthToken{}
-	this.AuthToken = randStringDeviceclaimingserver(r)
+	this.AuthToken = string(randStringDeviceclaimingserver(r))
 	return this
 }
 func NewPopulatedCUPSRedirection_ClientTLS(r randyDeviceclaimingserver, easy bool) *CUPSRedirection_ClientTLS {
@@ -2263,12 +2263,12 @@ func NewPopulatedClaimGatewayRequest(r randyDeviceclaimingserver, easy bool) *Cl
 	}
 	v9 := NewPopulatedOrganizationOrUserIdentifiers(r, easy)
 	this.Collaborator = *v9
-	this.TargetGatewayId = randStringDeviceclaimingserver(r)
-	this.TargetGatewayServerAddress = randStringDeviceclaimingserver(r)
+	this.TargetGatewayId = string(randStringDeviceclaimingserver(r))
+	this.TargetGatewayServerAddress = string(randStringDeviceclaimingserver(r))
 	if r.Intn(5) != 0 {
 		this.CUPSRedirection = NewPopulatedCUPSRedirection(r, easy)
 	}
-	this.TargetFrequencyPlanId = randStringDeviceclaimingserver(r)
+	this.TargetFrequencyPlanId = string(randStringDeviceclaimingserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2306,7 +2306,7 @@ func NewPopulatedAuthorizeGatewayRequest(r randyDeviceclaimingserver, easy bool)
 	this := &AuthorizeGatewayRequest{}
 	v13 := NewPopulatedGatewayIdentifiers(r, easy)
 	this.GatewayIdentifiers = *v13
-	this.APIKey = randStringDeviceclaimingserver(r)
+	this.APIKey = string(randStringDeviceclaimingserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2378,7 +2378,7 @@ func randFieldDeviceclaimingserver(dAtA []byte, r randyDeviceclaimingserver, fie
 }
 func encodeVarintPopulateDeviceclaimingserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2636,7 +2636,7 @@ func sovDeviceclaimingserver(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozDeviceclaimingserver(x uint64) (n int) {
-	return sovDeviceclaimingserver((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovDeviceclaimingserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *ClaimEndDeviceRequest) String() string {
 	if this == nil {

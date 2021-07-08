@@ -3861,7 +3861,7 @@ func NewPopulatedCryptoServicePayloadRequest(r randyJoinserver, easy bool) *Cryp
 	for i := 0; i < v9; i++ {
 		this.Payload[i] = byte(r.Intn(256))
 	}
-	this.ProvisionerID = randStringJoinserver(r)
+	this.ProvisionerID = string(randStringJoinserver(r))
 	if r.Intn(5) != 0 {
 		this.ProvisioningData = types.NewPopulatedStruct(r, easy)
 	}
@@ -3905,7 +3905,7 @@ func NewPopulatedDeriveSessionKeysRequest(r randyJoinserver, easy bool) *DeriveS
 	this.DevNonce = *v15
 	v16 := go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedNetID(r)
 	this.NetID = *v16
-	this.ProvisionerID = randStringJoinserver(r)
+	this.ProvisionerID = string(randStringJoinserver(r))
 	if r.Intn(5) != 0 {
 		this.ProvisioningData = types.NewPopulatedStruct(r, easy)
 	}
@@ -3918,7 +3918,7 @@ func NewPopulatedGetRootKeysRequest(r randyJoinserver, easy bool) *GetRootKeysRe
 	this := &GetRootKeysRequest{}
 	v17 := NewPopulatedEndDeviceIdentifiers(r, easy)
 	this.EndDeviceIdentifiers = *v17
-	this.ProvisionerID = randStringJoinserver(r)
+	this.ProvisionerID = string(randStringJoinserver(r))
 	if r.Intn(5) != 0 {
 		this.ProvisioningData = types.NewPopulatedStruct(r, easy)
 	}
@@ -3931,7 +3931,7 @@ func NewPopulatedProvisionEndDevicesRequest(r randyJoinserver, easy bool) *Provi
 	this := &ProvisionEndDevicesRequest{}
 	v18 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v18
-	this.ProvisionerID = randStringJoinserver(r)
+	this.ProvisionerID = string(randStringJoinserver(r))
 	v19 := r.Intn(100)
 	this.ProvisioningData = make([]byte, v19)
 	for i := 0; i < v19; i++ {
@@ -4002,12 +4002,12 @@ func NewPopulatedProvisionEndDevicesRequest_IdentifiersFromData(r randyJoinserve
 
 func NewPopulatedApplicationActivationSettings(r randyJoinserver, easy bool) *ApplicationActivationSettings {
 	this := &ApplicationActivationSettings{}
-	this.KEKLabel = randStringJoinserver(r)
+	this.KEKLabel = string(randStringJoinserver(r))
 	if r.Intn(5) != 0 {
 		this.KEK = NewPopulatedKeyEnvelope(r, easy)
 	}
 	this.HomeNetID = go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedNetID(r)
-	this.ApplicationServerID = randStringJoinserver(r)
+	this.ApplicationServerID = string(randStringJoinserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4052,7 +4052,7 @@ func NewPopulatedJoinEUIPrefix(r randyJoinserver, easy bool) *JoinEUIPrefix {
 	this := &JoinEUIPrefix{}
 	v27 := go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedEUI64(r)
 	this.JoinEui = *v27
-	this.Length = r.Uint32()
+	this.Length = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4139,7 +4139,7 @@ func randFieldJoinserver(dAtA []byte, r randyJoinserver, fieldNumber int, wire i
 }
 func encodeVarintPopulateJoinserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -4496,7 +4496,7 @@ func sovJoinserver(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozJoinserver(x uint64) (n int) {
-	return sovJoinserver((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovJoinserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *SessionKeyRequest) String() string {
 	if this == nil {

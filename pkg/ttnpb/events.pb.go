@@ -1155,7 +1155,7 @@ func encodeVarintEvents(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedEvent(r randyEvents, easy bool) *Event {
 	this := &Event{}
-	this.Name = randStringEvents(r)
+	this.Name = string(randStringEvents(r))
 	v1 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.Time = *v1
 	if r.Intn(5) != 0 {
@@ -1171,9 +1171,9 @@ func NewPopulatedEvent(r randyEvents, easy bool) *Event {
 	v3 := r.Intn(10)
 	this.CorrelationIDs = make([]string, v3)
 	for i := 0; i < v3; i++ {
-		this.CorrelationIDs[i] = randStringEvents(r)
+		this.CorrelationIDs[i] = string(randStringEvents(r))
 	}
-	this.Origin = randStringEvents(r)
+	this.Origin = string(randStringEvents(r))
 	if r.Intn(5) != 0 {
 		v4 := r.Intn(10)
 		this.Context = make(map[string][]byte)
@@ -1192,9 +1192,9 @@ func NewPopulatedEvent(r randyEvents, easy bool) *Event {
 	if r.Intn(5) != 0 {
 		this.Authentication = NewPopulatedEvent_Authentication(r, easy)
 	}
-	this.RemoteIP = randStringEvents(r)
-	this.UserAgent = randStringEvents(r)
-	this.UniqueID = randStringEvents(r)
+	this.RemoteIP = string(randStringEvents(r))
+	this.UserAgent = string(randStringEvents(r))
+	this.UniqueID = string(randStringEvents(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1202,9 +1202,9 @@ func NewPopulatedEvent(r randyEvents, easy bool) *Event {
 
 func NewPopulatedEvent_Authentication(r randyEvents, easy bool) *Event_Authentication {
 	this := &Event_Authentication{}
-	this.Type = randStringEvents(r)
-	this.TokenType = randStringEvents(r)
-	this.TokenID = randStringEvents(r)
+	this.Type = string(randStringEvents(r))
+	this.TokenType = string(randStringEvents(r))
+	this.TokenID = string(randStringEvents(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1219,7 +1219,7 @@ func NewPopulatedStreamEventsRequest(r randyEvents, easy bool) *StreamEventsRequ
 			this.Identifiers[i] = NewPopulatedEntityIdentifiers(r, easy)
 		}
 	}
-	this.Tail = r.Uint32()
+	this.Tail = uint32(r.Uint32())
 	if r.Intn(5) != 0 {
 		this.After = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
@@ -1230,7 +1230,7 @@ func NewPopulatedStreamEventsRequest(r randyEvents, easy bool) *StreamEventsRequ
 
 func NewPopulatedFindRelatedEventsRequest(r randyEvents, easy bool) *FindRelatedEventsRequest {
 	this := &FindRelatedEventsRequest{}
-	this.CorrelationID = randStringEvents(r)
+	this.CorrelationID = string(randStringEvents(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1316,7 +1316,7 @@ func randFieldEvents(dAtA []byte, r randyEvents, fieldNumber int, wire int) []by
 }
 func encodeVarintPopulateEvents(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1464,7 +1464,7 @@ func sovEvents(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozEvents(x uint64) (n int) {
-	return sovEvents((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovEvents(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *Event) String() string {
 	if this == nil {

@@ -356,7 +356,7 @@ func NewPopulatedPicture(r randyPicture, easy bool) *Picture {
 		v1 := r.Intn(10)
 		this.Sizes = make(map[uint32]string)
 		for i := 0; i < v1; i++ {
-			this.Sizes[r.Uint32()] = randStringPicture(r)
+			this.Sizes[uint32(r.Uint32())] = randStringPicture(r)
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -366,7 +366,7 @@ func NewPopulatedPicture(r randyPicture, easy bool) *Picture {
 
 func NewPopulatedPicture_Embedded(r randyPicture, easy bool) *Picture_Embedded {
 	this := &Picture_Embedded{}
-	this.MimeType = randStringPicture(r)
+	this.MimeType = string(randStringPicture(r))
 	v2 := r.Intn(100)
 	this.Data = make([]byte, v2)
 	for i := 0; i < v2; i++ {
@@ -443,7 +443,7 @@ func randFieldPicture(dAtA []byte, r randyPicture, fieldNumber int, wire int) []
 }
 func encodeVarintPopulatePicture(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -491,7 +491,7 @@ func sovPicture(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozPicture(x uint64) (n int) {
-	return sovPicture((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovPicture(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *Picture) String() string {
 	if this == nil {

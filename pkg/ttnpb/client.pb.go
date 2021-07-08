@@ -1733,8 +1733,8 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 	this.CreatedAt = *v2
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v3
-	this.Name = randStringClient(r)
-	this.Description = randStringClient(r)
+	this.Name = string(randStringClient(r))
+	this.Description = string(randStringClient(r))
 	if r.Intn(5) != 0 {
 		v4 := r.Intn(10)
 		this.Attributes = make(map[string]string)
@@ -1749,15 +1749,15 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 			this.ContactInfo[i] = NewPopulatedContactInfo(r, easy)
 		}
 	}
-	this.Secret = randStringClient(r)
+	this.Secret = string(randStringClient(r))
 	v6 := r.Intn(10)
 	this.RedirectURIs = make([]string, v6)
 	for i := 0; i < v6; i++ {
-		this.RedirectURIs[i] = randStringClient(r)
+		this.RedirectURIs[i] = string(randStringClient(r))
 	}
 	this.State = State([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.SkipAuthorization = bool(r.Intn(2) == 0)
-	this.Endorsed = bool(r.Intn(2) == 0)
+	this.SkipAuthorization = bool(bool(r.Intn(2) == 0))
+	this.Endorsed = bool(bool(r.Intn(2) == 0))
 	v7 := r.Intn(10)
 	this.Grants = make([]GrantType, v7)
 	for i := 0; i < v7; i++ {
@@ -1771,12 +1771,12 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 	v9 := r.Intn(10)
 	this.LogoutRedirectURIs = make([]string, v9)
 	for i := 0; i < v9; i++ {
-		this.LogoutRedirectURIs[i] = randStringClient(r)
+		this.LogoutRedirectURIs[i] = string(randStringClient(r))
 	}
 	if r.Intn(5) != 0 {
 		this.DeletedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	this.StateDescription = randStringClient(r)
+	this.StateDescription = string(randStringClient(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1816,10 +1816,10 @@ func NewPopulatedListClientsRequest(r randyClient, easy bool) *ListClientsReques
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.Order = randStringClient(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.Deleted = bool(r.Intn(2) == 0)
+	this.Order = string(randStringClient(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.Deleted = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1852,8 +1852,8 @@ func NewPopulatedListClientCollaboratorsRequest(r randyClient, easy bool) *ListC
 	this := &ListClientCollaboratorsRequest{}
 	v15 := NewPopulatedClientIdentifiers(r, easy)
 	this.ClientIdentifiers = *v15
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1947,7 +1947,7 @@ func randFieldClient(dAtA []byte, r randyClient, fieldNumber int, wire int) []by
 }
 func encodeVarintPopulateClient(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2172,7 +2172,7 @@ func sovClient(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozClient(x uint64) (n int) {
-	return sovClient((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovClient(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *Client) String() string {
 	if this == nil {

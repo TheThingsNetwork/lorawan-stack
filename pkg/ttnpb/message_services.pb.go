@@ -779,7 +779,7 @@ func NewPopulatedEncodeDownlinkMessageRequest(r randyMessageServices, easy bool)
 	v3 := NewPopulatedApplicationDownlink(r, easy)
 	this.Message = *v3
 	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.Parameter = randStringMessageServices(r)
+	this.Parameter = string(randStringMessageServices(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -794,7 +794,7 @@ func NewPopulatedDecodeUplinkMessageRequest(r randyMessageServices, easy bool) *
 	v6 := NewPopulatedApplicationUplink(r, easy)
 	this.Message = *v6
 	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.Parameter = randStringMessageServices(r)
+	this.Parameter = string(randStringMessageServices(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -809,7 +809,7 @@ func NewPopulatedDecodeDownlinkMessageRequest(r randyMessageServices, easy bool)
 	v9 := NewPopulatedApplicationDownlink(r, easy)
 	this.Message = *v9
 	this.Formatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.Parameter = randStringMessageServices(r)
+	this.Parameter = string(randStringMessageServices(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -881,7 +881,7 @@ func randFieldMessageServices(dAtA []byte, r randyMessageServices, fieldNumber i
 }
 func encodeVarintPopulateMessageServices(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -957,7 +957,7 @@ func sovMessageServices(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozMessageServices(x uint64) (n int) {
-	return sovMessageServices((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovMessageServices(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *EncodeDownlinkMessageRequest) String() string {
 	if this == nil {

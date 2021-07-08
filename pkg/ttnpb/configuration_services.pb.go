@@ -541,7 +541,7 @@ func encodeVarintConfigurationServices(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedListFrequencyPlansRequest(r randyConfigurationServices, easy bool) *ListFrequencyPlansRequest {
 	this := &ListFrequencyPlansRequest{}
-	this.BaseFrequency = r.Uint32()
+	this.BaseFrequency = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -549,10 +549,10 @@ func NewPopulatedListFrequencyPlansRequest(r randyConfigurationServices, easy bo
 
 func NewPopulatedFrequencyPlanDescription(r randyConfigurationServices, easy bool) *FrequencyPlanDescription {
 	this := &FrequencyPlanDescription{}
-	this.ID = randStringConfigurationServices(r)
-	this.BaseID = randStringConfigurationServices(r)
-	this.Name = randStringConfigurationServices(r)
-	this.BaseFrequency = r.Uint32()
+	this.ID = string(randStringConfigurationServices(r))
+	this.BaseID = string(randStringConfigurationServices(r))
+	this.Name = string(randStringConfigurationServices(r))
+	this.BaseFrequency = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -638,7 +638,7 @@ func randFieldConfigurationServices(dAtA []byte, r randyConfigurationServices, f
 }
 func encodeVarintPopulateConfigurationServices(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -699,7 +699,7 @@ func sovConfigurationServices(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozConfigurationServices(x uint64) (n int) {
-	return sovConfigurationServices((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovConfigurationServices(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *ListFrequencyPlansRequest) String() string {
 	if this == nil {

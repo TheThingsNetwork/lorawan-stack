@@ -2270,9 +2270,9 @@ func encodeVarintSearchServices(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedSearchApplicationsRequest(r randySearchServices, easy bool) *SearchApplicationsRequest {
 	this := &SearchApplicationsRequest{}
-	this.IDContains = randStringSearchServices(r)
-	this.NameContains = randStringSearchServices(r)
-	this.DescriptionContains = randStringSearchServices(r)
+	this.IDContains = string(randStringSearchServices(r))
+	this.NameContains = string(randStringSearchServices(r))
+	this.DescriptionContains = string(randStringSearchServices(r))
 	if r.Intn(5) != 0 {
 		v1 := r.Intn(10)
 		this.AttributesContain = make(map[string]string)
@@ -2283,10 +2283,10 @@ func NewPopulatedSearchApplicationsRequest(r randySearchServices, easy bool) *Se
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.Order = randStringSearchServices(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.Deleted = bool(r.Intn(2) == 0)
+	this.Order = string(randStringSearchServices(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.Deleted = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2294,9 +2294,9 @@ func NewPopulatedSearchApplicationsRequest(r randySearchServices, easy bool) *Se
 
 func NewPopulatedSearchClientsRequest(r randySearchServices, easy bool) *SearchClientsRequest {
 	this := &SearchClientsRequest{}
-	this.IDContains = randStringSearchServices(r)
-	this.NameContains = randStringSearchServices(r)
-	this.DescriptionContains = randStringSearchServices(r)
+	this.IDContains = string(randStringSearchServices(r))
+	this.NameContains = string(randStringSearchServices(r))
+	this.DescriptionContains = string(randStringSearchServices(r))
 	if r.Intn(5) != 0 {
 		v2 := r.Intn(10)
 		this.AttributesContain = make(map[string]string)
@@ -2312,10 +2312,10 @@ func NewPopulatedSearchClientsRequest(r randySearchServices, easy bool) *SearchC
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.Order = randStringSearchServices(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.Deleted = bool(r.Intn(2) == 0)
+	this.Order = string(randStringSearchServices(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.Deleted = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2323,9 +2323,9 @@ func NewPopulatedSearchClientsRequest(r randySearchServices, easy bool) *SearchC
 
 func NewPopulatedSearchGatewaysRequest(r randySearchServices, easy bool) *SearchGatewaysRequest {
 	this := &SearchGatewaysRequest{}
-	this.IDContains = randStringSearchServices(r)
-	this.NameContains = randStringSearchServices(r)
-	this.DescriptionContains = randStringSearchServices(r)
+	this.IDContains = string(randStringSearchServices(r))
+	this.NameContains = string(randStringSearchServices(r))
+	this.DescriptionContains = string(randStringSearchServices(r))
 	if r.Intn(5) != 0 {
 		v4 := r.Intn(10)
 		this.AttributesContain = make(map[string]string)
@@ -2333,14 +2333,14 @@ func NewPopulatedSearchGatewaysRequest(r randySearchServices, easy bool) *Search
 			this.AttributesContain[randStringSearchServices(r)] = randStringSearchServices(r)
 		}
 	}
-	this.EuiContains = randStringSearchServices(r)
+	this.EuiContains = string(randStringSearchServices(r))
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.Order = randStringSearchServices(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.Deleted = bool(r.Intn(2) == 0)
+	this.Order = string(randStringSearchServices(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.Deleted = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2348,9 +2348,9 @@ func NewPopulatedSearchGatewaysRequest(r randySearchServices, easy bool) *Search
 
 func NewPopulatedSearchOrganizationsRequest(r randySearchServices, easy bool) *SearchOrganizationsRequest {
 	this := &SearchOrganizationsRequest{}
-	this.IDContains = randStringSearchServices(r)
-	this.NameContains = randStringSearchServices(r)
-	this.DescriptionContains = randStringSearchServices(r)
+	this.IDContains = string(randStringSearchServices(r))
+	this.NameContains = string(randStringSearchServices(r))
+	this.DescriptionContains = string(randStringSearchServices(r))
 	if r.Intn(5) != 0 {
 		v5 := r.Intn(10)
 		this.AttributesContain = make(map[string]string)
@@ -2361,10 +2361,10 @@ func NewPopulatedSearchOrganizationsRequest(r randySearchServices, easy bool) *S
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.Order = randStringSearchServices(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.Deleted = bool(r.Intn(2) == 0)
+	this.Order = string(randStringSearchServices(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.Deleted = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2372,9 +2372,9 @@ func NewPopulatedSearchOrganizationsRequest(r randySearchServices, easy bool) *S
 
 func NewPopulatedSearchUsersRequest(r randySearchServices, easy bool) *SearchUsersRequest {
 	this := &SearchUsersRequest{}
-	this.IDContains = randStringSearchServices(r)
-	this.NameContains = randStringSearchServices(r)
-	this.DescriptionContains = randStringSearchServices(r)
+	this.IDContains = string(randStringSearchServices(r))
+	this.NameContains = string(randStringSearchServices(r))
+	this.DescriptionContains = string(randStringSearchServices(r))
 	if r.Intn(5) != 0 {
 		v6 := r.Intn(10)
 		this.AttributesContain = make(map[string]string)
@@ -2390,10 +2390,10 @@ func NewPopulatedSearchUsersRequest(r randySearchServices, easy bool) *SearchUse
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.Order = randStringSearchServices(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.Deleted = bool(r.Intn(2) == 0)
+	this.Order = string(randStringSearchServices(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.Deleted = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2403,9 +2403,9 @@ func NewPopulatedSearchEndDevicesRequest(r randySearchServices, easy bool) *Sear
 	this := &SearchEndDevicesRequest{}
 	v8 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v8
-	this.IDContains = randStringSearchServices(r)
-	this.NameContains = randStringSearchServices(r)
-	this.DescriptionContains = randStringSearchServices(r)
+	this.IDContains = string(randStringSearchServices(r))
+	this.NameContains = string(randStringSearchServices(r))
+	this.DescriptionContains = string(randStringSearchServices(r))
 	if r.Intn(5) != 0 {
 		v9 := r.Intn(10)
 		this.AttributesContain = make(map[string]string)
@@ -2413,15 +2413,15 @@ func NewPopulatedSearchEndDevicesRequest(r randySearchServices, easy bool) *Sear
 			this.AttributesContain[randStringSearchServices(r)] = randStringSearchServices(r)
 		}
 	}
-	this.DevEuiContains = randStringSearchServices(r)
-	this.JoinEuiContains = randStringSearchServices(r)
-	this.DevAddrContains = randStringSearchServices(r)
+	this.DevEuiContains = string(randStringSearchServices(r))
+	this.JoinEuiContains = string(randStringSearchServices(r))
+	this.DevAddrContains = string(randStringSearchServices(r))
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.Order = randStringSearchServices(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Order = string(randStringSearchServices(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2493,7 +2493,7 @@ func randFieldSearchServices(dAtA []byte, r randySearchServices, fieldNumber int
 }
 func encodeVarintPopulateSearchServices(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2808,7 +2808,7 @@ func sovSearchServices(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozSearchServices(x uint64) (n int) {
-	return sovSearchServices((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovSearchServices(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *SearchApplicationsRequest) String() string {
 	if this == nil {

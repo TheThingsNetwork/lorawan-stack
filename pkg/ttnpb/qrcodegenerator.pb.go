@@ -1026,7 +1026,7 @@ func encodeVarintQrcodegenerator(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedGenerateEndDeviceQRCodeRequest_Image(r randyQrcodegenerator, easy bool) *GenerateEndDeviceQRCodeRequest_Image {
 	this := &GenerateEndDeviceQRCodeRequest_Image{}
-	this.ImageSize = r.Uint32()
+	this.ImageSize = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1098,7 +1098,7 @@ func randFieldQrcodegenerator(dAtA []byte, r randyQrcodegenerator, fieldNumber i
 }
 func encodeVarintPopulateQrcodegenerator(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1212,7 +1212,7 @@ func sovQrcodegenerator(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozQrcodegenerator(x uint64) (n int) {
-	return sovQrcodegenerator((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovQrcodegenerator(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *QRCodeFormat) String() string {
 	if this == nil {

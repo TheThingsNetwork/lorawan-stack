@@ -1723,9 +1723,9 @@ func NewPopulatedListOAuthClientAuthorizationsRequest(r randyOauth, easy bool) *
 	this := &ListOAuthClientAuthorizationsRequest{}
 	v9 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v9
-	this.Order = randStringOauth(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Order = string(randStringOauth(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1742,14 +1742,14 @@ func NewPopulatedOAuthAuthorizationCode(r randyOauth, easy bool) *OAuthAuthoriza
 	for i := 0; i < v12; i++ {
 		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 56, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 57, 58, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55}[r.Intn(59)])
 	}
-	this.Code = randStringOauth(r)
-	this.RedirectURI = randStringOauth(r)
-	this.State = randStringOauth(r)
+	this.Code = string(randStringOauth(r))
+	this.RedirectURI = string(randStringOauth(r))
+	this.State = string(randStringOauth(r))
 	v13 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v13
 	v14 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.ExpiresAt = *v14
-	this.UserSessionID = randStringOauth(r)
+	this.UserSessionID = string(randStringOauth(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1761,7 +1761,7 @@ func NewPopulatedOAuthAccessTokenIdentifiers(r randyOauth, easy bool) *OAuthAcce
 	this.UserIds = *v15
 	v16 := NewPopulatedClientIdentifiers(r, easy)
 	this.ClientIds = *v16
-	this.ID = randStringOauth(r)
+	this.ID = string(randStringOauth(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1773,9 +1773,9 @@ func NewPopulatedOAuthAccessToken(r randyOauth, easy bool) *OAuthAccessToken {
 	this.UserIds = *v17
 	v18 := NewPopulatedClientIdentifiers(r, easy)
 	this.ClientIds = *v18
-	this.ID = randStringOauth(r)
-	this.AccessToken = randStringOauth(r)
-	this.RefreshToken = randStringOauth(r)
+	this.ID = string(randStringOauth(r))
+	this.AccessToken = string(randStringOauth(r))
+	this.RefreshToken = string(randStringOauth(r))
 	v19 := r.Intn(10)
 	this.Rights = make([]Right, v19)
 	for i := 0; i < v19; i++ {
@@ -1785,7 +1785,7 @@ func NewPopulatedOAuthAccessToken(r randyOauth, easy bool) *OAuthAccessToken {
 	this.CreatedAt = *v20
 	v21 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.ExpiresAt = *v21
-	this.UserSessionID = randStringOauth(r)
+	this.UserSessionID = string(randStringOauth(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1811,9 +1811,9 @@ func NewPopulatedListOAuthAccessTokensRequest(r randyOauth, easy bool) *ListOAut
 	this.UserIds = *v23
 	v24 := NewPopulatedClientIdentifiers(r, easy)
 	this.ClientIds = *v24
-	this.Order = randStringOauth(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Order = string(randStringOauth(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1885,7 +1885,7 @@ func randFieldOauth(dAtA []byte, r randyOauth, fieldNumber int, wire int) []byte
 }
 func encodeVarintPopulateOauth(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2103,7 +2103,7 @@ func sovOauth(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozOauth(x uint64) (n int) {
-	return sovOauth((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovOauth(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *OAuthClientAuthorizationIdentifiers) String() string {
 	if this == nil {

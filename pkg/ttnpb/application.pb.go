@@ -2109,8 +2109,8 @@ func NewPopulatedApplication(r randyApplication, easy bool) *Application {
 	this.CreatedAt = *v2
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v3
-	this.Name = randStringApplication(r)
-	this.Description = randStringApplication(r)
+	this.Name = string(randStringApplication(r))
+	this.Description = string(randStringApplication(r))
 	if r.Intn(5) != 0 {
 		v4 := r.Intn(10)
 		this.Attributes = make(map[string]string)
@@ -2176,10 +2176,10 @@ func NewPopulatedListApplicationsRequest(r randyApplication, easy bool) *ListApp
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.Order = randStringApplication(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
-	this.Deleted = bool(r.Intn(2) == 0)
+	this.Order = string(randStringApplication(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
+	this.Deleted = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2212,8 +2212,8 @@ func NewPopulatedListApplicationAPIKeysRequest(r randyApplication, easy bool) *L
 	this := &ListApplicationAPIKeysRequest{}
 	v12 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v12
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2223,7 +2223,7 @@ func NewPopulatedGetApplicationAPIKeyRequest(r randyApplication, easy bool) *Get
 	this := &GetApplicationAPIKeyRequest{}
 	v13 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v13
-	this.KeyID = randStringApplication(r)
+	this.KeyID = string(randStringApplication(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2233,7 +2233,7 @@ func NewPopulatedCreateApplicationAPIKeyRequest(r randyApplication, easy bool) *
 	this := &CreateApplicationAPIKeyRequest{}
 	v14 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v14
-	this.Name = randStringApplication(r)
+	this.Name = string(randStringApplication(r))
 	v15 := r.Intn(10)
 	this.Rights = make([]Right, v15)
 	for i := 0; i < v15; i++ {
@@ -2265,8 +2265,8 @@ func NewPopulatedListApplicationCollaboratorsRequest(r randyApplication, easy bo
 	this := &ListApplicationCollaboratorsRequest{}
 	v18 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v18
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2360,7 +2360,7 @@ func randFieldApplication(dAtA []byte, r randyApplication, fieldNumber int, wire
 }
 func encodeVarintPopulateApplication(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2628,7 +2628,7 @@ func sovApplication(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozApplication(x uint64) (n int) {
-	return sovApplication((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovApplication(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *Application) String() string {
 	if this == nil {

@@ -9102,7 +9102,7 @@ func (m *TxSettings) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x28
 	}
 	if m.Frequency != 0 {
-		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Frequency))
 		i--
 		dAtA[i] = 0x20
 	}
@@ -9163,7 +9163,7 @@ func (m *TxSettings_Downlink) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	if m.TxPower != 0 {
 		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.TxPower)))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.TxPower))))
 		i--
 		dAtA[i] = 0x15
 	}
@@ -9395,7 +9395,7 @@ func (m *TxRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x40
 	}
 	if m.Rx2Frequency != 0 {
-		i = encodeVarintLorawan(dAtA, i, m.Rx2Frequency)
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx2Frequency))
 		i--
 		dAtA[i] = 0x38
 	}
@@ -9405,7 +9405,7 @@ func (m *TxRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x30
 	}
 	if m.Rx1Frequency != 0 {
-		i = encodeVarintLorawan(dAtA, i, m.Rx1Frequency)
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx1Frequency))
 		i--
 		dAtA[i] = 0x28
 	}
@@ -10405,7 +10405,7 @@ func (m *MACCommand_RxParamSetupReq) MarshalToSizedBuffer(dAtA []byte) (int, err
 	var l int
 	_ = l
 	if m.Rx2Frequency != 0 {
-		i = encodeVarintLorawan(dAtA, i, m.Rx2Frequency)
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx2Frequency))
 		i--
 		dAtA[i] = 0x18
 	}
@@ -10539,7 +10539,7 @@ func (m *MACCommand_NewChannelReq) MarshalToSizedBuffer(dAtA []byte) (int, error
 		dAtA[i] = 0x18
 	}
 	if m.Frequency != 0 {
-		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Frequency))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -10615,7 +10615,7 @@ func (m *MACCommand_DLChannelReq) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	var l int
 	_ = l
 	if m.Frequency != 0 {
-		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Frequency))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -11029,7 +11029,7 @@ func (m *MACCommand_PingSlotChannelReq) MarshalToSizedBuffer(dAtA []byte) (int, 
 		dAtA[i] = 0x10
 	}
 	if m.Frequency != 0 {
-		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Frequency))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -11133,7 +11133,7 @@ func (m *MACCommand_BeaconFreqReq) MarshalToSizedBuffer(dAtA []byte) (int, error
 	var l int
 	_ = l
 	if m.Frequency != 0 {
-		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Frequency))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -11250,7 +11250,7 @@ func (m *FrequencyValue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if m.Value != 0 {
-		i = encodeVarintLorawan(dAtA, i, m.Value)
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Value))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -11503,11 +11503,11 @@ func NewPopulatedMHDR(r randyLorawan, easy bool) *MHDR {
 
 func NewPopulatedFCtrl(r randyLorawan, easy bool) *FCtrl {
 	this := &FCtrl{}
-	this.ADR = bool(r.Intn(2) == 0)
-	this.ADRAckReq = bool(r.Intn(2) == 0)
-	this.Ack = bool(r.Intn(2) == 0)
-	this.FPending = bool(r.Intn(2) == 0)
-	this.ClassB = bool(r.Intn(2) == 0)
+	this.ADR = bool(bool(r.Intn(2) == 0))
+	this.ADRAckReq = bool(bool(r.Intn(2) == 0))
+	this.Ack = bool(bool(r.Intn(2) == 0))
+	this.FPending = bool(bool(r.Intn(2) == 0))
+	this.ClassB = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11515,8 +11515,8 @@ func NewPopulatedFCtrl(r randyLorawan, easy bool) *FCtrl {
 
 func NewPopulatedLoRaDataRate(r randyLorawan, easy bool) *LoRaDataRate {
 	this := &LoRaDataRate{}
-	this.Bandwidth = r.Uint32()
-	this.SpreadingFactor = r.Uint32()
+	this.Bandwidth = uint32(r.Uint32())
+	this.SpreadingFactor = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11524,7 +11524,7 @@ func NewPopulatedLoRaDataRate(r randyLorawan, easy bool) *LoRaDataRate {
 
 func NewPopulatedFSKDataRate(r randyLorawan, easy bool) *FSKDataRate {
 	this := &FSKDataRate{}
-	this.BitRate = r.Uint32()
+	this.BitRate = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11556,12 +11556,12 @@ func NewPopulatedDataRate_FSK(r randyLorawan, easy bool) *DataRate_FSK {
 }
 func NewPopulatedTxSettings_Downlink(r randyLorawan, easy bool) *TxSettings_Downlink {
 	this := &TxSettings_Downlink{}
-	this.AntennaIndex = r.Uint32()
+	this.AntennaIndex = uint32(r.Uint32())
 	this.TxPower = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.TxPower *= -1
 	}
-	this.InvertPolarization = bool(r.Intn(2) == 0)
+	this.InvertPolarization = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11571,7 +11571,7 @@ func NewPopulatedGatewayAntennaIdentifiers(r randyLorawan, easy bool) *GatewayAn
 	this := &GatewayAntennaIdentifiers{}
 	v1 := NewPopulatedGatewayIdentifiers(r, easy)
 	this.GatewayIdentifiers = *v1
-	this.AntennaIndex = r.Uint32()
+	this.AntennaIndex = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11581,10 +11581,10 @@ func NewPopulatedUplinkToken(r randyLorawan, easy bool) *UplinkToken {
 	this := &UplinkToken{}
 	v2 := NewPopulatedGatewayAntennaIdentifiers(r, easy)
 	this.GatewayAntennaIdentifiers = *v2
-	this.Timestamp = r.Uint32()
+	this.Timestamp = uint32(r.Uint32())
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.ServerTime = *v3
-	this.ConcentratorTime = r.Int63()
+	this.ConcentratorTime = int64(r.Int63())
 	if r.Intn(2) == 0 {
 		this.ConcentratorTime *= -1
 	}
@@ -11623,9 +11623,9 @@ func NewPopulatedDownlinkPath_Fixed(r randyLorawan, easy bool) *DownlinkPath_Fix
 }
 func NewPopulatedMACCommand_LinkADRAns(r randyLorawan, easy bool) *MACCommand_LinkADRAns {
 	this := &MACCommand_LinkADRAns{}
-	this.ChannelMaskAck = bool(r.Intn(2) == 0)
-	this.DataRateIndexAck = bool(r.Intn(2) == 0)
-	this.TxPowerIndexAck = bool(r.Intn(2) == 0)
+	this.ChannelMaskAck = bool(bool(r.Intn(2) == 0))
+	this.DataRateIndexAck = bool(bool(r.Intn(2) == 0))
+	this.TxPowerIndexAck = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11641,9 +11641,9 @@ func NewPopulatedMACCommand_DutyCycleReq(r randyLorawan, easy bool) *MACCommand_
 
 func NewPopulatedMACCommand_RxParamSetupAns(r randyLorawan, easy bool) *MACCommand_RxParamSetupAns {
 	this := &MACCommand_RxParamSetupAns{}
-	this.Rx2DataRateIndexAck = bool(r.Intn(2) == 0)
-	this.Rx1DataRateOffsetAck = bool(r.Intn(2) == 0)
-	this.Rx2FrequencyAck = bool(r.Intn(2) == 0)
+	this.Rx2DataRateIndexAck = bool(bool(r.Intn(2) == 0))
+	this.Rx1DataRateOffsetAck = bool(bool(r.Intn(2) == 0))
+	this.Rx2FrequencyAck = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11651,8 +11651,8 @@ func NewPopulatedMACCommand_RxParamSetupAns(r randyLorawan, easy bool) *MACComma
 
 func NewPopulatedMACCommand_NewChannelAns(r randyLorawan, easy bool) *MACCommand_NewChannelAns {
 	this := &MACCommand_NewChannelAns{}
-	this.FrequencyAck = bool(r.Intn(2) == 0)
-	this.DataRateAck = bool(r.Intn(2) == 0)
+	this.FrequencyAck = bool(bool(r.Intn(2) == 0))
+	this.DataRateAck = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11660,8 +11660,8 @@ func NewPopulatedMACCommand_NewChannelAns(r randyLorawan, easy bool) *MACCommand
 
 func NewPopulatedMACCommand_DLChannelAns(r randyLorawan, easy bool) *MACCommand_DLChannelAns {
 	this := &MACCommand_DLChannelAns{}
-	this.ChannelIndexAck = bool(r.Intn(2) == 0)
-	this.FrequencyAck = bool(r.Intn(2) == 0)
+	this.ChannelIndexAck = bool(bool(r.Intn(2) == 0))
+	this.FrequencyAck = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11678,8 +11678,8 @@ func NewPopulatedMACCommand_RxTimingSetupReq(r randyLorawan, easy bool) *MACComm
 func NewPopulatedMACCommand_TxParamSetupReq(r randyLorawan, easy bool) *MACCommand_TxParamSetupReq {
 	this := &MACCommand_TxParamSetupReq{}
 	this.MaxEIRPIndex = DeviceEIRP([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
-	this.UplinkDwellTime = bool(r.Intn(2) == 0)
-	this.DownlinkDwellTime = bool(r.Intn(2) == 0)
+	this.UplinkDwellTime = bool(bool(r.Intn(2) == 0))
+	this.DownlinkDwellTime = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11730,7 +11730,7 @@ func NewPopulatedMACCommand_RejoinParamSetupReq(r randyLorawan, easy bool) *MACC
 
 func NewPopulatedMACCommand_RejoinParamSetupAns(r randyLorawan, easy bool) *MACCommand_RejoinParamSetupAns {
 	this := &MACCommand_RejoinParamSetupAns{}
-	this.MaxTimeExponentAck = bool(r.Intn(2) == 0)
+	this.MaxTimeExponentAck = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11746,8 +11746,8 @@ func NewPopulatedMACCommand_PingSlotInfoReq(r randyLorawan, easy bool) *MACComma
 
 func NewPopulatedMACCommand_PingSlotChannelAns(r randyLorawan, easy bool) *MACCommand_PingSlotChannelAns {
 	this := &MACCommand_PingSlotChannelAns{}
-	this.FrequencyAck = bool(r.Intn(2) == 0)
-	this.DataRateIndexAck = bool(r.Intn(2) == 0)
+	this.FrequencyAck = bool(bool(r.Intn(2) == 0))
+	this.DataRateIndexAck = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11755,7 +11755,7 @@ func NewPopulatedMACCommand_PingSlotChannelAns(r randyLorawan, easy bool) *MACCo
 
 func NewPopulatedMACCommand_BeaconFreqAns(r randyLorawan, easy bool) *MACCommand_BeaconFreqAns {
 	this := &MACCommand_BeaconFreqAns{}
-	this.FrequencyAck = bool(r.Intn(2) == 0)
+	this.FrequencyAck = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11779,7 +11779,7 @@ func NewPopulatedMACCommand_DeviceModeConf(r randyLorawan, easy bool) *MACComman
 
 func NewPopulatedFrequencyValue(r randyLorawan, easy bool) *FrequencyValue {
 	this := &FrequencyValue{}
-	this.Value = uint64(r.Uint32())
+	this.Value = uint64(uint64(r.Uint32()))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -11915,7 +11915,7 @@ func randFieldLorawan(dAtA []byte, r randyLorawan, fieldNumber int, wire int) []
 }
 func encodeVarintPopulateLorawan(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -12254,7 +12254,7 @@ func (m *TxSettings) Size() (n int) {
 		n += 1 + l + sovLorawan(uint64(l))
 	}
 	if m.Frequency != 0 {
-		n += 1 + sovLorawan(m.Frequency)
+		n += 1 + sovLorawan(uint64(m.Frequency))
 	}
 	if m.EnableCRC {
 		n += 2
@@ -12382,13 +12382,13 @@ func (m *TxRequest) Size() (n int) {
 		n += 1 + sovLorawan(uint64(m.Rx1DataRateIndex))
 	}
 	if m.Rx1Frequency != 0 {
-		n += 1 + sovLorawan(m.Rx1Frequency)
+		n += 1 + sovLorawan(uint64(m.Rx1Frequency))
 	}
 	if m.Rx2DataRateIndex != 0 {
 		n += 1 + sovLorawan(uint64(m.Rx2DataRateIndex))
 	}
 	if m.Rx2Frequency != 0 {
-		n += 1 + sovLorawan(m.Rx2Frequency)
+		n += 1 + sovLorawan(uint64(m.Rx2Frequency))
 	}
 	if m.Priority != 0 {
 		n += 1 + sovLorawan(uint64(m.Priority))
@@ -12904,7 +12904,7 @@ func (m *MACCommand_RxParamSetupReq) Size() (n int) {
 		n += 1 + sovLorawan(uint64(m.Rx1DataRateOffset))
 	}
 	if m.Rx2Frequency != 0 {
-		n += 1 + sovLorawan(m.Rx2Frequency)
+		n += 1 + sovLorawan(uint64(m.Rx2Frequency))
 	}
 	return n
 }
@@ -12952,7 +12952,7 @@ func (m *MACCommand_NewChannelReq) Size() (n int) {
 		n += 1 + sovLorawan(uint64(m.ChannelIndex))
 	}
 	if m.Frequency != 0 {
-		n += 1 + sovLorawan(m.Frequency)
+		n += 1 + sovLorawan(uint64(m.Frequency))
 	}
 	if m.MinDataRateIndex != 0 {
 		n += 1 + sovLorawan(uint64(m.MinDataRateIndex))
@@ -12988,7 +12988,7 @@ func (m *MACCommand_DLChannelReq) Size() (n int) {
 		n += 1 + sovLorawan(uint64(m.ChannelIndex))
 	}
 	if m.Frequency != 0 {
-		n += 1 + sovLorawan(m.Frequency)
+		n += 1 + sovLorawan(uint64(m.Frequency))
 	}
 	return n
 }
@@ -13155,7 +13155,7 @@ func (m *MACCommand_PingSlotChannelReq) Size() (n int) {
 	var l int
 	_ = l
 	if m.Frequency != 0 {
-		n += 1 + sovLorawan(m.Frequency)
+		n += 1 + sovLorawan(uint64(m.Frequency))
 	}
 	if m.DataRateIndex != 0 {
 		n += 1 + sovLorawan(uint64(m.DataRateIndex))
@@ -13200,7 +13200,7 @@ func (m *MACCommand_BeaconFreqReq) Size() (n int) {
 	var l int
 	_ = l
 	if m.Frequency != 0 {
-		n += 1 + sovLorawan(m.Frequency)
+		n += 1 + sovLorawan(uint64(m.Frequency))
 	}
 	return n
 }
@@ -13248,7 +13248,7 @@ func (m *FrequencyValue) Size() (n int) {
 	var l int
 	_ = l
 	if m.Value != 0 {
-		n += 1 + sovLorawan(m.Value)
+		n += 1 + sovLorawan(uint64(m.Value))
 	}
 	return n
 }
@@ -13353,7 +13353,7 @@ func sovLorawan(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozLorawan(x uint64) (n int) {
-	return sovLorawan((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovLorawan(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *Message) String() string {
 	if this == nil {
@@ -16856,7 +16856,7 @@ func (m *TxSettings_Downlink) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
 			m.TxPower = float32(math.Float32frombits(v))
 		case 3:

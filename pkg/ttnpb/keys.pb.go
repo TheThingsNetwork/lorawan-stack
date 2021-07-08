@@ -593,7 +593,7 @@ func encodeVarintKeys(dAtA []byte, offset int, v uint64) int {
 func NewPopulatedKeyEnvelope(r randyKeys, easy bool) *KeyEnvelope {
 	this := &KeyEnvelope{}
 	this.Key = go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedAES128Key(r)
-	this.KEKLabel = randStringKeys(r)
+	this.KEKLabel = string(randStringKeys(r))
 	v1 := r.Intn(100)
 	this.EncryptedKey = make([]byte, v1)
 	for i := 0; i < v1; i++ {
@@ -606,7 +606,7 @@ func NewPopulatedKeyEnvelope(r randyKeys, easy bool) *KeyEnvelope {
 
 func NewPopulatedRootKeys(r randyKeys, easy bool) *RootKeys {
 	this := &RootKeys{}
-	this.RootKeyID = randStringKeys(r)
+	this.RootKeyID = string(randStringKeys(r))
 	if r.Intn(5) != 0 {
 		this.AppKey = NewPopulatedKeyEnvelope(r, easy)
 	}
@@ -684,7 +684,7 @@ func randFieldKeys(dAtA []byte, r randyKeys, fieldNumber int, wire int) []byte {
 }
 func encodeVarintPopulateKeys(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -765,7 +765,7 @@ func sovKeys(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozKeys(x uint64) (n int) {
-	return sovKeys((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovKeys(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *KeyEnvelope) String() string {
 	if this == nil {

@@ -544,7 +544,7 @@ func NewPopulatedGetStoredApplicationUpRequest(r randyApplicationserverIntegrati
 	if r.Intn(5) != 0 {
 		this.EndDeviceIds = NewPopulatedEndDeviceIdentifiers(r, easy)
 	}
-	this.Type = randStringApplicationserverIntegrationsStorage(r)
+	this.Type = string(randStringApplicationserverIntegrationsStorage(r))
 	if r.Intn(5) != 0 {
 		this.Limit = types.NewPopulatedUInt32Value(r, easy)
 	}
@@ -557,7 +557,7 @@ func NewPopulatedGetStoredApplicationUpRequest(r randyApplicationserverIntegrati
 	if r.Intn(5) != 0 {
 		this.FPort = types.NewPopulatedUInt32Value(r, easy)
 	}
-	this.Order = randStringApplicationserverIntegrationsStorage(r)
+	this.Order = string(randStringApplicationserverIntegrationsStorage(r))
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
@@ -635,7 +635,7 @@ func randFieldApplicationserverIntegrationsStorage(dAtA []byte, r randyApplicati
 }
 func encodeVarintPopulateApplicationserverIntegrationsStorage(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -694,7 +694,7 @@ func sovApplicationserverIntegrationsStorage(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozApplicationserverIntegrationsStorage(x uint64) (n int) {
-	return sovApplicationserverIntegrationsStorage((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovApplicationserverIntegrationsStorage(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *GetStoredApplicationUpRequest) String() string {
 	if this == nil {

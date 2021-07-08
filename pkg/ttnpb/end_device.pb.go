@@ -4639,7 +4639,7 @@ func (m *MACParameters) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		}
 	}
 	if m.BeaconFrequency != 0 {
-		i = encodeVarintEndDevice(dAtA, i, m.BeaconFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.BeaconFrequency))
 		i--
 		dAtA[i] = 0x1
 		i--
@@ -4653,7 +4653,7 @@ func (m *MACParameters) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x88
 	}
 	if m.PingSlotFrequency != 0 {
-		i = encodeVarintEndDevice(dAtA, i, m.PingSlotFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotFrequency))
 		i--
 		dAtA[i] = 0x1
 		i--
@@ -4675,7 +4675,7 @@ func (m *MACParameters) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x68
 	}
 	if m.Rx2Frequency != 0 {
-		i = encodeVarintEndDevice(dAtA, i, m.Rx2Frequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx2Frequency))
 		i--
 		dAtA[i] = 0x60
 	}
@@ -4721,7 +4721,7 @@ func (m *MACParameters) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	if m.MaxEIRP != 0 {
 		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.MaxEIRP)))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.MaxEIRP))))
 		i--
 		dAtA[i] = 0xd
 	}
@@ -4769,12 +4769,12 @@ func (m *MACParameters_Channel) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x18
 	}
 	if m.DownlinkFrequency != 0 {
-		i = encodeVarintEndDevice(dAtA, i, m.DownlinkFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DownlinkFrequency))
 		i--
 		dAtA[i] = 0x10
 	}
 	if m.UplinkFrequency != 0 {
-		i = encodeVarintEndDevice(dAtA, i, m.UplinkFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.UplinkFrequency))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -4832,12 +4832,12 @@ func (m *EndDeviceVersion) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x58
 	}
 	if m.MaxFrequency != 0 {
-		i = encodeVarintEndDevice(dAtA, i, m.MaxFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxFrequency))
 		i--
 		dAtA[i] = 0x50
 	}
 	if m.MinFrequency != 0 {
-		i = encodeVarintEndDevice(dAtA, i, m.MinFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MinFrequency))
 		i--
 		dAtA[i] = 0x48
 	}
@@ -5191,7 +5191,7 @@ func (m *MACSettings) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		var j30 int
 		for _, num := range m.FactoryPresetFrequencies {
 			for num >= 1<<7 {
-				dAtA31[j30] = uint8(num&0x7f | 0x80)
+				dAtA31[j30] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
 				j30++
 			}
@@ -5354,7 +5354,7 @@ func (m *MACState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i--
 				dAtA[i] = 0x12
 			}
-			i = encodeVarintEndDevice(dAtA, i, k)
+			i = encodeVarintEndDevice(dAtA, i, uint64(k))
 			i--
 			dAtA[i] = 0x8
 			i = encodeVarintEndDevice(dAtA, i, uint64(baseI-i))
@@ -5381,7 +5381,7 @@ func (m *MACState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		var j43 int
 		for _, num := range m.RejectedFrequencies {
 			for num >= 1<<7 {
-				dAtA44[j43] = uint8(num&0x7f | 0x80)
+				dAtA44[j43] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
 				j43++
 			}
@@ -6236,14 +6236,14 @@ func (m *EndDevice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa0
 	}
 	if m.MaxFrequency != 0 {
-		i = encodeVarintEndDevice(dAtA, i, m.MaxFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxFrequency))
 		i--
 		dAtA[i] = 0x1
 		i--
 		dAtA[i] = 0x98
 	}
 	if m.MinFrequency != 0 {
-		i = encodeVarintEndDevice(dAtA, i, m.MinFrequency)
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MinFrequency))
 		i--
 		dAtA[i] = 0x1
 		i--
@@ -7014,10 +7014,10 @@ func NewPopulatedSession(r randyEndDevice, easy bool) *Session {
 	this.DevAddr = *v1
 	v2 := NewPopulatedSessionKeys(r, easy)
 	this.SessionKeys = *v2
-	this.LastFCntUp = r.Uint32()
-	this.LastNFCntDown = r.Uint32()
-	this.LastAFCntDown = r.Uint32()
-	this.LastConfFCntDown = r.Uint32()
+	this.LastFCntUp = uint32(r.Uint32())
+	this.LastNFCntDown = uint32(r.Uint32())
+	this.LastAFCntDown = uint32(r.Uint32())
+	this.LastConfFCntDown = uint32(r.Uint32())
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.StartedAt = *v3
 	if r.Intn(5) != 0 {
@@ -7034,7 +7034,7 @@ func NewPopulatedSession(r randyEndDevice, easy bool) *Session {
 
 func NewPopulatedBoolValue(r randyEndDevice, easy bool) *BoolValue {
 	this := &BoolValue{}
-	this.Value = bool(r.Intn(2) == 0)
+	this.Value = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -7072,7 +7072,7 @@ func NewPopulatedMACSettings(r randyEndDevice, easy bool) *MACSettings {
 	v5 := r.Intn(10)
 	this.FactoryPresetFrequencies = make([]uint64, v5)
 	for i := 0; i < v5; i++ {
-		this.FactoryPresetFrequencies[i] = uint64(r.Uint32())
+		this.FactoryPresetFrequencies[i] = uint64(uint64(r.Uint32()))
 	}
 	if r.Intn(5) != 0 {
 		this.MaxDutyCycle = NewPopulatedAggregatedDutyCycleValue(r, easy)
@@ -7163,7 +7163,7 @@ func NewPopulatedMACState_JoinAccept(r randyEndDevice, easy bool) *MACState_Join
 	v10 := r.Intn(10)
 	this.CorrelationIDs = make([]string, v10)
 	for i := 0; i < v10; i++ {
-		this.CorrelationIDs[i] = randStringEndDevice(r)
+		this.CorrelationIDs[i] = string(randStringEndDevice(r))
 	}
 	v11 := go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedDevAddr(r)
 	this.DevAddr = *v11
@@ -7199,7 +7199,7 @@ func NewPopulatedMACState_DataRateRanges(r randyEndDevice, easy bool) *MACState_
 
 func NewPopulatedEndDeviceAuthenticationCode(r randyEndDevice, easy bool) *EndDeviceAuthenticationCode {
 	this := &EndDeviceAuthenticationCode{}
-	this.Value = randStringEndDevice(r)
+	this.Value = string(randStringEndDevice(r))
 	if r.Intn(5) != 0 {
 		this.ValidFrom = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
@@ -7219,8 +7219,8 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	this.CreatedAt = *v15
 	v16 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v16
-	this.Name = randStringEndDevice(r)
-	this.Description = randStringEndDevice(r)
+	this.Name = string(randStringEndDevice(r))
+	this.Description = string(randStringEndDevice(r))
 	if r.Intn(5) != 0 {
 		v17 := r.Intn(10)
 		this.Attributes = make(map[string]string)
@@ -7231,10 +7231,10 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(5) != 0 {
 		this.VersionIDs = NewPopulatedEndDeviceVersionIdentifiers(r, easy)
 	}
-	this.ServiceProfileID = randStringEndDevice(r)
-	this.NetworkServerAddress = randStringEndDevice(r)
-	this.ApplicationServerAddress = randStringEndDevice(r)
-	this.JoinServerAddress = randStringEndDevice(r)
+	this.ServiceProfileID = string(randStringEndDevice(r))
+	this.NetworkServerAddress = string(randStringEndDevice(r))
+	this.ApplicationServerAddress = string(randStringEndDevice(r))
+	this.JoinServerAddress = string(randStringEndDevice(r))
 	if r.Intn(5) != 0 {
 		v18 := r.Intn(10)
 		this.Locations = make(map[string]*Location)
@@ -7242,15 +7242,15 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 			this.Locations[randStringEndDevice(r)] = NewPopulatedLocation(r, easy)
 		}
 	}
-	this.SupportsClassB = bool(r.Intn(2) == 0)
-	this.SupportsClassC = bool(r.Intn(2) == 0)
+	this.SupportsClassB = bool(bool(r.Intn(2) == 0))
+	this.SupportsClassC = bool(bool(r.Intn(2) == 0))
 	this.LoRaWANVersion = MACVersion([]int32{0, 1, 2, 3, 4, 5, 6}[r.Intn(7)])
 	this.LoRaWANPHYVersion = PHYVersion([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}[r.Intn(12)])
-	this.FrequencyPlanID = randStringEndDevice(r)
-	this.MinFrequency = uint64(r.Uint32())
-	this.MaxFrequency = uint64(r.Uint32())
-	this.SupportsJoin = bool(r.Intn(2) == 0)
-	this.ResetsJoinNonces = bool(r.Intn(2) == 0)
+	this.FrequencyPlanID = string(randStringEndDevice(r))
+	this.MinFrequency = uint64(uint64(r.Uint32()))
+	this.MaxFrequency = uint64(uint64(r.Uint32()))
+	this.SupportsJoin = bool(bool(r.Intn(2) == 0))
+	this.ResetsJoinNonces = bool(bool(r.Intn(2) == 0))
 	if r.Intn(5) != 0 {
 		this.RootKeys = NewPopulatedRootKeys(r, easy)
 	}
@@ -7267,15 +7267,15 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(5) != 0 {
 		this.PendingSession = NewPopulatedSession(r, easy)
 	}
-	this.LastDevNonce = r.Uint32()
+	this.LastDevNonce = uint32(r.Uint32())
 	v19 := r.Intn(10)
 	this.UsedDevNonces = make([]uint32, v19)
 	for i := 0; i < v19; i++ {
-		this.UsedDevNonces[i] = r.Uint32()
+		this.UsedDevNonces[i] = uint32(r.Uint32())
 	}
-	this.LastJoinNonce = r.Uint32()
-	this.LastRJCount0 = r.Uint32()
-	this.LastRJCount1 = r.Uint32()
+	this.LastJoinNonce = uint32(r.Uint32())
+	this.LastRJCount0 = uint32(r.Uint32())
+	this.LastRJCount1 = uint32(r.Uint32())
 	if r.Intn(5) != 0 {
 		this.LastDevStatusReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
@@ -7283,7 +7283,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(5) != 0 {
 		this.BatteryPercentage = types.NewPopulatedFloatValue(r, easy)
 	}
-	this.DownlinkMargin = r.Int31()
+	this.DownlinkMargin = int32(r.Int31())
 	if r.Intn(2) == 0 {
 		this.DownlinkMargin *= -1
 	}
@@ -7297,24 +7297,24 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(5) != 0 {
 		this.Formatters = NewPopulatedMessagePayloadFormatters(r, easy)
 	}
-	this.ProvisionerID = randStringEndDevice(r)
+	this.ProvisionerID = string(randStringEndDevice(r))
 	if r.Intn(5) != 0 {
 		this.ProvisioningData = types.NewPopulatedStruct(r, easy)
 	}
 	if r.Intn(5) != 0 {
 		this.PendingMACState = NewPopulatedMACState(r, easy)
 	}
-	this.Multicast = bool(r.Intn(2) == 0)
+	this.Multicast = bool(bool(r.Intn(2) == 0))
 	if r.Intn(5) != 0 {
 		this.ClaimAuthenticationCode = NewPopulatedEndDeviceAuthenticationCode(r, easy)
 	}
-	this.NetworkServerKEKLabel = randStringEndDevice(r)
-	this.ApplicationServerKEKLabel = randStringEndDevice(r)
-	this.ApplicationServerID = randStringEndDevice(r)
+	this.NetworkServerKEKLabel = string(randStringEndDevice(r))
+	this.ApplicationServerKEKLabel = string(randStringEndDevice(r))
+	this.ApplicationServerID = string(randStringEndDevice(r))
 	if r.Intn(5) != 0 {
 		this.Picture = NewPopulatedPicture(r, easy)
 	}
-	this.SkipPayloadCrypto = bool(r.Intn(2) == 0)
+	this.SkipPayloadCrypto = bool(bool(r.Intn(2) == 0))
 	if r.Intn(5) != 0 {
 		this.SkipPayloadCryptoOverride = types.NewPopulatedBoolValue(r, easy)
 	}
@@ -7340,7 +7340,7 @@ func NewPopulatedEndDevices(r randyEndDevice, easy bool) *EndDevices {
 func NewPopulatedDevAddrPrefix(r randyEndDevice, easy bool) *DevAddrPrefix {
 	this := &DevAddrPrefix{}
 	this.DevAddr = go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedDevAddr(r)
-	this.Length = r.Uint32()
+	this.Length = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -7397,9 +7397,9 @@ func NewPopulatedListEndDevicesRequest(r randyEndDevice, easy bool) *ListEndDevi
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.Order = randStringEndDevice(r)
-	this.Limit = r.Uint32()
-	this.Page = r.Uint32()
+	this.Order = string(randStringEndDevice(r))
+	this.Limit = uint32(r.Uint32())
+	this.Page = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -7436,7 +7436,7 @@ func NewPopulatedEndDeviceTemplate(r randyEndDevice, easy bool) *EndDeviceTempla
 	if r.Intn(5) != 0 {
 		this.FieldMask = types.NewPopulatedFieldMask(r, easy)
 	}
-	this.MappingKey = randStringEndDevice(r)
+	this.MappingKey = string(randStringEndDevice(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -7444,12 +7444,12 @@ func NewPopulatedEndDeviceTemplate(r randyEndDevice, easy bool) *EndDeviceTempla
 
 func NewPopulatedEndDeviceTemplateFormat(r randyEndDevice, easy bool) *EndDeviceTemplateFormat {
 	this := &EndDeviceTemplateFormat{}
-	this.Name = randStringEndDevice(r)
-	this.Description = randStringEndDevice(r)
+	this.Name = string(randStringEndDevice(r))
+	this.Description = string(randStringEndDevice(r))
 	v31 := r.Intn(10)
 	this.FileExtensions = make([]string, v31)
 	for i := 0; i < v31; i++ {
-		this.FileExtensions[i] = randStringEndDevice(r)
+		this.FileExtensions[i] = string(randStringEndDevice(r))
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -7472,7 +7472,7 @@ func NewPopulatedEndDeviceTemplateFormats(r randyEndDevice, easy bool) *EndDevic
 
 func NewPopulatedConvertEndDeviceTemplateRequest(r randyEndDevice, easy bool) *ConvertEndDeviceTemplateRequest {
 	this := &ConvertEndDeviceTemplateRequest{}
-	this.FormatID = randStringEndDevice(r)
+	this.FormatID = string(randStringEndDevice(r))
 	v33 := r.Intn(100)
 	this.Data = make([]byte, v33)
 	for i := 0; i < v33; i++ {
@@ -7549,7 +7549,7 @@ func randFieldEndDevice(dAtA []byte, r randyEndDevice, fieldNumber int, wire int
 }
 func encodeVarintPopulateEndDevice(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -7634,7 +7634,7 @@ func (m *MACParameters) Size() (n int) {
 		n += 1 + sovEndDevice(uint64(m.Rx2DataRateIndex))
 	}
 	if m.Rx2Frequency != 0 {
-		n += 1 + sovEndDevice(m.Rx2Frequency)
+		n += 1 + sovEndDevice(uint64(m.Rx2Frequency))
 	}
 	if m.MaxDutyCycle != 0 {
 		n += 1 + sovEndDevice(uint64(m.MaxDutyCycle))
@@ -7646,13 +7646,13 @@ func (m *MACParameters) Size() (n int) {
 		n += 1 + sovEndDevice(uint64(m.RejoinCountPeriodicity))
 	}
 	if m.PingSlotFrequency != 0 {
-		n += 2 + sovEndDevice(m.PingSlotFrequency)
+		n += 2 + sovEndDevice(uint64(m.PingSlotFrequency))
 	}
 	if m.PingSlotDataRateIndex != 0 {
 		n += 2 + sovEndDevice(uint64(m.PingSlotDataRateIndex))
 	}
 	if m.BeaconFrequency != 0 {
-		n += 2 + sovEndDevice(m.BeaconFrequency)
+		n += 2 + sovEndDevice(uint64(m.BeaconFrequency))
 	}
 	if len(m.Channels) > 0 {
 		for _, e := range m.Channels {
@@ -7690,10 +7690,10 @@ func (m *MACParameters_Channel) Size() (n int) {
 	var l int
 	_ = l
 	if m.UplinkFrequency != 0 {
-		n += 1 + sovEndDevice(m.UplinkFrequency)
+		n += 1 + sovEndDevice(uint64(m.UplinkFrequency))
 	}
 	if m.DownlinkFrequency != 0 {
-		n += 1 + sovEndDevice(m.DownlinkFrequency)
+		n += 1 + sovEndDevice(uint64(m.DownlinkFrequency))
 	}
 	if m.MinDataRateIndex != 0 {
 		n += 1 + sovEndDevice(uint64(m.MinDataRateIndex))
@@ -7742,10 +7742,10 @@ func (m *EndDeviceVersion) Size() (n int) {
 		n += 1 + l + sovEndDevice(uint64(l))
 	}
 	if m.MinFrequency != 0 {
-		n += 1 + sovEndDevice(m.MinFrequency)
+		n += 1 + sovEndDevice(uint64(m.MinFrequency))
 	}
 	if m.MaxFrequency != 0 {
-		n += 1 + sovEndDevice(m.MaxFrequency)
+		n += 1 + sovEndDevice(uint64(m.MaxFrequency))
 	}
 	if m.SupportsJoin {
 		n += 2
@@ -7803,7 +7803,7 @@ func (m *MACSettings) Size() (n int) {
 	if len(m.FactoryPresetFrequencies) > 0 {
 		l = 0
 		for _, e := range m.FactoryPresetFrequencies {
-			l += sovEndDevice(e)
+			l += sovEndDevice(uint64(e))
 		}
 		n += 1 + sovEndDevice(uint64(l)) + l
 	}
@@ -7973,7 +7973,7 @@ func (m *MACState) Size() (n int) {
 	if len(m.RejectedFrequencies) > 0 {
 		l = 0
 		for _, e := range m.RejectedFrequencies {
-			l += sovEndDevice(e)
+			l += sovEndDevice(uint64(e))
 		}
 		n += 2 + sovEndDevice(uint64(l)) + l
 	}
@@ -7990,7 +7990,7 @@ func (m *MACState) Size() (n int) {
 				l = v.Size()
 				l += 1 + sovEndDevice(uint64(l))
 			}
-			mapEntrySize := 1 + sovEndDevice(k) + l
+			mapEntrySize := 1 + sovEndDevice(uint64(k)) + l
 			n += mapEntrySize + 2 + sovEndDevice(uint64(mapEntrySize))
 		}
 	}
@@ -8174,10 +8174,10 @@ func (m *EndDevice) Size() (n int) {
 		n += 2 + l + sovEndDevice(uint64(l))
 	}
 	if m.MinFrequency != 0 {
-		n += 2 + sovEndDevice(m.MinFrequency)
+		n += 2 + sovEndDevice(uint64(m.MinFrequency))
 	}
 	if m.MaxFrequency != 0 {
-		n += 2 + sovEndDevice(m.MaxFrequency)
+		n += 2 + sovEndDevice(uint64(m.MaxFrequency))
 	}
 	if m.SupportsJoin {
 		n += 3
@@ -8522,7 +8522,7 @@ func sovEndDevice(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozEndDevice(x uint64) (n int) {
-	return sovEndDevice((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovEndDevice(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (this *Session) String() string {
 	if this == nil {
@@ -9415,7 +9415,7 @@ func (m *MACParameters) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
 			m.MaxEIRP = float32(math.Float32frombits(v))
 		case 4:
