@@ -32,8 +32,8 @@ const (
 	protocOut             = "/out"
 	gogoProtoImage        = "thethingsindustries/protoc:3.1.28-dev-tts"
 	fieldMaskProtoImage   = "thethingsindustries/protoc:3.1.28-dev-tts"
-	grpcGatewayProtoImage = "thethingsindustries/protoc:3.1.28-dev-tts"
-	swaggerProtoImage     = "thethingsindustries/protoc:3.1.28-dev-tts"
+	grpcGatewayProtoImage = "ghcr.io/htdvisser/protoc:gen-grpc-gateway-1.16.0"
+	swaggerProtoImage     = "ghcr.io/htdvisser/protoc:gen-grpc-gateway-1.16.0"
 	docProtoImage         = "ghcr.io/htdvisser/protoc:gen-doc-1.4.1"
 )
 
