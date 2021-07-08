@@ -34,7 +34,7 @@ const (
 	fieldMaskProtoImage   = "thethingsindustries/protoc:3.1.28-dev-tts"
 	grpcGatewayProtoImage = "thethingsindustries/protoc:3.1.28-dev-tts"
 	swaggerProtoImage     = "thethingsindustries/protoc:3.1.28-dev-tts"
-	docProtoImage         = "thethingsindustries/protoc:3.1.28-dev-tts"
+	docProtoImage         = "ghcr.io/htdvisser/protoc:gen-doc-1.4.1"
 )
 
 // Proto namespace.
@@ -64,6 +64,7 @@ func makeProtoc(image string) (func(...string) error, *protocContext, error) {
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/v3/sdk/js", filepath.Join(wd, "sdk", "js"), mountWD),
 			"-w", mountWD,
 			image,
+			fmt.Sprintf("-I%s/api/third_party", wd),
 			fmt.Sprintf("-I%s", filepath.Dir(wd)),
 		), &protocContext{
 			WorkingDirectory: mountWD,
