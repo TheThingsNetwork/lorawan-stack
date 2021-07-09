@@ -94,6 +94,10 @@ export class SafeInspector extends Component {
      * tables).
      */
     small: PropTypes.bool,
+    /** The input count (byte or characters, based on type) after which the
+     * display is truncated.
+     */
+    truncateAfter: PropTypes.number,
   }
 
   static defaultProps = {
@@ -107,6 +111,7 @@ export class SafeInspector extends Component {
     noTransform: false,
     noCopy: false,
     enableUint32: false,
+    truncateAfter: Infinity,
   }
 
   _getNextRepresentation(current) {
@@ -142,6 +147,7 @@ export class SafeInspector extends Component {
       byteStyle: !prev.hidden ? true : prev.byteStyle,
       hidden: !prev.hidden,
     }))
+    this.checkTruncateState()
   }
 
   @bind
@@ -244,13 +250,19 @@ export class SafeInspector extends Component {
       noCopyPopup,
       noCopy,
       noTransform,
+      truncateAfter,
     } = this.props
 
     let formattedData = isBytes ? data.toUpperCase() : data
     let display = formattedData
+    let truncated = false
 
     if (isBytes) {
-      const chunks = chunkArray(data.toUpperCase().split(''), 2)
+      let chunks = chunkArray(data.toUpperCase().split(''), 2)
+      if (chunks.length > truncateAfter) {
+        truncated = true
+        chunks = chunks.slice(0, truncateAfter)
+      }
       if (!byteStyle) {
         if (representation === UINT32_T) {
           formattedData = display = `0x${data}`
@@ -264,7 +276,11 @@ export class SafeInspector extends Component {
         ))
       }
     } else if (hidden) {
-      display = '•'.repeat(formattedData.length)
+      display = '•'.repeat(Math.min(formattedData.length, truncateAfter))
+    }
+
+    if (truncated) {
+      display = [...display, '…']
     }
 
     const containerStyle = classnames(className, style.container, {
@@ -281,71 +297,80 @@ export class SafeInspector extends Component {
       [style.buttonIconCopied]: copied,
     })
 
+    const renderButtonContainer = hideable || !noCopy || !noTransform
+
     return (
       <div ref={this.containerElem} className={containerStyle}>
-        <div ref={this.displayElem} onClick={this.handleDataClick} className={dataStyle}>
+        <div
+          ref={this.displayElem}
+          onClick={this.handleDataClick}
+          className={dataStyle}
+          title={truncated ? formattedData : undefined}
+        >
           {display}
         </div>
-        <div ref={this.buttonsElem} className={style.buttons}>
-          {!hidden && !byteStyle && isBytes && (
-            <React.Fragment>
-              <span>{representation}</span>
+        {renderButtonContainer && (
+          <div ref={this.buttonsElem} className={style.buttons}>
+            {!hidden && !byteStyle && isBytes && (
+              <React.Fragment>
+                <span>{representation}</span>
+                <button
+                  title={intl.formatMessage(m.byteOrder)}
+                  className={style.buttonSwap}
+                  onClick={this.handleSwapToggle}
+                >
+                  <Icon className={style.buttonIcon} small icon="swap_horiz" />
+                </button>
+              </React.Fragment>
+            )}
+            {!noTransform && !hidden && isBytes && (
               <button
-                title={intl.formatMessage(m.byteOrder)}
-                className={style.buttonSwap}
-                onClick={this.handleSwapToggle}
+                title={intl.formatMessage(m.arrayFormatting)}
+                className={style.buttonTransform}
+                onClick={this.handleTransformToggle}
               >
-                <Icon className={style.buttonIcon} small icon="swap_horiz" />
+                <Icon className={style.buttonIcon} small icon="code" />
               </button>
-            </React.Fragment>
-          )}
-          {!noTransform && !hidden && isBytes && (
-            <button
-              title={intl.formatMessage(m.arrayFormatting)}
-              className={style.buttonTransform}
-              onClick={this.handleTransformToggle}
-            >
-              <Icon className={style.buttonIcon} small icon="code" />
-            </button>
-          )}
-          {!noCopy && (
-            <button
-              title={intl.formatMessage(m.copyClipboard)}
-              className={style.buttonCopy}
-              onClick={this.handleCopyClick}
-              data-clipboard-text={formattedData}
-              ref={this.copyElem}
-              disabled={copied}
-            >
-              <Icon
-                className={copyButtonStyle}
+            )}
+            {!noCopy && (
+              <button
+                title={intl.formatMessage(m.copyClipboard)}
+                className={style.buttonCopy}
                 onClick={this.handleCopyClick}
-                small
-                icon={copyIcon}
-              />
-              {copied && !noCopyPopup && (
-                <Message
-                  content={m.copied}
-                  onAnimationEnd={this.handleCopyAnimationEnd}
-                  className={style.copyConfirm}
+                data-clipboard-text={formattedData}
+                ref={this.copyElem}
+                disabled={copied}
+              >
+                <Icon
+                  className={copyButtonStyle}
+                  onClick={this.handleCopyClick}
+                  small
+                  icon={copyIcon}
                 />
-              )}
-            </button>
-          )}
-          {hideable && (
-            <button
-              title={intl.formatMessage(m.toggleVisibility)}
-              className={style.buttonVisibility}
-              onClick={this.handleVisibiltyToggle}
-            >
-              <Icon
-                className={style.buttonIcon}
-                small
-                icon={hidden ? 'visibility' : 'visibility_off'}
-              />
-            </button>
-          )}
-        </div>
+                {copied && !noCopyPopup && (
+                  <Message
+                    content={m.copied}
+                    onAnimationEnd={this.handleCopyAnimationEnd}
+                    className={style.copyConfirm}
+                  />
+                )}
+              </button>
+            )}
+            {hideable && (
+              <button
+                title={intl.formatMessage(m.toggleVisibility)}
+                className={style.buttonVisibility}
+                onClick={this.handleVisibiltyToggle}
+              >
+                <Icon
+                  className={style.buttonIcon}
+                  small
+                  icon={hidden ? 'visibility' : 'visibility_off'}
+                />
+              </button>
+            )}
+          </div>
+        )}
       </div>
     )
   }
