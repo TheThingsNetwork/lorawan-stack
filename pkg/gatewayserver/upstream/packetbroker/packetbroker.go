@@ -31,7 +31,8 @@ import (
 )
 
 const (
-	publishUplinkTimeout = 3 * time.Second
+	publishUplinkTimeout = 2 * time.Second
+	updateGatewayTimeout = 2 * time.Second
 
 	DefaultUpdateGatewayInterval = 5 * time.Minute
 	DefaultUpdateGatewayJitter   = 0.2
@@ -140,7 +141,9 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 			},
 		},
 	}
-	res, err := pbaClient.UpdateGateway(ctx, req, h.Cluster.WithClusterAuth())
+	updateCtx, cancel := context.WithTimeout(ctx, updateGatewayTimeout)
+	res, err := pbaClient.UpdateGateway(updateCtx, req, h.Cluster.WithClusterAuth())
+	cancel()
 	if err != nil {
 		return err
 	}
@@ -240,7 +243,10 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 		if err != nil {
 			return errPacketBrokerAgentNotFound.WithCause(err)
 		}
-		res, err := ttnpb.NewGsPbaClient(pbaConn).UpdateGateway(ctx, req, h.Cluster.WithClusterAuth())
+
+		updateCtx, cancel := context.WithTimeout(ctx, updateGatewayTimeout)
+		res, err := ttnpb.NewGsPbaClient(pbaConn).UpdateGateway(updateCtx, req, h.Cluster.WithClusterAuth())
+		cancel()
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to update gateway")
 			onlineTTL = nil
