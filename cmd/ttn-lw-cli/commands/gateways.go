@@ -326,7 +326,9 @@ var (
 			if gtwID.Eui != nil {
 				paths = append(paths, "ids.eui")
 			}
-			if len(paths)+len(antennaPaths) == 0 {
+			antennaAdd, _ := cmd.Flags().GetBool("antenna.add")
+			antennaRemove, _ := cmd.Flags().GetBool("antenna.remove")
+			if len(paths)+len(antennaPaths) == 0 && !antennaRemove {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
 			}
@@ -343,8 +345,6 @@ var (
 				return err
 			}
 
-			antennaAdd, _ := cmd.Flags().GetBool("antenna.add")
-			antennaRemove, _ := cmd.Flags().GetBool("antenna.remove")
 			if len(antennaPaths) > 0 || antennaAdd || antennaRemove {
 				res, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
 					GatewayIdentifiers: gateway.GatewayIdentifiers,
@@ -354,7 +354,7 @@ var (
 					return err
 				}
 				antennaIndex, _ := cmd.Flags().GetInt("antenna.index")
-				if antennaAdd {
+				if antennaAdd || len(res.Antennas) == 0 {
 					res.Antennas = append(res.Antennas, ttnpb.GatewayAntenna{})
 					antennaIndex = len(res.Antennas) - 1
 				} else if antennaIndex > len(res.Antennas) {

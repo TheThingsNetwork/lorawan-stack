@@ -26,6 +26,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Network Server ADR algorithm data rate adjustment behavior on negative margin.
+- CLI `gateway set --antenna.remove` command failing to remove gateway antennas in some cases.
+- CLI `gateway set --antenna.gain <gain>` command crashing when no gateway antennas are present.
 
 ### Security
 
