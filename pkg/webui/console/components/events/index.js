@@ -20,7 +20,7 @@ import { EVENT_VERBOSE_FILTERS_REGEXP } from '@console/constants/event-filters'
 import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
 
 import Button from '@ttn-lw/components/button'
-import Checkbox from '@ttn-lw/components/checkbox'
+import Switch from '@ttn-lw/components/switch'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -83,13 +83,10 @@ const Events = React.memo(
             <div className={style.stickyContainer}>
               <div className={style.actions}>
                 {!disableFiltering && (
-                  <Checkbox
-                    className={style.verboseCheckbox}
-                    onChange={handleVerboseFilterChange}
-                    label={m.verboseStream}
-                    value={!Boolean(filter)}
-                    name="verbose-stream"
-                  />
+                  <label className={style.toggleContainer}>
+                    <Message content={m.verboseStream} className={style.toggleLabel} />
+                    <Switch onChange={handleVerboseFilterChange} checked={!Boolean(filter)} />
+                  </label>
                 )}
                 <Button
                   onClick={onPause}

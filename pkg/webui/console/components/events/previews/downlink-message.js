@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import Message from '@ttn-lw/lib/components/message'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 import getByPath from '@ttn-lw/lib/get-by-path'
 
@@ -23,16 +25,17 @@ import DescriptionList from './shared/description-list'
 
 const DownLinkMessagePreview = React.memo(({ event }) => {
   const { data } = event
+
   if ('scheduled' in data) {
-    const rawPayload = getByPath(data, 'raw_payload')
     const txPower = getByPath(data, 'scheduled.downlink.tx_power')
     const bandwidth = getByPath(data, 'scheduled.data_rate.lora.bandwidth')
+    const spreadingFactor = getByPath(data, 'scheduled.data_rate.lora.spreading_factor')
+    const dataRate = `SF${spreadingFactor}BW${bandwidth / 1000}`
 
     return (
       <DescriptionList>
-        <DescriptionList.Byte title={messages.rawPayload} data={rawPayload} convertToHex />
         <DescriptionList.Item title={messages.txPower} data={txPower} />
-        <DescriptionList.Item title={messages.bandwidth} data={bandwidth} />
+        <DescriptionList.Item title={messages.dataRate} data={dataRate} />
       </DescriptionList>
     )
   }
@@ -63,11 +66,17 @@ const DownLinkMessagePreview = React.memo(({ event }) => {
     const frmPayload = getByPath(data, 'payload.mac_payload.frm_payload')
     const rx1Delay = getByPath(data, 'request.rx1_delay')
     const fPort = getByPath(data, 'payload.mac_payload.f_port')
+    const isConfirmed = getByPath(data, 'payload.m_hdr.m_type') === 'CONFIRMED_DOWN'
 
     return (
       <DescriptionList>
         <DescriptionList.Byte title={messages.devAddr} data={devAddr} />
         <DescriptionList.Item title={messages.fPort} data={fPort} />
+        {isConfirmed && (
+          <DescriptionList.Item>
+            <Message content={messages.confirmedDownlink} />
+          </DescriptionList.Item>
+        )}
         <DescriptionList.Byte title={messages.MACPayload} data={frmPayload} convertToHex />
         <DescriptionList.Item title={messages.rx1Delay} data={rx1Delay} />
       </DescriptionList>

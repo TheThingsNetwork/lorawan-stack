@@ -15,6 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
+import { isPlainObject } from 'lodash'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -31,9 +32,10 @@ const ARRAY_PLACEHOLDER = '[…]'
 
 const KeyValue = ({ entryKey, entryValue, showKey }) => {
   let renderValue
-  if (Array.isArray(entryValue)) {
+
+  if (Array.isArray(entryValue) && !entryValue.every(e => typeof e !== 'object')) {
     renderValue = ARRAY_PLACEHOLDER
-  } else if (typeof entryValue === 'object') {
+  } else if (isPlainObject(entryValue)) {
     renderValue = OBJECT_PLACEHOLDER
   } else {
     renderValue = JSON.stringify(entryValue)

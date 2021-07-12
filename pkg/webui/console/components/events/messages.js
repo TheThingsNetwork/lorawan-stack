@@ -23,6 +23,7 @@ const messages = defineMessages({
   fCnt: 'FCnt',
   rawPayload: 'Raw payload',
   txPower: 'Tx Power',
+  dataRate: 'Data rate',
   bandwidth: 'Bandwidth',
   metrics: 'Metrics',
   versions: 'Versions',
@@ -53,6 +54,8 @@ const messages = defineMessages({
     'Old events have been truncated to save memory. The current event limit per stream is {limit}.',
   eventUnavailable: 'This event is not available anymore. It was likely truncated to save memory.',
   verboseStream: 'Verbose stream',
+  confirmedDownlink: 'Confirmed downlink',
+  confirmedUplink: 'Confirmed uplink',
 })
 
 export default messages
