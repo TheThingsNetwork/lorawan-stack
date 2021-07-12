@@ -32,7 +32,6 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -40,7 +39,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/entityregistry/is"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	iogrpc "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/grpc"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt"
@@ -118,16 +116,18 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		forward[""] = []types.DevAddrPrefix{{}}
 	}
 
+	ctx := log.NewContextWithField(c.Context(), "namespace", "gatewayserver")
+
 	gs = &GatewayServer{
 		Component:                         c,
-		ctx:                               log.NewContextWithField(c.Context(), "namespace", "gatewayserver"),
+		ctx:                               ctx,
 		config:                            conf,
 		requireRegisteredGateways:         conf.RequireRegisteredGateways,
 		forward:                           forward,
 		upstreamHandlers:                  make(map[string]upstream.Handler),
 		statsRegistry:                     conf.Stats,
 		updateConnectionStatsDebounceTime: conf.UpdateConnectionStatsDebounceTime,
-		entityRegistry:                    is.New(c),
+		entityRegistry:                    NewIS(c),
 	}
 	for _, opt := range opts {
 		opt(gs)
@@ -422,7 +422,7 @@ type connectionEntry struct {
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
 func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
-	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+	if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 
