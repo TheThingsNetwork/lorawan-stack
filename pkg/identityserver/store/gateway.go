@@ -77,6 +77,8 @@ type Gateway struct {
 	RequireAuthenticatedConnection bool
 
 	SupportsLRFHSS bool `gorm:"default:false not null"`
+
+	DisablePacketBrokerForwarding bool `gorm:"default:false not null"`
 }
 
 func init() {
@@ -179,6 +181,9 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 		}
 		pb.Lrfhss.Supported = gtw.SupportsLRFHSS
 	},
+	disablePacketBrokerForwardingField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.DisablePacketBrokerForwarding = gtw.DisablePacketBrokerForwarding
+	},
 }
 
 // functions to set fields from the gateway proto into the gateway model.
@@ -275,6 +280,9 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	supportsLRFHSSField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		gtw.SupportsLRFHSS = pb.GetLrfhss().GetSupported()
 	},
+	disablePacketBrokerForwardingField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.DisablePacketBrokerForwarding = pb.DisablePacketBrokerForwarding
+	},
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -319,6 +327,7 @@ var gatewayColumnNames = map[string][]string{
 	updateLocationFromStatusField:       {updateLocationFromStatusField},
 	versionIDsField:                     {"brand_id", "model_id", "hardware_version", "firmware_version"},
 	requireAuthenticatedConnectionField: {requireAuthenticatedConnectionField},
+	disablePacketBrokerForwardingField:  {disablePacketBrokerForwardingField},
 }
 
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {

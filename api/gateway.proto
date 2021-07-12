@@ -183,7 +183,9 @@ message Gateway {
 
   LRFHSS lrfhss = 28;
 
-  // next: 29
+  bool disable_packet_broker_forwarding = 29;
+
+  // next: 30
 }
 
 message Gateways {

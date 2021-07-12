@@ -633,6 +633,16 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 					dst.Lrfhss = nil
 				}
 			}
+		case "disable_packet_broker_forwarding":
+			if len(subs) > 0 {
+				return fmt.Errorf("'disable_packet_broker_forwarding' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DisablePacketBrokerForwarding = src.DisablePacketBrokerForwarding
+			} else {
+				var zero bool
+				dst.DisablePacketBrokerForwarding = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

@@ -26,6 +26,7 @@ const (
 	claimAuthenticationCodeField        = "claim_authentication_code"
 	contactInfoField                    = "contact_info"
 	descriptionField                    = "description"
+	disablePacketBrokerForwardingField  = "disable_packet_broker_forwarding"
 	downlinkPathConstraintField         = "downlink_path_constraint"
 	endorsedField                       = "endorsed"
 	enforceDutyCycleField               = "enforce_duty_cycle"
