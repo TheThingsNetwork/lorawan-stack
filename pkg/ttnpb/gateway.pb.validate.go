@@ -922,6 +922,18 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "require_authenticated_connection":
 			// no validation rules for RequireAuthenticatedConnection
+		case "lrfhss":
+
+			if v, ok := interface{}(m.GetLrfhss()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayValidationError{
+						field:  "lrfhss",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return GatewayValidationError{
 				field:  name,
@@ -3029,6 +3041,87 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GatewayRadio_TxConfigurationValidationError{}
+
+// ValidateFields checks the field values on Gateway_LRFHSS with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *Gateway_LRFHSS) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = Gateway_LRFHSSFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "supported":
+			// no validation rules for Supported
+		default:
+			return Gateway_LRFHSSValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// Gateway_LRFHSSValidationError is the validation error returned by
+// Gateway_LRFHSS.ValidateFields if the designated constraints aren't met.
+type Gateway_LRFHSSValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Gateway_LRFHSSValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Gateway_LRFHSSValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Gateway_LRFHSSValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Gateway_LRFHSSValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Gateway_LRFHSSValidationError) ErrorName() string { return "Gateway_LRFHSSValidationError" }
+
+// Error satisfies the builtin error interface
+func (e Gateway_LRFHSSValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGateway_LRFHSS.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Gateway_LRFHSSValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Gateway_LRFHSSValidationError{}
 
 // ValidateFields checks the field values on
 // GatewayConnectionStats_RoundTripTimes with the rules defined in the proto

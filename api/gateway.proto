@@ -175,7 +175,15 @@ message Gateway {
   // Require an authenticated gateway connection. This prevents the gateway from using the UDP protocol and requires authentication when using other protocols.
   bool require_authenticated_connection = 27;
 
-  // next: 28
+  // LR-FHSS gateway capabilities.
+  message LRFHSS {
+    // The gateway supports the LR-FHSS uplink channels.
+    bool supported = 1;
+  }
+
+  LRFHSS lrfhss = 28;
+
+  // next: 29
 }
 
 message Gateways {

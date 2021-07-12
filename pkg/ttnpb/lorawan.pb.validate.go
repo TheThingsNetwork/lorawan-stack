@@ -1289,6 +1289,89 @@ var _ interface {
 	ErrorName() string
 } = FSKDataRateValidationError{}
 
+// ValidateFields checks the field values on LRFHSSDataRate with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *LRFHSSDataRate) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = LRFHSSDataRateFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "modulation_type":
+			// no validation rules for ModulationType
+		case "operating_channel_width":
+			// no validation rules for OperatingChannelWidth
+		default:
+			return LRFHSSDataRateValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// LRFHSSDataRateValidationError is the validation error returned by
+// LRFHSSDataRate.ValidateFields if the designated constraints aren't met.
+type LRFHSSDataRateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LRFHSSDataRateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LRFHSSDataRateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LRFHSSDataRateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LRFHSSDataRateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LRFHSSDataRateValidationError) ErrorName() string { return "LRFHSSDataRateValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LRFHSSDataRateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLRFHSSDataRate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LRFHSSDataRateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LRFHSSDataRateValidationError{}
+
 // ValidateFields checks the field values on DataRate with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -1313,7 +1396,7 @@ func (m *DataRate) ValidateFields(paths ...string) error {
 			}
 			if len(subs) == 0 {
 				subs = []string{
-					"lora", "fsk",
+					"lora", "fsk", "lrfhss",
 				}
 			}
 			for name, subs := range _processPaths(subs) {
@@ -1345,6 +1428,22 @@ func (m *DataRate) ValidateFields(paths ...string) error {
 						if err := v.ValidateFields(subs...); err != nil {
 							return DataRateValidationError{
 								field:  "fsk",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "lrfhss":
+					w, ok := m.Modulation.(*DataRate_Lrfhss)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetLrfhss()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return DataRateValidationError{
+								field:  "lrfhss",
 								reason: "embedded message failed validation",
 								cause:  err,
 							}

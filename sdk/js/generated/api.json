@@ -16452,6 +16452,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "lrfhss",
+              "description": "",
+              "label": "",
+              "type": "LRFHSS",
+              "longType": "Gateway.LRFHSS",
+              "fullType": "ttn.lorawan.v3.Gateway.LRFHSS",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -16484,6 +16496,30 @@
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LRFHSS",
+          "longName": "Gateway.LRFHSS",
+          "fullName": "ttn.lorawan.v3.Gateway.LRFHSS",
+          "description": "LR-FHSS gateway capabilities.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "supported",
+              "description": "The gateway supports the LR-FHSS uplink channels.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -23536,6 +23572,18 @@
               "isoneof": true,
               "oneofdecl": "modulation",
               "defaultValue": ""
+            },
+            {
+              "name": "lrfhss",
+              "description": "",
+              "label": "",
+              "type": "LRFHSSDataRate",
+              "longType": "LRFHSSDataRate",
+              "fullType": "ttn.lorawan.v3.LRFHSSDataRate",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "modulation",
+              "defaultValue": ""
             }
           ]
         },
@@ -24080,6 +24128,42 @@
               "type": "bytes",
               "longType": "bytes",
               "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LRFHSSDataRate",
+          "longName": "LRFHSSDataRate",
+          "fullName": "ttn.lorawan.v3.LRFHSSDataRate",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "modulation_type",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "operating_channel_width",
+              "description": "Operating Channel Width (kHz).",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

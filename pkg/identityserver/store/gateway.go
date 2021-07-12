@@ -75,6 +75,8 @@ type Gateway struct {
 	TargetCUPSKey []byte `gorm:"type:BYTEA"`
 
 	RequireAuthenticatedConnection bool
+
+	SupportsLRFHSS bool `gorm:"default:false not null"`
 }
 
 func init() {
@@ -171,6 +173,12 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	requireAuthenticatedConnectionField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		pb.RequireAuthenticatedConnection = gtw.RequireAuthenticatedConnection
 	},
+	supportsLRFHSSField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		if pb.Lrfhss == nil {
+			pb.Lrfhss = &ttnpb.Gateway_LRFHSS{}
+		}
+		pb.Lrfhss.Supported = gtw.SupportsLRFHSS
+	},
 }
 
 // functions to set fields from the gateway proto into the gateway model.
@@ -263,6 +271,9 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	},
 	requireAuthenticatedConnectionField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		gtw.RequireAuthenticatedConnection = pb.RequireAuthenticatedConnection
+	},
+	supportsLRFHSSField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.SupportsLRFHSS = pb.GetLrfhss().GetSupported()
 	},
 }
 

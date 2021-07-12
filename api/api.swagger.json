@@ -10568,6 +10568,16 @@
         }
       }
     },
+    "GatewayLRFHSS": {
+      "type": "object",
+      "properties": {
+        "supported": {
+          "type": "boolean",
+          "description": "The gateway supports the LR-FHSS uplink channels."
+        }
+      },
+      "description": "LR-FHSS gateway capabilities."
+    },
     "GatewayRadioTxConfiguration": {
       "type": "object",
       "properties": {
@@ -13183,6 +13193,9 @@
         },
         "fsk": {
           "$ref": "#/definitions/v3FSKDataRate"
+        },
+        "lrfhss": {
+          "$ref": "#/definitions/v3LRFHSSDataRate"
         }
       }
     },
@@ -14305,6 +14318,9 @@
         "require_authenticated_connection": {
           "type": "boolean",
           "description": "Require an authenticated gateway connection. This prevents the gateway from using the UDP protocol and requires authentication when using other protocols."
+        },
+        "lrfhss": {
+          "$ref": "#/definitions/GatewayLRFHSS"
         }
       },
       "description": "Gateway is the message that defines a gateway on the network."
@@ -14784,6 +14800,20 @@
       ],
       "default": "KEY_SECURITY_UNKNOWN",
       "description": " - KEY_SECURITY_UNKNOWN: Unknown key security.\n - KEY_SECURITY_NONE: No key security.\n - KEY_SECURITY_READ_PROTECTED: Read Protected key security.\n - KEY_SECURITY_SECURE_ELEMENT: Key security using the Security Element."
+    },
+    "v3LRFHSSDataRate": {
+      "type": "object",
+      "properties": {
+        "modulation_type": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "operating_channel_width": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Operating Channel Width (kHz)."
+        }
+      }
     },
     "v3ListEndDeviceBrandsResponse": {
       "type": "object",

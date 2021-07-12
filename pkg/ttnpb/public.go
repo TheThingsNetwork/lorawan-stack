@@ -87,6 +87,7 @@ var PublicGatewayFields = append(PublicEntityFields,
 	"gateway_server_address", // only public if status_public=true
 	"location_public",
 	"antennas", // only public if location_public=true
+	"lrfhss.supported",
 )
 
 // PublicSafe returns a copy of the gateway with only the fields that are

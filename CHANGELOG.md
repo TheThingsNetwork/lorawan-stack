@@ -17,6 +17,9 @@ For details about compatibility between different releases, see the **Commitment
 - User session management (listing and deleting) in the Identity Server and the CLI.
 - Improved logging for the OAuth server.
 
+- LR-FHSS modulation support as part of the gateways API.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+
 ### Changed
 
 ### Deprecated
