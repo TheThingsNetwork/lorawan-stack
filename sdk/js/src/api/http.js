@@ -140,7 +140,10 @@ class Http {
           statusCode = response.status
         } catch (err) {
           if (
+            typeof err === 'object' &&
             'response' in err &&
+            typeof err.response === 'object' &&
+            err.response !== null &&
             'status' in err.response &&
             err.response.status === 429 &&
             retries <= RATE_LIMIT_RETRIES
