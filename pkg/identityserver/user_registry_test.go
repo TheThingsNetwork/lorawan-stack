@@ -76,7 +76,7 @@ func TestTemporaryValidPassword(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := population.Users[defaultUserIdx].UserIdentifiers
+		userID := population.Users[userTestUserIdx].UserIdentifiers
 
 		reg := ttnpb.NewUserRegistryClient(cc)
 
@@ -152,7 +152,7 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := population.Users[defaultUserIdx].UserIdentifiers
+		userID := population.Users[userTestUserIdx].UserIdentifiers
 
 		reg := ttnpb.NewUserRegistryClient(cc)
 
@@ -174,7 +174,7 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 // 	ctx := test.Context()
 
 // 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-// 		user := population.Users[defaultUserIdx]
+// 		user := population.Users[userTestUserIdx]
 // 		userID := user.UserIdentifiers
 
 // 		reg := ttnpb.NewUserRegistryClient(cc)
@@ -238,7 +238,7 @@ func TestUsersWeakPassword(t *testing.T) {
 			a.So(errors.IsInvalidArgument(err), should.BeTrue)
 		}
 
-		user, creds := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
+		user, creds := population.Users[userTestUserIdx], userCreds(userTestUserIdx)
 
 		oldPassword := user.Password
 		newPassword := weakPassword
@@ -272,8 +272,8 @@ func TestUsersCRUD(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewUserRegistryClient(cc)
 
-		user, creds := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
-		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
+		user, creds := population.Users[userTestUserIdx], userCreds(userTestUserIdx)
+		credsWithoutRights := userCreds(userTestUserIdx, "key without rights")
 
 		got, err := reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,

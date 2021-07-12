@@ -36,7 +36,7 @@ import (
 var (
 	setup        sync.Once
 	dbConnString string
-	population   = store.NewPopulator(15, 42)
+	population   = store.NewPopulator(16, 42)
 )
 
 var (
@@ -46,6 +46,7 @@ var (
 	defaultUser, defaultUserIdx                             = getTestUser()
 	suspendedUser, suspendedUserIdx                         = getTestUser()
 	adminUser, adminUserIdx                                 = getTestUser()
+	userTestUser, userTestUserIdx                           = getTestUser()
 	collaboratorUser, collaboratorUserIdx                   = getTestUser()
 	applicationAccessUser, applicationAccessUserIdx         = getTestUser()
 	appAccessCollaboratorUser, appAccessCollaboratorUserIdx = getTestUser()
@@ -77,8 +78,16 @@ func init() {
 	defaultUser.TemporaryPasswordCreatedAt = nil
 	defaultUser.TemporaryPasswordExpiresAt = nil
 
+	userTestUser.Admin = false
+	userTestUser.PrimaryEmailAddressValidatedAt = &now
+	userTestUser.State = ttnpb.STATE_APPROVED
+
+	userTestUser.TemporaryPassword = ""
+	userTestUser.TemporaryPasswordCreatedAt = nil
+	userTestUser.TemporaryPasswordExpiresAt = nil
+
 	for id, apiKeys := range population.APIKeys {
-		if id.GetUserIds().GetUserId() == defaultUser.GetUserId() {
+		if id.GetUserIds().GetUserId() == defaultUser.GetUserId() || id.GetUserIds().GetUserId() == userTestUser.GetUserId() {
 			expiredTime := time.Now().Add(-1 * time.Hour)
 			population.APIKeys[id] = append(
 				apiKeys,
