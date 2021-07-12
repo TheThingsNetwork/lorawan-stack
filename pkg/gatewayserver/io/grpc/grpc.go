@@ -130,7 +130,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 				"uplink_count", len(msg.UplinkMessages),
 			)).Debug("Received message")
 
-			for _, up := range msg.UplinkMessages {
+			for _, up := range io.UniqueUplinkMessagesByRSSI(msg.UplinkMessages) {
 				up.ReceivedAt = now
 				if err := conn.HandleUp(up); err != nil {
 					logger.WithError(err).Warn("Failed to handle uplink message")

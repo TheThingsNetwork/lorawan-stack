@@ -187,14 +187,17 @@ func TestGatewayServer(t *testing.T) {
 				DetectsDisconnect      bool
 				TimeoutOnInvalidAuth   bool
 				HasAuth                bool
+				DeduplicatesUplinks    bool
 				ValidAuth              func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
 				Link                   func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
 			}{
 				{
-					Protocol:          "grpc",
-					SupportsStatus:    true,
-					HasAuth:           true,
-					DetectsDisconnect: true,
+					Protocol:            "grpc",
+					SupportsStatus:      true,
+					HasAuth:             true,
+					DetectsDisconnect:   true,
+					DeduplicatesUplinks: true,
+
 					ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 						return ids.GatewayId == registeredGatewayID && key == registeredGatewayKey
 					},
@@ -338,8 +341,9 @@ func TestGatewayServer(t *testing.T) {
 					},
 				},
 				{
-					Protocol:       "udp",
-					SupportsStatus: true,
+					Protocol:            "udp",
+					SupportsStatus:      true,
+					DeduplicatesUplinks: true,
 					ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 						return ids.Eui != nil
 					},
@@ -1069,58 +1073,6 @@ func TestGatewayServer(t *testing.T) {
 												},
 												CodingRate: "4/5",
 												Frequency:  867900000,
-												Timestamp:  100,
-											},
-											RxMetadata: []*ttnpb.RxMetadata{
-												{
-													GatewayIdentifiers: ids,
-													Timestamp:          100,
-													RSSI:               -69,
-													ChannelRSSI:        -69,
-													SNR:                11,
-													Location:           location,
-												},
-											},
-											RawPayload: duplicatePayload,
-										},
-										{
-											Settings: ttnpb.TxSettings{
-												DataRate: ttnpb.DataRate{
-													Modulation: &ttnpb.DataRate_LoRa{
-														LoRa: &ttnpb.LoRaDataRate{
-															SpreadingFactor: 7,
-															Bandwidth:       250000,
-														},
-													},
-												},
-												CodingRate: "4/5",
-												Frequency:  867900000,
-												Timestamp:  100,
-											},
-											RxMetadata: []*ttnpb.RxMetadata{
-												{
-													GatewayIdentifiers: ids,
-													Timestamp:          100,
-													RSSI:               -69,
-													ChannelRSSI:        -69,
-													SNR:                11,
-													Location:           location,
-												},
-											},
-											RawPayload: duplicatePayload,
-										},
-										{
-											Settings: ttnpb.TxSettings{
-												DataRate: ttnpb.DataRate{
-													Modulation: &ttnpb.DataRate_LoRa{
-														LoRa: &ttnpb.LoRaDataRate{
-															SpreadingFactor: 7,
-															Bandwidth:       250000,
-														},
-													},
-												},
-												CodingRate: "4/5",
-												Frequency:  867900000,
 												Timestamp:  101,
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
@@ -1135,9 +1087,61 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RawPayload: duplicatePayload,
 										},
+										{
+											Settings: ttnpb.TxSettings{
+												DataRate: ttnpb.DataRate{
+													Modulation: &ttnpb.DataRate_LoRa{
+														LoRa: &ttnpb.LoRaDataRate{
+															SpreadingFactor: 7,
+															Bandwidth:       250000,
+														},
+													},
+												},
+												CodingRate: "4/5",
+												Frequency:  867900000,
+												Timestamp:  100,
+											},
+											RxMetadata: []*ttnpb.RxMetadata{
+												{
+													GatewayIdentifiers: ids,
+													Timestamp:          100,
+													RSSI:               -69,
+													ChannelRSSI:        -69,
+													SNR:                11,
+													Location:           location,
+												},
+											},
+											RawPayload: duplicatePayload,
+										},
+										{
+											Settings: ttnpb.TxSettings{
+												DataRate: ttnpb.DataRate{
+													Modulation: &ttnpb.DataRate_LoRa{
+														LoRa: &ttnpb.LoRaDataRate{
+															SpreadingFactor: 7,
+															Bandwidth:       250000,
+														},
+													},
+												},
+												CodingRate: "4/5",
+												Frequency:  867900000,
+												Timestamp:  100,
+											},
+											RxMetadata: []*ttnpb.RxMetadata{
+												{
+													GatewayIdentifiers: ids,
+													Timestamp:          100,
+													RSSI:               -69,
+													ChannelRSSI:        -69,
+													SNR:                11,
+													Location:           location,
+												},
+											},
+											RawPayload: duplicatePayload,
+										},
 									},
 								},
-								Forwards:      []uint32{100},
+								Forwards:      []uint32{101},
 								UplinkCount:   1,
 								RepeatUpEvent: true,
 							},
@@ -1299,7 +1303,7 @@ func TestGatewayServer(t *testing.T) {
 									uplinkCount += len(tc.Up.UplinkMessages)
 								}
 
-								if tc.RepeatUpEvent {
+								if tc.RepeatUpEvent && !ptc.DeduplicatesUplinks {
 									select {
 									case evt := <-upEvents["gs.up.repeat"]:
 										a.So(evt.Name(), should.Equal, "gs.up.repeat")

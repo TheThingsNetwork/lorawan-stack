@@ -22,6 +22,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- When a gateway uplink message contains duplicate data uplinks, only the one with the highest RSSI are forwarded.
+
 ### Deprecated
 
 ### Removed

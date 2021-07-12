@@ -17,6 +17,7 @@ package io
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"fmt"
 	"sync/atomic"
 	"time"
@@ -733,4 +734,41 @@ func (c *Connection) discardRepeatedUplink(up *ttnpb.UplinkMessage) bool {
 		registerRepeatUp(c.ctx, shouldEmitEvent, c.gateway, c.frontend.Protocol())
 	}
 	return shouldDiscard
+}
+
+type rssiAndIndex struct {
+	rssi  float32
+	index int
+}
+
+// UniqueUplinkMessagesByRSSI returns the given list of gateway uplink messages after discarding
+// duplicates by RSSI. Two gateway uplink messages are considered duplicates if the RawPayload
+// is identical, and the RSSI values differ. In these cases, only the gateway uplink message
+// with the highest RSSI will be included in the result.
+//
+// UniqueUplinkMessagesByRSSI will allocate a new list of uplink messages, but will not copy the uplink
+// messages themselves.
+func UniqueUplinkMessagesByRSSI(uplinks []*ttnpb.UplinkMessage) []*ttnpb.UplinkMessage {
+	if len(uplinks) < 2 {
+		return uplinks
+	}
+
+	maxRSSI := make(map[string]rssiAndIndex, len(uplinks))
+	deduplicated := make([]*ttnpb.UplinkMessage, 0, len(uplinks))
+	for _, uplink := range uplinks {
+		md := uplink.GetRxMetadata()
+		if len(md) == 0 {
+			deduplicated = append(deduplicated, uplink)
+			continue
+		}
+		key := base64.StdEncoding.EncodeToString(uplink.GetRawPayload())
+		if s, ok := maxRSSI[key]; ok && s.rssi < md[0].RSSI {
+			deduplicated[s.index] = uplink
+			maxRSSI[key] = rssiAndIndex{md[0].RSSI, s.index}
+		} else if !ok {
+			deduplicated = append(deduplicated, uplink)
+			maxRSSI[key] = rssiAndIndex{md[0].RSSI, len(deduplicated) - 1}
+		}
+	}
+	return deduplicated
 }
