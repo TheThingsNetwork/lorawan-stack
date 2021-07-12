@@ -608,6 +608,31 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 				var zero bool
 				dst.RequireAuthenticatedConnection = zero
 			}
+		case "lrfhss":
+			if len(subs) > 0 {
+				var newDst, newSrc *Gateway_LRFHSS
+				if (src == nil || src.Lrfhss == nil) && dst.Lrfhss == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Lrfhss
+				}
+				if dst.Lrfhss != nil {
+					newDst = dst.Lrfhss
+				} else {
+					newDst = &Gateway_LRFHSS{}
+					dst.Lrfhss = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Lrfhss = src.Lrfhss
+				} else {
+					dst.Lrfhss = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1518,6 +1543,27 @@ func (dst *GatewayRadio_TxConfiguration) SetFields(src *GatewayRadio_TxConfigura
 			} else {
 				var zero uint64
 				dst.NotchFrequency = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *Gateway_LRFHSS) SetFields(src *Gateway_LRFHSS, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "supported":
+			if len(subs) > 0 {
+				return fmt.Errorf("'supported' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Supported = src.Supported
+			} else {
+				var zero bool
+				dst.Supported = zero
 			}
 
 		default:

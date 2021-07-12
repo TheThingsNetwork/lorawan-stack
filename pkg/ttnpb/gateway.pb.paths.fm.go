@@ -96,6 +96,8 @@ var GatewayFieldPathsNested = []string{
 	"lbs_lns_secret.key_id",
 	"lbs_lns_secret.value",
 	"location_public",
+	"lrfhss",
+	"lrfhss.supported",
 	"name",
 	"require_authenticated_connection",
 	"schedule_anytime_delay",
@@ -132,6 +134,7 @@ var GatewayFieldPathsTopLevel = []string{
 	"ids",
 	"lbs_lns_secret",
 	"location_public",
+	"lrfhss",
 	"name",
 	"require_authenticated_connection",
 	"schedule_anytime_delay",
@@ -226,6 +229,8 @@ var CreateGatewayRequestFieldPathsNested = []string{
 	"gateway.lbs_lns_secret.key_id",
 	"gateway.lbs_lns_secret.value",
 	"gateway.location_public",
+	"gateway.lrfhss",
+	"gateway.lrfhss.supported",
 	"gateway.name",
 	"gateway.require_authenticated_connection",
 	"gateway.schedule_anytime_delay",
@@ -277,6 +282,8 @@ var UpdateGatewayRequestFieldPathsNested = []string{
 	"gateway.lbs_lns_secret.key_id",
 	"gateway.lbs_lns_secret.value",
 	"gateway.location_public",
+	"gateway.lrfhss",
+	"gateway.lrfhss.supported",
 	"gateway.name",
 	"gateway.require_authenticated_connection",
 	"gateway.schedule_anytime_delay",
@@ -491,6 +498,13 @@ var GatewayRadio_TxConfigurationFieldPathsTopLevel = []string{
 	"max_frequency",
 	"min_frequency",
 	"notch_frequency",
+}
+var Gateway_LRFHSSFieldPathsNested = []string{
+	"supported",
+}
+
+var Gateway_LRFHSSFieldPathsTopLevel = []string{
+	"supported",
 }
 var GatewayConnectionStats_RoundTripTimesFieldPathsNested = []string{
 	"count",

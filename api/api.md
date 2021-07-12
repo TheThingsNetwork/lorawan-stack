@@ -232,6 +232,7 @@
   - [Message `CreateGatewayRequest`](#ttn.lorawan.v3.CreateGatewayRequest)
   - [Message `Gateway`](#ttn.lorawan.v3.Gateway)
   - [Message `Gateway.AttributesEntry`](#ttn.lorawan.v3.Gateway.AttributesEntry)
+  - [Message `Gateway.LRFHSS`](#ttn.lorawan.v3.Gateway.LRFHSS)
   - [Message `GatewayAntenna`](#ttn.lorawan.v3.GatewayAntenna)
   - [Message `GatewayAntenna.AttributesEntry`](#ttn.lorawan.v3.GatewayAntenna.AttributesEntry)
   - [Message `GatewayBrand`](#ttn.lorawan.v3.GatewayBrand)
@@ -3647,6 +3648,7 @@ Gateway is the message that defines a gateway on the network.
 | `target_cups_uri` | [`string`](#string) |  | CUPS URI for LoRa Basics Station CUPS redirection. The CUPS Trust field will be automatically fetched from the cert chain presented by the target server. |
 | `target_cups_key` | [`Secret`](#ttn.lorawan.v3.Secret) |  | CUPS Key for LoRa Basics Station CUPS redirection. If redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value. |
 | `require_authenticated_connection` | [`bool`](#bool) |  | Require an authenticated gateway connection. This prevents the gateway from using the UDP protocol and requires authentication when using other protocols. |
+| `lrfhss` | [`Gateway.LRFHSS`](#ttn.lorawan.v3.Gateway.LRFHSS) |  |  |
 
 #### Field Rules
 
@@ -3672,6 +3674,14 @@ Gateway is the message that defines a gateway on the network.
 | ----- | ---- | ----- | ----------- |
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.Gateway.LRFHSS">Message `Gateway.LRFHSS`</a>
+
+LR-FHSS gateway capabilities.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `supported` | [`bool`](#bool) |  | The gateway supports the LR-FHSS uplink channels. |
 
 ### <a name="ttn.lorawan.v3.GatewayAntenna">Message `GatewayAntenna`</a>
 
