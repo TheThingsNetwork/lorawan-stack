@@ -88,10 +88,10 @@ func TestWebhooks(t *testing.T) {
 						DownlinkAPIKey: "foo.secret",
 						Format:         "json",
 						UplinkMessage: &ttnpb.ApplicationWebhook_Message{
-							Path: tc.prefix + "up",
+							Path: tc.prefix + "up{?devEUI}",
 						},
 						JoinAccept: &ttnpb.ApplicationWebhook_Message{
-							Path: tc.prefix + "join",
+							Path: tc.prefix + "join{?joinEUI}",
 						},
 						DownlinkAck: &ttnpb.ApplicationWebhook_Message{
 							Path: tc.prefix + "down/ack",
@@ -194,7 +194,7 @@ func TestWebhooks(t *testing.T) {
 									},
 								},
 								OK:  true,
-								URL: fmt.Sprintf("%s/up", baseURL),
+								URL: fmt.Sprintf("%s/up?devEUI=%s", baseURL, registeredDeviceID.DevEui),
 							},
 							{
 								Name: "UplinkMessage/UnregisteredDevice",
@@ -222,7 +222,7 @@ func TestWebhooks(t *testing.T) {
 									},
 								},
 								OK:  true,
-								URL: fmt.Sprintf("%s/join", baseURL),
+								URL: fmt.Sprintf("%s/join?joinEUI=%s", baseURL, registeredDeviceID.JoinEui),
 							},
 							{
 								Name: "DownlinkMessage/Ack",

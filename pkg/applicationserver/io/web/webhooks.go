@@ -27,6 +27,7 @@ import (
 	stdio "io"
 
 	"github.com/gorilla/mux"
+	"github.com/jtacoma/uritemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -35,7 +36,6 @@ import (
 	ttnweb "go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
-	"google.golang.org/api/googleapi"
 )
 
 const namespace = "applicationserver/io/web"
@@ -322,16 +322,14 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	if cfg == nil {
 		return nil, nil
 	}
-	baseURL, err := url.Parse(hook.BaseURL)
+	baseURL, err := expandVariables(hook.BaseURL, msg)
 	if err != nil {
 		return nil, err
 	}
-	expandVariables(baseURL, msg)
-	pathURL, err := url.Parse(cfg.Path)
+	pathURL, err := expandVariables(cfg.Path, msg)
 	if err != nil {
 		return nil, err
 	}
-	expandVariables(pathURL, msg)
 	if strings.HasPrefix(pathURL.Path, "/") {
 		// Trim the leading slash, in order to ensure that the path is not
 		// interpreted as relative to the root of the URL.
@@ -426,7 +424,7 @@ func (w *webhooks) handleDown(op func(io.Server, context.Context, ttnpb.EndDevic
 	})
 }
 
-func expandVariables(url *url.URL, up *ttnpb.ApplicationUp) {
+func expandVariables(u string, up *ttnpb.ApplicationUp) (*url.URL, error) {
 	var joinEUI, devEUI, devAddr string
 	if up.JoinEui != nil {
 		joinEUI = up.JoinEui.String()
@@ -437,7 +435,11 @@ func expandVariables(url *url.URL, up *ttnpb.ApplicationUp) {
 	if up.DevAddr != nil {
 		devAddr = up.DevAddr.String()
 	}
-	googleapi.Expand(url, map[string]string{
+	tmpl, err := uritemplates.Parse(u)
+	if err != nil {
+		return nil, err
+	}
+	expanded, err := tmpl.Expand(map[string]interface{}{
 		"appID":         up.ApplicationId,
 		"applicationID": up.ApplicationId,
 		"appEUI":        joinEUI,
@@ -447,4 +449,8 @@ func expandVariables(url *url.URL, up *ttnpb.ApplicationUp) {
 		"devEUI":        devEUI,
 		"devAddr":       devAddr,
 	})
+	if err != nil {
+		return nil, err
+	}
+	return url.Parse(expanded)
 }
