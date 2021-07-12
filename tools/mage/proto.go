@@ -29,35 +29,23 @@ import (
 )
 
 const (
-	protocName    = "thethingsindustries/protoc"
-	protocVersion = "3.1.28-dev-tts"
-
-	protocOut = "/out"
+	protocOut             = "/out"
+	gogoProtoImage        = "ghcr.io/thethingsindustries/protoc:gen-gogo-1.3.1"
+	fieldMaskProtoImage   = "thethingsindustries/protoc:3.1.28-dev-tts"
+	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
+	swaggerProtoImage     = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
+	docProtoImage         = "ghcr.io/thethingsindustries/protoc:gen-doc-1.4.1"
 )
 
 // Proto namespace.
 type Proto mg.Namespace
-
-// Image pulls the proto image.
-func (Proto) Image(context.Context) error {
-	out, err := sh.Output("docker", "images", "-q", fmt.Sprintf("%s:%s", protocName, protocVersion))
-	if err != nil {
-		return fmt.Errorf("failed to query docker images: %s", err)
-	}
-	if len(out) > 0 {
-		return nil
-	}
-	return sh.Run("docker", "pull", fmt.Sprintf("%s:%s", protocName, protocVersion))
-}
 
 type protocContext struct {
 	WorkingDirectory string
 	UID, GID         string
 }
 
-func makeProtoc() (func(...string) error, *protocContext, error) {
-	mg.Deps(Proto.Image)
-
+func makeProtoc(image string) (func(...string) error, *protocContext, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get working directory: %w", err)
@@ -75,7 +63,8 @@ func makeProtoc() (func(...string) error, *protocContext, error) {
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/go.thethings.network/lorawan-stack/v3/pkg/ttnpb", filepath.Join(wd, "pkg", "ttnpb"), protocOut),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/v3/sdk/js", filepath.Join(wd, "sdk", "js"), mountWD),
 			"-w", mountWD,
-			fmt.Sprintf("%s:%s", protocName, protocVersion),
+			image,
+			fmt.Sprintf("-I%s/api/third_party", wd),
 			fmt.Sprintf("-I%s", filepath.Dir(wd)),
 		), &protocContext{
 			WorkingDirectory: mountWD,
@@ -84,27 +73,50 @@ func makeProtoc() (func(...string) error, *protocContext, error) {
 		}, nil
 }
 
-func withProtoc(f func(pCtx *protocContext, protoc func(...string) error) error) error {
-	protoc, pCtx, err := makeProtoc()
+func withProtoc(image string, f func(pCtx *protocContext, protoc func(...string) error) error) error {
+	protoc, pCtx, err := makeProtoc(image)
 	if err != nil {
 		return errors.New("failed to construct protoc command")
 	}
 	return f(pCtx, protoc)
 }
 
-// Go generates Go protos.
-func (p Proto) Go(context.Context) error {
-	if err := withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
-		var convs []string
-		for _, t := range []string{"any", "duration", "empty", "field_mask", "struct", "timestamp", "wrappers"} {
-			convs = append(convs, fmt.Sprintf("Mgoogle/protobuf/%s.proto=github.com/gogo/protobuf/types", t))
-		}
-		convStr := strings.Join(convs, ",")
+var gogoConvString = func() string {
+	var convs []string
+	for _, t := range []string{"any", "duration", "empty", "field_mask", "struct", "timestamp", "wrappers"} {
+		convs = append(convs, fmt.Sprintf("Mgoogle/protobuf/%s.proto=github.com/gogo/protobuf/types", t))
+	}
+	return strings.Join(convs, ",")
+}()
 
+func (p Proto) gogo(context.Context) error {
+	return withProtoc(gogoProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
-			fmt.Sprintf("--fieldmask_out=lang=gogo,%s:%s", convStr, protocOut),
-			fmt.Sprintf("--gogottn_out=plugins=grpc,%s:%s", convStr, protocOut),
-			fmt.Sprintf("--grpc-gateway_out=%s:%s", convStr, protocOut),
+			fmt.Sprintf("--gogo_out=plugins=grpc,%s:%s", gogoConvString, protocOut),
+			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+		); err != nil {
+			return fmt.Errorf("failed to generate protos: %w", err)
+		}
+		return nil
+	})
+}
+
+func (p Proto) fieldMask(context.Context) error {
+	return withProtoc(fieldMaskProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
+		if err := protoc(
+			fmt.Sprintf("--fieldmask_out=lang=gogo,%s:%s", gogoConvString, protocOut),
+			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+		); err != nil {
+			return fmt.Errorf("failed to generate protos: %w", err)
+		}
+		return nil
+	})
+}
+
+func (p Proto) grpcGateway(context.Context) error {
+	if err := withProtoc(grpcGatewayProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
+		if err := protoc(
+			fmt.Sprintf("--grpc-gateway_out=%s:%s", gogoConvString, protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
@@ -118,15 +130,16 @@ func (p Proto) Go(context.Context) error {
 		return fmt.Errorf("failed to fix gRPC-gateway names: %w", err)
 	}
 
+	return nil
+}
+
+// Go generates Go protos.
+func (p Proto) Go(context.Context) error {
+	mg.Deps(p.gogo, p.fieldMask, p.grpcGateway)
+
 	ttnpb, err := filepath.Abs(filepath.Join("pkg", "ttnpb"))
 	if err != nil {
 		return fmt.Errorf("failed to construct absolute path to pkg/ttnpb: %w", err)
-	}
-	if err := runGoTool("golang.org/x/tools/cmd/goimports", "-w", ttnpb); err != nil {
-		return fmt.Errorf("failed to run goimports on generated code: %w", err)
-	}
-	if err := runUnconvert(ttnpb); err != nil {
-		return fmt.Errorf("failed to run unconvert on generated code: %w", err)
 	}
 	return sh.RunV("gofmt", "-w", "-s", ttnpb)
 }
@@ -161,7 +174,7 @@ func (p Proto) Swagger(context.Context) error {
 	if !ok {
 		return nil
 	}
-	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
+	return withProtoc(swaggerProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--swagger_out=allow_merge,merge_file_name=api:%s/api", pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
@@ -189,7 +202,7 @@ func (p Proto) Markdown(context.Context) error {
 	if !ok {
 		return nil
 	}
-	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
+	return withProtoc(docProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--doc_opt=%s/api/api.md.tmpl,api.md --doc_out=%s/api", pCtx.WorkingDirectory, pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
@@ -217,7 +230,7 @@ func (p Proto) JsSDK(context.Context) error {
 	if !ok {
 		return nil
 	}
-	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
+	return withProtoc(docProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--doc_opt=json,api.json --doc_out=%s/v3/sdk/js/generated", pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),

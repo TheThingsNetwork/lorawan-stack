@@ -4,7 +4,6 @@ package ttnpb
 
 import (
 	fmt "fmt"
-
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 

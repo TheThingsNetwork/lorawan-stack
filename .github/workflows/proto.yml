@@ -38,8 +38,6 @@ jobs:
     - name: Make Mage
       run: make tools/bin/mage
       if: steps.tools-cache.outputs.cache-hit != 'true'
-    - name: Download protoc image
-      run: tools/bin/mage proto:image
     - name: Generate protos
       run: tools/bin/mage proto:clean proto:all
     - name: Check for diff

@@ -46,8 +46,6 @@ jobs:
     - name: Make Mage
       run: make tools/bin/mage
       if: steps.tools-cache.outputs.cache-hit != 'true'
-    - name: Remove unnecessary type conversions
-      run: tools/bin/mage go:unconvert
     - name: Format code
       run: tools/bin/mage go:fmt
     - name: Lint code

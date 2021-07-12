@@ -4,9 +4,8 @@ package ttnpb
 
 import (
 	fmt "fmt"
-	time "time"
-
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
+	time "time"
 )
 
 func (dst *Message) SetFields(src *Message, paths ...string) error {
