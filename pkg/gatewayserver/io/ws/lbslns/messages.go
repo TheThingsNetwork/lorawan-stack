@@ -18,7 +18,6 @@ import (
 	"encoding/json"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 // MessageType is the type of the message.
@@ -57,8 +56,6 @@ type DiscoverResponse struct {
 	URI   string           `json:"uri,omitempty"`
 	Error string           `json:"error,omitempty"`
 }
-
-var errNotSupported = errors.DefineFailedPrecondition("not_supported", "not supported")
 
 // Type returns the message type of the given data.
 func Type(data []byte) (string, error) {
