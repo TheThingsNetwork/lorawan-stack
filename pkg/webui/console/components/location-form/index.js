@@ -63,6 +63,7 @@ const validationSchema = Yup.object().shape({
 // We consider location of an entity set iff at least one coordinate is set,
 // i.e. longitude, altitude, latitude.
 const hasLocationSet = location =>
+  location !== null &&
   typeof location === 'object' &&
   (typeof location.altitude !== 'undefined' ||
     typeof location.latitude !== 'undefined' ||

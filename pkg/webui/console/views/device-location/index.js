@@ -42,7 +42,11 @@ const getRegistryLocation = locations => {
   let registryLocation
   if (locations) {
     for (const key of Object.keys(locations)) {
-      if (typeof locations[key] === 'object' && locations[key].source === 'SOURCE_REGISTRY') {
+      if (
+        locations[key] !== null &&
+        typeof locations[key] === 'object' &&
+        locations[key].source === 'SOURCE_REGISTRY'
+      ) {
         registryLocation = { location: locations[key], key }
         break
       }

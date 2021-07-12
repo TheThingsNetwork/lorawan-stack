@@ -48,14 +48,21 @@ class Gateways {
       const { antennas } = gateway
 
       for (const antenna of antennas) {
-        if (!('altitude' in antenna.location)) {
-          antenna.location.altitude = 0
-        }
-        if (!('longitude' in antenna.location)) {
-          antenna.location.longitude = 0
-        }
-        if (!('latitude' in antenna.location)) {
-          antenna.location.latitude = 0
+        if (
+          antenna !== null &&
+          typeof antenna === 'object' &&
+          antenna.location !== null &&
+          typeof antenna.location === 'object'
+        ) {
+          if (!('altitude' in antenna.location)) {
+            antenna.location.altitude = 0
+          }
+          if (!('longitude' in antenna.location)) {
+            antenna.location.longitude = 0
+          }
+          if (!('latitude' in antenna.location)) {
+            antenna.location.latitude = 0
+          }
         }
       }
     }

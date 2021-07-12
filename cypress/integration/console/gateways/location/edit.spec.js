@@ -47,11 +47,21 @@ describe('Gateway location', () => {
     },
   }
 
+  const updatedGatewayNullLocation = {
+    gateway: {
+      antennas: [{ location: null }],
+      location_public: true,
+      update_location_from_status: false,
+    },
+    field_mask: {
+      paths: ['antennas', 'location_public', 'update_location_from_status'],
+    },
+  }
+
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createGateway(gateway, userId)
-    cy.updateGateway(gatewayId, updatedGatewayLocation)
   })
 
   beforeEach(() => {
@@ -59,6 +69,23 @@ describe('Gateway location', () => {
   })
 
   it('succeeds editing latitude, longitude, altitude', () => {
+    cy.updateGateway(gatewayId, updatedGatewayLocation)
+    cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
+    cy.findByLabelText('Latitude').type(coordinates.latitude)
+    cy.findByLabelText('Longitude').type(coordinates.longitude)
+    cy.findByLabelText('Altitude').type(coordinates.altitude)
+
+    cy.findByRole('button', { name: 'Save changes' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification')
+      .should('be.visible')
+      .findByText(`Location updated`)
+      .should('be.visible')
+  })
+
+  it('suceeds editing the location when location was null', () => {
+    cy.updateGateway(gatewayId, updatedGatewayNullLocation)
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
     cy.findByLabelText('Latitude').type(coordinates.latitude)
     cy.findByLabelText('Longitude').type(coordinates.longitude)
@@ -74,6 +101,7 @@ describe('Gateway location', () => {
   })
 
   it('succeeds editing latitude and longitude based map widget location change', () => {
+    cy.updateGateway(gatewayId, updatedGatewayLocation)
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
     cy.findByTestId('location-map').should('be.visible')
     cy.findByTestId('location-map').click(30, 30)
@@ -92,6 +120,7 @@ describe('Gateway location', () => {
   })
 
   it('succeeds deleting location entry', () => {
+    cy.updateGateway(gatewayId, updatedGatewayLocation)
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
     cy.findByRole('button', { name: /Remove location entry/ }).click()
 
@@ -107,14 +136,8 @@ describe('Gateway location', () => {
       .should('be.visible')
       .findByText(`Location deleted`)
       .should('be.visible')
-    cy.findByLabelText('Latitude')
-      .should('have.attr', 'value')
-      .and('eq', '')
-    cy.findByLabelText('Longitude')
-      .should('have.attr', 'value')
-      .and('eq', '')
-    cy.findByLabelText('Altitude')
-      .should('have.attr', 'value')
-      .and('eq', '')
+    cy.findByLabelText('Latitude').should('have.attr', 'value').and('eq', '')
+    cy.findByLabelText('Longitude').should('have.attr', 'value').and('eq', '')
+    cy.findByLabelText('Altitude').should('have.attr', 'value').and('eq', '')
   })
 })
