@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -245,6 +246,11 @@ func (s *server) Token(c echo.Context) error {
 	if err := tokenRequest.ValidateContext(req.Context()); err != nil {
 		return err
 	}
+
+	req = req.WithContext(
+		log.NewContextWithField(req.Context(), "oauth_client_id", tokenRequest.ClientID),
+	)
+	c.SetRequest(req)
 
 	req.Form = tokenRequest.Values()
 	req.PostForm = req.Form

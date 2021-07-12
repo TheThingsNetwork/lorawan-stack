@@ -4735,7 +4735,7 @@
   },
   "error:pkg/identityserver/store:access_token_not_found": {
     "translations": {
-      "en": "access token not found"
+      "en": "access token `{access_token_id}` not found"
     },
     "description": {
       "package": "pkg/identityserver/store",

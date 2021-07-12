@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 - Payload formatter length validation in the Console.
 - User session management (listing and deleting) in the Identity Server and the CLI.
+- Improved logging for the OAuth server.
 
 ### Changed
 
