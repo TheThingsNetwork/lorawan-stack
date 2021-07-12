@@ -72,6 +72,7 @@ const getRegistryLocation = antennas => {
   if (antennas) {
     for (const key of Object.keys(antennas)) {
       if (
+        antennas[key].location !== null &&
         typeof antennas[key].location === 'object' &&
         antennas[key].location.source === 'SOURCE_REGISTRY'
       ) {
