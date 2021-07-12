@@ -30,11 +30,11 @@ import (
 
 const (
 	protocOut             = "/out"
-	gogoProtoImage        = "ghcr.io/htdvisser/protoc:gen-gogo-1.3.1"
+	gogoProtoImage        = "ghcr.io/thethingsindustries/protoc:gen-gogo-1.3.1"
 	fieldMaskProtoImage   = "thethingsindustries/protoc:3.1.28-dev-tts"
-	grpcGatewayProtoImage = "ghcr.io/htdvisser/protoc:gen-grpc-gateway-1.16.0"
-	swaggerProtoImage     = "ghcr.io/htdvisser/protoc:gen-grpc-gateway-1.16.0"
-	docProtoImage         = "ghcr.io/htdvisser/protoc:gen-doc-1.4.1"
+	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
+	swaggerProtoImage     = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
+	docProtoImage         = "ghcr.io/thethingsindustries/protoc:gen-doc-1.4.1"
 )
 
 // Proto namespace.
