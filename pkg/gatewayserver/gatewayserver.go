@@ -443,6 +443,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{
 				"antennas",
+				"disable_packet_broker_forwarding",
 				"downlink_path_constraint",
 				"enforce_duty_cycle",
 				"frequency_plan_id",
@@ -661,6 +662,9 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 
 	hosts := make([]*upstreamHost, 0, len(gs.upstreamHandlers))
 	for name, handler := range gs.upstreamHandlers {
+		if name == "packetbroker" && gtw.DisablePacketBrokerForwarding {
+			continue
+		}
 		host := &upstreamHost{
 			name:          name,
 			handler:       handler,
