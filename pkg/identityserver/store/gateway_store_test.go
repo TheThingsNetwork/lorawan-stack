@@ -88,12 +88,13 @@ func TestGatewayStore(t *testing.T) {
 					Placement: ttnpb.GatewayAntennaPlacement_OUTDOOR,
 				},
 			},
-			ScheduleAnytimeDelay:     &scheduleAnytimeDelay,
-			UpdateLocationFromStatus: true,
-			LBSLNSSecret:             secret,
-			ClaimAuthenticationCode:  &gtwClaimAuthCode,
-			TargetCUPSURI:            targetCUPSURI,
-			TargetCUPSKey:            secret,
+			ScheduleAnytimeDelay:          &scheduleAnytimeDelay,
+			UpdateLocationFromStatus:      true,
+			LBSLNSSecret:                  secret,
+			ClaimAuthenticationCode:       &gtwClaimAuthCode,
+			TargetCUPSURI:                 targetCUPSURI,
+			TargetCUPSKey:                 secret,
+			DisablePacketBrokerForwarding: true,
 		})
 
 		a.So(err, should.BeNil)
@@ -117,9 +118,10 @@ func TestGatewayStore(t *testing.T) {
 			a.So(created.TargetCUPSURI, should.Equal, targetCUPSURI)
 			a.So(created.TargetCUPSKey, should.NotBeNil)
 			a.So(created.TargetCUPSKey, should.Resemble, secret)
+			a.So(created.DisablePacketBrokerForwarding, should.BeTrue)
 		}
 
-		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}})
+		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key", "disable_packet_broker_forwarding"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -133,6 +135,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.ClaimAuthenticationCode.Secret, should.Resemble, created.ClaimAuthenticationCode.Secret)
 			a.So(got.TargetCUPSURI, should.Equal, created.TargetCUPSURI)
 			a.So(got.TargetCUPSKey, should.Resemble, created.TargetCUPSKey)
+			a.So(got.DisablePacketBrokerForwarding, should.BeTrue)
 		}
 
 		byEUI, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{Eui: &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}}, &pbtypes.FieldMask{Paths: []string{"name"}})
@@ -176,13 +179,14 @@ func TestGatewayStore(t *testing.T) {
 					Placement:  ttnpb.GatewayAntennaPlacement_OUTDOOR,
 				},
 			},
-			ScheduleAnytimeDelay:     nil,
-			UpdateLocationFromStatus: false,
-			LBSLNSSecret:             otherSecret,
-			ClaimAuthenticationCode:  &otherGtwClaimAuthCode,
-			TargetCUPSURI:            otherTargetCUPSURI,
-			TargetCUPSKey:            otherSecret,
-		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "antennas", "schedule_anytime_delay", "update_location_from_status", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key"}})
+			ScheduleAnytimeDelay:          nil,
+			UpdateLocationFromStatus:      false,
+			LBSLNSSecret:                  otherSecret,
+			ClaimAuthenticationCode:       &otherGtwClaimAuthCode,
+			TargetCUPSURI:                 otherTargetCUPSURI,
+			TargetCUPSKey:                 otherSecret,
+			DisablePacketBrokerForwarding: false,
+		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "antennas", "schedule_anytime_delay", "update_location_from_status", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key", "disable_packet_broker_forwarding"}})
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
@@ -204,6 +208,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(updated.ClaimAuthenticationCode.Secret, should.Resemble, otherGtwClaimAuthCode.Secret)
 			a.So(updated.TargetCUPSKey, should.Resemble, otherSecret)
 			a.So(updated.TargetCUPSURI, should.Resemble, otherTargetCUPSURI)
+			a.So(updated.DisablePacketBrokerForwarding, should.BeFalse)
 		}
 
 		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, nil)
