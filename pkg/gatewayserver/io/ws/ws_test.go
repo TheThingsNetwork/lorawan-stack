@@ -919,7 +919,7 @@ func TestTraffic(t *testing.T) {
 				},
 			},
 			ExpectedBSDownstream: lbslns.DownlinkMessage{
-				DevEUI:      "00-00-00-00-00-00-00-00",
+				DevEUI:      "00-00-00-00-00-00-00-01",
 				DeviceClass: 0,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
 				Diid:        1,
