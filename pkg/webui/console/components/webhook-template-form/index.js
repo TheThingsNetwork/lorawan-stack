@@ -30,8 +30,7 @@ import WebhookTemplateInfo from '@console/components/webhook-template-info'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-
-import { id as webhookIdRegexp } from '@console/lib/regexp'
+import { id as webhookIdRegexp } from '@ttn-lw/lib/regexp'
 
 const m = defineMessages({
   createTemplate: 'Create {template} webhook',
@@ -159,9 +158,9 @@ export default class WebhookTemplateForm extends Component {
         }),
         {
           webhook_id: Yup.string()
+            .min(3, Yup.passValues(sharedMessages.validateTooShort))
+            .max(36, Yup.passValues(sharedMessages.validateTooLong))
             .matches(webhookIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
-            .min(2, Yup.passValues(sharedMessages.validateTooShort))
-            .max(25, Yup.passValues(sharedMessages.validateTooLong))
             .required(sharedMessages.validateRequired),
         },
       ),

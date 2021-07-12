@@ -29,7 +29,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import createPasswordValidationSchema from '@ttn-lw/lib/create-password-validation-schema'
 
-import { id as userIdRegexp } from '@console/lib/regexp'
+import { userId as userIdRegexp } from '@console/lib/regexp'
 
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -62,7 +62,7 @@ const baseValidationSchema = Yup.object().shape({
   ids: Yup.object().shape({
     user_id: Yup.string()
       .min(2, Yup.passValues(sharedMessages.validateTooShort))
-      .max(25, Yup.passValues(sharedMessages.validateTooLong))
+      .max(36, Yup.passValues(sharedMessages.validateTooLong))
       .matches(userIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
       .required(sharedMessages.validateRequired),
   }),

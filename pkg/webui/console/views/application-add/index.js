@@ -35,8 +35,8 @@ import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getApplicationId } from '@ttn-lw/lib/selectors/id'
+import { id as applicationIdRegexp } from '@ttn-lw/lib/regexp'
 
-import { id as applicationIdRegexp } from '@console/lib/regexp'
 import { mayCreateApplications } from '@console/lib/feature-checks'
 
 import { selectUserId, selectUserRights } from '@console/store/selectors/user'
@@ -54,9 +54,9 @@ const m = defineMessages({
 const validationSchema = Yup.object().shape({
   owner_id: Yup.string().required(sharedMessages.validateRequired),
   application_id: Yup.string()
+    .min(3, Yup.passValues(sharedMessages.validateTooShort))
+    .max(36, Yup.passValues(sharedMessages.validateTooLong))
     .matches(applicationIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
-    .min(2, Yup.passValues(sharedMessages.validateTooShort))
-    .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   name: Yup.string()
     .min(2, Yup.passValues(sharedMessages.validateTooShort))

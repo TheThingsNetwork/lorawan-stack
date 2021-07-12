@@ -14,21 +14,18 @@
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { id as gatewayIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { attributeValidCheck, attributeTooShortCheck } from '@console/lib/attributes'
-import {
-  id as gatewayIdRegexp,
-  address as addressRegexp,
-  delay as delayRegexp,
-} from '@console/lib/regexp'
+import { address as addressRegexp, delay as delayRegexp } from '@console/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   owner_id: Yup.string(),
   ids: Yup.object().shape({
     gateway_id: Yup.string()
-      .matches(gatewayIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
-      .min(2, Yup.passValues(sharedMessages.validateTooShort))
+      .min(3, Yup.passValues(sharedMessages.validateTooShort))
       .max(36, Yup.passValues(sharedMessages.validateTooLong))
+      .matches(gatewayIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
       .required(sharedMessages.validateRequired),
     eui: Yup.nullableString().length(8 * 2, Yup.passValues(sharedMessages.validateLength)),
   }),

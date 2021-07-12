@@ -22,9 +22,9 @@ import { parseLorawanMacVersion } from '@console/lib/device-utils'
 import { REGISTRATION_TYPES } from '../utils'
 
 const deviceIdSchema = Yup.string()
-  .matches(deviceIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
-  .min(2, Yup.passValues(sharedMessages.validateTooShort))
+  .min(3, Yup.passValues(sharedMessages.validateTooShort))
   .max(36, Yup.passValues(sharedMessages.validateTooLong))
+  .matches(deviceIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
   .required(sharedMessages.validateRequired)
 
 const joinEUISchema = Yup.string().length(8 * 2, Yup.passValues(sharedMessages.validateLength))

@@ -22,15 +22,14 @@ import Input from '@ttn-lw/components/input'
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import { id as organizationIdRegexp } from '@console/lib/regexp'
+import { id as organizationIdRegexp } from '@ttn-lw/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
     organization_id: Yup.string()
+      .min(3, Yup.passValues(sharedMessages.validateTooShort))
+      .max(36, Yup.passValues(sharedMessages.validateTooLong))
       .matches(organizationIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
-      .min(2, Yup.passValues(sharedMessages.validateTooShort))
-      .max(25, Yup.passValues(sharedMessages.validateTooLong))
       .required(sharedMessages.validateRequired),
   }),
   name: Yup.string()
