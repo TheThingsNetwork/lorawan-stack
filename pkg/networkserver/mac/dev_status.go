@@ -39,9 +39,9 @@ const (
 	DefaultStatusTimePeriodicity         = 24 * time.Hour
 )
 
-func deviceStatusCountPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
-	if dev.MACSettings != nil && dev.MACSettings.StatusCountPeriodicity != nil {
-		return dev.MACSettings.StatusCountPeriodicity.Value
+func DeviceStatusCountPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
+	if v := dev.GetMACSettings().GetStatusCountPeriodicity(); v != nil {
+		return v.Value
 	}
 	if defaults.StatusCountPeriodicity != nil {
 		return defaults.StatusCountPeriodicity.Value
@@ -49,9 +49,9 @@ func deviceStatusCountPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettin
 	return DefaultStatusCountPeriodicity
 }
 
-func deviceStatusTimePeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
-	if dev.MACSettings != nil && dev.MACSettings.StatusTimePeriodicity != nil {
-		return *dev.MACSettings.StatusTimePeriodicity
+func DeviceStatusTimePeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
+	if v := dev.GetMACSettings().GetStatusTimePeriodicity(); v != nil {
+		return *v
 	}
 	if defaults.StatusTimePeriodicity != nil {
 		return *defaults.StatusTimePeriodicity
@@ -63,7 +63,7 @@ func DeviceNeedsDevStatusReqAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings)
 	if dev.MACState == nil {
 		return time.Time{}, false
 	}
-	tp := deviceStatusTimePeriodicity(dev, defaults)
+	tp := DeviceStatusTimePeriodicity(dev, defaults)
 	if tp == 0 {
 		return time.Time{}, false
 	}
@@ -78,7 +78,7 @@ func DeviceNeedsDevStatusReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, t
 		return false
 	}
 	timedAt, timeBound := DeviceNeedsDevStatusReqAt(dev, defaults)
-	cp := deviceStatusCountPeriodicity(dev, defaults)
+	cp := DeviceStatusCountPeriodicity(dev, defaults)
 	return (cp != 0 || timeBound) && dev.LastDevStatusReceivedAt == nil ||
 		cp != 0 && dev.MACState.LastDevStatusFCntUp+cp <= dev.Session.LastFCntUp ||
 		timeBound && !timedAt.After(transmitAt)

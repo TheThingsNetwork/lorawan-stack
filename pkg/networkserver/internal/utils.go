@@ -67,19 +67,23 @@ var LoRaWANBands = func() map[string]map[ttnpb.PHYVersion]*band.Band {
 
 var errNoBandVersion = errors.DefineInvalidArgument("no_band_version", "specified version `{ver}` of band `{id}` does not exist")
 
-func DeviceFrequencyPlanAndBand(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*frequencyplans.FrequencyPlan, *band.Band, error) {
-	fp, err := fps.GetByID(dev.FrequencyPlanID)
+func FrequencyPlanAndBand(frequencyPlanID string, phyVersion ttnpb.PHYVersion, fps *frequencyplans.Store) (*frequencyplans.FrequencyPlan, *band.Band, error) {
+	fp, err := fps.GetByID(frequencyPlanID)
 	if err != nil {
 		return nil, nil, err
 	}
-	b, ok := LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion]
+	b, ok := LoRaWANBands[fp.BandID][phyVersion]
 	if !ok || b == nil {
 		return nil, nil, errNoBandVersion.WithAttributes(
-			"ver", dev.LoRaWANPHYVersion,
+			"ver", phyVersion,
 			"id", fp.BandID,
 		)
 	}
 	return fp, b, nil
+}
+
+func DeviceFrequencyPlanAndBand(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*frequencyplans.FrequencyPlan, *band.Band, error) {
+	return FrequencyPlanAndBand(dev.FrequencyPlanID, dev.LoRaWANPHYVersion, fps)
 }
 
 func DeviceBand(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*band.Band, error) {

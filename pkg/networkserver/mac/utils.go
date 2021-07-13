@@ -67,8 +67,8 @@ func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.D
 const DefaultClassBTimeout = 10 * time.Minute
 
 func DeviceClassBTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
-	if dev.MACSettings != nil && dev.MACSettings.ClassBTimeout != nil {
-		return *dev.MACSettings.ClassBTimeout
+	if t := dev.GetMACSettings().GetClassBTimeout(); t != nil {
+		return *t
 	}
 	if defaults.ClassBTimeout != nil {
 		return *defaults.ClassBTimeout
@@ -81,8 +81,8 @@ func DeviceClassBTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.
 const DefaultClassCTimeout = 5 * time.Minute
 
 func DeviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
-	if dev.MACSettings != nil && dev.MACSettings.ClassCTimeout != nil {
-		return *dev.MACSettings.ClassCTimeout
+	if t := dev.GetMACSettings().GetClassCTimeout(); t != nil {
+		return *t
 	}
 	if defaults.ClassCTimeout != nil {
 		return *defaults.ClassCTimeout
@@ -149,11 +149,11 @@ func DeviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Ba
 	if !phy.EnableADR {
 		return false
 	}
-	if dev.Multicast {
+	if dev.GetMulticast() {
 		return false
 	}
-	if dev.MACSettings != nil && dev.MACSettings.UseADR != nil {
-		return dev.MACSettings.UseADR.Value
+	if v := dev.GetMACSettings().GetUseADR(); v != nil {
+		return v.Value
 	}
 	if defaults.UseADR != nil {
 		return defaults.UseADR.Value

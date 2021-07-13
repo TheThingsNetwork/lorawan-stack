@@ -81,9 +81,9 @@ const (
 	DefaultADRMargin = 15
 )
 
-func deviceADRMargin(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) float32 {
-	if dev.MACSettings != nil && dev.MACSettings.ADRMargin != nil {
-		return dev.MACSettings.ADRMargin.Value
+func DeviceADRMargin(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) float32 {
+	if v := dev.GetMACSettings().GetADRMargin(); v != nil {
+		return v.Value
 	}
 	if defaults.ADRMargin != nil {
 		return defaults.ADRMargin.Value
@@ -233,7 +233,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		if !ok {
 			return ErrInvalidDataRate.New()
 		}
-		margin = maxSNR - df - deviceADRMargin(dev, defaults)
+		margin = maxSNR - df - DeviceADRMargin(dev, defaults)
 	}
 	if len(adrUplinks) < OptimalADRUplinkCount {
 		margin -= safetyMargin
