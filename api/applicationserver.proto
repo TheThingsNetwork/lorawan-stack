@@ -99,7 +99,7 @@ message AsConfiguration {
 
       Status mqtt = 1;
       Status nats = 2;
-      Status aws_iot = 3;
+      reserved 3; // Deprecated: aws_iot
     }
 
     Providers providers = 1;

@@ -11181,9 +11181,6 @@
         },
         "nats": {
           "$ref": "#/definitions/ProvidersStatus"
-        },
-        "aws_iot": {
-          "$ref": "#/definitions/ProvidersStatus"
         }
       }
     },
