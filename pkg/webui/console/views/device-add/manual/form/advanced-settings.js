@@ -83,7 +83,6 @@ const AdvancedSettingsSection = props => {
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
-  const isNone = activationMode === ACTIVATION_MODES.NONE
   const isClassB = deviceClass === DEVICE_CLASS_MAP.CLASS_B
   const isClassC =
     deviceClass === DEVICE_CLASS_MAP.CLASS_B_C || deviceClass === DEVICE_CLASS_MAP.CLASS_C
@@ -121,19 +120,16 @@ const AdvancedSettingsSection = props => {
           value={ACTIVATION_MODES.MULTICAST}
           disabled={!nsEnabled}
         />
-        <Radio label={messages.activationModeNone} value={ACTIVATION_MODES.NONE} />
       </Form.Field>
-      {!isNone && (
-        <Form.Field
-          title={isMulticast ? m.multicastClassCapabilities : messages.classCapabilities}
-          required={isMulticast}
-          name="_device_class"
-          component={Select}
-          onChange={onDeviceClassChange}
-          options={isMulticast ? multicastClassOptions : allClassOptions}
-          tooltipId={tooltipIds.CLASSES}
-        />
-      )}
+      <Form.Field
+        title={isMulticast ? m.multicastClassCapabilities : messages.classCapabilities}
+        required={isMulticast}
+        name="_device_class"
+        component={Select}
+        onChange={onDeviceClassChange}
+        options={isMulticast ? multicastClassOptions : allClassOptions}
+        tooltipId={tooltipIds.CLASSES}
+      />
       <Form.Field
         label={messages.defaultNetworksSettings}
         name="_default_ns_settings"
@@ -171,7 +167,7 @@ const AdvancedSettingsSection = props => {
               </Form.FieldContainer>
             </>
           )}
-          {((isClassB && !isNone) || isMulticast) && (
+          {(isClassB || isMulticast) && (
             <Form.FieldContainer horizontal>
               <Form.Field
                 title={messages.classBTimeout}
@@ -197,66 +193,60 @@ const AdvancedSettingsSection = props => {
               />
             </Form.FieldContainer>
           )}
-          {!isNone && (
-            <>
-              <Form.FieldContainer horizontal>
-                {isClassC && (
-                  <Form.Field
-                    title={messages.classCTimeout}
-                    name="mac_settings.class_c_timeout"
-                    encode={timeoutEncode}
-                    decode={timeoutDecode}
-                    component={Input}
-                    type="number"
-                    inputWidth="xxs"
-                    autoWidth
-                  />
-                )}
-                <Form.Field
-                  title={messages.rx2DataRateIndexTitle}
-                  type="number"
-                  name="mac_settings.rx2_data_rate_index"
-                  tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
-                  component={Input}
-                  min={0}
-                  max={15}
-                  autoWidth
-                />
-                <Form.Field
-                  type="number"
-                  min={100000}
-                  step={100}
-                  title={messages.rx2FrequencyTitle}
-                  description={messages.rx2FrequencyDescription}
-                  placeholder={messages.frequencyPlaceholder}
-                  name="mac_settings.rx2_frequency"
-                  tooltipId={tooltipIds.RX2_FREQUENCY}
-                  component={Input}
-                  autoWidth
-                />
-              </Form.FieldContainer>
+          <Form.FieldContainer horizontal>
+            {isClassC && (
               <Form.Field
-                indexAsKey
-                name="mac_settings.factory_preset_frequencies"
-                component={KeyValueMap}
-                title={messages.factoryPresetFreqTitle}
-                description={messages.factoryPresetFreqDescription}
-                addMessage={messages.freqAdd}
-                valuePlaceholder={messages.frequencyPlaceholder}
+                title={messages.classCTimeout}
+                name="mac_settings.class_c_timeout"
+                encode={timeoutEncode}
+                decode={timeoutDecode}
+                component={Input}
+                type="number"
+                inputWidth="xxs"
+                autoWidth
               />
-            </>
-          )}
+            )}
+            <Form.Field
+              title={messages.rx2DataRateIndexTitle}
+              type="number"
+              name="mac_settings.rx2_data_rate_index"
+              tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
+              component={Input}
+              min={0}
+              max={15}
+              autoWidth
+            />
+            <Form.Field
+              type="number"
+              min={100000}
+              step={100}
+              title={messages.rx2FrequencyTitle}
+              description={messages.rx2FrequencyDescription}
+              placeholder={messages.frequencyPlaceholder}
+              name="mac_settings.rx2_frequency"
+              tooltipId={tooltipIds.RX2_FREQUENCY}
+              component={Input}
+              autoWidth
+            />
+          </Form.FieldContainer>
+          <Form.Field
+            indexAsKey
+            name="mac_settings.factory_preset_frequencies"
+            component={KeyValueMap}
+            title={messages.factoryPresetFreqTitle}
+            description={messages.factoryPresetFreqDescription}
+            addMessage={messages.freqAdd}
+            valuePlaceholder={messages.frequencyPlaceholder}
+          />
         </>
       )}
-      {!isNone && (
-        <Form.Field
-          label={m.useExternalServers}
-          name="_external_servers"
-          component={Checkbox}
-          onChange={handleExternalServers}
-        />
-      )}
-      {!isNone && externalServers && (
+      <Form.Field
+        label={m.useExternalServers}
+        name="_external_servers"
+        component={Checkbox}
+        onChange={handleExternalServers}
+      />
+      {externalServers && (
         <>
           <Form.Field
             title={sharedMessages.networkServerAddress}

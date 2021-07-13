@@ -230,7 +230,6 @@ const ManualForm = props => {
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
-  const isNone = activationMode === ACTIVATION_MODES.NONE
 
   const handleSubmit = React.useCallback(
     async (values, { setSubmitting, resetForm }) => {
@@ -311,33 +310,29 @@ const ManualForm = props => {
       error={error}
       formikRef={formRef}
     >
-      {!isNone && (
-        <>
-          <Form.Field
-            required
-            title={sharedMessages.macVersion}
-            name="lorawan_version"
-            component={Select}
-            options={LORAWAN_VERSIONS}
-            tooltipId={tooltipIds.LORAWAN_VERSION}
-            onChange={handleLorawanVersionChange}
-          />
-          <Form.Field
-            required
-            title={sharedMessages.phyVersion}
-            name="lorawan_phy_version"
-            component={PhyVersionInput}
-            lorawanVersion={lorawanVersion}
-            tooltipId={tooltipIds.REGIONAL_PARAMETERS}
-          />
-          <NsFrequencyPlansSelect
-            required={nsEnabled}
-            tooltipId={tooltipIds.FREQUENCY_PLAN}
-            name="frequency_plan_id"
-          />
-        </>
-      )}
-      {!isNone && <hr />}
+      <Form.Field
+        required
+        title={sharedMessages.macVersion}
+        name="lorawan_version"
+        component={Select}
+        options={LORAWAN_VERSIONS}
+        tooltipId={tooltipIds.LORAWAN_VERSION}
+        onChange={handleLorawanVersionChange}
+      />
+      <Form.Field
+        required
+        title={sharedMessages.phyVersion}
+        name="lorawan_phy_version"
+        component={PhyVersionInput}
+        lorawanVersion={lorawanVersion}
+        tooltipId={tooltipIds.REGIONAL_PARAMETERS}
+      />
+      <NsFrequencyPlansSelect
+        required={nsEnabled}
+        tooltipId={tooltipIds.FREQUENCY_PLAN}
+        name="frequency_plan_id"
+      />
+      <hr />
       <AdvancedSettingsSection
         jsEnabled={jsConfig.enabled}
         nsEnabled={nsConfig.enabled}
@@ -349,108 +344,104 @@ const ManualForm = props => {
         defaultNsSettings={defaultNsSettings}
       />
       <hr />
-      {!isNone && (
+      {!isMulticast && (
+        <Form.Field
+          title={sharedMessages.devEUI}
+          name="ids.dev_eui"
+          type="byte"
+          min={8}
+          max={8}
+          required={isOTAA}
+          component={Input}
+          tooltipId={tooltipIds.DEV_EUI}
+          onBlur={handleIdPrefill}
+        />
+      )}
+      {(isABP || isMulticast) && (
         <>
-          {!isMulticast && (
+          <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
+          <Form.Field
+            mayGenerateValue
+            title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
+            name="session.keys.f_nwk_s_int_key.key"
+            type="byte"
+            min={16}
+            max={16}
+            required
+            component={Input.Generate}
+            onGenerateValue={generate16BytesKey}
+            tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
+          />
+          {lwVersion >= 110 && (
             <Form.Field
-              title={sharedMessages.devEUI}
-              name="ids.dev_eui"
+              mayGenerateValue
+              title={sharedMessages.sNwkSIKey}
+              name="session.keys.s_nwk_s_int_key.key"
               type="byte"
-              min={8}
-              max={8}
-              required={isOTAA}
-              component={Input}
-              tooltipId={tooltipIds.DEV_EUI}
-              onBlur={handleIdPrefill}
+              min={16}
+              max={16}
+              required
+              description={sharedMessages.sNwkSIKeyDescription}
+              component={Input.Generate}
+              onGenerateValue={generate16BytesKey}
             />
           )}
-          {(isABP || isMulticast) && (
-            <>
-              <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
-              <Form.Field
-                mayGenerateValue
-                title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
-                name="session.keys.f_nwk_s_int_key.key"
-                type="byte"
-                min={16}
-                max={16}
-                required
-                component={Input.Generate}
-                onGenerateValue={generate16BytesKey}
-                tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
-              />
-              {lwVersion >= 110 && (
-                <Form.Field
-                  mayGenerateValue
-                  title={sharedMessages.sNwkSIKey}
-                  name="session.keys.s_nwk_s_int_key.key"
-                  type="byte"
-                  min={16}
-                  max={16}
-                  required
-                  description={sharedMessages.sNwkSIKeyDescription}
-                  component={Input.Generate}
-                  onGenerateValue={generate16BytesKey}
-                />
-              )}
-              {lwVersion >= 110 && (
-                <Form.Field
-                  mayGenerateValue
-                  title={sharedMessages.nwkSEncKey}
-                  name="session.keys.nwk_s_enc_key.key"
-                  type="byte"
-                  min={16}
-                  max={16}
-                  required
-                  description={sharedMessages.nwkSEncKeyDescription}
-                  component={Input.Generate}
-                  onGenerateValue={generate16BytesKey}
-                />
-              )}
-            </>
+          {lwVersion >= 110 && (
+            <Form.Field
+              mayGenerateValue
+              title={sharedMessages.nwkSEncKey}
+              name="session.keys.nwk_s_enc_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              required
+              description={sharedMessages.nwkSEncKeyDescription}
+              component={Input.Generate}
+              onGenerateValue={generate16BytesKey}
+            />
           )}
-          {isOTAA && (
-            <>
-              <Form.Field
-                title={lwVersion < 104 ? sharedMessages.appEUI : sharedMessages.joinEUI}
-                component={JoinEUIPRefixesInput}
-                name="ids.join_eui"
-                prefixes={prefixes}
-                required
-                showPrefixes
-                tooltipId={tooltipIds.JOIN_EUI}
-              />
-              <Form.Field
-                required
-                disabled={!mayEditKeys}
-                title={sharedMessages.appKey}
-                name="root_keys.app_key.key"
-                type="byte"
-                min={16}
-                max={16}
-                component={Input.Generate}
-                placeholder={appKeyPlaceholder}
-                mayGenerateValue={mayEditKeys}
-                onGenerateValue={generate16BytesKey}
-                tooltipId={tooltipIds.APP_KEY}
-              />
-              {lwVersion >= 110 && (
-                <Form.Field
-                  required
-                  title={sharedMessages.nwkKey}
-                  name="root_keys.nwk_key.key"
-                  type="byte"
-                  min={16}
-                  max={16}
-                  component={Input.Generate}
-                  placeholder={nwkKeyPlaceholder}
-                  disabled={!mayEditKeys}
-                  mayGenerateValue={mayEditKeys}
-                  onGenerateValue={generate16BytesKey}
-                  tooltipId={tooltipIds.NETWORK_KEY}
-                />
-              )}
-            </>
+        </>
+      )}
+      {isOTAA && (
+        <>
+          <Form.Field
+            title={lwVersion < 104 ? sharedMessages.appEUI : sharedMessages.joinEUI}
+            component={JoinEUIPRefixesInput}
+            name="ids.join_eui"
+            prefixes={prefixes}
+            required
+            showPrefixes
+            tooltipId={tooltipIds.JOIN_EUI}
+          />
+          <Form.Field
+            required
+            disabled={!mayEditKeys}
+            title={sharedMessages.appKey}
+            name="root_keys.app_key.key"
+            type="byte"
+            min={16}
+            max={16}
+            component={Input.Generate}
+            placeholder={appKeyPlaceholder}
+            mayGenerateValue={mayEditKeys}
+            onGenerateValue={generate16BytesKey}
+            tooltipId={tooltipIds.APP_KEY}
+          />
+          {lwVersion >= 110 && (
+            <Form.Field
+              required
+              title={sharedMessages.nwkKey}
+              name="root_keys.nwk_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              component={Input.Generate}
+              placeholder={nwkKeyPlaceholder}
+              disabled={!mayEditKeys}
+              mayGenerateValue={mayEditKeys}
+              onGenerateValue={generate16BytesKey}
+              tooltipId={tooltipIds.NETWORK_KEY}
+            />
           )}
         </>
       )}
