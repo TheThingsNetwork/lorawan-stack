@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package is abstracts the Identity Server Gateway functions.
-package is
+package gatewayserver
 
 import (
 	"context"
@@ -39,8 +38,8 @@ type IS struct {
 	Cluster
 }
 
-// New returns a new IS.
-func New(c Cluster) *IS {
+// NewIS returns a new IS.
+func NewIS(c Cluster) *IS {
 	return &IS{
 		Cluster: c,
 	}

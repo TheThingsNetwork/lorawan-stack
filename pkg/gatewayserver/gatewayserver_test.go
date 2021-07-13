@@ -39,7 +39,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
-	er "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/entityregistry/is"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
@@ -122,7 +121,7 @@ func TestGatewayServer(t *testing.T) {
 					UpdateConnectionStatsDebounceTime: 0,
 				}
 
-				er := er.New(c)
+				er := gatewayserver.NewIS(c)
 				gs, err := gatewayserver.New(c, gsConfig,
 					gatewayserver.WithRegistry(er),
 				)
