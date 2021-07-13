@@ -76,6 +76,8 @@ const AdvancedSettingsSection = props => {
     onDeviceClassChange,
     deviceClass,
     activationMode,
+    onDefaultNsSettingsChange,
+    defaultNsSettings,
   } = props
 
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
@@ -90,6 +92,11 @@ const AdvancedSettingsSection = props => {
   const handleExternalServers = React.useCallback(
     () => setExternalServer(external => !external),
     [],
+  )
+
+  const handleDefaultNsSettings = React.useCallback(
+    evt => onDefaultNsSettingsChange(evt.target.checked),
+    [onDefaultNsSettingsChange],
   )
 
   return (
@@ -127,7 +134,13 @@ const AdvancedSettingsSection = props => {
           tooltipId={tooltipIds.CLASSES}
         />
       )}
-      {nsEnabled && (
+      <Form.Field
+        label={messages.defaultNetworksSettings}
+        name="_default_ns_settings"
+        component={Checkbox}
+        onChange={handleDefaultNsSettings}
+      />
+      {!defaultNsSettings && nsEnabled && (
         <>
           {isABP && (
             <>
@@ -272,10 +285,12 @@ const AdvancedSettingsSection = props => {
 
 AdvancedSettingsSection.propTypes = {
   activationMode: PropTypes.oneOf(Object.values(ACTIVATION_MODES)).isRequired,
+  defaultNsSettings: PropTypes.bool.isRequired,
   deviceClass: PropTypes.string,
   jsEnabled: PropTypes.bool.isRequired,
   nsEnabled: PropTypes.bool.isRequired,
   onActivationModeChange: PropTypes.func.isRequired,
+  onDefaultNsSettingsChange: PropTypes.func.isRequired,
   onDeviceClassChange: PropTypes.func.isRequired,
 }
 

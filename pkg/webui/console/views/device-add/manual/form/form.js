@@ -88,6 +88,7 @@ const defaultValues = {
   _device_class: undefined,
   _external_servers: false,
   _registration: REGISTRATION_TYPES.SINGLE,
+  _default_ns_settings: true,
 }
 
 const generateDeviceId = (device = {}) => {
@@ -174,6 +175,27 @@ const ManualForm = props => {
     [validationContext],
   )
 
+  const [defaultNsSettings, setDefaultNsSettings] = React.useState(true)
+  const handleDefaultNsSettings = React.useCallback(
+    checked => {
+      const { setValues, values } = formRef.current
+
+      setValues(
+        validationSchema.cast(
+          {
+            ...defaultValues,
+            ...values,
+            mac_settings: defaultValues.mac_settings,
+          },
+          { context: validationContext },
+        ),
+      )
+
+      return setDefaultNsSettings(checked)
+    },
+    [validationContext],
+  )
+
   const [deviceClass, setDeviceClass] = React.useState(
     initialValues._activation_mode === ACTIVATION_MODES.OTAA ? DEVICE_CLASSES.CLASS_A : undefined,
   )
@@ -220,6 +242,7 @@ const ManualForm = props => {
           _device_class,
           _registration,
           _external_servers,
+          _default_ns_settings,
           ...castedValues
         } = validationSchema.cast(values, {
           context: validationContext,
@@ -322,6 +345,8 @@ const ManualForm = props => {
         onActivationModeChange={handleActivationModeChange}
         deviceClass={deviceClass}
         onDeviceClassChange={handleDeviceClassChange}
+        onDefaultNsSettingsChange={handleDefaultNsSettings}
+        defaultNsSettings={defaultNsSettings}
       />
       <hr />
       {!isNone && (
