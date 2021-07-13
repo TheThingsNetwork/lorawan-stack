@@ -241,6 +241,7 @@ const AdvancedSettingsSection = props => {
         </>
       )}
       <Form.Field
+        title={messages.clusterSettings}
         label={m.useExternalServers}
         name="_external_servers"
         component={Checkbox}

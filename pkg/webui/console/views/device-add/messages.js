@@ -51,6 +51,7 @@ const messages = defineMessages({
   classBTimeout: 'Class B timeout',
   classCTimeout: 'Class C timeout',
   defaultNetworksSettings: "Use network's Rx and frequency defaults",
+  clusterSettings: 'Cluster settings',
   // Device repository messages.
   otherOption: 'Other…',
   typeToSearch: 'Type to search…',
