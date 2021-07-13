@@ -20,13 +20,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
-
-var errNoClockSync = errors.DefineUnavailable("no_clock_sync", "no clock sync")
 
 // DownlinkMessage is the LoRaWAN downlink message sent to the LoRa Basics Station.
 type DownlinkMessage struct {
@@ -88,8 +85,8 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
 	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))
 
-	// This field is not used but needs to be defined for the station to parse the json.
-	dnmsg.DevEUI = "00-00-00-00-00-00-00-00"
+	// This field is not used but needs to be defined for the station to parse the json and should be non-zero for the station to return tx confirmations.
+	dnmsg.DevEUI = "00-00-00-00-00-00-00-01"
 
 	// Fix the Tx Parameters since we don't use the gateway scheduler.
 	dnmsg.Rx1DR = int(settings.DataRateIndex)

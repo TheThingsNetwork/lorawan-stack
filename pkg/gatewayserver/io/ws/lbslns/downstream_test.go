@@ -28,8 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func timePtr(time time.Time) *time.Time { return &time }
-
 func TestFromDownlinkMessage(t *testing.T) {
 	var lbsLNS lbsLNS
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
@@ -63,7 +61,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 				CorrelationIDs: []string{"correlation1"},
 			},
 			ExpectedDownlinkMessage: DownlinkMessage{
-				DevEUI:      "00-00-00-00-00-00-00-00",
+				DevEUI:      "00-00-00-00-00-00-00-01",
 				DeviceClass: 0,
 				Diid:        1,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
@@ -94,7 +92,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 				CorrelationIDs: []string{"correlation2"},
 			},
 			ExpectedDownlinkMessage: DownlinkMessage{
-				DevEUI:      "00-00-00-00-00-00-00-00",
+				DevEUI:      "00-00-00-00-00-00-00-01",
 				DeviceClass: 0,
 				Diid:        2,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
