@@ -35,9 +35,7 @@ require (
 	github.com/cloudflare/cfssl v1.4.1
 	github.com/magefile/mage v1.10.0
 	github.com/mattn/goveralls v0.0.5
-	github.com/mdempsky/unconvert v0.0.0-20200228143138-95ecdbfc0b5f
 	github.com/mgechev/revive v1.0.2
 	go.thethings.network/lorawan-stack/v3 v3.0.0-00010101000000-000000000000
-	golang.org/x/tools v0.1.0
 	gopkg.in/yaml.v2 v2.4.0
 )

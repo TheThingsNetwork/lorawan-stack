@@ -215,7 +215,7 @@ func TestForwarder(t *testing.T) {
 														Latitude:  52.5,
 														Longitude: 4.8,
 														Altitude:  2,
-														Hdop:      0,
+														Accuracy:  0,
 													},
 													SignalQuality: &packetbroker.TerrestrialGatewayAntennaSignalQuality{
 														ChannelRssi: -42,
@@ -608,7 +608,7 @@ func TestHomeNetwork(t *testing.T) {
 														Latitude:  52.5,
 														Longitude: 4.8,
 														Altitude:  2,
-														Hdop:      0,
+														Accuracy:  0,
 													},
 													SignalQuality: &packetbroker.TerrestrialGatewayAntennaSignalQuality{
 														ChannelRssi: -42,
