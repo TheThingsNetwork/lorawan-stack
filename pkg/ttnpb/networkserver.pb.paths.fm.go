@@ -9,3 +9,12 @@ var GenerateDevAddrResponseFieldPathsNested = []string{
 var GenerateDevAddrResponseFieldPathsTopLevel = []string{
 	"dev_addr",
 }
+var GetDefaultMACSettingsRequestFieldPathsNested = []string{
+	"frequency_plan_id",
+	"lorawan_phy_version",
+}
+
+var GetDefaultMACSettingsRequestFieldPathsTopLevel = []string{
+	"frequency_plan_id",
+	"lorawan_phy_version",
+}

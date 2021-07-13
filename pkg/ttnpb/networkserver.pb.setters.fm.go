@@ -23,3 +23,34 @@ func (dst *GenerateDevAddrResponse) SetFields(src *GenerateDevAddrResponse, path
 	}
 	return nil
 }
+
+func (dst *GetDefaultMACSettingsRequest) SetFields(src *GetDefaultMACSettingsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "frequency_plan_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_plan_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyPlanID = src.FrequencyPlanID
+			} else {
+				var zero string
+				dst.FrequencyPlanID = zero
+			}
+		case "lorawan_phy_version":
+			if len(subs) > 0 {
+				return fmt.Errorf("'lorawan_phy_version' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LorawanPhyVersion = src.LorawanPhyVersion
+			} else {
+				var zero PHYVersion
+				dst.LorawanPhyVersion = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

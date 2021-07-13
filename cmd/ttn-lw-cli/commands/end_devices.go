@@ -41,12 +41,13 @@ import (
 )
 
 var (
-	selectEndDeviceListFlags = &pflag.FlagSet{}
-	selectEndDeviceFlags     = &pflag.FlagSet{}
-	setEndDeviceFlags        = &pflag.FlagSet{}
-	endDeviceFlattenPaths    = []string{"provisioning_data"}
-	endDevicePictureFlags    = &pflag.FlagSet{}
-	endDeviceLocationFlags   = util.FieldFlags(&ttnpb.Location{}, "location")
+	selectEndDeviceListFlags   = &pflag.FlagSet{}
+	selectEndDeviceFlags       = &pflag.FlagSet{}
+	setEndDeviceFlags          = &pflag.FlagSet{}
+	endDeviceFlattenPaths      = []string{"provisioning_data"}
+	endDevicePictureFlags      = &pflag.FlagSet{}
+	endDeviceLocationFlags     = util.FieldFlags(&ttnpb.Location{}, "location")
+	getDefaultMACSettingsFlags = util.FieldFlags(&ttnpb.GetDefaultMACSettingsRequest{})
 
 	selectAllEndDeviceFlags = util.SelectAllFlagSet("end devices")
 )
@@ -1193,6 +1194,30 @@ This command may take end device identifiers from stdin.`,
 			return err
 		},
 	}
+	endDevicesGetDefaultMACSettingsCommand = &cobra.Command{
+		Use:               "get-default-mac-settings",
+		Short:             "Get Network Server default MAC settings for frequency plan and LoRaWAN version",
+		PersistentPreRunE: preRun(),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if !config.NetworkServerEnabled {
+				return errNetworkServerDisabled
+			}
+
+			req := &ttnpb.GetDefaultMACSettingsRequest{}
+			if err := util.SetFields(req, getDefaultMACSettingsFlags); err != nil {
+				return err
+			}
+			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewNsClient(ns).GetDefaultMACSettings(ctx, req)
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 )
 
 func init() {
@@ -1295,6 +1320,9 @@ func init() {
 	endDevicesCommand.AddCommand(endDevicesExternalJSCommand)
 
 	endDevicesCommand.AddCommand(applicationsDownlinkCommand)
+
+	endDevicesGetDefaultMACSettingsCommand.Flags().AddFlagSet(getDefaultMACSettingsFlags)
+	endDevicesCommand.AddCommand(endDevicesGetDefaultMACSettingsCommand)
 
 	Root.AddCommand(endDevicesCommand)
 

@@ -453,6 +453,7 @@
   - [Message `MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo)
 - [File `lorawan-stack/api/networkserver.proto`](#lorawan-stack/api/networkserver.proto)
   - [Message `GenerateDevAddrResponse`](#ttn.lorawan.v3.GenerateDevAddrResponse)
+  - [Message `GetDefaultMACSettingsRequest`](#ttn.lorawan.v3.GetDefaultMACSettingsRequest)
   - [Service `AsNs`](#ttn.lorawan.v3.AsNs)
   - [Service `GsNs`](#ttn.lorawan.v3.GsNs)
   - [Service `Ns`](#ttn.lorawan.v3.Ns)
@@ -6496,6 +6497,22 @@ Response of GenerateDevAddr.
 | ----- | ---- | ----- | ----------- |
 | `dev_addr` | [`bytes`](#bytes) |  |  |
 
+### <a name="ttn.lorawan.v3.GetDefaultMACSettingsRequest">Message `GetDefaultMACSettingsRequest`</a>
+
+Request of GetDefaultMACSettings.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `frequency_plan_id` | [`string`](#string) |  |  |
+| `lorawan_phy_version` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
+| `lorawan_phy_version` | <p>`enum.defined_only`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.AsNs">Service `AsNs`</a>
 
 The AsNs service connects an Application Server to a Network Server.
@@ -6522,12 +6539,14 @@ The Ns service manages the Network Server.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GenerateDevAddr` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`GenerateDevAddrResponse`](#ttn.lorawan.v3.GenerateDevAddrResponse) | GenerateDevAddr requests a device address assignment from the Network Server. |
+| `GetDefaultMACSettings` | [`GetDefaultMACSettingsRequest`](#ttn.lorawan.v3.GetDefaultMACSettingsRequest) | [`MACSettings`](#ttn.lorawan.v3.MACSettings) | GetDefaultMACSettings retrieves the default MAC settings for a frequency plan. |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `GenerateDevAddr` | `GET` | `/api/v3/ns/dev_addr` |  |
+| `GetDefaultMACSettings` | `GET` | `/api/v3/ns/default_mac_settings/{frequency_plan_id}/{lorawan_phy_version}` |  |
 
 ### <a name="ttn.lorawan.v3.NsEndDeviceRegistry">Service `NsEndDeviceRegistry`</a>
 

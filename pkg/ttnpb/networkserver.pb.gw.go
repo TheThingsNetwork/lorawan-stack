@@ -52,6 +52,88 @@ func local_request_Ns_GenerateDevAddr_0(ctx context.Context, marshaler runtime.M
 
 }
 
+func request_Ns_GetDefaultMACSettings_0(ctx context.Context, marshaler runtime.Marshaler, client NsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetDefaultMACSettingsRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		e   int32
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["frequency_plan_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "frequency_plan_id")
+	}
+
+	protoReq.FrequencyPlanID, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "frequency_plan_id", err)
+	}
+
+	val, ok = pathParams["lorawan_phy_version"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "lorawan_phy_version")
+	}
+
+	e, err = runtime.Enum(val, PHYVersion_value)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "lorawan_phy_version", err)
+	}
+
+	protoReq.LorawanPhyVersion = PHYVersion(e)
+
+	msg, err := client.GetDefaultMACSettings(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_Ns_GetDefaultMACSettings_0(ctx context.Context, marshaler runtime.Marshaler, server NsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetDefaultMACSettingsRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		e   int32
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["frequency_plan_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "frequency_plan_id")
+	}
+
+	protoReq.FrequencyPlanID, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "frequency_plan_id", err)
+	}
+
+	val, ok = pathParams["lorawan_phy_version"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "lorawan_phy_version")
+	}
+
+	e, err = runtime.Enum(val, PHYVersion_value)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "lorawan_phy_version", err)
+	}
+
+	protoReq.LorawanPhyVersion = PHYVersion(e)
+
+	msg, err := server.GetDefaultMACSettings(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 var (
 	filter_NsEndDeviceRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device_ids": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
 )
@@ -523,6 +605,29 @@ func RegisterNsHandlerServer(ctx context.Context, mux *runtime.ServeMux, server 
 
 	})
 
+	mux.Handle("GET", pattern_Ns_GetDefaultMACSettings_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Ns_GetDefaultMACSettings_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Ns_GetDefaultMACSettings_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -708,15 +813,39 @@ func RegisterNsHandlerClient(ctx context.Context, mux *runtime.ServeMux, client 
 
 	})
 
+	mux.Handle("GET", pattern_Ns_GetDefaultMACSettings_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Ns_GetDefaultMACSettings_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Ns_GetDefaultMACSettings_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
 var (
 	pattern_Ns_GenerateDevAddr_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ns", "dev_addr"}, "", runtime.AssumeColonVerbOpt(true)))
+
+	pattern_Ns_GetDefaultMACSettings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"ns", "default_mac_settings", "frequency_plan_id", "lorawan_phy_version"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
 	forward_Ns_GenerateDevAddr_0 = runtime.ForwardResponseMessage
+
+	forward_Ns_GetDefaultMACSettings_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterNsEndDeviceRegistryHandlerFromEndpoint is same as RegisterNsEndDeviceRegistryHandler but
