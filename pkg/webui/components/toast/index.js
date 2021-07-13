@@ -28,6 +28,7 @@ class ToastContainer extends React.Component {
     closeButton: PropTypes.oneOfType([PropTypes.bool, PropTypes.element]),
     closeOnClick: PropTypes.bool,
     hideProgressBar: PropTypes.bool,
+    limit: PropTypes.number,
     pauseOnFocusLoss: PropTypes.bool,
     pauseOnHover: PropTypes.bool,
     position: PropTypes.oneOf([
@@ -42,13 +43,14 @@ class ToastContainer extends React.Component {
   }
 
   static defaultProps = {
+    autoClose: undefined,
     position: 'bottom-right',
-    autoClose: 4000,
     closeButton: false,
     hideProgressBar: true,
     pauseOnHover: true,
     closeOnClick: true,
     pauseOnFocusLoss: true,
+    limit: 2,
     transition: cssTransition({ enter: style.slideInRight, exit: style.slideOutRight }),
   }
 
