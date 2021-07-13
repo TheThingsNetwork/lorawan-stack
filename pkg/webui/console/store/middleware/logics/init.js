@@ -22,6 +22,7 @@ import * as init from '@console/store/actions/init'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
+  noCancelOnRouteChange: true,
   process: async (_, dispatch) => {
     dispatch(user.getUserRights())
 

@@ -18,17 +18,20 @@ export const createRequestActions = (baseType, requestPayloadCreator, requestMet
   const requestType = `${baseType}_REQUEST`
   const successType = `${baseType}_SUCCESS`
   const failureType = `${baseType}_FAILURE`
+  const abortType = `${baseType}_ABORT`
 
   return [
     {
       request: requestType,
       success: successType,
       failure: failureType,
+      abort: abortType,
     },
     {
       request: createAction(requestType, requestPayloadCreator, requestMetaCreator),
       success: createAction(successType),
       failure: createAction(failureType),
+      abort: createAction(abortType),
     },
   ]
 }
@@ -66,7 +69,7 @@ export default actionOrActionCreator => {
  * on the request action type.
  *
  * @param {string} typeString - The request action type.
- * @param {string} status - The result type, either `SUCCESS` or `FAILURE`.
+ * @param {string} status - The result type, either `SUCCESS`, `FAILURE` or `ABORT`.
  * @returns {string} - The result action type.
  */
 export const getResultActionFromType = (typeString, status) => typeString.replace('REQUEST', status)

@@ -15,25 +15,34 @@
 import { CancelablePromise } from 'cancelable-promise'
 
 /**
- * This middleware will check for request actions and attach a cancelable
- * promise to the action.
+ * `promisifiedDispatch` is a decorator for the dispatch function that attaches
+ * a cancelable promise to the action that it will use as return value.
+ * You should usually use the middleware instead.
  *
- * @param {object} store - The store to apply the middleware to.
- * @returns {object} The middleware.
+ * @param {object} dispatch - The to be decorated dispatch function.
+ * @returns {Function} - The decorated dispatch function.
  */
-const requestPromiseMiddleware = store => next => action => {
-  if (action.meta && action.meta._attachPromise) {
+export const promisifiedDispatch = dispatch => action => {
+  if (action.meta && action.meta._attachPromise && !action.meta._resolve && !action.meta._reject) {
     return new CancelablePromise((resolve, reject) => {
       action.meta = {
         ...action.meta,
         _resolve: resolve,
         _reject: reject,
       }
-      next(action)
+      dispatch(action)
     })
   }
-
-  return next(action)
+  return dispatch(action)
 }
+
+/**
+ * This middleware will check for request actions and attach a cancelable
+ * promise to the action.
+ *
+ * @param {object} store - The store to apply the middleware to.
+ * @returns {object} The middleware.
+ */
+const requestPromiseMiddleware = store => promisifiedDispatch
 
 export default requestPromiseMiddleware

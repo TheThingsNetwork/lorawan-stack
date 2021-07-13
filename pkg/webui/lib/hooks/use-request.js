@@ -12,53 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useState, useEffect, useRef } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import CancelablePromise from 'cancelable-promise'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-import { selectIsOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
 const useRequest = requestAction => {
   const dispatch = useDispatch()
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')
   const [result, setResult] = useState()
-  const isOnline = useSelector(selectIsOnlineStatus)
-  const prevIsOnlineRef = useRef()
-  useEffect(() => {
-    prevIsOnlineRef.current = isOnline
-  })
-  const prevIsOnline = prevIsOnlineRef.current
 
   useEffect(() => {
-    if (prevIsOnline === undefined || (prevIsOnline === false && isOnline)) {
-      // Make the request initially and additionally when the online state
-      // has changed to `online`.
+    const promise = (requestAction instanceof Array
+      ? CancelablePromise.all(requestAction.map(req => dispatch(attachPromise(req))))
+      : dispatch(attachPromise(requestAction))
+    )
+      .then(() => {
+        setResult(result)
+        setFetching(false)
+      })
+      .catch(error => {
+        setError(error)
+        setFetching(false)
+      })
 
-      const promise = (requestAction instanceof Array
-        ? CancelablePromise.all(requestAction.map(req => dispatch(attachPromise(req))))
-        : dispatch(attachPromise(requestAction))
-      )
-        .then(() => {
-          setResult(result)
-          setFetching(false)
-        })
-        .catch(error => {
-          setError(error)
-          setFetching(false)
-        })
-
-      return () => {
-        // Cancel the promise on unmount (if still pending).
-        promise.cancel()
-      }
+    return () => {
+      // Cancel the promise on unmount (if still pending).
+      promise.cancel()
     }
 
-    // We use the `isOnline` prop as dependency here since we want the effect
-    // to trigger only initially and when the online state changed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOnline])
+  }, [])
 
   return [fetching, error, result]
 }
