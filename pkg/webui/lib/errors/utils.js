@@ -394,7 +394,7 @@ export const toMessageProps = error => {
  */
 export const ingestError = (error, extras = {}, tags = {}) => {
   // Log the error when in development mode
-  errorLog(error)
+  errorLog('The following error was considered for Sentry', error)
 
   // Send to Sentry if necessary.
   if (isSentryWorthy(error)) {
