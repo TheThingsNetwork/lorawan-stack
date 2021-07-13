@@ -64,11 +64,10 @@ var (
 )
 
 var (
-	errAdminsCreateGateways       = errors.DefinePermissionDenied("admins_create_gateways", "gateways may only be created by admins, or in organizations")
-	errGatewayEUITaken            = errors.DefineAlreadyExists("gateway_eui_taken", "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`")
-	errGatewaySecretEncryptionKey = errors.DefineNotFound("gateway_secret_encryption_key_not_found", "a gateway secret encryption key with id `{id}` not found")
-	errAdminsPurgeGateways        = errors.DefinePermissionDenied("admins_purge_gateways", "gateways may only be purged by admins")
-	errClaimAuthenticationCode    = errors.DefineInvalidArgument("claim_authentication_code", "invalid claim authentication code")
+	errAdminsCreateGateways    = errors.DefinePermissionDenied("admins_create_gateways", "gateways may only be created by admins, or in organizations")
+	errGatewayEUITaken         = errors.DefineAlreadyExists("gateway_eui_taken", "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`")
+	errAdminsPurgeGateways     = errors.DefinePermissionDenied("admins_purge_gateways", "gateways may only be purged by admins")
+	errClaimAuthenticationCode = errors.DefineInvalidArgument("claim_authentication_code", "invalid claim authentication code")
 )
 
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
@@ -439,6 +438,10 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			return nil, err
 		}
 	}
+
+	// Store plaintext values to return in the response to clients.
+	var ptLBSLNSSecret, ptCACSecret, ptTargetCUPSKeySecret []byte
+
 	// Backwards compatibility for frequency_plan_id field.
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_id") {
 		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_ids") {
@@ -464,6 +467,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			return nil, err
 		} else if req.LBSLNSSecret != nil {
 			value := req.LBSLNSSecret.Value
+			ptLBSLNSSecret = req.LBSLNSSecret.Value
 			if is.config.Gateways.EncryptionKeyID != "" {
 				value, err = is.KeyVault.Encrypt(ctx, req.LBSLNSSecret.Value, is.config.Gateways.EncryptionKeyID)
 				if err != nil {
@@ -483,6 +487,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			return nil, err
 		} else if req.TargetCUPSKey != nil {
 			value := req.TargetCUPSKey.Value
+			ptTargetCUPSKeySecret = req.TargetCUPSKey.Value
 			if is.config.Gateways.EncryptionKeyID != "" {
 				value, err = is.KeyVault.Encrypt(ctx, req.TargetCUPSKey.Value, is.config.Gateways.EncryptionKeyID)
 				if err != nil {
@@ -503,6 +508,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		} else if req.ClaimAuthenticationCode != nil {
 			if err := validateClaimAuthenticationCode(*req.ClaimAuthenticationCode); err == nil {
 				value := req.ClaimAuthenticationCode.Secret.Value
+				ptCACSecret = req.ClaimAuthenticationCode.Secret.Value
 				if is.config.Gateways.EncryptionKeyID != "" {
 					value, err = is.KeyVault.Encrypt(ctx, value, is.config.Gateways.EncryptionKeyID)
 					if err != nil {
@@ -538,6 +544,17 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		return nil, err
 	}
 	events.Publish(evtUpdateGateway.NewWithIdentifiersAndData(ctx, &req.GatewayIdentifiers, req.FieldMask.GetPaths()))
+
+	if len(ptCACSecret) != 0 {
+		gtw.ClaimAuthenticationCode.Secret.Value = ptCACSecret
+	}
+	if len(ptLBSLNSSecret) != 0 {
+		gtw.LBSLNSSecret.Value = ptLBSLNSSecret
+	}
+	if len(ptTargetCUPSKeySecret) != 0 {
+		gtw.TargetCUPSKey.Value = ptTargetCUPSKeySecret
+	}
+
 	return gtw, nil
 }
 

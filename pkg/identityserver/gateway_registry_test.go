@@ -555,16 +555,18 @@ func TestGatewaysSecrets(t *testing.T) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
+		updatedSecretValue := []byte("my new secret value")
+
 		updated, err := reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: created.GatewayIdentifiers,
 				LBSLNSSecret: &ttnpb.Secret{
-					Value: []byte("my new secret value"),
+					Value: updatedSecretValue,
 				},
 				ClaimAuthenticationCode: &otherGtwClaimAuthCode,
 				TargetCUPSURI:           otherTargetCUPSURI,
 				TargetCUPSKey: &ttnpb.Secret{
-					Value: []byte("my new secret value"),
+					Value: updatedSecretValue,
 				},
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"lbs_lns_secret", "claim_authentication_code", "target_cups_key", "target_cups_uri"}},
@@ -573,8 +575,11 @@ func TestGatewaysSecrets(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(updated, should.NotBeNil)
 		a.So(updated.LBSLNSSecret, should.NotBeNil)
+		a.So(updated.LBSLNSSecret.Value, should.Resemble, updatedSecretValue)
 		a.So(updated.ClaimAuthenticationCode, should.NotBeNil)
+		a.So(updated.ClaimAuthenticationCode.Secret.Value, should.Resemble, otherGtwClaimAuthCode.Secret.Value)
 		a.So(updated.TargetCUPSKey, should.NotBeNil)
+		a.So(updated.TargetCUPSKey.Value, should.Resemble, updatedSecretValue)
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
