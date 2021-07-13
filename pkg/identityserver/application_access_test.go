@@ -62,7 +62,7 @@ func TestApplicationAccessNotFound(t *testing.T) {
 
 		got, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
-			KeyID:                  apiKey.ID,
+			KeyId:                  apiKey.ID,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -160,7 +160,7 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
-			KeyID:                  APIKeyID,
+			KeyId:                  APIKeyID,
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -277,7 +277,7 @@ func TestApplicationAccessCRUD(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
-			KeyID:                  applicationKey.ID,
+			KeyId:                  applicationKey.ID,
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -561,7 +561,7 @@ func TestApplicationAccessRights(t *testing.T) {
 
 		_, err = reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
-			KeyID:                  APIKey.ID,
+			KeyId:                  APIKey.ID,
 		}, collaboratorCreds)
 
 		if a.So(err, should.NotBeNil) {

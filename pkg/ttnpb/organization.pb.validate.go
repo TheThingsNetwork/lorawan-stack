@@ -925,7 +925,7 @@ func (m *GetOrganizationAPIKeyRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "key_id":
-			// no validation rules for KeyID
+			// no validation rules for KeyId
 		default:
 			return GetOrganizationAPIKeyRequestValidationError{
 				field:  name,

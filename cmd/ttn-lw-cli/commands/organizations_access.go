@@ -226,7 +226,7 @@ var (
 			}
 			res, err := ttnpb.NewOrganizationAccessClient(is).GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 				OrganizationIdentifiers: *orgID,
-				KeyID:                   id,
+				KeyId:                   id,
 			})
 			if err != nil {
 				return err

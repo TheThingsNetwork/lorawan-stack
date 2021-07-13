@@ -226,7 +226,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationAccessClient(is).GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 				ApplicationIdentifiers: *appID,
-				KeyID:                  id,
+				KeyId:                  id,
 			})
 			if err != nil {
 				return err

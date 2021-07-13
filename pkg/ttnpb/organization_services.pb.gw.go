@@ -742,7 +742,7 @@ func request_OrganizationAccess_GetAPIKey_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key_id")
 	}
 
-	protoReq.KeyID, err = runtime.String(val)
+	protoReq.KeyId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key_id", err)
@@ -787,7 +787,7 @@ func local_request_OrganizationAccess_GetAPIKey_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key_id")
 	}
 
-	protoReq.KeyID, err = runtime.String(val)
+	protoReq.KeyId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key_id", err)

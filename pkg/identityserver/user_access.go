@@ -123,7 +123,7 @@ func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserA
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		_, key, err = store.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyID)
+		_, key, err = store.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyId)
 		if err != nil {
 			return err
 		}

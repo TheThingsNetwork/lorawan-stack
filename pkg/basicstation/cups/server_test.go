@@ -184,7 +184,7 @@ func TestServer(t *testing.T) {
 
 	mockGateway := func(hasLNSSecret, redirectCUPS, updateCUPSCreds bool) *ttnpb.Gateway {
 		secret := &ttnpb.Secret{
-			KeyID: "test-key",
+			KeyId: "test-key",
 			Value: []byte("KEYCONTENTS"),
 		}
 		gtw := ttnpb.Gateway{
@@ -272,11 +272,11 @@ func TestServer(t *testing.T) {
 						Eui:       &mockGatewayEUI,
 					},
 					LBSLNSSecret: &ttnpb.Secret{
-						KeyID: "some-key-id",
+						KeyId: "some-key-id",
 						Value: []byte("KEYCONTENTS"),
 					},
 					TargetCUPSKey: &ttnpb.Secret{
-						KeyID: "test-key",
+						KeyId: "test-key",
 						Value: []byte("KEYCONTENTS"),
 					},
 					TargetCUPSURI: cupsURI,

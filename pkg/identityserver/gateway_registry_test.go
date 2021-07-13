@@ -324,7 +324,7 @@ func TestGatewaysSecrets(t *testing.T) {
 			ValidFrom: &from,
 			ValidTo:   &to,
 			Secret: &ttnpb.Secret{
-				KeyID: "is-test",
+				KeyId: "is-test",
 				Value: []byte("my claim auth code"),
 			},
 		}
@@ -333,13 +333,13 @@ func TestGatewaysSecrets(t *testing.T) {
 			ValidFrom: &from,
 			ValidTo:   &to,
 			Secret: &ttnpb.Secret{
-				KeyID: "is-test",
+				KeyId: "is-test",
 				Value: []byte("my other claim auth code"),
 			},
 		}
 
 		secret := &ttnpb.Secret{
-			KeyID: "is-test",
+			KeyId: "is-test",
 			Value: []byte("my very secret value"),
 		}
 

@@ -64,7 +64,7 @@ func TestGatewayAccessNotFound(t *testing.T) {
 
 		got, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
-			KeyID:              apiKey.ID,
+			KeyId:              apiKey.ID,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -162,7 +162,7 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
-			KeyID:              APIKeyID,
+			KeyId:              APIKeyID,
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -279,7 +279,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
-			KeyID:              gatewayKey.ID,
+			KeyId:              gatewayKey.ID,
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -563,7 +563,7 @@ func TestGatewayAccessRights(t *testing.T) {
 
 		_, err = reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
-			KeyID:              APIKey.ID,
+			KeyId:              APIKey.ID,
 		}, collaboratorCreds)
 
 		if a.So(err, should.NotBeNil) {

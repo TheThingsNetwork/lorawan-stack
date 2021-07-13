@@ -243,7 +243,7 @@ message ListGatewayAPIKeysRequest {
 message GetGatewayAPIKeyRequest {
   GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Unique public identifier for the API key.
-  string key_id = 2 [(gogoproto.customname) = "KeyID"];
+  string key_id = 2;
 }
 
 message CreateGatewayAPIKeyRequest {

@@ -51,7 +51,7 @@ func (m *Secret) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "key_id":
-			// no validation rules for KeyID
+			// no validation rules for KeyId
 		case "value":
 
 			if len(m.GetValue()) > 2048 {

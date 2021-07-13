@@ -63,7 +63,7 @@ func TestOrganizationAccessNotFound(t *testing.T) {
 
 		got, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
-			KeyID:                   apiKey.ID,
+			KeyId:                   apiKey.ID,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -161,7 +161,7 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
-			KeyID:                   APIKeyID,
+			KeyId:                   APIKeyID,
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -278,7 +278,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
-			KeyID:                   organizationKey.ID,
+			KeyId:                   organizationKey.ID,
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -562,7 +562,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 
 		_, err = reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
-			KeyID:                   APIKey.ID,
+			KeyId:                   APIKey.ID,
 		}, collaboratorCreds)
 
 		if a.So(err, should.NotBeNil) {
