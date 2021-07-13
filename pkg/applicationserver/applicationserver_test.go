@@ -71,11 +71,11 @@ func TestApplicationServer(t *testing.T) {
 	registeredApplicationFormatter := ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
 	registeredApplicationWebhookID := ttnpb.ApplicationWebhookIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,
-		WebhookID:              "test",
+		WebhookId:              "test",
 	}
 	registeredApplicationPubSubID := ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,
-		PubSubID:               "test",
+		PubSubId:               "test",
 	}
 
 	// This device gets registered in the device registry of the Application Server.
@@ -463,9 +463,9 @@ func TestApplicationServer(t *testing.T) {
 				req := &ttnpb.SetApplicationPubSubRequest{
 					ApplicationPubSub: ttnpb.ApplicationPubSub{
 						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
-						Provider: &ttnpb.ApplicationPubSub_NATS{
-							NATS: &ttnpb.ApplicationPubSub_NATSProvider{
-								ServerURL: "nats://localhost:4124",
+						Provider: &ttnpb.ApplicationPubSub_Nats{
+							Nats: &ttnpb.ApplicationPubSub_NATSProvider{
+								ServerUrl: "nats://localhost:4124",
 							},
 						},
 						Format:    "json",
@@ -605,11 +605,11 @@ func TestApplicationServer(t *testing.T) {
 				req := &ttnpb.SetApplicationPubSubRequest{
 					ApplicationPubSub: ttnpb.ApplicationPubSub{
 						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
-						Provider: &ttnpb.ApplicationPubSub_MQTT{
-							MQTT: &ttnpb.ApplicationPubSub_MQTTProvider{
-								ServerURL:    fmt.Sprintf("tcp://%v", mqttLis.Addr()),
-								PublishQoS:   ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
-								SubscribeQoS: ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
+						Provider: &ttnpb.ApplicationPubSub_Mqtt{
+							Mqtt: &ttnpb.ApplicationPubSub_MQTTProvider{
+								ServerUrl:    fmt.Sprintf("tcp://%v", mqttLis.Addr()),
+								PublishQos:   ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
+								SubscribeQos: ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
 							},
 						},
 						Format:    "json",
@@ -763,7 +763,7 @@ func TestApplicationServer(t *testing.T) {
 				req := &ttnpb.SetApplicationWebhookRequest{
 					ApplicationWebhook: ttnpb.ApplicationWebhook{
 						ApplicationWebhookIdentifiers: registeredApplicationWebhookID,
-						BaseURL:                       webhookTarget.URL,
+						BaseUrl:                       webhookTarget.URL,
 						Format:                        "json",
 						UplinkMessage:                 &ttnpb.ApplicationWebhook_Message{Path: ""},
 						JoinAccept:                    &ttnpb.ApplicationWebhook_Message{Path: ""},
@@ -811,7 +811,7 @@ func TestApplicationServer(t *testing.T) {
 							continue
 						}
 						url := fmt.Sprintf("http://127.0.0.1:8099/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/%s",
-							data.ApplicationId, registeredApplicationWebhookID.WebhookID, data.DeviceId, action,
+							data.ApplicationId, registeredApplicationWebhookID.WebhookId, data.DeviceId, action,
 						)
 						req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
 						if err != nil {

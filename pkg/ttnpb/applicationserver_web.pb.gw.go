@@ -519,7 +519,7 @@ func request_ApplicationWebhookRegistry_Delete_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "webhook_id")
 	}
 
-	protoReq.WebhookID, err = runtime.String(val)
+	protoReq.WebhookId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "webhook_id", err)
@@ -564,7 +564,7 @@ func local_request_ApplicationWebhookRegistry_Delete_0(ctx context.Context, mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "webhook_id")
 	}
 
-	protoReq.WebhookID, err = runtime.String(val)
+	protoReq.WebhookId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "webhook_id", err)

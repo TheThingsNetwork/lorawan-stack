@@ -29,16 +29,13 @@ import (
 
 const yamlFetchErrorCache = 1 * time.Minute
 
-type noopTemplateStore struct {
-}
+type noopTemplateStore struct{}
 
-var (
-	errTemplateNotFound = errors.DefineNotFound("template_not_found", "template `{template_id}` not found")
-)
+var errTemplateNotFound = errors.DefineNotFound("template_not_found", "template `{template_id}` not found")
 
 // GetTemplate implements TemplateStore.
 func (ts *noopTemplateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
-	return nil, errTemplateNotFound.WithAttributes("template_id", req.TemplateID)
+	return nil, errTemplateNotFound.WithAttributes("template_id", req.TemplateId)
 }
 
 // ListTemplates implements TemplateStore.
@@ -62,14 +59,14 @@ type templateStore struct {
 
 // prependBaseURL prepends the base URL and the template ID to the LogoURL, if it is available.
 func (ts *templateStore) prependBaseURL(template *ttnpb.ApplicationWebhookTemplate) error {
-	if template.LogoURL == "" {
+	if template.LogoUrl == "" {
 		return nil
 	}
-	logoURL, err := url.Parse(template.LogoURL)
+	logoURL, err := url.Parse(template.LogoUrl)
 	if err != nil {
 		return err
 	}
-	template.LogoURL = ts.baseURL.ResolveReference(logoURL).String()
+	template.LogoUrl = ts.baseURL.ResolveReference(logoURL).String()
 	return nil
 }
 
@@ -100,7 +97,7 @@ func (ts *templateStore) ListTemplates(ctx context.Context, req *ttnpb.ListAppli
 	var templates ttnpb.ApplicationWebhookTemplates
 	for _, id := range ids {
 		template, err := ts.getTemplate(ttnpb.ApplicationWebhookTemplateIdentifiers{
-			TemplateID: id,
+			TemplateId: id,
 		})
 		if err != nil {
 			return nil, err
@@ -163,7 +160,7 @@ func (ts *templateStore) getAllTemplateIDs() ([]string, error) {
 }
 
 func (ts *templateStore) template(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (*ttnpb.ApplicationWebhookTemplate, error) {
-	data, err := ts.fetcher.File(fmt.Sprintf("%s.yml", ids.TemplateID))
+	data, err := ts.fetcher.File(fmt.Sprintf("%s.yml", ids.TemplateId))
 	if err != nil {
 		return nil, errFetchFailed.WithCause(err)
 	}
@@ -178,11 +175,11 @@ func (ts *templateStore) template(ids ttnpb.ApplicationWebhookTemplateIdentifier
 func (ts *templateStore) getTemplate(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (t *ttnpb.ApplicationWebhookTemplate, err error) {
 	ts.templatesMu.Lock()
 	defer ts.templatesMu.Unlock()
-	if cached, ok := ts.templates[ids.TemplateID]; ok && cached.err == nil && time.Since(cached.time) < yamlFetchErrorCache {
+	if cached, ok := ts.templates[ids.TemplateId]; ok && cached.err == nil && time.Since(cached.time) < yamlFetchErrorCache {
 		return cached.t, cached.err
 	}
 	template, err := ts.template(ids)
-	ts.templates[ids.TemplateID] = queryResult{
+	ts.templates[ids.TemplateId] = queryResult{
 		t:    template,
 		err:  err,
 		time: time.Now(),
@@ -215,7 +212,7 @@ type webhookTemplateField struct {
 
 func (f webhookTemplateField) toPB() *ttnpb.ApplicationWebhookTemplateField {
 	return &ttnpb.ApplicationWebhookTemplateField{
-		ID:           f.ID,
+		Id:           f.ID,
 		Name:         f.Name,
 		Description:  f.Description,
 		Secret:       f.Secret,
@@ -272,18 +269,18 @@ func (t webhookTemplate) pbFields() []*ttnpb.ApplicationWebhookTemplateField {
 func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
 	return &ttnpb.ApplicationWebhookTemplate{
 		ApplicationWebhookTemplateIdentifiers: ttnpb.ApplicationWebhookTemplateIdentifiers{
-			TemplateID: t.TemplateID,
+			TemplateId: t.TemplateID,
 		},
 		Name:                     t.Name,
 		Description:              t.Description,
-		LogoURL:                  t.LogoURL,
-		InfoURL:                  t.InfoURL,
-		DocumentationURL:         t.DocumentationURL,
-		BaseURL:                  t.BaseURL,
+		LogoUrl:                  t.LogoURL,
+		InfoUrl:                  t.InfoURL,
+		DocumentationUrl:         t.DocumentationURL,
+		BaseUrl:                  t.BaseURL,
 		Headers:                  t.Headers,
 		Format:                   t.Format,
 		Fields:                   t.pbFields(),
-		CreateDownlinkAPIKey:     t.CreateDownlinkAPIKey,
+		CreateDownlinkApiKey:     t.CreateDownlinkAPIKey,
 		UplinkMessage:            t.pathToMessage(t.Paths.UplinkMessage),
 		JoinAccept:               t.pathToMessage(t.Paths.JoinAccept),
 		DownlinkAck:              t.pathToMessage(t.Paths.DownlinkAck),

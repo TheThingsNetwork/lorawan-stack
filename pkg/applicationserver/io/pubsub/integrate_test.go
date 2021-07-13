@@ -43,7 +43,7 @@ func TestIntegrate(t *testing.T) {
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
 
 	mockProvider, err := provider.GetProvider(&ttnpb.ApplicationPubSub{
-		Provider: &ttnpb.ApplicationPubSub_NATS{},
+		Provider: &ttnpb.ApplicationPubSub_Nats{},
 	})
 	a.So(mockProvider, should.NotBeNil)
 	a.So(err, should.BeNil)
@@ -57,11 +57,11 @@ func TestIntegrate(t *testing.T) {
 	// ps1 is added to the pubsub registry, app2 will be integrated at runtime.
 	ps1 := ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,
-		PubSubID:               "ps1",
+		PubSubId:               "ps1",
 	}
 	ps2 := ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,
-		PubSubID:               "ps2",
+		PubSubId:               "ps2",
 	}
 	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
@@ -71,9 +71,9 @@ func TestIntegrate(t *testing.T) {
 		return &ttnpb.ApplicationPubSub{
 			ApplicationPubSubIdentifiers: ps1,
 			Format:                       "json",
-			Provider: &ttnpb.ApplicationPubSub_NATS{
-				NATS: &ttnpb.ApplicationPubSub_NATSProvider{
-					ServerURL: "nats://localhost",
+			Provider: &ttnpb.ApplicationPubSub_Nats{
+				Nats: &ttnpb.ApplicationPubSub_NATSProvider{
+					ServerUrl: "nats://localhost",
 				},
 			},
 		}, append(paths, "ids.application_ids", "ids.pub_sub_id"), nil
@@ -130,9 +130,9 @@ func TestIntegrate(t *testing.T) {
 		integration := ttnpb.ApplicationPubSub{
 			ApplicationPubSubIdentifiers: ps2,
 			Format:                       "json",
-			Provider: &ttnpb.ApplicationPubSub_NATS{
-				NATS: &ttnpb.ApplicationPubSub_NATSProvider{
-					ServerURL: "nats://localhost",
+			Provider: &ttnpb.ApplicationPubSub_Nats{
+				Nats: &ttnpb.ApplicationPubSub_NATSProvider{
+					ServerUrl: "nats://localhost",
 				},
 			},
 		}

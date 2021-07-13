@@ -43,7 +43,7 @@ option (gogoproto.unmarshaler_all) = true;
 
 message ApplicationPubSubIdentifiers {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  string pub_sub_id = 2 [(gogoproto.customname) = "PubSubID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+  string pub_sub_id = 2 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
 message ApplicationPubSub {
@@ -58,11 +58,11 @@ message ApplicationPubSub {
   // The NATS provider settings.
   message NATSProvider {
     // The server connection URL.
-    string server_url = 1 [(gogoproto.customname) = "ServerURL", (validate.rules).string.uri = true];
+    string server_url = 1 [(validate.rules).string.uri = true];
   }
   // The MQTT provider settings.
   message MQTTProvider {
-    string server_url = 1 [(gogoproto.customname) = "ServerURL", (validate.rules).string.uri = true];
+    string server_url = 1 [(validate.rules).string.uri = true];
     string client_id = 2 [(validate.rules).string.max_len = 23];
     string username = 3 [(validate.rules).string.max_len = 100];
     string password = 4 [(validate.rules).string.max_len = 100];
@@ -72,16 +72,16 @@ message ApplicationPubSub {
       AT_LEAST_ONCE = 1;
       EXACTLY_ONCE = 2;
     }
-    QoS subscribe_qos = 5 [(gogoproto.customname) = "SubscribeQoS"];
-    QoS publish_qos = 6 [(gogoproto.customname) = "PublishQoS"];
+    QoS subscribe_qos = 5;
+    QoS publish_qos = 6;
 
-    bool use_tls = 7 [(gogoproto.customname) = "UseTLS"];
+    bool use_tls = 7;
     // The server Root CA certificate. PEM formatted.
-    bytes tls_ca = 8 [(gogoproto.customname) = "TLSCA", (validate.rules).bytes.max_len = 8192];
+    bytes tls_ca = 8 [(validate.rules).bytes.max_len = 8192];
     // The client certificate. PEM formatted.
-    bytes tls_client_cert = 9 [(gogoproto.customname) = "TLSClientCert", (validate.rules).bytes.max_len = 8192];
+    bytes tls_client_cert = 9 [(validate.rules).bytes.max_len = 8192];
     // The client private key. PEM formatted.
-    bytes tls_client_key = 10 [(gogoproto.customname) = "TLSClientKey", (validate.rules).bytes.max_len = 8192];
+    bytes tls_client_key = 10 [(validate.rules).bytes.max_len = 8192];
 
     // HTTP headers to use on MQTT-over-Websocket connections.
     map<string,string> headers = 11;
@@ -92,7 +92,7 @@ message ApplicationPubSub {
     string region = 1 [(validate.rules).string = { in: ["af-south-1", "ap-east-1", "ap-northeast-1", "ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ca-central-1", "eu-central-1", "eu-north-1", "eu-south-1", "eu-west-1", "eu-west-2", "eu-west-3", "me-south-1", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2"] }];
 
     message AccessKey {
-      string access_key_id = 1 [(gogoproto.customname) = "AccessKeyID", (validate.rules).string = {pattern: "^[\\w]*$", min_len: 16, max_len: 128}];
+      string access_key_id = 1 [(validate.rules).string = {pattern: "^[\\w]*$", min_len: 16, max_len: 128}];
       string secret_access_key = 2 [(validate.rules).string.max_len = 40];
       string session_token = 3 [(validate.rules).string.max_len = 256];
     }
@@ -101,8 +101,8 @@ message ApplicationPubSub {
     AccessKey access_key = 2;
 
     message AssumeRole {
-      string arn = 1 [(gogoproto.customname) = "ARN", (validate.rules).string = {pattern: "^arn:aws:iam::[0-9]{12}:role\\/[A-Za-z0-9_+=,.@-]+$"}];
-      string external_id = 2 [(gogoproto.customname) = "ExternalID", (validate.rules).string = {pattern: "^[\\w+=,.@:\\/-]*$", max_len: 1224}];
+      string arn = 1 [(validate.rules).string = {pattern: "^arn:aws:iam::[0-9]{12}:role\\/[A-Za-z0-9_+=,.@-]+$"}];
+      string external_id = 2 [(validate.rules).string = {pattern: "^[\\w+=,.@:\\/-]*$", max_len: 1224}];
       google.protobuf.Duration session_duration = 3 [(gogoproto.stdduration) = true];
     }
 
@@ -128,9 +128,9 @@ message ApplicationPubSub {
   oneof provider {
     option (validate.required) = true;
 
-    NATSProvider nats = 17 [(gogoproto.customname) = "NATS"];
-    MQTTProvider mqtt = 25 [(gogoproto.customname) = "MQTT"];
-    AWSIoTProvider aws_iot = 101 [(gogoproto.customname) = "AWSIoT"];
+    NATSProvider nats = 17;
+    MQTTProvider mqtt = 25;
+    AWSIoTProvider aws_iot = 101;
   };
 
   // Base topic name to which the messages topic is appended.

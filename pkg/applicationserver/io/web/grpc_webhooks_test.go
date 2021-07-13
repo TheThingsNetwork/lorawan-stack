@@ -98,9 +98,9 @@ func TestWebhookRegistryRPC(t *testing.T) {
 			ApplicationWebhook: ttnpb.ApplicationWebhook{
 				ApplicationWebhookIdentifiers: ttnpb.ApplicationWebhookIdentifiers{
 					ApplicationIdentifiers: registeredApplicationID,
-					WebhookID:              registeredWebhookID,
+					WebhookId:              registeredWebhookID,
 				},
-				BaseURL: "http://localhost/test",
+				BaseUrl: "http://localhost/test",
 			},
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
@@ -119,7 +119,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res.Webhooks, should.HaveLength, 1)
-		a.So(res.Webhooks[0].BaseURL, should.Equal, "http://localhost/test")
+		a.So(res.Webhooks[0].BaseUrl, should.Equal, "http://localhost/test")
 	}
 
 	// Get.
@@ -127,21 +127,21 @@ func TestWebhookRegistryRPC(t *testing.T) {
 		res, err := client.Get(ctx, &ttnpb.GetApplicationWebhookRequest{
 			ApplicationWebhookIdentifiers: ttnpb.ApplicationWebhookIdentifiers{
 				ApplicationIdentifiers: registeredApplicationID,
-				WebhookID:              registeredWebhookID,
+				WebhookId:              registeredWebhookID,
 			},
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
 		}, creds)
 		a.So(err, should.BeNil)
-		a.So(res.BaseURL, should.Equal, "http://localhost/test")
+		a.So(res.BaseUrl, should.Equal, "http://localhost/test")
 	}
 
 	// Delete.
 	{
 		_, err := client.Delete(ctx, &ttnpb.ApplicationWebhookIdentifiers{
 			ApplicationIdentifiers: registeredApplicationID,
-			WebhookID:              registeredWebhookID,
+			WebhookId:              registeredWebhookID,
 		}, creds)
 		a.So(err, should.BeNil)
 	}
@@ -244,7 +244,7 @@ description: Bar`),
 
 			getRes, err := client.GetTemplate(ctx, &ttnpb.GetApplicationWebhookTemplateRequest{
 				ApplicationWebhookTemplateIdentifiers: ttnpb.ApplicationWebhookTemplateIdentifiers{
-					TemplateID: "foo",
+					TemplateId: "foo",
 				},
 			})
 			tc.assertGet(a, getRes, err)

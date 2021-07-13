@@ -100,7 +100,7 @@ func getApplicationPubSubID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appli
 	}
 	return &ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
-		PubSubID:               pubsubID,
+		PubSubId:               pubsubID,
 	}, nil
 }
 
@@ -227,26 +227,26 @@ var (
 			}
 
 			if nats, _ := cmd.Flags().GetBool("nats"); nats {
-				if pubsub.GetNATS() == nil {
+				if pubsub.GetNats() == nil {
 					paths = append(paths, "provider")
-					pubsub.Provider = &ttnpb.ApplicationPubSub_NATS{
-						NATS: &ttnpb.ApplicationPubSub_NATSProvider{},
+					pubsub.Provider = &ttnpb.ApplicationPubSub_Nats{
+						Nats: &ttnpb.ApplicationPubSub_NATSProvider{},
 					}
 				} else {
 					providerPaths := util.UpdateFieldMask(cmd.Flags(), natsProviderApplicationPubSubFlags)
 					providerPaths = ttnpb.FieldsWithPrefix("provider", providerPaths...)
 					paths = append(paths, providerPaths...)
 				}
-				if err = util.SetFields(pubsub.GetNATS(), natsProviderApplicationPubSubFlags, "nats"); err != nil {
+				if err = util.SetFields(pubsub.GetNats(), natsProviderApplicationPubSubFlags, "nats"); err != nil {
 					return err
 				}
 			}
 
 			if mqtt, _ := cmd.Flags().GetBool("mqtt"); mqtt {
-				if pubsub.GetMQTT() == nil {
+				if pubsub.GetMqtt() == nil {
 					paths = append(paths, "provider")
-					pubsub.Provider = &ttnpb.ApplicationPubSub_MQTT{
-						MQTT: &ttnpb.ApplicationPubSub_MQTTProvider{},
+					pubsub.Provider = &ttnpb.ApplicationPubSub_Mqtt{
+						Mqtt: &ttnpb.ApplicationPubSub_MQTTProvider{},
 					}
 				} else {
 					providerPaths := util.UpdateFieldMask(cmd.Flags(), mqttProviderApplicationPubSubFlags)
@@ -269,23 +269,23 @@ var (
 						}
 					}
 				}
-				if err = util.SetFields(pubsub.GetMQTT(), mqttProviderApplicationPubSubFlags, "mqtt"); err != nil {
+				if err = util.SetFields(pubsub.GetMqtt(), mqttProviderApplicationPubSubFlags, "mqtt"); err != nil {
 					return err
 				}
 			}
 
 			if awsiot, _ := cmd.Flags().GetBool("aws-iot"); awsiot {
-				if pubsub.GetAWSIoT() == nil {
+				if pubsub.GetAwsIot() == nil {
 					paths = append(paths, "provider")
-					pubsub.Provider = &ttnpb.ApplicationPubSub_AWSIoT{
-						AWSIoT: &ttnpb.ApplicationPubSub_AWSIoTProvider{},
+					pubsub.Provider = &ttnpb.ApplicationPubSub_AwsIot{
+						AwsIot: &ttnpb.ApplicationPubSub_AWSIoTProvider{},
 					}
 				} else {
 					providerPaths := util.UpdateFieldMask(cmd.Flags(), awsiotProviderApplicationPubSubFlags)
 					providerPaths = ttnpb.FieldsWithPrefix("provider", providerPaths...)
 					paths = append(paths, providerPaths...)
 				}
-				if err = util.SetFields(pubsub.GetAWSIoT(), awsiotProviderApplicationPubSubFlags, "aws_iot"); err != nil {
+				if err = util.SetFields(pubsub.GetAwsIot(), awsiotProviderApplicationPubSubFlags, "aws_iot"); err != nil {
 					return err
 				}
 				if defaultStackName, _ := cmd.Flags().GetString("aws-iot.deployment.default.stack-name"); defaultStackName != "" {
@@ -296,7 +296,7 @@ var (
 					if err = util.SetFields(defaultIntegration, awsiotDefaultIntegrationPubSubFlags, "aws_iot", "deployment", "default"); err != nil {
 						return err
 					}
-					pubsub.GetAWSIoT().Deployment = &ttnpb.ApplicationPubSub_AWSIoTProvider_Default{
+					pubsub.GetAwsIot().Deployment = &ttnpb.ApplicationPubSub_AWSIoTProvider_Default{
 						Default: defaultIntegration,
 					}
 				}

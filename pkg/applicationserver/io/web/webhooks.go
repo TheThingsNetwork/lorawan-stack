@@ -229,7 +229,7 @@ func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.Applic
 	return fmt.Sprintf(downlinkOperationURLFormat,
 		baseURL,
 		webhookID.ApplicationId,
-		webhookID.WebhookID,
+		webhookID.WebhookId,
 		devID.DeviceId,
 		op,
 	)
@@ -273,7 +273,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	wg := sync.WaitGroup{}
 	for i := range hooks {
 		hook := hooks[i]
-		logger := log.FromContext(ctx).WithField("hook", hook.WebhookID)
+		logger := log.FromContext(ctx).WithField("hook", hook.WebhookId)
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -322,7 +322,7 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	if cfg == nil {
 		return nil, nil
 	}
-	baseURL, err := expandVariables(hook.BaseURL, msg)
+	baseURL, err := expandVariables(hook.BaseUrl, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -361,8 +361,8 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	for key, value := range hook.Headers {
 		req.Header.Set(key, value)
 	}
-	if hook.DownlinkAPIKey != "" {
-		req.Header.Set(downlinkKeyHeader, hook.DownlinkAPIKey)
+	if hook.DownlinkApiKey != "" {
+		req.Header.Set(downlinkKeyHeader, hook.DownlinkApiKey)
 		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "push"))
 		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "replace"))
 	}
@@ -387,7 +387,7 @@ func (w *webhooks) handleDown(op func(io.Server, context.Context, ttnpb.EndDevic
 		logger := log.FromContext(ctx).WithFields(log.Fields(
 			"application_id", devID.ApplicationId,
 			"device_id", devID.DeviceId,
-			"webhook_id", hookID.WebhookID,
+			"webhook_id", hookID.WebhookId,
 		))
 
 		hook, err := w.registry.Get(ctx, hookID, []string{"format"})

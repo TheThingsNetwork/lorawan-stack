@@ -108,7 +108,7 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 	if err := ps.stop(ctx, req.ApplicationPubSubIdentifiers); err != nil && !errors.IsNotFound(err) {
 		log.FromContext(ctx).WithFields(log.Fields(
 			"application_uid", unique.ID(ctx, req.ApplicationIdentifiers),
-			"pub_sub_id", req.PubSubID,
+			"pub_sub_id", req.PubSubId,
 		)).WithError(err).Warn("Failed to cancel pub/sub")
 	}
 	ps.startTask(ps.ctx, req.ApplicationPubSubIdentifiers)
@@ -128,7 +128,7 @@ func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdenti
 	if err := ps.stop(ctx, *ids); err != nil {
 		log.FromContext(ctx).WithFields(log.Fields(
 			"application_uid", unique.ID(ctx, ids.ApplicationIdentifiers),
-			"pub_sub_id", ids.PubSubID,
+			"pub_sub_id", ids.PubSubId,
 		)).WithError(err).Warn("Failed to cancel pub/sub")
 	}
 	_, err := ps.registry.Set(ctx, *ids, nil,

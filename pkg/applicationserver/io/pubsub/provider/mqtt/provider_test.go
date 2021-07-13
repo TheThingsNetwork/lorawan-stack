@@ -70,10 +70,10 @@ func TestOpenConnection(t *testing.T) {
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app1",
 			},
-			PubSubID: "ps1",
+			PubSubId: "ps1",
 		},
-		Provider: &ttnpb.ApplicationPubSub_MQTT{
-			MQTT: &ttnpb.ApplicationPubSub_MQTTProvider{},
+		Provider: &ttnpb.ApplicationPubSub_Mqtt{
+			Mqtt: &ttnpb.ApplicationPubSub_MQTTProvider{},
 		},
 		BaseTopic: "app1/ps1",
 		DownlinkPush: &ttnpb.ApplicationPubSub_Message{
@@ -115,7 +115,7 @@ func TestOpenConnection(t *testing.T) {
 	}
 
 	impl, err := provider.GetProvider(&ttnpb.ApplicationPubSub{
-		Provider: &ttnpb.ApplicationPubSub_MQTT{},
+		Provider: &ttnpb.ApplicationPubSub_Mqtt{},
 	})
 	a.So(impl, should.NotBeNil)
 	a.So(err, should.BeNil)
@@ -135,11 +135,11 @@ func TestOpenConnection(t *testing.T) {
 	}{
 		{
 			name: "TCP",
-			provider: &ttnpb.ApplicationPubSub_MQTT{
-				MQTT: &ttnpb.ApplicationPubSub_MQTTProvider{
-					ServerURL:    fmt.Sprintf("tcp://%v", lis.Addr()),
-					SubscribeQoS: ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
-					PublishQoS:   ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
+			provider: &ttnpb.ApplicationPubSub_Mqtt{
+				Mqtt: &ttnpb.ApplicationPubSub_MQTTProvider{
+					ServerUrl:    fmt.Sprintf("tcp://%v", lis.Addr()),
+					SubscribeQos: ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
+					PublishQos:   ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
 				},
 			},
 			createClient: func(t *testing.T, a *assertions.Assertion) paho_mqtt.Client {
@@ -159,16 +159,16 @@ func TestOpenConnection(t *testing.T) {
 		},
 		{
 			name: "TCP+TLS",
-			provider: &ttnpb.ApplicationPubSub_MQTT{
-				MQTT: &ttnpb.ApplicationPubSub_MQTTProvider{
-					ServerURL:    fmt.Sprintf("tcps://%v", tlsLis.Addr()),
-					SubscribeQoS: ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
-					PublishQoS:   ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
+			provider: &ttnpb.ApplicationPubSub_Mqtt{
+				Mqtt: &ttnpb.ApplicationPubSub_MQTTProvider{
+					ServerUrl:    fmt.Sprintf("tcps://%v", tlsLis.Addr()),
+					SubscribeQos: ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
+					PublishQos:   ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
 
-					UseTLS:        true,
-					TLSCA:         ca,
-					TLSClientCert: clientCert,
-					TLSClientKey:  clientKey,
+					UseTls:        true,
+					TlsCa:         ca,
+					TlsClientCert: clientCert,
+					TlsClientKey:  clientKey,
 				},
 			},
 			createClient: func(t *testing.T, a *assertions.Assertion) paho_mqtt.Client {

@@ -51,17 +51,17 @@ func TestPubSub(t *testing.T) {
 	}
 	ids := ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,
-		PubSubID:               registeredPubSubID,
+		PubSubId:               registeredPubSubID,
 	}
 
 	ps := &ttnpb.ApplicationPubSub{
 		ApplicationPubSubIdentifiers: ttnpb.ApplicationPubSubIdentifiers{
 			ApplicationIdentifiers: registeredApplicationID,
-			PubSubID:               registeredPubSubID,
+			PubSubId:               registeredPubSubID,
 		},
-		Provider: &ttnpb.ApplicationPubSub_NATS{
-			NATS: &ttnpb.ApplicationPubSub_NATSProvider{
-				ServerURL: "nats://localhost",
+		Provider: &ttnpb.ApplicationPubSub_Nats{
+			Nats: &ttnpb.ApplicationPubSub_NATSProvider{
+				ServerUrl: "nats://localhost",
 			},
 		},
 		Format:    "json",
@@ -136,7 +136,7 @@ func TestPubSub(t *testing.T) {
 	}
 
 	mockProvider, err := provider.GetProvider(&ttnpb.ApplicationPubSub{
-		Provider: &ttnpb.ApplicationPubSub_NATS{},
+		Provider: &ttnpb.ApplicationPubSub_Nats{},
 	})
 	a.So(mockProvider, should.NotBeNil)
 	a.So(err, should.BeNil)

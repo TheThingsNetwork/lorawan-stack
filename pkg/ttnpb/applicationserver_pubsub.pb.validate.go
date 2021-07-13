@@ -64,14 +64,14 @@ func (m *ApplicationPubSubIdentifiers) ValidateFields(paths ...string) error {
 
 		case "pub_sub_id":
 
-			if utf8.RuneCountInString(m.GetPubSubID()) > 36 {
+			if utf8.RuneCountInString(m.GetPubSubId()) > 36 {
 				return ApplicationPubSubIdentifiersValidationError{
 					field:  "pub_sub_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_ApplicationPubSubIdentifiers_PubSubID_Pattern.MatchString(m.GetPubSubID()) {
+			if !_ApplicationPubSubIdentifiers_PubSubId_Pattern.MatchString(m.GetPubSubId()) {
 				return ApplicationPubSubIdentifiersValidationError{
 					field:  "pub_sub_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -145,7 +145,7 @@ var _ interface {
 	ErrorName() string
 } = ApplicationPubSubIdentifiersValidationError{}
 
-var _ApplicationPubSubIdentifiers_PubSubID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _ApplicationPubSubIdentifiers_PubSubId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on ApplicationPubSub with the rules
 // defined in the proto definition for this message. If any rules are
@@ -383,12 +383,12 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "nats":
-					w, ok := m.Provider.(*ApplicationPubSub_NATS)
+					w, ok := m.Provider.(*ApplicationPubSub_Nats)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetNATS()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetNats()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return ApplicationPubSubValidationError{
 								field:  "nats",
@@ -399,12 +399,12 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 					}
 
 				case "mqtt":
-					w, ok := m.Provider.(*ApplicationPubSub_MQTT)
+					w, ok := m.Provider.(*ApplicationPubSub_Mqtt)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetMQTT()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetMqtt()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return ApplicationPubSubValidationError{
 								field:  "mqtt",
@@ -415,12 +415,12 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 					}
 
 				case "aws_iot":
-					w, ok := m.Provider.(*ApplicationPubSub_AWSIoT)
+					w, ok := m.Provider.(*ApplicationPubSub_AwsIot)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetAWSIoT()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetAwsIot()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return ApplicationPubSubValidationError{
 								field:  "aws_iot",
@@ -1017,7 +1017,7 @@ func (m *ApplicationPubSub_NATSProvider) ValidateFields(paths ...string) error {
 		switch name {
 		case "server_url":
 
-			if uri, err := url.Parse(m.GetServerURL()); err != nil {
+			if uri, err := url.Parse(m.GetServerUrl()); err != nil {
 				return ApplicationPubSub_NATSProviderValidationError{
 					field:  "server_url",
 					reason: "value must be a valid URI",
@@ -1114,7 +1114,7 @@ func (m *ApplicationPubSub_MQTTProvider) ValidateFields(paths ...string) error {
 		switch name {
 		case "server_url":
 
-			if uri, err := url.Parse(m.GetServerURL()); err != nil {
+			if uri, err := url.Parse(m.GetServerUrl()); err != nil {
 				return ApplicationPubSub_MQTTProviderValidationError{
 					field:  "server_url",
 					reason: "value must be a valid URI",
@@ -1155,14 +1155,14 @@ func (m *ApplicationPubSub_MQTTProvider) ValidateFields(paths ...string) error {
 			}
 
 		case "subscribe_qos":
-			// no validation rules for SubscribeQoS
+			// no validation rules for SubscribeQos
 		case "publish_qos":
-			// no validation rules for PublishQoS
+			// no validation rules for PublishQos
 		case "use_tls":
-			// no validation rules for UseTLS
+			// no validation rules for UseTls
 		case "tls_ca":
 
-			if len(m.GetTLSCA()) > 8192 {
+			if len(m.GetTlsCa()) > 8192 {
 				return ApplicationPubSub_MQTTProviderValidationError{
 					field:  "tls_ca",
 					reason: "value length must be at most 8192 bytes",
@@ -1171,7 +1171,7 @@ func (m *ApplicationPubSub_MQTTProvider) ValidateFields(paths ...string) error {
 
 		case "tls_client_cert":
 
-			if len(m.GetTLSClientCert()) > 8192 {
+			if len(m.GetTlsClientCert()) > 8192 {
 				return ApplicationPubSub_MQTTProviderValidationError{
 					field:  "tls_client_cert",
 					reason: "value length must be at most 8192 bytes",
@@ -1180,7 +1180,7 @@ func (m *ApplicationPubSub_MQTTProvider) ValidateFields(paths ...string) error {
 
 		case "tls_client_key":
 
-			if len(m.GetTLSClientKey()) > 8192 {
+			if len(m.GetTlsClientKey()) > 8192 {
 				return ApplicationPubSub_MQTTProviderValidationError{
 					field:  "tls_client_key",
 					reason: "value length must be at most 8192 bytes",
@@ -1547,14 +1547,14 @@ func (m *ApplicationPubSub_AWSIoTProvider_AccessKey) ValidateFields(paths ...str
 		switch name {
 		case "access_key_id":
 
-			if l := utf8.RuneCountInString(m.GetAccessKeyID()); l < 16 || l > 128 {
+			if l := utf8.RuneCountInString(m.GetAccessKeyId()); l < 16 || l > 128 {
 				return ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{
 					field:  "access_key_id",
 					reason: "value length must be between 16 and 128 runes, inclusive",
 				}
 			}
 
-			if !_ApplicationPubSub_AWSIoTProvider_AccessKey_AccessKeyID_Pattern.MatchString(m.GetAccessKeyID()) {
+			if !_ApplicationPubSub_AWSIoTProvider_AccessKey_AccessKeyId_Pattern.MatchString(m.GetAccessKeyId()) {
 				return ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{
 					field:  "access_key_id",
 					reason: "value does not match regex pattern \"^[\\\\w]*$\"",
@@ -1646,7 +1646,7 @@ var _ interface {
 	ErrorName() string
 } = ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{}
 
-var _ApplicationPubSub_AWSIoTProvider_AccessKey_AccessKeyID_Pattern = regexp.MustCompile("^[\\w]*$")
+var _ApplicationPubSub_AWSIoTProvider_AccessKey_AccessKeyId_Pattern = regexp.MustCompile("^[\\w]*$")
 
 // ValidateFields checks the field values on
 // ApplicationPubSub_AWSIoTProvider_AssumeRole with the rules defined in the
@@ -1665,7 +1665,7 @@ func (m *ApplicationPubSub_AWSIoTProvider_AssumeRole) ValidateFields(paths ...st
 		switch name {
 		case "arn":
 
-			if !_ApplicationPubSub_AWSIoTProvider_AssumeRole_ARN_Pattern.MatchString(m.GetARN()) {
+			if !_ApplicationPubSub_AWSIoTProvider_AssumeRole_Arn_Pattern.MatchString(m.GetArn()) {
 				return ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{
 					field:  "arn",
 					reason: "value does not match regex pattern \"^arn:aws:iam::[0-9]{12}:role\\\\/[A-Za-z0-9_+=,.@-]+$\"",
@@ -1674,14 +1674,14 @@ func (m *ApplicationPubSub_AWSIoTProvider_AssumeRole) ValidateFields(paths ...st
 
 		case "external_id":
 
-			if utf8.RuneCountInString(m.GetExternalID()) > 1224 {
+			if utf8.RuneCountInString(m.GetExternalId()) > 1224 {
 				return ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{
 					field:  "external_id",
 					reason: "value length must be at most 1224 runes",
 				}
 			}
 
-			if !_ApplicationPubSub_AWSIoTProvider_AssumeRole_ExternalID_Pattern.MatchString(m.GetExternalID()) {
+			if !_ApplicationPubSub_AWSIoTProvider_AssumeRole_ExternalId_Pattern.MatchString(m.GetExternalId()) {
 				return ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{
 					field:  "external_id",
 					reason: "value does not match regex pattern \"^[\\\\w+=,.@:\\\\/-]*$\"",
@@ -1768,9 +1768,9 @@ var _ interface {
 	ErrorName() string
 } = ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{}
 
-var _ApplicationPubSub_AWSIoTProvider_AssumeRole_ARN_Pattern = regexp.MustCompile("^arn:aws:iam::[0-9]{12}:role\\/[A-Za-z0-9_+=,.@-]+$")
+var _ApplicationPubSub_AWSIoTProvider_AssumeRole_Arn_Pattern = regexp.MustCompile("^arn:aws:iam::[0-9]{12}:role\\/[A-Za-z0-9_+=,.@-]+$")
 
-var _ApplicationPubSub_AWSIoTProvider_AssumeRole_ExternalID_Pattern = regexp.MustCompile("^[\\w+=,.@:\\/-]*$")
+var _ApplicationPubSub_AWSIoTProvider_AssumeRole_ExternalId_Pattern = regexp.MustCompile("^[\\w+=,.@:\\/-]*$")
 
 // ValidateFields checks the field values on
 // ApplicationPubSub_AWSIoTProvider_DefaultIntegration with the rules defined

@@ -180,8 +180,8 @@ func init() {
 		ShutdownCh:       make(chan *ConnectionWithError, 10),
 	}
 	for _, p := range []ttnpb.ApplicationPubSub_Provider{
-		&ttnpb.ApplicationPubSub_NATS{},
-		&ttnpb.ApplicationPubSub_MQTT{},
+		&ttnpb.ApplicationPubSub_Nats{},
+		&ttnpb.ApplicationPubSub_Mqtt{},
 	} {
 		provider.RegisterProvider(p, impl)
 	}
