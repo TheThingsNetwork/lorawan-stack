@@ -31,7 +31,7 @@ var withIdentifiersOption = events.WithDataType(&ttnpb.ApplicationPubSubIdentifi
 	ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 		ApplicationId: "application-id",
 	},
-	PubSubID: "pubsub-id",
+	PubSubId: "pubsub-id",
 })
 
 var (
@@ -157,7 +157,7 @@ func registerIntegrationFail(ctx context.Context, i *integration, err error) {
 	err = errIntegrationFailed.
 		WithAttributes(
 			"application_uid", unique.ID(ctx, i.ApplicationIdentifiers),
-			"pub_sub_id", i.PubSubID,
+			"pub_sub_id", i.PubSubId,
 		).
 		WithCause(err)
 	events.Publish(evtPubSubFail.NewWithIdentifiersAndData(ctx, &i.ApplicationIdentifiers, err))

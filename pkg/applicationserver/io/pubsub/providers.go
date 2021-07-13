@@ -56,9 +56,9 @@ func providerStatusFromString(s string) (ProviderStatus, error) {
 func providerTypeFromString(ctx context.Context, s string) (reflect.Type, error) {
 	switch s {
 	case "mqtt":
-		return reflect.TypeOf(&ttnpb.ApplicationPubSub_MQTT{}), nil
+		return reflect.TypeOf(&ttnpb.ApplicationPubSub_Mqtt{}), nil
 	case "nats":
-		return reflect.TypeOf(&ttnpb.ApplicationPubSub_NATS{}), nil
+		return reflect.TypeOf(&ttnpb.ApplicationPubSub_Nats{}), nil
 	default:
 		log.FromContext(ctx).WithField("provider", s).Warn("Unknown PubSub provider specified")
 		return nil, nil

@@ -62,10 +62,10 @@ func TestOpenConnection(t *testing.T) {
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app1",
 			},
-			PubSubID: "ps1",
+			PubSubId: "ps1",
 		},
-		Provider: &ttnpb.ApplicationPubSub_NATS{
-			NATS: &ttnpb.ApplicationPubSub_NATSProvider{},
+		Provider: &ttnpb.ApplicationPubSub_Nats{
+			Nats: &ttnpb.ApplicationPubSub_NATSProvider{},
 		},
 		BaseTopic: "app1.ps1",
 		DownlinkPush: &ttnpb.ApplicationPubSub_Message{
@@ -107,9 +107,9 @@ func TestOpenConnection(t *testing.T) {
 	}
 
 	impl, err := provider.GetProvider(&ttnpb.ApplicationPubSub{
-		Provider: &ttnpb.ApplicationPubSub_NATS{
-			NATS: &ttnpb.ApplicationPubSub_NATSProvider{
-				ServerURL: "nats://invalid.local:4222",
+		Provider: &ttnpb.ApplicationPubSub_Nats{
+			Nats: &ttnpb.ApplicationPubSub_NATSProvider{
+				ServerUrl: "nats://invalid.local:4222",
 			},
 		},
 	})
@@ -123,9 +123,9 @@ func TestOpenConnection(t *testing.T) {
 		a.So(err, should.NotBeNil)
 	}
 
-	pb.Provider = &ttnpb.ApplicationPubSub_NATS{
-		NATS: &ttnpb.ApplicationPubSub_NATSProvider{
-			ServerURL: "nats://localhost:4123",
+	pb.Provider = &ttnpb.ApplicationPubSub_Nats{
+		Nats: &ttnpb.ApplicationPubSub_NATSProvider{
+			ServerUrl: "nats://localhost:4123",
 		},
 	}
 

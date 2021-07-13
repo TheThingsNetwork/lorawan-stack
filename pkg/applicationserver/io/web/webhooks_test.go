@@ -53,7 +53,7 @@ func TestWebhooks(t *testing.T) {
 	}
 	ids := ttnpb.ApplicationWebhookIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,
-		WebhookID:              registeredWebhookID,
+		WebhookId:              registeredWebhookID,
 	}
 	for _, tc := range []struct {
 		prefix string
@@ -81,11 +81,11 @@ func TestWebhooks(t *testing.T) {
 			_, err := registry.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 				return &ttnpb.ApplicationWebhook{
 						ApplicationWebhookIdentifiers: ids,
-						BaseURL:                       "https://myapp.com/api/ttn/v3{/appID,devID}" + tc.suffix,
+						BaseUrl:                       "https://myapp.com/api/ttn/v3{/appID,devID}" + tc.suffix,
 						Headers: map[string]string{
 							"Authorization": "key secret",
 						},
-						DownlinkAPIKey: "foo.secret",
+						DownlinkApiKey: "foo.secret",
 						Format:         "json",
 						UplinkMessage: &ttnpb.ApplicationWebhook_Message{
 							Path: tc.prefix + "up{?devEUI}",

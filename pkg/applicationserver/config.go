@@ -89,7 +89,7 @@ type Config struct {
 
 func (c Config) toProto() *ttnpb.AsConfiguration {
 	return &ttnpb.AsConfiguration{
-		PubSub: c.PubSub.toProto(),
+		Pubsub: c.PubSub.toProto(),
 	}
 }
 
@@ -143,13 +143,13 @@ func (c PubSubConfig) toProto() *ttnpb.AsConfiguration_PubSub {
 	}
 	providers := &ttnpb.AsConfiguration_PubSub_Providers{}
 	if status, ok := c.Providers["mqtt"]; ok {
-		providers.MQTT = toStatus(status)
+		providers.Mqtt = toStatus(status)
 	}
 	if status, ok := c.Providers["nats"]; ok {
-		providers.NATS = toStatus(status)
+		providers.Nats = toStatus(status)
 	}
 	if status, ok := c.Providers["awsiot"]; ok {
-		providers.AWSIoT = toStatus(status)
+		providers.AwsIot = toStatus(status)
 	}
 	return &ttnpb.AsConfiguration_PubSub{
 		Providers: providers,

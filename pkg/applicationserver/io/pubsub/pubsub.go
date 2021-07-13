@@ -78,7 +78,7 @@ func (ps *PubSub) startAll(ctx context.Context) error {
 func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", unique.ID(ctx, ids.ApplicationIdentifiers),
-		"pub_sub_id", ids.PubSubID,
+		"pub_sub_id", ids.PubSubId,
 	))
 	ps.StartTask(&component.TaskConfig{
 		Context: ctx,
@@ -229,11 +229,11 @@ func (i *integration) startHandleDown(ctx context.Context) {
 
 func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err error) {
 	appUID := unique.ID(ctx, pb.ApplicationIdentifiers)
-	psUID := PubSubUID(appUID, pb.PubSubID)
+	psUID := PubSubUID(appUID, pb.PubSubId)
 
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", appUID,
-		"pub_sub_id", pb.PubSubID,
+		"pub_sub_id", pb.PubSubId,
 		"provider", fmt.Sprintf("%T", pb.Provider),
 	))
 	logger := log.FromContext(ctx)
@@ -314,7 +314,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 
 func (ps *PubSub) stop(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) error {
 	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
-	psUID := PubSubUID(appUID, ids.PubSubID)
+	psUID := PubSubUID(appUID, ids.PubSubId)
 	if val, ok := ps.integrations.Load(psUID); ok {
 		i := val.(*integration)
 		i.cancel(context.Canceled)

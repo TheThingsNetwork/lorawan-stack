@@ -76,7 +76,7 @@ func (r *PubSubRegistry) makeUIDKeyFunc(appUID string) func(id string) string {
 // Get implements pubsub.Registry.
 func (r PubSubRegistry) Get(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers, paths []string) (*ttnpb.ApplicationPubSub, error) {
 	pb := &ttnpb.ApplicationPubSub{}
-	if err := ttnredis.GetProto(ctx, r.Redis, r.uidKey(unique.ID(ctx, ids.ApplicationIdentifiers), ids.PubSubID)).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(ctx, r.Redis, r.uidKey(unique.ID(ctx, ids.ApplicationIdentifiers), ids.PubSubId)).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyPubSubFieldMask(nil, pb, appendImplicitPubSubGetPaths(paths...)...)
@@ -142,7 +142,7 @@ func (r PubSubRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifie
 // Set implements pubsub.Registry.
 func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers, gets []string, f func(*ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error)) (*ttnpb.ApplicationPubSub, error) {
 	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
-	ik := r.uidKey(appUID, ids.PubSubID)
+	ik := r.uidKey(appUID, ids.PubSubId)
 
 	var pb *ttnpb.ApplicationPubSub
 	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
@@ -191,8 +191,8 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(ctx, ik)
-				p.SRem(ctx, r.appKey(appUID), stored.PubSubID)
-				p.SRem(ctx, r.allKey(ctx), pubsub.PubSubUID(appUID, stored.PubSubID))
+				p.SRem(ctx, r.appKey(appUID), stored.PubSubId)
+				p.SRem(ctx, r.allKey(ctx), pubsub.PubSubUID(appUID, stored.PubSubId))
 				return nil
 			}
 		} else {
@@ -221,14 +221,14 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 				if err != nil {
 					return err
 				}
-				if updated.ApplicationId != ids.ApplicationId || updated.PubSubID != ids.PubSubID {
+				if updated.ApplicationId != ids.ApplicationId || updated.PubSubId != ids.PubSubId {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
 				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.pub_sub_id") && pb.PubSubID != stored.PubSubID {
+				if ttnpb.HasAnyField(sets, "ids.pub_sub_id") && pb.PubSubId != stored.PubSubId {
 					return errReadOnlyField.WithAttributes("field", "ids.pub_sub_id")
 				}
 				if err := cmd.ScanProto(updated); err != nil {
@@ -247,8 +247,8 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 				if _, err := ttnredis.SetProto(ctx, p, ik, updated, 0); err != nil {
 					return err
 				}
-				p.SAdd(ctx, r.appKey(appUID), updated.PubSubID)
-				p.SAdd(ctx, r.allKey(ctx), pubsub.PubSubUID(appUID, updated.PubSubID))
+				p.SAdd(ctx, r.appKey(appUID), updated.PubSubId)
+				p.SAdd(ctx, r.allKey(ctx), pubsub.PubSubUID(appUID, updated.PubSubId))
 				return nil
 			}
 

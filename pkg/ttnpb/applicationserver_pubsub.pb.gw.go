@@ -411,7 +411,7 @@ func request_ApplicationPubSubRegistry_Delete_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pub_sub_id")
 	}
 
-	protoReq.PubSubID, err = runtime.String(val)
+	protoReq.PubSubId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pub_sub_id", err)
@@ -456,7 +456,7 @@ func local_request_ApplicationPubSubRegistry_Delete_0(ctx context.Context, marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pub_sub_id")
 	}
 
-	protoReq.PubSubID, err = runtime.String(val)
+	protoReq.PubSubId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pub_sub_id", err)

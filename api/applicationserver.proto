@@ -52,7 +52,7 @@ message ApplicationLink {
   MessagePayloadFormatters default_formatters = 3;
   // Enable TLS for linking to the external Network Server.
   // For cluster-local Network Servers, the cluster's TLS setting is used.
-  bool tls = 4 [(gogoproto.customname) = "TLS"];
+  bool tls = 4;
   // Skip decryption of uplink payloads and encryption of downlink payloads.
   // Leave empty for the using the Application Server's default setting.
   google.protobuf.BoolValue skip_payload_crypto = 5;
@@ -97,14 +97,14 @@ message AsConfiguration {
         DISABLED = 2;
       };
 
-      Status mqtt = 1 [(gogoproto.customname) = "MQTT"];
-      Status nats = 2 [(gogoproto.customname) = "NATS"];
-      Status aws_iot = 3 [(gogoproto.customname) = "AWSIoT"];
+      Status mqtt = 1;
+      Status nats = 2;
+      Status aws_iot = 3;
     }
 
     Providers providers = 1;
   };
-  PubSub pubsub = 1 [(gogoproto.customname) = "PubSub"];
+  PubSub pubsub = 1;
 }
 
 message GetAsConfigurationRequest {
