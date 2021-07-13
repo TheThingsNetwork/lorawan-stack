@@ -16,13 +16,18 @@ package gatewayserver
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
+	"github.com/bluele/gcache"
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
 )
 
@@ -118,4 +123,55 @@ func (is IS) newRegistryClient(ctx context.Context, ids *ttnpb.GatewayIdentifier
 		return nil, err
 	}
 	return ttnpb.NewGatewayRegistryClient(cc), nil
+}
+
+type CachedEntityRegistry struct {
+	EntityRegistry
+	identifiers gcache.Cache
+	gateways    gcache.Cache
+}
+
+type cachedResponse struct {
+	result interface{}
+	err    error
+}
+
+func (is CachedEntityRegistry) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
+	if cached, err := is.identifiers.Get(req.Eui); err == nil {
+		response := cached.(cachedResponse)
+		return response.result.(*ttnpb.GatewayIdentifiers), response.err
+	}
+	ids, err := is.EntityRegistry.GetIdentifiersForEUI(ctx, req)
+	if err := is.identifiers.Set(req.Eui, cachedResponse{ids, err}); err != nil {
+		log.FromContext(ctx).WithError(err).Debug("Failed to cache gateway identifiers")
+	}
+	return ids, err
+}
+
+func (is CachedEntityRegistry) Get(ctx context.Context, in *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+	key := fmt.Sprintf("%s:%s", unique.ID(ctx, in.GatewayIdentifiers), strings.Join(in.GetFieldMask().GetPaths(), ","))
+	if cached, err := is.gateways.Get(key); err == nil {
+		response := cached.(cachedResponse)
+		return response.result.(*ttnpb.Gateway), response.err
+	}
+	gtw, err := is.EntityRegistry.Get(ctx, in)
+	if err := is.gateways.Set(key, cachedResponse{gtw, err}); err != nil {
+		log.FromContext(ctx).WithError(err).Debug("Failed to cache gateway")
+	}
+	return gtw, err
+}
+
+func EntityRegistryWithCache(er EntityRegistry, config EntityRegistryCacheConfig) *CachedEntityRegistry {
+	buildCache := func() gcache.Cache {
+		builder := gcache.New(int(config.Size)).Expiration(config.Timeout)
+		if config.Clock != nil {
+			builder.Clock(config.Clock)
+		}
+		return builder.Build()
+	}
+	return &CachedEntityRegistry{
+		EntityRegistry: er,
+		identifiers:    buildCache(),
+		gateways:       buildCache(),
+	}
 }

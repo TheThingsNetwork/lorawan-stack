@@ -127,7 +127,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		upstreamHandlers:                  make(map[string]upstream.Handler),
 		statsRegistry:                     conf.Stats,
 		updateConnectionStatsDebounceTime: conf.UpdateConnectionStatsDebounceTime,
-		entityRegistry:                    NewIS(c),
+		entityRegistry:                    conf.NewEntityRegistry(c),
 	}
 	for _, opt := range opts {
 		opt(gs)

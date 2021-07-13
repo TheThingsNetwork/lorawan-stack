@@ -17,6 +17,7 @@ package gatewayserver
 import (
 	"time"
 
+	"github.com/bluele/gcache"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
@@ -45,6 +46,13 @@ type PacketBrokerConfig struct {
 	OnlineTTLMargin       time.Duration `name:"online-ttl-margin" description:"Time to extend the online status before it expires"`
 }
 
+type EntityRegistryCacheConfig struct {
+	Size    uint32        `name:"size" description:"Cache size"`
+	Timeout time.Duration `name:"timeout" description:"Cache timeout"`
+
+	Clock gcache.Clock `name:"-"`
+}
+
 // Config represents the Gateway Server configuration.
 type Config struct {
 	RequireRegisteredGateways bool `name:"require-registered-gateways" description:"Require the gateways to be registered in the Identity Server"`
@@ -61,6 +69,8 @@ type Config struct {
 	MQTTV2       config.MQTT        `name:"mqtt-v2"`
 	UDP          UDPConfig          `name:"udp"`
 	BasicStation BasicStationConfig `name:"basic-station"`
+
+	EntityRegistryCache EntityRegistryCacheConfig `name:"entity-registry-cache" description:"Cache responses from the gateway entity registry"`
 }
 
 // ForwardDevAddrPrefixes parses the configured forward map.
@@ -77,4 +87,12 @@ func (c Config) ForwardDevAddrPrefixes() (map[string][]types.DevAddrPrefix, erro
 		}
 	}
 	return res, nil
+}
+
+func (c Config) NewEntityRegistry(cluster Cluster) EntityRegistry {
+	is := &IS{Cluster: cluster}
+	if c.EntityRegistryCache.Timeout == 0 || c.EntityRegistryCache.Size == 0 {
+		return is
+	}
+	return EntityRegistryWithCache(is, c.EntityRegistryCache)
 }
