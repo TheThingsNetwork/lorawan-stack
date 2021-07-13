@@ -42,11 +42,11 @@ func TestGatewayStore(t *testing.T) {
 		targetCUPSURI := "https://thethings.example.com"
 		otherTargetCUPSURI := "https://thenotthings.example.com"
 		secret := &ttnpb.Secret{
-			KeyID: "my-secret-key-id",
+			KeyId: "my-secret-key-id",
 			Value: []byte("my very secret value"),
 		}
 		otherSecret := &ttnpb.Secret{
-			KeyID: "my-secret-key-id",
+			KeyId: "my-secret-key-id",
 			Value: []byte("my other very secret value"),
 		}
 
@@ -56,7 +56,7 @@ func TestGatewayStore(t *testing.T) {
 			ValidFrom: &from,
 			ValidTo:   &to,
 			Secret: &ttnpb.Secret{
-				KeyID: "my-secret-key-id",
+				KeyId: "my-secret-key-id",
 				Value: []byte("my very secret value"),
 			},
 		}
@@ -64,7 +64,7 @@ func TestGatewayStore(t *testing.T) {
 			ValidFrom: &from,
 			ValidTo:   &to,
 			Secret: &ttnpb.Secret{
-				KeyID: "my-secret-key-id",
+				KeyId: "my-secret-key-id",
 				Value: []byte("my other very secret value"),
 			},
 		}

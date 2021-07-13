@@ -226,7 +226,7 @@ var (
 			}
 			res, err := ttnpb.NewGatewayAccessClient(is).GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
 				GatewayIdentifiers: *gtwID,
-				KeyID:              id,
+				KeyId:              id,
 			})
 			if err != nil {
 				return err

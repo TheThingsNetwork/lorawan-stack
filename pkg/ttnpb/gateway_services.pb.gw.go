@@ -956,7 +956,7 @@ func request_GatewayAccess_GetAPIKey_0(ctx context.Context, marshaler runtime.Ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key_id")
 	}
 
-	protoReq.KeyID, err = runtime.String(val)
+	protoReq.KeyId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key_id", err)
@@ -1001,7 +1001,7 @@ func local_request_GatewayAccess_GetAPIKey_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "key_id")
 	}
 
-	protoReq.KeyID, err = runtime.String(val)
+	protoReq.KeyId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "key_id", err)

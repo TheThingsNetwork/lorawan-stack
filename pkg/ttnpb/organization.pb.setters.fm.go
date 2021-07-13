@@ -406,10 +406,10 @@ func (dst *GetOrganizationAPIKeyRequest) SetFields(src *GetOrganizationAPIKeyReq
 				return fmt.Errorf("'key_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.KeyID = src.KeyID
+				dst.KeyId = src.KeyId
 			} else {
 				var zero string
-				dst.KeyID = zero
+				dst.KeyId = zero
 			}
 
 		default:

@@ -98,7 +98,7 @@ var (
 			}
 			res, err := ttnpb.NewUserAccessClient(is).GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
 				UserIdentifiers: *usrID,
-				KeyID:           id,
+				KeyId:           id,
 			})
 			if err != nil {
 				return err

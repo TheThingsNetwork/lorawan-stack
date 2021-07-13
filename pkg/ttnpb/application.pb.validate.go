@@ -1007,7 +1007,7 @@ func (m *GetApplicationAPIKeyRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "key_id":
-			// no validation rules for KeyID
+			// no validation rules for KeyId
 		default:
 			return GetApplicationAPIKeyRequestValidationError{
 				field:  name,

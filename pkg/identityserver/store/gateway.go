@@ -136,7 +136,7 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 		blocks := bytes.SplitN(gtw.LBSLNSSecret, secretFieldSeparator, 2)
 		if len(blocks) == 2 {
 			pb.LBSLNSSecret = &ttnpb.Secret{
-				KeyID: string(blocks[0]),
+				KeyId: string(blocks[0]),
 				Value: blocks[1],
 			}
 		} else {
@@ -148,7 +148,7 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 		var secret *ttnpb.Secret
 		if len(blocks) == 2 {
 			secret = &ttnpb.Secret{
-				KeyID: string(blocks[0]),
+				KeyId: string(blocks[0]),
 				Value: blocks[1],
 			}
 		}
@@ -163,7 +163,7 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 		blocks := bytes.SplitN(gtw.TargetCUPSKey, secretFieldSeparator, 2)
 		if len(blocks) == 2 {
 			pb.TargetCUPSKey = &ttnpb.Secret{
-				KeyID: string(blocks[0]),
+				KeyId: string(blocks[0]),
 				Value: blocks[1],
 			}
 		} else {
@@ -231,7 +231,7 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	lbsLNSSecretField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		if pb.LBSLNSSecret != nil {
 			var secretBuffer bytes.Buffer
-			secretBuffer.WriteString(pb.LBSLNSSecret.KeyID)
+			secretBuffer.WriteString(pb.LBSLNSSecret.KeyId)
 			secretBuffer.Write(secretFieldSeparator)
 			secretBuffer.Write(pb.LBSLNSSecret.Value)
 			gtw.LBSLNSSecret = secretBuffer.Bytes()
@@ -244,7 +244,7 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 		if pb.ClaimAuthenticationCode != nil {
 			if pb.ClaimAuthenticationCode.Secret != nil {
 				var secretBuffer bytes.Buffer
-				secretBuffer.WriteString(pb.ClaimAuthenticationCode.Secret.KeyID)
+				secretBuffer.WriteString(pb.ClaimAuthenticationCode.Secret.KeyId)
 				secretBuffer.Write(secretFieldSeparator)
 				secretBuffer.Write(pb.ClaimAuthenticationCode.Secret.Value)
 				gtw.ClaimAuthenticationCodeSecret = secretBuffer.Bytes()
@@ -261,7 +261,7 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	targetCUPSKeyField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		if pb.TargetCUPSKey != nil {
 			var secretBuffer bytes.Buffer
-			secretBuffer.WriteString(pb.TargetCUPSKey.KeyID)
+			secretBuffer.WriteString(pb.TargetCUPSKey.KeyId)
 			secretBuffer.Write(secretFieldSeparator)
 			secretBuffer.Write(pb.TargetCUPSKey.Value)
 			gtw.TargetCUPSKey = secretBuffer.Bytes()

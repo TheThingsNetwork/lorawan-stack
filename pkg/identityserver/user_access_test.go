@@ -52,7 +52,7 @@ func TestUserAccessNotFound(t *testing.T) {
 
 		got, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
 			UserIdentifiers: userID,
-			KeyID:           apiKey.ID,
+			KeyId:           apiKey.ID,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -128,7 +128,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
 			UserIdentifiers: userID,
-			KeyID:           APIKeyID,
+			KeyId:           APIKeyID,
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -219,7 +219,7 @@ func TestUserAccessCRUD(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			KeyID:           userKey.ID,
+			KeyId:           userKey.ID,
 		}, creds)
 
 		a.So(err, should.BeNil)

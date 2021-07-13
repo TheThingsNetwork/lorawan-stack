@@ -55,13 +55,13 @@ func NewPopulator(size int, seed int64) *Populator {
 
 		// This is to prevent the IS trying to use the randomly generated key IDs to decrypt the secrets.
 		if gateway.LBSLNSSecret != nil {
-			gateway.LBSLNSSecret.KeyID = ""
+			gateway.LBSLNSSecret.KeyId = ""
 		}
 		if gateway.ClaimAuthenticationCode != nil && gateway.ClaimAuthenticationCode.Secret != nil {
-			gateway.ClaimAuthenticationCode.Secret.KeyID = ""
+			gateway.ClaimAuthenticationCode.Secret.KeyId = ""
 		}
 		if gateway.TargetCUPSKey != nil {
-			gateway.TargetCUPSKey.KeyID = ""
+			gateway.TargetCUPSKey.KeyId = ""
 		}
 
 		p.Gateways = append(p.Gateways, gateway)
