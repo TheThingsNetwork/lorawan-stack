@@ -1829,6 +1829,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 								RxMetadata:   up.GetUplinkMessage().GetRxMetadata(),
 								Settings:     deduplicatedUp.Settings,
 								SessionKeyID: upConf.SessionKeys.SessionKeyID,
+								NetworkIds:   up.GetUplinkMessage().GetNetworkIds(),
 							},
 						},
 					}),

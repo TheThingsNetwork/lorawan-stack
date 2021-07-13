@@ -582,3 +582,43 @@ func (dst *EndDeviceVersionIdentifiers) SetFields(src *EndDeviceVersionIdentifie
 	}
 	return nil
 }
+
+func (dst *NetworkIdentifiers) SetFields(src *NetworkIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "net_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'net_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetId = src.NetId
+			} else {
+				dst.NetId = nil
+			}
+		case "tenant_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tenant_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TenantId = src.TenantId
+			} else {
+				var zero string
+				dst.TenantId = zero
+			}
+		case "cluster_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cluster_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ClusterId = src.ClusterId
+			} else {
+				var zero string
+				dst.ClusterId = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

@@ -638,6 +638,31 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 					dst.VersionIDs = nil
 				}
 			}
+		case "network_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *NetworkIdentifiers
+				if (src == nil || src.NetworkIds == nil) && dst.NetworkIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.NetworkIds
+				}
+				if dst.NetworkIds != nil {
+					newDst = dst.NetworkIds
+				} else {
+					newDst = &NetworkIdentifiers{}
+					dst.NetworkIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.NetworkIds = src.NetworkIds
+				} else {
+					dst.NetworkIds = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
