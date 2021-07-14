@@ -27,6 +27,8 @@ div.toast
 .slide-out-right
   animation: slide-in-right 0.5s cubic-bezier(0.230, 1.000, 0.320, 1.000) both reverse
 
+.beat
+  animation: beat 0.5s cubic-bezier(0.230, 1.000, 0.320, 1.000) both
 
 @keyframes slide-in-right
   0%
@@ -37,4 +39,15 @@ div.toast
   100%
     -webkit-transform: translateX(0)
     transform: translateX(0)
+    opacity: 1
+
+@keyframes beat
+  0%
+    -webkit-transform: rotateX(0deg)
+    transform: scale(1.2)
+    opacity: 0
+
+  100%
+    -webkit-transform: rotateX(180deg)
+    transform: scale(1)
     opacity: 1
