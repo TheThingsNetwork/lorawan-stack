@@ -16,11 +16,13 @@ package commands
 
 import (
 	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack/v5"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	nsredis "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -92,6 +94,18 @@ var (
 
 			logger.Info("Connecting to Redis database...")
 			cl := NewNetworkServerDeviceRegistryRedis(*config)
+
+			if force, _ := cmd.Flags().GetBool("force"); !force {
+				needMigration, err := checkLatestSchemaVersion(cl)
+				if err != nil {
+					return err
+				}
+				if !needMigration {
+					logger.Info("Database schema version is already in latest version")
+					return nil
+				}
+			}
+
 			var migrated uint64
 			defer func() { logger.Debugf("%d keys migrated", migrated) }()
 
@@ -120,7 +134,7 @@ var (
 			addrRegexp3_11_Current := regexp.MustCompile(cl.Key("addr", devAddrRegexpStr, "current$"))
 			addrRegexp3_11_CurrentFields := regexp.MustCompile(cl.Key("addr", devAddrRegexpStr, "current", "fields$"))
 			addrRegexp3_11_PendingFields := regexp.MustCompile(cl.Key("addr", devAddrRegexpStr, "pending", "fields$"))
-			return rangeRedisKeys(ctx, cl, cl.Key("*"), 1, func(k string) (bool, error) {
+			err := rangeRedisKeys(ctx, cl, cl.Key("*"), 1, func(k string) (bool, error) {
 				logger := logger.WithField("key", k)
 				switch {
 				case uidRegexp3_10_Fields.MatchString(k):
@@ -442,12 +456,40 @@ var (
 				migrated++
 				return true, nil
 			})
+			if err != nil {
+				return err
+			}
+
+			return recordSchemaVersion(cl)
 		},
 	}
 )
+
+func recordSchemaVersion(cl *ttnredis.Client) error {
+	logger.WithField("version", nsredis.SchemaVersion).Info("Setting schema version")
+	return cl.Set(ctx, "schema-version", nsredis.SchemaVersion, 0).Err()
+}
+
+func checkLatestSchemaVersion(cl *ttnredis.Client) (bool, error) {
+	schemaVersionString, err := cl.Get(ctx, "schema-version").Result()
+	if err != nil {
+		if errors.IsNotFound(ttnredis.ConvertError(err)) {
+			return true, nil
+		}
+		return true, err
+	}
+	schemaVersion, err := strconv.ParseInt(schemaVersionString, 10, 32)
+	if err != nil {
+		return true, err
+	}
+	logger.WithField("version", schemaVersion).Info("Existing database schema version")
+	return schemaVersion < nsredis.SchemaVersion, nil
+}
 
 func init() {
 	Root.AddCommand(nsDBCommand)
 	nsDBCommand.AddCommand(nsDBPruneCommand)
 	nsDBCommand.AddCommand(nsDBMigrateCommand)
+
+	nsDBMigrateCommand.Flags().Bool("force", false, "Force perform database migrations")
 }

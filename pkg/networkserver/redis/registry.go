@@ -42,6 +42,9 @@ var (
 	errReadOnlyField        = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
 )
 
+// SchemaVersion is the Network Server database schema version. Bump when a migration is required.
+const SchemaVersion = 1
+
 // DeviceRegistry is an implementation of networkserver.DeviceRegistry.
 type DeviceRegistry struct {
 	Redis   *ttnredis.Client
