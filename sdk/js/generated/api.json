@@ -1623,18 +1623,6 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
-            },
-            {
-              "name": "aws_iot",
-              "description": "",
-              "label": "",
-              "type": "Status",
-              "longType": "AsConfiguration.PubSub.Providers.Status",
-              "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
             }
           ]
         },

@@ -148,9 +148,6 @@ func (c PubSubConfig) toProto() *ttnpb.AsConfiguration_PubSub {
 	if status, ok := c.Providers["nats"]; ok {
 		providers.Nats = toStatus(status)
 	}
-	if status, ok := c.Providers["awsiot"]; ok {
-		providers.AwsIot = toStatus(status)
-	}
 	return &ttnpb.AsConfiguration_PubSub{
 		Providers: providers,
 	}

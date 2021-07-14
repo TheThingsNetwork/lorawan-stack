@@ -1670,8 +1670,6 @@ func (m *AsConfiguration_PubSub_Providers) ValidateFields(paths ...string) error
 			// no validation rules for Mqtt
 		case "nats":
 			// no validation rules for Nats
-		case "aws_iot":
-			// no validation rules for AwsIot
 		default:
 			return AsConfiguration_PubSub_ProvidersValidationError{
 				field:  name,

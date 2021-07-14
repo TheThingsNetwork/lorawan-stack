@@ -808,16 +808,6 @@ func (dst *AsConfiguration_PubSub_Providers) SetFields(src *AsConfiguration_PubS
 				var zero AsConfiguration_PubSub_Providers_Status
 				dst.Nats = zero
 			}
-		case "aws_iot":
-			if len(subs) > 0 {
-				return fmt.Errorf("'aws_iot' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.AwsIot = src.AwsIot
-			} else {
-				var zero AsConfiguration_PubSub_Providers_Status
-				dst.AwsIot = zero
-			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
