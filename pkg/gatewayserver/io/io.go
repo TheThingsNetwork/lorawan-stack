@@ -407,10 +407,17 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			break
 		}
 	}
-	phy, err := band.GetByID(fp.BandID)
+
+	phyFromFP, err := band.GetByID(fp.BandID)
 	if err != nil {
 		return false, false, 0, err
 	}
+
+	phy, err := phyFromFP.Version(request.GetLorawanPhyVersion())
+	if err != nil {
+		return false, false, 0, err
+	}
+
 	var rxErrs []errors.ErrorDetails
 	for i, rx := range []struct {
 		dataRateIndex ttnpb.DataRateIndex
