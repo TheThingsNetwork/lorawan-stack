@@ -26,6 +26,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - When a gateway uplink message contains duplicate data uplinks, only the one with the highest RSSI are forwarded.
+- `ttn-lw-stack ns-db migrate` command records the schema version and only performs migrations if on a newer version.
+  - Use the `--force` flag to force perform migrations.
 
 ### Deprecated
 
