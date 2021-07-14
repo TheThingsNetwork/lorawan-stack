@@ -178,7 +178,7 @@ const m = defineMessages({
     'When checked, the location of this gateway will be updated from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported.',
 
   disablePacketBrokerForwardingDescription:
-    'When checked, uplink messages received from this gateway will not be forwarded to the Packet Broker. This option takes effect only after the gateway reconnects.',
+    'When checked, uplink messages received from this gateway will not be forwarded to Packet Broker. This option takes effect only after the gateway reconnects.',
 })
 
 const descriptions = Object.freeze({
