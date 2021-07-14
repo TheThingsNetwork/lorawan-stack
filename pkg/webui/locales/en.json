@@ -1085,7 +1085,5 @@
   "lib.shared-messages.webhookBaseUrl": "Base URL",
   "lib.shared-messages.webhookFormat": "Webhook format",
   "lib.shared-messages.webhookId": "Webhook ID",
-  "lib.shared-messages.webhooks": "Webhooks",
-  "lib.store.logics.create-request-logic.applicationIsOfflineTitle": "{applicationName} is offline",
-  "lib.store.logics.create-request-logic.applicationIsOfflineMessage": "The action cannot be performed because your host machine is currently offline or has connection issues. Please check your internet connection and try again."
+  "lib.shared-messages.webhooks": "Webhooks"
 }

@@ -1085,7 +1085,5 @@
   "lib.shared-messages.webhookBaseUrl": "Xxxx XXX",
   "lib.shared-messages.webhookFormat": "Xxxxxxx xxxxxx",
   "lib.shared-messages.webhookId": "Xxxxxxx XX",
-  "lib.shared-messages.webhooks": "Xxxxxxxx",
-  "lib.store.logics.create-request-logic.applicationIsOfflineTitle": "{applicationName} xx xxxxxxx",
-  "lib.store.logics.create-request-logic.applicationIsOfflineMessage": "Xxx xxxxxx xxxxxx xx xxxxxxxxx xxxxxxx xxxx xxxx xxxxxxx xx xxxxxxxxx xxxxxxx xx xxx xxxxxxxxxx xxxxxx. Xxxxxx xxxxx xxxx xxxxxxxx xxxxxxxxxx xxx xxx xxxxx."
+  "lib.shared-messages.webhooks": "Xxxxxxxx"
 }
