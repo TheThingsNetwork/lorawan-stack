@@ -41,6 +41,7 @@ For details about compatibility between different releases, see the **Commitment
 - Webhook template path variable expansion of query parameters.
 - LBS LNS Auth Secret displays garbage value when updated.
 - Transmit confirmation messages for LoRa Basics Station gateways.
+- Instability and frequent crashes when internet connection is lost in the Console.
 
 ### Security
 
