@@ -19,6 +19,9 @@ For details about compatibility between different releases, see the **Commitment
 
 - LR-FHSS modulation support as part of the gateways API.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+- Network Server now appends network identifiers in forwarded uplink messages. These are populated from the `ns.net-id` and the new `ns.cluster-id` configuration option.
+  - See the new `uplink_message.network_identifiers.net_id`, `uplink_message.network_identifiers.cluster_id` and `uplink_message.network_identifiers.tenant_id` fields.
+  - This can be useful for HTTP webhooks to determine the Network Server that received and forwarded an uplink message.
 
 ### Changed
 
