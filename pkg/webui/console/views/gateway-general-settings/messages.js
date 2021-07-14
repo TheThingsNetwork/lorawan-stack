@@ -25,6 +25,8 @@ const messages = defineMessages({
   deleteGateway: 'Delete gateway',
   modalWarning:
     'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID.',
+  disablePacketBrokerForwarding:
+    'Disable forwarding uplink messages received from this gateway to the Packet Broker',
 })
 
 export default messages

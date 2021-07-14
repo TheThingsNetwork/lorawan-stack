@@ -49,4 +49,5 @@ export default Object.freeze({
   SCHEDULE_ANYTIME_DELAY: 'schedule-anytime-delay',
   SCHEDULE_DOWNLINK_LATE: 'schedule-downlink-late',
   UPDATE_LOCATION_FROM_STATUS: 'update-location-from-status',
+  DISABLE_PACKET_BROKER_FORWARDING: 'disable-packet-broker-forwarding',
 })
