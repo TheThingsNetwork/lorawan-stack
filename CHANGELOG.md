@@ -23,6 +23,9 @@ For details about compatibility between different releases, see the **Commitment
   - This can be useful for HTTP webhooks to determine the Network Server that received and forwarded an uplink message.
 - `GetDefaultMACSettings` RPC for requesting the default and desired MAC settings for a Band (Frequency Plan) and LoRaWAN regional parameters version.
 - Error handling for missing templates in device repository form in the Console.
+- Opt out of Packet Broker for individual gateways, see the new `disable_packet_broker_forwarding` gateway option.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+  - This is only relevant when Packet Broker is enabled and configured by the network operator.
 
 ### Changed
 
