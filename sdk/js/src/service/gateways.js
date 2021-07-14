@@ -92,6 +92,12 @@ class Gateways {
     ) {
       gateway.update_location_from_status = false
     }
+    if (
+      paths.includes('disable_packet_broker_forwarding') &&
+      !Boolean(gateway.disable_packet_broker_forwarding)
+    ) {
+      gateway.disable_packet_broker_forwarding = false
+    }
 
     return gateway
   }

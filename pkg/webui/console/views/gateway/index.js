@@ -102,6 +102,7 @@ import {
       'schedule_anytime_delay',
       'attributes',
       'require_authenticated_connection',
+      'disable_packet_broker_forwarding',
     ]
 
     if (mayViewSecrets) {
