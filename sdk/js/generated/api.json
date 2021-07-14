@@ -29800,6 +29800,58 @@
               "defaultValue": ""
             }
           ]
+        },
+        {
+          "name": "GetDefaultMACSettingsRequest",
+          "longName": "GetDefaultMACSettingsRequest",
+          "fullName": "ttn.lorawan.v3.GetDefaultMACSettingsRequest",
+          "description": "Request of GetDefaultMACSettings.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "frequency_plan_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
+            },
+            {
+              "name": "lorawan_phy_version",
+              "description": "",
+              "label": "",
+              "type": "PHYVersion",
+              "longType": "PHYVersion",
+              "fullType": "ttn.lorawan.v3.PHYVersion",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
         }
       ],
       "services": [
@@ -29902,6 +29954,28 @@
                     {
                       "method": "GET",
                       "pattern": "/ns/dev_addr"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetDefaultMACSettings",
+              "description": "GetDefaultMACSettings retrieves the default MAC settings for a frequency plan.",
+              "requestType": "GetDefaultMACSettingsRequest",
+              "requestLongType": "GetDefaultMACSettingsRequest",
+              "requestFullType": "ttn.lorawan.v3.GetDefaultMACSettingsRequest",
+              "requestStreaming": false,
+              "responseType": "MACSettings",
+              "responseLongType": "MACSettings",
+              "responseFullType": "ttn.lorawan.v3.MACSettings",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ns/default_mac_settings/{frequency_plan_id}/{lorawan_phy_version}"
                     }
                   ]
                 }

@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -171,6 +172,51 @@ func TestGenerateDevAddr(t *testing.T) {
 				a.So(seen[tc.DevAddrPrefixes[0]], should.BeGreaterThan, 0)
 				a.So(seen[tc.DevAddrPrefixes[1]], should.BeGreaterThan, 0)
 				a.So(seen[tc.DevAddrPrefixes[2]], should.BeGreaterThan, 0)
+			},
+		})
+	}
+}
+
+func TestGetDefaultMACSettings(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		assertion func(err error) bool
+		req       *ttnpb.GetDefaultMACSettingsRequest
+	}{
+		{
+			name:      "NoFrequencyPlanID",
+			assertion: errors.IsNotFound,
+			req:       &ttnpb.GetDefaultMACSettingsRequest{},
+		},
+		{
+			name:      "NoLoRaWANVersion",
+			assertion: errors.IsInvalidArgument,
+			req: &ttnpb.GetDefaultMACSettingsRequest{
+				FrequencyPlanID: "EU_863_870",
+			},
+		},
+		{
+			name:      "OK",
+			assertion: func(err error) bool { return err == nil },
+			req: &ttnpb.GetDefaultMACSettingsRequest{
+				FrequencyPlanID:   "EU_863_870",
+				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+			},
+		},
+	} {
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ns, _, _, stop := StartTest(ctx, TestConfig{})
+				defer stop()
+				settings, err := ttnpb.NewNsClient(ns.LoopbackConn()).GetDefaultMACSettings(test.Context(), tc.req)
+				if tc.assertion != nil {
+					a.So(tc.assertion(err), should.BeTrue)
+				} else {
+					a.So(settings, should.NotBeNil)
+				}
 			},
 		})
 	}

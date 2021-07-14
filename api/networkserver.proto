@@ -14,12 +14,14 @@
 
 syntax = "proto3";
 
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "lorawan-stack/api/end_device.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
+import "lorawan-stack/api/lorawan.proto";
 
 package ttn.lorawan.v3;
 
@@ -44,12 +46,24 @@ message GenerateDevAddrResponse {
   bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
 }
 
+// Request of GetDefaultMACSettings.
+message GetDefaultMACSettingsRequest {
+  string frequency_plan_id = 1 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
+  PHYVersion lorawan_phy_version = 2 [(validate.rules).enum.defined_only = true];
+}
+
 // The Ns service manages the Network Server.
 service Ns {
   // GenerateDevAddr requests a device address assignment from the Network Server.
   rpc GenerateDevAddr(google.protobuf.Empty) returns (GenerateDevAddrResponse) {
     option (google.api.http) = {
       get: "/ns/dev_addr"
+    };
+  };
+  // GetDefaultMACSettings retrieves the default MAC settings for a frequency plan.
+  rpc GetDefaultMACSettings(GetDefaultMACSettingsRequest) returns (MACSettings) {
+    option (google.api.http) = {
+      get: "/ns/default_mac_settings/{frequency_plan_id}/{lorawan_phy_version}"
     };
   };
 }

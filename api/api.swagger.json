@@ -6205,6 +6205,57 @@
         ]
       }
     },
+    "/ns/default_mac_settings/{frequency_plan_id}/{lorawan_phy_version}": {
+      "get": {
+        "summary": "GetDefaultMACSettings retrieves the default MAC settings for a frequency plan.",
+        "operationId": "Ns_GetDefaultMACSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3MACSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "frequency_plan_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "lorawan_phy_version",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "PHY_UNKNOWN",
+              "TS001_V1_0",
+              "TS001_V1_0_1",
+              "RP001_V1_0_2",
+              "RP001_V1_0_2_REV_B",
+              "RP001_V1_1_REV_A",
+              "RP001_V1_1_REV_B",
+              "RP001_V1_0_3_REV_A",
+              "RP002_V1_0_0",
+              "RP002_V1_0_1",
+              "RP002_V1_0_2",
+              "RP002_V1_0_3"
+            ]
+          }
+        ],
+        "tags": [
+          "Ns"
+        ]
+      }
+    },
     "/ns/dev_addr": {
       "get": {
         "summary": "GenerateDevAddr requests a device address assignment from the Network Server.",
