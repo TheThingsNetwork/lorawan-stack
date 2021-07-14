@@ -25,6 +25,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- When generating client configuration with the CLI `use` command, automatically set the correct Identity Server and OAuth Server addresses for The Things Stack Cloud and The Things Stack Community Edition.
+
 ### Deprecated
 
 ### Removed
