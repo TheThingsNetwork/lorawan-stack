@@ -119,8 +119,8 @@ jobs:
       - name: Create device repository index
         run: tools/bin/mage dev:initDeviceRepo
         if: steps.dr-index-cache.outputs.cache-hit != 'true'
-      - name: Initialize stack environment
-        run: tools/bin/mage init
+      - name: Generate certs
+        run: tools/bin/mage dev:certificates
       - name: Run test preparations
         if: |
           steps.db-cache.outputs.cache-hit != 'true'
