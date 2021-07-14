@@ -592,3 +592,77 @@ func TestSubBandEIRPOverride(t *testing.T) {
 		})
 	}
 }
+
+func TestUniqueUplinkMessagesByRSSI(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		in   []*ttnpb.UplinkMessage
+		out  []*ttnpb.UplinkMessage
+	}{
+		{
+			name: "nil",
+		},
+		{
+			name: "one",
+			in: []*ttnpb.UplinkMessage{{
+				RawPayload: []byte{1, 2, 3, 4, 5},
+				Settings:   ttnpb.TxSettings{Frequency: 1000000},
+				RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -20, AntennaIndex: 0}},
+			}},
+			out: []*ttnpb.UplinkMessage{{
+				RawPayload: []byte{1, 2, 3, 4, 5},
+				Settings:   ttnpb.TxSettings{Frequency: 1000000},
+				RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -20, AntennaIndex: 0}},
+			}},
+		},
+		{
+			name: "deduplicate",
+			in: []*ttnpb.UplinkMessage{
+				{
+					RawPayload: []byte{1, 2, 3, 4},
+					Settings:   ttnpb.TxSettings{Frequency: 1200000},
+				},
+				{
+					RawPayload: []byte{1, 2, 3, 4, 5},
+					Settings:   ttnpb.TxSettings{Frequency: 1200000},
+					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -40, AntennaIndex: 0}},
+				},
+				{
+					RawPayload: []byte{1, 2, 3, 4, 5},
+					Settings:   ttnpb.TxSettings{Frequency: 1000000},
+					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -20, AntennaIndex: 0}},
+				},
+				{
+					RawPayload: []byte{1, 2, 3, 4, 5},
+					Settings:   ttnpb.TxSettings{Frequency: 1100000},
+					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -100, AntennaIndex: 0}},
+				},
+				{
+					RawPayload: []byte{1, 2, 3, 4, 5, 6},
+					Settings:   ttnpb.TxSettings{Frequency: 1000000},
+					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -10, AntennaIndex: 0}},
+				},
+			},
+			out: []*ttnpb.UplinkMessage{
+				{
+					RawPayload: []byte{1, 2, 3, 4},
+					Settings:   ttnpb.TxSettings{Frequency: 1200000},
+				},
+				{
+					RawPayload: []byte{1, 2, 3, 4, 5},
+					Settings:   ttnpb.TxSettings{Frequency: 1000000},
+					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -20, AntennaIndex: 0}},
+				},
+				{
+					RawPayload: []byte{1, 2, 3, 4, 5, 6},
+					Settings:   ttnpb.TxSettings{Frequency: 1000000},
+					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -10, AntennaIndex: 0}},
+				},
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			assertions.New(t).So(io.UniqueUplinkMessagesByRSSI(tc.in), should.Resemble, tc.out)
+		})
+	}
+}

@@ -372,6 +372,56 @@ func TestTraffic(t *testing.T) {
 				}
 			})
 		}
+		t.Run("DeduplicateByRSSI", func(t *testing.T) {
+			a := assertions.New(t)
+			upCh <- &ttnpb.GatewayUp{
+				UplinkMessages: []*ttnpb.UplinkMessage{
+					{
+						RawPayload: []byte{0x06},
+						RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: registeredGatewayID, RSSI: -100}},
+						Settings: ttnpb.TxSettings{
+							DataRate: ttnpb.DataRate{
+								Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+									Bandwidth:       125000,
+									SpreadingFactor: 11,
+								}},
+							},
+							EnableCRC: true,
+							Frequency: 868500000,
+							Timestamp: 42,
+						},
+					},
+					{
+						RawPayload: []byte{0x06},
+						RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: registeredGatewayID, RSSI: -10}},
+						Settings: ttnpb.TxSettings{
+							DataRate: ttnpb.DataRate{
+								Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+									Bandwidth:       125000,
+									SpreadingFactor: 11,
+								}},
+							},
+							EnableCRC: true,
+							Frequency: 868700000,
+							Timestamp: 42,
+						},
+					},
+				},
+			}
+			select {
+			case up := <-conn.Up():
+				a.So(up.RxMetadata[0].RSSI, should.Equal, -10)
+				a.So(up.RawPayload, should.Resemble, []byte{0x06})
+				a.So(up.Settings.Frequency, should.Equal, 868700000)
+			case <-time.After(timeout):
+				t.Fatalf("Receive unexpected upstream timeout")
+			}
+			select {
+			case <-conn.Up():
+				t.Fatalf("Received unexpected upstream message")
+			case <-time.After(timeout):
+			}
+		})
 	})
 
 	t.Run("Downstream", func(t *testing.T) {
