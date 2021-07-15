@@ -100,6 +100,7 @@ const DeviceRepository = props => {
     getRegistrationTemplate,
     template,
     templateFetching,
+    templateError,
     prefixes,
     mayEditKeys,
     jsConfig,
@@ -122,7 +123,7 @@ const DeviceRepository = props => {
   const hardwareVersion = selectHwVersion(state)
   const firmwareVersion = selectFwVersion(state)
   const band = selectBand(state)
-  const error = selectError(state)
+  const error = selectError(state) || templateError
 
   const versionRef = React.useRef(version)
   const formRef = React.useRef(null)
@@ -222,10 +223,11 @@ const DeviceRepository = props => {
     }
   }, [])
 
+  const hasTemplateError = Boolean(templateError)
   const hasSelectedOther = hasAnySelectedOther(state)
   const hasCompleted = hasCompletedSelection(state)
   const showProgressHint = !hasSelectedOther && !hasCompleted
-  const showRegistrationForm = !hasSelectedOther && hasCompleted
+  const showRegistrationForm = !hasSelectedOther && hasCompleted && !hasTemplateError
   const showDeviceCard = !hasSelectedOther && hasCompleted && Boolean(template)
   const showOtherHint = hasSelectedOther
 
@@ -345,6 +347,7 @@ DeviceRepository.propTypes = {
       lorawan_version: PropTypes.string.isRequired,
     }),
   }),
+  templateError: PropTypes.error,
   templateFetching: PropTypes.bool,
 }
 
@@ -352,6 +355,7 @@ DeviceRepository.defaultProps = {
   template: undefined,
   templateFetching: false,
   supportLink: undefined,
+  templateError: undefined,
 }
 
 export default withBreadcrumb('devices.add.device-repository', props => (

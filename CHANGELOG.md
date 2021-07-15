@@ -22,6 +22,7 @@ For details about compatibility between different releases, see the **Commitment
   - See the new `uplink_message.network_identifiers.net_id`, `uplink_message.network_identifiers.cluster_id` and `uplink_message.network_identifiers.tenant_id` fields.
   - This can be useful for HTTP webhooks to determine the Network Server that received and forwarded an uplink message.
 - `GetDefaultMACSettings` RPC for requesting the default and desired MAC settings for a Band (Frequency Plan) and LoRaWAN regional parameters version.
+- Error handling for missing templates in device repository form in the Console.
 
 ### Changed
 

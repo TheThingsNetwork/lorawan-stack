@@ -31,6 +31,7 @@ import { getTemplate } from '@console/store/actions/device-repository'
 import {
   selectDeviceTemplate,
   selectDeviceTemplateFetching,
+  selectDeviceTemplateError,
 } from '@console/store/selectors/device-repository'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { selectJoinEUIPrefixes } from '@console/store/selectors/join-server'
@@ -40,6 +41,7 @@ const mapStateToProps = state => ({
   prefixes: selectJoinEUIPrefixes(state),
   template: selectDeviceTemplate(state),
   templateFetching: selectDeviceTemplateFetching(state),
+  templateError: selectDeviceTemplateError(state),
   createDevice: (appId, device) => api.device.create(appId, device),
   mayEditKeys: checkFromState(mayEditApplicationDeviceKeys, state),
   jsConfig: selectJsConfig(),
