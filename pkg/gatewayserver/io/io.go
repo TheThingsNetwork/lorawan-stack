@@ -408,14 +408,18 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		}
 	}
 
-	phyFromFP, err := band.GetByID(fp.BandID)
+	phy, err := band.GetByID(fp.BandID)
 	if err != nil {
 		return false, false, 0, err
 	}
 
-	phy, err := phyFromFP.Version(request.GetLorawanPhyVersion())
-	if err != nil {
-		return false, false, 0, err
+	lwPhyVersion := request.GetLorawanPhyVersion()
+	// Backwards compatibility. If there's no LoRaWANPhyVersion defined, assume that the band is already versioned.
+	if lwPhyVersion != ttnpb.PHY_UNKNOWN {
+		phy, err = phy.Version(request.GetLorawanPhyVersion())
+		if err != nil {
+			return false, false, 0, err
+		}
 	}
 
 	var rxErrs []errors.ErrorDetails

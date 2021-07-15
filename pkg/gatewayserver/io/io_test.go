@@ -170,7 +170,34 @@ func TestFlow(t *testing.T) {
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
-			Name: "NoLWPhyVersionClassA",
+			Name: "ClassAWithInvalidLWPhyVersion",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(
+						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
+						100,
+						100000,
+						time.Unix(0, 100*1000),
+					),
+				},
+			},
+			Message: &ttnpb.DownlinkMessage{
+				RawPayload: []byte{0x01},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:             ttnpb.CLASS_A,
+						Priority:          ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay:          ttnpb.RX_DELAY_1,
+						Rx1DataRateIndex:  5,
+						Rx1Frequency:      868100000,
+						LorawanPhyVersion: ttnpb.RP002_V1_0_3,
+					},
+				},
+			},
+			ErrorAssertion: errors.IsNotFound,
+		},
+		{
+			Name: "ValidClassA",
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
@@ -193,33 +220,6 @@ func TestFlow(t *testing.T) {
 					},
 				},
 			},
-			ErrorAssertion: errors.IsNotFound,
-		},
-		{
-			Name: "ValidClassA",
-			Path: &ttnpb.DownlinkPath{
-				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
-						100,
-						100000,
-						time.Unix(0, 100*1000),
-					),
-				},
-			},
-			Message: &ttnpb.DownlinkMessage{
-				RawPayload: []byte{0x01},
-				Settings: &ttnpb.DownlinkMessage_Request{
-					Request: &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_A,
-						Priority:          ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay:          ttnpb.RX_DELAY_1,
-						Rx1DataRateIndex:  5,
-						Rx1Frequency:      868100000,
-						LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-					},
-				},
-			},
 			ExpectedEIRP: 16.15 - antennaGain,
 		},
 		{
@@ -238,12 +238,11 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_A,
-						Priority:          ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay:          ttnpb.RX_DELAY_1,
-						Rx1DataRateIndex:  5,                        // Same as previous.
-						Rx1Frequency:      868100000,                // Same as previous.
-						LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B, // Same as previous.
+						Class:            ttnpb.CLASS_A,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay:         ttnpb.RX_DELAY_1,
+						Rx1DataRateIndex: 5,         // Same as previous.
+						Rx1Frequency:     868100000, // Same as previous.
 					},
 				},
 			},
@@ -268,13 +267,12 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_A,
-						Priority:          ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay:          ttnpb.RX_DELAY_1,
-						Rx1DataRateIndex:  5,         // Same as previous.
-						Rx1Frequency:      868100000, // Same as previous.
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B, // Same as previous.
+						Class:            ttnpb.CLASS_A,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay:         ttnpb.RX_DELAY_1,
+						Rx1DataRateIndex: 5,         // Same as previous.
+						Rx1Frequency:     868100000, // Same as previous.
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -296,12 +294,11 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_A,
-						Priority:          ttnpb.TxSchedulePriority_NORMAL,
-						Rx1DataRateIndex:  5,
-						Rx1Frequency:      868100000,
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+						Class:            ttnpb.CLASS_A,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1DataRateIndex: 5,
+						Rx1Frequency:     868100000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -323,12 +320,11 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_C,
-						Priority:          ttnpb.TxSchedulePriority_NORMAL,
-						Rx2DataRateIndex:  5,
-						Rx2Frequency:      869525000,
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+						Class:            ttnpb.CLASS_C,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx2DataRateIndex: 5,
+						Rx2Frequency:     869525000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -349,12 +345,11 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_C,
-						Priority:          ttnpb.TxSchedulePriority_NORMAL,
-						Rx2DataRateIndex:  5,
-						Rx2Frequency:      869525000,
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+						Class:            ttnpb.CLASS_C,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx2DataRateIndex: 5,
+						Rx2Frequency:     869525000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -375,13 +370,12 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_C,
-						Priority:          ttnpb.TxSchedulePriority_NORMAL,
-						Rx2DataRateIndex:  5,
-						Rx2Frequency:      869525000,
-						AbsoluteTime:      timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+						Class:            ttnpb.CLASS_C,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx2DataRateIndex: 5,
+						Rx2Frequency:     869525000,
+						AbsoluteTime:     timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -394,13 +388,12 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_C,
-						Priority:          ttnpb.TxSchedulePriority_NORMAL,
-						Rx2DataRateIndex:  5,
-						Rx2Frequency:      869525000,
-						AbsoluteTime:      timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+						Class:            ttnpb.CLASS_C,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx2DataRateIndex: 5,
+						Rx2Frequency:     869525000,
+						AbsoluteTime:     timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -422,12 +415,11 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_C,
-						Priority:          ttnpb.TxSchedulePriority_NORMAL,
-						Rx2DataRateIndex:  10, // This one doesn't exist in the band.
-						Rx2Frequency:      869525000,
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+						Class:            ttnpb.CLASS_C,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx2DataRateIndex: 10, // This one doesn't exist in the band.
+						Rx2Frequency:     869525000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -449,12 +441,11 @@ func TestFlow(t *testing.T) {
 				RawPayload: bytes.Repeat([]byte{0x01}, 80),
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_C,
-						Priority:          ttnpb.TxSchedulePriority_NORMAL,
-						Rx2DataRateIndex:  0,
-						Rx2Frequency:      869525000,
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+						Class:            ttnpb.CLASS_C,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx2DataRateIndex: 0,
+						Rx2Frequency:     869525000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -593,13 +584,12 @@ func TestSubBandEIRPOverride(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_A,
-						Priority:          ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay:          ttnpb.RX_DELAY_1,
-						Rx1DataRateIndex:  5,
-						Rx1Frequency:      923200000,
-						FrequencyPlanID:   "AS_923_925_AU",
-						LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+						Class:            ttnpb.CLASS_A,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay:         ttnpb.RX_DELAY_1,
+						Rx1DataRateIndex: 5,
+						Rx1Frequency:     923200000,
+						FrequencyPlanID:  "AS_923_925_AU",
 					},
 				},
 			},
