@@ -15,7 +15,7 @@
 import { id as idRegexp } from '@ttn-lw/lib/regexp'
 
 export const mapFormValueToAttributes = formValue =>
-  (formValue &&
+  (Array.isArray(formValue) &&
     formValue.reduce(
       (result, { key, value }) => ({
         ...result,
