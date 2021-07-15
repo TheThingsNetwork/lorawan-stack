@@ -55,6 +55,9 @@ const (
 
 	// networkInitiatedDownlinkInterval is the minimum time.Duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink.
 	networkInitiatedDownlinkInterval = time.Second
+
+	// SchemaVersion is the Network Server database schema version. Bump when a migration is required.
+	SchemaVersion = 1
 )
 
 // windowDurationFunc is a function, which is used by Network Server to determine the duration of deduplication and cooldown windows.
