@@ -407,10 +407,21 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			break
 		}
 	}
+
 	phy, err := band.GetByID(fp.BandID)
 	if err != nil {
 		return false, false, 0, err
 	}
+
+	lwPhyVersion := request.GetLorawanPhyVersion()
+	// Backwards compatibility. If there's no LoRaWANPhyVersion defined, assume that the band is already versioned.
+	if lwPhyVersion != ttnpb.PHY_UNKNOWN {
+		phy, err = phy.Version(request.GetLorawanPhyVersion())
+		if err != nil {
+			return false, false, 0, err
+		}
+	}
+
 	var rxErrs []errors.ErrorDetails
 	for i, rx := range []struct {
 		dataRateIndex ttnpb.DataRateIndex
