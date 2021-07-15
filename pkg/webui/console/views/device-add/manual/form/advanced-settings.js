@@ -43,7 +43,7 @@ const m = defineMessages({
   classC: 'Class C (Continuous)',
   classBandC: 'Class B and class C',
   useExternalServers: 'Use external LoRaWAN backend servers',
-  multicastClassCapabilities: 'LoRaWAN Class for multicast downlinks',
+  multicastClassCapabilities: 'LoRaWAN class for multicast downlinks',
 })
 
 const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
