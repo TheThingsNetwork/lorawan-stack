@@ -16,8 +16,10 @@ import React from 'react'
 import classnames from 'classnames'
 import { defineMessages, useIntl } from 'react-intl'
 
-import Form, { useFormContext } from '@ttn-lw/components/form'
+import { useFormContext } from '@ttn-lw/components/form'
 import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -52,7 +54,7 @@ const FormCollapseSection = props => {
         aria-controls={id}
         disabled={disabled}
       >
-        <Form.SubTitle className={style.title} title={title} />
+        <Message content={title} className={style.title} />
         <Icon className={style.icon} icon={collapsed ? 'expand_down' : 'expand_up'} />
       </button>
       <div className={classnames(style.content, { [style.expanded]: !collapsed })} id={id}>
