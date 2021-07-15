@@ -227,7 +227,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	// don't have enough data for our decision.
 	var margin float32
 	// NOTE: We currently assume that the uplink's SF and BW correspond to CurrentParameters.ADRDataRateIndex.
-	if dr := LastUplink(adrUplinks...).Settings.DataRate.GetLoRa(); dr != nil {
+	if dr := LastUplink(adrUplinks...).Settings.DataRate.GetLora(); dr != nil {
 		var ok bool
 		df, ok := demodulationFloor[dr.SpreadingFactor][dr.Bandwidth]
 		if !ok {

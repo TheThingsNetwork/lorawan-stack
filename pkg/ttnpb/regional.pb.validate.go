@@ -69,7 +69,7 @@ func (m *ConcentratorConfig) ValidateFields(paths ...string) error {
 
 		case "lora_standard_channel":
 
-			if v, ok := interface{}(m.GetLoRaStandardChannel()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetLoraStandardChannel()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ConcentratorConfigValidationError{
 						field:  "lora_standard_channel",

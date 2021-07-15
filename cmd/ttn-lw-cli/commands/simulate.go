@@ -103,12 +103,12 @@ func (m *simulateMetadataParams) setDefaults() error {
 		if !ok {
 			return errInvalidDataRateIndex
 		}
-		lora := dr.Rate.GetLoRa()
+		lora := dr.Rate.GetLora()
 		m.SpreadingFactor, m.Bandwidth = lora.SpreadingFactor, lora.Bandwidth
 	} else if m.DataRateIndex == 0 {
 		drIdx, err := func() (uint32, error) {
 			for i, dr := range phy.DataRates {
-				if lora := dr.Rate.GetLoRa(); lora != nil && lora.SpreadingFactor == m.SpreadingFactor && lora.Bandwidth == m.Bandwidth {
+				if lora := dr.Rate.GetLora(); lora != nil && lora.SpreadingFactor == m.SpreadingFactor && lora.Bandwidth == m.Bandwidth {
 					return uint32(i), nil
 				}
 			}
@@ -197,8 +197,8 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 	upMsg := &ttnpb.UplinkMessage{
 		Settings: ttnpb.TxSettings{
 			DataRate: ttnpb.DataRate{
-				Modulation: &ttnpb.DataRate_LoRa{
-					LoRa: &ttnpb.LoRaDataRate{
+				Modulation: &ttnpb.DataRate_Lora{
+					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       uplinkParams.Bandwidth,
 						SpreadingFactor: uplinkParams.SpreadingFactor,
 					},

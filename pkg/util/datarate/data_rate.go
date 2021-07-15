@@ -30,7 +30,7 @@ type DR struct {
 
 // MarshalJSON implements the json.Marshaler interface.
 func (dr DR) MarshalJSON() ([]byte, error) {
-	if dr.GetLoRa() != nil {
+	if dr.GetLora() != nil {
 		return []byte(strconv.Quote(dr.String())), nil
 	}
 	if dr.GetFSK() != nil {
@@ -73,7 +73,7 @@ var (
 
 // String implements the Stringer interface.
 func (dr DR) String() string {
-	if lora := dr.GetLoRa(); lora != nil {
+	if lora := dr.GetLora(); lora != nil {
 		return fmt.Sprintf("SF%dBW%v", lora.SpreadingFactor, float32(lora.Bandwidth)/1000)
 	}
 	if fsk := dr.GetFSK(); fsk != nil {
@@ -102,8 +102,8 @@ func ParseLoRa(dr string) (DR, error) {
 	}
 	return DR{
 		DataRate: ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_LoRa{
-				LoRa: &ttnpb.LoRaDataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: uint32(sf),
 					Bandwidth:       uint32(bw * 1000),
 				},

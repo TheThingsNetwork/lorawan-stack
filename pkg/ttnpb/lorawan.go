@@ -2014,8 +2014,8 @@ func (v RxDelay) String() string {
 
 func (v LoRaDataRate) DataRate() DataRate {
 	return DataRate{
-		Modulation: &DataRate_LoRa{
-			LoRa: &v,
+		Modulation: &DataRate_Lora{
+			Lora: &v,
 		},
 	}
 }

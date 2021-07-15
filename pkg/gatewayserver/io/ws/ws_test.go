@@ -815,7 +815,7 @@ func TestTraffic(t *testing.T) {
 					CodingRate: "4/5",
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -880,7 +880,7 @@ func TestTraffic(t *testing.T) {
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 					CodingRate: "4/5",
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
