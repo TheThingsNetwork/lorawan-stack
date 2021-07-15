@@ -154,9 +154,9 @@ message EndDeviceVersion {
   EndDeviceVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   // LoRaWAN MAC version.
-  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  MACVersion lorawan_version = 2 [(validate.rules).enum.defined_only = true];
   // LoRaWAN PHY version.
-  PHYVersion lorawan_phy_version = 3 [(gogoproto.customname) = "LoRaWANPHYVersion", (validate.rules).enum.defined_only = true];
+  PHYVersion lorawan_phy_version = 3 [(validate.rules).enum.defined_only = true];
   // ID of the frequency plan used by this device.
   string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
 
@@ -298,7 +298,7 @@ message MACState {
   // - If device sent DeviceModeInd MAC message, this will be set to that value
   Class device_class = 3 [(validate.rules).enum.defined_only = true];
   // LoRaWAN MAC version.
-  MACVersion lorawan_version = 4 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  MACVersion lorawan_version = 4 [(validate.rules).enum.defined_only = true];
   // Time when the last confirmed downlink message or MAC command was scheduled.
   google.protobuf.Timestamp last_confirmed_downlink_at = 5 [(gogoproto.stdtime) = true];
   // Frame counter value of last uplink containing DevStatusAns.
@@ -468,10 +468,10 @@ message EndDevice {
   bool supports_class_c = 14;
   // LoRaWAN MAC version. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  MACVersion lorawan_version = 15 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  MACVersion lorawan_version = 15 [(validate.rules).enum.defined_only = true];
   // LoRaWAN PHY version. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  PHYVersion lorawan_phy_version = 16 [(gogoproto.customname) = "LoRaWANPHYVersion", (validate.rules).enum.defined_only = true];
+  PHYVersion lorawan_phy_version = 16 [(validate.rules).enum.defined_only = true];
   // ID of the frequency plan used by this device.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
   string frequency_plan_id = 17 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];

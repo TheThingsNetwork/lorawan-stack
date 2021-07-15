@@ -223,14 +223,14 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		dev.PendingSession != nil &&
 		dev.PendingMACState != nil &&
 		pld.DevAddr.Equal(dev.PendingSession.DevAddr) &&
-		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.PendingMACState.LoRaWANVersion.UseLegacyMIC():
+		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.PendingMACState.LorawanVersion.UseLegacyMIC():
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.PendingSession.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.PendingSession.FNwkSIntKey.KEKLabel).Warn("Failed to unwrap FNwkSIntKey")
 			return nil, false, nil
 		}
 		if cmacFMatchResult.FNwkSIntKey.Equal(fNwkSIntKey) {
-			ctx = log.NewContextWithField(ctx, "mac_version", dev.PendingMACState.LoRaWANVersion)
+			ctx = log.NewContextWithField(ctx, "mac_version", dev.PendingMACState.LorawanVersion)
 			if dev.PendingMACState.PendingJoinRequest == nil {
 				log.FromContext(ctx).Warn("Pending join-request missing")
 				return nil, false, nil
@@ -238,9 +238,9 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.PendingMACState.CurrentParameters.Rx1Delay = dev.PendingMACState.PendingJoinRequest.RxDelay
 			dev.PendingMACState.CurrentParameters.Rx1DataRateOffset = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx1DROffset
 			dev.PendingMACState.CurrentParameters.Rx2DataRateIndex = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx2DR
-			if dev.PendingMACState.PendingJoinRequest.DownlinkSettings.OptNeg && dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+			if dev.PendingMACState.PendingJoinRequest.DownlinkSettings.OptNeg && dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 				// The version will be further negotiated via RekeyInd/RekeyConf
-				dev.PendingMACState.LoRaWANVersion = ttnpb.MAC_V1_1
+				dev.PendingMACState.LorawanVersion = ttnpb.MAC_V1_1
 			}
 			chs, ok := applyCFList(dev.PendingMACState.PendingJoinRequest.CFList, phy, dev.PendingMACState.CurrentParameters.Channels...)
 			if !ok {
@@ -262,7 +262,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	case dev.Session != nil &&
 		dev.MACState != nil &&
 		pld.DevAddr.Equal(dev.Session.DevAddr) &&
-		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.MACState.LoRaWANVersion.UseLegacyMIC() &&
+		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.MACState.LorawanVersion.UseLegacyMIC() &&
 		(cmacFMatchResult.FullFCnt == FullFCnt(uint16(pld.FCnt), dev.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(dev, ns.defaultMACSettings)) ||
 			cmacFMatchResult.FullFCnt == pld.FCnt):
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.FNwkSIntKey, ns.KeyVault)
@@ -273,7 +273,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		if cmacFMatchResult.FNwkSIntKey.Equal(fNwkSIntKey) {
 			ctx = log.NewContextWithFields(ctx, log.Fields(
 				"last_f_cnt_up", dev.Session.LastFCntUp,
-				"mac_version", dev.MACState.LoRaWANVersion,
+				"mac_version", dev.MACState.LorawanVersion,
 				"pending_session", false,
 			))
 			switch {
@@ -300,7 +300,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 				ctx = log.NewContextWithField(ctx, "f_cnt_reset", false)
 
 				fCntGap := cmacFMatchResult.FullFCnt - dev.Session.LastFCntUp
-				if dev.MACState.LoRaWANVersion.HasMaxFCntGap() && uint(fCntGap) > phy.MaxFCntGap {
+				if dev.MACState.LorawanVersion.HasMaxFCntGap() && uint(fCntGap) > phy.MaxFCntGap {
 					log.FromContext(ctx).WithFields(log.Fields(
 						"f_cnt_gap", fCntGap,
 						"max_f_cnt_gap", phy.MaxFCntGap,
@@ -313,7 +313,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			default: // cmacFMatchResult.FullFCnt == dev.Session.LastFCntUp
 				ctx = log.NewContextWithField(ctx, "f_cnt_reset", false)
 
-				maxNbTrans := maxTransmissionNumber(dev.MACState.LoRaWANVersion, up.Payload.MType == ttnpb.MType_CONFIRMED_UP, dev.MACState.CurrentParameters.AdrNbTrans)
+				maxNbTrans := maxTransmissionNumber(dev.MACState.LorawanVersion, up.Payload.MType == ttnpb.MType_CONFIRMED_UP, dev.MACState.CurrentParameters.AdrNbTrans)
 				if maxNbTrans < 1 {
 					panic(fmt.Sprintf("invalid maximum transmission number %d", maxNbTrans))
 				}
@@ -376,7 +376,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	}
 
 	// NOTE: We assume no dwell time if current value unknown.
-	if dev.MACState.LoRaWANVersion.IgnoreUplinksExceedingLengthLimit() && len(up.RawPayload)-5 > int(dr.MaxMACPayloadSize(dev.MACState.CurrentParameters.UplinkDwellTime.GetValue())) {
+	if dev.MACState.LorawanVersion.IgnoreUplinksExceedingLengthLimit() && len(up.RawPayload)-5 > int(dr.MaxMACPayloadSize(dev.MACState.CurrentParameters.UplinkDwellTime.GetValue())) {
 		log.FromContext(ctx).Debug("Uplink length exceeds maximum")
 		return nil, false, nil
 	}
@@ -385,7 +385,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	if pld.FPort == 0 && len(pld.FRMPayload) > 0 {
 		cmdBuf = pld.FRMPayload
 	}
-	if len(cmdBuf) > 0 && (len(pld.FOpts) == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
+	if len(cmdBuf) > 0 && (len(pld.FOpts) == 0 || dev.MACState.LorawanVersion.EncryptFOpts()) {
 		session := dev.Session
 		if matchType == pendingMatch {
 			session = dev.PendingSession
@@ -460,7 +460,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.MACState.DeviceClass = ttnpb.CLASS_B
 		}
 	} else if dev.MACState.DeviceClass == ttnpb.CLASS_B {
-		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC {
+		if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC {
 			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassCSwitch.BindData(ttnpb.CLASS_B))
 			dev.MACState.DeviceClass = ttnpb.CLASS_C
 		} else {
@@ -497,7 +497,7 @@ macLoop:
 		case ttnpb.CID_LINK_ADR:
 			pld := cmd.GetLinkAdrAns()
 			dupCount := 0
-			if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 				for _, dup := range cmds {
 					if dup.CID != ttnpb.CID_LINK_ADR {
 						break
@@ -570,7 +570,7 @@ macLoop:
 	}
 
 	if matchType == pendingMatch {
-		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			dev.EndDeviceIdentifiers.DevAddr = &pld.DevAddr
 			dev.Session = dev.PendingSession
 		} else if dev.PendingSession != nil || dev.PendingMACState != nil || dev.MACState.PendingJoinRequest != nil {
@@ -594,7 +594,7 @@ macLoop:
 	ctx = log.NewContext(ctx, logger)
 
 	// NOTE: Legacy MIC check is already performed.
-	if !dev.MACState.LoRaWANVersion.UseLegacyMIC() {
+	if !dev.MACState.LorawanVersion.UseLegacyMIC() {
 		sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.SNwkSIntKey, ns.KeyVault)
 		if err != nil {
 			logger.WithField("kek_label", dev.Session.SNwkSIntKey.GetKEKLabel()).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
@@ -1097,11 +1097,11 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		log.FromContext(ctx).Error("Reusing the DevAddr used for current session")
 	}
 
-	cfList := frequencyplans.CFList(*fp, matched.LoRaWANPHYVersion)
+	cfList := frequencyplans.CFList(*fp, matched.LorawanPhyVersion)
 	dlSettings := ttnpb.DLSettings{
 		Rx1DROffset: macState.DesiredParameters.Rx1DataRateOffset,
 		Rx2DR:       macState.DesiredParameters.Rx2DataRateIndex,
-		OptNeg:      matched.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+		OptNeg:      matched.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 	}
 	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, &ttnpb.JoinRequest{
 		Payload:            up.Payload,
@@ -1111,7 +1111,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		NetID:              ns.netID,
 		RawPayload:         up.RawPayload,
 		RxDelay:            macState.DesiredParameters.Rx1Delay,
-		SelectedMACVersion: matched.LoRaWANVersion, // Assume NS version is always higher than the version of the device
+		SelectedMACVersion: matched.LorawanVersion, // Assume NS version is always higher than the version of the device
 		DownlinkSettings:   dlSettings,
 		ConsumedAirtime:    up.ConsumedAirtime,
 	})

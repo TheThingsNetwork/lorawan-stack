@@ -167,10 +167,10 @@ func (dst *CryptoServicePayloadRequest) SetFields(src *CryptoServicePayloadReque
 				return fmt.Errorf("'lorawan_version' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LoRaWANVersion = src.LoRaWANVersion
+				dst.LorawanVersion = src.LorawanVersion
 			} else {
 				var zero MACVersion
-				dst.LoRaWANVersion = zero
+				dst.LorawanVersion = zero
 			}
 		case "payload":
 			if len(subs) > 0 {
@@ -303,10 +303,10 @@ func (dst *DeriveSessionKeysRequest) SetFields(src *DeriveSessionKeysRequest, pa
 				return fmt.Errorf("'lorawan_version' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LoRaWANVersion = src.LoRaWANVersion
+				dst.LorawanVersion = src.LorawanVersion
 			} else {
 				var zero MACVersion
-				dst.LoRaWANVersion = zero
+				dst.LorawanVersion = zero
 			}
 		case "join_nonce":
 			if len(subs) > 0 {

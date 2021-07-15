@@ -291,7 +291,7 @@ func (MACStateOptionNamespace) WithDeviceClass(v ttnpb.Class) MACStateOption {
 // WithLoRaWANVersion returns a MACStateOption, which returns a copy of ttnpb.MACState with LoRaWANVersion set to v.
 func (MACStateOptionNamespace) WithLoRaWANVersion(v ttnpb.MACVersion) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
-		x.LoRaWANVersion = v
+		x.LorawanVersion = v
 		return x
 	}
 }
@@ -705,7 +705,7 @@ func (EndDeviceOptionNamespace) WithSupportsClassC(v bool) EndDeviceOption {
 // WithLoRaWANVersion returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LoRaWANVersion set to v.
 func (EndDeviceOptionNamespace) WithLoRaWANVersion(v ttnpb.MACVersion) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.LoRaWANVersion = v
+		x.LorawanVersion = v
 		return x
 	}
 }
@@ -713,7 +713,7 @@ func (EndDeviceOptionNamespace) WithLoRaWANVersion(v ttnpb.MACVersion) EndDevice
 // WithLoRaWANPHYVersion returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LoRaWANPHYVersion set to v.
 func (EndDeviceOptionNamespace) WithLoRaWANPHYVersion(v ttnpb.PHYVersion) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.LoRaWANPHYVersion = v
+		x.LorawanPhyVersion = v
 		return x
 	}
 }

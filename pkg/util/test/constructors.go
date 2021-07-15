@@ -39,7 +39,7 @@ var (
 	}
 
 	baseMACState = ttnpb.MACState{
-		LoRaWANVersion: DefaultMACVersion,
+		LorawanVersion: DefaultMACVersion,
 	}
 
 	baseEndDevice = ttnpb.EndDevice{

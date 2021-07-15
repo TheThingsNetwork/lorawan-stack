@@ -705,7 +705,7 @@ var (
 					if dev, ok := m["ids.dev_eui"]; ok && dev.DevEui != nil && !dev.DevEui.IsZero() {
 						return true, ""
 					}
-					if m["lorawan_version"].LoRaWANVersion.RequireDevEUIForABP() && !m["multicast"].GetMulticast() {
+					if m["lorawan_version"].LorawanVersion.RequireDevEUIForABP() && !m["multicast"].GetMulticast() {
 						return false, "ids.dev_eui"
 					}
 					return true, ""
@@ -974,13 +974,13 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		return nil, err
 	}
 	if err := st.ValidateSetFieldWithCause(
-		st.Device.LoRaWANPHYVersion.Validate,
+		st.Device.LorawanPhyVersion.Validate,
 		"lorawan_phy_version",
 	); err != nil {
 		return nil, err
 	}
 	if err := st.ValidateSetFieldWithCause(
-		st.Device.LoRaWANVersion.Validate,
+		st.Device.LorawanVersion.Validate,
 		"lorawan_version",
 	); err != nil {
 		return nil, err
@@ -990,7 +990,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if st.Device.MACState == nil {
 				return nil
 			}
-			return st.Device.MACState.LoRaWANVersion.Validate()
+			return st.Device.MACState.LorawanVersion.Validate()
 		},
 		"mac_state.lorawan_version",
 	); err != nil {
@@ -1001,7 +1001,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if st.Device.PendingMACState == nil {
 				return nil
 			}
-			return st.Device.PendingMACState.LoRaWANVersion.Validate()
+			return st.Device.PendingMACState.LorawanVersion.Validate()
 		},
 		"pending_mac_state.lorawan_version",
 	); err != nil {
@@ -1202,7 +1202,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
 			phy, err := DeviceBand(&ttnpb.EndDevice{
 				FrequencyPlanID:   m["frequency_plan_id"].FrequencyPlanID,
-				LoRaWANPHYVersion: m["lorawan_phy_version"].LoRaWANPHYVersion,
+				LorawanPhyVersion: m["lorawan_phy_version"].LorawanPhyVersion,
 			}, ns.FrequencyPlans)
 			if err != nil {
 				return err
@@ -1759,12 +1759,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if dev, ok := m["mac_state.lorawan_version"]; ok && dev.MACState == nil {
 				return false, "mac_state.lorawan_version"
 			} else if !ok {
-				macVersion = m["lorawan_version"].LoRaWANVersion
+				macVersion = m["lorawan_version"].LorawanVersion
 			} else {
-				macVersion = dev.MACState.LoRaWANVersion
+				macVersion = dev.MACState.LorawanVersion
 			}
 		} else {
-			macVersion = m["lorawan_version"].LoRaWANVersion
+			macVersion = m["lorawan_version"].LorawanVersion
 		}
 
 		if dev, ok := m["session.dev_addr"]; !ok || dev.Session == nil {
@@ -1940,7 +1940,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if dev, ok := m["pending_mac_state.lorawan_version"]; !ok || dev.PendingMACState == nil {
 			return false, "pending_mac_state.lorawan_version"
 		} else {
-			macVersion = dev.PendingMACState.LoRaWANVersion
+			macVersion = dev.PendingMACState.LorawanVersion
 		}
 		supports1_1 := macVersion.Compare(ttnpb.MAC_V1_1) >= 0
 
@@ -2193,7 +2193,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	var evt events.Event
 	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.EndDeviceIdentifiers.ApplicationIdentifiers, st.Device.EndDeviceIdentifiers.DeviceId, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
 		if hasSession {
-			macVersion := stored.GetMACState().GetLoRaWANVersion()
+			macVersion := stored.GetMACState().GetLorawanVersion()
 			if stored.GetMACState() == nil && !st.HasSetField("mac_state") {
 				macState, err := mac.NewState(st.Device, ns.FrequencyPlans, ns.defaultMACSettings)
 				if err != nil {
@@ -2208,9 +2208,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				st.AddSetFields(
 					"mac_state",
 				)
-				macVersion = macState.LoRaWANVersion
+				macVersion = macState.LorawanVersion
 			} else if st.HasSetField("mac_state.lorawan_version") {
-				macVersion = st.Device.MACState.LoRaWANVersion
+				macVersion = st.Device.MACState.LorawanVersion
 			}
 
 			if st.HasSetField("session.keys.f_nwk_s_int_key.key") && macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
@@ -2238,9 +2238,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if hasPendingSession {
 			var macVersion ttnpb.MACVersion
 			if st.HasSetField("pending_mac_state.lorawan_version") {
-				macVersion = st.Device.GetPendingMACState().GetLoRaWANVersion()
+				macVersion = st.Device.GetPendingMACState().GetLorawanVersion()
 			} else {
-				macVersion = stored.GetPendingMACState().GetLoRaWANVersion()
+				macVersion = stored.GetPendingMACState().GetLorawanVersion()
 			}
 
 			supports1_1 := macVersion.Compare(ttnpb.MAC_V1_1) >= 0

@@ -70,8 +70,8 @@ func TestProfile(t *testing.T) {
 			profile: "example-1",
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
-					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
+					LorawanVersion:    ttnpb.MAC_V1_0_2,
+					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 					SupportsJoin:      true,
 					MACSettings: &ttnpb.MACSettings{
 						Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
@@ -95,8 +95,8 @@ func TestProfile(t *testing.T) {
 			codec:   "codec",
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
-					LoRaWANVersion:    ttnpb.MAC_V1_1,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanVersion:    ttnpb.MAC_V1_1,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					Formatters: &ttnpb.MessagePayloadFormatters{
 						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
@@ -148,8 +148,8 @@ func TestProfile(t *testing.T) {
 			profile: "class-b-profile",
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
-					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
+					LorawanVersion:    ttnpb.MAC_V1_0_2,
+					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 					SupportsClassB:    true,
 					SupportsJoin:      true,
 					MACSettings: &ttnpb.MACSettings{
@@ -179,8 +179,8 @@ func TestProfile(t *testing.T) {
 			profile: "class-c-profile",
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
-					LoRaWANVersion:    ttnpb.MAC_V1_0_2,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
+					LorawanVersion:    ttnpb.MAC_V1_0_2,
+					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 					SupportsClassC:    true,
 					SupportsJoin:      true,
 					MACSettings: &ttnpb.MACSettings{

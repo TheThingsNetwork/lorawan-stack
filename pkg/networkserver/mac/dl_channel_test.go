@@ -246,7 +246,7 @@ func TestDLChannelReq(t *testing.T) {
 								Channels: tc.DesiredChannels,
 							},
 							RejectedFrequencies: tc.RejectedFrequencies,
-							LoRaWANVersion:      ttnpb.MAC_V1_0_3,
+							LorawanVersion:      ttnpb.MAC_V1_0_3,
 						},
 					})
 				}

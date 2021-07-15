@@ -121,8 +121,8 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		log.FromContext(ctx).Debug("Either desired data rate index or TX power output index have been rejected and there are no channel mask and NbTrans changes desired, avoid enqueueing LinkADRReq")
 		return linkADRReqParameters{}, false, nil
 
-	case dev.MACState.LoRaWANVersion.HasNoChangeDataRateIndex() && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) &&
-		dev.MACState.LoRaWANVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex):
+	case dev.MACState.LorawanVersion.HasNoChangeDataRateIndex() && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) &&
+		dev.MACState.LorawanVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex):
 		drIdx = noChangeDataRateIndex
 		txPowerIdx = noChangeTXPowerIndex
 
@@ -150,10 +150,10 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 			}
 		}
 	}
-	if drIdx == dev.MACState.CurrentParameters.AdrDataRateIndex && dev.MACState.LoRaWANVersion.HasNoChangeDataRateIndex() && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) {
+	if drIdx == dev.MACState.CurrentParameters.AdrDataRateIndex && dev.MACState.LorawanVersion.HasNoChangeDataRateIndex() && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) {
 		drIdx = noChangeDataRateIndex
 	}
-	if txPowerIdx == dev.MACState.CurrentParameters.AdrTxPowerIndex && dev.MACState.LoRaWANVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex) {
+	if txPowerIdx == dev.MACState.CurrentParameters.AdrTxPowerIndex && dev.MACState.LorawanVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex) {
 		txPowerIdx = noChangeTXPowerIndex
 	}
 	return linkADRReqParameters{
@@ -192,7 +192,7 @@ func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		}
 
 		uplinksNeeded := uint16(1)
-		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			uplinksNeeded = uint16(len(params.Masks))
 		}
 		if nUp < uplinksNeeded {
@@ -227,7 +227,7 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	if pld == nil {
 		return nil, ErrNoPayload.New()
 	}
-	if (dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0) && dupCount != 0 {
+	if (dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) < 0 || dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0) && dupCount != 0 {
 		return nil, ErrInvalidPayload.New()
 	}
 
@@ -248,13 +248,13 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 
 	handler := handleMACResponseBlock
-	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
+	if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
 		handler = handleMACResponse
 	}
 	var n uint
 	var req *ttnpb.MACCommand_LinkADRReq
 	dev.MACState.PendingRequests, err = handler(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
-		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && n > dupCount+1 {
+		if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && n > dupCount+1 {
 			return ErrInvalidPayload.New()
 		}
 		n++
@@ -306,11 +306,11 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
 		return evs, nil
 	}
-	if !dev.MACState.LoRaWANVersion.HasNoChangeDataRateIndex() || req.DataRateIndex != noChangeDataRateIndex {
+	if !dev.MACState.LorawanVersion.HasNoChangeDataRateIndex() || req.DataRateIndex != noChangeDataRateIndex {
 		dev.MACState.CurrentParameters.AdrDataRateIndex = req.DataRateIndex
 		dev.MACState.LastAdrChangeFCntUp = fCntUp
 	}
-	if !dev.MACState.LoRaWANVersion.HasNoChangeTXPowerIndex() || req.TxPowerIndex != noChangeTXPowerIndex {
+	if !dev.MACState.LorawanVersion.HasNoChangeTXPowerIndex() || req.TxPowerIndex != noChangeTXPowerIndex {
 		dev.MACState.CurrentParameters.AdrTxPowerIndex = req.TxPowerIndex
 		dev.MACState.LastAdrChangeFCntUp = fCntUp
 	}

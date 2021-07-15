@@ -554,7 +554,7 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 
 		case "lorawan_version":
 
-			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+			if _, ok := MACVersion_name[int32(m.GetLorawanVersion())]; !ok {
 				return EndDeviceVersionValidationError{
 					field:  "lorawan_version",
 					reason: "value must be one of the defined enum values",
@@ -563,7 +563,7 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 
 		case "lorawan_phy_version":
 
-			if _, ok := PHYVersion_name[int32(m.GetLoRaWANPHYVersion())]; !ok {
+			if _, ok := PHYVersion_name[int32(m.GetLorawanPhyVersion())]; !ok {
 				return EndDeviceVersionValidationError{
 					field:  "lorawan_phy_version",
 					reason: "value must be one of the defined enum values",
@@ -1162,7 +1162,7 @@ func (m *MACState) ValidateFields(paths ...string) error {
 
 		case "lorawan_version":
 
-			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+			if _, ok := MACVersion_name[int32(m.GetLorawanVersion())]; !ok {
 				return MACStateValidationError{
 					field:  "lorawan_version",
 					reason: "value must be one of the defined enum values",
@@ -1811,7 +1811,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 			// no validation rules for SupportsClassC
 		case "lorawan_version":
 
-			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+			if _, ok := MACVersion_name[int32(m.GetLorawanVersion())]; !ok {
 				return EndDeviceValidationError{
 					field:  "lorawan_version",
 					reason: "value must be one of the defined enum values",
@@ -1820,7 +1820,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "lorawan_phy_version":
 
-			if _, ok := PHYVersion_name[int32(m.GetLoRaWANPHYVersion())]; !ok {
+			if _, ok := PHYVersion_name[int32(m.GetLorawanPhyVersion())]; !ok {
 				return EndDeviceValidationError{
 					field:  "lorawan_phy_version",
 					reason: "value must be one of the defined enum values",

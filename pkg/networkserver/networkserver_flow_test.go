@@ -159,7 +159,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 				Response: &ttnpb.JoinResponse{
 					RawPayload: bytes.Repeat([]byte{0x42}, 33),
 					SessionKeys: *test.MakeSessionKeys(
-						test.SessionKeysOptions.WithDefaultNwkKeys(dev.LoRaWANVersion),
+						test.SessionKeysOptions.WithDefaultNwkKeys(dev.LorawanVersion),
 					),
 					Lifetime:       time.Hour,
 					CorrelationIDs: []string{"NsJs-1", "NsJs-2"},
@@ -175,7 +175,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		var upCmders []MACCommander
 		var upEvBuilders []events.Builder
 		var downCmders []MACCommander
-		if dev.PendingMACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+		if dev.PendingMACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 			rekeyInd := &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: ttnpb.MINOR_1,
 			}
@@ -196,7 +196,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		}
 
 		fp := test.FrequencyPlan(dev.FrequencyPlanID)
-		phy := LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion]
+		phy := LoRaWANBands[fp.BandID][dev.LorawanPhyVersion]
 
 		deviceChannels, ok := ApplyCFList(dev.PendingMACState.PendingJoinRequest.CFList, phy, dev.PendingMACState.CurrentParameters.Channels...)
 		if !a.So(ok, should.BeTrue) {
@@ -228,7 +228,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 
-		fpCmders, fpEvBuilders := frequencyPlanMACCommands(dev.MACState.LoRaWANVersion, dev.LoRaWANPHYVersion, dev.FrequencyPlanID, true)
+		fpCmders, fpEvBuilders := frequencyPlanMACCommands(dev.MACState.LorawanVersion, dev.LorawanPhyVersion, dev.FrequencyPlanID, true)
 		downEvBuilders := append(conf.DownlinkEventBuilders, fpEvBuilders...)
 		downCmders = append(downCmders, conf.DownlinkMACCommanders...)
 		downCmders = append(downCmders, fpCmders...)
@@ -242,7 +242,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		down := MakeDataDownlink(DataDownlinkConfig{
 			DecodePayload: true,
 
-			MACVersion: dev.MACState.LoRaWANVersion,
+			MACVersion: dev.MACState.LorawanVersion,
 			DevAddr:    dev.Session.DevAddr,
 			FCtrl: ttnpb.FCtrl{
 				Adr: true,
@@ -279,7 +279,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 
-		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			if !a.So(env.AssertNsAsHandleUplink(ctx, dev.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
 				if !a.So(ups, should.HaveLength, 1) {

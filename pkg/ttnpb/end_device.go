@@ -534,7 +534,7 @@ func (v *MACState) FieldIsZero(p string) bool {
 	case "last_network_initiated_downlink_at":
 		return v.LastNetworkInitiatedDownlinkAt == nil
 	case "lorawan_version":
-		return v.LoRaWANVersion == 0
+		return v.LorawanVersion == 0
 	case "pending_application_downlink":
 		return v.PendingApplicationDownlink == nil
 	case "pending_application_downlink.class_b_c":
@@ -926,9 +926,9 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "locations":
 		return v.Locations == nil
 	case "lorawan_phy_version":
-		return v.LoRaWANPHYVersion == 0
+		return v.LorawanPhyVersion == 0
 	case "lorawan_version":
-		return v.LoRaWANVersion == 0
+		return v.LorawanVersion == 0
 	case "mac_settings":
 		return v.MACSettings == nil
 	case "mac_settings.adr_margin":

@@ -54,7 +54,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			matched = reflect.DeepEqual(match, &UplinkMatch{
 				ApplicationIdentifiers: expectedMatch.ApplicationIdentifiers,
 				DeviceID:               expectedMatch.DeviceId,
-				LoRaWANVersion:         expectedMACState.LoRaWANVersion,
+				LoRaWANVersion:         expectedMACState.LorawanVersion,
 				FNwkSIntKey:            expectedSession.FNwkSIntKey,
 				LastFCnt:               expectedSession.LastFCntUp,
 				ResetsFCnt:             expectedMatch.GetMACSettings().GetResetsFCnt(),
@@ -210,8 +210,8 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 
 	pb := &ttnpb.EndDevice{
 		FrequencyPlanID:   test.EUFrequencyPlanID,
-		LoRaWANVersion:    ttnpb.MAC_V1_0_3,
-		LoRaWANPHYVersion: ttnpb.RP001_V1_0_3_REV_A,
+		LorawanVersion:    ttnpb.MAC_V1_0_3,
+		LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			JoinEui:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEui:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},

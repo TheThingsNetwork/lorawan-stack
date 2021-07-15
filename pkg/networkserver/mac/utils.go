@@ -187,7 +187,7 @@ var errClassAMulticast = errors.DefineInvalidArgument("class_a_multicast", "mult
 
 func DeviceDefaultClass(dev *ttnpb.EndDevice) (ttnpb.Class, error) {
 	switch {
-	case dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC:
+	case dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC:
 		return ttnpb.CLASS_C, nil
 	case !dev.Multicast:
 		return ttnpb.CLASS_A, nil
@@ -203,11 +203,11 @@ func DeviceDefaultClass(dev *ttnpb.EndDevice) (ttnpb.Class, error) {
 func DeviceDefaultLoRaWANVersion(dev *ttnpb.EndDevice) ttnpb.MACVersion {
 	switch {
 	case dev.Multicast:
-		return dev.LoRaWANVersion
-	case dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0:
+		return dev.LorawanVersion
+	case dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0:
 		return ttnpb.MAC_V1_1
 	default:
-		return dev.LoRaWANVersion
+		return dev.LorawanVersion
 	}
 }
 
@@ -624,7 +624,7 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 	}
 	// TODO: Support rejoins. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
 	return &ttnpb.MACState{
-		LoRaWANVersion:      DeviceDefaultLoRaWANVersion(dev),
+		LorawanVersion:      DeviceDefaultLoRaWANVersion(dev),
 		DeviceClass:         class,
 		PingSlotPeriodicity: DeviceDefaultPingSlotPeriodicity(dev, defaults),
 		CurrentParameters:   current,

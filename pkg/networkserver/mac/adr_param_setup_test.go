@@ -154,7 +154,7 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 						Name: makeBandName(makeMACName(conf.Suffix)),
 						InputDevice: &ttnpb.EndDevice{
 							MACState: &ttnpb.MACState{
-								LoRaWANVersion:    macVersion,
+								LorawanVersion:    macVersion,
 								CurrentParameters: conf.CurrentParameters,
 								DesiredParameters: conf.DesiredParameters,
 							},

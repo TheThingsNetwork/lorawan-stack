@@ -1081,7 +1081,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							a.So(lorawan.UnmarshalMessage(req.Message.RawPayload, actual), should.BeNil)
 							a.So(lorawan.UnmarshalMessage(conf.Payload, expected), should.BeNil)
 							a.So(actual, should.Resemble, expected)
-							if aPld, ePld := actual.GetMACPayload(), expected.GetMACPayload(); !conf.MACState.LoRaWANVersion.EncryptFOpts() &&
+							if aPld, ePld := actual.GetMACPayload(), expected.GetMACPayload(); !conf.MACState.LorawanVersion.EncryptFOpts() &&
 								aPld != nil && ePld != nil &&
 								!bytes.Equal(aPld.FHDR.FOpts, ePld.FHDR.FOpts) {
 								macCommands := func(b []byte) (cmds []*ttnpb.MACCommand) {
@@ -1123,13 +1123,13 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 			t.Helper()
 
 			fp := test.FrequencyPlan(dev.FrequencyPlanID)
-			phy := LoRaWANBands[fp.BandID][dev.LoRaWANPHYVersion]
+			phy := LoRaWANBands[fp.BandID][dev.LorawanPhyVersion]
 
 			scheduledDown, ok := env.AssertScheduleDownlink(ctx, DownlinkSchedulingAssertionConfig{
 				SetRX1:          true,
 				SetRX2:          true,
 				FrequencyPlanID: dev.FrequencyPlanID,
-				PHYVersion:      dev.LoRaWANPHYVersion,
+				PHYVersion:      dev.LorawanPhyVersion,
 				MACState:        dev.PendingMACState,
 				Session:         dev.PendingSession,
 				Class:           ttnpb.CLASS_A,
@@ -1218,7 +1218,7 @@ func (env TestEnvironment) AssertScheduleDataDownlink(ctx context.Context, conf 
 				SetRX1:          conf.SetRX1,
 				SetRX2:          conf.SetRX2,
 				FrequencyPlanID: dev.FrequencyPlanID,
-				PHYVersion:      dev.LoRaWANPHYVersion,
+				PHYVersion:      dev.LorawanPhyVersion,
 				MACState:        dev.MACState,
 				Session:         dev.Session,
 				Class:           conf.Class,
@@ -1449,7 +1449,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 	t.Helper()
 
 	fp := test.FrequencyPlan(conf.Device.FrequencyPlanID)
-	phy := LoRaWANBands[fp.BandID][conf.Device.LoRaWANPHYVersion]
+	phy := LoRaWANBands[fp.BandID][conf.Device.LorawanPhyVersion]
 	upCh := phy.UplinkChannels[conf.ChannelIndex]
 	upDR := phy.DataRates[conf.DataRateIndex].Rate
 
@@ -1528,7 +1528,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 								RX2DataRateIndex:   defaultRX2DRIdx,
 								RXDelay:            desiredRX1Delay,
 								FrequencyPlanID:    conf.Device.FrequencyPlanID,
-								PHYVersion:         conf.Device.LoRaWANPHYVersion,
+								PHYVersion:         conf.Device.LorawanPhyVersion,
 								CorrelationIDs:     req.CorrelationIDs,
 							})),
 						)
@@ -1588,7 +1588,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					PingSlotDataRateIndexValue: mac.DeviceDesiredPingSlotDataRateIndexValue(dev, phy, fp, defaultMACSettings),
 				},
 				DeviceClass:    test.Must(mac.DeviceDefaultClass(dev)).(ttnpb.Class),
-				LoRaWANVersion: defaultLoRaWANVersion,
+				LorawanVersion: defaultLoRaWANVersion,
 				QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 					Payload: joinResp.RawPayload,
 					DevAddr: joinReq.DevAddr,
@@ -2066,7 +2066,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 		if !x.SupportsJoin {
 			panic("join request requested for non-OTAA device")
 		}
-		phy := Band(x.FrequencyPlanID, x.LoRaWANPHYVersion)
+		phy := Band(x.FrequencyPlanID, x.LorawanPhyVersion)
 		drIdx := func() ttnpb.DataRateIndex {
 			for idx := ttnpb.DATA_RATE_0; idx <= ttnpb.DATA_RATE_15; idx++ {
 				if _, ok := phy.DataRates[idx]; ok {
@@ -2096,12 +2096,12 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 				DownlinkSettings: ttnpb.DLSettings{
 					Rx1DROffset: macState.DesiredParameters.Rx1DataRateOffset,
 					Rx2DR:       macState.DesiredParameters.Rx2DataRateIndex,
-					OptNeg:      x.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+					OptNeg:      x.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 				},
 				RxDelay: macState.DesiredParameters.Rx1Delay,
-				CFList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanID), x.LoRaWANPHYVersion),
+				CFList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanID), x.LorawanPhyVersion),
 			},
-			Keys:           *MakeSessionKeys(x.LoRaWANVersion, wrapKeys, true),
+			Keys:           *MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
 			DevAddr:        test.DefaultDevAddr,
 			NetID:          test.DefaultNetID,
 			CorrelationIDs: []string{"join-request"},
@@ -2154,10 +2154,10 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 							Class:             ttnpb.CLASS_A,
 							Priority:          priority,
 							FrequencyPlanID:   x.FrequencyPlanID,
-							Rx1Delay:          ttnpb.RxDelay(Band(x.FrequencyPlanID, x.LoRaWANPHYVersion).JoinAcceptDelay1 / time.Second),
+							Rx1Delay:          ttnpb.RxDelay(Band(x.FrequencyPlanID, x.LorawanPhyVersion).JoinAcceptDelay1 / time.Second),
 							Rx2DataRateIndex:  x.PendingMACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      x.PendingMACState.CurrentParameters.Rx2Frequency,
-							LorawanPhyVersion: x.LoRaWANPHYVersion,
+							LorawanPhyVersion: x.LorawanPhyVersion,
 							// TODO: Generate RX1 transmission parameters if necessary.
 							// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
 						},
@@ -2173,7 +2173,7 @@ func (o EndDeviceOptionNamespace) Activate(defaults ttnpb.MACSettings, wrapKeys 
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		if !x.SupportsJoin {
 			macState := MakeMACState(&x, defaults, macStateOpts...)
-			ses := MakeSession(macState.LoRaWANVersion, wrapKeys, false, sessionOpts...)
+			ses := MakeSession(macState.LorawanVersion, wrapKeys, false, sessionOpts...)
 			return o.Compose(
 				o.WithMACState(macState),
 				o.WithSession(ses),
@@ -2227,7 +2227,7 @@ func MakeABPEndDevice(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []t
 	return MakeEndDevice(
 		EndDeviceOptions.Compose(opts...),
 		func(x ttnpb.EndDevice) ttnpb.EndDevice {
-			if x.Multicast || x.DevEui != nil && !x.DevEui.IsZero() || !x.LoRaWANVersion.RequireDevEUIForABP() {
+			if x.Multicast || x.DevEui != nil && !x.DevEui.IsZero() || !x.LorawanVersion.RequireDevEUIForABP() {
 				return x
 			}
 			return EndDeviceOptions.WithDefaultDevEUI()(x)
@@ -2328,7 +2328,7 @@ func MakeABPSetDeviceRequest(defaults ttnpb.MACSettings, sessionOpts []test.Sess
 	dev := MakeABPEndDevice(defaults, false, sessionOpts, macStateOpts, deviceOpts...)
 	return &SetDeviceRequest{
 		EndDevice: dev,
-		Paths:     MakeABPEndDevicePaths(!dev.Multicast && dev.LoRaWANVersion.RequireDevEUIForABP(), paths...),
+		Paths:     MakeABPEndDevicePaths(!dev.Multicast && dev.LorawanVersion.RequireDevEUIForABP(), paths...),
 	}
 }
 

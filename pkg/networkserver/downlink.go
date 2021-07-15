@@ -168,9 +168,9 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-		"mac_version", dev.MACState.LoRaWANVersion,
+		"mac_version", dev.MACState.LorawanVersion,
 		"max_downlink_length", maxDownLen,
-		"phy_version", dev.LoRaWANPHYVersion,
+		"phy_version", dev.LorawanPhyVersion,
 		"transmit_at", transmitAt,
 	))
 	logger := log.FromContext(ctx)
@@ -218,7 +218,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
 		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) mac.EnqueueState, 0, 13)
-		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0) >= 0 {
+		if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_0) >= 0 {
 			enqueuers = append(enqueuers,
 				mac.EnqueueDutyCycleReq,
 				mac.EnqueueRxParamSetupReq,
@@ -251,7 +251,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				)
 			}
 		}
-		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
+		if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
 			if phy.TxParamSetupReqSupport {
 				enqueuers = append(enqueuers,
 					func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
@@ -263,7 +263,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				mac.EnqueueDLChannelReq,
 			)
 		}
-		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+		if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 			enqueuers = append(enqueuers,
 				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
 					return mac.EnqueueADRParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
@@ -365,7 +365,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 					})
 				}
 
-			case down.FCnt <= dev.Session.LastNFCntDown && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0:
+			case down.FCnt <= dev.Session.LastNFCntDown && dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0:
 				logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Drop application downlink with too low FCnt")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
@@ -499,7 +499,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	if len(cmdBuf) > 0 && (!cmdsInFOpts || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
+	if len(cmdBuf) > 0 && (!cmdsInFOpts || dev.MACState.LorawanVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
 			return nil, genState, errUnknownNwkSEncKey.New()
 		}
@@ -522,7 +522,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	} else {
 		pld.FRMPayload = cmdBuf
 	}
-	if pld.FPort == 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+	if pld.FPort == 0 && dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		genState.ifScheduledApplicationUps = append(genState.ifScheduledApplicationUps, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 			CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
@@ -580,7 +580,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	}
 
 	var mic [4]byte
-	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+	if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		mic, err = crypto.ComputeLegacyDownlinkMIC(
 			key,
 			dev.Session.DevAddr,
@@ -1053,7 +1053,7 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, ne
 	if macPayload == nil {
 		panic("invalid downlink")
 	}
-	if genState.ApplicationDownlink == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && macPayload.FullFCnt > dev.Session.LastNFCntDown {
+	if genState.ApplicationDownlink == nil || dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && macPayload.FullFCnt > dev.Session.LastNFCntDown {
 		dev.Session.LastNFCntDown = macPayload.FullFCnt
 	}
 	dev.MACState.LastDownlinkAt = TimePtr(down.TransmitAt)
@@ -1238,7 +1238,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		Priority:          genDown.Priority,
 		FrequencyPlanID:   dev.FrequencyPlanID,
 		Rx1Delay:          ttnpb.RxDelay(slot.RxDelay / time.Second),
-		LorawanPhyVersion: dev.LoRaWANPHYVersion,
+		LorawanPhyVersion: dev.LorawanPhyVersion,
 	}
 	if attemptRX1 {
 		req.Rx1Frequency = rx1Freq
@@ -1414,7 +1414,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		Rx2DataRateIndex:  drIdx,
 		Rx2Frequency:      freq,
 		AbsoluteTime:      absTime,
-		LorawanPhyVersion: dev.LoRaWANPHYVersion,
+		LorawanPhyVersion: dev.LorawanPhyVersion,
 	}
 	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
 		log.NewContext(ctx, loggerWithTxRequestFields(log.FromContext(ctx), req, false, true)),
@@ -1641,7 +1641,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						Priority:          ns.downlinkPriorities.JoinAccept,
 						FrequencyPlanID:   dev.FrequencyPlanID,
 						Rx1Delay:          ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second),
-						LorawanPhyVersion: dev.LoRaWANPHYVersion,
+						LorawanPhyVersion: dev.LorawanPhyVersion,
 					}
 					if attemptRX1 {
 						req.Rx1Frequency = rx1Freq
@@ -1758,7 +1758,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				ctx = log.NewContext(ctx, logger)
 
 				var maxUpLength uint16 = math.MaxUint16
-				if !dev.Multicast && dev.MACState.LoRaWANVersion == ttnpb.MAC_V1_1 {
+				if !dev.Multicast && dev.MACState.LorawanVersion == ttnpb.MAC_V1_1 {
 					maxUpLength, err = maximumUplinkLength(fp, phy, dev.MACState.RecentUplinks...)
 					if err != nil {
 						logger.WithError(err).Error("Failed to determine maximum uplink length")

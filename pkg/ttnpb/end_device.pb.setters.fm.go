@@ -458,20 +458,20 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 				return fmt.Errorf("'lorawan_version' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LoRaWANVersion = src.LoRaWANVersion
+				dst.LorawanVersion = src.LorawanVersion
 			} else {
 				var zero MACVersion
-				dst.LoRaWANVersion = zero
+				dst.LorawanVersion = zero
 			}
 		case "lorawan_phy_version":
 			if len(subs) > 0 {
 				return fmt.Errorf("'lorawan_phy_version' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LoRaWANPHYVersion = src.LoRaWANPHYVersion
+				dst.LorawanPhyVersion = src.LorawanPhyVersion
 			} else {
 				var zero PHYVersion
-				dst.LoRaWANPHYVersion = zero
+				dst.LorawanPhyVersion = zero
 			}
 		case "frequency_plan_id":
 			if len(subs) > 0 {
@@ -1297,10 +1297,10 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 				return fmt.Errorf("'lorawan_version' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LoRaWANVersion = src.LoRaWANVersion
+				dst.LorawanVersion = src.LorawanVersion
 			} else {
 				var zero MACVersion
-				dst.LoRaWANVersion = zero
+				dst.LorawanVersion = zero
 			}
 		case "last_confirmed_downlink_at":
 			if len(subs) > 0 {
@@ -1802,20 +1802,20 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				return fmt.Errorf("'lorawan_version' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LoRaWANVersion = src.LoRaWANVersion
+				dst.LorawanVersion = src.LorawanVersion
 			} else {
 				var zero MACVersion
-				dst.LoRaWANVersion = zero
+				dst.LorawanVersion = zero
 			}
 		case "lorawan_phy_version":
 			if len(subs) > 0 {
 				return fmt.Errorf("'lorawan_phy_version' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LoRaWANPHYVersion = src.LoRaWANPHYVersion
+				dst.LorawanPhyVersion = src.LorawanPhyVersion
 			} else {
 				var zero PHYVersion
-				dst.LoRaWANPHYVersion = zero
+				dst.LorawanPhyVersion = zero
 			}
 		case "frequency_plan_id":
 			if len(subs) > 0 {
