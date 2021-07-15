@@ -381,7 +381,7 @@ func (s *mockNetworkRPCServer) JoinRequestMIC(ctx context.Context, req *ttnpb.Cr
 	dev := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
 	}
-	mic, err := s.Network.JoinRequestMIC(ctx, dev, req.LoRaWANVersion, req.Payload)
+	mic, err := s.Network.JoinRequestMIC(ctx, dev, req.LorawanVersion, req.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -394,7 +394,7 @@ func (s *mockNetworkRPCServer) JoinAcceptMIC(ctx context.Context, req *ttnpb.Joi
 	dev := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
 	}
-	mic, err := s.Network.JoinAcceptMIC(ctx, dev, req.LoRaWANVersion, byte(req.JoinRequestType), req.DevNonce, req.Payload)
+	mic, err := s.Network.JoinAcceptMIC(ctx, dev, req.LorawanVersion, byte(req.JoinRequestType), req.DevNonce, req.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -407,7 +407,7 @@ func (s *mockNetworkRPCServer) EncryptJoinAccept(ctx context.Context, req *ttnpb
 	dev := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
 	}
-	data, err := s.Network.EncryptJoinAccept(ctx, dev, req.LoRaWANVersion, req.Payload)
+	data, err := s.Network.EncryptJoinAccept(ctx, dev, req.LorawanVersion, req.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -420,7 +420,7 @@ func (s *mockNetworkRPCServer) EncryptRejoinAccept(ctx context.Context, req *ttn
 	dev := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
 	}
-	data, err := s.Network.EncryptRejoinAccept(ctx, dev, req.LoRaWANVersion, req.Payload)
+	data, err := s.Network.EncryptRejoinAccept(ctx, dev, req.LorawanVersion, req.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -433,7 +433,7 @@ func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.De
 	dev := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
 	}
-	nwkSKeys, err := s.Network.DeriveNwkSKeys(ctx, dev, req.LoRaWANVersion, req.JoinNonce, req.DevNonce, req.NetID)
+	nwkSKeys, err := s.Network.DeriveNwkSKeys(ctx, dev, req.LorawanVersion, req.JoinNonce, req.DevNonce, req.NetID)
 	if err != nil {
 		return nil, err
 	}
@@ -476,7 +476,7 @@ func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb
 	dev := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
 	}
-	appSKey, err := s.Application.DeriveAppSKey(ctx, dev, req.LoRaWANVersion, req.JoinNonce, req.DevNonce, req.NetID)
+	appSKey, err := s.Application.DeriveAppSKey(ctx, dev, req.LorawanVersion, req.JoinNonce, req.DevNonce, req.NetID)
 	if err != nil {
 		return nil, err
 	}

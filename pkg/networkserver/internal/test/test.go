@@ -227,9 +227,9 @@ func MakeDefaultEU868CurrentChannels() []*ttnpb.MACParameters_Channel {
 
 func MakeDefaultEU868CurrentMACParameters(phyVersion ttnpb.PHYVersion) ttnpb.MACParameters {
 	return ttnpb.MACParameters{
-		ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
-		ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
-		ADRNbTrans:                 1,
+		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
+		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
+		AdrNbTrans:                 1,
 		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
 		MaxEIRP:                    16,
 		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
@@ -292,7 +292,7 @@ func MakeDefaultEU868DesiredMACParameters(phyVersion ttnpb.PHYVersion) ttnpb.MAC
 func MakeDefaultEU868MACState(class ttnpb.Class, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) *ttnpb.MACState {
 	return &ttnpb.MACState{
 		DeviceClass:       class,
-		LoRaWANVersion:    macVersion,
+		LorawanVersion:    macVersion,
 		CurrentParameters: MakeDefaultEU868CurrentMACParameters(phyVersion),
 		DesiredParameters: MakeDefaultEU868DesiredMACParameters(phyVersion),
 	}
@@ -328,9 +328,9 @@ func MakeDefaultUS915CurrentChannels() []*ttnpb.MACParameters_Channel {
 
 func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
 	return ttnpb.MACParameters{
-		ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
-		ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
-		ADRNbTrans:                 1,
+		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
+		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
+		AdrNbTrans:                 1,
 		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
 		MaxEIRP:                    30,
 		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_8},
@@ -371,7 +371,7 @@ func MakeDefaultUS915FSB2DesiredMACParameters(ver ttnpb.PHYVersion) ttnpb.MACPar
 func MakeDefaultUS915FSB2MACState(class ttnpb.Class, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) *ttnpb.MACState {
 	return &ttnpb.MACState{
 		DeviceClass:       class,
-		LoRaWANVersion:    macVersion,
+		LorawanVersion:    macVersion,
 		CurrentParameters: MakeDefaultUS915CurrentMACParameters(phyVersion),
 		DesiredParameters: MakeDefaultUS915FSB2DesiredMACParameters(phyVersion),
 	}
@@ -541,10 +541,10 @@ func WithDeviceDataUplinkConfig(dev *ttnpb.EndDevice, pending bool, drIdx ttnpb.
 		macState = dev.PendingMACState
 	}
 	return func(conf DataUplinkConfig) DataUplinkConfig {
-		conf.MACVersion = macState.LoRaWANVersion
+		conf.MACVersion = macState.LorawanVersion
 		conf.DevAddr = session.DevAddr
 		conf.FCnt = session.LastFCntUp + fCntDelta
-		conf.DataRate = LoRaWANBands[test.FrequencyPlan(dev.FrequencyPlanID).BandID][dev.LoRaWANPHYVersion].DataRates[drIdx].Rate
+		conf.DataRate = LoRaWANBands[test.FrequencyPlan(dev.FrequencyPlanID).BandID][dev.LorawanPhyVersion].DataRates[drIdx].Rate
 		conf.DataRateIndex = drIdx
 		conf.Frequency = macState.CurrentParameters.Channels[chIdx].UplinkFrequency
 		conf.ChannelIndex = chIdx

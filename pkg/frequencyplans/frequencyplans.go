@@ -208,7 +208,7 @@ func (lsc *LoRaStandardChannel) ToConcentratorConfig(phy band.Band) (*ttnpb.Conc
 	if !ok {
 		return nil, errInvalidDataRateIndex.New()
 	}
-	lora := dr.Rate.GetLoRa()
+	lora := dr.Rate.GetLora()
 	return &ttnpb.ConcentratorConfig_LoRaStandardChannel{
 		Frequency:       lsc.Frequency,
 		Radio:           uint32(lsc.Radio),
@@ -492,7 +492,7 @@ func (fp *FrequencyPlan) ToConcentratorConfig() (*ttnpb.ConcentratorConfig, erro
 	if err != nil {
 		return nil, err
 	}
-	cc.LoRaStandardChannel = lora
+	cc.LoraStandardChannel = lora
 	cc.FSKChannel = fp.FSKChannel.ToConcentratorConfig()
 	cc.LBT = fp.LBT.ToConcentratorConfig()
 	cc.PingSlot = fp.PingSlot.ToConcentratorConfig()

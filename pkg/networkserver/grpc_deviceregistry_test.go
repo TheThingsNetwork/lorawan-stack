@@ -832,8 +832,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 								return "ABP"
 							}
 						}()),
-						fmt.Sprintf("MAC:%s", dev.LoRaWANVersion.String()),
-						fmt.Sprintf("PHY:%s", dev.LoRaWANPHYVersion.String()),
+						fmt.Sprintf("MAC:%s", dev.LorawanVersion.String()),
+						fmt.Sprintf("PHY:%s", dev.LorawanPhyVersion.String()),
 						fmt.Sprintf("fp:%s", dev.FrequencyPlanID),
 						fmt.Sprintf("paths:[%s]", strings.Join(tc.SetDevice.Paths, ",")),
 					}

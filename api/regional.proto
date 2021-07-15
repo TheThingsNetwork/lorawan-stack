@@ -52,7 +52,7 @@ message ConcentratorConfig {
     uint32 bandwidth = 3;
     uint32 spreading_factor = 4;
   }
-  LoRaStandardChannel lora_standard_channel = 2 [(gogoproto.customname) = "LoRaStandardChannel"];
+  LoRaStandardChannel lora_standard_channel = 2;
   message FSKChannel {
     // Frequency (Hz).
     uint64 frequency = 1;

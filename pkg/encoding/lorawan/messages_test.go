@@ -46,14 +46,14 @@ func TestFCtrl(t *testing.T) {
 		{
 			Bytes: []byte{0b1_0_0_0_0010},
 			FCtrl: ttnpb.FCtrl{
-				ADR: true,
+				Adr: true,
 			},
 			FOptsLen: 2,
 		},
 		{
 			Bytes: []byte{0b1_0_0_0_0010},
 			FCtrl: ttnpb.FCtrl{
-				ADR: true,
+				Adr: true,
 			},
 			FOptsLen: 2,
 			IsUplink: true,
@@ -61,7 +61,7 @@ func TestFCtrl(t *testing.T) {
 		{
 			Bytes: []byte{0b1_0_1_1_0100},
 			FCtrl: ttnpb.FCtrl{
-				ADR:      true,
+				Adr:      true,
 				Ack:      true,
 				FPending: true,
 			},
@@ -70,8 +70,8 @@ func TestFCtrl(t *testing.T) {
 		{
 			Bytes: []byte{0b1_1_1_1_0100},
 			FCtrl: ttnpb.FCtrl{
-				ADR:       true,
-				ADRAckReq: true,
+				Adr:       true,
+				AdrAckReq: true,
 				Ack:       true,
 				ClassB:    true,
 			},
@@ -81,9 +81,9 @@ func TestFCtrl(t *testing.T) {
 	} {
 		var name string
 		if tc.IsUplink {
-			name = fmt.Sprintf("uplink/ADR:%v,ADRACKReq:%v,ACK:%v,ClassB:%v,FOptsLen:%d", tc.FCtrl.ADR, tc.FCtrl.ADRAckReq, tc.FCtrl.Ack, tc.FCtrl.ClassB, tc.FOptsLen)
+			name = fmt.Sprintf("uplink/ADR:%v,ADRACKReq:%v,ACK:%v,ClassB:%v,FOptsLen:%d", tc.FCtrl.Adr, tc.FCtrl.AdrAckReq, tc.FCtrl.Ack, tc.FCtrl.ClassB, tc.FOptsLen)
 		} else {
-			name = fmt.Sprintf("downlink/ADR:%v,ACK:%v,FPending:%v,FOptsLen:%d", tc.FCtrl.ADR, tc.FCtrl.Ack, tc.FCtrl.FPending, tc.FOptsLen)
+			name = fmt.Sprintf("downlink/ADR:%v,ACK:%v,FPending:%v,FOptsLen:%d", tc.FCtrl.Adr, tc.FCtrl.Ack, tc.FCtrl.FPending, tc.FOptsLen)
 		}
 		t.Run(name, func(t *testing.T) {
 			a := assertions.New(t)
@@ -108,7 +108,7 @@ func TestFCtrl(t *testing.T) {
 
 func TestAppendFHDR(t *testing.T) {
 	fCtrl := ttnpb.FCtrl{
-		ADR: true,
+		Adr: true,
 		Ack: true,
 	}
 	for _, tc := range []struct {

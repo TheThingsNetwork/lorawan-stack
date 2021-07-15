@@ -54,7 +54,7 @@ func NewADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, confirmed bool, tx
 				MACPayload: &ttnpb.MACPayload{
 					FHDR: ttnpb.FHDR{
 						FCtrl: ttnpb.FCtrl{
-							ADR: true,
+							Adr: true,
 						},
 						FCnt: fCnt & 0xffff,
 					},

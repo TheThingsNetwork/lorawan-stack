@@ -57,14 +57,14 @@ func AppendFCtrl(dst []byte, msg ttnpb.FCtrl, isUplink bool, fOptsLen uint8) ([]
 		return nil, errExpectedLowerOrEqual("FOptsLen", 15)(fOptsLen)
 	}
 	b := fOptsLen
-	if msg.ADR {
+	if msg.Adr {
 		b |= 1 << 7
 	}
 	if msg.Ack {
 		b |= 1 << 5
 	}
 	if isUplink {
-		if msg.ADRAckReq {
+		if msg.AdrAckReq {
 			b |= 1 << 6
 		}
 		if msg.ClassB {
@@ -84,10 +84,10 @@ func UnmarshalFCtrl(b []byte, msg *ttnpb.FCtrl, isUplink bool) error {
 		return errExpectedLengthEncodedEqual("FCtrl", 1)(len(b))
 	}
 	v := b[0]
-	msg.ADR = v&(1<<7) > 0
+	msg.Adr = v&(1<<7) > 0
 	msg.Ack = v&(1<<5) > 0
 	if isUplink {
-		msg.ADRAckReq = v&(1<<6) > 0
+		msg.AdrAckReq = v&(1<<6) > 0
 		msg.ClassB = v&(1<<4) > 0
 	} else {
 		msg.FPending = v&(1<<4) > 0

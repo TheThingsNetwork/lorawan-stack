@@ -130,7 +130,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -200,14 +200,14 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
@@ -279,14 +279,14 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
@@ -302,7 +302,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 					PendingMACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LorawanVersion: ttnpb.MAC_V1_1,
 					},
 					PendingSession: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -382,14 +382,14 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
@@ -458,7 +458,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -531,14 +531,14 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
@@ -609,14 +609,14 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
@@ -824,7 +824,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -894,14 +894,14 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
@@ -973,14 +973,14 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
@@ -996,7 +996,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					},
 					PendingMACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LorawanVersion: ttnpb.MAC_V1_1,
 					},
 					PendingSession: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -1060,14 +1060,14 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
@@ -1130,14 +1130,14 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
-						LoRaWANVersion: ttnpb.MAC_V1_0_2,
+						LorawanVersion: ttnpb.MAC_V1_0_2,
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
@@ -1195,14 +1195,14 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MACState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
-						LoRaWANVersion: ttnpb.MAC_V1_0_2,
+						LorawanVersion: ttnpb.MAC_V1_0_2,
 						RecentUplinks:  ups,
 					},
 				})

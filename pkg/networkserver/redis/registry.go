@@ -773,7 +773,7 @@ func removeAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string
 
 func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
 	return msgpack.Marshal(UplinkMatchSession{
-		LoRaWANVersion:    dev.GetMACState().GetLoRaWANVersion(),
+		LoRaWANVersion:    dev.GetMACState().GetLorawanVersion(),
 		FNwkSIntKey:       dev.GetSession().GetFNwkSIntKey(),
 		LastFCnt:          dev.GetSession().GetLastFCntUp(),
 		ResetsFCnt:        dev.GetMACSettings().GetResetsFCnt(),
@@ -783,7 +783,7 @@ func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
 
 func MarshalDevicePendingSession(dev *ttnpb.EndDevice) ([]byte, error) {
 	return msgpack.Marshal(UplinkMatchSession{
-		LoRaWANVersion: dev.GetPendingMACState().GetLoRaWANVersion(),
+		LoRaWANVersion: dev.GetPendingMACState().GetLorawanVersion(),
 		FNwkSIntKey:    dev.GetPendingSession().GetFNwkSIntKey(),
 	})
 }
@@ -948,7 +948,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					}
 					storedPendingMACState := stored.GetPendingMACState()
 					return false, false, storedPendingMACState == nil ||
-						updated.PendingMACState.LoRaWANVersion != storedPendingMACState.LoRaWANVersion ||
+						updated.PendingMACState.LorawanVersion != storedPendingMACState.LorawanVersion ||
 						!updated.PendingSession.FNwkSIntKey.Equal(storedPendingSession.FNwkSIntKey)
 				}()
 				if removeStored {
@@ -985,7 +985,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					storedMACState := stored.GetMACState()
 					storedMACSettings := stored.GetMACSettings()
 					return false, false, storedMACState == nil ||
-						updated.MACState.LoRaWANVersion != storedMACState.LoRaWANVersion ||
+						updated.MACState.LorawanVersion != storedMACState.LorawanVersion ||
 						!updated.Session.FNwkSIntKey.Equal(storedSession.FNwkSIntKey) ||
 						!updated.MACSettings.GetResetsFCnt().Equal(storedMACSettings.GetResetsFCnt()) ||
 						!updated.MACSettings.GetSupports32BitFCnt().Equal(storedMACSettings.GetSupports32BitFCnt())

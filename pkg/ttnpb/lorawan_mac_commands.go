@@ -63,8 +63,8 @@ func (pld *MACCommand_LinkCheckAns) MACCommand() *MACCommand {
 func (pld *MACCommand_LinkADRReq) MACCommand() *MACCommand {
 	return &MACCommand{
 		CID: CID_LINK_ADR,
-		Payload: &MACCommand_LinkADRReq_{
-			LinkADRReq: pld,
+		Payload: &MACCommand_LinkAdrReq{
+			LinkAdrReq: pld,
 		},
 	}
 }
@@ -73,8 +73,8 @@ func (pld *MACCommand_LinkADRReq) MACCommand() *MACCommand {
 func (pld *MACCommand_LinkADRAns) MACCommand() *MACCommand {
 	return &MACCommand{
 		CID: CID_LINK_ADR,
-		Payload: &MACCommand_LinkADRAns_{
-			LinkADRAns: pld,
+		Payload: &MACCommand_LinkAdrAns{
+			LinkAdrAns: pld,
 		},
 	}
 }
@@ -203,8 +203,8 @@ func (pld *MACCommand_RekeyConf) MACCommand() *MACCommand {
 func (pld *MACCommand_ADRParamSetupReq) MACCommand() *MACCommand {
 	return &MACCommand{
 		CID: CID_ADR_PARAM_SETUP,
-		Payload: &MACCommand_ADRParamSetupReq_{
-			ADRParamSetupReq: pld,
+		Payload: &MACCommand_AdrParamSetupReq{
+			AdrParamSetupReq: pld,
 		},
 	}
 }

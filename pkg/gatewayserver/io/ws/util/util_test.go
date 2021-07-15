@@ -53,7 +53,7 @@ func TestGetDataRateFromDataRateIndex(t *testing.T) {
 			Name:   "Valid_EU",
 			BandID: "EU_863_870",
 			IsLora: true,
-			ExpectedDataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+			ExpectedDataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 12,
 				Bandwidth:       125000,
 			}}},
@@ -106,7 +106,7 @@ func TestGetDataRateIndexFromDataRate(t *testing.T) {
 		{
 			Name:   "Valid_EU",
 			BandID: "EU_863_870",
-			DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+			DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 7,
 				Bandwidth:       125000,
 			}}},
@@ -123,7 +123,7 @@ func TestGetDataRateIndexFromDataRate(t *testing.T) {
 		{
 			Name:   "Invalid_EU",
 			BandID: "EU_863_870",
-			DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+			DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 11,
 				Bandwidth:       250000,
 			}}},
@@ -208,8 +208,8 @@ func TestGetFCtrlAsUint(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			a := assertions.New(t)
 			fCtrl := GetFCtrlAsUint(ttnpb.FCtrl{
-				ADR:       tc.ADR,
-				ADRAckReq: tc.ADRAckReq,
+				Adr:       tc.ADR,
+				AdrAckReq: tc.ADRAckReq,
 				Ack:       tc.Ack,
 				FPending:  tc.FPending,
 				ClassB:    tc.ClassB,

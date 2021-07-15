@@ -27,8 +27,8 @@ import (
 // This function takes into account PHYPayload.
 func Compute(payloadSize int, settings ttnpb.TxSettings) (d time.Duration, err error) {
 	switch dr := settings.DataRate.Modulation.(type) {
-	case *ttnpb.DataRate_LoRa:
-		return computeLoRa(payloadSize, settings.Frequency, uint8(dr.LoRa.SpreadingFactor), dr.LoRa.Bandwidth, settings.CodingRate, settings.EnableCRC)
+	case *ttnpb.DataRate_Lora:
+		return computeLoRa(payloadSize, settings.Frequency, uint8(dr.Lora.SpreadingFactor), dr.Lora.Bandwidth, settings.CodingRate, settings.EnableCRC)
 	case *ttnpb.DataRate_FSK:
 		return computeFSK(payloadSize, settings.Frequency, dr.FSK.BitRate, settings.EnableCRC)
 	default:

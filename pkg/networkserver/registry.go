@@ -151,7 +151,7 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 				return nil
 			}
 			// Replicate old behavior for backwards-compatibility.
-			dev.MACState.CurrentParameters.ADRAckDelay = 0
+			dev.MACState.CurrentParameters.AdrAckDelay = 0
 			return nil
 		},
 	},
@@ -164,7 +164,7 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 				return nil
 			}
 			// Replicate old behavior for backwards-compatibility.
-			dev.MACState.CurrentParameters.ADRAckLimit = 0
+			dev.MACState.CurrentParameters.AdrAckLimit = 0
 			return nil
 		},
 	},
@@ -190,7 +190,7 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 				return nil
 			}
 			// Replicate old behavior for backwards-compatibility.
-			dev.MACState.DesiredParameters.ADRAckDelay = 0
+			dev.MACState.DesiredParameters.AdrAckDelay = 0
 			return nil
 		},
 	},
@@ -203,7 +203,7 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 				return nil
 			}
 			// Replicate old behavior for backwards-compatibility.
-			dev.MACState.DesiredParameters.ADRAckLimit = 0
+			dev.MACState.DesiredParameters.AdrAckLimit = 0
 			return nil
 		},
 	},
