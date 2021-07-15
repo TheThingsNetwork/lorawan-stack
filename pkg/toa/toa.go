@@ -34,7 +34,7 @@ func Compute(payloadSize int, settings ttnpb.TxSettings) (d time.Duration, err e
 	case *ttnpb.DataRate_FSK:
 		return computeFSK(payloadSize, settings.Frequency, dr.FSK.BitRate, settings.EnableCRC)
 	case *ttnpb.DataRate_Lrfhss:
-		return 0, errModulationTypeNotSupported.WithAttributes("type", dr.Lrfhss.ModulationType)
+		return 0, errModulationTypeNotSupported.WithAttributes("type", "LRFHSS")
 	default:
 		panic("invalid modulation")
 	}
