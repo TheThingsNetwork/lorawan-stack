@@ -15,7 +15,7 @@
 import * as Sentry from '@sentry/browser'
 import { isPlainObject } from 'lodash'
 
-import { error as errorLog } from '@ttn-lw/lib/log'
+import { error as errorLog, warn } from '@ttn-lw/lib/log'
 
 import errorMessages from './error-messages'
 import grpcErrToHttpErr from './grpc-error-map'
@@ -220,7 +220,8 @@ export const isNetworkError = error =>
  * @param {object} error - The error to be tested.
  * @returns {boolean} `true` if `error` is a timeout error, `false` otherwise.
  */
-export const isTimeoutError = error => error.code === 'ECONNABORTED'
+export const isTimeoutError = error =>
+  Boolean(error) && typeof error === 'object' && error.code === 'ECONNABORTED'
 
 /**
  * Returns whether the error is worth being sent to Sentry.
@@ -230,7 +231,10 @@ export const isTimeoutError = error => error.code === 'ECONNABORTED'
  * `false` otherwise.
  */
 export const isSentryWorthy = error =>
-  (isUnknown(error) && httpStatusCode(error) === undefined) ||
+  (isUnknown(error) &&
+    httpStatusCode(error) === undefined &&
+    !isNetworkError(error) &&
+    !isTimeoutError(error)) ||
   isInvalidArgumentError(error) ||
   isInternalError(error) ||
   httpStatusCode(error) >= 500 || // Server errors.
@@ -398,6 +402,7 @@ export const ingestError = (error, extras = {}, tags = {}) => {
 
   // Send to Sentry if necessary.
   if (isSentryWorthy(error)) {
+    warn('The above error was considered Sentry worthy')
     Sentry.withScope(scope => {
       scope.setTags({ ...tags, frontendOrigin: true })
       scope.setFingerprint(isBackend(error) ? getBackendErrorId(error) : error)

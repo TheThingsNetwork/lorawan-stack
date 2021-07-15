@@ -32,7 +32,8 @@ import style from './offline.styl'
 const siteTitle = selectApplicationSiteTitle()
 
 const m = defineMessages({
-  offline: '{applicationName} went offline',
+  checking: 'Connection issues detected. Attempting to reconnect…',
+  offline: '{applicationName} is offline. Please check your internet connection.',
   online: '{applicationName} is back online',
 })
 
@@ -61,12 +62,16 @@ const OfflineStatus = ({ showOfflineOnly, showWarnings, onlineStatus }) => {
       initialUpdate.current = false
       return
     }
-    if (showWarnings && isOnline) {
-      handleMessage(m.online, toast.types.INFO)
-    } else if (showWarnings && isOffline) {
-      handleMessage(m.offline, toast.types.ERROR)
+    if (showWarnings) {
+      if (isOnline) {
+        handleMessage(m.online, toast.types.INFO)
+      } else if (isChecking) {
+        handleMessage(m.checking, toast.types.WARNING)
+      } else if (isOffline) {
+        handleMessage(m.offline, toast.types.ERROR)
+      }
     }
-  }, [showWarnings, isOnline, isOffline])
+  }, [showWarnings, isOnline, isChecking, isOffline])
 
   if (showOfflineOnly && isOnline) {
     return null

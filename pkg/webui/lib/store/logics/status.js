@@ -32,11 +32,15 @@ const connectionCheck = (dispatch, done) => () => {
 }
 
 let periodicCheck
+let connectionCheckResolve
 
 const connectionManagementLogic = createLogic({
   type: status.SET_CONNECTION_STATUS,
   process: async ({ action }, dispatch, done) => {
     if (action.payload.onlineStatus === ONLINE_STATUS.CHECKING) {
+      if (action.meta && action.meta._attachPromise) {
+        connectionCheckResolve = action.meta._resolve
+      }
       try {
         // Make a simple GET request to the auth_info endpoint.
         await axios.get(`${isRoot}/auth_info`, { timeout: 5000 })
@@ -53,6 +57,12 @@ const connectionManagementLogic = createLogic({
     if (action.payload.onlineStatus === ONLINE_STATUS.OFFLINE && navigator.onLine) {
       // If the app went offline, try to reconnect periodically.
       dispatch(status.attemptReconnect())
+    } else if (
+      action.payload.onlineStatus === ONLINE_STATUS.ONLINE &&
+      typeof connectionCheckResolve === 'function'
+    ) {
+      // Resolve the connection check promise.
+      connectionCheckResolve()
     }
 
     done()
@@ -63,8 +73,8 @@ const connectionCheckLogic = createLogic({
   type: status.ATTEMPT_RECONNECT,
   // Additionally to periodic reconnects, freshly incoming request actions will
   // also trigger reconnection attempts, which is why this action is throttled
-  // to 5 seconds.
-  throttle: 5000,
+  // to 3 seconds.
+  throttle: 3000,
   validate: ({ action, getState }, allow, reject) => {
     if (selectIsOfflineStatus(getState()) && navigator.onLine) {
       return allow(action)
