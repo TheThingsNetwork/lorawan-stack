@@ -77,28 +77,28 @@ func TestAdaptDataRate(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
-						ADRNbTrans:      1,
-						ADRTxPowerIndex: 1,
+						AdrNbTrans:      1,
+						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
 					DesiredParameters: ttnpb.MACParameters{
-						ADRDataRateIndex: ttnpb.DATA_RATE_4,
-						ADRNbTrans:       3,
-						ADRTxPowerIndex:  2,
+						AdrDataRateIndex: ttnpb.DATA_RATE_4,
+						AdrNbTrans:       3,
+						AdrTxPowerIndex:  2,
 						Channels:         MakeDefaultEU868CurrentChannels(),
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
-					ADRMargin: &pbtypes.FloatValue{
+					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_4
-				dev.MACState.DesiredParameters.ADRTxPowerIndex = 1
-				dev.MACState.DesiredParameters.ADRNbTrans = 1
+				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_4
+				dev.MACState.DesiredParameters.AdrTxPowerIndex = 1
+				dev.MACState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 		{
@@ -108,28 +108,28 @@ func TestAdaptDataRate(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
-						ADRNbTrans:      1,
-						ADRTxPowerIndex: 1,
+						AdrNbTrans:      1,
+						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
 					DesiredParameters: ttnpb.MACParameters{
 						Channels: MakeDefaultEU868CurrentChannels(),
 					},
-					RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
+					RejectedAdrDataRateIndexes: []ttnpb.DataRateIndex{
 						ttnpb.DATA_RATE_1, ttnpb.DATA_RATE_4,
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
-					ADRMargin: &pbtypes.FloatValue{
+					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_3
-				dev.MACState.DesiredParameters.ADRTxPowerIndex = 2
-				dev.MACState.DesiredParameters.ADRNbTrans = 1
+				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_3
+				dev.MACState.DesiredParameters.AdrTxPowerIndex = 2
+				dev.MACState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 		{
@@ -139,28 +139,28 @@ func TestAdaptDataRate(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
-						ADRNbTrans:      1,
-						ADRTxPowerIndex: 1,
+						AdrNbTrans:      1,
+						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
 					DesiredParameters: ttnpb.MACParameters{
 						Channels: MakeDefaultEU868CurrentChannels(),
 					},
-					RejectedADRTxPowerIndexes: []uint32{
+					RejectedAdrTxPowerIndexes: []uint32{
 						1,
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
-					ADRMargin: &pbtypes.FloatValue{
+					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_4
-				dev.MACState.DesiredParameters.ADRTxPowerIndex = 0
-				dev.MACState.DesiredParameters.ADRNbTrans = 1
+				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_4
+				dev.MACState.DesiredParameters.AdrTxPowerIndex = 0
+				dev.MACState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 		{
@@ -170,28 +170,28 @@ func TestAdaptDataRate(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
-						ADRNbTrans:      1,
-						ADRTxPowerIndex: 1,
+						AdrNbTrans:      1,
+						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
 					DesiredParameters: ttnpb.MACParameters{
 						Channels: MakeDefaultEU868CurrentChannels(),
 					},
-					RejectedADRTxPowerIndexes: []uint32{
+					RejectedAdrTxPowerIndexes: []uint32{
 						0, 1,
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
-					ADRMargin: &pbtypes.FloatValue{
+					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_3
-				dev.MACState.DesiredParameters.ADRTxPowerIndex = 2
-				dev.MACState.DesiredParameters.ADRNbTrans = 1
+				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_3
+				dev.MACState.DesiredParameters.AdrTxPowerIndex = 2
+				dev.MACState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 		{
@@ -201,31 +201,31 @@ func TestAdaptDataRate(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
-						ADRNbTrans:      1,
-						ADRTxPowerIndex: 1,
+						AdrNbTrans:      1,
+						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
 					DesiredParameters: ttnpb.MACParameters{
 						Channels: MakeDefaultEU868CurrentChannels(),
 					},
-					RejectedADRTxPowerIndexes: []uint32{
+					RejectedAdrTxPowerIndexes: []uint32{
 						0, 2, 3,
 					},
-					RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
+					RejectedAdrDataRateIndexes: []ttnpb.DataRateIndex{
 						ttnpb.DATA_RATE_1, ttnpb.DATA_RATE_4,
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
-					ADRMargin: &pbtypes.FloatValue{
+					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_3
-				dev.MACState.DesiredParameters.ADRTxPowerIndex = 1
-				dev.MACState.DesiredParameters.ADRNbTrans = 1
+				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_3
+				dev.MACState.DesiredParameters.AdrTxPowerIndex = 1
+				dev.MACState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 		{
@@ -235,31 +235,31 @@ func TestAdaptDataRate(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
-						ADRNbTrans:      1,
-						ADRTxPowerIndex: 1,
+						AdrNbTrans:      1,
+						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
 					DesiredParameters: ttnpb.MACParameters{
 						Channels: MakeDefaultEU868CurrentChannels(),
 					},
-					RejectedADRTxPowerIndexes: []uint32{
+					RejectedAdrTxPowerIndexes: []uint32{
 						0, 1,
 					},
-					RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
+					RejectedAdrDataRateIndexes: []ttnpb.DataRateIndex{
 						ttnpb.DATA_RATE_3,
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
 				MACSettings: &ttnpb.MACSettings{
-					ADRMargin: &pbtypes.FloatValue{
+					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.ADRDataRateIndex = ttnpb.DATA_RATE_2
-				dev.MACState.DesiredParameters.ADRTxPowerIndex = 3
-				dev.MACState.DesiredParameters.ADRNbTrans = 1
+				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_2
+				dev.MACState.DesiredParameters.AdrTxPowerIndex = 3
+				dev.MACState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 	} {
@@ -286,7 +286,8 @@ func TestAdaptDataRate(t *testing.T) {
 
 func TestIssue458(t *testing.T) {
 	issue458Uplinks := ADRMatrixToUplinks([]ADRMatrixRow{
-		{FCnt: 1, MaxSNR: -7.2, GtwDiversity: 1,
+		{
+			FCnt: 1, MaxSNR: -7.2, GtwDiversity: 1,
 			TxSettings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_LoRa{
@@ -361,7 +362,7 @@ func TestIssue458(t *testing.T) {
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.ADRNbTrans = 3
+				dev.MACState.DesiredParameters.AdrNbTrans = 3
 			},
 		},
 	} {

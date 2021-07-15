@@ -145,50 +145,50 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 				return fmt.Errorf("'adr_data_rate_index' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ADRDataRateIndex = src.ADRDataRateIndex
+				dst.AdrDataRateIndex = src.AdrDataRateIndex
 			} else {
 				var zero DataRateIndex
-				dst.ADRDataRateIndex = zero
+				dst.AdrDataRateIndex = zero
 			}
 		case "adr_tx_power_index":
 			if len(subs) > 0 {
 				return fmt.Errorf("'adr_tx_power_index' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ADRTxPowerIndex = src.ADRTxPowerIndex
+				dst.AdrTxPowerIndex = src.AdrTxPowerIndex
 			} else {
 				var zero uint32
-				dst.ADRTxPowerIndex = zero
+				dst.AdrTxPowerIndex = zero
 			}
 		case "adr_nb_trans":
 			if len(subs) > 0 {
 				return fmt.Errorf("'adr_nb_trans' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ADRNbTrans = src.ADRNbTrans
+				dst.AdrNbTrans = src.AdrNbTrans
 			} else {
 				var zero uint32
-				dst.ADRNbTrans = zero
+				dst.AdrNbTrans = zero
 			}
 		case "adr_ack_limit":
 			if len(subs) > 0 {
 				return fmt.Errorf("'adr_ack_limit' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ADRAckLimit = src.ADRAckLimit
+				dst.AdrAckLimit = src.AdrAckLimit
 			} else {
 				var zero uint32
-				dst.ADRAckLimit = zero
+				dst.AdrAckLimit = zero
 			}
 		case "adr_ack_delay":
 			if len(subs) > 0 {
 				return fmt.Errorf("'adr_ack_delay' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ADRAckDelay = src.ADRAckDelay
+				dst.AdrAckDelay = src.AdrAckDelay
 			} else {
 				var zero uint32
-				dst.ADRAckDelay = zero
+				dst.AdrAckDelay = zero
 			}
 		case "rx1_delay":
 			if len(subs) > 0 {
@@ -352,51 +352,51 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 		case "adr_ack_limit_exponent":
 			if len(subs) > 0 {
 				var newDst, newSrc *ADRAckLimitExponentValue
-				if (src == nil || src.ADRAckLimitExponent == nil) && dst.ADRAckLimitExponent == nil {
+				if (src == nil || src.AdrAckLimitExponent == nil) && dst.AdrAckLimitExponent == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.ADRAckLimitExponent
+					newSrc = src.AdrAckLimitExponent
 				}
-				if dst.ADRAckLimitExponent != nil {
-					newDst = dst.ADRAckLimitExponent
+				if dst.AdrAckLimitExponent != nil {
+					newDst = dst.AdrAckLimitExponent
 				} else {
 					newDst = &ADRAckLimitExponentValue{}
-					dst.ADRAckLimitExponent = newDst
+					dst.AdrAckLimitExponent = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ADRAckLimitExponent = src.ADRAckLimitExponent
+					dst.AdrAckLimitExponent = src.AdrAckLimitExponent
 				} else {
-					dst.ADRAckLimitExponent = nil
+					dst.AdrAckLimitExponent = nil
 				}
 			}
 		case "adr_ack_delay_exponent":
 			if len(subs) > 0 {
 				var newDst, newSrc *ADRAckDelayExponentValue
-				if (src == nil || src.ADRAckDelayExponent == nil) && dst.ADRAckDelayExponent == nil {
+				if (src == nil || src.AdrAckDelayExponent == nil) && dst.AdrAckDelayExponent == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.ADRAckDelayExponent
+					newSrc = src.AdrAckDelayExponent
 				}
-				if dst.ADRAckDelayExponent != nil {
-					newDst = dst.ADRAckDelayExponent
+				if dst.AdrAckDelayExponent != nil {
+					newDst = dst.AdrAckDelayExponent
 				} else {
 					newDst = &ADRAckDelayExponentValue{}
-					dst.ADRAckDelayExponent = newDst
+					dst.AdrAckDelayExponent = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ADRAckDelayExponent = src.ADRAckDelayExponent
+					dst.AdrAckDelayExponent = src.AdrAckDelayExponent
 				} else {
-					dst.ADRAckDelayExponent = nil
+					dst.AdrAckDelayExponent = nil
 				}
 			}
 		case "ping_slot_data_rate_index_value":
@@ -886,26 +886,26 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 		case "use_adr":
 			if len(subs) > 0 {
 				var newDst, newSrc *BoolValue
-				if (src == nil || src.UseADR == nil) && dst.UseADR == nil {
+				if (src == nil || src.UseAdr == nil) && dst.UseAdr == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.UseADR
+					newSrc = src.UseAdr
 				}
-				if dst.UseADR != nil {
-					newDst = dst.UseADR
+				if dst.UseAdr != nil {
+					newDst = dst.UseAdr
 				} else {
 					newDst = &BoolValue{}
-					dst.UseADR = newDst
+					dst.UseAdr = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UseADR = src.UseADR
+					dst.UseAdr = src.UseAdr
 				} else {
-					dst.UseADR = nil
+					dst.UseAdr = nil
 				}
 			}
 		case "adr_margin":
@@ -913,9 +913,9 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 				return fmt.Errorf("'adr_margin' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ADRMargin = src.ADRMargin
+				dst.AdrMargin = src.AdrMargin
 			} else {
-				dst.ADRMargin = nil
+				dst.AdrMargin = nil
 			}
 		case "resets_f_cnt":
 			if len(subs) > 0 {
@@ -1088,51 +1088,51 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 		case "desired_adr_ack_limit_exponent":
 			if len(subs) > 0 {
 				var newDst, newSrc *ADRAckLimitExponentValue
-				if (src == nil || src.DesiredADRAckLimitExponent == nil) && dst.DesiredADRAckLimitExponent == nil {
+				if (src == nil || src.DesiredAdrAckLimitExponent == nil) && dst.DesiredAdrAckLimitExponent == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.DesiredADRAckLimitExponent
+					newSrc = src.DesiredAdrAckLimitExponent
 				}
-				if dst.DesiredADRAckLimitExponent != nil {
-					newDst = dst.DesiredADRAckLimitExponent
+				if dst.DesiredAdrAckLimitExponent != nil {
+					newDst = dst.DesiredAdrAckLimitExponent
 				} else {
 					newDst = &ADRAckLimitExponentValue{}
-					dst.DesiredADRAckLimitExponent = newDst
+					dst.DesiredAdrAckLimitExponent = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.DesiredADRAckLimitExponent = src.DesiredADRAckLimitExponent
+					dst.DesiredAdrAckLimitExponent = src.DesiredAdrAckLimitExponent
 				} else {
-					dst.DesiredADRAckLimitExponent = nil
+					dst.DesiredAdrAckLimitExponent = nil
 				}
 			}
 		case "desired_adr_ack_delay_exponent":
 			if len(subs) > 0 {
 				var newDst, newSrc *ADRAckDelayExponentValue
-				if (src == nil || src.DesiredADRAckDelayExponent == nil) && dst.DesiredADRAckDelayExponent == nil {
+				if (src == nil || src.DesiredAdrAckDelayExponent == nil) && dst.DesiredAdrAckDelayExponent == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.DesiredADRAckDelayExponent
+					newSrc = src.DesiredAdrAckDelayExponent
 				}
-				if dst.DesiredADRAckDelayExponent != nil {
-					newDst = dst.DesiredADRAckDelayExponent
+				if dst.DesiredAdrAckDelayExponent != nil {
+					newDst = dst.DesiredAdrAckDelayExponent
 				} else {
 					newDst = &ADRAckDelayExponentValue{}
-					dst.DesiredADRAckDelayExponent = newDst
+					dst.DesiredAdrAckDelayExponent = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.DesiredADRAckDelayExponent = src.DesiredADRAckDelayExponent
+					dst.DesiredAdrAckDelayExponent = src.DesiredAdrAckDelayExponent
 				} else {
-					dst.DesiredADRAckDelayExponent = nil
+					dst.DesiredAdrAckDelayExponent = nil
 				}
 			}
 		case "desired_ping_slot_data_rate_index":
@@ -1481,18 +1481,18 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 				return fmt.Errorf("'rejected_adr_data_rate_indexes' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RejectedADRDataRateIndexes = src.RejectedADRDataRateIndexes
+				dst.RejectedAdrDataRateIndexes = src.RejectedAdrDataRateIndexes
 			} else {
-				dst.RejectedADRDataRateIndexes = nil
+				dst.RejectedAdrDataRateIndexes = nil
 			}
 		case "rejected_adr_tx_power_indexes":
 			if len(subs) > 0 {
 				return fmt.Errorf("'rejected_adr_tx_power_indexes' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RejectedADRTxPowerIndexes = src.RejectedADRTxPowerIndexes
+				dst.RejectedAdrTxPowerIndexes = src.RejectedAdrTxPowerIndexes
 			} else {
-				dst.RejectedADRTxPowerIndexes = nil
+				dst.RejectedAdrTxPowerIndexes = nil
 			}
 		case "rejected_frequencies":
 			if len(subs) > 0 {
@@ -1526,10 +1526,10 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 				return fmt.Errorf("'last_adr_change_f_cnt_up' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LastADRChangeFCntUp = src.LastADRChangeFCntUp
+				dst.LastAdrChangeFCntUp = src.LastAdrChangeFCntUp
 			} else {
 				var zero uint32
-				dst.LastADRChangeFCntUp = zero
+				dst.LastAdrChangeFCntUp = zero
 			}
 
 		default:

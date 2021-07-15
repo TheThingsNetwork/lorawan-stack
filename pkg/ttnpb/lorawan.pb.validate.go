@@ -554,9 +554,9 @@ func (m *FCtrl) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "adr":
-			// no validation rules for ADR
+			// no validation rules for Adr
 		case "adr_ack_req":
-			// no validation rules for ADRAckReq
+			// no validation rules for AdrAckReq
 		case "ack":
 			// no validation rules for Ack
 		case "f_pending":

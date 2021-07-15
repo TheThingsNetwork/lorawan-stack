@@ -51,7 +51,7 @@ func (c MACSettingConfig) Parse() ttnpb.MACSettings {
 		StatusTimePeriodicity: c.StatusTimePeriodicity,
 	}
 	if c.ADRMargin != nil {
-		p.ADRMargin = &pbtypes.FloatValue{Value: *c.ADRMargin}
+		p.AdrMargin = &pbtypes.FloatValue{Value: *c.ADRMargin}
 	}
 	if c.DesiredRx1Delay != nil {
 		p.DesiredRx1Delay = &ttnpb.RxDelayValue{Value: *c.DesiredRx1Delay}
@@ -60,10 +60,10 @@ func (c MACSettingConfig) Parse() ttnpb.MACSettings {
 		p.DesiredMaxDutyCycle = &ttnpb.AggregatedDutyCycleValue{Value: *c.DesiredMaxDutyCycle}
 	}
 	if c.DesiredADRAckLimitExponent != nil {
-		p.DesiredADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: *c.DesiredADRAckLimitExponent}
+		p.DesiredAdrAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: *c.DesiredADRAckLimitExponent}
 	}
 	if c.DesiredADRAckDelayExponent != nil {
-		p.DesiredADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: *c.DesiredADRAckDelayExponent}
+		p.DesiredAdrAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: *c.DesiredADRAckDelayExponent}
 	}
 	if c.StatusCountPeriodicity != nil {
 		p.StatusCountPeriodicity = &pbtypes.UInt32Value{Value: *c.StatusCountPeriodicity}

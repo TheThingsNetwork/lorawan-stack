@@ -227,9 +227,9 @@ func MakeDefaultEU868CurrentChannels() []*ttnpb.MACParameters_Channel {
 
 func MakeDefaultEU868CurrentMACParameters(phyVersion ttnpb.PHYVersion) ttnpb.MACParameters {
 	return ttnpb.MACParameters{
-		ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
-		ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
-		ADRNbTrans:                 1,
+		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
+		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
+		AdrNbTrans:                 1,
 		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
 		MaxEIRP:                    16,
 		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
@@ -328,9 +328,9 @@ func MakeDefaultUS915CurrentChannels() []*ttnpb.MACParameters_Channel {
 
 func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
 	return ttnpb.MACParameters{
-		ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
-		ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
-		ADRNbTrans:                 1,
+		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
+		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
+		AdrNbTrans:                 1,
 		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
 		MaxEIRP:                    30,
 		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_8},

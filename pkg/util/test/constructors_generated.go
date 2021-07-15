@@ -395,7 +395,7 @@ func (MACStateOptionNamespace) WithLastNetworkInitiatedDownlinkAt(v *time.Time) 
 // WithRejectedADRDataRateIndexes returns a MACStateOption, which returns a copy of ttnpb.MACState with RejectedADRDataRateIndexes set to vs.
 func (MACStateOptionNamespace) WithRejectedADRDataRateIndexes(vs ...ttnpb.DataRateIndex) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
-		x.RejectedADRDataRateIndexes = vs
+		x.RejectedAdrDataRateIndexes = vs
 		return x
 	}
 }
@@ -403,7 +403,7 @@ func (MACStateOptionNamespace) WithRejectedADRDataRateIndexes(vs ...ttnpb.DataRa
 // WithRejectedADRTxPowerIndexes returns a MACStateOption, which returns a copy of ttnpb.MACState with RejectedADRTxPowerIndexes set to vs.
 func (MACStateOptionNamespace) WithRejectedADRTxPowerIndexes(vs ...uint32) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
-		x.RejectedADRTxPowerIndexes = vs
+		x.RejectedAdrTxPowerIndexes = vs
 		return x
 	}
 }
@@ -435,7 +435,7 @@ func (MACStateOptionNamespace) WithRejectedDataRateRanges(v map[uint64]*ttnpb.MA
 // WithLastADRChangeFCntUp returns a MACStateOption, which returns a copy of ttnpb.MACState with LastADRChangeFCntUp set to v.
 func (MACStateOptionNamespace) WithLastADRChangeFCntUp(v uint32) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
-		x.LastADRChangeFCntUp = v
+		x.LastAdrChangeFCntUp = v
 		return x
 	}
 }

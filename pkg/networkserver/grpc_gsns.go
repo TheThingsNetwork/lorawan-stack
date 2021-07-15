@@ -313,7 +313,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			default: // cmacFMatchResult.FullFCnt == dev.Session.LastFCntUp
 				ctx = log.NewContextWithField(ctx, "f_cnt_reset", false)
 
-				maxNbTrans := maxTransmissionNumber(dev.MACState.LoRaWANVersion, up.Payload.MType == ttnpb.MType_CONFIRMED_UP, dev.MACState.CurrentParameters.ADRNbTrans)
+				maxNbTrans := maxTransmissionNumber(dev.MACState.LoRaWANVersion, up.Payload.MType == ttnpb.MType_CONFIRMED_UP, dev.MACState.CurrentParameters.AdrNbTrans)
 				if maxNbTrans < 1 {
 					panic(fmt.Sprintf("invalid maximum transmission number %d", maxNbTrans))
 				}
@@ -881,14 +881,14 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				ConsumedAirtime:    up.ConsumedAirtime,
 			}, recentUplinkCount)
 
-			if up.Settings.DataRateIndex < stored.MACState.CurrentParameters.ADRDataRateIndex {
+			if up.Settings.DataRateIndex < stored.MACState.CurrentParameters.AdrDataRateIndex {
 				// Device lowers TX power index before lowering data rate index according to the spec.
-				stored.MACState.CurrentParameters.ADRTxPowerIndex = 0
+				stored.MACState.CurrentParameters.AdrTxPowerIndex = 0
 				paths = ttnpb.AddFields(paths,
 					"mac_state.current_parameters.adr_tx_power_index",
 				)
 			}
-			stored.MACState.CurrentParameters.ADRDataRateIndex = up.Settings.DataRateIndex
+			stored.MACState.CurrentParameters.AdrDataRateIndex = up.Settings.DataRateIndex
 			paths = ttnpb.AddFields(paths,
 				"mac_state.current_parameters.adr_data_rate_index",
 			)
@@ -900,9 +900,9 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 					"mac_state.desired_parameters.adr_nb_trans",
 					"mac_state.desired_parameters.adr_tx_power_index",
 				)
-				stored.MACState.DesiredParameters.ADRDataRateIndex = stored.MACState.CurrentParameters.ADRDataRateIndex
-				stored.MACState.DesiredParameters.ADRTxPowerIndex = stored.MACState.CurrentParameters.ADRTxPowerIndex
-				stored.MACState.DesiredParameters.ADRNbTrans = stored.MACState.CurrentParameters.ADRNbTrans
+				stored.MACState.DesiredParameters.AdrDataRateIndex = stored.MACState.CurrentParameters.AdrDataRateIndex
+				stored.MACState.DesiredParameters.AdrTxPowerIndex = stored.MACState.CurrentParameters.AdrTxPowerIndex
+				stored.MACState.DesiredParameters.AdrNbTrans = stored.MACState.CurrentParameters.AdrNbTrans
 			}
 			if !pld.FHDR.Adr || !useADR {
 				return stored, paths, nil
