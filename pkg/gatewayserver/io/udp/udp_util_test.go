@@ -55,7 +55,7 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 		up := ttnpb.NewPopulatedUplinkMessage(test.Randy, true)
 		var modulation, codr string
 		switch up.Settings.DataRate.Modulation.(type) {
-		case *ttnpb.DataRate_LoRa:
+		case *ttnpb.DataRate_Lora:
 			modulation = "LORA"
 			codr = up.Settings.CodingRate
 		case *ttnpb.DataRate_FSK:

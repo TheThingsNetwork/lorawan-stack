@@ -288,7 +288,7 @@ message DataRate {
   oneof modulation {
     option (validate.required) = true;
 
-    LoRaDataRate lora = 1 [(gogoproto.customname) = "LoRa"];
+    LoRaDataRate lora = 1;
     FSKDataRate fsk = 2 [(gogoproto.customname) = "FSK"];
     LRFHSSDataRate lrfhss = 3;
   };

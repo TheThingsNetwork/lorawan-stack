@@ -1403,12 +1403,12 @@ func (m *DataRate) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "lora":
-					w, ok := m.Modulation.(*DataRate_LoRa)
+					w, ok := m.Modulation.(*DataRate_Lora)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetLoRa()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetLora()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return DataRateValidationError{
 								field:  "lora",

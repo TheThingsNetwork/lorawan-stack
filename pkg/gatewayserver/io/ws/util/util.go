@@ -70,7 +70,7 @@ func GetDataRateFromIndex(bandID string, index int) (ttnpb.DataRate, bool, error
 		return ttnpb.DataRate{}, false, errDataRateIndex.New()
 	}
 
-	if dr.Rate.GetLoRa() != nil {
+	if dr.Rate.GetLora() != nil {
 		return dr.Rate, true, nil
 	}
 	return dr.Rate, false, nil

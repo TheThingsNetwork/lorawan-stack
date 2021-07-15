@@ -22,26 +22,26 @@ func (dst *ConcentratorConfig) SetFields(src *ConcentratorConfig, paths ...strin
 		case "lora_standard_channel":
 			if len(subs) > 0 {
 				var newDst, newSrc *ConcentratorConfig_LoRaStandardChannel
-				if (src == nil || src.LoRaStandardChannel == nil) && dst.LoRaStandardChannel == nil {
+				if (src == nil || src.LoraStandardChannel == nil) && dst.LoraStandardChannel == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.LoRaStandardChannel
+					newSrc = src.LoraStandardChannel
 				}
-				if dst.LoRaStandardChannel != nil {
-					newDst = dst.LoRaStandardChannel
+				if dst.LoraStandardChannel != nil {
+					newDst = dst.LoraStandardChannel
 				} else {
 					newDst = &ConcentratorConfig_LoRaStandardChannel{}
-					dst.LoRaStandardChannel = newDst
+					dst.LoraStandardChannel = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.LoRaStandardChannel = src.LoRaStandardChannel
+					dst.LoraStandardChannel = src.LoraStandardChannel
 				} else {
-					dst.LoRaStandardChannel = nil
+					dst.LoraStandardChannel = nil
 				}
 			}
 		case "fsk_channel":

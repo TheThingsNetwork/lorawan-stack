@@ -53,8 +53,8 @@ func TestAdaptDataRate(t *testing.T) {
 			FCnt: 31, MaxSNR: -7, GtwDiversity: 2,
 			TxSettings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							SpreadingFactor: 12,
 							Bandwidth:       125000,
 						},
@@ -290,8 +290,8 @@ func TestIssue458(t *testing.T) {
 			FCnt: 1, MaxSNR: -7.2, GtwDiversity: 1,
 			TxSettings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							SpreadingFactor: 10,
 							Bandwidth:       125000,
 						},

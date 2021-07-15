@@ -330,8 +330,8 @@ func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
 			},
 		}
 	case 1:
-		out.DataRate.Modulation = &DataRate_LoRa{
-			LoRa: &LoRaDataRate{
+		out.DataRate.Modulation = &DataRate_Lora{
+			Lora: &LoRaDataRate{
 				Bandwidth:       []uint32{125000, 250000, 500000}[r.Intn(3)],
 				SpreadingFactor: uint32(r.Intn(6) + 7),
 			},

@@ -76,10 +76,10 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdent
 		lorawan.FCnt = pld.MACPayload.FHDR.FCnt
 	}
 	switch dr := settings.DataRate.Modulation.(type) {
-	case *ttnpb.DataRate_LoRa:
+	case *ttnpb.DataRate_Lora:
 		lorawan.Modulation = ttnpbv2.Modulation_LORA
 		lorawan.CodingRate = settings.CodingRate
-		lorawan.DataRate = fmt.Sprintf("SF%dBW%d", dr.LoRa.SpreadingFactor, dr.LoRa.Bandwidth/1000)
+		lorawan.DataRate = fmt.Sprintf("SF%dBW%d", dr.Lora.SpreadingFactor, dr.Lora.Bandwidth/1000)
 	case *ttnpb.DataRate_FSK:
 		lorawan.Modulation = ttnpbv2.Modulation_FSK
 		lorawan.BitRate = dr.FSK.BitRate

@@ -873,8 +873,8 @@ func TestGatewayServer(t *testing.T) {
 									{
 										Settings: ttnpb.TxSettings{
 											DataRate: ttnpb.DataRate{
-												Modulation: &ttnpb.DataRate_LoRa{
-													LoRa: &ttnpb.LoRaDataRate{
+												Modulation: &ttnpb.DataRate_Lora{
+													Lora: &ttnpb.LoRaDataRate{
 														SpreadingFactor: 7,
 														Bandwidth:       250000,
 													},
@@ -1030,8 +1030,8 @@ func TestGatewayServer(t *testing.T) {
 										{
 											Settings: ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
-													Modulation: &ttnpb.DataRate_LoRa{
-														LoRa: &ttnpb.LoRaDataRate{
+													Modulation: &ttnpb.DataRate_Lora{
+														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 7,
 															Bandwidth:       250000,
 														},
@@ -1064,8 +1064,8 @@ func TestGatewayServer(t *testing.T) {
 										{
 											Settings: ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
-													Modulation: &ttnpb.DataRate_LoRa{
-														LoRa: &ttnpb.LoRaDataRate{
+													Modulation: &ttnpb.DataRate_Lora{
+														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 7,
 															Bandwidth:       250000,
 														},
@@ -1090,8 +1090,8 @@ func TestGatewayServer(t *testing.T) {
 										{
 											Settings: ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
-													Modulation: &ttnpb.DataRate_LoRa{
-														LoRa: &ttnpb.LoRaDataRate{
+													Modulation: &ttnpb.DataRate_Lora{
+														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 7,
 															Bandwidth:       250000,
 														},
@@ -1116,8 +1116,8 @@ func TestGatewayServer(t *testing.T) {
 										{
 											Settings: ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
-													Modulation: &ttnpb.DataRate_LoRa{
-														LoRa: &ttnpb.LoRaDataRate{
+													Modulation: &ttnpb.DataRate_Lora{
+														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 7,
 															Bandwidth:       250000,
 														},
@@ -1184,8 +1184,8 @@ func TestGatewayServer(t *testing.T) {
 										{
 											Settings: ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
-													Modulation: &ttnpb.DataRate_LoRa{
-														LoRa: &ttnpb.LoRaDataRate{
+													Modulation: &ttnpb.DataRate_Lora{
+														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 9,
 															Bandwidth:       125000,
 														},
@@ -1210,8 +1210,8 @@ func TestGatewayServer(t *testing.T) {
 										{
 											Settings: ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
-													Modulation: &ttnpb.DataRate_LoRa{
-														LoRa: &ttnpb.LoRaDataRate{
+													Modulation: &ttnpb.DataRate_Lora{
+														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 7,
 															Bandwidth:       125000,
 														},
@@ -1236,8 +1236,8 @@ func TestGatewayServer(t *testing.T) {
 										{
 											Settings: ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
-													Modulation: &ttnpb.DataRate_LoRa{
-														LoRa: &ttnpb.LoRaDataRate{
+													Modulation: &ttnpb.DataRate_Lora{
+														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 12,
 															Bandwidth:       125000,
 														},
@@ -1415,8 +1415,8 @@ func TestGatewayServer(t *testing.T) {
 									Settings: &ttnpb.DownlinkMessage_Scheduled{
 										Scheduled: &ttnpb.TxSettings{
 											DataRate: ttnpb.DataRate{
-												Modulation: &ttnpb.DataRate_LoRa{
-													LoRa: &ttnpb.LoRaDataRate{
+												Modulation: &ttnpb.DataRate_Lora{
+													Lora: &ttnpb.LoRaDataRate{
 														SpreadingFactor: 12,
 														Bandwidth:       125000,
 													},

@@ -804,11 +804,11 @@ func (dst *DataRate) SetFields(src *DataRate, paths ...string) error {
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "lora":
-					_, srcOk := src.Modulation.(*DataRate_LoRa)
+					_, srcOk := src.Modulation.(*DataRate_Lora)
 					if !srcOk && src.Modulation != nil {
 						return fmt.Errorf("attempt to set oneof 'lora', while different oneof is set in source")
 					}
-					_, dstOk := dst.Modulation.(*DataRate_LoRa)
+					_, dstOk := dst.Modulation.(*DataRate_Lora)
 					if !dstOk && dst.Modulation != nil {
 						return fmt.Errorf("attempt to set oneof 'lora', while different oneof is set in destination")
 					}
@@ -818,13 +818,13 @@ func (dst *DataRate) SetFields(src *DataRate, paths ...string) error {
 							continue
 						}
 						if srcOk {
-							newSrc = src.Modulation.(*DataRate_LoRa).LoRa
+							newSrc = src.Modulation.(*DataRate_Lora).Lora
 						}
 						if dstOk {
-							newDst = dst.Modulation.(*DataRate_LoRa).LoRa
+							newDst = dst.Modulation.(*DataRate_Lora).Lora
 						} else {
 							newDst = &LoRaDataRate{}
-							dst.Modulation = &DataRate_LoRa{LoRa: newDst}
+							dst.Modulation = &DataRate_Lora{Lora: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err

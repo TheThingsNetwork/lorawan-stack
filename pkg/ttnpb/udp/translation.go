@@ -197,7 +197,7 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 	}
 
 	up.Settings.DataRate = rx.DatR.DataRate
-	if lora := up.Settings.DataRate.GetLoRa(); lora != nil {
+	if lora := up.Settings.DataRate.GetLora(); lora != nil {
 		up.Settings.CodingRate = rx.CodR
 	}
 
@@ -278,7 +278,7 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 	var modulation, codr string
 	for _, msg := range up.UplinkMessages {
 		switch msg.Settings.DataRate.Modulation.(type) {
-		case *ttnpb.DataRate_LoRa:
+		case *ttnpb.DataRate_Lora:
 			modulation = lora
 			codr = msg.Settings.CodingRate
 		case *ttnpb.DataRate_FSK:
@@ -328,7 +328,7 @@ func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 		},
 		Timestamp: tx.Tmst,
 	}
-	if lora := scheduled.DataRate.GetLoRa(); lora != nil {
+	if lora := scheduled.DataRate.GetLora(); lora != nil {
 		scheduled.CodingRate = tx.CodR
 	}
 	if tx.Time != nil {
@@ -371,7 +371,7 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 
 	tx.DatR.DataRate = scheduled.DataRate
 	switch scheduled.DataRate.Modulation.(type) {
-	case *ttnpb.DataRate_LoRa:
+	case *ttnpb.DataRate_Lora:
 		tx.CodR = scheduled.CodingRate
 		tx.NCRC = !scheduled.EnableCRC
 		tx.Modu = lora
