@@ -28,9 +28,10 @@ import (
 )
 
 const (
-	delta = 0.001 // For GPS comparisons
-	lora  = "LORA"
-	fsk   = "FSK"
+	delta  = 0.001 // For GPS comparisons
+	lora   = "LORA"
+	fsk    = "FSK"
+	lrfhss = "LR-FHSS"
 
 	// eirpDelta is the delta between EIRP and ERP.
 	eirpDelta = 2.15
@@ -199,8 +200,9 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 	up.Settings.DataRate = rx.DatR.DataRate
 	if lora := up.Settings.DataRate.GetLora(); lora != nil {
 		up.Settings.CodingRate = rx.CodR
+	} else if lrhfss := up.Settings.DataRate.GetLrfhss(); lrhfss != nil {
+		up.Settings.CodingRate = rx.CodR
 	}
-
 	return up, nil
 }
 
@@ -283,6 +285,8 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 			codr = msg.Settings.CodingRate
 		case *ttnpb.DataRate_FSK:
 			modulation = fsk
+		case *ttnpb.DataRate_Lrfhss:
+			modulation = lrfhss
 		}
 		rxs = append(rxs, &RxPacket{
 			Freq: float64(msg.Settings.Frequency) / 1000000,
