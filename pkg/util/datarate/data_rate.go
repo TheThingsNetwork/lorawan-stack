@@ -36,15 +36,29 @@ func (dr DR) MarshalJSON() ([]byte, error) {
 	if dr.GetFSK() != nil {
 		return []byte(dr.String()), nil
 	}
+	if dr.GetLrfhss() != nil {
+		return []byte(strconv.Quote(dr.String())), nil
+	}
 	return nil, nil
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (dr *DR) UnmarshalJSON(data []byte) error {
 	if len(data) >= 2 && data[0] == '"' && data[len(data)-1] == '"' {
-		datarate, err := ParseLoRa(string(data[1 : len(data)-1]))
-		if err != nil {
-			return err
+		var (
+			datarate DR
+			err      error
+		)
+		if data[1] == 'M' {
+			datarate, err = ParseLRFHSS(string(data[1 : len(data)-1]))
+			if err != nil {
+				return err
+			}
+		} else {
+			datarate, err = ParseLoRa(string(data[1 : len(data)-1]))
+			if err != nil {
+				return err
+			}
 		}
 		*dr = datarate
 		return nil
@@ -66,9 +80,10 @@ func (dr *DR) UnmarshalJSON(data []byte) error {
 }
 
 var (
-	errDataRate = errors.DefineInvalidArgument("data_rate", "invalid data rate")
-	sfRegexp    = regexp.MustCompile(`^SF([1-9]|10|11|12)BW`)
-	bwRegexp    = regexp.MustCompile(`BW(\d+(?:\.\d+)?)$`)
+	errDataRate    = errors.DefineInvalidArgument("data_rate", "invalid data rate")
+	sfRegexp       = regexp.MustCompile(`^SF([1-9]|10|11|12)BW`)
+	bwRegexp       = regexp.MustCompile(`BW(\d+(?:\.\d+)?)$`)
+	lrfhssDRRegexp = regexp.MustCompile(`^M(\d+(?:\.\d+)?)CW(\d+(?:\.\d+)?)$`)
 )
 
 // String implements the Stringer interface.
@@ -78,6 +93,9 @@ func (dr DR) String() string {
 	}
 	if fsk := dr.GetFSK(); fsk != nil {
 		return fmt.Sprintf("%d", fsk.BitRate)
+	}
+	if lrfhss := dr.GetLrfhss(); lrfhss != nil {
+		return fmt.Sprintf("M%dCW%d", lrfhss.ModulationType, lrfhss.OperatingChannelWidth)
 	}
 	return ""
 }
@@ -106,6 +124,32 @@ func ParseLoRa(dr string) (DR, error) {
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: uint32(sf),
 					Bandwidth:       uint32(bw * 1000),
+				},
+			},
+		},
+	}, nil
+}
+
+// ParseLRFHSS converts a string of format "MxxCWxxx" to a LRFHSSDataRate.
+func ParseLRFHSS(dr string) (DR, error) {
+	matches := lrfhssDRRegexp.FindStringSubmatch(dr)
+	if len(matches) != 3 {
+		return DR{}, errDataRate.New()
+	}
+	mod, err := strconv.ParseUint(matches[1], 10, 64)
+	if err != nil {
+		return DR{}, errDataRate.New()
+	}
+	ocw, err := strconv.ParseUint(matches[2], 10, 64)
+	if err != nil {
+		return DR{}, errDataRate.New()
+	}
+	return DR{
+		DataRate: ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_Lrfhss{
+				Lrfhss: &ttnpb.LRFHSSDataRate{
+					ModulationType:        uint32(mod),
+					OperatingChannelWidth: uint32(ocw),
 				},
 			},
 		},
