@@ -189,6 +189,19 @@ const m = defineMessages({
 
   rx2DataRateDescription:
     'The data rate used for the RX2 window. For OTAA devices, this is configured as part of join. For ABP devices, a matching value must be programmed in the device.',
+
+  networkRxDefaultsDescription:
+    'The network uses a set of default values for Rx delays and frequencies that the end device uses. These are based on the recommendations made for the respective band. In most cases these defaults will be correct for your setup. If you wish to use different settings, you can uncheck this checkbox and use custom values.',
+
+  clusterSettingsDescription:
+    'By default, the server components of the current cluster are used. However, for advanced use cases, it is possible to register this end device to different Network Server and/or Join Server.',
+
+  factoryPresetFreqDescription:
+    'Factory preset frequencies are hard-coded channel frequencies to provide for the Network Server when the end device uses frequencies that divert from the defaults of the band specification. This is uncommon but can be the case for some special devices.',
+  factoryPresetFreqLocation:
+    'If your device uses non-default channel frequencies, this information is likely found in the specification sheet or manual of your end device. Otherwise please contact your manufacturer or reseller.',
+  factoryPresetFreqAbsence:
+    'If your device uses non-default channel frequencies and these frequencies are not passed to the Network Serve, the messages sent between the network and the end device on such non-default frequencies are likely to drop.',
 })
 
 const descriptions = Object.freeze({
@@ -364,6 +377,17 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.CLASS_B_TIMEOUT]: {
     description: m.classBTimeoutDescription,
+  },
+  [TOOLTIP_IDS.NETWORK_RX_DEFAULTS]: {
+    description: m.networkRxDefaultsDescription,
+  },
+  [TOOLTIP_IDS.CLUSTER_SETTINGS]: {
+    description: m.clusterSettingsDescription,
+  },
+  [TOOLTIP_IDS.FACTORY_PRESET_FREQUENCIES]: {
+    description: m.factoryPresetFreqDescription,
+    location: m.factoryPresetFreqLocation,
+    absence: m.factoryPresetFreqAbsence,
   },
 })
 

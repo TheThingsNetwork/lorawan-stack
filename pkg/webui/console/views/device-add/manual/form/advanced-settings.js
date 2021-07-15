@@ -135,6 +135,7 @@ const AdvancedSettingsSection = props => {
         name="_default_ns_settings"
         component={Checkbox}
         onChange={handleDefaultNsSettings}
+        tooltipId={tooltipIds.NETWORK_RX_DEFAULTS}
       />
       {!defaultNsSettings && nsEnabled && (
         <>
@@ -237,6 +238,7 @@ const AdvancedSettingsSection = props => {
             description={messages.factoryPresetFreqDescription}
             addMessage={messages.freqAdd}
             valuePlaceholder={messages.frequencyPlaceholder}
+            tooltipId={tooltipIds.FACTORY_PRESET_FREQUENCIES}
           />
         </>
       )}
@@ -246,6 +248,7 @@ const AdvancedSettingsSection = props => {
         name="_external_servers"
         component={Checkbox}
         onChange={handleExternalServers}
+        tooltipId={tooltipIds.CLUSTER_SETTINGS}
       />
       {externalServers && (
         <>
