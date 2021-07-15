@@ -22,6 +22,9 @@ For details about compatibility between different releases, see the **Commitment
   - See the new `uplink_message.network_identifiers.net_id`, `uplink_message.network_identifiers.cluster_id` and `uplink_message.network_identifiers.tenant_id` fields.
   - This can be useful for HTTP webhooks to determine the Network Server that received and forwarded an uplink message.
 - `GetDefaultMACSettings` RPC for requesting the default and desired MAC settings for a Band (Frequency Plan) and LoRaWAN regional parameters version.
+- Opt out of Packet Broker for individual gateways, see the new `disable_packet_broker_forwarding` gateway option.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+  - This is only relevant when Packet Broker is enabled and configured by the network operator.
 
 ### Changed
 

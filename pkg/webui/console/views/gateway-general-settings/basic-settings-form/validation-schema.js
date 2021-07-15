@@ -53,6 +53,7 @@ const validationSchema = Yup.object().shape({
   status_public: Yup.boolean().default(false),
   update_location_from_status: Yup.boolean().default(false),
   auto_update: Yup.boolean().default(false),
+  disable_packet_broker_forwarding: Yup.boolean().default(false),
   attributes: Yup.array()
     .max(10, Yup.passValues(sharedMessages.attributesValidateTooMany))
     .test(
