@@ -259,7 +259,7 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		}
 		n++
 
-		req = cmd.GetLinkADRReq()
+		req = cmd.GetLinkAdrReq()
 		if req.NbTrans > 15 || len(req.ChannelMask) != 16 || req.ChannelMaskControl > 7 {
 			panic("Network Server scheduled an invalid LinkADR command")
 		}

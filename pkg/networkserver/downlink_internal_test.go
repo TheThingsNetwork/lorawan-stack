@@ -295,7 +295,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: true,
-								ADR: true,
+								Adr: true,
 							},
 							FCnt: 42,
 						},
@@ -406,7 +406,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
-								ADR: true,
+								Adr: true,
 							},
 							FCnt: 42,
 						},
@@ -520,7 +520,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: true,
-								ADR: true,
+								Adr: true,
 							},
 							FCnt: 42,
 						},
@@ -634,7 +634,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
-								ADR: true,
+								Adr: true,
 							},
 							FCnt: 42,
 						},
@@ -751,7 +751,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: true,
-								ADR: true,
+								Adr: true,
 							},
 							FCnt: 42,
 						},
@@ -873,7 +873,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
-								ADR: true,
+								Adr: true,
 							},
 							FCnt: 42,
 							FOpts: MustEncryptDownlink(nwkSEncKey, devAddr, 42, true, MakeDownlinkMACBuffer(
@@ -992,7 +992,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
-								ADR: true,
+								Adr: true,
 							},
 							FCnt: 42,
 							FOpts: MustEncryptDownlink(nwkSEncKey, devAddr, 42, true, MakeDownlinkMACBuffer(

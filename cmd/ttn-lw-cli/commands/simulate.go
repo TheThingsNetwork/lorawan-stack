@@ -608,8 +608,8 @@ var (
 								FHDR: ttnpb.FHDR{
 									DevAddr: dataUplinkParams.DevAddr,
 									FCtrl: ttnpb.FCtrl{
-										ADR:       dataUplinkParams.ADR,
-										ADRAckReq: dataUplinkParams.ADRAckReq,
+										Adr:       dataUplinkParams.ADR,
+										AdrAckReq: dataUplinkParams.ADRAckReq,
 										Ack:       dataUplinkParams.Ack,
 									},
 									FCnt:  dataUplinkParams.FCnt,

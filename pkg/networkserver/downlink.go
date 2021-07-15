@@ -308,7 +308,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		up = LastUplink(dev.MACState.RecentUplinks...)
 		switch up.Payload.MHDR.MType {
 		case ttnpb.MType_UNCONFIRMED_UP:
-			if up.Payload.GetMACPayload().FCtrl.ADRAckReq {
+			if up.Payload.GetMACPayload().FCtrl.AdrAckReq {
 				logger.Debug("Need downlink for ADRAckReq")
 				needsDownlink = true
 			}
@@ -329,13 +329,13 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			DevAddr: dev.Session.DevAddr,
 			FCtrl: ttnpb.FCtrl{
 				Ack: up != nil && up.Payload.MHDR.MType == ttnpb.MType_CONFIRMED_UP,
-				ADR: mac.DeviceUseADR(dev, ns.defaultMACSettings, phy),
+				Adr: mac.DeviceUseADR(dev, ns.defaultMACSettings, phy),
 			},
 		},
 	}
 	logger = logger.WithFields(log.Fields(
 		"ack", pld.FHDR.FCtrl.Ack,
-		"adr", pld.FHDR.FCtrl.ADR,
+		"adr", pld.FHDR.FCtrl.Adr,
 	))
 	ctx = log.NewContext(ctx, logger)
 
@@ -1032,7 +1032,7 @@ loop:
 		case ttnpb.MType_JOIN_REQUEST:
 			break loop
 		case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP:
-			if ups[i].Payload.GetMACPayload().FHDR.FCtrl.ADR {
+			if ups[i].Payload.GetMACPayload().FHDR.FCtrl.Adr {
 				maxUpDRIdx = ups[i].Settings.DataRateIndex
 			}
 			break loop

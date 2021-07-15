@@ -2135,9 +2135,9 @@ func (v *FCtrl) FieldIsZero(p string) bool {
 	case "ack":
 		return !v.Ack
 	case "adr":
-		return !v.ADR
+		return !v.Adr
 	case "adr_ack_req":
-		return !v.ADRAckReq
+		return !v.AdrAckReq
 	case "class_b":
 		return !v.ClassB
 	case "f_pending":

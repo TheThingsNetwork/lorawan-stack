@@ -495,14 +495,14 @@ macLoop:
 			}
 			evs, err = mac.HandleLinkCheckReq(ctx, dev, up)
 		case ttnpb.CID_LINK_ADR:
-			pld := cmd.GetLinkADRAns()
+			pld := cmd.GetLinkAdrAns()
 			dupCount := 0
 			if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 				for _, dup := range cmds {
 					if dup.CID != ttnpb.CID_LINK_ADR {
 						break
 					}
-					if *dup.GetLinkADRAns() != *pld {
+					if *dup.GetLinkAdrAns() != *pld {
 						err = errInvalidPayload.New()
 						break
 					}
@@ -722,8 +722,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	pld := up.Payload.GetMACPayload()
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"ack", pld.Ack,
-		"adr", pld.ADR,
-		"adr_ack_req", pld.ADRAckReq,
+		"adr", pld.Adr,
+		"adr_ack_req", pld.AdrAckReq,
 		"class_b", pld.ClassB,
 		"dev_addr", pld.DevAddr,
 		"f_opts_len", len(pld.FOpts),
@@ -904,7 +904,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				stored.MACState.DesiredParameters.ADRTxPowerIndex = stored.MACState.CurrentParameters.ADRTxPowerIndex
 				stored.MACState.DesiredParameters.ADRNbTrans = stored.MACState.CurrentParameters.ADRNbTrans
 			}
-			if !pld.FHDR.ADR || !useADR {
+			if !pld.FHDR.Adr || !useADR {
 				return stored, paths, nil
 			}
 			if err := mac.AdaptDataRate(ctx, stored, matched.phy, ns.defaultMACSettings); err != nil {

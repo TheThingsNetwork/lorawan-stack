@@ -41,10 +41,10 @@ func GetInt32AsByteSlice(value int32) ([]byte, error) {
 
 func GetFCtrlAsUint(fCtrl ttnpb.FCtrl) uint {
 	var ret uint
-	if fCtrl.GetADR() {
+	if fCtrl.GetAdr() {
 		ret = ret | 0x80
 	}
-	if fCtrl.GetADRAckReq() {
+	if fCtrl.GetAdrAckReq() {
 		ret = ret | 0x40
 	}
 	if fCtrl.GetAck() {

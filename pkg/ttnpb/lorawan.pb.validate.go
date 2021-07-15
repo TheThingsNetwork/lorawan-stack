@@ -2244,12 +2244,12 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "link_adr_req":
-					w, ok := m.Payload.(*MACCommand_LinkADRReq_)
+					w, ok := m.Payload.(*MACCommand_LinkAdrReq)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetLinkADRReq()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetLinkAdrReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return MACCommandValidationError{
 								field:  "link_adr_req",
@@ -2260,12 +2260,12 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "link_adr_ans":
-					w, ok := m.Payload.(*MACCommand_LinkADRAns_)
+					w, ok := m.Payload.(*MACCommand_LinkAdrAns)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetLinkADRAns()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetLinkAdrAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return MACCommandValidationError{
 								field:  "link_adr_ans",
@@ -2468,12 +2468,12 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "adr_param_setup_req":
-					w, ok := m.Payload.(*MACCommand_ADRParamSetupReq_)
+					w, ok := m.Payload.(*MACCommand_AdrParamSetupReq)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetADRParamSetupReq()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetAdrParamSetupReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return MACCommandValidationError{
 								field:  "adr_param_setup_req",
@@ -5310,7 +5310,7 @@ func (m *MACCommand_ADRParamSetupReq) ValidateFields(paths ...string) error {
 		switch name {
 		case "adr_ack_limit_exponent":
 
-			if _, ok := ADRAckLimitExponent_name[int32(m.GetADRAckLimitExponent())]; !ok {
+			if _, ok := ADRAckLimitExponent_name[int32(m.GetAdrAckLimitExponent())]; !ok {
 				return MACCommand_ADRParamSetupReqValidationError{
 					field:  "adr_ack_limit_exponent",
 					reason: "value must be one of the defined enum values",
@@ -5319,7 +5319,7 @@ func (m *MACCommand_ADRParamSetupReq) ValidateFields(paths ...string) error {
 
 		case "adr_ack_delay_exponent":
 
-			if _, ok := ADRAckDelayExponent_name[int32(m.GetADRAckDelayExponent())]; !ok {
+			if _, ok := ADRAckDelayExponent_name[int32(m.GetAdrAckDelayExponent())]; !ok {
 				return MACCommand_ADRParamSetupReqValidationError{
 					field:  "adr_ack_delay_exponent",
 					reason: "value must be one of the defined enum values",

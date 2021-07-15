@@ -142,7 +142,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 		UplinkLength: 1,
 		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
-			pld := cmd.GetLinkADRAns()
+			pld := cmd.GetLinkAdrAns()
 			var status byte
 			if pld.ChannelMaskAck {
 				status |= 1
@@ -157,8 +157,8 @@ var DefaultMACCommands = MACCommandSpec{
 			return b, nil
 		},
 		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_LINK_ADR, "LinkADRAns", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
-			cmd.Payload = &ttnpb.MACCommand_LinkADRAns_{
-				LinkADRAns: &ttnpb.MACCommand_LinkADRAns{
+			cmd.Payload = &ttnpb.MACCommand_LinkAdrAns{
+				LinkAdrAns: &ttnpb.MACCommand_LinkADRAns{
 					ChannelMaskAck:   b[0]&1 == 1,
 					DataRateIndexAck: (b[0]>>1)&1 == 1,
 					TxPowerIndexAck:  (b[0]>>2)&1 == 1,
@@ -169,7 +169,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 		DownlinkLength: 4,
 		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
-			pld := cmd.GetLinkADRReq()
+			pld := cmd.GetLinkAdrReq()
 			if pld.DataRateIndex > 15 {
 				return nil, errExpectedLowerOrEqual("DataRateIndex", 15)(pld.DataRateIndex)
 			}
@@ -199,8 +199,8 @@ var DefaultMACCommands = MACCommandSpec{
 			for i := 0; i < 16; i++ {
 				chMask[i] = (b[1+i/8]>>(i%8))&1 == 1
 			}
-			cmd.Payload = &ttnpb.MACCommand_LinkADRReq_{
-				LinkADRReq: &ttnpb.MACCommand_LinkADRReq{
+			cmd.Payload = &ttnpb.MACCommand_LinkAdrReq{
+				LinkAdrReq: &ttnpb.MACCommand_LinkADRReq{
 					DataRateIndex:      ttnpb.DataRateIndex(b[0] >> 4),
 					TxPowerIndex:       uint32(b[0] & 0xf),
 					ChannelMask:        chMask[:],
@@ -563,25 +563,25 @@ var DefaultMACCommands = MACCommandSpec{
 
 		DownlinkLength: 1,
 		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
-			pld := cmd.GetADRParamSetupReq()
-			if 1 > pld.ADRAckDelayExponent || pld.ADRAckDelayExponent > 32768 {
-				return nil, errExpectedBetween("ADRAckDelay", 1, 32768)(pld.ADRAckDelayExponent)
+			pld := cmd.GetAdrParamSetupReq()
+			if 1 > pld.AdrAckDelayExponent || pld.AdrAckDelayExponent > 32768 {
+				return nil, errExpectedBetween("ADRAckDelay", 1, 32768)(pld.AdrAckDelayExponent)
 			}
-			v := byte(pld.ADRAckDelayExponent)
+			v := byte(pld.AdrAckDelayExponent)
 
-			if 1 > pld.ADRAckLimitExponent || pld.ADRAckLimitExponent > 32768 {
-				return nil, errExpectedBetween("ADRAckLimit", 1, 32768)(pld.ADRAckLimitExponent)
+			if 1 > pld.AdrAckLimitExponent || pld.AdrAckLimitExponent > 32768 {
+				return nil, errExpectedBetween("ADRAckLimit", 1, 32768)(pld.AdrAckLimitExponent)
 			}
-			v |= byte(pld.ADRAckLimitExponent) << 4
+			v |= byte(pld.AdrAckLimitExponent) << 4
 
 			b = append(b, v)
 			return b, nil
 		},
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_ADR_PARAM_SETUP, "ADRParamSetupReq", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
-			cmd.Payload = &ttnpb.MACCommand_ADRParamSetupReq_{
-				ADRParamSetupReq: &ttnpb.MACCommand_ADRParamSetupReq{
-					ADRAckDelayExponent: ttnpb.ADRAckDelayExponent(b[0] & 0xf),
-					ADRAckLimitExponent: ttnpb.ADRAckLimitExponent(b[0] >> 4),
+			cmd.Payload = &ttnpb.MACCommand_AdrParamSetupReq{
+				AdrParamSetupReq: &ttnpb.MACCommand_ADRParamSetupReq{
+					AdrAckDelayExponent: ttnpb.ADRAckDelayExponent(b[0] & 0xf),
+					AdrAckLimitExponent: ttnpb.ADRAckLimitExponent(b[0] >> 4),
 				},
 			}
 			return nil

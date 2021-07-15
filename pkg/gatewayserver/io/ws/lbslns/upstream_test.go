@@ -478,8 +478,8 @@ func TestFromUplinkDataFrame(t *testing.T) {
 						FHDR: ttnpb.FHDR{
 							DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 							FCtrl: ttnpb.FCtrl{
-								ADR:       true,
-								ADRAckReq: false,
+								Adr:       true,
+								AdrAckReq: false,
 								Ack:       true,
 								ClassB:    true,
 								FPending:  false,

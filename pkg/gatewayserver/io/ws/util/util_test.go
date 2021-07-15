@@ -208,8 +208,8 @@ func TestGetFCtrlAsUint(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			a := assertions.New(t)
 			fCtrl := GetFCtrlAsUint(ttnpb.FCtrl{
-				ADR:       tc.ADR,
-				ADRAckReq: tc.ADRAckReq,
+				Adr:       tc.ADR,
+				AdrAckReq: tc.ADRAckReq,
 				Ack:       tc.Ack,
 				FPending:  tc.FPending,
 				ClassB:    tc.ClassB,

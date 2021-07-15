@@ -4,8 +4,9 @@ package ttnpb
 
 import (
 	fmt "fmt"
-	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 	time "time"
+
+	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func (dst *Message) SetFields(src *Message, paths ...string) error {
@@ -363,20 +364,20 @@ func (dst *FCtrl) SetFields(src *FCtrl, paths ...string) error {
 				return fmt.Errorf("'adr' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ADR = src.ADR
+				dst.Adr = src.Adr
 			} else {
 				var zero bool
-				dst.ADR = zero
+				dst.Adr = zero
 			}
 		case "adr_ack_req":
 			if len(subs) > 0 {
 				return fmt.Errorf("'adr_ack_req' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ADRAckReq = src.ADRAckReq
+				dst.AdrAckReq = src.AdrAckReq
 			} else {
 				var zero bool
-				dst.ADRAckReq = zero
+				dst.AdrAckReq = zero
 			}
 		case "ack":
 			if len(subs) > 0 {
@@ -1482,11 +1483,11 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						}
 					}
 				case "link_adr_req":
-					_, srcOk := src.Payload.(*MACCommand_LinkADRReq_)
+					_, srcOk := src.Payload.(*MACCommand_LinkAdrReq)
 					if !srcOk && src.Payload != nil {
 						return fmt.Errorf("attempt to set oneof 'link_adr_req', while different oneof is set in source")
 					}
-					_, dstOk := dst.Payload.(*MACCommand_LinkADRReq_)
+					_, dstOk := dst.Payload.(*MACCommand_LinkAdrReq)
 					if !dstOk && dst.Payload != nil {
 						return fmt.Errorf("attempt to set oneof 'link_adr_req', while different oneof is set in destination")
 					}
@@ -1496,13 +1497,13 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 							continue
 						}
 						if srcOk {
-							newSrc = src.Payload.(*MACCommand_LinkADRReq_).LinkADRReq
+							newSrc = src.Payload.(*MACCommand_LinkAdrReq).LinkAdrReq
 						}
 						if dstOk {
-							newDst = dst.Payload.(*MACCommand_LinkADRReq_).LinkADRReq
+							newDst = dst.Payload.(*MACCommand_LinkAdrReq).LinkAdrReq
 						} else {
 							newDst = &MACCommand_LinkADRReq{}
-							dst.Payload = &MACCommand_LinkADRReq_{LinkADRReq: newDst}
+							dst.Payload = &MACCommand_LinkAdrReq{LinkAdrReq: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
@@ -1515,11 +1516,11 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						}
 					}
 				case "link_adr_ans":
-					_, srcOk := src.Payload.(*MACCommand_LinkADRAns_)
+					_, srcOk := src.Payload.(*MACCommand_LinkAdrAns)
 					if !srcOk && src.Payload != nil {
 						return fmt.Errorf("attempt to set oneof 'link_adr_ans', while different oneof is set in source")
 					}
-					_, dstOk := dst.Payload.(*MACCommand_LinkADRAns_)
+					_, dstOk := dst.Payload.(*MACCommand_LinkAdrAns)
 					if !dstOk && dst.Payload != nil {
 						return fmt.Errorf("attempt to set oneof 'link_adr_ans', while different oneof is set in destination")
 					}
@@ -1529,13 +1530,13 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 							continue
 						}
 						if srcOk {
-							newSrc = src.Payload.(*MACCommand_LinkADRAns_).LinkADRAns
+							newSrc = src.Payload.(*MACCommand_LinkAdrAns).LinkAdrAns
 						}
 						if dstOk {
-							newDst = dst.Payload.(*MACCommand_LinkADRAns_).LinkADRAns
+							newDst = dst.Payload.(*MACCommand_LinkAdrAns).LinkAdrAns
 						} else {
 							newDst = &MACCommand_LinkADRAns{}
-							dst.Payload = &MACCommand_LinkADRAns_{LinkADRAns: newDst}
+							dst.Payload = &MACCommand_LinkAdrAns{LinkAdrAns: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
@@ -1944,11 +1945,11 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						}
 					}
 				case "adr_param_setup_req":
-					_, srcOk := src.Payload.(*MACCommand_ADRParamSetupReq_)
+					_, srcOk := src.Payload.(*MACCommand_AdrParamSetupReq)
 					if !srcOk && src.Payload != nil {
 						return fmt.Errorf("attempt to set oneof 'adr_param_setup_req', while different oneof is set in source")
 					}
-					_, dstOk := dst.Payload.(*MACCommand_ADRParamSetupReq_)
+					_, dstOk := dst.Payload.(*MACCommand_AdrParamSetupReq)
 					if !dstOk && dst.Payload != nil {
 						return fmt.Errorf("attempt to set oneof 'adr_param_setup_req', while different oneof is set in destination")
 					}
@@ -1958,13 +1959,13 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 							continue
 						}
 						if srcOk {
-							newSrc = src.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq
+							newSrc = src.Payload.(*MACCommand_AdrParamSetupReq).AdrParamSetupReq
 						}
 						if dstOk {
-							newDst = dst.Payload.(*MACCommand_ADRParamSetupReq_).ADRParamSetupReq
+							newDst = dst.Payload.(*MACCommand_AdrParamSetupReq).AdrParamSetupReq
 						} else {
 							newDst = &MACCommand_ADRParamSetupReq{}
-							dst.Payload = &MACCommand_ADRParamSetupReq_{ADRParamSetupReq: newDst}
+							dst.Payload = &MACCommand_AdrParamSetupReq{AdrParamSetupReq: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
@@ -3179,20 +3180,20 @@ func (dst *MACCommand_ADRParamSetupReq) SetFields(src *MACCommand_ADRParamSetupR
 				return fmt.Errorf("'adr_ack_limit_exponent' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ADRAckLimitExponent = src.ADRAckLimitExponent
+				dst.AdrAckLimitExponent = src.AdrAckLimitExponent
 			} else {
 				var zero ADRAckLimitExponent
-				dst.ADRAckLimitExponent = zero
+				dst.AdrAckLimitExponent = zero
 			}
 		case "adr_ack_delay_exponent":
 			if len(subs) > 0 {
 				return fmt.Errorf("'adr_ack_delay_exponent' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ADRAckDelayExponent = src.ADRAckDelayExponent
+				dst.AdrAckDelayExponent = src.AdrAckDelayExponent
 			} else {
 				var zero ADRAckDelayExponent
-				dst.ADRAckDelayExponent = zero
+				dst.AdrAckDelayExponent = zero
 			}
 
 		default:

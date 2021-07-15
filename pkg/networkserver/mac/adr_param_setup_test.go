@@ -212,8 +212,8 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ADRParamSetupReq{
-							ADRAckLimitExponent: ttnpb.ADR_ACK_LIMIT_32768,
-							ADRAckDelayExponent: ttnpb.ADR_ACK_DELAY_1024,
+							AdrAckLimitExponent: ttnpb.ADR_ACK_LIMIT_32768,
+							AdrAckDelayExponent: ttnpb.ADR_ACK_DELAY_1024,
 						}).MACCommand(),
 					},
 				},

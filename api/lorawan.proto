@@ -172,8 +172,8 @@ message FHDR {
 }
 
 message FCtrl {
-  bool adr = 1 [(gogoproto.customname) = "ADR"];
-  bool adr_ack_req = 2 [(gogoproto.customname) = "ADRAckReq"]; // Only on uplink.
+  bool adr = 1;
+  bool adr_ack_req = 2; // Only on uplink.
   bool ack = 3;
   bool f_pending = 4; // Only on downlink.
   bool class_b = 5; // Only on uplink.
@@ -437,8 +437,8 @@ message MACCommand {
     ResetInd reset_ind = 3;
     ResetConf reset_conf = 4;
     LinkCheckAns link_check_ans = 5;
-    LinkADRReq link_adr_req = 6 [(gogoproto.customname) = "LinkADRReq"];
-    LinkADRAns link_adr_ans = 7 [(gogoproto.customname) = "LinkADRAns"];
+    LinkADRReq link_adr_req = 6;
+    LinkADRAns link_adr_ans = 7;
     DutyCycleReq duty_cycle_req = 8;
     RxParamSetupReq rx_param_setup_req = 9;
     RxParamSetupAns rx_param_setup_ans = 10;
@@ -451,7 +451,7 @@ message MACCommand {
     TxParamSetupReq tx_param_setup_req = 17;
     RekeyInd rekey_ind = 18;
     RekeyConf rekey_conf = 19;
-    ADRParamSetupReq adr_param_setup_req = 20 [(gogoproto.customname) = "ADRParamSetupReq"];
+    ADRParamSetupReq adr_param_setup_req = 20;
     DeviceTimeAns device_time_ans = 21;
     ForceRejoinReq force_rejoin_req = 22;
     RejoinParamSetupReq rejoin_param_setup_req = 23;
@@ -564,9 +564,9 @@ message MACCommand {
   }
   message ADRParamSetupReq {
     // Exponent e that configures the ADR_ACK_LIMIT = 2^e messages.
-    ADRAckLimitExponent adr_ack_limit_exponent = 1 [(gogoproto.customname) = "ADRAckLimitExponent", (validate.rules).enum.defined_only = true];
+    ADRAckLimitExponent adr_ack_limit_exponent = 1 [(validate.rules).enum.defined_only = true];
     // Exponent e that configures the ADR_ACK_DELAY = 2^e messages.
-    ADRAckDelayExponent adr_ack_delay_exponent = 2 [(gogoproto.customname) = "ADRAckDelayExponent", (validate.rules).enum.defined_only = true];
+    ADRAckDelayExponent adr_ack_delay_exponent = 2 [(validate.rules).enum.defined_only = true];
   }
   message DeviceTimeAns {
     google.protobuf.Timestamp time = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];

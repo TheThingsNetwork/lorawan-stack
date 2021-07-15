@@ -7,13 +7,6 @@ import (
 	bytes "bytes"
 	encoding_binary "encoding/binary"
 	fmt "fmt"
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
-	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
-	types "github.com/gogo/protobuf/types"
-	golang_proto "github.com/golang/protobuf/proto"
-	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 	io "io"
 	math "math"
 	math_bits "math/bits"
@@ -21,14 +14,24 @@ import (
 	strconv "strconv"
 	strings "strings"
 	time "time"
+
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	_ "github.com/gogo/protobuf/gogoproto"
+	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	types "github.com/gogo/protobuf/types"
+	golang_proto "github.com/golang/protobuf/proto"
+	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var _ = proto.Marshal
-var _ = golang_proto.Marshal
-var _ = fmt.Errorf
-var _ = math.Inf
-var _ = time.Kitchen
+var (
+	_ = proto.Marshal
+	_ = golang_proto.Marshal
+	_ = fmt.Errorf
+	_ = math.Inf
+	_ = time.Kitchen
+)
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -1099,9 +1102,11 @@ func (*Message) ProtoMessage() {}
 func (*Message) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{0}
 }
+
 func (m *Message) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *Message) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Message.Marshal(b, m, deterministic)
@@ -1114,12 +1119,15 @@ func (m *Message) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *Message) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Message.Merge(m, src)
 }
+
 func (m *Message) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *Message) XXX_DiscardUnknown() {
 	xxx_messageInfo_Message.DiscardUnknown(m)
 }
@@ -1136,12 +1144,15 @@ type isMessage_Payload interface {
 type Message_MACPayload struct {
 	MACPayload *MACPayload `protobuf:"bytes,3,opt,name=mac_payload,json=macPayload,proto3,oneof" json:"mac_payload,omitempty"`
 }
+
 type Message_JoinRequestPayload struct {
 	JoinRequestPayload *JoinRequestPayload `protobuf:"bytes,4,opt,name=join_request_payload,json=joinRequestPayload,proto3,oneof" json:"join_request_payload,omitempty"`
 }
+
 type Message_JoinAcceptPayload struct {
 	JoinAcceptPayload *JoinAcceptPayload `protobuf:"bytes,5,opt,name=join_accept_payload,json=joinAcceptPayload,proto3,oneof" json:"join_accept_payload,omitempty"`
 }
+
 type Message_RejoinRequestPayload struct {
 	RejoinRequestPayload *RejoinRequestPayload `protobuf:"bytes,6,opt,name=rejoin_request_payload,json=rejoinRequestPayload,proto3,oneof" json:"rejoin_request_payload,omitempty"`
 }
@@ -1215,9 +1226,11 @@ func (*MHDR) ProtoMessage() {}
 func (*MHDR) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{1}
 }
+
 func (m *MHDR) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MHDR) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MHDR.Marshal(b, m, deterministic)
@@ -1230,12 +1243,15 @@ func (m *MHDR) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *MHDR) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MHDR.Merge(m, src)
 }
+
 func (m *MHDR) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MHDR) XXX_DiscardUnknown() {
 	xxx_messageInfo_MHDR.DiscardUnknown(m)
 }
@@ -1272,9 +1288,11 @@ func (*MACPayload) ProtoMessage() {}
 func (*MACPayload) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{2}
 }
+
 func (m *MACPayload) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACPayload.Marshal(b, m, deterministic)
@@ -1287,12 +1305,15 @@ func (m *MACPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *MACPayload) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACPayload.Merge(m, src)
 }
+
 func (m *MACPayload) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACPayload) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACPayload.DiscardUnknown(m)
 }
@@ -1341,9 +1362,11 @@ func (*FHDR) ProtoMessage() {}
 func (*FHDR) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{3}
 }
+
 func (m *FHDR) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *FHDR) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_FHDR.Marshal(b, m, deterministic)
@@ -1356,12 +1379,15 @@ func (m *FHDR) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *FHDR) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_FHDR.Merge(m, src)
 }
+
 func (m *FHDR) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *FHDR) XXX_DiscardUnknown() {
 	xxx_messageInfo_FHDR.DiscardUnknown(m)
 }
@@ -1383,8 +1409,8 @@ func (m *FHDR) GetFOpts() []byte {
 }
 
 type FCtrl struct {
-	ADR                  bool     `protobuf:"varint,1,opt,name=adr,proto3" json:"adr,omitempty"`
-	ADRAckReq            bool     `protobuf:"varint,2,opt,name=adr_ack_req,json=adrAckReq,proto3" json:"adr_ack_req,omitempty"`
+	Adr                  bool     `protobuf:"varint,1,opt,name=adr,proto3" json:"adr,omitempty"`
+	AdrAckReq            bool     `protobuf:"varint,2,opt,name=adr_ack_req,json=adrAckReq,proto3" json:"adr_ack_req,omitempty"`
 	Ack                  bool     `protobuf:"varint,3,opt,name=ack,proto3" json:"ack,omitempty"`
 	FPending             bool     `protobuf:"varint,4,opt,name=f_pending,json=fPending,proto3" json:"f_pending,omitempty"`
 	ClassB               bool     `protobuf:"varint,5,opt,name=class_b,json=classB,proto3" json:"class_b,omitempty"`
@@ -1397,9 +1423,11 @@ func (*FCtrl) ProtoMessage() {}
 func (*FCtrl) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{4}
 }
+
 func (m *FCtrl) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *FCtrl) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_FCtrl.Marshal(b, m, deterministic)
@@ -1412,28 +1440,31 @@ func (m *FCtrl) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *FCtrl) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_FCtrl.Merge(m, src)
 }
+
 func (m *FCtrl) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *FCtrl) XXX_DiscardUnknown() {
 	xxx_messageInfo_FCtrl.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_FCtrl proto.InternalMessageInfo
 
-func (m *FCtrl) GetADR() bool {
+func (m *FCtrl) GetAdr() bool {
 	if m != nil {
-		return m.ADR
+		return m.Adr
 	}
 	return false
 }
 
-func (m *FCtrl) GetADRAckReq() bool {
+func (m *FCtrl) GetAdrAckReq() bool {
 	if m != nil {
-		return m.ADRAckReq
+		return m.AdrAckReq
 	}
 	return false
 }
@@ -1472,9 +1503,11 @@ func (*JoinRequestPayload) ProtoMessage() {}
 func (*JoinRequestPayload) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{5}
 }
+
 func (m *JoinRequestPayload) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *JoinRequestPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_JoinRequestPayload.Marshal(b, m, deterministic)
@@ -1487,12 +1520,15 @@ func (m *JoinRequestPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
+
 func (m *JoinRequestPayload) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_JoinRequestPayload.Merge(m, src)
 }
+
 func (m *JoinRequestPayload) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *JoinRequestPayload) XXX_DiscardUnknown() {
 	xxx_messageInfo_JoinRequestPayload.DiscardUnknown(m)
 }
@@ -1514,9 +1550,11 @@ func (*RejoinRequestPayload) ProtoMessage() {}
 func (*RejoinRequestPayload) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{6}
 }
+
 func (m *RejoinRequestPayload) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *RejoinRequestPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_RejoinRequestPayload.Marshal(b, m, deterministic)
@@ -1529,12 +1567,15 @@ func (m *RejoinRequestPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
+
 func (m *RejoinRequestPayload) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_RejoinRequestPayload.Merge(m, src)
 }
+
 func (m *RejoinRequestPayload) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *RejoinRequestPayload) XXX_DiscardUnknown() {
 	xxx_messageInfo_RejoinRequestPayload.DiscardUnknown(m)
 }
@@ -1572,9 +1613,11 @@ func (*JoinAcceptPayload) ProtoMessage() {}
 func (*JoinAcceptPayload) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{7}
 }
+
 func (m *JoinAcceptPayload) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *JoinAcceptPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_JoinAcceptPayload.Marshal(b, m, deterministic)
@@ -1587,12 +1630,15 @@ func (m *JoinAcceptPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
+
 func (m *JoinAcceptPayload) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_JoinAcceptPayload.Merge(m, src)
 }
+
 func (m *JoinAcceptPayload) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *JoinAcceptPayload) XXX_DiscardUnknown() {
 	xxx_messageInfo_JoinAcceptPayload.DiscardUnknown(m)
 }
@@ -1634,9 +1680,11 @@ func (*DLSettings) ProtoMessage() {}
 func (*DLSettings) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{8}
 }
+
 func (m *DLSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *DLSettings) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_DLSettings.Marshal(b, m, deterministic)
@@ -1649,12 +1697,15 @@ func (m *DLSettings) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *DLSettings) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_DLSettings.Merge(m, src)
 }
+
 func (m *DLSettings) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *DLSettings) XXX_DiscardUnknown() {
 	xxx_messageInfo_DLSettings.DiscardUnknown(m)
 }
@@ -1701,9 +1752,11 @@ func (*CFList) ProtoMessage() {}
 func (*CFList) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{9}
 }
+
 func (m *CFList) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *CFList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_CFList.Marshal(b, m, deterministic)
@@ -1716,12 +1769,15 @@ func (m *CFList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *CFList) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CFList.Merge(m, src)
 }
+
 func (m *CFList) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *CFList) XXX_DiscardUnknown() {
 	xxx_messageInfo_CFList.DiscardUnknown(m)
 }
@@ -1762,9 +1818,11 @@ func (*LoRaDataRate) ProtoMessage() {}
 func (*LoRaDataRate) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{10}
 }
+
 func (m *LoRaDataRate) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *LoRaDataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_LoRaDataRate.Marshal(b, m, deterministic)
@@ -1777,12 +1835,15 @@ func (m *LoRaDataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
+
 func (m *LoRaDataRate) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_LoRaDataRate.Merge(m, src)
 }
+
 func (m *LoRaDataRate) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *LoRaDataRate) XXX_DiscardUnknown() {
 	xxx_messageInfo_LoRaDataRate.DiscardUnknown(m)
 }
@@ -1815,9 +1876,11 @@ func (*FSKDataRate) ProtoMessage() {}
 func (*FSKDataRate) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{11}
 }
+
 func (m *FSKDataRate) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *FSKDataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_FSKDataRate.Marshal(b, m, deterministic)
@@ -1830,12 +1893,15 @@ func (m *FSKDataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
+
 func (m *FSKDataRate) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_FSKDataRate.Merge(m, src)
 }
+
 func (m *FSKDataRate) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *FSKDataRate) XXX_DiscardUnknown() {
 	xxx_messageInfo_FSKDataRate.DiscardUnknown(m)
 }
@@ -1862,9 +1928,11 @@ func (*LRFHSSDataRate) ProtoMessage() {}
 func (*LRFHSSDataRate) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{12}
 }
+
 func (m *LRFHSSDataRate) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *LRFHSSDataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_LRFHSSDataRate.Marshal(b, m, deterministic)
@@ -1877,12 +1945,15 @@ func (m *LRFHSSDataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
+
 func (m *LRFHSSDataRate) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_LRFHSSDataRate.Merge(m, src)
 }
+
 func (m *LRFHSSDataRate) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *LRFHSSDataRate) XXX_DiscardUnknown() {
 	xxx_messageInfo_LRFHSSDataRate.DiscardUnknown(m)
 }
@@ -1918,9 +1989,11 @@ func (*DataRate) ProtoMessage() {}
 func (*DataRate) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{13}
 }
+
 func (m *DataRate) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *DataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_DataRate.Marshal(b, m, deterministic)
@@ -1933,12 +2006,15 @@ func (m *DataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *DataRate) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_DataRate.Merge(m, src)
 }
+
 func (m *DataRate) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *DataRate) XXX_DiscardUnknown() {
 	xxx_messageInfo_DataRate.DiscardUnknown(m)
 }
@@ -1955,9 +2031,11 @@ type isDataRate_Modulation interface {
 type DataRate_LoRa struct {
 	LoRa *LoRaDataRate `protobuf:"bytes,1,opt,name=lora,proto3,oneof" json:"lora,omitempty"`
 }
+
 type DataRate_FSK struct {
 	FSK *FSKDataRate `protobuf:"bytes,2,opt,name=fsk,proto3,oneof" json:"fsk,omitempty"`
 }
+
 type DataRate_Lrfhss struct {
 	Lrfhss *LRFHSSDataRate `protobuf:"bytes,3,opt,name=lrfhss,proto3,oneof" json:"lrfhss,omitempty"`
 }
@@ -2034,9 +2112,11 @@ func (*TxSettings) ProtoMessage() {}
 func (*TxSettings) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{14}
 }
+
 func (m *TxSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *TxSettings) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_TxSettings.Marshal(b, m, deterministic)
@@ -2049,12 +2129,15 @@ func (m *TxSettings) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *TxSettings) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_TxSettings.Merge(m, src)
 }
+
 func (m *TxSettings) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *TxSettings) XXX_DiscardUnknown() {
 	xxx_messageInfo_TxSettings.DiscardUnknown(m)
 }
@@ -2134,9 +2217,11 @@ func (*TxSettings_Downlink) ProtoMessage() {}
 func (*TxSettings_Downlink) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{14, 0}
 }
+
 func (m *TxSettings_Downlink) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *TxSettings_Downlink) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_TxSettings_Downlink.Marshal(b, m, deterministic)
@@ -2149,12 +2234,15 @@ func (m *TxSettings_Downlink) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
+
 func (m *TxSettings_Downlink) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_TxSettings_Downlink.Merge(m, src)
 }
+
 func (m *TxSettings_Downlink) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *TxSettings_Downlink) XXX_DiscardUnknown() {
 	xxx_messageInfo_TxSettings_Downlink.DiscardUnknown(m)
 }
@@ -2194,9 +2282,11 @@ func (*GatewayAntennaIdentifiers) ProtoMessage() {}
 func (*GatewayAntennaIdentifiers) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{15}
 }
+
 func (m *GatewayAntennaIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *GatewayAntennaIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_GatewayAntennaIdentifiers.Marshal(b, m, deterministic)
@@ -2209,12 +2299,15 @@ func (m *GatewayAntennaIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
+
 func (m *GatewayAntennaIdentifiers) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_GatewayAntennaIdentifiers.Merge(m, src)
 }
+
 func (m *GatewayAntennaIdentifiers) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *GatewayAntennaIdentifiers) XXX_DiscardUnknown() {
 	xxx_messageInfo_GatewayAntennaIdentifiers.DiscardUnknown(m)
 }
@@ -2244,9 +2337,11 @@ func (*UplinkToken) ProtoMessage() {}
 func (*UplinkToken) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{16}
 }
+
 func (m *UplinkToken) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *UplinkToken) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_UplinkToken.Marshal(b, m, deterministic)
@@ -2259,12 +2354,15 @@ func (m *UplinkToken) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
+
 func (m *UplinkToken) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_UplinkToken.Merge(m, src)
 }
+
 func (m *UplinkToken) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *UplinkToken) XXX_DiscardUnknown() {
 	xxx_messageInfo_UplinkToken.DiscardUnknown(m)
 }
@@ -2309,9 +2407,11 @@ func (*DownlinkPath) ProtoMessage() {}
 func (*DownlinkPath) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{17}
 }
+
 func (m *DownlinkPath) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *DownlinkPath) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_DownlinkPath.Marshal(b, m, deterministic)
@@ -2324,12 +2424,15 @@ func (m *DownlinkPath) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
+
 func (m *DownlinkPath) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_DownlinkPath.Merge(m, src)
 }
+
 func (m *DownlinkPath) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *DownlinkPath) XXX_DiscardUnknown() {
 	xxx_messageInfo_DownlinkPath.DiscardUnknown(m)
 }
@@ -2346,6 +2449,7 @@ type isDownlinkPath_Path interface {
 type DownlinkPath_UplinkToken struct {
 	UplinkToken []byte `protobuf:"bytes,1,opt,name=uplink_token,json=uplinkToken,proto3,oneof" json:"uplink_token,omitempty"`
 }
+
 type DownlinkPath_Fixed struct {
 	Fixed *GatewayAntennaIdentifiers `protobuf:"bytes,2,opt,name=fixed,proto3,oneof" json:"fixed,omitempty"`
 }
@@ -2428,9 +2532,11 @@ func (*TxRequest) ProtoMessage() {}
 func (*TxRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{18}
 }
+
 func (m *TxRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *TxRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_TxRequest.Marshal(b, m, deterministic)
@@ -2443,12 +2549,15 @@ func (m *TxRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *TxRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_TxRequest.Merge(m, src)
 }
+
 func (m *TxRequest) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *TxRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_TxRequest.DiscardUnknown(m)
 }
@@ -2583,9 +2692,11 @@ func (*MACCommand) ProtoMessage() {}
 func (*MACCommand) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19}
 }
+
 func (m *MACCommand) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand.Marshal(b, m, deterministic)
@@ -2598,12 +2709,15 @@ func (m *MACCommand) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand.Merge(m, src)
 }
+
 func (m *MACCommand) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand.DiscardUnknown(m)
 }
@@ -2620,93 +2734,123 @@ type isMACCommand_Payload interface {
 type MACCommand_RawPayload struct {
 	RawPayload []byte `protobuf:"bytes,2,opt,name=raw_payload,json=rawPayload,proto3,oneof" json:"raw_payload,omitempty"`
 }
+
 type MACCommand_ResetInd_ struct {
 	ResetInd *MACCommand_ResetInd `protobuf:"bytes,3,opt,name=reset_ind,json=resetInd,proto3,oneof" json:"reset_ind,omitempty"`
 }
+
 type MACCommand_ResetConf_ struct {
 	ResetConf *MACCommand_ResetConf `protobuf:"bytes,4,opt,name=reset_conf,json=resetConf,proto3,oneof" json:"reset_conf,omitempty"`
 }
+
 type MACCommand_LinkCheckAns_ struct {
 	LinkCheckAns *MACCommand_LinkCheckAns `protobuf:"bytes,5,opt,name=link_check_ans,json=linkCheckAns,proto3,oneof" json:"link_check_ans,omitempty"`
 }
-type MACCommand_LinkADRReq_ struct {
-	LinkADRReq *MACCommand_LinkADRReq `protobuf:"bytes,6,opt,name=link_adr_req,json=linkAdrReq,proto3,oneof" json:"link_adr_req,omitempty"`
+
+type MACCommand_LinkAdrReq struct {
+	LinkAdrReq *MACCommand_LinkADRReq `protobuf:"bytes,6,opt,name=link_adr_req,json=linkAdrReq,proto3,oneof" json:"link_adr_req,omitempty"`
 }
-type MACCommand_LinkADRAns_ struct {
-	LinkADRAns *MACCommand_LinkADRAns `protobuf:"bytes,7,opt,name=link_adr_ans,json=linkAdrAns,proto3,oneof" json:"link_adr_ans,omitempty"`
+
+type MACCommand_LinkAdrAns struct {
+	LinkAdrAns *MACCommand_LinkADRAns `protobuf:"bytes,7,opt,name=link_adr_ans,json=linkAdrAns,proto3,oneof" json:"link_adr_ans,omitempty"`
 }
+
 type MACCommand_DutyCycleReq_ struct {
 	DutyCycleReq *MACCommand_DutyCycleReq `protobuf:"bytes,8,opt,name=duty_cycle_req,json=dutyCycleReq,proto3,oneof" json:"duty_cycle_req,omitempty"`
 }
+
 type MACCommand_RxParamSetupReq_ struct {
 	RxParamSetupReq *MACCommand_RxParamSetupReq `protobuf:"bytes,9,opt,name=rx_param_setup_req,json=rxParamSetupReq,proto3,oneof" json:"rx_param_setup_req,omitempty"`
 }
+
 type MACCommand_RxParamSetupAns_ struct {
 	RxParamSetupAns *MACCommand_RxParamSetupAns `protobuf:"bytes,10,opt,name=rx_param_setup_ans,json=rxParamSetupAns,proto3,oneof" json:"rx_param_setup_ans,omitempty"`
 }
+
 type MACCommand_DevStatusAns_ struct {
 	DevStatusAns *MACCommand_DevStatusAns `protobuf:"bytes,11,opt,name=dev_status_ans,json=devStatusAns,proto3,oneof" json:"dev_status_ans,omitempty"`
 }
+
 type MACCommand_NewChannelReq_ struct {
 	NewChannelReq *MACCommand_NewChannelReq `protobuf:"bytes,12,opt,name=new_channel_req,json=newChannelReq,proto3,oneof" json:"new_channel_req,omitempty"`
 }
+
 type MACCommand_NewChannelAns_ struct {
 	NewChannelAns *MACCommand_NewChannelAns `protobuf:"bytes,13,opt,name=new_channel_ans,json=newChannelAns,proto3,oneof" json:"new_channel_ans,omitempty"`
 }
+
 type MACCommand_DLChannelReq_ struct {
 	DLChannelReq *MACCommand_DLChannelReq `protobuf:"bytes,14,opt,name=dl_channel_req,json=dlChannelReq,proto3,oneof" json:"dl_channel_req,omitempty"`
 }
+
 type MACCommand_DLChannelAns_ struct {
 	DLChannelAns *MACCommand_DLChannelAns `protobuf:"bytes,15,opt,name=dl_channel_ans,json=dlChannelAns,proto3,oneof" json:"dl_channel_ans,omitempty"`
 }
+
 type MACCommand_RxTimingSetupReq_ struct {
 	RxTimingSetupReq *MACCommand_RxTimingSetupReq `protobuf:"bytes,16,opt,name=rx_timing_setup_req,json=rxTimingSetupReq,proto3,oneof" json:"rx_timing_setup_req,omitempty"`
 }
+
 type MACCommand_TxParamSetupReq_ struct {
 	TxParamSetupReq *MACCommand_TxParamSetupReq `protobuf:"bytes,17,opt,name=tx_param_setup_req,json=txParamSetupReq,proto3,oneof" json:"tx_param_setup_req,omitempty"`
 }
+
 type MACCommand_RekeyInd_ struct {
 	RekeyInd *MACCommand_RekeyInd `protobuf:"bytes,18,opt,name=rekey_ind,json=rekeyInd,proto3,oneof" json:"rekey_ind,omitempty"`
 }
+
 type MACCommand_RekeyConf_ struct {
 	RekeyConf *MACCommand_RekeyConf `protobuf:"bytes,19,opt,name=rekey_conf,json=rekeyConf,proto3,oneof" json:"rekey_conf,omitempty"`
 }
-type MACCommand_ADRParamSetupReq_ struct {
-	ADRParamSetupReq *MACCommand_ADRParamSetupReq `protobuf:"bytes,20,opt,name=adr_param_setup_req,json=adrParamSetupReq,proto3,oneof" json:"adr_param_setup_req,omitempty"`
+
+type MACCommand_AdrParamSetupReq struct {
+	AdrParamSetupReq *MACCommand_ADRParamSetupReq `protobuf:"bytes,20,opt,name=adr_param_setup_req,json=adrParamSetupReq,proto3,oneof" json:"adr_param_setup_req,omitempty"`
 }
+
 type MACCommand_DeviceTimeAns_ struct {
 	DeviceTimeAns *MACCommand_DeviceTimeAns `protobuf:"bytes,21,opt,name=device_time_ans,json=deviceTimeAns,proto3,oneof" json:"device_time_ans,omitempty"`
 }
+
 type MACCommand_ForceRejoinReq_ struct {
 	ForceRejoinReq *MACCommand_ForceRejoinReq `protobuf:"bytes,22,opt,name=force_rejoin_req,json=forceRejoinReq,proto3,oneof" json:"force_rejoin_req,omitempty"`
 }
+
 type MACCommand_RejoinParamSetupReq_ struct {
 	RejoinParamSetupReq *MACCommand_RejoinParamSetupReq `protobuf:"bytes,23,opt,name=rejoin_param_setup_req,json=rejoinParamSetupReq,proto3,oneof" json:"rejoin_param_setup_req,omitempty"`
 }
+
 type MACCommand_RejoinParamSetupAns_ struct {
 	RejoinParamSetupAns *MACCommand_RejoinParamSetupAns `protobuf:"bytes,24,opt,name=rejoin_param_setup_ans,json=rejoinParamSetupAns,proto3,oneof" json:"rejoin_param_setup_ans,omitempty"`
 }
+
 type MACCommand_PingSlotInfoReq_ struct {
 	PingSlotInfoReq *MACCommand_PingSlotInfoReq `protobuf:"bytes,25,opt,name=ping_slot_info_req,json=pingSlotInfoReq,proto3,oneof" json:"ping_slot_info_req,omitempty"`
 }
+
 type MACCommand_PingSlotChannelReq_ struct {
 	PingSlotChannelReq *MACCommand_PingSlotChannelReq `protobuf:"bytes,26,opt,name=ping_slot_channel_req,json=pingSlotChannelReq,proto3,oneof" json:"ping_slot_channel_req,omitempty"`
 }
+
 type MACCommand_PingSlotChannelAns_ struct {
 	PingSlotChannelAns *MACCommand_PingSlotChannelAns `protobuf:"bytes,27,opt,name=ping_slot_channel_ans,json=pingSlotChannelAns,proto3,oneof" json:"ping_slot_channel_ans,omitempty"`
 }
+
 type MACCommand_BeaconTimingAns_ struct {
 	BeaconTimingAns *MACCommand_BeaconTimingAns `protobuf:"bytes,28,opt,name=beacon_timing_ans,json=beaconTimingAns,proto3,oneof" json:"beacon_timing_ans,omitempty"`
 }
+
 type MACCommand_BeaconFreqReq_ struct {
 	BeaconFreqReq *MACCommand_BeaconFreqReq `protobuf:"bytes,29,opt,name=beacon_freq_req,json=beaconFreqReq,proto3,oneof" json:"beacon_freq_req,omitempty"`
 }
+
 type MACCommand_BeaconFreqAns_ struct {
 	BeaconFreqAns *MACCommand_BeaconFreqAns `protobuf:"bytes,30,opt,name=beacon_freq_ans,json=beaconFreqAns,proto3,oneof" json:"beacon_freq_ans,omitempty"`
 }
+
 type MACCommand_DeviceModeInd_ struct {
 	DeviceModeInd *MACCommand_DeviceModeInd `protobuf:"bytes,31,opt,name=device_mode_ind,json=deviceModeInd,proto3,oneof" json:"device_mode_ind,omitempty"`
 }
+
 type MACCommand_DeviceModeConf_ struct {
 	DeviceModeConf *MACCommand_DeviceModeConf `protobuf:"bytes,32,opt,name=device_mode_conf,json=deviceModeConf,proto3,oneof" json:"device_mode_conf,omitempty"`
 }
@@ -2715,8 +2859,8 @@ func (*MACCommand_RawPayload) isMACCommand_Payload()           {}
 func (*MACCommand_ResetInd_) isMACCommand_Payload()            {}
 func (*MACCommand_ResetConf_) isMACCommand_Payload()           {}
 func (*MACCommand_LinkCheckAns_) isMACCommand_Payload()        {}
-func (*MACCommand_LinkADRReq_) isMACCommand_Payload()          {}
-func (*MACCommand_LinkADRAns_) isMACCommand_Payload()          {}
+func (*MACCommand_LinkAdrReq) isMACCommand_Payload()           {}
+func (*MACCommand_LinkAdrAns) isMACCommand_Payload()           {}
 func (*MACCommand_DutyCycleReq_) isMACCommand_Payload()        {}
 func (*MACCommand_RxParamSetupReq_) isMACCommand_Payload()     {}
 func (*MACCommand_RxParamSetupAns_) isMACCommand_Payload()     {}
@@ -2729,7 +2873,7 @@ func (*MACCommand_RxTimingSetupReq_) isMACCommand_Payload()    {}
 func (*MACCommand_TxParamSetupReq_) isMACCommand_Payload()     {}
 func (*MACCommand_RekeyInd_) isMACCommand_Payload()            {}
 func (*MACCommand_RekeyConf_) isMACCommand_Payload()           {}
-func (*MACCommand_ADRParamSetupReq_) isMACCommand_Payload()    {}
+func (*MACCommand_AdrParamSetupReq) isMACCommand_Payload()     {}
 func (*MACCommand_DeviceTimeAns_) isMACCommand_Payload()       {}
 func (*MACCommand_ForceRejoinReq_) isMACCommand_Payload()      {}
 func (*MACCommand_RejoinParamSetupReq_) isMACCommand_Payload() {}
@@ -2785,16 +2929,16 @@ func (m *MACCommand) GetLinkCheckAns() *MACCommand_LinkCheckAns {
 	return nil
 }
 
-func (m *MACCommand) GetLinkADRReq() *MACCommand_LinkADRReq {
-	if x, ok := m.GetPayload().(*MACCommand_LinkADRReq_); ok {
-		return x.LinkADRReq
+func (m *MACCommand) GetLinkAdrReq() *MACCommand_LinkADRReq {
+	if x, ok := m.GetPayload().(*MACCommand_LinkAdrReq); ok {
+		return x.LinkAdrReq
 	}
 	return nil
 }
 
-func (m *MACCommand) GetLinkADRAns() *MACCommand_LinkADRAns {
-	if x, ok := m.GetPayload().(*MACCommand_LinkADRAns_); ok {
-		return x.LinkADRAns
+func (m *MACCommand) GetLinkAdrAns() *MACCommand_LinkADRAns {
+	if x, ok := m.GetPayload().(*MACCommand_LinkAdrAns); ok {
+		return x.LinkAdrAns
 	}
 	return nil
 }
@@ -2883,9 +3027,9 @@ func (m *MACCommand) GetRekeyConf() *MACCommand_RekeyConf {
 	return nil
 }
 
-func (m *MACCommand) GetADRParamSetupReq() *MACCommand_ADRParamSetupReq {
-	if x, ok := m.GetPayload().(*MACCommand_ADRParamSetupReq_); ok {
-		return x.ADRParamSetupReq
+func (m *MACCommand) GetAdrParamSetupReq() *MACCommand_ADRParamSetupReq {
+	if x, ok := m.GetPayload().(*MACCommand_AdrParamSetupReq); ok {
+		return x.AdrParamSetupReq
 	}
 	return nil
 }
@@ -2981,8 +3125,8 @@ func (*MACCommand) XXX_OneofWrappers() []interface{} {
 		(*MACCommand_ResetInd_)(nil),
 		(*MACCommand_ResetConf_)(nil),
 		(*MACCommand_LinkCheckAns_)(nil),
-		(*MACCommand_LinkADRReq_)(nil),
-		(*MACCommand_LinkADRAns_)(nil),
+		(*MACCommand_LinkAdrReq)(nil),
+		(*MACCommand_LinkAdrAns)(nil),
 		(*MACCommand_DutyCycleReq_)(nil),
 		(*MACCommand_RxParamSetupReq_)(nil),
 		(*MACCommand_RxParamSetupAns_)(nil),
@@ -2995,7 +3139,7 @@ func (*MACCommand) XXX_OneofWrappers() []interface{} {
 		(*MACCommand_TxParamSetupReq_)(nil),
 		(*MACCommand_RekeyInd_)(nil),
 		(*MACCommand_RekeyConf_)(nil),
-		(*MACCommand_ADRParamSetupReq_)(nil),
+		(*MACCommand_AdrParamSetupReq)(nil),
 		(*MACCommand_DeviceTimeAns_)(nil),
 		(*MACCommand_ForceRejoinReq_)(nil),
 		(*MACCommand_RejoinParamSetupReq_)(nil),
@@ -3022,9 +3166,11 @@ func (*MACCommand_ResetInd) ProtoMessage() {}
 func (*MACCommand_ResetInd) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 0}
 }
+
 func (m *MACCommand_ResetInd) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_ResetInd) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_ResetInd.Marshal(b, m, deterministic)
@@ -3037,12 +3183,15 @@ func (m *MACCommand_ResetInd) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_ResetInd) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_ResetInd.Merge(m, src)
 }
+
 func (m *MACCommand_ResetInd) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_ResetInd) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_ResetInd.DiscardUnknown(m)
 }
@@ -3067,9 +3216,11 @@ func (*MACCommand_ResetConf) ProtoMessage() {}
 func (*MACCommand_ResetConf) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 1}
 }
+
 func (m *MACCommand_ResetConf) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_ResetConf) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_ResetConf.Marshal(b, m, deterministic)
@@ -3082,12 +3233,15 @@ func (m *MACCommand_ResetConf) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_ResetConf) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_ResetConf.Merge(m, src)
 }
+
 func (m *MACCommand_ResetConf) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_ResetConf) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_ResetConf.DiscardUnknown(m)
 }
@@ -3114,9 +3268,11 @@ func (*MACCommand_LinkCheckAns) ProtoMessage() {}
 func (*MACCommand_LinkCheckAns) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 2}
 }
+
 func (m *MACCommand_LinkCheckAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_LinkCheckAns) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_LinkCheckAns.Marshal(b, m, deterministic)
@@ -3129,12 +3285,15 @@ func (m *MACCommand_LinkCheckAns) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_LinkCheckAns) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_LinkCheckAns.Merge(m, src)
 }
+
 func (m *MACCommand_LinkCheckAns) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_LinkCheckAns) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_LinkCheckAns.DiscardUnknown(m)
 }
@@ -3170,9 +3329,11 @@ func (*MACCommand_LinkADRReq) ProtoMessage() {}
 func (*MACCommand_LinkADRReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 3}
 }
+
 func (m *MACCommand_LinkADRReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_LinkADRReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_LinkADRReq.Marshal(b, m, deterministic)
@@ -3185,12 +3346,15 @@ func (m *MACCommand_LinkADRReq) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_LinkADRReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_LinkADRReq.Merge(m, src)
 }
+
 func (m *MACCommand_LinkADRReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_LinkADRReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_LinkADRReq.DiscardUnknown(m)
 }
@@ -3245,9 +3409,11 @@ func (*MACCommand_LinkADRAns) ProtoMessage() {}
 func (*MACCommand_LinkADRAns) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 4}
 }
+
 func (m *MACCommand_LinkADRAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_LinkADRAns) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_LinkADRAns.Marshal(b, m, deterministic)
@@ -3260,12 +3426,15 @@ func (m *MACCommand_LinkADRAns) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_LinkADRAns) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_LinkADRAns.Merge(m, src)
 }
+
 func (m *MACCommand_LinkADRAns) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_LinkADRAns) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_LinkADRAns.DiscardUnknown(m)
 }
@@ -3304,9 +3473,11 @@ func (*MACCommand_DutyCycleReq) ProtoMessage() {}
 func (*MACCommand_DutyCycleReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 5}
 }
+
 func (m *MACCommand_DutyCycleReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_DutyCycleReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_DutyCycleReq.Marshal(b, m, deterministic)
@@ -3319,12 +3490,15 @@ func (m *MACCommand_DutyCycleReq) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_DutyCycleReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_DutyCycleReq.Merge(m, src)
 }
+
 func (m *MACCommand_DutyCycleReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_DutyCycleReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_DutyCycleReq.DiscardUnknown(m)
 }
@@ -3351,9 +3525,11 @@ func (*MACCommand_RxParamSetupReq) ProtoMessage() {}
 func (*MACCommand_RxParamSetupReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 6}
 }
+
 func (m *MACCommand_RxParamSetupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_RxParamSetupReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_RxParamSetupReq.Marshal(b, m, deterministic)
@@ -3366,12 +3542,15 @@ func (m *MACCommand_RxParamSetupReq) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_RxParamSetupReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_RxParamSetupReq.Merge(m, src)
 }
+
 func (m *MACCommand_RxParamSetupReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_RxParamSetupReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_RxParamSetupReq.DiscardUnknown(m)
 }
@@ -3412,9 +3591,11 @@ func (*MACCommand_RxParamSetupAns) ProtoMessage() {}
 func (*MACCommand_RxParamSetupAns) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 7}
 }
+
 func (m *MACCommand_RxParamSetupAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_RxParamSetupAns) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_RxParamSetupAns.Marshal(b, m, deterministic)
@@ -3427,12 +3608,15 @@ func (m *MACCommand_RxParamSetupAns) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_RxParamSetupAns) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_RxParamSetupAns.Merge(m, src)
 }
+
 func (m *MACCommand_RxParamSetupAns) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_RxParamSetupAns) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_RxParamSetupAns.DiscardUnknown(m)
 }
@@ -3477,9 +3661,11 @@ func (*MACCommand_DevStatusAns) ProtoMessage() {}
 func (*MACCommand_DevStatusAns) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 8}
 }
+
 func (m *MACCommand_DevStatusAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_DevStatusAns) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_DevStatusAns.Marshal(b, m, deterministic)
@@ -3492,12 +3678,15 @@ func (m *MACCommand_DevStatusAns) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_DevStatusAns) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_DevStatusAns.Merge(m, src)
 }
+
 func (m *MACCommand_DevStatusAns) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_DevStatusAns) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_DevStatusAns.DiscardUnknown(m)
 }
@@ -3532,9 +3721,11 @@ func (*MACCommand_NewChannelReq) ProtoMessage() {}
 func (*MACCommand_NewChannelReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 9}
 }
+
 func (m *MACCommand_NewChannelReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_NewChannelReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_NewChannelReq.Marshal(b, m, deterministic)
@@ -3547,12 +3738,15 @@ func (m *MACCommand_NewChannelReq) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_NewChannelReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_NewChannelReq.Merge(m, src)
 }
+
 func (m *MACCommand_NewChannelReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_NewChannelReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_NewChannelReq.DiscardUnknown(m)
 }
@@ -3599,9 +3793,11 @@ func (*MACCommand_NewChannelAns) ProtoMessage() {}
 func (*MACCommand_NewChannelAns) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 10}
 }
+
 func (m *MACCommand_NewChannelAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_NewChannelAns) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_NewChannelAns.Marshal(b, m, deterministic)
@@ -3614,12 +3810,15 @@ func (m *MACCommand_NewChannelAns) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_NewChannelAns) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_NewChannelAns.Merge(m, src)
 }
+
 func (m *MACCommand_NewChannelAns) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_NewChannelAns) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_NewChannelAns.DiscardUnknown(m)
 }
@@ -3652,9 +3851,11 @@ func (*MACCommand_DLChannelReq) ProtoMessage() {}
 func (*MACCommand_DLChannelReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 11}
 }
+
 func (m *MACCommand_DLChannelReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_DLChannelReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_DLChannelReq.Marshal(b, m, deterministic)
@@ -3667,12 +3868,15 @@ func (m *MACCommand_DLChannelReq) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_DLChannelReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_DLChannelReq.Merge(m, src)
 }
+
 func (m *MACCommand_DLChannelReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_DLChannelReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_DLChannelReq.DiscardUnknown(m)
 }
@@ -3705,9 +3909,11 @@ func (*MACCommand_DLChannelAns) ProtoMessage() {}
 func (*MACCommand_DLChannelAns) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 12}
 }
+
 func (m *MACCommand_DLChannelAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_DLChannelAns) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_DLChannelAns.Marshal(b, m, deterministic)
@@ -3720,12 +3926,15 @@ func (m *MACCommand_DLChannelAns) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_DLChannelAns) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_DLChannelAns.Merge(m, src)
 }
+
 func (m *MACCommand_DLChannelAns) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_DLChannelAns) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_DLChannelAns.DiscardUnknown(m)
 }
@@ -3757,9 +3966,11 @@ func (*MACCommand_RxTimingSetupReq) ProtoMessage() {}
 func (*MACCommand_RxTimingSetupReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 13}
 }
+
 func (m *MACCommand_RxTimingSetupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_RxTimingSetupReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_RxTimingSetupReq.Marshal(b, m, deterministic)
@@ -3772,12 +3983,15 @@ func (m *MACCommand_RxTimingSetupReq) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_RxTimingSetupReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_RxTimingSetupReq.Merge(m, src)
 }
+
 func (m *MACCommand_RxTimingSetupReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_RxTimingSetupReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_RxTimingSetupReq.DiscardUnknown(m)
 }
@@ -3806,9 +4020,11 @@ func (*MACCommand_TxParamSetupReq) ProtoMessage() {}
 func (*MACCommand_TxParamSetupReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 14}
 }
+
 func (m *MACCommand_TxParamSetupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_TxParamSetupReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_TxParamSetupReq.Marshal(b, m, deterministic)
@@ -3821,12 +4037,15 @@ func (m *MACCommand_TxParamSetupReq) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_TxParamSetupReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_TxParamSetupReq.Merge(m, src)
 }
+
 func (m *MACCommand_TxParamSetupReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_TxParamSetupReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_TxParamSetupReq.DiscardUnknown(m)
 }
@@ -3865,9 +4084,11 @@ func (*MACCommand_RekeyInd) ProtoMessage() {}
 func (*MACCommand_RekeyInd) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 15}
 }
+
 func (m *MACCommand_RekeyInd) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_RekeyInd) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_RekeyInd.Marshal(b, m, deterministic)
@@ -3880,12 +4101,15 @@ func (m *MACCommand_RekeyInd) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_RekeyInd) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_RekeyInd.Merge(m, src)
 }
+
 func (m *MACCommand_RekeyInd) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_RekeyInd) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_RekeyInd.DiscardUnknown(m)
 }
@@ -3910,9 +4134,11 @@ func (*MACCommand_RekeyConf) ProtoMessage() {}
 func (*MACCommand_RekeyConf) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 16}
 }
+
 func (m *MACCommand_RekeyConf) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_RekeyConf) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_RekeyConf.Marshal(b, m, deterministic)
@@ -3925,12 +4151,15 @@ func (m *MACCommand_RekeyConf) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_RekeyConf) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_RekeyConf.Merge(m, src)
 }
+
 func (m *MACCommand_RekeyConf) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_RekeyConf) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_RekeyConf.DiscardUnknown(m)
 }
@@ -3946,9 +4175,9 @@ func (m *MACCommand_RekeyConf) GetMinorVersion() Minor {
 
 type MACCommand_ADRParamSetupReq struct {
 	// Exponent e that configures the ADR_ACK_LIMIT = 2^e messages.
-	ADRAckLimitExponent ADRAckLimitExponent `protobuf:"varint,1,opt,name=adr_ack_limit_exponent,json=adrAckLimitExponent,proto3,enum=ttn.lorawan.v3.ADRAckLimitExponent" json:"adr_ack_limit_exponent,omitempty"`
+	AdrAckLimitExponent ADRAckLimitExponent `protobuf:"varint,1,opt,name=adr_ack_limit_exponent,json=adrAckLimitExponent,proto3,enum=ttn.lorawan.v3.ADRAckLimitExponent" json:"adr_ack_limit_exponent,omitempty"`
 	// Exponent e that configures the ADR_ACK_DELAY = 2^e messages.
-	ADRAckDelayExponent  ADRAckDelayExponent `protobuf:"varint,2,opt,name=adr_ack_delay_exponent,json=adrAckDelayExponent,proto3,enum=ttn.lorawan.v3.ADRAckDelayExponent" json:"adr_ack_delay_exponent,omitempty"`
+	AdrAckDelayExponent  ADRAckDelayExponent `protobuf:"varint,2,opt,name=adr_ack_delay_exponent,json=adrAckDelayExponent,proto3,enum=ttn.lorawan.v3.ADRAckDelayExponent" json:"adr_ack_delay_exponent,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_sizecache        int32               `json:"-"`
 }
@@ -3958,9 +4187,11 @@ func (*MACCommand_ADRParamSetupReq) ProtoMessage() {}
 func (*MACCommand_ADRParamSetupReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 17}
 }
+
 func (m *MACCommand_ADRParamSetupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_ADRParamSetupReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_ADRParamSetupReq.Marshal(b, m, deterministic)
@@ -3973,28 +4204,31 @@ func (m *MACCommand_ADRParamSetupReq) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_ADRParamSetupReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_ADRParamSetupReq.Merge(m, src)
 }
+
 func (m *MACCommand_ADRParamSetupReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_ADRParamSetupReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_ADRParamSetupReq.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_MACCommand_ADRParamSetupReq proto.InternalMessageInfo
 
-func (m *MACCommand_ADRParamSetupReq) GetADRAckLimitExponent() ADRAckLimitExponent {
+func (m *MACCommand_ADRParamSetupReq) GetAdrAckLimitExponent() ADRAckLimitExponent {
 	if m != nil {
-		return m.ADRAckLimitExponent
+		return m.AdrAckLimitExponent
 	}
 	return ADR_ACK_LIMIT_1
 }
 
-func (m *MACCommand_ADRParamSetupReq) GetADRAckDelayExponent() ADRAckDelayExponent {
+func (m *MACCommand_ADRParamSetupReq) GetAdrAckDelayExponent() ADRAckDelayExponent {
 	if m != nil {
-		return m.ADRAckDelayExponent
+		return m.AdrAckDelayExponent
 	}
 	return ADR_ACK_DELAY_1
 }
@@ -4010,9 +4244,11 @@ func (*MACCommand_DeviceTimeAns) ProtoMessage() {}
 func (*MACCommand_DeviceTimeAns) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 18}
 }
+
 func (m *MACCommand_DeviceTimeAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_DeviceTimeAns) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_DeviceTimeAns.Marshal(b, m, deterministic)
@@ -4025,12 +4261,15 @@ func (m *MACCommand_DeviceTimeAns) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_DeviceTimeAns) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_DeviceTimeAns.Merge(m, src)
 }
+
 func (m *MACCommand_DeviceTimeAns) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_DeviceTimeAns) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_DeviceTimeAns.DiscardUnknown(m)
 }
@@ -4059,9 +4298,11 @@ func (*MACCommand_ForceRejoinReq) ProtoMessage() {}
 func (*MACCommand_ForceRejoinReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 19}
 }
+
 func (m *MACCommand_ForceRejoinReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_ForceRejoinReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_ForceRejoinReq.Marshal(b, m, deterministic)
@@ -4074,12 +4315,15 @@ func (m *MACCommand_ForceRejoinReq) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_ForceRejoinReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_ForceRejoinReq.Merge(m, src)
 }
+
 func (m *MACCommand_ForceRejoinReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_ForceRejoinReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_ForceRejoinReq.DiscardUnknown(m)
 }
@@ -4128,9 +4372,11 @@ func (*MACCommand_RejoinParamSetupReq) ProtoMessage() {}
 func (*MACCommand_RejoinParamSetupReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 20}
 }
+
 func (m *MACCommand_RejoinParamSetupReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_RejoinParamSetupReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_RejoinParamSetupReq.Marshal(b, m, deterministic)
@@ -4143,12 +4389,15 @@ func (m *MACCommand_RejoinParamSetupReq) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_RejoinParamSetupReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_RejoinParamSetupReq.Merge(m, src)
 }
+
 func (m *MACCommand_RejoinParamSetupReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_RejoinParamSetupReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_RejoinParamSetupReq.DiscardUnknown(m)
 }
@@ -4180,9 +4429,11 @@ func (*MACCommand_RejoinParamSetupAns) ProtoMessage() {}
 func (*MACCommand_RejoinParamSetupAns) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 21}
 }
+
 func (m *MACCommand_RejoinParamSetupAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_RejoinParamSetupAns) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_RejoinParamSetupAns.Marshal(b, m, deterministic)
@@ -4195,12 +4446,15 @@ func (m *MACCommand_RejoinParamSetupAns) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_RejoinParamSetupAns) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_RejoinParamSetupAns.Merge(m, src)
 }
+
 func (m *MACCommand_RejoinParamSetupAns) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_RejoinParamSetupAns) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_RejoinParamSetupAns.DiscardUnknown(m)
 }
@@ -4225,9 +4479,11 @@ func (*MACCommand_PingSlotInfoReq) ProtoMessage() {}
 func (*MACCommand_PingSlotInfoReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 22}
 }
+
 func (m *MACCommand_PingSlotInfoReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_PingSlotInfoReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_PingSlotInfoReq.Marshal(b, m, deterministic)
@@ -4240,12 +4496,15 @@ func (m *MACCommand_PingSlotInfoReq) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_PingSlotInfoReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_PingSlotInfoReq.Merge(m, src)
 }
+
 func (m *MACCommand_PingSlotInfoReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_PingSlotInfoReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_PingSlotInfoReq.DiscardUnknown(m)
 }
@@ -4271,9 +4530,11 @@ func (*MACCommand_PingSlotChannelReq) ProtoMessage() {}
 func (*MACCommand_PingSlotChannelReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 23}
 }
+
 func (m *MACCommand_PingSlotChannelReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_PingSlotChannelReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_PingSlotChannelReq.Marshal(b, m, deterministic)
@@ -4286,12 +4547,15 @@ func (m *MACCommand_PingSlotChannelReq) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_PingSlotChannelReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_PingSlotChannelReq.Merge(m, src)
 }
+
 func (m *MACCommand_PingSlotChannelReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_PingSlotChannelReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_PingSlotChannelReq.DiscardUnknown(m)
 }
@@ -4324,9 +4588,11 @@ func (*MACCommand_PingSlotChannelAns) ProtoMessage() {}
 func (*MACCommand_PingSlotChannelAns) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 24}
 }
+
 func (m *MACCommand_PingSlotChannelAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_PingSlotChannelAns) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_PingSlotChannelAns.Marshal(b, m, deterministic)
@@ -4339,12 +4605,15 @@ func (m *MACCommand_PingSlotChannelAns) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_PingSlotChannelAns) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_PingSlotChannelAns.Merge(m, src)
 }
+
 func (m *MACCommand_PingSlotChannelAns) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_PingSlotChannelAns) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_PingSlotChannelAns.DiscardUnknown(m)
 }
@@ -4377,9 +4646,11 @@ func (*MACCommand_BeaconTimingAns) ProtoMessage() {}
 func (*MACCommand_BeaconTimingAns) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 25}
 }
+
 func (m *MACCommand_BeaconTimingAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_BeaconTimingAns) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_BeaconTimingAns.Marshal(b, m, deterministic)
@@ -4392,12 +4663,15 @@ func (m *MACCommand_BeaconTimingAns) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_BeaconTimingAns) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_BeaconTimingAns.Merge(m, src)
 }
+
 func (m *MACCommand_BeaconTimingAns) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_BeaconTimingAns) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_BeaconTimingAns.DiscardUnknown(m)
 }
@@ -4429,9 +4703,11 @@ func (*MACCommand_BeaconFreqReq) ProtoMessage() {}
 func (*MACCommand_BeaconFreqReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 26}
 }
+
 func (m *MACCommand_BeaconFreqReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_BeaconFreqReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_BeaconFreqReq.Marshal(b, m, deterministic)
@@ -4444,12 +4720,15 @@ func (m *MACCommand_BeaconFreqReq) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_BeaconFreqReq) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_BeaconFreqReq.Merge(m, src)
 }
+
 func (m *MACCommand_BeaconFreqReq) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_BeaconFreqReq) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_BeaconFreqReq.DiscardUnknown(m)
 }
@@ -4474,9 +4753,11 @@ func (*MACCommand_BeaconFreqAns) ProtoMessage() {}
 func (*MACCommand_BeaconFreqAns) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 27}
 }
+
 func (m *MACCommand_BeaconFreqAns) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_BeaconFreqAns) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_BeaconFreqAns.Marshal(b, m, deterministic)
@@ -4489,12 +4770,15 @@ func (m *MACCommand_BeaconFreqAns) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_BeaconFreqAns) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_BeaconFreqAns.Merge(m, src)
 }
+
 func (m *MACCommand_BeaconFreqAns) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_BeaconFreqAns) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_BeaconFreqAns.DiscardUnknown(m)
 }
@@ -4519,9 +4803,11 @@ func (*MACCommand_DeviceModeInd) ProtoMessage() {}
 func (*MACCommand_DeviceModeInd) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 28}
 }
+
 func (m *MACCommand_DeviceModeInd) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_DeviceModeInd) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_DeviceModeInd.Marshal(b, m, deterministic)
@@ -4534,12 +4820,15 @@ func (m *MACCommand_DeviceModeInd) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_DeviceModeInd) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_DeviceModeInd.Merge(m, src)
 }
+
 func (m *MACCommand_DeviceModeInd) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_DeviceModeInd) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_DeviceModeInd.DiscardUnknown(m)
 }
@@ -4564,9 +4853,11 @@ func (*MACCommand_DeviceModeConf) ProtoMessage() {}
 func (*MACCommand_DeviceModeConf) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{19, 29}
 }
+
 func (m *MACCommand_DeviceModeConf) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MACCommand_DeviceModeConf) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MACCommand_DeviceModeConf.Marshal(b, m, deterministic)
@@ -4579,12 +4870,15 @@ func (m *MACCommand_DeviceModeConf) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
+
 func (m *MACCommand_DeviceModeConf) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MACCommand_DeviceModeConf.Merge(m, src)
 }
+
 func (m *MACCommand_DeviceModeConf) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MACCommand_DeviceModeConf) XXX_DiscardUnknown() {
 	xxx_messageInfo_MACCommand_DeviceModeConf.DiscardUnknown(m)
 }
@@ -4609,9 +4903,11 @@ func (*FrequencyValue) ProtoMessage() {}
 func (*FrequencyValue) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{20}
 }
+
 func (m *FrequencyValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *FrequencyValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_FrequencyValue.Marshal(b, m, deterministic)
@@ -4624,12 +4920,15 @@ func (m *FrequencyValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
+
 func (m *FrequencyValue) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_FrequencyValue.Merge(m, src)
 }
+
 func (m *FrequencyValue) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *FrequencyValue) XXX_DiscardUnknown() {
 	xxx_messageInfo_FrequencyValue.DiscardUnknown(m)
 }
@@ -4654,9 +4953,11 @@ func (*DataRateOffsetValue) ProtoMessage() {}
 func (*DataRateOffsetValue) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{21}
 }
+
 func (m *DataRateOffsetValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *DataRateOffsetValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_DataRateOffsetValue.Marshal(b, m, deterministic)
@@ -4669,12 +4970,15 @@ func (m *DataRateOffsetValue) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
+
 func (m *DataRateOffsetValue) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_DataRateOffsetValue.Merge(m, src)
 }
+
 func (m *DataRateOffsetValue) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *DataRateOffsetValue) XXX_DiscardUnknown() {
 	xxx_messageInfo_DataRateOffsetValue.DiscardUnknown(m)
 }
@@ -4699,9 +5003,11 @@ func (*DataRateIndexValue) ProtoMessage() {}
 func (*DataRateIndexValue) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{22}
 }
+
 func (m *DataRateIndexValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *DataRateIndexValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_DataRateIndexValue.Marshal(b, m, deterministic)
@@ -4714,12 +5020,15 @@ func (m *DataRateIndexValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
+
 func (m *DataRateIndexValue) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_DataRateIndexValue.Merge(m, src)
 }
+
 func (m *DataRateIndexValue) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *DataRateIndexValue) XXX_DiscardUnknown() {
 	xxx_messageInfo_DataRateIndexValue.DiscardUnknown(m)
 }
@@ -4744,9 +5053,11 @@ func (*PingSlotPeriodValue) ProtoMessage() {}
 func (*PingSlotPeriodValue) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{23}
 }
+
 func (m *PingSlotPeriodValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *PingSlotPeriodValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_PingSlotPeriodValue.Marshal(b, m, deterministic)
@@ -4759,12 +5070,15 @@ func (m *PingSlotPeriodValue) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
+
 func (m *PingSlotPeriodValue) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PingSlotPeriodValue.Merge(m, src)
 }
+
 func (m *PingSlotPeriodValue) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *PingSlotPeriodValue) XXX_DiscardUnknown() {
 	xxx_messageInfo_PingSlotPeriodValue.DiscardUnknown(m)
 }
@@ -4789,9 +5103,11 @@ func (*AggregatedDutyCycleValue) ProtoMessage() {}
 func (*AggregatedDutyCycleValue) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{24}
 }
+
 func (m *AggregatedDutyCycleValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *AggregatedDutyCycleValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_AggregatedDutyCycleValue.Marshal(b, m, deterministic)
@@ -4804,12 +5120,15 @@ func (m *AggregatedDutyCycleValue) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
+
 func (m *AggregatedDutyCycleValue) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_AggregatedDutyCycleValue.Merge(m, src)
 }
+
 func (m *AggregatedDutyCycleValue) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *AggregatedDutyCycleValue) XXX_DiscardUnknown() {
 	xxx_messageInfo_AggregatedDutyCycleValue.DiscardUnknown(m)
 }
@@ -4834,9 +5153,11 @@ func (*RxDelayValue) ProtoMessage() {}
 func (*RxDelayValue) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{25}
 }
+
 func (m *RxDelayValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *RxDelayValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_RxDelayValue.Marshal(b, m, deterministic)
@@ -4849,12 +5170,15 @@ func (m *RxDelayValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
+
 func (m *RxDelayValue) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_RxDelayValue.Merge(m, src)
 }
+
 func (m *RxDelayValue) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *RxDelayValue) XXX_DiscardUnknown() {
 	xxx_messageInfo_RxDelayValue.DiscardUnknown(m)
 }
@@ -4879,9 +5203,11 @@ func (*ADRAckLimitExponentValue) ProtoMessage() {}
 func (*ADRAckLimitExponentValue) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{26}
 }
+
 func (m *ADRAckLimitExponentValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *ADRAckLimitExponentValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_ADRAckLimitExponentValue.Marshal(b, m, deterministic)
@@ -4894,12 +5220,15 @@ func (m *ADRAckLimitExponentValue) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
+
 func (m *ADRAckLimitExponentValue) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ADRAckLimitExponentValue.Merge(m, src)
 }
+
 func (m *ADRAckLimitExponentValue) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *ADRAckLimitExponentValue) XXX_DiscardUnknown() {
 	xxx_messageInfo_ADRAckLimitExponentValue.DiscardUnknown(m)
 }
@@ -4924,9 +5253,11 @@ func (*ADRAckDelayExponentValue) ProtoMessage() {}
 func (*ADRAckDelayExponentValue) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{27}
 }
+
 func (m *ADRAckDelayExponentValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *ADRAckDelayExponentValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_ADRAckDelayExponentValue.Marshal(b, m, deterministic)
@@ -4939,12 +5270,15 @@ func (m *ADRAckDelayExponentValue) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
+
 func (m *ADRAckDelayExponentValue) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ADRAckDelayExponentValue.Merge(m, src)
 }
+
 func (m *ADRAckDelayExponentValue) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *ADRAckDelayExponentValue) XXX_DiscardUnknown() {
 	xxx_messageInfo_ADRAckDelayExponentValue.DiscardUnknown(m)
 }
@@ -4969,9 +5303,11 @@ func (*DeviceEIRPValue) ProtoMessage() {}
 func (*DeviceEIRPValue) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2084d1d5a227b67e, []int{28}
 }
+
 func (m *DeviceEIRPValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *DeviceEIRPValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_DeviceEIRPValue.Marshal(b, m, deterministic)
@@ -4984,12 +5320,15 @@ func (m *DeviceEIRPValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return b[:n], nil
 	}
 }
+
 func (m *DeviceEIRPValue) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_DeviceEIRPValue.Merge(m, src)
 }
+
 func (m *DeviceEIRPValue) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *DeviceEIRPValue) XXX_DiscardUnknown() {
 	xxx_messageInfo_DeviceEIRPValue.DiscardUnknown(m)
 }
@@ -5547,6 +5886,7 @@ func (x MType) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x Major) String() string {
 	s, ok := Major_name[int32(x)]
 	if ok {
@@ -5554,6 +5894,7 @@ func (x Major) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x JoinRequestType) String() string {
 	s, ok := JoinRequestType_name[int32(x)]
 	if ok {
@@ -5561,6 +5902,7 @@ func (x JoinRequestType) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x RejoinRequestType) String() string {
 	s, ok := RejoinRequestType_name[int32(x)]
 	if ok {
@@ -5568,6 +5910,7 @@ func (x RejoinRequestType) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x CFListType) String() string {
 	s, ok := CFListType_name[int32(x)]
 	if ok {
@@ -5575,6 +5918,7 @@ func (x CFListType) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x Class) String() string {
 	s, ok := Class_name[int32(x)]
 	if ok {
@@ -5582,6 +5926,7 @@ func (x Class) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x TxSchedulePriority) String() string {
 	s, ok := TxSchedulePriority_name[int32(x)]
 	if ok {
@@ -5589,6 +5934,7 @@ func (x TxSchedulePriority) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x MACCommandIdentifier) String() string {
 	s, ok := MACCommandIdentifier_name[int32(x)]
 	if ok {
@@ -5596,6 +5942,7 @@ func (x MACCommandIdentifier) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x AggregatedDutyCycle) String() string {
 	s, ok := AggregatedDutyCycle_name[int32(x)]
 	if ok {
@@ -5603,6 +5950,7 @@ func (x AggregatedDutyCycle) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x PingSlotPeriod) String() string {
 	s, ok := PingSlotPeriod_name[int32(x)]
 	if ok {
@@ -5610,6 +5958,7 @@ func (x PingSlotPeriod) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x RejoinCountExponent) String() string {
 	s, ok := RejoinCountExponent_name[int32(x)]
 	if ok {
@@ -5617,6 +5966,7 @@ func (x RejoinCountExponent) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x RejoinTimeExponent) String() string {
 	s, ok := RejoinTimeExponent_name[int32(x)]
 	if ok {
@@ -5624,6 +5974,7 @@ func (x RejoinTimeExponent) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x RejoinPeriodExponent) String() string {
 	s, ok := RejoinPeriodExponent_name[int32(x)]
 	if ok {
@@ -5631,6 +5982,7 @@ func (x RejoinPeriodExponent) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x DeviceEIRP) String() string {
 	s, ok := DeviceEIRP_name[int32(x)]
 	if ok {
@@ -5638,6 +5990,7 @@ func (x DeviceEIRP) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x ADRAckLimitExponent) String() string {
 	s, ok := ADRAckLimitExponent_name[int32(x)]
 	if ok {
@@ -5645,6 +5998,7 @@ func (x ADRAckLimitExponent) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x ADRAckDelayExponent) String() string {
 	s, ok := ADRAckDelayExponent_name[int32(x)]
 	if ok {
@@ -5652,6 +6006,7 @@ func (x ADRAckDelayExponent) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (x Minor) String() string {
 	s, ok := Minor_name[int32(x)]
 	if ok {
@@ -5659,6 +6014,7 @@ func (x Minor) String() string {
 	}
 	return strconv.Itoa(int(x))
 }
+
 func (this *Message) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5695,6 +6051,7 @@ func (this *Message) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *Message_MACPayload) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5719,6 +6076,7 @@ func (this *Message_MACPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *Message_JoinRequestPayload) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5743,6 +6101,7 @@ func (this *Message_JoinRequestPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *Message_JoinAcceptPayload) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5767,6 +6126,7 @@ func (this *Message_JoinAcceptPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *Message_RejoinRequestPayload) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5791,6 +6151,7 @@ func (this *Message_RejoinRequestPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MHDR) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5818,6 +6179,7 @@ func (this *MHDR) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACPayload) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5854,6 +6216,7 @@ func (this *MACPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *FHDR) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5887,6 +6250,7 @@ func (this *FHDR) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *FCtrl) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5906,10 +6270,10 @@ func (this *FCtrl) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.ADR != that1.ADR {
+	if this.Adr != that1.Adr {
 		return false
 	}
-	if this.ADRAckReq != that1.ADRAckReq {
+	if this.AdrAckReq != that1.AdrAckReq {
 		return false
 	}
 	if this.Ack != that1.Ack {
@@ -5923,6 +6287,7 @@ func (this *FCtrl) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *JoinRequestPayload) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5953,6 +6318,7 @@ func (this *JoinRequestPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *RejoinRequestPayload) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -5989,6 +6355,7 @@ func (this *RejoinRequestPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *JoinAcceptPayload) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6031,6 +6398,7 @@ func (this *JoinAcceptPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DLSettings) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6061,6 +6429,7 @@ func (this *DLSettings) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *CFList) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6101,6 +6470,7 @@ func (this *CFList) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *LoRaDataRate) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6128,6 +6498,7 @@ func (this *LoRaDataRate) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *FSKDataRate) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6152,6 +6523,7 @@ func (this *FSKDataRate) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *LRFHSSDataRate) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6179,6 +6551,7 @@ func (this *LRFHSSDataRate) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DataRate) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6209,6 +6582,7 @@ func (this *DataRate) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DataRate_LoRa) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6233,6 +6607,7 @@ func (this *DataRate_LoRa) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DataRate_FSK) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6257,6 +6632,7 @@ func (this *DataRate_FSK) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DataRate_Lrfhss) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6281,6 +6657,7 @@ func (this *DataRate_Lrfhss) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *TxSettings) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6330,6 +6707,7 @@ func (this *TxSettings) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *TxSettings_Downlink) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6360,6 +6738,7 @@ func (this *TxSettings_Downlink) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *GatewayAntennaIdentifiers) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6387,6 +6766,7 @@ func (this *GatewayAntennaIdentifiers) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *UplinkToken) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6420,6 +6800,7 @@ func (this *UplinkToken) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DownlinkPath) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6450,6 +6831,7 @@ func (this *DownlinkPath) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DownlinkPath_UplinkToken) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6474,6 +6856,7 @@ func (this *DownlinkPath_UplinkToken) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DownlinkPath_Fixed) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6498,6 +6881,7 @@ func (this *DownlinkPath_Fixed) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *TxRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6564,6 +6948,7 @@ func (this *TxRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6597,6 +6982,7 @@ func (this *MACCommand) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RawPayload) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6621,6 +7007,7 @@ func (this *MACCommand_RawPayload) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_ResetInd_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6645,6 +7032,7 @@ func (this *MACCommand_ResetInd_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_ResetConf_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6669,6 +7057,7 @@ func (this *MACCommand_ResetConf_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_LinkCheckAns_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6693,14 +7082,15 @@ func (this *MACCommand_LinkCheckAns_) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_LinkADRReq_) Equal(that interface{}) bool {
+
+func (this *MACCommand_LinkAdrReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*MACCommand_LinkADRReq_)
+	that1, ok := that.(*MACCommand_LinkAdrReq)
 	if !ok {
-		that2, ok := that.(MACCommand_LinkADRReq_)
+		that2, ok := that.(MACCommand_LinkAdrReq)
 		if ok {
 			that1 = &that2
 		} else {
@@ -6712,19 +7102,20 @@ func (this *MACCommand_LinkADRReq_) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.LinkADRReq.Equal(that1.LinkADRReq) {
+	if !this.LinkAdrReq.Equal(that1.LinkAdrReq) {
 		return false
 	}
 	return true
 }
-func (this *MACCommand_LinkADRAns_) Equal(that interface{}) bool {
+
+func (this *MACCommand_LinkAdrAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*MACCommand_LinkADRAns_)
+	that1, ok := that.(*MACCommand_LinkAdrAns)
 	if !ok {
-		that2, ok := that.(MACCommand_LinkADRAns_)
+		that2, ok := that.(MACCommand_LinkAdrAns)
 		if ok {
 			that1 = &that2
 		} else {
@@ -6736,11 +7127,12 @@ func (this *MACCommand_LinkADRAns_) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.LinkADRAns.Equal(that1.LinkADRAns) {
+	if !this.LinkAdrAns.Equal(that1.LinkAdrAns) {
 		return false
 	}
 	return true
 }
+
 func (this *MACCommand_DutyCycleReq_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6765,6 +7157,7 @@ func (this *MACCommand_DutyCycleReq_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RxParamSetupReq_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6789,6 +7182,7 @@ func (this *MACCommand_RxParamSetupReq_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RxParamSetupAns_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6813,6 +7207,7 @@ func (this *MACCommand_RxParamSetupAns_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_DevStatusAns_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6837,6 +7232,7 @@ func (this *MACCommand_DevStatusAns_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_NewChannelReq_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6861,6 +7257,7 @@ func (this *MACCommand_NewChannelReq_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_NewChannelAns_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6885,6 +7282,7 @@ func (this *MACCommand_NewChannelAns_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_DLChannelReq_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6909,6 +7307,7 @@ func (this *MACCommand_DLChannelReq_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_DLChannelAns_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6933,6 +7332,7 @@ func (this *MACCommand_DLChannelAns_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RxTimingSetupReq_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6957,6 +7357,7 @@ func (this *MACCommand_RxTimingSetupReq_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_TxParamSetupReq_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -6981,6 +7382,7 @@ func (this *MACCommand_TxParamSetupReq_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RekeyInd_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7005,6 +7407,7 @@ func (this *MACCommand_RekeyInd_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RekeyConf_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7029,14 +7432,15 @@ func (this *MACCommand_RekeyConf_) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *MACCommand_ADRParamSetupReq_) Equal(that interface{}) bool {
+
+func (this *MACCommand_AdrParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*MACCommand_ADRParamSetupReq_)
+	that1, ok := that.(*MACCommand_AdrParamSetupReq)
 	if !ok {
-		that2, ok := that.(MACCommand_ADRParamSetupReq_)
+		that2, ok := that.(MACCommand_AdrParamSetupReq)
 		if ok {
 			that1 = &that2
 		} else {
@@ -7048,11 +7452,12 @@ func (this *MACCommand_ADRParamSetupReq_) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.ADRParamSetupReq.Equal(that1.ADRParamSetupReq) {
+	if !this.AdrParamSetupReq.Equal(that1.AdrParamSetupReq) {
 		return false
 	}
 	return true
 }
+
 func (this *MACCommand_DeviceTimeAns_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7077,6 +7482,7 @@ func (this *MACCommand_DeviceTimeAns_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_ForceRejoinReq_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7101,6 +7507,7 @@ func (this *MACCommand_ForceRejoinReq_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RejoinParamSetupReq_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7125,6 +7532,7 @@ func (this *MACCommand_RejoinParamSetupReq_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RejoinParamSetupAns_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7149,6 +7557,7 @@ func (this *MACCommand_RejoinParamSetupAns_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_PingSlotInfoReq_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7173,6 +7582,7 @@ func (this *MACCommand_PingSlotInfoReq_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_PingSlotChannelReq_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7197,6 +7607,7 @@ func (this *MACCommand_PingSlotChannelReq_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_PingSlotChannelAns_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7221,6 +7632,7 @@ func (this *MACCommand_PingSlotChannelAns_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_BeaconTimingAns_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7245,6 +7657,7 @@ func (this *MACCommand_BeaconTimingAns_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_BeaconFreqReq_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7269,6 +7682,7 @@ func (this *MACCommand_BeaconFreqReq_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_BeaconFreqAns_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7293,6 +7707,7 @@ func (this *MACCommand_BeaconFreqAns_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_DeviceModeInd_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7317,6 +7732,7 @@ func (this *MACCommand_DeviceModeInd_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_DeviceModeConf_) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7341,6 +7757,7 @@ func (this *MACCommand_DeviceModeConf_) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_ResetInd) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7365,6 +7782,7 @@ func (this *MACCommand_ResetInd) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_ResetConf) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7389,6 +7807,7 @@ func (this *MACCommand_ResetConf) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_LinkCheckAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7416,6 +7835,7 @@ func (this *MACCommand_LinkCheckAns) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_LinkADRReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7457,6 +7877,7 @@ func (this *MACCommand_LinkADRReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_LinkADRAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7487,6 +7908,7 @@ func (this *MACCommand_LinkADRAns) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_DutyCycleReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7511,6 +7933,7 @@ func (this *MACCommand_DutyCycleReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RxParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7541,6 +7964,7 @@ func (this *MACCommand_RxParamSetupReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RxParamSetupAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7571,6 +7995,7 @@ func (this *MACCommand_RxParamSetupAns) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_DevStatusAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7598,6 +8023,7 @@ func (this *MACCommand_DevStatusAns) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_NewChannelReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7631,6 +8057,7 @@ func (this *MACCommand_NewChannelReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_NewChannelAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7658,6 +8085,7 @@ func (this *MACCommand_NewChannelAns) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_DLChannelReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7685,6 +8113,7 @@ func (this *MACCommand_DLChannelReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_DLChannelAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7712,6 +8141,7 @@ func (this *MACCommand_DLChannelAns) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RxTimingSetupReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7736,6 +8166,7 @@ func (this *MACCommand_RxTimingSetupReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_TxParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7766,6 +8197,7 @@ func (this *MACCommand_TxParamSetupReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RekeyInd) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7790,6 +8222,7 @@ func (this *MACCommand_RekeyInd) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RekeyConf) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7814,6 +8247,7 @@ func (this *MACCommand_RekeyConf) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_ADRParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7833,14 +8267,15 @@ func (this *MACCommand_ADRParamSetupReq) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.ADRAckLimitExponent != that1.ADRAckLimitExponent {
+	if this.AdrAckLimitExponent != that1.AdrAckLimitExponent {
 		return false
 	}
-	if this.ADRAckDelayExponent != that1.ADRAckDelayExponent {
+	if this.AdrAckDelayExponent != that1.AdrAckDelayExponent {
 		return false
 	}
 	return true
 }
+
 func (this *MACCommand_DeviceTimeAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7865,6 +8300,7 @@ func (this *MACCommand_DeviceTimeAns) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_ForceRejoinReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7898,6 +8334,7 @@ func (this *MACCommand_ForceRejoinReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RejoinParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7925,6 +8362,7 @@ func (this *MACCommand_RejoinParamSetupReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_RejoinParamSetupAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7949,6 +8387,7 @@ func (this *MACCommand_RejoinParamSetupAns) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_PingSlotInfoReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -7973,6 +8412,7 @@ func (this *MACCommand_PingSlotInfoReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_PingSlotChannelReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8000,6 +8440,7 @@ func (this *MACCommand_PingSlotChannelReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_PingSlotChannelAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8027,6 +8468,7 @@ func (this *MACCommand_PingSlotChannelAns) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_BeaconTimingAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8054,6 +8496,7 @@ func (this *MACCommand_BeaconTimingAns) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_BeaconFreqReq) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8078,6 +8521,7 @@ func (this *MACCommand_BeaconFreqReq) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_BeaconFreqAns) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8102,6 +8546,7 @@ func (this *MACCommand_BeaconFreqAns) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_DeviceModeInd) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8126,6 +8571,7 @@ func (this *MACCommand_DeviceModeInd) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *MACCommand_DeviceModeConf) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8150,6 +8596,7 @@ func (this *MACCommand_DeviceModeConf) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *FrequencyValue) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8174,6 +8621,7 @@ func (this *FrequencyValue) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DataRateOffsetValue) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8198,6 +8646,7 @@ func (this *DataRateOffsetValue) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DataRateIndexValue) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8222,6 +8671,7 @@ func (this *DataRateIndexValue) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *PingSlotPeriodValue) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8246,6 +8696,7 @@ func (this *PingSlotPeriodValue) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *AggregatedDutyCycleValue) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8270,6 +8721,7 @@ func (this *AggregatedDutyCycleValue) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *RxDelayValue) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8294,6 +8746,7 @@ func (this *RxDelayValue) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *ADRAckLimitExponentValue) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8318,6 +8771,7 @@ func (this *ADRAckLimitExponentValue) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *ADRAckDelayExponentValue) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8342,6 +8796,7 @@ func (this *ADRAckDelayExponentValue) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DeviceEIRPValue) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -8366,6 +8821,7 @@ func (this *DeviceEIRPValue) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (m *Message) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -8436,6 +8892,7 @@ func (m *Message_MACPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *Message_JoinRequestPayload) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -8457,6 +8914,7 @@ func (m *Message_JoinRequestPayload) MarshalToSizedBuffer(dAtA []byte) (int, err
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *Message_JoinAcceptPayload) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -8478,6 +8936,7 @@ func (m *Message_JoinAcceptPayload) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *Message_RejoinRequestPayload) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -8499,6 +8958,7 @@ func (m *Message_RejoinRequestPayload) MarshalToSizedBuffer(dAtA []byte) (int, e
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MHDR) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -8699,9 +9159,9 @@ func (m *FCtrl) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x18
 	}
-	if m.ADRAckReq {
+	if m.AdrAckReq {
 		i--
-		if m.ADRAckReq {
+		if m.AdrAckReq {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -8709,9 +9169,9 @@ func (m *FCtrl) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x10
 	}
-	if m.ADR {
+	if m.Adr {
 		i--
-		if m.ADR {
+		if m.Adr {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -9174,6 +9634,7 @@ func (m *DataRate_LoRa) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *DataRate_FSK) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9195,6 +9656,7 @@ func (m *DataRate_FSK) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *DataRate_Lrfhss) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9216,6 +9678,7 @@ func (m *DataRate_Lrfhss) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *TxSettings) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -9484,6 +9947,7 @@ func (m *DownlinkPath_UplinkToken) MarshalToSizedBuffer(dAtA []byte) (int, error
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *DownlinkPath_Fixed) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9505,6 +9969,7 @@ func (m *DownlinkPath_Fixed) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *TxRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -9666,6 +10131,7 @@ func (m *MACCommand_RawPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_ResetInd_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9687,6 +10153,7 @@ func (m *MACCommand_ResetInd_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_ResetConf_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9708,6 +10175,7 @@ func (m *MACCommand_ResetConf_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_LinkCheckAns_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9729,16 +10197,17 @@ func (m *MACCommand_LinkCheckAns_) MarshalToSizedBuffer(dAtA []byte) (int, error
 	}
 	return len(dAtA) - i, nil
 }
-func (m *MACCommand_LinkADRReq_) MarshalTo(dAtA []byte) (int, error) {
+
+func (m *MACCommand_LinkAdrReq) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MACCommand_LinkADRReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MACCommand_LinkAdrReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.LinkADRReq != nil {
+	if m.LinkAdrReq != nil {
 		{
-			size, err := m.LinkADRReq.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.LinkAdrReq.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -9750,16 +10219,17 @@ func (m *MACCommand_LinkADRReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	}
 	return len(dAtA) - i, nil
 }
-func (m *MACCommand_LinkADRAns_) MarshalTo(dAtA []byte) (int, error) {
+
+func (m *MACCommand_LinkAdrAns) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MACCommand_LinkADRAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MACCommand_LinkAdrAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.LinkADRAns != nil {
+	if m.LinkAdrAns != nil {
 		{
-			size, err := m.LinkADRAns.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.LinkAdrAns.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -9771,6 +10241,7 @@ func (m *MACCommand_LinkADRAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_DutyCycleReq_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9792,6 +10263,7 @@ func (m *MACCommand_DutyCycleReq_) MarshalToSizedBuffer(dAtA []byte) (int, error
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_RxParamSetupReq_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9813,6 +10285,7 @@ func (m *MACCommand_RxParamSetupReq_) MarshalToSizedBuffer(dAtA []byte) (int, er
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_RxParamSetupAns_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9834,6 +10307,7 @@ func (m *MACCommand_RxParamSetupAns_) MarshalToSizedBuffer(dAtA []byte) (int, er
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_DevStatusAns_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9855,6 +10329,7 @@ func (m *MACCommand_DevStatusAns_) MarshalToSizedBuffer(dAtA []byte) (int, error
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_NewChannelReq_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9876,6 +10351,7 @@ func (m *MACCommand_NewChannelReq_) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_NewChannelAns_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9897,6 +10373,7 @@ func (m *MACCommand_NewChannelAns_) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_DLChannelReq_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9918,6 +10395,7 @@ func (m *MACCommand_DLChannelReq_) MarshalToSizedBuffer(dAtA []byte) (int, error
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_DLChannelAns_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9939,6 +10417,7 @@ func (m *MACCommand_DLChannelAns_) MarshalToSizedBuffer(dAtA []byte) (int, error
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_RxTimingSetupReq_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9962,6 +10441,7 @@ func (m *MACCommand_RxTimingSetupReq_) MarshalToSizedBuffer(dAtA []byte) (int, e
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_TxParamSetupReq_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -9985,6 +10465,7 @@ func (m *MACCommand_TxParamSetupReq_) MarshalToSizedBuffer(dAtA []byte) (int, er
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_RekeyInd_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10008,6 +10489,7 @@ func (m *MACCommand_RekeyInd_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_RekeyConf_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10031,16 +10513,17 @@ func (m *MACCommand_RekeyConf_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
-func (m *MACCommand_ADRParamSetupReq_) MarshalTo(dAtA []byte) (int, error) {
+
+func (m *MACCommand_AdrParamSetupReq) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MACCommand_ADRParamSetupReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MACCommand_AdrParamSetupReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.ADRParamSetupReq != nil {
+	if m.AdrParamSetupReq != nil {
 		{
-			size, err := m.ADRParamSetupReq.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.AdrParamSetupReq.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -10054,6 +10537,7 @@ func (m *MACCommand_ADRParamSetupReq_) MarshalToSizedBuffer(dAtA []byte) (int, e
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_DeviceTimeAns_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10077,6 +10561,7 @@ func (m *MACCommand_DeviceTimeAns_) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_ForceRejoinReq_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10100,6 +10585,7 @@ func (m *MACCommand_ForceRejoinReq_) MarshalToSizedBuffer(dAtA []byte) (int, err
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_RejoinParamSetupReq_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10123,6 +10609,7 @@ func (m *MACCommand_RejoinParamSetupReq_) MarshalToSizedBuffer(dAtA []byte) (int
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_RejoinParamSetupAns_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10146,6 +10633,7 @@ func (m *MACCommand_RejoinParamSetupAns_) MarshalToSizedBuffer(dAtA []byte) (int
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_PingSlotInfoReq_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10169,6 +10657,7 @@ func (m *MACCommand_PingSlotInfoReq_) MarshalToSizedBuffer(dAtA []byte) (int, er
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_PingSlotChannelReq_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10192,6 +10681,7 @@ func (m *MACCommand_PingSlotChannelReq_) MarshalToSizedBuffer(dAtA []byte) (int,
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_PingSlotChannelAns_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10215,6 +10705,7 @@ func (m *MACCommand_PingSlotChannelAns_) MarshalToSizedBuffer(dAtA []byte) (int,
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_BeaconTimingAns_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10238,6 +10729,7 @@ func (m *MACCommand_BeaconTimingAns_) MarshalToSizedBuffer(dAtA []byte) (int, er
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_BeaconFreqReq_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10261,6 +10753,7 @@ func (m *MACCommand_BeaconFreqReq_) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_BeaconFreqAns_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10284,6 +10777,7 @@ func (m *MACCommand_BeaconFreqAns_) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_DeviceModeInd_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10307,6 +10801,7 @@ func (m *MACCommand_DeviceModeInd_) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_DeviceModeConf_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -10330,6 +10825,7 @@ func (m *MACCommand_DeviceModeConf_) MarshalToSizedBuffer(dAtA []byte) (int, err
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *MACCommand_ResetInd) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -10994,13 +11490,13 @@ func (m *MACCommand_ADRParamSetupReq) MarshalToSizedBuffer(dAtA []byte) (int, er
 	_ = i
 	var l int
 	_ = l
-	if m.ADRAckDelayExponent != 0 {
-		i = encodeVarintLorawan(dAtA, i, uint64(m.ADRAckDelayExponent))
+	if m.AdrAckDelayExponent != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.AdrAckDelayExponent))
 		i--
 		dAtA[i] = 0x10
 	}
-	if m.ADRAckLimitExponent != 0 {
-		i = encodeVarintLorawan(dAtA, i, uint64(m.ADRAckLimitExponent))
+	if m.AdrAckLimitExponent != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.AdrAckLimitExponent))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -11664,6 +12160,7 @@ func encodeVarintLorawan(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+
 func NewPopulatedMHDR(r randyLorawan, easy bool) *MHDR {
 	this := &MHDR{}
 	this.MType = MType([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
@@ -11675,8 +12172,8 @@ func NewPopulatedMHDR(r randyLorawan, easy bool) *MHDR {
 
 func NewPopulatedFCtrl(r randyLorawan, easy bool) *FCtrl {
 	this := &FCtrl{}
-	this.ADR = bool(bool(r.Intn(2) == 0))
-	this.ADRAckReq = bool(bool(r.Intn(2) == 0))
+	this.Adr = bool(bool(r.Intn(2) == 0))
+	this.AdrAckReq = bool(bool(r.Intn(2) == 0))
 	this.Ack = bool(bool(r.Intn(2) == 0))
 	this.FPending = bool(bool(r.Intn(2) == 0))
 	this.ClassB = bool(bool(r.Intn(2) == 0))
@@ -11732,16 +12229,19 @@ func NewPopulatedDataRate_LoRa(r randyLorawan, easy bool) *DataRate_LoRa {
 	this.LoRa = NewPopulatedLoRaDataRate(r, easy)
 	return this
 }
+
 func NewPopulatedDataRate_FSK(r randyLorawan, easy bool) *DataRate_FSK {
 	this := &DataRate_FSK{}
 	this.FSK = NewPopulatedFSKDataRate(r, easy)
 	return this
 }
+
 func NewPopulatedDataRate_Lrfhss(r randyLorawan, easy bool) *DataRate_Lrfhss {
 	this := &DataRate_Lrfhss{}
 	this.Lrfhss = NewPopulatedLRFHSSDataRate(r, easy)
 	return this
 }
+
 func NewPopulatedTxSettings_Downlink(r randyLorawan, easy bool) *TxSettings_Downlink {
 	this := &TxSettings_Downlink{}
 	this.AntennaIndex = uint32(r.Uint32())
@@ -11804,11 +12304,13 @@ func NewPopulatedDownlinkPath_UplinkToken(r randyLorawan, easy bool) *DownlinkPa
 	}
 	return this
 }
+
 func NewPopulatedDownlinkPath_Fixed(r randyLorawan, easy bool) *DownlinkPath_Fixed {
 	this := &DownlinkPath_Fixed{}
 	this.Fixed = NewPopulatedGatewayAntennaIdentifiers(r, easy)
 	return this
 }
+
 func NewPopulatedMACCommand_LinkADRAns(r randyLorawan, easy bool) *MACCommand_LinkADRAns {
 	this := &MACCommand_LinkADRAns{}
 	this.ChannelMaskAck = bool(bool(r.Intn(2) == 0))
@@ -11891,8 +12393,8 @@ func NewPopulatedMACCommand_RekeyConf(r randyLorawan, easy bool) *MACCommand_Rek
 
 func NewPopulatedMACCommand_ADRParamSetupReq(r randyLorawan, easy bool) *MACCommand_ADRParamSetupReq {
 	this := &MACCommand_ADRParamSetupReq{}
-	this.ADRAckLimitExponent = ADRAckLimitExponent([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
-	this.ADRAckDelayExponent = ADRAckDelayExponent([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
+	this.AdrAckLimitExponent = ADRAckLimitExponent([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
+	this.AdrAckDelayExponent = ADRAckDelayExponent([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -12055,6 +12557,7 @@ func randUTF8RuneLorawan(r randyLorawan) rune {
 	}
 	return rune(ru + 61)
 }
+
 func randStringLorawan(r randyLorawan) string {
 	v6 := r.Intn(100)
 	tmps := make([]rune, v6)
@@ -12063,6 +12566,7 @@ func randStringLorawan(r randyLorawan) string {
 	}
 	return string(tmps)
 }
+
 func randUnrecognizedLorawan(r randyLorawan, maxFieldNumber int) (dAtA []byte) {
 	l := r.Intn(5)
 	for i := 0; i < l; i++ {
@@ -12075,6 +12579,7 @@ func randUnrecognizedLorawan(r randyLorawan, maxFieldNumber int) (dAtA []byte) {
 	}
 	return dAtA
 }
+
 func randFieldLorawan(dAtA []byte, r randyLorawan, fieldNumber int, wire int) []byte {
 	key := uint32(fieldNumber)<<3 | uint32(wire)
 	switch wire {
@@ -12101,6 +12606,7 @@ func randFieldLorawan(dAtA []byte, r randyLorawan, fieldNumber int, wire int) []
 	}
 	return dAtA
 }
+
 func encodeVarintPopulateLorawan(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
 		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
@@ -12109,6 +12615,7 @@ func encodeVarintPopulateLorawan(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
+
 func (m *Message) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12139,6 +12646,7 @@ func (m *Message_MACPayload) Size() (n int) {
 	}
 	return n
 }
+
 func (m *Message_JoinRequestPayload) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12151,6 +12659,7 @@ func (m *Message_JoinRequestPayload) Size() (n int) {
 	}
 	return n
 }
+
 func (m *Message_JoinAcceptPayload) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12163,6 +12672,7 @@ func (m *Message_JoinAcceptPayload) Size() (n int) {
 	}
 	return n
 }
+
 func (m *Message_RejoinRequestPayload) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12175,6 +12685,7 @@ func (m *Message_RejoinRequestPayload) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MHDR) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12241,10 +12752,10 @@ func (m *FCtrl) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.ADR {
+	if m.Adr {
 		n += 2
 	}
-	if m.ADRAckReq {
+	if m.AdrAckReq {
 		n += 2
 	}
 	if m.Ack {
@@ -12429,6 +12940,7 @@ func (m *DataRate_LoRa) Size() (n int) {
 	}
 	return n
 }
+
 func (m *DataRate_FSK) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12441,6 +12953,7 @@ func (m *DataRate_FSK) Size() (n int) {
 	}
 	return n
 }
+
 func (m *DataRate_Lrfhss) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12453,6 +12966,7 @@ func (m *DataRate_Lrfhss) Size() (n int) {
 	}
 	return n
 }
+
 func (m *TxSettings) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12563,6 +13077,7 @@ func (m *DownlinkPath_UplinkToken) Size() (n int) {
 	}
 	return n
 }
+
 func (m *DownlinkPath_Fixed) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12575,6 +13090,7 @@ func (m *DownlinkPath_Fixed) Size() (n int) {
 	}
 	return n
 }
+
 func (m *TxRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12653,6 +13169,7 @@ func (m *MACCommand_RawPayload) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_ResetInd_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12665,6 +13182,7 @@ func (m *MACCommand_ResetInd_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_ResetConf_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12677,6 +13195,7 @@ func (m *MACCommand_ResetConf_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_LinkCheckAns_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12689,30 +13208,33 @@ func (m *MACCommand_LinkCheckAns_) Size() (n int) {
 	}
 	return n
 }
-func (m *MACCommand_LinkADRReq_) Size() (n int) {
+
+func (m *MACCommand_LinkAdrReq) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.LinkADRReq != nil {
-		l = m.LinkADRReq.Size()
+	if m.LinkAdrReq != nil {
+		l = m.LinkAdrReq.Size()
 		n += 1 + l + sovLorawan(uint64(l))
 	}
 	return n
 }
-func (m *MACCommand_LinkADRAns_) Size() (n int) {
+
+func (m *MACCommand_LinkAdrAns) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.LinkADRAns != nil {
-		l = m.LinkADRAns.Size()
+	if m.LinkAdrAns != nil {
+		l = m.LinkAdrAns.Size()
 		n += 1 + l + sovLorawan(uint64(l))
 	}
 	return n
 }
+
 func (m *MACCommand_DutyCycleReq_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12725,6 +13247,7 @@ func (m *MACCommand_DutyCycleReq_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_RxParamSetupReq_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12737,6 +13260,7 @@ func (m *MACCommand_RxParamSetupReq_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_RxParamSetupAns_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12749,6 +13273,7 @@ func (m *MACCommand_RxParamSetupAns_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_DevStatusAns_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12761,6 +13286,7 @@ func (m *MACCommand_DevStatusAns_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_NewChannelReq_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12773,6 +13299,7 @@ func (m *MACCommand_NewChannelReq_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_NewChannelAns_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12785,6 +13312,7 @@ func (m *MACCommand_NewChannelAns_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_DLChannelReq_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12797,6 +13325,7 @@ func (m *MACCommand_DLChannelReq_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_DLChannelAns_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12809,6 +13338,7 @@ func (m *MACCommand_DLChannelAns_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_RxTimingSetupReq_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12821,6 +13351,7 @@ func (m *MACCommand_RxTimingSetupReq_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_TxParamSetupReq_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12833,6 +13364,7 @@ func (m *MACCommand_TxParamSetupReq_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_RekeyInd_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12845,6 +13377,7 @@ func (m *MACCommand_RekeyInd_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_RekeyConf_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12857,18 +13390,20 @@ func (m *MACCommand_RekeyConf_) Size() (n int) {
 	}
 	return n
 }
-func (m *MACCommand_ADRParamSetupReq_) Size() (n int) {
+
+func (m *MACCommand_AdrParamSetupReq) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.ADRParamSetupReq != nil {
-		l = m.ADRParamSetupReq.Size()
+	if m.AdrParamSetupReq != nil {
+		l = m.AdrParamSetupReq.Size()
 		n += 2 + l + sovLorawan(uint64(l))
 	}
 	return n
 }
+
 func (m *MACCommand_DeviceTimeAns_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12881,6 +13416,7 @@ func (m *MACCommand_DeviceTimeAns_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_ForceRejoinReq_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12893,6 +13429,7 @@ func (m *MACCommand_ForceRejoinReq_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_RejoinParamSetupReq_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12905,6 +13442,7 @@ func (m *MACCommand_RejoinParamSetupReq_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_RejoinParamSetupAns_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12917,6 +13455,7 @@ func (m *MACCommand_RejoinParamSetupAns_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_PingSlotInfoReq_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12929,6 +13468,7 @@ func (m *MACCommand_PingSlotInfoReq_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_PingSlotChannelReq_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12941,6 +13481,7 @@ func (m *MACCommand_PingSlotChannelReq_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_PingSlotChannelAns_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12953,6 +13494,7 @@ func (m *MACCommand_PingSlotChannelAns_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_BeaconTimingAns_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12965,6 +13507,7 @@ func (m *MACCommand_BeaconTimingAns_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_BeaconFreqReq_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12977,6 +13520,7 @@ func (m *MACCommand_BeaconFreqReq_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_BeaconFreqAns_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -12989,6 +13533,7 @@ func (m *MACCommand_BeaconFreqAns_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_DeviceModeInd_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -13001,6 +13546,7 @@ func (m *MACCommand_DeviceModeInd_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_DeviceModeConf_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -13013,6 +13559,7 @@ func (m *MACCommand_DeviceModeConf_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *MACCommand_ResetInd) Size() (n int) {
 	if m == nil {
 		return 0
@@ -13283,11 +13830,11 @@ func (m *MACCommand_ADRParamSetupReq) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.ADRAckLimitExponent != 0 {
-		n += 1 + sovLorawan(uint64(m.ADRAckLimitExponent))
+	if m.AdrAckLimitExponent != 0 {
+		n += 1 + sovLorawan(uint64(m.AdrAckLimitExponent))
 	}
-	if m.ADRAckDelayExponent != 0 {
-		n += 1 + sovLorawan(uint64(m.ADRAckDelayExponent))
+	if m.AdrAckDelayExponent != 0 {
+		n += 1 + sovLorawan(uint64(m.AdrAckDelayExponent))
 	}
 	return n
 }
@@ -13567,14 +14114,17 @@ func (m *DeviceEIRPValue) Size() (n int) {
 func sovLorawan(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
+
 func sozLorawan(x uint64) (n int) {
 	return sovLorawan(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
+
 func (this *Message) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&Message{`,
+	s := strings.Join([]string{
+		`&Message{`,
 		`MHDR:` + strings.Replace(strings.Replace(this.MHDR.String(), "MHDR", "MHDR", 1), `&`, ``, 1) + `,`,
 		`MIC:` + fmt.Sprintf("%v", this.MIC) + `,`,
 		`Payload:` + fmt.Sprintf("%v", this.Payload) + `,`,
@@ -13582,62 +14132,74 @@ func (this *Message) String() string {
 	}, "")
 	return s
 }
+
 func (this *Message_MACPayload) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&Message_MACPayload{`,
+	s := strings.Join([]string{
+		`&Message_MACPayload{`,
 		`MACPayload:` + strings.Replace(fmt.Sprintf("%v", this.MACPayload), "MACPayload", "MACPayload", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *Message_JoinRequestPayload) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&Message_JoinRequestPayload{`,
+	s := strings.Join([]string{
+		`&Message_JoinRequestPayload{`,
 		`JoinRequestPayload:` + strings.Replace(fmt.Sprintf("%v", this.JoinRequestPayload), "JoinRequestPayload", "JoinRequestPayload", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *Message_JoinAcceptPayload) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&Message_JoinAcceptPayload{`,
+	s := strings.Join([]string{
+		`&Message_JoinAcceptPayload{`,
 		`JoinAcceptPayload:` + strings.Replace(fmt.Sprintf("%v", this.JoinAcceptPayload), "JoinAcceptPayload", "JoinAcceptPayload", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *Message_RejoinRequestPayload) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&Message_RejoinRequestPayload{`,
+	s := strings.Join([]string{
+		`&Message_RejoinRequestPayload{`,
 		`RejoinRequestPayload:` + strings.Replace(fmt.Sprintf("%v", this.RejoinRequestPayload), "RejoinRequestPayload", "RejoinRequestPayload", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MHDR) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MHDR{`,
+	s := strings.Join([]string{
+		`&MHDR{`,
 		`MType:` + fmt.Sprintf("%v", this.MType) + `,`,
 		`Major:` + fmt.Sprintf("%v", this.Major) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACPayload) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACPayload{`,
+	s := strings.Join([]string{
+		`&MACPayload{`,
 		`FHDR:` + strings.Replace(strings.Replace(this.FHDR.String(), "FHDR", "FHDR", 1), `&`, ``, 1) + `,`,
 		`FPort:` + fmt.Sprintf("%v", this.FPort) + `,`,
 		`FRMPayload:` + fmt.Sprintf("%v", this.FRMPayload) + `,`,
@@ -13647,11 +14209,13 @@ func (this *MACPayload) String() string {
 	}, "")
 	return s
 }
+
 func (this *FHDR) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&FHDR{`,
+	s := strings.Join([]string{
+		`&FHDR{`,
 		`DevAddr:` + fmt.Sprintf("%v", this.DevAddr) + `,`,
 		`FCtrl:` + strings.Replace(strings.Replace(this.FCtrl.String(), "FCtrl", "FCtrl", 1), `&`, ``, 1) + `,`,
 		`FCnt:` + fmt.Sprintf("%v", this.FCnt) + `,`,
@@ -13660,13 +14224,15 @@ func (this *FHDR) String() string {
 	}, "")
 	return s
 }
+
 func (this *FCtrl) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&FCtrl{`,
-		`ADR:` + fmt.Sprintf("%v", this.ADR) + `,`,
-		`ADRAckReq:` + fmt.Sprintf("%v", this.ADRAckReq) + `,`,
+	s := strings.Join([]string{
+		`&FCtrl{`,
+		`ADR:` + fmt.Sprintf("%v", this.Adr) + `,`,
+		`ADRAckReq:` + fmt.Sprintf("%v", this.AdrAckReq) + `,`,
 		`Ack:` + fmt.Sprintf("%v", this.Ack) + `,`,
 		`FPending:` + fmt.Sprintf("%v", this.FPending) + `,`,
 		`ClassB:` + fmt.Sprintf("%v", this.ClassB) + `,`,
@@ -13674,11 +14240,13 @@ func (this *FCtrl) String() string {
 	}, "")
 	return s
 }
+
 func (this *JoinRequestPayload) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&JoinRequestPayload{`,
+	s := strings.Join([]string{
+		`&JoinRequestPayload{`,
 		`JoinEui:` + fmt.Sprintf("%v", this.JoinEui) + `,`,
 		`DevEui:` + fmt.Sprintf("%v", this.DevEui) + `,`,
 		`DevNonce:` + fmt.Sprintf("%v", this.DevNonce) + `,`,
@@ -13686,11 +14254,13 @@ func (this *JoinRequestPayload) String() string {
 	}, "")
 	return s
 }
+
 func (this *RejoinRequestPayload) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&RejoinRequestPayload{`,
+	s := strings.Join([]string{
+		`&RejoinRequestPayload{`,
 		`RejoinType:` + fmt.Sprintf("%v", this.RejoinType) + `,`,
 		`NetID:` + fmt.Sprintf("%v", this.NetID) + `,`,
 		`JoinEui:` + fmt.Sprintf("%v", this.JoinEui) + `,`,
@@ -13700,11 +14270,13 @@ func (this *RejoinRequestPayload) String() string {
 	}, "")
 	return s
 }
+
 func (this *JoinAcceptPayload) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&JoinAcceptPayload{`,
+	s := strings.Join([]string{
+		`&JoinAcceptPayload{`,
 		`Encrypted:` + fmt.Sprintf("%v", this.Encrypted) + `,`,
 		`JoinNonce:` + fmt.Sprintf("%v", this.JoinNonce) + `,`,
 		`NetID:` + fmt.Sprintf("%v", this.NetID) + `,`,
@@ -13716,11 +14288,13 @@ func (this *JoinAcceptPayload) String() string {
 	}, "")
 	return s
 }
+
 func (this *DLSettings) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DLSettings{`,
+	s := strings.Join([]string{
+		`&DLSettings{`,
 		`Rx1DROffset:` + fmt.Sprintf("%v", this.Rx1DROffset) + `,`,
 		`Rx2DR:` + fmt.Sprintf("%v", this.Rx2DR) + `,`,
 		`OptNeg:` + fmt.Sprintf("%v", this.OptNeg) + `,`,
@@ -13728,11 +14302,13 @@ func (this *DLSettings) String() string {
 	}, "")
 	return s
 }
+
 func (this *CFList) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CFList{`,
+	s := strings.Join([]string{
+		`&CFList{`,
 		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
 		`Freq:` + fmt.Sprintf("%v", this.Freq) + `,`,
 		`ChMasks:` + fmt.Sprintf("%v", this.ChMasks) + `,`,
@@ -13740,83 +14316,99 @@ func (this *CFList) String() string {
 	}, "")
 	return s
 }
+
 func (this *LoRaDataRate) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&LoRaDataRate{`,
+	s := strings.Join([]string{
+		`&LoRaDataRate{`,
 		`Bandwidth:` + fmt.Sprintf("%v", this.Bandwidth) + `,`,
 		`SpreadingFactor:` + fmt.Sprintf("%v", this.SpreadingFactor) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *FSKDataRate) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&FSKDataRate{`,
+	s := strings.Join([]string{
+		`&FSKDataRate{`,
 		`BitRate:` + fmt.Sprintf("%v", this.BitRate) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *LRFHSSDataRate) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&LRFHSSDataRate{`,
+	s := strings.Join([]string{
+		`&LRFHSSDataRate{`,
 		`ModulationType:` + fmt.Sprintf("%v", this.ModulationType) + `,`,
 		`OperatingChannelWidth:` + fmt.Sprintf("%v", this.OperatingChannelWidth) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *DataRate) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DataRate{`,
+	s := strings.Join([]string{
+		`&DataRate{`,
 		`Modulation:` + fmt.Sprintf("%v", this.Modulation) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *DataRate_LoRa) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DataRate_LoRa{`,
+	s := strings.Join([]string{
+		`&DataRate_LoRa{`,
 		`LoRa:` + strings.Replace(fmt.Sprintf("%v", this.LoRa), "LoRaDataRate", "LoRaDataRate", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *DataRate_FSK) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DataRate_FSK{`,
+	s := strings.Join([]string{
+		`&DataRate_FSK{`,
 		`FSK:` + strings.Replace(fmt.Sprintf("%v", this.FSK), "FSKDataRate", "FSKDataRate", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *DataRate_Lrfhss) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DataRate_Lrfhss{`,
+	s := strings.Join([]string{
+		`&DataRate_Lrfhss{`,
 		`Lrfhss:` + strings.Replace(fmt.Sprintf("%v", this.Lrfhss), "LRFHSSDataRate", "LRFHSSDataRate", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *TxSettings) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&TxSettings{`,
+	s := strings.Join([]string{
+		`&TxSettings{`,
 		`DataRate:` + strings.Replace(strings.Replace(this.DataRate.String(), "DataRate", "DataRate", 1), `&`, ``, 1) + `,`,
 		`DataRateIndex:` + fmt.Sprintf("%v", this.DataRateIndex) + `,`,
 		`CodingRate:` + fmt.Sprintf("%v", this.CodingRate) + `,`,
@@ -13829,11 +14421,13 @@ func (this *TxSettings) String() string {
 	}, "")
 	return s
 }
+
 func (this *TxSettings_Downlink) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&TxSettings_Downlink{`,
+	s := strings.Join([]string{
+		`&TxSettings_Downlink{`,
 		`AntennaIndex:` + fmt.Sprintf("%v", this.AntennaIndex) + `,`,
 		`TxPower:` + fmt.Sprintf("%v", this.TxPower) + `,`,
 		`InvertPolarization:` + fmt.Sprintf("%v", this.InvertPolarization) + `,`,
@@ -13841,22 +14435,26 @@ func (this *TxSettings_Downlink) String() string {
 	}, "")
 	return s
 }
+
 func (this *GatewayAntennaIdentifiers) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&GatewayAntennaIdentifiers{`,
+	s := strings.Join([]string{
+		`&GatewayAntennaIdentifiers{`,
 		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
 		`AntennaIndex:` + fmt.Sprintf("%v", this.AntennaIndex) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *UplinkToken) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&UplinkToken{`,
+	s := strings.Join([]string{
+		`&UplinkToken{`,
 		`GatewayAntennaIdentifiers:` + strings.Replace(strings.Replace(this.GatewayAntennaIdentifiers.String(), "GatewayAntennaIdentifiers", "GatewayAntennaIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Timestamp:` + fmt.Sprintf("%v", this.Timestamp) + `,`,
 		`ServerTime:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ServerTime), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
@@ -13865,36 +14463,43 @@ func (this *UplinkToken) String() string {
 	}, "")
 	return s
 }
+
 func (this *DownlinkPath) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DownlinkPath{`,
+	s := strings.Join([]string{
+		`&DownlinkPath{`,
 		`Path:` + fmt.Sprintf("%v", this.Path) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *DownlinkPath_UplinkToken) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DownlinkPath_UplinkToken{`,
+	s := strings.Join([]string{
+		`&DownlinkPath_UplinkToken{`,
 		`UplinkToken:` + fmt.Sprintf("%v", this.UplinkToken) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *DownlinkPath_Fixed) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DownlinkPath_Fixed{`,
+	s := strings.Join([]string{
+		`&DownlinkPath_Fixed{`,
 		`Fixed:` + strings.Replace(fmt.Sprintf("%v", this.Fixed), "GatewayAntennaIdentifiers", "GatewayAntennaIdentifiers", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *TxRequest) String() string {
 	if this == nil {
 		return "nil"
@@ -13904,7 +14509,8 @@ func (this *TxRequest) String() string {
 		repeatedStringForDownlinkPaths += strings.Replace(f.String(), "DownlinkPath", "DownlinkPath", 1) + ","
 	}
 	repeatedStringForDownlinkPaths += "}"
-	s := strings.Join([]string{`&TxRequest{`,
+	s := strings.Join([]string{
+		`&TxRequest{`,
 		`Class:` + fmt.Sprintf("%v", this.Class) + `,`,
 		`DownlinkPaths:` + repeatedStringForDownlinkPaths + `,`,
 		`Rx1Delay:` + fmt.Sprintf("%v", this.Rx1Delay) + `,`,
@@ -13921,363 +14527,435 @@ func (this *TxRequest) String() string {
 	}, "")
 	return s
 }
+
 func (this *MACCommand) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand{`,
+	s := strings.Join([]string{
+		`&MACCommand{`,
 		`CID:` + fmt.Sprintf("%v", this.CID) + `,`,
 		`Payload:` + fmt.Sprintf("%v", this.Payload) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RawPayload) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RawPayload{`,
+	s := strings.Join([]string{
+		`&MACCommand_RawPayload{`,
 		`RawPayload:` + fmt.Sprintf("%v", this.RawPayload) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_ResetInd_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_ResetInd_{`,
+	s := strings.Join([]string{
+		`&MACCommand_ResetInd_{`,
 		`ResetInd:` + strings.Replace(fmt.Sprintf("%v", this.ResetInd), "MACCommand_ResetInd", "MACCommand_ResetInd", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_ResetConf_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_ResetConf_{`,
+	s := strings.Join([]string{
+		`&MACCommand_ResetConf_{`,
 		`ResetConf:` + strings.Replace(fmt.Sprintf("%v", this.ResetConf), "MACCommand_ResetConf", "MACCommand_ResetConf", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_LinkCheckAns_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_LinkCheckAns_{`,
+	s := strings.Join([]string{
+		`&MACCommand_LinkCheckAns_{`,
 		`LinkCheckAns:` + strings.Replace(fmt.Sprintf("%v", this.LinkCheckAns), "MACCommand_LinkCheckAns", "MACCommand_LinkCheckAns", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *MACCommand_LinkADRReq_) String() string {
+
+func (this *MACCommand_LinkAdrReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_LinkADRReq_{`,
-		`LinkADRReq:` + strings.Replace(fmt.Sprintf("%v", this.LinkADRReq), "MACCommand_LinkADRReq", "MACCommand_LinkADRReq", 1) + `,`,
+	s := strings.Join([]string{
+		`&MACCommand_LinkADRReq_{`,
+		`LinkADRReq:` + strings.Replace(fmt.Sprintf("%v", this.LinkAdrReq), "MACCommand_LinkADRReq", "MACCommand_LinkADRReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *MACCommand_LinkADRAns_) String() string {
+
+func (this *MACCommand_LinkAdrAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_LinkADRAns_{`,
-		`LinkADRAns:` + strings.Replace(fmt.Sprintf("%v", this.LinkADRAns), "MACCommand_LinkADRAns", "MACCommand_LinkADRAns", 1) + `,`,
+	s := strings.Join([]string{
+		`&MACCommand_LinkADRAns_{`,
+		`LinkADRAns:` + strings.Replace(fmt.Sprintf("%v", this.LinkAdrAns), "MACCommand_LinkADRAns", "MACCommand_LinkADRAns", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DutyCycleReq_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DutyCycleReq_{`,
+	s := strings.Join([]string{
+		`&MACCommand_DutyCycleReq_{`,
 		`DutyCycleReq:` + strings.Replace(fmt.Sprintf("%v", this.DutyCycleReq), "MACCommand_DutyCycleReq", "MACCommand_DutyCycleReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RxParamSetupReq_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RxParamSetupReq_{`,
+	s := strings.Join([]string{
+		`&MACCommand_RxParamSetupReq_{`,
 		`RxParamSetupReq:` + strings.Replace(fmt.Sprintf("%v", this.RxParamSetupReq), "MACCommand_RxParamSetupReq", "MACCommand_RxParamSetupReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RxParamSetupAns_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RxParamSetupAns_{`,
+	s := strings.Join([]string{
+		`&MACCommand_RxParamSetupAns_{`,
 		`RxParamSetupAns:` + strings.Replace(fmt.Sprintf("%v", this.RxParamSetupAns), "MACCommand_RxParamSetupAns", "MACCommand_RxParamSetupAns", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DevStatusAns_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DevStatusAns_{`,
+	s := strings.Join([]string{
+		`&MACCommand_DevStatusAns_{`,
 		`DevStatusAns:` + strings.Replace(fmt.Sprintf("%v", this.DevStatusAns), "MACCommand_DevStatusAns", "MACCommand_DevStatusAns", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_NewChannelReq_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_NewChannelReq_{`,
+	s := strings.Join([]string{
+		`&MACCommand_NewChannelReq_{`,
 		`NewChannelReq:` + strings.Replace(fmt.Sprintf("%v", this.NewChannelReq), "MACCommand_NewChannelReq", "MACCommand_NewChannelReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_NewChannelAns_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_NewChannelAns_{`,
+	s := strings.Join([]string{
+		`&MACCommand_NewChannelAns_{`,
 		`NewChannelAns:` + strings.Replace(fmt.Sprintf("%v", this.NewChannelAns), "MACCommand_NewChannelAns", "MACCommand_NewChannelAns", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DLChannelReq_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DLChannelReq_{`,
+	s := strings.Join([]string{
+		`&MACCommand_DLChannelReq_{`,
 		`DLChannelReq:` + strings.Replace(fmt.Sprintf("%v", this.DLChannelReq), "MACCommand_DLChannelReq", "MACCommand_DLChannelReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DLChannelAns_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DLChannelAns_{`,
+	s := strings.Join([]string{
+		`&MACCommand_DLChannelAns_{`,
 		`DLChannelAns:` + strings.Replace(fmt.Sprintf("%v", this.DLChannelAns), "MACCommand_DLChannelAns", "MACCommand_DLChannelAns", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RxTimingSetupReq_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RxTimingSetupReq_{`,
+	s := strings.Join([]string{
+		`&MACCommand_RxTimingSetupReq_{`,
 		`RxTimingSetupReq:` + strings.Replace(fmt.Sprintf("%v", this.RxTimingSetupReq), "MACCommand_RxTimingSetupReq", "MACCommand_RxTimingSetupReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_TxParamSetupReq_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_TxParamSetupReq_{`,
+	s := strings.Join([]string{
+		`&MACCommand_TxParamSetupReq_{`,
 		`TxParamSetupReq:` + strings.Replace(fmt.Sprintf("%v", this.TxParamSetupReq), "MACCommand_TxParamSetupReq", "MACCommand_TxParamSetupReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RekeyInd_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RekeyInd_{`,
+	s := strings.Join([]string{
+		`&MACCommand_RekeyInd_{`,
 		`RekeyInd:` + strings.Replace(fmt.Sprintf("%v", this.RekeyInd), "MACCommand_RekeyInd", "MACCommand_RekeyInd", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RekeyConf_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RekeyConf_{`,
+	s := strings.Join([]string{
+		`&MACCommand_RekeyConf_{`,
 		`RekeyConf:` + strings.Replace(fmt.Sprintf("%v", this.RekeyConf), "MACCommand_RekeyConf", "MACCommand_RekeyConf", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *MACCommand_ADRParamSetupReq_) String() string {
+
+func (this *MACCommand_AdrParamSetupReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_ADRParamSetupReq_{`,
-		`ADRParamSetupReq:` + strings.Replace(fmt.Sprintf("%v", this.ADRParamSetupReq), "MACCommand_ADRParamSetupReq", "MACCommand_ADRParamSetupReq", 1) + `,`,
+	s := strings.Join([]string{
+		`&MACCommand_ADRParamSetupReq_{`,
+		`ADRParamSetupReq:` + strings.Replace(fmt.Sprintf("%v", this.AdrParamSetupReq), "MACCommand_ADRParamSetupReq", "MACCommand_ADRParamSetupReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DeviceTimeAns_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DeviceTimeAns_{`,
+	s := strings.Join([]string{
+		`&MACCommand_DeviceTimeAns_{`,
 		`DeviceTimeAns:` + strings.Replace(fmt.Sprintf("%v", this.DeviceTimeAns), "MACCommand_DeviceTimeAns", "MACCommand_DeviceTimeAns", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_ForceRejoinReq_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_ForceRejoinReq_{`,
+	s := strings.Join([]string{
+		`&MACCommand_ForceRejoinReq_{`,
 		`ForceRejoinReq:` + strings.Replace(fmt.Sprintf("%v", this.ForceRejoinReq), "MACCommand_ForceRejoinReq", "MACCommand_ForceRejoinReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RejoinParamSetupReq_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RejoinParamSetupReq_{`,
+	s := strings.Join([]string{
+		`&MACCommand_RejoinParamSetupReq_{`,
 		`RejoinParamSetupReq:` + strings.Replace(fmt.Sprintf("%v", this.RejoinParamSetupReq), "MACCommand_RejoinParamSetupReq", "MACCommand_RejoinParamSetupReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RejoinParamSetupAns_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RejoinParamSetupAns_{`,
+	s := strings.Join([]string{
+		`&MACCommand_RejoinParamSetupAns_{`,
 		`RejoinParamSetupAns:` + strings.Replace(fmt.Sprintf("%v", this.RejoinParamSetupAns), "MACCommand_RejoinParamSetupAns", "MACCommand_RejoinParamSetupAns", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_PingSlotInfoReq_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_PingSlotInfoReq_{`,
+	s := strings.Join([]string{
+		`&MACCommand_PingSlotInfoReq_{`,
 		`PingSlotInfoReq:` + strings.Replace(fmt.Sprintf("%v", this.PingSlotInfoReq), "MACCommand_PingSlotInfoReq", "MACCommand_PingSlotInfoReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_PingSlotChannelReq_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_PingSlotChannelReq_{`,
+	s := strings.Join([]string{
+		`&MACCommand_PingSlotChannelReq_{`,
 		`PingSlotChannelReq:` + strings.Replace(fmt.Sprintf("%v", this.PingSlotChannelReq), "MACCommand_PingSlotChannelReq", "MACCommand_PingSlotChannelReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_PingSlotChannelAns_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_PingSlotChannelAns_{`,
+	s := strings.Join([]string{
+		`&MACCommand_PingSlotChannelAns_{`,
 		`PingSlotChannelAns:` + strings.Replace(fmt.Sprintf("%v", this.PingSlotChannelAns), "MACCommand_PingSlotChannelAns", "MACCommand_PingSlotChannelAns", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_BeaconTimingAns_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_BeaconTimingAns_{`,
+	s := strings.Join([]string{
+		`&MACCommand_BeaconTimingAns_{`,
 		`BeaconTimingAns:` + strings.Replace(fmt.Sprintf("%v", this.BeaconTimingAns), "MACCommand_BeaconTimingAns", "MACCommand_BeaconTimingAns", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_BeaconFreqReq_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_BeaconFreqReq_{`,
+	s := strings.Join([]string{
+		`&MACCommand_BeaconFreqReq_{`,
 		`BeaconFreqReq:` + strings.Replace(fmt.Sprintf("%v", this.BeaconFreqReq), "MACCommand_BeaconFreqReq", "MACCommand_BeaconFreqReq", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_BeaconFreqAns_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_BeaconFreqAns_{`,
+	s := strings.Join([]string{
+		`&MACCommand_BeaconFreqAns_{`,
 		`BeaconFreqAns:` + strings.Replace(fmt.Sprintf("%v", this.BeaconFreqAns), "MACCommand_BeaconFreqAns", "MACCommand_BeaconFreqAns", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DeviceModeInd_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DeviceModeInd_{`,
+	s := strings.Join([]string{
+		`&MACCommand_DeviceModeInd_{`,
 		`DeviceModeInd:` + strings.Replace(fmt.Sprintf("%v", this.DeviceModeInd), "MACCommand_DeviceModeInd", "MACCommand_DeviceModeInd", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DeviceModeConf_) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DeviceModeConf_{`,
+	s := strings.Join([]string{
+		`&MACCommand_DeviceModeConf_{`,
 		`DeviceModeConf:` + strings.Replace(fmt.Sprintf("%v", this.DeviceModeConf), "MACCommand_DeviceModeConf", "MACCommand_DeviceModeConf", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_ResetInd) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_ResetInd{`,
+	s := strings.Join([]string{
+		`&MACCommand_ResetInd{`,
 		`MinorVersion:` + fmt.Sprintf("%v", this.MinorVersion) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_ResetConf) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_ResetConf{`,
+	s := strings.Join([]string{
+		`&MACCommand_ResetConf{`,
 		`MinorVersion:` + fmt.Sprintf("%v", this.MinorVersion) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_LinkCheckAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_LinkCheckAns{`,
+	s := strings.Join([]string{
+		`&MACCommand_LinkCheckAns{`,
 		`Margin:` + fmt.Sprintf("%v", this.Margin) + `,`,
 		`GatewayCount:` + fmt.Sprintf("%v", this.GatewayCount) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_LinkADRReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_LinkADRReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_LinkADRReq{`,
 		`DataRateIndex:` + fmt.Sprintf("%v", this.DataRateIndex) + `,`,
 		`TxPowerIndex:` + fmt.Sprintf("%v", this.TxPowerIndex) + `,`,
 		`ChannelMask:` + fmt.Sprintf("%v", this.ChannelMask) + `,`,
@@ -14287,11 +14965,13 @@ func (this *MACCommand_LinkADRReq) String() string {
 	}, "")
 	return s
 }
+
 func (this *MACCommand_LinkADRAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_LinkADRAns{`,
+	s := strings.Join([]string{
+		`&MACCommand_LinkADRAns{`,
 		`ChannelMaskAck:` + fmt.Sprintf("%v", this.ChannelMaskAck) + `,`,
 		`DataRateIndexAck:` + fmt.Sprintf("%v", this.DataRateIndexAck) + `,`,
 		`TxPowerIndexAck:` + fmt.Sprintf("%v", this.TxPowerIndexAck) + `,`,
@@ -14299,21 +14979,25 @@ func (this *MACCommand_LinkADRAns) String() string {
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DutyCycleReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DutyCycleReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_DutyCycleReq{`,
 		`MaxDutyCycle:` + fmt.Sprintf("%v", this.MaxDutyCycle) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RxParamSetupReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RxParamSetupReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_RxParamSetupReq{`,
 		`Rx2DataRateIndex:` + fmt.Sprintf("%v", this.Rx2DataRateIndex) + `,`,
 		`Rx1DataRateOffset:` + fmt.Sprintf("%v", this.Rx1DataRateOffset) + `,`,
 		`Rx2Frequency:` + fmt.Sprintf("%v", this.Rx2Frequency) + `,`,
@@ -14321,11 +15005,13 @@ func (this *MACCommand_RxParamSetupReq) String() string {
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RxParamSetupAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RxParamSetupAns{`,
+	s := strings.Join([]string{
+		`&MACCommand_RxParamSetupAns{`,
 		`Rx2DataRateIndexAck:` + fmt.Sprintf("%v", this.Rx2DataRateIndexAck) + `,`,
 		`Rx1DataRateOffsetAck:` + fmt.Sprintf("%v", this.Rx1DataRateOffsetAck) + `,`,
 		`Rx2FrequencyAck:` + fmt.Sprintf("%v", this.Rx2FrequencyAck) + `,`,
@@ -14333,22 +15019,26 @@ func (this *MACCommand_RxParamSetupAns) String() string {
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DevStatusAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DevStatusAns{`,
+	s := strings.Join([]string{
+		`&MACCommand_DevStatusAns{`,
 		`Battery:` + fmt.Sprintf("%v", this.Battery) + `,`,
 		`Margin:` + fmt.Sprintf("%v", this.Margin) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_NewChannelReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_NewChannelReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_NewChannelReq{`,
 		`ChannelIndex:` + fmt.Sprintf("%v", this.ChannelIndex) + `,`,
 		`Frequency:` + fmt.Sprintf("%v", this.Frequency) + `,`,
 		`MinDataRateIndex:` + fmt.Sprintf("%v", this.MinDataRateIndex) + `,`,
@@ -14357,54 +15047,64 @@ func (this *MACCommand_NewChannelReq) String() string {
 	}, "")
 	return s
 }
+
 func (this *MACCommand_NewChannelAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_NewChannelAns{`,
+	s := strings.Join([]string{
+		`&MACCommand_NewChannelAns{`,
 		`FrequencyAck:` + fmt.Sprintf("%v", this.FrequencyAck) + `,`,
 		`DataRateAck:` + fmt.Sprintf("%v", this.DataRateAck) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DLChannelReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DLChannelReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_DLChannelReq{`,
 		`ChannelIndex:` + fmt.Sprintf("%v", this.ChannelIndex) + `,`,
 		`Frequency:` + fmt.Sprintf("%v", this.Frequency) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DLChannelAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DLChannelAns{`,
+	s := strings.Join([]string{
+		`&MACCommand_DLChannelAns{`,
 		`ChannelIndexAck:` + fmt.Sprintf("%v", this.ChannelIndexAck) + `,`,
 		`FrequencyAck:` + fmt.Sprintf("%v", this.FrequencyAck) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RxTimingSetupReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RxTimingSetupReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_RxTimingSetupReq{`,
 		`Delay:` + fmt.Sprintf("%v", this.Delay) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_TxParamSetupReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_TxParamSetupReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_TxParamSetupReq{`,
 		`MaxEIRPIndex:` + fmt.Sprintf("%v", this.MaxEIRPIndex) + `,`,
 		`UplinkDwellTime:` + fmt.Sprintf("%v", this.UplinkDwellTime) + `,`,
 		`DownlinkDwellTime:` + fmt.Sprintf("%v", this.DownlinkDwellTime) + `,`,
@@ -14412,52 +15112,62 @@ func (this *MACCommand_TxParamSetupReq) String() string {
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RekeyInd) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RekeyInd{`,
+	s := strings.Join([]string{
+		`&MACCommand_RekeyInd{`,
 		`MinorVersion:` + fmt.Sprintf("%v", this.MinorVersion) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RekeyConf) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RekeyConf{`,
+	s := strings.Join([]string{
+		`&MACCommand_RekeyConf{`,
 		`MinorVersion:` + fmt.Sprintf("%v", this.MinorVersion) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_ADRParamSetupReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_ADRParamSetupReq{`,
-		`ADRAckLimitExponent:` + fmt.Sprintf("%v", this.ADRAckLimitExponent) + `,`,
-		`ADRAckDelayExponent:` + fmt.Sprintf("%v", this.ADRAckDelayExponent) + `,`,
+	s := strings.Join([]string{
+		`&MACCommand_ADRParamSetupReq{`,
+		`ADRAckLimitExponent:` + fmt.Sprintf("%v", this.AdrAckLimitExponent) + `,`,
+		`ADRAckDelayExponent:` + fmt.Sprintf("%v", this.AdrAckDelayExponent) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DeviceTimeAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DeviceTimeAns{`,
+	s := strings.Join([]string{
+		`&MACCommand_DeviceTimeAns{`,
 		`Time:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_ForceRejoinReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_ForceRejoinReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_ForceRejoinReq{`,
 		`RejoinType:` + fmt.Sprintf("%v", this.RejoinType) + `,`,
 		`DataRateIndex:` + fmt.Sprintf("%v", this.DataRateIndex) + `,`,
 		`MaxRetries:` + fmt.Sprintf("%v", this.MaxRetries) + `,`,
@@ -14466,200 +15176,239 @@ func (this *MACCommand_ForceRejoinReq) String() string {
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RejoinParamSetupReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RejoinParamSetupReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_RejoinParamSetupReq{`,
 		`MaxCountExponent:` + fmt.Sprintf("%v", this.MaxCountExponent) + `,`,
 		`MaxTimeExponent:` + fmt.Sprintf("%v", this.MaxTimeExponent) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_RejoinParamSetupAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_RejoinParamSetupAns{`,
+	s := strings.Join([]string{
+		`&MACCommand_RejoinParamSetupAns{`,
 		`MaxTimeExponentAck:` + fmt.Sprintf("%v", this.MaxTimeExponentAck) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_PingSlotInfoReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_PingSlotInfoReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_PingSlotInfoReq{`,
 		`Period:` + fmt.Sprintf("%v", this.Period) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_PingSlotChannelReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_PingSlotChannelReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_PingSlotChannelReq{`,
 		`Frequency:` + fmt.Sprintf("%v", this.Frequency) + `,`,
 		`DataRateIndex:` + fmt.Sprintf("%v", this.DataRateIndex) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_PingSlotChannelAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_PingSlotChannelAns{`,
+	s := strings.Join([]string{
+		`&MACCommand_PingSlotChannelAns{`,
 		`FrequencyAck:` + fmt.Sprintf("%v", this.FrequencyAck) + `,`,
 		`DataRateIndexAck:` + fmt.Sprintf("%v", this.DataRateIndexAck) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_BeaconTimingAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_BeaconTimingAns{`,
+	s := strings.Join([]string{
+		`&MACCommand_BeaconTimingAns{`,
 		`Delay:` + fmt.Sprintf("%v", this.Delay) + `,`,
 		`ChannelIndex:` + fmt.Sprintf("%v", this.ChannelIndex) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_BeaconFreqReq) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_BeaconFreqReq{`,
+	s := strings.Join([]string{
+		`&MACCommand_BeaconFreqReq{`,
 		`Frequency:` + fmt.Sprintf("%v", this.Frequency) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_BeaconFreqAns) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_BeaconFreqAns{`,
+	s := strings.Join([]string{
+		`&MACCommand_BeaconFreqAns{`,
 		`FrequencyAck:` + fmt.Sprintf("%v", this.FrequencyAck) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DeviceModeInd) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DeviceModeInd{`,
+	s := strings.Join([]string{
+		`&MACCommand_DeviceModeInd{`,
 		`Class:` + fmt.Sprintf("%v", this.Class) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *MACCommand_DeviceModeConf) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&MACCommand_DeviceModeConf{`,
+	s := strings.Join([]string{
+		`&MACCommand_DeviceModeConf{`,
 		`Class:` + fmt.Sprintf("%v", this.Class) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *FrequencyValue) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&FrequencyValue{`,
+	s := strings.Join([]string{
+		`&FrequencyValue{`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *DataRateOffsetValue) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DataRateOffsetValue{`,
+	s := strings.Join([]string{
+		`&DataRateOffsetValue{`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *DataRateIndexValue) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DataRateIndexValue{`,
+	s := strings.Join([]string{
+		`&DataRateIndexValue{`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *PingSlotPeriodValue) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&PingSlotPeriodValue{`,
+	s := strings.Join([]string{
+		`&PingSlotPeriodValue{`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *AggregatedDutyCycleValue) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&AggregatedDutyCycleValue{`,
+	s := strings.Join([]string{
+		`&AggregatedDutyCycleValue{`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *RxDelayValue) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&RxDelayValue{`,
+	s := strings.Join([]string{
+		`&RxDelayValue{`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *ADRAckLimitExponentValue) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ADRAckLimitExponentValue{`,
+	s := strings.Join([]string{
+		`&ADRAckLimitExponentValue{`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *ADRAckDelayExponentValue) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ADRAckDelayExponentValue{`,
+	s := strings.Join([]string{
+		`&ADRAckDelayExponentValue{`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *DeviceEIRPValue) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DeviceEIRPValue{`,
+	s := strings.Join([]string{
+		`&DeviceEIRPValue{`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func valueToStringLorawan(v interface{}) string {
 	rv := reflect.ValueOf(v)
 	if rv.IsNil() {
@@ -14668,6 +15417,7 @@ func valueToStringLorawan(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
+
 func (m *Message) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -14928,6 +15678,7 @@ func (m *Message) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MHDR) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -15019,6 +15770,7 @@ func (m *MHDR) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACPayload) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -15213,6 +15965,7 @@ func (m *MACPayload) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *FHDR) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -15385,6 +16138,7 @@ func (m *FHDR) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *FCtrl) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -15433,7 +16187,7 @@ func (m *FCtrl) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.ADR = bool(v != 0)
+			m.Adr = bool(v != 0)
 		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ADRAckReq", wireType)
@@ -15453,7 +16207,7 @@ func (m *FCtrl) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.ADRAckReq = bool(v != 0)
+			m.AdrAckReq = bool(v != 0)
 		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Ack", wireType)
@@ -15538,6 +16292,7 @@ func (m *FCtrl) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *JoinRequestPayload) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -15690,6 +16445,7 @@ func (m *JoinRequestPayload) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *RejoinRequestPayload) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -15880,6 +16636,7 @@ func (m *RejoinRequestPayload) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *JoinAcceptPayload) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -16154,6 +16911,7 @@ func (m *JoinAcceptPayload) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *DLSettings) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -16265,6 +17023,7 @@ func (m *DLSettings) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *CFList) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -16483,6 +17242,7 @@ func (m *CFList) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *LoRaDataRate) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -16574,6 +17334,7 @@ func (m *LoRaDataRate) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *FSKDataRate) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -16646,6 +17407,7 @@ func (m *FSKDataRate) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *LRFHSSDataRate) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -16737,6 +17499,7 @@ func (m *LRFHSSDataRate) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *DataRate) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -16895,6 +17658,7 @@ func (m *DataRate) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *TxSettings) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -17162,6 +17926,7 @@ func (m *TxSettings) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *TxSettings_Downlink) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -17265,6 +18030,7 @@ func (m *TxSettings_Downlink) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *GatewayAntennaIdentifiers) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -17370,6 +18136,7 @@ func (m *GatewayAntennaIdentifiers) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *UplinkToken) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -17527,6 +18294,7 @@ func (m *UplinkToken) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *DownlinkPath) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -17648,6 +18416,7 @@ func (m *DownlinkPath) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *TxRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -17991,6 +18760,7 @@ func (m *TxRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -18210,7 +18980,7 @@ func (m *MACCommand) Unmarshal(dAtA []byte) error {
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Payload = &MACCommand_LinkADRReq_{v}
+			m.Payload = &MACCommand_LinkAdrReq{v}
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
@@ -18245,7 +19015,7 @@ func (m *MACCommand) Unmarshal(dAtA []byte) error {
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Payload = &MACCommand_LinkADRAns_{v}
+			m.Payload = &MACCommand_LinkAdrAns{v}
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
@@ -18700,7 +19470,7 @@ func (m *MACCommand) Unmarshal(dAtA []byte) error {
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Payload = &MACCommand_ADRParamSetupReq_{v}
+			m.Payload = &MACCommand_AdrParamSetupReq{v}
 			iNdEx = postIndex
 		case 21:
 			if wireType != 2 {
@@ -19146,6 +19916,7 @@ func (m *MACCommand) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_ResetInd) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -19218,6 +19989,7 @@ func (m *MACCommand_ResetInd) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_ResetConf) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -19290,6 +20062,7 @@ func (m *MACCommand_ResetConf) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_LinkCheckAns) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -19381,6 +20154,7 @@ func (m *MACCommand_LinkCheckAns) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_LinkADRReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -19580,6 +20354,7 @@ func (m *MACCommand_LinkADRReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_LinkADRAns) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -19693,6 +20468,7 @@ func (m *MACCommand_LinkADRAns) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_DutyCycleReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -19765,6 +20541,7 @@ func (m *MACCommand_DutyCycleReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_RxParamSetupReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -19875,6 +20652,7 @@ func (m *MACCommand_RxParamSetupReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_RxParamSetupAns) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -19988,6 +20766,7 @@ func (m *MACCommand_RxParamSetupAns) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_DevStatusAns) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -20079,6 +20858,7 @@ func (m *MACCommand_DevStatusAns) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_NewChannelReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -20208,6 +20988,7 @@ func (m *MACCommand_NewChannelReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_NewChannelAns) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -20301,6 +21082,7 @@ func (m *MACCommand_NewChannelAns) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_DLChannelReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -20392,6 +21174,7 @@ func (m *MACCommand_DLChannelReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_DLChannelAns) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -20485,6 +21268,7 @@ func (m *MACCommand_DLChannelAns) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_RxTimingSetupReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -20557,6 +21341,7 @@ func (m *MACCommand_RxTimingSetupReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_TxParamSetupReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -20669,6 +21454,7 @@ func (m *MACCommand_TxParamSetupReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_RekeyInd) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -20741,6 +21527,7 @@ func (m *MACCommand_RekeyInd) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_RekeyConf) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -20813,6 +21600,7 @@ func (m *MACCommand_RekeyConf) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_ADRParamSetupReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -20846,7 +21634,7 @@ func (m *MACCommand_ADRParamSetupReq) Unmarshal(dAtA []byte) error {
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ADRAckLimitExponent", wireType)
 			}
-			m.ADRAckLimitExponent = 0
+			m.AdrAckLimitExponent = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowLorawan
@@ -20856,7 +21644,7 @@ func (m *MACCommand_ADRParamSetupReq) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ADRAckLimitExponent |= ADRAckLimitExponent(b&0x7F) << shift
+				m.AdrAckLimitExponent |= ADRAckLimitExponent(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -20865,7 +21653,7 @@ func (m *MACCommand_ADRParamSetupReq) Unmarshal(dAtA []byte) error {
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ADRAckDelayExponent", wireType)
 			}
-			m.ADRAckDelayExponent = 0
+			m.AdrAckDelayExponent = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowLorawan
@@ -20875,7 +21663,7 @@ func (m *MACCommand_ADRParamSetupReq) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ADRAckDelayExponent |= ADRAckDelayExponent(b&0x7F) << shift
+				m.AdrAckDelayExponent |= ADRAckDelayExponent(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -20904,6 +21692,7 @@ func (m *MACCommand_ADRParamSetupReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_DeviceTimeAns) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -20990,6 +21779,7 @@ func (m *MACCommand_DeviceTimeAns) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_ForceRejoinReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21119,6 +21909,7 @@ func (m *MACCommand_ForceRejoinReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_RejoinParamSetupReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21210,6 +22001,7 @@ func (m *MACCommand_RejoinParamSetupReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_RejoinParamSetupAns) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21283,6 +22075,7 @@ func (m *MACCommand_RejoinParamSetupAns) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_PingSlotInfoReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21355,6 +22148,7 @@ func (m *MACCommand_PingSlotInfoReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_PingSlotChannelReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21446,6 +22240,7 @@ func (m *MACCommand_PingSlotChannelReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_PingSlotChannelAns) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21539,6 +22334,7 @@ func (m *MACCommand_PingSlotChannelAns) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_BeaconTimingAns) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21630,6 +22426,7 @@ func (m *MACCommand_BeaconTimingAns) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_BeaconFreqReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21702,6 +22499,7 @@ func (m *MACCommand_BeaconFreqReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_BeaconFreqAns) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21775,6 +22573,7 @@ func (m *MACCommand_BeaconFreqAns) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_DeviceModeInd) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21847,6 +22646,7 @@ func (m *MACCommand_DeviceModeInd) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *MACCommand_DeviceModeConf) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21919,6 +22719,7 @@ func (m *MACCommand_DeviceModeConf) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *FrequencyValue) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -21991,6 +22792,7 @@ func (m *FrequencyValue) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *DataRateOffsetValue) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -22063,6 +22865,7 @@ func (m *DataRateOffsetValue) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *DataRateIndexValue) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -22135,6 +22938,7 @@ func (m *DataRateIndexValue) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *PingSlotPeriodValue) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -22207,6 +23011,7 @@ func (m *PingSlotPeriodValue) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *AggregatedDutyCycleValue) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -22279,6 +23084,7 @@ func (m *AggregatedDutyCycleValue) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *RxDelayValue) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -22351,6 +23157,7 @@ func (m *RxDelayValue) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *ADRAckLimitExponentValue) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -22423,6 +23230,7 @@ func (m *ADRAckLimitExponentValue) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *ADRAckDelayExponentValue) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -22495,6 +23303,7 @@ func (m *ADRAckDelayExponentValue) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *DeviceEIRPValue) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -22567,6 +23376,7 @@ func (m *DeviceEIRPValue) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func skipLorawan(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0

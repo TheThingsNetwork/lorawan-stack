@@ -219,7 +219,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			Pending:       true,
 			FRMPayload:    []byte("test"),
 			FOpts:         MakeUplinkMACBuffer(phy, append(upCmders, conf.UplinkMACCommanders...)...),
-			FCtrl:         ttnpb.FCtrl{ADR: true},
+			FCtrl:         ttnpb.FCtrl{Adr: true},
 			FPort:         0x42,
 			EventBuilders: append(upEvBuilders, conf.UplinkEventBuilders...),
 		})
@@ -245,7 +245,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			MACVersion: dev.MACState.LoRaWANVersion,
 			DevAddr:    dev.Session.DevAddr,
 			FCtrl: ttnpb.FCtrl{
-				ADR: true,
+				Adr: true,
 				Ack: true,
 			},
 			FRMPayload:  frmPayload,
