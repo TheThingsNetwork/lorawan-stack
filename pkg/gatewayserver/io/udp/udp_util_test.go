@@ -34,8 +34,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func durationPtr(d time.Duration) *time.Duration { return &d }
-
 func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration) encoding.Packet {
 	packet := encoding.Packet{
 		GatewayEUI:      &eui,
@@ -60,6 +58,9 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 			codr = up.Settings.CodingRate
 		case *ttnpb.DataRate_FSK:
 			modulation = "FSK"
+		case *ttnpb.DataRate_Lrfhss:
+			modulation = "LR-FHSS"
+			codr = up.Settings.CodingRate
 		}
 		abs := encoding.CompactTime(time.Unix(0, 0).Add(t))
 		packet.Data.RxPacket[i] = &encoding.RxPacket{
