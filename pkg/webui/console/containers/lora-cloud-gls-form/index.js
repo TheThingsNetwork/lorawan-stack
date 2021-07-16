@@ -27,8 +27,6 @@ import toast from '@ttn-lw/components/toast'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Select from '@ttn-lw/components/select'
 
-import RequireRequest from '@ttn-lw/lib/components/require-request'
-
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
@@ -36,7 +34,6 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import {
   setAppPkgDefaultAssoc,
-  getAppPkgDefaultAssoc,
   deleteAppPkgDefaultAssoc,
 } from '@console/store/actions/application-packages'
 
@@ -53,13 +50,15 @@ const m = defineMessages({
     'Are you sure you want to delete the LoRaCloud Geolocation token? This action cannot be undone.',
   queryType: 'Query type',
   queryTypeDescription: 'What kind of geolocation query should be used',
-  multiFrame: 'Multiframe',
   multiFrameDescription: 'Enable multiframe lookups to improve accuracy',
   multiFrameWindowSize: 'Multiframe window size',
-  multiFrameWindowSizeDescription:
-    'How many historical messages to send as part of the request. Using 0 will automatically determine this based on the first byte of the payload',
+  multiFrameWindowSizeDescription: 'How many historical messages to send as part of the request.',
   multiFrameTimeWindow: 'Multiframe time window',
   multiFrameTimeWindowDescription: 'The maximum age of considered historical messages in minutes',
+  determineWindowSizeAutomatically: 'Determine window size automatically',
+  enableMultiFrame: 'Enable multiframe',
+  automaticMultiFrameDescription:
+    'Determine the count of sent historical messages considered for based on the first byte of the payload',
 })
 
 const LORACLOUD_GLS_QUERY_LABELS = Object.freeze([
@@ -77,7 +76,7 @@ const LORACLOUD_GLS_QUERY_VALUES = Object.freeze(Object.values(LORACLOUD_GLS_QUE
 const validationSchema = Yup.object()
   .shape({
     data: Yup.object().shape({
-      token: Yup.string().required(sharedMessages.validateRequired),
+      token: Yup.string().default('').required(sharedMessages.validateRequired),
       query: Yup.string()
         .oneOf(LORACLOUD_GLS_QUERY_VALUES)
         .default(LORACLOUD_GLS_QUERY_TYPES.TOARSSI)
@@ -114,10 +113,12 @@ const validationSchema = Yup.object()
 const promisifiedSetAppPkgDefaultAssoc = attachPromise(setAppPkgDefaultAssoc)
 const promisifiedDeleteAppPkgDefaultAssoc = attachPromise(deleteAppPkgDefaultAssoc)
 
+const decodeDetermineMultiframeAutomatically = value => value === 0
+const encodeDetermineMultiframeAutomatically = value => (value ? 0 : 1)
+
 const LoRaCloudGLSForm = () => {
   const [error, setError] = useState('')
   const appId = useSelector(selectSelectedApplicationId)
-  const selector = ['data']
   const formRef = useRef(null)
 
   const dispatch = useDispatch()
@@ -191,95 +192,113 @@ const LoRaCloudGLSForm = () => {
     [setMultiFrame, formRef],
   )
 
+  const [automaticMultiFrame, setAutomaticMultiFrame] = useState(
+    initialValues.data.multi_frame_window_size === 0 ||
+      initialValues.data.multi_frame_window_size === undefined,
+  )
+  const handleAutomaticWindowSizeChange = useCallback(
+    evt => {
+      const checked = evt.target.checked
+      setAutomaticMultiFrame(checked)
+    },
+    [setAutomaticMultiFrame],
+  )
+
   useEffect(() => {
     setQueryType(initialValues.data.query)
     setMultiFrame(initialValues.data.multi_frame)
   }, [initialValues.data.query, initialValues.data.multi_frame])
 
   return (
-    <RequireRequest
-      requestAction={getAppPkgDefaultAssoc(appId, LORA_CLOUD_GLS.DEFAULT_PORT, selector)}
+    <Form
+      error={error}
+      validationSchema={validationSchema}
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+      formikRef={formRef}
     >
-      <Form
-        error={error}
-        validationSchema={validationSchema}
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
-        formikRef={formRef}
-      >
-        <Form.Field
-          component={Input}
-          title={sharedMessages.token}
-          description={m.tokenDescription}
-          name="data.token"
-          required
-        />
-        <Form.Field
-          component={Select}
-          title={m.queryType}
-          description={m.queryTypeDescription}
-          name="data.query"
-          options={LORACLOUD_GLS_QUERY_LABELS}
-          disabled={LORACLOUD_GLS_QUERY_LABELS.length === 1}
-          onChange={handleQueryTypeChange}
-          required
-        />
-        {queryType === LORACLOUD_GLS_QUERY_TYPES.TOARSSI && (
-          <>
-            <Form.Field
-              component={Checkbox}
-              title={m.multiFrame}
-              description={m.multiFrameDescription}
-              name="data.multi_frame"
-              onChange={handleMultiFrameChange}
-              required
-            />
-            {multiFrame && (
-              <>
+      <Form.Field
+        component={Input}
+        title={sharedMessages.token}
+        description={m.tokenDescription}
+        name="data.token"
+        required
+      />
+      <Form.Field
+        component={Select}
+        title={m.queryType}
+        description={m.queryTypeDescription}
+        name="data.query"
+        options={LORACLOUD_GLS_QUERY_LABELS}
+        disabled={LORACLOUD_GLS_QUERY_LABELS.length === 1}
+        onChange={handleQueryTypeChange}
+        required
+      />
+      {queryType === LORACLOUD_GLS_QUERY_TYPES.TOARSSI && (
+        <>
+          <Form.Field
+            component={Checkbox}
+            label={m.enableMultiFrame}
+            description={m.multiFrameDescription}
+            name="data.multi_frame"
+            onChange={handleMultiFrameChange}
+          />
+          {multiFrame && (
+            <>
+              <Form.Field
+                component={Checkbox}
+                label={m.determineWindowSizeAutomatically}
+                description={m.automaticMultiFrameDescription}
+                onChange={handleAutomaticWindowSizeChange}
+                decode={decodeDetermineMultiframeAutomatically}
+                encode={encodeDetermineMultiframeAutomatically}
+                name="data.multi_frame_window_size"
+              />
+              {!automaticMultiFrame && (
                 <Form.Field
                   component={Input}
                   title={m.multiFrameWindowSize}
                   description={m.multiFrameWindowSizeDescription}
                   name="data.multi_frame_window_size"
                   type="number"
-                  min={0}
+                  min={1}
                   max={16}
                   inputWidth="xs"
                   required
                 />
-                <Form.Field
-                  component={Input}
-                  title={m.multiFrameTimeWindow}
-                  description={m.multiFrameTimeWindowDescription}
-                  name="data.multi_frame_window_age"
-                  type="number"
-                  min={1}
-                  max={7 * 24 * 60}
-                  inputWidth="xs"
-                  required
-                />
-              </>
-            )}
-          </>
-        )}
-        <SubmitBar>
-          <Form.Submit component={SubmitButton} message={sharedMessages.tokenSet} />
-          {Boolean(defaultAssociation) && (
-            <ModalButton
-              type="button"
-              icon="delete"
-              message={sharedMessages.tokenDelete}
-              modalData={{
-                message: m.deleteWarning,
-              }}
-              onApprove={handleDelete}
-              danger
-              naked
-            />
+              )}
+              <Form.Field
+                component={Input}
+                title={m.multiFrameTimeWindow}
+                description={m.multiFrameTimeWindowDescription}
+                name="data.multi_frame_window_age"
+                type="number"
+                min={1}
+                max={7 * 24 * 60}
+                inputWidth="xs"
+                required
+              />
+            </>
           )}
-        </SubmitBar>
-      </Form>
-    </RequireRequest>
+        </>
+      )}
+      <SubmitBar>
+        <Form.Submit component={SubmitButton} message={sharedMessages.tokenSet} />
+        {Boolean(defaultAssociation) && (
+          <ModalButton
+            type="button"
+            icon="delete"
+            message={sharedMessages.tokenDelete}
+            modalData={{
+              message: m.deleteWarning,
+            }}
+            onApprove={handleDelete}
+            danger
+            naked
+          />
+        )}
+      </SubmitBar>
+    </Form>
   )
 }
 
