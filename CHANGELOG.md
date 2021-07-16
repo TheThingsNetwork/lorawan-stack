@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
   - This is only relevant when Packet Broker is enabled and configured by the network operator.
 - Gateways are now disconnected when settings affecting the connection with Gateway Server change. Use the `gs.fetch-gateway-interval` and `gs.fetch-interval-jitter` to configure how often the gateway is fetched from the entity registry.
+- Small UX improvements to the LoRaCloud DAS forms in the Console.
 
 ### Changed
 
