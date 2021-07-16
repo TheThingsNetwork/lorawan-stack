@@ -348,8 +348,8 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 		SupportsJoin:      p.SupportsJoin,
 		SupportsClassB:    p.SupportsClassB,
 		SupportsClassC:    p.SupportsClassC,
-		LoRaWANVersion:    p.MACVersion,
-		LoRaWANPHYVersion: phyVersion,
+		LorawanVersion:    p.MACVersion,
+		LorawanPhyVersion: phyVersion,
 	}
 
 	if info.CodecId != "" {

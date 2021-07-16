@@ -47,8 +47,8 @@ func TestInvalidLoRa(t *testing.T) {
 	// Invalid coding rate.
 	{
 		downlink, err := buildLoRaDownlinkFromParameters(10, 868100000, ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_LoRa{
-				LoRa: &ttnpb.LoRaDataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 10,
 					Bandwidth:       125000,
 				},
@@ -62,8 +62,8 @@ func TestInvalidLoRa(t *testing.T) {
 	// Invalid spreading factor.
 	{
 		downlink, err := buildLoRaDownlinkFromParameters(10, 868100000, ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_LoRa{
-				LoRa: &ttnpb.LoRaDataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 0,
 					Bandwidth:       125000,
 				},
@@ -77,8 +77,8 @@ func TestInvalidLoRa(t *testing.T) {
 	// Invalid bandwidth.
 	{
 		downlink, err := buildLoRaDownlinkFromParameters(10, 868100000, ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_LoRa{
-				LoRa: &ttnpb.LoRaDataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 7,
 					Bandwidth:       0,
 				},
@@ -93,12 +93,12 @@ func TestInvalidLoRa(t *testing.T) {
 func TestDifferentLoRaSFs(t *testing.T) {
 	a := assertions.New(t)
 	sfTests := map[ttnpb.DataRate]uint{
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}:  41216,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 8, Bandwidth: 125000}}}:  72192,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 125000}}}:  144384,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}: 288768,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 11, Bandwidth: 125000}}}: 577536,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 12, Bandwidth: 125000}}}: 991232,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}:  41216,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 8, Bandwidth: 125000}}}:  72192,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 125000}}}:  144384,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}: 288768,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 11, Bandwidth: 125000}}}: 577536,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 12, Bandwidth: 125000}}}: 991232,
 	}
 	for dr, us := range sfTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, dr, "4/5")
@@ -112,9 +112,9 @@ func TestDifferentLoRaSFs(t *testing.T) {
 func TestDifferentLoRaBWs(t *testing.T) {
 	a := assertions.New(t)
 	bwTests := map[ttnpb.DataRate]uint{
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}: 41216,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 250000}}}: 20608,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 500000}}}: 10304,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}: 41216,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 250000}}}: 20608,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 500000}}}: 10304,
 	}
 	for dr, us := range bwTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, dr, "4/5")
@@ -134,7 +134,7 @@ func TestDifferentLoRaCRs(t *testing.T) {
 		"4/8": 53504,
 	}
 	for cr, us := range crTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, cr)
+		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, cr)
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)
@@ -154,7 +154,7 @@ func TestDifferentLoRaPayloadSizes(t *testing.T) {
 		19: 51456,
 	}
 	for size, us := range plTests {
-		dl, err := buildLoRaDownlinkFromParameters(size, 868100000, ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, "4/5")
+		dl, err := buildLoRaDownlinkFromParameters(size, 868100000, ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, "4/5")
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)
@@ -198,8 +198,8 @@ func TestInvalidLoRa2400(t *testing.T) {
 	// Invalid coding rate.
 	{
 		downlink, err := buildLoRaDownlinkFromParameters(10, 2422000000, ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_LoRa{
-				LoRa: &ttnpb.LoRaDataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 10,
 					Bandwidth:       812000,
 				},
@@ -213,8 +213,8 @@ func TestInvalidLoRa2400(t *testing.T) {
 	// Invalid spreading factor.
 	{
 		downlink, err := buildLoRaDownlinkFromParameters(10, 2422000000, ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_LoRa{
-				LoRa: &ttnpb.LoRaDataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 0,
 					Bandwidth:       812000,
 				},
@@ -228,8 +228,8 @@ func TestInvalidLoRa2400(t *testing.T) {
 	// Invalid bandwidth.
 	{
 		downlink, err := buildLoRaDownlinkFromParameters(10, 2422000000, ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_LoRa{
-				LoRa: &ttnpb.LoRaDataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 7,
 					Bandwidth:       0,
 				},
@@ -244,14 +244,14 @@ func TestInvalidLoRa2400(t *testing.T) {
 func TestDifferentLoRa2400SFs(t *testing.T) {
 	a := assertions.New(t)
 	sfTests := map[ttnpb.DataRate]time.Duration{
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 5, Bandwidth: 812000}}}:  1665000,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 6, Bandwidth: 812000}}}:  3093600,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 812000}}}:  5556700,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 8, Bandwidth: 812000}}}:  10482800,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 812000}}}:  19073900,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 812000}}}: 36886700,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 11, Bandwidth: 812000}}}: 73773400,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 12, Bandwidth: 812000}}}: 142502500,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 5, Bandwidth: 812000}}}:  1665000,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 6, Bandwidth: 812000}}}:  3093600,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 812000}}}:  5556700,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 8, Bandwidth: 812000}}}:  10482800,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 812000}}}:  19073900,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 812000}}}: 36886700,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 11, Bandwidth: 812000}}}: 73773400,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 12, Bandwidth: 812000}}}: 142502500,
 	}
 	for dr, ns := range sfTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, dr, "4/5LI")
@@ -265,10 +265,10 @@ func TestDifferentLoRa2400SFs(t *testing.T) {
 func TestDifferentLoRa2400BWs(t *testing.T) {
 	a := assertions.New(t)
 	bwTests := map[ttnpb.DataRate]time.Duration{
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 203000}}}:  22226600,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 406000}}}:  11113300,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 812000}}}:  5556700,
-		{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 1625000}}}: 2776600,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 203000}}}:  22226600,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 406000}}}:  11113300,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 812000}}}:  5556700,
+		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 1625000}}}: 2776600,
 	}
 	for dr, ns := range bwTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, dr, "4/5LI")
@@ -289,8 +289,8 @@ func TestDifferentLoRa2400CRs(t *testing.T) {
 	}
 	for cr, ns := range crTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_LoRa{
-				LoRa: &ttnpb.LoRaDataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 7,
 					Bandwidth:       812000,
 				},
@@ -315,8 +315,8 @@ func TestDifferentLoRa2400PayloadSizes(t *testing.T) {
 	}
 	for size, ns := range plTests {
 		dl, err := buildLoRaDownlinkFromParameters(size, 2422000000, ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_LoRa{
-				LoRa: &ttnpb.LoRaDataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 12,
 					Bandwidth:       812000,
 				},
@@ -337,8 +337,8 @@ func TestDifferentLoRa2400CRCs(t *testing.T) {
 	}
 	for crc, ns := range crcTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_LoRa{
-				LoRa: &ttnpb.LoRaDataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 7,
 					Bandwidth:       812000,
 				},

@@ -342,7 +342,7 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 	if channel := frequencyPlan.LoRaStandardChannel; channel != nil {
 		dr, ok := phy.DataRates[ttnpb.DataRateIndex(channel.DataRate)]
 		if ok {
-			if lora := dr.Rate.GetLoRa(); lora != nil {
+			if lora := dr.Rate.GetLora(); lora != nil {
 				conf.LoRaStandardChannel = &IFConfig{
 					Enable:       true,
 					Radio:        channel.Radio,

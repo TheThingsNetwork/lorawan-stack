@@ -38,8 +38,8 @@ func HandleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Up
 	}
 
 	var floor float32
-	if dr, ok := msg.Settings.DataRate.Modulation.(*ttnpb.DataRate_LoRa); ok {
-		floor, ok = demodulationFloor[dr.LoRa.SpreadingFactor][dr.LoRa.Bandwidth]
+	if dr, ok := msg.Settings.DataRate.Modulation.(*ttnpb.DataRate_Lora); ok {
+		floor, ok = demodulationFloor[dr.Lora.SpreadingFactor][dr.Lora.Bandwidth]
 		if !ok {
 			return evs, ErrInvalidDataRate.New()
 		}

@@ -830,15 +830,15 @@ func toPBFrequencyPlan(fps ...*frequencyplans.FrequencyPlan) (*packetbroker.Gate
 					res.FskChannel = &packetbroker.GatewayFrequencyPlan_FSKChannel{
 						Frequency: ch.Frequency,
 					}
-				case *ttnpb.DataRate_LoRa:
-					chKey := singleSFChannel{ch.Frequency, mod.LoRa.SpreadingFactor, mod.LoRa.Bandwidth}
+				case *ttnpb.DataRate_Lora:
+					chKey := singleSFChannel{ch.Frequency, mod.Lora.SpreadingFactor, mod.Lora.Bandwidth}
 					if _, ok := singleSFChs[chKey]; ok {
 						continue
 					}
 					res.LoraSingleSfChannels = append(res.LoraSingleSfChannels, &packetbroker.GatewayFrequencyPlan_LoRaSingleSFChannel{
 						Frequency:       ch.Frequency,
-						SpreadingFactor: mod.LoRa.SpreadingFactor,
-						Bandwidth:       mod.LoRa.Bandwidth,
+						SpreadingFactor: mod.Lora.SpreadingFactor,
+						Bandwidth:       mod.Lora.Bandwidth,
 					})
 					singleSFChs[chKey] = struct{}{}
 				}

@@ -81,17 +81,17 @@ message MACParameters {
   reserved 2; // Deprecated: uplink_dwell_time
   reserved 3; // Deprecated: downlink_dwell_time
   // ADR: data rate index to use.
-  DataRateIndex adr_data_rate_index = 4 [(gogoproto.customname) = "ADRDataRateIndex", (validate.rules).enum.defined_only = true];
+  DataRateIndex adr_data_rate_index = 4 [(validate.rules).enum.defined_only = true];
   // ADR: transmission power index to use.
-  uint32 adr_tx_power_index = 5 [(gogoproto.customname) = "ADRTxPowerIndex", (validate.rules).uint32.lte = 15];
+  uint32 adr_tx_power_index = 5 [(validate.rules).uint32.lte = 15];
   // ADR: number of retransmissions.
-  uint32 adr_nb_trans = 6 [(gogoproto.customname) = "ADRNbTrans", (validate.rules).uint32.lte = 15];
+  uint32 adr_nb_trans = 6 [(validate.rules).uint32.lte = 15];
   // ADR: number of messages to wait before setting ADRAckReq.
   // This field is deprecated, use adr_ack_limit_exponent instead.
-  uint32 adr_ack_limit = 7 [(gogoproto.customname) = "ADRAckLimit", deprecated = true];
+  uint32 adr_ack_limit = 7 [deprecated = true];
   // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
   // This field is deprecated, use adr_ack_delay_exponent instead.
-  uint32 adr_ack_delay = 8 [(gogoproto.customname) = "ADRAckDelay", deprecated = true];
+  uint32 adr_ack_delay = 8 [deprecated = true];
   // Rx1 delay (Rx2 delay is Rx1 delay + 1 second).
   RxDelay rx1_delay = 9 [(validate.rules).enum.defined_only = true];
   // Data rate offset for Rx1.
@@ -139,9 +139,9 @@ message MACParameters {
   BoolValue downlink_dwell_time = 21;
 
   // ADR: number of messages to wait before setting ADRAckReq.
-  ADRAckLimitExponentValue adr_ack_limit_exponent = 22 [(gogoproto.customname) = "ADRAckLimitExponent"];
+  ADRAckLimitExponentValue adr_ack_limit_exponent = 22;
   // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
-  ADRAckDelayExponentValue adr_ack_delay_exponent = 23 [(gogoproto.customname) = "ADRAckDelayExponent"];
+  ADRAckDelayExponentValue adr_ack_delay_exponent = 23;
   // Data rate index of the class B ping slot.
   DataRateIndexValue ping_slot_data_rate_index_value = 24;
 }
@@ -154,9 +154,9 @@ message EndDeviceVersion {
   EndDeviceVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   // LoRaWAN MAC version.
-  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  MACVersion lorawan_version = 2 [(validate.rules).enum.defined_only = true];
   // LoRaWAN PHY version.
-  PHYVersion lorawan_phy_version = 3 [(gogoproto.customname) = "LoRaWANPHYVersion", (validate.rules).enum.defined_only = true];
+  PHYVersion lorawan_phy_version = 3 [(validate.rules).enum.defined_only = true];
   // ID of the frequency plan used by this device.
   string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
 
@@ -228,11 +228,11 @@ message MACSettings {
 
   // Whether the Network Server should use ADR for the device.
   // If unset, the default value from Network Server configuration will be used.
-  BoolValue use_adr = 13 [(gogoproto.customname) = "UseADR"];
+  BoolValue use_adr = 13;
   // The ADR margin tells the network server how much margin it should add in ADR requests.
   // A bigger margin is less efficient, but gives a better chance of successful reception.
   // If unset, the default value from Network Server configuration will be used.
-  google.protobuf.FloatValue adr_margin = 14 [(gogoproto.customname) = "ADRMargin"];
+  google.protobuf.FloatValue adr_margin = 14;
   // Whether the device resets the frame counters (not LoRaWAN compliant).
   // If unset, the default value from Network Server configuration will be used.
   BoolValue resets_f_cnt = 15;
@@ -262,10 +262,10 @@ message MACSettings {
 
   // The ADR ACK limit Network Server should configure device to use via MAC commands.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
-  ADRAckLimitExponentValue desired_adr_ack_limit_exponent = 23 [(gogoproto.customname) = "DesiredADRAckLimitExponent"];
+  ADRAckLimitExponentValue desired_adr_ack_limit_exponent = 23;
   // The ADR ACK delay Network Server should configure device to use via MAC commands.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
-  ADRAckDelayExponentValue desired_adr_ack_delay_exponent = 24 [(gogoproto.customname) = "DesiredADRAckDelayExponent"];
+  ADRAckDelayExponentValue desired_adr_ack_delay_exponent = 24;
 
   // The data rate index of the class B ping slot Network Server should configure device to use via MAC commands.
   // If unset, the default value from Network Server configuration will be used.
@@ -298,7 +298,7 @@ message MACState {
   // - If device sent DeviceModeInd MAC message, this will be set to that value
   Class device_class = 3 [(validate.rules).enum.defined_only = true];
   // LoRaWAN MAC version.
-  MACVersion lorawan_version = 4 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  MACVersion lorawan_version = 4 [(validate.rules).enum.defined_only = true];
   // Time when the last confirmed downlink message or MAC command was scheduled.
   google.protobuf.Timestamp last_confirmed_downlink_at = 5 [(gogoproto.stdtime) = true];
   // Frame counter value of last uplink containing DevStatusAns.
@@ -355,11 +355,11 @@ message MACState {
   // ADR Data rate index values rejected by the device.
   // Reset each time `current_parameters.channels` change.
   // Elements are sorted in ascending order.
-  repeated DataRateIndex rejected_adr_data_rate_indexes = 17 [(gogoproto.customname) = "RejectedADRDataRateIndexes", (validate.rules).repeated = { max_items: 15, items{ enum{ defined_only: true } } }];
+  repeated DataRateIndex rejected_adr_data_rate_indexes = 17 [ (validate.rules).repeated = { max_items: 15, items{ enum{ defined_only: true } } }];
 
   // ADR TX output power index values rejected by the device.
   // Elements are sorted in ascending order.
-  repeated uint32 rejected_adr_tx_power_indexes = 18 [(gogoproto.customname) = "RejectedADRTxPowerIndexes", (validate.rules).repeated = { max_items: 15, items{ uint32{ lte: 15 } } }];
+  repeated uint32 rejected_adr_tx_power_indexes = 18 [(validate.rules).repeated = { max_items: 15, items{ uint32{ lte: 15 } } }];
 
   // Frequencies rejected by the device.
   repeated uint64 rejected_frequencies = 19 [(validate.rules).repeated.items.uint64.gte = 100000];
@@ -378,7 +378,7 @@ message MACState {
   map<uint64, DataRateRanges> rejected_data_rate_ranges = 21;
 
   // Frame counter of uplink, which confirmed the last ADR parameter change.
-  uint32 last_adr_change_f_cnt_up = 22 [(gogoproto.customname) = "LastADRChangeFCntUp"];
+  uint32 last_adr_change_f_cnt_up = 22;
 }
 
 // Power state of the device.
@@ -468,10 +468,10 @@ message EndDevice {
   bool supports_class_c = 14;
   // LoRaWAN MAC version. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  MACVersion lorawan_version = 15 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  MACVersion lorawan_version = 15 [(validate.rules).enum.defined_only = true];
   // LoRaWAN PHY version. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  PHYVersion lorawan_phy_version = 16 [(gogoproto.customname) = "LoRaWANPHYVersion", (validate.rules).enum.defined_only = true];
+  PHYVersion lorawan_phy_version = 16 [(validate.rules).enum.defined_only = true];
   // ID of the frequency plan used by this device.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
   string frequency_plan_id = 17 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];

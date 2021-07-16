@@ -322,7 +322,7 @@ func TestProtoConversion(t *testing.T) {
 					Frequency: 868800000,
 					Radio:     1,
 				},
-				LoRaStandardChannel: &ttnpb.ConcentratorConfig_LoRaStandardChannel{
+				LoraStandardChannel: &ttnpb.ConcentratorConfig_LoRaStandardChannel{
 					Frequency:       868300000,
 					Radio:           1,
 					SpreadingFactor: 7,

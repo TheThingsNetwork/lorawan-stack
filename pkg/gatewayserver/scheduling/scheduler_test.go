@@ -65,8 +65,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
 						},
@@ -86,8 +86,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize:             51,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
 						},
@@ -106,8 +106,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
 						},
@@ -128,8 +128,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize:             51,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
 						},
@@ -149,8 +149,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize: 51,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
 						},
@@ -169,8 +169,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize: 16,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
 						},
@@ -190,8 +190,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize:             16,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
 						},
@@ -209,8 +209,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
 						},
@@ -228,8 +228,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
 						},
@@ -248,8 +248,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
 						},
@@ -268,8 +268,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
 						},
@@ -287,8 +287,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			PayloadSize: 20,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
 						},
@@ -382,8 +382,8 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 			PayloadSize: 20,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 12,
 						},
@@ -454,8 +454,8 @@ func TestScheduleAnytime(t *testing.T) {
 	settingsAt := func(frequency uint64, sf, t uint32) ttnpb.TxSettings {
 		return ttnpb.TxSettings{
 			DataRate: ttnpb.DataRate{
-				Modulation: &ttnpb.DataRate_LoRa{
-					LoRa: &ttnpb.LoRaDataRate{
+				Modulation: &ttnpb.DataRate_Lora{
+					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: sf,
 					},
@@ -565,8 +565,8 @@ func TestScheduleAnytimeShort(t *testing.T) {
 	settingsAt := func(frequency uint64, sf uint32, time *time.Time, timestamp uint32) ttnpb.TxSettings {
 		return ttnpb.TxSettings{
 			DataRate: ttnpb.DataRate{
-				Modulation: &ttnpb.DataRate_LoRa{
-					LoRa: &ttnpb.LoRaDataRate{
+				Modulation: &ttnpb.DataRate_Lora{
+					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: sf,
 					},
@@ -760,8 +760,8 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: ttnpb.DataRate{
-				Modulation: &ttnpb.DataRate_LoRa{
-					LoRa: &ttnpb.LoRaDataRate{
+				Modulation: &ttnpb.DataRate_Lora{
+					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
 					},
@@ -782,8 +782,8 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: ttnpb.DataRate{
-				Modulation: &ttnpb.DataRate_LoRa{
-					LoRa: &ttnpb.LoRaDataRate{
+				Modulation: &ttnpb.DataRate_Lora{
+					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
 					},
@@ -808,8 +808,8 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: ttnpb.DataRate{
-				Modulation: &ttnpb.DataRate_LoRa{
-					LoRa: &ttnpb.LoRaDataRate{
+				Modulation: &ttnpb.DataRate_Lora{
+					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
 					},
@@ -834,16 +834,17 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 	}{
 		{
 			Name: "RepeatedNoOverlap",
-			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{test.EUFrequencyPlanID: {
-				BandID: band.EU_863_870,
-				TimeOffAir: frequencyplans.TimeOffAir{
-					Duration: time.Second,
+			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{
+				test.EUFrequencyPlanID: {
+					BandID: band.EU_863_870,
+					TimeOffAir: frequencyplans.TimeOffAir{
+						Duration: time.Second,
+					},
+					DwellTime: frequencyplans.DwellTime{
+						Downlinks: boolPtr(true),
+						Duration:  durationPtr(2 * time.Second),
+					},
 				},
-				DwellTime: frequencyplans.DwellTime{
-					Downlinks: boolPtr(true),
-					Duration:  durationPtr(2 * time.Second),
-				},
-			},
 				"EU_863_870_Custom": {
 					BandID: band.EU_863_870,
 					TimeOffAir: frequencyplans.TimeOffAir{
@@ -859,25 +860,26 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 		},
 		{
 			Name: "UnionOfNonOverlapping",
-			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{test.EUFrequencyPlanID: {
-				BandID: band.EU_863_870,
-				TimeOffAir: frequencyplans.TimeOffAir{
-					Duration: time.Second,
-				},
-				DwellTime: frequencyplans.DwellTime{
-					Downlinks: boolPtr(true),
-					Duration:  durationPtr(2 * time.Second),
-				},
-				SubBands: []frequencyplans.SubBandParameters{
-					// Fictional Band S
-					{
-						MinFrequency: 870000000,
-						MaxFrequency: 875000000,
-						DutyCycle:    0.01,
-						MaxEIRP:      float32Ptr(16.25),
+			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{
+				test.EUFrequencyPlanID: {
+					BandID: band.EU_863_870,
+					TimeOffAir: frequencyplans.TimeOffAir{
+						Duration: time.Second,
+					},
+					DwellTime: frequencyplans.DwellTime{
+						Downlinks: boolPtr(true),
+						Duration:  durationPtr(2 * time.Second),
+					},
+					SubBands: []frequencyplans.SubBandParameters{
+						// Fictional Band S
+						{
+							MinFrequency: 870000000,
+							MaxFrequency: 875000000,
+							DutyCycle:    0.01,
+							MaxEIRP:      float32Ptr(16.25),
+						},
 					},
 				},
-			},
 				"EU_863_870_Custom": {
 					BandID: band.EU_863_870,
 					TimeOffAir: frequencyplans.TimeOffAir{
@@ -893,16 +895,17 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 		},
 		{
 			Name: "MismatchedTimeOffAir",
-			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{test.EUFrequencyPlanID: {
-				BandID: band.EU_863_870,
-				TimeOffAir: frequencyplans.TimeOffAir{
-					Duration: 2 * time.Second,
+			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{
+				test.EUFrequencyPlanID: {
+					BandID: band.EU_863_870,
+					TimeOffAir: frequencyplans.TimeOffAir{
+						Duration: 2 * time.Second,
+					},
+					DwellTime: frequencyplans.DwellTime{
+						Downlinks: boolPtr(true),
+						Duration:  durationPtr(2 * time.Second),
+					},
 				},
-				DwellTime: frequencyplans.DwellTime{
-					Downlinks: boolPtr(true),
-					Duration:  durationPtr(2 * time.Second),
-				},
-			},
 				"EU_863_870_Custom": {
 					BandID: band.EU_863_870,
 					TimeOffAir: frequencyplans.TimeOffAir{
@@ -920,25 +923,26 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 		},
 		{
 			Name: "OverlappingSubBands",
-			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{test.EUFrequencyPlanID: {
-				BandID: band.EU_863_870,
-				TimeOffAir: frequencyplans.TimeOffAir{
-					Duration: time.Second,
-				},
-				DwellTime: frequencyplans.DwellTime{
-					Downlinks: boolPtr(true),
-					Duration:  durationPtr(2 * time.Second),
-				},
-				SubBands: []frequencyplans.SubBandParameters{
-					// Fictional Band S
-					{
-						MinFrequency: 869000000,
-						MaxFrequency: 873000000,
-						DutyCycle:    0.01,
-						MaxEIRP:      float32Ptr(16.25),
+			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{
+				test.EUFrequencyPlanID: {
+					BandID: band.EU_863_870,
+					TimeOffAir: frequencyplans.TimeOffAir{
+						Duration: time.Second,
+					},
+					DwellTime: frequencyplans.DwellTime{
+						Downlinks: boolPtr(true),
+						Duration:  durationPtr(2 * time.Second),
+					},
+					SubBands: []frequencyplans.SubBandParameters{
+						// Fictional Band S
+						{
+							MinFrequency: 869000000,
+							MaxFrequency: 873000000,
+							DutyCycle:    0.01,
+							MaxEIRP:      float32Ptr(16.25),
+						},
 					},
 				},
-			},
 				"EU_863_870_Custom": {
 					BandID: band.EU_863_870,
 					TimeOffAir: frequencyplans.TimeOffAir{
@@ -956,17 +960,18 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 		},
 		{
 			Name: "OverlappingSubBandsFromBand",
-			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{"AS_923": {
-				// This is a fictional test case since currently we don't support mix-band frequency plans (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394).
-				BandID: band.AS_923,
-				TimeOffAir: frequencyplans.TimeOffAir{
-					Duration: time.Second,
+			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{
+				"AS_923": {
+					// This is a fictional test case since currently we don't support mix-band frequency plans (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394).
+					BandID: band.AS_923,
+					TimeOffAir: frequencyplans.TimeOffAir{
+						Duration: time.Second,
+					},
+					DwellTime: frequencyplans.DwellTime{
+						Downlinks: boolPtr(true),
+						Duration:  durationPtr(2 * time.Second),
+					},
 				},
-				DwellTime: frequencyplans.DwellTime{
-					Downlinks: boolPtr(true),
-					Duration:  durationPtr(2 * time.Second),
-				},
-			},
 				"AU_915_928": {
 					BandID: band.AU_915_928,
 					TimeOffAir: frequencyplans.TimeOffAir{
@@ -1007,25 +1012,26 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := map[string]*frequencyplans.FrequencyPlan{test.EUFrequencyPlanID: {
-		BandID: band.EU_863_870,
-		TimeOffAir: frequencyplans.TimeOffAir{
-			Duration: time.Second,
-		},
-		DwellTime: frequencyplans.DwellTime{
-			Downlinks: boolPtr(true),
-			Duration:  durationPtr(2 * time.Second),
-		},
-		SubBands: []frequencyplans.SubBandParameters{
-			// Fictional Band S
-			{
-				MinFrequency: 870000000,
-				MaxFrequency: 875000000,
-				DutyCycle:    0.01,
-				MaxEIRP:      float32Ptr(16.25),
+	fps := map[string]*frequencyplans.FrequencyPlan{
+		test.EUFrequencyPlanID: {
+			BandID: band.EU_863_870,
+			TimeOffAir: frequencyplans.TimeOffAir{
+				Duration: time.Second,
+			},
+			DwellTime: frequencyplans.DwellTime{
+				Downlinks: boolPtr(true),
+				Duration:  durationPtr(2 * time.Second),
+			},
+			SubBands: []frequencyplans.SubBandParameters{
+				// Fictional Band S
+				{
+					MinFrequency: 870000000,
+					MaxFrequency: 875000000,
+					DutyCycle:    0.01,
+					MaxEIRP:      float32Ptr(16.25),
+				},
 			},
 		},
-	},
 		"EU_863_870_Custom": {
 			BandID: band.EU_863_870,
 			TimeOffAir: frequencyplans.TimeOffAir{
@@ -1050,8 +1056,8 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: ttnpb.DataRate{
-				Modulation: &ttnpb.DataRate_LoRa{
-					LoRa: &ttnpb.LoRaDataRate{
+				Modulation: &ttnpb.DataRate_Lora{
+					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
 					},
@@ -1072,8 +1078,8 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: ttnpb.DataRate{
-				Modulation: &ttnpb.DataRate_LoRa{
-					LoRa: &ttnpb.LoRaDataRate{
+				Modulation: &ttnpb.DataRate_Lora{
+					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
 					},
@@ -1098,8 +1104,8 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: ttnpb.DataRate{
-				Modulation: &ttnpb.DataRate_LoRa{
-					LoRa: &ttnpb.LoRaDataRate{
+				Modulation: &ttnpb.DataRate_Lora{
+					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
 						SpreadingFactor: 7,
 					},
@@ -1139,8 +1145,8 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 			PayloadSize: 10,
 			TxSettings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
 						},
@@ -1165,8 +1171,8 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 			PayloadSize: 10,
 			TxSettings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
 						},
@@ -1197,8 +1203,8 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 			PayloadSize: 10,
 			TxSettings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{
-						LoRa: &ttnpb.LoRaDataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
 							SpreadingFactor: 7,
 						},

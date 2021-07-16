@@ -705,7 +705,7 @@ var (
 					if dev, ok := m["ids.dev_eui"]; ok && dev.DevEui != nil && !dev.DevEui.IsZero() {
 						return true, ""
 					}
-					if m["lorawan_version"].LoRaWANVersion.RequireDevEUIForABP() && !m["multicast"].GetMulticast() {
+					if m["lorawan_version"].LorawanVersion.RequireDevEUIForABP() && !m["multicast"].GetMulticast() {
 						return false, "ids.dev_eui"
 					}
 					return true, ""
@@ -737,19 +737,19 @@ var (
 		"multicast": append(func() (rs []ifThenFuncFieldRight) {
 			for s, eq := range map[string]func(ttnpb.MACParameters, ttnpb.MACParameters) bool{
 				"adr_ack_delay_exponent.value": func(a, b ttnpb.MACParameters) bool {
-					return a.ADRAckDelayExponent.Equal(b.ADRAckDelayExponent)
+					return a.AdrAckDelayExponent.Equal(b.AdrAckDelayExponent)
 				},
 				"adr_ack_limit_exponent.value": func(a, b ttnpb.MACParameters) bool {
-					return a.ADRAckLimitExponent.Equal(b.ADRAckLimitExponent)
+					return a.AdrAckLimitExponent.Equal(b.AdrAckLimitExponent)
 				},
 				"adr_data_rate_index": func(a, b ttnpb.MACParameters) bool {
-					return a.ADRDataRateIndex == b.ADRDataRateIndex
+					return a.AdrDataRateIndex == b.AdrDataRateIndex
 				},
 				"adr_nb_trans": func(a, b ttnpb.MACParameters) bool {
-					return a.ADRNbTrans == b.ADRNbTrans
+					return a.AdrNbTrans == b.AdrNbTrans
 				},
 				"adr_tx_power_index": func(a, b ttnpb.MACParameters) bool {
-					return a.ADRTxPowerIndex == b.ADRTxPowerIndex
+					return a.AdrTxPowerIndex == b.AdrTxPowerIndex
 				},
 				"beacon_frequency": func(a, b ttnpb.MACParameters) bool {
 					return a.BeaconFrequency == b.BeaconFrequency
@@ -974,13 +974,13 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		return nil, err
 	}
 	if err := st.ValidateSetFieldWithCause(
-		st.Device.LoRaWANPHYVersion.Validate,
+		st.Device.LorawanPhyVersion.Validate,
 		"lorawan_phy_version",
 	); err != nil {
 		return nil, err
 	}
 	if err := st.ValidateSetFieldWithCause(
-		st.Device.LoRaWANVersion.Validate,
+		st.Device.LorawanVersion.Validate,
 		"lorawan_version",
 	); err != nil {
 		return nil, err
@@ -990,7 +990,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if st.Device.MACState == nil {
 				return nil
 			}
-			return st.Device.MACState.LoRaWANVersion.Validate()
+			return st.Device.MACState.LorawanVersion.Validate()
 		},
 		"mac_state.lorawan_version",
 	); err != nil {
@@ -1001,7 +1001,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if st.Device.PendingMACState == nil {
 				return nil
 			}
-			return st.Device.PendingMACState.LoRaWANVersion.Validate()
+			return st.Device.PendingMACState.LorawanVersion.Validate()
 		},
 		"pending_mac_state.lorawan_version",
 	); err != nil {
@@ -1202,7 +1202,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
 			phy, err := DeviceBand(&ttnpb.EndDevice{
 				FrequencyPlanID:   m["frequency_plan_id"].FrequencyPlanID,
-				LoRaWANPHYVersion: m["lorawan_phy_version"].LoRaWANPHYVersion,
+				LorawanPhyVersion: m["lorawan_phy_version"].LorawanPhyVersion,
 			}, ns.FrequencyPlans)
 			if err != nil {
 				return err
@@ -1453,40 +1453,40 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 		for p, isValid := range map[string]func(*ttnpb.EndDevice, *band.Band) bool{
 			"mac_settings.use_adr.value": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return !dev.GetMACSettings().GetUseADR().GetValue() || phy.EnableADR
+				return !dev.GetMACSettings().GetUseAdr().GetValue() || phy.EnableADR
 			},
 			"mac_state.current_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMACState().GetCurrentParameters().ADRDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetMACState().GetCurrentParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
 			},
 			"mac_state.current_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMACState().GetCurrentParameters().ADRTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetMACState().GetCurrentParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
 			},
 			"mac_state.current_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
 				return len(dev.GetMACState().GetCurrentParameters().Channels) <= int(phy.MaxUplinkChannels)
 			},
 			"mac_state.desired_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMACState().GetDesiredParameters().ADRDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetMACState().GetDesiredParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
 			},
 			"mac_state.desired_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMACState().GetDesiredParameters().ADRTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetMACState().GetDesiredParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
 			},
 			"mac_state.desired_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
 				return len(dev.GetMACState().GetDesiredParameters().Channels) <= int(phy.MaxUplinkChannels)
 			},
 			"pending_mac_state.current_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMACState().GetCurrentParameters().ADRDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetPendingMACState().GetCurrentParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
 			},
 			"pending_mac_state.current_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMACState().GetCurrentParameters().ADRTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetPendingMACState().GetCurrentParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
 			},
 			"pending_mac_state.current_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
 				return len(dev.GetPendingMACState().GetCurrentParameters().Channels) <= int(phy.MaxUplinkChannels)
 			},
 			"pending_mac_state.desired_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMACState().GetDesiredParameters().ADRDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetPendingMACState().GetDesiredParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
 			},
 			"pending_mac_state.desired_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMACState().GetDesiredParameters().ADRTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetPendingMACState().GetDesiredParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
 			},
 			"pending_mac_state.desired_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
 				return len(dev.GetPendingMACState().GetDesiredParameters().Channels) <= int(phy.MaxUplinkChannels)
@@ -1759,12 +1759,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if dev, ok := m["mac_state.lorawan_version"]; ok && dev.MACState == nil {
 				return false, "mac_state.lorawan_version"
 			} else if !ok {
-				macVersion = m["lorawan_version"].LoRaWANVersion
+				macVersion = m["lorawan_version"].LorawanVersion
 			} else {
-				macVersion = dev.MACState.LoRaWANVersion
+				macVersion = dev.MACState.LorawanVersion
 			}
 		} else {
-			macVersion = m["lorawan_version"].LoRaWANVersion
+			macVersion = m["lorawan_version"].LorawanVersion
 		}
 
 		if dev, ok := m["session.dev_addr"]; !ok || dev.Session == nil {
@@ -1940,7 +1940,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if dev, ok := m["pending_mac_state.lorawan_version"]; !ok || dev.PendingMACState == nil {
 			return false, "pending_mac_state.lorawan_version"
 		} else {
-			macVersion = dev.PendingMACState.LoRaWANVersion
+			macVersion = dev.PendingMACState.LorawanVersion
 		}
 		supports1_1 := macVersion.Compare(ttnpb.MAC_V1_1) >= 0
 
@@ -2193,7 +2193,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	var evt events.Event
 	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.EndDeviceIdentifiers.ApplicationIdentifiers, st.Device.EndDeviceIdentifiers.DeviceId, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
 		if hasSession {
-			macVersion := stored.GetMACState().GetLoRaWANVersion()
+			macVersion := stored.GetMACState().GetLorawanVersion()
 			if stored.GetMACState() == nil && !st.HasSetField("mac_state") {
 				macState, err := mac.NewState(st.Device, ns.FrequencyPlans, ns.defaultMACSettings)
 				if err != nil {
@@ -2208,9 +2208,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				st.AddSetFields(
 					"mac_state",
 				)
-				macVersion = macState.LoRaWANVersion
+				macVersion = macState.LorawanVersion
 			} else if st.HasSetField("mac_state.lorawan_version") {
-				macVersion = st.Device.MACState.LoRaWANVersion
+				macVersion = st.Device.MACState.LorawanVersion
 			}
 
 			if st.HasSetField("session.keys.f_nwk_s_int_key.key") && macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
@@ -2238,9 +2238,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if hasPendingSession {
 			var macVersion ttnpb.MACVersion
 			if st.HasSetField("pending_mac_state.lorawan_version") {
-				macVersion = st.Device.GetPendingMACState().GetLoRaWANVersion()
+				macVersion = st.Device.GetPendingMACState().GetLorawanVersion()
 			} else {
-				macVersion = stored.GetPendingMACState().GetLoRaWANVersion()
+				macVersion = stored.GetPendingMACState().GetLorawanVersion()
 			}
 
 			supports1_1 := macVersion.Compare(ttnpb.MAC_V1_1) >= 0

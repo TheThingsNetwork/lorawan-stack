@@ -107,13 +107,13 @@ func searchUint64(v uint64, vs ...uint64) int {
 }
 
 func deviceRejectedADRDataRateIndex(dev *ttnpb.EndDevice, idx ttnpb.DataRateIndex) bool {
-	i := searchDataRateIndex(idx, dev.MACState.RejectedADRDataRateIndexes...)
-	return i < len(dev.MACState.RejectedADRDataRateIndexes) && dev.MACState.RejectedADRDataRateIndexes[i] == idx
+	i := searchDataRateIndex(idx, dev.MACState.RejectedAdrDataRateIndexes...)
+	return i < len(dev.MACState.RejectedAdrDataRateIndexes) && dev.MACState.RejectedAdrDataRateIndexes[i] == idx
 }
 
 func deviceRejectedADRTXPowerIndex(dev *ttnpb.EndDevice, idx uint32) bool {
-	i := searchUint32(idx, dev.MACState.RejectedADRTxPowerIndexes...)
-	return i < len(dev.MACState.RejectedADRTxPowerIndexes) && dev.MACState.RejectedADRTxPowerIndexes[i] == idx
+	i := searchUint32(idx, dev.MACState.RejectedAdrTxPowerIndexes...)
+	return i < len(dev.MACState.RejectedAdrTxPowerIndexes) && dev.MACState.RejectedAdrTxPowerIndexes[i] == idx
 }
 
 func deviceRejectedFrequency(dev *ttnpb.EndDevice, freq uint64) bool {

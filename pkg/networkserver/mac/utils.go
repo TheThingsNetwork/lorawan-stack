@@ -152,11 +152,11 @@ func DeviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Ba
 	if dev.GetMulticast() {
 		return false
 	}
-	if v := dev.GetMACSettings().GetUseADR(); v != nil {
+	if v := dev.GetMACSettings().GetUseAdr(); v != nil {
 		return v.Value
 	}
-	if defaults.UseADR != nil {
-		return defaults.UseADR.Value
+	if defaults.UseAdr != nil {
+		return defaults.UseAdr.Value
 	}
 	return true
 }
@@ -187,7 +187,7 @@ var errClassAMulticast = errors.DefineInvalidArgument("class_a_multicast", "mult
 
 func DeviceDefaultClass(dev *ttnpb.EndDevice) (ttnpb.Class, error) {
 	switch {
-	case dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC:
+	case dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC:
 		return ttnpb.CLASS_C, nil
 	case !dev.Multicast:
 		return ttnpb.CLASS_A, nil
@@ -203,11 +203,11 @@ func DeviceDefaultClass(dev *ttnpb.EndDevice) (ttnpb.Class, error) {
 func DeviceDefaultLoRaWANVersion(dev *ttnpb.EndDevice) ttnpb.MACVersion {
 	switch {
 	case dev.Multicast:
-		return dev.LoRaWANVersion
-	case dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0:
+		return dev.LorawanVersion
+	case dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0:
 		return ttnpb.MAC_V1_1
 	default:
-		return dev.LoRaWANVersion
+		return dev.LorawanVersion
 	}
 }
 
@@ -271,10 +271,10 @@ func DeviceDesiredRX1Delay(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.
 
 func DeviceDesiredADRAckLimitExponent(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) *ttnpb.ADRAckLimitExponentValue {
 	switch {
-	case dev.GetMACSettings().GetDesiredADRAckLimitExponent() != nil:
-		return &ttnpb.ADRAckLimitExponentValue{Value: dev.MACSettings.DesiredADRAckLimitExponent.Value}
-	case defaults.DesiredADRAckLimitExponent != nil:
-		return &ttnpb.ADRAckLimitExponentValue{Value: defaults.DesiredADRAckLimitExponent.Value}
+	case dev.GetMACSettings().GetDesiredAdrAckLimitExponent() != nil:
+		return &ttnpb.ADRAckLimitExponentValue{Value: dev.MACSettings.DesiredAdrAckLimitExponent.Value}
+	case defaults.DesiredAdrAckLimitExponent != nil:
+		return &ttnpb.ADRAckLimitExponentValue{Value: defaults.DesiredAdrAckLimitExponent.Value}
 	default:
 		return &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit}
 	}
@@ -282,10 +282,10 @@ func DeviceDesiredADRAckLimitExponent(dev *ttnpb.EndDevice, phy *band.Band, defa
 
 func DeviceDesiredADRAckDelayExponent(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) *ttnpb.ADRAckDelayExponentValue {
 	switch {
-	case dev.GetMACSettings().GetDesiredADRAckDelayExponent() != nil:
-		return &ttnpb.ADRAckDelayExponentValue{Value: dev.MACSettings.DesiredADRAckDelayExponent.Value}
-	case defaults.DesiredADRAckDelayExponent != nil:
-		return &ttnpb.ADRAckDelayExponentValue{Value: defaults.DesiredADRAckDelayExponent.Value}
+	case dev.GetMACSettings().GetDesiredAdrAckDelayExponent() != nil:
+		return &ttnpb.ADRAckDelayExponentValue{Value: dev.MACSettings.DesiredAdrAckDelayExponent.Value}
+	case defaults.DesiredAdrAckDelayExponent != nil:
+		return &ttnpb.ADRAckDelayExponentValue{Value: defaults.DesiredAdrAckDelayExponent.Value}
 	default:
 		return &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay}
 	}
@@ -583,8 +583,8 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 
 	current := ttnpb.MACParameters{
 		MaxEIRP:                    phy.DefaultMaxEIRP,
-		ADRDataRateIndex:           ttnpb.DATA_RATE_0,
-		ADRNbTrans:                 1,
+		AdrDataRateIndex:           ttnpb.DATA_RATE_0,
+		AdrNbTrans:                 1,
 		Rx1Delay:                   DeviceDefaultRX1Delay(dev, phy, defaults),
 		Rx1DataRateOffset:          DeviceDefaultRX1DataRateOffset(dev, defaults),
 		Rx2DataRateIndex:           DeviceDefaultRX2DataRateIndex(dev, phy, defaults),
@@ -595,16 +595,16 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 		PingSlotFrequency:          DeviceDefaultPingSlotFrequency(dev, phy, defaults),
 		BeaconFrequency:            DeviceDefaultBeaconFrequency(dev, defaults),
 		Channels:                   DeviceDefaultChannels(dev, phy, defaults),
-		ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit},
-		ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay},
+		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit},
+		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay},
 		PingSlotDataRateIndexValue: DeviceDefaultPingSlotDataRateIndexValue(dev, phy, defaults),
 	}
 	desired := current
 	if !dev.Multicast {
 		desired = ttnpb.MACParameters{
 			MaxEIRP:                    DeviceDesiredMaxEIRP(dev, phy, fp, defaults),
-			ADRDataRateIndex:           ttnpb.DATA_RATE_0,
-			ADRNbTrans:                 1,
+			AdrDataRateIndex:           ttnpb.DATA_RATE_0,
+			AdrNbTrans:                 1,
 			Rx1Delay:                   DeviceDesiredRX1Delay(dev, phy, defaults),
 			Rx1DataRateOffset:          DeviceDesiredRX1DataRateOffset(dev, defaults),
 			Rx2DataRateIndex:           DeviceDesiredRX2DataRateIndex(dev, phy, fp, defaults),
@@ -617,14 +617,14 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 			Channels:                   DeviceDesiredChannels(dev, phy, fp, defaults),
 			UplinkDwellTime:            DeviceDesiredUplinkDwellTime(fp),
 			DownlinkDwellTime:          DeviceDesiredDownlinkDwellTime(fp),
-			ADRAckLimitExponent:        DeviceDesiredADRAckLimitExponent(dev, phy, defaults),
-			ADRAckDelayExponent:        DeviceDesiredADRAckDelayExponent(dev, phy, defaults),
+			AdrAckLimitExponent:        DeviceDesiredADRAckLimitExponent(dev, phy, defaults),
+			AdrAckDelayExponent:        DeviceDesiredADRAckDelayExponent(dev, phy, defaults),
 			PingSlotDataRateIndexValue: DeviceDesiredPingSlotDataRateIndexValue(dev, phy, fp, defaults),
 		}
 	}
 	// TODO: Support rejoins. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
 	return &ttnpb.MACState{
-		LoRaWANVersion:      DeviceDefaultLoRaWANVersion(dev),
+		LorawanVersion:      DeviceDefaultLoRaWANVersion(dev),
 		DeviceClass:         class,
 		PingSlotPeriodicity: DeviceDefaultPingSlotPeriodicity(dev, defaults),
 		CurrentParameters:   current,

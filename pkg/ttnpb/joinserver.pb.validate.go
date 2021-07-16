@@ -364,7 +364,7 @@ func (m *CryptoServicePayloadRequest) ValidateFields(paths ...string) error {
 
 		case "lorawan_version":
 
-			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+			if _, ok := MACVersion_name[int32(m.GetLorawanVersion())]; !ok {
 				return CryptoServicePayloadRequestValidationError{
 					field:  "lorawan_version",
 					reason: "value must be one of the defined enum values",
@@ -694,7 +694,7 @@ func (m *DeriveSessionKeysRequest) ValidateFields(paths ...string) error {
 
 		case "lorawan_version":
 
-			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+			if _, ok := MACVersion_name[int32(m.GetLorawanVersion())]; !ok {
 				return DeriveSessionKeysRequestValidationError{
 					field:  "lorawan_version",
 					reason: "value must be one of the defined enum values",

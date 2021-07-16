@@ -48,8 +48,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
-						Modulation: &ttnpb.DataRate_LoRa{
-							LoRa: &ttnpb.LoRaDataRate{
+						Modulation: &ttnpb.DataRate_Lora{
+							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 13,
 								Bandwidth:       250000,
 							},
@@ -73,8 +73,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
-						Modulation: &ttnpb.DataRate_LoRa{
-							LoRa: &ttnpb.LoRaDataRate{
+						Modulation: &ttnpb.DataRate_Lora{
+							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
 								Bandwidth:       250000,
 							},
@@ -104,8 +104,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
-						Modulation: &ttnpb.DataRate_LoRa{
-							LoRa: &ttnpb.LoRaDataRate{
+						Modulation: &ttnpb.DataRate_Lora{
+							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
 								Bandwidth:       250000,
 							},
@@ -156,8 +156,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
-						Modulation: &ttnpb.DataRate_LoRa{
-							LoRa: &ttnpb.LoRaDataRate{
+						Modulation: &ttnpb.DataRate_Lora{
+							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
 								Bandwidth:       250000,
 							},
@@ -208,8 +208,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
-						Modulation: &ttnpb.DataRate_LoRa{
-							LoRa: &ttnpb.LoRaDataRate{
+						Modulation: &ttnpb.DataRate_Lora{
+							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
 								Bandwidth:       250000,
 							},
@@ -272,8 +272,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
-						Modulation: &ttnpb.DataRate_LoRa{
-							LoRa: &ttnpb.LoRaDataRate{
+						Modulation: &ttnpb.DataRate_Lora{
+							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
 								Bandwidth:       250000,
 							},

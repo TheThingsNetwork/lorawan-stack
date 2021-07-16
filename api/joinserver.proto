@@ -85,7 +85,7 @@ message CryptoServicePayloadRequest {
   // End device identifiers for the cryptographic operation.
   EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
   // LoRaWAN version to use for the cryptographic operation.
-  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  MACVersion lorawan_version = 2 [(validate.rules).enum.defined_only = true];
   // Raw input payload.
   bytes payload = 3 [(validate.rules).bytes.max_len = 256];
   // Provisioner that provisioned the end device.
@@ -113,7 +113,7 @@ message DeriveSessionKeysRequest {
   // The DevAddr must be set in this request. The DevEUI may need to be set, depending on the provisioner.
   EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
   // LoRaWAN key derivation scheme.
-  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
+  MACVersion lorawan_version = 2 [(validate.rules).enum.defined_only = true];
   // LoRaWAN JoinNonce (or AppNonce).
   bytes join_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.JoinNonce"];
   // LoRaWAN DevNonce.

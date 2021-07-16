@@ -48,7 +48,7 @@ func HandleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		dev.EndDeviceIdentifiers.DevAddr = &dev.PendingSession.DevAddr
 		dev.Session = dev.PendingSession
 	}
-	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
+	dev.MACState.LorawanVersion = ttnpb.MAC_V1_1
 	dev.MACState.PendingJoinRequest = nil
 	dev.PendingMACState = nil
 	dev.PendingSession = nil

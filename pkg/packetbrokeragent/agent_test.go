@@ -149,8 +149,8 @@ func TestForwarder(t *testing.T) {
 						},
 						Settings: ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_LoRa{
-									LoRa: &ttnpb.LoRaDataRate{
+								Modulation: &ttnpb.DataRate_Lora{
+									Lora: &ttnpb.LoRaDataRate{
 										SpreadingFactor: 7,
 										Bandwidth:       125000,
 									},
@@ -269,8 +269,8 @@ func TestForwarder(t *testing.T) {
 						},
 						Settings: ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_LoRa{
-									LoRa: &ttnpb.LoRaDataRate{
+								Modulation: &ttnpb.DataRate_Lora{
+									Lora: &ttnpb.LoRaDataRate{
 										SpreadingFactor: 9,
 										Bandwidth:       125000,
 									},
@@ -677,8 +677,8 @@ func TestHomeNetwork(t *testing.T) {
 					},
 					Settings: ttnpb.TxSettings{
 						DataRate: ttnpb.DataRate{
-							Modulation: &ttnpb.DataRate_LoRa{
-								LoRa: &ttnpb.LoRaDataRate{
+							Modulation: &ttnpb.DataRate_Lora{
+								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
 									Bandwidth:       125000,
 								},
@@ -788,8 +788,8 @@ func TestHomeNetwork(t *testing.T) {
 					},
 					Settings: ttnpb.TxSettings{
 						DataRate: ttnpb.DataRate{
-							Modulation: &ttnpb.DataRate_LoRa{
-								LoRa: &ttnpb.LoRaDataRate{
+							Modulation: &ttnpb.DataRate_Lora{
+								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 9,
 									Bandwidth:       125000,
 								},

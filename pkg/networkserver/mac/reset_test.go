@@ -40,14 +40,14 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanVersion:    ttnpb.MAC_V1_1,
+				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
 				MACState:          &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanVersion:    ttnpb.MAC_V1_1,
+				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
 				MACState:          &ttnpb.MACState{},
 			},
@@ -56,8 +56,8 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanVersion:    ttnpb.MAC_V1_1,
+				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
@@ -68,8 +68,8 @@ func TestHandleResetInd(t *testing.T) {
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
-					LoRaWANVersion:    ttnpb.MAC_V1_1,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanVersion:    ttnpb.MAC_V1_1,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 				}
@@ -78,7 +78,7 @@ func TestHandleResetInd(t *testing.T) {
 					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
 				}
 				dev.MACState = macState
-				dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
+				dev.MACState.LorawanVersion = ttnpb.MAC_V1_1
 				dev.MACState.QueuedResponses = []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_ResetConf{
 						MinorVersion: 1,
@@ -101,8 +101,8 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				LoRaWANVersion:    ttnpb.MAC_V1_1,
-				LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanVersion:    ttnpb.MAC_V1_1,
+				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
@@ -117,8 +117,8 @@ func TestHandleResetInd(t *testing.T) {
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
-					LoRaWANVersion:    ttnpb.MAC_V1_1,
-					LoRaWANPHYVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanVersion:    ttnpb.MAC_V1_1,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 				}
@@ -127,7 +127,7 @@ func TestHandleResetInd(t *testing.T) {
 					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
 				}
 				dev.MACState = macState
-				dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
+				dev.MACState.LorawanVersion = ttnpb.MAC_V1_1
 				dev.MACState.QueuedResponses = []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_ResetConf{
 						MinorVersion: 1,

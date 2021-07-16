@@ -265,7 +265,7 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 			// no validation rules for MaxEIRP
 		case "adr_data_rate_index":
 
-			if _, ok := DataRateIndex_name[int32(m.GetADRDataRateIndex())]; !ok {
+			if _, ok := DataRateIndex_name[int32(m.GetAdrDataRateIndex())]; !ok {
 				return MACParametersValidationError{
 					field:  "adr_data_rate_index",
 					reason: "value must be one of the defined enum values",
@@ -274,7 +274,7 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 
 		case "adr_tx_power_index":
 
-			if m.GetADRTxPowerIndex() > 15 {
+			if m.GetAdrTxPowerIndex() > 15 {
 				return MACParametersValidationError{
 					field:  "adr_tx_power_index",
 					reason: "value must be less than or equal to 15",
@@ -283,7 +283,7 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 
 		case "adr_nb_trans":
 
-			if m.GetADRNbTrans() > 15 {
+			if m.GetAdrNbTrans() > 15 {
 				return MACParametersValidationError{
 					field:  "adr_nb_trans",
 					reason: "value must be less than or equal to 15",
@@ -291,9 +291,9 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 			}
 
 		case "adr_ack_limit":
-			// no validation rules for ADRAckLimit
+			// no validation rules for AdrAckLimit
 		case "adr_ack_delay":
-			// no validation rules for ADRAckDelay
+			// no validation rules for AdrAckDelay
 		case "rx1_delay":
 
 			if _, ok := RxDelay_name[int32(m.GetRx1Delay())]; !ok {
@@ -427,7 +427,7 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 
 		case "adr_ack_limit_exponent":
 
-			if v, ok := interface{}(m.GetADRAckLimitExponent()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetAdrAckLimitExponent()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACParametersValidationError{
 						field:  "adr_ack_limit_exponent",
@@ -439,7 +439,7 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 
 		case "adr_ack_delay_exponent":
 
-			if v, ok := interface{}(m.GetADRAckDelayExponent()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetAdrAckDelayExponent()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACParametersValidationError{
 						field:  "adr_ack_delay_exponent",
@@ -554,7 +554,7 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 
 		case "lorawan_version":
 
-			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+			if _, ok := MACVersion_name[int32(m.GetLorawanVersion())]; !ok {
 				return EndDeviceVersionValidationError{
 					field:  "lorawan_version",
 					reason: "value must be one of the defined enum values",
@@ -563,7 +563,7 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 
 		case "lorawan_phy_version":
 
-			if _, ok := PHYVersion_name[int32(m.GetLoRaWANPHYVersion())]; !ok {
+			if _, ok := PHYVersion_name[int32(m.GetLorawanPhyVersion())]; !ok {
 				return EndDeviceVersionValidationError{
 					field:  "lorawan_phy_version",
 					reason: "value must be one of the defined enum values",
@@ -858,7 +858,7 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 		case "use_adr":
 
-			if v, ok := interface{}(m.GetUseADR()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUseAdr()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "use_adr",
@@ -870,7 +870,7 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 		case "adr_margin":
 
-			if v, ok := interface{}(m.GetADRMargin()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetAdrMargin()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "adr_margin",
@@ -978,7 +978,7 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 		case "desired_adr_ack_limit_exponent":
 
-			if v, ok := interface{}(m.GetDesiredADRAckLimitExponent()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetDesiredAdrAckLimitExponent()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "desired_adr_ack_limit_exponent",
@@ -990,7 +990,7 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 		case "desired_adr_ack_delay_exponent":
 
-			if v, ok := interface{}(m.GetDesiredADRAckDelayExponent()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetDesiredAdrAckDelayExponent()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "desired_adr_ack_delay_exponent",
@@ -1162,7 +1162,7 @@ func (m *MACState) ValidateFields(paths ...string) error {
 
 		case "lorawan_version":
 
-			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+			if _, ok := MACVersion_name[int32(m.GetLorawanVersion())]; !ok {
 				return MACStateValidationError{
 					field:  "lorawan_version",
 					reason: "value must be one of the defined enum values",
@@ -1315,14 +1315,14 @@ func (m *MACState) ValidateFields(paths ...string) error {
 
 		case "rejected_adr_data_rate_indexes":
 
-			if len(m.GetRejectedADRDataRateIndexes()) > 15 {
+			if len(m.GetRejectedAdrDataRateIndexes()) > 15 {
 				return MACStateValidationError{
 					field:  "rejected_adr_data_rate_indexes",
 					reason: "value must contain no more than 15 item(s)",
 				}
 			}
 
-			for idx, item := range m.GetRejectedADRDataRateIndexes() {
+			for idx, item := range m.GetRejectedAdrDataRateIndexes() {
 				_, _ = idx, item
 
 				if _, ok := DataRateIndex_name[int32(item)]; !ok {
@@ -1336,14 +1336,14 @@ func (m *MACState) ValidateFields(paths ...string) error {
 
 		case "rejected_adr_tx_power_indexes":
 
-			if len(m.GetRejectedADRTxPowerIndexes()) > 15 {
+			if len(m.GetRejectedAdrTxPowerIndexes()) > 15 {
 				return MACStateValidationError{
 					field:  "rejected_adr_tx_power_indexes",
 					reason: "value must contain no more than 15 item(s)",
 				}
 			}
 
-			for idx, item := range m.GetRejectedADRTxPowerIndexes() {
+			for idx, item := range m.GetRejectedAdrTxPowerIndexes() {
 				_, _ = idx, item
 
 				if item > 15 {
@@ -1401,7 +1401,7 @@ func (m *MACState) ValidateFields(paths ...string) error {
 			}
 
 		case "last_adr_change_f_cnt_up":
-			// no validation rules for LastADRChangeFCntUp
+			// no validation rules for LastAdrChangeFCntUp
 		default:
 			return MACStateValidationError{
 				field:  name,
@@ -1811,7 +1811,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 			// no validation rules for SupportsClassC
 		case "lorawan_version":
 
-			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+			if _, ok := MACVersion_name[int32(m.GetLorawanVersion())]; !ok {
 				return EndDeviceValidationError{
 					field:  "lorawan_version",
 					reason: "value must be one of the defined enum values",
@@ -1820,7 +1820,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "lorawan_phy_version":
 
-			if _, ok := PHYVersion_name[int32(m.GetLoRaWANPHYVersion())]; !ok {
+			if _, ok := PHYVersion_name[int32(m.GetLorawanPhyVersion())]; !ok {
 				return EndDeviceValidationError{
 					field:  "lorawan_phy_version",
 					reason: "value must be one of the defined enum values",

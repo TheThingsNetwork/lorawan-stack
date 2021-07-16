@@ -145,9 +145,9 @@ func NewPopulatedMACCommand(r randyLorawan, easy bool) *MACCommand {
 		}
 	case CID_LINK_ADR:
 		if r.Intn(2) == 1 {
-			out.Payload = &MACCommand_LinkADRReq_{LinkADRReq: NewPopulatedMACCommand_LinkADRReq(r, easy)}
+			out.Payload = &MACCommand_LinkAdrReq{LinkAdrReq: NewPopulatedMACCommand_LinkADRReq(r, easy)}
 		} else {
-			out.Payload = &MACCommand_LinkADRAns_{LinkADRAns: NewPopulatedMACCommand_LinkADRAns(r, easy)}
+			out.Payload = &MACCommand_LinkAdrAns{LinkAdrAns: NewPopulatedMACCommand_LinkADRAns(r, easy)}
 		}
 	case CID_DUTY_CYCLE:
 		if r.Intn(2) == 1 {
@@ -191,7 +191,7 @@ func NewPopulatedMACCommand(r randyLorawan, easy bool) *MACCommand {
 		}
 	case CID_ADR_PARAM_SETUP:
 		if r.Intn(2) == 1 {
-			out.Payload = &MACCommand_ADRParamSetupReq_{ADRParamSetupReq: NewPopulatedMACCommand_ADRParamSetupReq(r, easy)}
+			out.Payload = &MACCommand_AdrParamSetupReq{AdrParamSetupReq: NewPopulatedMACCommand_ADRParamSetupReq(r, easy)}
 		}
 	case CID_DEVICE_TIME:
 		if r.Intn(2) == 1 {
@@ -330,8 +330,8 @@ func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
 			},
 		}
 	case 1:
-		out.DataRate.Modulation = &DataRate_LoRa{
-			LoRa: &LoRaDataRate{
+		out.DataRate.Modulation = &DataRate_Lora{
+			Lora: &LoRaDataRate{
 				Bandwidth:       []uint32{125000, 250000, 500000}[r.Intn(3)],
 				SpreadingFactor: uint32(r.Intn(6) + 7),
 			},
@@ -463,8 +463,8 @@ func NewPopulatedMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey types.AE
 	}
 	pld := NewPopulatedMessage_MACPayload(r)
 	pld.MACPayload.FHDR.FCtrl = FCtrl{
-		ADR:       r.Intn(2) == 0,
-		ADRAckReq: r.Intn(2) == 0,
+		Adr:       r.Intn(2) == 0,
+		AdrAckReq: r.Intn(2) == 0,
 		ClassB:    r.Intn(2) == 0,
 		Ack:       r.Intn(2) == 0,
 	}
@@ -496,7 +496,7 @@ func NewPopulatedMessageDownlink(r randyLorawan, sNwkSIntKey types.AES128Key, co
 	}
 	pld := NewPopulatedMessage_MACPayload(r)
 	pld.MACPayload.FHDR.FCtrl = FCtrl{
-		ADR:      r.Intn(2) == 0,
+		Adr:      r.Intn(2) == 0,
 		FPending: r.Intn(2) == 0,
 		Ack:      r.Intn(2) == 0,
 	}

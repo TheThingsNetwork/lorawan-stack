@@ -87,7 +87,7 @@ func TestNeedsRejoinParamSetupReq(t *testing.T) {
 					Name: makeMACName(conf.Suffix),
 					InputDevice: &ttnpb.EndDevice{
 						MACState: &ttnpb.MACState{
-							LoRaWANVersion:    macVersion,
+							LorawanVersion:    macVersion,
 							CurrentParameters: conf.CurrentParameters,
 							DesiredParameters: conf.DesiredParameters,
 						},

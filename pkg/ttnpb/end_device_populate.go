@@ -21,7 +21,7 @@ import (
 func NewPopulatedMACState(r randyEndDevice, easy bool) *MACState {
 	out := &MACState{}
 	out.DeviceClass = Class([]int32{0, 1, 2}[r.Intn(3)])
-	out.LoRaWANVersion = MACVersion([]int32{1, 2, 3, 4}[r.Intn(4)])
+	out.LorawanVersion = MACVersion([]int32{1, 2, 3, 4}[r.Intn(4)])
 	if r.Intn(2) == 0 {
 		out.PingSlotPeriodicity = &PingSlotPeriodValue{
 			Value: PingSlotPeriod([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)]),
@@ -71,11 +71,11 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	if r.Intn(2) == 0 {
 		out.DownlinkDwellTime = &BoolValue{Value: r.Uint32()%2 == 0}
 	}
-	out.ADRDataRateIndex = NewPopulatedDataRateIndex(r, easy)
-	out.ADRTxPowerIndex = r.Uint32() % 16
-	out.ADRNbTrans = 1 + r.Uint32()%15
-	out.ADRAckLimitExponent = NewPopulatedADRAckLimitExponentValue(r, easy)
-	out.ADRAckDelayExponent = NewPopulatedADRAckDelayExponentValue(r, easy)
+	out.AdrDataRateIndex = NewPopulatedDataRateIndex(r, easy)
+	out.AdrTxPowerIndex = r.Uint32() % 16
+	out.AdrNbTrans = 1 + r.Uint32()%15
+	out.AdrAckLimitExponent = NewPopulatedADRAckLimitExponentValue(r, easy)
+	out.AdrAckDelayExponent = NewPopulatedADRAckDelayExponentValue(r, easy)
 	out.MaxDutyCycle = AggregatedDutyCycle([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
 	out.Channels = make([]*MACParameters_Channel, 1+r.Intn(254))
 	for i := range out.Channels {

@@ -125,10 +125,10 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 				TestCase{
 					Name: makeName(conf.Suffix),
 					InputDevice: &ttnpb.EndDevice{
-						LoRaWANVersion:    macVersion,
-						LoRaWANPHYVersion: phyVersion,
+						LorawanVersion:    macVersion,
+						LorawanPhyVersion: phyVersion,
 						MACState: &ttnpb.MACState{
-							LoRaWANVersion:    macVersion,
+							LorawanVersion:    macVersion,
 							CurrentParameters: conf.CurrentParameters,
 							DesiredParameters: conf.DesiredParameters,
 						},
@@ -171,7 +171,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			Name: "payload fits/EIRP 26/dwell time both",
 			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
 					},
@@ -184,7 +184,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
 					},
@@ -221,7 +221,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			Name: "payload fits/EIRP 26/no dwell time limitations",
 			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
 					},
@@ -232,7 +232,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
 					},
@@ -253,7 +253,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			Name: "downlink does not fit/EIRP 26/dwell time both",
 			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
 					},
@@ -266,7 +266,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
 					},
@@ -288,7 +288,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			Name: "uplink does not fit/EIRP 26/dwell time both",
 			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
 					},
@@ -301,7 +301,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
 					},

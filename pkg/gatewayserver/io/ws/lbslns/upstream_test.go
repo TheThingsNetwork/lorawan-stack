@@ -188,7 +188,7 @@ func TestJoinRequest(t *testing.T) {
 				}},
 				Settings: ttnpb.TxSettings{
 					CodingRate: "4/5",
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 12,
 						Bandwidth:       125000,
 					}}},
@@ -241,7 +241,7 @@ func TestJoinRequest(t *testing.T) {
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 					CodingRate: "4/5",
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -354,7 +354,7 @@ func TestUplinkDataFrame(t *testing.T) {
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
 					CodingRate: "4/5",
 					Frequency:  868300000,
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -418,7 +418,7 @@ func TestUplinkDataFrame(t *testing.T) {
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
 					CodingRate: "4/5",
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -478,8 +478,8 @@ func TestFromUplinkDataFrame(t *testing.T) {
 						FHDR: ttnpb.FHDR{
 							DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 							FCtrl: ttnpb.FCtrl{
-								ADR:       true,
-								ADRAckReq: false,
+								Adr:       true,
+								AdrAckReq: false,
 								Ack:       true,
 								ClassB:    true,
 								FPending:  false,
@@ -503,7 +503,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 				},
 				Settings: ttnpb.TxSettings{
 					Frequency: 868300000,
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -597,7 +597,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 				},
 				Settings: ttnpb.TxSettings{
 					Frequency: 868300000,
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},

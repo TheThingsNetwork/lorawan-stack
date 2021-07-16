@@ -130,7 +130,7 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "adr_margin":
-		return v.ADRMargin == nil
+		return v.AdrMargin == nil
 	case "beacon_frequency":
 		return v.BeaconFrequency == nil
 	case "beacon_frequency.value":
@@ -140,13 +140,13 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 	case "class_c_timeout":
 		return v.ClassCTimeout == nil
 	case "desired_adr_ack_delay_exponent":
-		return v.DesiredADRAckDelayExponent == nil
+		return v.DesiredAdrAckDelayExponent == nil
 	case "desired_adr_ack_delay_exponent.value":
-		return v.DesiredADRAckDelayExponent.FieldIsZero("value")
+		return v.DesiredAdrAckDelayExponent.FieldIsZero("value")
 	case "desired_adr_ack_limit_exponent":
-		return v.DesiredADRAckLimitExponent == nil
+		return v.DesiredAdrAckLimitExponent == nil
 	case "desired_adr_ack_limit_exponent.value":
-		return v.DesiredADRAckLimitExponent.FieldIsZero("value")
+		return v.DesiredAdrAckLimitExponent.FieldIsZero("value")
 	case "desired_beacon_frequency":
 		return v.DesiredBeaconFrequency == nil
 	case "desired_beacon_frequency.value":
@@ -230,9 +230,9 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 	case "supports_32_bit_f_cnt.value":
 		return v.Supports32BitFCnt.FieldIsZero("value")
 	case "use_adr":
-		return v.UseADR == nil
+		return v.UseAdr == nil
 	case "use_adr.value":
-		return v.UseADR.FieldIsZero("value")
+		return v.UseAdr.FieldIsZero("value")
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -244,23 +244,23 @@ func (v *MACParameters) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "adr_ack_delay":
-		return v.ADRAckDelay == 0
+		return v.AdrAckDelay == 0
 	case "adr_ack_delay_exponent":
-		return v.ADRAckDelayExponent == nil
+		return v.AdrAckDelayExponent == nil
 	case "adr_ack_delay_exponent.value":
-		return v.ADRAckDelayExponent.FieldIsZero("value")
+		return v.AdrAckDelayExponent.FieldIsZero("value")
 	case "adr_ack_limit":
-		return v.ADRAckLimit == 0
+		return v.AdrAckLimit == 0
 	case "adr_ack_limit_exponent":
-		return v.ADRAckLimitExponent == nil
+		return v.AdrAckLimitExponent == nil
 	case "adr_ack_limit_exponent.value":
-		return v.ADRAckLimitExponent.FieldIsZero("value")
+		return v.AdrAckLimitExponent.FieldIsZero("value")
 	case "adr_data_rate_index":
-		return v.ADRDataRateIndex == 0
+		return v.AdrDataRateIndex == 0
 	case "adr_nb_trans":
-		return v.ADRNbTrans == 0
+		return v.AdrNbTrans == 0
 	case "adr_tx_power_index":
-		return v.ADRTxPowerIndex == 0
+		return v.AdrTxPowerIndex == 0
 	case "beacon_frequency":
 		return v.BeaconFrequency == 0
 	case "channels":
@@ -524,7 +524,7 @@ func (v *MACState) FieldIsZero(p string) bool {
 	case "device_class":
 		return v.DeviceClass == 0
 	case "last_adr_change_f_cnt_up":
-		return v.LastADRChangeFCntUp == 0
+		return v.LastAdrChangeFCntUp == 0
 	case "last_confirmed_downlink_at":
 		return v.LastConfirmedDownlinkAt == nil
 	case "last_dev_status_f_cnt_up":
@@ -534,7 +534,7 @@ func (v *MACState) FieldIsZero(p string) bool {
 	case "last_network_initiated_downlink_at":
 		return v.LastNetworkInitiatedDownlinkAt == nil
 	case "lorawan_version":
-		return v.LoRaWANVersion == 0
+		return v.LorawanVersion == 0
 	case "pending_application_downlink":
 		return v.PendingApplicationDownlink == nil
 	case "pending_application_downlink.class_b_c":
@@ -762,9 +762,9 @@ func (v *MACState) FieldIsZero(p string) bool {
 	case "recent_uplinks":
 		return v.RecentUplinks == nil
 	case "rejected_adr_data_rate_indexes":
-		return v.RejectedADRDataRateIndexes == nil
+		return v.RejectedAdrDataRateIndexes == nil
 	case "rejected_adr_tx_power_indexes":
-		return v.RejectedADRTxPowerIndexes == nil
+		return v.RejectedAdrTxPowerIndexes == nil
 	case "rejected_data_rate_ranges":
 		return v.RejectedDataRateRanges == nil
 	case "rejected_frequencies":
@@ -926,9 +926,9 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "locations":
 		return v.Locations == nil
 	case "lorawan_phy_version":
-		return v.LoRaWANPHYVersion == 0
+		return v.LorawanPhyVersion == 0
 	case "lorawan_version":
-		return v.LoRaWANVersion == 0
+		return v.LorawanVersion == 0
 	case "mac_settings":
 		return v.MACSettings == nil
 	case "mac_settings.adr_margin":
