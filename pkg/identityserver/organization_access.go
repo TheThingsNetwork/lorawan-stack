@@ -283,8 +283,11 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 }
 
 func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, req *ttnpb.ListOrganizationCollaboratorsRequest) (collaborators *ttnpb.Collaborators, err error) {
-	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
+	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
+	}
+	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
+		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)

@@ -139,8 +139,11 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 }
 
 func (is *IdentityServer) listClientCollaborators(ctx context.Context, req *ttnpb.ListClientCollaboratorsRequest) (collaborators *ttnpb.Collaborators, err error) {
-	if err = is.RequireAuthenticated(ctx); err != nil { // Client collaborators can be seen by all authenticated users.
+	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
+	}
+	if err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
+		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)

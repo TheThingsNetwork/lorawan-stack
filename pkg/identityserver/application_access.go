@@ -283,9 +283,13 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 }
 
 func (is *IdentityServer) listApplicationCollaborators(ctx context.Context, req *ttnpb.ListApplicationCollaboratorsRequest) (collaborators *ttnpb.Collaborators, err error) {
-	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
+	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
+	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
+		defer func() { collaborators = collaborators.PublicSafe() }()
+	}
+
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {

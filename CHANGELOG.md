@@ -33,6 +33,7 @@ For details about compatibility between different releases, see the **Commitment
 - The HTTP port now allows HTTP/2 connections over cleartext (h2c).
 - `ttn-lw-stack ns-db migrate` command records the schema version and only performs migrations if on a newer version.
   - Use the `--force` flag to force perform migrations.
+- Any authenticated user in the network can now list the collaborators of entities in the network.
 
 ### Deprecated
 
