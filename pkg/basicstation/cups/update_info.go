@@ -249,7 +249,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 
 	res := UpdateInfoResponse{}
 	if s.allowCUPSURIUpdate && gtw.TargetCUPSURI != "" && gtw.TargetCUPSURI != req.CUPSURI {
-		if gtw.TargetCUPSKey.Value == nil {
+		if gtw.TargetCUPSKey == nil || gtw.TargetCUPSKey.Value == nil {
 			return errTargetCUPSCredentials.New()
 		}
 		logger := logger.WithField("cups_uri", gtw.TargetCUPSURI)
