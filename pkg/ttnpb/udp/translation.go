@@ -126,6 +126,7 @@ func metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetada
 			RSSI:               float32(rx.RSSI),
 			ChannelRSSI:        float32(rx.RSSI),
 			SNR:                float32(rx.LSNR),
+			LrfhssHoppingWidth: rx.Hpw,
 		},
 	}
 }
@@ -134,14 +135,16 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 	md := make([]*ttnpb.RxMetadata, 0)
 	for _, signal := range rx.RSig {
 		signalMetadata := &ttnpb.RxMetadata{
-			GatewayIdentifiers: gatewayID,
-			AntennaIndex:       uint32(signal.Ant),
-			ChannelIndex:       uint32(signal.Chan),
-			Timestamp:          rx.Tmst,
-			RSSI:               float32(signal.RSSIC),
-			ChannelRSSI:        float32(signal.RSSIC),
-			SNR:                float32(signal.LSNR),
-			FrequencyOffset:    int64(signal.FOff),
+			GatewayIdentifiers:   gatewayID,
+			AntennaIndex:         uint32(signal.Ant),
+			ChannelIndex:         uint32(signal.Chan),
+			Timestamp:            rx.Tmst,
+			RSSI:                 float32(signal.RSSIC),
+			ChannelRSSI:          float32(signal.RSSIC),
+			SNR:                  float32(signal.LSNR),
+			FrequencyOffset:      int64(signal.FOff),
+			LrfhssHoppingWidth:   rx.Hpw,
+			LrfhssFrequencyDrift: signal.Fdri,
 		}
 		if signal.RSSIS != nil {
 			signalMetadata.SignalRSSI = &pbtypes.FloatValue{

@@ -125,6 +125,54 @@ func TestToGatewayUp(t *testing.T) {
 	a.So(msg.RawPayload, should.Resemble, []byte{0x40, 0x29, 0x2e, 0x01, 0x26, 0x80, 0x00, 0x00, 0x01, 0xc8, 0x56, 0x85, 0xe7, 0x72, 0x2e, 0xfa, 0xfc, 0xe6, 0xc1})
 }
 
+func TestToGatewayUpLRFHSS(t *testing.T) {
+	a := assertions.New(t)
+
+	p := udp.Packet{
+		GatewayEUI:      &types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		ProtocolVersion: udp.Version1,
+		Token:           [2]byte{0x11, 0x00},
+		Data: &udp.Data{
+			RxPacket: []*udp.RxPacket{
+				{
+					Freq: 868.0,
+					Chan: 2,
+					Modu: "LR-FHSS",
+					DatR: datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lrfhss{Lrfhss: &ttnpb.LRFHSSDataRate{ModulationType: 0, OperatingChannelWidth: 125}}}},
+					CodR: "5/6",
+					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
+					Size: 19,
+					Tmst: 1000,
+					Hpw:  "10",
+					RSig: []udp.RSig{
+						{
+							FOff: 125000,
+							Fdri: 25000,
+						},
+					},
+				},
+			},
+		},
+		PacketType: udp.PushData,
+	}
+
+	upstream, err := udp.ToGatewayUp(*p.Data, udp.UpstreamMetadata{ID: ids})
+	a.So(err, should.BeNil)
+
+	msg := upstream.UplinkMessages[0]
+	dr := msg.Settings.DataRate.GetLrfhss()
+	a.So(dr, should.NotBeNil)
+	a.So(dr.ModulationType, should.Equal, 0)
+	a.So(dr.OperatingChannelWidth, should.Equal, 125)
+	a.So(msg.Settings.CodingRate, should.Equal, "5/6")
+	a.So(msg.Settings.Frequency, should.Equal, 868000000)
+	a.So(msg.Settings.Timestamp, should.Equal, 1000)
+	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 1000)
+	a.So(msg.RxMetadata[0].LrfhssHoppingWidth, should.Equal, "10")
+	a.So(msg.RxMetadata[0].LrfhssFrequencyDrift, should.Equal, 25000)
+	a.So(msg.RawPayload, should.Resemble, []byte{0x40, 0x29, 0x2e, 0x01, 0x26, 0x80, 0x00, 0x00, 0x01, 0xc8, 0x56, 0x85, 0xe7, 0x72, 0x2e, 0xfa, 0xfc, 0xe6, 0xc1})
+}
+
 func TestToGatewayUpRoundtrip(t *testing.T) {
 	expectedMd := udp.UpstreamMetadata{
 		ID: ttnpb.GatewayIdentifiers{
