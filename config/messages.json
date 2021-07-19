@@ -7388,6 +7388,15 @@
       "file": "translation.go"
     }
   },
+  "error:pkg/packetbrokeragent:unknown_phy_version": {
+    "translations": {
+      "en": "unknown LoRaWAN Regional Parameters version `{version}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
   "error:pkg/packetbrokeragent:unknown_priority": {
     "translations": {
       "en": "unknown priority `{priority}`"
