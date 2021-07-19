@@ -18,12 +18,14 @@ import (
 	"context"
 	"net/http"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc"
 )
 
 const bufferSize = 32
@@ -54,12 +56,26 @@ type UplinkStorage interface {
 	RangeUplinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(ctx context.Context, up *ttnpb.ApplicationUplink) bool) error
 }
 
+// Cluster represents the Application Server cluster peers to application frontends.
+type Cluster interface {
+	// GetPeers returns peers with the given role.
+	GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]cluster.Peer, error)
+	// GetPeer returns a peer with the given role, and a responsibility for the
+	// given identifiers. If the identifiers are nil, this function returns a random
+	// peer from the list that would be returned by GetPeers.
+	GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (cluster.Peer, error)
+	// GetPeerConn returns the gRPC client connection of a peer, if the peer is available as
+	// as per GetPeer.
+	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error)
+}
+
 // Server represents the Application Server to application frontends.
 type Server interface {
 	component.TaskStarter
 	PubSub
 	DownlinkQueueOperator
 	UplinkStorage
+	Cluster
 	// GetBaseConfig returns the component configuration.
 	GetBaseConfig(ctx context.Context) config.ServiceBase
 	// FillContext fills the given context.
