@@ -7,7 +7,7 @@ with the exception that this project **does not** follow Semantic Versioning.
 
 For details about compatibility between different releases, see the **Commitments and Releases** section of our README.
 
-## [v3.14.0] - Upcoming
+## [Unreleased]
 
 ### Added
 
@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - When a gateway uplink message contains duplicate data uplinks, only the one with the highest RSSI are forwarded.
+- The HTTP port now allows HTTP/2 connections over cleartext (h2c).
 
 ### Deprecated
 
@@ -43,20 +44,6 @@ For details about compatibility between different releases, see the **Commitment
 - LBS LNS Auth Secret displays garbage value when updated.
 - Transmit confirmation messages for LoRa Basics Station gateways.
 - Instability and frequent crashes when internet connection is lost in the Console.
-
-### Security
-
-## [Unreleased]
-
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
 
 ### Security
 
