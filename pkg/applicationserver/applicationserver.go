@@ -420,7 +420,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		dev.Session = nil
 		dev.DevAddr = nil
 	}
-	mask = append(mask, "session", "ids.dev_addr")
+	mask = ttnpb.AddFields(mask, "session", "ids.dev_addr")
 
 	if diagnostics.PendingDevAddr != nil {
 		switch {
@@ -442,7 +442,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 	} else {
 		dev.PendingSession = nil
 	}
-	mask = append(mask, "pending_session")
+	mask = ttnpb.AddFields(mask, "pending_session")
 
 	return mask, nil
 }
@@ -477,13 +477,13 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 		sessions := make([]*ttnpb.Session, 0, 2)
 		if dev.Session != nil && !op.shouldSkip(dev.Session.SessionKeyID) {
 			sessions = append(sessions, dev.Session)
-			mask = append(mask, "session.last_a_f_cnt_down")
+			mask = ttnpb.AddFields(mask, "session.last_a_f_cnt_down")
 		}
 		if dev.PendingSession != nil && !op.shouldSkip(dev.PendingSession.SessionKeyID) {
 			// Downlink can be encrypted with the pending session while the device first joined but not confirmed the
 			// session by sending an uplink.
 			sessions = append(sessions, dev.PendingSession)
-			mask = append(mask, "pending_session.last_a_f_cnt_down")
+			mask = ttnpb.AddFields(mask, "pending_session.last_a_f_cnt_down")
 		}
 		if len(sessions) == 0 {
 			return nil, errNoDeviceSession.New()
@@ -716,9 +716,11 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 	}
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
+			"formatters",
 			"pending_session",
 			"session",
 			"skip_payload_crypto_override",
+			"version_ids",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var mask []string
@@ -745,7 +747,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				},
 				StartedAt: time.Now().UTC(),
 			}
-			mask = append(mask, "pending_session")
+			mask = ttnpb.AddFields(mask, "pending_session")
 			if as.skipPayloadCrypto(ctx, link, dev, dev.PendingSession) {
 				return dev, mask, nil
 			}
@@ -786,7 +788,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				as.registerDropDownlinks(ctx, ids, items, err)
 				return nil, nil, err
 			}
-			mask = append(mask, pushMask...)
+			mask = ttnpb.AddFields(mask, pushMask...)
 
 			return dev, mask, nil
 		},
@@ -811,7 +813,7 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids ttnpb.EndDevi
 	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, sessionKeyID):
 		dev.Session = dev.PendingSession
 		dev.PendingSession = nil
-		mask = append(mask, "session", "pending_session")
+		mask = ttnpb.AddFields(mask, "session", "pending_session")
 		logger.Debug("Switched to pending session")
 	default:
 		appSKey, err := as.fetchAppSKey(ctx, ids, sessionKeyID)
@@ -828,7 +830,7 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids ttnpb.EndDevi
 		}
 		dev.PendingSession = nil
 		dev.DevAddr = ids.DevAddr
-		mask = append(mask, "session", "pending_session", "ids.dev_addr")
+		mask = ttnpb.AddFields(mask, "session", "pending_session", "ids.dev_addr")
 		logger.Debug("Restored session")
 	}
 	return mask, nil
@@ -965,9 +967,11 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 	}
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
+			"formatters",
 			"pending_session",
 			"session",
 			"skip_payload_crypto_override",
+			"version_ids",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
@@ -988,7 +992,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 			if err != nil {
 				return nil, nil, err
 			}
-			mask = append(mask, matchMask...)
+			mask = ttnpb.AddFields(mask, matchMask...)
 			dev.Session.LastAFCntDown = invalid.LastFCntDown
 
 			items := make([]*ttnpb.ApplicationDownlink, 0, len(invalid.Downlinks))
@@ -1012,7 +1016,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 				as.registerDropDownlinks(ctx, ids, items, err)
 				return nil, nil, err
 			}
-			mask = append(mask, pushMask...)
+			mask = ttnpb.AddFields(mask, pushMask...)
 
 			return dev, mask, nil
 		},
@@ -1031,6 +1035,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 			"pending_session",
 			"session",
 			"skip_payload_crypto_override",
+			"version_ids",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
@@ -1062,7 +1067,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 				as.registerDropDownlinks(ctx, ids, items, err)
 				return nil, nil, err
 			}
-			mask := append(matchMask, pushMask...)
+			mask := ttnpb.AddFields(matchMask, pushMask...)
 
 			return dev, mask, nil
 		},
@@ -1117,6 +1122,7 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 		"pending_session",
 		"session",
 		"skip_payload_crypto_override",
+		"version_ids",
 	})
 	if err != nil {
 		return err
