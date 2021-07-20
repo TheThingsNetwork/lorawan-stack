@@ -87,3 +87,10 @@ func Require(limiter Interface, resource Resource) error {
 	}
 	return nil
 }
+
+// RateLimitKeyer can be implemented by request messages. If implemented, the
+// string returned by the RateLimitKey() method is appended to the key used for
+// rate limiting.
+type RateLimitKeyer interface {
+	RateLimitKey() string
+}
