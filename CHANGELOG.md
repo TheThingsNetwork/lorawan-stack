@@ -48,6 +48,7 @@ For details about compatibility between different releases, see the **Commitment
 - Transmit confirmation messages for LoRa Basics Station gateways.
 - Instability and frequent crashes when internet connection is lost in the Console.
 - Panic in GCS when CUPS rotation is set without a key.
+- Rate limiting for `GatewayRegistry.GetGatewayIdentifiersForEUI` is now applied per gateway EUI.
 
 ### Security
 
