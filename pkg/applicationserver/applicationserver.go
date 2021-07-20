@@ -888,7 +888,8 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 	if _, exists := as.activationTasks.LoadOrStore(devUID, struct{}{}); exists {
 		return
 	}
-	mask := []string{"activated"}
+	now := time.Now().UTC()
+	mask := []string{"activated_at"}
 	f := func(ctx context.Context) error {
 		defer as.activationTasks.Delete(devUID)
 		cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, &ids)
@@ -898,9 +899,9 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 		_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ids,
-				Activated:            true,
+				ActivatedAt:          &now,
 			},
-			FieldMask: pbtypes.FieldMask{
+			FieldMask: &pbtypes.FieldMask{
 				Paths: mask,
 			},
 		}, as.WithClusterAuth())
@@ -912,7 +913,7 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 				if dev == nil {
 					return nil, nil, errDeviceNotFound.WithAttributes("device_uid", devUID)
 				}
-				dev.Activated = true
+				dev.ActivatedAt = &now
 				return dev, mask, nil
 			},
 		)
@@ -931,7 +932,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
-			"activated",
+			"activated_at",
 			"formatters",
 			"pending_session",
 			"session",
@@ -1002,7 +1003,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		}
 	}
 
-	if !dev.Activated {
+	if dev.ActivatedAt == nil {
 		as.markEndDeviceAsActivated(ctx, ids)
 	}
 

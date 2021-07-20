@@ -183,7 +183,7 @@ func (is *IdentityServer) setFullEndDevicePictureURL(ctx context.Context, dev *t
 
 func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.UpdateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
 	if clusterauth.Authorized(ctx) == nil {
-		req.FieldMask = cleanFieldMaskPaths([]string{"activated", "locations"}, req.FieldMask, nil, getPaths)
+		req.FieldMask = cleanFieldMaskPaths([]string{"activated_at", "locations"}, req.FieldMask, nil, getPaths)
 	} else if err = rights.RequireApplication(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
@@ -192,9 +192,9 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		req.FieldMask = &pbtypes.FieldMask{Paths: updatePaths}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "activated") {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "activated_at") && req.ActivatedAt == nil {
 		// The end device activation state may not be unset once set.
-		req.Activated = true
+		req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, nil, []string{"activated_at"})
 	}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "picture") {

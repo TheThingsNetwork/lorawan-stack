@@ -16,7 +16,7 @@ package store
 
 const (
 	// NOTE: please keep this sorted
-	activatedField                      = "activated"
+	activatedAtField                    = "activated_at"
 	adminField                          = "admin"
 	antennasField                       = "antennas"
 	applicationServerAddressField       = "application_server_address"
