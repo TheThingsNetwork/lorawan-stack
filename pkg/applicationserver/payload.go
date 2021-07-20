@@ -36,11 +36,16 @@ func (as *ApplicationServer) encodeAndEncryptDownlinks(ctx context.Context, dev 
 		skipPayloadCrypto := as.skipPayloadCrypto(ctx, link, dev, session)
 		for _, item := range items {
 			fCnt := session.LastAFCntDown + 1
+			sessionKeyID := session.SessionKeyID
 			if skipPayloadCrypto {
 				fCnt = item.FCnt
+
+				if len(item.SessionKeyID) > 0 {
+					sessionKeyID = item.SessionKeyID
+				}
 			}
 			encryptedItem := &ttnpb.ApplicationDownlink{
-				SessionKeyID:   session.SessionKeyID,
+				SessionKeyID:   sessionKeyID,
 				FPort:          item.FPort,
 				FCnt:           fCnt,
 				FRMPayload:     item.FRMPayload,
