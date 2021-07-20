@@ -51,6 +51,9 @@ type Config struct {
 
 	Stats GatewayConnectionStatsRegistry `name:"-"`
 
+	FetchGatewayInterval time.Duration `name:"fetch-gateway-interval" description:"Fetch gateway interval"`
+	FetchGatewayJitter   float64       `name:"fetch-gateway-jitter" description:"Jitter (fraction) to apply to the get interval to randomize intervals"`
+
 	UpdateGatewayLocationDebounceTime time.Duration `name:"update-gateway-location-debounce-time" description:"Debounce time for gateway location updates from status messages"`
 	UpdateConnectionStatsDebounceTime time.Duration `name:"update-connection-stats-debounce-time" description:"Time before repeated refresh of the gateway connection stats"`
 
