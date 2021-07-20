@@ -26,8 +26,6 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import toast from '@ttn-lw/components/toast'
 
-import RequireRequest from '@ttn-lw/lib/components/require-request'
-
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
@@ -35,7 +33,6 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import {
   setAppPkgDefaultAssoc,
-  getAppPkgDefaultAssoc,
   deleteAppPkgDefaultAssoc,
 } from '@console/store/actions/application-packages'
 
@@ -74,7 +71,6 @@ const promisifiedDeleteAppPkgDefaultAssoc = attachPromise(deleteAppPkgDefaultAss
 const LoRaCloudDASForm = () => {
   const [error, setError] = useState('')
   const appId = useSelector(selectSelectedApplicationId)
-  const selector = ['data']
 
   const dispatch = useDispatch()
   const defaultAssociation = useSelector(state =>
@@ -126,42 +122,38 @@ const LoRaCloudDASForm = () => {
   }
 
   return (
-    <RequireRequest
-      requestAction={getAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, selector)}
+    <Form
+      error={error}
+      validationSchema={validationSchema}
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+      enableReinitialize
     >
-      <Form
-        error={error}
-        validationSchema={validationSchema}
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
-        enableReinitialize
-      >
-        <Form.Field
-          component={Input}
-          title={sharedMessages.token}
-          description={m.tokenDescription}
-          name="data.token"
-          required
-        />
-        <Form.Field component={Checkbox} title={m.lr1110Encoding} name="data.use_tlv_encoding" />
-        <SubmitBar>
-          <Form.Submit component={SubmitButton} message={sharedMessages.tokenSet} />
-          {Boolean(defaultAssociation) && (
-            <ModalButton
-              type="button"
-              icon="delete"
-              message={sharedMessages.tokenDelete}
-              modalData={{
-                message: m.deleteWarning,
-              }}
-              onApprove={handleDelete}
-              danger
-              naked
-            />
-          )}
-        </SubmitBar>
-      </Form>
-    </RequireRequest>
+      <Form.Field
+        component={Input}
+        title={sharedMessages.token}
+        description={m.tokenDescription}
+        name="data.token"
+        required
+      />
+      <Form.Field component={Checkbox} title={m.lr1110Encoding} name="data.use_tlv_encoding" />
+      <SubmitBar>
+        <Form.Submit component={SubmitButton} message={sharedMessages.tokenSet} />
+        {Boolean(defaultAssociation) && (
+          <ModalButton
+            type="button"
+            icon="delete"
+            message={sharedMessages.tokenDelete}
+            modalData={{
+              message: m.deleteWarning,
+            }}
+            onApprove={handleDelete}
+            danger
+            naked
+          />
+        )}
+      </SubmitBar>
+    </Form>
   )
 }
 

@@ -17,6 +17,8 @@ import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
 
+import LORA_CLOUD_DAS from '@console/constants/lora-cloud-das'
+import LORA_CLOUD_GLS from '@console/constants/lora-cloud-gls'
 import LoRaCloudImage from '@assets/misc/lora-cloud.png'
 
 import PageTitle from '@ttn-lw/components/page-title'
@@ -27,6 +29,7 @@ import Collapse from '@ttn-lw/components/collapse'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorView from '@ttn-lw/lib/components/error-view'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import LoRaCloudDASForm from '@console/containers/lora-cloud-das-form'
 import LoRaCloudGLSForm from '@console/containers/lora-cloud-gls-form'
@@ -38,6 +41,8 @@ import SubViewError from '@console/views/sub-view-error'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewOrEditApplicationPackages } from '@console/lib/feature-checks'
+
+import { getAppPkgDefaultAssoc } from '@console/store/actions/application-packages'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
@@ -57,48 +62,57 @@ const m = defineMessages({
 
 const LoRaCloud = () => {
   const appId = useSelector(selectSelectedApplicationId)
+  const selector = ['data']
+
   return (
     <Require
       featureCheck={mayViewOrEditApplicationPackages}
       otherwise={{ redirect: `/applications/${appId}` }}
     >
-      <ErrorView ErrorComponent={SubViewError}>
-        <Container>
-          <PageTitle title="LoRa Cloud Device & Application Services" />
-          <Row>
-            <Col lg={8} md={12}>
-              <img className={style.logo} src={LoRaCloudImage} alt="LoRa Cloud" />
-              <Message content={m.loraCloudInfoText} className={style.info} />
-              <div>
-                <Message
-                  component="h4"
-                  content={m.furtherResources}
-                  className={style.furtherResources}
-                />
-                <Link.DocLink
-                  path="/integrations/application-packages/lora-cloud-device-and-application-services/"
-                  secondary
-                >
-                  Device & Application Services
-                </Link.DocLink>
-                {' | '}
-                <Link.Anchor href="https://www.loracloud.com" external secondary>
-                  <Message content={m.officialLoRaCloudDocumentation} />
-                </Link.Anchor>
-              </div>
-              <hr className={style.hRule} />
-              <Collapse title="Geolocation" description={m.glsDescription}>
-                <Message component="h3" content={m.setToken} />
-                <LoRaCloudGLSForm />
-              </Collapse>
-              <Collapse title="Device & Application Services" description={m.dasDescription}>
-                <Message component="h3" content={m.setToken} />
-                <LoRaCloudDASForm />
-              </Collapse>
-            </Col>
-          </Row>
-        </Container>
-      </ErrorView>
+      <RequireRequest
+        requestAction={[
+          getAppPkgDefaultAssoc(appId, LORA_CLOUD_DAS.DEFAULT_PORT, selector),
+          getAppPkgDefaultAssoc(appId, LORA_CLOUD_GLS.DEFAULT_PORT, selector),
+        ]}
+      >
+        <ErrorView ErrorComponent={SubViewError}>
+          <Container>
+            <PageTitle title="LoRa Cloud Device & Application Services" />
+            <Row>
+              <Col lg={8} md={12}>
+                <img className={style.logo} src={LoRaCloudImage} alt="LoRa Cloud" />
+                <Message content={m.loraCloudInfoText} className={style.info} />
+                <div>
+                  <Message
+                    component="h4"
+                    content={m.furtherResources}
+                    className={style.furtherResources}
+                  />
+                  <Link.DocLink
+                    path="/integrations/application-packages/lora-cloud-device-and-application-services/"
+                    secondary
+                  >
+                    Device & Application Services
+                  </Link.DocLink>
+                  {' | '}
+                  <Link.Anchor href="https://www.loracloud.com" external secondary>
+                    <Message content={m.officialLoRaCloudDocumentation} />
+                  </Link.Anchor>
+                </div>
+                <hr className={style.hRule} />
+                <Collapse title="Geolocation" description={m.glsDescription}>
+                  <Message component="h3" content={m.setToken} />
+                  <LoRaCloudGLSForm />
+                </Collapse>
+                <Collapse title="Device & Application Services" description={m.dasDescription}>
+                  <Message component="h3" content={m.setToken} />
+                  <LoRaCloudDASForm />
+                </Collapse>
+              </Col>
+            </Row>
+          </Container>
+        </ErrorView>
+      </RequireRequest>
     </Require>
   )
 }
