@@ -37,6 +37,9 @@ func grpcRemoteIP(ctx context.Context) string {
 }
 
 func grpcEntityFromRequest(ctx context.Context, req interface{}) string {
+	if r, ok := req.(RateLimitKeyer); ok {
+		return r.RateLimitKey()
+	}
 	if r, ok := req.(ttnpb.IDStringer); ok {
 		if r.IDString() == "" {
 			return fmt.Sprintf("%s:_", r.EntityType())

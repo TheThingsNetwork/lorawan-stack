@@ -63,6 +63,14 @@ func grpcUnaryHandler(context.Context, interface{}) (interface{}, error) { retur
 
 func grpcStreamHandler(interface{}, grpc.ServerStream) error { return nil }
 
+type mockRequestWithKeyer struct {
+	key string
+}
+
+func (r *mockRequestWithKeyer) RateLimitKey() string {
+	return r.key
+}
+
 func TestGRPC(t *testing.T) {
 	const (
 		unaryMethod  = "/Service/UnaryMethod"
@@ -77,6 +85,7 @@ func TestGRPC(t *testing.T) {
 			limiter  *mockLimiter
 			remoteIP string
 			assert   func(t *testing.T, limiter *mockLimiter, resp interface{}, err error)
+			request  interface{}
 		}{
 			{
 				name:    "NoIP",
@@ -115,13 +124,23 @@ func TestGRPC(t *testing.T) {
 					a.So(limiter.calledWithResource, should.NotBeNil)
 				},
 			},
+			{
+				name:     "Keyer",
+				limiter:  &mockLimiter{limit: true},
+				remoteIP: "10.10.10.10",
+				request:  &mockRequestWithKeyer{key: "test_keyer"},
+				assert: func(t *testing.T, limiter *mockLimiter, resp interface{}, err error) {
+					a := assertions.New(t)
+					a.So(limiter.calledWithResource.Key(), should.ContainSubstring, "test_keyer")
+				},
+			},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
 				intercept := ratelimit.UnaryServerInterceptor(tc.limiter)
 
 				ctx := grpcContext(tc.remoteIP, authTokenID)
 				info := &grpc.UnaryServerInfo{FullMethod: unaryMethod}
-				resp, err := intercept(ctx, nil, info, grpcUnaryHandler)
+				resp, err := intercept(ctx, tc.request, info, grpcUnaryHandler)
 				tc.assert(t, tc.limiter, resp, err)
 			})
 		}
