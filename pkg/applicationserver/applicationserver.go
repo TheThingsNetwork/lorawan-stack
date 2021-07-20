@@ -352,6 +352,18 @@ func (as *ApplicationServer) skipPayloadCrypto(ctx context.Context, link *ttnpb.
 	return link.SkipPayloadCrypto.GetValue()
 }
 
+// lastAFCntDownFromMinFCnt computes the last application frame counter based on the
+// minimum frame counter provided by the Network Server.
+// The Network Server may report this minimum as being zero, thus the last application
+// frame counter would be -1. As the frame counters are unsigned integers, this would
+// lead to an overflow.
+func lastAFCntDownFromMinFCnt(min uint32) uint32 {
+	if min == 0 {
+		return 0
+	}
+	return min - 1
+}
+
 var (
 	errDeviceNotFound  = errors.DefineNotFound("device_not_found", "device `{device_uid}` not found")
 	errNoDeviceSession = errors.DefineFailedPrecondition("no_device_session", "no device session; check device activation")
@@ -373,7 +385,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 				SessionKeyID: sessionKeyID,
 				AppSKey:      &appSKey,
 			},
-			LastAFCntDown: minFCntDown,
+			LastAFCntDown: lastAFCntDownFromMinFCnt(minFCntDown),
 			StartedAt:     time.Now().UTC(),
 		}, nil
 	}
@@ -404,7 +416,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		case dev.Session != nil &&
 			bytes.Equal(diagnostics.SessionKeyID, dev.Session.SessionKeyID) &&
 			dev.Session.DevAddr.Equal(*diagnostics.DevAddr):
-			dev.Session.LastAFCntDown = diagnostics.MinFCntDown
+			dev.Session.LastAFCntDown = lastAFCntDownFromMinFCnt(diagnostics.MinFCntDown)
 		// If there is a SessionKeyID on the Network Server side, rebuild the session.
 		case len(diagnostics.SessionKeyID) > 0:
 			session, err := reconstructSession(diagnostics.SessionKeyID, diagnostics.DevAddr, diagnostics.MinFCntDown)
@@ -428,7 +440,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		case dev.PendingSession != nil &&
 			bytes.Equal(diagnostics.PendingSessionKeyID, dev.PendingSession.SessionKeyID) &&
 			dev.PendingSession.DevAddr.Equal(*diagnostics.PendingDevAddr):
-			dev.PendingSession.LastAFCntDown = diagnostics.PendingMinFCntDown
+			dev.PendingSession.LastAFCntDown = lastAFCntDownFromMinFCnt(diagnostics.PendingMinFCntDown)
 		// If there is a SessionKeyID on the Network Server side, rebuild the session.
 		case len(diagnostics.PendingSessionKeyID) > 0:
 			session, err := reconstructSession(diagnostics.PendingSessionKeyID, diagnostics.PendingDevAddr, diagnostics.PendingMinFCntDown)
