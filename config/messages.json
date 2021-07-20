@@ -6704,6 +6704,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:device_and_frequency_plan_band_mismatch": {
+    "translations": {
+      "en": "device band ID `{dev_band_id}` and frequency plan band ID `{fp_band_id}` do not match"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:device_exists": {
     "translations": {
       "en": "device already exists"

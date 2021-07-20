@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
@@ -1194,24 +1195,24 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"pending_mac_state.desired_parameters.rx2_data_rate_index",
 		"supports_class_b",
 	) {
-		var deferredPHYValidations []func(*band.Band) error
-		withPHY := func(f func(*band.Band) error) error {
+		var deferredPHYValidations []func(*band.Band, *frequencyplans.FrequencyPlan) error
+		withPHY := func(f func(*band.Band, *frequencyplans.FrequencyPlan) error) error {
 			deferredPHYValidations = append(deferredPHYValidations, f)
 			return nil
 		}
 		if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
-			phy, err := DeviceBand(&ttnpb.EndDevice{
+			fp, phy, err := DeviceFrequencyPlanAndBand(&ttnpb.EndDevice{
 				FrequencyPlanID:   m["frequency_plan_id"].FrequencyPlanID,
 				LorawanPhyVersion: m["lorawan_phy_version"].LorawanPhyVersion,
 			}, ns.FrequencyPlans)
 			if err != nil {
 				return err
 			}
-			withPHY = func(f func(*band.Band) error) error {
-				return f(phy)
+			withPHY = func(f func(*band.Band, *frequencyplans.FrequencyPlan) error) error {
+				return f(phy, fp)
 			}
 			for _, f := range deferredPHYValidations {
-				if err := f(phy); err != nil {
+				if err := f(phy, fp); err != nil {
 					return err
 				}
 			}
@@ -1225,6 +1226,26 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 		if st.HasSetField(
 			"frequency_plan_id",
+			"version_ids.band_id",
+		) {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+					if devBandID := dev.GetVersionIDs().GetBandID(); devBandID != "" && devBandID != fp.BandID {
+						return newInvalidFieldValueError("version_ids.band_id").WithCause(
+							errDeviceAndFrequencyPlanBandMismatch.WithAttributes(
+								"dev_band_id", devBandID,
+								"fp_band_id", fp.BandID,
+							),
+						)
+					}
+					return nil
+				})
+			}, "version_ids.band_id"); err != nil {
+				return nil, err
+			}
+		}
+		if st.HasSetField(
+			"frequency_plan_id",
 			"lorawan_phy_version",
 			"mac_state.current_parameters.rx2_data_rate_index",
 		) {
@@ -1232,7 +1253,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if dev.GetMACState() == nil {
 					return nil
 				}
-				return withPHY(func(phy *band.Band) error {
+				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError("mac_state.current_parameters.rx2_data_rate_index")
@@ -1254,7 +1275,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if dev.GetMACState() == nil {
 					return nil
 				}
-				return withPHY(func(phy *band.Band) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.MACState.DesiredParameters.Rx2DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError("mac_state.desired_parameters.rx2_data_rate_index")
@@ -1277,7 +1298,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if dev.GetPendingMACState() == nil {
 					return nil
 				}
-				return withPHY(func(phy *band.Band) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.PendingMACState.CurrentParameters.Rx2DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError("pending_mac_state.current_parameters.rx2_data_rate_index")
@@ -1299,7 +1320,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if dev.GetPendingMACState() == nil {
 					return nil
 				}
-				return withPHY(func(phy *band.Band) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.PendingMACState.DesiredParameters.Rx2DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError("pending_mac_state.desired_parameters.rx2_data_rate_index")
@@ -1322,7 +1343,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if dev.GetMACState() == nil || dev.MACState.CurrentParameters.PingSlotDataRateIndexValue == nil {
 					return nil
 				}
-				return withPHY(func(phy *band.Band) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.MACState.CurrentParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
 						return newInvalidFieldValueError("mac_state.current_parameters.ping_slot_data_rate_index_value.value")
@@ -1344,7 +1365,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if dev.GetMACState() == nil || dev.MACState.DesiredParameters.PingSlotDataRateIndexValue == nil {
 					return nil
 				}
-				return withPHY(func(phy *band.Band) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.MACState.DesiredParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
 						return newInvalidFieldValueError("mac_state.desired_parameters.ping_slot_data_rate_index_value.value")
@@ -1367,7 +1388,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if dev.GetPendingMACState() == nil || dev.PendingMACState.CurrentParameters.PingSlotDataRateIndexValue == nil {
 					return nil
 				}
-				return withPHY(func(phy *band.Band) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.PendingMACState.CurrentParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
 						return newInvalidFieldValueError("pending_mac_state.current_parameters.ping_slot_data_rate_index_value.value")
@@ -1389,7 +1410,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if dev.GetPendingMACState() == nil || dev.PendingMACState.DesiredParameters.PingSlotDataRateIndexValue == nil {
 					return nil
 				}
-				return withPHY(func(phy *band.Band) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.PendingMACState.DesiredParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
 						return newInvalidFieldValueError("pending_mac_state.desired_parameters.ping_slot_data_rate_index_value.value")
@@ -1412,7 +1433,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				if dev.GetMACSettings() == nil || len(dev.MACSettings.FactoryPresetFrequencies) == 0 {
 					return nil
 				}
-				return withPHY(func(phy *band.Band) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if phy.MaxUplinkChannels != phy.MaxDownlinkChannels {
 						// TODO: Allow this (https://github.com/TheThingsNetwork/lorawan-stack/issues/2269).
 						return newInvalidFieldValueError("mac_settings.factory_preset_frequencies")
@@ -1437,7 +1458,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					m["mac_settings.ping_slot_frequency.value"].GetMACSettings().GetPingSlotFrequency().GetValue() > 0 {
 					return nil
 				}
-				return withPHY(func(phy *band.Band) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if phy.PingSlotFrequency == nil {
 						return newInvalidFieldValueError("mac_settings.ping_slot_frequency.value")
 					}
@@ -1501,7 +1522,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 			p := p
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				return withPHY(func(phy *band.Band) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if !isValid(dev, phy) {
 						return newInvalidFieldValueError(p)
 					}
