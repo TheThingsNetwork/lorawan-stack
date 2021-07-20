@@ -232,7 +232,7 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 			if src != nil {
 				dst.HoppingWidth = src.HoppingWidth
 			} else {
-				var zero string
+				var zero uint32
 				dst.HoppingWidth = zero
 			}
 		case "frequency_drift":

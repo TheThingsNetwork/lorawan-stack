@@ -122,7 +122,7 @@ func TestUplinkPacket(t *testing.T) {
 			  "datr":"M0CW123",
 			  "codr":"4/7",
 			  "lsnr":-12,
-			  "hpw":"10",
+			  "hpw":8,
 			  "rssi":-112,
 			  "size":61,
 			  "data":"tlJ+3kao1MjU3ol8kuTwhziot4L/wQGMXngnecZaq5dXGpqZFTHWkzg/Hea7Y4NEjZND1gARpWtPdwC1vQ=="
@@ -145,7 +145,7 @@ func TestUplinkPacket(t *testing.T) {
 	a.So(uplink.RFCh, should.Equal, 0)
 	a.So(uplink.Stat, should.Equal, 1)
 	a.So(uplink.Modu, should.Equal, "LRFHSS")
-	a.So(uplink.Hpw, should.Equal, "10")
+	a.So(uplink.Hpw, should.Equal, 8)
 	a.So(uplink.DatR, should.Resemble, datarate.DR{DataRate: ttnpb.DataRate{
 		Modulation: &ttnpb.DataRate_Lrfhss{
 			Lrfhss: &ttnpb.LRFHSSDataRate{

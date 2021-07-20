@@ -40,7 +40,7 @@ type RxPacket struct {
 	Modu string       `json:"modu"`           // Modulation identifier "LORA", "FSK" or "LR-FHSS"
 	DatR datarate.DR  `json:"datr"`           // LoRa datarate, FSK datarate or LR-FHSS datarate
 	CodR string       `json:"codr"`           // LoRa or LR-FHSS ECC coding rate identifier
-	Hpw  string       `json:"hpw"`            // LR-FHSS hopping channel width (grid), in kHz
+	Hpw  uint32       `json:"hpw,omitempty"`  // Hopping width; a number describing the number of steps of the LR-FHSS grid
 	RSSI int16        `json:"rssi"`           // RSSI in dBm (signed integer, 1 dB precision)
 	LSNR float64      `json:"lsnr"`           // Lora SNR ratio in dB (signed float, 0.1 dB precision)
 	Size uint16       `json:"size"`           // RF packet payload size in bytes (unsigned integer)

@@ -143,7 +143,7 @@ func TestToGatewayUpLRFHSS(t *testing.T) {
 					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
 					Size: 19,
 					Tmst: 1000,
-					Hpw:  "10",
+					Hpw:  8,
 					RSig: []udp.RSig{
 						{
 							FOff: 125000,
@@ -168,9 +168,10 @@ func TestToGatewayUpLRFHSS(t *testing.T) {
 	a.So(msg.Settings.Frequency, should.Equal, 868000000)
 	a.So(msg.Settings.Timestamp, should.Equal, 1000)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 1000)
-	a.So(msg.RxMetadata[0].HoppingWidth, should.Equal, "10")
+	a.So(msg.RxMetadata[0].HoppingWidth, should.Equal, 8)
 	a.So(msg.RxMetadata[0].FrequencyDrift, should.Equal, 25000)
 	a.So(msg.RawPayload, should.Resemble, []byte{0x40, 0x29, 0x2e, 0x01, 0x26, 0x80, 0x00, 0x00, 0x01, 0xc8, 0x56, 0x85, 0xe7, 0x72, 0x2e, 0xfa, 0xfc, 0xe6, 0xc1})
+
 }
 
 func TestToGatewayUpRoundtrip(t *testing.T) {
@@ -256,6 +257,32 @@ func TestToGatewayUpRaw(t *testing.T) {
 	a.So(msg.Settings.CodingRate, should.Equal, "4/5")
 	a.So(msg.Settings.Frequency, should.Equal, 868100000)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 368384825)
+	a.So(len(msg.RawPayload), should.Equal, base64.StdEncoding.DecodedLen(len("Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9")))
+}
+
+func TestToGatewayUpRawLRFHSS(t *testing.T) {
+	a := assertions.New(t)
+
+	raw := []byte(`{"rxpk":[{"tmst":368384825,"chan":0,"rfch":0,"freq":868.100000,"stat":1,"modu":"LR-FHSS","datr":"M0CW125","codr":"2/3","hpw":52,"rssi":-107,"size":108,"data":"Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9"}]}`)
+	var rxData udp.Data
+	err := json.Unmarshal(raw, &rxData)
+	a.So(err, should.BeNil)
+
+	upstream, err := udp.ToGatewayUp(rxData, udp.UpstreamMetadata{ID: ids})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	a.So(len(upstream.UplinkMessages), should.Equal, 1)
+	msg := upstream.UplinkMessages[0]
+	dr := msg.Settings.DataRate.GetLrfhss()
+	a.So(dr, should.NotBeNil)
+	a.So(dr.ModulationType, should.Equal, 0)
+	a.So(dr.OperatingChannelWidth, should.Equal, 125)
+	a.So(msg.Settings.CodingRate, should.Equal, "2/3")
+	a.So(msg.Settings.Frequency, should.Equal, 868100000)
+	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 368384825)
+	a.So(msg.RxMetadata[0].HoppingWidth, should.Equal, 52)
 	a.So(len(msg.RawPayload), should.Equal, base64.StdEncoding.DecodedLen(len("Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9")))
 }
 
