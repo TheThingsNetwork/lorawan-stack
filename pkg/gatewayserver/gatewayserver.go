@@ -49,6 +49,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/ns"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
@@ -512,6 +513,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	registerGatewayConnect(ctx, ids, frontend.Protocol())
 	logger.Info("Connected")
 
+	gs.startDisconnectOnChangeTask(connEntry)
 	go gs.handleUpstream(connEntry)
 	if gs.statsRegistry != nil {
 		go gs.updateConnStats(connEntry)
@@ -544,6 +546,86 @@ func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIde
 		return nil, false
 	}
 	return entry.(connectionEntry).Connection, true
+}
+
+func requireDisconnect(connected, current *ttnpb.Gateway) bool {
+	if !sameAntennaLocations(connected.Antennas, current.Antennas) {
+		// Gateway Server may update the location from status messages. If the locations aren't the same, but if the new
+		// location is a GPS location, do not disconnect the gateway. This is to avoid that updating the location from a
+		// gateway status message results in disconnecting the gateway.
+		if len(current.Antennas) > 0 && current.Antennas[0].Location != nil && current.Antennas[0].Location.Source != ttnpb.SOURCE_GPS {
+			return true
+		}
+	}
+	if connected.DownlinkPathConstraint != current.DownlinkPathConstraint ||
+		connected.EnforceDutyCycle != current.EnforceDutyCycle ||
+		connected.LocationPublic != current.LocationPublic ||
+		connected.RequireAuthenticatedConnection != current.RequireAuthenticatedConnection ||
+		(connected.ScheduleAnytimeDelay != nil) != (current.ScheduleAnytimeDelay != nil) ||
+		connected.ScheduleAnytimeDelay != nil && *connected.ScheduleAnytimeDelay != *current.ScheduleAnytimeDelay ||
+		connected.ScheduleDownlinkLate != current.ScheduleDownlinkLate ||
+		connected.StatusPublic != current.StatusPublic ||
+		connected.UpdateLocationFromStatus != current.UpdateLocationFromStatus ||
+		connected.FrequencyPlanID != current.FrequencyPlanID ||
+		len(connected.FrequencyPlanIDs) != len(current.FrequencyPlanIDs) {
+		return true
+	}
+	for i := range connected.FrequencyPlanIDs {
+		if connected.FrequencyPlanIDs[i] != current.FrequencyPlanIDs[i] {
+			return true
+		}
+	}
+	return false
+}
+
+var errGatewayChanged = errors.Define("gateway_changed", "gateway changed in registry")
+
+func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
+	conn.tasksDone.Add(1)
+	gs.StartTask(&component.TaskConfig{
+		Context: conn.Context(),
+		ID:      fmt.Sprintf("disconnect_on_change_%s", unique.ID(conn.Context(), conn.Gateway().GatewayIdentifiers)),
+		Func: func(ctx context.Context) error {
+			d := random.Jitter(gs.config.FetchGatewayInterval, gs.config.FetchGatewayJitter)
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-time.After(d):
+			}
+
+			gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
+				GatewayIdentifiers: conn.Gateway().GatewayIdentifiers,
+				FieldMask: &pbtypes.FieldMask{
+					Paths: []string{
+						"antennas",
+						"downlink_path_constraint",
+						"enforce_duty_cycle",
+						"frequency_plan_id",
+						"frequency_plan_ids",
+						"location_public",
+						"require_authenticated_connection",
+						"schedule_anytime_delay",
+						"schedule_downlink_late",
+						"status_public",
+						"update_location_from_status",
+					},
+				},
+			})
+			if err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Failed to get gateway")
+				return err
+			}
+			if requireDisconnect(conn.Gateway(), gtw) {
+				log.FromContext(ctx).Info("Gateway changed in registry, disconnect")
+				conn.Disconnect(errGatewayChanged.New())
+			}
+
+			return nil
+		},
+		Done:    conn.tasksDone.Done,
+		Restart: component.TaskRestartAlways,
+		Backoff: component.DialTaskBackoffConfig,
+	})
 }
 
 var errHostHandle = errors.Define("host_handle", "host `{host}` failed to handle message")

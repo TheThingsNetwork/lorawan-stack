@@ -15,7 +15,6 @@
 package udp
 
 import (
-	"bytes"
 	"context"
 	"net"
 	"sync"
@@ -78,7 +77,7 @@ func (f *memoryFirewall) Filter(packet encoding.Packet) error {
 	val, ok := f.m.Load(eui)
 	if ok {
 		a := val.(addrTime)
-		if !bytes.Equal(a.IP, packet.GatewayAddr.IP) && a.lastSeen.Add(f.addrChangeBlock).After(now) {
+		if !a.IP.Equal(packet.GatewayAddr.IP) && a.lastSeen.Add(f.addrChangeBlock).After(now) {
 			return errAlreadyConnected.WithAttributes(
 				"connected_ip", a.IP.String(),
 				"connecting_ip", packet.GatewayAddr.IP.String(),

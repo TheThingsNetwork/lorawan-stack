@@ -29,7 +29,10 @@ import (
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.
 var DefaultGatewayServerConfig = gatewayserver.Config{
 	RequireRegisteredGateways:         false,
+	FetchGatewayInterval:              10 * time.Minute,
+	FetchGatewayJitter:                0.2,
 	UpdateGatewayLocationDebounceTime: time.Hour,
+	UpdateConnectionStatsDebounceTime: 3 * time.Second,
 	Forward: map[string][]string{
 		"": {"00000000/0"},
 	},
@@ -62,5 +65,4 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 		Listen:                 ":1887",
 		ListenTLS:              ":8887",
 	},
-	UpdateConnectionStatsDebounceTime: 3 * time.Second,
 }

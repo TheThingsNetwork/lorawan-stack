@@ -95,6 +95,8 @@ func TestGatewayServer(t *testing.T) {
 				gsConfig := &gatewayserver.Config{
 					RequireRegisteredGateways:         false,
 					UpdateGatewayLocationDebounceTime: 0,
+					FetchGatewayInterval:              time.Minute,
+					FetchGatewayJitter:                1,
 					MQTT: config.MQTT{
 						Listen: ":1882",
 					},
