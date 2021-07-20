@@ -488,7 +488,7 @@ func (s *srv) gc() {
 						lastSeenPush := time.Unix(0, atomic.LoadInt64(&state.lastSeenPush))
 						if time.Since(lastSeenPush) > s.config.ConnectionExpires {
 							logger.Debug("Connection expired")
-							state.io.Disconnect(errConnectionExpired)
+							state.io.Disconnect(errConnectionExpired.New())
 							state.downlinkTaskDone.Wait()
 							s.connections.Delete(k)
 						}

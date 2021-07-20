@@ -34,8 +34,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func durationPtr(d time.Duration) *time.Duration { return &d }
-
 func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration) encoding.Packet {
 	packet := encoding.Packet{
 		GatewayEUI:      &eui,
