@@ -29672,8 +29672,8 @@
               }
             },
             {
-              "name": "lrfhss_hopping_width",
-              "description": "LR-FHSS hopping width (grid), in kHz.",
+              "name": "hopping_width",
+              "description": "Hopping width (grid) for LR-FHSS in kHz.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -29684,7 +29684,7 @@
               "defaultValue": ""
             },
             {
-              "name": "lrfhss_frequency_drift",
+              "name": "frequency_drift",
               "description": "Frequency drift in Hz between start and end of an LR-FHSS packet (signed).",
               "label": "",
               "type": "int32",

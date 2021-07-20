@@ -78,10 +78,10 @@ message RxMetadata {
   bytes uplink_token = 15;
   // Index of the gateway channel that received the message.
   uint32 channel_index = 17 [(validate.rules).uint32 = {lte: 255}];
-  // LR-FHSS hopping width (grid), in kHz.
-  string lrfhss_hopping_width = 19;
+  // Hopping width (grid) for LR-FHSS in kHz.
+  string hopping_width = 19;
   // Frequency drift in Hz between start and end of an LR-FHSS packet (signed).
-  int32 lrfhss_frequency_drift = 20;
+  int32 frequency_drift = 20;
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case

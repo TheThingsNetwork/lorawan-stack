@@ -168,8 +168,8 @@ func TestToGatewayUpLRFHSS(t *testing.T) {
 	a.So(msg.Settings.Frequency, should.Equal, 868000000)
 	a.So(msg.Settings.Timestamp, should.Equal, 1000)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 1000)
-	a.So(msg.RxMetadata[0].LrfhssHoppingWidth, should.Equal, "10")
-	a.So(msg.RxMetadata[0].LrfhssFrequencyDrift, should.Equal, 25000)
+	a.So(msg.RxMetadata[0].HoppingWidth, should.Equal, "10")
+	a.So(msg.RxMetadata[0].FrequencyDrift, should.Equal, 25000)
 	a.So(msg.RawPayload, should.Resemble, []byte{0x40, 0x29, 0x2e, 0x01, 0x26, 0x80, 0x00, 0x00, 0x01, 0xc8, 0x56, 0x85, 0xe7, 0x72, 0x2e, 0xfa, 0xfc, 0xe6, 0xc1})
 }
 

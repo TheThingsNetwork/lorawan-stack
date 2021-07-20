@@ -150,10 +150,10 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "lrfhss_hopping_width":
-			// no validation rules for LrfhssHoppingWidth
-		case "lrfhss_frequency_drift":
-			// no validation rules for LrfhssFrequencyDrift
+		case "hopping_width":
+			// no validation rules for HoppingWidth
+		case "frequency_drift":
+			// no validation rules for FrequencyDrift
 		case "advanced":
 
 			if v, ok := interface{}(m.GetAdvanced()).(interface{ ValidateFields(...string) error }); ok {
