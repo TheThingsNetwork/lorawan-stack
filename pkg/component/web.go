@@ -28,6 +28,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 )
 
 const (
@@ -129,8 +131,12 @@ func (c *Component) RegisterReadinessCheck(name string, check healthcheck.Check)
 }
 
 func (c *Component) serveWeb(lis net.Listener) error {
+	var handler http.Handler = c
+	if _, isTCP := lis.(*net.TCPListener); isTCP {
+		handler = h2c.NewHandler(c, &http2.Server{})
+	}
 	srv := http.Server{
-		Handler:           c,
+		Handler:           handler,
 		ReadTimeout:       120 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
 		ErrorLog:          log.New(ioutil.Discard, "", 0),
