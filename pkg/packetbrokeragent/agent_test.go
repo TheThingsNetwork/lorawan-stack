@@ -382,8 +382,11 @@ func TestForwarder(t *testing.T) {
 			Id:                  "test",
 			Message: &packetbroker.DownlinkMessage{
 				PhyPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
-				Class:      packetbroker.DownlinkMessageClass_CLASS_A,
-				Priority:   packetbroker.DownlinkMessagePriority_NORMAL,
+				RegionalParametersVersion: &packetbroker.RegionalParametersVersionValue{
+					Value: packetbroker.RegionalParametersVersion_RP001_V1_0_2_B,
+				},
+				Class:    packetbroker.DownlinkMessageClass_CLASS_A,
+				Priority: packetbroker.DownlinkMessagePriority_NORMAL,
 				Rx1: &packetbroker.DownlinkMessage_RXSettings{
 					Frequency:     868100000,
 					DataRateIndex: 5,
@@ -408,7 +411,8 @@ func TestForwarder(t *testing.T) {
 			CorrelationIDs: gtwMsg.CorrelationIDs,
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
-					Class: ttnpb.CLASS_A,
+					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+					Class:             ttnpb.CLASS_A,
 					DownlinkPaths: []*ttnpb.DownlinkPath{
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -838,7 +842,8 @@ func TestHomeNetwork(t *testing.T) {
 			RawPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
-					Class: ttnpb.CLASS_A,
+					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					Class:             ttnpb.CLASS_A,
 					DownlinkPaths: []*ttnpb.DownlinkPath{
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -879,6 +884,9 @@ func TestHomeNetwork(t *testing.T) {
 			HomeNetworkTenantId:  "foo-tenant",
 			HomeNetworkClusterId: "test",
 			Message: &packetbroker.DownlinkMessage{
+				RegionalParametersVersion: &packetbroker.RegionalParametersVersionValue{
+					Value: packetbroker.RegionalParametersVersion_RP001_V1_1_B,
+				},
 				PhyPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 				Class:      packetbroker.DownlinkMessageClass_CLASS_A,
 				Priority:   packetbroker.DownlinkMessagePriority_NORMAL,

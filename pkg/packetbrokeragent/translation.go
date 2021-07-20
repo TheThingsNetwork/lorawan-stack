@@ -65,6 +65,35 @@ var (
 	}
 )
 
+var (
+	fromPBRegionalParameters = map[packetbroker.RegionalParametersVersion]ttnpb.PHYVersion{
+		packetbroker.RegionalParametersVersion_TS001_V1_0:     ttnpb.TS001_V1_0,
+		packetbroker.RegionalParametersVersion_TS001_V1_0_1:   ttnpb.TS001_V1_0_1,
+		packetbroker.RegionalParametersVersion_RP001_V1_0_2_A: ttnpb.RP001_V1_0_2,
+		packetbroker.RegionalParametersVersion_RP001_V1_0_2_B: ttnpb.RP001_V1_0_2_REV_B,
+		packetbroker.RegionalParametersVersion_RP001_V1_0_3_A: ttnpb.RP001_V1_0_3_REV_A,
+		packetbroker.RegionalParametersVersion_RP001_V1_1_A:   ttnpb.RP001_V1_1_REV_A,
+		packetbroker.RegionalParametersVersion_RP001_V1_1_B:   ttnpb.RP001_V1_1_REV_B,
+		packetbroker.RegionalParametersVersion_RP002_V1_0_0:   ttnpb.RP002_V1_0_0,
+		packetbroker.RegionalParametersVersion_RP002_V1_0_1:   ttnpb.RP002_V1_0_1,
+		packetbroker.RegionalParametersVersion_RP002_V1_0_2:   ttnpb.RP002_V1_0_2,
+		packetbroker.RegionalParametersVersion_RP002_V1_0_3:   ttnpb.RP002_V1_0_3,
+	}
+	toPBRegionalParameters = map[ttnpb.PHYVersion]packetbroker.RegionalParametersVersion{
+		ttnpb.TS001_V1_0:         packetbroker.RegionalParametersVersion_TS001_V1_0,
+		ttnpb.TS001_V1_0_1:       packetbroker.RegionalParametersVersion_TS001_V1_0_1,
+		ttnpb.RP001_V1_0_2:       packetbroker.RegionalParametersVersion_RP001_V1_0_2_A,
+		ttnpb.RP001_V1_0_2_REV_B: packetbroker.RegionalParametersVersion_RP001_V1_0_2_B,
+		ttnpb.RP001_V1_0_3_REV_A: packetbroker.RegionalParametersVersion_RP001_V1_0_3_A,
+		ttnpb.RP001_V1_1_REV_A:   packetbroker.RegionalParametersVersion_RP001_V1_1_A,
+		ttnpb.RP001_V1_1_REV_B:   packetbroker.RegionalParametersVersion_RP001_V1_1_B,
+		ttnpb.RP002_V1_0_0:       packetbroker.RegionalParametersVersion_RP002_V1_0_0,
+		ttnpb.RP002_V1_0_1:       packetbroker.RegionalParametersVersion_RP002_V1_0_1,
+		ttnpb.RP002_V1_0_2:       packetbroker.RegionalParametersVersion_RP002_V1_0_2,
+		ttnpb.RP002_V1_0_3:       packetbroker.RegionalParametersVersion_RP002_V1_0_3,
+	}
+)
+
 func fromPBDataRate(region packetbroker.Region, index int) (ttnpb.DataRate, bool) {
 	bandID, ok := fromPBRegion[region]
 	if !ok {
@@ -558,6 +587,7 @@ var (
 
 var (
 	errNoRequest           = errors.DefineFailedPrecondition("no_request", "downlink message is not a transmission request")
+	errUnknownPHYVersion   = errors.DefineInvalidArgument("unknown_phy_version", "unknown LoRaWAN Regional Parameters version `{version}`")
 	errUnknownClass        = errors.DefineInvalidArgument("unknown_class", "unknown class `{class}`")
 	errUnknownPriority     = errors.DefineInvalidArgument("unknown_priority", "unknown priority `{priority}`")
 	errNoDownlinkPaths     = errors.DefineFailedPrecondition("no_downlink_paths", "no downlink paths")
@@ -572,6 +602,11 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage) (*packetbroke
 
 	down := &packetbroker.DownlinkMessage{
 		PhyPayload: msg.RawPayload,
+	}
+	if rpVersion, ok := toPBRegionalParameters[req.LorawanPhyVersion]; ok {
+		down.RegionalParametersVersion = &packetbroker.RegionalParametersVersionValue{
+			Value: rpVersion,
+		}
 	}
 	if req.Rx1Frequency != 0 {
 		down.Rx1 = &packetbroker.DownlinkMessage_RXSettings{
@@ -633,6 +668,11 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 		},
 	}
 	var ok bool
+	if msg.RegionalParametersVersion != nil {
+		if req.LorawanPhyVersion, ok = fromPBRegionalParameters[msg.RegionalParametersVersion.Value]; !ok {
+			return "", nil, errUnknownPHYVersion.WithAttributes("version", msg.RegionalParametersVersion.Value)
+		}
+	}
 	if req.Class, ok = fromPBClass[msg.Class]; !ok {
 		return "", nil, errUnknownClass.WithAttributes("class", msg.Class)
 	}
