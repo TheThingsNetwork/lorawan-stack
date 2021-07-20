@@ -2049,8 +2049,18 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "activated":
-			// no validation rules for Activated
+		case "activated_at":
+
+			if v, ok := interface{}(m.GetActivatedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EndDeviceValidationError{
+						field:  "activated_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return EndDeviceValidationError{
 				field:  name,

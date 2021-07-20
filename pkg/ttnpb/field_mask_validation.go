@@ -27,7 +27,7 @@ var asApplicationLinkFieldPaths = append(
 )
 
 var isEndDeviceReadFieldPaths = []string{
-	"activated",
+	"activated_at",
 	"application_server_address",
 	"attributes",
 	"created_at",
@@ -54,7 +54,7 @@ var isEndDeviceReadFieldPaths = []string{
 }
 
 var isEndDeviceWriteFieldPaths = []string{
-	"activated",
+	"activated_at",
 	"application_server_address",
 	"attributes",
 	"description",

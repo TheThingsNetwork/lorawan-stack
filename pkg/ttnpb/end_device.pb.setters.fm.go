@@ -2220,15 +2220,14 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				dst.SkipPayloadCryptoOverride = nil
 			}
-		case "activated":
+		case "activated_at":
 			if len(subs) > 0 {
-				return fmt.Errorf("'activated' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'activated_at' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Activated = src.Activated
+				dst.ActivatedAt = src.ActivatedAt
 			} else {
-				var zero bool
-				dst.Activated = zero
+				dst.ActivatedAt = nil
 			}
 
 		default:

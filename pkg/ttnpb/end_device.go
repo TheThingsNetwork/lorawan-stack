@@ -861,8 +861,8 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return true
 	}
 	switch p {
-	case "activated":
-		return !v.Activated
+	case "activated_at":
+		return v.ActivatedAt == nil
 	case "application_server_address":
 		return v.ApplicationServerAddress == ""
 	case "application_server_id":

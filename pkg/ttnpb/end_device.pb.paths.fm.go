@@ -448,7 +448,7 @@ var EndDeviceAuthenticationCodeFieldPathsTopLevel = []string{
 	"value",
 }
 var EndDeviceFieldPathsNested = []string{
-	"activated",
+	"activated_at",
 	"application_server_address",
 	"application_server_id",
 	"application_server_kek_label",
@@ -894,7 +894,7 @@ var EndDeviceFieldPathsNested = []string{
 }
 
 var EndDeviceFieldPathsTopLevel = []string{
-	"activated",
+	"activated_at",
 	"application_server_address",
 	"application_server_id",
 	"application_server_kek_label",
@@ -963,7 +963,7 @@ var DevAddrPrefixFieldPathsTopLevel = []string{
 }
 var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device",
-	"end_device.activated",
+	"end_device.activated_at",
 	"end_device.application_server_address",
 	"end_device.application_server_id",
 	"end_device.application_server_kek_label",
@@ -1413,7 +1413,7 @@ var CreateEndDeviceRequestFieldPathsTopLevel = []string{
 }
 var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device",
-	"end_device.activated",
+	"end_device.activated_at",
 	"end_device.application_server_address",
 	"end_device.application_server_id",
 	"end_device.application_server_kek_label",
@@ -1905,7 +1905,7 @@ var ListEndDevicesRequestFieldPathsTopLevel = []string{
 }
 var SetEndDeviceRequestFieldPathsNested = []string{
 	"end_device",
-	"end_device.activated",
+	"end_device.activated_at",
 	"end_device.application_server_address",
 	"end_device.application_server_id",
 	"end_device.application_server_kek_label",
@@ -2372,7 +2372,7 @@ var ResetAndGetEndDeviceRequestFieldPathsTopLevel = []string{
 }
 var EndDeviceTemplateFieldPathsNested = []string{
 	"end_device",
-	"end_device.activated",
+	"end_device.activated_at",
 	"end_device.application_server_address",
 	"end_device.application_server_id",
 	"end_device.application_server_kek_label",
