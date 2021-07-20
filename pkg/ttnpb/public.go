@@ -147,3 +147,27 @@ func (u *User) PublicSafe() *User {
 	safe.ContactInfo = onlyPublicContactInfo(safe.ContactInfo)
 	return &safe
 }
+
+// PublicSafe returns only the identifiers of the collaborators.
+func (c *Collaborators) PublicSafe() *Collaborators {
+	if c == nil {
+		return nil
+	}
+	safe := Collaborators{
+		Collaborators: make([]*Collaborator, len(c.Collaborators)),
+	}
+	for i, collaborator := range c.Collaborators {
+		safe.Collaborators[i] = collaborator.PublicSafe()
+	}
+	return &safe
+}
+
+// PublicSafe returns only the identifiers of the collaborator.
+func (c *Collaborator) PublicSafe() *Collaborator {
+	if c == nil {
+		return nil
+	}
+	return &Collaborator{
+		OrganizationOrUserIdentifiers: c.OrganizationOrUserIdentifiers,
+	}
+}

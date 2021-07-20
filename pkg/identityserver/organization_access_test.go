@@ -183,7 +183,7 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 		})
 
 		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			a.So(errors.IsUnauthenticated(err), should.BeTrue)
 		}
 		a.So(collaborators, should.BeNil)
 
