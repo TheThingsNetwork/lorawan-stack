@@ -246,6 +246,12 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 		if cs.ioErr != nil {
 			return nil, cs.ioErr
 		}
+		// The connection may be disconnected and is awaiting garbage collection, see gc().
+		// The connection cannot be deleted from the map at this point, because before that, the downlink tasks must be
+		// awaited, which is not desirable here in the hot path.
+		if err := cs.io.Context().Err(); err != nil {
+			return nil, err
+		}
 	}
 	return cs, nil
 }
