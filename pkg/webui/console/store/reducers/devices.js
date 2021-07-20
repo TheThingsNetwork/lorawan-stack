@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { mergeWith, merge } from 'lodash'
+import { mergeWith } from 'lodash'
 
 import { EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP } from '@console/constants/event-filters'
 
@@ -41,11 +41,16 @@ const downlinkFrameCountEvent = 'ns.down.data.schedule.attempt'
 
 const mergeDerived = (state, id, derived) =>
   Object.keys(derived).length > 0
-    ? merge({}, state, {
+    ? {
+        ...state,
         derived: {
-          [id]: derived,
+          ...state.derived,
+          [id]: {
+            ...state.derived[id],
+            ...derived,
+          },
         },
-      })
+      }
     : state
 
 const devices = (state = defaultState, { type, payload, event }) => {

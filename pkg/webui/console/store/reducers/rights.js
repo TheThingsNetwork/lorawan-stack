@@ -17,7 +17,10 @@ import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actio
 import { createGetRightsListActionType } from '@console/store/actions/rights'
 
 const defaultState = {
-  rights: [],
+  rights: {
+    regular: [],
+    pseudo: [],
+  },
 }
 
 const createNamedRightsReducer = (reducerName = '') => {
@@ -29,7 +32,10 @@ const createNamedRightsReducer = (reducerName = '') => {
       case GET_LIST_SUCCESS:
         return {
           ...state,
-          rights: payload,
+          rights: {
+            regular: payload.filter(right => !right.endsWith('_ALL')),
+            pseudo: payload.filter(right => right.endsWith('_ALL')),
+          },
         }
       default:
         return state
