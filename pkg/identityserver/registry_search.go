@@ -50,7 +50,20 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 	if err != nil {
 		return nil, err
 	}
-	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, getPaths, nil)
+	var searchFields []string
+	if req.IDContains != "" {
+		searchFields = append(searchFields, "ids")
+	}
+	if req.NameContains != "" {
+		searchFields = append(searchFields, "name")
+	}
+	if req.DescriptionContains != "" {
+		searchFields = append(searchFields, "description")
+	}
+	if len(req.AttributesContain) > 0 {
+		searchFields = append(searchFields, "attributes")
+	}
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, append(getPaths, searchFields...), nil)
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
@@ -95,7 +108,23 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 	if err != nil {
 		return nil, err
 	}
-	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, getPaths, nil)
+	var searchFields []string
+	if req.IDContains != "" {
+		searchFields = append(searchFields, "ids")
+	}
+	if req.NameContains != "" {
+		searchFields = append(searchFields, "name")
+	}
+	if req.DescriptionContains != "" {
+		searchFields = append(searchFields, "description")
+	}
+	if len(req.AttributesContain) > 0 {
+		searchFields = append(searchFields, "attributes")
+	}
+	if len(req.State) > 0 {
+		searchFields = append(searchFields, "state")
+	}
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, append(getPaths, searchFields...), nil)
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
@@ -146,7 +175,20 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "frequency_plan_ids")
 		}
 	}
-	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, getPaths, []string{"frequency_plan_id"})
+	var searchFields []string
+	if req.IDContains != "" {
+		searchFields = append(searchFields, "ids")
+	}
+	if req.NameContains != "" {
+		searchFields = append(searchFields, "name")
+	}
+	if req.DescriptionContains != "" {
+		searchFields = append(searchFields, "description")
+	}
+	if len(req.AttributesContain) > 0 {
+		searchFields = append(searchFields, "attributes")
+	}
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, append(getPaths, searchFields...), nil)
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
@@ -197,7 +239,20 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	if err != nil {
 		return nil, err
 	}
-	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
+	var searchFields []string
+	if req.IDContains != "" {
+		searchFields = append(searchFields, "ids")
+	}
+	if req.NameContains != "" {
+		searchFields = append(searchFields, "name")
+	}
+	if req.DescriptionContains != "" {
+		searchFields = append(searchFields, "description")
+	}
+	if len(req.AttributesContain) > 0 {
+		searchFields = append(searchFields, "attributes")
+	}
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, append(getPaths, searchFields...), nil)
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
@@ -245,7 +300,23 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 	if member != nil {
 		return nil, errSearchForbidden.New()
 	}
-	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, getPaths, nil)
+	var searchFields []string
+	if req.IDContains != "" {
+		searchFields = append(searchFields, "ids")
+	}
+	if req.NameContains != "" {
+		searchFields = append(searchFields, "name")
+	}
+	if req.DescriptionContains != "" {
+		searchFields = append(searchFields, "description")
+	}
+	if len(req.AttributesContain) > 0 {
+		searchFields = append(searchFields, "attributes")
+	}
+	if len(req.State) > 0 {
+		searchFields = append(searchFields, "state")
+	}
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, append(getPaths, searchFields...), nil)
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
@@ -290,7 +361,20 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 	if err != nil {
 		return nil, err
 	}
-	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, getPaths, nil)
+	var searchFields []string
+	if req.IDContains != "" {
+		searchFields = append(searchFields, "ids")
+	}
+	if req.NameContains != "" {
+		searchFields = append(searchFields, "name")
+	}
+	if req.DescriptionContains != "" {
+		searchFields = append(searchFields, "description")
+	}
+	if len(req.AttributesContain) > 0 {
+		searchFields = append(searchFields, "attributes")
+	}
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, append(getPaths, searchFields...), nil)
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
