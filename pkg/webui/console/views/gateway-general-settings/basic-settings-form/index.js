@@ -201,6 +201,14 @@ const BasicSettingsForm = React.memo(props => {
         component={Input}
         autoComplete="on"
       />
+      <Form.Field
+        title={sharedMessages.packetBroker}
+        label={sharedMessages.disabled}
+        name="disable_packet_broker_forwarding"
+        component={Checkbox}
+        description={m.disablePacketBrokerForwarding}
+        tooltipId={tooltipIds.DISABLE_PACKET_BROKER_FORWARDING}
+      />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
         <Require featureCheck={mayDeleteGateway}>

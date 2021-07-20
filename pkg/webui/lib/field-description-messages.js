@@ -176,6 +176,9 @@ const m = defineMessages({
 
   updateGtwLocationFromStatusDescription:
     'When checked, the location of this gateway will be updated from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported.',
+
+  disablePacketBrokerForwardingDescription:
+    'When checked, uplink messages received from this gateway will not be forwarded to Packet Broker. This option takes effect only after the gateway reconnects.',
 })
 
 const descriptions = Object.freeze({
@@ -341,6 +344,9 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.UPDATE_LOCATION_FROM_STATUS]: {
     description: m.updateGtwLocationFromStatusDescription,
+  },
+  [TOOLTIP_IDS.DISABLE_PACKET_BROKER_FORWARDING]: {
+    description: m.disablePacketBrokerForwardingDescription,
   },
 })
 

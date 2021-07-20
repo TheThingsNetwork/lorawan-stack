@@ -3651,6 +3651,7 @@ Gateway is the message that defines a gateway on the network.
 | `target_cups_key` | [`Secret`](#ttn.lorawan.v3.Secret) |  | CUPS Key for LoRa Basics Station CUPS redirection. If redirecting to another instance of TTS, use the CUPS API Key for the gateway on the target instance. Requires the RIGHT_GATEWAY_READ_SECRETS for reading and RIGHT_GATEWAY_WRITE_SECRETS for updating this value. |
 | `require_authenticated_connection` | [`bool`](#bool) |  | Require an authenticated gateway connection. This prevents the gateway from using the UDP protocol and requires authentication when using other protocols. |
 | `lrfhss` | [`Gateway.LRFHSS`](#ttn.lorawan.v3.Gateway.LRFHSS) |  |  |
+| `disable_packet_broker_forwarding` | [`bool`](#bool) |  |  |
 
 #### Field Rules
 

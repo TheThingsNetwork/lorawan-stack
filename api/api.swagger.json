@@ -14373,6 +14373,9 @@
         },
         "lrfhss": {
           "$ref": "#/definitions/GatewayLRFHSS"
+        },
+        "disable_packet_broker_forwarding": {
+          "type": "boolean"
         }
       },
       "description": "Gateway is the message that defines a gateway on the network."

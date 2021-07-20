@@ -934,6 +934,8 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "disable_packet_broker_forwarding":
+			// no validation rules for DisablePacketBrokerForwarding
 		default:
 			return GatewayValidationError{
 				field:  name,
