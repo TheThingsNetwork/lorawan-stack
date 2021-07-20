@@ -29672,6 +29672,30 @@
               }
             },
             {
+              "name": "hopping_width",
+              "description": "Hopping width; a number describing the number of steps of the LR-FHSS grid.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "frequency_drift",
+              "description": "Frequency drift in Hz between start and end of an LR-FHSS packet (signed).",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "advanced",
               "description": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case",
               "label": "",

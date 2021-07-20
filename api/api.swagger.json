@@ -16618,6 +16618,16 @@
           "format": "int64",
           "description": "Index of the gateway channel that received the message."
         },
+        "hopping_width": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Hopping width; a number describing the number of steps of the LR-FHSS grid."
+        },
+        "frequency_drift": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Frequency drift in Hz between start and end of an LR-FHSS packet (signed)."
+        },
         "advanced": {
           "type": "object",
           "title": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case"

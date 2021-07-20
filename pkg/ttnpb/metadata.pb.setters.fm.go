@@ -225,6 +225,26 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 				var zero uint32
 				dst.ChannelIndex = zero
 			}
+		case "hopping_width":
+			if len(subs) > 0 {
+				return fmt.Errorf("'hopping_width' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.HoppingWidth = src.HoppingWidth
+			} else {
+				var zero uint32
+				dst.HoppingWidth = zero
+			}
+		case "frequency_drift":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_drift' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyDrift = src.FrequencyDrift
+			} else {
+				var zero int32
+				dst.FrequencyDrift = zero
+			}
 		case "advanced":
 			if len(subs) > 0 {
 				return fmt.Errorf("'advanced' has no subfields, but %s were specified", subs)
