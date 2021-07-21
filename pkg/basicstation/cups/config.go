@@ -61,7 +61,9 @@ func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option)
 			}),
 		)
 	}
-	if tlsConfig, err := c.GetTLSServerConfig(c.Context()); err == nil {
+	// The Server.tlsConfig is used when dialing a CUPS or an LNS server to query its certificate chain.
+	// When dialing servers with self-signed certs, the Root CA of target server must either be trusted by the system or added explicitly via the `--tls.root-ca` option.
+	if tlsConfig, err := c.GetTLSClientConfig(c.Context()); err == nil {
 		opts = append(opts, WithTLSConfig(tlsConfig))
 	}
 	s := NewServer(c, append(opts, customOpts...)...)
