@@ -118,6 +118,7 @@ export default defineMessages({
   devAddr: 'Device address',
   devDesc: 'End device description',
   devEUI: 'DevEUI',
+  devEUIBlockLimitReached: 'DevEUI generation limit reached',
   deviceCounted: '{count, plural, one {End device} other {End devices}}',
   deviceDescDescription:
     'Optional end device description; can also be used to save notes about the end device',
@@ -346,6 +347,7 @@ export default defineMessages({
   traffic: 'Traffic',
   type: 'Type',
   unknown: 'Unknown',
+  unknownError: 'Unknown error while generating DevEUI',
   updateChannelDescription: 'Channel for gateway automatic updates',
   updatedAt: 'Last updated at',
   uplink: 'Uplink',
@@ -353,6 +355,7 @@ export default defineMessages({
   uplinkMessage: 'Uplink message',
   uplinksReceived: 'Uplinks received',
   unexposed: 'Unexposed',
+  used: '{currentValue}/{maxValue} used',
   user: 'User',
   userAdd: 'Add user',
   userDelete: 'Delete user',
