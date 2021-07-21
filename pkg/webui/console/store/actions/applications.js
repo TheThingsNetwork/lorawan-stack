@@ -53,6 +53,20 @@ export const [
   (id, selector) => ({ selector }),
 )
 
+export const GET_APP_DEV_EUI_COUNT_BASE = 'GET_APP_DEV_EUI_COUNT'
+export const [
+  {
+    request: GET_APP_DEV_EUI_COUNT,
+    success: GET_APP_DEV_EUI_COUNT_SUCCESS,
+    failure: GET_APP_DEV_EUI_COUNT_FAILURE,
+  },
+  {
+    request: getApplicationDevEUICount,
+    success: getApplicationDevEUICountSuccess,
+    failure: getApplicationDevEUICountFailure,
+  },
+] = createRequestActions(GET_APP_DEV_EUI_COUNT_BASE, id => ({ id }))
+
 export const GET_APP_DEV_COUNT_BASE = 'GET_APPLICATION_DEVICE_COUNT'
 export const [
   {

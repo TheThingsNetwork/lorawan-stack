@@ -27,7 +27,7 @@ import {
 import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
 import { getTemplate } from '@console/store/actions/device-repository'
-import { getApplication } from '@console/store/actions/applications'
+import { getApplicationDevEUICount } from '@console/store/actions/applications'
 
 import {
   selectDeviceTemplate,
@@ -48,7 +48,6 @@ const mapStateToProps = state => ({
   templateFetching: selectDeviceTemplateFetching(state),
   templateError: selectDeviceTemplateError(state),
   createDevice: (appId, device) => api.device.create(appId, device),
-  generateDevEUI: appId => api.application.generateDevEUI(appId),
   mayEditKeys: checkFromState(mayEditApplicationDeviceKeys, state),
   jsConfig: selectJsConfig(),
   nsConfig: selectNsConfig(),
@@ -60,7 +59,7 @@ const mapDispatchToProps = dispatch => ({
   createDeviceSuccess: (appId, deviceId) =>
     dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
   getRegistrationTemplate: (appId, version) => dispatch(getTemplate(appId, version)),
-  fetchDevEUICounter: appId => dispatch(getApplication(appId, 'dev_eui_counter')),
+  fetchDevEUICounter: appId => dispatch(getApplicationDevEUICount(appId)),
 })
 
 export default DeviceRepository => connect(mapStateToProps, mapDispatchToProps)(DeviceRepository)

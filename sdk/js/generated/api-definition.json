@@ -225,7 +225,6 @@
         "created_at",
         "deleted_at",
         "description",
-        "dev_eui_counter",
         "ids",
         "ids.application_id",
         "name",

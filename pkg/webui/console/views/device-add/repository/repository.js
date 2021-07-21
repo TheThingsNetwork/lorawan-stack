@@ -17,6 +17,8 @@ import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { merge, isEqual } from 'lodash'
 
+import api from '@console/api'
+
 import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -106,7 +108,6 @@ const DeviceRepository = props => {
     asConfig,
     nsConfig,
     supportLink,
-    generateDevEUI,
     fetchDevEUICounter,
     applicationDevEUICounter,
   } = props
@@ -226,10 +227,10 @@ const DeviceRepository = props => {
   }, [])
 
   const handleDevEUIRequest = React.useCallback(async () => {
-    const result = await generateDevEUI(appId)
+    const result = await api.application.generateDevEUI(appId)
     fetchDevEUICounter(appId)
     return result.dev_eui
-  }, [appId, fetchDevEUICounter, generateDevEUI])
+  }, [appId, fetchDevEUICounter])
 
   const hasTemplateError = Boolean(templateError)
   const hasSelectedOther = hasAnySelectedOther(state)
@@ -351,7 +352,6 @@ DeviceRepository.propTypes = {
   createDevice: PropTypes.func.isRequired,
   createDeviceSuccess: PropTypes.func.isRequired,
   fetchDevEUICounter: PropTypes.func.isRequired,
-  generateDevEUI: PropTypes.func.isRequired,
   getRegistrationTemplate: PropTypes.func.isRequired,
   jsConfig: PropTypes.stackComponent.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,

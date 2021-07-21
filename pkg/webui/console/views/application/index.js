@@ -86,8 +86,7 @@ import {
 )
 @withRequest(
   ({ appId, loadData }) => loadData(appId),
-  ({ fetching, application }) =>
-    (fetching && !Boolean(application)) || (!fetching && !Boolean(application)),
+  ({ fetching, application }) => fetching || !Boolean(application),
 )
 @withBreadcrumb('apps.single', props => {
   const {
