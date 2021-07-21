@@ -81,6 +81,12 @@ service AsJs {
   rpc GetAppSKey(SessionKeyRequest) returns (AppSKeyResponse);
 }
 
+// The AppJs service connects an Application to a Join Server.
+service AppJs {
+  // Request the application session key for a particular session.
+  rpc GetAppSKey(SessionKeyRequest) returns (AppSKeyResponse);
+}
+
 message CryptoServicePayloadRequest {
   // End device identifiers for the cryptographic operation.
   EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];

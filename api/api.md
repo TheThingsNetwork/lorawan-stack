@@ -321,6 +321,7 @@
   - [Message `ProvisionEndDevicesRequest.IdentifiersRange`](#ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersRange)
   - [Message `SessionKeyRequest`](#ttn.lorawan.v3.SessionKeyRequest)
   - [Message `SetApplicationActivationSettingsRequest`](#ttn.lorawan.v3.SetApplicationActivationSettingsRequest)
+  - [Service `AppJs`](#ttn.lorawan.v3.AppJs)
   - [Service `ApplicationActivationSettingRegistry`](#ttn.lorawan.v3.ApplicationActivationSettingRegistry)
   - [Service `ApplicationCryptoService`](#ttn.lorawan.v3.ApplicationCryptoService)
   - [Service `AsJs`](#ttn.lorawan.v3.AsJs)
@@ -4689,6 +4690,14 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 | `settings` | [`ApplicationActivationSettings`](#ttn.lorawan.v3.ApplicationActivationSettings) |  |  |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+### <a name="ttn.lorawan.v3.AppJs">Service `AppJs`</a>
+
+The AppJs service connects an Application to a Join Server.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `GetAppSKey` | [`SessionKeyRequest`](#ttn.lorawan.v3.SessionKeyRequest) | [`AppSKeyResponse`](#ttn.lorawan.v3.AppSKeyResponse) | Request the application session key for a particular session. |
 
 ### <a name="ttn.lorawan.v3.ApplicationActivationSettingRegistry">Service `ApplicationActivationSettingRegistry`</a>
 
