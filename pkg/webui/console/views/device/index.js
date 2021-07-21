@@ -100,47 +100,44 @@ import style from './device.styl'
     stopStream: id => dispatch(stopDeviceEventsStream(id)),
   }),
 )
-@withRequest(
-  ({ appId, devId, loadDeviceData, mayReadKeys }) => {
-    const selector = [
-      'name',
-      'description',
-      'version_ids',
-      'frequency_plan_id',
-      'mac_settings',
-      'resets_join_nonces',
-      'supports_class_b',
-      'supports_class_c',
-      'supports_join',
-      'lorawan_version',
-      'lorawan_phy_version',
-      'network_server_address',
-      'application_server_address',
-      'join_server_address',
-      'locations',
-      'formatters',
-      'multicast',
-      'net_id',
-      'application_server_id',
-      'application_server_kek_label',
-      'network_server_kek_label',
-      'claim_authentication_code',
-      'mac_state.recent_uplinks',
-      'attributes',
-      'skip_payload_crypto',
-      'skip_payload_crypto_override',
-    ]
+@withRequest(({ appId, devId, loadDeviceData, mayReadKeys }) => {
+  const selector = [
+    'name',
+    'description',
+    'version_ids',
+    'frequency_plan_id',
+    'mac_settings',
+    'resets_join_nonces',
+    'supports_class_b',
+    'supports_class_c',
+    'supports_join',
+    'lorawan_version',
+    'lorawan_phy_version',
+    'network_server_address',
+    'application_server_address',
+    'join_server_address',
+    'locations',
+    'formatters',
+    'multicast',
+    'net_id',
+    'application_server_id',
+    'application_server_kek_label',
+    'network_server_kek_label',
+    'claim_authentication_code',
+    'mac_state.recent_uplinks',
+    'attributes',
+    'skip_payload_crypto',
+    'skip_payload_crypto_override',
+  ]
 
-    if (mayReadKeys) {
-      selector.push('session')
-      selector.push('pending_session')
-      selector.push('root_keys')
-    }
+  if (mayReadKeys) {
+    selector.push('session')
+    selector.push('pending_session')
+    selector.push('root_keys')
+  }
 
-    return loadDeviceData(appId, devId, selector, { ignoreNotFound: true })
-  },
-  ({ fetching, device }) => fetching,
-)
+  return loadDeviceData(appId, devId, selector, { ignoreNotFound: true })
+})
 @withBreadcrumb('device.single', props => {
   const {
     devId,
