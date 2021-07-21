@@ -2268,6 +2268,7 @@
         }
       ],
       "allowedFieldMaskPaths": [
+        "activated_at",
         "application_server_address",
         "attributes",
         "created_at",
@@ -2309,6 +2310,7 @@
         }
       ],
       "allowedFieldMaskPaths": [
+        "activated_at",
         "application_server_address",
         "attributes",
         "created_at",
@@ -2348,6 +2350,7 @@
         }
       ],
       "allowedFieldMaskPaths": [
+        "activated_at",
         "application_server_address",
         "attributes",
         "description",
@@ -4716,6 +4719,7 @@
         }
       ],
       "allowedFieldMaskPaths": [
+        "activated_at",
         "application_server_address",
         "attributes",
         "created_at",

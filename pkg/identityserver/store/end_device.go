@@ -15,6 +15,8 @@
 package store
 
 import (
+	"time"
+
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -52,6 +54,8 @@ type EndDevice struct {
 
 	Picture   *Picture
 	PictureID *string `gorm:"type:UUID;index:end_device_picture_index"`
+
+	ActivatedAt *time.Time `gorm:"default:null"`
 }
 
 func init() {
@@ -108,6 +112,7 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 			pb.Picture = dev.Picture.toPB()
 		}
 	},
+	activatedAtField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ActivatedAt = dev.ActivatedAt },
 }
 
 // functions to set fields from the device proto into the device model.
@@ -149,6 +154,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 			dev.Picture.fromPB(pb.Picture)
 		}
 	},
+	activatedAtField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ActivatedAt = pb.ActivatedAt },
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -182,6 +188,7 @@ var deviceColumnNames = map[string][]string{
 	joinServerAddressField:        {joinServerAddressField},
 	serviceProfileIDField:         {serviceProfileIDField},
 	locationsField:                {},
+	activatedAtField:              {activatedAtField},
 }
 
 func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) {

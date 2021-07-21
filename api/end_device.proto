@@ -569,7 +569,15 @@ message EndDevice {
   // This field overrides the application-level setting.
   google.protobuf.BoolValue skip_payload_crypto_override = 52;
 
-  // next: 53;
+  // Timestamp when the device has been activated. Stored in the Entity Registry.
+  // This field is set by the Application Server when an end device sends
+  // its first uplink.
+  // The Application Server will use the field in order to avoid repeated
+  // calls to the Entity Registry.
+  // The field cannot be unset once set.
+  google.protobuf.Timestamp activated_at = 53 [(gogoproto.stdtime) = true];
+
+  // next: 54;
 }
 
 message EndDevices {
