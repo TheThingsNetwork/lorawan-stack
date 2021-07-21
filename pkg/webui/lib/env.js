@@ -35,6 +35,7 @@ const env = {
   siteName: envSelector.selectApplicationSiteName(),
   siteTitle: envSelector.selectApplicationSiteTitle(),
   siteSubTitle: envSelector.selectApplicationSiteSubTitle(),
+  devEUIConfig: envSelector.selectDevEUIConfig(),
 }
 
 export default env
