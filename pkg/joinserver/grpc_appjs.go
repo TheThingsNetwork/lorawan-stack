@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,5 +26,5 @@ type appJsServer struct {
 
 // GetAppSKey returns the AppSKey associated with session keys identified by the supplied request.
 func (srv appJsServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
-	return srv.JS.GetAppSKey(ctx, req)
+	return srv.JS.GetAppSKey(ctx, req, ApplicationRightsAuthorizer)
 }

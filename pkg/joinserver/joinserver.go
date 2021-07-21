@@ -21,18 +21,12 @@ import (
 	"encoding/binary"
 	"io"
 	"math/rand"
-	"net"
-	"net/url"
 	"sort"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	ulid "github.com/oklog/ulid/v2"
-	"go.thethings.network/lorawan-stack/v3/pkg/auth"
-	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
-	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
@@ -162,58 +156,6 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 	ttnpb.MAC_V1_1,
 }
 
-// verifyNSASByID validates that the Network Server or Application Server ID matches the common name of the given
-// X.509 distinguished name.
-func verifyNSASByID(ctx context.Context, id string) error {
-	dn, ok := auth.X509DNFromContext(ctx)
-	if !ok {
-		return errUnauthenticated.New()
-	}
-	if !strings.EqualFold(id, dn.CommonName) {
-		return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
-	}
-	return nil
-}
-
-// verifyNSASByAddress validates that the Network Server or Application Server presented a certificate with a X.509
-// distinguished name that matches the given address.
-func verifyNSASByAddress(ctx context.Context, addr string) error {
-	dn, ok := auth.X509DNFromContext(ctx)
-	if !ok {
-		return errUnauthenticated.New()
-	}
-
-	host := addr
-	if url, err := url.Parse(addr); err == nil && url.Host != "" {
-		host = url.Host
-	}
-	if h, _, err := net.SplitHostPort(addr); err == nil {
-		host = h
-	}
-
-	host = strings.TrimSuffix(host, ".")
-	pattern := strings.TrimSuffix(dn.CommonName, ".")
-	if len(pattern) == 0 || len(host) == 0 {
-		return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
-	}
-
-	patternParts := strings.Split(pattern, ".")
-	hostParts := strings.Split(host, ".")
-	if len(patternParts) != len(hostParts) {
-		return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
-	}
-	for i, patternPart := range patternParts {
-		if i == 0 && patternPart == "*" {
-			continue
-		}
-		if patternPart != hostParts[i] {
-			return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
-		}
-	}
-
-	return nil
-}
-
 // wrapKeyWithVault wraps the given key with the configured KEK label.
 // If KEK label is empty or wrapping fails with err, for which plaintextCond(err) is true, the key is returned in the clear.
 func wrapKeyWithVault(ctx context.Context, key types.AES128Key, kekLabel string, kv crypto.KeyVault, plaintextCond func(error) bool) (*ttnpb.KeyEnvelope, error) {
@@ -249,29 +191,14 @@ func wrapKeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel string, k
 	return ke, nil
 }
 
-// authorizeNSAS authorizes the Network Server or Application Server.
-// The return value verifyCaller indicates that the Network Server or Application Server still need to be verified with
-// verifyNSASByAddress or verifyNSASByID.
-func authorizeNSAS(ctx context.Context) (verifyCaller bool, err error) {
-	if _, ok := auth.X509DNFromContext(ctx); !ok {
-		if err := clusterauth.Authorized(ctx); err != nil {
-			return false, err
-		} else {
-			return false, nil
-		}
-	}
-	return true, nil
-}
-
 var (
 	errGetApplicationActivationSettings = errors.Define("application_activation_settings", "failed to get application activation settings")
 	errNoKEK                            = errors.DefineNotFound("kek", "KEK not found")
 )
 
 // HandleJoin handles the given join-request.
-func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (res *ttnpb.JoinResponse, err error) {
-	verifyNS, err := authorizeNSAS(ctx)
-	if err != nil {
+func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, authorizer Authorizer) (res *ttnpb.JoinResponse, err error) {
+	if err := authorizer.Authorized(ctx); err != nil {
 		return nil, err
 	}
 
@@ -363,7 +290,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				}
 			}(dev.ApplicationIdentifiers)
 
-			if verifyNS {
+			if trustedOriginAuth, ok := authorizer.(TrustedOriginAuthorizer); ok {
 				netID := dev.NetID
 				if netID == nil {
 					appSettings, err := getAppSettings()
@@ -380,7 +307,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					return nil, nil, errNetIDMismatch.WithAttributes("net_id", req.NetID)
 				}
 				if dev.NetworkServerAddress != "" {
-					if err := verifyNSASByAddress(ctx, dev.NetworkServerAddress); err != nil {
+					if err := trustedOriginAuth.RequireAddress(ctx, dev.NetworkServerAddress); err != nil {
 						return nil, nil, err
 					}
 				}
@@ -645,13 +572,12 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 }
 
 // GetNwkSKeys returns the requested network session keys.
-func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
-	verifyNS, err := authorizeNSAS(ctx)
-	if err != nil {
+func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest, authorizer Authorizer) (*ttnpb.NwkSKeysResponse, error) {
+	if err := authorizer.Authorized(ctx); err != nil {
 		return nil, err
 	}
 
-	if verifyNS {
+	if trustedOriginAuth, ok := authorizer.(TrustedOriginAuthorizer); ok {
 		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, req.DevEui,
 			[]string{
 				"network_server_address",
@@ -661,7 +587,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 			return nil, errRegistryOperation.WithCause(err)
 		}
 		if dev.NetworkServerAddress != "" {
-			if err := verifyNSASByAddress(ctx, dev.NetworkServerAddress); err != nil {
+			if err := trustedOriginAuth.RequireAddress(ctx, dev.NetworkServerAddress); err != nil {
 				return nil, err
 			}
 		}
@@ -696,11 +622,12 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 }
 
 // GetAppSKey returns the requested application session key.
-func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
-	verifyAS, err := authorizeNSAS(ctx)
-	verifyApp := err != nil
+func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest, authorizer Authorizer) (*ttnpb.AppSKeyResponse, error) {
+	if err := authorizer.Authorized(ctx); err != nil {
+		return nil, err
+	}
 
-	if verifyAS {
+	if trustedOriginAuth, ok := authorizer.(TrustedOriginAuthorizer); ok {
 		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, req.DevEui,
 			[]string{
 				"application_server_address",
@@ -710,40 +637,38 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
-		if verifyAS {
-			if dev.ApplicationServerID != "" {
-				if err := verifyNSASByID(ctx, dev.ApplicationServerID); err != nil {
-					return nil, err
+		if dev.ApplicationServerID != "" {
+			if err := trustedOriginAuth.RequireID(ctx, dev.ApplicationServerID); err != nil {
+				return nil, err
+			}
+		} else if dev.ApplicationServerAddress != "" {
+			if err := trustedOriginAuth.RequireAddress(ctx, dev.ApplicationServerAddress); err != nil {
+				return nil, err
+			}
+		} else {
+			sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
+				"application_server_id",
+			})
+			if err != nil {
+				if !errors.IsNotFound(err) {
+					return nil, errGetApplicationActivationSettings.WithCause(err)
 				}
-			} else if dev.ApplicationServerAddress != "" {
-				if err := verifyNSASByAddress(ctx, dev.ApplicationServerAddress); err != nil {
-					return nil, err
-				}
-			} else {
-				sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
-					"application_server_id",
-				})
-				if err != nil {
-					if !errors.IsNotFound(err) {
-						return nil, errGetApplicationActivationSettings.WithCause(err)
-					}
-					return nil, errNoApplicationServerID.New()
-				}
-				if sets.ApplicationServerID == "" {
-					return nil, errNoApplicationServerID.New()
-				}
-				if err := verifyNSASByID(ctx, sets.ApplicationServerID); err != nil {
-					return nil, err
-				}
+				return nil, errNoApplicationServerID.New()
+			}
+			if sets.ApplicationServerID == "" {
+				return nil, errNoApplicationServerID.New()
+			}
+			if err := trustedOriginAuth.RequireID(ctx, sets.ApplicationServerID); err != nil {
+				return nil, err
 			}
 		}
 	}
-	if verifyApp {
+	if appAuth, ok := authorizer.(ApplicationAccessAuthorizer); ok {
 		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, req.DevEui, nil)
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
-		if err := rights.RequireApplication(ctx, dev.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+		if err := appAuth.RequireApplication(ctx, dev.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
 	}
@@ -765,8 +690,8 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 }
 
 // GetHomeNetID returns the requested NetID.
-func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64) (*types.NetID, error) {
-	if _, err := authorizeNSAS(ctx); err != nil {
+func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (*types.NetID, error) {
+	if err := authorizer.Authorized(ctx); err != nil {
 		return nil, err
 	}
 

@@ -26,10 +26,10 @@ type nsJsServer struct {
 
 // HandleJoin is called by the Network Server to join a device.
 func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (res *ttnpb.JoinResponse, err error) {
-	return srv.JS.HandleJoin(ctx, req)
+	return srv.JS.HandleJoin(ctx, req, ClusterAuthorizer)
 }
 
 // GetNwkSKeys returns the NwkSKeys associated with session keys identified by the supplied request.
 func (srv nsJsServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
-	return srv.JS.GetNwkSKeys(ctx, req)
+	return srv.JS.GetNwkSKeys(ctx, req, ClusterAuthorizer)
 }
