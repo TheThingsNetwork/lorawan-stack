@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,27 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.button
-  reset-button()
-  padding: $cs.s
-  margin-left: -($cs.s)
+import ManualForm from './form'
 
-.title
-  margin: 0
-  display: inline-block
-  user-select: auto
-  text-decoration: underline
-
-.icon
-  color: $c-icon-fill
-  font-size: $fs.xl
-  user-select: none
-
-.content
-  margin-top: $ls.xxs
-  display: none
-  overflow: hidden
-
-  &.expanded
-    display: block
-    overflow: initial
+export default ManualForm

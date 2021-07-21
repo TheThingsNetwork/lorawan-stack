@@ -41,7 +41,7 @@ const m = defineMessages({
   factoryPresetFreqTitle: 'Factory Preset Frequencies',
   freqAdd: 'Add Frequency',
   frequencyPlaceholder: 'e.g. 869525000 for 869,525 MHz',
-  macSettings: 'MAC settings',
+  advancedMacSettings: 'Advanced MAC settings',
   pingSlotFrequencyDescription: 'Frequency of the class B ping slot (Hz)',
   pingSlotFrequencyTitle: 'Ping Slot Frequency',
   pingSlotPeriodicityDescription: 'Periodicity of the class B ping slot',
@@ -84,10 +84,9 @@ const MacSettingsSection = props => {
   return (
     <Form.CollapseSection
       id="mac-settings"
-      title={sharedMessages.advancedSettings}
+      title={m.advancedMacSettings}
       initiallyCollapsed={initiallyCollapsed}
     >
-      <Form.SubTitle title={m.macSettings} />
       <Form.Field
         title={sharedMessages.frameCounterWidth}
         name="mac_settings.supports_32_bit_f_cnt"

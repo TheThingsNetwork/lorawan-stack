@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { connect } from 'react-redux'
-import { push, replace } from 'connected-react-router'
+import { push } from 'connected-react-router'
 
 import api from '@console/api'
 
@@ -30,16 +30,13 @@ const mapStateToProps = state => ({
   nsConfig: selectNsConfig(),
   asConfig: selectAsConfig(),
   mayEditKeys: checkFromState(mayEditApplicationDeviceKeys, state),
-  createDevice: (appId, device) => api.device.create(appId, device),
   prefixes: selectJoinEUIPrefixes(state),
+  createDevice: (appId, device) => api.device.create(appId, device),
 })
 
-const mapDispatchToProps = (dispatch, { match }) => ({
-  redirectToNextLocation: location => dispatch(replace(location)),
-  redirectToEndDevice: (appId, deviceId) =>
+const mapDispatchToProps = dispatch => ({
+  createDeviceSuccess: (appId, deviceId) =>
     dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
-  redirectToWizard: () => dispatch(push(`${match.url}/steps`)),
-  redirectToConfiguration: () => dispatch(replace(match.url)),
 })
 
 export default Manual => connect(mapStateToProps, mapDispatchToProps)(Manual)

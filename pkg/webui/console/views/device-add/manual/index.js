@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import ManualForm from './form'
 import connect from './connect'
-import Manual from './manual'
 
-const ConnectedManual = connect(Manual)
+const ConnectedManualForm = connect(ManualForm)
 
-export { ConnectedManual as default, Manual }
+export { ConnectedManualForm as default, ManualForm }

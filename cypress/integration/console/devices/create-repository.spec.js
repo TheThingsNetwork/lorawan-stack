@@ -275,13 +275,13 @@ describe('End device repository create', () => {
         cy.findByLabelText('AppEUI').type(generateHexValue(16))
         cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should('have.value', devEui)
+        cy.findByLabelText('End device ID').should('have.value', `eui-${devEui}`)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${devEui}`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/eui-${devEui}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
@@ -296,9 +296,7 @@ describe('End device repository create', () => {
         cy.findByLabelText('AppEUI').type(generateHexValue(16))
         cy.findByLabelText('DevEUI').type(generateHexValue(16))
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID')
-          .clear()
-          .type(devId)
+        cy.findByLabelText('End device ID').clear().type(devId)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
@@ -319,13 +317,13 @@ describe('End device repository create', () => {
         cy.findByLabelText('AppEUI').type(generateHexValue(16))
         cy.findByLabelText('DevEUI').type(devEui)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should('have.value', devEui)
+        cy.findByLabelText('End device ID').should('have.value', `eui-${devEui}`)
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${devEui}`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/eui-${devEui}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })
@@ -341,7 +339,7 @@ describe('End device repository create', () => {
         cy.findByLabelText('AppEUI').type(generateHexValue(16))
         cy.findByLabelText('DevEUI').type(devEui1)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should('have.value', devEui1)
+        cy.findByLabelText('End device ID').should('have.value', `eui-${devEui1}`)
         cy.findByLabelText('Register another end device of this type').check()
 
         cy.findByRole('button', { name: 'Register end device' }).click()
@@ -356,14 +354,14 @@ describe('End device repository create', () => {
         // End device registration.
         cy.findByLabelText('DevEUI').type(devEui2)
         cy.findByLabelText('AppKey').type(generateHexValue(32))
-        cy.findByLabelText('End device ID').should('have.value', devEui2)
+        cy.findByLabelText('End device ID').should('have.value', `eui-${devEui2}`)
         cy.findByLabelText('View registered end device').check()
 
         cy.findByRole('button', { name: 'Register end device' }).click()
 
         cy.location('pathname').should(
           'eq',
-          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${devEui2}`,
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/eui-${devEui2}`,
         )
         cy.findByTestId('full-error-view').should('not.exist')
       })

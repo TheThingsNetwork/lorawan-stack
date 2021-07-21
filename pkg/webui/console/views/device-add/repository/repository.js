@@ -29,6 +29,7 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { REGISTRATION_TYPES } from '../utils'
+import messages from '../messages'
 
 import { RepositoryContext } from './context'
 import ProgressHint from './hints/progress-hint'
@@ -63,8 +64,6 @@ const m = defineMessages({
   enterDataTitle: '2. Enter registration data',
   enterDataDescription:
     'Please choose an end device first to proceed with entering registration data',
-  submitTitle: 'Register end device',
-  createSuccess: 'End device registered',
   register: 'Register from The LoRaWAN Device Repository',
 })
 
@@ -73,7 +72,7 @@ const generateDeviceId = (device = {}) => {
 
   try {
     devEUISchema.validateSync(idsValues.dev_eui)
-    return idsValues.dev_eui.toLowerCase()
+    return `eui-${idsValues.dev_eui.toLowerCase()}`
   } catch (e) {
     // We dont want to use invalid `dev_eui` as `device_id`.
   }
@@ -172,7 +171,7 @@ const DeviceRepository = props => {
             const { resetForm, values } = formRef.current
             toast({
               type: toast.types.SUCCESS,
-              message: m.createSuccess,
+              message: messages.createSuccess,
             })
             resetForm({
               errors: {},
@@ -318,7 +317,7 @@ const DeviceRepository = props => {
             )}
             <SubmitBar align="start">
               <Form.Submit
-                message={m.submitTitle}
+                message={messages.submitTitle}
                 component={SubmitButton}
                 disabled={!showRegistrationForm}
               />

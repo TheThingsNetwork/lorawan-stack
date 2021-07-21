@@ -51,7 +51,7 @@ const m = defineMessages({
 
   devIdDescription: 'A unique, human-readable identifier for your end device.',
   devIdLocation:
-    'You can make it up, so be creative. End device IDs can not be reused by multiple end devices within the same application.',
+    'We prefill this value using the previously entered DevEUI but you can use any other unique value you want. End device IDs can not be reused by multiple end devices within the same application.',
 
   joinServerDescription:
     "The Join Server's role is to store root keys, generate session keys, and to send those securely to the Network Server and Application Server of choice. The device contains the same root keys, which can be provisioned as part of assembly, distribution or upon installation.",
@@ -179,6 +179,38 @@ const m = defineMessages({
 
   disablePacketBrokerForwardingDescription:
     'When checked, uplink messages received from this gateway will not be forwarded to Packet Broker. This option takes effect only after the gateway reconnects.',
+  rx1DelayDescription:
+    'The amount of time in seconds after an uplink that the downlink window opens.',
+  rx1DelayAbsence:
+    'The default value of 5 seconds will be set by The Things Stack to accommodate for high-latency backhauls and/or Packet Broker.',
+
+  pingSlotPeriodicityDescription: 'The amount of time between two receive windows (ping slots).',
+
+  classBTimeoutDescription:
+    'The amount of time after which the network server will assume a message is lost, if not confirmed. This should be set to a value less than the time between two ping slots (ping slot periodicity).',
+
+  rx2DataRateDescription:
+    'The data rate used for the RX2 window. For OTAA devices, this is configured as part of join. For ABP devices, a matching value must be programmed in the device.',
+
+  networkRxDefaultsDescription:
+    'The network uses a set of default values for Rx delays and frequencies that the end device uses. These are based on the recommendations made for the respective band. In most cases these defaults will be correct for your setup. If you wish to use different settings, you can uncheck this checkbox and use custom values.',
+
+  clusterSettingsDescription:
+    'By default, the server components of the current cluster are used. However, for advanced use cases, it is possible to register this end device to different Network Server and/or Join Server.',
+
+  factoryPresetFreqDescription:
+    'Factory preset frequencies are hard-coded channel frequencies to provide for the Network Server when the end device uses frequencies that divert from the defaults of the band specification. This is uncommon but can be the case for some special devices.',
+  factoryPresetFreqLocation:
+    'If your device uses non-default channel frequencies, this information is likely found in the specification sheet or manual of your end device. Otherwise please contact your manufacturer or reseller.',
+  factoryPresetFreqAbsence:
+    'If your device uses non-default channel frequencies and these frequencies are not passed to the Network Server, the messages sent between the network and the end device on such non-default frequencies are likely to drop.',
+
+  classCTimeoutDescription:
+    'The class C timeout determines how long the network will wait for a response for downlinks that require confirmation (e.g. confirmed downlink messages or MAC commands). During that period no other downlinks will be sent.',
+  classCTimeoutLocation:
+    'This is dependant on your exact use case. It can help to consider the following implications: timeouts that are too long can be prone to blocking communication when replies are not sent immediately. On the other hand, timeouts that are too short might miss the reply when it arrives later.',
+  classCTimeoutAbsence:
+    'Leave this field empty to let the network apply a default value that should be applicable for most use cases.',
 })
 
 const descriptions = Object.freeze({
@@ -347,6 +379,32 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.DISABLE_PACKET_BROKER_FORWARDING]: {
     description: m.disablePacketBrokerForwardingDescription,
+  },
+  [TOOLTIP_IDS.RX1_DELAY]: {
+    description: m.rx1DelayDescription,
+    absence: m.rx1DelayAbsence,
+  },
+  [TOOLTIP_IDS.PING_SLOT_PERIODICITY]: {
+    description: m.pingSlotPeriodicityDescription,
+  },
+  [TOOLTIP_IDS.CLASS_B_TIMEOUT]: {
+    description: m.classBTimeoutDescription,
+  },
+  [TOOLTIP_IDS.NETWORK_RX_DEFAULTS]: {
+    description: m.networkRxDefaultsDescription,
+  },
+  [TOOLTIP_IDS.CLUSTER_SETTINGS]: {
+    description: m.clusterSettingsDescription,
+  },
+  [TOOLTIP_IDS.FACTORY_PRESET_FREQUENCIES]: {
+    description: m.factoryPresetFreqDescription,
+    location: m.factoryPresetFreqLocation,
+    absence: m.factoryPresetFreqAbsence,
+  },
+  [TOOLTIP_IDS.CLASS_C_TIMEOUT]: {
+    description: m.classCTimeoutDescription,
+    location: m.classCTimeoutLocation,
+    absence: m.classCTimeoutAbsence,
   },
 })
 
