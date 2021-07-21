@@ -21447,6 +21447,26 @@
       ],
       "services": [
         {
+          "name": "AppJs",
+          "longName": "AppJs",
+          "fullName": "ttn.lorawan.v3.AppJs",
+          "description": "The AppJs service connects an Application to a Join Server.",
+          "methods": [
+            {
+              "name": "GetAppSKey",
+              "description": "Request the application session key for a particular session.",
+              "requestType": "SessionKeyRequest",
+              "requestLongType": "SessionKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.SessionKeyRequest",
+              "requestStreaming": false,
+              "responseType": "AppSKeyResponse",
+              "responseLongType": "AppSKeyResponse",
+              "responseFullType": "ttn.lorawan.v3.AppSKeyResponse",
+              "responseStreaming": false
+            }
+          ]
+        },
+        {
           "name": "ApplicationActivationSettingRegistry",
           "longName": "ApplicationActivationSettingRegistry",
           "fullName": "ttn.lorawan.v3.ApplicationActivationSettingRegistry",

@@ -35,21 +35,21 @@ type mockInteropHandler struct {
 	GetAppSKeyFunc   func(context.Context, *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error)
 }
 
-func (h mockInteropHandler) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+func (h mockInteropHandler) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, authorizer Authorizer) (*ttnpb.JoinResponse, error) {
 	if h.HandleJoinFunc == nil {
 		panic("HandleJoin should not be called")
 	}
 	return h.HandleJoinFunc(ctx, req)
 }
 
-func (h mockInteropHandler) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64) (*types.NetID, error) {
+func (h mockInteropHandler) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (*types.NetID, error) {
 	if h.GetHomeNetIDFunc == nil {
 		panic("GetHomeNetID should not be called")
 	}
 	return h.GetHomeNetIDFunc(ctx, joinEUI, devEUI)
 }
 
-func (h mockInteropHandler) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+func (h mockInteropHandler) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest, authorizer Authorizer) (*ttnpb.AppSKeyResponse, error) {
 	if h.GetAppSKeyFunc == nil {
 		panic("GetAppSKey should not be called")
 	}

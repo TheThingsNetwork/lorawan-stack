@@ -112,7 +112,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	}
 	a.So(retCtx, should.BeNil)
 
-	ret, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceId,
+	_, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceId,
 		[]string{
 			"provisioner_id",
 			"provisioning_data",

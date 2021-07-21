@@ -5894,15 +5894,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:check_mic": {
-    "translations": {
-      "en": "MIC check failed"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:compute_mic": {
     "translations": {
       "en": "failed to compute MIC"
@@ -5984,15 +5975,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:end_device_request": {
-    "translations": {
-      "en": "GetEndDeviceRequest is invalid"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:field_mask": {
     "translations": {
       "en": "invalid field mask"
@@ -6014,15 +5996,6 @@
   "error:pkg/joinserver:generate_session_key_id": {
     "translations": {
       "en": "failed to generate session key ID"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/joinserver:invalid_identifiers": {
-    "translations": {
-      "en": "invalid identifiers"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -6119,15 +6092,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:no_dev_addr": {
-    "translations": {
-      "en": "no DevAddr specified"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:no_dev_eui": {
     "translations": {
       "en": "no DevEUI specified"
@@ -6209,36 +6173,9 @@
       "file": "grpc_application_activation_settings_registry.go"
     }
   },
-  "error:pkg/joinserver:no_payload": {
-    "translations": {
-      "en": "no message payload specified"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/joinserver:no_root_keys": {
-    "translations": {
-      "en": "no root keys specified"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:no_s_nwk_s_int_key": {
     "translations": {
       "en": "no SNwkSIntKey specified"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/joinserver:payload_length": {
-    "translations": {
-      "en": "expected length of payload to be equal to 23 got {length}"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -6254,36 +6191,9 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:provision_entry_count": {
-    "translations": {
-      "en": "expected `{expected}` but have `{actual}` entries to provision"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/joinserver:provisioner_decode": {
-    "translations": {
-      "en": "failed to decode provisioning data"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:provisioner_not_found": {
     "translations": {
       "en": "provisioner `{id}` not found"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/joinserver:provisioning": {
-    "translations": {
-      "en": "provisioning failed"
     },
     "description": {
       "package": "pkg/joinserver",
