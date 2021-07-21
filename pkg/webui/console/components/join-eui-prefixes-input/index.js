@@ -206,9 +206,9 @@ class JoinEUIPrefixesInput extends React.PureComponent {
             title: m.zeroInput,
             onClick: this.handleZerosClick,
             onBlur: this.handleBlur,
-            raw: true,
             name: this._getFillButtonName(),
-            children: <span className={style.zeroFillButton}>00</span>,
+            message: m.zeroInput,
+            secondary: true,
           }}
           {...rest}
         />
