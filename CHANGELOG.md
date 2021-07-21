@@ -58,6 +58,7 @@ For details about compatibility between different releases, see the **Commitment
 - Instability and frequent crashes when internet connection is lost in the Console.
 - Panic in GCS when CUPS rotation is set without a key.
 - Rate limiting for `GatewayRegistry.GetGatewayIdentifiersForEUI` is now applied per gateway EUI.
+- Network Server ensures that the Band ID in the end device version identifiers match the configured Frequency Plan of the device.
 
 ### Security
 

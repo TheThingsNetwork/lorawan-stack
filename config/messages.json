@@ -6704,6 +6704,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:device_and_frequency_plan_band_mismatch": {
+    "translations": {
+      "en": "device band ID `{dev_band_id}` and frequency plan band ID `{fp_band_id}` do not match"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:device_exists": {
     "translations": {
       "en": "device already exists"
@@ -6812,15 +6821,6 @@
       "file": "grpc_deviceregistry.go"
     }
   },
-  "error:pkg/networkserver:field_mask": {
-    "translations": {
-      "en": "invalid field mask"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:field_not_zero": {
     "translations": {
       "en": "field `{name}` is not zero"
@@ -6857,15 +6857,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:no_dev_eui": {
-    "translations": {
-      "en": "no DevEUI specified"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:no_downlink": {
     "translations": {
       "en": "no downlink to send"
@@ -6878,15 +6869,6 @@
   "error:pkg/networkserver:no_downlink_path": {
     "translations": {
       "en": "no downlink path available"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:no_join_eui": {
-    "translations": {
-      "en": "no JoinEUI specified"
     },
     "description": {
       "package": "pkg/networkserver",
