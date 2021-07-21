@@ -2896,6 +2896,12 @@
       ]
     }
   },
+  "AppJs": {
+    "GetAppSKey": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": []
+    }
+  },
   "ApplicationActivationSettingRegistry": {
     "Get": {
       "file": "lorawan-stack/api/joinserver.proto",
