@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import classnames from 'classnames'
 
 import Spinner from '@ttn-lw/components/spinner'
 import Input from '@ttn-lw/components/input'
@@ -30,6 +31,7 @@ import DevAddrInput from '@console/containers/dev-addr-input'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import env from '@ttn-lw/lib/env'
 
 import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
 
@@ -37,6 +39,7 @@ import { useRepositoryContext } from '../context'
 import { selectBand } from '../reducer'
 import { REGISTRATION_TYPES } from '../../utils'
 import messages from '../../messages'
+import style from '../../device-add.styl'
 
 import FreqPlansSelect from './freq-plans-select'
 
@@ -45,14 +48,56 @@ const m = defineMessages({
 })
 
 const Registration = props => {
-  const { template, fetching, prefixes, mayEditKeys, onIdPrefill, onIdSelect } = props
+  const {
+    template,
+    fetching,
+    prefixes,
+    mayEditKeys,
+    onIdPrefill,
+    onIdSelect,
+    generateDevEUI,
+    applicationDevEUICounter,
+  } = props
   const state = useRepositoryContext()
   const hasTemplate = Boolean(template)
   const idInputRef = React.useRef(null)
+  const euiInputRef = React.useRef(null)
+  const [devEUIGenerated, setDevEUIGenerated] = React.useState(false)
+  const [errorMessage, setErrorMessage] = React.useState(undefined)
+
+  const indicatorContent = Boolean(errorMessage)
+    ? errorMessage
+    : {
+        ...sharedMessages.used,
+        values: {
+          currentValue: applicationDevEUICounter,
+          maxValue: env.devEUIConfig.applicationLimit,
+        },
+      }
+
+  const devEUIGenerateDisabled =
+    applicationDevEUICounter === env.devEUIConfig.applicationLimit ||
+    !env.devEUIConfig.devEUIIssuingEnabled ||
+    devEUIGenerated
 
   const handleIdFocus = React.useCallback(() => {
     onIdSelect(idInputRef)
   }, [idInputRef, onIdSelect])
+
+  const handleGenerate = React.useCallback(async () => {
+    try {
+      const result = await generateDevEUI()
+      setDevEUIGenerated(true)
+      euiInputRef.current.focus()
+      setErrorMessage(undefined)
+      return result
+    } catch (error) {
+      if (error.details[0].name === 'global_eui_limit_reached') {
+        setErrorMessage(sharedMessages.devEUIBlockLimitReached)
+      } else setErrorMessage(sharedMessages.unknownError)
+      setDevEUIGenerated(true)
+    }
+  }, [generateDevEUI])
 
   if (!hasTemplate || (fetching && !hasTemplate)) {
     return (
@@ -61,6 +106,11 @@ const Registration = props => {
       </Spinner>
     )
   }
+
+  const indicatorCls = classnames(style.indicator, {
+    [style.error]:
+      applicationDevEUICounter === env.devEUIConfig.applicationLimit || Boolean(errorMessage),
+  })
 
   const band = selectBand(state)
   const { end_device } = template
@@ -75,6 +125,37 @@ const Registration = props => {
     appKeyPlaceholder = sharedMessages.insufficientAppKeyRights
     nwkKeyPlaceholder = sharedMessages.insufficientNwkKeyRights
   }
+
+  const devEUIComponent = env.devEUIConfig.devEUIIssuingEnabled ? (
+    <Form.Field
+      title={sharedMessages.devEUI}
+      name="ids.dev_eui"
+      type="byte"
+      min={8}
+      max={8}
+      required
+      component={Input.Generate}
+      tooltipId={tooltipIds.DEV_EUI}
+      onBlur={onIdPrefill}
+      onGenerateValue={handleGenerate}
+      actionDisable={devEUIGenerateDisabled}
+      inputRef={euiInputRef}
+    >
+      <Message className={indicatorCls} component="label" content={indicatorContent} />
+    </Form.Field>
+  ) : (
+    <Form.Field
+      title={sharedMessages.devEUI}
+      name="ids.dev_eui"
+      type="byte"
+      min={8}
+      max={8}
+      required
+      component={Input}
+      tooltipId={tooltipIds.DEV_EUI}
+      onBlur={onIdPrefill}
+    />
+  )
 
   return (
     <Overlay visible={fetching} loading={fetching} spinnerMessage={m.fetching}>
@@ -96,17 +177,7 @@ const Registration = props => {
               showPrefixes
               tooltipId={tooltipIds.JOIN_EUI}
             />
-            <Form.Field
-              title={sharedMessages.devEUI}
-              name="ids.dev_eui"
-              type="byte"
-              min={8}
-              max={8}
-              required
-              component={Input}
-              tooltipId={tooltipIds.DEV_EUI}
-              onBlur={onIdPrefill}
-            />
+            {devEUIComponent}
             <Form.Field
               required
               title={sharedMessages.appKey}
@@ -142,18 +213,7 @@ const Registration = props => {
         {!isOTAA && (
           <>
             <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
-            {lwVersion === 104 && (
-              <Form.Field
-                title={sharedMessages.devEUI}
-                name="ids.dev_eui"
-                type="byte"
-                min={8}
-                max={8}
-                required
-                component={Input}
-                tooltipId={tooltipIds.DEV_EUI}
-              />
-            )}
+            {lwVersion === 104 && devEUIComponent}
             <Form.Field
               required={mayEditKeys}
               title={sharedMessages.appSKey}
@@ -229,7 +289,9 @@ const Registration = props => {
 }
 
 Registration.propTypes = {
+  applicationDevEUICounter: PropTypes.number.isRequired,
   fetching: PropTypes.bool,
+  generateDevEUI: PropTypes.func.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,
   onIdPrefill: PropTypes.func.isRequired,
   onIdSelect: PropTypes.func.isRequired,

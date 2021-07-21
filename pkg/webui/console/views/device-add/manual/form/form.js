@@ -15,6 +15,7 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 import { merge } from 'lodash'
+import classnames from 'classnames'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -26,6 +27,8 @@ import toast from '@ttn-lw/components/toast'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
+import Message from '@ttn-lw/lib/components/message'
+
 import PhyVersionInput from '@console/components/phy-version-input'
 import JoinEUIPRefixesInput from '@console/components/join-eui-prefixes-input'
 
@@ -35,6 +38,7 @@ import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import env from '@ttn-lw/lib/env'
 
 import {
   LORAWAN_VERSIONS,
@@ -46,6 +50,7 @@ import {
 
 import { REGISTRATION_TYPES } from '../../utils'
 import messages from '../../messages'
+import style from '../../device-add.styl'
 
 import AdvancedSettingsSection from './advanced-settings'
 import validationSchema, { devEUISchema } from './validation-schema'
@@ -74,7 +79,6 @@ const defaultValues = {
   session: {
     dev_addr: '',
     keys: {
-      app_s_key: { key: '' },
       f_nwk_s_int_key: { key: '' },
       s_nwk_s_int_key: { key: '' },
       nwk_s_enc_key: { key: '' },
@@ -115,6 +119,9 @@ const ManualForm = props => {
     prefixes,
     createDevice,
     createDeviceSuccess,
+    applicationDevEUICounter,
+    generateDevEUI,
+    fetchDevEUICounter,
   } = props
 
   const asEnabled = asConfig.enabled
@@ -153,6 +160,39 @@ const ManualForm = props => {
   )
   const formRef = React.useRef(null)
   const deviceIdInputRef = React.useRef(null)
+  const euiInputRef = React.useRef(null)
+  const [devEUIGenerated, setDevEUIGenerated] = React.useState(false)
+  const [errorMessage, setErrorMessage] = React.useState(undefined)
+
+  const indicatorContent = Boolean(errorMessage)
+    ? errorMessage
+    : {
+        ...sharedMessages.used,
+        values: {
+          currentValue: applicationDevEUICounter,
+          maxValue: env.devEUIConfig.applicationLimit,
+        },
+      }
+
+  const handleGenerate = React.useCallback(async () => {
+    try {
+      const result = await generateDevEUI(appId)
+      setDevEUIGenerated(true)
+      fetchDevEUICounter(appId)
+      euiInputRef.current.focus()
+      setErrorMessage(undefined)
+      return result.dev_eui
+    } catch (error) {
+      if (error.details[0].name === 'global_eui_limit_reached') {
+        setErrorMessage(sharedMessages.devEUIBlockLimitReached)
+      } else setErrorMessage(sharedMessages.unknownError)
+      setDevEUIGenerated(true)
+    }
+  }, [appId, fetchDevEUICounter, generateDevEUI])
+
+  React.useEffect(() => {
+    fetchDevEUICounter(appId)
+  }, [appId, fetchDevEUICounter])
 
   const [error, setError] = React.useState(undefined)
   const handleSetError = React.useCallback(error => setError(error), [])
@@ -231,6 +271,10 @@ const ManualForm = props => {
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
+  const devEUIGenerateDisabled =
+    applicationDevEUICounter === env.devEUIConfig.applicationLimit ||
+    !env.devEUIConfig.devEUIIssuingEnabled ||
+    devEUIGenerated
 
   const handleSubmit = React.useCallback(
     async (values, { setSubmitting, resetForm }) => {
@@ -295,12 +339,48 @@ const ManualForm = props => {
     [appId, createDevice, createDeviceSuccess, handleSetError, validationContext],
   )
 
+  const indicatorCls = classnames(style.indicator, {
+    [style.error]:
+      applicationDevEUICounter === env.devEUIConfig.applicationLimit || Boolean(errorMessage),
+  })
+
   let appKeyPlaceholder = undefined
   let nwkKeyPlaceholder = undefined
   if (!mayEditKeys) {
     appKeyPlaceholder = sharedMessages.insufficientAppKeyRights
     nwkKeyPlaceholder = sharedMessages.insufficientNwkKeyRights
   }
+
+  const devEUIComponent = env.devEUIConfig.devEUIIssuingEnabled ? (
+    <Form.Field
+      title={sharedMessages.devEUI}
+      name="ids.dev_eui"
+      type="byte"
+      min={8}
+      max={8}
+      required
+      component={Input.Generate}
+      tooltipId={tooltipIds.DEV_EUI}
+      onBlur={handleIdPrefill}
+      onGenerateValue={handleGenerate}
+      actionDisable={devEUIGenerateDisabled}
+      inputRef={euiInputRef}
+    >
+      <Message className={indicatorCls} component="label" content={indicatorContent} />
+    </Form.Field>
+  ) : (
+    <Form.Field
+      title={sharedMessages.devEUI}
+      name="ids.dev_eui"
+      type="byte"
+      min={8}
+      max={8}
+      required
+      component={Input}
+      tooltipId={tooltipIds.DEV_EUI}
+      onBlur={handleIdPrefill}
+    />
+  )
 
   return (
     <Form
@@ -345,19 +425,7 @@ const ManualForm = props => {
         defaultNsSettings={defaultNsSettings}
       />
       <hr />
-      {!isMulticast && (
-        <Form.Field
-          title={sharedMessages.devEUI}
-          name="ids.dev_eui"
-          type="byte"
-          min={8}
-          max={8}
-          required={isOTAA}
-          component={Input}
-          tooltipId={tooltipIds.DEV_EUI}
-          onBlur={handleIdPrefill}
-        />
-      )}
+      {!isMulticast && devEUIComponent}
       {(isABP || isMulticast) && (
         <>
           <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
@@ -485,9 +553,12 @@ const ManualForm = props => {
 
 ManualForm.propTypes = {
   appId: PropTypes.string.isRequired,
+  applicationDevEUICounter: PropTypes.number.isRequired,
   asConfig: PropTypes.stackComponent.isRequired,
   createDevice: PropTypes.func.isRequired,
   createDeviceSuccess: PropTypes.func.isRequired,
+  fetchDevEUICounter: PropTypes.func.isRequired,
+  generateDevEUI: PropTypes.func.isRequired,
   jsConfig: PropTypes.stackComponent.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,
   nsConfig: PropTypes.stackComponent.isRequired,

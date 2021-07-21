@@ -59,6 +59,8 @@ export const selectApplicationDevicesFetching = createFetchingSelector(GET_APP_D
 export const selectApplicationDevicesError = createErrorSelector(GET_APP_DEV_COUNT_BASE)
 export const selectApplicationDerivedLastSeen = (state, id) =>
   (selectApplicationDerivedById(state, id) || {}).lastSeen
+export const selectApplicationDevEUICount = state =>
+  selectApplicationById(state, selectSelectedApplicationId(state)).dev_eui_counter || 0
 
 // Applications.
 const selectAppsIds = createPaginationIdsSelectorByEntity(ENTITY)
