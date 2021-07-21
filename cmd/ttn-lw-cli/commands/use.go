@@ -25,9 +25,11 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/discover"
 	"gopkg.in/yaml.v2"
 )
@@ -35,13 +37,22 @@ import (
 const configFileName = ".ttn-lw-cli.yml"
 
 var (
-	errNoHost     = errors.DefineInvalidArgument("no_host", "no host set")
-	errFileExists = errors.DefineAlreadyExists("file_exists", "`{file}` exists")
-	errFailWrite  = errors.DefinePermissionDenied("fail_write", "failed to write `{file}`")
-	useCommand    = &cobra.Command{
-		Use:               "use [host]",
+	errNoHost          = errors.DefineInvalidArgument("no_host", "no host set")
+	errFileExists      = errors.DefineAlreadyExists("file_exists", "`{file}` exists")
+	errFailWrite       = errors.DefinePermissionDenied("fail_write", "failed to write `{file}`")
+	errInvalidHostname = errors.DefineInvalidArgument("invalid_hostname", "`{hostname}` is not a valid hostname")
+	errMissingTenantID = errors.DefineInvalidArgument("missing_tenant_id", "missing tenant ID in hostname")
+
+	// validHostnameRegex is valid as per https://datatracker.ietf.org/doc/html/rfc1123
+	validHostnameRegex             = regexp.MustCompile(`^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`)
+	communityClusterRegex          = regexp.MustCompile(`^((nam|sam|eu|af|as|au)\d+).cloud.thethings.network$`)
+	cloudClusterRegex              = regexp.MustCompile(`^([a-z][a-z0-9-]{2,}).((nam|sam|eu|af|as|au)\d+).cloud.thethings.industries$`)
+	cloudClusterMissingTenantRegex = regexp.MustCompile(`^((nam|sam|eu|af|as|au)\d+).cloud.thethings.industries$`)
+
+	useCommand = &cobra.Command{
+		Use:               "use",
 		Aliases:           []string{"generate-configuration", "generate-cfg"},
-		Short:             "Use",
+		Short:             "Generate client configuration for The Things Stack",
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 {
@@ -53,6 +64,10 @@ var (
 			overwrite, _ := cmd.Flags().GetBool("overwrite")
 
 			host := args[0]
+			if !validHostnameRegex.MatchString(host) {
+				return errInvalidHostname.WithAttributes("hostname", host)
+			}
+
 			grpcPort, _ := cmd.Flags().GetInt("grpc-port")
 			if grpcPort == 0 {
 				grpcPort = discover.DefaultPorts[!insecure]
@@ -90,6 +105,27 @@ var (
 					return "", errFileExists.WithAttributes("file", fileName)
 				}
 				return fileName, nil
+			}
+
+			if cloudClusterMissingTenantRegex.MatchString(host) {
+				return errMissingTenantID.New()
+			}
+			if matches := cloudClusterRegex.FindStringSubmatch(host); len(matches) == 4 {
+				// Configuration for The Things Stack Cloud
+				tenantID, clusterID := matches[1], matches[2]
+				logger.WithFields(log.Fields("tenant_id", tenantID, "cluster_id", clusterID)).Info("Configuring for The Things Stack Cloud")
+				conf.OAuthServerAddress = fmt.Sprintf("https://%s.eu1.cloud.thethings.industries/oauth", tenantID)
+				conf.IdentityServerGRPCAddress = fmt.Sprintf("%s.eu1.cloud.thethings.industries:%d", tenantID, discover.DefaultPorts[!insecure])
+				logger.WithField("address", conf.OAuthServerAddress).Info("Set OAuth Server address")
+				logger.WithField("address", conf.IdentityServerGRPCAddress).Info("Set Identity Server gRPC address")
+			} else if matches := communityClusterRegex.FindStringSubmatch(host); len(matches) == 3 {
+				// Configuration for The Things Stack Community Edition
+				clusterID := matches[1]
+				logger.WithField("cluster_id", clusterID).Info("Configuring for The Things Stack Community Edition")
+				conf.OAuthServerAddress = "https://eu1.cloud.thethings.network/oauth"
+				conf.IdentityServerGRPCAddress = fmt.Sprintf("eu1.cloud.thethings.industries:%d", discover.DefaultPorts[!insecure])
+				logger.WithField("address", conf.OAuthServerAddress).Info("Set OAuth Server address")
+				logger.WithField("address", conf.IdentityServerGRPCAddress).Info("Set Identity Server gRPC address")
 			}
 
 			// Get CA certificate from server
@@ -133,12 +169,10 @@ var (
 			if err != nil {
 				return err
 			}
-
 			configFile, err := destPath(configFileName, user, overwrite)
 			if err != nil {
 				return err
 			}
-
 			if err = ioutil.WriteFile(configFile, b, 0644); err != nil {
 				return errFailWrite.WithCause(err).WithAttributes("file", configFile)
 			}
