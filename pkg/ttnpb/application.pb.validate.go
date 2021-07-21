@@ -175,6 +175,8 @@ func (m *Application) ValidateFields(paths ...string) error {
 
 			}
 
+		case "dev_eui_counter":
+			// no validation rules for DevEuiCounter
 		default:
 			return ApplicationValidationError{
 				field:  name,

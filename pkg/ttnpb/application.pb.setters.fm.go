@@ -96,6 +96,16 @@ func (dst *Application) SetFields(src *Application, paths ...string) error {
 			} else {
 				dst.ContactInfo = nil
 			}
+		case "dev_eui_counter":
+			if len(subs) > 0 {
+				return fmt.Errorf("'dev_eui_counter' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DevEuiCounter = src.DevEuiCounter
+			} else {
+				var zero uint32
+				dst.DevEuiCounter = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

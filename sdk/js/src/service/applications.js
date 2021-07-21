@@ -171,6 +171,16 @@ class Applications {
     return Marshaler.payloadSingleResponse(response)
   }
 
+  // DevEUI issuing.
+
+  async issueDevEUI(id) {
+    const response = await this._api.ApplicationRegistry.IssueDevEUI({
+      routeParams: { application_id: id },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   // Miscellaneous.
 
   async getRightsById(applicationId) {

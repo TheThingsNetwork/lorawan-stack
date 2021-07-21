@@ -41,9 +41,10 @@ func init() {
 
 // functions to set fields from the application model into the application proto.
 var applicationPBSetters = map[string]func(*ttnpb.Application, *Application){
-	nameField:        func(pb *ttnpb.Application, app *Application) { pb.Name = app.Name },
-	descriptionField: func(pb *ttnpb.Application, app *Application) { pb.Description = app.Description },
-	attributesField:  func(pb *ttnpb.Application, app *Application) { pb.Attributes = attributes(app.Attributes).toMap() },
+	nameField:                 func(pb *ttnpb.Application, app *Application) { pb.Name = app.Name },
+	descriptionField:          func(pb *ttnpb.Application, app *Application) { pb.Description = app.Description },
+	attributesField:           func(pb *ttnpb.Application, app *Application) { pb.Attributes = attributes(app.Attributes).toMap() },
+	devEuiAddressCounterField: func(pb *ttnpb.Application, app *Application) { pb.DevEuiCounter = uint32(app.DevEUIAddressCounter) },
 }
 
 // functions to set fields from the application proto into the application model.
@@ -70,10 +71,11 @@ func init() {
 
 // fieldmask path to column name in applications table.
 var applicationColumnNames = map[string][]string{
-	attributesField:  {},
-	contactInfoField: {},
-	nameField:        {nameField},
-	descriptionField: {descriptionField},
+	attributesField:           {},
+	contactInfoField:          {},
+	nameField:                 {nameField},
+	descriptionField:          {descriptionField},
+	devEuiAddressCounterField: {devEuiAddressCounterField},
 }
 
 func (app Application) toPB(pb *ttnpb.Application, fieldMask *pbtypes.FieldMask) {

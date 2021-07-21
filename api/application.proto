@@ -62,7 +62,9 @@ message Application {
   // Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.
   repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
 
-  // next: 9
+  uint32 dev_eui_counter = 9;
+
+  // next: 10
 }
 
 message Applications {

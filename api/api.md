@@ -608,6 +608,7 @@ Application is the message that defines an Application in the network.
 | `description` | [`string`](#string) |  |  |
 | `attributes` | [`Application.AttributesEntry`](#ttn.lorawan.v3.Application.AttributesEntry) | repeated | Key-value attributes for this application. Typically used for organizing applications or for storing integration-specific data. |
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application. |
+| `dev_eui_counter` | [`uint32`](#uint32) |  |  |
 
 #### Field Rules
 

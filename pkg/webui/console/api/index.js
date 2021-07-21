@@ -140,6 +140,7 @@ export default {
     update: tts.Applications.updateById.bind(tts.Applications),
     eventsSubscribe: tts.Applications.openStream.bind(tts.Applications),
     getMqttConnectionInfo: tts.Applications.getMqttConnectionInfo.bind(tts.Applications),
+    generateDevEUI: tts.Applications.issueDevEUI.bind(tts.Applications),
     apiKeys: {
       get: tts.Applications.ApiKeys.getById.bind(tts.Applications.ApiKeys),
       list: tts.Applications.ApiKeys.getAll.bind(tts.Applications.ApiKeys),
