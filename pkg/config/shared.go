@@ -420,21 +420,22 @@ type InteropServer struct {
 
 // ServiceBase represents base service configuration.
 type ServiceBase struct {
-	Base           `name:",squash"`
-	Cluster        cluster.Config       `name:"cluster"`
-	Cache          Cache                `name:"cache"`
-	Redis          redis.Config         `name:"redis"`
-	Events         Events               `name:"events"`
-	GRPC           GRPC                 `name:"grpc"`
-	HTTP           HTTP                 `name:"http"`
-	Interop        InteropServer        `name:"interop"`
-	TLS            tlsconfig.Config     `name:"tls"`
-	Sentry         Sentry               `name:"sentry"`
-	Blob           BlobConfig           `name:"blob"`
-	FrequencyPlans FrequencyPlansConfig `name:"frequency-plans" description:"Source of the frequency plans"`
-	Rights         Rights               `name:"rights"`
-	KeyVault       KeyVault             `name:"key-vault"`
-	RateLimiting   RateLimiting         `name:"rate-limiting" description:"Rate limiting configuration"`
+	Base             `name:",squash"`
+	Cluster          cluster.Config       `name:"cluster"`
+	Cache            Cache                `name:"cache"`
+	Redis            redis.Config         `name:"redis"`
+	Events           Events               `name:"events"`
+	GRPC             GRPC                 `name:"grpc"`
+	HTTP             HTTP                 `name:"http"`
+	Interop          InteropServer        `name:"interop"`
+	TLS              tlsconfig.Config     `name:"tls"`
+	Sentry           Sentry               `name:"sentry"`
+	Blob             BlobConfig           `name:"blob"`
+	FrequencyPlans   FrequencyPlansConfig `name:"frequency-plans" description:"Source of the frequency plans"`
+	Rights           Rights               `name:"rights"`
+	KeyVault         KeyVault             `name:"key-vault"`
+	RateLimiting     RateLimiting         `name:"rate-limiting" description:"Rate limiting configuration"`
+	SkipVersionCheck bool                 `name:"skip-version-check" yaml:"skip-version-check" description:"Skip version checks"`
 }
 
 // FrequencyPlansFetcher returns a fetch.Interface based on the frequency plans configuration.

@@ -39,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/io"
+	pkgversion "go.thethings.network/lorawan-stack/v3/pkg/version"
 	"golang.org/x/oauth2"
 )
 
@@ -53,6 +54,9 @@ var (
 
 	inputDecoder io.Decoder
 
+	versionUpdate       chan pkgversion.Update
+	versionCheckTimeout = 500 * time.Millisecond
+
 	// Root command is the entrypoint of the program
 	Root = &cobra.Command{
 		Use:               name,
@@ -63,6 +67,16 @@ var (
 		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
 			// clean up the API
 			api.CloseAll()
+
+			select {
+			case <-ctx.Done():
+			case <-time.After(versionCheckTimeout):
+				logger.Warn("Version check timed out")
+			case versionUpdate, ok := <-versionUpdate:
+				if ok {
+					pkgversion.LogUpdate(ctx, &versionUpdate)
+				}
+			}
 
 			err := util.SaveAuthCache(cache)
 			if err != nil {
@@ -109,6 +123,24 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		}
 
 		ctx = log.NewContext(ctx, logger)
+
+		// check version in background
+		versionUpdate = make(chan pkgversion.Update)
+		if config.SkipVersionCheck {
+			close(versionUpdate)
+		} else {
+			go func(ctx context.Context) {
+				defer close(versionUpdate)
+				update, err := pkgversion.CheckUpdate(ctx)
+				if err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Failed to check version update")
+				} else if update != nil {
+					versionUpdate <- *update
+				} else {
+					log.FromContext(ctx).Debug("No new version available")
+				}
+			}(ctx)
+		}
 
 		// prepare the API
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{}
