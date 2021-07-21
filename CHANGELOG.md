@@ -32,6 +32,7 @@ For details about compatibility between different releases, see the **Commitment
 - End device first activation timestamp in the Identity Server end device store.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 - `AppJs` interface for applications to get the LoRaWAN AppSKey directly from the Join Server.
+- Console support for DevEUI generation from the configured DevEUI address block.
 
 ### Changed
 
