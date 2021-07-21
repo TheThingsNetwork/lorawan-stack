@@ -37,6 +37,7 @@ For details about compatibility between different releases, see the **Commitment
 - `ttn-lw-stack ns-db migrate` command records the schema version and only performs migrations if on a newer version.
   - Use the `--force` flag to force perform migrations.
 - Any authenticated user in the network can now list the collaborators of entities in the network.
+- The search RPCs no longer require fields to be specified in the field mask when those fields are already specified as filters.
 
 ### Deprecated
 
