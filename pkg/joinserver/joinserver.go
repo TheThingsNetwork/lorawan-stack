@@ -51,7 +51,7 @@ import (
 
 // JoinServer implements the Join Server component.
 //
-// The Join Server exposes the NsJs and DeviceRegistry services.
+// The Join Server exposes the NsJs, AsJs, AppJs and DeviceRegistry services.
 type JoinServer struct {
 	*component.Component
 	ctx context.Context
@@ -68,6 +68,7 @@ type JoinServer struct {
 	grpc struct {
 		nsJs                          nsJsServer
 		asJs                          asJsServer
+		appJs                         appJsServer
 		jsDevices                     jsEndDeviceRegistryServer
 		js                            jsServer
 		applicationActivationSettings applicationActivationSettingsRegistryServer
@@ -104,14 +105,16 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		JS:       js,
 		kekLabel: conf.DeviceKEKLabel,
 	}
-	js.grpc.asJs = asJsServer{JS: js}
 	js.grpc.nsJs = nsJsServer{JS: js}
+	js.grpc.asJs = asJsServer{JS: js}
+	js.grpc.appJs = appJsServer{JS: js}
 	js.grpc.js = jsServer{JS: js}
 	js.interop = interopServer{JS: js}
 
 	// TODO: Support authentication from non-cluster-local NS and AS (https://github.com/TheThingsNetwork/lorawan-stack/issues/4).
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AppJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Js", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.ApplicationActivationSettingsRegistry", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
@@ -131,6 +134,7 @@ func (js *JoinServer) Roles() []ttnpb.ClusterRole {
 // RegisterServices registers services provided by js at s.
 func (js *JoinServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsJsServer(s, js.grpc.asJs)
+	ttnpb.RegisterAppJsServer(s, js.grpc.appJs)
 	ttnpb.RegisterNsJsServer(s, js.grpc.nsJs)
 	ttnpb.RegisterJsEndDeviceRegistryServer(s, js.grpc.jsDevices)
 	ttnpb.RegisterJsServer(s, js.grpc.js)
