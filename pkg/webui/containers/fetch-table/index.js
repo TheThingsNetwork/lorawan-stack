@@ -31,6 +31,7 @@ import ErrorNotification from '@ttn-lw/components/error-notification'
 import debounce from '@ttn-lw/lib/debounce'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import style from './fetch-table.styl'
 
@@ -156,6 +157,7 @@ class FetchTable extends Component {
       page: 1,
       tab: tabs.length > 0 ? tabs[0].name : undefined,
       order: undefined,
+      initialFetch: true,
     }
 
     const { debounced: debouncedFunction, cancel: cancelFunction } = debounce(
@@ -167,8 +169,9 @@ class FetchTable extends Component {
     this.debounceCancel = cancelFunction
   }
 
-  componentDidMount() {
-    this.fetchItems()
+  async componentDidMount() {
+    await this.fetchItems(true)
+    this.setState({ initialFetch: false })
   }
 
   componentWillUnmount() {
@@ -181,15 +184,11 @@ class FetchTable extends Component {
 
     const filters = { ...this.state, limit: pageSize }
 
-    if (filters.query) {
-      if (searchItemsAction) {
-        dispatch(searchItemsAction(filters))
-      } else {
-        dispatch(getItemsAction(filters))
-      }
-    } else {
-      dispatch(getItemsAction(filters))
+    if (filters.query && searchItemsAction) {
+      return dispatch(attachPromise(searchItemsAction(filters)))
     }
+
+    return dispatch(attachPromise(getItemsAction(filters)))
   }
 
   @bind
@@ -308,7 +307,7 @@ class FetchTable extends Component {
       error,
       searchPlaceholderMessage,
     } = this.props
-    const { page, query, tab, order } = this.state
+    const { page, query, tab, order, initialFetch } = this.state
     let orderDirection, orderBy
 
     // Parse order string.
@@ -384,7 +383,7 @@ class FetchTable extends Component {
             onPageChange={this.onPageChange}
             loading={fetching}
             headers={headers}
-            data={items}
+            data={initialFetch ? [] : items}
             emptyMessage={sharedMessages.noMatch}
             handlesPagination={handlesPagination}
             onSortRequest={this.onOrderChange}

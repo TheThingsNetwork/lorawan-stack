@@ -30,7 +30,7 @@ import style from './table.styl'
 const Empty = ({ className, colSpan, message }) => (
   <Row className={classnames(className, style.emptyMessageRow)} clickable={false}>
     <DataCell colSpan={colSpan}>
-      <Message className={style.emptyMessage} content={message} />
+      {Boolean(message) && <Message className={style.emptyMessage} content={message} />}
     </DataCell>
   </Row>
 )
