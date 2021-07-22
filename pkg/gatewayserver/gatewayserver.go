@@ -558,6 +558,7 @@ func requireDisconnect(connected, current *ttnpb.Gateway) bool {
 		}
 	}
 	if connected.DownlinkPathConstraint != current.DownlinkPathConstraint ||
+		connected.DisablePacketBrokerForwarding != current.DisablePacketBrokerForwarding ||
 		connected.EnforceDutyCycle != current.EnforceDutyCycle ||
 		connected.LocationPublic != current.LocationPublic ||
 		connected.RequireAuthenticatedConnection != current.RequireAuthenticatedConnection ||
@@ -598,6 +599,7 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"antennas",
+						"disable_packet_broker_forwarding",
 						"downlink_path_constraint",
 						"enforce_duty_cycle",
 						"frequency_plan_id",
