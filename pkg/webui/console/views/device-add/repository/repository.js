@@ -17,6 +17,8 @@ import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { merge, isEqual } from 'lodash'
 
+import api from '@console/api'
+
 import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -106,6 +108,8 @@ const DeviceRepository = props => {
     asConfig,
     nsConfig,
     supportLink,
+    fetchDevEUICounter,
+    applicationDevEUICounter,
   } = props
 
   const asEnabled = asConfig.enabled
@@ -222,6 +226,12 @@ const DeviceRepository = props => {
     }
   }, [])
 
+  const handleDevEUIRequest = React.useCallback(async () => {
+    const result = await api.application.generateDevEUI(appId)
+    fetchDevEUICounter(appId)
+    return result.dev_eui
+  }, [appId, fetchDevEUICounter])
+
   const hasTemplateError = Boolean(templateError)
   const hasSelectedOther = hasAnySelectedOther(state)
   const hasCompleted = hasCompletedSelection(state)
@@ -235,6 +245,10 @@ const DeviceRepository = props => {
     [band, brand, firmwareVersion, hardwareVersion, model],
   )
   const stateKeyRef = React.useRef(stateKey)
+
+  React.useEffect(() => {
+    fetchDevEUICounter(appId)
+  }, [appId, fetchDevEUICounter])
 
   React.useEffect(() => {
     const version = selectVersion(state)
@@ -311,6 +325,8 @@ const DeviceRepository = props => {
                 mayEditKeys={mayEditKeys}
                 onIdPrefill={handleIdPrefill}
                 onIdSelect={handleIdTextSelect}
+                generateDevEUI={handleDevEUIRequest}
+                applicationDevEUICounter={applicationDevEUICounter}
               />
             ) : (
               <Message content={m.enterDataDescription} component="p" />
@@ -331,9 +347,11 @@ const DeviceRepository = props => {
 
 DeviceRepository.propTypes = {
   appId: PropTypes.string.isRequired,
+  applicationDevEUICounter: PropTypes.number.isRequired,
   asConfig: PropTypes.stackComponent.isRequired,
   createDevice: PropTypes.func.isRequired,
   createDeviceSuccess: PropTypes.func.isRequired,
+  fetchDevEUICounter: PropTypes.func.isRequired,
   getRegistrationTemplate: PropTypes.func.isRequired,
   jsConfig: PropTypes.stackComponent.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,

@@ -181,6 +181,18 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "dev_eui_counter",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

@@ -11702,6 +11702,10 @@
             "$ref": "#/definitions/v3ContactInfo"
           },
           "description": "Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application."
+        },
+        "dev_eui_counter": {
+          "type": "integer",
+          "format": "int64"
         }
       },
       "description": "Application is the message that defines an Application in the network."

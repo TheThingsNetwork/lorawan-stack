@@ -38,8 +38,8 @@ func getMaxCounter(addressBlock types.EUI64Prefix) int64 {
 }
 
 var (
-	errMaxGlobalEUILimitReached = errors.DefineInternal("global_eui_limit_reached", "global eui limit from address block reached")
-	errAppDevEUILimitReached    = errors.DefineInternal("application_dev_eui_limit_reached", "application issued DevEUI limit ({dev_eui_limit}) reached")
+	errMaxGlobalEUILimitReached = errors.DefineInvalidArgument("global_eui_limit_reached", "global eui limit from address block reached")
+	errAppDevEUILimitReached    = errors.DefineInvalidArgument("application_dev_eui_limit_reached", "application issued DevEUI limit ({dev_eui_limit}) reached")
 )
 
 func (s *euiStore) incrementApplicationDevEUICounter(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, applicationLimit int) error {

@@ -35,6 +35,7 @@ class Input extends React.Component {
     action: PropTypes.shape({
       ...Button.propTypes,
     }),
+    actionDisable: PropTypes.bool,
     autoComplete: PropTypes.oneOf([
       'current-password',
       'email',
@@ -45,6 +46,7 @@ class Input extends React.Component {
       'url',
       'username',
     ]),
+    children: PropTypes.node,
     className: PropTypes.string,
     code: PropTypes.bool,
     component: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
@@ -76,7 +78,9 @@ class Input extends React.Component {
 
   static defaultProps = {
     action: undefined,
+    actionDisable: false,
     autoComplete: 'off',
+    children: undefined,
     className: undefined,
     code: false,
     component: 'input',
@@ -154,6 +158,8 @@ class Input extends React.Component {
       showPerChar,
       forwardedRef,
       inputRef,
+      actionDisable,
+      children,
       ...rest
     } = this.props
 
@@ -229,9 +235,10 @@ class Input extends React.Component {
         </div>
         {hasAction && (
           <div className={style.actions}>
-            <Button className={style.button} disabled={disabled} {...action} />
+            <Button className={style.button} {...action} disabled={disabled || actionDisable} />
           </div>
         )}
+        {children}
       </div>
     )
   }

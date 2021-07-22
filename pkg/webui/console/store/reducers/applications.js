@@ -21,6 +21,7 @@ import {
   GET_APP,
   GET_APP_SUCCESS,
   GET_APP_DEV_COUNT_SUCCESS,
+  GET_APP_DEV_EUI_COUNT_SUCCESS,
   GET_APPS_LIST_SUCCESS,
   UPDATE_APP_SUCCESS,
   DELETE_APP_SUCCESS,
@@ -77,6 +78,17 @@ const applications = (state = defaultState, { type, payload, event }) => {
         entities: {
           ...state.entities,
           [id]: application(state.entities[id], payload),
+        },
+      }
+    case GET_APP_DEV_EUI_COUNT_SUCCESS:
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [payload.id]: {
+            ...state.entities[payload.id],
+            dev_eui_counter: payload.dev_eui_counter,
+          },
         },
       }
     case DELETE_APP_SUCCESS:

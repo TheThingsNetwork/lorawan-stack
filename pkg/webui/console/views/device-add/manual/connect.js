@@ -21,7 +21,12 @@ import { selectNsConfig, selectAsConfig, selectJsConfig } from '@ttn-lw/lib/sele
 
 import { checkFromState, mayEditApplicationDeviceKeys } from '@console/lib/feature-checks'
 
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { getApplicationDevEUICount } from '@console/store/actions/applications'
+
+import {
+  selectSelectedApplicationId,
+  selectApplicationDevEUICount,
+} from '@console/store/selectors/applications'
 import { selectJoinEUIPrefixes } from '@console/store/selectors/join-server'
 
 const mapStateToProps = state => ({
@@ -32,11 +37,13 @@ const mapStateToProps = state => ({
   mayEditKeys: checkFromState(mayEditApplicationDeviceKeys, state),
   prefixes: selectJoinEUIPrefixes(state),
   createDevice: (appId, device) => api.device.create(appId, device),
+  applicationDevEUICounter: selectApplicationDevEUICount(state),
 })
 
 const mapDispatchToProps = dispatch => ({
   createDeviceSuccess: (appId, deviceId) =>
     dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
+  fetchDevEUICounter: appId => dispatch(getApplicationDevEUICount(appId)),
 })
 
 export default Manual => connect(mapStateToProps, mapDispatchToProps)(Manual)

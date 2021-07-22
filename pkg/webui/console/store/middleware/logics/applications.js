@@ -35,6 +35,17 @@ const getApplicationLogic = createRequestLogic({
   },
 })
 
+const getApplicationDevEUICountLogic = createRequestLogic({
+  type: applications.GET_APP_DEV_EUI_COUNT,
+  process: async ({ action }) => {
+    const {
+      payload: { id },
+    } = action
+    const result = await api.application.get(id, 'dev_eui_counter')
+    return { id, dev_eui_counter: result.dev_eui_counter }
+  },
+})
+
 const updateApplicationLogic = createRequestLogic({
   type: applications.UPDATE_APP,
   process: async ({ action }) => {
@@ -145,6 +156,7 @@ export default [
   getApplicationsLogic,
   getApplicationsRightsLogic,
   getApplicationLinkLogic,
+  getApplicationDevEUICountLogic,
   ...createEventsConnectLogics(
     applications.SHARED_NAME,
     'applications',

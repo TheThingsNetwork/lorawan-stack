@@ -79,7 +79,7 @@ import {
   dispatch => ({
     stopStream: id => dispatch(stopApplicationEventsStream(id)),
     loadData: id => {
-      dispatch(getApplication(id, 'name,description,attributes'))
+      dispatch(getApplication(id, 'name,description,attributes,dev_eui_counter'))
       dispatch(getApplicationsRightsList(id))
     },
   }),

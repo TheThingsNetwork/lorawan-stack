@@ -378,7 +378,7 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 	// Applications:
 	"/ttn.lorawan.v3.ApplicationRegistry/Get":                 {All: ApplicationFieldPathsNested, Allowed: ApplicationFieldPathsNested},
 	"/ttn.lorawan.v3.ApplicationRegistry/List":                {All: ApplicationFieldPathsNested, Allowed: ApplicationFieldPathsNested},
-	"/ttn.lorawan.v3.ApplicationRegistry/Update":              {All: ApplicationFieldPathsNested, Allowed: ApplicationFieldPathsNested, Set: true},
+	"/ttn.lorawan.v3.ApplicationRegistry/Update":              {All: ApplicationFieldPathsNested, Allowed: omitFields(ApplicationFieldPathsNested, "dev_eui_counter"), Set: true},
 	"/ttn.lorawan.v3.EntityRegistrySearch/SearchApplications": {All: ApplicationFieldPathsNested, Allowed: ApplicationFieldPathsNested},
 
 	// Application Activation Settings:

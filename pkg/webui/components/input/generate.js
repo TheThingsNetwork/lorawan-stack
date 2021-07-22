@@ -29,9 +29,9 @@ const GenerateInput = props => {
   const { onChange } = props
   const { generateTitle, mayGenerateValue, onGenerateValue, action, ...rest } = props
 
-  const handleGenerateValue = React.useCallback(() => {
+  const handleGenerateValue = React.useCallback(async () => {
     if (mayGenerateValue) {
-      const generatedValue = onGenerateValue()
+      const generatedValue = await onGenerateValue()
 
       onChange(generatedValue, true)
     }
@@ -44,7 +44,8 @@ const GenerateInput = props => {
       title: generateTitle,
       disabled: !mayGenerateValue,
       onClick: handleGenerateValue,
-      raw: true,
+      message: m.generate,
+      secondary: true,
       ...action,
     }),
     [action, generateTitle, handleGenerateValue, mayGenerateValue],

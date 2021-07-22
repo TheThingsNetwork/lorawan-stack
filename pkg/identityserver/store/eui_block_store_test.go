@@ -70,7 +70,7 @@ func TestEUIStore(t *testing.T) {
 		devEUI, err = euiStore.IssueDevEUIForApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}, 1)
 		if a.So(err, should.NotBeNil) {
 			a.So(devEUI, should.BeNil)
-			a.So(errors.IsInternal(err), should.BeTrue)
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
 		}
 
 		// Test global DevEUI block limit reached.
@@ -80,7 +80,7 @@ func TestEUIStore(t *testing.T) {
 		devEUI, err = euiStore.IssueDevEUIForApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}, 100)
 		if a.So(err, should.NotBeNil) {
 			a.So(devEUI, should.BeNil)
-			a.So(errors.IsInternal(err), should.BeTrue)
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
 		}
 	})
 }
