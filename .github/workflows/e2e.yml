@@ -24,6 +24,7 @@ jobs:
     outputs:
       needs-to-run: ${{ steps.check-result.outputs.passed != 'true' }}
       hash: ${{ steps.get-hash.outputs.hash }}
+      yarn-cache-dir-path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -45,36 +46,31 @@ jobs:
         id: check-result
         continue-on-error: true
         run: test -f .cache/passed && echo "::set-output name=passed::$(cat .cache/passed)"
-  end-to-end:
-    name: Frontend based (cypress)
+      - name: Get Yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(npx yarn cache dir)"
+  preparation:
+    name: Run preparations
     runs-on: ubuntu-18.04
+    needs: determine-if-required
+    if: needs.determine-if-required.outputs.needs-to-run == 'true'
     env:
       TTN_LW_LOG_LEVEL: debug
       # TODO: Remove this after we no longer depend on cockroach dump command
       # (https://github.com/TheThingsNetwork/lorawan-stack/issues/4184)
       COCKROACHDB_COCKROACH_TAG: v19.2.12
-      CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RUN_HASH: ${{ needs.determine-if-required.outputs.hash }}
-    strategy:
-      matrix:
-        machines: [1, 2, 3, 4]
-    needs: determine-if-required
-    if: needs.determine-if-required.outputs.needs-to-run == 'true'
     steps:
       - name: Check out code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
           submodules: true
-      - name: Get Yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(npx yarn cache dir)"
       - name: Initialize Yarn module cache
         id: yarn-cache
         uses: actions/cache@v2
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          path: ${{ needs.determine-if-required.outputs.yarn-cache-dir-path }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -119,15 +115,10 @@ jobs:
       - name: Create device repository index
         run: tools/bin/mage dev:initDeviceRepo
         if: steps.dr-index-cache.outputs.cache-hit != 'true'
-      - name: Generate certs
-        run: tools/bin/mage dev:certificates
       - name: Run test preparations
         if: |
           steps.db-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage -v dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump
-      - name: Restore initialized sql db
-        if: steps.db-cache.outputs.cache-hit == 'true'
-        run: tools/bin/mage dev:dbStart dev:sqlRestore
       - name: Initialize public folder cache
         id: public-cache
         uses: actions/cache@v2
@@ -146,6 +137,79 @@ jobs:
       - name: Build frontend
         if: steps.public-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage js:build
+  end-to-end:
+    name: Frontend based (cypress)
+    runs-on: ubuntu-18.04
+    env:
+      TTN_LW_LOG_LEVEL: debug
+      # TODO: Remove this after we no longer depend on cockroach dump command
+      # (https://github.com/TheThingsNetwork/lorawan-stack/issues/4184)
+      COCKROACHDB_COCKROACH_TAG: v19.2.12
+      CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RUN_HASH: ${{ needs.determine-if-required.outputs.hash }}
+    strategy:
+      matrix:
+        machines: [1, 2, 3, 4]
+    needs: [determine-if-required, preparation]
+    if: needs.determine-if-required.outputs.needs-to-run == 'true'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Initialize Yarn module cache
+        id: yarn-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ needs.determine-if-required.outputs.yarn-cache-dir-path }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '~1.16'
+      - name: Initialize tool binary cache
+        id: tools-cache
+        uses: actions/cache@v2
+        with:
+          path: tools/bin
+          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
+      - name: Initialize SQL dump cache
+        id: db-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            .cache/sqldump.sql
+            .env/admin_api_key.txt
+          key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go') }}
+      - name: Restore initialized sql db
+        run: tools/bin/mage dev:dbStart dev:sqlRestore
+      - name: Initialize device repository index cache
+        id: dr-index-cache
+        uses: actions/cache@v2
+        with:
+          path: data/lorawan-devices-index
+          key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
+      - name: Generate certs
+        run: tools/bin/mage dev:certificates
+      - name: Initialize Go module cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Download go modules
+        run: go mod download
+      - name: Initialize public folder cache
+        id: public-cache
+        uses: actions/cache@v2
+        with:
+          path: public
+          key: public-cache-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/webpack.config.babel.js', 'yarn.lock', 'sdk/js/yarn.lock')}}
       - name: Run frontend end-to-end tests
         run: tools/bin/mage dev:startDevStack & tools/bin/mage -v js:cypressHeadless
       - name: Upload logs
@@ -163,7 +227,7 @@ jobs:
   cache-result:
     name: Write result cache
     runs-on: ubuntu-18.04
-    needs: [end-to-end, determine-if-required]
+    needs: [preparation, end-to-end, determine-if-required]
     steps:
       - name: Setup result cache to skip redundant runs
         id: run-cache
