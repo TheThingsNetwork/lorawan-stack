@@ -122,7 +122,7 @@ class Tabular extends React.Component {
           </Table.Row>
         ))
       ) : (
-        <Table.Empty colSpan={headers.length} message={emptyMessage} />
+        <Table.Empty colSpan={headers.length} message={!loading ? emptyMessage : undefined} />
       )
 
     const pagination = paginated ? (
