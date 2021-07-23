@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.14.0] - 2021-07-23
+
+### Added
+
 - Gateway antenna placement; unknown, indoor or outdoor. This can now be specified with CLI, e.g. for the first antenna: `ttn-lw-cli gateways set <gateway-id> --antenna.index 0 --antenna.placement OUTDOOR`. The antenna placement will be reported to Packet Broker Mapper.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 - Payload formatter length validation in the Console.
@@ -45,8 +59,6 @@ For details about compatibility between different releases, see the **Commitment
 - The search RPCs no longer require fields to be specified in the field mask when those fields are already specified as filters.
 - When generating client configuration with the CLI `use` command, automatically set the correct Identity Server and OAuth Server addresses for The Things Stack Cloud and The Things Stack Community Edition.
 
-### Deprecated
-
 ### Removed
 
 - The `old` log format.
@@ -63,8 +75,6 @@ For details about compatibility between different releases, see the **Commitment
 - Panic in GCS when CUPS rotation is set without a key.
 - Rate limiting for `GatewayRegistry.GetGatewayIdentifiersForEUI` is now applied per gateway EUI.
 - Network Server ensures that the Band ID in the end device version identifiers match the configured Frequency Plan of the device.
-
-### Security
 
 ## [3.13.3] - 2021-07-02
 
@@ -1658,7 +1668,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.3...v3.13
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.0...v3.14
+[3.14.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.3...v3.14.0
 [3.13.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.2...v3.13.3
 [3.13.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.1...v3.13.2
 [3.13.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.0...v3.13.1
