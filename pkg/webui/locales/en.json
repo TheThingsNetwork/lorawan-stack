@@ -347,7 +347,7 @@
   "console.containers.lora-cloud-gls-form.index.multiFrameTimeWindowDescription": "The maximum age of considered historical messages in minutes",
   "console.containers.lora-cloud-gls-form.index.determineWindowSizeAutomatically": "Determine window size automatically",
   "console.containers.lora-cloud-gls-form.index.enableMultiFrame": "Enable multiframe",
-  "console.containers.lora-cloud-gls-form.index.automaticMultiFrameDescription": "Determine the count of sent historical messages considered for based on the first byte of the payload",
+  "console.containers.lora-cloud-gls-form.index.automaticMultiFrameDescription": "Determines the count of sent historical messages considered for geolocation based on the first byte of the payload",
   "console.containers.owners-select.owners-select.title": "Owner",
   "console.containers.owners-select.owners-select.warning": "There was an error and the list of organizations could not be displayed",
   "console.containers.packet-broker-networks-table.index.nonDefaultPolicies": "Networks with non-default policies",
