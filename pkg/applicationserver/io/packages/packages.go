@@ -17,6 +17,7 @@ package packages
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
@@ -44,7 +45,12 @@ type Server interface {
 	rpcserver.Registerer
 }
 
-func startPackageWorker(ctx context.Context, as io.Server, name string, handler ApplicationPackageHandler, sub *io.Subscription, id int) {
+func startPackageWorker(ctx context.Context, as io.Server, name string, handler ApplicationPackageHandler, sub *io.Subscription, id int, timeout time.Duration) {
+	handleUp := func(ctx context.Context, defAssoc *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) error {
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		return handler.HandleUp(ctx, defAssoc, assoc, up)
+	}
 	as.StartTask(&component.TaskConfig{
 		Context: ctx,
 		ID:      fmt.Sprintf("run_application_packages_%v_%v", name, id),
@@ -58,7 +64,7 @@ func startPackageWorker(ctx context.Context, as io.Server, name string, handler 
 				case up := <-sub.Up():
 					ctx := up.Context
 					pair := associationsPairFromContext(ctx)
-					if err := handler.HandleUp(ctx, pair.defaultAssociation, pair.association, up.ApplicationUp); err != nil {
+					if err := handleUp(ctx, pair.defaultAssociation, pair.association, up.ApplicationUp); err != nil {
 						log.FromContext(ctx).WithError(err).Warn("Failed to handle message")
 						registerMessageFailed(name, err)
 						continue
@@ -97,7 +103,7 @@ func startFrontendWorker(ctx context.Context, as io.Server, sub *io.Subscription
 }
 
 // New returns an application packages server wrapping the given registries and handlers.
-func New(ctx context.Context, as io.Server, registry Registry, handlers map[string]ApplicationPackageHandler, workers int) (Server, error) {
+func New(ctx context.Context, as io.Server, registry Registry, handlers map[string]ApplicationPackageHandler, workers int, timeout time.Duration) (Server, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", namespace)
 	s := &server{
 		ctx:           ctx,
@@ -109,7 +115,7 @@ func New(ctx context.Context, as io.Server, registry Registry, handlers map[stri
 	for name, handler := range handlers {
 		s.subscriptions[name] = io.NewSubscription(ctx, name, nil)
 		for id := 0; id < workers; id++ {
-			startPackageWorker(ctx, as, name, handler, s.subscriptions[name], id)
+			startPackageWorker(ctx, as, name, handler, s.subscriptions[name], id, timeout)
 		}
 	}
 	sub, err := as.Subscribe(ctx, "applicationpackages", nil, false)

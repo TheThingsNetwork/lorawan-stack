@@ -225,7 +225,7 @@ func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, s
 	// Initialize LoRa Cloud Geolocation v3 package handler
 	handlers[loracloudgeolocationv3.PackageName] = loracloudgeolocationv3.New(server, c.Registry)
 
-	return packages.New(ctx, server, c.Registry, handlers, c.Workers)
+	return packages.New(ctx, server, c.Registry, handlers, c.Workers, c.Timeout)
 }
 
 var (
