@@ -352,8 +352,6 @@ var startCommand = &cobra.Command{
 			if config.Console.UI.TemplateData.SentryDSN == "" {
 				config.Console.UI.TemplateData.SentryDSN = config.Sentry.DSN
 			}
-			config.Console.UI.TemplateData.DevEUIIssuingEnabled = config.IS.DevEUIBlock.Enabled
-			config.Console.UI.TemplateData.DevEUIApplicationLimit = config.IS.DevEUIBlock.ApplicationLimit
 			console, err := console.New(c, config.Console)
 			if err != nil {
 				return shared.ErrInitializeConsole.WithCause(err)

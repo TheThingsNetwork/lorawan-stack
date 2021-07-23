@@ -31,8 +31,8 @@ export const selectApplicationSiteSubTitle = () => configSelector().SITE_SUB_TIT
 export const selectSentryDsnConfig = () => configSelector().SENTRY_DSN
 
 export const selectDevEUIConfig = () => ({
-  devEUIIssuingEnabled: configSelector().DEV_EUI_ISSUING_ENABLED,
-  applicationLimit: configSelector().DEV_EUI_APP_LIMIT,
+  devEUIIssuingEnabled: selectApplicationConfig().dev_eui_issuing_enabled,
+  applicationLimit: selectApplicationConfig().dev_eui_application_limit,
 })
 
 export const selectCSRFToken = () => configSelector().CSRF_TOKEN

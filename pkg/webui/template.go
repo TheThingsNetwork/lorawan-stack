@@ -34,22 +34,20 @@ type Data struct {
 
 // TemplateData contains data to use in the App template.
 type TemplateData struct {
-	SiteName               string   `name:"site-name" description:"The site name"`
-	Title                  string   `name:"title" description:"The page title"`
-	SubTitle               string   `name:"sub-title" description:"The page sub-title"`
-	Description            string   `name:"descriptions" description:"The page description"`
-	Language               string   `name:"language" description:"The page language"`
-	ThemeColor             string   `name:"theme-color" description:"The page theme color"`
-	CanonicalURL           string   `name:"canonical-url" description:"The page canonical URL"`
-	AssetsBaseURL          string   `name:"assets-base-url" description:"The base URL to the page assets"`
-	BrandingBaseURL        string   `name:"branding-base-url" description:"The base URL to the branding assets"`
-	IconPrefix             string   `name:"icon-prefix" description:"The prefix to put before the page icons (favicon.ico, touch-icon.png, og-image.png)"`
-	CSSFiles               []string `name:"css-file" description:"The names of the CSS files"`
-	JSFiles                []string `name:"js-file" description:"The names of the JS files"`
-	SentryDSN              string   `name:"sentry-dsn" description:"The Sentry DSN"`
-	CSRFToken              string   `name:"-"`
-	DevEUIIssuingEnabled   bool     `name:"dev-eui-issuing-enabled" description:"DevEUI issuer flag"`
-	DevEUIApplicationLimit int      `name:"dev-eui-app-limit" description:"Limit on number of DevEUI's issued per application"`
+	SiteName        string   `name:"site-name" description:"The site name"`
+	Title           string   `name:"title" description:"The page title"`
+	SubTitle        string   `name:"sub-title" description:"The page sub-title"`
+	Description     string   `name:"descriptions" description:"The page description"`
+	Language        string   `name:"language" description:"The page language"`
+	ThemeColor      string   `name:"theme-color" description:"The page theme color"`
+	CanonicalURL    string   `name:"canonical-url" description:"The page canonical URL"`
+	AssetsBaseURL   string   `name:"assets-base-url" description:"The base URL to the page assets"`
+	BrandingBaseURL string   `name:"branding-base-url" description:"The base URL to the branding assets"`
+	IconPrefix      string   `name:"icon-prefix" description:"The prefix to put before the page icons (favicon.ico, touch-icon.png, og-image.png)"`
+	CSSFiles        []string `name:"css-file" description:"The names of the CSS files"`
+	JSFiles         []string `name:"js-file" description:"The names of the JS files"`
+	SentryDSN       string   `name:"sentry-dsn" description:"The Sentry DSN"`
+	CSRFToken       string   `name:"-"`
 }
 
 // MountPath derives the mount path from the canonical URL of the config.
@@ -102,8 +100,6 @@ const appHTML = `
 				SITE_TITLE:{{.Title}},
 				SITE_SUB_TITLE:{{.SubTitle}},
 				SENTRY_DSN:{{.SentryDSN}},
-				DEV_EUI_ISSUING_ENABLED:{{.DevEUIIssuingEnabled}},
-				DEV_EUI_APP_LIMIT:{{.DevEUIApplicationLimit}},
 				{{with .CSRFToken}}CSRF_TOKEN:{{.}},{{end}}
 				{{with .PageData}}PAGE_DATA:{{.}}{{end}}
 			};

@@ -39,11 +39,13 @@ type StackConfig struct {
 
 // FrontendConfig is the configuration for the Console frontend.
 type FrontendConfig struct {
-	DocumentationBaseURL string `json:"documentation_base_url" name:"documentation-base-url" description:"The base URL for generating documentation links"`
-	Language             string `json:"language" name:"-"`
-	SupportLink          string `json:"support_link" name:"support-link" description:"The URI that the support button will point to"`
-	StackConfig          `json:"stack_config" name:",squash"`
-	AccountURL           string `json:"account_url" name:"account-url" description:"The URL that points to the root of the Account"`
+	DocumentationBaseURL   string `json:"documentation_base_url" name:"documentation-base-url" description:"The base URL for generating documentation links"`
+	Language               string `json:"language" name:"-"`
+	SupportLink            string `json:"support_link" name:"support-link" description:"The URI that the support button will point to"`
+	StackConfig            `json:"stack_config" name:",squash"`
+	AccountURL             string `json:"account_url" name:"account-url" description:"The URL that points to the root of the Account"`
+	DevEUIIssuingEnabled   bool   `json:"dev_eui_issuing_enabled" name:"dev-eui-issuing-enabled" description:"DevEUI issuer flag"`
+	DevEUIApplicationLimit int    `json:"dev_eui_application_limit" name:"dev-eui-app-limit" description:"Limit on number of DevEUI's issued per application"`
 }
 
 // Config is the configuration for the Console.
