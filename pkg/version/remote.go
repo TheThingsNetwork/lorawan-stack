@@ -145,7 +145,7 @@ func WithReference(current semver.Version) CheckOption {
 // CheckUpdate checks whether there is a version update available.
 // If there is no update, this function returns nil.
 func CheckUpdate(ctx context.Context, opts ...CheckOption) (*Update, error) {
-	current, err := semver.Parse(TTN)
+	current, err := semver.Parse(strings.TrimPrefix(TTN, "v"))
 	if err != nil {
 		return nil, err
 	}

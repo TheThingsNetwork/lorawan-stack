@@ -37,18 +37,18 @@ func versionCheckTask(ctx context.Context, clientProvider httpClientProvider) *T
 		Context: ctx,
 		ID:      "version_check",
 		Func: func(ctx context.Context) error {
-			ctx, cancel := context.WithTimeout(ctx, versionCheckTimeout)
+			checkCtx, cancel := context.WithTimeout(ctx, versionCheckTimeout)
 			defer cancel()
 
-			client, err := clientProvider.HTTPClient(ctx)
+			client, err := clientProvider.HTTPClient(checkCtx)
 			if err != nil {
 				return err
 			}
-			update, err := version.CheckUpdate(ctx, version.WithClient(client))
+			update, err := version.CheckUpdate(checkCtx, version.WithClient(client))
 			if err != nil {
 				return err
 			}
-			version.LogUpdate(ctx, update)
+			version.LogUpdate(checkCtx, update)
 
 			select {
 			case <-ctx.Done():
