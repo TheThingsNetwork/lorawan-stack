@@ -230,6 +230,11 @@ func (g Git) prePush(stdin string, args ...string) error {
 		switch n := err.ExitCode(); n {
 		case 1:
 			return nil
+		case 128:
+			if mg.Verbose() {
+				fmt.Println("Unable to check presence of TTI marker commit: hash not found")
+			}
+			return nil
 		default:
 			return fmt.Errorf("expected exit code of 1, got %d", n)
 		}
