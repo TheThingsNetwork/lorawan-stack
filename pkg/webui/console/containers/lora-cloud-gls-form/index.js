@@ -58,7 +58,7 @@ const m = defineMessages({
   determineWindowSizeAutomatically: 'Determine window size automatically',
   enableMultiFrame: 'Enable multiframe',
   automaticMultiFrameDescription:
-    'Determine the count of sent historical messages considered for based on the first byte of the payload',
+    'Determines the count of sent historical messages considered for geolocation based on the first byte of the payload',
 })
 
 const LORACLOUD_GLS_QUERY_LABELS = Object.freeze([
