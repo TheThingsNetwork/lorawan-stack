@@ -16,13 +16,18 @@ package redis
 
 import (
 	"context"
+	"io"
+	"math/rand"
 	"runtime/trace"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
+	ulid "github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -60,7 +65,21 @@ func applyDefaultAssociationFieldMask(dst, src *ttnpb.ApplicationPackageDefaultA
 
 // ApplicationPackagesRegistry is a Redis application packages registry.
 type ApplicationPackagesRegistry struct {
-	Redis *ttnredis.Client
+	Redis   *ttnredis.Client
+	LockTTL time.Duration
+
+	entropyMu *sync.Mutex
+	entropy   io.Reader
+}
+
+// Init initializes the ApplicationPackagesRegistry.
+func (r *ApplicationPackagesRegistry) Init(ctx context.Context) error {
+	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
+		return err
+	}
+	r.entropyMu = &sync.Mutex{}
+	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
+	return nil
 }
 
 func (r *ApplicationPackagesRegistry) uidKey(uid string) string {
@@ -82,6 +101,10 @@ func (r *ApplicationPackagesRegistry) makeAssociationKeyFunc(uid string) func(po
 	return func(port string) string {
 		return r.associationKey(uid, port)
 	}
+}
+
+func (r *ApplicationPackagesRegistry) transactionKey(uid string, fPort string, packageName string) string {
+	return r.Redis.Key("transaction", uid, fPort, packageName)
 }
 
 // GetAssociation implements applicationpackages.AssociationRegistry.
@@ -453,4 +476,29 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 // WithPagination implements applicationpackages.AssociationRegistry.
 func (r ApplicationPackagesRegistry) WithPagination(ctx context.Context, limit, page uint32, total *int64) context.Context {
 	return ttnredis.NewContextWithPagination(ctx, int64(limit), int64(page), total)
+}
+
+// EndDeviceTransaction implements applicationpackages.TransactionRegistry.
+func (r *ApplicationPackagesRegistry) EndDeviceTransaction(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fPort uint32, packageName string, fn func(ctx context.Context) error) error {
+	k := r.transactionKey(unique.ID(ctx, ids), r.fPortStr(fPort), packageName)
+
+	r.entropyMu.Lock()
+	lockID, err := ulid.New(ulid.Timestamp(time.Now()), r.entropy)
+	r.entropyMu.Unlock()
+	if err != nil {
+		return err
+	}
+	lockIDStr := lockID.String()
+
+	defer trace.StartRegion(ctx, "run end device transaction").End()
+
+	if err := ttnredis.LockMutex(ctx, r.Redis, k, lockIDStr, r.LockTTL); err != nil {
+		return err
+	}
+	defer func() {
+		if err := ttnredis.UnlockMutex(ctx, r.Redis, k, lockIDStr, r.LockTTL); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to unlock mutex")
+		}
+	}()
+	return fn(ctx)
 }

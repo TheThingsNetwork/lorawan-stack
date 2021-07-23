@@ -96,8 +96,11 @@ func TestAuthentication(t *testing.T) {
 	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
-	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient}
-	srv, err := packages.New(ctx, as, apRegistry, map[string]packages.ApplicationPackageHandler{}, 1)
+	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient, LockTTL: 10 * time.Second}
+	if err := apRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	srv, err := packages.New(ctx, as, apRegistry, map[string]packages.ApplicationPackageHandler{}, 1, 10*time.Second)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -174,14 +177,16 @@ func TestAssociations(t *testing.T) {
 	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
-	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient}
-
+	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient, LockTTL: 10 * time.Second}
+	if err := apRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	handleUpCh := make(chan *handleUpRequest, 4)
 	mockHandler := createMockPackageHandler(handleUpCh)
 	handlers := map[string]packages.ApplicationPackageHandler{
 		mockHandler.Package().Name: mockHandler,
 	}
-	srv, err := packages.New(ctx, as, apRegistry, handlers, 1)
+	srv, err := packages.New(ctx, as, apRegistry, handlers, 1, 10*time.Second)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
