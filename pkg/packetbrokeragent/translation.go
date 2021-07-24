@@ -94,7 +94,7 @@ var (
 	}
 )
 
-func fromPBDataRate(region packetbroker.Region, index int) (ttnpb.DataRate, bool) {
+func fromPBDataRateIndex(region packetbroker.Region, index int) (ttnpb.DataRate, bool) {
 	bandID, ok := fromPBRegion[region]
 	if !ok {
 		return ttnpb.DataRate{}, false
@@ -129,6 +129,10 @@ func toPBDataRateIndex(region packetbroker.Region, dr ttnpb.DataRate) (uint32, b
 		}
 	}
 	return 0, false
+}
+
+func fromPBDataRate(region packetbroker.Region, dataRate *packetbroker.DataRate) (ttnpb.DataRate, bool) {
+
 }
 
 func fromPBLocation(loc *packetbroker.Location) *ttnpb.Location {
@@ -278,7 +282,8 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 	up := &packetbroker.UplinkMessage{
 		PhyPayload: &packetbroker.UplinkMessage_PHYPayload{
 			Teaser: &packetbroker.PHYPayloadTeaser{
-				Hash: hash[:],
+				Hash:   hash[:],
+				Length: uint32(len(msg.RawPayload)),
 			},
 			Value: &packetbroker.UplinkMessage_PHYPayload_Plain{
 				Plain: msg.RawPayload,
@@ -423,7 +428,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 var errWrapUplinkTokens = errors.DefineAborted("wrap_uplink_tokens", "wrap uplink tokens")
 
 func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, receivedAt time.Time, includeHops bool) (*ttnpb.UplinkMessage, error) {
-	dataRate, ok := fromPBDataRate(msg.Message.GatewayRegion, int(msg.Message.DataRateIndex))
+	dataRate, ok := fromPBDataRateIndex(msg.Message.GatewayRegion, int(msg.Message.DataRateIndex))
 	if !ok {
 		return nil, errUnknownDataRate.WithAttributes(
 			"index", msg.Message.DataRateIndex,
