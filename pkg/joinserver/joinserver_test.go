@@ -104,13 +104,6 @@ func TestHandleJoin(t *testing.T) {
 		a.So(err, should.NotBeNil)
 		a.So(res, should.BeNil)
 
-		// Empty JoinEUI.
-		req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
-		req.Payload.GetJoinRequestPayload().JoinEui = types.EUI64{}
-		res, err = js.HandleJoin(ctx, req, ClusterAuthorizer)
-		a.So(err, should.NotBeNil)
-		a.So(res, should.BeNil)
-
 		// Empty DevEUI.
 		req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 		req.Payload.GetJoinRequestPayload().DevEui = types.EUI64{}
