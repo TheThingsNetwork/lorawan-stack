@@ -17,11 +17,11 @@ package redis_test
 import (
 	"testing"
 
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestScheduledDownlinkMatcher(t *testing.T) {
@@ -78,7 +78,8 @@ func TestScheduledDownlinkMatcher(t *testing.T) {
 		down, err := m.Match(ctx, &ttnpb.TxAcknowledgment{
 			DownlinkMessage: &ttnpb.DownlinkMessage{
 				CorrelationIDs: []string{"ns:downlink:OTHERCORRELATIONID"},
-			}})
+			},
+		})
 		a.So(errors.IsNotFound(err), should.BeTrue)
 		a.So(down, should.BeNil)
 	})
