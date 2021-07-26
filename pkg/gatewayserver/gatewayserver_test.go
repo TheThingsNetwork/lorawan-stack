@@ -25,6 +25,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/gogo/protobuf/proto"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
@@ -291,7 +292,7 @@ func TestGatewayServer(t *testing.T) {
 									return
 								case up := <-upCh:
 									for _, msg := range up.UplinkMessages {
-										buf, err := msg.Marshal()
+										buf, err := proto.Marshal(msg)
 										if err != nil {
 											cancel(err)
 											return
@@ -302,7 +303,7 @@ func TestGatewayServer(t *testing.T) {
 										}
 									}
 									if up.GatewayStatus != nil {
-										buf, err := up.GatewayStatus.Marshal()
+										buf, err := proto.Marshal(up.GatewayStatus)
 										if err != nil {
 											cancel(err)
 											return
@@ -313,7 +314,7 @@ func TestGatewayServer(t *testing.T) {
 										}
 									}
 									if up.TxAcknowledgment != nil {
-										buf, err := up.TxAcknowledgment.Marshal()
+										buf, err := proto.Marshal(up.TxAcknowledgment)
 										if err != nil {
 											cancel(err)
 											return
@@ -329,7 +330,7 @@ func TestGatewayServer(t *testing.T) {
 						// Read downstream.
 						token := client.Subscribe(fmt.Sprintf("v3/%v/down", unique.ID(ctx, ids)), 1, func(_ mqtt.Client, raw mqtt.Message) {
 							var msg ttnpb.GatewayDown
-							if err := msg.Unmarshal(raw.Payload()); err != nil {
+							if err := proto.Unmarshal(raw.Payload(), &msg); err != nil {
 								cancel(err)
 								return
 							}

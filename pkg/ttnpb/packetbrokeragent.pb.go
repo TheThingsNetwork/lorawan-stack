@@ -16,7 +16,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	io "io"
 	math "math"
 	math_bits "math/bits"
 	reflect "reflect"
@@ -63,25 +62,16 @@ func (*PacketBrokerGateway) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{0}
 }
 func (m *PacketBrokerGateway) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerGateway.Unmarshal(m, b)
 }
 func (m *PacketBrokerGateway) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerGateway.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerGateway.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerGateway) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerGateway.Merge(m, src)
 }
 func (m *PacketBrokerGateway) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerGateway.Size(m)
 }
 func (m *PacketBrokerGateway) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerGateway.DiscardUnknown(m)
@@ -174,25 +164,16 @@ func (*PacketBrokerGateway_GatewayIdentifiers) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{0, 0}
 }
 func (m *PacketBrokerGateway_GatewayIdentifiers) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerGateway_GatewayIdentifiers.Unmarshal(m, b)
 }
 func (m *PacketBrokerGateway_GatewayIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerGateway_GatewayIdentifiers.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerGateway_GatewayIdentifiers.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerGateway_GatewayIdentifiers) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerGateway_GatewayIdentifiers.Merge(m, src)
 }
 func (m *PacketBrokerGateway_GatewayIdentifiers) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerGateway_GatewayIdentifiers.Size(m)
 }
 func (m *PacketBrokerGateway_GatewayIdentifiers) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerGateway_GatewayIdentifiers.DiscardUnknown(m)
@@ -228,25 +209,16 @@ func (*UpdatePacketBrokerGatewayRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{1}
 }
 func (m *UpdatePacketBrokerGatewayRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_UpdatePacketBrokerGatewayRequest.Unmarshal(m, b)
 }
 func (m *UpdatePacketBrokerGatewayRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_UpdatePacketBrokerGatewayRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_UpdatePacketBrokerGatewayRequest.Marshal(b, m, deterministic)
 }
 func (m *UpdatePacketBrokerGatewayRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_UpdatePacketBrokerGatewayRequest.Merge(m, src)
 }
 func (m *UpdatePacketBrokerGatewayRequest) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_UpdatePacketBrokerGatewayRequest.Size(m)
 }
 func (m *UpdatePacketBrokerGatewayRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_UpdatePacketBrokerGatewayRequest.DiscardUnknown(m)
@@ -281,25 +253,16 @@ func (*UpdatePacketBrokerGatewayResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{2}
 }
 func (m *UpdatePacketBrokerGatewayResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_UpdatePacketBrokerGatewayResponse.Unmarshal(m, b)
 }
 func (m *UpdatePacketBrokerGatewayResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_UpdatePacketBrokerGatewayResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_UpdatePacketBrokerGatewayResponse.Marshal(b, m, deterministic)
 }
 func (m *UpdatePacketBrokerGatewayResponse) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_UpdatePacketBrokerGatewayResponse.Merge(m, src)
 }
 func (m *UpdatePacketBrokerGatewayResponse) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_UpdatePacketBrokerGatewayResponse.Size(m)
 }
 func (m *UpdatePacketBrokerGatewayResponse) XXX_DiscardUnknown() {
 	xxx_messageInfo_UpdatePacketBrokerGatewayResponse.DiscardUnknown(m)
@@ -329,25 +292,16 @@ func (*PacketBrokerNetworkIdentifier) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{3}
 }
 func (m *PacketBrokerNetworkIdentifier) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerNetworkIdentifier.Unmarshal(m, b)
 }
 func (m *PacketBrokerNetworkIdentifier) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerNetworkIdentifier.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerNetworkIdentifier.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerNetworkIdentifier) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerNetworkIdentifier.Merge(m, src)
 }
 func (m *PacketBrokerNetworkIdentifier) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerNetworkIdentifier.Size(m)
 }
 func (m *PacketBrokerNetworkIdentifier) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerNetworkIdentifier.DiscardUnknown(m)
@@ -382,25 +336,16 @@ func (*PacketBrokerDevAddrBlock) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{4}
 }
 func (m *PacketBrokerDevAddrBlock) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerDevAddrBlock.Unmarshal(m, b)
 }
 func (m *PacketBrokerDevAddrBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerDevAddrBlock.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerDevAddrBlock.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerDevAddrBlock) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerDevAddrBlock.Merge(m, src)
 }
 func (m *PacketBrokerDevAddrBlock) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerDevAddrBlock.Size(m)
 }
 func (m *PacketBrokerDevAddrBlock) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerDevAddrBlock.DiscardUnknown(m)
@@ -443,25 +388,16 @@ func (*PacketBrokerNetwork) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{5}
 }
 func (m *PacketBrokerNetwork) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerNetwork.Unmarshal(m, b)
 }
 func (m *PacketBrokerNetwork) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerNetwork.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerNetwork.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerNetwork) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerNetwork.Merge(m, src)
 }
 func (m *PacketBrokerNetwork) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerNetwork.Size(m)
 }
 func (m *PacketBrokerNetwork) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerNetwork.DiscardUnknown(m)
@@ -516,25 +452,16 @@ func (*PacketBrokerNetworks) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{6}
 }
 func (m *PacketBrokerNetworks) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerNetworks.Unmarshal(m, b)
 }
 func (m *PacketBrokerNetworks) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerNetworks.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerNetworks.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerNetworks) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerNetworks.Merge(m, src)
 }
 func (m *PacketBrokerNetworks) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerNetworks.Size(m)
 }
 func (m *PacketBrokerNetworks) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerNetworks.DiscardUnknown(m)
@@ -566,25 +493,16 @@ func (*PacketBrokerInfo) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{7}
 }
 func (m *PacketBrokerInfo) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerInfo.Unmarshal(m, b)
 }
 func (m *PacketBrokerInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerInfo.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerInfo.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerInfo) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerInfo.Merge(m, src)
 }
 func (m *PacketBrokerInfo) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerInfo.Size(m)
 }
 func (m *PacketBrokerInfo) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerInfo.DiscardUnknown(m)
@@ -634,25 +552,16 @@ func (*PacketBrokerRoutingPolicyUplink) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{8}
 }
 func (m *PacketBrokerRoutingPolicyUplink) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerRoutingPolicyUplink.Unmarshal(m, b)
 }
 func (m *PacketBrokerRoutingPolicyUplink) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerRoutingPolicyUplink.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerRoutingPolicyUplink.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerRoutingPolicyUplink) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerRoutingPolicyUplink.Merge(m, src)
 }
 func (m *PacketBrokerRoutingPolicyUplink) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerRoutingPolicyUplink.Size(m)
 }
 func (m *PacketBrokerRoutingPolicyUplink) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerRoutingPolicyUplink.DiscardUnknown(m)
@@ -712,25 +621,16 @@ func (*PacketBrokerRoutingPolicyDownlink) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{9}
 }
 func (m *PacketBrokerRoutingPolicyDownlink) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerRoutingPolicyDownlink.Unmarshal(m, b)
 }
 func (m *PacketBrokerRoutingPolicyDownlink) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerRoutingPolicyDownlink.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerRoutingPolicyDownlink.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerRoutingPolicyDownlink) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerRoutingPolicyDownlink.Merge(m, src)
 }
 func (m *PacketBrokerRoutingPolicyDownlink) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerRoutingPolicyDownlink.Size(m)
 }
 func (m *PacketBrokerRoutingPolicyDownlink) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerRoutingPolicyDownlink.DiscardUnknown(m)
@@ -776,25 +676,16 @@ func (*PacketBrokerDefaultRoutingPolicy) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{10}
 }
 func (m *PacketBrokerDefaultRoutingPolicy) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerDefaultRoutingPolicy.Unmarshal(m, b)
 }
 func (m *PacketBrokerDefaultRoutingPolicy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerDefaultRoutingPolicy.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerDefaultRoutingPolicy.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerDefaultRoutingPolicy) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerDefaultRoutingPolicy.Merge(m, src)
 }
 func (m *PacketBrokerDefaultRoutingPolicy) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerDefaultRoutingPolicy.Size(m)
 }
 func (m *PacketBrokerDefaultRoutingPolicy) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerDefaultRoutingPolicy.DiscardUnknown(m)
@@ -844,25 +735,16 @@ func (*PacketBrokerRoutingPolicy) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{11}
 }
 func (m *PacketBrokerRoutingPolicy) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerRoutingPolicy.Unmarshal(m, b)
 }
 func (m *PacketBrokerRoutingPolicy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerRoutingPolicy.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerRoutingPolicy.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerRoutingPolicy) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerRoutingPolicy.Merge(m, src)
 }
 func (m *PacketBrokerRoutingPolicy) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerRoutingPolicy.Size(m)
 }
 func (m *PacketBrokerRoutingPolicy) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerRoutingPolicy.DiscardUnknown(m)
@@ -922,25 +804,16 @@ func (*SetPacketBrokerDefaultRoutingPolicyRequest) Descriptor() ([]byte, []int) 
 	return fileDescriptor_1a44242dc5cd678e, []int{12}
 }
 func (m *SetPacketBrokerDefaultRoutingPolicyRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_SetPacketBrokerDefaultRoutingPolicyRequest.Unmarshal(m, b)
 }
 func (m *SetPacketBrokerDefaultRoutingPolicyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_SetPacketBrokerDefaultRoutingPolicyRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_SetPacketBrokerDefaultRoutingPolicyRequest.Marshal(b, m, deterministic)
 }
 func (m *SetPacketBrokerDefaultRoutingPolicyRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_SetPacketBrokerDefaultRoutingPolicyRequest.Merge(m, src)
 }
 func (m *SetPacketBrokerDefaultRoutingPolicyRequest) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_SetPacketBrokerDefaultRoutingPolicyRequest.Size(m)
 }
 func (m *SetPacketBrokerDefaultRoutingPolicyRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_SetPacketBrokerDefaultRoutingPolicyRequest.DiscardUnknown(m)
@@ -977,25 +850,16 @@ func (*ListHomeNetworkRoutingPoliciesRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{13}
 }
 func (m *ListHomeNetworkRoutingPoliciesRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_ListHomeNetworkRoutingPoliciesRequest.Unmarshal(m, b)
 }
 func (m *ListHomeNetworkRoutingPoliciesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ListHomeNetworkRoutingPoliciesRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_ListHomeNetworkRoutingPoliciesRequest.Marshal(b, m, deterministic)
 }
 func (m *ListHomeNetworkRoutingPoliciesRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ListHomeNetworkRoutingPoliciesRequest.Merge(m, src)
 }
 func (m *ListHomeNetworkRoutingPoliciesRequest) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_ListHomeNetworkRoutingPoliciesRequest.Size(m)
 }
 func (m *ListHomeNetworkRoutingPoliciesRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_ListHomeNetworkRoutingPoliciesRequest.DiscardUnknown(m)
@@ -1029,25 +893,16 @@ func (*PacketBrokerRoutingPolicies) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{14}
 }
 func (m *PacketBrokerRoutingPolicies) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerRoutingPolicies.Unmarshal(m, b)
 }
 func (m *PacketBrokerRoutingPolicies) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerRoutingPolicies.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerRoutingPolicies.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerRoutingPolicies) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerRoutingPolicies.Merge(m, src)
 }
 func (m *PacketBrokerRoutingPolicies) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerRoutingPolicies.Size(m)
 }
 func (m *PacketBrokerRoutingPolicies) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerRoutingPolicies.DiscardUnknown(m)
@@ -1079,25 +934,16 @@ func (*SetPacketBrokerRoutingPolicyRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{15}
 }
 func (m *SetPacketBrokerRoutingPolicyRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_SetPacketBrokerRoutingPolicyRequest.Unmarshal(m, b)
 }
 func (m *SetPacketBrokerRoutingPolicyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_SetPacketBrokerRoutingPolicyRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_SetPacketBrokerRoutingPolicyRequest.Marshal(b, m, deterministic)
 }
 func (m *SetPacketBrokerRoutingPolicyRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_SetPacketBrokerRoutingPolicyRequest.Merge(m, src)
 }
 func (m *SetPacketBrokerRoutingPolicyRequest) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_SetPacketBrokerRoutingPolicyRequest.Size(m)
 }
 func (m *SetPacketBrokerRoutingPolicyRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_SetPacketBrokerRoutingPolicyRequest.DiscardUnknown(m)
@@ -1147,25 +993,16 @@ func (*ListPacketBrokerNetworksRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{16}
 }
 func (m *ListPacketBrokerNetworksRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_ListPacketBrokerNetworksRequest.Unmarshal(m, b)
 }
 func (m *ListPacketBrokerNetworksRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ListPacketBrokerNetworksRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_ListPacketBrokerNetworksRequest.Marshal(b, m, deterministic)
 }
 func (m *ListPacketBrokerNetworksRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ListPacketBrokerNetworksRequest.Merge(m, src)
 }
 func (m *ListPacketBrokerNetworksRequest) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_ListPacketBrokerNetworksRequest.Size(m)
 }
 func (m *ListPacketBrokerNetworksRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_ListPacketBrokerNetworksRequest.DiscardUnknown(m)
@@ -1227,25 +1064,16 @@ func (*ListPacketBrokerHomeNetworksRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{17}
 }
 func (m *ListPacketBrokerHomeNetworksRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_ListPacketBrokerHomeNetworksRequest.Unmarshal(m, b)
 }
 func (m *ListPacketBrokerHomeNetworksRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ListPacketBrokerHomeNetworksRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_ListPacketBrokerHomeNetworksRequest.Marshal(b, m, deterministic)
 }
 func (m *ListPacketBrokerHomeNetworksRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ListPacketBrokerHomeNetworksRequest.Merge(m, src)
 }
 func (m *ListPacketBrokerHomeNetworksRequest) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_ListPacketBrokerHomeNetworksRequest.Size(m)
 }
 func (m *ListPacketBrokerHomeNetworksRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_ListPacketBrokerHomeNetworksRequest.DiscardUnknown(m)
@@ -1298,25 +1126,16 @@ func (*ListForwarderRoutingPoliciesRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1a44242dc5cd678e, []int{18}
 }
 func (m *ListForwarderRoutingPoliciesRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_ListForwarderRoutingPoliciesRequest.Unmarshal(m, b)
 }
 func (m *ListForwarderRoutingPoliciesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ListForwarderRoutingPoliciesRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_ListForwarderRoutingPoliciesRequest.Marshal(b, m, deterministic)
 }
 func (m *ListForwarderRoutingPoliciesRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ListForwarderRoutingPoliciesRequest.Merge(m, src)
 }
 func (m *ListForwarderRoutingPoliciesRequest) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_ListForwarderRoutingPoliciesRequest.Size(m)
 }
 func (m *ListForwarderRoutingPoliciesRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_ListForwarderRoutingPoliciesRequest.DiscardUnknown(m)
@@ -1396,143 +1215,142 @@ func init() {
 }
 
 var fileDescriptor_1a44242dc5cd678e = []byte{
-	// 2168 bytes of a gzipped FileDescriptorProto
+	// 2158 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0x4d, 0x6c, 0x1b, 0xc7,
 	0x15, 0xf6, 0x92, 0xfa, 0xa1, 0x1e, 0x45, 0xfd, 0x8c, 0x65, 0x77, 0x4d, 0xd9, 0x14, 0xbd, 0x92,
 	0x10, 0x5a, 0x8e, 0x48, 0x85, 0xb6, 0x83, 0xda, 0x68, 0xea, 0x8a, 0x96, 0xac, 0xa8, 0x8d, 0x53,
 	0x79, 0x15, 0xc5, 0x85, 0x0c, 0x67, 0x3b, 0xe4, 0x0e, 0xa9, 0xad, 0x96, 0xbb, 0x9b, 0xdd, 0xa1,
 	0x64, 0xc5, 0x31, 0x5a, 0x14, 0xbd, 0x34, 0xa7, 0xc2, 0x05, 0xda, 0x43, 0x2f, 0x45, 0x0e, 0x41,
-	0xd2, 0x63, 0x8f, 0x3d, 0x14, 0xbd, 0x14, 0x68, 0x81, 0x1e, 0x8a, 0x16, 0x05, 0xd2, 0x1e, 0x82,
-	0x56, 0xee, 0x21, 0xe8, 0xa9, 0x97, 0x5c, 0x74, 0x0a, 0x76, 0x76, 0x96, 0x5c, 0x72, 0xf9, 0x27,
-	0xc9, 0x39, 0x91, 0x3b, 0xf3, 0xbd, 0xb7, 0xdf, 0x7b, 0xef, 0x9b, 0x99, 0x37, 0x0b, 0x57, 0x74,
-	0xd3, 0xc6, 0xfb, 0xd8, 0x58, 0x74, 0x28, 0x2e, 0xed, 0xe6, 0xb0, 0xa5, 0xe5, 0x2c, 0x5c, 0xda,
-	0x25, 0xb4, 0x68, 0x9b, 0xbb, 0xc4, 0xc6, 0x15, 0x62, 0xd0, 0xac, 0x65, 0x9b, 0xd4, 0x44, 0x63,
-	0x94, 0x1a, 0x59, 0x0e, 0xcf, 0xee, 0x5d, 0x4b, 0x2e, 0x57, 0x34, 0xba, 0x53, 0x2b, 0x66, 0x4b,
-	0x66, 0x35, 0x47, 0x8c, 0x3d, 0xf3, 0xc0, 0xb2, 0xcd, 0xc7, 0x07, 0x39, 0x06, 0x2e, 0x2d, 0x56,
-	0x88, 0xb1, 0xb8, 0x87, 0x75, 0x4d, 0xc5, 0x94, 0xe4, 0x42, 0x7f, 0x3c, 0x97, 0xc9, 0xc5, 0x80,
-	0x8b, 0x8a, 0x59, 0x31, 0x3d, 0xe3, 0x62, 0xad, 0xcc, 0x9e, 0xd8, 0x03, 0xfb, 0xc7, 0xe1, 0x17,
-	0x2b, 0xa6, 0x59, 0xd1, 0x09, 0x63, 0x89, 0x0d, 0xc3, 0xa4, 0x98, 0x6a, 0xa6, 0xe1, 0xf0, 0xd9,
-	0x14, 0x9f, 0xad, 0xfb, 0x50, 0x6b, 0x36, 0x03, 0xf0, 0xf9, 0xe9, 0xd6, 0x79, 0x52, 0xb5, 0xe8,
-	0x01, 0x9f, 0x4c, 0xb7, 0x4e, 0x96, 0x35, 0xa2, 0xab, 0x4a, 0x15, 0x3b, 0xbb, 0x1c, 0x31, 0xd3,
-	0x8a, 0xa0, 0x5a, 0x95, 0x38, 0x14, 0x57, 0xad, 0x4e, 0xef, 0xdf, 0xb7, 0xb1, 0x65, 0x11, 0xdb,
-	0xe7, 0x37, 0x17, 0x4e, 0x75, 0xc9, 0x34, 0x28, 0x2e, 0x51, 0x45, 0x33, 0xca, 0x7e, 0x8c, 0x33,
-	0x61, 0x54, 0x05, 0x53, 0xb2, 0x8f, 0x7d, 0xa6, 0x52, 0x18, 0x40, 0x0c, 0x55, 0x51, 0xc9, 0x9e,
-	0x56, 0xf2, 0xf3, 0x9a, 0x0e, 0x63, 0xaa, 0xc4, 0x71, 0x70, 0x85, 0x70, 0x32, 0xd2, 0x17, 0x83,
-	0x70, 0x76, 0x83, 0x15, 0xba, 0xc0, 0x0a, 0xbd, 0xe6, 0xbd, 0x03, 0xc9, 0x10, 0xd5, 0x54, 0x47,
-	0x14, 0xd2, 0x42, 0x26, 0x9e, 0x7f, 0x35, 0xdb, 0x5c, 0xf2, 0x6c, 0x1b, 0x8b, 0x2c, 0xff, 0x5d,
-	0x57, 0x89, 0x41, 0xb5, 0xb2, 0x46, 0x6c, 0xa7, 0x10, 0x3b, 0x2a, 0x0c, 0x7e, 0x20, 0x44, 0x26,
-	0x04, 0xd9, 0x75, 0x86, 0x5e, 0x87, 0xd1, 0x60, 0xa0, 0xe2, 0x70, 0x3a, 0x9a, 0x89, 0xe7, 0xa7,
-	0x5b, 0x9d, 0xdf, 0xf1, 0x30, 0xeb, 0x46, 0xd9, 0x64, 0x1e, 0x9e, 0x09, 0x91, 0x09, 0x90, 0xe3,
-	0xa5, 0xc6, 0x30, 0x5a, 0x81, 0x18, 0x36, 0x28, 0x31, 0x0c, 0xec, 0x88, 0x09, 0xe6, 0x25, 0xd5,
-	0xea, 0x85, 0xd3, 0x59, 0xf6, 0x60, 0x75, 0x47, 0x31, 0xb9, 0x6e, 0x89, 0x66, 0x21, 0xe1, 0x50,
-	0x4c, 0x6b, 0x8e, 0x62, 0xd5, 0x8a, 0xba, 0x56, 0x12, 0xc7, 0xd2, 0x42, 0x26, 0x26, 0x8f, 0x7a,
-	0x83, 0x1b, 0x6c, 0x0c, 0xbd, 0x04, 0xe3, 0xba, 0x59, 0x62, 0xfa, 0xf1, 0x61, 0xe3, 0x0c, 0x36,
-	0xe6, 0x0f, 0x73, 0xe0, 0x37, 0x00, 0x95, 0x6d, 0xf2, 0x6e, 0x8d, 0x18, 0xa5, 0x03, 0xc5, 0xd2,
-	0xb1, 0xa1, 0xb8, 0x09, 0x9c, 0x4a, 0x47, 0x33, 0x23, 0x85, 0xb1, 0xa3, 0x42, 0xfc, 0x99, 0x10,
-	0x9b, 0x88, 0x49, 0x03, 0x76, 0x44, 0xfc, 0x96, 0x3c, 0x51, 0x47, 0x6e, 0xe8, 0xd8, 0x58, 0x57,
-	0x1d, 0xf4, 0x1a, 0x4c, 0xd7, 0x2c, 0x77, 0x45, 0x28, 0xf5, 0xb7, 0x95, 0x6d, 0xb3, 0xaa, 0x78,
-	0x5c, 0xc4, 0x73, 0xec, 0x95, 0xa2, 0x07, 0x79, 0x83, 0x23, 0xee, 0xda, 0x66, 0x75, 0x93, 0xcd,
-	0xa3, 0xf3, 0x30, 0x64, 0x1a, 0xba, 0x66, 0x10, 0xf1, 0x22, 0x43, 0xf2, 0x27, 0x74, 0x1d, 0x86,
-	0xed, 0xc7, 0x8a, 0x8d, 0x29, 0x11, 0x2f, 0xb1, 0x52, 0x4e, 0x67, 0x3d, 0x75, 0x66, 0x7d, 0x75,
-	0x66, 0xef, 0xea, 0x26, 0xa6, 0x6f, 0x63, 0xbd, 0x46, 0xe4, 0x21, 0xfb, 0xb1, 0x8c, 0x29, 0xb3,
-	0xa2, 0xdc, 0x2a, 0xd5, 0x87, 0x15, 0x65, 0x56, 0xc9, 0xdf, 0x08, 0x80, 0xc2, 0x22, 0x40, 0x6b,
-	0x00, 0x5c, 0xb8, 0x8a, 0xa6, 0x32, 0x41, 0x8d, 0x14, 0x32, 0x47, 0x85, 0x79, 0x7b, 0x56, 0x9c,
-	0xcb, 0xcf, 0xbc, 0xf3, 0x10, 0x2f, 0xbe, 0xb7, 0xb4, 0x78, 0xf3, 0x51, 0xe6, 0xf6, 0xad, 0x87,
-	0xca, 0xe2, 0xa3, 0xdb, 0xfe, 0xf3, 0x95, 0x27, 0xf9, 0x97, 0x9f, 0xce, 0xc9, 0x23, 0x15, 0xdf,
-	0x23, 0xfa, 0x0e, 0x44, 0x49, 0x4d, 0x13, 0x23, 0x69, 0x21, 0x33, 0x5a, 0xb8, 0xf9, 0xaf, 0xcf,
-	0x66, 0x6e, 0x54, 0xcc, 0x2c, 0xdd, 0x21, 0x74, 0x47, 0x33, 0x2a, 0x4e, 0xd6, 0x20, 0x74, 0xdf,
-	0xb4, 0x77, 0x73, 0xcd, 0x92, 0xdf, 0xbb, 0x96, 0xb3, 0x76, 0x2b, 0x39, 0x7a, 0x60, 0x11, 0x27,
-	0xbb, 0xba, 0xb5, 0xfe, 0xea, 0x75, 0xd9, 0xf5, 0x22, 0x7d, 0x24, 0x40, 0x7a, 0x8b, 0x65, 0xb3,
-	0x8d, 0x96, 0x65, 0xb7, 0x38, 0x0e, 0x45, 0x6b, 0x30, 0xcc, 0x5f, 0xcf, 0x17, 0xc2, 0x6c, 0x1f,
-	0x0b, 0x21, 0xa0, 0x7a, 0xdf, 0x1a, 0xdd, 0x04, 0x68, 0xec, 0x23, 0xe2, 0x20, 0xf3, 0x95, 0x0c,
-	0xe7, 0xd4, 0x85, 0xdc, 0xc3, 0xce, 0xae, 0x3c, 0x52, 0xf6, 0xff, 0x4a, 0x8f, 0xe0, 0x72, 0x17,
-	0x9e, 0x8e, 0x65, 0x1a, 0x0e, 0x41, 0x5f, 0x07, 0xf0, 0x0a, 0xae, 0x50, 0xaa, 0x73, 0xae, 0x17,
-	0x42, 0xfe, 0x57, 0xf8, 0x3e, 0x28, 0x8f, 0x78, 0xe0, 0xb7, 0xa8, 0x2e, 0xfd, 0x10, 0x2e, 0x05,
-	0x1d, 0xbf, 0xe9, 0x25, 0xb1, 0x51, 0x3f, 0x74, 0x0e, 0x86, 0x0c, 0x42, 0xfd, 0xd2, 0x25, 0xe4,
-	0x41, 0x83, 0xd0, 0x75, 0x15, 0xad, 0xc1, 0x08, 0x25, 0x06, 0x36, 0xd8, 0x4c, 0x84, 0x15, 0x75,
-	0xe1, 0xa8, 0xf0, 0x92, 0x3d, 0x2f, 0xce, 0xe5, 0x2f, 0x37, 0x15, 0x35, 0x54, 0xd3, 0xf7, 0xdf,
-	0x99, 0x93, 0x63, 0x9e, 0xf1, 0xba, 0x2a, 0xfd, 0x56, 0x00, 0x31, 0xc8, 0x60, 0x85, 0xec, 0x2d,
-	0xab, 0xaa, 0x5d, 0xd0, 0xcd, 0xd2, 0x2e, 0x5a, 0x85, 0x71, 0x95, 0xec, 0x29, 0x58, 0x55, 0x6d,
-	0xc5, 0xb2, 0x49, 0x59, 0x7b, 0xcc, 0x83, 0xbb, 0xd4, 0x5a, 0x08, 0x6e, 0xb6, 0xc1, 0x40, 0x72,
-	0x42, 0x0d, 0x3e, 0xa2, 0xef, 0xc2, 0xd7, 0x76, 0xcc, 0x2a, 0x51, 0xb8, 0x44, 0x94, 0x92, 0x5e,
-	0x73, 0x28, 0xb1, 0x1b, 0xd4, 0xc5, 0xc3, 0xcf, 0x66, 0xa6, 0x5e, 0x37, 0xab, 0x84, 0xc7, 0x7f,
-	0xc7, 0x03, 0xac, 0xaf, 0xc8, 0x53, 0x3b, 0xe1, 0x51, 0x55, 0x7a, 0x16, 0x69, 0xde, 0x35, 0x39,
-	0x00, 0xbd, 0x06, 0x11, 0x9e, 0xa8, 0x78, 0x7e, 0xb1, 0x9b, 0x56, 0x42, 0x79, 0x96, 0x23, 0x9a,
-	0x8a, 0x10, 0x0c, 0x18, 0xb8, 0x4a, 0x3c, 0x52, 0x32, 0xfb, 0x8f, 0x36, 0x02, 0x29, 0x28, 0xba,
-	0x49, 0x71, 0xc4, 0x28, 0xdb, 0xf1, 0x32, 0xdd, 0xfc, 0x07, 0xb3, 0x58, 0xcf, 0x06, 0x7b, 0x72,
-	0xd0, 0x37, 0x5b, 0xb6, 0xe1, 0x81, 0x9e, 0xdb, 0x70, 0xf3, 0xe6, 0x7b, 0x1e, 0x86, 0x74, 0xcd,
-	0xa1, 0x44, 0x65, 0x42, 0x8e, 0xc9, 0xfc, 0x49, 0x7a, 0x00, 0x53, 0x6d, 0x42, 0x74, 0xd0, 0x6d,
-	0x88, 0xf1, 0xc4, 0xbb, 0xe7, 0x49, 0xb4, 0xd7, 0x32, 0xe2, 0x76, 0x72, 0xdd, 0x48, 0xfa, 0x9d,
-	0x00, 0x13, 0x41, 0x04, 0x63, 0xb1, 0x06, 0xa3, 0x36, 0xa9, 0x68, 0x0e, 0xf5, 0x34, 0xdd, 0xcf,
-	0x02, 0xf5, 0x3d, 0x37, 0x19, 0xa2, 0xab, 0x30, 0x59, 0x36, 0xed, 0x7d, 0x6c, 0xab, 0xc4, 0x56,
-	0x88, 0x81, 0x8b, 0x3a, 0xf1, 0x64, 0x11, 0x93, 0x27, 0xea, 0x13, 0xab, 0xde, 0x38, 0x5a, 0x82,
-	0xa9, 0x26, 0x25, 0xf9, 0xf8, 0x28, 0xc3, 0xa3, 0x80, 0x58, 0xb8, 0x85, 0xf4, 0x0f, 0x01, 0x66,
-	0x82, 0x24, 0x64, 0xb3, 0x46, 0x35, 0xa3, 0xb2, 0x61, 0xea, 0x5a, 0xe9, 0x60, 0xcb, 0xd2, 0x35,
-	0x63, 0x17, 0x5d, 0x86, 0xd1, 0x1f, 0x98, 0x9a, 0xa1, 0xd8, 0xde, 0xbe, 0xc3, 0x62, 0x89, 0xc9,
-	0x71, 0x77, 0xcc, 0xdf, 0x8a, 0x2e, 0x40, 0xac, 0x8a, 0x4b, 0x8a, 0x8a, 0x29, 0xe6, 0xe4, 0x86,
-	0xab, 0xb8, 0xb4, 0x82, 0x29, 0x46, 0x57, 0x60, 0x02, 0x5b, 0x96, 0xae, 0xf1, 0x63, 0x83, 0x41,
-	0x3c, 0x3e, 0xe3, 0x81, 0x71, 0x06, 0x9d, 0x87, 0x31, 0x47, 0xab, 0x18, 0x58, 0x57, 0xde, 0xad,
-	0x61, 0x5d, 0xa3, 0x07, 0xe2, 0x00, 0x03, 0x26, 0xbc, 0xd1, 0xfb, 0xde, 0x20, 0x92, 0x60, 0xd4,
-	0x3d, 0x85, 0x74, 0xed, 0x3d, 0x2f, 0xb7, 0x5e, 0x9d, 0x9b, 0xc6, 0xa4, 0x0f, 0x04, 0xb8, 0xdc,
-	0x31, 0xae, 0x15, 0x73, 0xdf, 0x60, 0x91, 0xcd, 0x00, 0x8b, 0x42, 0xc1, 0xa5, 0x12, 0xb1, 0xfc,
-	0xc0, 0xc0, 0x1d, 0x5a, 0x66, 0x23, 0x2f, 0x26, 0x2e, 0xe9, 0x0b, 0x01, 0xd2, 0xcd, 0xf2, 0x2f,
-	0xe3, 0x9a, 0x4e, 0x9b, 0x38, 0xb9, 0x9b, 0xb0, 0x77, 0x7e, 0xaa, 0x0a, 0xa6, 0x5c, 0x2f, 0xe1,
-	0x4d, 0xf8, 0x2d, 0xbf, 0x9b, 0x93, 0x47, 0x38, 0x7a, 0xd9, 0x3d, 0x08, 0x86, 0x6a, 0xac, 0x54,
-	0x8c, 0x63, 0x3c, 0x9f, 0xeb, 0x26, 0xb3, 0x36, 0x15, 0x96, 0xb9, 0x39, 0xba, 0x07, 0x31, 0x95,
-	0xe7, 0x86, 0xc5, 0x12, 0xcf, 0xbf, 0xd2, 0xb7, 0x2b, 0x3f, 0xa9, 0x72, 0xdd, 0x85, 0xf4, 0xcb,
-	0x28, 0x5c, 0xe8, 0x88, 0x47, 0x1b, 0x30, 0xda, 0x50, 0xf6, 0x49, 0xf7, 0xa5, 0x78, 0xdd, 0xc5,
-	0xba, 0x8a, 0xb6, 0x60, 0xbc, 0x49, 0xfe, 0x7c, 0x03, 0x3d, 0xb6, 0xd3, 0x44, 0x60, 0xa1, 0xac,
-	0xab, 0x2d, 0x95, 0x89, 0x9e, 0xac, 0x32, 0x03, 0x2f, 0xae, 0x32, 0x83, 0xa7, 0xaf, 0xcc, 0xa7,
-	0x02, 0x2c, 0x6c, 0x12, 0xda, 0x4b, 0x94, 0xfe, 0xf2, 0xbe, 0x5f, 0x0f, 0x43, 0x38, 0x51, 0x18,
-	0x81, 0xa6, 0xc3, 0x0f, 0xe8, 0x41, 0x20, 0xa0, 0xc8, 0x09, 0x03, 0x0a, 0xb8, 0x6d, 0x84, 0xf6,
-	0x10, 0xe6, 0xdf, 0xd0, 0x1c, 0x1a, 0x38, 0x2e, 0x83, 0xb6, 0x1a, 0x71, 0xfc, 0xa0, 0x52, 0x30,
-	0xa8, 0x6b, 0x55, 0xcd, 0x5b, 0x6b, 0x09, 0xe6, 0x6b, 0x21, 0x2a, 0x7e, 0x3e, 0x2c, 0x7b, 0xc3,
-	0xee, 0x71, 0x67, 0xe1, 0x8a, 0x77, 0xdc, 0x25, 0x64, 0xf6, 0x5f, 0x52, 0x61, 0xba, 0x13, 0x2b,
-	0x8d, 0x38, 0x68, 0x15, 0x62, 0x16, 0xff, 0xcf, 0xcf, 0x92, 0x2b, 0x7d, 0x07, 0x25, 0xd7, 0x4d,
-	0xa5, 0x8f, 0x23, 0x30, 0xdb, 0x52, 0x9d, 0xb6, 0x65, 0x69, 0xa3, 0x77, 0xe1, 0x05, 0xe8, 0xfd,
-	0xfe, 0x29, 0xb7, 0x93, 0x1e, 0xd5, 0x8e, 0xbe, 0xc8, 0x6a, 0xff, 0x4f, 0x80, 0x19, 0xb7, 0xdc,
-	0xed, 0x8e, 0xf6, 0x53, 0x14, 0x1a, 0x65, 0xe1, 0xec, 0xbe, 0x46, 0x77, 0x14, 0xdb, 0x63, 0xa2,
-	0xb0, 0xda, 0x1c, 0xf0, 0x0d, 0x7e, 0xd2, 0x9d, 0x6a, 0xde, 0xcc, 0x6e, 0x00, 0xaa, 0x37, 0x9c,
-	0x0a, 0x6b, 0x47, 0x34, 0xc3, 0x61, 0x8b, 0x7e, 0xa4, 0x30, 0x7c, 0x54, 0x70, 0xef, 0x55, 0xaa,
-	0x3c, 0xe1, 0xb7, 0x95, 0x77, 0x38, 0x00, 0xbd, 0x0c, 0x09, 0xb7, 0x8d, 0x6a, 0x58, 0x0c, 0x36,
-	0x5b, 0x8c, 0xba, 0xb3, 0x3e, 0x5a, 0xfa, 0xbd, 0x00, 0xb3, 0xad, 0xc1, 0x06, 0x74, 0x7e, 0xaa,
-	0x80, 0xdb, 0x07, 0x10, 0x3d, 0x76, 0x00, 0x03, 0xdd, 0x02, 0xf8, 0x88, 0x07, 0x70, 0xd7, 0xdf,
-	0xb4, 0x3b, 0x2c, 0xcd, 0xaf, 0x48, 0xd8, 0x53, 0x7e, 0x5e, 0xbc, 0xc0, 0x5b, 0xb2, 0x11, 0x6d,
-	0x64, 0x23, 0xff, 0x17, 0x01, 0x06, 0xd7, 0x9c, 0x8d, 0x22, 0x46, 0xf7, 0x20, 0xc1, 0x6e, 0xd0,
-	0xce, 0x0e, 0xef, 0x86, 0xe6, 0x3a, 0x5c, 0xe5, 0xbd, 0xe9, 0x7b, 0xde, 0xf7, 0x8b, 0xe4, 0xf9,
-	0xd0, 0xf9, 0xb0, 0x5a, 0xb5, 0xe8, 0x01, 0xa2, 0x90, 0xf0, 0xee, 0x4b, 0xfe, 0x97, 0x8c, 0xa5,
-	0x56, 0x77, 0xbd, 0xae, 0x7d, 0xc9, 0x57, 0x8e, 0x61, 0xe1, 0x5d, 0xc0, 0xf2, 0x9b, 0x30, 0xf8,
-	0x26, 0x8b, 0xe6, 0xdb, 0x30, 0xce, 0xa3, 0x69, 0xf4, 0x40, 0xa1, 0xbb, 0x0a, 0x9f, 0xe9, 0x11,
-	0x4a, 0xfe, 0x8f, 0x93, 0x10, 0x75, 0x7d, 0xbe, 0x0d, 0xc3, 0x6b, 0x84, 0xf7, 0xde, 0xed, 0xa1,
-	0xc9, 0x74, 0xb7, 0xb2, 0xb9, 0x96, 0xd2, 0xe4, 0x8f, 0xff, 0xfe, 0xdf, 0x9f, 0x47, 0xe2, 0x68,
-	0x24, 0x67, 0x15, 0x71, 0xce, 0x6d, 0xfc, 0xd1, 0x3e, 0xc4, 0x64, 0xd6, 0x09, 0x13, 0xbb, 0xa3,
-	0xe3, 0x7e, 0x1a, 0x6a, 0x29, 0xcb, 0x7c, 0x67, 0x92, 0x93, 0xcc, 0x77, 0xb0, 0xbb, 0xde, 0x3e,
-	0x2b, 0x85, 0x07, 0xd1, 0x03, 0x80, 0x15, 0x62, 0xf7, 0x7a, 0x75, 0x87, 0x71, 0xe9, 0x02, 0x7b,
-	0xdb, 0xd9, 0x85, 0x36, 0x8e, 0x7f, 0x25, 0x80, 0xb4, 0x46, 0x82, 0x47, 0x53, 0xdb, 0x4e, 0xb0,
-	0xd3, 0x1b, 0x97, 0xba, 0x5f, 0xa9, 0xc2, 0x9e, 0xa4, 0xab, 0x8c, 0xcb, 0x3c, 0x9a, 0x65, 0x5c,
-	0xdc, 0xc5, 0xb0, 0xe8, 0x5f, 0x5b, 0x72, 0xfe, 0x69, 0x93, 0x53, 0x3d, 0x4b, 0xf4, 0x37, 0x01,
-	0xa4, 0xcd, 0xde, 0xec, 0x6e, 0xb5, 0xb2, 0xe8, 0xbf, 0x8f, 0xe8, 0x98, 0xb3, 0xef, 0x31, 0x9e,
-	0x72, 0xb2, 0x1f, 0x9e, 0xb7, 0x84, 0x85, 0xed, 0x8c, 0xd4, 0x27, 0x12, 0xfd, 0x44, 0x80, 0xf9,
-	0x15, 0xa2, 0x13, 0x4a, 0x4e, 0x9a, 0xf5, 0x4e, 0x9c, 0x79, 0x6e, 0x17, 0xfa, 0xca, 0xed, 0x27,
-	0x02, 0xa4, 0xba, 0x77, 0x25, 0xe8, 0x46, 0x6b, 0x5e, 0xfb, 0xea, 0x62, 0x92, 0x57, 0xfb, 0x3d,
-	0x47, 0xdd, 0xc6, 0x62, 0x96, 0x71, 0xbe, 0x84, 0xa6, 0xbb, 0x70, 0x46, 0xff, 0x14, 0x60, 0xba,
-	0x59, 0xa5, 0xcd, 0x89, 0x3a, 0xde, 0x1e, 0x9c, 0xec, 0xbf, 0x03, 0x92, 0xbe, 0xcf, 0xe8, 0x6d,
-	0xa3, 0xb9, 0x6e, 0x29, 0x7d, 0xe2, 0x7d, 0xef, 0x79, 0xba, 0x9d, 0x47, 0x4b, 0xfd, 0xe0, 0x72,
-	0x4f, 0xea, 0xe7, 0xda, 0x53, 0xf4, 0x8b, 0x28, 0x4c, 0x6f, 0x76, 0x89, 0xed, 0x5a, 0x0f, 0x71,
-	0x1f, 0x4b, 0xd5, 0x9f, 0x44, 0x58, 0x3c, 0x1f, 0x46, 0x92, 0xd7, 0xbb, 0x12, 0x6d, 0x39, 0xea,
-	0xb2, 0x9c, 0xb8, 0x2b, 0xf4, 0x9b, 0xd2, 0x89, 0x4d, 0xb7, 0x92, 0x1b, 0x27, 0x31, 0x0d, 0x4f,
-	0x34, 0xd2, 0xc7, 0xdc, 0x4a, 0x5f, 0x85, 0x5b, 0xf4, 0x67, 0x01, 0x52, 0xa1, 0x75, 0x7a, 0x2a,
-	0xdd, 0x75, 0xaa, 0x0a, 0x17, 0xd9, 0x42, 0x9f, 0x22, 0x5b, 0x38, 0xbe, 0xc8, 0xde, 0x87, 0x51,
-	0x77, 0xed, 0xd6, 0xbf, 0x30, 0xe5, 0xda, 0xad, 0xec, 0x2e, 0x0d, 0x6b, 0x72, 0xae, 0x8f, 0x48,
-	0x1d, 0xe9, 0x1c, 0x0b, 0x64, 0x1c, 0x25, 0x18, 0x41, 0x9f, 0x1b, 0xfa, 0xa9, 0x00, 0x13, 0x2d,
-	0x5b, 0x87, 0x13, 0xd6, 0x75, 0x1f, 0x6d, 0x64, 0x9f, 0x34, 0x92, 0x8c, 0xc6, 0x14, 0x42, 0xe1,
-	0x3c, 0xa1, 0x0f, 0x05, 0xb8, 0xd8, 0xad, 0xdf, 0x6b, 0xcf, 0xab, 0x47, 0x77, 0x78, 0xbc, 0x2d,
-	0x2f, 0xcd, 0xe8, 0x25, 0x91, 0xc8, 0xe8, 0xd5, 0xbf, 0x16, 0x34, 0x6a, 0x58, 0x78, 0xf4, 0xe9,
-	0x7f, 0x52, 0x67, 0x7e, 0x74, 0x98, 0x12, 0x3e, 0x3e, 0x4c, 0x09, 0x7f, 0x3a, 0x4c, 0x09, 0x7f,
-	0x3d, 0x4c, 0x09, 0xff, 0x3e, 0x4c, 0x09, 0x9f, 0x1f, 0xa6, 0xce, 0xfc, 0xff, 0x30, 0x25, 0xfc,
-	0xec, 0x79, 0xea, 0xcc, 0xaf, 0x9f, 0xa7, 0xce, 0xfc, 0xe1, 0x79, 0x4a, 0xd8, 0xce, 0x1d, 0xe3,
-	0xab, 0x3e, 0x35, 0xac, 0x62, 0x71, 0x88, 0xe9, 0xef, 0xda, 0x97, 0x01, 0x00, 0x00, 0xff, 0xff,
-	0x3c, 0x5e, 0x9f, 0xaf, 0xc3, 0x1c, 0x00, 0x00,
+	0xd2, 0x63, 0x8f, 0x3d, 0x14, 0xbd, 0xf4, 0x50, 0xa0, 0xa7, 0x16, 0x05, 0xd2, 0x1e, 0x82, 0x56,
+	0xee, 0x21, 0xe8, 0xa9, 0x97, 0x5c, 0x74, 0x0a, 0x76, 0x76, 0x96, 0x5c, 0x72, 0xf9, 0x27, 0xc9,
+	0x3e, 0x91, 0x3b, 0xf3, 0xbd, 0xb7, 0xdf, 0x7b, 0xef, 0x9b, 0x99, 0x37, 0x0b, 0x57, 0x74, 0xd3,
+	0xc6, 0xfb, 0xd8, 0x58, 0x74, 0x28, 0x2e, 0xed, 0xe6, 0xb0, 0xa5, 0xe5, 0x2c, 0x5c, 0xda, 0x25,
+	0xb4, 0x68, 0x9b, 0xbb, 0xc4, 0xc6, 0x15, 0x62, 0xd0, 0xac, 0x65, 0x9b, 0xd4, 0x44, 0x63, 0x94,
+	0x1a, 0x59, 0x0e, 0xcf, 0xee, 0x5d, 0x4b, 0x2e, 0x57, 0x34, 0xba, 0x53, 0x2b, 0x66, 0x4b, 0x66,
+	0x35, 0x47, 0x8c, 0x3d, 0xf3, 0xc0, 0xb2, 0xcd, 0xc7, 0x07, 0x39, 0x06, 0x2e, 0x2d, 0x56, 0x88,
+	0xb1, 0xb8, 0x87, 0x75, 0x4d, 0xc5, 0x94, 0xe4, 0x42, 0x7f, 0x3c, 0x97, 0xc9, 0xc5, 0x80, 0x8b,
+	0x8a, 0x59, 0x31, 0x3d, 0xe3, 0x62, 0xad, 0xcc, 0x9e, 0xd8, 0x03, 0xfb, 0xc7, 0xe1, 0x17, 0x2b,
+	0xa6, 0x59, 0xd1, 0x09, 0x63, 0x89, 0x0d, 0xc3, 0xa4, 0x98, 0x6a, 0xa6, 0xe1, 0xf0, 0xd9, 0x14,
+	0x9f, 0xad, 0xfb, 0x50, 0x6b, 0x36, 0x03, 0xf0, 0xf9, 0xe9, 0xd6, 0x79, 0x52, 0xb5, 0xe8, 0x01,
+	0x9f, 0x4c, 0xb7, 0x4e, 0x96, 0x35, 0xa2, 0xab, 0x4a, 0x15, 0x3b, 0xbb, 0x1c, 0x31, 0xd3, 0x8a,
+	0xa0, 0x5a, 0x95, 0x38, 0x14, 0x57, 0xad, 0x4e, 0xef, 0xdf, 0xb7, 0xb1, 0x65, 0x11, 0xdb, 0xe7,
+	0x37, 0x17, 0x4e, 0x75, 0xc9, 0x34, 0x28, 0x2e, 0x51, 0x45, 0x33, 0xca, 0x7e, 0x8c, 0x33, 0x61,
+	0x54, 0x05, 0x53, 0xb2, 0x8f, 0x7d, 0xa6, 0x52, 0x18, 0x40, 0x0c, 0x55, 0x51, 0xc9, 0x9e, 0x56,
+	0xf2, 0xf3, 0x9a, 0x0e, 0x63, 0xaa, 0xc4, 0x71, 0x70, 0x85, 0x70, 0x32, 0xd2, 0x57, 0x83, 0x70,
+	0x76, 0x83, 0x15, 0xba, 0xc0, 0x0a, 0xbd, 0xe6, 0xbd, 0x03, 0xc9, 0x10, 0xd5, 0x54, 0x47, 0x14,
+	0xd2, 0x42, 0x26, 0x9e, 0x7f, 0x3d, 0xdb, 0x5c, 0xf2, 0x6c, 0x1b, 0x8b, 0x2c, 0xff, 0x5d, 0x57,
+	0x89, 0x41, 0xb5, 0xb2, 0x46, 0x6c, 0xa7, 0x10, 0x3b, 0x2a, 0x0c, 0x7e, 0x24, 0x44, 0x26, 0x04,
+	0xd9, 0x75, 0x86, 0xde, 0x84, 0xd1, 0x60, 0xa0, 0xe2, 0x70, 0x3a, 0x9a, 0x89, 0xe7, 0xa7, 0x5b,
+	0x9d, 0xdf, 0xf1, 0x30, 0xeb, 0x46, 0xd9, 0x64, 0x1e, 0x9e, 0x09, 0x91, 0x09, 0x90, 0xe3, 0xa5,
+	0xc6, 0x30, 0x5a, 0x81, 0x18, 0x36, 0x28, 0x31, 0x0c, 0xec, 0x88, 0x09, 0xe6, 0x25, 0xd5, 0xea,
+	0x85, 0xd3, 0x59, 0xf6, 0x60, 0x75, 0x47, 0x31, 0xb9, 0x6e, 0x89, 0x66, 0x21, 0xe1, 0x50, 0x4c,
+	0x6b, 0x8e, 0x62, 0xd5, 0x8a, 0xba, 0x56, 0x12, 0xc7, 0xd2, 0x42, 0x26, 0x26, 0x8f, 0x7a, 0x83,
+	0x1b, 0x6c, 0x0c, 0xbd, 0x02, 0xe3, 0xba, 0x59, 0x62, 0xfa, 0xf1, 0x61, 0xe3, 0x0c, 0x36, 0xe6,
+	0x0f, 0x73, 0xe0, 0xb7, 0x00, 0x95, 0x6d, 0xf2, 0x7e, 0x8d, 0x18, 0xa5, 0x03, 0xc5, 0xd2, 0xb1,
+	0xa1, 0xb8, 0x09, 0x9c, 0x4a, 0x47, 0x33, 0x23, 0x85, 0xb1, 0xa3, 0x42, 0xfc, 0x99, 0x10, 0x9b,
+	0x88, 0x49, 0x03, 0x76, 0x44, 0xfc, 0x8e, 0x3c, 0x51, 0x47, 0x6e, 0xe8, 0xd8, 0x58, 0x57, 0x1d,
+	0xf4, 0x06, 0x4c, 0xd7, 0x2c, 0x77, 0x45, 0x28, 0xf5, 0xb7, 0x95, 0x6d, 0xb3, 0xaa, 0x78, 0x5c,
+	0xc4, 0x73, 0xec, 0x95, 0xa2, 0x07, 0x79, 0x8b, 0x23, 0xee, 0xda, 0x66, 0x75, 0x93, 0xcd, 0xa3,
+	0xf3, 0x30, 0x64, 0x1a, 0xba, 0x66, 0x10, 0xf1, 0x22, 0x43, 0xf2, 0x27, 0x74, 0x1d, 0x86, 0xed,
+	0xc7, 0x8a, 0x8d, 0x29, 0x11, 0x2f, 0xb1, 0x52, 0x4e, 0x67, 0x3d, 0x75, 0x66, 0x7d, 0x75, 0x66,
+	0xef, 0xea, 0x26, 0xa6, 0xef, 0x62, 0xbd, 0x46, 0xe4, 0x21, 0xfb, 0xb1, 0x8c, 0x29, 0xb3, 0xa2,
+	0xdc, 0x2a, 0xd5, 0x87, 0x15, 0x65, 0x56, 0xc9, 0xdf, 0x09, 0x80, 0xc2, 0x22, 0x40, 0x6b, 0x00,
+	0x5c, 0xb8, 0x8a, 0xa6, 0x32, 0x41, 0x8d, 0x14, 0x32, 0x47, 0x85, 0x79, 0x7b, 0x56, 0x9c, 0xcb,
+	0xcf, 0xbc, 0xf7, 0x10, 0x2f, 0x7e, 0xb0, 0xb4, 0x78, 0xf3, 0x51, 0xe6, 0xf6, 0xad, 0x87, 0xca,
+	0xe2, 0xa3, 0xdb, 0xfe, 0xf3, 0x95, 0x27, 0xf9, 0x57, 0x9f, 0xce, 0xc9, 0x23, 0x15, 0xdf, 0x23,
+	0xfa, 0x1e, 0x44, 0x49, 0x4d, 0x13, 0x23, 0x69, 0x21, 0x33, 0x5a, 0xb8, 0xf9, 0xaf, 0x2f, 0x66,
+	0x6e, 0x54, 0xcc, 0x2c, 0xdd, 0x21, 0x74, 0x47, 0x33, 0x2a, 0x4e, 0xd6, 0x20, 0x74, 0xdf, 0xb4,
+	0x77, 0x73, 0xcd, 0x92, 0xdf, 0xbb, 0x96, 0xb3, 0x76, 0x2b, 0x39, 0x7a, 0x60, 0x11, 0x27, 0xbb,
+	0xba, 0xb5, 0xfe, 0xfa, 0x75, 0xd9, 0xf5, 0x22, 0x7d, 0x22, 0x40, 0x7a, 0x8b, 0x65, 0xb3, 0x8d,
+	0x96, 0x65, 0xb7, 0x38, 0x0e, 0x45, 0x6b, 0x30, 0xcc, 0x5f, 0xcf, 0x17, 0xc2, 0x6c, 0x1f, 0x0b,
+	0x21, 0xa0, 0x7a, 0xdf, 0x1a, 0xdd, 0x04, 0x68, 0xec, 0x23, 0xe2, 0x20, 0xf3, 0x95, 0x0c, 0xe7,
+	0xd4, 0x85, 0xdc, 0xc3, 0xce, 0xae, 0x3c, 0x52, 0xf6, 0xff, 0x4a, 0x8f, 0xe0, 0x72, 0x17, 0x9e,
+	0x8e, 0x65, 0x1a, 0x0e, 0x41, 0xdf, 0x04, 0xf0, 0x0a, 0xae, 0x50, 0xaa, 0x73, 0xae, 0x17, 0x42,
+	0xfe, 0x57, 0xf8, 0x3e, 0x28, 0x8f, 0x78, 0xe0, 0x77, 0xa8, 0x2e, 0xfd, 0x18, 0x2e, 0x05, 0x1d,
+	0xbf, 0xed, 0x25, 0xb1, 0x51, 0x3f, 0x74, 0x0e, 0x86, 0x0c, 0x42, 0xfd, 0xd2, 0x25, 0xe4, 0x41,
+	0x83, 0xd0, 0x75, 0x15, 0xad, 0xc1, 0x08, 0x25, 0x06, 0x36, 0xd8, 0x4c, 0x84, 0x15, 0x75, 0xe1,
+	0xa8, 0xf0, 0x8a, 0x3d, 0x2f, 0xce, 0xe5, 0x2f, 0x37, 0x15, 0x35, 0x54, 0xd3, 0x0f, 0xdf, 0x9b,
+	0x93, 0x63, 0x9e, 0xf1, 0xba, 0x2a, 0xfd, 0x5e, 0x00, 0x31, 0xc8, 0x60, 0x85, 0xec, 0x2d, 0xab,
+	0xaa, 0x5d, 0xd0, 0xcd, 0xd2, 0x2e, 0x5a, 0x85, 0x71, 0x95, 0xec, 0x29, 0x58, 0x55, 0x6d, 0xc5,
+	0xb2, 0x49, 0x59, 0x7b, 0xcc, 0x83, 0xbb, 0xd4, 0x5a, 0x08, 0x6e, 0xb6, 0xc1, 0x40, 0x72, 0x42,
+	0x0d, 0x3e, 0xa2, 0xef, 0xc3, 0x37, 0x76, 0xcc, 0x2a, 0x51, 0xb8, 0x44, 0x94, 0x92, 0x5e, 0x73,
+	0x28, 0xb1, 0x1b, 0xd4, 0xc5, 0xc3, 0x2f, 0x66, 0xa6, 0xde, 0x34, 0xab, 0x84, 0xc7, 0x7f, 0xc7,
+	0x03, 0xac, 0xaf, 0xc8, 0x53, 0x3b, 0xe1, 0x51, 0x55, 0x7a, 0x16, 0x69, 0xde, 0x35, 0x39, 0x00,
+	0xbd, 0x01, 0x11, 0x9e, 0xa8, 0x78, 0x7e, 0xb1, 0x9b, 0x56, 0x42, 0x79, 0x96, 0x23, 0x9a, 0x8a,
+	0x10, 0x0c, 0x18, 0xb8, 0x4a, 0x3c, 0x52, 0x32, 0xfb, 0x8f, 0x36, 0x02, 0x29, 0x28, 0xba, 0x49,
+	0x71, 0xc4, 0x28, 0xdb, 0xf1, 0x32, 0xdd, 0xfc, 0x07, 0xb3, 0x58, 0xcf, 0x06, 0x7b, 0x72, 0xd0,
+	0xb7, 0x5b, 0xb6, 0xe1, 0x81, 0x9e, 0xdb, 0x70, 0xf3, 0xe6, 0x7b, 0x1e, 0x86, 0x74, 0xcd, 0xa1,
+	0x44, 0x65, 0x42, 0x8e, 0xc9, 0xfc, 0x49, 0x7a, 0x00, 0x53, 0x6d, 0x42, 0x74, 0xd0, 0x6d, 0x88,
+	0xf1, 0xc4, 0xbb, 0xe7, 0x49, 0xb4, 0xd7, 0x32, 0xe2, 0x76, 0x72, 0xdd, 0x48, 0xfa, 0x83, 0x00,
+	0x13, 0x41, 0x04, 0x63, 0xb1, 0x06, 0xa3, 0x36, 0xa9, 0x68, 0x0e, 0xf5, 0x34, 0xdd, 0xcf, 0x02,
+	0xf5, 0x3d, 0x37, 0x19, 0xa2, 0xab, 0x30, 0x59, 0x36, 0xed, 0x7d, 0x6c, 0xab, 0xc4, 0x56, 0x88,
+	0x81, 0x8b, 0x3a, 0xf1, 0x64, 0x11, 0x93, 0x27, 0xea, 0x13, 0xab, 0xde, 0x38, 0x5a, 0x82, 0xa9,
+	0x26, 0x25, 0xf9, 0xf8, 0x28, 0xc3, 0xa3, 0x80, 0x58, 0xb8, 0x85, 0xf4, 0x0f, 0x01, 0x66, 0x82,
+	0x24, 0x64, 0xb3, 0x46, 0x35, 0xa3, 0xb2, 0x61, 0xea, 0x5a, 0xe9, 0x60, 0xcb, 0xd2, 0x35, 0x63,
+	0x17, 0x5d, 0x86, 0xd1, 0x1f, 0x99, 0x9a, 0xa1, 0xd8, 0xde, 0xbe, 0xc3, 0x62, 0x89, 0xc9, 0x71,
+	0x77, 0xcc, 0xdf, 0x8a, 0x2e, 0x40, 0xac, 0x8a, 0x4b, 0x8a, 0x8a, 0x29, 0xe6, 0xe4, 0x86, 0xab,
+	0xb8, 0xb4, 0x82, 0x29, 0x46, 0x57, 0x60, 0x02, 0x5b, 0x96, 0xae, 0xf1, 0x63, 0x83, 0x41, 0x3c,
+	0x3e, 0xe3, 0x81, 0x71, 0x06, 0x9d, 0x87, 0x31, 0x47, 0xab, 0x18, 0x58, 0x57, 0xde, 0xaf, 0x61,
+	0x5d, 0xa3, 0x07, 0xe2, 0x00, 0x03, 0x26, 0xbc, 0xd1, 0xfb, 0xde, 0x20, 0x92, 0x60, 0xd4, 0x3d,
+	0x85, 0x74, 0xed, 0x03, 0x2f, 0xb7, 0x5e, 0x9d, 0x9b, 0xc6, 0xa4, 0x8f, 0x04, 0xb8, 0xdc, 0x31,
+	0xae, 0x15, 0x73, 0xdf, 0x60, 0x91, 0xcd, 0x00, 0x8b, 0x42, 0xc1, 0xa5, 0x12, 0xb1, 0xfc, 0xc0,
+	0xc0, 0x1d, 0x5a, 0x66, 0x23, 0x2f, 0x26, 0x2e, 0xe9, 0x2b, 0x01, 0xd2, 0xcd, 0xf2, 0x2f, 0xe3,
+	0x9a, 0x4e, 0x9b, 0x38, 0xb9, 0x9b, 0xb0, 0x77, 0x7e, 0xaa, 0x0a, 0xa6, 0x5c, 0x2f, 0xe1, 0x4d,
+	0xf8, 0x1d, 0xbf, 0x9b, 0x93, 0x47, 0x38, 0x7a, 0xd9, 0x3d, 0x08, 0x86, 0x6a, 0xac, 0x54, 0x8c,
+	0x63, 0x3c, 0x9f, 0xeb, 0x26, 0xb3, 0x36, 0x15, 0x96, 0xb9, 0x39, 0xba, 0x07, 0x31, 0x95, 0xe7,
+	0x86, 0xc5, 0x12, 0xcf, 0xbf, 0xd6, 0xb7, 0x2b, 0x3f, 0xa9, 0x72, 0xdd, 0x85, 0xf4, 0xeb, 0x28,
+	0x5c, 0xe8, 0x88, 0x47, 0x1b, 0x30, 0xda, 0x50, 0xf6, 0x49, 0xf7, 0xa5, 0x78, 0xdd, 0xc5, 0xba,
+	0x8a, 0xb6, 0x60, 0xbc, 0x49, 0xfe, 0x7c, 0x03, 0x3d, 0xb6, 0xd3, 0x44, 0x60, 0xa1, 0xac, 0xab,
+	0x2d, 0x95, 0x89, 0x9e, 0xac, 0x32, 0x03, 0x2f, 0xae, 0x32, 0x83, 0xa7, 0xaf, 0xcc, 0xe7, 0x02,
+	0x2c, 0x6c, 0x12, 0xda, 0x4b, 0x94, 0xfe, 0xf2, 0xbe, 0x5f, 0x0f, 0x43, 0x38, 0x51, 0x18, 0x81,
+	0xa6, 0xc3, 0x0f, 0xe8, 0x41, 0x20, 0xa0, 0xc8, 0x09, 0x03, 0x0a, 0xb8, 0x6d, 0x84, 0xf6, 0x10,
+	0xe6, 0xdf, 0xd2, 0x1c, 0x1a, 0x38, 0x2e, 0x83, 0xb6, 0x1a, 0x71, 0xfc, 0xa0, 0x52, 0x30, 0xa8,
+	0x6b, 0x55, 0xcd, 0x5b, 0x6b, 0x09, 0xe6, 0x6b, 0x21, 0x2a, 0x7e, 0x39, 0x2c, 0x7b, 0xc3, 0xee,
+	0x71, 0x67, 0xe1, 0x8a, 0x77, 0xdc, 0x25, 0x64, 0xf6, 0x5f, 0x52, 0x61, 0xba, 0x13, 0x2b, 0x8d,
+	0x38, 0x68, 0x15, 0x62, 0x16, 0xff, 0xcf, 0xcf, 0x92, 0x2b, 0x7d, 0x07, 0x25, 0xd7, 0x4d, 0xa5,
+	0x4f, 0x23, 0x30, 0xdb, 0x52, 0x9d, 0xb6, 0x65, 0x69, 0xa3, 0x77, 0xe1, 0x05, 0xe8, 0xfd, 0xfe,
+	0x29, 0xb7, 0x93, 0x1e, 0xd5, 0x8e, 0xbe, 0xc8, 0x6a, 0xff, 0x4f, 0x80, 0x19, 0xb7, 0xdc, 0xed,
+	0x8e, 0xf6, 0x53, 0x14, 0x1a, 0x65, 0xe1, 0xec, 0xbe, 0x46, 0x77, 0x14, 0xdb, 0x63, 0xa2, 0xb0,
+	0xda, 0x1c, 0xf0, 0x0d, 0x7e, 0xd2, 0x9d, 0x6a, 0xde, 0xcc, 0x6e, 0x00, 0xaa, 0x37, 0x9c, 0x0a,
+	0x6b, 0x47, 0x34, 0xc3, 0x61, 0x8b, 0x7e, 0xa4, 0x30, 0x7c, 0x54, 0x70, 0xef, 0x55, 0xaa, 0x3c,
+	0xe1, 0xb7, 0x95, 0x77, 0x38, 0x00, 0xbd, 0x0a, 0x09, 0xb7, 0x8d, 0x6a, 0x58, 0x0c, 0x36, 0x5b,
+	0x8c, 0xba, 0xb3, 0x3e, 0x5a, 0xfa, 0xa3, 0x00, 0xb3, 0xad, 0xc1, 0x06, 0x74, 0x7e, 0xaa, 0x80,
+	0xdb, 0x07, 0x10, 0x3d, 0x76, 0x00, 0x03, 0xdd, 0x02, 0xf8, 0x84, 0x07, 0x70, 0xd7, 0xdf, 0xb4,
+	0x3b, 0x2c, 0xcd, 0x97, 0x24, 0xec, 0x29, 0x3f, 0x2f, 0x5e, 0xe0, 0x2d, 0xd9, 0x88, 0x36, 0xb2,
+	0x91, 0xff, 0xab, 0x00, 0x83, 0x6b, 0xce, 0x46, 0x11, 0xa3, 0x7b, 0x90, 0x60, 0x37, 0x68, 0x67,
+	0x87, 0x77, 0x43, 0x73, 0x1d, 0xae, 0xf2, 0xde, 0xf4, 0x3d, 0xef, 0xfb, 0x45, 0xf2, 0x7c, 0xe8,
+	0x7c, 0x58, 0xad, 0x5a, 0xf4, 0x00, 0x51, 0x48, 0x78, 0xf7, 0x25, 0xff, 0x4b, 0xc6, 0x52, 0xab,
+	0xbb, 0x5e, 0xd7, 0xbe, 0xe4, 0x6b, 0xc7, 0xb0, 0xf0, 0x2e, 0x60, 0xf9, 0x4d, 0x18, 0x7c, 0x9b,
+	0x45, 0xf3, 0x5d, 0x18, 0xe7, 0xd1, 0x34, 0x7a, 0xa0, 0xd0, 0x5d, 0x85, 0xcf, 0xf4, 0x08, 0x25,
+	0xff, 0xe7, 0x49, 0x88, 0xba, 0x3e, 0xdf, 0x85, 0xe1, 0x35, 0xc2, 0x7b, 0xef, 0xf6, 0xd0, 0x64,
+	0xba, 0x5b, 0xd9, 0x5c, 0x4b, 0x69, 0xf2, 0xa7, 0x7f, 0xff, 0xef, 0x2f, 0x23, 0x71, 0x34, 0x92,
+	0xb3, 0x8a, 0x38, 0xe7, 0x36, 0xfe, 0x68, 0x1f, 0x62, 0x32, 0xeb, 0x84, 0x89, 0xdd, 0xd1, 0x71,
+	0x3f, 0x0d, 0xb5, 0x94, 0x65, 0xbe, 0x33, 0xc9, 0x49, 0xe6, 0x3b, 0xd8, 0x5d, 0x6f, 0x9f, 0x95,
+	0xc2, 0x83, 0xe8, 0x01, 0xc0, 0x0a, 0xb1, 0x7b, 0xbd, 0xba, 0xc3, 0xb8, 0x74, 0x81, 0xbd, 0xed,
+	0xec, 0x42, 0x1b, 0xc7, 0xbf, 0x11, 0x40, 0x5a, 0x23, 0xc1, 0xa3, 0xa9, 0x6d, 0x27, 0xd8, 0xe9,
+	0x8d, 0x4b, 0xdd, 0xaf, 0x54, 0x61, 0x4f, 0xd2, 0x55, 0xc6, 0x65, 0x1e, 0xcd, 0x32, 0x2e, 0xee,
+	0x62, 0x58, 0xf4, 0xaf, 0x2d, 0x39, 0xff, 0xb4, 0xc9, 0xa9, 0x9e, 0x25, 0xfa, 0x9b, 0x00, 0xd2,
+	0x66, 0x6f, 0x76, 0xb7, 0x5a, 0x59, 0xf4, 0xdf, 0x47, 0x74, 0xcc, 0xd9, 0x0f, 0x18, 0x4f, 0x39,
+	0xd9, 0x0f, 0xcf, 0x5b, 0xc2, 0xc2, 0x76, 0x46, 0xea, 0x13, 0x89, 0x7e, 0x26, 0xc0, 0xfc, 0x0a,
+	0xd1, 0x09, 0x25, 0x27, 0xcd, 0x7a, 0x27, 0xce, 0x3c, 0xb7, 0x0b, 0x7d, 0xe5, 0xf6, 0x33, 0x01,
+	0x52, 0xdd, 0xbb, 0x12, 0x74, 0xa3, 0x35, 0xaf, 0x7d, 0x75, 0x31, 0xc9, 0xab, 0xfd, 0x9e, 0xa3,
+	0x6e, 0x63, 0x31, 0xcb, 0x38, 0x5f, 0x42, 0xd3, 0x5d, 0x38, 0xa3, 0x7f, 0x0a, 0x30, 0xdd, 0xac,
+	0xd2, 0xe6, 0x44, 0x1d, 0x6f, 0x0f, 0x4e, 0xf6, 0xdf, 0x01, 0x49, 0x3f, 0x64, 0xf4, 0xb6, 0xd1,
+	0x5c, 0xb7, 0x94, 0x3e, 0xf1, 0xbe, 0xf7, 0x3c, 0xdd, 0xce, 0xa3, 0xa5, 0x7e, 0x70, 0xb9, 0x27,
+	0xf5, 0x73, 0xed, 0x29, 0xfa, 0x55, 0x14, 0xa6, 0x37, 0xbb, 0xc4, 0x76, 0xad, 0x87, 0xb8, 0x8f,
+	0xa5, 0xea, 0xcf, 0x22, 0x2c, 0x9e, 0x8f, 0x23, 0xc9, 0xeb, 0x5d, 0x89, 0xb6, 0x1c, 0x75, 0x59,
+	0x4e, 0xdc, 0x15, 0xfa, 0x4d, 0xe9, 0xc4, 0xa6, 0x5b, 0xc9, 0x8d, 0x93, 0x98, 0x86, 0x27, 0x1a,
+	0xe9, 0x63, 0x6e, 0xa5, 0x97, 0xe1, 0x16, 0xfd, 0x45, 0x80, 0x54, 0x68, 0x9d, 0x9e, 0x4a, 0x77,
+	0x9d, 0xaa, 0xc2, 0x45, 0xb6, 0xd0, 0xa7, 0xc8, 0x16, 0x8e, 0x2f, 0xb2, 0x0f, 0x61, 0xd4, 0x5d,
+	0xbb, 0xf5, 0x2f, 0x4c, 0xb9, 0x76, 0x2b, 0xbb, 0x4b, 0xc3, 0x9a, 0x9c, 0xeb, 0x23, 0x52, 0x47,
+	0x3a, 0xc7, 0x02, 0x19, 0x47, 0x09, 0x46, 0xd0, 0xe7, 0x86, 0x7e, 0x2e, 0xc0, 0x44, 0xcb, 0xd6,
+	0xe1, 0x84, 0x75, 0xdd, 0x47, 0x1b, 0xd9, 0x27, 0x8d, 0x24, 0xa3, 0x31, 0x85, 0x50, 0x38, 0x4f,
+	0xe8, 0x63, 0x01, 0x2e, 0x76, 0xeb, 0xf7, 0xda, 0xf3, 0xea, 0xd1, 0x1d, 0x1e, 0x6f, 0xcb, 0x4b,
+	0x33, 0x7a, 0x49, 0x24, 0x32, 0x7a, 0xf5, 0xaf, 0x05, 0x8d, 0x1a, 0x16, 0xb6, 0x3e, 0xff, 0x4f,
+	0xea, 0xcc, 0x4f, 0x0e, 0x53, 0xc2, 0xa7, 0x87, 0x29, 0xe1, 0xdf, 0x87, 0x29, 0xe1, 0xcb, 0xc3,
+	0xd4, 0x99, 0xff, 0x1f, 0xa6, 0x84, 0x5f, 0x3c, 0x4f, 0x9d, 0xf9, 0xed, 0xf3, 0xd4, 0x99, 0x3f,
+	0x3d, 0x4f, 0x09, 0xdb, 0xb9, 0x63, 0x7c, 0xcd, 0xa7, 0x86, 0x55, 0x2c, 0x0e, 0x31, 0xdd, 0x5d,
+	0xfb, 0x3a, 0x00, 0x00, 0xff, 0xff, 0x3b, 0xa0, 0x66, 0x5a, 0xbb, 0x1c, 0x00, 0x00,
 }
 
 func (this *PacketBrokerGateway) Equal(that interface{}) bool {
@@ -2943,1129 +2761,6 @@ var _Pba_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/packetbrokeragent.proto",
 }
 
-func (m *PacketBrokerGateway) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerGateway) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerGateway) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.TxRate != nil {
-		{
-			size, err := m.TxRate.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xf2
-	}
-	if m.RxRate != nil {
-		{
-			size, err := m.RxRate.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xea
-	}
-	if m.Online {
-		i--
-		if m.Online {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xe0
-	}
-	if m.UpdateLocationFromStatus {
-		i--
-		if m.UpdateLocationFromStatus {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xa8
-	}
-	if len(m.FrequencyPlanIds) > 0 {
-		for iNdEx := len(m.FrequencyPlanIds) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.FrequencyPlanIds[iNdEx])
-			copy(dAtA[i:], m.FrequencyPlanIds[iNdEx])
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(len(m.FrequencyPlanIds[iNdEx])))
-			i--
-			dAtA[i] = 0x1
-			i--
-			dAtA[i] = 0xa2
-		}
-	}
-	if m.LocationPublic {
-		i--
-		if m.LocationPublic {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x78
-	}
-	if m.StatusPublic {
-		i--
-		if m.StatusPublic {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x70
-	}
-	if len(m.Antennas) > 0 {
-		for iNdEx := len(m.Antennas) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Antennas[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x6a
-		}
-	}
-	if len(m.ContactInfo) > 0 {
-		for iNdEx := len(m.ContactInfo) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.ContactInfo[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x3a
-		}
-	}
-	if m.Ids != nil {
-		{
-			size, err := m.Ids.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerGateway_GatewayIdentifiers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerGateway_GatewayIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerGateway_GatewayIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Eui != nil {
-		{
-			size := m.Eui.Size()
-			i -= size
-			if _, err := m.Eui.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.GatewayId) > 0 {
-		i -= len(m.GatewayId)
-		copy(dAtA[i:], m.GatewayId)
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(len(m.GatewayId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *UpdatePacketBrokerGatewayRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *UpdatePacketBrokerGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *UpdatePacketBrokerGatewayRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.FieldMask != nil {
-		{
-			size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x2a
-	}
-	if m.Gateway != nil {
-		{
-			size, err := m.Gateway.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *UpdatePacketBrokerGatewayResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *UpdatePacketBrokerGatewayResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *UpdatePacketBrokerGatewayResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.OnlineTtl != nil {
-		{
-			size, err := m.OnlineTtl.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerNetworkIdentifier) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerNetworkIdentifier) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerNetworkIdentifier) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.TenantId) > 0 {
-		i -= len(m.TenantId)
-		copy(dAtA[i:], m.TenantId)
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(len(m.TenantId)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.NetId != 0 {
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(m.NetId))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerDevAddrBlock) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerDevAddrBlock) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerDevAddrBlock) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.HomeNetworkClusterID) > 0 {
-		i -= len(m.HomeNetworkClusterID)
-		copy(dAtA[i:], m.HomeNetworkClusterID)
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(len(m.HomeNetworkClusterID)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.DevAddrPrefix != nil {
-		{
-			size, err := m.DevAddrPrefix.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerNetwork) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerNetwork) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerNetwork) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Listed {
-		i--
-		if m.Listed {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x28
-	}
-	if len(m.ContactInfo) > 0 {
-		for iNdEx := len(m.ContactInfo) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.ContactInfo[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x22
-		}
-	}
-	if len(m.DevAddrBlocks) > 0 {
-		for iNdEx := len(m.DevAddrBlocks) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.DevAddrBlocks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x1a
-		}
-	}
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(len(m.Name)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.Id != nil {
-		{
-			size, err := m.Id.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerNetworks) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerNetworks) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerNetworks) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Networks) > 0 {
-		for iNdEx := len(m.Networks) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Networks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerInfo) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerInfo) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.HomeNetworkEnabled {
-		i--
-		if m.HomeNetworkEnabled {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x18
-	}
-	if m.ForwarderEnabled {
-		i--
-		if m.ForwarderEnabled {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Registration != nil {
-		{
-			size, err := m.Registration.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerRoutingPolicyUplink) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerRoutingPolicyUplink) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerRoutingPolicyUplink) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Localization {
-		i--
-		if m.Localization {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x28
-	}
-	if m.SignalQuality {
-		i--
-		if m.SignalQuality {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x20
-	}
-	if m.ApplicationData {
-		i--
-		if m.ApplicationData {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x18
-	}
-	if m.MacData {
-		i--
-		if m.MacData {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.JoinRequest {
-		i--
-		if m.JoinRequest {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerRoutingPolicyDownlink) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerRoutingPolicyDownlink) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerRoutingPolicyDownlink) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.ApplicationData {
-		i--
-		if m.ApplicationData {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x18
-	}
-	if m.MacData {
-		i--
-		if m.MacData {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.JoinAccept {
-		i--
-		if m.JoinAccept {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerDefaultRoutingPolicy) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerDefaultRoutingPolicy) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerDefaultRoutingPolicy) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Downlink != nil {
-		{
-			size, err := m.Downlink.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1a
-	}
-	if m.Uplink != nil {
-		{
-			size, err := m.Uplink.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.UpdatedAt != nil {
-		{
-			size, err := m.UpdatedAt.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerRoutingPolicy) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerRoutingPolicy) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerRoutingPolicy) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Downlink != nil {
-		{
-			size, err := m.Downlink.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x2a
-	}
-	if m.Uplink != nil {
-		{
-			size, err := m.Uplink.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.UpdatedAt != nil {
-		{
-			size, err := m.UpdatedAt.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1a
-	}
-	if m.HomeNetworkId != nil {
-		{
-			size, err := m.HomeNetworkId.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.ForwarderId != nil {
-		{
-			size, err := m.ForwarderId.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *SetPacketBrokerDefaultRoutingPolicyRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SetPacketBrokerDefaultRoutingPolicyRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SetPacketBrokerDefaultRoutingPolicyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Downlink != nil {
-		{
-			size, err := m.Downlink.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.Uplink != nil {
-		{
-			size, err := m.Uplink.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ListHomeNetworkRoutingPoliciesRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListHomeNetworkRoutingPoliciesRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ListHomeNetworkRoutingPoliciesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Page != 0 {
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(m.Page))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Limit != 0 {
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(m.Limit))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerRoutingPolicies) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerRoutingPolicies) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerRoutingPolicies) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Policies) > 0 {
-		for iNdEx := len(m.Policies) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Policies[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *SetPacketBrokerRoutingPolicyRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SetPacketBrokerRoutingPolicyRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SetPacketBrokerRoutingPolicyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Downlink != nil {
-		{
-			size, err := m.Downlink.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1a
-	}
-	if m.Uplink != nil {
-		{
-			size, err := m.Uplink.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.HomeNetworkId != nil {
-		{
-			size, err := m.HomeNetworkId.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ListPacketBrokerNetworksRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListPacketBrokerNetworksRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ListPacketBrokerNetworksRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.NameContains) > 0 {
-		i -= len(m.NameContains)
-		copy(dAtA[i:], m.NameContains)
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(len(m.NameContains)))
-		i--
-		dAtA[i] = 0x2a
-	}
-	if len(m.TenantIdContains) > 0 {
-		i -= len(m.TenantIdContains)
-		copy(dAtA[i:], m.TenantIdContains)
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(len(m.TenantIdContains)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.WithRoutingPolicy {
-		i--
-		if m.WithRoutingPolicy {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x18
-	}
-	if m.Page != 0 {
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(m.Page))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Limit != 0 {
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(m.Limit))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ListPacketBrokerHomeNetworksRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListPacketBrokerHomeNetworksRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ListPacketBrokerHomeNetworksRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.NameContains) > 0 {
-		i -= len(m.NameContains)
-		copy(dAtA[i:], m.NameContains)
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(len(m.NameContains)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.TenantIdContains) > 0 {
-		i -= len(m.TenantIdContains)
-		copy(dAtA[i:], m.TenantIdContains)
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(len(m.TenantIdContains)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if m.Page != 0 {
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(m.Page))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Limit != 0 {
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(m.Limit))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ListForwarderRoutingPoliciesRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListForwarderRoutingPoliciesRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ListForwarderRoutingPoliciesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Page != 0 {
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(m.Page))
-		i--
-		dAtA[i] = 0x18
-	}
-	if m.Limit != 0 {
-		i = encodeVarintPacketbrokeragent(dAtA, i, uint64(m.Limit))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.HomeNetworkId != nil {
-		{
-			size, err := m.HomeNetworkId.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPacketbrokeragent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func encodeVarintPacketbrokeragent(dAtA []byte, offset int, v uint64) int {
-	offset -= sovPacketbrokeragent(v)
-	base := offset
-	for v >= 1<<7 {
-		dAtA[offset] = uint8(v&0x7f | 0x80)
-		v >>= 7
-		offset++
-	}
-	dAtA[offset] = uint8(v)
-	return base
-}
 func (m *PacketBrokerGateway) Size() (n int) {
 	if m == nil {
 		return 0
@@ -4779,2993 +3474,3 @@ func valueToStringPacketbrokeragent(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (m *PacketBrokerGateway) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerGateway: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerGateway: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Ids", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Ids == nil {
-				m.Ids = &PacketBrokerGateway_GatewayIdentifiers{}
-			}
-			if err := m.Ids.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContactInfo", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ContactInfo = append(m.ContactInfo, &ContactInfo{})
-			if err := m.ContactInfo[len(m.ContactInfo)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Antennas", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Antennas = append(m.Antennas, &GatewayAntenna{})
-			if err := m.Antennas[len(m.Antennas)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 14:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StatusPublic", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.StatusPublic = bool(v != 0)
-		case 15:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LocationPublic", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.LocationPublic = bool(v != 0)
-		case 20:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyPlanIds", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.FrequencyPlanIds = append(m.FrequencyPlanIds, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 21:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateLocationFromStatus", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.UpdateLocationFromStatus = bool(v != 0)
-		case 28:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Online", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Online = bool(v != 0)
-		case 29:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RxRate", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.RxRate == nil {
-				m.RxRate = &types.FloatValue{}
-			}
-			if err := m.RxRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 30:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TxRate", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.TxRate == nil {
-				m.TxRate = &types.FloatValue{}
-			}
-			if err := m.TxRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerGateway_GatewayIdentifiers) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GatewayIdentifiers: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GatewayIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GatewayId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.GatewayId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Eui", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			var v go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-			m.Eui = &v
-			if err := m.Eui.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *UpdatePacketBrokerGatewayRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: UpdatePacketBrokerGatewayRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UpdatePacketBrokerGatewayRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Gateway", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Gateway == nil {
-				m.Gateway = &PacketBrokerGateway{}
-			}
-			if err := m.Gateway.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.FieldMask == nil {
-				m.FieldMask = &types.FieldMask{}
-			}
-			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *UpdatePacketBrokerGatewayResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: UpdatePacketBrokerGatewayResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UpdatePacketBrokerGatewayResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OnlineTtl", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.OnlineTtl == nil {
-				m.OnlineTtl = &types.Duration{}
-			}
-			if err := m.OnlineTtl.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerNetworkIdentifier) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerNetworkIdentifier: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerNetworkIdentifier: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NetId", wireType)
-			}
-			m.NetId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.NetId |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TenantId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TenantId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerDevAddrBlock) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerDevAddrBlock: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerDevAddrBlock: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DevAddrPrefix", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.DevAddrPrefix == nil {
-				m.DevAddrPrefix = &DevAddrPrefix{}
-			}
-			if err := m.DevAddrPrefix.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HomeNetworkClusterID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.HomeNetworkClusterID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerNetwork) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerNetwork: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerNetwork: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Id == nil {
-				m.Id = &PacketBrokerNetworkIdentifier{}
-			}
-			if err := m.Id.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DevAddrBlocks", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DevAddrBlocks = append(m.DevAddrBlocks, &PacketBrokerDevAddrBlock{})
-			if err := m.DevAddrBlocks[len(m.DevAddrBlocks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContactInfo", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ContactInfo = append(m.ContactInfo, &ContactInfo{})
-			if err := m.ContactInfo[len(m.ContactInfo)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Listed", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Listed = bool(v != 0)
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerNetworks) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerNetworks: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerNetworks: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Networks", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Networks = append(m.Networks, &PacketBrokerNetwork{})
-			if err := m.Networks[len(m.Networks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerInfo) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerInfo: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerInfo: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Registration", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Registration == nil {
-				m.Registration = &PacketBrokerNetwork{}
-			}
-			if err := m.Registration.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ForwarderEnabled", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ForwarderEnabled = bool(v != 0)
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HomeNetworkEnabled", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.HomeNetworkEnabled = bool(v != 0)
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerRoutingPolicyUplink) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerRoutingPolicyUplink: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerRoutingPolicyUplink: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field JoinRequest", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.JoinRequest = bool(v != 0)
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MacData", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.MacData = bool(v != 0)
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationData", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ApplicationData = bool(v != 0)
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SignalQuality", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.SignalQuality = bool(v != 0)
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Localization", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Localization = bool(v != 0)
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerRoutingPolicyDownlink) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerRoutingPolicyDownlink: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerRoutingPolicyDownlink: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field JoinAccept", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.JoinAccept = bool(v != 0)
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MacData", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.MacData = bool(v != 0)
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationData", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ApplicationData = bool(v != 0)
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerDefaultRoutingPolicy) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerDefaultRoutingPolicy: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerDefaultRoutingPolicy: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.UpdatedAt == nil {
-				m.UpdatedAt = &types.Timestamp{}
-			}
-			if err := m.UpdatedAt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uplink", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Uplink == nil {
-				m.Uplink = &PacketBrokerRoutingPolicyUplink{}
-			}
-			if err := m.Uplink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Downlink", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Downlink == nil {
-				m.Downlink = &PacketBrokerRoutingPolicyDownlink{}
-			}
-			if err := m.Downlink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerRoutingPolicy) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerRoutingPolicy: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerRoutingPolicy: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ForwarderId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ForwarderId == nil {
-				m.ForwarderId = &PacketBrokerNetworkIdentifier{}
-			}
-			if err := m.ForwarderId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HomeNetworkId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.HomeNetworkId == nil {
-				m.HomeNetworkId = &PacketBrokerNetworkIdentifier{}
-			}
-			if err := m.HomeNetworkId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.UpdatedAt == nil {
-				m.UpdatedAt = &types.Timestamp{}
-			}
-			if err := m.UpdatedAt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uplink", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Uplink == nil {
-				m.Uplink = &PacketBrokerRoutingPolicyUplink{}
-			}
-			if err := m.Uplink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Downlink", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Downlink == nil {
-				m.Downlink = &PacketBrokerRoutingPolicyDownlink{}
-			}
-			if err := m.Downlink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SetPacketBrokerDefaultRoutingPolicyRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SetPacketBrokerDefaultRoutingPolicyRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SetPacketBrokerDefaultRoutingPolicyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uplink", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Uplink == nil {
-				m.Uplink = &PacketBrokerRoutingPolicyUplink{}
-			}
-			if err := m.Uplink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Downlink", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Downlink == nil {
-				m.Downlink = &PacketBrokerRoutingPolicyDownlink{}
-			}
-			if err := m.Downlink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListHomeNetworkRoutingPoliciesRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListHomeNetworkRoutingPoliciesRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListHomeNetworkRoutingPoliciesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
-			}
-			m.Limit = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Limit |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
-			}
-			m.Page = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Page |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerRoutingPolicies) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerRoutingPolicies: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerRoutingPolicies: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Policies", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Policies = append(m.Policies, &PacketBrokerRoutingPolicy{})
-			if err := m.Policies[len(m.Policies)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SetPacketBrokerRoutingPolicyRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SetPacketBrokerRoutingPolicyRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SetPacketBrokerRoutingPolicyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HomeNetworkId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.HomeNetworkId == nil {
-				m.HomeNetworkId = &PacketBrokerNetworkIdentifier{}
-			}
-			if err := m.HomeNetworkId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uplink", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Uplink == nil {
-				m.Uplink = &PacketBrokerRoutingPolicyUplink{}
-			}
-			if err := m.Uplink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Downlink", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Downlink == nil {
-				m.Downlink = &PacketBrokerRoutingPolicyDownlink{}
-			}
-			if err := m.Downlink.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListPacketBrokerNetworksRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListPacketBrokerNetworksRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListPacketBrokerNetworksRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
-			}
-			m.Limit = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Limit |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
-			}
-			m.Page = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Page |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WithRoutingPolicy", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.WithRoutingPolicy = bool(v != 0)
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TenantIdContains", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TenantIdContains = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NameContains", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.NameContains = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListPacketBrokerHomeNetworksRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListPacketBrokerHomeNetworksRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListPacketBrokerHomeNetworksRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
-			}
-			m.Limit = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Limit |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
-			}
-			m.Page = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Page |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TenantIdContains", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TenantIdContains = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NameContains", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.NameContains = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListForwarderRoutingPoliciesRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListForwarderRoutingPoliciesRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListForwarderRoutingPoliciesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HomeNetworkId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.HomeNetworkId == nil {
-				m.HomeNetworkId = &PacketBrokerNetworkIdentifier{}
-			}
-			if err := m.HomeNetworkId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
-			}
-			m.Limit = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Limit |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
-			}
-			m.Page = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Page |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPacketbrokeragent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPacketbrokeragent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func skipPacketbrokeragent(dAtA []byte) (n int, err error) {
-	l := len(dAtA)
-	iNdEx := 0
-	depth := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return 0, ErrIntOverflowPacketbrokeragent
-			}
-			if iNdEx >= l {
-				return 0, io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		wireType := int(wire & 0x7)
-		switch wireType {
-		case 0:
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 {
-					break
-				}
-			}
-		case 1:
-			iNdEx += 8
-		case 2:
-			var length int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowPacketbrokeragent
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if length < 0 {
-				return 0, ErrInvalidLengthPacketbrokeragent
-			}
-			iNdEx += length
-		case 3:
-			depth++
-		case 4:
-			if depth == 0 {
-				return 0, ErrUnexpectedEndOfGroupPacketbrokeragent
-			}
-			depth--
-		case 5:
-			iNdEx += 4
-		default:
-			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		}
-		if iNdEx < 0 {
-			return 0, ErrInvalidLengthPacketbrokeragent
-		}
-		if depth == 0 {
-			return iNdEx, nil
-		}
-	}
-	return 0, io.ErrUnexpectedEOF
-}
-
-var (
-	ErrInvalidLengthPacketbrokeragent        = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowPacketbrokeragent          = fmt.Errorf("proto: integer overflow")
-	ErrUnexpectedEndOfGroupPacketbrokeragent = fmt.Errorf("proto: unexpected end of group")
-)

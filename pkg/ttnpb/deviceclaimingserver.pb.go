@@ -17,7 +17,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	io "io"
 	math "math"
 	math_bits "math/bits"
 	reflect "reflect"
@@ -73,25 +72,16 @@ func (*ClaimEndDeviceRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e8a7f6d184fc3dc3, []int{0}
 }
 func (m *ClaimEndDeviceRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_ClaimEndDeviceRequest.Unmarshal(m, b)
 }
 func (m *ClaimEndDeviceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ClaimEndDeviceRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_ClaimEndDeviceRequest.Marshal(b, m, deterministic)
 }
 func (m *ClaimEndDeviceRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ClaimEndDeviceRequest.Merge(m, src)
 }
 func (m *ClaimEndDeviceRequest) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_ClaimEndDeviceRequest.Size(m)
 }
 func (m *ClaimEndDeviceRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_ClaimEndDeviceRequest.DiscardUnknown(m)
@@ -102,7 +92,6 @@ var xxx_messageInfo_ClaimEndDeviceRequest proto.InternalMessageInfo
 type isClaimEndDeviceRequest_SourceDevice interface {
 	isClaimEndDeviceRequest_SourceDevice()
 	Equal(interface{}) bool
-	MarshalTo([]byte) (int, error)
 	Size() int
 }
 
@@ -221,25 +210,16 @@ func (*ClaimEndDeviceRequest_AuthenticatedIdentifiers) Descriptor() ([]byte, []i
 	return fileDescriptor_e8a7f6d184fc3dc3, []int{0, 0}
 }
 func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_ClaimEndDeviceRequest_AuthenticatedIdentifiers.Unmarshal(m, b)
 }
 func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ClaimEndDeviceRequest_AuthenticatedIdentifiers.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_ClaimEndDeviceRequest_AuthenticatedIdentifiers.Marshal(b, m, deterministic)
 }
 func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ClaimEndDeviceRequest_AuthenticatedIdentifiers.Merge(m, src)
 }
 func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_ClaimEndDeviceRequest_AuthenticatedIdentifiers.Size(m)
 }
 func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) XXX_DiscardUnknown() {
 	xxx_messageInfo_ClaimEndDeviceRequest_AuthenticatedIdentifiers.DiscardUnknown(m)
@@ -267,25 +247,16 @@ func (*AuthorizeApplicationRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e8a7f6d184fc3dc3, []int{1}
 }
 func (m *AuthorizeApplicationRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_AuthorizeApplicationRequest.Unmarshal(m, b)
 }
 func (m *AuthorizeApplicationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AuthorizeApplicationRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_AuthorizeApplicationRequest.Marshal(b, m, deterministic)
 }
 func (m *AuthorizeApplicationRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_AuthorizeApplicationRequest.Merge(m, src)
 }
 func (m *AuthorizeApplicationRequest) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_AuthorizeApplicationRequest.Size(m)
 }
 func (m *AuthorizeApplicationRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_AuthorizeApplicationRequest.DiscardUnknown(m)
@@ -323,25 +294,16 @@ func (*CUPSRedirection) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e8a7f6d184fc3dc3, []int{2}
 }
 func (m *CUPSRedirection) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_CUPSRedirection.Unmarshal(m, b)
 }
 func (m *CUPSRedirection) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_CUPSRedirection.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_CUPSRedirection.Marshal(b, m, deterministic)
 }
 func (m *CUPSRedirection) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CUPSRedirection.Merge(m, src)
 }
 func (m *CUPSRedirection) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_CUPSRedirection.Size(m)
 }
 func (m *CUPSRedirection) XXX_DiscardUnknown() {
 	xxx_messageInfo_CUPSRedirection.DiscardUnknown(m)
@@ -352,7 +314,6 @@ var xxx_messageInfo_CUPSRedirection proto.InternalMessageInfo
 type isCUPSRedirection_GatewayCredentials interface {
 	isCUPSRedirection_GatewayCredentials()
 	Equal(interface{}) bool
-	MarshalTo([]byte) (int, error)
 	Size() int
 }
 
@@ -431,25 +392,16 @@ func (*CUPSRedirection_ClientTLS) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e8a7f6d184fc3dc3, []int{2, 0}
 }
 func (m *CUPSRedirection_ClientTLS) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_CUPSRedirection_ClientTLS.Unmarshal(m, b)
 }
 func (m *CUPSRedirection_ClientTLS) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_CUPSRedirection_ClientTLS.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_CUPSRedirection_ClientTLS.Marshal(b, m, deterministic)
 }
 func (m *CUPSRedirection_ClientTLS) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CUPSRedirection_ClientTLS.Merge(m, src)
 }
 func (m *CUPSRedirection_ClientTLS) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_CUPSRedirection_ClientTLS.Size(m)
 }
 func (m *CUPSRedirection_ClientTLS) XXX_DiscardUnknown() {
 	xxx_messageInfo_CUPSRedirection_ClientTLS.DiscardUnknown(m)
@@ -498,25 +450,16 @@ func (*ClaimGatewayRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e8a7f6d184fc3dc3, []int{3}
 }
 func (m *ClaimGatewayRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_ClaimGatewayRequest.Unmarshal(m, b)
 }
 func (m *ClaimGatewayRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ClaimGatewayRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_ClaimGatewayRequest.Marshal(b, m, deterministic)
 }
 func (m *ClaimGatewayRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ClaimGatewayRequest.Merge(m, src)
 }
 func (m *ClaimGatewayRequest) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_ClaimGatewayRequest.Size(m)
 }
 func (m *ClaimGatewayRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_ClaimGatewayRequest.DiscardUnknown(m)
@@ -527,7 +470,6 @@ var xxx_messageInfo_ClaimGatewayRequest proto.InternalMessageInfo
 type isClaimGatewayRequest_SourceGateway interface {
 	isClaimGatewayRequest_SourceGateway()
 	Equal(interface{}) bool
-	MarshalTo([]byte) (int, error)
 	Size() int
 }
 
@@ -620,25 +562,16 @@ func (*ClaimGatewayRequest_AuthenticatedIdentifiers) Descriptor() ([]byte, []int
 	return fileDescriptor_e8a7f6d184fc3dc3, []int{3, 0}
 }
 func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_ClaimGatewayRequest_AuthenticatedIdentifiers.Unmarshal(m, b)
 }
 func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ClaimGatewayRequest_AuthenticatedIdentifiers.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_ClaimGatewayRequest_AuthenticatedIdentifiers.Marshal(b, m, deterministic)
 }
 func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ClaimGatewayRequest_AuthenticatedIdentifiers.Merge(m, src)
 }
 func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_ClaimGatewayRequest_AuthenticatedIdentifiers.Size(m)
 }
 func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) XXX_DiscardUnknown() {
 	xxx_messageInfo_ClaimGatewayRequest_AuthenticatedIdentifiers.DiscardUnknown(m)
@@ -666,25 +599,16 @@ func (*AuthorizeGatewayRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e8a7f6d184fc3dc3, []int{4}
 }
 func (m *AuthorizeGatewayRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_AuthorizeGatewayRequest.Unmarshal(m, b)
 }
 func (m *AuthorizeGatewayRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AuthorizeGatewayRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_AuthorizeGatewayRequest.Marshal(b, m, deterministic)
 }
 func (m *AuthorizeGatewayRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_AuthorizeGatewayRequest.Merge(m, src)
 }
 func (m *AuthorizeGatewayRequest) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_AuthorizeGatewayRequest.Size(m)
 }
 func (m *AuthorizeGatewayRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_AuthorizeGatewayRequest.DiscardUnknown(m)
@@ -726,111 +650,111 @@ func init() {
 }
 
 var fileDescriptor_e8a7f6d184fc3dc3 = []byte{
-	// 1663 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x57, 0x4d, 0x4c, 0x1b, 0xcb,
-	0x1d, 0xf7, 0x60, 0xc0, 0x30, 0x7c, 0x99, 0xe5, 0x23, 0x1b, 0x43, 0x6d, 0x9e, 0x43, 0x0a, 0xf8,
-	0xe1, 0xdd, 0xc6, 0x34, 0x4f, 0x05, 0xbd, 0x57, 0xe2, 0x05, 0x5a, 0x1c, 0x9e, 0xde, 0x4b, 0x37,
-	0xf0, 0x54, 0x85, 0x07, 0xab, 0x61, 0x77, 0x62, 0x36, 0x5e, 0x76, 0x9d, 0xd9, 0xb5, 0x53, 0x43,
-	0x50, 0x51, 0x55, 0x29, 0x52, 0x2a, 0xf5, 0x43, 0x95, 0x22, 0x55, 0xed, 0xa1, 0x97, 0x4a, 0xbd,
-	0xf5, 0xd4, 0x7b, 0x7b, 0xcb, 0x31, 0x6a, 0x2f, 0x55, 0x0e, 0x56, 0xeb, 0xf4, 0xd0, 0x63, 0x8f,
-	0x15, 0xa7, 0x6a, 0x66, 0x77, 0xed, 0xb5, 0xb1, 0x13, 0x12, 0xe5, 0x90, 0xdb, 0xec, 0xfe, 0xff,
-	0xf3, 0xfb, 0x7f, 0xce, 0xff, 0x37, 0x03, 0x17, 0x0d, 0x8b, 0xa0, 0x47, 0xc8, 0x4c, 0xdb, 0x0e,
-	0x52, 0x0b, 0x22, 0x2a, 0xea, 0xa2, 0x86, 0xcb, 0xba, 0x8a, 0x55, 0x03, 0xe9, 0x47, 0xba, 0x99,
-	0xb7, 0x31, 0x29, 0x63, 0x22, 0x14, 0x89, 0xe5, 0x58, 0xdc, 0xb0, 0xe3, 0x98, 0x82, 0xb7, 0x43,
-	0x28, 0x2f, 0xc5, 0xb2, 0x79, 0xdd, 0x39, 0x2c, 0x1d, 0x08, 0xaa, 0x75, 0x24, 0x62, 0xb3, 0x6c,
-	0x55, 0x8a, 0xc4, 0xfa, 0x51, 0x45, 0x64, 0xca, 0x6a, 0x3a, 0x8f, 0xcd, 0x74, 0x19, 0x19, 0xba,
-	0x86, 0x1c, 0x2c, 0x5e, 0x58, 0xb8, 0x90, 0xb1, 0x74, 0x00, 0x22, 0x6f, 0xe5, 0x2d, 0x77, 0xf3,
-	0x41, 0xe9, 0x3e, 0xfb, 0x62, 0x1f, 0x6c, 0xe5, 0xa9, 0x4f, 0xe7, 0x2d, 0x2b, 0x6f, 0x60, 0xe6,
-	0x28, 0x32, 0x4d, 0xcb, 0x41, 0x8e, 0x6e, 0x99, 0xb6, 0x27, 0x9d, 0xf2, 0xa4, 0x75, 0x0c, 0x7c,
-	0x54, 0x74, 0x2a, 0x9e, 0xf0, 0xda, 0xc5, 0x50, 0x75, 0x0d, 0x9b, 0x8e, 0x7e, 0x5f, 0xc7, 0xc4,
-	0x43, 0x48, 0xfe, 0x6c, 0x08, 0x4e, 0xac, 0xd1, 0xd0, 0x37, 0x4c, 0x6d, 0x9d, 0x25, 0x42, 0xc6,
-	0x0f, 0x4b, 0xd8, 0x76, 0xb8, 0xdf, 0x02, 0x78, 0x15, 0x95, 0x9c, 0x43, 0xba, 0x43, 0x45, 0x0e,
-	0xd6, 0x94, 0xc0, 0x6e, 0x1e, 0xcc, 0x80, 0xf9, 0x81, 0xcc, 0x77, 0x85, 0xe6, 0x04, 0x09, 0x6d,
-	0xa1, 0x84, 0x6c, 0x10, 0x26, 0xd7, 0x40, 0x91, 0xa6, 0x6b, 0xd5, 0x04, 0xdf, 0x49, 0xba, 0x19,
-	0x92, 0x79, 0xd4, 0x41, 0xc6, 0x89, 0x30, 0xf2, 0x90, 0x28, 0xaa, 0xa5, 0x61, 0xbe, 0x6b, 0x06,
-	0xcc, 0x0f, 0x4a, 0xe3, 0xe7, 0x52, 0xe4, 0xb8, 0x27, 0x1a, 0xe2, 0xcf, 0xfa, 0x6a, 0xd5, 0x44,
-	0xef, 0x0f, 0xe4, 0x35, 0x4b, 0xc3, 0x9b, 0x21, 0xb9, 0xf7, 0x21, 0xa1, 0x2b, 0xee, 0x01, 0x9c,
-	0x74, 0x10, 0xc9, 0x63, 0x47, 0x41, 0xc5, 0xa2, 0x41, 0x01, 0x75, 0xcb, 0x54, 0x74, 0xcd, 0xe6,
-	0xc3, 0x2c, 0x94, 0x6f, 0xb6, 0x86, 0x92, 0x6d, 0xa8, 0x05, 0x5d, 0x1e, 0x3c, 0x97, 0x7a, 0x9e,
-	0x82, 0xae, 0x28, 0x78, 0x5e, 0x4d, 0x84, 0xe4, 0x71, 0x17, 0xb3, 0x49, 0xd7, 0xe6, 0xb6, 0x61,
-	0xd4, 0xb3, 0xe5, 0xf6, 0x96, 0xa2, 0x6b, 0x7c, 0xf7, 0x0c, 0x98, 0xef, 0x97, 0x52, 0xe7, 0xd2,
-	0x1c, 0xb9, 0xce, 0xcf, 0x66, 0x3e, 0xda, 0xdf, 0x45, 0xe9, 0xe3, 0x6f, 0xa5, 0x97, 0xf7, 0xe6,
-	0x57, 0x57, 0x76, 0xd3, 0x7b, 0xab, 0xfe, 0xe7, 0xc2, 0x49, 0x66, 0xf1, 0x74, 0xf6, 0xf1, 0xfe,
-	0xac, 0x3c, 0xec, 0x62, 0xb8, 0xa9, 0xcc, 0x69, 0xdc, 0xdf, 0x00, 0xfc, 0x86, 0x07, 0x6b, 0x62,
-	0xe7, 0x91, 0x45, 0x0a, 0x8a, 0xdb, 0xac, 0x0a, 0xd2, 0x34, 0x82, 0x6d, 0x9b, 0x8f, 0x30, 0x1b,
-	0x3f, 0x07, 0xe7, 0xd2, 0x53, 0x40, 0x9e, 0x80, 0xcc, 0x4f, 0xc1, 0xfe, 0xfc, 0xea, 0x0a, 0x35,
-	0x80, 0xd2, 0xc7, 0xd9, 0xf4, 0x3d, 0x8a, 0xff, 0x38, 0xb0, 0x6e, 0x2c, 0xbf, 0x4e, 0xef, 0xa5,
-	0x02, 0x82, 0x85, 0xaf, 0x85, 0x85, 0x14, 0xdd, 0x97, 0x4d, 0xdf, 0xf3, 0xfc, 0x7a, 0x1c, 0x58,
-	0x37, 0x96, 0x6c, 0x5f, 0x43, 0xb0, 0x30, 0xbf, 0xba, 0xb2, 0xb2, 0x4b, 0x57, 0x27, 0x37, 0x16,
-	0x6f, 0x9e, 0x2e, 0xac, 0xb2, 0x40, 0x62, 0xae, 0xd7, 0x5f, 0xb8, 0x4e, 0xdf, 0x65, 0x3e, 0x67,
-	0x5d, 0x97, 0xb9, 0x23, 0x98, 0x68, 0x1f, 0x53, 0x01, 0x17, 0x14, 0x03, 0x1d, 0x60, 0x83, 0xef,
-	0x63, 0x51, 0xcd, 0x9d, 0x4b, 0x3d, 0x24, 0xcc, 0x9f, 0x45, 0x6b, 0xd5, 0xc4, 0xd4, 0xf6, 0x45,
-	0xc0, 0xad, 0x8d, 0xad, 0xcf, 0xa9, 0xba, 0x3c, 0xd5, 0xc6, 0xda, 0x16, 0x2e, 0x30, 0x21, 0xf7,
-	0x12, 0xc0, 0x8f, 0xda, 0xb4, 0x41, 0x4b, 0x1e, 0xfb, 0x3f, 0xcc, 0x3c, 0xc6, 0x2f, 0x34, 0x5b,
-	0x73, 0x2e, 0x2b, 0xf0, 0x5a, 0xe7, 0xd8, 0x1a, 0xf9, 0x84, 0x2c, 0xba, 0x8f, 0x03, 0xf9, 0x4c,
-	0x6c, 0xb7, 0x07, 0xae, 0xe7, 0x34, 0xd1, 0xc1, 0x72, 0x3d, 0xaf, 0x18, 0x4e, 0x77, 0x36, 0xad,
-	0x6b, 0xfc, 0x00, 0xb3, 0x39, 0x7b, 0x2e, 0x75, 0x93, 0x2e, 0x5e, 0xab, 0x55, 0x13, 0x57, 0x3b,
-	0x98, 0xcc, 0xad, 0xcb, 0x57, 0x3b, 0x18, 0xcb, 0x69, 0xdc, 0x1e, 0x1c, 0x6a, 0x74, 0x0b, 0xc5,
-	0x1d, 0x62, 0x67, 0x7f, 0xf9, 0x65, 0x35, 0x71, 0x33, 0x6f, 0x09, 0xce, 0x21, 0x76, 0x0e, 0xe9,
-	0x0c, 0x17, 0xbc, 0x66, 0x12, 0x9b, 0x47, 0x60, 0x79, 0x49, 0x2c, 0x16, 0xf2, 0xa2, 0x53, 0x29,
-	0x62, 0x5b, 0xf8, 0x02, 0x3b, 0xb9, 0x75, 0x79, 0xa0, 0xde, 0x2d, 0x39, 0x8d, 0x5b, 0x87, 0x71,
-	0xdd, 0xf4, 0xe7, 0xb5, 0x12, 0x98, 0x3d, 0x34, 0x18, 0x36, 0x6b, 0x7a, 0x66, 0xc0, 0x7c, 0x9f,
-	0x3c, 0xdd, 0xd0, 0xca, 0x36, 0x29, 0xd1, 0x49, 0x13, 0x7b, 0xd6, 0x05, 0x3b, 0xce, 0x34, 0xee,
-	0x87, 0xb0, 0xef, 0x81, 0xa5, 0x9b, 0x0a, 0x2e, 0xe9, 0x6c, 0x86, 0x0e, 0x4a, 0x9f, 0xd1, 0x41,
-	0xf2, 0x2e, 0x01, 0x6c, 0xec, 0xe4, 0x3e, 0xf9, 0xb6, 0x1c, 0xa1, 0x70, 0x1b, 0x25, 0x9d, 0xfb,
-	0x0a, 0x46, 0x34, 0x5c, 0x66, 0xc0, 0x5d, 0xef, 0x03, 0xb8, 0x57, 0xc3, 0x65, 0x8a, 0xbb, 0x09,
-	0xc7, 0xda, 0x65, 0x22, 0xcc, 0x2a, 0x7a, 0xe5, 0x5c, 0x1a, 0x27, 0x5c, 0x26, 0xba, 0xbf, 0xeb,
-	0x75, 0xfc, 0xc9, 0x8d, 0xc5, 0xa5, 0xcc, 0xe9, 0xac, 0xcc, 0xa1, 0x0b, 0x89, 0x91, 0xc6, 0xe1,
-	0x90, 0x6d, 0x95, 0x88, 0x8a, 0xbd, 0xb1, 0xc8, 0x85, 0xff, 0x27, 0x81, 0xdb, 0xdd, 0x7d, 0xbd,
-	0xd1, 0xc8, 0xed, 0xee, 0xbe, 0xc1, 0xe8, 0x50, 0xf2, 0x4f, 0x00, 0x4e, 0xd1, 0xd4, 0x59, 0x44,
-	0x3f, 0xc6, 0x81, 0x06, 0xf0, 0x39, 0x09, 0xc1, 0x91, 0xd6, 0xe9, 0x0d, 0xde, 0x6a, 0x7a, 0x47,
-	0x83, 0xd3, 0xfb, 0x45, 0x35, 0x01, 0xe4, 0x61, 0xd4, 0x3c, 0xbb, 0xd3, 0x30, 0x82, 0x8a, 0xba,
-	0x52, 0xc0, 0x15, 0x96, 0xc6, 0x7e, 0x46, 0x2c, 0xa4, 0x27, 0x0a, 0xf8, 0x33, 0x40, 0x89, 0x25,
-	0x7b, 0x27, 0xb7, 0x85, 0x2b, 0x72, 0x2f, 0x2a, 0xea, 0x5b, 0xb8, 0x92, 0x7c, 0x12, 0x86, 0x23,
-	0x6b, 0x3b, 0x77, 0xee, 0xca, 0x58, 0xd3, 0x09, 0x56, 0x29, 0x0a, 0xb7, 0x0c, 0x47, 0xbc, 0x2e,
-	0x55, 0x4b, 0x45, 0x5b, 0x29, 0x11, 0xb7, 0xd4, 0xfd, 0xd2, 0x68, 0xad, 0x9a, 0x18, 0x72, 0x1b,
-	0x9f, 0xee, 0xd9, 0x91, 0x73, 0xb2, 0xd7, 0xcf, 0x6b, 0xa5, 0xa2, 0xbd, 0x43, 0x74, 0xee, 0x3b,
-	0x70, 0x4c, 0x2d, 0x11, 0x82, 0x4d, 0x47, 0xc9, 0x23, 0x07, 0x3f, 0x42, 0x95, 0x80, 0x27, 0x7d,
-	0xfe, 0x91, 0x95, 0x47, 0x3d, 0xa5, 0xef, 0xbb, 0x3a, 0x5b, 0xb8, 0xc2, 0xa5, 0xe0, 0x68, 0xd0,
-	0xa8, 0x43, 0x4a, 0xb6, 0xc3, 0x8a, 0x34, 0x28, 0x8f, 0x34, 0x6c, 0x6c, 0xd3, 0xdf, 0xdc, 0x6d,
-	0x08, 0x55, 0x43, 0xa7, 0x46, 0x1c, 0xc3, 0x66, 0xcc, 0x34, 0x90, 0x59, 0xb8, 0x40, 0xe5, 0xcd,
-	0x51, 0x09, 0x6b, 0x6c, 0xc7, 0xf6, 0xe7, 0x77, 0x37, 0x43, 0x72, 0xbf, 0xbb, 0x7d, 0xdb, 0xb0,
-	0xb9, 0x05, 0x08, 0x69, 0xa9, 0x15, 0xc7, 0x2a, 0x60, 0x93, 0x9d, 0x8f, 0x80, 0xa3, 0x54, 0x95,
-	0x4a, 0xb7, 0xa9, 0x30, 0xb6, 0x01, 0xfb, 0xeb, 0x20, 0xdc, 0x34, 0xec, 0x56, 0x31, 0x71, 0xbc,
-	0x43, 0x40, 0x77, 0x1c, 0x87, 0xf9, 0xb3, 0x5b, 0x32, 0xfb, 0xcb, 0xc5, 0x60, 0xd8, 0x8f, 0x3b,
-	0x28, 0xa4, 0x3f, 0xa5, 0x09, 0x38, 0xe6, 0xe7, 0x46, 0x25, 0x98, 0x15, 0x17, 0x19, 0x76, 0xb2,
-	0x16, 0x81, 0x63, 0xec, 0xfa, 0xe1, 0x25, 0xc5, 0xef, 0x99, 0xdf, 0x5c, 0xe2, 0x1e, 0xf3, 0x69,
-	0xdb, 0x7b, 0x4c, 0x33, 0xd0, 0x07, 0x71, 0x8b, 0x51, 0xe0, 0xa0, 0x6a, 0x19, 0x06, 0x3a, 0xb0,
-	0x08, 0x72, 0x2c, 0xe2, 0xdd, 0x5d, 0xd2, 0xad, 0xee, 0x7f, 0x49, 0xf2, 0xc8, 0xd4, 0x8f, 0x59,
-	0x53, 0x7f, 0x49, 0x76, 0x6c, 0x3a, 0x3c, 0x3b, 0x5d, 0x61, 0x9a, 0x00, 0xb9, 0xaf, 0xea, 0x6d,
-	0xe4, 0xe7, 0xf8, 0x9d, 0xee, 0x2e, 0x5e, 0xcb, 0x79, 0x19, 0x6c, 0xbe, 0xbc, 0xf8, 0xc0, 0x2d,
-	0xa4, 0xdb, 0xf3, 0x41, 0x5f, 0x5e, 0xbc, 0x48, 0x9a, 0x09, 0x57, 0x81, 0x51, 0x76, 0xd8, 0x48,
-	0xe3, 0x98, 0xf0, 0xbd, 0xac, 0x22, 0x89, 0x37, 0x9c, 0x26, 0x69, 0xac, 0x56, 0x4d, 0xb4, 0x0e,
-	0x0e, 0x79, 0x84, 0xa2, 0x05, 0x27, 0xc9, 0x2d, 0xc8, 0x7b, 0x49, 0xbb, 0x4f, 0x68, 0x17, 0x9a,
-	0x6a, 0x45, 0x29, 0x1a, 0x88, 0x4e, 0x3e, 0xef, 0xb2, 0x17, 0x71, 0x29, 0xf5, 0x96, 0x3c, 0xe1,
-	0x2a, 0x7e, 0xcf, 0xd7, 0xbb, 0x63, 0x20, 0x33, 0xa7, 0xc5, 0xfe, 0x0c, 0x5e, 0x43, 0x46, 0xfb,
-	0x70, 0xc0, 0x2f, 0xc6, 0x7b, 0xe3, 0x23, 0xe8, 0x21, 0x52, 0xea, 0x58, 0x6e, 0x4f, 0x1d, 0xcd,
-	0xa7, 0x3a, 0xda, 0x96, 0x2b, 0x26, 0xe0, 0xb0, 0xc7, 0x15, 0x1e, 0x1e, 0x23, 0x8b, 0xe4, 0xef,
-	0x00, 0xbc, 0x52, 0x27, 0x88, 0x96, 0x83, 0xbe, 0xd3, 0x88, 0xa6, 0x41, 0x0c, 0xc9, 0xd6, 0x42,
-	0xd4, 0x5b, 0xf2, 0x75, 0xa4, 0xe0, 0x07, 0x41, 0x09, 0x21, 0xd5, 0x4a, 0x08, 0xa3, 0x2c, 0xe5,
-	0xd1, 0x36, 0x6c, 0x90, 0xf9, 0x6b, 0x18, 0x5e, 0xa9, 0xbf, 0x7e, 0xd6, 0xbc, 0x17, 0xa5, 0xdb,
-	0x33, 0x9c, 0x01, 0x7b, 0xd8, 0x1f, 0xee, 0xfa, 0xa5, 0x1e, 0x4d, 0xb1, 0xd9, 0x56, 0xb5, 0xba,
-	0x46, 0xc0, 0xf7, 0xe4, 0xe4, 0x4f, 0xfe, 0xfe, 0xef, 0x5f, 0x77, 0x45, 0x93, 0x03, 0x22, 0xd6,
-	0x54, 0x5b, 0x64, 0xaf, 0xd8, 0x15, 0x90, 0xe2, 0xfe, 0x00, 0xe0, 0x78, 0x3b, 0x26, 0xe5, 0x3e,
-	0xbe, 0xc0, 0x94, 0x9d, 0xf9, 0x36, 0x36, 0x29, 0xb8, 0x0f, 0x4c, 0xc1, 0x7f, 0x60, 0x0a, 0x1b,
-	0xf4, 0x81, 0x99, 0xdc, 0x64, 0x56, 0xa5, 0xe4, 0x67, 0xae, 0xd5, 0x00, 0x85, 0xda, 0xe2, 0x49,
-	0x0b, 0x43, 0x0b, 0xcd, 0xdf, 0xa7, 0x22, 0xf2, 0x0d, 0x52, 0x3f, 0x7f, 0x01, 0xe0, 0xe4, 0x8e,
-	0x89, 0xda, 0x79, 0x7a, 0x49, 0x4e, 0xef, 0xe8, 0xe4, 0x4d, 0xe6, 0xa4, 0x98, 0x4a, 0xbf, 0xd9,
-	0xc9, 0x80, 0x53, 0x99, 0x67, 0x61, 0x38, 0xe1, 0x35, 0x49, 0x4b, 0x05, 0x0f, 0xfd, 0x0a, 0x5e,
-	0xbb, 0x04, 0x5d, 0xc4, 0x2e, 0xd1, 0x79, 0x81, 0xea, 0xe5, 0x55, 0x23, 0x50, 0xbd, 0x5f, 0x01,
-	0x18, 0x6d, 0x6d, 0x73, 0x6e, 0xae, 0x63, 0xe5, 0x5a, 0x2c, 0x77, 0x4a, 0xc8, 0xa7, 0xcc, 0xda,
-	0x27, 0xc9, 0x1b, 0xae, 0x35, 0xaf, 0xc7, 0x6d, 0xf1, 0x24, 0x70, 0x6c, 0x84, 0xc6, 0xba, 0xa5,
-	0x52, 0x3f, 0x86, 0x5c, 0xa0, 0x50, 0xbe, 0x53, 0x97, 0x88, 0xb2, 0xa3, 0x3f, 0x69, 0xe6, 0xcf,
-	0x5c, 0xea, 0x7a, 0x67, 0x7f, 0x02, 0x3e, 0x48, 0x7b, 0xff, 0xf8, 0x57, 0x3c, 0x74, 0x56, 0x8b,
-	0x83, 0x3f, 0xd6, 0xe2, 0xe0, 0x79, 0x2d, 0x0e, 0x5e, 0xd4, 0xe2, 0xe0, 0x9f, 0xb5, 0x38, 0xf8,
-	0x4f, 0x2d, 0x1e, 0xfa, 0x6f, 0x2d, 0x0e, 0x7e, 0xf9, 0x2a, 0x1e, 0xfa, 0xfd, 0xab, 0x78, 0xe8,
-	0x2f, 0xaf, 0xe2, 0xe0, 0x9e, 0xf8, 0x16, 0xe3, 0xcb, 0x31, 0x8b, 0x07, 0x07, 0xbd, 0xcc, 0xbb,
-	0xa5, 0xff, 0x07, 0x00, 0x00, 0xff, 0xff, 0xcc, 0x7f, 0x21, 0xd0, 0x22, 0x12, 0x00, 0x00,
+	// 1656 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x57, 0x4b, 0x6c, 0xdb, 0xc8,
+	0x19, 0x16, 0x2d, 0xdb, 0xb2, 0xc7, 0x2f, 0x99, 0x7e, 0x84, 0x91, 0x5d, 0xc9, 0x51, 0x9c, 0xda,
+	0x56, 0x2c, 0xb2, 0x91, 0x9b, 0xa0, 0x36, 0x92, 0x3a, 0xa2, 0xed, 0xd6, 0x8a, 0x83, 0x24, 0x65,
+	0xac, 0xa0, 0x88, 0x63, 0x13, 0x63, 0x72, 0x22, 0x33, 0xa2, 0x49, 0x65, 0x48, 0x29, 0x95, 0x1d,
+	0xa3, 0x46, 0x51, 0x20, 0x40, 0x0a, 0xf4, 0x81, 0x02, 0x01, 0x8a, 0xf6, 0xd0, 0x4b, 0x81, 0xde,
+	0x7a, 0xea, 0xbd, 0xbd, 0xf5, 0x58, 0xec, 0x5e, 0x16, 0x39, 0x08, 0xbb, 0xca, 0x1e, 0xf6, 0xb8,
+	0xc7, 0x85, 0x4f, 0x8b, 0x19, 0x92, 0x12, 0x25, 0x4b, 0x89, 0x13, 0xe4, 0x90, 0xdb, 0x90, 0xff,
+	0x3f, 0xdf, 0xff, 0x9c, 0xff, 0x9b, 0x01, 0xf3, 0xba, 0x89, 0xe1, 0x33, 0x68, 0x24, 0x2d, 0x1b,
+	0x2a, 0x79, 0x01, 0x16, 0x34, 0x41, 0x45, 0x25, 0x4d, 0x41, 0x8a, 0x0e, 0xb5, 0x7d, 0xcd, 0xc8,
+	0x59, 0x08, 0x97, 0x10, 0xe6, 0x0b, 0xd8, 0xb4, 0x4d, 0x76, 0xd0, 0xb6, 0x0d, 0xde, 0xdd, 0xc1,
+	0x97, 0x16, 0x22, 0xe9, 0x9c, 0x66, 0xef, 0x15, 0x77, 0x79, 0xc5, 0xdc, 0x17, 0x90, 0x51, 0x32,
+	0xcb, 0x05, 0x6c, 0xfe, 0xaa, 0x2c, 0x50, 0x65, 0x25, 0x99, 0x43, 0x46, 0xb2, 0x04, 0x75, 0x4d,
+	0x85, 0x36, 0x12, 0x4e, 0x2d, 0x1c, 0xc8, 0x48, 0xd2, 0x07, 0x91, 0x33, 0x73, 0xa6, 0xb3, 0x79,
+	0xb7, 0xf8, 0x98, 0x7e, 0xd1, 0x0f, 0xba, 0x72, 0xd5, 0x27, 0x73, 0xa6, 0x99, 0xd3, 0x11, 0x75,
+	0x14, 0x1a, 0x86, 0x69, 0x43, 0x5b, 0x33, 0x0d, 0xcb, 0x95, 0x4e, 0xb8, 0xd2, 0x1a, 0x06, 0xda,
+	0x2f, 0xd8, 0x65, 0x57, 0x78, 0xf1, 0x74, 0xa8, 0x9a, 0x8a, 0x0c, 0x5b, 0x7b, 0xac, 0x21, 0xec,
+	0x22, 0xc4, 0x7f, 0x37, 0x00, 0xc6, 0x56, 0x48, 0xe8, 0x6b, 0x86, 0xba, 0x4a, 0x13, 0x21, 0xa1,
+	0xa7, 0x45, 0x64, 0xd9, 0xec, 0x5f, 0x19, 0x70, 0x1e, 0x16, 0xed, 0x3d, 0xb2, 0x43, 0x81, 0x36,
+	0x52, 0x65, 0xdf, 0x6e, 0x8e, 0x99, 0x62, 0x66, 0xfb, 0x52, 0x3f, 0xe5, 0x1b, 0x13, 0xc4, 0xb7,
+	0x84, 0xe2, 0xd3, 0x7e, 0x98, 0x4c, 0x1d, 0x45, 0x9c, 0xac, 0x56, 0x62, 0x5c, 0x3b, 0xe9, 0x7a,
+	0x40, 0xe2, 0x60, 0x1b, 0x19, 0x2b, 0x80, 0xd0, 0x53, 0x2c, 0x2b, 0xa6, 0x8a, 0xb8, 0x8e, 0x29,
+	0x66, 0xb6, 0x5f, 0x1c, 0x3d, 0x11, 0x43, 0x07, 0x5d, 0xe1, 0x00, 0x77, 0xdc, 0x53, 0xad, 0xc4,
+	0xba, 0x7f, 0x21, 0xad, 0x98, 0x2a, 0x5a, 0x0f, 0x48, 0xdd, 0x4f, 0x31, 0x59, 0xb1, 0x4f, 0xc0,
+	0xb8, 0x0d, 0x71, 0x0e, 0xd9, 0x32, 0x2c, 0x14, 0x74, 0x02, 0xa8, 0x99, 0x86, 0xac, 0xa9, 0x16,
+	0x17, 0xa4, 0xa1, 0xfc, 0xb0, 0x39, 0x94, 0x74, 0x5d, 0xcd, 0xef, 0x72, 0xff, 0x89, 0xd8, 0xf5,
+	0x92, 0xe9, 0x08, 0x33, 0xff, 0xab, 0xc4, 0x02, 0xd2, 0xa8, 0x83, 0xd9, 0xa0, 0x6b, 0xb1, 0x9b,
+	0x20, 0xec, 0xda, 0x72, 0x7a, 0x4b, 0xd6, 0x54, 0xae, 0x73, 0x8a, 0x99, 0xed, 0x15, 0x13, 0x27,
+	0xe2, 0x0c, 0xbe, 0xc4, 0x4d, 0xa7, 0x2e, 0xec, 0x6c, 0xc1, 0xe4, 0xc1, 0x8f, 0x92, 0x8b, 0xdb,
+	0xb3, 0xcb, 0x4b, 0x5b, 0xc9, 0xed, 0x65, 0xef, 0x73, 0xee, 0x30, 0x35, 0x7f, 0x34, 0xfd, 0x7c,
+	0x67, 0x5a, 0x1a, 0x74, 0x30, 0x9c, 0x54, 0x66, 0x54, 0xf6, 0x33, 0x06, 0xfc, 0xc0, 0x85, 0x35,
+	0x90, 0xfd, 0xcc, 0xc4, 0x79, 0xd9, 0x69, 0x56, 0x19, 0xaa, 0x2a, 0x46, 0x96, 0xc5, 0x85, 0xa8,
+	0x8d, 0xdf, 0x33, 0x27, 0xe2, 0x4b, 0x06, 0xbf, 0x60, 0x52, 0xbf, 0x65, 0x76, 0x66, 0x97, 0x97,
+	0x88, 0x01, 0x98, 0x3c, 0x48, 0x27, 0x1f, 0x12, 0xfc, 0xe7, 0xbe, 0x75, 0x7d, 0xf9, 0x28, 0xb9,
+	0x9d, 0xf0, 0x09, 0xe6, 0x1e, 0xf1, 0x73, 0x09, 0xb2, 0x2f, 0x9d, 0x7c, 0xe8, 0xfa, 0xf5, 0xdc,
+	0xb7, 0xae, 0x2f, 0xe9, 0xbe, 0xba, 0x60, 0x6e, 0x76, 0x79, 0x69, 0x69, 0x8b, 0xac, 0x0e, 0xaf,
+	0xcc, 0x5f, 0x3d, 0x9a, 0x5b, 0xa6, 0x81, 0x44, 0x1c, 0xaf, 0xef, 0x38, 0x4e, 0xdf, 0xa7, 0x3e,
+	0xa7, 0x1d, 0x97, 0xd9, 0x7d, 0x10, 0x6b, 0x1d, 0x53, 0x1e, 0xe5, 0x65, 0x1d, 0xee, 0x22, 0x9d,
+	0xeb, 0xa1, 0x51, 0xcd, 0x9c, 0x88, 0x5d, 0x38, 0xc8, 0x1d, 0x87, 0xab, 0x95, 0xd8, 0xc4, 0xe6,
+	0x69, 0xc0, 0x8d, 0xb5, 0x8d, 0xdb, 0x44, 0x5d, 0x9a, 0x68, 0x61, 0x6d, 0x03, 0xe5, 0xa9, 0x90,
+	0x7d, 0xcd, 0x80, 0x0b, 0x2d, 0xda, 0xa0, 0x29, 0x8f, 0xbd, 0x9f, 0x66, 0x1e, 0xa3, 0xa7, 0x9a,
+	0xad, 0x31, 0x97, 0x65, 0x70, 0xb1, 0x7d, 0x6c, 0xf5, 0x7c, 0x02, 0x1a, 0xdd, 0x65, 0x5f, 0x3e,
+	0x63, 0x9b, 0xad, 0x81, 0x6b, 0x39, 0x8d, 0xb5, 0xb1, 0x5c, 0xcb, 0x2b, 0x02, 0x93, 0xed, 0x4d,
+	0x6b, 0x2a, 0xd7, 0x47, 0x6d, 0x4e, 0x9f, 0x88, 0x9d, 0xb8, 0x83, 0x53, 0xab, 0x95, 0xd8, 0xf9,
+	0x36, 0x26, 0x33, 0xab, 0xd2, 0xf9, 0x36, 0xc6, 0x32, 0x2a, 0xbb, 0x0d, 0x06, 0xea, 0xdd, 0x42,
+	0x70, 0x07, 0xe8, 0xd9, 0x5f, 0x7c, 0x5d, 0x89, 0x5d, 0xcd, 0x99, 0xbc, 0xbd, 0x87, 0xec, 0x3d,
+	0x32, 0xc3, 0x79, 0xb7, 0x99, 0x84, 0xc6, 0x11, 0x58, 0x5a, 0x10, 0x0a, 0xf9, 0x9c, 0x60, 0x97,
+	0x0b, 0xc8, 0xe2, 0xef, 0x20, 0x3b, 0xb3, 0x2a, 0xf5, 0xd5, 0xba, 0x25, 0xa3, 0xb2, 0xab, 0x20,
+	0xaa, 0x19, 0xde, 0xbc, 0x96, 0x7d, 0xb3, 0x87, 0x04, 0x43, 0x67, 0x4d, 0xd7, 0x14, 0x33, 0xdb,
+	0x23, 0x4d, 0xd6, 0xb5, 0xd2, 0x0d, 0x4a, 0x64, 0xd2, 0x44, 0x5e, 0x75, 0x80, 0xb6, 0x33, 0x8d,
+	0xfd, 0x25, 0xe8, 0x79, 0x62, 0x6a, 0x86, 0x8c, 0x8a, 0x1a, 0x9d, 0xa1, 0xfd, 0xe2, 0x0d, 0x32,
+	0x48, 0x3e, 0x24, 0x80, 0xb5, 0x6c, 0xe6, 0xda, 0x8f, 0xa5, 0x10, 0x81, 0x5b, 0x2b, 0x6a, 0xec,
+	0x03, 0x10, 0x52, 0x51, 0x89, 0x02, 0x77, 0x7c, 0x0c, 0xe0, 0x6e, 0x15, 0x95, 0x08, 0xee, 0x3a,
+	0x18, 0x69, 0x95, 0x89, 0x20, 0xad, 0xe8, 0xb9, 0x13, 0x71, 0x14, 0xb3, 0xa9, 0xf0, 0xce, 0x96,
+	0xdb, 0xf1, 0x87, 0x57, 0xe6, 0x17, 0x52, 0x47, 0xd3, 0x12, 0x0b, 0x4f, 0x25, 0x46, 0x1c, 0x05,
+	0x03, 0x96, 0x59, 0xc4, 0x0a, 0x72, 0xc7, 0x22, 0x1b, 0xfc, 0x4e, 0x64, 0x6e, 0x75, 0xf6, 0x74,
+	0x87, 0x43, 0xb7, 0x3a, 0x7b, 0xfa, 0xc3, 0x03, 0xf1, 0x7f, 0x31, 0x60, 0x82, 0xa4, 0xce, 0xc4,
+	0xda, 0x01, 0xf2, 0x35, 0x80, 0xc7, 0x49, 0x10, 0x0c, 0x35, 0x4f, 0x6f, 0xe6, 0xbd, 0xa6, 0x77,
+	0xd8, 0x3f, 0xbd, 0xff, 0x5f, 0x89, 0x31, 0xd2, 0x20, 0x6c, 0x9c, 0xdd, 0x49, 0x10, 0x82, 0x05,
+	0x4d, 0xce, 0xa3, 0x32, 0x4d, 0x63, 0x2f, 0x25, 0x16, 0xdc, 0x15, 0x66, 0xb8, 0x63, 0x86, 0x10,
+	0x4b, 0xfa, 0x5e, 0x66, 0x03, 0x95, 0xa5, 0x6e, 0x58, 0xd0, 0x36, 0x50, 0x39, 0xfe, 0x22, 0x08,
+	0x86, 0x56, 0xb2, 0xf7, 0xee, 0x4b, 0x48, 0xd5, 0x30, 0x52, 0x08, 0x0a, 0xbb, 0x08, 0x86, 0xdc,
+	0x2e, 0x55, 0x8a, 0x05, 0x4b, 0x2e, 0x62, 0xa7, 0xd4, 0xbd, 0xe2, 0x70, 0xb5, 0x12, 0x1b, 0x70,
+	0x1a, 0x9f, 0xec, 0xc9, 0x4a, 0x19, 0xc9, 0xed, 0xe7, 0x95, 0x62, 0xc1, 0xca, 0x62, 0x8d, 0xfd,
+	0x09, 0x18, 0x51, 0x8a, 0x18, 0x23, 0xc3, 0x96, 0x73, 0xd0, 0x46, 0xcf, 0x60, 0xd9, 0xe7, 0x49,
+	0x8f, 0x77, 0x64, 0xa5, 0x61, 0x57, 0xe9, 0xe7, 0x8e, 0xce, 0x06, 0x2a, 0xb3, 0x09, 0x30, 0xec,
+	0x37, 0x6a, 0xe3, 0xa2, 0x65, 0xd3, 0x22, 0xf5, 0x4b, 0x43, 0x75, 0x1b, 0x9b, 0xe4, 0x37, 0x7b,
+	0x0b, 0x00, 0x45, 0xd7, 0x88, 0x11, 0x5b, 0xb7, 0x28, 0x33, 0xf5, 0xa5, 0xe6, 0x4e, 0x51, 0x79,
+	0x63, 0x54, 0xfc, 0x0a, 0xdd, 0xb1, 0x79, 0xfb, 0xfe, 0x7a, 0x40, 0xea, 0x75, 0xb6, 0x6f, 0xea,
+	0x16, 0x3b, 0x07, 0x00, 0x29, 0xb5, 0x6c, 0x9b, 0x79, 0x64, 0xd0, 0xf3, 0xe1, 0x73, 0x94, 0xa8,
+	0x12, 0xe9, 0x26, 0x11, 0x46, 0xd6, 0x40, 0x6f, 0x0d, 0x84, 0x9d, 0x04, 0x9d, 0x0a, 0xc2, 0xb6,
+	0x7b, 0x08, 0xc8, 0x8e, 0x83, 0x20, 0x77, 0x7c, 0x53, 0xa2, 0x7f, 0xd9, 0x08, 0x08, 0x7a, 0x71,
+	0xfb, 0x85, 0xe4, 0xa7, 0x38, 0x06, 0x46, 0xbc, 0xdc, 0x28, 0x18, 0xd1, 0xe2, 0x42, 0xdd, 0x8a,
+	0x57, 0x43, 0x60, 0x84, 0x5e, 0x3f, 0xdc, 0xa4, 0x78, 0x3d, 0xf3, 0x97, 0x33, 0xdc, 0x63, 0xae,
+	0xb7, 0xbc, 0xc7, 0x34, 0x02, 0x7d, 0x12, 0xb7, 0x18, 0x19, 0xf4, 0x2b, 0xa6, 0xae, 0xc3, 0x5d,
+	0x13, 0x43, 0xdb, 0xc4, 0xee, 0xdd, 0x25, 0xd9, 0xec, 0xfe, 0x5d, 0x9c, 0x83, 0x86, 0x76, 0x40,
+	0x9b, 0xfa, 0x2e, 0xce, 0x5a, 0x64, 0x78, 0xb6, 0xbb, 0xc2, 0x34, 0x00, 0xb2, 0x0f, 0x6a, 0x6d,
+	0xe4, 0xe5, 0xf8, 0x83, 0xee, 0x2e, 0x6e, 0xcb, 0xb9, 0x19, 0x6c, 0xbc, 0xbc, 0x78, 0xc0, 0x4d,
+	0xa4, 0xdb, 0xf5, 0x49, 0x5f, 0x5e, 0xdc, 0x48, 0x1a, 0x09, 0x57, 0x06, 0x61, 0x7a, 0xd8, 0x70,
+	0xfd, 0x98, 0x70, 0xdd, 0xb4, 0x22, 0xb1, 0x77, 0x9c, 0x26, 0x71, 0xa4, 0x5a, 0x89, 0x35, 0x0f,
+	0x0e, 0x69, 0x88, 0xa0, 0xf9, 0x27, 0xc9, 0x4d, 0xc0, 0xb9, 0x49, 0x7b, 0x8c, 0x49, 0x17, 0x1a,
+	0x4a, 0x59, 0x2e, 0xe8, 0x90, 0x4c, 0x3e, 0xf7, 0xb2, 0x17, 0x72, 0x28, 0xf5, 0xa6, 0x34, 0xe6,
+	0x28, 0xfe, 0xcc, 0xd3, 0xbb, 0xa7, 0x43, 0x23, 0xa3, 0x46, 0xfe, 0xcd, 0xbc, 0x85, 0x8c, 0x76,
+	0x40, 0x9f, 0x57, 0x8c, 0x8f, 0xc6, 0x47, 0xc0, 0x45, 0x24, 0xd4, 0xb1, 0xd8, 0x9a, 0x3a, 0x1a,
+	0x4f, 0x75, 0xb8, 0x25, 0x57, 0x8c, 0x81, 0x41, 0x97, 0x2b, 0x5c, 0x3c, 0x4a, 0x16, 0xf1, 0xbf,
+	0x31, 0xe0, 0x5c, 0x8d, 0x20, 0x9a, 0x0e, 0x7a, 0xb6, 0x1e, 0x4d, 0x9d, 0x18, 0xe2, 0xcd, 0x85,
+	0xa8, 0xb5, 0xe4, 0xdb, 0x48, 0xc1, 0x0b, 0x82, 0x10, 0x42, 0xa2, 0x99, 0x10, 0x86, 0x69, 0xca,
+	0xc3, 0x2d, 0xd8, 0x20, 0xf5, 0xdf, 0x20, 0x38, 0x57, 0x7b, 0xfd, 0xac, 0xb8, 0x2f, 0x4a, 0xa7,
+	0x67, 0x58, 0x1d, 0x74, 0xd1, 0x3f, 0xec, 0xa5, 0x33, 0x3d, 0x9a, 0x22, 0xd3, 0xcd, 0x6a, 0x35,
+	0x0d, 0x9f, 0xef, 0xf1, 0xf1, 0xdf, 0x7c, 0xfe, 0xf5, 0x9f, 0x3b, 0xc2, 0xf1, 0x3e, 0x01, 0xa9,
+	0x8a, 0x25, 0xd0, 0x57, 0xec, 0x12, 0x93, 0x60, 0xff, 0xc1, 0x80, 0xd1, 0x56, 0x4c, 0xca, 0x5e,
+	0x3e, 0xc5, 0x94, 0xed, 0xf9, 0x36, 0x32, 0xce, 0x3b, 0x0f, 0x4c, 0xde, 0x7b, 0x60, 0xf2, 0x6b,
+	0xe4, 0x81, 0x19, 0x5f, 0xa7, 0x56, 0xc5, 0xf8, 0x0d, 0xc7, 0xaa, 0x8f, 0x42, 0x2d, 0xe1, 0xb0,
+	0x89, 0xa1, 0xf9, 0xc6, 0xef, 0x23, 0x01, 0x7a, 0x06, 0x89, 0x9f, 0x7f, 0x60, 0xc0, 0x78, 0xd6,
+	0x80, 0xad, 0x3c, 0x3d, 0x23, 0xa7, 0xb7, 0x75, 0xf2, 0x2a, 0x75, 0x52, 0x48, 0x24, 0xdf, 0xed,
+	0xa4, 0xcf, 0xa9, 0xd4, 0xab, 0x20, 0x18, 0x73, 0x9b, 0xa4, 0xa9, 0x82, 0x7b, 0x5e, 0x05, 0x2f,
+	0x9e, 0x81, 0x2e, 0x22, 0x67, 0xe8, 0x3c, 0x5f, 0xf5, 0x72, 0x8a, 0xee, 0xab, 0xde, 0x9f, 0x18,
+	0x10, 0x6e, 0x6e, 0x73, 0x76, 0xa6, 0x6d, 0xe5, 0x9a, 0x2c, 0xb7, 0x4b, 0xc8, 0x75, 0x6a, 0xed,
+	0x5a, 0xfc, 0x8a, 0x63, 0xcd, 0xed, 0x71, 0x4b, 0x38, 0xf4, 0x1d, 0x1b, 0xbe, 0xbe, 0x6e, 0xaa,
+	0xd4, 0xaf, 0x01, 0xeb, 0x2b, 0x94, 0xe7, 0xd4, 0x19, 0xa2, 0x6c, 0xeb, 0x4f, 0x92, 0xfa, 0x33,
+	0x93, 0xb8, 0xd4, 0xde, 0x1f, 0x9f, 0x0f, 0x62, 0xf6, 0x8b, 0xaf, 0xa2, 0x81, 0xe3, 0x6a, 0x94,
+	0xf9, 0x67, 0x35, 0xca, 0x7c, 0x59, 0x8d, 0x32, 0xdf, 0x54, 0xa3, 0x81, 0x6f, 0xab, 0x51, 0xe6,
+	0x8f, 0x6f, 0xa2, 0x81, 0xbf, 0xbf, 0x89, 0x06, 0xfe, 0xf3, 0x26, 0xca, 0x3c, 0x14, 0xde, 0x63,
+	0x6c, 0xd9, 0x46, 0x61, 0x77, 0xb7, 0x9b, 0x7a, 0xb5, 0xf0, 0x7d, 0x00, 0x00, 0x00, 0xff, 0xff,
+	0x01, 0x2b, 0x44, 0xc8, 0x1a, 0x12, 0x00, 0x00,
 }
 
 func (this *ClaimEndDeviceRequest) Equal(that interface{}) bool {
@@ -1577,567 +1501,6 @@ var _GatewayClaimingServer_serviceDesc = grpc.ServiceDesc{
 	Metadata: "lorawan-stack/api/deviceclaimingserver.proto",
 }
 
-func (m *ClaimEndDeviceRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ClaimEndDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ClaimEndDeviceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.TargetNetId != nil {
-		{
-			size := m.TargetNetId.Size()
-			i -= size
-			if _, err := m.TargetNetId.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-			i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x6a
-	}
-	if len(m.TargetApplicationServerID) > 0 {
-		i -= len(m.TargetApplicationServerID)
-		copy(dAtA[i:], m.TargetApplicationServerID)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetApplicationServerID)))
-		i--
-		dAtA[i] = 0x5a
-	}
-	if len(m.TargetApplicationServerKEKLabel) > 0 {
-		i -= len(m.TargetApplicationServerKEKLabel)
-		copy(dAtA[i:], m.TargetApplicationServerKEKLabel)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetApplicationServerKEKLabel)))
-		i--
-		dAtA[i] = 0x52
-	}
-	if len(m.TargetApplicationServerAddress) > 0 {
-		i -= len(m.TargetApplicationServerAddress)
-		copy(dAtA[i:], m.TargetApplicationServerAddress)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetApplicationServerAddress)))
-		i--
-		dAtA[i] = 0x4a
-	}
-	if len(m.TargetNetworkServerKEKLabel) > 0 {
-		i -= len(m.TargetNetworkServerKEKLabel)
-		copy(dAtA[i:], m.TargetNetworkServerKEKLabel)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetNetworkServerKEKLabel)))
-		i--
-		dAtA[i] = 0x42
-	}
-	if len(m.TargetNetworkServerAddress) > 0 {
-		i -= len(m.TargetNetworkServerAddress)
-		copy(dAtA[i:], m.TargetNetworkServerAddress)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetNetworkServerAddress)))
-		i--
-		dAtA[i] = 0x3a
-	}
-	if m.InvalidateAuthenticationCode {
-		i--
-		if m.InvalidateAuthenticationCode {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x28
-	}
-	if len(m.TargetDeviceId) > 0 {
-		i -= len(m.TargetDeviceId)
-		copy(dAtA[i:], m.TargetDeviceId)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetDeviceId)))
-		i--
-		dAtA[i] = 0x22
-	}
-	{
-		size, err := m.TargetApplicationIds.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x1a
-	if m.SourceDevice != nil {
-		{
-			size := m.SourceDevice.Size()
-			i -= size
-			if _, err := m.SourceDevice.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers_) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.AuthenticatedIdentifiers != nil {
-		{
-			size, err := m.AuthenticatedIdentifiers.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-func (m *ClaimEndDeviceRequest_QRCode) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ClaimEndDeviceRequest_QRCode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.QRCode != nil {
-		i -= len(m.QRCode)
-		copy(dAtA[i:], m.QRCode)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.QRCode)))
-		i--
-		dAtA[i] = 0x12
-	}
-	return len(dAtA) - i, nil
-}
-func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.AuthenticationCode) > 0 {
-		i -= len(m.AuthenticationCode)
-		copy(dAtA[i:], m.AuthenticationCode)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.AuthenticationCode)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	{
-		size := m.DevEui.Size()
-		i -= size
-		if _, err := m.DevEui.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x12
-	{
-		size := m.JoinEui.Size()
-		i -= size
-		if _, err := m.JoinEui.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *AuthorizeApplicationRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AuthorizeApplicationRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *AuthorizeApplicationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.APIKey) > 0 {
-		i -= len(m.APIKey)
-		copy(dAtA[i:], m.APIKey)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.APIKey)))
-		i--
-		dAtA[i] = 0x12
-	}
-	{
-		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *CUPSRedirection) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *CUPSRedirection) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *CUPSRedirection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.GatewayCredentials != nil {
-		{
-			size := m.GatewayCredentials.Size()
-			i -= size
-			if _, err := m.GatewayCredentials.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	if len(m.TargetCupsTrust) > 0 {
-		i -= len(m.TargetCupsTrust)
-		copy(dAtA[i:], m.TargetCupsTrust)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetCupsTrust)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.CurrentGatewayKey) > 0 {
-		i -= len(m.CurrentGatewayKey)
-		copy(dAtA[i:], m.CurrentGatewayKey)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.CurrentGatewayKey)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.TargetCUPSURI) > 0 {
-		i -= len(m.TargetCUPSURI)
-		copy(dAtA[i:], m.TargetCUPSURI)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetCUPSURI)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *CUPSRedirection_ClientTls) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *CUPSRedirection_ClientTls) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.ClientTls != nil {
-		{
-			size, err := m.ClientTls.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x22
-	}
-	return len(dAtA) - i, nil
-}
-func (m *CUPSRedirection_AuthToken) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *CUPSRedirection_AuthToken) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	i -= len(m.AuthToken)
-	copy(dAtA[i:], m.AuthToken)
-	i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.AuthToken)))
-	i--
-	dAtA[i] = 0x2a
-	return len(dAtA) - i, nil
-}
-func (m *CUPSRedirection_ClientTLS) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *CUPSRedirection_ClientTLS) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *CUPSRedirection_ClientTLS) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Key) > 0 {
-		i -= len(m.Key)
-		copy(dAtA[i:], m.Key)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.Key)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Cert) > 0 {
-		i -= len(m.Cert)
-		copy(dAtA[i:], m.Cert)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.Cert)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ClaimGatewayRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ClaimGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ClaimGatewayRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.TargetFrequencyPlanId) > 0 {
-		i -= len(m.TargetFrequencyPlanId)
-		copy(dAtA[i:], m.TargetFrequencyPlanId)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetFrequencyPlanId)))
-		i--
-		dAtA[i] = 0x3a
-	}
-	if m.CUPSRedirection != nil {
-		{
-			size, err := m.CUPSRedirection.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x32
-	}
-	if len(m.TargetGatewayServerAddress) > 0 {
-		i -= len(m.TargetGatewayServerAddress)
-		copy(dAtA[i:], m.TargetGatewayServerAddress)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetGatewayServerAddress)))
-		i--
-		dAtA[i] = 0x2a
-	}
-	if len(m.TargetGatewayId) > 0 {
-		i -= len(m.TargetGatewayId)
-		copy(dAtA[i:], m.TargetGatewayId)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetGatewayId)))
-		i--
-		dAtA[i] = 0x22
-	}
-	{
-		size, err := m.Collaborator.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x1a
-	if m.SourceGateway != nil {
-		{
-			size := m.SourceGateway.Size()
-			i -= size
-			if _, err := m.SourceGateway.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ClaimGatewayRequest_AuthenticatedIdentifiers_) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ClaimGatewayRequest_AuthenticatedIdentifiers_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.AuthenticatedIdentifiers != nil {
-		{
-			size, err := m.AuthenticatedIdentifiers.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-func (m *ClaimGatewayRequest_QRCode) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ClaimGatewayRequest_QRCode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.QRCode != nil {
-		i -= len(m.QRCode)
-		copy(dAtA[i:], m.QRCode)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.QRCode)))
-		i--
-		dAtA[i] = 0x12
-	}
-	return len(dAtA) - i, nil
-}
-func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.AuthenticationCode) > 0 {
-		i -= len(m.AuthenticationCode)
-		copy(dAtA[i:], m.AuthenticationCode)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.AuthenticationCode)))
-		i--
-		dAtA[i] = 0x12
-	}
-	{
-		size := m.GatewayEui.Size()
-		i -= size
-		if _, err := m.GatewayEui.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *AuthorizeGatewayRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AuthorizeGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *AuthorizeGatewayRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.APIKey) > 0 {
-		i -= len(m.APIKey)
-		copy(dAtA[i:], m.APIKey)
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.APIKey)))
-		i--
-		dAtA[i] = 0x12
-	}
-	{
-		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func encodeVarintDeviceclaimingserver(dAtA []byte, offset int, v uint64) int {
-	offset -= sovDeviceclaimingserver(v)
-	base := offset
-	for v >= 1<<7 {
-		dAtA[offset] = uint8(v&0x7f | 0x80)
-		v >>= 7
-		offset++
-	}
-	dAtA[offset] = uint8(v)
-	return base
-}
 func (m *ClaimEndDeviceRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2152,9 +1515,6 @@ func (m *ClaimEndDeviceRequest) Size() (n int) {
 	l = len(m.TargetDeviceId)
 	if l > 0 {
 		n += 1 + l + sovDeviceclaimingserver(uint64(l))
-	}
-	if m.InvalidateAuthenticationCode {
-		n += 2
 	}
 	l = len(m.TargetNetworkServerAddress)
 	if l > 0 {
@@ -2179,6 +1539,9 @@ func (m *ClaimEndDeviceRequest) Size() (n int) {
 	if m.TargetNetId != nil {
 		l = m.TargetNetId.Size()
 		n += 1 + l + sovDeviceclaimingserver(uint64(l))
+	}
+	if m.InvalidateAuthenticationCode {
+		n += 2
 	}
 	return n
 }
@@ -2400,13 +1763,13 @@ func (this *ClaimEndDeviceRequest) String() string {
 		`SourceDevice:` + fmt.Sprintf("%v", this.SourceDevice) + `,`,
 		`TargetApplicationIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.TargetApplicationIds), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`TargetDeviceId:` + fmt.Sprintf("%v", this.TargetDeviceId) + `,`,
-		`InvalidateAuthenticationCode:` + fmt.Sprintf("%v", this.InvalidateAuthenticationCode) + `,`,
 		`TargetNetworkServerAddress:` + fmt.Sprintf("%v", this.TargetNetworkServerAddress) + `,`,
 		`TargetNetworkServerKEKLabel:` + fmt.Sprintf("%v", this.TargetNetworkServerKEKLabel) + `,`,
 		`TargetApplicationServerAddress:` + fmt.Sprintf("%v", this.TargetApplicationServerAddress) + `,`,
 		`TargetApplicationServerKEKLabel:` + fmt.Sprintf("%v", this.TargetApplicationServerKEKLabel) + `,`,
 		`TargetApplicationServerID:` + fmt.Sprintf("%v", this.TargetApplicationServerID) + `,`,
 		`TargetNetId:` + fmt.Sprintf("%v", this.TargetNetId) + `,`,
+		`InvalidateAuthenticationCode:` + fmt.Sprintf("%v", this.InvalidateAuthenticationCode) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2563,1620 +1926,3 @@ func valueToStringDeviceclaimingserver(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (m *ClaimEndDeviceRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowDeviceclaimingserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ClaimEndDeviceRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ClaimEndDeviceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AuthenticatedIdentifiers", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &ClaimEndDeviceRequest_AuthenticatedIdentifiers{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.SourceDevice = &ClaimEndDeviceRequest_AuthenticatedIdentifiers_{v}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field QRCode", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := make([]byte, postIndex-iNdEx)
-			copy(v, dAtA[iNdEx:postIndex])
-			m.SourceDevice = &ClaimEndDeviceRequest_QRCode{v}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetApplicationIds", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TargetApplicationIds.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetDeviceId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetDeviceId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InvalidateAuthenticationCode", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.InvalidateAuthenticationCode = bool(v != 0)
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetNetworkServerAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetNetworkServerAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetNetworkServerKEKLabel", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetNetworkServerKEKLabel = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetApplicationServerAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetApplicationServerAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetApplicationServerKEKLabel", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetApplicationServerKEKLabel = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetApplicationServerID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetApplicationServerID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetNetId", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			var v go_thethings_network_lorawan_stack_v3_pkg_types.NetID
-			m.TargetNetId = &v
-			if err := m.TargetNetId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowDeviceclaimingserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AuthenticatedIdentifiers: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AuthenticatedIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field JoinEui", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.JoinEui.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DevEui", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.DevEui.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AuthenticationCode", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AuthenticationCode = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AuthorizeApplicationRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowDeviceclaimingserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AuthorizeApplicationRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AuthorizeApplicationRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field APIKey", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.APIKey = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *CUPSRedirection) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowDeviceclaimingserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: CUPSRedirection: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: CUPSRedirection: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetCUPSURI", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetCUPSURI = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CurrentGatewayKey", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.CurrentGatewayKey = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetCupsTrust", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetCupsTrust = append(m.TargetCupsTrust[:0], dAtA[iNdEx:postIndex]...)
-			if m.TargetCupsTrust == nil {
-				m.TargetCupsTrust = []byte{}
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientTls", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &CUPSRedirection_ClientTLS{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.GatewayCredentials = &CUPSRedirection_ClientTls{v}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AuthToken", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.GatewayCredentials = &CUPSRedirection_AuthToken{string(dAtA[iNdEx:postIndex])}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *CUPSRedirection_ClientTLS) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowDeviceclaimingserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ClientTLS: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ClientTLS: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Cert", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Cert = append(m.Cert[:0], dAtA[iNdEx:postIndex]...)
-			if m.Cert == nil {
-				m.Cert = []byte{}
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Key = append(m.Key[:0], dAtA[iNdEx:postIndex]...)
-			if m.Key == nil {
-				m.Key = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ClaimGatewayRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowDeviceclaimingserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ClaimGatewayRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ClaimGatewayRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AuthenticatedIdentifiers", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &ClaimGatewayRequest_AuthenticatedIdentifiers{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.SourceGateway = &ClaimGatewayRequest_AuthenticatedIdentifiers_{v}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field QRCode", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := make([]byte, postIndex-iNdEx)
-			copy(v, dAtA[iNdEx:postIndex])
-			m.SourceGateway = &ClaimGatewayRequest_QRCode{v}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Collaborator", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.Collaborator.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetGatewayId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetGatewayId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetGatewayServerAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetGatewayServerAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CUPSRedirection", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.CUPSRedirection == nil {
-				m.CUPSRedirection = &CUPSRedirection{}
-			}
-			if err := m.CUPSRedirection.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetFrequencyPlanId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetFrequencyPlanId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowDeviceclaimingserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AuthenticatedIdentifiers: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AuthenticatedIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GatewayEui", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.GatewayEui.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AuthenticationCode", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AuthenticationCode = append(m.AuthenticationCode[:0], dAtA[iNdEx:postIndex]...)
-			if m.AuthenticationCode == nil {
-				m.AuthenticationCode = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AuthorizeGatewayRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowDeviceclaimingserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AuthorizeGatewayRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AuthorizeGatewayRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field APIKey", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.APIKey = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipDeviceclaimingserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDeviceclaimingserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func skipDeviceclaimingserver(dAtA []byte) (n int, err error) {
-	l := len(dAtA)
-	iNdEx := 0
-	depth := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return 0, ErrIntOverflowDeviceclaimingserver
-			}
-			if iNdEx >= l {
-				return 0, io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		wireType := int(wire & 0x7)
-		switch wireType {
-		case 0:
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 {
-					break
-				}
-			}
-		case 1:
-			iNdEx += 8
-		case 2:
-			var length int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowDeviceclaimingserver
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if length < 0 {
-				return 0, ErrInvalidLengthDeviceclaimingserver
-			}
-			iNdEx += length
-		case 3:
-			depth++
-		case 4:
-			if depth == 0 {
-				return 0, ErrUnexpectedEndOfGroupDeviceclaimingserver
-			}
-			depth--
-		case 5:
-			iNdEx += 4
-		default:
-			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		}
-		if iNdEx < 0 {
-			return 0, ErrInvalidLengthDeviceclaimingserver
-		}
-		if depth == 0 {
-			return iNdEx, nil
-		}
-	}
-	return 0, io.ErrUnexpectedEOF
-}
-
-var (
-	ErrInvalidLengthDeviceclaimingserver        = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowDeviceclaimingserver          = fmt.Errorf("proto: integer overflow")
-	ErrUnexpectedEndOfGroupDeviceclaimingserver = fmt.Errorf("proto: unexpected end of group")
-)

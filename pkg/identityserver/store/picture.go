@@ -14,7 +14,10 @@
 
 package store
 
-import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+import (
+	"github.com/gogo/protobuf/proto"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+)
 
 // Picture model.
 type Picture struct {
@@ -30,10 +33,10 @@ func init() {
 
 func (p Picture) toPB() *ttnpb.Picture {
 	pb := &ttnpb.Picture{}
-	pb.Unmarshal(p.Data)
+	proto.Unmarshal(p.Data, pb)
 	return pb
 }
 
 func (p *Picture) fromPB(pb *ttnpb.Picture) {
-	p.Data, _ = pb.Marshal()
+	p.Data, _ = proto.Marshal(pb)
 }

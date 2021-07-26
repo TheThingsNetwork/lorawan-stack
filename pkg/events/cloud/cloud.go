@@ -21,6 +21,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
@@ -105,7 +106,7 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 		switch m {
 		case "application/protobuf":
 			var e ttnpb.Event
-			if err = e.Unmarshal(msg.Body); err != nil {
+			if err = proto.Unmarshal(msg.Body, &e); err != nil {
 				logger.WithError(err).Warn("Failed to unmarshal event from binary")
 				continue
 			}
@@ -182,7 +183,7 @@ func (ps *PubSub) Publish(evt events.Event) {
 			logger.WithError(err).Warn("Failed to marshal event to protobuf")
 			return
 		}
-		body, err = evtpb.Marshal()
+		body, err = proto.Marshal(evtpb)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to marshal event to binary")
 			return

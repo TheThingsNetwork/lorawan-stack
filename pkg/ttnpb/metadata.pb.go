@@ -5,7 +5,6 @@ package ttnpb
 
 import (
 	bytes "bytes"
-	encoding_binary "encoding/binary"
 	fmt "fmt"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	_ "github.com/gogo/protobuf/gogoproto"
@@ -14,7 +13,6 @@ import (
 	types "github.com/gogo/protobuf/types"
 	golang_proto "github.com/golang/protobuf/proto"
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-	io "io"
 	math "math"
 	math_bits "math/bits"
 	reflect "reflect"
@@ -140,25 +138,16 @@ func (*RxMetadata) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e1123b3e8fd87092, []int{0}
 }
 func (m *RxMetadata) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_RxMetadata.Unmarshal(m, b)
 }
 func (m *RxMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RxMetadata.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_RxMetadata.Marshal(b, m, deterministic)
 }
 func (m *RxMetadata) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_RxMetadata.Merge(m, src)
 }
 func (m *RxMetadata) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_RxMetadata.Size(m)
 }
 func (m *RxMetadata) XXX_DiscardUnknown() {
 	xxx_messageInfo_RxMetadata.DiscardUnknown(m)
@@ -327,25 +316,16 @@ func (*Location) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e1123b3e8fd87092, []int{1}
 }
 func (m *Location) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_Location.Unmarshal(m, b)
 }
 func (m *Location) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Location.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_Location.Marshal(b, m, deterministic)
 }
 func (m *Location) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Location.Merge(m, src)
 }
 func (m *Location) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_Location.Size(m)
 }
 func (m *Location) XXX_DiscardUnknown() {
 	xxx_messageInfo_Location.DiscardUnknown(m)
@@ -420,25 +400,16 @@ func (*PacketBrokerMetadata) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e1123b3e8fd87092, []int{2}
 }
 func (m *PacketBrokerMetadata) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerMetadata.Unmarshal(m, b)
 }
 func (m *PacketBrokerMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerMetadata.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerMetadata.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerMetadata) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerMetadata.Merge(m, src)
 }
 func (m *PacketBrokerMetadata) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerMetadata.Size(m)
 }
 func (m *PacketBrokerMetadata) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerMetadata.DiscardUnknown(m)
@@ -516,25 +487,16 @@ func (*PacketBrokerRouteHop) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e1123b3e8fd87092, []int{3}
 }
 func (m *PacketBrokerRouteHop) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	return xxx_messageInfo_PacketBrokerRouteHop.Unmarshal(m, b)
 }
 func (m *PacketBrokerRouteHop) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_PacketBrokerRouteHop.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	return xxx_messageInfo_PacketBrokerRouteHop.Marshal(b, m, deterministic)
 }
 func (m *PacketBrokerRouteHop) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PacketBrokerRouteHop.Merge(m, src)
 }
 func (m *PacketBrokerRouteHop) XXX_Size() int {
-	return m.Size()
+	return xxx_messageInfo_PacketBrokerRouteHop.Size(m)
 }
 func (m *PacketBrokerRouteHop) XXX_DiscardUnknown() {
 	xxx_messageInfo_PacketBrokerRouteHop.DiscardUnknown(m)
@@ -596,99 +558,99 @@ func init() {
 }
 
 var fileDescriptor_e1123b3e8fd87092 = []byte{
-	// 1469 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0xcd, 0x6f, 0x1b, 0x4f,
-	0x19, 0xf6, 0xc6, 0x4e, 0x62, 0x8f, 0x3f, 0xe2, 0x4e, 0x92, 0x66, 0xf3, 0x51, 0xaf, 0x49, 0xf9,
-	0x70, 0x2b, 0xc5, 0x46, 0x49, 0x8b, 0x0a, 0x12, 0x52, 0xb3, 0x89, 0x1b, 0x56, 0x4d, 0xed, 0x30,
-	0x4e, 0x5a, 0x81, 0x84, 0x56, 0x93, 0xdd, 0xf1, 0x7a, 0xb1, 0x3d, 0xbb, 0xec, 0x8e, 0x93, 0xfa,
-	0x56, 0x71, 0x42, 0x9c, 0xca, 0x5f, 0x40, 0x25, 0x2e, 0xfc, 0x09, 0x1c, 0x7b, 0xec, 0xb1, 0x47,
-	0xe0, 0x60, 0xc0, 0xbd, 0x70, 0xe4, 0x04, 0x52, 0x2f, 0xa0, 0x9d, 0x9d, 0x5d, 0xdb, 0x71, 0x0a,
-	0xe2, 0xa7, 0x5f, 0x4e, 0x9e, 0xe7, 0x7d, 0x9e, 0x67, 0x66, 0xdf, 0xf7, 0x9d, 0x77, 0x02, 0xca,
-	0x3d, 0xc7, 0xc3, 0xd7, 0x98, 0xee, 0xf9, 0x0c, 0x1b, 0xdd, 0x1a, 0x76, 0xed, 0x5a, 0x9f, 0x30,
-	0x6c, 0x62, 0x86, 0xab, 0xae, 0xe7, 0x30, 0x07, 0x16, 0x18, 0xa3, 0x55, 0xc1, 0xaa, 0x5e, 0x1d,
-	0x6c, 0x1d, 0x5a, 0x36, 0xeb, 0x0c, 0x2e, 0xab, 0x86, 0xd3, 0xaf, 0x11, 0x7a, 0xe5, 0x0c, 0x5d,
-	0xcf, 0x79, 0x3d, 0xac, 0x71, 0xb2, 0xb1, 0x67, 0x11, 0xba, 0x77, 0x85, 0x7b, 0xb6, 0x89, 0x19,
-	0xa9, 0xcd, 0xfd, 0x08, 0x2d, 0xb7, 0xf6, 0xa6, 0x2c, 0x2c, 0xc7, 0x72, 0x42, 0xf1, 0xe5, 0xa0,
-	0xcd, 0x57, 0x7c, 0xc1, 0x7f, 0x09, 0xfa, 0x8e, 0xe5, 0x38, 0x56, 0x8f, 0x4c, 0x58, 0x3e, 0xf3,
-	0x06, 0x06, 0x13, 0x51, 0xe5, 0x66, 0x94, 0xd9, 0x7d, 0xe2, 0x33, 0xdc, 0x77, 0x05, 0xa1, 0x74,
-	0x93, 0x70, 0xed, 0x61, 0xd7, 0x25, 0x9e, 0x2f, 0xe2, 0xf7, 0xe6, 0x53, 0x40, 0xe8, 0xa0, 0x1f,
-	0x85, 0xef, 0xcf, 0x87, 0x6d, 0x93, 0x50, 0x66, 0xb7, 0xed, 0xd8, 0x63, 0xf7, 0xb7, 0x19, 0x00,
-	0xd0, 0xeb, 0x17, 0x22, 0x73, 0xf0, 0x02, 0x64, 0x2d, 0xcc, 0xc8, 0x35, 0x1e, 0xea, 0xb6, 0xe9,
-	0xcb, 0x52, 0x59, 0xaa, 0x64, 0xf7, 0x77, 0xab, 0xb3, 0x99, 0xac, 0x9e, 0x84, 0x14, 0x6d, 0xe2,
-	0xa6, 0x16, 0x3f, 0xab, 0x8b, 0xbf, 0x96, 0x16, 0x8a, 0xd2, 0x87, 0x91, 0x92, 0xf8, 0x38, 0x52,
-	0x24, 0x04, 0xac, 0x88, 0xe5, 0x43, 0x0d, 0xe4, 0x5d, 0x6c, 0x74, 0x09, 0xd3, 0x2f, 0x3d, 0xa7,
-	0x4b, 0x3c, 0x19, 0x72, 0xe3, 0x6f, 0xde, 0x34, 0x3e, 0xe3, 0x24, 0x95, 0x73, 0xa2, 0x33, 0xa1,
-	0x9c, 0x3b, 0x85, 0xc2, 0xfb, 0x20, 0x8f, 0x29, 0x23, 0x94, 0x62, 0xdd, 0xa6, 0x26, 0x79, 0x2d,
-	0x2f, 0x94, 0xa5, 0x4a, 0x1e, 0xe5, 0x04, 0xa8, 0x05, 0x18, 0x7c, 0x04, 0x52, 0x41, 0x32, 0xe5,
-	0x24, 0xdf, 0x66, 0xab, 0x1a, 0x26, 0xb2, 0x1a, 0x25, 0xb2, 0x7a, 0x1e, 0x65, 0x5a, 0x4d, 0xbd,
-	0xfd, 0x8b, 0x22, 0x21, 0xce, 0x86, 0x3b, 0x20, 0x13, 0x97, 0x40, 0x4e, 0x71, 0xdb, 0x09, 0x00,
-	0xbf, 0x05, 0x0a, 0x6d, 0x9b, 0x12, 0x7d, 0x42, 0x59, 0x2c, 0x4b, 0x95, 0x14, 0xca, 0x07, 0x68,
-	0x6c, 0x08, 0x9f, 0x00, 0x99, 0x50, 0xc3, 0x1b, 0xba, 0x8c, 0x98, 0xfa, 0x0d, 0xc1, 0x52, 0x59,
-	0xaa, 0xe4, 0xd0, 0xdd, 0x38, 0xfe, 0x6c, 0x46, 0x49, 0x80, 0xf2, 0x25, 0xa5, 0xde, 0x25, 0x41,
-	0x41, 0xe4, 0xe5, 0xb2, 0x54, 0xc9, 0xa8, 0xca, 0x78, 0xa4, 0x6c, 0xd7, 0x6f, 0x35, 0x79, 0x4e,
-	0x86, 0xda, 0x31, 0xda, 0x26, 0x5f, 0x0c, 0x9a, 0x70, 0x07, 0xa4, 0x3c, 0xdf, 0xb7, 0xe5, 0x74,
-	0x59, 0xaa, 0x2c, 0xa8, 0xe9, 0xf1, 0x48, 0x49, 0xa1, 0x56, 0x4b, 0x43, 0x1c, 0x85, 0xa7, 0x20,
-	0xeb, 0xdb, 0x16, 0xc5, 0x3d, 0x9d, 0x93, 0x8a, 0x3c, 0x81, 0xdb, 0x73, 0x09, 0x7c, 0xd6, 0x73,
-	0x30, 0x7b, 0x89, 0x7b, 0x03, 0xa2, 0x16, 0xc6, 0x23, 0x05, 0xb4, 0xb8, 0x86, 0xfb, 0x80, 0x50,
-	0x8f, 0x02, 0xb7, 0x7d, 0x90, 0x33, 0x3a, 0x98, 0x52, 0x22, 0xec, 0x32, 0x7c, 0xcf, 0x95, 0xf1,
-	0x48, 0xc9, 0x1e, 0x85, 0x38, 0x97, 0x64, 0x05, 0x89, 0x6b, 0x7e, 0x0c, 0x36, 0x02, 0xae, 0xee,
-	0x33, 0x4c, 0x4d, 0xec, 0x99, 0xba, 0x49, 0xae, 0x6c, 0xcc, 0x6c, 0x87, 0xca, 0x80, 0xcb, 0x37,
-	0xc7, 0x23, 0x65, 0x3d, 0xd0, 0xb5, 0x04, 0xe3, 0x38, 0x22, 0xa0, 0xf5, 0x40, 0x39, 0x07, 0xc3,
-	0x4d, 0x90, 0xf4, 0xa9, 0x27, 0x67, 0xb9, 0x7c, 0x79, 0x3c, 0x52, 0x92, 0xad, 0x06, 0x42, 0x01,
-	0x06, 0x1f, 0x80, 0x62, 0xdb, 0x23, 0xbf, 0x18, 0x10, 0x6a, 0x0c, 0x75, 0xa7, 0xdd, 0xf6, 0x09,
-	0x93, 0x73, 0x65, 0xa9, 0x92, 0x44, 0x2b, 0x31, 0xde, 0xe4, 0x30, 0x7c, 0x04, 0xd2, 0x3d, 0xc7,
-	0x08, 0x4f, 0x92, 0xe7, 0x79, 0x91, 0x6f, 0xf6, 0xef, 0xa9, 0x88, 0xa3, 0x98, 0x09, 0x7f, 0x0e,
-	0x64, 0xd3, 0xb9, 0xa6, 0x3d, 0x9b, 0x76, 0x75, 0x17, 0xb3, 0x8e, 0x6e, 0x38, 0xd4, 0x67, 0x1e,
-	0xb6, 0x29, 0x93, 0x0b, 0x65, 0xa9, 0x52, 0xd8, 0xff, 0xf6, 0x4d, 0x97, 0x63, 0xc1, 0x3f, 0xc3,
-	0xac, 0x73, 0x14, 0xb3, 0xd5, 0xf4, 0x67, 0x75, 0xf1, 0x97, 0xc1, 0x15, 0x43, 0x77, 0xcd, 0x5b,
-	0x19, 0xf0, 0x1b, 0x20, 0x37, 0x70, 0xf9, 0x4e, 0xcc, 0xe9, 0x12, 0x2a, 0xaf, 0xf0, 0x7e, 0xcb,
-	0x86, 0xd8, 0x79, 0x00, 0xc1, 0x3d, 0x90, 0x8f, 0x2a, 0x12, 0x5e, 0x9f, 0x3b, 0x41, 0x9f, 0x73,
-	0xef, 0x87, 0x49, 0xf9, 0xdf, 0x12, 0x8a, 0x0a, 0x16, 0x5e, 0xa4, 0xfb, 0x20, 0xdf, 0x71, 0x5c,
-	0xd7, 0xa6, 0x96, 0x7e, 0x6d, 0x9b, 0xac, 0x23, 0xaf, 0x86, 0xb7, 0x4d, 0x80, 0xaf, 0x02, 0x0c,
-	0x7e, 0x07, 0x4c, 0x72, 0xa5, 0x9b, 0x9e, 0xdd, 0x66, 0xf2, 0x5a, 0x59, 0xaa, 0x2c, 0xa2, 0x42,
-	0x0c, 0x1f, 0x07, 0x28, 0x3c, 0x00, 0x69, 0x6c, 0x5e, 0x61, 0x6a, 0x10, 0x53, 0x36, 0x78, 0x06,
-	0x37, 0xe6, 0x3a, 0xab, 0xc5, 0x47, 0x24, 0x8a, 0x89, 0xbb, 0xff, 0x94, 0x40, 0x3a, 0xca, 0x6b,
-	0xe0, 0xd0, 0xc3, 0xcc, 0x66, 0x03, 0x93, 0xf0, 0xe1, 0x24, 0xa9, 0x1b, 0x9f, 0xd5, 0x35, 0x08,
-	0x37, 0x13, 0xc1, 0xdf, 0x9b, 0x97, 0x4f, 0x1f, 0x88, 0x1f, 0xef, 0x51, 0x4c, 0x84, 0x8f, 0x41,
-	0xa6, 0xe7, 0x50, 0x2b, 0x54, 0x2d, 0xcc, 0xab, 0xda, 0x91, 0xaa, 0xfd, 0x1e, 0x4d, 0x98, 0x70,
-	0x0b, 0xa4, 0x71, 0x4f, 0xec, 0x95, 0xe4, 0xdf, 0x13, 0xaf, 0x79, 0xcc, 0x30, 0x06, 0x1e, 0x36,
-	0x86, 0x7c, 0x52, 0x04, 0x31, 0xb1, 0x86, 0x4f, 0xc1, 0x92, 0xef, 0x0c, 0x3c, 0x83, 0xf0, 0x01,
-	0x51, 0xd8, 0x2f, 0x7d, 0xa9, 0x4b, 0x5a, 0x9c, 0x35, 0x55, 0x57, 0xa1, 0xfb, 0x41, 0xea, 0x0f,
-	0xef, 0x14, 0x69, 0xf7, 0x4f, 0x8b, 0x60, 0xed, 0xb6, 0x81, 0x08, 0xef, 0x01, 0xd0, 0x27, 0xbe,
-	0x8f, 0x2d, 0x12, 0xcc, 0x84, 0x20, 0x0d, 0x19, 0x94, 0x11, 0x88, 0x66, 0x42, 0x0b, 0x14, 0xdb,
-	0x8e, 0x77, 0x8d, 0x3d, 0x93, 0x78, 0x3a, 0x25, 0x2c, 0x20, 0x05, 0x5f, 0x9d, 0x53, 0x7f, 0x18,
-	0x0c, 0xe7, 0x3f, 0x8f, 0x94, 0xc7, 0x96, 0x53, 0x65, 0x1d, 0xc2, 0x3a, 0x36, 0xb5, 0xfc, 0x2a,
-	0x25, 0xec, 0xda, 0xf1, 0xba, 0xb5, 0xd9, 0xe7, 0xe2, 0xea, 0xa0, 0xe6, 0x76, 0xad, 0x1a, 0x1b,
-	0xba, 0xc4, 0xaf, 0x36, 0x08, 0xd3, 0x8e, 0x51, 0x21, 0xb6, 0x0d, 0xd6, 0x26, 0xac, 0x82, 0xd5,
-	0xc9, 0x46, 0x8c, 0x50, 0x4c, 0xf9, 0x5e, 0x49, 0x7e, 0xa0, 0x3b, 0x71, 0xe8, 0x9c, 0x47, 0x34,
-	0x13, 0x7e, 0x17, 0xac, 0x4d, 0xf8, 0x46, 0x6f, 0xe0, 0x33, 0xe2, 0x05, 0x82, 0x14, 0x17, 0xc0,
-	0x38, 0x76, 0x14, 0x86, 0x34, 0x13, 0xf6, 0xc1, 0xfa, 0x44, 0x11, 0x3d, 0x4c, 0x64, 0x10, 0x0e,
-	0x92, 0x9c, 0xfa, 0xfd, 0xaf, 0xf2, 0x2d, 0xf5, 0x0b, 0xed, 0x7b, 0x8f, 0xd0, 0xe4, 0xe4, 0xe2,
-	0x31, 0xab, 0x0f, 0x6c, 0xd8, 0x98, 0x3e, 0xe0, 0xe4, 0x1d, 0xe4, 0x73, 0x27, 0xbb, 0xbf, 0x73,
-	0x5b, 0xaf, 0xda, 0xd4, 0xe2, 0x63, 0x70, 0xea, 0xf8, 0xf1, 0xeb, 0x08, 0x7b, 0x60, 0xb5, 0xe3,
-	0xf4, 0x89, 0x2e, 0x4e, 0x15, 0x15, 0x63, 0xf1, 0xeb, 0x28, 0x46, 0x31, 0x70, 0x6e, 0x84, 0xec,
-	0xb0, 0x1c, 0x07, 0xe0, 0xee, 0xcc, 0x6e, 0x93, 0x8a, 0x2c, 0xf1, 0x04, 0xaf, 0x4e, 0x29, 0xe2,
-	0x9a, 0x3c, 0x06, 0x1b, 0x33, 0xa2, 0xa9, 0xb2, 0xa4, 0xb9, 0x6a, 0x6d, 0x4a, 0x35, 0x29, 0xcc,
-	0x13, 0x90, 0xea, 0x38, 0xae, 0x2f, 0x2f, 0x97, 0x93, 0xff, 0xeb, 0x1d, 0x47, 0xce, 0x80, 0x91,
-	0x1f, 0x39, 0x2e, 0xe2, 0x0a, 0xd1, 0xdb, 0xff, 0x92, 0x66, 0x7b, 0x3b, 0x22, 0xc1, 0x3a, 0xc8,
-	0x7a, 0xc4, 0x20, 0xf6, 0x15, 0x31, 0x75, 0xcc, 0xc4, 0x3f, 0x20, 0xff, 0xed, 0x01, 0x4f, 0x07,
-	0x69, 0xe4, 0x8f, 0x38, 0x88, 0x84, 0x87, 0x0c, 0x2a, 0x20, 0xeb, 0x13, 0xca, 0x2f, 0x00, 0xee,
-	0x87, 0x97, 0x3e, 0x83, 0x40, 0x08, 0x35, 0x70, 0x9f, 0x04, 0xaf, 0xb9, 0x20, 0x60, 0xd3, 0xf4,
-	0x88, 0xef, 0x8b, 0xb6, 0xcd, 0x87, 0xe8, 0x61, 0x08, 0x06, 0xf3, 0x4f, 0xb8, 0x0a, 0xa7, 0xb0,
-	0x57, 0x73, 0x11, 0x18, 0x79, 0xc5, 0x24, 0x6c, 0x11, 0xca, 0x78, 0x85, 0x33, 0x28, 0x96, 0x1e,
-	0x06, 0x60, 0xf8, 0xe5, 0x0f, 0x7f, 0xb3, 0x00, 0x0a, 0xb3, 0x03, 0x00, 0x42, 0x50, 0x68, 0x35,
-	0x2f, 0xd0, 0x51, 0x5d, 0xbf, 0x68, 0x3c, 0x6f, 0x34, 0x5f, 0x35, 0x8a, 0x09, 0x58, 0x00, 0x40,
-	0x60, 0x27, 0x67, 0xad, 0xa2, 0x04, 0x57, 0xc1, 0x8a, 0x58, 0xa3, 0xfa, 0x89, 0xd6, 0x3a, 0x47,
-	0x3f, 0x29, 0x26, 0xe1, 0x26, 0x58, 0x17, 0xa0, 0x76, 0xa6, 0x9f, 0xd4, 0x9b, 0xa7, 0xcd, 0xa3,
-	0xc3, 0x73, 0xad, 0xd9, 0x28, 0xa6, 0x60, 0x19, 0xec, 0x88, 0xd0, 0x2b, 0xed, 0x99, 0xa6, 0x07,
-	0xcf, 0xe5, 0x0c, 0x63, 0x11, 0x96, 0xc0, 0x96, 0x60, 0xa8, 0xe7, 0xf3, 0xf1, 0xa5, 0x29, 0x87,
-	0xd3, 0x26, 0x3a, 0x9c, 0x67, 0x2c, 0xdf, 0x64, 0x9c, 0x1f, 0x37, 0x0f, 0x67, 0x18, 0x69, 0xa8,
-	0x80, 0x6d, 0xc1, 0x38, 0x6a, 0xbe, 0x50, 0xb5, 0x46, 0xfd, 0x78, 0x86, 0x90, 0xd9, 0x4a, 0xfd,
-	0xea, 0x77, 0xa5, 0x84, 0xfa, 0xb3, 0x3f, 0xfe, 0xad, 0x94, 0x78, 0x33, 0x2e, 0x49, 0xbf, 0x1f,
-	0x97, 0xa4, 0x0f, 0xe3, 0x92, 0xf4, 0x71, 0x5c, 0x92, 0xfe, 0x3a, 0x2e, 0x49, 0x7f, 0x1f, 0x97,
-	0x12, 0xff, 0x18, 0x97, 0xa4, 0xb7, 0x9f, 0x4a, 0x89, 0x77, 0x9f, 0x4a, 0x89, 0xf7, 0x9f, 0x4a,
-	0xd2, 0x4f, 0x6b, 0xff, 0xc7, 0x85, 0x61, 0xd4, 0xbd, 0xbc, 0x5c, 0xe2, 0x6d, 0x73, 0xf0, 0x9f,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0x82, 0xc0, 0x24, 0xb2, 0x33, 0x0c, 0x00, 0x00,
+	// 1462 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0xcf, 0x6f, 0xdb, 0xc8,
+	0x15, 0x16, 0x2d, 0xd9, 0x96, 0x46, 0x3f, 0xac, 0x8c, 0xed, 0x98, 0xfe, 0x11, 0x51, 0x75, 0xfa,
+	0x43, 0x09, 0x60, 0xa9, 0xb0, 0x93, 0x22, 0x2d, 0x50, 0x20, 0xa6, 0xad, 0xb8, 0x44, 0x1c, 0xc9,
+	0x1d, 0xd9, 0x09, 0xda, 0x0b, 0x31, 0x26, 0x47, 0x14, 0x2b, 0x69, 0xc8, 0x92, 0x23, 0x3b, 0xba,
+	0x05, 0x3d, 0x15, 0x3d, 0xa5, 0x7f, 0x41, 0x03, 0xf4, 0xd2, 0x3f, 0xa1, 0xc7, 0x1c, 0x7b, 0xec,
+	0xb1, 0xed, 0x41, 0x6d, 0x95, 0x4b, 0x8f, 0x3d, 0xed, 0x02, 0xb9, 0xec, 0x82, 0xc3, 0x21, 0x25,
+	0x59, 0xce, 0x2e, 0x76, 0xb1, 0x3e, 0x69, 0xbe, 0xf7, 0x7d, 0xdf, 0x0c, 0xdf, 0x7b, 0xf3, 0xc6,
+	0xa0, 0xdc, 0x73, 0x3c, 0x7c, 0x8d, 0xe9, 0x9e, 0xcf, 0xb0, 0xd1, 0xad, 0x61, 0xd7, 0xae, 0xf5,
+	0x09, 0xc3, 0x26, 0x66, 0xb8, 0xea, 0x7a, 0x0e, 0x73, 0x60, 0x81, 0x31, 0x5a, 0x15, 0xac, 0xea,
+	0xd5, 0xc1, 0xd6, 0xa1, 0x65, 0xb3, 0xce, 0xe0, 0xb2, 0x6a, 0x38, 0xfd, 0x1a, 0xa1, 0x57, 0xce,
+	0xd0, 0xf5, 0x9c, 0xd7, 0xc3, 0x1a, 0x27, 0x1b, 0x7b, 0x16, 0xa1, 0x7b, 0x57, 0xb8, 0x67, 0x9b,
+	0x98, 0x91, 0xda, 0xdc, 0x8f, 0xd0, 0x72, 0x6b, 0x6f, 0xca, 0xc2, 0x72, 0x2c, 0x27, 0x14, 0x5f,
+	0x0e, 0xda, 0x7c, 0xc5, 0x17, 0xfc, 0x97, 0xa0, 0xef, 0x58, 0x8e, 0x63, 0xf5, 0xc8, 0x84, 0xe5,
+	0x33, 0x6f, 0x60, 0x30, 0x11, 0x55, 0x6e, 0x46, 0x99, 0xdd, 0x27, 0x3e, 0xc3, 0x7d, 0x57, 0x10,
+	0x4a, 0x37, 0x09, 0xd7, 0x1e, 0x76, 0x5d, 0xe2, 0xf9, 0x22, 0x7e, 0x6f, 0x3e, 0x05, 0x84, 0x0e,
+	0xfa, 0x51, 0xf8, 0xfe, 0x7c, 0xd8, 0x36, 0x09, 0x65, 0x76, 0xdb, 0x8e, 0x3d, 0x76, 0xff, 0x94,
+	0x01, 0x00, 0xbd, 0x7e, 0x21, 0x32, 0x07, 0x2f, 0x40, 0xd6, 0xc2, 0x8c, 0x5c, 0xe3, 0xa1, 0x6e,
+	0x9b, 0xbe, 0x2c, 0x95, 0xa5, 0x4a, 0x76, 0x7f, 0xb7, 0x3a, 0x9b, 0xc9, 0xea, 0x49, 0x48, 0xd1,
+	0x26, 0x6e, 0x6a, 0xf1, 0xa3, 0xba, 0xf8, 0x07, 0x69, 0xa1, 0x28, 0xfd, 0x6d, 0xa4, 0x24, 0xfe,
+	0x3e, 0x52, 0x24, 0x04, 0xac, 0x88, 0xe5, 0x43, 0x0d, 0xe4, 0x5d, 0x6c, 0x74, 0x09, 0xd3, 0x2f,
+	0x3d, 0xa7, 0x4b, 0x3c, 0x19, 0x72, 0xe3, 0xef, 0xdf, 0x34, 0x3e, 0xe3, 0x24, 0x95, 0x73, 0xa2,
+	0x33, 0xa1, 0x9c, 0x3b, 0x85, 0xc2, 0xfb, 0x20, 0x8f, 0x29, 0x23, 0x94, 0x62, 0xdd, 0xa6, 0x26,
+	0x79, 0x2d, 0x2f, 0x94, 0xa5, 0x4a, 0x1e, 0xe5, 0x04, 0xa8, 0x05, 0x18, 0x7c, 0x04, 0x52, 0x41,
+	0x32, 0xe5, 0x24, 0xdf, 0x66, 0xab, 0x1a, 0x26, 0xb2, 0x1a, 0x25, 0xb2, 0x7a, 0x1e, 0x65, 0x5a,
+	0x4d, 0xbd, 0xfd, 0xb7, 0x22, 0x21, 0xce, 0x86, 0x3b, 0x20, 0x13, 0x97, 0x40, 0x4e, 0x71, 0xdb,
+	0x09, 0x00, 0x7f, 0x00, 0x0a, 0x6d, 0x9b, 0x12, 0x7d, 0x42, 0x59, 0x2c, 0x4b, 0x95, 0x14, 0xca,
+	0x07, 0x68, 0x6c, 0x08, 0x9f, 0x00, 0x99, 0x50, 0xc3, 0x1b, 0xba, 0x8c, 0x98, 0xfa, 0x0d, 0xc1,
+	0x52, 0x59, 0xaa, 0xe4, 0xd0, 0xdd, 0x38, 0xfe, 0x6c, 0x46, 0x49, 0x80, 0xf2, 0x29, 0xa5, 0xde,
+	0x25, 0x41, 0x41, 0xe4, 0xe5, 0xb2, 0x54, 0xc9, 0xa8, 0xca, 0x78, 0xa4, 0x6c, 0xd7, 0x6f, 0x35,
+	0x79, 0x4e, 0x86, 0xda, 0x31, 0xda, 0x26, 0x9f, 0x0c, 0x9a, 0x70, 0x07, 0xa4, 0x3c, 0xdf, 0xb7,
+	0xe5, 0x74, 0x59, 0xaa, 0x2c, 0xa8, 0xe9, 0xf1, 0x48, 0x49, 0xa1, 0x56, 0x4b, 0x43, 0x1c, 0x85,
+	0xa7, 0x20, 0xeb, 0xdb, 0x16, 0xc5, 0x3d, 0x9d, 0x93, 0x8a, 0x3c, 0x81, 0xdb, 0x73, 0x09, 0x7c,
+	0xd6, 0x73, 0x30, 0x7b, 0x89, 0x7b, 0x03, 0xa2, 0x16, 0xc6, 0x23, 0x05, 0xb4, 0xb8, 0x86, 0xfb,
+	0x80, 0x50, 0x8f, 0x02, 0xb7, 0x7d, 0x90, 0x33, 0x3a, 0x98, 0x52, 0x22, 0xec, 0x32, 0x7c, 0xcf,
+	0x95, 0xf1, 0x48, 0xc9, 0x1e, 0x85, 0x38, 0x97, 0x64, 0x05, 0x89, 0x6b, 0x7e, 0x09, 0x36, 0x02,
+	0xae, 0xee, 0x33, 0x4c, 0x4d, 0xec, 0x99, 0xba, 0x49, 0xae, 0x6c, 0xcc, 0x6c, 0x87, 0xca, 0x80,
+	0xcb, 0x37, 0xc7, 0x23, 0x65, 0x3d, 0xd0, 0xb5, 0x04, 0xe3, 0x38, 0x22, 0xa0, 0xf5, 0x40, 0x39,
+	0x07, 0xc3, 0x4d, 0x90, 0xf4, 0xa9, 0x27, 0x67, 0xb9, 0x7c, 0x79, 0x3c, 0x52, 0x92, 0xad, 0x06,
+	0x42, 0x01, 0x06, 0x1f, 0x80, 0x62, 0xdb, 0x23, 0xbf, 0x1d, 0x10, 0x6a, 0x0c, 0x75, 0xa7, 0xdd,
+	0xf6, 0x09, 0x93, 0x73, 0x65, 0xa9, 0x92, 0x44, 0x2b, 0x31, 0xde, 0xe4, 0x30, 0x7c, 0x04, 0xd2,
+	0x3d, 0xc7, 0x08, 0x4f, 0x92, 0xe7, 0x79, 0x91, 0x6f, 0xf6, 0xef, 0xa9, 0x88, 0xa3, 0x98, 0x09,
+	0x7f, 0x03, 0x64, 0xd3, 0xb9, 0xa6, 0x3d, 0x9b, 0x76, 0x75, 0x17, 0xb3, 0x8e, 0x6e, 0x38, 0xd4,
+	0x67, 0x1e, 0xb6, 0x29, 0x93, 0x0b, 0x65, 0xa9, 0x52, 0xd8, 0xff, 0xe1, 0x4d, 0x97, 0x63, 0xc1,
+	0x3f, 0xc3, 0xac, 0x73, 0x14, 0xb3, 0xd5, 0xf4, 0x47, 0x75, 0xf1, 0x77, 0xc1, 0x15, 0x43, 0x77,
+	0xcd, 0x5b, 0x19, 0xf0, 0x7b, 0x20, 0x37, 0x70, 0xf9, 0x4e, 0xcc, 0xe9, 0x12, 0x2a, 0xaf, 0xf0,
+	0x7e, 0xcb, 0x86, 0xd8, 0x79, 0x00, 0xc1, 0x3d, 0x90, 0x8f, 0x2a, 0x12, 0x5e, 0x9f, 0x3b, 0x41,
+	0x9f, 0x73, 0xef, 0x87, 0x49, 0xf9, 0x0b, 0x09, 0x45, 0x05, 0x0b, 0x2f, 0xd2, 0x7d, 0x90, 0xef,
+	0x38, 0xae, 0x6b, 0x53, 0x4b, 0xbf, 0xb6, 0x4d, 0xd6, 0x91, 0x57, 0xc3, 0xdb, 0x26, 0xc0, 0x57,
+	0x01, 0x06, 0x7f, 0x04, 0x26, 0xb9, 0xd2, 0x4d, 0xcf, 0x6e, 0x33, 0x79, 0xad, 0x2c, 0x55, 0x16,
+	0x51, 0x21, 0x86, 0x8f, 0x03, 0x14, 0x1e, 0x80, 0x34, 0x36, 0xaf, 0x30, 0x35, 0x88, 0x29, 0x1b,
+	0x3c, 0x83, 0x1b, 0x73, 0x9d, 0xd5, 0xe2, 0x23, 0x12, 0xc5, 0xc4, 0xdd, 0xcf, 0x24, 0x90, 0x8e,
+	0xf2, 0x1a, 0x38, 0xf4, 0x30, 0xb3, 0xd9, 0xc0, 0x24, 0x7c, 0x38, 0x49, 0xea, 0xc6, 0x47, 0x75,
+	0x0d, 0xc2, 0xcd, 0x44, 0xf0, 0xf7, 0xe6, 0xe5, 0xd3, 0x07, 0xe2, 0xc7, 0x7b, 0x14, 0x13, 0xe1,
+	0x63, 0x90, 0xe9, 0x39, 0xd4, 0x0a, 0x55, 0x0b, 0xf3, 0xaa, 0x76, 0xa4, 0x6a, 0xbf, 0x47, 0x13,
+	0x26, 0xdc, 0x02, 0x69, 0xdc, 0x13, 0x7b, 0x25, 0xf9, 0xf7, 0xc4, 0x6b, 0x1e, 0x33, 0x8c, 0x81,
+	0x87, 0x8d, 0x21, 0x9f, 0x14, 0x41, 0x4c, 0xac, 0xe1, 0x53, 0xb0, 0xe4, 0x3b, 0x03, 0xcf, 0x20,
+	0x7c, 0x40, 0x14, 0xf6, 0x4b, 0x9f, 0xea, 0x92, 0x16, 0x67, 0x4d, 0xd5, 0x55, 0xe8, 0x7e, 0x96,
+	0xfa, 0xeb, 0x3b, 0x45, 0xda, 0xfd, 0xe7, 0x22, 0x58, 0xbb, 0x6d, 0x20, 0xc2, 0x7b, 0x00, 0xf4,
+	0x89, 0xef, 0x63, 0x8b, 0x04, 0x33, 0x21, 0x48, 0x43, 0x06, 0x65, 0x04, 0xa2, 0x99, 0xd0, 0x02,
+	0xc5, 0xb6, 0xe3, 0x5d, 0x63, 0xcf, 0x24, 0x9e, 0x4e, 0x09, 0x0b, 0x48, 0xc1, 0x57, 0xe7, 0xd4,
+	0x9f, 0x07, 0xc3, 0xf9, 0x5f, 0x23, 0xe5, 0xb1, 0xe5, 0x54, 0x59, 0x87, 0xb0, 0x8e, 0x4d, 0x2d,
+	0xbf, 0x4a, 0x09, 0xbb, 0x76, 0xbc, 0x6e, 0x6d, 0xf6, 0xb9, 0xb8, 0x3a, 0xa8, 0xb9, 0x5d, 0xab,
+	0xc6, 0x86, 0x2e, 0xf1, 0xab, 0x0d, 0xc2, 0xb4, 0x63, 0x54, 0x88, 0x6d, 0x83, 0xb5, 0x09, 0xab,
+	0x60, 0x75, 0xb2, 0x11, 0x23, 0x14, 0x53, 0xbe, 0x57, 0x92, 0x1f, 0xe8, 0x4e, 0x1c, 0x3a, 0xe7,
+	0x11, 0xcd, 0x84, 0x3f, 0x06, 0x6b, 0x13, 0xbe, 0xd1, 0x1b, 0xf8, 0x8c, 0x78, 0x81, 0x20, 0xc5,
+	0x05, 0x30, 0x8e, 0x1d, 0x85, 0x21, 0xcd, 0x84, 0x7d, 0xb0, 0x3e, 0x51, 0x44, 0x0f, 0x13, 0x19,
+	0x84, 0x83, 0x24, 0xa7, 0xfe, 0xf4, 0xdb, 0x7c, 0x4b, 0xfd, 0x42, 0xfb, 0xc9, 0x23, 0x34, 0x39,
+	0xb9, 0x78, 0xcc, 0xea, 0x03, 0x1b, 0x36, 0xa6, 0x0f, 0x38, 0x79, 0x07, 0xf9, 0xdc, 0xc9, 0xee,
+	0xef, 0xdc, 0xd6, 0xab, 0x36, 0xb5, 0xf8, 0x18, 0x9c, 0x3a, 0x7e, 0xfc, 0x3a, 0xc2, 0x1e, 0x58,
+	0xed, 0x38, 0x7d, 0xa2, 0x8b, 0x53, 0x45, 0xc5, 0x58, 0xfc, 0x2e, 0x8a, 0x51, 0x0c, 0x9c, 0x1b,
+	0x21, 0x3b, 0x2c, 0xc7, 0x01, 0xb8, 0x3b, 0xb3, 0xdb, 0xa4, 0x22, 0x4b, 0x3c, 0xc1, 0xab, 0x53,
+	0x8a, 0xb8, 0x26, 0x8f, 0xc1, 0xc6, 0x8c, 0x68, 0xaa, 0x2c, 0x69, 0xae, 0x5a, 0x9b, 0x52, 0x4d,
+	0x0a, 0xf3, 0x04, 0xa4, 0x3a, 0x8e, 0xeb, 0xcb, 0xcb, 0xe5, 0xe4, 0xd7, 0xbd, 0xe3, 0xc8, 0x19,
+	0x30, 0xf2, 0x0b, 0xc7, 0x45, 0x5c, 0x21, 0x7a, 0xfb, 0x73, 0x69, 0xb6, 0xb7, 0x23, 0x12, 0xac,
+	0x83, 0xac, 0x47, 0x0c, 0x62, 0x5f, 0x11, 0x53, 0xc7, 0x4c, 0xfc, 0x03, 0xf2, 0x55, 0x0f, 0x78,
+	0x3a, 0x48, 0x23, 0x7f, 0xc4, 0x41, 0x24, 0x3c, 0x64, 0x50, 0x01, 0x59, 0x9f, 0x50, 0x7e, 0x01,
+	0x70, 0x3f, 0xbc, 0xf4, 0x19, 0x04, 0x42, 0xa8, 0x81, 0xfb, 0x24, 0x78, 0xcd, 0x05, 0x01, 0x9b,
+	0xa6, 0x47, 0x7c, 0x5f, 0xb4, 0x6d, 0x3e, 0x44, 0x0f, 0x43, 0x30, 0x98, 0x7f, 0xc2, 0x55, 0x38,
+	0x85, 0xbd, 0x9a, 0x8b, 0xc0, 0xc8, 0x2b, 0x26, 0x61, 0x8b, 0x50, 0xc6, 0x2b, 0x9c, 0x41, 0xb1,
+	0xf4, 0x30, 0x00, 0xc3, 0x2f, 0x7f, 0xf8, 0xc7, 0x05, 0x50, 0x98, 0x1d, 0x00, 0x10, 0x82, 0x42,
+	0xab, 0x79, 0x81, 0x8e, 0xea, 0xfa, 0x45, 0xe3, 0x79, 0xa3, 0xf9, 0xaa, 0x51, 0x4c, 0xc0, 0x02,
+	0x00, 0x02, 0x3b, 0x39, 0x6b, 0x15, 0x25, 0xb8, 0x0a, 0x56, 0xc4, 0x1a, 0xd5, 0x4f, 0xb4, 0xd6,
+	0x39, 0xfa, 0x55, 0x31, 0x09, 0x37, 0xc1, 0xba, 0x00, 0xb5, 0x33, 0xfd, 0xa4, 0xde, 0x3c, 0x6d,
+	0x1e, 0x1d, 0x9e, 0x6b, 0xcd, 0x46, 0x31, 0x05, 0xcb, 0x60, 0x47, 0x84, 0x5e, 0x69, 0xcf, 0x34,
+	0x3d, 0x78, 0x2e, 0x67, 0x18, 0x8b, 0xb0, 0x04, 0xb6, 0x04, 0x43, 0x3d, 0x9f, 0x8f, 0x2f, 0x4d,
+	0x39, 0x9c, 0x36, 0xd1, 0xe1, 0x3c, 0x63, 0xf9, 0x26, 0xe3, 0xfc, 0xb8, 0x79, 0x38, 0xc3, 0x48,
+	0x43, 0x05, 0x6c, 0x0b, 0xc6, 0x51, 0xf3, 0x85, 0xaa, 0x35, 0xea, 0xc7, 0x33, 0x84, 0xcc, 0x56,
+	0xea, 0xf7, 0x7f, 0x2e, 0x25, 0xd4, 0x8b, 0x7f, 0xfc, 0xb7, 0x94, 0x78, 0x33, 0x2e, 0x49, 0x7f,
+	0x19, 0x97, 0xa4, 0xff, 0x8c, 0x4b, 0xd2, 0xff, 0xc6, 0xa5, 0xc4, 0xff, 0xc7, 0x25, 0xe9, 0xed,
+	0x87, 0x52, 0xe2, 0xdd, 0x87, 0x52, 0xe2, 0xfd, 0x87, 0x92, 0xf4, 0xeb, 0xda, 0x37, 0xb8, 0x28,
+	0x8c, 0xba, 0x97, 0x97, 0x4b, 0xbc, 0x5d, 0x0e, 0xbe, 0x0c, 0x00, 0x00, 0xff, 0xff, 0x49, 0xd3,
+	0x10, 0x88, 0x2b, 0x0c, 0x00, 0x00,
 }
 
 func (x LocationSource) String() string {
@@ -918,430 +880,6 @@ func (this *PacketBrokerRouteHop) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (m *RxMetadata) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *RxMetadata) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *RxMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Advanced != nil {
-		{
-			size, err := m.Advanced.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintMetadata(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x6
-		i--
-		dAtA[i] = 0x9a
-	}
-	if m.FrequencyDrift != 0 {
-		i = encodeVarintMetadata(dAtA, i, uint64(m.FrequencyDrift))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xa0
-	}
-	if m.HoppingWidth != 0 {
-		i = encodeVarintMetadata(dAtA, i, uint64(m.HoppingWidth))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x98
-	}
-	if m.PacketBroker != nil {
-		{
-			size, err := m.PacketBroker.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintMetadata(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x92
-	}
-	if m.ChannelIndex != 0 {
-		i = encodeVarintMetadata(dAtA, i, uint64(m.ChannelIndex))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x88
-	}
-	if m.SignalRSSI != nil {
-		{
-			size, err := m.SignalRSSI.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintMetadata(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x82
-	}
-	if len(m.UplinkToken) > 0 {
-		i -= len(m.UplinkToken)
-		copy(dAtA[i:], m.UplinkToken)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.UplinkToken)))
-		i--
-		dAtA[i] = 0x7a
-	}
-	if m.DownlinkPathConstraint != 0 {
-		i = encodeVarintMetadata(dAtA, i, uint64(m.DownlinkPathConstraint))
-		i--
-		dAtA[i] = 0x70
-	}
-	if m.Location != nil {
-		{
-			size, err := m.Location.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintMetadata(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x6a
-	}
-	if m.FrequencyOffset != 0 {
-		i = encodeVarintMetadata(dAtA, i, uint64(m.FrequencyOffset))
-		i--
-		dAtA[i] = 0x60
-	}
-	if m.SNR != 0 {
-		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.SNR))))
-		i--
-		dAtA[i] = 0x5d
-	}
-	if m.RSSIStandardDeviation != 0 {
-		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSIStandardDeviation))))
-		i--
-		dAtA[i] = 0x55
-	}
-	if m.ChannelRSSI != 0 {
-		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.ChannelRSSI))))
-		i--
-		dAtA[i] = 0x4d
-	}
-	if m.RSSI != 0 {
-		i -= 4
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSI))))
-		i--
-		dAtA[i] = 0x45
-	}
-	if len(m.EncryptedFineTimestampKeyID) > 0 {
-		i -= len(m.EncryptedFineTimestampKeyID)
-		copy(dAtA[i:], m.EncryptedFineTimestampKeyID)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.EncryptedFineTimestampKeyID)))
-		i--
-		dAtA[i] = 0x3a
-	}
-	if len(m.EncryptedFineTimestamp) > 0 {
-		i -= len(m.EncryptedFineTimestamp)
-		copy(dAtA[i:], m.EncryptedFineTimestamp)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.EncryptedFineTimestamp)))
-		i--
-		dAtA[i] = 0x32
-	}
-	if m.FineTimestamp != 0 {
-		i = encodeVarintMetadata(dAtA, i, uint64(m.FineTimestamp))
-		i--
-		dAtA[i] = 0x28
-	}
-	if m.Timestamp != 0 {
-		i = encodeVarintMetadata(dAtA, i, uint64(m.Timestamp))
-		i--
-		dAtA[i] = 0x20
-	}
-	if m.Time != nil {
-		n5, err5 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Time, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time):])
-		if err5 != nil {
-			return 0, err5
-		}
-		i -= n5
-		i = encodeVarintMetadata(dAtA, i, uint64(n5))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if m.AntennaIndex != 0 {
-		i = encodeVarintMetadata(dAtA, i, uint64(m.AntennaIndex))
-		i--
-		dAtA[i] = 0x10
-	}
-	{
-		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintMetadata(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *Location) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Location) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Location) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Source != 0 {
-		i = encodeVarintMetadata(dAtA, i, uint64(m.Source))
-		i--
-		dAtA[i] = 0x28
-	}
-	if m.Accuracy != 0 {
-		i = encodeVarintMetadata(dAtA, i, uint64(m.Accuracy))
-		i--
-		dAtA[i] = 0x20
-	}
-	if m.Altitude != 0 {
-		i = encodeVarintMetadata(dAtA, i, uint64(m.Altitude))
-		i--
-		dAtA[i] = 0x18
-	}
-	if m.Longitude != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Longitude))))
-		i--
-		dAtA[i] = 0x11
-	}
-	if m.Latitude != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Latitude))))
-		i--
-		dAtA[i] = 0x9
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerMetadata) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerMetadata) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.ForwarderGatewayId != nil {
-		{
-			size, err := m.ForwarderGatewayId.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintMetadata(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x52
-	}
-	if m.ForwarderGatewayEui != nil {
-		{
-			size := m.ForwarderGatewayEui.Size()
-			i -= size
-			if _, err := m.ForwarderGatewayEui.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-			i = encodeVarintMetadata(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x4a
-	}
-	if len(m.HomeNetworkClusterId) > 0 {
-		i -= len(m.HomeNetworkClusterId)
-		copy(dAtA[i:], m.HomeNetworkClusterId)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.HomeNetworkClusterId)))
-		i--
-		dAtA[i] = 0x42
-	}
-	if len(m.Hops) > 0 {
-		for iNdEx := len(m.Hops) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Hops[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintMetadata(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x3a
-		}
-	}
-	if len(m.HomeNetworkTenantId) > 0 {
-		i -= len(m.HomeNetworkTenantId)
-		copy(dAtA[i:], m.HomeNetworkTenantId)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.HomeNetworkTenantId)))
-		i--
-		dAtA[i] = 0x32
-	}
-	{
-		size := m.HomeNetworkNetId.Size()
-		i -= size
-		if _, err := m.HomeNetworkNetId.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintMetadata(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x2a
-	if len(m.ForwarderClusterId) > 0 {
-		i -= len(m.ForwarderClusterId)
-		copy(dAtA[i:], m.ForwarderClusterId)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.ForwarderClusterId)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.ForwarderTenantId) > 0 {
-		i -= len(m.ForwarderTenantId)
-		copy(dAtA[i:], m.ForwarderTenantId)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.ForwarderTenantId)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	{
-		size := m.ForwarderNetId.Size()
-		i -= size
-		if _, err := m.ForwarderNetId.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintMetadata(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x12
-	if len(m.MessageId) > 0 {
-		i -= len(m.MessageId)
-		copy(dAtA[i:], m.MessageId)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.MessageId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *PacketBrokerRouteHop) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PacketBrokerRouteHop) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *PacketBrokerRouteHop) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.ReceiverAgent) > 0 {
-		i -= len(m.ReceiverAgent)
-		copy(dAtA[i:], m.ReceiverAgent)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.ReceiverAgent)))
-		i--
-		dAtA[i] = 0x2a
-	}
-	if len(m.ReceiverName) > 0 {
-		i -= len(m.ReceiverName)
-		copy(dAtA[i:], m.ReceiverName)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.ReceiverName)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.SenderAddress) > 0 {
-		i -= len(m.SenderAddress)
-		copy(dAtA[i:], m.SenderAddress)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.SenderAddress)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.SenderName) > 0 {
-		i -= len(m.SenderName)
-		copy(dAtA[i:], m.SenderName)
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.SenderName)))
-		i--
-		dAtA[i] = 0x12
-	}
-	n8, err8 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ReceivedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.ReceivedAt):])
-	if err8 != nil {
-		return 0, err8
-	}
-	i -= n8
-	i = encodeVarintMetadata(dAtA, i, uint64(n8))
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func encodeVarintMetadata(dAtA []byte, offset int, v uint64) int {
-	offset -= sovMetadata(v)
-	base := offset
-	for v >= 1<<7 {
-		dAtA[offset] = uint8(v&0x7f | 0x80)
-		v >>= 7
-		offset++
-	}
-	dAtA[offset] = uint8(v)
-	return base
-}
 func NewPopulatedLocation(r randyMetadata, easy bool) *Location {
 	this := &Location{}
 	this.Latitude = float64(r.Float64())
@@ -1373,20 +911,20 @@ func NewPopulatedPacketBrokerMetadata(r randyMetadata, easy bool) *PacketBrokerM
 	this.ForwarderNetId = *v1
 	this.ForwarderTenantId = string(randStringMetadata(r))
 	this.ForwarderClusterId = string(randStringMetadata(r))
+	this.ForwarderGatewayEui = go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedEUI64(r)
+	if r.Intn(5) != 0 {
+		this.ForwarderGatewayId = types.NewPopulatedStringValue(r, easy)
+	}
 	v2 := go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedNetID(r)
 	this.HomeNetworkNetId = *v2
 	this.HomeNetworkTenantId = string(randStringMetadata(r))
+	this.HomeNetworkClusterId = string(randStringMetadata(r))
 	if r.Intn(5) != 0 {
 		v3 := r.Intn(5)
 		this.Hops = make([]*PacketBrokerRouteHop, v3)
 		for i := 0; i < v3; i++ {
 			this.Hops[i] = NewPopulatedPacketBrokerRouteHop(r, easy)
 		}
-	}
-	this.HomeNetworkClusterId = string(randStringMetadata(r))
-	this.ForwarderGatewayEui = go_thethings_network_lorawan_stack_v3_pkg_types.NewPopulatedEUI64(r)
-	if r.Intn(5) != 0 {
-		this.ForwarderGatewayId = types.NewPopulatedStringValue(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -1486,6 +1024,10 @@ func (m *RxMetadata) Size() (n int) {
 	_ = l
 	l = m.GatewayIdentifiers.Size()
 	n += 1 + l + sovMetadata(uint64(l))
+	if m.PacketBroker != nil {
+		l = m.PacketBroker.Size()
+		n += 2 + l + sovMetadata(uint64(l))
+	}
 	if m.AntennaIndex != 0 {
 		n += 1 + sovMetadata(uint64(m.AntennaIndex))
 	}
@@ -1510,6 +1052,10 @@ func (m *RxMetadata) Size() (n int) {
 	if m.RSSI != 0 {
 		n += 5
 	}
+	if m.SignalRSSI != nil {
+		l = m.SignalRSSI.Size()
+		n += 2 + l + sovMetadata(uint64(l))
+	}
 	if m.ChannelRSSI != 0 {
 		n += 5
 	}
@@ -1533,16 +1079,8 @@ func (m *RxMetadata) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovMetadata(uint64(l))
 	}
-	if m.SignalRSSI != nil {
-		l = m.SignalRSSI.Size()
-		n += 2 + l + sovMetadata(uint64(l))
-	}
 	if m.ChannelIndex != 0 {
 		n += 2 + sovMetadata(uint64(m.ChannelIndex))
-	}
-	if m.PacketBroker != nil {
-		l = m.PacketBroker.Size()
-		n += 2 + l + sovMetadata(uint64(l))
 	}
 	if m.HoppingWidth != 0 {
 		n += 2 + sovMetadata(uint64(m.HoppingWidth))
@@ -1601,9 +1139,21 @@ func (m *PacketBrokerMetadata) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovMetadata(uint64(l))
 	}
+	if m.ForwarderGatewayEui != nil {
+		l = m.ForwarderGatewayEui.Size()
+		n += 1 + l + sovMetadata(uint64(l))
+	}
+	if m.ForwarderGatewayId != nil {
+		l = m.ForwarderGatewayId.Size()
+		n += 1 + l + sovMetadata(uint64(l))
+	}
 	l = m.HomeNetworkNetId.Size()
 	n += 1 + l + sovMetadata(uint64(l))
 	l = len(m.HomeNetworkTenantId)
+	if l > 0 {
+		n += 1 + l + sovMetadata(uint64(l))
+	}
+	l = len(m.HomeNetworkClusterId)
 	if l > 0 {
 		n += 1 + l + sovMetadata(uint64(l))
 	}
@@ -1612,18 +1162,6 @@ func (m *PacketBrokerMetadata) Size() (n int) {
 			l = e.Size()
 			n += 1 + l + sovMetadata(uint64(l))
 		}
-	}
-	l = len(m.HomeNetworkClusterId)
-	if l > 0 {
-		n += 1 + l + sovMetadata(uint64(l))
-	}
-	if m.ForwarderGatewayEui != nil {
-		l = m.ForwarderGatewayEui.Size()
-		n += 1 + l + sovMetadata(uint64(l))
-	}
-	if m.ForwarderGatewayId != nil {
-		l = m.ForwarderGatewayId.Size()
-		n += 1 + l + sovMetadata(uint64(l))
 	}
 	return n
 }
@@ -1667,6 +1205,7 @@ func (this *RxMetadata) String() string {
 	}
 	s := strings.Join([]string{`&RxMetadata{`,
 		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`PacketBroker:` + strings.Replace(this.PacketBroker.String(), "PacketBrokerMetadata", "PacketBrokerMetadata", 1) + `,`,
 		`AntennaIndex:` + fmt.Sprintf("%v", this.AntennaIndex) + `,`,
 		`Time:` + strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "types.Timestamp", 1) + `,`,
 		`Timestamp:` + fmt.Sprintf("%v", this.Timestamp) + `,`,
@@ -1674,6 +1213,7 @@ func (this *RxMetadata) String() string {
 		`EncryptedFineTimestamp:` + fmt.Sprintf("%v", this.EncryptedFineTimestamp) + `,`,
 		`EncryptedFineTimestampKeyID:` + fmt.Sprintf("%v", this.EncryptedFineTimestampKeyID) + `,`,
 		`RSSI:` + fmt.Sprintf("%v", this.RSSI) + `,`,
+		`SignalRSSI:` + strings.Replace(fmt.Sprintf("%v", this.SignalRSSI), "FloatValue", "types.FloatValue", 1) + `,`,
 		`ChannelRSSI:` + fmt.Sprintf("%v", this.ChannelRSSI) + `,`,
 		`RSSIStandardDeviation:` + fmt.Sprintf("%v", this.RSSIStandardDeviation) + `,`,
 		`SNR:` + fmt.Sprintf("%v", this.SNR) + `,`,
@@ -1681,9 +1221,7 @@ func (this *RxMetadata) String() string {
 		`Location:` + strings.Replace(this.Location.String(), "Location", "Location", 1) + `,`,
 		`DownlinkPathConstraint:` + fmt.Sprintf("%v", this.DownlinkPathConstraint) + `,`,
 		`UplinkToken:` + fmt.Sprintf("%v", this.UplinkToken) + `,`,
-		`SignalRSSI:` + strings.Replace(fmt.Sprintf("%v", this.SignalRSSI), "FloatValue", "types.FloatValue", 1) + `,`,
 		`ChannelIndex:` + fmt.Sprintf("%v", this.ChannelIndex) + `,`,
-		`PacketBroker:` + strings.Replace(this.PacketBroker.String(), "PacketBrokerMetadata", "PacketBrokerMetadata", 1) + `,`,
 		`HoppingWidth:` + fmt.Sprintf("%v", this.HoppingWidth) + `,`,
 		`FrequencyDrift:` + fmt.Sprintf("%v", this.FrequencyDrift) + `,`,
 		`Advanced:` + strings.Replace(fmt.Sprintf("%v", this.Advanced), "Struct", "types.Struct", 1) + `,`,
@@ -1719,12 +1257,12 @@ func (this *PacketBrokerMetadata) String() string {
 		`ForwarderNetId:` + fmt.Sprintf("%v", this.ForwarderNetId) + `,`,
 		`ForwarderTenantId:` + fmt.Sprintf("%v", this.ForwarderTenantId) + `,`,
 		`ForwarderClusterId:` + fmt.Sprintf("%v", this.ForwarderClusterId) + `,`,
-		`HomeNetworkNetId:` + fmt.Sprintf("%v", this.HomeNetworkNetId) + `,`,
-		`HomeNetworkTenantId:` + fmt.Sprintf("%v", this.HomeNetworkTenantId) + `,`,
-		`Hops:` + repeatedStringForHops + `,`,
-		`HomeNetworkClusterId:` + fmt.Sprintf("%v", this.HomeNetworkClusterId) + `,`,
 		`ForwarderGatewayEui:` + fmt.Sprintf("%v", this.ForwarderGatewayEui) + `,`,
 		`ForwarderGatewayId:` + strings.Replace(fmt.Sprintf("%v", this.ForwarderGatewayId), "StringValue", "types.StringValue", 1) + `,`,
+		`HomeNetworkNetId:` + fmt.Sprintf("%v", this.HomeNetworkNetId) + `,`,
+		`HomeNetworkTenantId:` + fmt.Sprintf("%v", this.HomeNetworkTenantId) + `,`,
+		`HomeNetworkClusterId:` + fmt.Sprintf("%v", this.HomeNetworkClusterId) + `,`,
+		`Hops:` + repeatedStringForHops + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1751,1379 +1289,3 @@ func valueToStringMetadata(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (m *RxMetadata) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowMetadata
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: RxMetadata: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: RxMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AntennaIndex", wireType)
-			}
-			m.AntennaIndex = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.AntennaIndex |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Time", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Time == nil {
-				m.Time = new(time.Time)
-			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.Time, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			}
-			m.Timestamp = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Timestamp |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FineTimestamp", wireType)
-			}
-			m.FineTimestamp = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.FineTimestamp |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EncryptedFineTimestamp", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.EncryptedFineTimestamp = append(m.EncryptedFineTimestamp[:0], dAtA[iNdEx:postIndex]...)
-			if m.EncryptedFineTimestamp == nil {
-				m.EncryptedFineTimestamp = []byte{}
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EncryptedFineTimestampKeyID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.EncryptedFineTimestampKeyID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 8:
-			if wireType != 5 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RSSI", wireType)
-			}
-			var v uint32
-			if (iNdEx + 4) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
-			iNdEx += 4
-			m.RSSI = float32(math.Float32frombits(v))
-		case 9:
-			if wireType != 5 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ChannelRSSI", wireType)
-			}
-			var v uint32
-			if (iNdEx + 4) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
-			iNdEx += 4
-			m.ChannelRSSI = float32(math.Float32frombits(v))
-		case 10:
-			if wireType != 5 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RSSIStandardDeviation", wireType)
-			}
-			var v uint32
-			if (iNdEx + 4) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
-			iNdEx += 4
-			m.RSSIStandardDeviation = float32(math.Float32frombits(v))
-		case 11:
-			if wireType != 5 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SNR", wireType)
-			}
-			var v uint32
-			if (iNdEx + 4) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
-			iNdEx += 4
-			m.SNR = float32(math.Float32frombits(v))
-		case 12:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyOffset", wireType)
-			}
-			m.FrequencyOffset = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.FrequencyOffset |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Location == nil {
-				m.Location = &Location{}
-			}
-			if err := m.Location.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 14:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkPathConstraint", wireType)
-			}
-			m.DownlinkPathConstraint = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.DownlinkPathConstraint |= DownlinkPathConstraint(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 15:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UplinkToken", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.UplinkToken = append(m.UplinkToken[:0], dAtA[iNdEx:postIndex]...)
-			if m.UplinkToken == nil {
-				m.UplinkToken = []byte{}
-			}
-			iNdEx = postIndex
-		case 16:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SignalRSSI", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.SignalRSSI == nil {
-				m.SignalRSSI = &types.FloatValue{}
-			}
-			if err := m.SignalRSSI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 17:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ChannelIndex", wireType)
-			}
-			m.ChannelIndex = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.ChannelIndex |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 18:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PacketBroker", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.PacketBroker == nil {
-				m.PacketBroker = &PacketBrokerMetadata{}
-			}
-			if err := m.PacketBroker.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 19:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HoppingWidth", wireType)
-			}
-			m.HoppingWidth = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.HoppingWidth |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 20:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyDrift", wireType)
-			}
-			m.FrequencyDrift = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.FrequencyDrift |= int32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 99:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Advanced", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Advanced == nil {
-				m.Advanced = &types.Struct{}
-			}
-			if err := m.Advanced.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipMetadata(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Location) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowMetadata
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Location: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Location: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Latitude", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Latitude = float64(math.Float64frombits(v))
-		case 2:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Longitude", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Longitude = float64(math.Float64frombits(v))
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Altitude", wireType)
-			}
-			m.Altitude = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Altitude |= int32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Accuracy", wireType)
-			}
-			m.Accuracy = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Accuracy |= int32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Source", wireType)
-			}
-			m.Source = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Source |= LocationSource(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipMetadata(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerMetadata) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowMetadata
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerMetadata: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MessageId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.MessageId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ForwarderNetId", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ForwarderNetId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ForwarderTenantId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ForwarderTenantId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ForwarderClusterId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ForwarderClusterId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HomeNetworkNetId", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.HomeNetworkNetId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HomeNetworkTenantId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.HomeNetworkTenantId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Hops", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Hops = append(m.Hops, &PacketBrokerRouteHop{})
-			if err := m.Hops[len(m.Hops)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HomeNetworkClusterId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.HomeNetworkClusterId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ForwarderGatewayEui", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			var v go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-			m.ForwarderGatewayEui = &v
-			if err := m.ForwarderGatewayEui.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ForwarderGatewayId", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ForwarderGatewayId == nil {
-				m.ForwarderGatewayId = &types.StringValue{}
-			}
-			if err := m.ForwarderGatewayId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipMetadata(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PacketBrokerRouteHop) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowMetadata
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PacketBrokerRouteHop: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PacketBrokerRouteHop: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ReceivedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ReceivedAt, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SenderName", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SenderName = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SenderAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SenderAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ReceiverName", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ReceiverName = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ReceiverAgent", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ReceiverAgent = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipMetadata(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthMetadata
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func skipMetadata(dAtA []byte) (n int, err error) {
-	l := len(dAtA)
-	iNdEx := 0
-	depth := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return 0, ErrIntOverflowMetadata
-			}
-			if iNdEx >= l {
-				return 0, io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		wireType := int(wire & 0x7)
-		switch wireType {
-		case 0:
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 {
-					break
-				}
-			}
-		case 1:
-			iNdEx += 8
-		case 2:
-			var length int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowMetadata
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if length < 0 {
-				return 0, ErrInvalidLengthMetadata
-			}
-			iNdEx += length
-		case 3:
-			depth++
-		case 4:
-			if depth == 0 {
-				return 0, ErrUnexpectedEndOfGroupMetadata
-			}
-			depth--
-		case 5:
-			iNdEx += 4
-		default:
-			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		}
-		if iNdEx < 0 {
-			return 0, ErrInvalidLengthMetadata
-		}
-		if depth == 0 {
-			return iNdEx, nil
-		}
-	}
-	return 0, io.ErrUnexpectedEOF
-}
-
-var (
-	ErrInvalidLengthMetadata        = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowMetadata          = fmt.Errorf("proto: integer overflow")
-	ErrUnexpectedEndOfGroupMetadata = fmt.Errorf("proto: unexpected end of group")
-)

@@ -18,6 +18,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -59,7 +60,7 @@ func (c *membershipCache) GetMember(ctx context.Context, id *ttnpb.OrganizationO
 			)
 		}
 		var rights ttnpb.Rights
-		if err = rights.Unmarshal(cached); err == nil {
+		if err = proto.Unmarshal(cached, &rights); err == nil {
 			return &rights, nil
 		}
 	}
@@ -72,7 +73,7 @@ func (c *membershipCache) GetMember(ctx context.Context, id *ttnpb.OrganizationO
 		}
 		return nil, err
 	}
-	if cache, err := rights.Marshal(); err == nil {
+	if cache, err := proto.Marshal(rights); err == nil {
 		if cacheErr := c.redis.Set(ctx, cacheKey, cache, c.ttl).Err(); cacheErr != nil {
 			log.FromContext(ctx).WithError(cacheErr).Error("Failed to set membership cache")
 		}
