@@ -107,7 +107,11 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			}), should.BeNil) {
 				return false
 			}
-			a.So(collected, should.Resemble, expected)
+			if a.So(len(collected), should.Equal, len(expected)) {
+				for i := range collected {
+					a.So(collected[i], should.Resemble, expected[i])
+				}
+			}
 			close(req.Response)
 
 			select {

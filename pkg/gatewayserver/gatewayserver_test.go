@@ -1338,11 +1338,12 @@ func TestGatewayServer(t *testing.T) {
 										}
 										a.So(time.Since(msg.ReceivedAt), should.BeLessThan, timeout)
 										a.So(msg.Settings, should.Resemble, expected.Settings)
-										for _, md := range msg.RxMetadata {
+										a.So(len(msg.RxMetadata), should.Equal, len(expected.RxMetadata))
+										for i, md := range msg.RxMetadata {
 											a.So(md.UplinkToken, should.NotBeEmpty)
 											md.UplinkToken = nil
+											a.So(md, should.Resemble, expected.RxMetadata[i])
 										}
-										a.So(msg.RxMetadata, should.Resemble, expected.RxMetadata)
 										a.So(msg.RawPayload, should.Resemble, expected.RawPayload)
 									case <-time.After(timeout):
 										t.Fatal("Expected uplink timeout")
