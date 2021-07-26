@@ -93,7 +93,7 @@ func TestPba(t *testing.T) {
 				a.So(res, should.Resemble, &ttnpb.PacketBrokerInfo{
 					Registration: &ttnpb.PacketBrokerNetwork{
 						Id: &ttnpb.PacketBrokerNetworkIdentifier{
-							NetID:    0x13,
+							NetId:    0x13,
 							TenantId: "foo-tenant",
 						},
 						Name: "Test Network",
@@ -167,7 +167,7 @@ func TestPba(t *testing.T) {
 				}
 				a.So(res, should.Resemble, &ttnpb.PacketBrokerNetwork{
 					Id: &ttnpb.PacketBrokerNetworkIdentifier{
-						NetID:    0x13,
+						NetId:    0x13,
 						TenantId: "foo-tenant",
 					},
 					Name: "Test Network",
@@ -268,7 +268,7 @@ func TestPba(t *testing.T) {
 				}
 				a.So(res, should.Resemble, &ttnpb.PacketBrokerNetwork{
 					Id: &ttnpb.PacketBrokerNetworkIdentifier{
-						NetID:    0x13,
+						NetId:    0x13,
 						TenantId: "foo-tenant",
 					},
 					Name: "Test Network",
@@ -488,11 +488,11 @@ func TestPba(t *testing.T) {
 						for i := 0; i < len(policies); i++ {
 							a.So(policies[i], should.Resemble, &ttnpb.PacketBrokerRoutingPolicy{
 								ForwarderId: &ttnpb.PacketBrokerNetworkIdentifier{
-									NetID:    0x13,
+									NetId:    0x13,
 									TenantId: "foo-tenant",
 								},
 								HomeNetworkId: &ttnpb.PacketBrokerNetworkIdentifier{
-									NetID: uint32(i) + 1,
+									NetId: uint32(i) + 1,
 								},
 								UpdatedAt: test.Must(pbtypes.TimestampProto(time.Unix(int64(i), 0))).(*pbtypes.Timestamp),
 								Uplink: &ttnpb.PacketBrokerRoutingPolicyUplink{
@@ -603,11 +603,11 @@ func TestPba(t *testing.T) {
 						for i, n := range networks {
 							if i%2 == 0 {
 								a.So(n.Id, should.Resemble, &ttnpb.PacketBrokerNetworkIdentifier{
-									NetID: uint32(i),
+									NetId: uint32(i),
 								})
 							} else {
 								a.So(n.Id, should.Resemble, &ttnpb.PacketBrokerNetworkIdentifier{
-									NetID:    uint32(i),
+									NetId:    uint32(i),
 									TenantId: fmt.Sprintf("tenant-%d", i),
 								})
 							}
@@ -670,11 +670,11 @@ func TestPba(t *testing.T) {
 						for i, n := range networks {
 							if i%2 == 0 {
 								a.So(n.Id, should.Resemble, &ttnpb.PacketBrokerNetworkIdentifier{
-									NetID: uint32(i),
+									NetId: uint32(i),
 								})
 							} else {
 								a.So(n.Id, should.Resemble, &ttnpb.PacketBrokerNetworkIdentifier{
-									NetID:    uint32(i),
+									NetId:    uint32(i),
 									TenantId: fmt.Sprintf("tenant-%d", i),
 								})
 							}

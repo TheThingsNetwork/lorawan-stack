@@ -108,7 +108,7 @@ func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDev
 		LorawanVersion:       version,
 		JoinNonce:            jn,
 		DevNonce:             dn,
-		NetID:                nid,
+		NetId:                nid,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
 	}, s.callOpts...)
@@ -171,7 +171,7 @@ func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.End
 		LorawanVersion:       version,
 		JoinNonce:            jn,
 		DevNonce:             dn,
-		NetID:                nid,
+		NetId:                nid,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
 	}, s.callOpts...)

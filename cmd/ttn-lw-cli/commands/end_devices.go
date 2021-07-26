@@ -964,7 +964,7 @@ values will be stored in the Join Server.`,
 
 			req.TargetDeviceId, _ = cmd.Flags().GetString("target-device-id")
 			if netIDHex, _ := cmd.Flags().GetString("target-net-id"); netIDHex != "" {
-				if err := req.TargetNetID.UnmarshalText([]byte(netIDHex)); err != nil {
+				if err := req.TargetNetId.UnmarshalText([]byte(netIDHex)); err != nil {
 					return err
 				}
 			}

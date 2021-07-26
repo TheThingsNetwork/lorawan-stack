@@ -1857,7 +1857,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 			}
 
 		case "net_id":
-			// no validation rules for NetID
+			// no validation rules for NetId
 		case "mac_settings":
 
 			if v, ok := interface{}(m.GetMACSettings()).(interface{ ValidateFields(...string) error }); ok {
@@ -3819,7 +3819,7 @@ func (m *MACState_JoinAccept) ValidateFields(paths ...string) error {
 		case "dev_addr":
 			// no validation rules for DevAddr
 		case "net_id":
-			// no validation rules for NetID
+			// no validation rules for NetId
 		default:
 			return MACState_JoinAcceptValidationError{
 				field:  name,

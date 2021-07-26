@@ -637,7 +637,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: *CopyEndDevice(&ttnpb.EndDevice{
 					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-					NetID:                &types.NetID{0x42, 0x00, 0x00},
+					NetId:                &types.NetID{0x42, 0x00, 0x00},
 				}),
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"net_id"},
@@ -654,21 +654,21 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 				dev, sets, err := cb(CopyEndDevice(&ttnpb.EndDevice{
 					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-					NetID:                registeredDevice.NetID,
+					NetId:                registeredDevice.NetId,
 				}))
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"net_id",
 				})
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-					NetID:                &types.NetID{0x42, 0x00, 0x00},
+					NetId:                &types.NetID{0x42, 0x00, 0x00},
 				})
 				return dev, err
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-					NetID:                &types.NetID{0x42, 0x00, 0x00},
+					NetId:                &types.NetID{0x42, 0x00, 0x00},
 				})
 			},
 			SetByIDCalls: 1,

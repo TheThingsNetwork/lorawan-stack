@@ -49,7 +49,7 @@ func (v *JoinRequest) FieldIsZero(p string) bool {
 	case "downlink_settings.rx2_dr":
 		return v.DownlinkSettings.FieldIsZero("rx2_dr")
 	case "net_id":
-		return v.NetID == types.NetID{}
+		return v.NetId == types.NetID{}
 	case "payload":
 		return v.Payload == nil
 	case "payload.Payload":

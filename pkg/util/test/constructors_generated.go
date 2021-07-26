@@ -769,7 +769,7 @@ func (EndDeviceOptionNamespace) WithRootKeys(v *ttnpb.RootKeys) EndDeviceOption 
 // WithNetID returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with NetID set to v.
 func (EndDeviceOptionNamespace) WithNetID(v *types.NetID) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.NetID = v
+		x.NetId = v
 		return x
 	}
 }

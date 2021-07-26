@@ -706,7 +706,7 @@ func (m *DeriveSessionKeysRequest) ValidateFields(paths ...string) error {
 		case "dev_nonce":
 			// no validation rules for DevNonce
 		case "net_id":
-			// no validation rules for NetID
+			// no validation rules for NetId
 		case "provisioner_id":
 
 			if utf8.RuneCountInString(m.GetProvisionerID()) > 36 {
@@ -1137,7 +1137,7 @@ func (m *ApplicationActivationSettings) ValidateFields(paths ...string) error {
 			}
 
 		case "home_net_id":
-			// no validation rules for HomeNetID
+			// no validation rules for HomeNetId
 		case "application_server_id":
 
 			if utf8.RuneCountInString(m.GetApplicationServerID()) > 100 {

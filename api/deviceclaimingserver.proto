@@ -76,7 +76,7 @@ message ClaimEndDeviceRequest {
   string target_application_server_id = 11 [(gogoproto.customname) = "TargetApplicationServerID", (validate.rules).string.max_len = 100];
   reserved 12; // target_join_server_address
   // Home NetID.
-  bytes target_net_id = 13 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID", (gogoproto.customname) = "TargetNetID"];
+  bytes target_net_id = 13 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
 
   // If set, invalidate the authentication code with which the device gets claimed. This prohibits subsequent claiming requests.
   bool invalidate_authentication_code = 5;

@@ -459,7 +459,7 @@ func (m *PacketBrokerNetworkIdentifier) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "net_id":
-			// no validation rules for NetID
+			// no validation rules for NetId
 		case "tenant_id":
 
 			if utf8.RuneCountInString(m.GetTenantId()) > 36 {

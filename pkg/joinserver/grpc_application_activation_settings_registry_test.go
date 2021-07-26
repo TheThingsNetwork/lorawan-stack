@@ -466,7 +466,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			CreateSettings: &ttnpb.ApplicationActivationSettings{
 				KEKLabel:            sessionKEKLabel,
 				KEK:                 jsKEKEnvelopeUnwrapped,
-				HomeNetID:           &netID,
+				HomeNetId:           &netID,
 				ApplicationServerID: asID,
 			},
 			CreatePaths: []string{
@@ -478,7 +478,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			GetSettings: &ttnpb.ApplicationActivationSettings{
 				KEKLabel:            sessionKEKLabel,
 				KEK:                 jsKEKEnvelopeUnwrapped,
-				HomeNetID:           &netID,
+				HomeNetId:           &netID,
 				ApplicationServerID: asID,
 			},
 		},

@@ -333,10 +333,10 @@ func (dst *DeriveSessionKeysRequest) SetFields(src *DeriveSessionKeysRequest, pa
 				return fmt.Errorf("'net_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.NetID = src.NetID
+				dst.NetId = src.NetId
 			} else {
 				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
-				dst.NetID = zero
+				dst.NetId = zero
 			}
 		case "provisioner_id":
 			if len(subs) > 0 {
@@ -624,9 +624,9 @@ func (dst *ApplicationActivationSettings) SetFields(src *ApplicationActivationSe
 				return fmt.Errorf("'home_net_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.HomeNetID = src.HomeNetID
+				dst.HomeNetId = src.HomeNetId
 			} else {
-				dst.HomeNetID = nil
+				dst.HomeNetId = nil
 			}
 		case "application_server_id":
 			if len(subs) > 0 {

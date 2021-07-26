@@ -266,7 +266,7 @@ func request_Pba_GetHomeNetworkRoutingPolicy_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "net_id")
 	}
 
-	protoReq.NetID, err = runtime.Uint32(val)
+	protoReq.NetId, err = runtime.Uint32(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "net_id", err)
@@ -300,7 +300,7 @@ func local_request_Pba_GetHomeNetworkRoutingPolicy_0(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "net_id")
 	}
 
-	protoReq.NetID, err = runtime.Uint32(val)
+	protoReq.NetId, err = runtime.Uint32(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "net_id", err)
@@ -334,7 +334,7 @@ func request_Pba_GetHomeNetworkRoutingPolicy_1(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "net_id")
 	}
 
-	protoReq.NetID, err = runtime.Uint32(val)
+	protoReq.NetId, err = runtime.Uint32(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "net_id", err)
@@ -372,7 +372,7 @@ func local_request_Pba_GetHomeNetworkRoutingPolicy_1(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "net_id")
 	}
 
-	protoReq.NetID, err = runtime.Uint32(val)
+	protoReq.NetId, err = runtime.Uint32(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "net_id", err)
@@ -738,7 +738,7 @@ func request_Pba_DeleteHomeNetworkRoutingPolicy_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "net_id")
 	}
 
-	protoReq.NetID, err = runtime.Uint32(val)
+	protoReq.NetId, err = runtime.Uint32(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "net_id", err)
@@ -772,7 +772,7 @@ func local_request_Pba_DeleteHomeNetworkRoutingPolicy_0(ctx context.Context, mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "net_id")
 	}
 
-	protoReq.NetID, err = runtime.Uint32(val)
+	protoReq.NetId, err = runtime.Uint32(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "net_id", err)
@@ -806,7 +806,7 @@ func request_Pba_DeleteHomeNetworkRoutingPolicy_1(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "net_id")
 	}
 
-	protoReq.NetID, err = runtime.Uint32(val)
+	protoReq.NetId, err = runtime.Uint32(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "net_id", err)
@@ -844,7 +844,7 @@ func local_request_Pba_DeleteHomeNetworkRoutingPolicy_1(ctx context.Context, mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "net_id")
 	}
 
-	protoReq.NetID, err = runtime.Uint32(val)
+	protoReq.NetId, err = runtime.Uint32(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "net_id", err)

@@ -2601,7 +2601,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						case ttnpb.MType_JOIN_ACCEPT:
 							msg.Payload = &ttnpb.Message_JoinAcceptPayload{
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-									NetID:      created.PendingMACState.QueuedJoinAccept.NetID,
+									NetId:      created.PendingMACState.QueuedJoinAccept.NetId,
 									DevAddr:    created.PendingMACState.QueuedJoinAccept.DevAddr,
 									DLSettings: created.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    created.PendingMACState.QueuedJoinAccept.Request.RxDelay,

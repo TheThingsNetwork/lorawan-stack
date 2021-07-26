@@ -2103,7 +2103,7 @@ func (v *JoinAcceptPayload) FieldIsZero(p string) bool {
 	case "join_nonce":
 		return v.JoinNonce == types.JoinNonce{}
 	case "net_id":
-		return v.NetID == types.NetID{}
+		return v.NetId == types.NetID{}
 	case "rx_delay":
 		return v.RxDelay == 0
 	}
@@ -2223,7 +2223,7 @@ func (v *RejoinRequestPayload) FieldIsZero(p string) bool {
 	case "join_eui":
 		return v.JoinEui == types.EUI64{}
 	case "net_id":
-		return v.NetID == types.NetID{}
+		return v.NetId == types.NetID{}
 	case "rejoin_cnt":
 		return v.RejoinCnt == 0
 	case "rejoin_type":

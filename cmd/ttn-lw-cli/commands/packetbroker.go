@@ -74,7 +74,7 @@ func getPacketBrokerNetworkID(flagSet *pflag.FlagSet, args []string, allowDefaul
 		return nil, err
 	}
 	return &ttnpb.PacketBrokerNetworkIdentifier{
-		NetID:    netID.MarshalNumber(),
+		NetId:    netID.MarshalNumber(),
 		TenantId: tenantID,
 	}, nil
 }

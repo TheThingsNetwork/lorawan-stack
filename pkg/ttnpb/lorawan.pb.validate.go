@@ -739,7 +739,7 @@ func (m *RejoinRequestPayload) ValidateFields(paths ...string) error {
 			}
 
 		case "net_id":
-			// no validation rules for NetID
+			// no validation rules for NetId
 		case "join_eui":
 			// no validation rules for JoinEui
 		case "dev_eui":
@@ -832,7 +832,7 @@ func (m *JoinAcceptPayload) ValidateFields(paths ...string) error {
 		case "join_nonce":
 			// no validation rules for JoinNonce
 		case "net_id":
-			// no validation rules for NetID
+			// no validation rules for NetId
 		case "dev_addr":
 			// no validation rules for DevAddr
 		case "dl_settings":
