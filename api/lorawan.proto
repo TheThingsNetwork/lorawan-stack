@@ -32,7 +32,6 @@ option (gogoproto.goproto_registration) = true;
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.marshaler_all) = true;
-option (gogoproto.populate_all) = true;
 option (gogoproto.protosizer_all) = false;
 option (gogoproto.sizer_all) = true;
 option (gogoproto.stringer_all) = true;
@@ -40,8 +39,6 @@ option (gogoproto.unmarshaler_all) = true;
 
 // Message represents a LoRaWAN message
 message Message {
-  option (gogoproto.populate) = false;
-
   MHDR m_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   bytes mic = 2 [(gogoproto.customname) = "MIC", (validate.rules).bytes = { min_len: 0, max_len: 4 }];
 
@@ -147,13 +144,13 @@ enum DataRateOffset {
 }
 
 message MHDR {
+  option (gogoproto.populate) = true;
+
   MType m_type = 1 [(validate.rules).enum.defined_only = true];
   Major major = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message MACPayload {
-  option (gogoproto.populate) = false;
-
   FHDR f_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   uint32 f_port = 2 [(validate.rules).uint32.lte = 255];
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
@@ -163,8 +160,6 @@ message MACPayload {
 }
 
 message FHDR {
-  option (gogoproto.populate) = false;
-
   bytes dev_addr = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
   FCtrl f_ctrl = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   uint32 f_cnt = 3 [(validate.rules).uint32.lte = 65535];
@@ -172,6 +167,8 @@ message FHDR {
 }
 
 message FCtrl {
+  option (gogoproto.populate) = true;
+
   bool adr = 1;
   bool adr_ack_req = 2; // Only on uplink.
   bool ack = 3;
@@ -180,8 +177,6 @@ message FCtrl {
 }
 
 message JoinRequestPayload {
-  option (gogoproto.populate) = false;
-
   bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
   bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
   bytes dev_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevNonce"];
@@ -201,8 +196,6 @@ enum RejoinRequestType {
 }
 
 message RejoinRequestPayload {
-  option (gogoproto.populate) = false;
-
   RejoinRequestType rejoin_type = 1 [(validate.rules).enum.defined_only = true];
   bytes net_id = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
   bytes join_eui = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
@@ -211,8 +204,6 @@ message RejoinRequestPayload {
 }
 
 message JoinAcceptPayload {
-  option (gogoproto.populate) = false;
-
   bytes encrypted = 1;
   bytes join_nonce = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.JoinNonce"];
   bytes net_id = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
@@ -223,8 +214,6 @@ message JoinAcceptPayload {
 }
 
 message DLSettings {
-  option (gogoproto.populate) = false;
-
   DataRateOffset rx1_dr_offset = 1 [(gogoproto.customname) = "Rx1DROffset", (validate.rules).enum.defined_only = true];
   DataRateIndex rx2_dr = 2 [(gogoproto.customname) = "Rx2DR", (validate.rules).enum.defined_only = true];
   // OptNeg is set if Network Server implements LoRaWAN 1.1 or greater.
@@ -237,8 +226,6 @@ enum CFListType {
 }
 
 message CFList {
-  option (gogoproto.populate) = false;
-
   CFListType type = 1 [(validate.rules).enum.defined_only = true];
   // Frequencies to be broadcasted, in hecto-Hz.
   // These values are broadcasted as 24 bits unsigned integers.
@@ -298,8 +285,6 @@ message DataRate {
 // This message is used on both uplink and downlink.
 // On downlink, this is a scheduled transmission.
 message TxSettings {
-  option (gogoproto.populate) = false;
-
   // Transmission settings for downlink.
   message Downlink{
     // Index of the antenna on which the uplink was received and/or downlink must be sent.
@@ -360,8 +345,6 @@ message DownlinkPath {
 // If the gateway has a scheduler, this request is sent to the gateway, in the order of gateway_ids.
 // Otherwise, the Gateway Server attempts to schedule the request and creates the TxSettings.
 message TxRequest {
-  option (gogoproto.populate) = false;
-
   Class class = 1;
   // Downlink paths used to select a gateway for downlink.
   // In class A, the downlink paths are required to only contain uplink tokens.
@@ -428,8 +411,6 @@ enum MACCommandIdentifier {
 }
 
 message MACCommand {
-  option (gogoproto.populate) = false;
-
   MACCommandIdentifier cid = 1 [(gogoproto.customname) = "CID", (validate.rules).enum = {defined_only: true, not_in:[0]}];
 
   oneof payload {
@@ -467,25 +448,17 @@ message MACCommand {
   }
 
   message ResetInd {
-    option (gogoproto.populate) = false;
-
     Minor minor_version = 1 [(validate.rules).enum = {defined_only: true, in:[1]}];
   }
   message ResetConf {
-    option (gogoproto.populate) = false;
-
     Minor minor_version = 1 [(validate.rules).enum = {defined_only: true, in:[1]}];
   }
   message LinkCheckAns {
-    option (gogoproto.populate) = false;
-
     // Indicates the link margin in dB of the received LinkCheckReq, relative to the demodulation floor.
     uint32 margin = 1 [(validate.rules).uint32.lte = 254];
     uint32 gateway_count = 2 [(validate.rules).uint32.lte = 255];
   }
   message LinkADRReq {
-    option (gogoproto.populate) = false;
-
     DataRateIndex data_rate_index = 1 [(validate.rules).enum.defined_only = true];
     uint32 tx_power_index = 2 [(validate.rules).uint32.lte = 15];
     repeated bool channel_mask = 3 [(validate.rules).repeated.max_items = 16];
@@ -494,28 +467,27 @@ message MACCommand {
     uint32 nb_trans = 6 [(validate.rules).uint32.lte = 15];
   }
   message LinkADRAns {
+    option (gogoproto.populate) = true;
     bool channel_mask_ack = 1;
     bool data_rate_index_ack = 2;
     bool tx_power_index_ack = 3;
   }
   message DutyCycleReq {
+    option (gogoproto.populate) = true;
     AggregatedDutyCycle max_duty_cycle = 1 [(validate.rules).enum.defined_only = true];
   }
   message RxParamSetupReq {
-    option (gogoproto.populate) = false;
-
     DataRateIndex rx2_data_rate_index = 1 [(validate.rules).enum.defined_only = true];
     DataRateOffset rx1_data_rate_offset = 2 [(validate.rules).enum.defined_only = true];
     uint64 rx2_frequency = 3 [(validate.rules).uint64.gte = 100000]; // Rx2 frequency (Hz).
   }
   message RxParamSetupAns {
+    option (gogoproto.populate) = true;
     bool rx2_data_rate_index_ack = 1;
     bool rx1_data_rate_offset_ack = 2;
     bool rx2_frequency_ack = 3;
   }
   message DevStatusAns {
-    option (gogoproto.populate) = false;
-
     // Device battery status.
     // 0 indicates that the device is connected to an external power source.
     // 1..254 indicates a battery level.
@@ -525,31 +497,31 @@ message MACCommand {
     int32 margin = 2 [(validate.rules).int32 = {gte: -32, lte: 31}];
   }
   message NewChannelReq {
-    option (gogoproto.populate) = false;
-
     uint32 channel_index = 1 [(validate.rules).uint32.lte = 255];
     uint64 frequency = 2 [(validate.rules).uint64 = { lte: 0, gte: 100000 }]; // Channel frequency (Hz).
     DataRateIndex min_data_rate_index = 3 [(validate.rules).enum.defined_only = true];
     DataRateIndex max_data_rate_index = 4 [(validate.rules).enum.defined_only = true];
   }
   message NewChannelAns {
+    option (gogoproto.populate) = true;
     bool frequency_ack = 1;
     bool data_rate_ack = 2;
   }
   message DLChannelReq {
-    option (gogoproto.populate) = false;
-
     uint32 channel_index = 1 [(validate.rules).uint32.lte = 255];
     uint64 frequency = 2 [(validate.rules).uint64.gte = 100000]; // Downlink channel frequency (Hz).
   }
   message DLChannelAns {
+    option (gogoproto.populate) = true;
     bool channel_index_ack = 1;
     bool frequency_ack = 2;
   }
   message RxTimingSetupReq {
+    option (gogoproto.populate) = true;
     RxDelay delay = 1 [(validate.rules).enum.defined_only = true];
   }
   message TxParamSetupReq {
+    option (gogoproto.populate) = true;
     // Indicates the maximum EIRP value in dBm, indexed by the following vector:
     // [ 8 10 12 13 14 16 18 20 21 24 26 27 29 30 33 36 ]
     DeviceEIRP max_eirp_index = 1 [(gogoproto.customname) = "MaxEIRPIndex", (validate.rules).enum.defined_only = true];
@@ -557,23 +529,25 @@ message MACCommand {
     bool downlink_dwell_time = 3;
   }
   message RekeyInd {
+    option (gogoproto.populate) = true;
     Minor minor_version = 1 [(validate.rules).enum.defined_only = true];
   }
   message RekeyConf {
+    option (gogoproto.populate) = true;
     Minor minor_version = 1 [(validate.rules).enum.defined_only = true];
   }
   message ADRParamSetupReq {
+    option (gogoproto.populate) = true;
     // Exponent e that configures the ADR_ACK_LIMIT = 2^e messages.
     ADRAckLimitExponent adr_ack_limit_exponent = 1 [(validate.rules).enum.defined_only = true];
     // Exponent e that configures the ADR_ACK_DELAY = 2^e messages.
     ADRAckDelayExponent adr_ack_delay_exponent = 2 [(validate.rules).enum.defined_only = true];
   }
   message DeviceTimeAns {
+    option (gogoproto.populate) = true;
     google.protobuf.Timestamp time = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
   }
   message ForceRejoinReq {
-    option (gogoproto.populate) = false;
-
     RejoinRequestType rejoin_type = 1 [(validate.rules).enum.defined_only = true];
     DataRateIndex data_rate_index = 2 [(validate.rules).enum.defined_only = true];
     uint32 max_retries = 3 [(validate.rules).uint32.lte = 7];
@@ -581,45 +555,46 @@ message MACCommand {
     RejoinPeriodExponent period_exponent = 4 [(validate.rules).enum.defined_only = true];
   }
   message RejoinParamSetupReq {
+    option (gogoproto.populate) = true;
     // Exponent e that configures the rejoin counter = 2^(e+4) messages.
     RejoinCountExponent max_count_exponent = 1 [(validate.rules).enum.defined_only = true];
     // Exponent e that configures the rejoin timer = 2^(e+10) seconds.
     RejoinTimeExponent max_time_exponent = 2 [(validate.rules).enum.defined_only = true];
   }
   message RejoinParamSetupAns {
+    option (gogoproto.populate) = true;
     bool max_time_exponent_ack = 1;
   }
   message PingSlotInfoReq {
+    option (gogoproto.populate) = true;
     PingSlotPeriod period = 1 [(validate.rules).enum.defined_only = true];
   }
   message PingSlotChannelReq {
-    option (gogoproto.populate) = false;
-
     uint64 frequency = 1 [(validate.rules).uint64 = { lte: 0, gte: 100000 }]; // Ping slot channel frequency (Hz).
     DataRateIndex data_rate_index = 2 [(validate.rules).enum.defined_only = true];
   }
   message PingSlotChannelAns {
+    option (gogoproto.populate) = true;
     bool frequency_ack = 1;
     bool data_rate_index_ack = 2;
   }
   message BeaconTimingAns {
-    option (gogoproto.populate) = false;
-
     uint32 delay = 1 [(validate.rules).uint32.lte = 65535]; // (uint16) See LoRaWAN specification.
     uint32 channel_index = 2 [(validate.rules).uint32.lte = 255];
   }
   message BeaconFreqReq {
-    option (gogoproto.populate) = false;
-
     uint64 frequency = 1 [(validate.rules).uint64 = { lte: 0, gte: 100000 }]; // Frequency of the Class B beacons (Hz).
   }
   message BeaconFreqAns {
+    option (gogoproto.populate) = true;
     bool frequency_ack = 1;
   }
   message DeviceModeInd {
+    option (gogoproto.populate) = true;
     Class class = 1 [(validate.rules).enum.defined_only = true];
   }
   message DeviceModeConf {
+    option (gogoproto.populate) = true;
     Class class = 1 [(validate.rules).enum.defined_only = true];
   }
 }
@@ -838,9 +813,13 @@ message RxDelayValue {
   RxDelay value = 1 [(validate.rules).enum.defined_only = true];
 }
 message ADRAckLimitExponentValue {
+  option (gogoproto.populate) = true;
+
   ADRAckLimitExponent value = 1 [(validate.rules).enum.defined_only = true];
 }
 message ADRAckDelayExponentValue {
+  option (gogoproto.populate) = true;
+
   ADRAckDelayExponent value = 1 [(validate.rules).enum.defined_only = true];
 }
 message DeviceEIRPValue {

@@ -33,7 +33,6 @@ option (gogoproto.goproto_registration) = true;
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.marshaler_all) = true;
-option (gogoproto.populate_all) = true;
 option (gogoproto.protosizer_all) = false;
 option (gogoproto.sizer_all) = true;
 option (gogoproto.stringer_all) = true;
@@ -57,6 +56,8 @@ enum ContactMethod {
 }
 
 message ContactInfo {
+  option (gogoproto.populate) = true;
+
   ContactType contact_type = 1 [(validate.rules).enum.defined_only = true];
   ContactMethod contact_method = 2 [(validate.rules).enum.defined_only = true];
   string value = 3 [(validate.rules).string.max_len = 256];

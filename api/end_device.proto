@@ -40,13 +40,14 @@ option (gogoproto.goproto_registration) = true;
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.marshaler_all) = true;
-option (gogoproto.populate_all) = true;
 option (gogoproto.protosizer_all) = false;
 option (gogoproto.sizer_all) = true;
 option (gogoproto.stringer_all) = true;
 option (gogoproto.unmarshaler_all) = true;
 
 message Session {
+  option (gogoproto.populate) = true;
+
   reserved 1; // RFU: Session ID
 
   // Device Address, issued by the Network Server or chosen by device manufacturer in case of testing range (beginning with 00-03).
@@ -74,8 +75,6 @@ message BoolValue {
 // MACParameters represent the parameters of the device's MAC layer (active or desired).
 // This is used internally by the Network Server.
 message MACParameters {
-  option (gogoproto.populate) = false;
-
   // Maximum EIRP (dBm).
   float max_eirp = 1 [(gogoproto.customname) = "MaxEIRP"];
   reserved 2; // Deprecated: uplink_dwell_time
@@ -115,9 +114,7 @@ message MACParameters {
   uint64 beacon_frequency = 18 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
 
   message Channel {
-    option (gogoproto.populate) = false;
-
-    // Uplink frequency of the channel (Hz).
+      // Uplink frequency of the channel (Hz).
     uint64 uplink_frequency = 1 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
     // Downlink frequency of the channel (Hz).
     uint64 downlink_frequency = 2 [(validate.rules).uint64.gte = 100000];
@@ -148,8 +145,6 @@ message MACParameters {
 
 // Template for creating end devices.
 message EndDeviceVersion {
-  option (gogoproto.populate) = false;
-
   // Version identifiers.
   EndDeviceVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 
@@ -285,8 +280,6 @@ message MACSettings {
 // MACState is reset on each join for OTAA or ResetInd for ABP devices.
 // This is used internally by the Network Server.
 message MACState {
-  option (gogoproto.populate) = false;
-
   // Current LoRaWAN MAC parameters.
   MACParameters current_parameters = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Desired LoRaWAN MAC parameters.
@@ -315,6 +308,8 @@ message MACState {
   repeated MACCommand pending_requests = 10;
 
   message JoinRequest {
+    option (gogoproto.populate) = true;
+
     reserved 1,2,3,4,5,9,10; // deprecated JoinRequest fields.
     DLSettings downlink_settings = 6 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
     RxDelay rx_delay = 7 [(validate.rules).enum.defined_only = true];
@@ -585,6 +580,8 @@ message EndDevices {
 }
 
 message DevAddrPrefix {
+  option (gogoproto.populate) = true;
+
   // DevAddr base.
   bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
   // Number of most significant bits from dev_addr that are used as prefix.

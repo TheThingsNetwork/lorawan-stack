@@ -30,7 +30,6 @@ option (gogoproto.goproto_registration) = true;
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.marshaler_all) = true;
-option (gogoproto.populate_all) = true;
 option (gogoproto.protosizer_all) = false;
 option (gogoproto.sizer_all) = true;
 option (gogoproto.stringer_all) = true;
@@ -39,6 +38,8 @@ option (gogoproto.unmarshaler_all) = true;
 // Error details that are communicated over gRPC (and HTTP) APIs.
 // The messages (for translation) are stored as "error:<namespace>:<name>".
 message ErrorDetails {
+  option (gogoproto.populate) = true;
+
   // Namespace of the error (typically the package name in The Things Stack).
   string namespace = 1;
   // Name of the error.

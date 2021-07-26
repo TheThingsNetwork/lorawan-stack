@@ -37,7 +37,6 @@ option (gogoproto.goproto_registration) = true;
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.marshaler_all) = true;
-option (gogoproto.populate_all) = true;
 option (gogoproto.protosizer_all) = false;
 option (gogoproto.sizer_all) = true;
 option (gogoproto.stringer_all) = true;
@@ -45,7 +44,6 @@ option (gogoproto.unmarshaler_all) = true;
 
 // Uplink message from the end device to the network
 message UplinkMessage {
-  option (gogoproto.populate) = false;
 
   // Mapping from UDP message (other fields can be set in "advanced"):
   //
@@ -105,7 +103,6 @@ message UplinkMessage {
 
 // Downlink message from the network to the end device
 message DownlinkMessage {
-  option (gogoproto.populate) = false;
 
   // Mapping from UDP message:
   //
@@ -194,6 +191,8 @@ message GatewayUplinkMessage {
 }
 
 message ApplicationUplink {
+  option (gogoproto.populate) = true;
+
   // Join Server issued identifier for the session keys used by this uplink.
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
   uint32 f_port = 2 [(validate.rules).uint32 = {lte: 255, not_in: [224]}];
@@ -246,6 +245,8 @@ message ApplicationUplink {
 }
 
 message ApplicationLocation {
+  option (gogoproto.populate) = true;
+
   string service = 1;
   Location location = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   map<string,string> attributes = 3 [
@@ -258,6 +259,8 @@ message ApplicationLocation {
 }
 
 message ApplicationJoinAccept {
+  option (gogoproto.populate) = true;
+
   // Join Server issued identifier for the session keys negotiated in this join.
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
   // Encrypted Application Session Key (if Join Server sent it to Network Server).
@@ -272,8 +275,6 @@ message ApplicationJoinAccept {
 }
 
 message ApplicationDownlink {
-  option (gogoproto.populate) = false;
-
   // Join Server issued identifier for the session keys used by this downlink.
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
   uint32 f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255, not_in: [224]}];
@@ -323,11 +324,15 @@ message ApplicationDownlinks {
 }
 
 message ApplicationDownlinkFailed {
+  option (gogoproto.populate) = true;
+
   ApplicationDownlink downlink = 1  [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   ErrorDetails error = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message ApplicationInvalidatedDownlinks {
+  option (gogoproto.populate) = true;
+
   repeated ApplicationDownlink downlinks = 1;
   uint32 last_f_cnt_down = 2;
   bytes session_key_id = 3 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
@@ -344,12 +349,16 @@ message DownlinkQueueOperationErrorDetails {
 }
 
 message ApplicationServiceData {
+  option (gogoproto.populate) = true;
+
   string service = 1;
   google.protobuf.Struct data = 2;
 }
 
 // Application uplink message.
 message ApplicationUp {
+  option (gogoproto.populate) = true;
+
   EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
   // Server time when the Application Server received the message.
