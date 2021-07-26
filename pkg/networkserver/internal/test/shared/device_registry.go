@@ -15,11 +15,13 @@
 package test
 
 import (
+	"bytes"
 	"context"
 	"reflect"
 	"testing"
 	"time"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -31,6 +33,58 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
+
+func isNil(c interface{}) bool {
+	if c == nil {
+		return true
+	}
+	if val := reflect.ValueOf(c); val.Kind() == reflect.Ptr {
+		return val.IsNil()
+	}
+	return false
+}
+
+func nilEquality(a interface{}, b interface{}) (bool, bool) {
+	if isNil(a) != isNil(b) {
+		return false, true
+	}
+	if isNil(a) {
+		return true, true
+	}
+	return false, false
+}
+
+func protoEquals(a proto.Message, b proto.Message) bool {
+	if eq, ok := nilEquality(a, b); ok {
+		return eq
+	}
+
+	ab, err := proto.Marshal(a)
+	if err != nil {
+		panic(err)
+	}
+	bb, err := proto.Marshal(b)
+	if err != nil {
+		panic(err)
+	}
+
+	return bytes.Equal(ab, bb)
+}
+
+func uplinkMatchEquals(a *UplinkMatch, b *UplinkMatch) bool {
+	if m, ok := nilEquality(a, b); ok {
+		return m
+	}
+
+	return protoEquals(&a.ApplicationIdentifiers, &b.ApplicationIdentifiers) &&
+		a.DeviceID == b.DeviceID &&
+		a.LoRaWANVersion == b.LoRaWANVersion &&
+		protoEquals(a.FNwkSIntKey, b.FNwkSIntKey) &&
+		a.LastFCnt == b.LastFCnt &&
+		protoEquals(a.ResetsFCnt, b.ResetsFCnt) &&
+		protoEquals(a.Supports32BitFCnt, b.Supports32BitFCnt) &&
+		a.IsPending == b.IsPending
+}
 
 func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	type uplinkMatch struct {
@@ -51,7 +105,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			attempts = append(attempts, match)
 			a.So(matched, should.BeFalse)
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
-			matched = reflect.DeepEqual(match, &UplinkMatch{
+			matched = uplinkMatchEquals(match, &UplinkMatch{
 				ApplicationIdentifiers: expectedMatch.ApplicationIdentifiers,
 				DeviceID:               expectedMatch.DeviceId,
 				LoRaWANVersion:         expectedMACState.LorawanVersion,
