@@ -29,27 +29,20 @@ option (gogoproto.goproto_registration) = true;
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.marshaler_all) = true;
-option (gogoproto.populate_all) = true;
 option (gogoproto.protosizer_all) = false;
 option (gogoproto.sizer_all) = true;
 option (gogoproto.stringer_all) = true;
 option (gogoproto.unmarshaler_all) = true;
 
 message ApplicationIdentifiers {
-  option (gogoproto.populate) = false;
-
   string application_id = 1 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
 message ClientIdentifiers {
-  option (gogoproto.populate) = false;
-
   string client_id = 1 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
 message EndDeviceIdentifiers {
-  option (gogoproto.populate) = false;
-
   string device_id = 1 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The LoRaWAN DevEUI.
@@ -61,8 +54,6 @@ message EndDeviceIdentifiers {
 }
 
 message GatewayIdentifiers {
-  option (gogoproto.populate) = false;
-
   string gateway_id = 1 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   // Secondary identifier, which can only be used in specific requests.
@@ -70,15 +61,11 @@ message GatewayIdentifiers {
 }
 
 message OrganizationIdentifiers {
-  option (gogoproto.populate) = false;
-
   // This ID shares namespace with user IDs.
   string organization_id = 1 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
 message UserIdentifiers {
-  option (gogoproto.populate) = false;
-
   // This ID shares namespace with organization IDs.
   string user_id = 1 [
     (validate.rules).string = {
@@ -115,6 +102,8 @@ message EntityIdentifiers {
 
 // Identifies an end device model with version information.
 message EndDeviceVersionIdentifiers {
+  option (gogoproto.populate) = true;
+
   string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36, ignore_empty: true}];
   string model_id = 2 [(gogoproto.customname) = "ModelID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36, ignore_empty: true}];
   string hardware_version = 3 [(validate.rules).string.max_len = 32];
@@ -124,6 +113,8 @@ message EndDeviceVersionIdentifiers {
 
 // Identifies a Network Server.
 message NetworkIdentifiers {
+  option (gogoproto.populate) = true;
+
   // LoRa Alliance NetID.
   bytes net_id = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
   // Optional tenant identifier for multi-tenant deployments.

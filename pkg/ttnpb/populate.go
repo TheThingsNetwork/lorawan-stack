@@ -16,6 +16,17 @@ package ttnpb
 
 import "go.thethings.network/lorawan-stack/v3/pkg/types"
 
+type randy interface {
+	Float32() float32
+	Float64() float64
+	Int63() int64
+	Int31() int32
+	Uint32() uint32
+	Intn(n int) int
+}
+
+type randyJoin = randy
+
 var PopulatorConfig struct {
 	LoRaWAN struct {
 		AppendMHDR       func(b []byte, mhdr MHDR) ([]byte, error)

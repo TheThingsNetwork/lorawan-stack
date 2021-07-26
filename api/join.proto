@@ -32,15 +32,12 @@ option (gogoproto.goproto_registration) = true;
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.marshaler_all) = true;
-option (gogoproto.populate_all) = true;
 option (gogoproto.protosizer_all) = false;
 option (gogoproto.sizer_all) = true;
 option (gogoproto.stringer_all) = true;
 option (gogoproto.unmarshaler_all) = true;
 
 message JoinRequest {
-  option (gogoproto.populate) = false;
-
   bytes raw_payload = 1 [(validate.rules).bytes.len = 23];
   Message payload = 2;
   bytes dev_addr = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
