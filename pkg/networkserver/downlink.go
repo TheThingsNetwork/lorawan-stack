@@ -1664,7 +1664,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								},
 								Payload: &ttnpb.Message_JoinAcceptPayload{
 									JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-										NetID:      dev.PendingMACState.QueuedJoinAccept.NetID,
+										NetId:      dev.PendingMACState.QueuedJoinAccept.NetId,
 										DevAddr:    dev.PendingMACState.QueuedJoinAccept.DevAddr,
 										DLSettings: dev.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
 										RxDelay:    dev.PendingMACState.QueuedJoinAccept.Request.RxDelay,

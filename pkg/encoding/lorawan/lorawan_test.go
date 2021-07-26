@@ -384,7 +384,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHDR: ttnpb.MHDR{MType: ttnpb.MType_REJOIN_REQUEST, Major: 0},
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 0,
-					NetID:      types.NetID{0x42, 0xff, 0xff},
+					NetId:      types.NetID{0x42, 0xff, 0xff},
 					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					RejoinCnt:  0xff42,
 				}},
@@ -444,7 +444,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				MHDR: ttnpb.MHDR{MType: ttnpb.MType_REJOIN_REQUEST, Major: 0},
 				Payload: &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 					RejoinType: 2,
-					NetID:      types.NetID{0x42, 0xff, 0xff},
+					NetId:      types.NetID{0x42, 0xff, 0xff},
 					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					RejoinCnt:  0xff42,
 				}},
@@ -726,7 +726,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 			"JoinAcceptPayload/NoCFList",
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
-				NetID:     types.NetID{0x42, 0xff, 0xff},
+				NetId:     types.NetID{0x42, 0xff, 0xff},
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DLSettings: ttnpb.DLSettings{
 					OptNeg:      true,
@@ -752,7 +752,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 			"JoinAcceptPayload/CFListFreq",
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
-				NetID:     types.NetID{0x42, 0xff, 0xff},
+				NetId:     types.NetID{0x42, 0xff, 0xff},
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DLSettings: ttnpb.DLSettings{
 					OptNeg:      true,
@@ -786,7 +786,7 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 			"JoinAcceptPayload/CFListChMask",
 			&ttnpb.JoinAcceptPayload{
 				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
-				NetID:     types.NetID{0x42, 0xff, 0xff},
+				NetId:     types.NetID{0x42, 0xff, 0xff},
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DLSettings: ttnpb.DLSettings{
 					OptNeg:      true,

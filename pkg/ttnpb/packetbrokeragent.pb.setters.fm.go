@@ -198,10 +198,10 @@ func (dst *PacketBrokerNetworkIdentifier) SetFields(src *PacketBrokerNetworkIden
 				return fmt.Errorf("'net_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.NetID = src.NetID
+				dst.NetId = src.NetId
 			} else {
 				var zero uint32
-				dst.NetID = zero
+				dst.NetId = zero
 			}
 		case "tenant_id":
 			if len(subs) > 0 {

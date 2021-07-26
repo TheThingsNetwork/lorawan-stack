@@ -93,9 +93,9 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 				return fmt.Errorf("'target_net_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TargetNetID = src.TargetNetID
+				dst.TargetNetId = src.TargetNetId
 			} else {
-				dst.TargetNetID = nil
+				dst.TargetNetId = nil
 			}
 		case "invalidate_authentication_code":
 			if len(subs) > 0 {

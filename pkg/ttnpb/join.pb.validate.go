@@ -76,7 +76,7 @@ func (m *JoinRequest) ValidateFields(paths ...string) error {
 		case "selected_mac_version":
 			// no validation rules for SelectedMACVersion
 		case "net_id":
-			// no validation rules for NetID
+			// no validation rules for NetId
 		case "downlink_settings":
 
 			if v, ok := interface{}(&m.DownlinkSettings).(interface{ ValidateFields(...string) error }); ok {

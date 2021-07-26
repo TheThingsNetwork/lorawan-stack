@@ -291,11 +291,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			}(dev.ApplicationIdentifiers)
 
 			if trustedOriginAuth, ok := authorizer.(TrustedOriginAuthorizer); ok {
-				netID := dev.NetID
+				netID := dev.NetId
 				if netID == nil {
 					appSettings, err := getAppSettings()
 					if err == nil {
-						netID = appSettings.HomeNetID
+						netID = appSettings.HomeNetId
 					} else if !errors.IsNotFound(err) {
 						return nil, nil, errLookupNetID.WithCause(err)
 					}
@@ -303,8 +303,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				if netID == nil {
 					return nil, nil, errNoNetID.New()
 				}
-				if !req.NetID.Equal(*netID) {
-					return nil, nil, errNetIDMismatch.WithAttributes("net_id", req.NetID)
+				if !req.NetId.Equal(*netID) {
+					return nil, nil, errNetIDMismatch.WithAttributes("net_id", req.NetId)
 				}
 				if dev.NetworkServerAddress != "" {
 					if err := trustedOriginAuth.RequireAddress(ctx, dev.NetworkServerAddress); err != nil {
@@ -362,7 +362,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			copy(jn[:], nb[1:])
 
 			b, err = lorawan.AppendJoinAcceptPayload(b, ttnpb.JoinAcceptPayload{
-				NetID:      req.NetID,
+				NetId:      req.NetId,
 				JoinNonce:  jn,
 				CFList:     req.CFList,
 				DevAddr:    req.DevAddr,
@@ -440,11 +440,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if err != nil {
 				return nil, nil, errEncryptPayload.WithCause(err)
 			}
-			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoDev, req.SelectedMACVersion, jn, pld.DevNonce, req.NetID)
+			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoDev, req.SelectedMACVersion, jn, pld.DevNonce, req.NetId)
 			if err != nil {
 				return nil, nil, errDeriveNwkSKeys.WithCause(err)
 			}
-			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoDev, req.SelectedMACVersion, jn, pld.DevNonce, req.NetID)
+			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoDev, req.SelectedMACVersion, jn, pld.DevNonce, req.NetId)
 			if err != nil {
 				return nil, nil, errDeriveAppSKey.WithCause(err)
 			}
@@ -460,7 +460,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			)
 			nsKEKLabel, asKEKLabel := dev.NetworkServerKEKLabel, dev.ApplicationServerKEKLabel
 			if nsKEKLabel == "" {
-				nsKEKLabel = js.KeyVault.NsKEKLabel(ctx, dev.NetID, dev.NetworkServerAddress)
+				nsKEKLabel = js.KeyVault.NsKEKLabel(ctx, dev.NetId, dev.NetworkServerAddress)
 				nsPlaintextCond = errors.IsNotFound
 			}
 			fNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.FNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
@@ -703,8 +703,8 @@ func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EU
 	if err != nil {
 		return nil, errRegistryOperation.WithCause(err)
 	}
-	if dev.NetID != nil {
-		return dev.NetID, nil
+	if dev.NetId != nil {
+		return dev.NetId, nil
 	}
 	sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
 		"home_net_id",
@@ -715,5 +715,5 @@ func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EU
 		}
 		return nil, nil
 	}
-	return sets.HomeNetID, nil
+	return sets.HomeNetId, nil
 }

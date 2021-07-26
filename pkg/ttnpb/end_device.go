@@ -376,7 +376,7 @@ func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 	case "keys.session_key_id":
 		return v.Keys.FieldIsZero("session_key_id")
 	case "net_id":
-		return v.NetID == types.NetID{}
+		return v.NetId == types.NetID{}
 	case "payload":
 		return v.Payload == nil
 	case "request":
@@ -1048,7 +1048,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "name":
 		return v.Name == ""
 	case "net_id":
-		return v.NetID == nil
+		return v.NetId == nil
 	case "network_server_address":
 		return v.NetworkServerAddress == ""
 	case "network_server_kek_label":

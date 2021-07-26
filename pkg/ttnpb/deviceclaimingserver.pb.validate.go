@@ -124,7 +124,7 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "target_net_id":
-			// no validation rules for TargetNetID
+			// no validation rules for TargetNetId
 		case "invalidate_authentication_code":
 			// no validation rules for InvalidateAuthenticationCode
 		case "source_device":

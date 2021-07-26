@@ -390,7 +390,7 @@ func NewPopulatedCFList(r randyLorawan, easy bool) *CFList {
 func NewPopulatedJoinAcceptPayload(r randyLorawan, easy bool) *JoinAcceptPayload {
 	out := &JoinAcceptPayload{}
 	out.JoinNonce = *types.NewPopulatedJoinNonce(r)
-	out.NetID = *types.NewPopulatedNetID(r)
+	out.NetId = *types.NewPopulatedNetID(r)
 	out.DevAddr = *types.NewPopulatedDevAddr(r)
 	out.DLSettings = *NewPopulatedDLSettings(r, easy)
 	out.RxDelay = RxDelay(r.Intn(16))
@@ -410,11 +410,11 @@ func NewPopulatedRejoinRequestPayloadType(r randyLorawan, typ RejoinRequestType)
 	switch typ {
 	case 0, 2:
 		out.JoinEui = types.EUI64{}
-		out.NetID = *types.NewPopulatedNetID(r)
+		out.NetId = *types.NewPopulatedNetID(r)
 		out.DevEui = *types.NewPopulatedEUI64(r)
 		out.RejoinCnt = uint32(uint16(r.Uint32()))
 	case 1:
-		out.NetID = types.NetID{}
+		out.NetId = types.NetID{}
 		out.JoinEui = *types.NewPopulatedEUI64(r)
 		out.DevEui = *types.NewPopulatedEUI64(r)
 		out.RejoinCnt = uint32(uint16(r.Uint32()))

@@ -197,7 +197,7 @@ enum RejoinRequestType {
 
 message RejoinRequestPayload {
   RejoinRequestType rejoin_type = 1 [(validate.rules).enum.defined_only = true];
-  bytes net_id = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
+  bytes net_id = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
   bytes join_eui = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
   bytes dev_eui = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
   uint32 rejoin_cnt = 5; // Contains RJCount0 or RJCount1 depending on rejoin_type.
@@ -206,7 +206,7 @@ message RejoinRequestPayload {
 message JoinAcceptPayload {
   bytes encrypted = 1;
   bytes join_nonce = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.JoinNonce"];
-  bytes net_id = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
+  bytes net_id = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
   bytes dev_addr = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
   DLSettings dl_settings = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   RxDelay rx_delay = 6 [(validate.rules).enum.defined_only = true];

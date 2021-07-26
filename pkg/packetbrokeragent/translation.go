@@ -800,13 +800,13 @@ func fromPBRoutingPolicy(policy *packetbroker.RoutingPolicy) *ttnpb.PacketBroker
 	var homeNetworkID *ttnpb.PacketBrokerNetworkIdentifier
 	if policy.HomeNetworkNetId != 0 || policy.HomeNetworkTenantId != "" {
 		homeNetworkID = &ttnpb.PacketBrokerNetworkIdentifier{
-			NetID:    policy.GetHomeNetworkNetId(),
+			NetId:    policy.GetHomeNetworkNetId(),
 			TenantId: policy.GetHomeNetworkTenantId(),
 		}
 	}
 	return &ttnpb.PacketBrokerRoutingPolicy{
 		ForwarderId: &ttnpb.PacketBrokerNetworkIdentifier{
-			NetID:    policy.GetForwarderNetId(),
+			NetId:    policy.GetForwarderNetId(),
 			TenantId: policy.GetForwarderTenantId(),
 		},
 		HomeNetworkId: homeNetworkID,

@@ -70,10 +70,10 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 				return fmt.Errorf("'net_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.NetID = src.NetID
+				dst.NetId = src.NetId
 			} else {
 				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
-				dst.NetID = zero
+				dst.NetId = zero
 			}
 		case "downlink_settings":
 			if len(subs) > 0 {

@@ -83,7 +83,7 @@ func (s *pbaServer) GetInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Packe
 	if registration != nil {
 		res.Registration = &ttnpb.PacketBrokerNetwork{
 			Id: &ttnpb.PacketBrokerNetworkIdentifier{
-				NetID:    s.netID.MarshalNumber(),
+				NetId:    s.netID.MarshalNumber(),
 				TenantId: tenantID,
 			},
 			Name:          registration.GetName(),
@@ -170,7 +170,7 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 
 	return &ttnpb.PacketBrokerNetwork{
 		Id: &ttnpb.PacketBrokerNetworkIdentifier{
-			NetID:    s.netID.MarshalNumber(),
+			NetId:    s.netID.MarshalNumber(),
 			TenantId: tenantID,
 		},
 		Name:          registration.Name,
@@ -339,7 +339,7 @@ func (s *pbaServer) GetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.
 	res, err := routingpb.NewPolicyManagerClient(s.cpConn).GetHomeNetworkPolicy(ctx, &routingpb.GetHomeNetworkPolicyRequest{
 		ForwarderNetId:      s.netID.MarshalNumber(),
 		ForwarderTenantId:   s.tenantIDExtractor(ctx),
-		HomeNetworkNetId:    req.GetNetID(),
+		HomeNetworkNetId:    req.GetNetId(),
 		HomeNetworkTenantId: req.GetTenantId(),
 	})
 	if err != nil {
@@ -360,7 +360,7 @@ func (s *pbaServer) SetHomeNetworkRoutingPolicy(ctx context.Context, req *ttnpb.
 		Policy: &packetbroker.RoutingPolicy{
 			ForwarderNetId:      s.netID.MarshalNumber(),
 			ForwarderTenantId:   s.tenantIDExtractor(ctx),
-			HomeNetworkNetId:    req.GetHomeNetworkId().GetNetID(),
+			HomeNetworkNetId:    req.GetHomeNetworkId().GetNetId(),
 			HomeNetworkTenantId: req.GetHomeNetworkId().GetTenantId(),
 			Uplink:              toPBUplinkRoutingPolicy(req.GetUplink()),
 			Downlink:            toPBDownlinkRoutingPolicy(req.GetDownlink()),
@@ -384,7 +384,7 @@ func (s *pbaServer) DeleteHomeNetworkRoutingPolicy(ctx context.Context, req *ttn
 		Policy: &packetbroker.RoutingPolicy{
 			ForwarderNetId:      s.netID.MarshalNumber(),
 			ForwarderTenantId:   s.tenantIDExtractor(ctx),
-			HomeNetworkNetId:    req.GetNetID(),
+			HomeNetworkNetId:    req.GetNetId(),
 			HomeNetworkTenantId: req.GetTenantId(),
 		},
 	})
@@ -419,12 +419,12 @@ func (s *pbaServer) listNetworks(ctx context.Context, req func() ([]*packetbroke
 		switch member := n.GetValue().(type) {
 		case *packetbroker.NetworkOrTenant_Network:
 			id = &ttnpb.PacketBrokerNetworkIdentifier{
-				NetID: member.Network.GetNetId(),
+				NetId: member.Network.GetNetId(),
 			}
 			network = member.Network
 		case *packetbroker.NetworkOrTenant_Tenant:
 			id = &ttnpb.PacketBrokerNetworkIdentifier{
-				NetID:    member.Tenant.GetNetId(),
+				NetId:    member.Tenant.GetNetId(),
 				TenantId: member.Tenant.GetTenantId(),
 			}
 			network = member.Tenant

@@ -207,7 +207,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 		Payload:            MakeJoinRequestDecodedPayload(conf.JoinEUI, conf.DevEUI, conf.DevNonce, conf.MIC),
 		DevAddr:            *conf.DevAddr.Copy(&types.DevAddr{}),
 		SelectedMACVersion: conf.SelectedMACVersion,
-		NetID:              *conf.NetID.Copy(&types.NetID{}),
+		NetId:              *conf.NetID.Copy(&types.NetID{}),
 		DownlinkSettings: ttnpb.DLSettings{
 			Rx1DROffset: conf.RX1DataRateOffset,
 			Rx2DR:       conf.RX2DataRateIndex,
@@ -1160,7 +1160,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 							},
 							Payload: &ttnpb.Message_JoinAcceptPayload{
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-									NetID:      dev.PendingMACState.QueuedJoinAccept.NetID,
+									NetId:      dev.PendingMACState.QueuedJoinAccept.NetId,
 									DevAddr:    dev.PendingMACState.QueuedJoinAccept.DevAddr,
 									DLSettings: dev.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    dev.PendingMACState.QueuedJoinAccept.Request.RxDelay,
@@ -1592,7 +1592,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 					Payload: joinResp.RawPayload,
 					DevAddr: joinReq.DevAddr,
-					NetID:   joinReq.NetID,
+					NetId:   joinReq.NetId,
 					Request: ttnpb.MACState_JoinRequest{
 						DownlinkSettings: joinReq.DownlinkSettings,
 						RxDelay:          joinReq.RxDelay,
@@ -2103,7 +2103,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 			},
 			Keys:           *MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
 			DevAddr:        test.DefaultDevAddr,
-			NetID:          test.DefaultNetID,
+			NetId:          test.DefaultNetID,
 			CorrelationIDs: []string{"join-request"},
 		})(*macState)))(x)
 	}
@@ -2140,7 +2140,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 						},
 						Payload: &ttnpb.Message_JoinAcceptPayload{
 							JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-								NetID:      x.PendingMACState.QueuedJoinAccept.NetID,
+								NetId:      x.PendingMACState.QueuedJoinAccept.NetId,
 								DevAddr:    x.PendingMACState.QueuedJoinAccept.DevAddr,
 								DLSettings: x.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
 								RxDelay:    x.PendingMACState.QueuedJoinAccept.Request.RxDelay,
