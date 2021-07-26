@@ -57,60 +57,136 @@ func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
 	return test.Must(crypto.EncryptJoinAccept(key, pld)).([]byte)
 }
 
-func TestHandleJoin(t *testing.T) {
-	a, ctx := test.New(t)
+func TestInvalidJoinRequests(t *testing.T) {
+	_, ctx := test.New(t)
 
-	redisClient, flush := test.NewRedis(ctx, "joinserver_test")
-	defer flush()
-	defer redisClient.Close()
-	devReg := &redis.DeviceRegistry{Redis: redisClient}
-	keyReg := &redis.KeyRegistry{Redis: redisClient}
-	aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(ctx)
-	defer aasRegCloseFn()
-
-	c := componenttest.NewComponent(t, &component.Config{})
-	js := test.Must(New(
-		c,
-		&Config{
-			ApplicationActivationSettings: aasReg,
-			Devices:                       devReg,
-			Keys:                          keyReg,
-			JoinEUIPrefixes:               joinEUIPrefixes,
+	for _, tc := range []struct {
+		Name       string
+		Invalidate func(*ttnpb.JoinRequest)
+		Assertion  func(error) bool
+	}{
+		{
+			// Baseline test: the join-request is valid; the end device is not found.
+			// Other test cases modify the join-request to trigger InvalidArgument errors.
+			Name:      "Device not found",
+			Assertion: errors.IsNotFound,
 		},
-	)).(*JoinServer)
-	componenttest.StartComponent(t, c)
+		{
+			Name: "Invalid MType",
+			Invalidate: func(up *ttnpb.JoinRequest) {
+				// Confirmed uplink message
+				up.RawPayload = []byte{0x80, 0x6c, 0xbf, 0xab, 0x1d, 0x80, 0x00, 0x00, 0x02, 0xfc, 0x7f, 0xa8, 0x0c, 0x17, 0xd5, 0x5b, 0x85, 0x5c, 0xa8, 0xa0, 0x14}
+			},
+			Assertion: errors.IsInvalidArgument,
+		},
+		{
+			Name: "No payload",
+			Invalidate: func(up *ttnpb.JoinRequest) {
+				up.RawPayload = nil
+			},
+			Assertion: errors.IsInvalidArgument,
+		},
+		{
+			Name: "Unknown JoinEUI",
+			Invalidate: func(up *ttnpb.JoinRequest) {
+				up.RawPayload = []byte{
+					/* MHDR */
+					0x00,
+					/* MACPayload */
+					/** JoinEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+					/** DevEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+					/** DevNonce **/
+					0x00, 0x00,
+					/* MIC */
+					0x55, 0x17, 0x54, 0x8e,
+				}
+			},
+			Assertion: errors.IsInvalidArgument,
+		},
+		{
+			Name: "Empty DevEUI",
+			Invalidate: func(up *ttnpb.JoinRequest) {
+				up.RawPayload = []byte{
+					/* MHDR */
+					0x00,
+					/* MACPayload */
+					/** JoinEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+					/** DevEUI **/
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+					/** DevNonce **/
+					0x00, 0x00,
+					/* MIC */
+					0x55, 0x17, 0x54, 0x8e,
+				}
+			},
+			Assertion: errors.IsInvalidArgument,
+		},
+	} {
+		test.RunSubtestFromContext(ctx, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				redisClient, flush := test.NewRedis(ctx, "joinserver_test")
+				defer flush()
+				defer redisClient.Close()
+				devReg := &redis.DeviceRegistry{Redis: redisClient}
+				keyReg := &redis.KeyRegistry{Redis: redisClient}
+				aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(ctx)
+				defer aasRegCloseFn()
 
-	{
-		ctx := clusterauth.NewContext(ctx, nil)
+				c := componenttest.NewComponent(t, &component.Config{})
+				js := test.Must(New(
+					c,
+					&Config{
+						ApplicationActivationSettings: aasReg,
+						Devices:                       devReg,
+						Keys:                          keyReg,
+						JoinEUIPrefixes:               joinEUIPrefixes,
+					},
+				)).(*JoinServer)
+				componenttest.StartComponent(t, c)
 
-		// Invalid payload.
-		req := ttnpb.NewPopulatedJoinRequest(test.Randy, false)
-		req.Payload = ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
-		res, err := js.HandleJoin(ctx, req, ClusterAuthorizer)
-		a.So(err, should.NotBeNil)
-		a.So(res, should.BeNil)
+				ctx = clusterauth.NewContext(ctx, nil)
+				req := &ttnpb.JoinRequest{
+					SelectedMACVersion: ttnpb.MAC_V1_1,
+					RawPayload: []byte{
+						/* MHDR */
+						0x00,
+						/* MACPayload */
+						/** JoinEUI **/
+						0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+						/** DevEUI **/
+						0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+						/** DevNonce **/
+						0x00, 0x00,
+						/* MIC */
+						0x55, 0x17, 0x54, 0x8e,
+					},
+					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					NetId:   types.NetID{0x42, 0xff, 0xff},
+					DownlinkSettings: ttnpb.DLSettings{
+						OptNeg:      true,
+						Rx1DROffset: 0x7,
+						Rx2DR:       0xf,
+					},
+					RxDelay: 0x42,
+				}
+				if tc.Invalidate != nil {
+					tc.Invalidate(req)
+				}
 
-		// No payload.
-		req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
-		req.Payload.Payload = nil
-		res, err = js.HandleJoin(ctx, req, ClusterAuthorizer)
-		a.So(err, should.NotBeNil)
-		a.So(res, should.BeNil)
-
-		// JoinEUI out of range.
-		req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
-		req.Payload.GetJoinRequestPayload().JoinEui = types.EUI64{0x11, 0x12, 0x13, 0x14, 0x42, 0x42, 0x42, 0x42}
-		res, err = js.HandleJoin(ctx, req, ClusterAuthorizer)
-		a.So(err, should.NotBeNil)
-		a.So(res, should.BeNil)
-
-		// Empty DevEUI.
-		req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
-		req.Payload.GetJoinRequestPayload().DevEui = types.EUI64{}
-		res, err = js.HandleJoin(ctx, req, ClusterAuthorizer)
-		a.So(err, should.NotBeNil)
-		a.So(res, should.BeNil)
+				_, err := js.HandleJoin(ctx, req, ClusterAuthorizer)
+				a.So(tc.Assertion(err), should.BeTrue)
+			},
+		})
 	}
+}
+
+func TestHandleJoin(t *testing.T) {
+	_, ctx := test.New(t)
 
 	for _, tc := range []struct {
 		Name        string
@@ -2161,8 +2237,8 @@ func TestGetNwkSKeys(t *testing.T) {
 					"s_nwk_s_int_key",
 				})
 				return &ttnpb.SessionKeys{
-					FNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
-					NwkSEncKey:  ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
+					FNwkSIntKey: test.DefaultFNwkSIntKeyEnvelopeWrapped,
+					NwkSEncKey:  test.DefaultNwkSEncKeyEnvelopeWrapped,
 				}, nil
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
@@ -2190,8 +2266,8 @@ func TestGetNwkSKeys(t *testing.T) {
 					"s_nwk_s_int_key",
 				})
 				return &ttnpb.SessionKeys{
-					FNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
-					SNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
+					FNwkSIntKey: test.DefaultFNwkSIntKeyEnvelopeWrapped,
+					SNwkSIntKey: test.DefaultSNwkSIntKeyEnvelopeWrapped,
 				}, nil
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
@@ -2219,8 +2295,8 @@ func TestGetNwkSKeys(t *testing.T) {
 					"s_nwk_s_int_key",
 				})
 				return &ttnpb.SessionKeys{
-					SNwkSIntKey: ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
-					NwkSEncKey:  ttnpb.NewPopulatedKeyEnvelope(test.Randy, false),
+					SNwkSIntKey: test.DefaultSNwkSIntKeyEnvelopeWrapped,
+					NwkSEncKey:  test.DefaultNwkSEncKeyEnvelopeWrapped,
 				}, nil
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
