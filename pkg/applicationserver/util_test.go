@@ -143,19 +143,26 @@ func (ns *mockNS) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDeviceIde
 type mockISEndDeviceRegistry struct {
 	ttnpb.EndDeviceRegistryServer
 
-	endDevices map[string]*ttnpb.EndDevice
+	endDevicesMu sync.RWMutex
+	endDevices   map[string]*ttnpb.EndDevice
 }
 
 func (m *mockISEndDeviceRegistry) add(ctx context.Context, dev *ttnpb.EndDevice) {
+	m.endDevicesMu.Lock()
+	defer m.endDevicesMu.Unlock()
 	m.endDevices[unique.ID(ctx, dev.EndDeviceIdentifiers)] = dev
 }
 
 func (m *mockISEndDeviceRegistry) get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, bool) {
+	m.endDevicesMu.RLock()
+	defer m.endDevicesMu.RUnlock()
 	dev, ok := m.endDevices[unique.ID(ctx, ids)]
 	return dev, ok
 }
 
 func (m *mockISEndDeviceRegistry) Get(ctx context.Context, in *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	m.endDevicesMu.RLock()
+	defer m.endDevicesMu.RUnlock()
 	if dev, ok := m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)]; ok {
 		return dev, nil
 	}
@@ -163,11 +170,17 @@ func (m *mockISEndDeviceRegistry) Get(ctx context.Context, in *ttnpb.GetEndDevic
 }
 
 func (m *mockISEndDeviceRegistry) Update(ctx context.Context, in *ttnpb.UpdateEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if _, ok := m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)]; !ok {
+	m.endDevicesMu.Lock()
+	defer m.endDevicesMu.Unlock()
+	dev, ok := m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)]
+	if !ok {
 		return nil, errNotFound.New()
 	}
-	m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)] = &in.EndDevice
-	return &in.EndDevice, nil
+	if err := dev.SetFields(&in.EndDevice, in.GetFieldMask().GetPaths()...); err != nil {
+		return nil, err
+	}
+	m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)] = dev
+	return dev, nil
 }
 
 type mockIS struct {
