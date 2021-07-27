@@ -204,7 +204,7 @@ func TestApplicationsCRUD(t *testing.T) {
 			if a.So(list, should.NotBeNil) && a.So(list.Applications, should.NotBeEmpty) {
 				var found bool
 				for _, item := range list.Applications {
-					if item.ApplicationIdentifiers == created.ApplicationIdentifiers {
+					if item.ApplicationId == created.ApplicationId {
 						found = true
 						a.So(item.Name, should.Equal, updated.Name)
 					}
