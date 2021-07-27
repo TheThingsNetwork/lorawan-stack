@@ -499,14 +499,14 @@ func TestProtoDeduplicator(t *testing.T) {
 func TestMutex(t *testing.T) {
 	a, ctx := test.New(t)
 
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second+(1<<8)*test.Delay)
+	ttl := (1 << 10) * test.Delay
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second+ttl)
 	defer cancel()
 
 	cl, flush := test.NewRedis(ctx, "redis_test")
 	defer flush()
 	defer cl.Close()
 
-	ttl := (1 << 8) * test.Delay
 	key := cl.Key("test1")
 
 	err := LockMutex(ctx, cl, key, "test-id-1", ttl)
@@ -528,7 +528,7 @@ func TestMutex(t *testing.T) {
 
 	timeoutErrCh := make(chan error, 1)
 	go func() {
-		ctx, cancel := context.WithTimeout(ctx, (1<<5)*test.Delay)
+		ctx, cancel := context.WithTimeout(ctx, (1<<8)*test.Delay)
 		defer cancel()
 		timeoutErrCh <- LockMutex(ctx, cl, key, "test-id-3", ttl)
 	}()
@@ -537,7 +537,9 @@ func TestMutex(t *testing.T) {
 	case <-ctx.Done():
 		t.Fatalf("Timed out while waiting for LockMutex with a deadline to return")
 	case err := <-timeoutErrCh:
-		a.So(errors.IsDeadlineExceeded(err), should.BeTrue)
+		if !a.So(errors.IsDeadlineExceeded(err), should.BeTrue) {
+			t.Fatal(err)
+		}
 	}
 	select {
 	case err := <-blockErrCh:
@@ -577,7 +579,7 @@ func TestMutex(t *testing.T) {
 	}
 	a.So(lockTTL, should.BeGreaterThan, 0)
 	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
-	a.So(listTTL, should.BeLessThanOrEqualTo, lockTTL)
+	a.So(listTTL, should.BeLessThanOrEqualTo, ttl)
 
 	err = UnlockMutex(ctx, cl, key, "non-existent-id", ttl)
 	if !a.So(err, should.BeNil) {
