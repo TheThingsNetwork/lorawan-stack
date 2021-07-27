@@ -183,7 +183,7 @@ func TestTraffic(t *testing.T) {
 	t.Run("Upstream", func(t *testing.T) {
 		for _, tc := range []struct {
 			Topic   string
-			Message proto.Marshaler
+			Message proto.Message
 			OK      bool
 		}{
 			{
@@ -245,7 +245,7 @@ func TestTraffic(t *testing.T) {
 		} {
 			tcok := t.Run(tc.Topic, func(t *testing.T) {
 				a := assertions.New(t)
-				buf, err := tc.Message.Marshal()
+				buf, err := proto.Marshal(tc.Message)
 				a.So(err, should.BeNil)
 				token := client.Publish(tc.Topic, 1, false, buf)
 				if !token.WaitTimeout(timeout) {
@@ -380,7 +380,7 @@ func TestTraffic(t *testing.T) {
 				downCh := make(chan *ttnpb.DownlinkMessage)
 				handler := func(_ mqtt.Client, msg mqtt.Message) {
 					down := &ttnpb.GatewayDown{}
-					err := down.Unmarshal(msg.Payload())
+					err := proto.Unmarshal(msg.Payload(), down)
 					a.So(err, should.BeNil)
 					downCh <- down.DownlinkMessage
 				}
@@ -414,10 +414,10 @@ func TestTraffic(t *testing.T) {
 				if tc.ErrorAssertion != nil || tc.TxAckTopic == "" {
 					return
 				}
-				buf, err := (&ttnpb.TxAcknowledgment{
+				buf, err := proto.Marshal(&ttnpb.TxAcknowledgment{
 					CorrelationIDs: cids,
 					Result:         ttnpb.TxAcknowledgment_SUCCESS,
-				}).Marshal()
+				})
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}

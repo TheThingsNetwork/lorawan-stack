@@ -14,17 +14,20 @@
 
 package formatters
 
-import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+import (
+	"github.com/gogo/protobuf/proto"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+)
 
 type protobuf struct{}
 
 func (protobuf) FromUp(msg *ttnpb.ApplicationUp) ([]byte, error) {
-	return msg.Marshal()
+	return proto.Marshal(msg)
 }
 
 func (protobuf) ToDownlinks(buf []byte) (*ttnpb.ApplicationDownlinks, error) {
 	res := &ttnpb.ApplicationDownlinks{}
-	if err := res.Unmarshal(buf); err != nil {
+	if err := proto.Unmarshal(buf, res); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -32,7 +35,7 @@ func (protobuf) ToDownlinks(buf []byte) (*ttnpb.ApplicationDownlinks, error) {
 
 func (protobuf) ToDownlinkQueueRequest(buf []byte) (*ttnpb.DownlinkQueueRequest, error) {
 	res := &ttnpb.DownlinkQueueRequest{}
-	if err := res.Unmarshal(buf); err != nil {
+	if err := proto.Unmarshal(buf, res); err != nil {
 		return nil, err
 	}
 	return res, nil

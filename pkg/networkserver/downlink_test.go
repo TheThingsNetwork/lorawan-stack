@@ -2485,8 +2485,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				cids := LastUplink(dev.PendingMACState.RecentUplinks...).CorrelationIDs
 				recvAt := LastUplink(dev.PendingMACState.RecentUplinks...).ReceivedAt
 
-				ok := a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
-					{
+				ok := false
+				if a.So(ups, should.HaveLength, 1) {
+					ok = a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: ids,
 						CorrelationIDs:       cids,
 						Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -2497,8 +2498,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 								ReceivedAt:           recvAt,
 							},
 						},
-					},
-				})
+					})
+				}
 				if !ok {
 					return nil, false
 				}

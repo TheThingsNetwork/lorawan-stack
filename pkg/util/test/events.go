@@ -15,11 +15,12 @@
 package test
 
 import (
+	"bytes"
 	"context"
-	"reflect"
 	"sync"
 	"time"
 
+	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -176,7 +177,18 @@ func MakeEventEqual(conf EventEqualConfig) func(a, b events.Event) bool {
 			ap.UserAgent = ""
 			bp.UserAgent = ""
 		}
-		return reflect.DeepEqual(ap, bp)
+
+		apb, err := proto.Marshal(ap)
+		if err != nil {
+			return false
+		}
+
+		bpb, err := proto.Marshal(bp)
+		if err != nil {
+			return false
+		}
+
+		return bytes.Equal(apb, bpb)
 	}
 }
 

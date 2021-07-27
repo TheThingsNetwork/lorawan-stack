@@ -17,6 +17,7 @@ package mqtt
 import (
 	"context"
 
+	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt/topics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -29,12 +30,12 @@ func (protobuf) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdentif
 	gwDown := &ttnpb.GatewayDown{
 		DownlinkMessage: down,
 	}
-	return gwDown.Marshal()
+	return proto.Marshal(gwDown)
 }
 
 func (protobuf) ToUplink(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.UplinkMessage, error) {
 	uplink := &ttnpb.UplinkMessage{}
-	if err := uplink.Unmarshal(message); err != nil {
+	if err := proto.Unmarshal(message, uplink); err != nil {
 		return nil, err
 	}
 	return uplink, nil
@@ -42,7 +43,7 @@ func (protobuf) ToUplink(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.Upl
 
 func (protobuf) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
 	status := &ttnpb.GatewayStatus{}
-	if err := status.Unmarshal(message); err != nil {
+	if err := proto.Unmarshal(message, status); err != nil {
 		return nil, err
 	}
 	return status, nil
@@ -50,7 +51,7 @@ func (protobuf) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.Gat
 
 func (protobuf) ToTxAck(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.TxAcknowledgment, error) {
 	ack := &ttnpb.TxAcknowledgment{}
-	if err := ack.Unmarshal(message); err != nil {
+	if err := proto.Unmarshal(message, ack); err != nil {
 		return nil, err
 	}
 	return ack, nil

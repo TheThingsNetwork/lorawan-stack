@@ -28,6 +28,7 @@ const (
 	shouldHaveEmptyDiff    = "Expected: '%#v'\nActual:   '%#v'\nDiff:  '%s'\n(should resemble diff)!"
 	shouldNotHaveEmptyDiff = "Expected '%#v'\nto diff  '%#v'\n(but it did)!"
 
+	needProtoMessage                   = "This assertion requires a proto.Message (and %T isn't one)."
 	needPointer                        = "This assertion requires a pointer type (you provided %T)."
 	needSetFielderCompatible           = "This assertion requires a SetFielder-compatible comparison type (you provided %T)."
 	needStringCompatible               = "This assertion requires a string-compatible comparison type (you provided %T)."
@@ -48,6 +49,12 @@ func lastLine(s string) string {
 func ShouldResemble(actual interface{}, expected ...interface{}) (message string) {
 	if message = assertions.ShouldResemble(actual, expected...); message == success {
 		return success
+	}
+
+	if expectedMessage := getProtoMessage(expected[0]); expectedMessage != nil {
+		if actualMessage := getProtoMessage(actual); actualMessage != nil {
+			return shouldEqualProto(actualMessage, expectedMessage)
+		}
 	}
 
 	diff := pretty.Diff(actual, expected[0])
@@ -130,6 +137,13 @@ func ShouldHaveEmptyDiff(actual interface{}, expected ...interface{}) (message s
 	if message = need(1, expected); message != success {
 		return
 	}
+
+	if expectedMessage := getProtoMessage(expected[0]); expectedMessage != nil {
+		if actualMessage := getProtoMessage(actual); actualMessage != nil {
+			return shouldEqualProto(actualMessage, expectedMessage)
+		}
+	}
+
 	diff := pretty.Diff(expected[0], actual)
 	if len(diff) != 0 {
 		return fmt.Sprintf(shouldHaveEmptyDiff, expected[0], actual, diff)

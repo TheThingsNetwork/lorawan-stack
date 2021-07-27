@@ -17,6 +17,7 @@ package io
 import (
 	"time"
 
+	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -29,7 +30,7 @@ func UplinkToken(ids ttnpb.GatewayAntennaIdentifiers, timestamp uint32, concentr
 		ServerTime:                serverTime,
 		ConcentratorTime:          int64(concentratorTime),
 	}
-	return token.Marshal()
+	return proto.Marshal(&token)
 }
 
 // MustUplinkToken returns an uplink token from the given downlink path.
@@ -45,7 +46,7 @@ func MustUplinkToken(ids ttnpb.GatewayAntennaIdentifiers, timestamp uint32, conc
 // ParseUplinkToken returns the downlink path from the given uplink token.
 func ParseUplinkToken(buf []byte) (*ttnpb.UplinkToken, error) {
 	var token ttnpb.UplinkToken
-	if err := token.Unmarshal(buf); err != nil {
+	if err := proto.Unmarshal(buf, &token); err != nil {
 		return nil, err
 	}
 	return &token, nil
