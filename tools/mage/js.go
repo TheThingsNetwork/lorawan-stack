@@ -352,7 +352,7 @@ func (js Js) Vulnerabilities() error {
 
 // CypressHeadless runs the Cypress end-to-end tests in the headless mode.
 func (js Js) CypressHeadless() error {
-	mg.Deps(Js.Deps)
+	mg.Deps(Js.deps)
 	if mg.Verbose() {
 		fmt.Println("Running Cypress E2E tests in headless mode")
 	}
@@ -370,7 +370,7 @@ func (js Js) CypressHeadless() error {
 
 // CypressInteractive runs the Cypress end-to-end tests in interactive mode.
 func (js Js) CypressInteractive() error {
-	mg.Deps(Js.Deps)
+	mg.Deps(Js.deps)
 	if mg.Verbose() {
 		fmt.Println("Running Cypress E2E tests in interactive mode")
 	}
