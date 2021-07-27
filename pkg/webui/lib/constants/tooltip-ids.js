@@ -30,6 +30,7 @@ export default Object.freeze({
   DEVICE_ID: 'device-id',
   DEVICE_MODEL: 'device-model',
   DEVICE_NAME: 'device-name',
+  DISABLE_PACKET_BROKER_FORWARDING: 'disable-packet-broker-forwarding',
   ENFORCE_DUTY_CYCLE: 'duty-cycle',
   FACTORY_PRESET_FREQUENCIES: 'factory-preset-frequencies',
   FRAME_COUNTER_WIDTH: 'frame-counter-width',
@@ -40,6 +41,7 @@ export default Object.freeze({
   GATEWAY_ID: 'gateway-id',
   GATEWAY_LOCATION: 'gateway-location',
   GATEWAY_NAME: 'gateway-name',
+  GATEWAY_PLACEMENT: 'gateway-placement',
   GATEWAY_STATUS: 'gateway-status',
   JOIN_EUI: 'joineui',
   JOIN_SERVER: 'join-server',
@@ -56,5 +58,4 @@ export default Object.freeze({
   SCHEDULE_ANYTIME_DELAY: 'schedule-anytime-delay',
   SCHEDULE_DOWNLINK_LATE: 'schedule-downlink-late',
   UPDATE_LOCATION_FROM_STATUS: 'update-location-from-status',
-  DISABLE_PACKET_BROKER_FORWARDING: 'disable-packet-broker-forwarding',
 })

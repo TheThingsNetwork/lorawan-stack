@@ -50,6 +50,7 @@ For details about compatibility between different releases, see the **Commitment
 - `AppJs` interface for applications to get the LoRaWAN AppSKey directly from the Join Server.
 - Console support for DevEUI generation from the configured DevEUI address block.
   - This requires `console.ui.dev-eui-issuing-enabled` and `console.ui.dev-eui-app-limit` to be set with the same values as in the Identity Server configuration.
+- Gateway antenna placement selection in the Console.
 
 ### Changed
 
