@@ -74,6 +74,7 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 	Packages: applicationserver.ApplicationPackagesConfig{
 		Config: packages.Config{
 			Workers: 16,
+			Timeout: 10 * time.Second,
 		},
 	},
 	Formatters: applicationserver.FormattersConfig{

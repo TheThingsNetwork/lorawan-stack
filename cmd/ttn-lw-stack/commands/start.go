@@ -309,9 +309,14 @@ var startCommand = &cobra.Command{
 			config.AS.PubSub.Registry = &asiopsredis.PubSubRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("as", "io", "pubsub")),
 			}
-			config.AS.Packages.Registry = &asioapredis.ApplicationPackagesRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("as", "io", "applicationpackages")),
+			applicationPackagesRegistry := &asioapredis.ApplicationPackagesRegistry{
+				Redis:   redis.New(config.Redis.WithNamespace("as", "io", "applicationpackages")),
+				LockTTL: 10 * time.Second,
 			}
+			if err := applicationPackagesRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeApplicationServer.WithCause(err)
+			}
+			config.AS.Packages.Registry = applicationPackagesRegistry
 			if config.AS.Webhooks.Target != "" {
 				config.AS.Webhooks.Registry = &asiowebredis.WebhookRegistry{
 					Redis: redis.New(config.Redis.WithNamespace("as", "io", "webhooks")),

@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- New config option `--as.packages.timeout` to control the message processing timeout of application packages.
+
 ### Changed
 
 ### Deprecated

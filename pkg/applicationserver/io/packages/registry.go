@@ -44,8 +44,14 @@ type DefaultAssociationRegistry interface {
 	WithPagination(ctx context.Context, limit, page uint32, total *int64) context.Context
 }
 
-// Registry is a registry for application package associations.
+// TransactionRegistry is a registry for application packages transactions.
+type TransactionRegistry interface {
+	EndDeviceTransaction(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fPort uint32, packageName string, fn func(ctx context.Context) error) error
+}
+
+// Registry is a registry for application packages.
 type Registry interface {
 	AssociationRegistry
 	DefaultAssociationRegistry
+	TransactionRegistry
 }
