@@ -256,8 +256,13 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 
 	joinEUI := types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	devEUI := types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	pb := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
-	pb.SessionKeyID = []byte{0x11, 0x22, 0x33, 0x44}
+	pb := &ttnpb.SessionKeys{
+		SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+		FNwkSIntKey:  test.DefaultFNwkSIntKeyEnvelope,
+		SNwkSIntKey:  test.DefaultSNwkSIntKeyEnvelope,
+		NwkSEncKey:   test.DefaultNwkSEncKeyEnvelope,
+		AppSKey:      test.DefaultAppSKeyEnvelope,
+	}
 
 	ret, err := reg.GetByID(ctx, joinEUI, devEUI, pb.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
