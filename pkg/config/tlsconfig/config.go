@@ -19,6 +19,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"io/ioutil"
+	"sync"
 	"sync/atomic"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -107,8 +108,11 @@ type FileReader interface {
 // Client is client-side configuration for server TLS.
 type Client struct {
 	FileReader         FileReader `json:"-" yaml:"-" name:"-"`
-	RootCA             string     `json:"root-ca" yaml:"root-ca" name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
-	InsecureSkipVerify bool       `name:"insecure-skip-verify" description:"Skip verification of certificate chains (insecure)"`
+	loadRootCA         sync.Once
+	rootCABytes        []byte
+	rootCABytesError   error
+	RootCA             string `json:"root-ca" yaml:"root-ca" name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
+	InsecureSkipVerify bool   `name:"insecure-skip-verify" description:"Skip verification of certificate chains (insecure)"`
 }
 
 // ApplyTo applies the client configuration options to the given TLS configuration.
@@ -117,21 +121,27 @@ func (c *Client) ApplyTo(tlsConfig *tls.Config) error {
 	if tlsConfig == nil {
 		return nil
 	}
-	if c.RootCA != "" {
-		readFile := ioutil.ReadFile
-		if c.FileReader != nil {
-			readFile = c.FileReader.ReadFile
+	c.loadRootCA.Do(func() {
+		if c.RootCA != "" {
+			readFile := ioutil.ReadFile
+			if c.FileReader != nil {
+				readFile = c.FileReader.ReadFile
+			}
+			c.rootCABytes, c.rootCABytesError = readFile(c.RootCA)
 		}
-		pem, err := readFile(c.RootCA)
-		if err != nil {
-			return err
-		}
+	})
+	if c.rootCABytesError != nil {
+		return c.rootCABytesError
+	}
+
+	if len(c.rootCABytes) > 0 {
+		var err error
 		if tlsConfig.RootCAs == nil {
 			if tlsConfig.RootCAs, err = x509.SystemCertPool(); err != nil {
 				tlsConfig.RootCAs = x509.NewCertPool()
 			}
 		}
-		tlsConfig.RootCAs.AppendCertsFromPEM(pem)
+		tlsConfig.RootCAs.AppendCertsFromPEM(c.rootCABytes)
 	}
 	tlsConfig.InsecureSkipVerify = c.InsecureSkipVerify
 	return nil

@@ -15,6 +15,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Cache Root CA for client TLS configuration.
+
 ### Deprecated
 
 ### Removed
