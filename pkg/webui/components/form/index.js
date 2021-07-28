@@ -138,7 +138,7 @@ class Form extends React.PureComponent {
     formikRef: PropTypes.shape({ current: PropTypes.shape({}) }),
     initialValues: PropTypes.shape({}),
     onReset: PropTypes.func,
-    onSubmit: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func,
     validateOnMount: PropTypes.bool,
     validateOnBlur: PropTypes.bool,
     validateOnChange: PropTypes.bool,
@@ -158,6 +158,7 @@ class Form extends React.PureComponent {
     validationSchema: undefined,
     validationContext: {},
     validateSync: true,
+    onSubmit: () => null,
   }
 
   @bind
