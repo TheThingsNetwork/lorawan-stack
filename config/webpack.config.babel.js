@@ -37,8 +37,6 @@ const {
   PUBLIC_DIR = 'public',
   NODE_ENV = 'production',
   MAGE = 'tools/bin/mage',
-  SUPPORT_LOCALES = 'en',
-  DEFAULT_LOCALE = 'en',
 } = process.env
 
 const WEBPACK_IS_DEV_SERVER_BUILD = process.env.WEBPACK_IS_DEV_SERVER_BUILD === 'true'
@@ -57,10 +55,18 @@ const src = path.resolve('.', 'pkg/webui')
 const include = [src]
 const modules = [path.resolve(context, 'node_modules')]
 
-const r = SUPPORT_LOCALES.split(',').map(l => new RegExp(l.trim()))
+const supportedLocales = fs
+  .readdirSync(path.resolve(context, 'pkg/webui/locales'))
+  .filter(fn => fn.endsWith('.json'))
+  .map(fn => fn.split('.')[0])
+
+const r = supportedLocales.map(l => new RegExp(`./${l.trim()}`))
 
 const filterLocales = (context, request, callback) => {
-  if (context.endsWith('node_modules/intl/locale-data/jsonp')) {
+  if (
+    context.endsWith('node_modules/intl/locale-data/jsonp') ||
+    context.endsWith('node_modules/@formatjs/intl-relativetimeformat/locale-data')
+  ) {
     const supported = r.reduce((acc, locale) => acc || locale.test(request), false)
 
     if (!supported) {
@@ -252,11 +258,7 @@ export default {
         VERSION: version,
       }),
       new webpack.DefinePlugin({
-        'process.predefined.DEFAULT_MESSAGES_LOCALE': JSON.stringify(DEFAULT_LOCALE),
-        'process.predefined.DEFAULT_MESSAGES': JSON.stringify({
-          ...require(`${src}/locales/${DEFAULT_LOCALE}`),
-          ...require(`${src}/locales/.backend/${DEFAULT_LOCALE}`),
-        }),
+        'process.predefined.SUPPORTED_LOCALES': JSON.stringify(supportedLocales),
       }),
       new HtmlWebpackPlugin({
         inject: false,
