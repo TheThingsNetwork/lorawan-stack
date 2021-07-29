@@ -66,7 +66,9 @@ message SearchApplicationsRequest {
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 7;
+  string order = 7 [
+    (validate.rules).string = { in: ["", "application_id", "-application_id", "name", "-name", "created_at", "-created_at"] }
+  ];
   // Limit the number of results per page.
   uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -107,7 +109,9 @@ message SearchClientsRequest {
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 7;
+  string order = 7 [
+    (validate.rules).string = { in: ["", "client_id", "-client_id", "name", "-name", "created_at", "-created_at"] }
+  ];
   // Limit the number of results per page.
   uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -145,7 +149,9 @@ message SearchGatewaysRequest {
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 7;
+  string order = 7 [
+    (validate.rules).string = { in: ["", "gateway_id", "-gateway_id", "gateway_eui", "-gateway_eui", "name", "-name", "created_at", "-created_at"] }
+  ];
   // Limit the number of results per page.
   uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -180,7 +186,9 @@ message SearchOrganizationsRequest {
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 7;
+  string order = 7  [
+    (validate.rules).string = { in: ["", "organization_id", "-organization_id", "name", "-name", "created_at", "-created_at"] }
+  ];
   // Limit the number of results per page.
   uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -221,7 +229,9 @@ message SearchUsersRequest {
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 7;
+  string order = 7 [
+    (validate.rules).string = { in: ["", "user_id", "-user_id", "name", "-name", "primary_email_address", "-primary_email_address", "state", "-state", "admin", "-admin", "created_at", "-created_at"] }
+  ];
   // Limit the number of results per page.
   uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -314,7 +324,9 @@ message SearchEndDevicesRequest {
 
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 10;
+  string order = 10 [
+    (validate.rules).string = { in: ["", "device_id", "-device_id", "join_eui", "-join_eui", "dev_eui", "-dev_eui", "name", "-name", "description", "-description", "created_at", "-created_at"] }
+  ];
   // Limit the number of results per page.
   uint32 limit = 11 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
