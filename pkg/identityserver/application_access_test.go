@@ -259,7 +259,7 @@ func TestApplicationAccessCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
-			a.So(rights.Rights, should.NotBeEmpty)
+			a.So(rights.Rights, should.Contain, ttnpb.RIGHT_APPLICATION_ALL)
 		}
 
 		modifiedApplicationID := applicationID
@@ -351,6 +351,24 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(res, should.NotBeNil) {
 			a.So(res.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL})
+		}
+
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIdentifiers: applicationID,
+			Collaborator: ttnpb.Collaborator{
+				OrganizationOrUserIdentifiers: *collaboratorID,
+			},
+		}, creds)
+
+		a.So(err, should.BeNil)
+
+		res, err = reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
+			ApplicationIdentifiers:        applicationID,
+			OrganizationOrUserIdentifiers: *collaboratorID,
+		}, creds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 	})
 }
