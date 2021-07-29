@@ -25,7 +25,7 @@ ul.dropdown
 
   &.larger
     li.dropdown-item
-      & > a, & > button
+      & > a.button, & > button.button
         padding: $cs.l
 
   hr
@@ -47,10 +47,10 @@ ul.dropdown
     display: block
     margin-bottom: 0
 
-    button
+    button.button
       reset-button()
 
-    & > a, & > button
+    & > a.button, & > button.button
       box-sizing: border-box
       line-height: 1
       display: block
@@ -59,6 +59,16 @@ ul.dropdown
       width: 100%
       &:not(.active)
         color: $tc-deep-gray
+        
+      &.active
+        border-left: $c-active-blue 5px solid
+        color: $c-active-blue
+        
+      &:hover
+        color: white
+        
+        .icon
+          color: white
 
     .icon
       margin-right: $cs.xs
@@ -68,13 +78,3 @@ ul.dropdown
 
     &:hover
       background-color: $c-active-blue
-
-      a, button
-        color: white
-
-      .icon
-        color: white
-
-.active
-  border-left: $c-active-blue 5px solid
-  color: $c-active-blue
