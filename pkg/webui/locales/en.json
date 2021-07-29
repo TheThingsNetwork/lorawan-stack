@@ -506,6 +506,7 @@
   "console.views.device-add.manual.form.advanced-settings.classBandC": "Class B and class C",
   "console.views.device-add.manual.form.advanced-settings.useExternalServers": "Use external LoRaWAN backend servers",
   "console.views.device-add.manual.form.advanced-settings.multicastClassCapabilities": "LoRaWAN class for multicast downlinks",
+  "console.views.device-add.manual.form.advanced-settings.factoryFreqWarning": "In LoRaWAN, factory preset frequencies are only supported for bands with a CFList type of frequencies",
   "console.views.device-add.manual.form.form.register": "Register manually",
   "console.views.device-add.messages.repositoryTabTitle": "From The LoRaWAN Device Repository",
   "console.views.device-add.messages.manualTabTitle": "Manually",

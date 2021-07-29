@@ -506,6 +506,7 @@
   "console.views.device-add.manual.form.advanced-settings.classBandC": "Xxxxx X xxx xxxxx X",
   "console.views.device-add.manual.form.advanced-settings.useExternalServers": "Xxx xxxxxxxx XxXxXXX xxxxxxx xxxxxxx",
   "console.views.device-add.manual.form.advanced-settings.multicastClassCapabilities": "XxXxXXX xxxxx xxx xxxxxxxxx xxxxxxxxx",
+  "console.views.device-add.manual.form.advanced-settings.factoryFreqWarning": "Xx XxXxXXX, xxxxxxx xxxxxx xxxxxxxxxxx xxx xxxx xxxxxxxxx xxx xxxxx xxxx x XXXxxx xxxx xx xxxxxxxxxxx",
   "console.views.device-add.manual.form.form.register": "Xxxxxxxx xxxxxxxx",
   "console.views.device-add.messages.repositoryTabTitle": "Xxxx Xxx XxXxXXX Xxxxxx Xxxxxxxxxx",
   "console.views.device-add.messages.manualTabTitle": "Xxxxxxxx",

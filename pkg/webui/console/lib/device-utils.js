@@ -156,3 +156,12 @@ export const getLastSeen = device => {
     }
   }
 }
+
+/**
+ * @param {string} freqPlan - End device frequency plan.
+ * @returns {boolean} - Whether end device frequency plan has a CFList type of ChMask (channel mask).
+ */
+export const hasCFListTypeChMask = (freqPlan = '') =>
+  freqPlan.startsWith('US_902_928') ||
+  freqPlan.startsWith('AU_915_928') ||
+  freqPlan.startsWith('CN_470_510')

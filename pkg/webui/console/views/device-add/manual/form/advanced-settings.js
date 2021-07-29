@@ -28,7 +28,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
-import { ACTIVATION_MODES } from '@console/lib/device-utils'
+import { ACTIVATION_MODES, hasCFListTypeChMask } from '@console/lib/device-utils'
 
 import messages from '../../messages'
 
@@ -44,6 +44,8 @@ const m = defineMessages({
   classBandC: 'Class B and class C',
   useExternalServers: 'Use external LoRaWAN backend servers',
   multicastClassCapabilities: 'LoRaWAN class for multicast downlinks',
+  factoryFreqWarning:
+    'In LoRaWAN, factory preset frequencies are only supported for bands with a CFList type of frequencies',
 })
 
 const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
@@ -78,6 +80,7 @@ const AdvancedSettingsSection = props => {
     activationMode,
     onDefaultNsSettingsChange,
     defaultNsSettings,
+    freqPlan,
   } = props
 
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
@@ -87,6 +90,14 @@ const AdvancedSettingsSection = props => {
     deviceClass === DEVICE_CLASS_MAP.CLASS_B_C || deviceClass === DEVICE_CLASS_MAP.CLASS_B
   const isClassC =
     deviceClass === DEVICE_CLASS_MAP.CLASS_B_C || deviceClass === DEVICE_CLASS_MAP.CLASS_C
+
+  // The technical difference between bands that do support factory preset frequencies
+  // and bands that do not support them, is that the former uses a CFList type of Frequencies,
+  // and the latter uses a CFList type of ChMask (channel mask).
+  // When there is a channel mask, the frequencies aren't configured by frequency in Hertz,
+  // but by index. The factory preset frequencies is really the frequencies in Hertz,
+  // so it requires bands with a CFList type of Frequencies.
+  const disableFactoryPresetFreq = hasCFListTypeChMask(freqPlan)
 
   const [externalServers, setExternalServer] = React.useState(false)
   const handleExternalServers = React.useCallback(
@@ -234,7 +245,9 @@ const AdvancedSettingsSection = props => {
           {!isOTAA && (
             <Form.Field
               indexAsKey
+              disabled={disableFactoryPresetFreq}
               name="mac_settings.factory_preset_frequencies"
+              description={disableFactoryPresetFreq ? m.factoryFreqWarning : undefined}
               component={KeyValueMap}
               title={messages.factoryPresetFreqTitle}
               addMessage={messages.freqAdd}
@@ -283,6 +296,7 @@ AdvancedSettingsSection.propTypes = {
   activationMode: PropTypes.oneOf(Object.values(ACTIVATION_MODES)).isRequired,
   defaultNsSettings: PropTypes.bool.isRequired,
   deviceClass: PropTypes.string,
+  freqPlan: PropTypes.string,
   jsEnabled: PropTypes.bool.isRequired,
   nsEnabled: PropTypes.bool.isRequired,
   onActivationModeChange: PropTypes.func.isRequired,
@@ -292,6 +306,7 @@ AdvancedSettingsSection.propTypes = {
 
 AdvancedSettingsSection.defaultProps = {
   deviceClass: undefined,
+  freqPlan: undefined,
 }
 
 export default AdvancedSettingsSection

@@ -33,6 +33,7 @@ class KeyValueMap extends React.PureComponent {
   static propTypes = {
     addMessage: PropTypes.message,
     className: PropTypes.string,
+    disabled: PropTypes.bool,
     indexAsKey: PropTypes.bool,
     keyPlaceholder: PropTypes.message,
     name: PropTypes.string.isRequired,
@@ -58,6 +59,7 @@ class KeyValueMap extends React.PureComponent {
     addMessage: m.addEntry,
     indexAsKey: false,
     keyPlaceholder: '',
+    disabled: false,
   }
 
   @bind
@@ -100,6 +102,7 @@ class KeyValueMap extends React.PureComponent {
       addMessage,
       onBlur,
       indexAsKey,
+      disabled,
     } = this.props
 
     return (
@@ -127,6 +130,7 @@ class KeyValueMap extends React.PureComponent {
             type="button"
             message={addMessage}
             onClick={this.addEmptyEntry}
+            disabled={disabled}
             icon="add"
             secondary
           />

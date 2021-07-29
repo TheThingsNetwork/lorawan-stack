@@ -245,6 +245,11 @@ const ManualForm = props => {
     setDeviceClass(devClass)
   }, [])
 
+  const [freqPlan, setFreqPlan] = React.useState()
+  const handleFreqPlanChange = React.useCallback(band => {
+    setFreqPlan(band.value)
+  }, [])
+
   const handleIdPrefill = React.useCallback(() => {
     if (formRef.current) {
       const { values, setFieldValue } = formRef.current
@@ -413,6 +418,7 @@ const ManualForm = props => {
         required={nsEnabled}
         tooltipId={tooltipIds.FREQUENCY_PLAN}
         name="frequency_plan_id"
+        onChange={handleFreqPlanChange}
       />
       <hr />
       <AdvancedSettingsSection
@@ -424,6 +430,7 @@ const ManualForm = props => {
         onDeviceClassChange={handleDeviceClassChange}
         onDefaultNsSettingsChange={handleDefaultNsSettings}
         defaultNsSettings={defaultNsSettings}
+        freqPlan={freqPlan}
       />
       <hr />
       {!isMulticast && devEUIComponent}
