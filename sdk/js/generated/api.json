@@ -35457,7 +35457,23 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "application_id",
+                      "-application_id",
+                      "name",
+                      "-name",
+                      "created_at",
+                      "-created_at"
+                    ]
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -35689,7 +35705,23 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "client_id",
+                      "-client_id",
+                      "name",
+                      "-name",
+                      "created_at",
+                      "-created_at"
+                    ]
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -35977,7 +36009,29 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "device_id",
+                      "-device_id",
+                      "join_eui",
+                      "-join_eui",
+                      "dev_eui",
+                      "-dev_eui",
+                      "name",
+                      "-name",
+                      "description",
+                      "-description",
+                      "created_at",
+                      "-created_at"
+                    ]
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -36193,7 +36247,25 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "gateway_id",
+                      "-gateway_id",
+                      "gateway_eui",
+                      "-gateway_eui",
+                      "name",
+                      "-name",
+                      "created_at",
+                      "-created_at"
+                    ]
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -36401,7 +36473,23 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "organization_id",
+                      "-organization_id",
+                      "name",
+                      "-name",
+                      "created_at",
+                      "-created_at"
+                    ]
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -36633,7 +36721,29 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "user_id",
+                      "-user_id",
+                      "name",
+                      "-name",
+                      "primary_email_address",
+                      "-primary_email_address",
+                      "state",
+                      "-state",
+                      "admin",
+                      "-admin",
+                      "created_at",
+                      "-created_at"
+                    ]
+                  }
+                ]
+              }
             },
             {
               "name": "limit",

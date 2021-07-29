@@ -7645,6 +7645,7 @@ This message is used for finding applications in the EntityRegistrySearch servic
 | `name_contains` | <p>`string.max_len`: `50`</p> |
 | `description_contains` | <p>`string.max_len`: `50`</p> |
 | `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
+| `order` | <p>`string.in`: `[ application_id -application_id name -name created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchApplicationsRequest.AttributesContainEntry">Message `SearchApplicationsRequest.AttributesContainEntry`</a>
@@ -7680,6 +7681,7 @@ This message is used for finding OAuth clients in the EntityRegistrySearch servi
 | `description_contains` | <p>`string.max_len`: `50`</p> |
 | `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
 | `state` | <p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+| `order` | <p>`string.in`: `[ client_id -client_id name -name created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchClientsRequest.AttributesContainEntry">Message `SearchClientsRequest.AttributesContainEntry`</a>
@@ -7718,6 +7720,7 @@ This message is used for finding OAuth clients in the EntityRegistrySearch servi
 | `dev_eui_contains` | <p>`string.max_len`: `16`</p> |
 | `join_eui_contains` | <p>`string.max_len`: `16`</p> |
 | `dev_addr_contains` | <p>`string.max_len`: `8`</p> |
+| `order` | <p>`string.in`: `[ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchEndDevicesRequest.AttributesContainEntry">Message `SearchEndDevicesRequest.AttributesContainEntry`</a>
@@ -7753,6 +7756,7 @@ This message is used for finding gateways in the EntityRegistrySearch service.
 | `description_contains` | <p>`string.max_len`: `50`</p> |
 | `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
 | `eui_contains` | <p>`string.max_len`: `16`</p> |
+| `order` | <p>`string.in`: `[ gateway_id -gateway_id gateway_eui -gateway_eui name -name created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchGatewaysRequest.AttributesContainEntry">Message `SearchGatewaysRequest.AttributesContainEntry`</a>
@@ -7786,6 +7790,7 @@ This message is used for finding organizations in the EntityRegistrySearch servi
 | `name_contains` | <p>`string.max_len`: `50`</p> |
 | `description_contains` | <p>`string.max_len`: `50`</p> |
 | `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
+| `order` | <p>`string.in`: `[ organization_id -organization_id name -name created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchOrganizationsRequest.AttributesContainEntry">Message `SearchOrganizationsRequest.AttributesContainEntry`</a>
@@ -7821,6 +7826,7 @@ This message is used for finding users in the EntityRegistrySearch service.
 | `description_contains` | <p>`string.max_len`: `50`</p> |
 | `attributes_contain` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `50`</p> |
 | `state` | <p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+| `order` | <p>`string.in`: `[ user_id -user_id name -name primary_email_address -primary_email_address state -state admin -admin created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchUsersRequest.AttributesContainEntry">Message `SearchUsersRequest.AttributesContainEntry`</a>

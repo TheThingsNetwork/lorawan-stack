@@ -23,6 +23,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Improved errors when ordering search requests by non-existent fields.
+
 ### Security
 
 ## [3.14.0] - 2021-07-23
