@@ -105,8 +105,8 @@ const DropdownItem = ({
 }
 
 DropdownItem.propTypes = {
-  active: PropTypes.bool,
   action: PropTypes.func,
+  active: PropTypes.bool,
   exact: PropTypes.bool,
   external: PropTypes.bool,
   icon: PropTypes.string,

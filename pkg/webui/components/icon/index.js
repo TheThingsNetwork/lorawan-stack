@@ -70,15 +70,25 @@ const hardcoded = {
 }
 
 const Icon = forwardRef((props, ref) => {
-  const { icon, className, nudgeUp, nudgeDown, small, large, textPadded, ...rest } = props
+  const {
+    icon,
+    className,
+    nudgeUp,
+    nudgeDown,
+    small,
+    large,
+    textPaddedLeft,
+    textPaddedRight,
+    ...rest
+  } = props
 
   const classname = classnames(style.icon, className, {
     [style.nudgeUp]: nudgeUp,
     [style.nudgeDown]: nudgeDown,
     [style.large]: large,
     [style.small]: small,
-    [style.textPadded]: textPadded === true,
-    [style.textPaddedLeft]: textPadded === 'left',
+    [style.textPaddedLeft]: textPaddedLeft,
+    [style.textPaddedRight]: textPaddedRight,
   })
 
   return (
@@ -100,8 +110,10 @@ Icon.propTypes = {
   nudgeUp: PropTypes.bool,
   /** Renders a smaller icon. */
   small: PropTypes.bool,
-  /** Whether icon should be padded for a text displayed next to it. */
-  textPadded: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  /** Whether icon should be padded for a text displayed left to it. */
+  textPaddedLeft: PropTypes.bool,
+  /** Whether icon should be padded for a text displayed right to it. */
+  textPaddedRight: PropTypes.bool,
 }
 
 Icon.defaultProps = {
@@ -110,7 +122,8 @@ Icon.defaultProps = {
   nudgeDown: false,
   nudgeUp: false,
   small: false,
-  textPadded: false,
+  textPaddedLeft: false,
+  textPaddedRight: false,
 }
 
 export default Icon
