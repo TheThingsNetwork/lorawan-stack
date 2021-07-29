@@ -502,7 +502,7 @@ macLoop:
 					if dup.CID != ttnpb.CID_LINK_ADR {
 						break
 					}
-					if *dup.GetLinkAdrAns() != *pld {
+					if !dup.GetLinkAdrAns().Equal(pld) {
 						err = errInvalidPayload.New()
 						break
 					}

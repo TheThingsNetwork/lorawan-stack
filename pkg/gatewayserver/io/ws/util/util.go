@@ -77,9 +77,6 @@ func GetDataRateFromIndex(bandID string, index int) (ttnpb.DataRate, bool, error
 }
 
 func GetDataRateIndexFromDataRate(bandID string, dr ttnpb.DataRate) (int, error) {
-	if (dr == ttnpb.DataRate{}) {
-		return 0, errDataRate.New()
-	}
 	phy, err := band.GetByID(bandID)
 	if err != nil {
 		return 0, err

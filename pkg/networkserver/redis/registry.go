@@ -881,7 +881,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				); err != nil {
 					return errInvalidFieldmask.WithCause(err)
 				}
-				if pb.ApplicationIdentifiers != appID || pb.DeviceId != devID {
+				if pb.ApplicationId != appID.ApplicationId || pb.DeviceId != devID {
 					return errInvalidIdentifiers.New()
 				}
 				if pb.JoinEui != nil && pb.DevEui != nil {

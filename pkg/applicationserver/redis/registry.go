@@ -135,7 +135,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				pb = &ttnpb.EndDevice{}
 			}
 
-			if pb.ApplicationIdentifiers != ids.ApplicationIdentifiers || pb.DeviceId != ids.DeviceId {
+			if pb.ApplicationId != ids.ApplicationId || pb.DeviceId != ids.DeviceId {
 				return errInvalidIdentifiers.New()
 			}
 
@@ -160,7 +160,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				if err != nil {
 					return err
 				}
-				if updated.ApplicationIdentifiers != ids.ApplicationIdentifiers || updated.DeviceId != ids.DeviceId {
+				if updated.ApplicationId != ids.ApplicationId || updated.DeviceId != ids.DeviceId {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
