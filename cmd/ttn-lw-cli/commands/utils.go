@@ -61,6 +61,10 @@ func getInputDecoder(reader stdio.Reader) (io.Decoder, error) {
 	switch config.InputFormat {
 	case "json":
 		return io.NewJSONDecoder(reader), nil
+	case "hex":
+		return io.NewHexDecoder(reader), nil
+	case "base64":
+		return io.NewBase64Decoder(reader), nil
 	default:
 		return nil, fmt.Errorf("unknown input format: %s", config.InputFormat)
 	}
