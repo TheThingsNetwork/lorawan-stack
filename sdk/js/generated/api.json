@@ -2610,6 +2610,182 @@
       "extensions": [],
       "messages": [
         {
+          "name": "GetStoredApplicationUpCountRequest",
+          "longName": "GetStoredApplicationUpCountRequest",
+          "fullName": "ttn.lorawan.v3.GetStoredApplicationUpCountRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "Count upstream messages from all end devices of an application. Cannot be used in conjunction with end_device_ids.",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_device_ids",
+              "description": "Count upstream messages from a single end device. Cannot be used in conjunction with application_ids.",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "type",
+              "description": "Count upstream messages of a specific type. If not set, then all upstream messages are returned.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "uplink_message",
+                      "join_accept",
+                      "downlink_ack",
+                      "downlink_nack",
+                      "downlink_sent",
+                      "downlink_failed",
+                      "downlink_queued",
+                      "downlink_queue_invalidated",
+                      "location_solved",
+                      "service_data"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "after",
+              "description": "Count upstream messages after this timestamp only. Cannot be used in conjunction with last.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "before",
+              "description": "Count upstream messages before this timestamp only. Cannot be used in conjunction with last.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "f_port",
+              "description": "Count uplinks on a specific FPort only.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "last",
+              "description": "Count upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetStoredApplicationUpCountResponse",
+          "longName": "GetStoredApplicationUpCountResponse",
+          "fullName": "ttn.lorawan.v3.GetStoredApplicationUpCountResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "count",
+              "description": "Number of stored messages by end device ID.",
+              "label": "repeated",
+              "type": "CountEntry",
+              "longType": "GetStoredApplicationUpCountResponse.CountEntry",
+              "fullType": "ttn.lorawan.v3.GetStoredApplicationUpCountResponse.CountEntry",
+              "ismap": true,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "CountEntry",
+          "longName": "GetStoredApplicationUpCountResponse.CountEntry",
+          "fullName": "ttn.lorawan.v3.GetStoredApplicationUpCountResponse.CountEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetStoredApplicationUpRequest",
           "longName": "GetStoredApplicationUpRequest",
           "fullName": "ttn.lorawan.v3.GetStoredApplicationUpRequest",
@@ -2802,6 +2978,32 @@
                     {
                       "method": "GET",
                       "pattern": "/as/applications/{application_ids.application_id}/packages/storage/{type}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetStoredApplicationUpCount",
+              "description": "Returns how many application messages have been stored in the database for an application or end device.",
+              "requestType": "GetStoredApplicationUpCountRequest",
+              "requestLongType": "GetStoredApplicationUpCountRequest",
+              "requestFullType": "ttn.lorawan.v3.GetStoredApplicationUpCountRequest",
+              "requestStreaming": false,
+              "responseType": "GetStoredApplicationUpCountResponse",
+              "responseLongType": "GetStoredApplicationUpCountResponse",
+              "responseFullType": "ttn.lorawan.v3.GetStoredApplicationUpCountResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}/count"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/as/applications/{application_ids.application_id}/packages/storage/{type}/count"
                     }
                   ]
                 }

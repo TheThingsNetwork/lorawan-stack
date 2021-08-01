@@ -29,14 +29,26 @@ var StoredApplicationUpTypes = map[string]struct{}{
 	"service_data":               {},
 }
 
-// WithEndDeviceIds returns the request with set EndDeviceIdentifiers
+// WithEndDeviceIds returns the request with set EndDeviceIdentifiers.
 func (m *GetStoredApplicationUpRequest) WithEndDeviceIds(ids *EndDeviceIdentifiers) *GetStoredApplicationUpRequest {
 	m.EndDeviceIds = ids
 	return m
 }
 
-// WithApplicationIds returns the request with set ApplicationIdentifiers
+// WithApplicationIds returns the request with set ApplicationIdentifiers.
 func (m *GetStoredApplicationUpRequest) WithApplicationIds(ids *ApplicationIdentifiers) *GetStoredApplicationUpRequest {
+	m.ApplicationIds = ids
+	return m
+}
+
+// WithEndDeviceIds returns the request with set EndDeviceIdentifiers.
+func (m *GetStoredApplicationUpCountRequest) WithEndDeviceIds(ids *EndDeviceIdentifiers) *GetStoredApplicationUpCountRequest {
+	m.EndDeviceIds = ids
+	return m
+}
+
+// WithApplicationIds returns the request with set ApplicationIdentifiers.
+func (m *GetStoredApplicationUpCountRequest) WithApplicationIds(ids *ApplicationIdentifiers) *GetStoredApplicationUpCountRequest {
 	m.ApplicationIds = ids
 	return m
 }

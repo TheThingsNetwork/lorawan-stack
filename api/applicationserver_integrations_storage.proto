@@ -38,8 +38,6 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.stringer_all) = true;
 
 message GetStoredApplicationUpRequest {
-  option (gogoproto.populate) = true;
-
   // Query upstream messages from all end devices of an application. Cannot be used in conjunction with end_device_ids.
   ApplicationIdentifiers application_ids = 1;
   // Query upstream messages from a single end device. Cannot be used in conjunction with application_ids.
@@ -82,6 +80,44 @@ message GetStoredApplicationUpRequest {
   google.protobuf.Duration last = 10;
 }
 
+message GetStoredApplicationUpCountRequest {
+  // Count upstream messages from all end devices of an application. Cannot be used in conjunction with end_device_ids.
+  ApplicationIdentifiers application_ids = 1;
+  // Count upstream messages from a single end device. Cannot be used in conjunction with application_ids.
+  EndDeviceIdentifiers end_device_ids = 2;
+
+  // Count upstream messages of a specific type. If not set, then all upstream messages are returned.
+  string type = 3 [(validate.rules).string = { in: [
+    "",
+    "uplink_message",
+    "join_accept",
+    "downlink_ack",
+    "downlink_nack",
+    "downlink_sent",
+    "downlink_failed",
+    "downlink_queued",
+    "downlink_queue_invalidated",
+    "location_solved",
+    "service_data"
+  ] }];
+
+  // Count upstream messages after this timestamp only. Cannot be used in conjunction with last.
+  google.protobuf.Timestamp after = 4;
+  // Count upstream messages before this timestamp only. Cannot be used in conjunction with last.
+  google.protobuf.Timestamp before = 5;
+  // Count uplinks on a specific FPort only.
+  google.protobuf.UInt32Value f_port = 6;
+
+  // Count upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.
+  google.protobuf.Duration last = 7;
+}
+
+
+message GetStoredApplicationUpCountResponse {
+  // Number of stored messages by end device ID.
+  map<string,uint32> count = 1;
+}
+
 // The ApplicationUpStorage service can be used to query stored application upstream messages.
 service ApplicationUpStorage {
   // Returns a stream of application messages that have been stored in the database.
@@ -90,6 +126,15 @@ service ApplicationUpStorage {
       get: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}"
       additional_bindings {
         get: "/as/applications/{application_ids.application_id}/packages/storage/{type}"
+      }
+    };
+  }
+  // Returns how many application messages have been stored in the database for an application or end device.
+  rpc GetStoredApplicationUpCount(GetStoredApplicationUpCountRequest) returns(GetStoredApplicationUpCountResponse) {
+    option (google.api.http) = {
+      get: "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}/count"
+      additional_bindings {
+        get: "/as/applications/{application_ids.application_id}/packages/storage/{type}/count"
       }
     };
   }

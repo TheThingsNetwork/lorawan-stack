@@ -1409,6 +1409,105 @@
         ]
       }
     },
+    "/as/applications/{application_ids.application_id}/packages/storage/{type}/count": {
+      "get": {
+        "summary": "Returns how many application messages have been stored in the database for an application or end device.",
+        "operationId": "ApplicationUpStorage_GetStoredApplicationUpCount2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetStoredApplicationUpCountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "description": "Count upstream messages of a specific type. If not set, then all upstream messages are returned.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "end_device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "end_device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "after",
+            "description": "Count upstream messages after this timestamp only. Cannot be used in conjunction with last.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "before",
+            "description": "Count upstream messages before this timestamp only. Cannot be used in conjunction with last.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "f_port",
+            "description": "Count uplinks on a specific FPort only.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "last",
+            "description": "Count upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationUpStorage"
+        ]
+      }
+    },
     "/as/applications/{application_id}/link": {
       "delete": {
         "summary": "Delete the link between the Application Server and Network Server for the specified application.",
@@ -2126,6 +2225,105 @@
           {
             "name": "last",
             "description": "Query upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationUpStorage"
+        ]
+      }
+    },
+    "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}/count": {
+      "get": {
+        "summary": "Returns how many application messages have been stored in the database for an application or end device.",
+        "operationId": "ApplicationUpStorage_GetStoredApplicationUpCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetStoredApplicationUpCountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "description": "Count upstream messages of a specific type. If not set, then all upstream messages are returned.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "end_device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "end_device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "after",
+            "description": "Count upstream messages after this timestamp only. Cannot be used in conjunction with last.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "before",
+            "description": "Count upstream messages before this timestamp only. Cannot be used in conjunction with last.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "f_port",
+            "description": "Count uplinks on a specific FPort only.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "last",
+            "description": "Count upstream messages that have arrived in the last minutes or hours. Cannot be used in conjunction with after and before.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -14712,6 +14910,19 @@
       "properties": {
         "configuration": {
           "$ref": "#/definitions/v3IsConfiguration"
+        }
+      }
+    },
+    "v3GetStoredApplicationUpCountResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": "Number of stored messages by end device ID."
         }
       }
     },
