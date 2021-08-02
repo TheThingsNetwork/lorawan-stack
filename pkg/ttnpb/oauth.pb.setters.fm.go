@@ -235,10 +235,10 @@ func (dst *OAuthAuthorizationCode) SetFields(src *OAuthAuthorizationCode, paths 
 				return fmt.Errorf("'user_session_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.UserSessionID = src.UserSessionID
+				dst.UserSessionId = src.UserSessionId
 			} else {
 				var zero string
-				dst.UserSessionID = zero
+				dst.UserSessionId = zero
 			}
 		case "client_ids":
 			if len(subs) > 0 {
@@ -408,10 +408,10 @@ func (dst *OAuthAccessToken) SetFields(src *OAuthAccessToken, paths ...string) e
 				return fmt.Errorf("'user_session_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.UserSessionID = src.UserSessionID
+				dst.UserSessionId = src.UserSessionId
 			} else {
 				var zero string
-				dst.UserSessionID = zero
+				dst.UserSessionId = zero
 			}
 		case "client_ids":
 			if len(subs) > 0 {

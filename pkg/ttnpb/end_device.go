@@ -866,7 +866,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "application_server_address":
 		return v.ApplicationServerAddress == ""
 	case "application_server_id":
-		return v.ApplicationServerID == ""
+		return v.ApplicationServerId == ""
 	case "application_server_kek_label":
 		return v.ApplicationServerKEKLabel == ""
 	case "attributes":
@@ -1120,7 +1120,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "power_state":
 		return v.PowerState == 0
 	case "provisioner_id":
-		return v.ProvisionerID == ""
+		return v.ProvisionerId == ""
 	case "provisioning_data":
 		return v.ProvisioningData == nil
 	case "queued_application_downlinks":
@@ -1148,7 +1148,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "root_keys.root_key_id":
 		return v.RootKeys.FieldIsZero("root_key_id")
 	case "service_profile_id":
-		return v.ServiceProfileID == ""
+		return v.ServiceProfileId == ""
 	case "session":
 		return v.Session == nil
 	case "session.dev_addr":

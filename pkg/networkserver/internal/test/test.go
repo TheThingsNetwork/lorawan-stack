@@ -178,7 +178,7 @@ var (
 			FPort:          0x1,
 			FRMPayload:     []byte("testPayload"),
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-			SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+			SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 		},
 		{
 			CorrelationIds: []string{"correlation-app-down-3", "correlation-app-down-4"},
@@ -186,7 +186,7 @@ var (
 			FPort:          0x1,
 			FRMPayload:     []byte("testPayload"),
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-			SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+			SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 		},
 	}
 )
@@ -488,7 +488,7 @@ func messageGenerationKeys(sk *ttnpb.SessionKeys, macVersion ttnpb.MACVersion) t
 		}
 	}
 	return ttnpb.SessionKeys{
-		SessionKeyID: sk.SessionKeyID,
+		SessionKeyId: sk.SessionKeyId,
 		FNwkSIntKey: &ttnpb.KeyEnvelope{
 			Key: decrypt(sk.FNwkSIntKey),
 		},

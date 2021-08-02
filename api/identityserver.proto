@@ -41,7 +41,7 @@ option (gogoproto.stringer_all) = true;
 message AuthInfoResponse {
   message APIKeyAccess {
     APIKey api_key = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-    EntityIdentifiers entity_ids = 2 [(gogoproto.customname) = "EntityIDs", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+    EntityIdentifiers entity_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   }
   oneof access_method {
     AuthInfoResponse.APIKeyAccess api_key = 1 [(gogoproto.customname) = "APIKey"];

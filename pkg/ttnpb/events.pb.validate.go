@@ -130,7 +130,7 @@ func (m *Event) ValidateFields(paths ...string) error {
 		case "user_agent":
 			// no validation rules for UserAgent
 		case "unique_id":
-			// no validation rules for UniqueID
+			// no validation rules for UniqueId
 		default:
 			return EventValidationError{
 				field:  name,
@@ -517,7 +517,7 @@ func (m *Event_Authentication) ValidateFields(paths ...string) error {
 		case "token_type":
 			// no validation rules for TokenType
 		case "token_id":
-			// no validation rules for TokenID
+			// no validation rules for TokenId
 		default:
 			return Event_AuthenticationValidationError{
 				field:  name,

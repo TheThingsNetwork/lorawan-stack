@@ -94,7 +94,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		return err
 	}
 	if err := stream.Send(&ttnpb.Event{
-		UniqueID:       events.NewCorrelationID(),
+		UniqueId:       events.NewCorrelationID(),
 		Name:           "events.stream.start",
 		Time:           time.Now().UTC(),
 		Identifiers:    req.Identifiers,
@@ -181,7 +181,7 @@ func (srv *EventsServer) FindRelated(ctx context.Context, req *ttnpb.FindRelated
 				// Authentication is private
 				// RemoteIP is private
 				// UserAgent is private
-				UniqueID: evtProto.UniqueID,
+				UniqueId: evtProto.UniqueId,
 			})
 		}
 	}

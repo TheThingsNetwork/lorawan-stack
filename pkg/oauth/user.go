@@ -56,7 +56,7 @@ func (s *server) ClientLogout(c echo.Context) error {
 			return err
 		}
 		events.Publish(evtAccessTokenDeleted.NewWithIdentifiersAndData(ctx, &at.UserIds, nil))
-		err = s.store.DeleteSession(ctx, &at.UserIds, at.UserSessionID)
+		err = s.store.DeleteSession(ctx, &at.UserIds, at.UserSessionId)
 		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
@@ -84,7 +84,7 @@ func (s *server) ClientLogout(c echo.Context) error {
 	}
 	if session != nil {
 		events.Publish(evtUserSessionTerminated.NewWithIdentifiersAndData(ctx, &session.UserIdentifiers, nil))
-		if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionID); err != nil {
+		if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionId); err != nil {
 			return err
 		}
 	}

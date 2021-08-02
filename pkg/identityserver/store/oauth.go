@@ -84,7 +84,7 @@ func (a AuthorizationCode) toPB() *ttnpb.OAuthAuthorizationCode {
 		pb.UserIds.UserId = a.User.Account.UID
 	}
 	if a.UserSessionID != nil {
-		pb.UserSessionID = *a.UserSessionID
+		pb.UserSessionId = *a.UserSessionID
 	}
 	return pb
 }
@@ -130,7 +130,7 @@ func (a AccessToken) toPB() *ttnpb.OAuthAccessToken {
 		pb.UserIds.UserId = a.User.Account.UID
 	}
 	if a.UserSessionID != nil {
-		pb.UserSessionID = *a.UserSessionID
+		pb.UserSessionId = *a.UserSessionID
 	}
 	return pb
 }

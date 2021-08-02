@@ -105,7 +105,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 	) {
 		rootKeysEnc := dev.RootKeys
 		dev.RootKeys = &ttnpb.RootKeys{
-			RootKeyID: rootKeysEnc.GetRootKeyID(),
+			RootKeyId: rootKeysEnc.GetRootKeyId(),
 		}
 		cc, err := srv.JS.GetPeerConn(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, &dev.EndDeviceIdentifiers)
 		if err != nil {
@@ -129,7 +129,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 				dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
 					Key: &nwkKey,
 				}
-			case cc != nil && dev.ProvisionerID != "":
+			case cc != nil && dev.ProvisionerId != "":
 				nwkKey, err := cryptoservices.NewNetworkRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth()).GetNwkKey(ctx, dev)
 				if err != nil {
 					return nil, err
@@ -156,7 +156,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 				dev.RootKeys.AppKey = &ttnpb.KeyEnvelope{
 					Key: &appKey,
 				}
-			case cc != nil && dev.ProvisionerID != "":
+			case cc != nil && dev.ProvisionerId != "":
 				appKey, err := cryptoservices.NewApplicationRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth()).GetAppKey(ctx, dev)
 				if err != nil {
 					return nil, err
@@ -279,7 +279,7 @@ func (srv jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReq
 	if err := rights.RequireApplication(stream.Context(), req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return err
 	}
-	return errProvisionerNotFound.WithAttributes("id", req.ProvisionerID)
+	return errProvisionerNotFound.WithAttributes("id", req.ProvisionerId)
 }
 
 // Delete implements ttnpb.JsEndDeviceRegistryServer.

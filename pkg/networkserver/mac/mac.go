@@ -53,7 +53,7 @@ func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint
 // cmds passed and error if f returned non-nil error or if command with CID cid is not found in cmds.
 func handleMACResponse(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand) error, cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
 	for i, cmd := range cmds {
-		if cmd.CID != cid {
+		if cmd.Cid != cid {
 			continue
 		}
 		if err := f(cmd); err != nil {
@@ -76,9 +76,9 @@ outer:
 		last = i
 
 		switch {
-		case first >= 0 && cmd.CID != cid:
+		case first >= 0 && cmd.Cid != cid:
 			break outer
-		case first < 0 && cmd.CID != cid:
+		case first < 0 && cmd.Cid != cid:
 			continue
 		case first < 0:
 			first = i

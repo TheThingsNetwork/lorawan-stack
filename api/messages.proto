@@ -190,7 +190,7 @@ message ApplicationUplink {
   option (gogoproto.populate) = true;
 
   // Join Server issued identifier for the session keys used by this uplink.
-  bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
+  bytes session_key_id = 1 [(validate.rules).bytes.max_len = 2048];
   uint32 f_port = 2 [(validate.rules).uint32 = {lte: 255, not_in: [224]}];
   uint32 f_cnt = 3;
 
@@ -258,7 +258,7 @@ message ApplicationJoinAccept {
   option (gogoproto.populate) = true;
 
   // Join Server issued identifier for the session keys negotiated in this join.
-  bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
+  bytes session_key_id = 1 [(validate.rules).bytes.max_len = 2048];
   // Encrypted Application Session Key (if Join Server sent it to Network Server).
   KeyEnvelope app_s_key = 2;
   // Downlink messages in the queue that got invalidated because of the session change.
@@ -272,7 +272,7 @@ message ApplicationJoinAccept {
 
 message ApplicationDownlink {
   // Join Server issued identifier for the session keys used by this downlink.
-  bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
+  bytes session_key_id = 1 [(validate.rules).bytes.max_len = 2048];
   uint32 f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255, not_in: [224]}];
   uint32 f_cnt = 3;
 
@@ -331,16 +331,16 @@ message ApplicationInvalidatedDownlinks {
 
   repeated ApplicationDownlink downlinks = 1;
   uint32 last_f_cnt_down = 2;
-  bytes session_key_id = 3 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
+  bytes session_key_id = 3 [(validate.rules).bytes.max_len = 2048];
 }
 
 message DownlinkQueueOperationErrorDetails {
   bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
-  bytes session_key_id = 2 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
+  bytes session_key_id = 2 [(validate.rules).bytes.max_len = 2048];
   uint32 min_f_cnt_down = 3;
 
   bytes pending_dev_addr = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
-  bytes pending_session_key_id = 5 [(gogoproto.customname) = "PendingSessionKeyID", (validate.rules).bytes.max_len = 2048];
+  bytes pending_session_key_id = 5 [(validate.rules).bytes.max_len = 2048];
   uint32 pending_min_f_cnt_down = 6;
 }
 

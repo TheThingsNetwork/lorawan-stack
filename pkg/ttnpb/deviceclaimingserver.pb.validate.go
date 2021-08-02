@@ -116,7 +116,7 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 
 		case "target_application_server_id":
 
-			if utf8.RuneCountInString(m.GetTargetApplicationServerID()) > 100 {
+			if utf8.RuneCountInString(m.GetTargetApplicationServerId()) > 100 {
 				return ClaimEndDeviceRequestValidationError{
 					field:  "target_application_server_id",
 					reason: "value length must be at most 100 runes",

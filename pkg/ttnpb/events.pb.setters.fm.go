@@ -151,10 +151,10 @@ func (dst *Event) SetFields(src *Event, paths ...string) error {
 				return fmt.Errorf("'unique_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.UniqueID = src.UniqueID
+				dst.UniqueId = src.UniqueId
 			} else {
 				var zero string
-				dst.UniqueID = zero
+				dst.UniqueId = zero
 			}
 
 		default:
@@ -272,10 +272,10 @@ func (dst *Event_Authentication) SetFields(src *Event_Authentication, paths ...s
 				return fmt.Errorf("'token_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TokenID = src.TokenID
+				dst.TokenId = src.TokenId
 			} else {
 				var zero string
-				dst.TokenID = zero
+				dst.TokenId = zero
 			}
 
 		default:

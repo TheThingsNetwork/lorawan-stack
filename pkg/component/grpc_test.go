@@ -161,13 +161,13 @@ func TestHooks(t *testing.T) {
 			as.up <- &ttnpb.ApplicationUp{
 				Up: &ttnpb.ApplicationUp_UplinkMessage{
 					UplinkMessage: &ttnpb.ApplicationUplink{
-						SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+						SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					},
 				},
 			}
 		}()
 		up, err := sub.Recv()
 		a.So(err, should.BeNil)
-		a.So(up.GetUplinkMessage().SessionKeyID, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
+		a.So(up.GetUplinkMessage().SessionKeyId, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 	}
 }

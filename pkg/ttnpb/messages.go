@@ -116,7 +116,7 @@ func (v *ApplicationDownlink) FieldIsZero(p string) bool {
 	case "priority":
 		return v.Priority == 0
 	case "session_key_id":
-		return v.SessionKeyID == nil
+		return v.SessionKeyId == nil
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -164,7 +164,7 @@ func PartitionDownlinks(p func(down *ApplicationDownlink) bool, downs ...*Applic
 
 // PartitionDownlinksBySessionKeyID partitions the downlinks based on the session key ID predicate p.
 func PartitionDownlinksBySessionKeyID(p func([]byte) bool, downs ...*ApplicationDownlink) (t, f []*ApplicationDownlink) {
-	return PartitionDownlinks(func(down *ApplicationDownlink) bool { return p(down.SessionKeyID) }, downs...)
+	return PartitionDownlinks(func(down *ApplicationDownlink) bool { return p(down.SessionKeyId) }, downs...)
 }
 
 // PartitionDownlinksBySessionKeyIDEquality partitions the downlinks based on the equality to the given session key ID.

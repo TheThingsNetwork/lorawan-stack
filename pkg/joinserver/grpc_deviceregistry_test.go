@@ -65,7 +65,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			DevEui:   registeredDevEUI,
 		},
 		RootKeys: &ttnpb.RootKeys{
-			RootKeyID: registeredRootKeyID,
+			RootKeyId: registeredRootKeyID,
 			NwkKey: &ttnpb.KeyEnvelope{
 				Key:          registeredNwkKey,
 				KEKLabel:     registeredKEKLabel,
@@ -452,7 +452,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			DevEui:   registeredDevEUI,
 		},
 		RootKeys: &ttnpb.RootKeys{
-			RootKeyID: registeredRootKeyID,
+			RootKeyId: registeredRootKeyID,
 			NwkKey: &ttnpb.KeyEnvelope{
 				Key:      registeredNwkKey,
 				KEKLabel: registeredKEKLabel,
@@ -851,7 +851,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			DevEui:   registeredDevEUI,
 		},
 		RootKeys: &ttnpb.RootKeys{
-			RootKeyID: registeredRootKeyID,
+			RootKeyId: registeredRootKeyID,
 			NwkKey: &ttnpb.KeyEnvelope{
 				Key:      registeredNwkKey,
 				KEKLabel: registeredKEKLabel,

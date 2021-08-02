@@ -135,7 +135,7 @@ func (s *userSessionStore) GetSessionByID(ctx context.Context, sessionID string)
 
 func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "update user session").End()
-	sessionModel, err := s.findSession(ctx, &sess.UserIdentifiers, sess.GetSessionID())
+	sessionModel, err := s.findSession(ctx, &sess.UserIdentifiers, sess.GetSessionId())
 	if err != nil {
 		return nil, err
 	}

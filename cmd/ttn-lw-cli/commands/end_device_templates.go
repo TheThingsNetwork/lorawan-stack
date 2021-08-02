@@ -308,7 +308,7 @@ This command takes end device templates from stdin.`,
 				return err
 			}
 			stream, err := ttnpb.NewEndDeviceTemplateConverterClient(dtc).Convert(ctx, &ttnpb.ConvertEndDeviceTemplateRequest{
-				FormatID: formatID,
+				FormatId: formatID,
 				Data:     data,
 			})
 			if err != nil {

@@ -104,7 +104,7 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 		},
 		Lifetime:     uint32(res.Lifetime / time.Second),
 		AppSKey:      (*interop.KeyEnvelope)(res.AppSKey),
-		SessionKeyID: interop.Buffer(res.SessionKeyID),
+		SessionKeyID: interop.Buffer(res.SessionKeyId),
 	}
 	if ttnpb.MACVersion(in.MACVersion).Compare(ttnpb.MAC_V1_1) < 0 {
 		ans.NwkSKey = (*interop.KeyEnvelope)(res.FNwkSIntKey)
@@ -147,7 +147,7 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKey
 	req := &ttnpb.SessionKeyRequest{
 		JoinEui:      types.EUI64(in.ReceiverID),
 		DevEui:       types.EUI64(in.DevEUI),
-		SessionKeyID: in.SessionKeyID,
+		SessionKeyId: in.SessionKeyID,
 	}
 	if err := req.ValidateFields(
 		"join_eui",

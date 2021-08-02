@@ -47,7 +47,7 @@ type ApplicationUplinkQueue interface {
 
 func applicationJoinAcceptWithoutAppSKey(pld *ttnpb.ApplicationJoinAccept) *ttnpb.ApplicationJoinAccept {
 	return &ttnpb.ApplicationJoinAccept{
-		SessionKeyID:         pld.SessionKeyID,
+		SessionKeyId:         pld.SessionKeyId,
 		InvalidatedDownlinks: pld.InvalidatedDownlinks,
 		PendingSession:       pld.PendingSession,
 		ReceivedAt:           pld.ReceivedAt,
@@ -152,7 +152,7 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 	if session == nil {
 		return downs, nil
 	}
-	downs, unmatched = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.SessionKeyID, downs...)
+	downs, unmatched = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.SessionKeyId, downs...)
 	switch {
 	case len(downs) == 0:
 		return unmatched, nil
@@ -168,7 +168,7 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 		case down.FCnt < minFCnt:
 			return unmatched, errFCntTooLow.WithAttributes("f_cnt", down.FCnt, "min_f_cnt", minFCnt).WithDetails(makeQueueOperationErrorDetails())
 
-		case !bytes.Equal(down.SessionKeyID, session.SessionKeyID):
+		case !bytes.Equal(down.SessionKeyId, session.SessionKeyId):
 			return unmatched, errUnknownSession.WithDetails(makeQueueOperationErrorDetails())
 
 		case multicast && down.Confirmed:
@@ -228,12 +228,12 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 		d := &ttnpb.DownlinkQueueOperationErrorDetails{}
 		if dev.Session != nil {
 			d.DevAddr = &dev.Session.DevAddr
-			d.SessionKeyID = dev.Session.SessionKeyID
+			d.SessionKeyId = dev.Session.SessionKeyId
 			d.MinFCntDown = minCurrentFCntDown
 		}
 		if dev.PendingSession != nil {
 			d.PendingDevAddr = &dev.PendingSession.DevAddr
-			d.PendingSessionKeyID = dev.PendingSession.SessionKeyID
+			d.PendingSessionKeyId = dev.PendingSession.SessionKeyId
 			d.PendingMinFCntDown = minPendingFCntDown
 		}
 		return d

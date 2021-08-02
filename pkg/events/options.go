@@ -84,10 +84,10 @@ func WithAuthFromContext() Option {
 		if md.AuthValue != "" {
 			if tokenType, tokenID, _, err := auth.SplitToken(md.AuthValue); err == nil {
 				authentication.TokenType = tokenType.String()
-				authentication.TokenID = tokenID
+				authentication.TokenId = tokenID
 			}
 		}
-		if authentication.TokenID != "" || authentication.TokenType != "" || authentication.Type != "" {
+		if authentication.TokenId != "" || authentication.TokenType != "" || authentication.Type != "" {
 			e.innerEvent.Authentication = authentication
 		}
 	})

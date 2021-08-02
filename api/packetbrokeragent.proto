@@ -116,7 +116,7 @@ message PacketBrokerNetworkIdentifier {
 
 message PacketBrokerDevAddrBlock {
   DevAddrPrefix dev_addr_prefix = 1;
-  string home_network_cluster_id = 2 [(gogoproto.customname) = "HomeNetworkClusterID"];
+  string home_network_cluster_id = 2;
 }
 
 message PacketBrokerNetwork {

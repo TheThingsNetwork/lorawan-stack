@@ -52,7 +52,7 @@ func (m *SessionKeyRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "session_key_id":
 
-			if len(m.GetSessionKeyID()) > 2048 {
+			if len(m.GetSessionKeyId()) > 2048 {
 				return SessionKeyRequestValidationError{
 					field:  "session_key_id",
 					reason: "value length must be at most 2048 bytes",
@@ -382,14 +382,14 @@ func (m *CryptoServicePayloadRequest) ValidateFields(paths ...string) error {
 
 		case "provisioner_id":
 
-			if utf8.RuneCountInString(m.GetProvisionerID()) > 36 {
+			if utf8.RuneCountInString(m.GetProvisionerId()) > 36 {
 				return CryptoServicePayloadRequestValidationError{
 					field:  "provisioner_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_CryptoServicePayloadRequest_ProvisionerID_Pattern.MatchString(m.GetProvisionerID()) {
+			if !_CryptoServicePayloadRequest_ProvisionerId_Pattern.MatchString(m.GetProvisionerId()) {
 				return CryptoServicePayloadRequestValidationError{
 					field:  "provisioner_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$\"",
@@ -475,7 +475,7 @@ var _ interface {
 	ErrorName() string
 } = CryptoServicePayloadRequestValidationError{}
 
-var _CryptoServicePayloadRequest_ProvisionerID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+var _CryptoServicePayloadRequest_ProvisionerId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
 
 // ValidateFields checks the field values on CryptoServicePayloadResponse with
 // the rules defined in the proto definition for this message. If any rules
@@ -709,14 +709,14 @@ func (m *DeriveSessionKeysRequest) ValidateFields(paths ...string) error {
 			// no validation rules for NetId
 		case "provisioner_id":
 
-			if utf8.RuneCountInString(m.GetProvisionerID()) > 36 {
+			if utf8.RuneCountInString(m.GetProvisionerId()) > 36 {
 				return DeriveSessionKeysRequestValidationError{
 					field:  "provisioner_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_DeriveSessionKeysRequest_ProvisionerID_Pattern.MatchString(m.GetProvisionerID()) {
+			if !_DeriveSessionKeysRequest_ProvisionerId_Pattern.MatchString(m.GetProvisionerId()) {
 				return DeriveSessionKeysRequestValidationError{
 					field:  "provisioner_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$\"",
@@ -802,7 +802,7 @@ var _ interface {
 	ErrorName() string
 } = DeriveSessionKeysRequestValidationError{}
 
-var _DeriveSessionKeysRequest_ProvisionerID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+var _DeriveSessionKeysRequest_ProvisionerId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
 
 // ValidateFields checks the field values on GetRootKeysRequest with the rules
 // defined in the proto definition for this message. If any rules are
@@ -833,14 +833,14 @@ func (m *GetRootKeysRequest) ValidateFields(paths ...string) error {
 
 		case "provisioner_id":
 
-			if utf8.RuneCountInString(m.GetProvisionerID()) > 36 {
+			if utf8.RuneCountInString(m.GetProvisionerId()) > 36 {
 				return GetRootKeysRequestValidationError{
 					field:  "provisioner_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_GetRootKeysRequest_ProvisionerID_Pattern.MatchString(m.GetProvisionerID()) {
+			if !_GetRootKeysRequest_ProvisionerId_Pattern.MatchString(m.GetProvisionerId()) {
 				return GetRootKeysRequestValidationError{
 					field:  "provisioner_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$\"",
@@ -925,7 +925,7 @@ var _ interface {
 	ErrorName() string
 } = GetRootKeysRequestValidationError{}
 
-var _GetRootKeysRequest_ProvisionerID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+var _GetRootKeysRequest_ProvisionerId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
 
 // ValidateFields checks the field values on ProvisionEndDevicesRequest with
 // the rules defined in the proto definition for this message. If any rules
@@ -956,14 +956,14 @@ func (m *ProvisionEndDevicesRequest) ValidateFields(paths ...string) error {
 
 		case "provisioner_id":
 
-			if utf8.RuneCountInString(m.GetProvisionerID()) > 36 {
+			if utf8.RuneCountInString(m.GetProvisionerId()) > 36 {
 				return ProvisionEndDevicesRequestValidationError{
 					field:  "provisioner_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_ProvisionEndDevicesRequest_ProvisionerID_Pattern.MatchString(m.GetProvisionerID()) {
+			if !_ProvisionEndDevicesRequest_ProvisionerId_Pattern.MatchString(m.GetProvisionerId()) {
 				return ProvisionEndDevicesRequestValidationError{
 					field:  "provisioner_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -1098,7 +1098,7 @@ var _ interface {
 	ErrorName() string
 } = ProvisionEndDevicesRequestValidationError{}
 
-var _ProvisionEndDevicesRequest_ProvisionerID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _ProvisionEndDevicesRequest_ProvisionerId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on ApplicationActivationSettings with
 // the rules defined in the proto definition for this message. If any rules
@@ -1140,7 +1140,7 @@ func (m *ApplicationActivationSettings) ValidateFields(paths ...string) error {
 			// no validation rules for HomeNetId
 		case "application_server_id":
 
-			if utf8.RuneCountInString(m.GetApplicationServerID()) > 100 {
+			if utf8.RuneCountInString(m.GetApplicationServerId()) > 100 {
 				return ApplicationActivationSettingsValidationError{
 					field:  "application_server_id",
 					reason: "value length must be at most 100 runes",

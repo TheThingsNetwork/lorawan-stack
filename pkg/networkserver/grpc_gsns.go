@@ -422,7 +422,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		}
 		logger := logger.WithField("command", cmd)
 		logger.Debug("Read MAC command")
-		def, ok := lorawan.DefaultMACCommands[cmd.CID]
+		def, ok := lorawan.DefaultMACCommands[cmd.Cid]
 		if ok && !def.InitiatedByDevice {
 			switch matchType {
 			case currentResetMatch, pendingMatch:
@@ -485,7 +485,7 @@ macLoop:
 
 		var evs events.Builders
 		var err error
-		switch cmd.CID {
+		switch cmd.Cid {
 		case ttnpb.CID_RESET:
 			evs, err = mac.HandleResetInd(ctx, dev, cmd.GetResetInd(), ns.FrequencyPlans, ns.defaultMACSettings)
 		case ttnpb.CID_LINK_CHECK:
@@ -499,7 +499,7 @@ macLoop:
 			dupCount := 0
 			if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 				for _, dup := range cmds {
-					if dup.CID != ttnpb.CID_LINK_ADR {
+					if dup.Cid != ttnpb.CID_LINK_ADR {
 						break
 					}
 					if !dup.GetLinkAdrAns().Equal(pld) {
@@ -934,7 +934,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 					FPort:           pld.FPort,
 					FRMPayload:      pld.FRMPayload,
 					RxMetadata:      up.RxMetadata,
-					SessionKeyID:    stored.Session.SessionKeyID,
+					SessionKeyId:    stored.Session.SessionKeyId,
 					Settings:        up.Settings,
 					ReceivedAt:      up.ReceivedAt,
 					ConsumedAirtime: up.ConsumedAirtime,
@@ -955,7 +955,7 @@ func joinResponseWithoutKeys(resp *ttnpb.JoinResponse) *ttnpb.JoinResponse {
 	return &ttnpb.JoinResponse{
 		RawPayload: resp.RawPayload,
 		SessionKeys: ttnpb.SessionKeys{
-			SessionKeyID: resp.SessionKeys.SessionKeyID,
+			SessionKeyId: resp.SessionKeys.SessionKeyId,
 		},
 		Lifetime:       resp.Lifetime,
 		CorrelationIds: resp.CorrelationIds,
@@ -1307,7 +1307,7 @@ func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, up *ttnpb.G
 		EndDeviceIdentifiers: *ids,
 		Up: &ttnpb.ApplicationUp_DownlinkSent{
 			DownlinkSent: &ttnpb.ApplicationDownlink{
-				SessionKeyID:   down.GetSessionKeyId(),
+				SessionKeyId:   down.GetSessionKeyId(),
 				FRMPayload:     pld.GetFRMPayload(),
 				FPort:          pld.GetFPort(),
 				FCnt:           pld.GetFullFCnt(),

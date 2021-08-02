@@ -47,7 +47,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 
 		_, err = reg.Delete(ctx, &ttnpb.UserSessionIdentifiers{
 			UserIdentifiers: user.UserIdentifiers,
-			SessionID:       randomUUID,
+			SessionId:       randomUUID,
 		}, credsWithoutRights)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -62,7 +62,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 
 		_, err = reg.Delete(ctx, &ttnpb.UserSessionIdentifiers{
 			UserIdentifiers: user.UserIdentifiers,
-			SessionID:       randomUUID,
+			SessionId:       randomUUID,
 		}, creds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
@@ -73,7 +73,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 		err = is.withDatabase(ctx, func(db *gorm.DB) error {
 			created, err = store.GetUserSessionStore(db).CreateSession(ctx, &ttnpb.UserSession{
 				UserIdentifiers: user.UserIdentifiers,
-				SessionID:       randomUUID,
+				SessionId:       randomUUID,
 			})
 			return err
 		})
@@ -90,7 +90,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 
 		_, err = reg.Delete(ctx, &ttnpb.UserSessionIdentifiers{
 			UserIdentifiers: user.UserIdentifiers,
-			SessionID:       created.SessionID,
+			SessionId:       created.SessionId,
 		}, creds)
 		a.So(err, should.BeNil)
 

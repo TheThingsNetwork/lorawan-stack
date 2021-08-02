@@ -58,7 +58,7 @@ func loggerWithApplicationDownlinkFields(logger log.Interface, down *ttnpb.Appli
 		"f_port", down.FPort,
 		"frm_payload_len", len(down.FRMPayload),
 		"priority", down.Priority,
-		"session_key_id", down.SessionKeyID,
+		"session_key_id", down.SessionKeyId,
 	}
 	if down.GetClassBC() != nil {
 		pairs = append(pairs, "class_b_c", true)
@@ -192,8 +192,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		cmds := make([]*ttnpb.MACCommand, 0, len(dev.MACState.QueuedResponses)+len(dev.MACState.PendingRequests))
 
 		for _, cmd := range dev.MACState.QueuedResponses {
-			logger := logger.WithField("cid", cmd.CID)
-			desc, ok := spec[cmd.CID]
+			logger := logger.WithField("cid", cmd.Cid)
+			desc, ok := spec[cmd.Cid]
 			switch {
 			case !ok:
 				logger.Error("Unknown MAC command response enqueued, set FPending")
@@ -284,7 +284,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		b := make([]byte, 0, maxDownLen)
 		cmds = append(cmds, dev.MACState.PendingRequests...)
 		for _, cmd := range cmds {
-			logger := logger.WithField("cid", cmd.CID)
+			logger := logger.WithField("cid", cmd.Cid)
 			logger.Debug("Add MAC command to buffer")
 			var err error
 			b, err = spec.AppendDownlink(*phy, b, *cmd)
@@ -347,8 +347,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			logger := loggerWithApplicationDownlinkFields(logger, down)
 
 			switch {
-			case !bytes.Equal(down.SessionKeyID, dev.Session.SessionKeyID):
-				if dev.PendingSession != nil && bytes.Equal(down.SessionKeyID, dev.PendingSession.SessionKeyID) {
+			case !bytes.Equal(down.SessionKeyId, dev.Session.SessionKeyId):
+				if dev.PendingSession != nil && bytes.Equal(down.SessionKeyId, dev.PendingSession.SessionKeyId) {
 					logger.Debug("Skip application downlink for pending session")
 					appDowns = append(appDowns, down)
 				} else {
@@ -374,7 +374,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 						DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 							Downlinks:    dev.Session.QueuedApplicationDownlinks[i:],
 							LastFCntDown: dev.Session.LastNFCntDown,
-							SessionKeyID: dev.Session.SessionKeyID,
+							SessionKeyId: dev.Session.SessionKeyId,
 						},
 					},
 				})
@@ -530,7 +530,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 					Downlinks:    dev.Session.QueuedApplicationDownlinks,
 					LastFCntDown: pld.FullFCnt,
-					SessionKeyID: dev.Session.SessionKeyID,
+					SessionKeyId: dev.Session.SessionKeyId,
 				},
 			},
 		})
@@ -626,7 +626,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		RawPayload:     b,
 		Priority:       priority,
 		NeedsMACAnswer: len(dev.MACState.PendingRequests) > 0 && class == ttnpb.CLASS_A,
-		SessionKeyID:   dev.Session.SessionKeyID,
+		SessionKeyID:   dev.Session.SessionKeyId,
 	}, genState, nil
 }
 
@@ -1424,7 +1424,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			Payload:              genDown.Payload,
 			RawPayload:           genDown.RawPayload,
 			DownlinkEvents:       genState.EventBuilders,
-			SessionKeyID:         dev.GetSession().GetSessionKeyID(),
+			SessionKeyID:         dev.GetSession().GetSessionKeyId(),
 		},
 		paths...,
 	)
@@ -1709,7 +1709,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:              dev.PendingMACState.QueuedJoinAccept.Keys.AppSKey,
 								InvalidatedDownlinks: invalidatedQueue,
-								SessionKeyID:         dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+								SessionKeyId:         dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyId,
 								ReceivedAt:           up.ReceivedAt,
 							},
 						},
@@ -1718,7 +1718,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					dev.PendingSession = &ttnpb.Session{
 						DevAddr: dev.PendingMACState.QueuedJoinAccept.DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
-							SessionKeyID: dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+							SessionKeyId: dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyId,
 							FNwkSIntKey:  dev.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey,
 							SNwkSIntKey:  dev.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey,
 							NwkSEncKey:   dev.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey,

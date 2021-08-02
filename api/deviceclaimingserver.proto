@@ -69,7 +69,7 @@ message ClaimEndDeviceRequest {
   // The KEK label of the Application Server to use for wrapping the application session key.
   string target_application_server_kek_label = 10 [(gogoproto.customname) = "TargetApplicationServerKEKLabel", (validate.rules).string.max_len = 2048];
   // The AS-ID of the Application Server to use.
-  string target_application_server_id = 11 [(gogoproto.customname) = "TargetApplicationServerID", (validate.rules).string.max_len = 100];
+  string target_application_server_id = 11 [(validate.rules).string.max_len = 100];
   reserved 12; // target_join_server_address
   // Home NetID.
   bytes target_net_id = 13 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];

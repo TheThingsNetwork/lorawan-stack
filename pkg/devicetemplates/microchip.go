@@ -215,10 +215,10 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					JoinEui: &joinEUI,
 				},
-				ProvisionerID:    provisioning.Microchip,
+				ProvisionerId:    provisioning.Microchip,
 				ProvisioningData: s,
 				RootKeys: &ttnpb.RootKeys{
-					RootKeyID: sn,
+					RootKeyId: sn,
 				},
 				SupportsJoin: true,
 			},
@@ -378,10 +378,10 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 					JoinEui:  &joinEUI,
 					DevEui:   &devEUI,
 				},
-				ProvisionerID:    provisioning.Microchip,
+				ProvisionerId:    provisioning.Microchip,
 				ProvisioningData: s,
 				RootKeys: &ttnpb.RootKeys{
-					RootKeyID: sn,
+					RootKeyId: sn,
 				},
 				SupportsJoin: true,
 			},

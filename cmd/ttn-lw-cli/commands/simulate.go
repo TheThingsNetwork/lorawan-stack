@@ -437,7 +437,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 				)).WithError(err).Warn("Failed to unmarshal MAC command")
 				break
 			}
-			logger.WithField("cid", cmd.CID).WithField("payload", cmd.GetPayload()).Info("Read MAC command")
+			logger.WithField("cid", cmd.Cid).WithField("payload", cmd.GetPayload()).Info("Read MAC command")
 			cmds = append(cmds, cmd)
 		}
 	}

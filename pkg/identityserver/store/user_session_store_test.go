@@ -62,20 +62,20 @@ func TestUserSessionStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(created, should.NotBeNil) {
-			a.So(created.SessionID, should.NotBeEmpty)
+			a.So(created.SessionId, should.NotBeEmpty)
 			a.So(created.SessionSecret, should.Equal, "123412341234123412341234")
 			a.So(created.CreatedAt, should.NotBeZeroValue)
 			a.So(created.UpdatedAt, should.NotBeZeroValue)
 			a.So(created.ExpiresAt, should.BeNil)
 		}
 
-		_, err = store.GetSession(ctx, &doesNotExistIDs, created.SessionID)
+		_, err = store.GetSession(ctx, &doesNotExistIDs, created.SessionId)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		got, err := store.GetSession(ctx, &userIDs, created.SessionID)
+		got, err := store.GetSession(ctx, &userIDs, created.SessionId)
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -84,7 +84,7 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(got.ExpiresAt, should.BeNil)
 		}
 
-		got, err = store.GetSessionByID(ctx, created.SessionID)
+		got, err = store.GetSessionByID(ctx, created.SessionId)
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -96,7 +96,7 @@ func TestUserSessionStore(t *testing.T) {
 		later := time.Now().Add(time.Hour)
 		updated, err := store.UpdateSession(ctx, &ttnpb.UserSession{
 			UserIdentifiers: userIDs,
-			SessionID:       created.SessionID,
+			SessionId:       created.SessionId,
 			ExpiresAt:       &later,
 		})
 
@@ -115,7 +115,7 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{UserIdentifiers: userIDs, SessionID: "00000000-0000-0000-0000-000000000000"})
+		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{UserIdentifiers: userIDs, SessionId: "00000000-0000-0000-0000-000000000000"})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
@@ -136,23 +136,23 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(list[0].ExpiresAt, should.Resemble, updated.ExpiresAt)
 		}
 
-		err = store.DeleteSession(ctx, &doesNotExistIDs, created.SessionID)
+		err = store.DeleteSession(ctx, &doesNotExistIDs, created.SessionId)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		err = store.DeleteSession(ctx, &userIDs, created.SessionID)
+		err = store.DeleteSession(ctx, &userIDs, created.SessionId)
 
 		a.So(err, should.BeNil)
 
-		_, err = store.GetSession(ctx, &userIDs, created.SessionID)
+		_, err = store.GetSession(ctx, &userIDs, created.SessionId)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		_, err = store.GetSessionByID(ctx, created.SessionID)
+		_, err = store.GetSessionByID(ctx, created.SessionId)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)

@@ -1607,7 +1607,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"pending_session.keys.nwk_s_enc_key.key":   st.Device.PendingSession.NwkSEncKey.IsZero,
 			"pending_session.keys.s_nwk_s_int_key.key": st.Device.PendingSession.SNwkSIntKey.IsZero,
 			"pending_session.keys.session_key_id": func() bool {
-				return len(st.Device.PendingSession.SessionKeyID) == 0
+				return len(st.Device.PendingSession.SessionKeyId) == 0
 			},
 		} {
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
@@ -1671,7 +1671,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key": st.Device.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey.IsZero,
 			"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key":   st.Device.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey.IsZero,
 			"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key": st.Device.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey.IsZero,
-			"pending_mac_state.queued_join_accept.keys.session_key_id":      func() bool { return len(st.Device.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID) == 0 },
+			"pending_mac_state.queued_join_accept.keys.session_key_id":      func() bool { return len(st.Device.PendingMACState.QueuedJoinAccept.Keys.SessionKeyId) == 0 },
 			"pending_mac_state.queued_join_accept.payload":                  func() bool { return len(st.Device.PendingMACState.QueuedJoinAccept.Payload) == 0 },
 			"pending_mac_state.queued_join_accept.dev_addr":                 st.Device.PendingMACState.QueuedJoinAccept.DevAddr.IsZero,
 		} {
@@ -2248,7 +2248,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 
 			if st.HasSetField("session.started_at") && st.Device.GetSession().GetStartedAt().IsZero() ||
-				st.HasSetField("session.session_key_id") && !bytes.Equal(st.Device.GetSession().GetSessionKeyID(), stored.GetSession().GetSessionKeyID()) ||
+				st.HasSetField("session.session_key_id") && !bytes.Equal(st.Device.GetSession().GetSessionKeyId(), stored.GetSession().GetSessionKeyId()) ||
 				stored.GetSession().GetStartedAt().IsZero() {
 				st.Device.Session.StartedAt = time.Now().UTC()
 				st.AddSetFields(

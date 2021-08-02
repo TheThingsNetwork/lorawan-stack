@@ -47,7 +47,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 			DeviceId:               "test-dev",
 		},
-		ProvisionerID: "mock",
+		ProvisionerId: "mock",
 		ProvisioningData: &pbtypes.Struct{
 			Fields: map[string]*pbtypes.Value{
 				"serial_number": {
@@ -257,20 +257,20 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	joinEUI := types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	devEUI := types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	pb := &ttnpb.SessionKeys{
-		SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+		SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 		FNwkSIntKey:  test.DefaultFNwkSIntKeyEnvelope,
 		SNwkSIntKey:  test.DefaultSNwkSIntKeyEnvelope,
 		NwkSEncKey:   test.DefaultNwkSEncKeyEnvelope,
 		AppSKey:      test.DefaultAppSKeyEnvelope,
 	}
 
-	ret, err := reg.GetByID(ctx, joinEUI, devEUI, pb.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel)
+	ret, err := reg.GetByID(ctx, joinEUI, devEUI, pb.SessionKeyId, ttnpb.SessionKeysFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = reg.SetByID(ctx, joinEUI, devEUI, pb.SessionKeyID,
+	ret, err = reg.SetByID(ctx, joinEUI, devEUI, pb.SessionKeyId,
 		[]string{
 			"app_s_key",
 			"f_nwk_s_int_key",
@@ -295,7 +295,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	}
 	a.So(ret, should.Resemble, pb)
 
-	ret, err = reg.GetByID(ctx, joinEUI, devEUI, pb.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel)
+	ret, err = reg.GetByID(ctx, joinEUI, devEUI, pb.SessionKeyId, ttnpb.SessionKeysFieldPathsTopLevel)
 	a.So(err, should.BeNil)
 	a.So(ret, should.HaveEmptyDiff, pb)
 
@@ -303,13 +303,13 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	joinEUIOther := types.EUI64{0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	devEUIOther := types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
-	ret, err = reg.GetByID(ctx, joinEUIOther, devEUIOther, pbOther.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel)
+	ret, err = reg.GetByID(ctx, joinEUIOther, devEUIOther, pbOther.SessionKeyId, ttnpb.SessionKeysFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = reg.SetByID(ctx, joinEUIOther, devEUIOther, pbOther.SessionKeyID,
+	ret, err = reg.SetByID(ctx, joinEUIOther, devEUIOther, pbOther.SessionKeyId,
 		[]string{
 			"app_s_key",
 			"f_nwk_s_int_key",
@@ -334,27 +334,27 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	}
 	a.So(ret, should.Resemble, pbOther)
 
-	ret, err = reg.GetByID(ctx, joinEUIOther, devEUIOther, pbOther.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel)
+	ret, err = reg.GetByID(ctx, joinEUIOther, devEUIOther, pbOther.SessionKeyId, ttnpb.SessionKeysFieldPathsTopLevel)
 	a.So(err, should.BeNil)
 	a.So(ret, should.HaveEmptyDiff, pbOther)
 
-	err = DeleteKeys(ctx, reg, joinEUI, devEUI, pb.SessionKeyID)
+	err = DeleteKeys(ctx, reg, joinEUI, devEUI, pb.SessionKeyId)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	ret, err = reg.GetByID(ctx, joinEUI, devEUI, pb.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel)
+	ret, err = reg.GetByID(ctx, joinEUI, devEUI, pb.SessionKeyId, ttnpb.SessionKeysFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
 
-	err = DeleteKeys(ctx, reg, joinEUIOther, devEUIOther, pbOther.SessionKeyID)
+	err = DeleteKeys(ctx, reg, joinEUIOther, devEUIOther, pbOther.SessionKeyId)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	ret, err = reg.GetByID(ctx, joinEUIOther, devEUIOther, pbOther.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel)
+	ret, err = reg.GetByID(ctx, joinEUIOther, devEUIOther, pbOther.SessionKeyId, ttnpb.SessionKeysFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}

@@ -171,7 +171,6 @@ func TestToGatewayUpLRFHSS(t *testing.T) {
 	a.So(msg.RxMetadata[0].HoppingWidth, should.Equal, 8)
 	a.So(msg.RxMetadata[0].FrequencyDrift, should.Equal, 25000)
 	a.So(msg.RawPayload, should.Resemble, []byte{0x40, 0x29, 0x2e, 0x01, 0x26, 0x80, 0x00, 0x00, 0x01, 0xc8, 0x56, 0x85, 0xe7, 0x72, 0x2e, 0xfa, 0xfc, 0xe6, 0xc1})
-
 }
 
 func TestToGatewayUpRoundtrip(t *testing.T) {
@@ -369,7 +368,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 						Timestamp:                   timestamp,
 						FineTimestamp:               1255738435,
 						EncryptedFineTimestamp:      []byte{0xe3, 0x64, 0x0c, 0xcc, 0xe9, 0x58, 0x49, 0x23, 0xcc, 0x31, 0xea, 0x95, 0x3e, 0xb6, 0x34, 0x7d},
-						EncryptedFineTimestampKeyID: "42",
+						EncryptedFineTimestampKeyId: "42",
 						RSSI:                        -95,
 						SignalRSSI:                  &pbtypes.FloatValue{Value: -92},
 						ChannelRSSI:                 -95,
@@ -387,7 +386,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 						Timestamp:                   timestamp,
 						FineTimestamp:               1252538436,
 						EncryptedFineTimestamp:      []byte{0x76, 0x31, 0xa2, 0x4b, 0x33, 0x82, 0xfa, 0x00, 0x93, 0xee, 0xf4, 0x4f, 0xbf, 0xbf, 0x80, 0xb3},
-						EncryptedFineTimestampKeyID: "42",
+						EncryptedFineTimestampKeyId: "42",
 						RSSI:                        -93,
 						SignalRSSI:                  &pbtypes.FloatValue{Value: -88},
 						ChannelRSSI:                 -93,

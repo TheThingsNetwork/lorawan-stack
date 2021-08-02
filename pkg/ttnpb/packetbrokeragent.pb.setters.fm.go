@@ -254,10 +254,10 @@ func (dst *PacketBrokerDevAddrBlock) SetFields(src *PacketBrokerDevAddrBlock, pa
 				return fmt.Errorf("'home_network_cluster_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.HomeNetworkClusterID = src.HomeNetworkClusterID
+				dst.HomeNetworkClusterId = src.HomeNetworkClusterId
 			} else {
 				var zero string
-				dst.HomeNetworkClusterID = zero
+				dst.HomeNetworkClusterId = zero
 			}
 
 		default:

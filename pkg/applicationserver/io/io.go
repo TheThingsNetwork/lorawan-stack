@@ -159,7 +159,7 @@ func CleanDownlinks(items []*ttnpb.ApplicationDownlink) []*ttnpb.ApplicationDown
 	res := make([]*ttnpb.ApplicationDownlink, 0, len(items))
 	for _, item := range items {
 		res = append(res, &ttnpb.ApplicationDownlink{
-			SessionKeyID:   item.SessionKeyID, // SessionKeyID must be set when skipping application payload crypto.
+			SessionKeyId:   item.SessionKeyId, // SessionKeyID must be set when skipping application payload crypto.
 			FPort:          item.FPort,
 			FCnt:           item.FCnt, // FCnt must be set when skipping application payload crypto.
 			FRMPayload:     item.FRMPayload,

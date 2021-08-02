@@ -130,7 +130,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			res.AccessMethod = &ttnpb.AuthInfoResponse_APIKey{
 				APIKey: &ttnpb.AuthInfoResponse_APIKeyAccess{
 					APIKey:    *apiKey,
-					EntityIDs: *ids.GetEntityIdentifiers(),
+					EntityIds: *ids.GetEntityIdentifiers(),
 				},
 			}
 			if ids.EntityType() == "user" {

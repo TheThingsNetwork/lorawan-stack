@@ -1701,7 +1701,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "service_profile_id":
 
-			if utf8.RuneCountInString(m.GetServiceProfileID()) > 64 {
+			if utf8.RuneCountInString(m.GetServiceProfileId()) > 64 {
 				return EndDeviceValidationError{
 					field:  "service_profile_id",
 					reason: "value length must be at most 64 runes",
@@ -1746,7 +1746,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "application_server_id":
 
-			if utf8.RuneCountInString(m.GetApplicationServerID()) > 100 {
+			if utf8.RuneCountInString(m.GetApplicationServerId()) > 100 {
 				return EndDeviceValidationError{
 					field:  "application_server_id",
 					reason: "value length must be at most 100 runes",
@@ -1995,14 +1995,14 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "provisioner_id":
 
-			if utf8.RuneCountInString(m.GetProvisionerID()) > 36 {
+			if utf8.RuneCountInString(m.GetProvisionerId()) > 36 {
 				return EndDeviceValidationError{
 					field:  "provisioner_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_EndDevice_ProvisionerID_Pattern.MatchString(m.GetProvisionerID()) {
+			if !_EndDevice_ProvisionerId_Pattern.MatchString(m.GetProvisionerId()) {
 				return EndDeviceValidationError{
 					field:  "provisioner_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$\"",
@@ -2135,7 +2135,7 @@ var _EndDevice_JoinServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9
 
 var _EndDevice_Locations_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
-var _EndDevice_ProvisionerID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+var _EndDevice_ProvisionerId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
 
 // ValidateFields checks the field values on EndDevices with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -3436,14 +3436,14 @@ func (m *ConvertEndDeviceTemplateRequest) ValidateFields(paths ...string) error 
 		switch name {
 		case "format_id":
 
-			if utf8.RuneCountInString(m.GetFormatID()) > 36 {
+			if utf8.RuneCountInString(m.GetFormatId()) > 36 {
 				return ConvertEndDeviceTemplateRequestValidationError{
 					field:  "format_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_ConvertEndDeviceTemplateRequest_FormatID_Pattern.MatchString(m.GetFormatID()) {
+			if !_ConvertEndDeviceTemplateRequest_FormatId_Pattern.MatchString(m.GetFormatId()) {
 				return ConvertEndDeviceTemplateRequestValidationError{
 					field:  "format_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -3519,7 +3519,7 @@ var _ interface {
 	ErrorName() string
 } = ConvertEndDeviceTemplateRequestValidationError{}
 
-var _ConvertEndDeviceTemplateRequest_FormatID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _ConvertEndDeviceTemplateRequest_FormatId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on MACParameters_Channel with the
 // rules defined in the proto definition for this message. If any rules are

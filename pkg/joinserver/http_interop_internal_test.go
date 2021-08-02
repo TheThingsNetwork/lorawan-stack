@@ -106,7 +106,7 @@ func TestInteropJoinRequest(t *testing.T) {
 					RawPayload: []byte{0x1, 0x2, 0x3, 0x4},
 					Lifetime:   1 * time.Hour,
 					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
+						SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							KEKLabel:     "test",
 							EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
@@ -185,7 +185,7 @@ func TestInteropJoinRequest(t *testing.T) {
 					RawPayload: []byte{0x1, 0x2, 0x3, 0x4},
 					Lifetime:   1 * time.Hour,
 					SessionKeys: ttnpb.SessionKeys{
-						SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
+						SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							KEKLabel:     "test",
 							EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
@@ -581,7 +581,7 @@ func TestInteropAppSKeyRequest(t *testing.T) {
 			ExpectedSessionKeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
+				SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 			},
 			GetAppSKeyFunc: func() (*ttnpb.AppSKeyResponse, error) {
 				return &ttnpb.AppSKeyResponse{
@@ -628,7 +628,7 @@ func TestInteropAppSKeyRequest(t *testing.T) {
 			ExpectedSessionKeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42},
-				SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
+				SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 			},
 			GetAppSKeyFunc: func() (*ttnpb.AppSKeyResponse, error) {
 				return nil, errRegistryOperation.WithCause(errNotFound)

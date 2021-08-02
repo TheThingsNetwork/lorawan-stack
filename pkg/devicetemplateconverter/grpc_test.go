@@ -89,7 +89,7 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 	})
 
 	stream, err := client.Convert(ctx, &ttnpb.ConvertEndDeviceTemplateRequest{
-		FormatID: "test",
+		FormatId: "test",
 		Data:     []byte{0x1, 0x2},
 	})
 	a.So(err, should.BeNil)

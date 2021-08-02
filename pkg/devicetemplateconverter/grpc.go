@@ -40,9 +40,9 @@ func (s *endDeviceTemplateConverterServer) ListFormats(ctx context.Context, _ *p
 
 // Convert implements ttnpb.DeviceTemplateServiceServer.
 func (s *endDeviceTemplateConverterServer) Convert(req *ttnpb.ConvertEndDeviceTemplateRequest, res ttnpb.EndDeviceTemplateConverter_ConvertServer) error {
-	converter, ok := s.DTC.converters[req.FormatID]
+	converter, ok := s.DTC.converters[req.FormatId]
 	if !ok {
-		return errNotFound.WithAttributes("id", req.FormatID)
+		return errNotFound.WithAttributes("id", req.FormatId)
 	}
 	ctx, cancel := errorcontext.New(res.Context())
 	ch := make(chan *ttnpb.EndDeviceTemplate)

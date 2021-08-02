@@ -99,7 +99,7 @@ func decodeEventMeta(values map[string]interface{}) (*ttnpb.Event, error) {
 			return nil, err
 		}
 	}
-	if pb.UniqueID, ok = values[eventUIDKey].(string); !ok {
+	if pb.UniqueId, ok = values[eventUIDKey].(string); !ok {
 		return nil, errUnknownEncoding.New()
 	}
 	if pb.Name, ok = values[eventNameKey].(string); !ok {

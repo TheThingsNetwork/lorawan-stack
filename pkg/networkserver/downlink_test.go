@@ -60,7 +60,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		SNwkSIntKey: &ttnpb.KeyEnvelope{
 			Key: &test.DefaultSNwkSIntKey,
 		},
-		SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+		SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 	}
 
 	customCh := &ttnpb.MACParameters_Channel{
@@ -163,8 +163,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 			yProto.Time = time.Time{}
 			xProto.Data = nil
 			yProto.Data = nil
-			xProto.UniqueID = ""
-			yProto.UniqueID = ""
+			xProto.UniqueId = ""
+			yProto.UniqueId = ""
 			return test.AllTrue(
 				a.So(x.Data(), should.BeError) && a.So(y.Data(), should.BeError) && a.So(x.Data(), should.HaveSameErrorDefinitionAs, y.Data()),
 				a.So(xProto, should.Resemble, yProto),
@@ -611,7 +611,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 						{
 							CorrelationIds: []string{"correlation-app-down-3", "correlation-app-down-4"},
@@ -619,7 +619,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 					},
 				},
@@ -637,7 +637,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 								LastFCntDown: dev.Session.LastNFCntDown,
 								Downlinks:    dev.Session.QueuedApplicationDownlinks,
-								SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+								SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 							},
 						},
 					})
@@ -696,7 +696,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     bytes.Repeat([]byte("x"), 250),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 					},
 				},
@@ -777,7 +777,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 					},
 				},
@@ -929,7 +929,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 					},
 				},
@@ -1091,7 +1091,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x15,
 							FRMPayload:     bytes.Repeat([]byte{0x42}, 46),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 					},
 				},
@@ -1247,7 +1247,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x15,
 							FRMPayload:     []byte("AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUU="),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 					},
 				},
@@ -1403,7 +1403,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 						{
 							CorrelationIds: []string{"correlation-app-down-3", "correlation-app-down-4"},
@@ -1411,7 +1411,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x2,
 							FRMPayload:     []byte("nextTestPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGH,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 					},
 				},
@@ -1548,7 +1548,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 					},
 				},
@@ -1712,7 +1712,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 					},
 				},
@@ -1842,7 +1842,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
 								AbsoluteTime: TimePtr(now.Add(InfrastructureDelay)),
 							},
@@ -1973,7 +1973,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
 								AbsoluteTime: TimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
 							},
@@ -2134,7 +2134,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
 								Gateways: DefaultGatewayAntennaIdentifiers[:],
 							},
@@ -2278,7 +2278,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
 								AbsoluteTime: TimePtr(now.Add(42 * time.Hour)),
 							},
@@ -2340,7 +2340,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
 								AbsoluteTime: TimePtr(now.Add(-2)),
 							},
@@ -2351,7 +2351,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
 								AbsoluteTime: TimePtr(now.Add(-1)),
 							},
@@ -2414,7 +2414,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 					},
 				},
@@ -2494,7 +2494,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:              dev.PendingMACState.QueuedJoinAccept.Keys.AppSKey,
 								InvalidatedDownlinks: dev.Session.QueuedApplicationDownlinks,
-								SessionKeyID:         dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+								SessionKeyId:         dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyId,
 								ReceivedAt:           recvAt,
 							},
 						},
@@ -2512,7 +2512,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									InvalidatedDownlinks: dev.Session.QueuedApplicationDownlinks,
-									SessionKeyID:         dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+									SessionKeyId:         dev.PendingMACState.QueuedJoinAccept.Keys.SessionKeyId,
 									ReceivedAt:           recvAt,
 								},
 							},

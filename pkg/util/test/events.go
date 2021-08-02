@@ -134,8 +134,8 @@ func MakeEventEqual(conf EventEqualConfig) func(a, b events.Event) bool {
 		}
 
 		if !conf.UniqueID {
-			ap.UniqueID = ""
-			bp.UniqueID = ""
+			ap.UniqueId = ""
+			bp.UniqueId = ""
 		}
 		if !conf.Time {
 			ap.Time = time.Time{}

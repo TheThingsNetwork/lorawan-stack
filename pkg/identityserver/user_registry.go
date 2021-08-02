@@ -609,7 +609,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 				return err
 			}
 			for _, session := range sessions {
-				err = sessionStore.DeleteSession(ctx, &req.UserIdentifiers, session.SessionID)
+				err = sessionStore.DeleteSession(ctx, &req.UserIdentifiers, session.SessionId)
 				if err != nil {
 					return err
 				}

@@ -176,7 +176,7 @@ func (v *SessionKeys) FieldIsZero(p string) bool {
 	case "s_nwk_s_int_key.key":
 		return v.SNwkSIntKey.FieldIsZero("key")
 	case "session_key_id":
-		return v.SessionKeyID == nil
+		return v.SessionKeyId == nil
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -204,7 +204,7 @@ func (v *RootKeys) FieldIsZero(p string) bool {
 	case "nwk_key.key":
 		return v.NwkKey.FieldIsZero("key")
 	case "root_key_id":
-		return v.RootKeyID == ""
+		return v.RootKeyId == ""
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }

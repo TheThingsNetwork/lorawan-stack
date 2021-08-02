@@ -95,7 +95,7 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 		case "encrypted_fine_timestamp":
 			// no validation rules for EncryptedFineTimestamp
 		case "encrypted_fine_timestamp_key_id":
-			// no validation rules for EncryptedFineTimestampKeyID
+			// no validation rules for EncryptedFineTimestampKeyId
 		case "rssi":
 			// no validation rules for RSSI
 		case "signal_rssi":

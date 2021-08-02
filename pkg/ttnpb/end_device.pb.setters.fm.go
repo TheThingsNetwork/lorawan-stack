@@ -1678,10 +1678,10 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				return fmt.Errorf("'service_profile_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ServiceProfileID = src.ServiceProfileID
+				dst.ServiceProfileId = src.ServiceProfileId
 			} else {
 				var zero string
-				dst.ServiceProfileID = zero
+				dst.ServiceProfileId = zero
 			}
 		case "network_server_address":
 			if len(subs) > 0 {
@@ -1728,10 +1728,10 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				return fmt.Errorf("'application_server_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ApplicationServerID = src.ApplicationServerID
+				dst.ApplicationServerId = src.ApplicationServerId
 			} else {
 				var zero string
-				dst.ApplicationServerID = zero
+				dst.ApplicationServerId = zero
 			}
 		case "join_server_address":
 			if len(subs) > 0 {
@@ -2152,10 +2152,10 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				return fmt.Errorf("'provisioner_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ProvisionerID = src.ProvisionerID
+				dst.ProvisionerId = src.ProvisionerId
 			} else {
 				var zero string
-				dst.ProvisionerID = zero
+				dst.ProvisionerId = zero
 			}
 		case "provisioning_data":
 			if len(subs) > 0 {
@@ -2683,10 +2683,10 @@ func (dst *ConvertEndDeviceTemplateRequest) SetFields(src *ConvertEndDeviceTempl
 				return fmt.Errorf("'format_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.FormatID = src.FormatID
+				dst.FormatId = src.FormatId
 			} else {
 				var zero string
-				dst.FormatID = zero
+				dst.FormatId = zero
 			}
 		case "data":
 			if len(subs) > 0 {
