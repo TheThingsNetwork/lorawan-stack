@@ -45,6 +45,7 @@ var (
 		packetbroker.Region_AU_915_928: band.AU_915_928,
 		packetbroker.Region_CN_470_510: band.CN_470_510,
 		packetbroker.Region_AS_923:     band.AS_923,
+		packetbroker.Region_AS_923_1:   band.AS_923,
 		packetbroker.Region_KR_920_923: band.KR_920_923,
 		packetbroker.Region_IN_865_867: band.IN_865_867,
 		packetbroker.Region_RU_864_870: band.RU_864_870,
