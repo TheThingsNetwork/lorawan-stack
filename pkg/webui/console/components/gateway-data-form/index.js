@@ -214,6 +214,7 @@ class GatewayDataForm extends React.Component {
           onChange={this.handleFrequencyPlanChange}
           tooltipId={tooltipIds.FREQUENCY_PLAN}
           warning={showFrequencyPlanWarning ? sharedMessages.frequencyPlanWarning : undefined}
+          required
         />
         <Form.Field
           title={sharedMessages.gatewayScheduleDownlinkLate}
