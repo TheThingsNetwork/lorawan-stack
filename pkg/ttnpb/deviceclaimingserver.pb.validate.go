@@ -364,7 +364,7 @@ func (m *CUPSRedirection) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "target_cups_uri":
-			// no validation rules for TargetCUPSURI
+			// no validation rules for TargetCupsUri
 		case "current_gateway_key":
 
 			if utf8.RuneCountInString(m.GetCurrentGatewayKey()) > 2048 {
@@ -534,7 +534,7 @@ func (m *ClaimGatewayRequest) ValidateFields(paths ...string) error {
 
 		case "cups_redirection":
 
-			if v, ok := interface{}(m.GetCUPSRedirection()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCupsRedirection()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ClaimGatewayRequestValidationError{
 						field:  "cups_redirection",

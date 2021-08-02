@@ -867,7 +867,7 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 			// no validation rules for UpdateLocationFromStatus
 		case "lbs_lns_secret":
 
-			if v, ok := interface{}(m.GetLBSLNSSecret()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetLbsLnsSecret()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayValidationError{
 						field:  "lbs_lns_secret",
@@ -891,9 +891,9 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "target_cups_uri":
 
-			if m.GetTargetCUPSURI() != "" {
+			if m.GetTargetCupsUri() != "" {
 
-				if uri, err := url.Parse(m.GetTargetCUPSURI()); err != nil {
+				if uri, err := url.Parse(m.GetTargetCupsUri()); err != nil {
 					return GatewayValidationError{
 						field:  "target_cups_uri",
 						reason: "value must be a valid URI",
@@ -910,7 +910,7 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "target_cups_key":
 
-			if v, ok := interface{}(m.GetTargetCUPSKey()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetTargetCupsKey()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayValidationError{
 						field:  "target_cups_key",

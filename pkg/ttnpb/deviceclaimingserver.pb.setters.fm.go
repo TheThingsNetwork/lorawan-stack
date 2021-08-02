@@ -233,10 +233,10 @@ func (dst *CUPSRedirection) SetFields(src *CUPSRedirection, paths ...string) err
 				return fmt.Errorf("'target_cups_uri' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TargetCUPSURI = src.TargetCUPSURI
+				dst.TargetCupsUri = src.TargetCupsUri
 			} else {
 				var zero string
-				dst.TargetCUPSURI = zero
+				dst.TargetCupsUri = zero
 			}
 		case "current_gateway_key":
 			if len(subs) > 0 {
@@ -380,26 +380,26 @@ func (dst *ClaimGatewayRequest) SetFields(src *ClaimGatewayRequest, paths ...str
 		case "cups_redirection":
 			if len(subs) > 0 {
 				var newDst, newSrc *CUPSRedirection
-				if (src == nil || src.CUPSRedirection == nil) && dst.CUPSRedirection == nil {
+				if (src == nil || src.CupsRedirection == nil) && dst.CupsRedirection == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.CUPSRedirection
+					newSrc = src.CupsRedirection
 				}
-				if dst.CUPSRedirection != nil {
-					newDst = dst.CUPSRedirection
+				if dst.CupsRedirection != nil {
+					newDst = dst.CupsRedirection
 				} else {
 					newDst = &CUPSRedirection{}
-					dst.CUPSRedirection = newDst
+					dst.CupsRedirection = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.CUPSRedirection = src.CUPSRedirection
+					dst.CupsRedirection = src.CupsRedirection
 				} else {
-					dst.CUPSRedirection = nil
+					dst.CupsRedirection = nil
 				}
 			}
 		case "target_frequency_plan_id":

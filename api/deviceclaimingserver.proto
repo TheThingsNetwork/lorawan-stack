@@ -119,7 +119,7 @@ service EndDeviceClaimingServer {
 
 message CUPSRedirection {
   // CUPS URI for LoRa Basics Station CUPS redirection.
-  string target_cups_uri = 1 [(gogoproto.customname) = "TargetCUPSURI"];
+  string target_cups_uri = 1;
 
   // The key set in the gateway to authenticate itself.
   string current_gateway_key = 2 [(validate.rules).string.max_len = 2048];
@@ -163,7 +163,7 @@ message ClaimGatewayRequest {
   string target_gateway_server_address = 5 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
 
   // Parameters to set CUPS redirection for the gateway.
-  CUPSRedirection cups_redirection = 6 [(gogoproto.customname) = "CUPSRedirection"];
+  CUPSRedirection cups_redirection = 6;
 
   // Frequency plan ID of the target gateway.
   // This equals the first element of the frequency_plan_ids field.

@@ -371,10 +371,10 @@ func TestGatewaysSecrets(t *testing.T) {
 					Eui:       &euiWithoutEncKey,
 				},
 				Name:                    gatewayNameWithoutEncKey,
-				LBSLNSSecret:            secret,
+				LbsLnsSecret:            secret,
 				ClaimAuthenticationCode: &gtwClaimAuthCode,
-				TargetCUPSURI:           targetCUPSURI,
-				TargetCUPSKey:           secret,
+				TargetCupsUri:           targetCUPSURI,
+				TargetCupsKey:           secret,
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
 		}, creds)
@@ -382,9 +382,9 @@ func TestGatewaysSecrets(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(createdWithoutEncKey, should.NotBeNil) {
 			a.So(createdWithoutEncKey.Name, should.Equal, gatewayNameWithoutEncKey)
-			a.So(createdWithoutEncKey.LBSLNSSecret, should.NotBeNil)
+			a.So(createdWithoutEncKey.LbsLnsSecret, should.NotBeNil)
 			a.So(createdWithoutEncKey.ClaimAuthenticationCode, should.NotBeNil)
-			a.So(createdWithoutEncKey.TargetCUPSKey, should.NotBeNil)
+			a.So(createdWithoutEncKey.TargetCupsKey, should.NotBeNil)
 		}
 
 		got, err := reg.Get(ctx, &ttnpb.GetGatewayRequest{
@@ -398,12 +398,12 @@ func TestGatewaysSecrets(t *testing.T) {
 			if a.So(got.Eui, should.NotBeNil) {
 				a.So(*got.Eui, should.Equal, euiWithoutEncKey)
 			}
-			a.So(got.LBSLNSSecret.Value, should.Resemble, secret.Value)
+			a.So(got.LbsLnsSecret.Value, should.Resemble, secret.Value)
 			a.So(got.ClaimAuthenticationCode, should.NotBeNil)
 			a.So(got.ClaimAuthenticationCode.Secret, should.NotBeNil)
 			a.So(got.ClaimAuthenticationCode.Secret.Value, should.Resemble, gtwClaimAuthCode.Secret.Value)
-			a.So(got.TargetCUPSKey.Value, should.Resemble, secret.Value)
-			a.So(got.TargetCUPSURI, should.Equal, targetCUPSURI)
+			a.So(got.TargetCupsKey.Value, should.Resemble, secret.Value)
+			a.So(got.TargetCupsUri, should.Equal, targetCUPSURI)
 		}
 
 		// With Encryption Key
@@ -416,10 +416,10 @@ func TestGatewaysSecrets(t *testing.T) {
 					Eui:       &eui,
 				},
 				Name:                    gatewayName,
-				LBSLNSSecret:            secret,
+				LbsLnsSecret:            secret,
 				ClaimAuthenticationCode: &gtwClaimAuthCode,
-				TargetCUPSURI:           targetCUPSURI,
-				TargetCUPSKey:           secret,
+				TargetCupsUri:           targetCUPSURI,
+				TargetCupsKey:           secret,
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
 		}, creds)
@@ -427,9 +427,9 @@ func TestGatewaysSecrets(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(created, should.NotBeNil) {
 			a.So(created.Name, should.Equal, gatewayName)
-			a.So(created.LBSLNSSecret, should.NotBeNil)
+			a.So(created.LbsLnsSecret, should.NotBeNil)
 			a.So(created.ClaimAuthenticationCode, should.NotBeNil)
-			a.So(createdWithoutEncKey.TargetCUPSKey, should.NotBeNil)
+			a.So(createdWithoutEncKey.TargetCupsKey, should.NotBeNil)
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
@@ -443,12 +443,12 @@ func TestGatewaysSecrets(t *testing.T) {
 			if a.So(got.Eui, should.NotBeNil) {
 				a.So(*got.Eui, should.Equal, eui)
 			}
-			a.So(got.LBSLNSSecret, should.Resemble, secret)
+			a.So(got.LbsLnsSecret, should.Resemble, secret)
 			a.So(got.ClaimAuthenticationCode, should.NotBeNil)
 			a.So(got.ClaimAuthenticationCode.Secret, should.NotBeNil)
 			a.So(got.ClaimAuthenticationCode.Secret.Value, should.Resemble, gtwClaimAuthCode.Secret.Value)
-			a.So(got.TargetCUPSKey.Value, should.Resemble, secret.Value)
-			a.So(got.TargetCUPSURI, should.Equal, targetCUPSURI)
+			a.So(got.TargetCupsKey.Value, should.Resemble, secret.Value)
+			a.So(got.TargetCupsUri, should.Equal, targetCUPSURI)
 		}
 
 		// Check that `claim_authentication_code` can only be updated/retrieved as a whole.
@@ -560,12 +560,12 @@ func TestGatewaysSecrets(t *testing.T) {
 		updated, err := reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: created.GatewayIdentifiers,
-				LBSLNSSecret: &ttnpb.Secret{
+				LbsLnsSecret: &ttnpb.Secret{
 					Value: updatedSecretValue,
 				},
 				ClaimAuthenticationCode: &otherGtwClaimAuthCode,
-				TargetCUPSURI:           otherTargetCUPSURI,
-				TargetCUPSKey: &ttnpb.Secret{
+				TargetCupsUri:           otherTargetCUPSURI,
+				TargetCupsKey: &ttnpb.Secret{
 					Value: updatedSecretValue,
 				},
 			},
@@ -574,12 +574,12 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		a.So(updated, should.NotBeNil)
-		a.So(updated.LBSLNSSecret, should.NotBeNil)
-		a.So(updated.LBSLNSSecret.Value, should.Resemble, updatedSecretValue)
+		a.So(updated.LbsLnsSecret, should.NotBeNil)
+		a.So(updated.LbsLnsSecret.Value, should.Resemble, updatedSecretValue)
 		a.So(updated.ClaimAuthenticationCode, should.NotBeNil)
 		a.So(updated.ClaimAuthenticationCode.Secret.Value, should.Resemble, otherGtwClaimAuthCode.Secret.Value)
-		a.So(updated.TargetCUPSKey, should.NotBeNil)
-		a.So(updated.TargetCUPSKey.Value, should.Resemble, updatedSecretValue)
+		a.So(updated.TargetCupsKey, should.NotBeNil)
+		a.So(updated.TargetCupsKey.Value, should.Resemble, updatedSecretValue)
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
@@ -592,16 +592,16 @@ func TestGatewaysSecrets(t *testing.T) {
 			if a.So(got.Eui, should.NotBeNil) {
 				a.So(*got.Eui, should.Equal, eui)
 			}
-			if a.So(got.LBSLNSSecret, should.NotBeNil) {
-				a.So(got.LBSLNSSecret.Value, should.Resemble, []byte("my new secret value"))
+			if a.So(got.LbsLnsSecret, should.NotBeNil) {
+				a.So(got.LbsLnsSecret.Value, should.Resemble, []byte("my new secret value"))
 			}
 			if a.So(got.ClaimAuthenticationCode, should.NotBeNil) && a.So(got.ClaimAuthenticationCode.Secret, should.NotBeNil) {
 				a.So(got.ClaimAuthenticationCode.Secret.Value, should.Resemble, otherGtwClaimAuthCode.Secret.Value)
 			}
-			if a.So(got.TargetCUPSKey, should.NotBeNil) {
-				a.So(got.TargetCUPSKey.Value, should.Resemble, []byte("my new secret value"))
+			if a.So(got.TargetCupsKey, should.NotBeNil) {
+				a.So(got.TargetCupsKey.Value, should.Resemble, []byte("my new secret value"))
 			}
-			a.So(got.TargetCUPSURI, should.Equal, otherTargetCUPSURI)
+			a.So(got.TargetCupsUri, should.Equal, otherTargetCUPSURI)
 
 		}
 
@@ -616,10 +616,10 @@ func TestGatewaysSecrets(t *testing.T) {
 				for _, item := range list.Gateways {
 					if item.GatewayId == created.GatewayId {
 						found = true
-						a.So(item.LBSLNSSecret, should.Resemble, got.LBSLNSSecret)
+						a.So(item.LbsLnsSecret, should.Resemble, got.LbsLnsSecret)
 						a.So(item.ClaimAuthenticationCode, should.Resemble, got.ClaimAuthenticationCode)
-						a.So(item.TargetCUPSKey, should.Resemble, got.TargetCUPSKey)
-						a.So(item.TargetCUPSURI, should.Equal, got.TargetCUPSURI)
+						a.So(item.TargetCupsKey, should.Resemble, got.TargetCupsKey)
+						a.So(item.TargetCupsUri, should.Equal, got.TargetCupsUri)
 					}
 				}
 				a.So(found, should.BeTrue)

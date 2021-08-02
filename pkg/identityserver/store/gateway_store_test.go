@@ -90,10 +90,10 @@ func TestGatewayStore(t *testing.T) {
 			},
 			ScheduleAnytimeDelay:          &scheduleAnytimeDelay,
 			UpdateLocationFromStatus:      true,
-			LBSLNSSecret:                  secret,
+			LbsLnsSecret:                  secret,
 			ClaimAuthenticationCode:       &gtwClaimAuthCode,
-			TargetCUPSURI:                 targetCUPSURI,
-			TargetCUPSKey:                 secret,
+			TargetCupsUri:                 targetCUPSURI,
+			TargetCupsKey:                 secret,
 			DisablePacketBrokerForwarding: true,
 		})
 
@@ -111,13 +111,13 @@ func TestGatewayStore(t *testing.T) {
 			a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 			a.So(*created.ScheduleAnytimeDelay, should.Equal, time.Second)
 			a.So(created.UpdateLocationFromStatus, should.BeTrue)
-			a.So(created.LBSLNSSecret, should.NotBeNil)
-			a.So(created.LBSLNSSecret, should.Resemble, secret)
+			a.So(created.LbsLnsSecret, should.NotBeNil)
+			a.So(created.LbsLnsSecret, should.Resemble, secret)
 			a.So(created.ClaimAuthenticationCode, should.NotBeNil)
 			a.So(created.ClaimAuthenticationCode.Secret, should.Resemble, gtwClaimAuthCode.Secret)
-			a.So(created.TargetCUPSURI, should.Equal, targetCUPSURI)
-			a.So(created.TargetCUPSKey, should.NotBeNil)
-			a.So(created.TargetCUPSKey, should.Resemble, secret)
+			a.So(created.TargetCupsUri, should.Equal, targetCUPSURI)
+			a.So(created.TargetCupsKey, should.NotBeNil)
+			a.So(created.TargetCupsKey, should.Resemble, secret)
 			a.So(created.DisablePacketBrokerForwarding, should.BeTrue)
 		}
 
@@ -131,10 +131,10 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.Attributes, should.HaveLength, 3)
 			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
-			a.So(got.LBSLNSSecret, should.Resemble, created.LBSLNSSecret)
+			a.So(got.LbsLnsSecret, should.Resemble, created.LbsLnsSecret)
 			a.So(got.ClaimAuthenticationCode.Secret, should.Resemble, created.ClaimAuthenticationCode.Secret)
-			a.So(got.TargetCUPSURI, should.Equal, created.TargetCUPSURI)
-			a.So(got.TargetCUPSKey, should.Resemble, created.TargetCUPSKey)
+			a.So(got.TargetCupsUri, should.Equal, created.TargetCupsUri)
+			a.So(got.TargetCupsKey, should.Resemble, created.TargetCupsKey)
 			a.So(got.DisablePacketBrokerForwarding, should.BeTrue)
 		}
 
@@ -143,9 +143,9 @@ func TestGatewayStore(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(byEUI, should.NotBeNil) {
 			a.So(byEUI.GatewayId, should.Equal, got.GatewayId)
-			a.So(byEUI.LBSLNSSecret, should.BeNil)
+			a.So(byEUI.LbsLnsSecret, should.BeNil)
 			a.So(byEUI.ClaimAuthenticationCode, should.BeNil)
-			a.So(byEUI.TargetCUPSKey, should.BeNil)
+			a.So(byEUI.TargetCupsKey, should.BeNil)
 		}
 
 		_, err = store.UpdateGateway(ctx, &ttnpb.Gateway{
@@ -181,10 +181,10 @@ func TestGatewayStore(t *testing.T) {
 			},
 			ScheduleAnytimeDelay:          nil,
 			UpdateLocationFromStatus:      false,
-			LBSLNSSecret:                  otherSecret,
+			LbsLnsSecret:                  otherSecret,
 			ClaimAuthenticationCode:       &otherGtwClaimAuthCode,
-			TargetCUPSURI:                 otherTargetCUPSURI,
-			TargetCUPSKey:                 otherSecret,
+			TargetCupsUri:                 otherTargetCUPSURI,
+			TargetCupsKey:                 otherSecret,
 			DisablePacketBrokerForwarding: false,
 		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "antennas", "schedule_anytime_delay", "update_location_from_status", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key", "disable_packet_broker_forwarding"}})
 
@@ -204,10 +204,10 @@ func TestGatewayStore(t *testing.T) {
 			a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 			a.So(*updated.ScheduleAnytimeDelay, should.Equal, time.Duration(0))
 			a.So(updated.UpdateLocationFromStatus, should.BeFalse)
-			a.So(updated.LBSLNSSecret, should.Resemble, otherSecret)
+			a.So(updated.LbsLnsSecret, should.Resemble, otherSecret)
 			a.So(updated.ClaimAuthenticationCode.Secret, should.Resemble, otherGtwClaimAuthCode.Secret)
-			a.So(updated.TargetCUPSKey, should.Resemble, otherSecret)
-			a.So(updated.TargetCUPSURI, should.Resemble, otherTargetCUPSURI)
+			a.So(updated.TargetCupsKey, should.Resemble, otherSecret)
+			a.So(updated.TargetCupsUri, should.Resemble, otherTargetCUPSURI)
 			a.So(updated.DisablePacketBrokerForwarding, should.BeFalse)
 		}
 
@@ -222,9 +222,9 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.Antennas, should.HaveLength, len(updated.Antennas))
 			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
-			a.So(got.LBSLNSSecret, should.Resemble, otherSecret)
+			a.So(got.LbsLnsSecret, should.Resemble, otherSecret)
 			a.So(got.ClaimAuthenticationCode.Secret, should.Resemble, otherGtwClaimAuthCode.Secret)
-			a.So(got.TargetCUPSKey, should.Resemble, otherSecret)
+			a.So(got.TargetCupsKey, should.Resemble, otherSecret)
 		}
 
 		list, err := store.FindGateways(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})

@@ -117,11 +117,11 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	_, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
 		Gateway: ttnpb.Gateway{
 			GatewayIdentifiers: ids,
-			LBSLNSSecret: &ttnpb.Secret{
+			LbsLnsSecret: &ttnpb.Secret{
 				Value: []byte(lnsKey.Key),
 			},
-			TargetCUPSURI: req.CUPSURI,
-			TargetCUPSKey: &ttnpb.Secret{
+			TargetCupsUri: req.CUPSURI,
+			TargetCupsKey: &ttnpb.Secret{
 				Value: []byte(cupsKey.Key),
 			},
 		},
@@ -188,7 +188,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 			// Use the generated CUPS API Key for authenticating subsequent calls.
 			md := metadata.New(map[string]string{
 				"id":            ids.GatewayId,
-				"authorization": fmt.Sprintf("Bearer %s", string(gtw.TargetCUPSKey.Value)),
+				"authorization": fmt.Sprintf("Bearer %s", string(gtw.TargetCupsKey.Value)),
 			})
 			if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
 				md = metadata.Join(ctxMd, md)
@@ -248,32 +248,32 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	}
 
 	res := UpdateInfoResponse{}
-	if s.allowCUPSURIUpdate && gtw.TargetCUPSURI != "" && gtw.TargetCUPSURI != req.CUPSURI {
-		if gtw.TargetCUPSKey == nil || gtw.TargetCUPSKey.Value == nil {
+	if s.allowCUPSURIUpdate && gtw.TargetCupsUri != "" && gtw.TargetCupsUri != req.CUPSURI {
+		if gtw.TargetCupsKey == nil || gtw.TargetCupsKey.Value == nil {
 			return errTargetCUPSCredentials.New()
 		}
-		logger := logger.WithField("cups_uri", gtw.TargetCUPSURI)
+		logger := logger.WithField("cups_uri", gtw.TargetCupsUri)
 		logger.Debug("Configure CUPS")
-		res.CUPSURI = gtw.TargetCUPSURI
+		res.CUPSURI = gtw.TargetCupsUri
 
-		cupsTrust, err := s.getTrust(gtw.TargetCUPSURI)
+		cupsTrust, err := s.getTrust(gtw.TargetCupsUri)
 		if err != nil {
-			return errServerTrust.WithCause(err).WithAttributes("address", gtw.TargetCUPSURI)
+			return errServerTrust.WithCause(err).WithAttributes("address", gtw.TargetCupsUri)
 		}
-		cupsCredentials, err := TokenCredentials(cupsTrust, string(gtw.TargetCUPSKey.Value))
+		cupsCredentials, err := TokenCredentials(cupsTrust, string(gtw.TargetCupsKey.Value))
 		if err != nil {
 			return err
 		}
 		if crc32.ChecksumIEEE(cupsCredentials) != req.CUPSCredentialsCRC {
 			res.CUPSCredentials = cupsCredentials
 		}
-	} else if gtw.TargetCUPSKey != nil && gtw.TargetCUPSKey.Value != nil {
+	} else if gtw.TargetCupsKey != nil && gtw.TargetCupsKey.Value != nil {
 		// Check if CUPS Key needs to be rotated.
 		cupsTrust, err := s.getTrust(req.CUPSURI)
 		if err != nil {
 			return errServerTrust.WithCause(err).WithAttributes("address", req.CUPSURI)
 		}
-		cupsCredentials, err := TokenCredentials(cupsTrust, string(gtw.TargetCUPSKey.Value))
+		cupsCredentials, err := TokenCredentials(cupsTrust, string(gtw.TargetCupsKey.Value))
 		if err != nil {
 			return err
 		}
@@ -284,7 +284,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	} else {
 		logger := logger.WithField("lns_uri", gtw.GatewayServerAddress)
 		logger.Debug("Configure LNS")
-		if gtw.LBSLNSSecret == nil {
+		if gtw.LbsLnsSecret == nil {
 			return errLNSCredentials.WithAttributes("gateway_uid", gtw.GatewayId)
 		}
 		if gtw.GatewayServerAddress == "" {
@@ -308,7 +308,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		if err != nil {
 			return errServerTrust.WithCause(err).WithAttributes("address", gtw.GatewayServerAddress)
 		}
-		lnsCredentials, err := TokenCredentials(lnsTrust, string(gtw.LBSLNSSecret.Value))
+		lnsCredentials, err := TokenCredentials(lnsTrust, string(gtw.LbsLnsSecret.Value))
 		if err != nil {
 			return err
 		}

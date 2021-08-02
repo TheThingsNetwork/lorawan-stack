@@ -98,9 +98,9 @@ A PEM encoded CUPS trust may be included in the claim request.
 				TargetFrequencyPlanId:      targetFrequencyPlanId,
 			}
 			if targetCUPSURI != "" {
-				req.CUPSRedirection = &ttnpb.CUPSRedirection{
+				req.CupsRedirection = &ttnpb.CUPSRedirection{
 					TargetCupsTrust: targetCUPSTrust,
-					TargetCUPSURI:   targetCUPSURI,
+					TargetCupsUri:   targetCUPSURI,
 				}
 			}
 			ids, err := ttnpb.NewGatewayClaimingServerClient(dcs).Claim(ctx, req)
