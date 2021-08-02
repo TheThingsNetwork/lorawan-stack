@@ -64,7 +64,7 @@ func makeProtoc(image string) (func(...string) error, *protocContext, error) {
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/v3/sdk/js", filepath.Join(wd, "sdk", "js"), mountWD),
 			"-w", mountWD,
 			image,
-			fmt.Sprintf("-I%s/api/third_party", wd),
+			fmt.Sprintf("-I%s/api/third_party", mountWD),
 			fmt.Sprintf("-I%s", filepath.Dir(wd)),
 		), &protocContext{
 			WorkingDirectory: mountWD,
