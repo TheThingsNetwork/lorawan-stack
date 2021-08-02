@@ -233,7 +233,7 @@ func TestJoinRequest(t *testing.T) {
 						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:               89,
 						ChannelRssi:        89,
-						SNR:                9.25,
+						Snr:                9.25,
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -346,7 +346,7 @@ func TestUplinkDataFrame(t *testing.T) {
 						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:               89,
 						ChannelRssi:        89,
-						SNR:                9.25,
+						Snr:                9.25,
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -410,7 +410,7 @@ func TestUplinkDataFrame(t *testing.T) {
 						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:               89,
 						ChannelRssi:        89,
-						SNR:                9.25,
+						Snr:                9.25,
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -498,7 +498,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
 						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:               89,
-						SNR:                9.25,
+						Snr:                9.25,
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -592,7 +592,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
 						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:               89,
-						SNR:                9.25,
+						Snr:                9.25,
 					},
 				},
 				Settings: ttnpb.TxSettings{

@@ -156,10 +156,10 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 				return fmt.Errorf("'snr' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SNR = src.SNR
+				dst.Snr = src.Snr
 			} else {
 				var zero float32
-				dst.SNR = zero
+				dst.Snr = zero
 			}
 		case "frequency_offset":
 			if len(subs) > 0 {

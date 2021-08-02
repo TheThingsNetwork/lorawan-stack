@@ -49,9 +49,9 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 	if r.Intn(2) == 0 {
 		this.RssiStandardDeviation *= -1
 	}
-	this.SNR = float32(r.Float32())
+	this.Snr = float32(r.Float32())
 	if r.Intn(2) == 0 {
-		this.SNR *= -1
+		this.Snr *= -1
 	}
 	this.FrequencyOffset = r.Int63()
 	if r.Intn(2) == 0 {

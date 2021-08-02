@@ -137,7 +137,7 @@ func TestForwarder(t *testing.T) {
 								},
 								ChannelRssi: -42,
 								Rssi:        -42,
-								SNR:         10.5,
+								Snr:         10.5,
 								Location: &ttnpb.Location{
 									Latitude:  52.5,
 									Longitude: 4.8,
@@ -262,7 +262,7 @@ func TestForwarder(t *testing.T) {
 								},
 								ChannelRssi: 4.2,
 								Rssi:        4.2,
-								SNR:         -5.5,
+								Snr:         -5.5,
 								UplinkToken: []byte("test-token"),
 								Timestamp:   123456,
 							},
@@ -666,7 +666,7 @@ func TestHomeNetwork(t *testing.T) {
 							},
 							ChannelRssi: -42,
 							Rssi:        -42,
-							SNR:         10.5,
+							Snr:         10.5,
 							Location: &ttnpb.Location{
 								Latitude:  52.5,
 								Longitude: 4.8,
@@ -782,7 +782,7 @@ func TestHomeNetwork(t *testing.T) {
 							},
 							ChannelRssi: 4.2,
 							Rssi:        4.2,
-							SNR:         -5.5,
+							Snr:         -5.5,
 							UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &AgentUplinkToken{
 								ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
 								ForwarderTenantID:  "foo-tenant",

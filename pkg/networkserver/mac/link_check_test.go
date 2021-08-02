@@ -117,7 +117,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 							GatewayId: "test",
 						},
-						SNR: 25,
+						Snr: 25,
 					},
 				},
 			},
@@ -169,7 +169,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 							GatewayId: "test",
 						},
-						SNR: 25,
+						Snr: 25,
 					},
 				},
 			},
@@ -221,19 +221,19 @@ func TestHandleLinkCheckReq(t *testing.T) {
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 							GatewayId: "test",
 						},
-						SNR: 24,
+						Snr: 24,
 					},
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 							GatewayId: "test2",
 						},
-						SNR: 25,
+						Snr: 25,
 					},
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 							GatewayId: "test3",
 						},
-						SNR: 2,
+						Snr: 2,
 					},
 				},
 			},
@@ -285,13 +285,13 @@ func TestHandleLinkCheckReq(t *testing.T) {
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 							GatewayId: "test",
 						},
-						SNR: 24,
+						Snr: 24,
 					},
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 							GatewayId: "test2",
 						},
-						SNR: 25,
+						Snr: 25,
 					},
 					{
 						GatewayIdentifiers: cluster.PacketBrokerGatewayID,
@@ -300,13 +300,13 @@ func TestHandleLinkCheckReq(t *testing.T) {
 							ForwarderTenantId:  "test",
 							ForwarderClusterId: "test",
 						},
-						SNR: 26,
+						Snr: 26,
 					},
 					{
 						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 							GatewayId: "test3",
 						},
-						SNR: 2,
+						Snr: 2,
 					},
 				},
 			},

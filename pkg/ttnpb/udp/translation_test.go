@@ -373,7 +373,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 						SignalRssi:                  &pbtypes.FloatValue{Value: -92},
 						ChannelRssi:                 -95,
 						RssiStandardDeviation:       0,
-						SNR:                         14.0,
+						Snr:                         14.0,
 						FrequencyOffset:             -8898,
 					},
 					{
@@ -391,7 +391,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 						SignalRssi:                  &pbtypes.FloatValue{Value: -88},
 						ChannelRssi:                 -93,
 						RssiStandardDeviation:       0,
-						SNR:                         14.0,
+						Snr:                         14.0,
 						FrequencyOffset:             -8898,
 					},
 				},

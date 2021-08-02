@@ -139,7 +139,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 			GatewayIdentifiers: ids,
 			ChannelRssi:        -2,
 			Rssi:               -2,
-			SNR:                -75,
+			Snr:                -75,
 			Time:               &nilTime,
 			Timestamp:          1000,
 		},

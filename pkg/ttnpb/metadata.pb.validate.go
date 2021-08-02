@@ -115,7 +115,7 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 		case "rssi_standard_deviation":
 			// no validation rules for RssiStandardDeviation
 		case "snr":
-			// no validation rules for SNR
+			// no validation rules for Snr
 		case "frequency_offset":
 			// no validation rules for FrequencyOffset
 		case "location":

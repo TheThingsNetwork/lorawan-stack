@@ -808,7 +808,7 @@ func TestTraffic(t *testing.T) {
 					Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 					Rssi:        89,
 					ChannelRssi: 89,
-					SNR:         9.25,
+					Snr:         9.25,
 				}},
 				Settings: ttnpb.TxSettings{
 					Frequency:  868300000,
@@ -872,7 +872,7 @@ func TestTraffic(t *testing.T) {
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,
 						ChannelRssi: 89,
-						SNR:         9.25,
+						Snr:         9.25,
 					},
 				},
 				Settings: ttnpb.TxSettings{

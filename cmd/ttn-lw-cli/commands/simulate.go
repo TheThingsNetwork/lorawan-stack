@@ -216,7 +216,7 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 				Timestamp:          uplinkParams.Timestamp,
 				Rssi:               uplinkParams.RSSI,
 				ChannelRssi:        uplinkParams.RSSI,
-				SNR:                uplinkParams.SNR,
+				Snr:                uplinkParams.SNR,
 			},
 		},
 	}

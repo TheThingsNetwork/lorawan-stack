@@ -178,7 +178,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 				FrequencyOffset:       antenna.FrequencyOffset,
 				Rssi:                  rssi,
 				RssiStandardDeviation: antenna.RssiStandardDeviation,
-				SNR:                   antenna.Snr,
+				Snr:                   antenna.Snr,
 				Time:                  &mdTime,
 				Timestamp:             gwMetadata.Timestamp,
 			})
@@ -189,7 +189,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 			AntennaIndex:       0,
 			ChannelRssi:        gwMetadata.Rssi,
 			Rssi:               gwMetadata.Rssi,
-			SNR:                gwMetadata.Snr,
+			Snr:                gwMetadata.Snr,
 			Time:               &mdTime,
 			Timestamp:          gwMetadata.Timestamp,
 		})

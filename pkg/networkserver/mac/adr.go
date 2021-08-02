@@ -116,10 +116,10 @@ func maxSNRFromMetadata(mds ...*ttnpb.RxMetadata) (float32, bool) {
 	if len(mds) == 0 {
 		return 0, false
 	}
-	maxSNR := mds[0].SNR
+	maxSNR := mds[0].Snr
 	for _, md := range mds[1:] {
-		if md.SNR > maxSNR {
-			maxSNR = md.SNR
+		if md.Snr > maxSNR {
+			maxSNR = md.Snr
 		}
 	}
 	return maxSNR, true

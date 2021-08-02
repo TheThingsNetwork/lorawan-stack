@@ -35,10 +35,10 @@ func NewADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, confirmed bool, tx
 	mds := make([]*ttnpb.RxMetadata, 0, gtwCount)
 	for i := uint(0); i < gtwCount; i++ {
 		mds = append(mds, &ttnpb.RxMetadata{
-			SNR: float32(-rand.Int31n(math.MaxInt32+int32(maxSNR)-1)) - rand.Float32() + maxSNR,
+			Snr: float32(-rand.Int31n(math.MaxInt32+int32(maxSNR)-1)) - rand.Float32() + maxSNR,
 		})
 	}
-	mds[rand.Intn(len(mds))].SNR = maxSNR
+	mds[rand.Intn(len(mds))].Snr = maxSNR
 
 	mType := ttnpb.MType_UNCONFIRMED_UP
 	if confirmed {

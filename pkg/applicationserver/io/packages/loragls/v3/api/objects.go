@@ -108,7 +108,7 @@ func parseRxMetadata(ctx context.Context, m *ttnpb.RxMetadata) (Gateway, Uplink)
 			AntennaID: &m.AntennaIndex,
 			TDOA:      tdoa,
 			RSSI:      float64(m.Rssi),
-			SNR:       float64(m.SNR),
+			SNR:       float64(m.Snr),
 		}
 }
 

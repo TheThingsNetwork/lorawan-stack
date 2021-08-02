@@ -60,7 +60,7 @@ message RxMetadata {
   // Standard deviation of the RSSI during preamble.
   float rssi_standard_deviation = 10;
   // Signal-to-noise ratio (dB).
-  float snr = 11 [(gogoproto.customname) = "SNR"];
+  float snr = 11;
   // Frequency offset (Hz).
   int64 frequency_offset = 12;
   // Antenna location; injected by the Gateway Server.
