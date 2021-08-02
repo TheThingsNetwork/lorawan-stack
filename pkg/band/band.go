@@ -325,6 +325,18 @@ func (b Band) FindUplinkDataRate(dr ttnpb.DataRate) (ttnpb.DataRateIndex, DataRa
 	return 0, DataRate{}, false
 }
 
+// FindDownlinkDataRate returns the downlink data rate with index by API data rate, if any.
+func (b Band) FindDownlinkDataRate(dr ttnpb.DataRate) (ttnpb.DataRateIndex, DataRate, bool) {
+	// NOTE: See notes in FindUplinkDataRate explaining the order of scanning data rates.
+	for i := ttnpb.DataRateIndex(len(b.DataRates) - 1); int(i) >= 0; i-- {
+		bDR, ok := b.DataRates[i]
+		if ok && bDR.Rate.Equal(dr) {
+			return i, bDR, true
+		}
+	}
+	return 0, DataRate{}, false
+}
+
 func makeBeaconFrequencyFunc(frequencies [8]uint64) func(float64) uint64 {
 	return func(beaconTime float64) uint64 {
 		floor := math.Floor(beaconTime / float64(128))
