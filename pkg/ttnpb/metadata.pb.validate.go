@@ -97,10 +97,10 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 		case "encrypted_fine_timestamp_key_id":
 			// no validation rules for EncryptedFineTimestampKeyId
 		case "rssi":
-			// no validation rules for RSSI
+			// no validation rules for Rssi
 		case "signal_rssi":
 
-			if v, ok := interface{}(m.GetSignalRSSI()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetSignalRssi()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return RxMetadataValidationError{
 						field:  "signal_rssi",
@@ -111,9 +111,9 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 			}
 
 		case "channel_rssi":
-			// no validation rules for ChannelRSSI
+			// no validation rules for ChannelRssi
 		case "rssi_standard_deviation":
-			// no validation rules for RSSIStandardDeviation
+			// no validation rules for RssiStandardDeviation
 		case "snr":
 			// no validation rules for SNR
 		case "frequency_offset":

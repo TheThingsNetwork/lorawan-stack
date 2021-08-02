@@ -267,20 +267,20 @@ func (dst *ConcentratorConfig_LBTConfiguration) SetFields(src *ConcentratorConfi
 				return fmt.Errorf("'rssi_target' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RSSITarget = src.RSSITarget
+				dst.RssiTarget = src.RssiTarget
 			} else {
 				var zero float32
-				dst.RSSITarget = zero
+				dst.RssiTarget = zero
 			}
 		case "rssi_offset":
 			if len(subs) > 0 {
 				return fmt.Errorf("'rssi_offset' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RSSIOffset = src.RSSIOffset
+				dst.RssiOffset = src.RssiOffset
 			} else {
 				var zero float32
-				dst.RSSIOffset = zero
+				dst.RssiOffset = zero
 			}
 		case "scan_time":
 			if len(subs) > 0 {

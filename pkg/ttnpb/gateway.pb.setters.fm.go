@@ -188,10 +188,10 @@ func (dst *GatewayRadio) SetFields(src *GatewayRadio, paths ...string) error {
 				return fmt.Errorf("'rssi_offset' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RSSIOffset = src.RSSIOffset
+				dst.RssiOffset = src.RssiOffset
 			} else {
 				var zero float32
-				dst.RSSIOffset = zero
+				dst.RssiOffset = zero
 			}
 		case "tx_configuration":
 			if len(subs) > 0 {

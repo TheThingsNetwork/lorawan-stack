@@ -123,8 +123,8 @@ func metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetada
 			AntennaIndex:       0,
 			ChannelIndex:       uint32(rx.Chan),
 			Timestamp:          rx.Tmst,
-			RSSI:               float32(rx.RSSI),
-			ChannelRSSI:        float32(rx.RSSI),
+			Rssi:               float32(rx.RSSI),
+			ChannelRssi:        float32(rx.RSSI),
 			SNR:                float32(rx.LSNR),
 			HoppingWidth:       rx.Hpw,
 		},
@@ -139,20 +139,20 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 			AntennaIndex:       uint32(signal.Ant),
 			ChannelIndex:       uint32(signal.Chan),
 			Timestamp:          rx.Tmst,
-			RSSI:               float32(signal.RSSIC),
-			ChannelRSSI:        float32(signal.RSSIC),
+			Rssi:               float32(signal.RSSIC),
+			ChannelRssi:        float32(signal.RSSIC),
 			SNR:                float32(signal.LSNR),
 			FrequencyOffset:    int64(signal.FOff),
 			HoppingWidth:       rx.Hpw,
 			FrequencyDrift:     signal.Fdri,
 		}
 		if signal.RSSIS != nil {
-			signalMetadata.SignalRSSI = &pbtypes.FloatValue{
+			signalMetadata.SignalRssi = &pbtypes.FloatValue{
 				Value: float32(*signal.RSSIS),
 			}
 		}
 		if signal.RSSISD != nil {
-			signalMetadata.RSSIStandardDeviation = float32(*signal.RSSISD)
+			signalMetadata.RssiStandardDeviation = float32(*signal.RSSISD)
 		}
 		if signal.ETime != "" {
 			if etime, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(signal.ETime, "=")); err == nil {
@@ -300,7 +300,7 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 			Size: uint16(len(msg.RawPayload)),
 			Data: base64.StdEncoding.EncodeToString(msg.RawPayload),
 			Tmst: msg.RxMetadata[0].Timestamp,
-			RSSI: int16(msg.RxMetadata[0].RSSI),
+			RSSI: int16(msg.RxMetadata[0].Rssi),
 			LSNR: float64(msg.RxMetadata[0].SNR),
 		})
 	}

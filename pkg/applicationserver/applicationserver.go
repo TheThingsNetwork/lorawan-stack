@@ -869,7 +869,7 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDevic
 			AntennaIndex:  md.AntennaIndex,
 			FineTimestamp: md.FineTimestamp,
 			Location:      md.Location,
-			RSSI:          md.RSSI,
+			Rssi:          md.Rssi,
 			SNR:           md.SNR,
 		})
 	}

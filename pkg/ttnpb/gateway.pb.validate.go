@@ -413,7 +413,7 @@ func (m *GatewayRadio) ValidateFields(paths ...string) error {
 		case "frequency":
 			// no validation rules for Frequency
 		case "rssi_offset":
-			// no validation rules for RSSIOffset
+			// no validation rules for RssiOffset
 		case "tx_configuration":
 
 			if v, ok := interface{}(m.GetTxConfiguration()).(interface{ ValidateFields(...string) error }); ok {

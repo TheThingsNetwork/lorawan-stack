@@ -68,7 +68,7 @@ message GatewayRadio {
   bool enable = 1;
   string chip_type = 2;
   uint64 frequency = 3;
-  float rssi_offset = 4 [(gogoproto.customname) = "RSSIOffset"];
+  float rssi_offset = 4;
 
   message TxConfiguration {
     uint64 min_frequency = 1;

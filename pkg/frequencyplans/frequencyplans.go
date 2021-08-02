@@ -77,8 +77,8 @@ func (lbt *LBT) ToConcentratorConfig() *ttnpb.ConcentratorConfig_LBTConfiguratio
 		return nil
 	}
 	return &ttnpb.ConcentratorConfig_LBTConfiguration{
-		RSSIOffset: lbt.RSSIOffset,
-		RSSITarget: lbt.RSSITarget,
+		RssiOffset: lbt.RSSIOffset,
+		RssiTarget: lbt.RSSITarget,
 		ScanTime:   lbt.ScanTime,
 	}
 }
@@ -306,7 +306,7 @@ func (r Radio) ToConcentratorConfig() *ttnpb.GatewayRadio {
 		Enable:     r.Enable,
 		Frequency:  r.Frequency,
 		ChipType:   r.ChipType,
-		RSSIOffset: r.RSSIOffset,
+		RssiOffset: r.RSSIOffset,
 	}
 	if tx := r.TxConfiguration; tx != nil {
 		ccr.TxConfiguration = &ttnpb.GatewayRadio_TxConfiguration{

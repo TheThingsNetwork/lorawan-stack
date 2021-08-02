@@ -52,13 +52,13 @@ message RxMetadata {
   string encrypted_fine_timestamp_key_id = 7;
   // Received signal strength indicator (dBm).
   // This value equals `channel_rssi`.
-  float rssi = 8 [(gogoproto.customname) = "RSSI"];
+  float rssi = 8;
   // Received signal strength indicator of the signal (dBm).
-  google.protobuf.FloatValue signal_rssi = 16 [(gogoproto.customname) = "SignalRSSI"];
+  google.protobuf.FloatValue signal_rssi = 16;
   // Received signal strength indicator of the channel (dBm).
-  float channel_rssi = 9 [(gogoproto.customname) = "ChannelRSSI"];
+  float channel_rssi = 9;
   // Standard deviation of the RSSI during preamble.
-  float rssi_standard_deviation = 10 [(gogoproto.customname) = "RSSIStandardDeviation"];
+  float rssi_standard_deviation = 10;
   // Signal-to-noise ratio (dB).
   float snr = 11 [(gogoproto.customname) = "SNR"];
   // Frequency offset (Hz).

@@ -378,7 +378,7 @@ func TestTraffic(t *testing.T) {
 				UplinkMessages: []*ttnpb.UplinkMessage{
 					{
 						RawPayload: []byte{0x06},
-						RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: registeredGatewayID, RSSI: -100}},
+						RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: registeredGatewayID, Rssi: -100}},
 						Settings: ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
@@ -393,7 +393,7 @@ func TestTraffic(t *testing.T) {
 					},
 					{
 						RawPayload: []byte{0x06},
-						RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: registeredGatewayID, RSSI: -10}},
+						RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: registeredGatewayID, Rssi: -10}},
 						Settings: ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
@@ -410,7 +410,7 @@ func TestTraffic(t *testing.T) {
 			}
 			select {
 			case up := <-conn.Up():
-				a.So(up.RxMetadata[0].RSSI, should.Equal, -10)
+				a.So(up.RxMetadata[0].Rssi, should.Equal, -10)
 				a.So(up.RawPayload, should.Resemble, []byte{0x06})
 				a.So(up.Settings.Frequency, should.Equal, 868700000)
 			case <-time.After(timeout):

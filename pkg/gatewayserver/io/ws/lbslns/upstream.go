@@ -171,8 +171,8 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		GatewayIdentifiers: ids,
 		Time:               rxTime,
 		Timestamp:          timestamp,
-		RSSI:               req.RadioMetaData.UpInfo.RSSI,
-		ChannelRSSI:        req.RadioMetaData.UpInfo.RSSI,
+		Rssi:               req.RadioMetaData.UpInfo.RSSI,
+		ChannelRssi:        req.RadioMetaData.UpInfo.RSSI,
 		SNR:                req.RadioMetaData.UpInfo.SNR,
 		AntennaIndex:       uint32(req.RadioMetaData.UpInfo.RCtx),
 	}
@@ -245,7 +245,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 		UpInfo: UpInfo{
 			RCtx:   int64(rxMetadata.AntennaIndex),
 			XTime:  int64(rxMetadata.Timestamp),
-			RSSI:   rxMetadata.RSSI,
+			RSSI:   rxMetadata.Rssi,
 			SNR:    rxMetadata.SNR,
 			RxTime: rxTime,
 		},
@@ -329,8 +329,8 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		GatewayIdentifiers: ids,
 		Time:               rxTime,
 		Timestamp:          timestamp,
-		RSSI:               updf.RadioMetaData.UpInfo.RSSI,
-		ChannelRSSI:        updf.RadioMetaData.UpInfo.RSSI,
+		Rssi:               updf.RadioMetaData.UpInfo.RSSI,
+		ChannelRssi:        updf.RadioMetaData.UpInfo.RSSI,
 		SNR:                updf.RadioMetaData.UpInfo.SNR,
 		AntennaIndex:       uint32(updf.RadioMetaData.UpInfo.RCtx),
 	}
@@ -398,7 +398,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 		UpInfo: UpInfo{
 			RCtx:   int64(rxMetadata.AntennaIndex),
 			XTime:  int64(rxMetadata.Timestamp),
-			RSSI:   rxMetadata.RSSI,
+			RSSI:   rxMetadata.Rssi,
 			SNR:    rxMetadata.SNR,
 			RxTime: rxTime,
 		},

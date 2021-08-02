@@ -106,7 +106,7 @@ var (
 				Longitude: 234.5,
 				Altitude:  345,
 			},
-			RSSI: 567.8,
+			Rssi: 567.8,
 			SNR:  678.9,
 		},
 		{
@@ -119,7 +119,7 @@ var (
 				Altitude:  456,
 			},
 			FineTimestamp: 890,
-			RSSI:          678.9,
+			Rssi:          678.9,
 			SNR:           789.1,
 		},
 	})
@@ -147,7 +147,7 @@ var (
 					Longitude: 234.5,
 					Altitude:  345,
 				},
-				RSSI: 567.8,
+				Rssi: 567.8,
 				SNR:  678.9,
 			},
 			{
@@ -160,7 +160,7 @@ var (
 					Altitude:  456,
 				},
 				FineTimestamp: 890,
-				RSSI:          678.9,
+				Rssi:          678.9,
 				SNR:           789.1,
 			},
 		},
@@ -174,7 +174,7 @@ var (
 					Longitude: 234.5,
 					Altitude:  345,
 				},
-				RSSI: 890.1,
+				Rssi: 890.1,
 				SNR:  910.1,
 			},
 			{
@@ -187,7 +187,7 @@ var (
 					Altitude:  456,
 				},
 				FineTimestamp: 910,
-				RSSI:          789.1,
+				Rssi:          789.1,
 				SNR:           890.1,
 			},
 		},
