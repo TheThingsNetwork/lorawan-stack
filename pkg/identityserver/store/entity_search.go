@@ -33,14 +33,14 @@ type entitySearch struct {
 }
 
 type metaFields interface {
-	GetIDContains() string
+	GetIdContains() string
 	GetNameContains() string
 	GetDescriptionContains() string
 	GetAttributesContain() map[string]string
 }
 
 func (s *entitySearch) queryMetaFields(ctx context.Context, query *gorm.DB, entityType string, req metaFields) *gorm.DB {
-	if v := req.GetIDContains(); v != "" {
+	if v := req.GetIdContains(); v != "" {
 		switch entityType {
 		case "organization", "user":
 			query = query.Where(`"accounts"."uid" LIKE ?`, "%"+v+"%")

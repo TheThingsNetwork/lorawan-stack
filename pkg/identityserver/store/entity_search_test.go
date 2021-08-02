@@ -101,7 +101,7 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("Application", func(t *testing.T) {
 			ids, err := s.FindApplications(ctx, nil, &ttnpb.SearchApplicationsRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -113,7 +113,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindApplications(ctx, nil, &ttnpb.SearchApplicationsRequest{
-				IDContains: "foo",
+				IdContains: "foo",
 			})
 
 			a.So(err, should.BeNil)
@@ -145,7 +145,7 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("Client", func(t *testing.T) {
 			ids, err := s.FindClients(ctx, nil, &ttnpb.SearchClientsRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -157,7 +157,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindClients(ctx, nil, &ttnpb.SearchClientsRequest{
-				IDContains: "foo",
+				IdContains: "foo",
 			})
 
 			a.So(err, should.BeNil)
@@ -189,7 +189,7 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("Gateway", func(t *testing.T) {
 			ids, err := s.FindGateways(ctx, nil, &ttnpb.SearchGatewaysRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -201,7 +201,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindGateways(ctx, nil, &ttnpb.SearchGatewaysRequest{
-				IDContains: "foo",
+				IdContains: "foo",
 			})
 
 			a.So(err, should.BeNil)
@@ -233,7 +233,7 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("Organization", func(t *testing.T) {
 			ids, err := s.FindOrganizations(ctx, nil, &ttnpb.SearchOrganizationsRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -245,7 +245,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindOrganizations(ctx, nil, &ttnpb.SearchOrganizationsRequest{
-				IDContains: "foo",
+				IdContains: "foo",
 			})
 
 			a.So(err, should.BeNil)
@@ -277,7 +277,7 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("User", func(t *testing.T) {
 			ids, err := s.FindUsers(ctx, nil, &ttnpb.SearchUsersRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -289,7 +289,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindUsers(ctx, nil, &ttnpb.SearchUsersRequest{
-				IDContains: "foo",
+				IdContains: "foo",
 			})
 
 			a.So(err, should.BeNil)
@@ -327,7 +327,7 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("deleted application", func(t *testing.T) {
 			ids, err := s.FindApplications(ctx, nil, &ttnpb.SearchApplicationsRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -339,7 +339,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 0)
 
 			ids, err = s.FindApplications(ctx, nil, &ttnpb.SearchApplicationsRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -354,7 +354,7 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("deleted client", func(t *testing.T) {
 			ids, err := s.FindClients(ctx, nil, &ttnpb.SearchClientsRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -366,7 +366,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 0)
 
 			ids, err = s.FindClients(ctx, nil, &ttnpb.SearchClientsRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -381,7 +381,7 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("deleted gateway", func(t *testing.T) {
 			ids, err := s.FindGateways(ctx, nil, &ttnpb.SearchGatewaysRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -393,7 +393,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 0)
 
 			ids, err = s.FindGateways(ctx, nil, &ttnpb.SearchGatewaysRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -408,7 +408,7 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("deleted organization", func(t *testing.T) {
 			ids, err := s.FindOrganizations(ctx, nil, &ttnpb.SearchOrganizationsRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -420,7 +420,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 0)
 
 			ids, err = s.FindOrganizations(ctx, nil, &ttnpb.SearchOrganizationsRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -435,7 +435,7 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("deleted user", func(t *testing.T) {
 			ids, err := s.FindUsers(ctx, nil, &ttnpb.SearchUsersRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -447,7 +447,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 0)
 
 			ids, err = s.FindUsers(ctx, nil, &ttnpb.SearchUsersRequest{
-				IDContains:          "foo",
+				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
 				AttributesContain: map[string]string{
@@ -463,7 +463,7 @@ func TestEntitySearch(t *testing.T) {
 		t.Run("end_device", func(t *testing.T) {
 			ids, err := s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
-				IDContains:             "baz",
+				IdContains:             "baz",
 				NameContains:           "baz",
 				DescriptionContains:    "baz",
 				AttributesContain: map[string]string{
@@ -476,7 +476,7 @@ func TestEntitySearch(t *testing.T) {
 
 			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
-				IDContains:             "baz",
+				IdContains:             "baz",
 			})
 
 			a.So(err, should.BeNil)
