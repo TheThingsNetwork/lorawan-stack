@@ -78,7 +78,6 @@ message Client {
   // If the authorization request does not pass a redirect URI, the first one
   // from this list is taken.
   repeated string redirect_uris = 9 [
-    (gogoproto.customname) = "RedirectURIs",
     (validate.rules).repeated = {
       max_items: 10,
       items: { string: { max_len: 128 } }
@@ -88,7 +87,6 @@ message Client {
   // requests are checked. If the authorization request does not pass a redirect
   // URI, the first one from this list is taken.
   repeated string logout_redirect_uris = 15 [
-    (gogoproto.customname) = "LogoutRedirectURIs",
     (validate.rules).repeated = {
       max_items: 10,
       items: { string: { max_len: 128 } }

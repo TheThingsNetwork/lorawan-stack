@@ -135,37 +135,37 @@ var (
 	DefaultRxMetadata = [...]*ttnpb.RxMetadata{
 		{
 			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},
-			SNR:                    -9,
+			Snr:                    -9,
 			UplinkToken:            []byte("token-gtw-1"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
 		},
 		{
 			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-3"},
-			SNR:                    -5.3,
+			Snr:                    -5.3,
 			UplinkToken:            []byte("token-gtw-3"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
 		{
 			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-5"},
-			SNR:                    12,
+			Snr:                    12,
 			UplinkToken:            []byte("token-gtw-5"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
 		},
 		{
 			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
-			SNR:                    5.2,
+			Snr:                    5.2,
 			UplinkToken:            []byte("token-gtw-0"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
 		},
 		{
 			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-2"},
-			SNR:                    6.3,
+			Snr:                    6.3,
 			UplinkToken:            []byte("token-gtw-2"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
 		{
 			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-4"},
-			SNR:                    -7,
+			Snr:                    -7,
 			UplinkToken:            []byte("token-gtw-4"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},

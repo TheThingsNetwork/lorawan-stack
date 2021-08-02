@@ -114,9 +114,9 @@ func (dst *APIKeys) SetFields(src *APIKeys, paths ...string) error {
 				return fmt.Errorf("'api_keys' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.APIKeys = src.APIKeys
+				dst.ApiKeys = src.ApiKeys
 			} else {
-				dst.APIKeys = nil
+				dst.ApiKeys = nil
 			}
 
 		default:

@@ -200,14 +200,14 @@ func TestServer(t *testing.T) {
 			GatewayServerAddress: lnsURI,
 		}
 		if hasLNSSecret {
-			gtw.LBSLNSSecret = secret
+			gtw.LbsLnsSecret = secret
 		}
 		if redirectCUPS {
-			gtw.TargetCUPSURI = cupsURI
-			gtw.TargetCUPSKey = secret
+			gtw.TargetCupsUri = cupsURI
+			gtw.TargetCupsKey = secret
 		}
 		if updateCUPSCreds {
-			gtw.TargetCUPSKey = secret
+			gtw.TargetCupsKey = secret
 		}
 		return &gtw
 	}
@@ -271,15 +271,15 @@ func TestServer(t *testing.T) {
 						GatewayId: "eui-58a0cbfffe800019",
 						Eui:       &mockGatewayEUI,
 					},
-					LBSLNSSecret: &ttnpb.Secret{
+					LbsLnsSecret: &ttnpb.Secret{
 						KeyId: "some-key-id",
 						Value: []byte("KEYCONTENTS"),
 					},
-					TargetCUPSKey: &ttnpb.Secret{
+					TargetCupsKey: &ttnpb.Secret{
 						KeyId: "test-key",
 						Value: []byte("KEYCONTENTS"),
 					},
-					TargetCUPSURI: cupsURI,
+					TargetCupsUri: cupsURI,
 				}
 				c.res.CreateAPIKey = &ttnpb.APIKey{
 					Id:  "KEYID",

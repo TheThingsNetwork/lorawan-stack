@@ -214,9 +214,9 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 				GatewayIdentifiers: *gtwID,
 				Time:               uplinkParams.Time,
 				Timestamp:          uplinkParams.Timestamp,
-				RSSI:               uplinkParams.RSSI,
-				ChannelRSSI:        uplinkParams.RSSI,
-				SNR:                uplinkParams.SNR,
+				Rssi:               uplinkParams.RSSI,
+				ChannelRssi:        uplinkParams.RSSI,
+				Snr:                uplinkParams.SNR,
 			},
 		},
 	}

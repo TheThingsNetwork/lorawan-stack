@@ -137,12 +137,12 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	lbsLNSSecretField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		blocks := bytes.SplitN(gtw.LBSLNSSecret, secretFieldSeparator, 2)
 		if len(blocks) == 2 {
-			pb.LBSLNSSecret = &ttnpb.Secret{
+			pb.LbsLnsSecret = &ttnpb.Secret{
 				KeyId: string(blocks[0]),
 				Value: blocks[1],
 			}
 		} else {
-			pb.LBSLNSSecret = nil
+			pb.LbsLnsSecret = nil
 		}
 	},
 	claimAuthenticationCodeField: func(pb *ttnpb.Gateway, gtw *Gateway) {
@@ -160,16 +160,16 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 			ValidTo:   gtw.ClaimAuthenticationCodeValidTo,
 		}
 	},
-	targetCUPSURIField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.TargetCUPSURI = gtw.TargetCUPSURI },
+	targetCUPSURIField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.TargetCupsUri = gtw.TargetCUPSURI },
 	targetCUPSKeyField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		blocks := bytes.SplitN(gtw.TargetCUPSKey, secretFieldSeparator, 2)
 		if len(blocks) == 2 {
-			pb.TargetCUPSKey = &ttnpb.Secret{
+			pb.TargetCupsKey = &ttnpb.Secret{
 				KeyId: string(blocks[0]),
 				Value: blocks[1],
 			}
 		} else {
-			pb.TargetCUPSKey = nil
+			pb.TargetCupsKey = nil
 		}
 	},
 	requireAuthenticatedConnectionField: func(pb *ttnpb.Gateway, gtw *Gateway) {
@@ -234,11 +234,11 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 		}
 	},
 	lbsLNSSecretField: func(gtw *Gateway, pb *ttnpb.Gateway) {
-		if pb.LBSLNSSecret != nil {
+		if pb.LbsLnsSecret != nil {
 			var secretBuffer bytes.Buffer
-			secretBuffer.WriteString(pb.LBSLNSSecret.KeyId)
+			secretBuffer.WriteString(pb.LbsLnsSecret.KeyId)
 			secretBuffer.Write(secretFieldSeparator)
-			secretBuffer.Write(pb.LBSLNSSecret.Value)
+			secretBuffer.Write(pb.LbsLnsSecret.Value)
 			gtw.LBSLNSSecret = secretBuffer.Bytes()
 		} else {
 			gtw.LBSLNSSecret = nil
@@ -262,13 +262,13 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 			}
 		}
 	},
-	targetCUPSURIField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.TargetCUPSURI = pb.TargetCUPSURI },
+	targetCUPSURIField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.TargetCUPSURI = pb.TargetCupsUri },
 	targetCUPSKeyField: func(gtw *Gateway, pb *ttnpb.Gateway) {
-		if pb.TargetCUPSKey != nil {
+		if pb.TargetCupsKey != nil {
 			var secretBuffer bytes.Buffer
-			secretBuffer.WriteString(pb.TargetCUPSKey.KeyId)
+			secretBuffer.WriteString(pb.TargetCupsKey.KeyId)
 			secretBuffer.Write(secretFieldSeparator)
-			secretBuffer.Write(pb.TargetCUPSKey.Value)
+			secretBuffer.Write(pb.TargetCupsKey.Value)
 			gtw.TargetCUPSKey = secretBuffer.Bytes()
 		} else {
 			gtw.TargetCUPSKey = nil

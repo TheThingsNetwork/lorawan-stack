@@ -589,34 +589,34 @@ func (dst *ApplicationActivationSettings) SetFields(src *ApplicationActivationSe
 				return fmt.Errorf("'kek_label' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.KEKLabel = src.KEKLabel
+				dst.KekLabel = src.KekLabel
 			} else {
 				var zero string
-				dst.KEKLabel = zero
+				dst.KekLabel = zero
 			}
 		case "kek":
 			if len(subs) > 0 {
 				var newDst, newSrc *KeyEnvelope
-				if (src == nil || src.KEK == nil) && dst.KEK == nil {
+				if (src == nil || src.Kek == nil) && dst.Kek == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.KEK
+					newSrc = src.Kek
 				}
-				if dst.KEK != nil {
-					newDst = dst.KEK
+				if dst.Kek != nil {
+					newDst = dst.Kek
 				} else {
 					newDst = &KeyEnvelope{}
-					dst.KEK = newDst
+					dst.Kek = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.KEK = src.KEK
+					dst.Kek = src.Kek
 				} else {
-					dst.KEK = nil
+					dst.Kek = nil
 				}
 			}
 		case "home_net_id":

@@ -59,11 +59,11 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "api_key":
-					_, srcOk := src.AccessMethod.(*AuthInfoResponse_APIKey)
+					_, srcOk := src.AccessMethod.(*AuthInfoResponse_ApiKey)
 					if !srcOk && src.AccessMethod != nil {
 						return fmt.Errorf("attempt to set oneof 'api_key', while different oneof is set in source")
 					}
-					_, dstOk := dst.AccessMethod.(*AuthInfoResponse_APIKey)
+					_, dstOk := dst.AccessMethod.(*AuthInfoResponse_ApiKey)
 					if !dstOk && dst.AccessMethod != nil {
 						return fmt.Errorf("attempt to set oneof 'api_key', while different oneof is set in destination")
 					}
@@ -73,13 +73,13 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 							continue
 						}
 						if srcOk {
-							newSrc = src.AccessMethod.(*AuthInfoResponse_APIKey).APIKey
+							newSrc = src.AccessMethod.(*AuthInfoResponse_ApiKey).ApiKey
 						}
 						if dstOk {
-							newDst = dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey
+							newDst = dst.AccessMethod.(*AuthInfoResponse_ApiKey).ApiKey
 						} else {
 							newDst = &AuthInfoResponse_APIKeyAccess{}
-							dst.AccessMethod = &AuthInfoResponse_APIKey{APIKey: newDst}
+							dst.AccessMethod = &AuthInfoResponse_ApiKey{ApiKey: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
@@ -92,11 +92,11 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 						}
 					}
 				case "oauth_access_token":
-					_, srcOk := src.AccessMethod.(*AuthInfoResponse_OAuthAccessToken)
+					_, srcOk := src.AccessMethod.(*AuthInfoResponse_OauthAccessToken)
 					if !srcOk && src.AccessMethod != nil {
 						return fmt.Errorf("attempt to set oneof 'oauth_access_token', while different oneof is set in source")
 					}
-					_, dstOk := dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken)
+					_, dstOk := dst.AccessMethod.(*AuthInfoResponse_OauthAccessToken)
 					if !dstOk && dst.AccessMethod != nil {
 						return fmt.Errorf("attempt to set oneof 'oauth_access_token', while different oneof is set in destination")
 					}
@@ -106,13 +106,13 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 							continue
 						}
 						if srcOk {
-							newSrc = src.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken
+							newSrc = src.AccessMethod.(*AuthInfoResponse_OauthAccessToken).OauthAccessToken
 						}
 						if dstOk {
-							newDst = dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken
+							newDst = dst.AccessMethod.(*AuthInfoResponse_OauthAccessToken).OauthAccessToken
 						} else {
 							newDst = &OAuthAccessToken{}
-							dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{OAuthAccessToken: newDst}
+							dst.AccessMethod = &AuthInfoResponse_OauthAccessToken{OauthAccessToken: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
@@ -608,9 +608,9 @@ func (dst *IsConfiguration_UserRegistration_Invitation) SetFields(src *IsConfigu
 				return fmt.Errorf("'token_ttl' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TokenTTL = src.TokenTTL
+				dst.TokenTtl = src.TokenTtl
 			} else {
-				dst.TokenTTL = nil
+				dst.TokenTtl = nil
 			}
 
 		default:

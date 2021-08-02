@@ -156,7 +156,7 @@ type KeyEnvelope ttnpb.KeyEnvelope
 // MarshalJSON marshals the key envelope to JSON.
 func (k KeyEnvelope) MarshalJSON() ([]byte, error) {
 	var key []byte
-	if k.KEKLabel != "" {
+	if k.KekLabel != "" {
 		key = k.EncryptedKey
 	} else if k.Key != nil {
 		key = k.Key[:]
@@ -165,7 +165,7 @@ func (k KeyEnvelope) MarshalJSON() ([]byte, error) {
 		KEKLabel string
 		AESKey   Buffer
 	}{
-		KEKLabel: k.KEKLabel,
+		KEKLabel: k.KekLabel,
 		AESKey:   Buffer(key),
 	})
 }
@@ -188,7 +188,7 @@ func (k *KeyEnvelope) UnmarshalJSON(data []byte) error {
 		copy(key[:], aux.AESKey)
 	}
 	*k = KeyEnvelope{
-		KEKLabel:     aux.KEKLabel,
+		KekLabel:     aux.KEKLabel,
 		Key:          key,
 		EncryptedKey: encryptedKey,
 	}

@@ -44,7 +44,7 @@ func WrapAES128Key(ctx context.Context, key types.AES128Key, kekLabel string, v 
 	}
 	return &ttnpb.KeyEnvelope{
 		EncryptedKey: wrapped,
-		KEKLabel:     kekLabel,
+		KekLabel:     kekLabel,
 	}, nil
 }
 
@@ -61,7 +61,7 @@ func WrapAES128KeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel str
 	}
 	return &ttnpb.KeyEnvelope{
 		EncryptedKey: wrapped,
-		KEKLabel:     kekLabel,
+		KekLabel:     kekLabel,
 	}, nil
 }
 
@@ -73,13 +73,13 @@ func UnwrapAES128Key(ctx context.Context, wrapped *ttnpb.KeyEnvelope, v crypto.K
 	if wrapped.Key != nil {
 		return *wrapped.Key, nil
 	}
-	if wrapped.KEKLabel == "" {
+	if wrapped.KekLabel == "" {
 		if len(wrapped.EncryptedKey) != 16 {
 			return key, errInvalidLength.New()
 		}
 		copy(key[:], wrapped.EncryptedKey)
 	} else {
-		keyBytes, err := v.Unwrap(ctx, wrapped.EncryptedKey, wrapped.KEKLabel)
+		keyBytes, err := v.Unwrap(ctx, wrapped.EncryptedKey, wrapped.KekLabel)
 		if err != nil {
 			return key, err
 		}

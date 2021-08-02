@@ -57,9 +57,9 @@ message ConcentratorConfig {
 
   message LBTConfiguration {
     // Received signal strength (dBm).
-    float rssi_target = 1 [(gogoproto.customname) = "RSSITarget"];
+    float rssi_target = 1;
     // Received signal strength offset (dBm).
-    float rssi_offset = 2 [(gogoproto.customname) = "RSSIOffset"];
+    float rssi_offset = 2;
     google.protobuf.Duration scan_time = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
   }
   LBTConfiguration lbt = 4 [(gogoproto.customname) = "LBT"];

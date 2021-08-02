@@ -383,7 +383,7 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "as:as.test.org",
+						KekLabel: "as:as.test.org",
 						EncryptedKey: MustWrapKey(
 							crypto.DeriveAppSKey(
 								appKey,
@@ -395,7 +395,7 @@ func TestHandleJoin(t *testing.T) {
 						),
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "ns:ns.test.org",
+						KekLabel: "ns:ns.test.org",
 						EncryptedKey: MustWrapKey(
 							crypto.DeriveSNwkSIntKey(
 								nwkKey,
@@ -407,7 +407,7 @@ func TestHandleJoin(t *testing.T) {
 						),
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "ns:ns.test.org",
+						KekLabel: "ns:ns.test.org",
 						EncryptedKey: MustWrapKey(
 							crypto.DeriveFNwkSIntKey(
 								nwkKey,
@@ -419,7 +419,7 @@ func TestHandleJoin(t *testing.T) {
 						),
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "ns:ns.test.org",
+						KekLabel: "ns:ns.test.org",
 						EncryptedKey: MustWrapKey(
 							crypto.DeriveNwkSEncKey(
 								nwkKey,
@@ -458,12 +458,12 @@ func TestHandleJoin(t *testing.T) {
 				},
 				LorawanVersion:            ttnpb.MAC_V1_1,
 				ApplicationServerAddress:  asAddr,
-				ApplicationServerKEKLabel: "test-as-kek",
+				ApplicationServerKekLabel: "test-as-kek",
 				NetworkServerAddress:      nsAddr,
-				NetworkServerKEKLabel:     "test-ns-kek",
+				NetworkServerKekLabel:     "test-ns-kek",
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{
-				KEKLabel: "test-aas-kek",
+				KekLabel: "test-aas-kek",
 			},
 			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
@@ -514,7 +514,7 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "test-as-kek",
+						KekLabel: "test-as-kek",
 						EncryptedKey: MustWrapKey(
 							crypto.DeriveAppSKey(
 								appKey,
@@ -526,7 +526,7 @@ func TestHandleJoin(t *testing.T) {
 						),
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "test-ns-kek",
+						KekLabel: "test-ns-kek",
 						EncryptedKey: MustWrapKey(
 							crypto.DeriveSNwkSIntKey(
 								nwkKey,
@@ -538,7 +538,7 @@ func TestHandleJoin(t *testing.T) {
 						),
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "test-ns-kek",
+						KekLabel: "test-ns-kek",
 						EncryptedKey: MustWrapKey(
 							crypto.DeriveFNwkSIntKey(
 								nwkKey,
@@ -550,7 +550,7 @@ func TestHandleJoin(t *testing.T) {
 						),
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "test-ns-kek",
+						KekLabel: "test-ns-kek",
 						EncryptedKey: MustWrapKey(
 							crypto.DeriveNwkSEncKey(
 								nwkKey,
@@ -591,8 +591,8 @@ func TestHandleJoin(t *testing.T) {
 				LorawanVersion: ttnpb.MAC_V1_1,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{
-				KEKLabel: "test-aas-kek",
-				KEK: MustWrapAES128KeyWithKEK(
+				KekLabel: "test-aas-kek",
+				Kek: MustWrapAES128KeyWithKEK(
 					ctx,
 					types.AES128Key{0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					"test-aas-kek-kek",
@@ -648,7 +648,7 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "test-aas-kek",
+						KekLabel: "test-aas-kek",
 						EncryptedKey: MustWrapKey(
 							crypto.DeriveAppSKey(
 								appKey,
@@ -2330,11 +2330,11 @@ func TestGetNwkSKeys(t *testing.T) {
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
 						Key:      KeyPtr(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-						KEKLabel: "NwkSEncKey-kek",
+						KekLabel: "NwkSEncKey-kek",
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key:      KeyPtr(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-						KEKLabel: "SNwkSIntKey-kek",
+						KekLabel: "SNwkSIntKey-kek",
 					},
 				}, nil
 			},
@@ -2349,11 +2349,11 @@ func TestGetNwkSKeys(t *testing.T) {
 				},
 				NwkSEncKey: ttnpb.KeyEnvelope{
 					Key:      KeyPtr(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel: "NwkSEncKey-kek",
+					KekLabel: "NwkSEncKey-kek",
 				},
 				SNwkSIntKey: ttnpb.KeyEnvelope{
 					Key:      KeyPtr(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel: "SNwkSIntKey-kek",
+					KekLabel: "SNwkSIntKey-kek",
 				},
 			},
 		},
@@ -2477,7 +2477,7 @@ func TestGetAppSKey(t *testing.T) {
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-						KEKLabel:     "test-kek",
+						KekLabel:     "test-kek",
 					},
 				}, nil
 			},
@@ -2529,7 +2529,7 @@ func TestGetAppSKey(t *testing.T) {
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-						KEKLabel:     "test-kek",
+						KekLabel:     "test-kek",
 					},
 				}, nil
 			},
@@ -2575,7 +2575,7 @@ func TestGetAppSKey(t *testing.T) {
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-						KEKLabel:     "test-kek",
+						KekLabel:     "test-kek",
 					},
 				}, nil
 			},
@@ -2587,7 +2587,7 @@ func TestGetAppSKey(t *testing.T) {
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
 					EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel:     "test-kek",
+					KekLabel:     "test-kek",
 				},
 			},
 		},
@@ -2615,7 +2615,7 @@ func TestGetAppSKey(t *testing.T) {
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-						KEKLabel:     "test-kek",
+						KekLabel:     "test-kek",
 					},
 				}, nil
 			},
@@ -2644,7 +2644,7 @@ func TestGetAppSKey(t *testing.T) {
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
 					EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel:     "test-kek",
+					KekLabel:     "test-kek",
 				},
 			},
 		},
@@ -2668,7 +2668,7 @@ func TestGetAppSKey(t *testing.T) {
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-						KEKLabel:     "test-kek",
+						KekLabel:     "test-kek",
 					},
 				}, nil
 			},
@@ -2701,7 +2701,7 @@ func TestGetAppSKey(t *testing.T) {
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
 					EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel:     "test-kek",
+					KekLabel:     "test-kek",
 				},
 			},
 		},
@@ -2725,7 +2725,7 @@ func TestGetAppSKey(t *testing.T) {
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-						KEKLabel:     "test-kek",
+						KekLabel:     "test-kek",
 					},
 				}, nil
 			},
@@ -2759,7 +2759,7 @@ func TestGetAppSKey(t *testing.T) {
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
 					EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel:     "test-kek",
+					KekLabel:     "test-kek",
 				},
 			},
 		},

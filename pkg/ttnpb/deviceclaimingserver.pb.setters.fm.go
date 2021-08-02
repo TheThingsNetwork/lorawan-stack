@@ -53,10 +53,10 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 				return fmt.Errorf("'target_network_server_kek_label' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TargetNetworkServerKEKLabel = src.TargetNetworkServerKEKLabel
+				dst.TargetNetworkServerKekLabel = src.TargetNetworkServerKekLabel
 			} else {
 				var zero string
-				dst.TargetNetworkServerKEKLabel = zero
+				dst.TargetNetworkServerKekLabel = zero
 			}
 		case "target_application_server_address":
 			if len(subs) > 0 {
@@ -73,10 +73,10 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 				return fmt.Errorf("'target_application_server_kek_label' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TargetApplicationServerKEKLabel = src.TargetApplicationServerKEKLabel
+				dst.TargetApplicationServerKekLabel = src.TargetApplicationServerKekLabel
 			} else {
 				var zero string
-				dst.TargetApplicationServerKEKLabel = zero
+				dst.TargetApplicationServerKekLabel = zero
 			}
 		case "target_application_server_id":
 			if len(subs) > 0 {
@@ -212,10 +212,10 @@ func (dst *AuthorizeApplicationRequest) SetFields(src *AuthorizeApplicationReque
 				return fmt.Errorf("'api_key' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.APIKey = src.APIKey
+				dst.ApiKey = src.ApiKey
 			} else {
 				var zero string
-				dst.APIKey = zero
+				dst.ApiKey = zero
 			}
 
 		default:
@@ -233,10 +233,10 @@ func (dst *CUPSRedirection) SetFields(src *CUPSRedirection, paths ...string) err
 				return fmt.Errorf("'target_cups_uri' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TargetCUPSURI = src.TargetCUPSURI
+				dst.TargetCupsUri = src.TargetCupsUri
 			} else {
 				var zero string
-				dst.TargetCUPSURI = zero
+				dst.TargetCupsUri = zero
 			}
 		case "current_gateway_key":
 			if len(subs) > 0 {
@@ -380,26 +380,26 @@ func (dst *ClaimGatewayRequest) SetFields(src *ClaimGatewayRequest, paths ...str
 		case "cups_redirection":
 			if len(subs) > 0 {
 				var newDst, newSrc *CUPSRedirection
-				if (src == nil || src.CUPSRedirection == nil) && dst.CUPSRedirection == nil {
+				if (src == nil || src.CupsRedirection == nil) && dst.CupsRedirection == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.CUPSRedirection
+					newSrc = src.CupsRedirection
 				}
-				if dst.CUPSRedirection != nil {
-					newDst = dst.CUPSRedirection
+				if dst.CupsRedirection != nil {
+					newDst = dst.CupsRedirection
 				} else {
 					newDst = &CUPSRedirection{}
-					dst.CUPSRedirection = newDst
+					dst.CupsRedirection = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.CUPSRedirection = src.CUPSRedirection
+					dst.CupsRedirection = src.CupsRedirection
 				} else {
-					dst.CUPSRedirection = nil
+					dst.CupsRedirection = nil
 				}
 			}
 		case "target_frequency_plan_id":
@@ -517,10 +517,10 @@ func (dst *AuthorizeGatewayRequest) SetFields(src *AuthorizeGatewayRequest, path
 				return fmt.Errorf("'api_key' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.APIKey = src.APIKey
+				dst.ApiKey = src.ApiKey
 			} else {
 				var zero string
-				dst.APIKey = zero
+				dst.ApiKey = zero
 			}
 
 		default:

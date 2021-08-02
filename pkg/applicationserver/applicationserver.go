@@ -869,8 +869,8 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDevic
 			AntennaIndex:  md.AntennaIndex,
 			FineTimestamp: md.FineTimestamp,
 			Location:      md.Location,
-			RSSI:          md.RSSI,
-			SNR:           md.SNR,
+			Rssi:          md.Rssi,
+			Snr:           md.Snr,
 		})
 	}
 	return as.appUpsRegistry.Push(ctx, ids, cleanUplink)

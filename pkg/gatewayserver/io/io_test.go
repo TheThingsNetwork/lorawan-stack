@@ -634,12 +634,12 @@ func TestUniqueUplinkMessagesByRSSI(t *testing.T) {
 			in: []*ttnpb.UplinkMessage{{
 				RawPayload: []byte{1, 2, 3, 4, 5},
 				Settings:   ttnpb.TxSettings{Frequency: 1000000},
-				RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -20, AntennaIndex: 0}},
+				RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -20, AntennaIndex: 0}},
 			}},
 			out: []*ttnpb.UplinkMessage{{
 				RawPayload: []byte{1, 2, 3, 4, 5},
 				Settings:   ttnpb.TxSettings{Frequency: 1000000},
-				RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -20, AntennaIndex: 0}},
+				RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -20, AntennaIndex: 0}},
 			}},
 		},
 		{
@@ -652,22 +652,22 @@ func TestUniqueUplinkMessagesByRSSI(t *testing.T) {
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5},
 					Settings:   ttnpb.TxSettings{Frequency: 1200000},
-					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -40, AntennaIndex: 0}},
+					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -40, AntennaIndex: 0}},
 				},
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5},
 					Settings:   ttnpb.TxSettings{Frequency: 1000000},
-					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -20, AntennaIndex: 0}},
+					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -20, AntennaIndex: 0}},
 				},
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5},
 					Settings:   ttnpb.TxSettings{Frequency: 1100000},
-					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -100, AntennaIndex: 0}},
+					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -100, AntennaIndex: 0}},
 				},
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5, 6},
 					Settings:   ttnpb.TxSettings{Frequency: 1000000},
-					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -10, AntennaIndex: 0}},
+					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -10, AntennaIndex: 0}},
 				},
 			},
 			out: []*ttnpb.UplinkMessage{
@@ -678,12 +678,12 @@ func TestUniqueUplinkMessagesByRSSI(t *testing.T) {
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5},
 					Settings:   ttnpb.TxSettings{Frequency: 1000000},
-					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -20, AntennaIndex: 0}},
+					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -20, AntennaIndex: 0}},
 				},
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5, 6},
 					Settings:   ttnpb.TxSettings{Frequency: 1000000},
-					RxMetadata: []*ttnpb.RxMetadata{{SNR: 10, RSSI: -10, AntennaIndex: 0}},
+					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -10, AntennaIndex: 0}},
 				},
 			},
 		},

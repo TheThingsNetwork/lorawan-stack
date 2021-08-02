@@ -93,32 +93,32 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		req.FrequencyPlanIds = []string{req.FrequencyPlanId}
 	}
 
-	if req.LBSLNSSecret != nil {
-		value := req.LBSLNSSecret.Value
+	if req.LbsLnsSecret != nil {
+		value := req.LbsLnsSecret.Value
 		if is.config.Gateways.EncryptionKeyID != "" {
-			value, err = is.KeyVault.Encrypt(ctx, req.LBSLNSSecret.Value, is.config.Gateways.EncryptionKeyID)
+			value, err = is.KeyVault.Encrypt(ctx, req.LbsLnsSecret.Value, is.config.Gateways.EncryptionKeyID)
 			if err != nil {
 				return nil, err
 			}
 		} else {
 			log.FromContext(ctx).Warn("No encryption key defined, store LBS LNS Secret in plaintext")
 		}
-		req.LBSLNSSecret.Value = value
-		req.LBSLNSSecret.KeyId = is.config.Gateways.EncryptionKeyID
+		req.LbsLnsSecret.Value = value
+		req.LbsLnsSecret.KeyId = is.config.Gateways.EncryptionKeyID
 	}
 
-	if req.TargetCUPSKey != nil {
-		value := req.TargetCUPSKey.Value
+	if req.TargetCupsKey != nil {
+		value := req.TargetCupsKey.Value
 		if is.config.Gateways.EncryptionKeyID != "" {
-			value, err = is.KeyVault.Encrypt(ctx, req.TargetCUPSKey.Value, is.config.Gateways.EncryptionKeyID)
+			value, err = is.KeyVault.Encrypt(ctx, req.TargetCupsKey.Value, is.config.Gateways.EncryptionKeyID)
 			if err != nil {
 				return nil, err
 			}
 		} else {
 			log.FromContext(ctx).Warn("No encryption key defined, store Target CUPS Key in plaintext")
 		}
-		req.TargetCUPSKey.Value = value
-		req.TargetCUPSKey.KeyId = is.config.Gateways.EncryptionKeyID
+		req.TargetCupsKey.Value = value
+		req.TargetCupsKey.KeyId = is.config.Gateways.EncryptionKeyID
 	}
 
 	if req.ClaimAuthenticationCode != nil {
@@ -223,18 +223,18 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 		return nil, err
 	}
 
-	if gtw.LBSLNSSecret != nil {
-		value := gtw.LBSLNSSecret.Value
-		if gtw.LBSLNSSecret.KeyId != "" {
-			value, err = is.KeyVault.Decrypt(ctx, gtw.LBSLNSSecret.Value, gtw.LBSLNSSecret.KeyId)
+	if gtw.LbsLnsSecret != nil {
+		value := gtw.LbsLnsSecret.Value
+		if gtw.LbsLnsSecret.KeyId != "" {
+			value, err = is.KeyVault.Decrypt(ctx, gtw.LbsLnsSecret.Value, gtw.LbsLnsSecret.KeyId)
 			if err != nil {
 				return nil, err
 			}
 		} else {
 			log.FromContext(ctx).Warn("No encryption key defined, return stored LBS LNS Secret value")
 		}
-		gtw.LBSLNSSecret.Value = value
-		gtw.LBSLNSSecret.KeyId = is.config.Gateways.EncryptionKeyID
+		gtw.LbsLnsSecret.Value = value
+		gtw.LbsLnsSecret.KeyId = is.config.Gateways.EncryptionKeyID
 	}
 
 	if gtw.ClaimAuthenticationCode != nil && gtw.ClaimAuthenticationCode.Secret != nil {
@@ -256,18 +256,18 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 		gtw.FrequencyPlanId = gtw.FrequencyPlanIds[0]
 	}
 
-	if gtw.TargetCUPSKey != nil {
-		value := gtw.TargetCUPSKey.Value
-		if gtw.TargetCUPSKey.KeyId != "" {
-			value, err = is.KeyVault.Decrypt(ctx, gtw.TargetCUPSKey.Value, gtw.TargetCUPSKey.KeyId)
+	if gtw.TargetCupsKey != nil {
+		value := gtw.TargetCupsKey.Value
+		if gtw.TargetCupsKey.KeyId != "" {
+			value, err = is.KeyVault.Decrypt(ctx, gtw.TargetCupsKey.Value, gtw.TargetCupsKey.KeyId)
 			if err != nil {
 				return nil, err
 			}
 		} else {
 			log.FromContext(ctx).Warn("No encryption key defined, return stored Target CUPS Key value")
 		}
-		gtw.TargetCUPSKey.Value = value
-		gtw.TargetCUPSKey.KeyId = is.config.Gateways.EncryptionKeyID
+		gtw.TargetCupsKey.Value = value
+		gtw.TargetCupsKey.KeyId = is.config.Gateways.EncryptionKeyID
 	}
 
 	return gtw, nil
@@ -372,11 +372,11 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret") {
 			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
-				gtws.Gateways[i].LBSLNSSecret = nil
-			} else if gtws.Gateways[i].LBSLNSSecret != nil {
-				value := gtws.Gateways[i].LBSLNSSecret.Value
-				if gtws.Gateways[i].LBSLNSSecret.KeyId != "" {
-					value, err = is.KeyVault.Decrypt(ctx, gtws.Gateways[i].LBSLNSSecret.Value, gtws.Gateways[i].LBSLNSSecret.KeyId)
+				gtws.Gateways[i].LbsLnsSecret = nil
+			} else if gtws.Gateways[i].LbsLnsSecret != nil {
+				value := gtws.Gateways[i].LbsLnsSecret.Value
+				if gtws.Gateways[i].LbsLnsSecret.KeyId != "" {
+					value, err = is.KeyVault.Decrypt(ctx, gtws.Gateways[i].LbsLnsSecret.Value, gtws.Gateways[i].LbsLnsSecret.KeyId)
 					if err != nil {
 						return nil, err
 					}
@@ -384,18 +384,18 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 					logger := log.FromContext(ctx)
 					logger.Warn("No encryption key defined, return stored LBS LNS Secret value")
 				}
-				gtws.Gateways[i].LBSLNSSecret.Value = value
-				gtws.Gateways[i].LBSLNSSecret.KeyId = is.config.Gateways.EncryptionKeyID
+				gtws.Gateways[i].LbsLnsSecret.Value = value
+				gtws.Gateways[i].LbsLnsSecret.KeyId = is.config.Gateways.EncryptionKeyID
 			}
 		}
 
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "target_cups_key") {
 			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
-				gtws.Gateways[i].TargetCUPSKey = nil
-			} else if gtws.Gateways[i].TargetCUPSKey != nil {
-				value := gtws.Gateways[i].TargetCUPSKey.Value
-				if gtws.Gateways[i].TargetCUPSKey.KeyId != "" {
-					value, err = is.KeyVault.Decrypt(ctx, gtws.Gateways[i].TargetCUPSKey.Value, gtws.Gateways[i].TargetCUPSKey.KeyId)
+				gtws.Gateways[i].TargetCupsKey = nil
+			} else if gtws.Gateways[i].TargetCupsKey != nil {
+				value := gtws.Gateways[i].TargetCupsKey.Value
+				if gtws.Gateways[i].TargetCupsKey.KeyId != "" {
+					value, err = is.KeyVault.Decrypt(ctx, gtws.Gateways[i].TargetCupsKey.Value, gtws.Gateways[i].TargetCupsKey.KeyId)
 					if err != nil {
 						return nil, err
 					}
@@ -403,8 +403,8 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 					logger := log.FromContext(ctx)
 					logger.Warn("No encryption key defined, return stored Target CUPS Key Secret value")
 				}
-				gtws.Gateways[i].TargetCUPSKey.Value = value
-				gtws.Gateways[i].TargetCUPSKey.KeyId = is.config.Gateways.EncryptionKeyID
+				gtws.Gateways[i].TargetCupsKey.Value = value
+				gtws.Gateways[i].TargetCupsKey.KeyId = is.config.Gateways.EncryptionKeyID
 			}
 		}
 
@@ -465,11 +465,11 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret") {
 		if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
 			return nil, err
-		} else if req.LBSLNSSecret != nil {
-			value := req.LBSLNSSecret.Value
-			ptLBSLNSSecret = req.LBSLNSSecret.Value
+		} else if req.LbsLnsSecret != nil {
+			value := req.LbsLnsSecret.Value
+			ptLBSLNSSecret = req.LbsLnsSecret.Value
 			if is.config.Gateways.EncryptionKeyID != "" {
-				value, err = is.KeyVault.Encrypt(ctx, req.LBSLNSSecret.Value, is.config.Gateways.EncryptionKeyID)
+				value, err = is.KeyVault.Encrypt(ctx, req.LbsLnsSecret.Value, is.config.Gateways.EncryptionKeyID)
 				if err != nil {
 					return nil, err
 				}
@@ -477,19 +477,19 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 				logger := log.FromContext(ctx)
 				logger.Warn("No encryption key defined, store LBS LNS Secret in plaintext")
 			}
-			req.LBSLNSSecret.Value = value
-			req.LBSLNSSecret.KeyId = is.config.Gateways.EncryptionKeyID
+			req.LbsLnsSecret.Value = value
+			req.LbsLnsSecret.KeyId = is.config.Gateways.EncryptionKeyID
 		}
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "target_cups_key") {
 		if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
 			return nil, err
-		} else if req.TargetCUPSKey != nil {
-			value := req.TargetCUPSKey.Value
-			ptTargetCUPSKeySecret = req.TargetCUPSKey.Value
+		} else if req.TargetCupsKey != nil {
+			value := req.TargetCupsKey.Value
+			ptTargetCUPSKeySecret = req.TargetCupsKey.Value
 			if is.config.Gateways.EncryptionKeyID != "" {
-				value, err = is.KeyVault.Encrypt(ctx, req.TargetCUPSKey.Value, is.config.Gateways.EncryptionKeyID)
+				value, err = is.KeyVault.Encrypt(ctx, req.TargetCupsKey.Value, is.config.Gateways.EncryptionKeyID)
 				if err != nil {
 					return nil, err
 				}
@@ -497,8 +497,8 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 				logger := log.FromContext(ctx)
 				logger.Warn("No encryption key defined, store Target CUPS Key in plaintext")
 			}
-			req.TargetCUPSKey.Value = value
-			req.TargetCUPSKey.KeyId = is.config.Gateways.EncryptionKeyID
+			req.TargetCupsKey.Value = value
+			req.TargetCupsKey.KeyId = is.config.Gateways.EncryptionKeyID
 		}
 	}
 
@@ -549,10 +549,10 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		gtw.ClaimAuthenticationCode.Secret.Value = ptCACSecret
 	}
 	if len(ptLBSLNSSecret) != 0 {
-		gtw.LBSLNSSecret.Value = ptLBSLNSSecret
+		gtw.LbsLnsSecret.Value = ptLBSLNSSecret
 	}
 	if len(ptTargetCUPSKeySecret) != 0 {
-		gtw.TargetCUPSKey.Value = ptTargetCUPSKeySecret
+		gtw.TargetCupsKey.Value = ptTargetCUPSKeySecret
 	}
 
 	return gtw, nil

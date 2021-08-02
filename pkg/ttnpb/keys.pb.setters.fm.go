@@ -21,10 +21,10 @@ func (dst *KeyEnvelope) SetFields(src *KeyEnvelope, paths ...string) error {
 				return fmt.Errorf("'kek_label' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.KEKLabel = src.KEKLabel
+				dst.KekLabel = src.KekLabel
 			} else {
 				var zero string
-				dst.KEKLabel = zero
+				dst.KekLabel = zero
 			}
 		case "encrypted_key":
 			if len(subs) > 0 {

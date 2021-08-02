@@ -78,9 +78,9 @@ func TestNSHandler(t *testing.T) {
 					},
 					RxMetadata: []*ttnpb.RxMetadata{{
 						GatewayIdentifiers: gtwIDs,
-						RSSI:               89,
-						ChannelRSSI:        89,
-						SNR:                9.25,
+						Rssi:               89,
+						ChannelRssi:        89,
+						Snr:                9.25,
 					}},
 					Settings: ttnpb.TxSettings{
 						Frequency:  868300000,

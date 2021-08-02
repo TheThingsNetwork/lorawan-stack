@@ -36,10 +36,10 @@ func (dst *GatewayBrand) SetFields(src *GatewayBrand, paths ...string) error {
 				return fmt.Errorf("'url' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.URL = src.URL
+				dst.Url = src.Url
 			} else {
 				var zero string
-				dst.URL = zero
+				dst.Url = zero
 			}
 		case "logos":
 			if len(subs) > 0 {
@@ -188,10 +188,10 @@ func (dst *GatewayRadio) SetFields(src *GatewayRadio, paths ...string) error {
 				return fmt.Errorf("'rssi_offset' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RSSIOffset = src.RSSIOffset
+				dst.RssiOffset = src.RssiOffset
 			} else {
 				var zero float32
-				dst.RSSIOffset = zero
+				dst.RssiOffset = zero
 			}
 		case "tx_configuration":
 			if len(subs) > 0 {
@@ -516,26 +516,26 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 		case "lbs_lns_secret":
 			if len(subs) > 0 {
 				var newDst, newSrc *Secret
-				if (src == nil || src.LBSLNSSecret == nil) && dst.LBSLNSSecret == nil {
+				if (src == nil || src.LbsLnsSecret == nil) && dst.LbsLnsSecret == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.LBSLNSSecret
+					newSrc = src.LbsLnsSecret
 				}
-				if dst.LBSLNSSecret != nil {
-					newDst = dst.LBSLNSSecret
+				if dst.LbsLnsSecret != nil {
+					newDst = dst.LbsLnsSecret
 				} else {
 					newDst = &Secret{}
-					dst.LBSLNSSecret = newDst
+					dst.LbsLnsSecret = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.LBSLNSSecret = src.LBSLNSSecret
+					dst.LbsLnsSecret = src.LbsLnsSecret
 				} else {
-					dst.LBSLNSSecret = nil
+					dst.LbsLnsSecret = nil
 				}
 			}
 		case "claim_authentication_code":
@@ -568,34 +568,34 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 				return fmt.Errorf("'target_cups_uri' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TargetCUPSURI = src.TargetCUPSURI
+				dst.TargetCupsUri = src.TargetCupsUri
 			} else {
 				var zero string
-				dst.TargetCUPSURI = zero
+				dst.TargetCupsUri = zero
 			}
 		case "target_cups_key":
 			if len(subs) > 0 {
 				var newDst, newSrc *Secret
-				if (src == nil || src.TargetCUPSKey == nil) && dst.TargetCUPSKey == nil {
+				if (src == nil || src.TargetCupsKey == nil) && dst.TargetCupsKey == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.TargetCUPSKey
+					newSrc = src.TargetCupsKey
 				}
-				if dst.TargetCUPSKey != nil {
-					newDst = dst.TargetCUPSKey
+				if dst.TargetCupsKey != nil {
+					newDst = dst.TargetCupsKey
 				} else {
 					newDst = &Secret{}
-					dst.TargetCUPSKey = newDst
+					dst.TargetCupsKey = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.TargetCUPSKey = src.TargetCUPSKey
+					dst.TargetCupsKey = src.TargetCupsKey
 				} else {
-					dst.TargetCUPSKey = nil
+					dst.TargetCupsKey = nil
 				}
 			}
 		case "require_authenticated_connection":

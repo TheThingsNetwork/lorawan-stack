@@ -331,19 +331,19 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 		var localization *packetbroker.GatewayMetadataLocalization_Terrestrial
 		for _, md := range msg.RxMetadata {
 			var rssiStandardDeviation *pbtypes.FloatValue
-			if md.RSSIStandardDeviation > 0 {
+			if md.RssiStandardDeviation > 0 {
 				rssiStandardDeviation = &pbtypes.FloatValue{
-					Value: md.RSSIStandardDeviation,
+					Value: md.RssiStandardDeviation,
 				}
 			}
 
 			sqAnt := &packetbroker.GatewayMetadataSignalQuality_Terrestrial_Antenna{
 				Index: md.AntennaIndex,
 				Value: &packetbroker.TerrestrialGatewayAntennaSignalQuality{
-					ChannelRssi:           md.ChannelRSSI,
-					SignalRssi:            md.SignalRSSI,
+					ChannelRssi:           md.ChannelRssi,
+					SignalRssi:            md.SignalRssi,
 					RssiStandardDeviation: rssiStandardDeviation,
-					Snr:                   md.SNR,
+					Snr:                   md.Snr,
 					FrequencyOffset:       md.FrequencyOffset,
 				},
 			}
@@ -522,11 +522,11 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 					AntennaIndex:           ant.Index,
 					Time:                   receiveTime,
 					FineTimestamp:          ant.FineTimestamp.GetValue(),
-					RSSI:                   ant.SignalQuality.GetChannelRssi(),
-					ChannelRSSI:            ant.SignalQuality.GetChannelRssi(),
-					SignalRSSI:             ant.SignalQuality.GetSignalRssi(),
-					RSSIStandardDeviation:  ant.SignalQuality.GetRssiStandardDeviation().GetValue(),
-					SNR:                    ant.SignalQuality.GetSnr(),
+					Rssi:                   ant.SignalQuality.GetChannelRssi(),
+					ChannelRssi:            ant.SignalQuality.GetChannelRssi(),
+					SignalRssi:             ant.SignalQuality.GetSignalRssi(),
+					RssiStandardDeviation:  ant.SignalQuality.GetRssiStandardDeviation().GetValue(),
+					Snr:                    ant.SignalQuality.GetSnr(),
 					FrequencyOffset:        ant.SignalQuality.GetFrequencyOffset(),
 					Location:               fromPBLocation(ant.Location),
 					DownlinkPathConstraint: downlinkPathConstraint,
@@ -540,11 +540,11 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 					PacketBroker:           pbMD,
 					AntennaIndex:           ant.Index,
 					Time:                   receiveTime,
-					RSSI:                   ant.Value.GetChannelRssi(),
-					ChannelRSSI:            ant.Value.GetChannelRssi(),
-					SignalRSSI:             ant.Value.GetSignalRssi(),
-					RSSIStandardDeviation:  ant.Value.GetRssiStandardDeviation().GetValue(),
-					SNR:                    ant.Value.GetSnr(),
+					Rssi:                   ant.Value.GetChannelRssi(),
+					ChannelRssi:            ant.Value.GetChannelRssi(),
+					SignalRssi:             ant.Value.GetSignalRssi(),
+					RssiStandardDeviation:  ant.Value.GetRssiStandardDeviation().GetValue(),
+					Snr:                    ant.Value.GetSnr(),
 					FrequencyOffset:        ant.Value.GetFrequencyOffset(),
 					DownlinkPathConstraint: downlinkPathConstraint,
 					UplinkToken:            uplinkToken,

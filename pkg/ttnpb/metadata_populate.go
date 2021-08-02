@@ -37,21 +37,21 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 		this.EncryptedFineTimestamp[i] = byte(r.Intn(256))
 	}
 	this.EncryptedFineTimestampKeyId = randStringMetadata(r)
-	this.RSSI = float32(r.Float32())
+	this.Rssi = float32(r.Float32())
 	if r.Intn(2) == 0 {
-		this.RSSI *= -1
+		this.Rssi *= -1
 	}
-	this.ChannelRSSI = float32(r.Float32())
+	this.ChannelRssi = float32(r.Float32())
 	if r.Intn(2) == 0 {
-		this.ChannelRSSI *= -1
+		this.ChannelRssi *= -1
 	}
-	this.RSSIStandardDeviation = float32(r.Float32())
+	this.RssiStandardDeviation = float32(r.Float32())
 	if r.Intn(2) == 0 {
-		this.RSSIStandardDeviation *= -1
+		this.RssiStandardDeviation *= -1
 	}
-	this.SNR = float32(r.Float32())
+	this.Snr = float32(r.Float32())
 	if r.Intn(2) == 0 {
-		this.SNR *= -1
+		this.Snr *= -1
 	}
 	this.FrequencyOffset = r.Int63()
 	if r.Intn(2) == 0 {
@@ -67,7 +67,7 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 		this.UplinkToken[i] = byte(r.Intn(256))
 	}
 	if r.Intn(2) == 0 {
-		this.SignalRSSI = &pbtypes.FloatValue{
+		this.SignalRssi = &pbtypes.FloatValue{
 			Value: -r.Float32(),
 		}
 	}

@@ -1117,7 +1117,7 @@ func (m *ApplicationActivationSettings) ValidateFields(paths ...string) error {
 		switch name {
 		case "kek_label":
 
-			if utf8.RuneCountInString(m.GetKEKLabel()) > 2048 {
+			if utf8.RuneCountInString(m.GetKekLabel()) > 2048 {
 				return ApplicationActivationSettingsValidationError{
 					field:  "kek_label",
 					reason: "value length must be at most 2048 runes",
@@ -1126,7 +1126,7 @@ func (m *ApplicationActivationSettings) ValidateFields(paths ...string) error {
 
 		case "kek":
 
-			if v, ok := interface{}(m.GetKEK()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetKek()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationActivationSettingsValidationError{
 						field:  "kek",

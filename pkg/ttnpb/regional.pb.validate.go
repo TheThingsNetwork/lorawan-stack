@@ -478,9 +478,9 @@ func (m *ConcentratorConfig_LBTConfiguration) ValidateFields(paths ...string) er
 		_ = subs
 		switch name {
 		case "rssi_target":
-			// no validation rules for RSSITarget
+			// no validation rules for RssiTarget
 		case "rssi_offset":
-			// no validation rules for RSSIOffset
+			// no validation rules for RssiOffset
 		case "scan_time":
 
 			if v, ok := interface{}(&m.ScanTime).(interface{ ValidateFields(...string) error }); ok {

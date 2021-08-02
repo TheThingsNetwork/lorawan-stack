@@ -53,7 +53,7 @@ func (is *IdentityServer) listOAuthAccessTokens(ctx context.Context, req *ttnpb.
 	if err != nil {
 		return nil, err
 	}
-	accessToken := authInfo.GetOAuthAccessToken()
+	accessToken := authInfo.GetOauthAccessToken()
 	if accessToken == nil || accessToken.UserIds.UserId != req.UserIds.UserId || accessToken.ClientIds.ClientId != req.ClientIds.ClientId {
 		if err := rights.RequireUser(ctx, req.UserIds, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 			return nil, err
@@ -101,7 +101,7 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 	if err != nil {
 		return nil, err
 	}
-	accessToken := authInfo.GetOAuthAccessToken()
+	accessToken := authInfo.GetOauthAccessToken()
 	if accessToken == nil || accessToken.UserIds.UserId != req.UserIds.UserId || accessToken.ClientIds.ClientId != req.ClientIds.ClientId {
 		if err := rights.RequireUser(ctx, req.UserIds, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 			return nil, err

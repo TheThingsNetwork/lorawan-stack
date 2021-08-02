@@ -89,7 +89,7 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 
 		case "target_network_server_kek_label":
 
-			if utf8.RuneCountInString(m.GetTargetNetworkServerKEKLabel()) > 2048 {
+			if utf8.RuneCountInString(m.GetTargetNetworkServerKekLabel()) > 2048 {
 				return ClaimEndDeviceRequestValidationError{
 					field:  "target_network_server_kek_label",
 					reason: "value length must be at most 2048 runes",
@@ -107,7 +107,7 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 
 		case "target_application_server_kek_label":
 
-			if utf8.RuneCountInString(m.GetTargetApplicationServerKEKLabel()) > 2048 {
+			if utf8.RuneCountInString(m.GetTargetApplicationServerKekLabel()) > 2048 {
 				return ClaimEndDeviceRequestValidationError{
 					field:  "target_application_server_kek_label",
 					reason: "value length must be at most 2048 runes",
@@ -274,7 +274,7 @@ func (m *AuthorizeApplicationRequest) ValidateFields(paths ...string) error {
 
 		case "api_key":
 
-			if l := utf8.RuneCountInString(m.GetAPIKey()); l < 1 || l > 128 {
+			if l := utf8.RuneCountInString(m.GetApiKey()); l < 1 || l > 128 {
 				return AuthorizeApplicationRequestValidationError{
 					field:  "api_key",
 					reason: "value length must be between 1 and 128 runes, inclusive",
@@ -364,7 +364,7 @@ func (m *CUPSRedirection) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "target_cups_uri":
-			// no validation rules for TargetCUPSURI
+			// no validation rules for TargetCupsUri
 		case "current_gateway_key":
 
 			if utf8.RuneCountInString(m.GetCurrentGatewayKey()) > 2048 {
@@ -534,7 +534,7 @@ func (m *ClaimGatewayRequest) ValidateFields(paths ...string) error {
 
 		case "cups_redirection":
 
-			if v, ok := interface{}(m.GetCUPSRedirection()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCupsRedirection()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ClaimGatewayRequestValidationError{
 						field:  "cups_redirection",
@@ -698,7 +698,7 @@ func (m *AuthorizeGatewayRequest) ValidateFields(paths ...string) error {
 
 		case "api_key":
 
-			if utf8.RuneCountInString(m.GetAPIKey()) < 1 {
+			if utf8.RuneCountInString(m.GetApiKey()) < 1 {
 				return AuthorizeGatewayRequestValidationError{
 					field:  "api_key",
 					reason: "value length must be at least 1 runes",

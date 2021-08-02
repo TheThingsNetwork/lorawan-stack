@@ -971,11 +971,11 @@ values will be stored in the Join Server.`,
 			if config.NetworkServerEnabled {
 				req.TargetNetworkServerAddress = config.NetworkServerGRPCAddress
 			}
-			req.TargetNetworkServerKEKLabel, _ = cmd.Flags().GetString("target-network-server-kek-label")
+			req.TargetNetworkServerKekLabel, _ = cmd.Flags().GetString("target-network-server-kek-label")
 			if config.ApplicationServerEnabled {
 				req.TargetApplicationServerAddress = config.ApplicationServerGRPCAddress
 			}
-			req.TargetApplicationServerKEKLabel, _ = cmd.Flags().GetString("target-application-server-kek-label")
+			req.TargetApplicationServerKekLabel, _ = cmd.Flags().GetString("target-application-server-kek-label")
 			req.TargetApplicationServerId, _ = cmd.Flags().GetString("target-application-server-id")
 			req.InvalidateAuthenticationCode, _ = cmd.Flags().GetBool("invalidate-authentication-code")
 

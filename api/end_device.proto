@@ -423,7 +423,7 @@ message EndDevice {
   string network_server_address = 9 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
   // The KEK label of the Network Server to use for wrapping network session keys.
   // Stored in Join Server.
-  string network_server_kek_label = 47 [(gogoproto.customname) = "NetworkServerKEKLabel", (validate.rules).string.max_len = 2048];
+  string network_server_kek_label = 47 [(validate.rules).string.max_len = 2048];
   // The address of the Application Server where this device is supposed to be registered.
   // Stored in Entity Registry and Join Server.
   // The typical format of the address is "host:port". If the port is omitted,
@@ -433,7 +433,7 @@ message EndDevice {
   string application_server_address = 10 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
   // The KEK label of the Application Server to use for wrapping the application session key.
   // Stored in Join Server.
-  string application_server_kek_label = 48 [(gogoproto.customname) = "ApplicationServerKEKLabel", (validate.rules).string.max_len = 2048];
+  string application_server_kek_label = 48 [(validate.rules).string.max_len = 2048];
   // The AS-ID of the Application Server to use.
   // Stored in Join Server.
   string application_server_id = 49 [(validate.rules).string.max_len = 100];

@@ -68,12 +68,12 @@ func TestDeviceRegistryGet(t *testing.T) {
 			RootKeyId: registeredRootKeyID,
 			NwkKey: &ttnpb.KeyEnvelope{
 				Key:          registeredNwkKey,
-				KEKLabel:     registeredKEKLabel,
+				KekLabel:     registeredKEKLabel,
 				EncryptedKey: registeredNwkKeyEnc,
 			},
 			AppKey: &ttnpb.KeyEnvelope{
 				Key:          registeredAppKey,
-				KEKLabel:     registeredKEKLabel,
+				KekLabel:     registeredKEKLabel,
 				EncryptedKey: registeredAppKeyEnc,
 			},
 		},
@@ -289,7 +289,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				ret := CopyEndDevice(registeredDevice)
 				ret.RootKeys.AppKey = &ttnpb.KeyEnvelope{
 					EncryptedKey: ret.RootKeys.AppKey.EncryptedKey,
-					KEKLabel:     ret.RootKeys.AppKey.KEKLabel,
+					KekLabel:     ret.RootKeys.AppKey.KekLabel,
 				}
 				ret.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
 					Key: ret.RootKeys.NwkKey.Key,
@@ -353,7 +353,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				}
 				ret.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
 					EncryptedKey: ret.RootKeys.NwkKey.EncryptedKey,
-					KEKLabel:     ret.RootKeys.NwkKey.KEKLabel,
+					KekLabel:     ret.RootKeys.NwkKey.KekLabel,
 				}
 				return ret, nil
 			},
@@ -455,11 +455,11 @@ func TestDeviceRegistrySet(t *testing.T) {
 			RootKeyId: registeredRootKeyID,
 			NwkKey: &ttnpb.KeyEnvelope{
 				Key:      registeredNwkKey,
-				KEKLabel: registeredKEKLabel,
+				KekLabel: registeredKEKLabel,
 			},
 			AppKey: &ttnpb.KeyEnvelope{
 				Key:      registeredAppKey,
-				KEKLabel: registeredKEKLabel,
+				KekLabel: registeredKEKLabel,
 			},
 		},
 	}
@@ -854,11 +854,11 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			RootKeyId: registeredRootKeyID,
 			NwkKey: &ttnpb.KeyEnvelope{
 				Key:      registeredNwkKey,
-				KEKLabel: registeredKEKLabel,
+				KekLabel: registeredKEKLabel,
 			},
 			AppKey: &ttnpb.KeyEnvelope{
 				Key:      registeredAppKey,
-				KEKLabel: registeredKEKLabel,
+				KekLabel: registeredKEKLabel,
 			},
 		},
 	}

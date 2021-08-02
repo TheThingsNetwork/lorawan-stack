@@ -773,12 +773,12 @@ func UniqueUplinkMessagesByRSSI(uplinks []*ttnpb.UplinkMessage) []*ttnpb.UplinkM
 			continue
 		}
 		key := base64.StdEncoding.EncodeToString(uplink.GetRawPayload())
-		if s, ok := maxRSSI[key]; ok && s.rssi < md[0].RSSI {
+		if s, ok := maxRSSI[key]; ok && s.rssi < md[0].Rssi {
 			deduplicated[s.index] = uplink
-			maxRSSI[key] = rssiAndIndex{md[0].RSSI, s.index}
+			maxRSSI[key] = rssiAndIndex{md[0].Rssi, s.index}
 		} else if !ok {
 			deduplicated = append(deduplicated, uplink)
-			maxRSSI[key] = rssiAndIndex{md[0].RSSI, len(deduplicated) - 1}
+			maxRSSI[key] = rssiAndIndex{md[0].Rssi, len(deduplicated) - 1}
 		}
 	}
 	return deduplicated

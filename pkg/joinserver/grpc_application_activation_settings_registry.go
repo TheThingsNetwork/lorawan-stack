@@ -43,11 +43,11 @@ func (srv applicationActivationSettingsRegistryServer) Get(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	kek, err := cryptoutil.UnwrapKeyEnvelope(ctx, sets.KEK, srv.JS.KeyVault)
+	kek, err := cryptoutil.UnwrapKeyEnvelope(ctx, sets.Kek, srv.JS.KeyVault)
 	if err != nil {
 		return nil, errUnwrapKey.WithCause(err)
 	}
-	sets.KEK = kek
+	sets.Kek = kek
 	return sets, nil
 }
 
@@ -62,7 +62,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 		return nil, errInvalidFieldMask.WithCause(errNoPaths)
 	}
 
-	reqKEK := req.ApplicationActivationSettings.KEK
+	reqKEK := req.ApplicationActivationSettings.Kek
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "kek.key") && reqKEK != nil {
 		if reqKEK.Key.IsZero() {
 			return nil, errInvalidFieldValue.WithAttributes("field", "kek.key")
@@ -70,7 +70,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 		if err := ttnpb.RequireFields(req.FieldMask.GetPaths(), "kek_label"); err != nil {
 			return nil, errInvalidFieldMask.WithCause(err)
 		}
-		if req.KEKLabel == "" {
+		if req.KekLabel == "" {
 			return nil, errNoKEKLabel.New()
 		}
 	}
@@ -85,7 +85,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 		if err != nil {
 			return nil, errWrapKey.WithCause(err)
 		}
-		req.ApplicationActivationSettings.KEK = kek
+		req.ApplicationActivationSettings.Kek = kek
 		sets = append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...)
 		sets = ttnpb.AddFields(sets,
 			"kek.encrypted_key",
@@ -98,7 +98,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	v.KEK = reqKEK
+	v.Kek = reqKEK
 	return v, nil
 }
 

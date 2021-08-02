@@ -29,7 +29,7 @@ import (
 func init() {
 	applicationAccessUser.Admin = false
 	applicationAccessUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&applicationAccessUser.UserIdentifiers).APIKeys {
+	for _, apiKey := range userAPIKeys(&applicationAccessUser.UserIdentifiers).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_LINK,
 			ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
@@ -38,7 +38,7 @@ func init() {
 	}
 	appAccessCollaboratorUser.Admin = false
 	appAccessCollaboratorUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&appAccessCollaboratorUser.UserIdentifiers).APIKeys {
+	for _, apiKey := range userAPIKeys(&appAccessCollaboratorUser.UserIdentifiers).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_ALL,
 		}
@@ -108,7 +108,7 @@ func TestApplicationAccessRightsPermissionDenied(t *testing.T) {
 
 		// Choose right that the user does not have and hence cannot add
 		right := ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC
-		APIKey = applicationAPIKeys(&applicationID).APIKeys[0]
+		APIKey = applicationAPIKeys(&applicationID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
@@ -147,7 +147,7 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 		userID := defaultUser.UserIdentifiers
 		applicationID := userApplications(&userID).Applications[0].ApplicationIdentifiers
 		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
-		APIKeyID := applicationAPIKeys(&applicationID).APIKeys[0].Id
+		APIKeyID := applicationAPIKeys(&applicationID).ApiKeys[0].Id
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
@@ -198,7 +198,7 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 		}
 		a.So(APIKey, should.BeNil)
 
-		APIKey = applicationAPIKeys(&applicationID).APIKeys[0]
+		APIKey = applicationAPIKeys(&applicationID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
@@ -273,7 +273,7 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		}
 
 		applicationAPIKeys := applicationAPIKeys(&applicationID)
-		applicationKey := applicationAPIKeys.APIKeys[0]
+		applicationKey := applicationAPIKeys.ApiKeys[0]
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
@@ -292,10 +292,10 @@ func TestApplicationAccessCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(APIKeys, should.NotBeNil) {
-			a.So(len(APIKeys.APIKeys), should.Equal, len(applicationAPIKeys.APIKeys))
-			for i, APIkey := range APIKeys.APIKeys {
-				a.So(APIkey.Name, should.Equal, applicationAPIKeys.APIKeys[i].Name)
-				a.So(APIkey.Id, should.Equal, applicationAPIKeys.APIKeys[i].Id)
+			a.So(len(APIKeys.ApiKeys), should.Equal, len(applicationAPIKeys.ApiKeys))
+			for i, APIkey := range APIKeys.ApiKeys {
+				a.So(APIkey.Name, should.Equal, applicationAPIKeys.ApiKeys[i].Name)
+				a.So(APIkey.Id, should.Equal, applicationAPIKeys.ApiKeys[i].Id)
 			}
 		}
 

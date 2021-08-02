@@ -116,8 +116,8 @@ var createOAuthClient = &cobra.Command{
 			}
 			cli.Name = name
 			cli.Secret = hashedSecret
-			cli.RedirectURIs = redirectURIs
-			cli.LogoutRedirectURIs = logoutRedirectURIs
+			cli.RedirectUris = redirectURIs
+			cli.LogoutRedirectUris = logoutRedirectURIs
 			cli.State = ttnpb.STATE_APPROVED
 			cli.SkipAuthorization = authorized
 			cli.Endorsed = endorsed

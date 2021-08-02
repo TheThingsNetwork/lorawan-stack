@@ -117,49 +117,49 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 				return fmt.Errorf("'rssi' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RSSI = src.RSSI
+				dst.Rssi = src.Rssi
 			} else {
 				var zero float32
-				dst.RSSI = zero
+				dst.Rssi = zero
 			}
 		case "signal_rssi":
 			if len(subs) > 0 {
 				return fmt.Errorf("'signal_rssi' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SignalRSSI = src.SignalRSSI
+				dst.SignalRssi = src.SignalRssi
 			} else {
-				dst.SignalRSSI = nil
+				dst.SignalRssi = nil
 			}
 		case "channel_rssi":
 			if len(subs) > 0 {
 				return fmt.Errorf("'channel_rssi' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ChannelRSSI = src.ChannelRSSI
+				dst.ChannelRssi = src.ChannelRssi
 			} else {
 				var zero float32
-				dst.ChannelRSSI = zero
+				dst.ChannelRssi = zero
 			}
 		case "rssi_standard_deviation":
 			if len(subs) > 0 {
 				return fmt.Errorf("'rssi_standard_deviation' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RSSIStandardDeviation = src.RSSIStandardDeviation
+				dst.RssiStandardDeviation = src.RssiStandardDeviation
 			} else {
 				var zero float32
-				dst.RSSIStandardDeviation = zero
+				dst.RssiStandardDeviation = zero
 			}
 		case "snr":
 			if len(subs) > 0 {
 				return fmt.Errorf("'snr' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SNR = src.SNR
+				dst.Snr = src.Snr
 			} else {
 				var zero float32
-				dst.SNR = zero
+				dst.Snr = zero
 			}
 		case "frequency_offset":
 			if len(subs) > 0 {

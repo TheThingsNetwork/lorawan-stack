@@ -44,8 +44,8 @@ message AuthInfoResponse {
     EntityIdentifiers entity_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   }
   oneof access_method {
-    AuthInfoResponse.APIKeyAccess api_key = 1 [(gogoproto.customname) = "APIKey"];
-    OAuthAccessToken oauth_access_token = 2 [(gogoproto.customname) = "OAuthAccessToken"];
+    AuthInfoResponse.APIKeyAccess api_key = 1;
+    OAuthAccessToken oauth_access_token = 2;
     // Warning: A user authorized by session cookie will be granted all
     // current and future rights. When using this auth type, the respective
     // handlers need to ensure thorough CSRF and CORS protection using
@@ -73,7 +73,7 @@ message IsConfiguration {
   message UserRegistration {
     message Invitation {
       google.protobuf.BoolValue required = 1;
-      google.protobuf.Duration token_ttl = 2 [(gogoproto.customname) = "TokenTTL", (gogoproto.stdduration) = true];
+      google.protobuf.Duration token_ttl = 2 [(gogoproto.stdduration) = true];
     }
     Invitation invitation = 1;
 

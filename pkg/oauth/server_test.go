@@ -67,8 +67,8 @@ var (
 		ClientIdentifiers:  ttnpb.ClientIdentifiers{ClientId: "client"},
 		State:              ttnpb.STATE_APPROVED,
 		Grants:             []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
-		RedirectURIs:       []string{"https://uri/callback", "http://uri/callback"},
-		LogoutRedirectURIs: []string{"https://uri/logout-callback", "http://uri/logout-callback", "http://uri/alternative-logout-callback", "http://other-host/logout-callback"},
+		RedirectUris:       []string{"https://uri/callback", "http://uri/callback"},
+		LogoutRedirectUris: []string{"https://uri/logout-callback", "http://uri/logout-callback", "http://uri/alternative-logout-callback", "http://other-host/logout-callback"},
 		Rights:             []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
 	}
 	mockAccessToken = &ttnpb.OAuthAccessToken{
@@ -235,7 +235,7 @@ func TestOAuthFlow(t *testing.T) {
 					ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "client"},
 					State:             ttnpb.STATE_REJECTED,
 					Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
-					RedirectURIs:      []string{"https://uri/callback", "http://uri/callback"},
+					RedirectUris:      []string{"https://uri/callback", "http://uri/callback"},
 					Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
 				}
 			},
@@ -254,7 +254,7 @@ func TestOAuthFlow(t *testing.T) {
 					ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "client"},
 					State:             ttnpb.STATE_REQUESTED,
 					Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
-					RedirectURIs:      []string{"https://uri/callback", "http://uri/callback"},
+					RedirectUris:      []string{"https://uri/callback", "http://uri/callback"},
 					Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
 				}
 			},
@@ -273,7 +273,7 @@ func TestOAuthFlow(t *testing.T) {
 					ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "client"},
 					State:             ttnpb.STATE_SUSPENDED,
 					Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
-					RedirectURIs:      []string{"https://uri/callback", "http://uri/callback"},
+					RedirectUris:      []string{"https://uri/callback", "http://uri/callback"},
 					Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
 				}
 			},
@@ -292,7 +292,7 @@ func TestOAuthFlow(t *testing.T) {
 					ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "client"},
 					State:             ttnpb.STATE_REJECTED,
 					Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
-					RedirectURIs:      []string{"https://uri/callback", "http://uri/callback"},
+					RedirectUris:      []string{"https://uri/callback", "http://uri/callback"},
 					Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
 				}
 			},
@@ -311,7 +311,7 @@ func TestOAuthFlow(t *testing.T) {
 					ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "client"},
 					State:             ttnpb.STATE_APPROVED,
 					Grants:            []ttnpb.GrantType{},
-					RedirectURIs:      []string{"https://uri/callback", "http://uri/callback"},
+					RedirectUris:      []string{"https://uri/callback", "http://uri/callback"},
 					Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
 				}
 			},
@@ -346,7 +346,7 @@ func TestOAuthFlow(t *testing.T) {
 				a.So(s.req.authorizationCode.UserSessionId, should.Equal, mockSession.SessionId)
 				a.So(s.req.authorizationCode.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.authorizationCode.Code, should.NotBeEmpty)
-				a.So(s.req.authorizationCode.RedirectURI, should.Equal, "http://uri/callback")
+				a.So(s.req.authorizationCode.RedirectUri, should.Equal, "http://uri/callback")
 				a.So(s.req.authorizationCode.State, should.Equal, "foo")
 			},
 		},
@@ -434,7 +434,7 @@ func TestOAuthFlow(t *testing.T) {
 			StoreSetup: func(s *mockStore) {
 				s.res.session = mockSession
 				s.res.client = mockClient
-				s.res.client.LogoutRedirectURIs = []string{}
+				s.res.client.LogoutRedirectUris = []string{}
 				s.res.accessToken = mockAccessToken
 			},
 			Method:           "GET",
@@ -669,7 +669,7 @@ func TestTokenExchange(t *testing.T) {
 					UserSessionId: mockSession.SessionId,
 					Rights:        mockClient.Rights,
 					Code:          "the code",
-					RedirectURI:   "http://uri/callback",
+					RedirectUri:   "http://uri/callback",
 					State:         "foo",
 					CreatedAt:     time.Now().Truncate(time.Second),
 					ExpiresAt:     time.Now().Truncate(time.Second).Add(time.Hour),
@@ -711,7 +711,7 @@ func TestTokenExchange(t *testing.T) {
 					UserSessionId: mockSession.SessionId,
 					Rights:        mockClient.Rights,
 					Code:          "the code",
-					RedirectURI:   "http://uri/callback",
+					RedirectUri:   "http://uri/callback",
 					State:         "foo",
 					CreatedAt:     time.Now().Truncate(time.Second),
 					ExpiresAt:     time.Now().Truncate(time.Second).Add(time.Hour),

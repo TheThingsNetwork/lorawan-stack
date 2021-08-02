@@ -106,8 +106,8 @@ var (
 				Longitude: 234.5,
 				Altitude:  345,
 			},
-			RSSI: 567.8,
-			SNR:  678.9,
+			Rssi: 567.8,
+			Snr:  678.9,
 		},
 		{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
@@ -119,8 +119,8 @@ var (
 				Altitude:  456,
 			},
 			FineTimestamp: 890,
-			RSSI:          678.9,
-			SNR:           789.1,
+			Rssi:          678.9,
+			Snr:           789.1,
 		},
 	})
 	singleFrameResponse = api.LocationSolverResponse{
@@ -147,8 +147,8 @@ var (
 					Longitude: 234.5,
 					Altitude:  345,
 				},
-				RSSI: 567.8,
-				SNR:  678.9,
+				Rssi: 567.8,
+				Snr:  678.9,
 			},
 			{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
@@ -160,8 +160,8 @@ var (
 					Altitude:  456,
 				},
 				FineTimestamp: 890,
-				RSSI:          678.9,
-				SNR:           789.1,
+				Rssi:          678.9,
+				Snr:           789.1,
 			},
 		},
 		{
@@ -174,8 +174,8 @@ var (
 					Longitude: 234.5,
 					Altitude:  345,
 				},
-				RSSI: 890.1,
-				SNR:  910.1,
+				Rssi: 890.1,
+				Snr:  910.1,
 			},
 			{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
@@ -187,8 +187,8 @@ var (
 					Altitude:  456,
 				},
 				FineTimestamp: 910,
-				RSSI:          789.1,
-				SNR:           890.1,
+				Rssi:          789.1,
+				Snr:           890.1,
 			},
 		},
 	})

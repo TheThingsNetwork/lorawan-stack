@@ -458,7 +458,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				nsPlaintextCond func(error) bool
 				asPlaintextCond func(error) bool
 			)
-			nsKEKLabel, asKEKLabel := dev.NetworkServerKEKLabel, dev.ApplicationServerKEKLabel
+			nsKEKLabel, asKEKLabel := dev.NetworkServerKekLabel, dev.ApplicationServerKekLabel
 			if nsKEKLabel == "" {
 				nsKEKLabel = js.KeyVault.NsKEKLabel(ctx, dev.NetId, dev.NetworkServerAddress)
 				nsPlaintextCond = errors.IsNotFound
@@ -487,16 +487,16 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 					asPlaintextCond = errors.IsNotFound
 				} else {
 					var kek types.AES128Key
-					if appSettings.KEKLabel != "" {
-						if appSettings.KEK == nil {
+					if appSettings.KekLabel != "" {
+						if appSettings.Kek == nil {
 							return nil, nil, errNoKEK.New()
 						}
-						kek, err = cryptoutil.UnwrapAES128Key(ctx, appSettings.KEK, js.KeyVault)
+						kek, err = cryptoutil.UnwrapAES128Key(ctx, appSettings.Kek, js.KeyVault)
 						if err != nil {
 							return nil, nil, errUnwrapKey.WithCause(err)
 						}
 					}
-					appSKeyEnvelope, err = wrapKeyWithKEK(ctx, appSKey, appSettings.KEKLabel, kek)
+					appSKeyEnvelope, err = wrapKeyWithKEK(ctx, appSKey, appSettings.KekLabel, kek)
 					if err != nil {
 						return nil, nil, err
 					}

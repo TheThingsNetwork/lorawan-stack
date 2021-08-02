@@ -240,9 +240,9 @@ service JsEndDeviceRegistry {
 
 message ApplicationActivationSettings {
   // The KEK label to use for wrapping application keys.
-  string kek_label = 1 [(gogoproto.customname) = "KEKLabel", (validate.rules).string.max_len = 2048];
+  string kek_label = 1 [(validate.rules).string.max_len = 2048];
   // The (encrypted) Key Encryption Key.
-  KeyEnvelope kek = 2 [(gogoproto.customname) = "KEK"];
+  KeyEnvelope kek = 2;
   // Home NetID.
   bytes home_net_id = 3 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
   // The AS-ID of the Application Server to use.

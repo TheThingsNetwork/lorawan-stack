@@ -233,8 +233,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
 				ApplicationIdentifiers: appID,
 				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
-					KEKLabel: sessionKEKLabel,
-					KEK:      jsKEKEnvelopeUnwrapped,
+					KekLabel: sessionKEKLabel,
+					Kek:      jsKEKEnvelopeUnwrapped,
 				},
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
@@ -252,8 +252,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
 				ApplicationIdentifiers: appID,
 				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
-					KEKLabel: sessionKEKLabel,
-					KEK:      jsKEKEnvelopeUnwrapped,
+					KekLabel: sessionKEKLabel,
+					Kek:      jsKEKEnvelopeUnwrapped,
 				},
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
@@ -274,8 +274,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
 				ApplicationIdentifiers: appID,
 				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
-					KEKLabel: sessionKEKLabel,
-					KEK:      jsKEKEnvelopeUnwrapped,
+					KekLabel: sessionKEKLabel,
+					Kek:      jsKEKEnvelopeUnwrapped,
 				},
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
@@ -296,8 +296,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
 				ApplicationIdentifiers: appID,
 				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
-					KEKLabel: sessionKEKLabel,
-					KEK:      jsKEKEnvelopeUnwrapped,
+					KekLabel: sessionKEKLabel,
+					Kek:      jsKEKEnvelopeUnwrapped,
 				},
 			},
 			Rights: []ttnpb.Right{
@@ -313,8 +313,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
 				ApplicationIdentifiers: appID,
 				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
-					KEKLabel: sessionKEKLabel,
-					KEK: &ttnpb.KeyEnvelope{
+					KekLabel: sessionKEKLabel,
+					Kek: &ttnpb.KeyEnvelope{
 						Key: &types.AES128Key{},
 					},
 				},
@@ -338,7 +338,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
 				ApplicationIdentifiers: appID,
 				ApplicationActivationSettings: ttnpb.ApplicationActivationSettings{
-					KEK: jsKEKEnvelopeUnwrapped,
+					Kek: jsKEKEnvelopeUnwrapped,
 				},
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
@@ -464,8 +464,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "KEK sent plaintext",
 			CreateSettings: &ttnpb.ApplicationActivationSettings{
-				KEKLabel:            sessionKEKLabel,
-				KEK:                 jsKEKEnvelopeUnwrapped,
+				KekLabel:            sessionKEKLabel,
+				Kek:                 jsKEKEnvelopeUnwrapped,
 				HomeNetId:           &netID,
 				ApplicationServerId: asID,
 			},
@@ -476,8 +476,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				"home_net_id",
 			},
 			GetSettings: &ttnpb.ApplicationActivationSettings{
-				KEKLabel:            sessionKEKLabel,
-				KEK:                 jsKEKEnvelopeUnwrapped,
+				KekLabel:            sessionKEKLabel,
+				Kek:                 jsKEKEnvelopeUnwrapped,
 				HomeNetId:           &netID,
 				ApplicationServerId: asID,
 			},
@@ -519,7 +519,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 						if !a.So(err, should.BeNil) {
 							t.Fatalf("Failed to get settings from registry directly: %s", test.FormatError(err))
 						}
-						a.So(stored.GetKEK().GetKey(), should.BeNil)
+						a.So(stored.GetKek().GetKey(), should.BeNil)
 					},
 				})
 				test.RunSubtestFromContext(ctx, test.SubtestConfig{
