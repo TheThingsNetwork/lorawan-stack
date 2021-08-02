@@ -39,10 +39,11 @@ import (
 )
 
 const (
-	cupsLastSeenAttribute = "cups-last-seen"
-	cupsStationAttribute  = "cups-station"
-	cupsModelAttribute    = "cups-model"
-	cupsPackageAttribute  = "cups-package"
+	cupsLastSeenAttribute  = "cups-last-seen"
+	cupsStationAttribute   = "cups-station"
+	cupsModelAttribute     = "cups-model"
+	cupsPackageAttribute   = "cups-package"
+	updateInfoRequestLabel = "update_info"
 )
 
 var (
@@ -149,9 +150,16 @@ var getGatewayMask = pbtypes.FieldMask{Paths: []string{
 }}
 
 // UpdateInfo implements the CUPS update-info handler.
-func (s *Server) UpdateInfo(c echo.Context) error {
+func (s *Server) UpdateInfo(c echo.Context) (err error) {
 	// This is to account for older LBS gateways that don't set this header.
 	c.Request().Header.Set(echo.HeaderContentType, "application/json")
+
+	registerUpdateInfoRequestReceived(c.Request().Context(), updateInfoRequestLabel)
+	defer func() {
+		if err != nil {
+			registerUpdateInfoRequestFailed(c.Request().Context(), updateInfoRequestLabel, err)
+		}
+	}()
 
 	var req UpdateInfoRequest
 	if err := c.Bind(&req); err != nil {
@@ -374,5 +382,8 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
+	registerUpdateInfoRequestSucceeded(c.Request().Context(), updateInfoRequestLabel, req.Package, req.Model, req.Station)
+
 	return c.Blob(http.StatusOK, echo.MIMEOctetStream, b)
 }
