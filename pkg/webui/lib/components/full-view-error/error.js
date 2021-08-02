@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Container, Row, Col } from 'react-grid-system'
+import { defineMessages } from 'react-intl'
+import clipboard from 'clipboard'
 
 import Link from '@ttn-lw/components/link'
 import Footer from '@ttn-lw/components/footer'
+import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
@@ -32,9 +35,13 @@ import {
 } from '@ttn-lw/lib/errors/utils'
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
+import { selectApplicationRootPath, selectSupportLinkConfig } from '@ttn-lw/lib/selectors/env'
 
 import style from './error.styl'
+
+const m = defineMessages({
+  errorDetails: 'Error details',
+})
 
 const appRoot = selectApplicationRootPath()
 
@@ -43,6 +50,10 @@ const FullViewErrorInner = ({ error }) => {
   const statusCode = httpStatusCode(error)
   const isNotFound = isNotFoundError(error)
   const isFrontend = isFrontendError(error)
+
+  const [copied, setCopied] = useState(false)
+
+  const supportLink = selectSupportLinkConfig()
 
   let errorTitleMessage = errorMessages.unknownErrorTitle
   let errorMessageMessage = errorMessages.contactAdministrator
@@ -61,6 +72,27 @@ const FullViewErrorInner = ({ error }) => {
     }
   }
 
+  const copiedTimer = useRef(undefined)
+  const handleCopyClick = useCallback(() => {
+    if (!copied) {
+      setCopied(true)
+      copiedTimer.current = setTimeout(() => setCopied(false), 3000)
+    }
+  }, [setCopied, copied])
+
+  const copyButton = useRef(null)
+  useEffect(() => {
+    if (copyButton.current) {
+      new clipboard(copyButton.current)
+    }
+    return () => {
+      // Clear timer on unmount.
+      if (copiedTimer.current) {
+        clearTimeout(copiedTimer.current)
+      }
+    }
+  }, [])
+
   let action = undefined
   if (isNotFound) {
     action = (
@@ -69,6 +101,8 @@ const FullViewErrorInner = ({ error }) => {
       </Link.Anchor>
     )
   }
+
+  const errorDetails = useMemo(() => JSON.stringify(error, undefined, 2), [error])
 
   return (
     <div className={style.fullViewError} data-test-id="full-error-view">
@@ -82,6 +116,29 @@ const FullViewErrorInner = ({ error }) => {
               content={errorTitleMessage}
             />
             <ErrorMessage className={style.fullViewErrorSub} content={errorMessageMessage} />
+            <details>
+              <summary>
+                <Message content={m.errorDetails} />
+              </summary>
+              <pre>{errorDetails}</pre>
+              <Button
+                onClick={handleCopyClick}
+                ref={copyButton}
+                data-clipboard-text={errorDetails}
+                message={copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard}
+                icon={copied ? 'done' : 'file_copy'}
+                secondary
+              />
+              {Boolean(supportLink) && (
+                <Button.AnchorLink
+                  href={supportLink}
+                  message={sharedMessages.getSupport}
+                  icon="contact_support"
+                  target="_blank"
+                  secondary
+                />
+              )}
+            </details>
             {action}
           </Col>
         </Row>

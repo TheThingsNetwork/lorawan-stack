@@ -23,6 +23,7 @@ import Icon from '@ttn-lw/components/icon'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './safe-inspector.styl'
 
@@ -46,9 +47,7 @@ const selectText = node => {
 }
 
 const m = defineMessages({
-  copied: 'Copied to clipboard!',
   toggleVisibility: 'Toggle visibility',
-  copyClipboard: 'Copy to clipboard',
   arrayFormatting: 'Toggle array formatting',
   byteOrder: 'Switch byte order',
 })
@@ -334,7 +333,7 @@ export class SafeInspector extends Component {
             )}
             {!noCopy && (
               <button
-                title={intl.formatMessage(m.copyClipboard)}
+                title={intl.formatMessage(sharedMessages.copyToClipboard)}
                 className={style.buttonCopy}
                 onClick={this.handleCopyClick}
                 data-clipboard-text={formattedData}
@@ -349,7 +348,7 @@ export class SafeInspector extends Component {
                 />
                 {copied && !noCopyPopup && (
                   <Message
-                    content={m.copied}
+                    content={sharedMessages.copiedToClipboard}
                     onAnimationEnd={this.handleCopyAnimationEnd}
                     className={style.copyConfirm}
                   />
