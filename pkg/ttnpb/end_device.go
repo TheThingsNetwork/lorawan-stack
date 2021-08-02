@@ -1216,17 +1216,17 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "used_dev_nonces":
 		return v.UsedDevNonces == nil
 	case "version_ids":
-		return v.VersionIDs == nil
+		return v.VersionIds == nil
 	case "version_ids.brand_id":
-		return v.VersionIDs.FieldIsZero("brand_id")
+		return v.VersionIds.FieldIsZero("brand_id")
 	case "version_ids.firmware_version":
-		return v.VersionIDs.FieldIsZero("firmware_version")
+		return v.VersionIds.FieldIsZero("firmware_version")
 	case "version_ids.hardware_version":
-		return v.VersionIDs.FieldIsZero("hardware_version")
+		return v.VersionIds.FieldIsZero("hardware_version")
 	case "version_ids.model_id":
-		return v.VersionIDs.FieldIsZero("model_id")
+		return v.VersionIds.FieldIsZero("model_id")
 	case "version_ids.band_id":
-		return v.VersionIDs.FieldIsZero("band_id")
+		return v.VersionIds.FieldIsZero("band_id")
 	}
 	switch {
 	case strings.HasPrefix(p, "mac_state."):

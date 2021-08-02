@@ -234,7 +234,7 @@ message ApplicationUplink {
   map<string,Location> locations = 14;
 
   // End device version identifiers, set by the Application Server while handling the message.
-  EndDeviceVersionIdentifiers version_ids = 15 [(gogoproto.customname) = "VersionIDs"];
+  EndDeviceVersionIdentifiers version_ids = 15;
 
   // Network identifiers, set by the Network Server that handles the message.
   NetworkIdentifiers network_ids = 16;

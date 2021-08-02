@@ -34,7 +34,7 @@ option (gogoproto.stringer_all) = true;
 
 message EncodeDownlinkMessageRequest {
   EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
-  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceVersionIDs", (validate.rules).message.required = true];
+  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   ApplicationDownlink message = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   PayloadFormatter formatter = 4;
   string parameter = 5;
@@ -42,7 +42,7 @@ message EncodeDownlinkMessageRequest {
 
 message DecodeUplinkMessageRequest {
   EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
-  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceVersionIDs", (validate.rules).message.required = true];
+  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   ApplicationUplink message = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   PayloadFormatter formatter = 4;
   string parameter = 5;
@@ -50,7 +50,7 @@ message DecodeUplinkMessageRequest {
 
 message DecodeDownlinkMessageRequest {
   EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
-  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceVersionIDs", (validate.rules).message.required = true];
+  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   ApplicationDownlink message = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   PayloadFormatter formatter = 4;
   string parameter = 5;

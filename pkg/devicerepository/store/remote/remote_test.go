@@ -375,7 +375,7 @@ func TestRemoteStore(t *testing.T) {
 					BandId:          "unknown-band",
 				},
 			} {
-				codec, err := s.GetDownlinkDecoder(&ttnpb.GetPayloadFormatterRequest{VersionIDs: &ids})
+				codec, err := s.GetDownlinkDecoder(&ttnpb.GetPayloadFormatterRequest{VersionIds: &ids})
 				a.So(errors.IsNotFound(err), should.BeTrue)
 				a.So(codec, should.Equal, nil)
 			}
@@ -419,7 +419,7 @@ func TestRemoteStore(t *testing.T) {
 					FirmwareVersion: "1.1",
 					BandId:          "EU_433",
 				}
-				codec, err := tc.f(&ttnpb.GetPayloadFormatterRequest{VersionIDs: versionIDs})
+				codec, err := tc.f(&ttnpb.GetPayloadFormatterRequest{VersionIds: versionIDs})
 				a.So(err, should.BeNil)
 				a.So(codec, should.Resemble, tc.codec)
 			})
@@ -515,7 +515,7 @@ func TestRemoteStore(t *testing.T) {
 						BandId:          "EU_433",
 					}
 					codec, err := tc.f(&ttnpb.GetPayloadFormatterRequest{
-						VersionIDs: versionIDs,
+						VersionIds: versionIDs,
 						FieldMask:  &pbtypes.FieldMask{Paths: []string{"examples"}},
 					})
 					a.So(err, should.BeNil)

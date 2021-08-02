@@ -306,7 +306,7 @@ message GetPayloadFormatterRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false];
 
   // End device version information.
-  EndDeviceVersionIdentifiers version_ids = 2 [(gogoproto.customname) = "VersionIDs"];
+  EndDeviceVersionIdentifiers version_ids = 2;
 
   // Field mask paths.
   google.protobuf.FieldMask field_mask = 3;

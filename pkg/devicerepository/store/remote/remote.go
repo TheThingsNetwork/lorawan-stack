@@ -287,7 +287,7 @@ var (
 )
 
 func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *EndDeviceCodecs) *EndDeviceDecoderCodec) (*ttnpb.MessagePayloadDecoder, error) {
-	codecs, err := s.getCodecs(req.GetVersionIDs())
+	codecs, err := s.getCodecs(req.GetVersionIds())
 	if err != nil {
 		return nil, err
 	}
@@ -296,7 +296,7 @@ func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *
 		return nil, errNoDecoder.WithAttributes("codec_id", codecs.CodecID)
 	}
 
-	b, err := s.fetcher.File("vendor", req.GetVersionIDs().BrandId, codec.FileName)
+	b, err := s.fetcher.File("vendor", req.GetVersionIds().BrandId, codec.FileName)
 	if err != nil {
 		return nil, err
 	}
@@ -348,17 +348,17 @@ func (s *remoteStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.Mess
 
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
 func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadEncoder, error) {
-	codecs, err := s.getCodecs(req.GetVersionIDs())
+	codecs, err := s.getCodecs(req.GetVersionIds())
 	if err != nil {
 		return nil, err
 	}
 	codec := codecs.DownlinkEncoder
 
 	if codec.FileName == "" {
-		return nil, errNoEncoder.WithAttributes("firmware_version", req.GetVersionIDs().FirmwareVersion, "band_id", req.GetVersionIDs().BandId)
+		return nil, errNoEncoder.WithAttributes("firmware_version", req.GetVersionIds().FirmwareVersion, "band_id", req.GetVersionIds().BandId)
 	}
 
-	b, err := s.fetcher.File("vendor", req.GetVersionIDs().BrandId, codec.FileName)
+	b, err := s.fetcher.File("vendor", req.GetVersionIds().BrandId, codec.FileName)
 	if err != nil {
 		return nil, err
 	}

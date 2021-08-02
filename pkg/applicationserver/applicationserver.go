@@ -970,8 +970,8 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 
 	registerUplinkLatency(ctx, uplink)
 
-	if dev.VersionIDs != nil {
-		uplink.VersionIDs = dev.VersionIDs
+	if dev.VersionIds != nil {
+		uplink.VersionIds = dev.VersionIds
 	}
 
 	isDev, err := as.endDeviceFetcher.Get(ctx, ids, "locations")

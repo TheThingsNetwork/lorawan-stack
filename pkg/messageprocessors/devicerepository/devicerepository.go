@@ -108,7 +108,7 @@ func (h *host) retrieve(ctx context.Context, codec codecType, ids ttnpb.Applicat
 		)
 		req := &ttnpb.GetPayloadFormatterRequest{
 			ApplicationIds: ids,
-			VersionIDs:     version,
+			VersionIds:     version,
 		}
 		client := ttnpb.NewDeviceRepositoryClient(cc)
 		switch codec {

@@ -850,7 +850,7 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 
 		case "version_ids":
 
-			if v, ok := interface{}(m.GetVersionIDs()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetVersionIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationUplinkValidationError{
 						field:  "version_ids",

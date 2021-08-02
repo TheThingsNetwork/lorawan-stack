@@ -58,7 +58,7 @@ type GetModelsResponse struct {
 
 // GetCodecRequest is a request to retrieve the codec of
 type GetCodecRequest interface {
-	GetVersionIDs() *ttnpb.EndDeviceVersionIdentifiers
+	GetVersionIds() *ttnpb.EndDeviceVersionIdentifiers
 	GetFieldMask() *pbtypes.FieldMask
 }
 

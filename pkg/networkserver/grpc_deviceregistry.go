@@ -1230,7 +1230,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		) {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
-					if devBandID := dev.GetVersionIDs().GetBandId(); devBandID != "" && devBandID != fp.BandID {
+					if devBandID := dev.GetVersionIds().GetBandId(); devBandID != "" && devBandID != fp.BandID {
 						return newInvalidFieldValueError("version_ids.band_id").WithCause(
 							errDeviceAndFrequencyPlanBandMismatch.WithAttributes(
 								"dev_band_id", devBandID,

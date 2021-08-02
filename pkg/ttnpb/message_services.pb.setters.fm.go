@@ -29,18 +29,18 @@ func (dst *EncodeDownlinkMessageRequest) SetFields(src *EncodeDownlinkMessageReq
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceVersionIdentifiers
 				if src != nil {
-					newSrc = &src.EndDeviceVersionIDs
+					newSrc = &src.EndDeviceVersionIds
 				}
-				newDst = &dst.EndDeviceVersionIDs
+				newDst = &dst.EndDeviceVersionIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceVersionIDs = src.EndDeviceVersionIDs
+					dst.EndDeviceVersionIds = src.EndDeviceVersionIds
 				} else {
 					var zero EndDeviceVersionIdentifiers
-					dst.EndDeviceVersionIDs = zero
+					dst.EndDeviceVersionIds = zero
 				}
 			}
 		case "message":
@@ -114,18 +114,18 @@ func (dst *DecodeUplinkMessageRequest) SetFields(src *DecodeUplinkMessageRequest
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceVersionIdentifiers
 				if src != nil {
-					newSrc = &src.EndDeviceVersionIDs
+					newSrc = &src.EndDeviceVersionIds
 				}
-				newDst = &dst.EndDeviceVersionIDs
+				newDst = &dst.EndDeviceVersionIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceVersionIDs = src.EndDeviceVersionIDs
+					dst.EndDeviceVersionIds = src.EndDeviceVersionIds
 				} else {
 					var zero EndDeviceVersionIdentifiers
-					dst.EndDeviceVersionIDs = zero
+					dst.EndDeviceVersionIds = zero
 				}
 			}
 		case "message":
@@ -199,18 +199,18 @@ func (dst *DecodeDownlinkMessageRequest) SetFields(src *DecodeDownlinkMessageReq
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceVersionIdentifiers
 				if src != nil {
-					newSrc = &src.EndDeviceVersionIDs
+					newSrc = &src.EndDeviceVersionIds
 				}
-				newDst = &dst.EndDeviceVersionIDs
+				newDst = &dst.EndDeviceVersionIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceVersionIDs = src.EndDeviceVersionIDs
+					dst.EndDeviceVersionIds = src.EndDeviceVersionIds
 				} else {
 					var zero EndDeviceVersionIdentifiers
-					dst.EndDeviceVersionIDs = zero
+					dst.EndDeviceVersionIds = zero
 				}
 			}
 		case "message":

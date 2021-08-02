@@ -409,7 +409,7 @@ message EndDevice {
   ];
 
   // Version Identifiers. Stored in Entity Registry, Network Server and Application Server.
-  EndDeviceVersionIdentifiers version_ids = 7 [(gogoproto.customname) = "VersionIDs"];
+  EndDeviceVersionIdentifiers version_ids = 7;
 
   // Default service profile. Stored in Entity Registry.
   string service_profile_id = 8 [(gogoproto.customname) = "ServiceProfileID", (validate.rules).string.max_len = 64];

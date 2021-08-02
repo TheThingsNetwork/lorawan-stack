@@ -104,7 +104,7 @@ func (dr *mockDR) key(ids *ttnpb.EndDeviceVersionIdentifiers) string {
 var errMock = fmt.Errorf("mock_error")
 
 func (dr *mockDR) GetUplinkDecoder(_ context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadDecoder, error) {
-	f, ok := dr.uplinkDecoders[dr.key(req.VersionIDs)]
+	f, ok := dr.uplinkDecoders[dr.key(req.VersionIds)]
 	if !ok {
 		return nil, errMock
 	}
@@ -112,7 +112,7 @@ func (dr *mockDR) GetUplinkDecoder(_ context.Context, req *ttnpb.GetPayloadForma
 }
 
 func (dr *mockDR) GetDownlinkDecoder(_ context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadDecoder, error) {
-	f, ok := dr.downlinkDecoders[dr.key(req.VersionIDs)]
+	f, ok := dr.downlinkDecoders[dr.key(req.VersionIds)]
 	if !ok {
 		return nil, errMock
 	}
@@ -120,7 +120,7 @@ func (dr *mockDR) GetDownlinkDecoder(_ context.Context, req *ttnpb.GetPayloadFor
 }
 
 func (dr *mockDR) GetDownlinkEncoder(_ context.Context, req *ttnpb.GetPayloadFormatterRequest) (*ttnpb.MessagePayloadEncoder, error) {
-	f, ok := dr.downlinkEncoders[dr.key(req.VersionIDs)]
+	f, ok := dr.downlinkEncoders[dr.key(req.VersionIds)]
 	if !ok {
 		return nil, errMock
 	}
