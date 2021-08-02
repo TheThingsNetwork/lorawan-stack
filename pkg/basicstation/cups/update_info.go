@@ -294,26 +294,29 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 				gtw.GatewayServerAddress = s.defaultLNSURI
 			}
 		}
+		scheme, host, port, err := parseAddress("wss", gtw.GatewayServerAddress)
+		if err != nil {
+			return err
+		}
 		if gtw.GatewayServerAddress != req.LNSURI {
-			scheme, host, port, err := parseAddress("wss", gtw.GatewayServerAddress)
-			if err != nil {
-				return err
-			}
 			address := host
 			address = net.JoinHostPort(host, port)
 			res.LNSURI = fmt.Sprintf("%s://%s", scheme, address)
 		}
 
-		lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
-		if err != nil {
-			return errServerTrust.WithCause(err).WithAttributes("address", gtw.GatewayServerAddress)
-		}
-		lnsCredentials, err := TokenCredentials(lnsTrust, string(gtw.LbsLnsSecret.Value))
-		if err != nil {
-			return err
-		}
-		if crc32.ChecksumIEEE(lnsCredentials) != req.LNSCredentialsCRC {
-			res.LNSCredentials = lnsCredentials
+		if scheme != "ws" { // Skip credentials if LNS is plain text.
+			lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
+			if err != nil {
+				return errServerTrust.WithCause(err).WithAttributes("address", gtw.GatewayServerAddress)
+			}
+
+			lnsCredentials, err := TokenCredentials(lnsTrust, string(gtw.LbsLnsSecret.Value))
+			if err != nil {
+				return err
+			}
+			if crc32.ChecksumIEEE(lnsCredentials) != req.LNSCredentialsCRC {
+				res.LNSCredentials = lnsCredentials
+			}
 		}
 	}
 

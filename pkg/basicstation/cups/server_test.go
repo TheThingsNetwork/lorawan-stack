@@ -369,6 +369,47 @@ func TestServer(t *testing.T) {
 			},
 		},
 		{
+			Name: "Existing Gateway With Plaintext LNS",
+			StoreSetup: func(c *mockGatewayClient) {
+				gtw := mockGateway(true, false, false)
+				gtw.GatewayServerAddress = "localhost:1887"
+				c.res.Get = gtw
+				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+			},
+			RequestSetup: func(req *http.Request) {
+				req.Header.Set(echo.HeaderAuthorization, "Bearer KEYCONTENTS")
+			},
+			AssertError: func(err error) bool {
+				return err == nil
+			},
+			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
+				var res UpdateInfoResponse
+				err := res.UnmarshalBinary(rec.Body.Bytes())
+				a.So(err, should.BeNil)
+				a.So(res.CUPSURI, should.BeEmpty)
+				a.So(res.LNSURI, should.Equal, "ws://localhost:1887")
+				a.So(res.CUPSCredentials, should.BeEmpty)
+				a.So(res.LNSCredentials, should.BeEmpty)
+				a.So(res.SignatureKeyCRC, should.BeZeroValue)
+				a.So(res.Signature, should.BeEmpty)
+				a.So(res.UpdateData, should.BeEmpty)
+			},
+			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
+				if a.So(s.req.Update, should.NotBeNil) {
+					a.So(s.req.Update.GatewayIdentifiers.GatewayId, should.Equal, "test-gateway")
+					a.So(s.req.Update.GatewayIdentifiers.Eui, should.Resemble, &mockGatewayEUI)
+					expectedAttributes := mockGateway(true, false, false).Attributes
+					for _, attr := range []string{
+						cupsStationAttribute,
+						cupsModelAttribute,
+						cupsPackageAttribute,
+					} {
+						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
+					}
+				}
+			},
+		},
+		{
 			Name: "Existing Gateway Without Bearer",
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway(true, false, false)

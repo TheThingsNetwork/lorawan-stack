@@ -234,6 +234,9 @@ func parseAddress(defaultScheme, address string) (scheme, host, port string, err
 		case "wss":
 			port = "8887"
 		}
+	} else if port == "1887" {
+		// Allow user to force a plain text LNS connection by setting the port.
+		scheme = "ws"
 	}
 	return
 }
