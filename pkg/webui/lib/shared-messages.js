@@ -105,6 +105,8 @@ export default defineMessages({
   connecting: 'Connecting',
   connectionIssues: 'Connection issues',
   contactInformation: 'Contact information',
+  copiedToClipboard: 'Copied to clipboard!',
+  copyToClipboard: 'Copy to clipboard',
   createApiKey: 'Create API key',
   created: 'Created',
   createdAt: 'Created at',
