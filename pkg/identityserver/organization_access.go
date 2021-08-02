@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 var (
@@ -227,6 +228,8 @@ func (is *IdentityServer) getOrganizationCollaborator(ctx context.Context, req *
 	return res, nil
 }
 
+var errOrganizationNeedsCollaborator = errors.DefineFailedPrecondition("organization_needs_collaborator", "every organization needs at least one collaborator with all rights")
+
 func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *ttnpb.SetOrganizationCollaboratorRequest) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
@@ -236,24 +239,50 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		store := is.getMembershipStore(ctx, db)
 
-		if len(req.Collaborator.Rights) > 0 {
-			newRights := ttnpb.RightsFrom(req.Collaborator.Rights...)
-			existingRights, err := store.GetMember(
-				ctx,
-				&req.Collaborator.OrganizationOrUserIdentifiers,
-				req.OrganizationIdentifiers.GetEntityIdentifiers(),
-			)
+		existingRights, err := store.GetMember(
+			ctx,
+			&req.Collaborator.OrganizationOrUserIdentifiers,
+			req.OrganizationIdentifiers.GetEntityIdentifiers(),
+		)
+		if err != nil && !errors.IsNotFound(err) {
+			return err
+		}
+		existingRights = existingRights.Implied()
+		newRights := ttnpb.RightsFrom(req.Collaborator.Rights...).Implied()
+		addedRights := newRights.Sub(existingRights)
+		removedRights := existingRights.Sub(newRights)
 
-			if err != nil && !errors.IsNotFound(err) {
+		// Require the caller to have all added rights.
+		if len(addedRights.GetRights()) > 0 {
+			if err := rights.RequireOrganization(ctx, req.OrganizationIdentifiers, addedRights.GetRights()...); err != nil {
 				return err
 			}
-			// Require the caller to have all added rights.
-			if err := rights.RequireOrganization(ctx, req.OrganizationIdentifiers, newRights.Sub(existingRights).GetRights()...); err != nil {
+		}
+
+		// Unless we're deleting the collaborator, require the caller to have all removed rights.
+		if len(newRights.GetRights()) > 0 && len(removedRights.GetRights()) > 0 {
+			if err := rights.RequireOrganization(ctx, req.OrganizationIdentifiers, removedRights.GetRights()...); err != nil {
 				return err
 			}
-			// Require the caller to have all removed rights.
-			if err := rights.RequireOrganization(ctx, req.OrganizationIdentifiers, existingRights.Sub(newRights).GetRights()...); err != nil {
+		}
+
+		if removedRights.IncludesAll(ttnpb.RIGHT_ORGANIZATION_ALL) {
+			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.OrganizationIdentifiers.GetEntityIdentifiers())
+			if err != nil {
 				return err
+			}
+			var hasOtherOwner bool
+			for member, rights := range memberRights {
+				if unique.ID(ctx, member) == unique.ID(ctx, &req.Collaborator.OrganizationOrUserIdentifiers) {
+					continue
+				}
+				if rights.Implied().IncludesAll(ttnpb.RIGHT_ORGANIZATION_ALL) {
+					hasOtherOwner = true
+					break
+				}
+			}
+			if !hasOtherOwner {
+				return errOrganizationNeedsCollaborator.New()
 			}
 		}
 

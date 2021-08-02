@@ -5174,6 +5174,15 @@
       "file": "application_registry.go"
     }
   },
+  "error:pkg/identityserver:application_needs_collaborator": {
+    "translations": {
+      "en": "every application needs at least one collaborator with all rights"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_access.go"
+    }
+  },
   "error:pkg/identityserver:claim_authentication_code": {
     "translations": {
       "en": "invalid claim authentication code"
@@ -5181,6 +5190,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "gateway_registry.go"
+    }
+  },
+  "error:pkg/identityserver:client_needs_collaborator": {
+    "translations": {
+      "en": "every client needs at least one collaborator with all rights"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "client_access.go"
     }
   },
   "error:pkg/identityserver:client_update_admin_field": {
@@ -5244,6 +5262,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "gateway_registry.go"
+    }
+  },
+  "error:pkg/identityserver:gateway_needs_collaborator": {
+    "translations": {
+      "en": "every gateway needs at least one collaborator with all rights"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_access.go"
     }
   },
   "error:pkg/identityserver:invalid_authorization": {
@@ -5352,6 +5379,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:organization_needs_collaborator": {
+    "translations": {
+      "en": "every organization needs at least one collaborator with all rights"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "organization_access.go"
     }
   },
   "error:pkg/identityserver:password_contains_user_id": {

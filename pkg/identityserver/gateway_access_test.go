@@ -354,6 +354,24 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		if a.So(res, should.NotBeNil) {
 			a.So(res.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL})
 		}
+
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
+			GatewayIdentifiers: gatewayID,
+			Collaborator: ttnpb.Collaborator{
+				OrganizationOrUserIdentifiers: *collaboratorID,
+			},
+		}, creds)
+
+		a.So(err, should.BeNil)
+
+		res, err = reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
+			GatewayIdentifiers:            gatewayID,
+			OrganizationOrUserIdentifiers: *collaboratorID,
+		}, creds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 	})
 }
 
