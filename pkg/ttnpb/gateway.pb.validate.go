@@ -51,7 +51,7 @@ func (m *GatewayBrand) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "id":
-			// no validation rules for ID
+			// no validation rules for Id
 		case "name":
 			// no validation rules for Name
 		case "url":
@@ -159,16 +159,16 @@ func (m *GatewayModel) ValidateFields(paths ...string) error {
 
 		case "id":
 
-			if m.GetID() != "" {
+			if m.GetId() != "" {
 
-				if utf8.RuneCountInString(m.GetID()) > 36 {
+				if utf8.RuneCountInString(m.GetId()) > 36 {
 					return GatewayModelValidationError{
 						field:  "id",
 						reason: "value length must be at most 36 runes",
 					}
 				}
 
-				if !_GatewayModel_ID_Pattern.MatchString(m.GetID()) {
+				if !_GatewayModel_Id_Pattern.MatchString(m.GetId()) {
 					return GatewayModelValidationError{
 						field:  "id",
 						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -245,7 +245,7 @@ var _ interface {
 
 var _GatewayModel_BrandID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
-var _GatewayModel_ID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GatewayModel_Id_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on GatewayVersionIdentifiers with the
 // rules defined in the proto definition for this message. If any rules are

@@ -72,10 +72,10 @@ func (dst *ContactInfoValidation) SetFields(src *ContactInfoValidation, paths ..
 				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ID = src.ID
+				dst.Id = src.Id
 			} else {
 				var zero string
-				dst.ID = zero
+				dst.Id = zero
 			}
 		case "token":
 			if len(subs) > 0 {

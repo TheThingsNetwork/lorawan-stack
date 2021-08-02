@@ -209,7 +209,7 @@ func TestOAuthStore(t *testing.T) {
 			err = store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 				UserIds:      *userIDs,
 				ClientIds:    *clientIDs,
-				ID:           tokenID,
+				Id:           tokenID,
 				AccessToken:  access,
 				RefreshToken: refresh,
 				Rights:       rights,
@@ -223,7 +223,7 @@ func TestOAuthStore(t *testing.T) {
 			if a.So(got, should.NotBeNil) {
 				a.So(got.UserIds.UserId, should.Equal, userIDs.UserId)
 				a.So(got.ClientIds.ClientId, should.Equal, clientIDs.ClientId)
-				a.So(got.ID, should.Equal, tokenID)
+				a.So(got.Id, should.Equal, tokenID)
 				a.So(got.AccessToken, should.Equal, access)
 				a.So(got.RefreshToken, should.Equal, refresh)
 				a.So(got.CreatedAt, should.HappenOnOrAfter, start)
@@ -288,7 +288,7 @@ func TestOAuthStore(t *testing.T) {
 			store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 				UserIds:      *userIDs,
 				ClientIds:    *clientIDs,
-				ID:           tokenID,
+				Id:           tokenID,
 				AccessToken:  access,
 				RefreshToken: refresh,
 				Rights:       rights,

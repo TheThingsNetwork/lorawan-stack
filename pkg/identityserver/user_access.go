@@ -145,7 +145,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		if len(req.APIKey.Rights) > 0 {
-			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.APIKey.ID)
+			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.APIKey.Id)
 			if err != nil {
 				return err
 			}

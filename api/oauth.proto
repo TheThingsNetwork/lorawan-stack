@@ -78,14 +78,14 @@ message OAuthAuthorizationCode {
 message OAuthAccessTokenIdentifiers {
   UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
   ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  string id = 3 [(gogoproto.customname) = "ID"];
+  string id = 3;
 }
 
 message OAuthAccessToken {
   UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string user_session_id = 9 [(gogoproto.customname) = "UserSessionID", (validate.rules).string.max_len = 64];
   ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  string id = 3 [(gogoproto.customname) = "ID"];
+  string id = 3;
   string access_token = 4;
   string refresh_token = 5;
   repeated Right rights = 6;

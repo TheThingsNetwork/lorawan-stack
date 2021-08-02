@@ -210,7 +210,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 
 	var model ContactInfoValidation
 	err := s.query(ctx, ContactInfoValidation{}).Where(ContactInfoValidation{
-		Reference: validation.ID,
+		Reference: validation.Id,
 		Token:     validation.Token,
 	}).Find(&model).Error
 	if err != nil {
@@ -254,7 +254,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 	}
 
 	err = s.query(ctx, ContactInfoValidation{}).Where(ContactInfoValidation{
-		Reference: validation.ID,
+		Reference: validation.Id,
 		Token:     validation.Token,
 	}).Update(ContactInfoValidation{
 		ExpiresAt: now,

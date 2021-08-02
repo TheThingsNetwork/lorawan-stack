@@ -33,10 +33,10 @@ func (dst *FrequencyPlanDescription) SetFields(src *FrequencyPlanDescription, pa
 				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ID = src.ID
+				dst.Id = src.Id
 			} else {
 				var zero string
-				dst.ID = zero
+				dst.Id = zero
 			}
 		case "base_id":
 			if len(subs) > 0 {

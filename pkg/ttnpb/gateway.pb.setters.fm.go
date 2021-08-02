@@ -16,10 +16,10 @@ func (dst *GatewayBrand) SetFields(src *GatewayBrand, paths ...string) error {
 				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ID = src.ID
+				dst.Id = src.Id
 			} else {
 				var zero string
-				dst.ID = zero
+				dst.Id = zero
 			}
 		case "name":
 			if len(subs) > 0 {
@@ -76,10 +76,10 @@ func (dst *GatewayModel) SetFields(src *GatewayModel, paths ...string) error {
 				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ID = src.ID
+				dst.Id = src.Id
 			} else {
 				var zero string
-				dst.ID = zero
+				dst.Id = zero
 			}
 		case "name":
 			if len(subs) > 0 {

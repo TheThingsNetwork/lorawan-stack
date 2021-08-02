@@ -63,7 +63,6 @@ message ContactInfo {
 
 message ContactInfoValidation {
   string id = 1 [
-    (gogoproto.customname) = "ID",
     (validate.rules).string.max_len = 64
   ];
   string token = 2 [(validate.rules).string.max_len = 64];

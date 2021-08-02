@@ -282,7 +282,7 @@ func TestServer(t *testing.T) {
 					TargetCUPSURI: cupsURI,
 				}
 				c.res.CreateAPIKey = &ttnpb.APIKey{
-					ID:  "KEYID",
+					Id:  "KEYID",
 					Key: "KEYCONTENTS",
 				}
 				c.res.Get = c.res.Create

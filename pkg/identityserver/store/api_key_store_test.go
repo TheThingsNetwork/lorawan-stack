@@ -86,7 +86,7 @@ func TestAPIKeyStore(t *testing.T) {
 				a := assertions.New(t)
 
 				key := &ttnpb.APIKey{
-					ID:        strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
+					Id:        strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
 					Key:       strings.ToUpper(fmt.Sprintf("%sKEY", tt.Name)),
 					Name:      fmt.Sprintf("%s API key", tt.Name),
 					Rights:    tt.Rights,
@@ -96,7 +96,7 @@ func TestAPIKeyStore(t *testing.T) {
 
 				a.So(err, should.BeNil)
 				if a.So(created, should.NotBeNil) {
-					a.So(created.ID, should.Equal, key.ID)
+					a.So(created.Id, should.Equal, key.Id)
 					a.So(created.Key, should.Equal, key.Key)
 					a.So(created.Name, should.Equal, key.Name)
 					a.So(created.Rights, should.Resemble, key.Rights)
@@ -111,14 +111,14 @@ func TestAPIKeyStore(t *testing.T) {
 					a.So(keys[0], should.Resemble, created)
 				}
 
-				ids, got, err := store.GetAPIKey(ctx, key.ID)
+				ids, got, err := store.GetAPIKey(ctx, key.Id)
 
 				a.So(err, should.BeNil)
 				a.So(ids, should.Resemble, tt.Identifiers)
 				a.So(got, should.Resemble, created)
 
 				updated, err := store.UpdateAPIKey(ctx, tt.Identifiers, &ttnpb.APIKey{
-					ID:     strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
+					Id:     strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
 					Name:   fmt.Sprintf("Updated %s API key", tt.Name),
 					Rights: tt.Rights,
 				},
@@ -126,7 +126,7 @@ func TestAPIKeyStore(t *testing.T) {
 
 				a.So(err, should.BeNil)
 
-				ids, got, err = store.GetAPIKey(ctx, key.ID)
+				ids, got, err = store.GetAPIKey(ctx, key.Id)
 
 				a.So(err, should.BeNil)
 				a.So(ids, should.Resemble, tt.Identifiers)
@@ -137,7 +137,7 @@ func TestAPIKeyStore(t *testing.T) {
 				}
 
 				updated, err = store.UpdateAPIKey(ctx, tt.Identifiers, &ttnpb.APIKey{
-					ID: strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
+					Id: strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
 					// Empty rights,
 				},
 					&pbtypes.FieldMask{Paths: []string{"rights"}})
@@ -145,7 +145,7 @@ func TestAPIKeyStore(t *testing.T) {
 				a.So(err, should.BeNil)
 				a.So(updated, should.BeNil)
 
-				_, _, err = store.GetAPIKey(ctx, key.ID)
+				_, _, err = store.GetAPIKey(ctx, key.Id)
 
 				if a.So(err, should.NotBeNil) {
 					a.So(errors.IsNotFound(err), should.BeTrue)
@@ -164,7 +164,7 @@ func TestAPIKeyStore(t *testing.T) {
 			// Create three API keys for entity
 			for i := 0; i < 3; i++ {
 				key := &ttnpb.APIKey{
-					ID:     strings.ToUpper(fmt.Sprintf("KEYID%d", i)),
+					Id:     strings.ToUpper(fmt.Sprintf("KEYID%d", i)),
 					Key:    strings.ToUpper(fmt.Sprintf("KEY%d", i)),
 					Name:   fmt.Sprintf("API key %d", i),
 					Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},

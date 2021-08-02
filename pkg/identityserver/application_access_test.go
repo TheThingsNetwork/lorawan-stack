@@ -56,13 +56,13 @@ func TestApplicationAccessNotFound(t *testing.T) {
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
 		apiKey := ttnpb.APIKey{
-			ID:   "does-not-exist-id",
+			Id:   "does-not-exist-id",
 			Name: "test-application-api-key-name",
 		}
 
 		got, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
-			KeyId:                  apiKey.ID,
+			KeyId:                  apiKey.Id,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -113,7 +113,7 @@ func TestApplicationAccessRightsPermissionDenied(t *testing.T) {
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Name:   APIKey.Name,
 				Rights: []ttnpb.Right{right},
 			},
@@ -147,7 +147,7 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 		userID := defaultUser.UserIdentifiers
 		applicationID := userApplications(&userID).Applications[0].ApplicationIdentifiers
 		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
-		APIKeyID := applicationAPIKeys(&applicationID).APIKeys[0].ID
+		APIKeyID := applicationAPIKeys(&applicationID).APIKeys[0].Id
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
@@ -277,12 +277,12 @@ func TestApplicationAccessCRUD(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
-			KeyId:                  applicationKey.ID,
+			KeyId:                  applicationKey.Id,
 		}, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(APIKey, should.NotBeNil) {
-			a.So(APIKey.ID, should.Equal, applicationKey.ID)
+			a.So(APIKey.Id, should.Equal, applicationKey.Id)
 			a.So(APIKey.Key, should.BeEmpty)
 		}
 
@@ -295,7 +295,7 @@ func TestApplicationAccessCRUD(t *testing.T) {
 			a.So(len(APIKeys.APIKeys), should.Equal, len(applicationAPIKeys.APIKeys))
 			for i, APIkey := range APIKeys.APIKeys {
 				a.So(APIkey.Name, should.Equal, applicationAPIKeys.APIKeys[i].Name)
-				a.So(APIkey.ID, should.Equal, applicationAPIKeys.APIKeys[i].ID)
+				a.So(APIkey.Id, should.Equal, applicationAPIKeys.APIKeys[i].Id)
 			}
 		}
 
@@ -425,7 +425,7 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
 			APIKey: ttnpb.APIKey{
-				ID: APIKey.ID,
+				Id: APIKey.Id,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
 					ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
@@ -455,7 +455,7 @@ func TestApplicationAccessRights(t *testing.T) {
 		key, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: newRights.Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -470,7 +470,7 @@ func TestApplicationAccessRights(t *testing.T) {
 		key, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: newRights.Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -508,7 +508,7 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_DELETE)).Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -551,7 +551,7 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: []ttnpb.Right{},
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -561,7 +561,7 @@ func TestApplicationAccessRights(t *testing.T) {
 
 		_, err = reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
-			KeyId:                  APIKey.ID,
+			KeyId:                  APIKey.Id,
 		}, collaboratorCreds)
 
 		if a.So(err, should.NotBeNil) {

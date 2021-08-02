@@ -49,7 +49,7 @@ func logout() error {
 				_, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
 					UserIds:   tokenInfo.UserIds,
 					ClientIds: tokenInfo.ClientIds,
-					ID:        tokenInfo.ID,
+					Id:        tokenInfo.Id,
 				})
 				if err != nil {
 					logger.Warn("Could not revoke the OAuth token on the server")

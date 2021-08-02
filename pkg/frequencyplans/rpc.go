@@ -37,7 +37,7 @@ func (s *RPCServer) ListFrequencyPlans(ctx context.Context, req *ttnpb.ListFrequ
 			continue
 		}
 		res.FrequencyPlans = append(res.FrequencyPlans, &ttnpb.FrequencyPlanDescription{
-			ID:            desc.ID,
+			Id:            desc.ID,
 			BaseID:        desc.BaseID,
 			Name:          desc.Name,
 			BaseFrequency: uint32(desc.BaseFrequency),

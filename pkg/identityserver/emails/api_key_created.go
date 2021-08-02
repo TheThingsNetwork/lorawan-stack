@@ -36,9 +36,9 @@ func (a APIKeyCreated) Identifier() string {
 // ConsoleURL returns the URL to the API key in the Console.
 func (a APIKeyCreated) ConsoleURL() string {
 	if a.Entity.Type == "user" {
-		return fmt.Sprintf("%s/user/api-keys/%s", a.Network.ConsoleURL, a.Key.ID)
+		return fmt.Sprintf("%s/user/api-keys/%s", a.Network.ConsoleURL, a.Key.Id)
 	}
-	return fmt.Sprintf("%s/%ss/%s/api-keys/%s", a.Network.ConsoleURL, a.Entity.Type, a.Entity.ID, a.Key.ID)
+	return fmt.Sprintf("%s/%ss/%s/api-keys/%s", a.Network.ConsoleURL, a.Entity.Type, a.Entity.ID, a.Key.Id)
 }
 
 // TemplateName returns the name of the template to use for this email.

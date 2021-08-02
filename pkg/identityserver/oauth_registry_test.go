@@ -47,7 +47,7 @@ func TestOAuthRegistry(t *testing.T) {
 			UserIds:       user.UserIdentifiers,
 			ClientIds:     client.ClientIdentifiers,
 			UserSessionID: "12345678-1234-5678-1234-567812345678",
-			ID:            "access_token_id",
+			Id:            "access_token_id",
 			Rights:        client.Rights,
 			AccessToken:   "access_token",
 			RefreshToken:  "refresh_token",
@@ -74,14 +74,14 @@ func TestOAuthRegistry(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(tokens, should.NotBeNil) && a.So(tokens.Tokens, should.HaveLength, 1) {
-			a.So(tokens.Tokens[0].ID, should.Equal, "access_token_id")
+			a.So(tokens.Tokens[0].Id, should.Equal, "access_token_id")
 			a.So(tokens.Tokens[0].UserSessionID, should.Equal, "12345678-1234-5678-1234-567812345678")
 		}
 
 		_, err = reg.DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
 			UserIds:   user.UserIdentifiers,
 			ClientIds: client.ClientIdentifiers,
-			ID:        "access_token_id",
+			Id:        "access_token_id",
 		}, creds)
 
 		a.So(err, should.BeNil)

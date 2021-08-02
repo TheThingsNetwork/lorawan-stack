@@ -45,7 +45,7 @@ func GenerateAPIKey(ctx context.Context, name string, expiresAt *time.Time, righ
 		return nil, "", err
 	}
 	key = &ttnpb.APIKey{
-		ID:        generatedID,
+		Id:        generatedID,
 		Key:       hashedKey,
 		Name:      name,
 		Rights:    rights,

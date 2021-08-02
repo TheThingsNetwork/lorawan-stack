@@ -90,7 +90,7 @@ func (oc *OAuthClient) HandleLogout(c echo.Context) error {
 				_, err := ttnpb.NewOAuthAuthorizationRegistryClient(cc).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
 					UserIds:   tokenInfo.UserIds,
 					ClientIds: tokenInfo.ClientIds,
-					ID:        tokenInfo.ID,
+					Id:        tokenInfo.Id,
 				}, creds)
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Error("Could not invalidate access token")

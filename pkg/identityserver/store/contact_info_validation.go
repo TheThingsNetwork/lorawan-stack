@@ -43,7 +43,7 @@ func init() {
 
 func (c ContactInfoValidation) toPB() *ttnpb.ContactInfoValidation {
 	return &ttnpb.ContactInfoValidation{
-		ID:        c.Reference,
+		Id:        c.Reference,
 		Token:     c.Token,
 		CreatedAt: &c.CreatedAt,
 		ExpiresAt: &c.ExpiresAt,
@@ -51,7 +51,7 @@ func (c ContactInfoValidation) toPB() *ttnpb.ContactInfoValidation {
 }
 
 func (c *ContactInfoValidation) fromPB(pb *ttnpb.ContactInfoValidation) {
-	c.Reference = pb.ID
+	c.Reference = pb.Id
 	c.Token = pb.Token
 	if pb.CreatedAt != nil {
 		c.CreatedAt = cleanTime(*pb.CreatedAt)

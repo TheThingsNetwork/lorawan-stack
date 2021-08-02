@@ -117,7 +117,7 @@ type AccessToken struct {
 func (a AccessToken) toPB() *ttnpb.OAuthAccessToken {
 	pb := &ttnpb.OAuthAccessToken{
 		Rights:       a.Rights.Rights,
-		ID:           a.TokenID,
+		Id:           a.TokenID,
 		AccessToken:  a.AccessToken,
 		RefreshToken: a.RefreshToken,
 		CreatedAt:    cleanTime(a.CreatedAt),

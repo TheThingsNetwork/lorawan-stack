@@ -58,13 +58,13 @@ func TestGatewayAccessNotFound(t *testing.T) {
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
 		apiKey := ttnpb.APIKey{
-			ID:   "does-not-exist-id",
+			Id:   "does-not-exist-id",
 			Name: "test-gateway-api-key-name",
 		}
 
 		got, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
-			KeyId:              apiKey.ID,
+			KeyId:              apiKey.Id,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -115,7 +115,7 @@ func TestGatewayAccessRightsPermissionDenied(t *testing.T) {
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Name:   APIKey.Name,
 				Rights: []ttnpb.Right{right},
 			},
@@ -149,7 +149,7 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 		userID := defaultUser.UserIdentifiers
 		gatewayID := userGateways(&userID).Gateways[0].GatewayIdentifiers
 		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
-		APIKeyID := gatewayAPIKeys(&gatewayID).APIKeys[0].ID
+		APIKeyID := gatewayAPIKeys(&gatewayID).APIKeys[0].Id
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
@@ -279,12 +279,12 @@ func TestGatewayAccessCRUD(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
-			KeyId:              gatewayKey.ID,
+			KeyId:              gatewayKey.Id,
 		}, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(APIKey, should.NotBeNil) {
-			a.So(APIKey.ID, should.Equal, gatewayKey.ID)
+			a.So(APIKey.Id, should.Equal, gatewayKey.Id)
 			a.So(APIKey.Key, should.BeEmpty)
 		}
 
@@ -297,7 +297,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 			a.So(len(APIKeys.APIKeys), should.Equal, len(gatewayAPIKeys.APIKeys))
 			for i, APIkey := range APIKeys.APIKeys {
 				a.So(APIkey.Name, should.Equal, gatewayAPIKeys.APIKeys[i].Name)
-				a.So(APIkey.ID, should.Equal, gatewayAPIKeys.APIKeys[i].ID)
+				a.So(APIkey.Id, should.Equal, gatewayAPIKeys.APIKeys[i].Id)
 			}
 		}
 
@@ -427,7 +427,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
 			APIKey: ttnpb.APIKey{
-				ID: APIKey.ID,
+				Id: APIKey.Id,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_LINK,
 					ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS,
@@ -457,7 +457,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		key, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: newRights.Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -472,7 +472,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		key, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: newRights.Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -510,7 +510,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_DELETE)).Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -553,7 +553,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: []ttnpb.Right{},
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -563,7 +563,7 @@ func TestGatewayAccessRights(t *testing.T) {
 
 		_, err = reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
-			KeyId:              APIKey.ID,
+			KeyId:              APIKey.Id,
 		}, collaboratorCreds)
 
 		if a.So(err, should.NotBeNil) {

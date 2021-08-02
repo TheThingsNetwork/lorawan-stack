@@ -260,7 +260,7 @@ func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAc
 		ClientID:     client.PrimaryKey(),
 		UserID:       user.PrimaryKey(),
 		Rights:       Rights{Rights: token.Rights},
-		TokenID:      token.ID,
+		TokenID:      token.Id,
 		PreviousID:   previousID,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
