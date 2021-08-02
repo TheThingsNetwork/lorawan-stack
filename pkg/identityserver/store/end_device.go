@@ -78,18 +78,18 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	attributesField:  func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Attributes = attributes(dev.Attributes).toMap() },
 	versionIDsField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.VersionIDs = &ttnpb.EndDeviceVersionIdentifiers{
-			BrandID:         dev.BrandID,
-			ModelID:         dev.ModelID,
+			BrandId:         dev.BrandID,
+			ModelId:         dev.ModelID,
 			HardwareVersion: dev.HardwareVersion,
 			FirmwareVersion: dev.FirmwareVersion,
 			BandID:          dev.BandID,
 		}
 	},
 	brandIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
-		mustEndDeviceVersionIDs(pb).BrandID = dev.BrandID
+		mustEndDeviceVersionIDs(pb).BrandId = dev.BrandID
 	},
 	modelIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
-		mustEndDeviceVersionIDs(pb).ModelID = dev.ModelID
+		mustEndDeviceVersionIDs(pb).ModelId = dev.ModelID
 	},
 	hardwareVersionField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		mustEndDeviceVersionIDs(pb).HardwareVersion = dev.HardwareVersion
@@ -125,14 +125,14 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 		dev.Attributes = attributes(dev.Attributes).updateFromMap(pb.Attributes)
 	},
 	versionIDsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
-		dev.BrandID = pb.GetVersionIDs().GetBrandID()
-		dev.ModelID = pb.GetVersionIDs().GetModelID()
+		dev.BrandID = pb.GetVersionIDs().GetBrandId()
+		dev.ModelID = pb.GetVersionIDs().GetModelId()
 		dev.HardwareVersion = pb.GetVersionIDs().GetHardwareVersion()
 		dev.FirmwareVersion = pb.GetVersionIDs().GetFirmwareVersion()
 		dev.BandID = pb.GetVersionIDs().GetBandID()
 	},
-	brandIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.BrandID = pb.GetVersionIDs().GetBrandID() },
-	modelIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ModelID = pb.GetVersionIDs().GetModelID() },
+	brandIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.BrandID = pb.GetVersionIDs().GetBrandId() },
+	modelIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ModelID = pb.GetVersionIDs().GetModelId() },
 	hardwareVersionField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.HardwareVersion = pb.GetVersionIDs().GetHardwareVersion()
 	},

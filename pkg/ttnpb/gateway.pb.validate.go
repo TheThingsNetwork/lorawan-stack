@@ -139,16 +139,16 @@ func (m *GatewayModel) ValidateFields(paths ...string) error {
 		switch name {
 		case "brand_id":
 
-			if m.GetBrandID() != "" {
+			if m.GetBrandId() != "" {
 
-				if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+				if utf8.RuneCountInString(m.GetBrandId()) > 36 {
 					return GatewayModelValidationError{
 						field:  "brand_id",
 						reason: "value length must be at most 36 runes",
 					}
 				}
 
-				if !_GatewayModel_BrandID_Pattern.MatchString(m.GetBrandID()) {
+				if !_GatewayModel_BrandId_Pattern.MatchString(m.GetBrandId()) {
 					return GatewayModelValidationError{
 						field:  "brand_id",
 						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -243,7 +243,7 @@ var _ interface {
 	ErrorName() string
 } = GatewayModelValidationError{}
 
-var _GatewayModel_BrandID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GatewayModel_BrandId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 var _GatewayModel_Id_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
@@ -264,16 +264,16 @@ func (m *GatewayVersionIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "brand_id":
 
-			if m.GetBrandID() != "" {
+			if m.GetBrandId() != "" {
 
-				if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+				if utf8.RuneCountInString(m.GetBrandId()) > 36 {
 					return GatewayVersionIdentifiersValidationError{
 						field:  "brand_id",
 						reason: "value length must be at most 36 runes",
 					}
 				}
 
-				if !_GatewayVersionIdentifiers_BrandID_Pattern.MatchString(m.GetBrandID()) {
+				if !_GatewayVersionIdentifiers_BrandId_Pattern.MatchString(m.GetBrandId()) {
 					return GatewayVersionIdentifiersValidationError{
 						field:  "brand_id",
 						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -284,16 +284,16 @@ func (m *GatewayVersionIdentifiers) ValidateFields(paths ...string) error {
 
 		case "model_id":
 
-			if m.GetModelID() != "" {
+			if m.GetModelId() != "" {
 
-				if utf8.RuneCountInString(m.GetModelID()) > 36 {
+				if utf8.RuneCountInString(m.GetModelId()) > 36 {
 					return GatewayVersionIdentifiersValidationError{
 						field:  "model_id",
 						reason: "value length must be at most 36 runes",
 					}
 				}
 
-				if !_GatewayVersionIdentifiers_ModelID_Pattern.MatchString(m.GetModelID()) {
+				if !_GatewayVersionIdentifiers_ModelId_Pattern.MatchString(m.GetModelId()) {
 					return GatewayVersionIdentifiersValidationError{
 						field:  "model_id",
 						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -387,9 +387,9 @@ var _ interface {
 	ErrorName() string
 } = GatewayVersionIdentifiersValidationError{}
 
-var _GatewayVersionIdentifiers_BrandID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GatewayVersionIdentifiers_BrandId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
-var _GatewayVersionIdentifiers_ModelID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GatewayVersionIdentifiers_ModelId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on GatewayRadio with the rules
 // defined in the proto definition for this message. If any rules are

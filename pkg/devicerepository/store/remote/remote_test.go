@@ -357,20 +357,20 @@ func TestRemoteStore(t *testing.T) {
 
 			for _, ids := range []ttnpb.EndDeviceVersionIdentifiers{
 				{
-					BrandID: "unknown-vendor",
+					BrandId: "unknown-vendor",
 				},
 				{
-					BrandID: "foo-vendor",
-					ModelID: "unknown-model",
+					BrandId: "foo-vendor",
+					ModelId: "unknown-model",
 				},
 				{
-					BrandID:         "foo-vendor",
-					ModelID:         "dev1",
+					BrandId:         "foo-vendor",
+					ModelId:         "dev1",
 					FirmwareVersion: "unknown-version",
 				},
 				{
-					BrandID:         "foo-vendor",
-					ModelID:         "dev1",
+					BrandId:         "foo-vendor",
+					ModelId:         "dev1",
 					FirmwareVersion: "1.0",
 					BandID:          "unknown-band",
 				},
@@ -414,8 +414,8 @@ func TestRemoteStore(t *testing.T) {
 				a := assertions.New(t)
 
 				versionIDs := &ttnpb.EndDeviceVersionIdentifiers{
-					BrandID:         "foo-vendor",
-					ModelID:         "dev2",
+					BrandId:         "foo-vendor",
+					ModelId:         "dev2",
 					FirmwareVersion: "1.1",
 					BandID:          "EU_433",
 				}
@@ -509,8 +509,8 @@ func TestRemoteStore(t *testing.T) {
 					a := assertions.New(t)
 
 					versionIDs := &ttnpb.EndDeviceVersionIdentifiers{
-						BrandID:         "foo-vendor",
-						ModelID:         "dev2",
+						BrandId:         "foo-vendor",
+						ModelId:         "dev2",
 						FirmwareVersion: "1.1",
 						BandID:          "EU_433",
 					}

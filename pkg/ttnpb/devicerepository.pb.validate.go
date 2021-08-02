@@ -457,14 +457,14 @@ func (m *GetEndDeviceBrandRequest) ValidateFields(paths ...string) error {
 
 		case "brand_id":
 
-			if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+			if utf8.RuneCountInString(m.GetBrandId()) > 36 {
 				return GetEndDeviceBrandRequestValidationError{
 					field:  "brand_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_GetEndDeviceBrandRequest_BrandID_Pattern.MatchString(m.GetBrandID()) {
+			if !_GetEndDeviceBrandRequest_BrandId_Pattern.MatchString(m.GetBrandId()) {
 				return GetEndDeviceBrandRequestValidationError{
 					field:  "brand_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -550,7 +550,7 @@ var _ interface {
 	ErrorName() string
 } = GetEndDeviceBrandRequestValidationError{}
 
-var _GetEndDeviceBrandRequest_BrandID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GetEndDeviceBrandRequest_BrandId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on ListEndDeviceBrandsRequest with
 // the rules defined in the proto definition for this message. If any rules
@@ -724,14 +724,14 @@ func (m *GetEndDeviceModelRequest) ValidateFields(paths ...string) error {
 
 		case "brand_id":
 
-			if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+			if utf8.RuneCountInString(m.GetBrandId()) > 36 {
 				return GetEndDeviceModelRequestValidationError{
 					field:  "brand_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_GetEndDeviceModelRequest_BrandID_Pattern.MatchString(m.GetBrandID()) {
+			if !_GetEndDeviceModelRequest_BrandId_Pattern.MatchString(m.GetBrandId()) {
 				return GetEndDeviceModelRequestValidationError{
 					field:  "brand_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -740,14 +740,14 @@ func (m *GetEndDeviceModelRequest) ValidateFields(paths ...string) error {
 
 		case "model_id":
 
-			if utf8.RuneCountInString(m.GetModelID()) > 36 {
+			if utf8.RuneCountInString(m.GetModelId()) > 36 {
 				return GetEndDeviceModelRequestValidationError{
 					field:  "model_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_GetEndDeviceModelRequest_ModelID_Pattern.MatchString(m.GetModelID()) {
+			if !_GetEndDeviceModelRequest_ModelId_Pattern.MatchString(m.GetModelId()) {
 				return GetEndDeviceModelRequestValidationError{
 					field:  "model_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -833,9 +833,9 @@ var _ interface {
 	ErrorName() string
 } = GetEndDeviceModelRequestValidationError{}
 
-var _GetEndDeviceModelRequest_BrandID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GetEndDeviceModelRequest_BrandId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
-var _GetEndDeviceModelRequest_ModelID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GetEndDeviceModelRequest_ModelId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on ListEndDeviceModelsRequest with
 // the rules defined in the proto definition for this message. If any rules
@@ -866,14 +866,14 @@ func (m *ListEndDeviceModelsRequest) ValidateFields(paths ...string) error {
 
 		case "brand_id":
 
-			if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+			if utf8.RuneCountInString(m.GetBrandId()) > 36 {
 				return ListEndDeviceModelsRequestValidationError{
 					field:  "brand_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_ListEndDeviceModelsRequest_BrandID_Pattern.MatchString(m.GetBrandID()) {
+			if !_ListEndDeviceModelsRequest_BrandId_Pattern.MatchString(m.GetBrandId()) {
 				return ListEndDeviceModelsRequestValidationError{
 					field:  "brand_id",
 					reason: "value does not match regex pattern \"^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$\"",
@@ -988,7 +988,7 @@ var _ interface {
 	ErrorName() string
 } = ListEndDeviceModelsRequestValidationError{}
 
-var _ListEndDeviceModelsRequest_BrandID_Pattern = regexp.MustCompile("^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$")
+var _ListEndDeviceModelsRequest_BrandId_Pattern = regexp.MustCompile("^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$")
 
 var _ListEndDeviceModelsRequest_OrderBy_InLookup = map[string]struct{}{
 	"":          {},

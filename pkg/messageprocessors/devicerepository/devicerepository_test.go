@@ -98,7 +98,7 @@ func (dr *mockDR) GetTemplate(_ context.Context, _ *ttnpb.GetTemplateRequest) (*
 }
 
 func (dr *mockDR) key(ids *ttnpb.EndDeviceVersionIdentifiers) string {
-	return fmt.Sprintf("%s:%s:%s:%s", ids.BrandID, ids.ModelID, ids.FirmwareVersion, ids.BandID)
+	return fmt.Sprintf("%s:%s:%s:%s", ids.BrandId, ids.ModelId, ids.FirmwareVersion, ids.BandID)
 }
 
 var errMock = fmt.Errorf("mock_error")
@@ -151,15 +151,15 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 
 func TestDeviceRepository(t *testing.T) {
 	ids := &ttnpb.EndDeviceVersionIdentifiers{
-		BrandID:         "brand",
-		ModelID:         "model",
+		BrandId:         "brand",
+		ModelId:         "model",
 		FirmwareVersion: "1.0",
 		HardwareVersion: "1.1",
 		BandID:          "band",
 	}
 	idsNotFound := &ttnpb.EndDeviceVersionIdentifiers{
-		BrandID:         "brand2",
-		ModelID:         "model1",
+		BrandId:         "brand2",
+		ModelId:         "model1",
 		FirmwareVersion: "1.0",
 		HardwareVersion: "1.1",
 		BandID:          "band",

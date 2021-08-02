@@ -122,8 +122,8 @@ func (s *mockStore) Close() error {
 
 func TestGRPC(t *testing.T) {
 	ids := &ttnpb.EndDeviceVersionIdentifiers{
-		BrandID:         "brand",
-		ModelID:         "model",
+		BrandId:         "brand",
+		ModelId:         "model",
 		FirmwareVersion: "1.0",
 		HardwareVersion: "1.0",
 		BandID:          "band",
@@ -199,7 +199,7 @@ func TestGRPC(t *testing.T) {
 				execute: func(ids ttnpb.ApplicationIdentifiers, opts ...grpc.CallOption) (interface{}, error) {
 					response, err := cl.GetBrand(test.Context(), &ttnpb.GetEndDeviceBrandRequest{
 						ApplicationIds: ids,
-						BrandID:        "brand1",
+						BrandId:        "brand1",
 					}, opts...)
 					return response, err
 				},
@@ -209,7 +209,7 @@ func TestGRPC(t *testing.T) {
 				execute: func(ids ttnpb.ApplicationIdentifiers, opts ...grpc.CallOption) (interface{}, error) {
 					response, err := cl.ListModels(test.Context(), &ttnpb.ListEndDeviceModelsRequest{
 						ApplicationIds: ids,
-						BrandID:        "brand1",
+						BrandId:        "brand1",
 					}, opts...)
 					return response, err
 				},
@@ -219,8 +219,8 @@ func TestGRPC(t *testing.T) {
 				execute: func(ids ttnpb.ApplicationIdentifiers, opts ...grpc.CallOption) (interface{}, error) {
 					response, err := cl.GetModel(test.Context(), &ttnpb.GetEndDeviceModelRequest{
 						ApplicationIds: ids,
-						BrandID:        "brand1",
-						ModelID:        "model1",
+						BrandId:        "brand1",
+						ModelId:        "model1",
 					}, opts...)
 					return response, err
 				},
@@ -231,8 +231,8 @@ func TestGRPC(t *testing.T) {
 					response, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
 						ApplicationIds: ids,
 						VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
-							BrandID: "brand1",
-							ModelID: "model1",
+							BrandId: "brand1",
+							ModelId: "model1",
 						},
 					}, opts...)
 					return response, err
@@ -244,8 +244,8 @@ func TestGRPC(t *testing.T) {
 					response, err := cl.GetUplinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
 						ApplicationIds: ids,
 						VersionIDs: &ttnpb.EndDeviceVersionIdentifiers{
-							BrandID: "brand1",
-							ModelID: "model1",
+							BrandId: "brand1",
+							ModelId: "model1",
 						},
 					}, opts...)
 					return response, err
@@ -257,8 +257,8 @@ func TestGRPC(t *testing.T) {
 					response, err := cl.GetDownlinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
 						ApplicationIds: ids,
 						VersionIDs: &ttnpb.EndDeviceVersionIdentifiers{
-							BrandID: "brand1",
-							ModelID: "model1",
+							BrandId: "brand1",
+							ModelId: "model1",
 						},
 					}, opts...)
 					return response, err
@@ -270,8 +270,8 @@ func TestGRPC(t *testing.T) {
 					response, err := cl.GetDownlinkEncoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
 						ApplicationIds: ids,
 						VersionIDs: &ttnpb.EndDeviceVersionIdentifiers{
-							BrandID: "brand1",
-							ModelID: "model1",
+							BrandId: "brand1",
+							ModelId: "model1",
 						},
 					}, opts...)
 					return response, err
@@ -401,7 +401,7 @@ func TestGRPC(t *testing.T) {
 
 			_, err := cl.GetBrand(test.Context(), &ttnpb.GetEndDeviceBrandRequest{
 				ApplicationIds: registeredApplicationID,
-				BrandID:        "brand1",
+				BrandId:        "brand1",
 				FieldMask: &types.FieldMask{
 					Paths: []string{"lora_alliance_vendor_id"},
 				},
@@ -437,7 +437,7 @@ func TestGRPC(t *testing.T) {
 
 			brand, err := cl.GetBrand(test.Context(), &ttnpb.GetEndDeviceBrandRequest{
 				ApplicationIds: registeredApplicationID,
-				BrandID:        "brand1",
+				BrandId:        "brand1",
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(brand, should.Resemble, &ttnpb.EndDeviceBrand{
@@ -454,7 +454,7 @@ func TestGRPC(t *testing.T) {
 
 			_, err := cl.ListModels(test.Context(), &ttnpb.ListEndDeviceModelsRequest{
 				ApplicationIds: registeredApplicationID,
-				BrandID:        "brand1",
+				BrandId:        "brand1",
 				Limit:          100,
 				Page:           2,
 				OrderBy:        "brand_id",
@@ -536,8 +536,8 @@ func TestGRPC(t *testing.T) {
 
 			_, err := cl.GetModel(test.Context(), &ttnpb.GetEndDeviceModelRequest{
 				ApplicationIds: registeredApplicationID,
-				BrandID:        "brand1",
-				ModelID:        "model1",
+				BrandId:        "brand1",
+				ModelId:        "model1",
 				FieldMask: &types.FieldMask{
 					Paths: []string{"firmware_versions"},
 				},
@@ -577,8 +577,8 @@ func TestGRPC(t *testing.T) {
 
 			model, err := cl.GetModel(test.Context(), &ttnpb.GetEndDeviceModelRequest{
 				ApplicationIds: registeredApplicationID,
-				BrandID:        "brand1",
-				ModelID:        "model1",
+				BrandId:        "brand1",
+				ModelId:        "model1",
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(model, should.Resemble, &ttnpb.EndDeviceModel{

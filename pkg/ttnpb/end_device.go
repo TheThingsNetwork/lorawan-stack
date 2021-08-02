@@ -842,13 +842,13 @@ func (v *EndDeviceVersionIdentifiers) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "brand_id":
-		return v.BrandID == ""
+		return v.BrandId == ""
 	case "firmware_version":
 		return v.FirmwareVersion == ""
 	case "hardware_version":
 		return v.HardwareVersion == ""
 	case "model_id":
-		return v.ModelID == ""
+		return v.ModelId == ""
 	case "band_id":
 		return v.BandID == ""
 	}

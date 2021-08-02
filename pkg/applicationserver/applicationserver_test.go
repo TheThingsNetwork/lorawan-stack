@@ -87,8 +87,8 @@ func TestApplicationServer(t *testing.T) {
 			DevEui:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 		},
 		VersionIDs: &ttnpb.EndDeviceVersionIdentifiers{
-			BrandID:         "thethingsproducts",
-			ModelID:         "thethingsnode",
+			BrandId:         "thethingsproducts",
+			ModelId:         "thethingsnode",
 			HardwareVersion: "1.0",
 			FirmwareVersion: "1.1",
 		},
