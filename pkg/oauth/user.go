@@ -63,11 +63,11 @@ func (s *server) ClientLogout(c echo.Context) error {
 		events.Publish(EvtUserLogout.NewWithIdentifiersAndData(ctx, &at.UserIds, nil))
 		redirectParam := c.QueryParam("post_logout_redirect_uri")
 		if redirectParam == "" {
-			if len(client.LogoutRedirectURIs) != 0 {
-				redirectURI = client.LogoutRedirectURIs[0]
+			if len(client.LogoutRedirectUris) != 0 {
+				redirectURI = client.LogoutRedirectUris[0]
 			}
 		} else {
-			for _, uri := range client.LogoutRedirectURIs {
+			for _, uri := range client.LogoutRedirectUris {
 				redirectURI, err = osin.ValidateUri(uri, redirectParam)
 				if err == nil {
 					break

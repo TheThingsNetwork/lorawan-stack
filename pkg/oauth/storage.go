@@ -48,7 +48,7 @@ func (cli osinClient) ClientSecretMatches(secret string) bool {
 }
 
 func (cli osinClient) GetRedirectUri() string {
-	return strings.Join(cli.RedirectURIs, redirectURISeparator)
+	return strings.Join(cli.RedirectUris, redirectURISeparator)
 }
 
 func (cli osinClient) GetUserData() interface{} { return nil }
@@ -103,7 +103,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 		UserSessionId: userSessionIDs.SessionId,
 		Rights:        rights,
 		Code:          data.Code,
-		RedirectURI:   data.RedirectUri,
+		RedirectUri:   data.RedirectUri,
 		State:         data.State,
 		CreatedAt:     data.CreatedAt,
 		ExpiresAt:     data.CreatedAt.Add(time.Duration(data.ExpiresIn) * time.Second),
@@ -128,7 +128,7 @@ func (s *storage) LoadAuthorize(code string) (data *osin.AuthorizeData, err erro
 		Code:        code,
 		ExpiresIn:   int32(authorizationCode.ExpiresAt.Sub(authorizationCode.CreatedAt).Seconds()),
 		Scope:       rightsToScope(authorizationCode.Rights...),
-		RedirectUri: authorizationCode.RedirectURI,
+		RedirectUri: authorizationCode.RedirectUri,
 		State:       authorizationCode.State,
 		CreatedAt:   authorizationCode.CreatedAt,
 		UserData: userData{

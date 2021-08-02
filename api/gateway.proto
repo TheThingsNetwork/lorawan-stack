@@ -43,7 +43,7 @@ option (gogoproto.stringer_all) = true;
 message GatewayBrand {
   string id = 1;
   string name = 2;
-  string url = 3 [(gogoproto.customname) = "URL"];
+  string url = 3;
   // Logos contains file names of brand logos.
   repeated string logos = 4;
 }

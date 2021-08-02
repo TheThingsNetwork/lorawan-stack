@@ -201,7 +201,7 @@ func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OA
 		UserID:      user.PrimaryKey(),
 		Rights:      Rights{Rights: code.Rights},
 		Code:        code.Code,
-		RedirectURI: code.RedirectURI,
+		RedirectURI: code.RedirectUri,
 		State:       code.State,
 		ExpiresAt:   code.ExpiresAt,
 	}

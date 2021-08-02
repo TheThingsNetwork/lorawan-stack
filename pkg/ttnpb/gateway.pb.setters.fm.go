@@ -36,10 +36,10 @@ func (dst *GatewayBrand) SetFields(src *GatewayBrand, paths ...string) error {
 				return fmt.Errorf("'url' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.URL = src.URL
+				dst.Url = src.Url
 			} else {
 				var zero string
-				dst.URL = zero
+				dst.Url = zero
 			}
 		case "logos":
 			if len(subs) > 0 {

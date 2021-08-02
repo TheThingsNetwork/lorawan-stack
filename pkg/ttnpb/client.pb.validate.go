@@ -186,14 +186,14 @@ func (m *Client) ValidateFields(paths ...string) error {
 
 		case "redirect_uris":
 
-			if len(m.GetRedirectURIs()) > 10 {
+			if len(m.GetRedirectUris()) > 10 {
 				return ClientValidationError{
 					field:  "redirect_uris",
 					reason: "value must contain no more than 10 item(s)",
 				}
 			}
 
-			for idx, item := range m.GetRedirectURIs() {
+			for idx, item := range m.GetRedirectUris() {
 				_, _ = idx, item
 
 				if utf8.RuneCountInString(item) > 128 {
@@ -207,14 +207,14 @@ func (m *Client) ValidateFields(paths ...string) error {
 
 		case "logout_redirect_uris":
 
-			if len(m.GetLogoutRedirectURIs()) > 10 {
+			if len(m.GetLogoutRedirectUris()) > 10 {
 				return ClientValidationError{
 					field:  "logout_redirect_uris",
 					reason: "value must contain no more than 10 item(s)",
 				}
 			}
 
-			for idx, item := range m.GetLogoutRedirectURIs() {
+			for idx, item := range m.GetLogoutRedirectUris() {
 				_, _ = idx, item
 
 				if utf8.RuneCountInString(item) > 128 {

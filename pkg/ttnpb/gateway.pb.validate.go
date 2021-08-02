@@ -55,7 +55,7 @@ func (m *GatewayBrand) ValidateFields(paths ...string) error {
 		case "name":
 			// no validation rules for Name
 		case "url":
-			// no validation rules for URL
+			// no validation rules for Url
 		case "logos":
 
 		default:

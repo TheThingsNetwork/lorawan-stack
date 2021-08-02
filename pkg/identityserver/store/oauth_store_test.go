@@ -141,7 +141,7 @@ func TestOAuthStore(t *testing.T) {
 				UserIds:     *userIDs,
 				Rights:      rights,
 				Code:        code,
-				RedirectURI: redirectURI,
+				RedirectUri: redirectURI,
 				State:       state,
 			})
 
@@ -154,7 +154,7 @@ func TestOAuthStore(t *testing.T) {
 				a.So(got.UserIds.UserId, should.Equal, userIDs.UserId)
 				a.So(got.ClientIds.ClientId, should.Equal, clientIDs.ClientId)
 				a.So(got.Code, should.Equal, code)
-				a.So(got.RedirectURI, should.Equal, redirectURI)
+				a.So(got.RedirectUri, should.Equal, redirectURI)
 				a.So(got.State, should.Equal, state)
 				a.So(got.CreatedAt, should.HappenOnOrAfter, start)
 				if a.So(got.Rights, should.HaveLength, len(rights)) {
@@ -279,7 +279,7 @@ func TestOAuthStore(t *testing.T) {
 				UserIds:     *userIDs,
 				Rights:      rights,
 				Code:        code,
-				RedirectURI: redirectURI,
+				RedirectUri: redirectURI,
 				State:       state,
 			})
 

@@ -72,7 +72,7 @@ func (a AuthorizationCode) toPB() *ttnpb.OAuthAuthorizationCode {
 	pb := &ttnpb.OAuthAuthorizationCode{
 		Rights:      a.Rights.Rights,
 		Code:        a.Code,
-		RedirectURI: a.RedirectURI,
+		RedirectUri: a.RedirectURI,
 		State:       a.State,
 		CreatedAt:   cleanTime(a.CreatedAt),
 		ExpiresAt:   cleanTime(a.ExpiresAt),

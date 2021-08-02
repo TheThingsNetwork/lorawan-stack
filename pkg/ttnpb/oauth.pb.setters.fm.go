@@ -282,10 +282,10 @@ func (dst *OAuthAuthorizationCode) SetFields(src *OAuthAuthorizationCode, paths 
 				return fmt.Errorf("'redirect_uri' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RedirectURI = src.RedirectURI
+				dst.RedirectUri = src.RedirectUri
 			} else {
 				var zero string
-				dst.RedirectURI = zero
+				dst.RedirectUri = zero
 			}
 		case "state":
 			if len(subs) > 0 {
