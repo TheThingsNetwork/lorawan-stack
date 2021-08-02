@@ -12,6 +12,9 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - New config option `--as.packages.timeout` to control the message processing timeout of application packages.
+- Option to connect LBS gateways to plaintext LNS.
+  - This should only be used for local testing.
+  - If a TTS instance is used as the LNS, the `require_authenticated_connection` field for the gateway must be unset and the `--gs.basic-station.allow-unauthenticated` option for the GS must be set.
 
 ### Changed
 
