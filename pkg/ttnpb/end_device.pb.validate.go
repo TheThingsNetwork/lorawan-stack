@@ -1719,7 +1719,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "network_server_kek_label":
 
-			if utf8.RuneCountInString(m.GetNetworkServerKEKLabel()) > 2048 {
+			if utf8.RuneCountInString(m.GetNetworkServerKekLabel()) > 2048 {
 				return EndDeviceValidationError{
 					field:  "network_server_kek_label",
 					reason: "value length must be at most 2048 runes",
@@ -1737,7 +1737,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "application_server_kek_label":
 
-			if utf8.RuneCountInString(m.GetApplicationServerKEKLabel()) > 2048 {
+			if utf8.RuneCountInString(m.GetApplicationServerKekLabel()) > 2048 {
 				return EndDeviceValidationError{
 					field:  "application_server_kek_label",
 					reason: "value length must be at most 2048 runes",

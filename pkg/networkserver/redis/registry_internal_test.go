@@ -64,7 +64,7 @@ func TestMsgpackCompatibility(t *testing.T) {
 	}
 	makeFNwkSIntWrappedKeyExpr := func(v *ttnpb.KeyEnvelope) string {
 		return fmt.Sprintf(`%s and x.f_nwk_s_int_key.encrypted_key == "%s"`,
-			makeStringExpr("f_nwk_s_int_key.kek_label", v.KEKLabel),
+			makeStringExpr("f_nwk_s_int_key.kek_label", v.KekLabel),
 			hex.EncodeToString(v.EncryptedKey),
 		)
 	}

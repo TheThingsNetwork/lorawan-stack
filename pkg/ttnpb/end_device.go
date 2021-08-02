@@ -868,7 +868,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "application_server_id":
 		return v.ApplicationServerId == ""
 	case "application_server_kek_label":
-		return v.ApplicationServerKEKLabel == ""
+		return v.ApplicationServerKekLabel == ""
 	case "attributes":
 		return v.Attributes == nil
 	case "battery_percentage":
@@ -1052,7 +1052,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "network_server_address":
 		return v.NetworkServerAddress == ""
 	case "network_server_kek_label":
-		return v.NetworkServerKEKLabel == ""
+		return v.NetworkServerKekLabel == ""
 	case "pending_mac_state":
 		return v.PendingMACState == nil
 	case "pending_session":

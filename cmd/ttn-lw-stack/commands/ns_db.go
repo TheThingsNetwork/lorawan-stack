@@ -352,7 +352,7 @@ var (
 							b, err := msgpack.Marshal(&nsredis.UplinkMatchSession{
 								FNwkSIntKey: &ttnpb.KeyEnvelope{
 									Key:          key,
-									KEKLabel:     stored.FNwkSIntKey.KEKLabel,
+									KekLabel:     stored.FNwkSIntKey.KEKLabel,
 									EncryptedKey: stored.FNwkSIntKey.EncryptedKey,
 								},
 								ResetsFCnt:        resetsFCnt,
@@ -406,7 +406,7 @@ var (
 							b, err := msgpack.Marshal(&nsredis.UplinkMatchSession{
 								FNwkSIntKey: &ttnpb.KeyEnvelope{
 									Key:          key,
-									KEKLabel:     stored.FNwkSIntKey.KEKLabel,
+									KekLabel:     stored.FNwkSIntKey.KEKLabel,
 									EncryptedKey: stored.FNwkSIntKey.EncryptedKey,
 								},
 								LoRaWANVersion: stored.LoRaWANVersion,

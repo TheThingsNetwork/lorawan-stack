@@ -54,7 +54,7 @@ func (m *KeyEnvelope) ValidateFields(paths ...string) error {
 			// no validation rules for Key
 		case "kek_label":
 
-			if utf8.RuneCountInString(m.GetKEKLabel()) > 2048 {
+			if utf8.RuneCountInString(m.GetKekLabel()) > 2048 {
 				return KeyEnvelopeValidationError{
 					field:  "kek_label",
 					reason: "value length must be at most 2048 runes",

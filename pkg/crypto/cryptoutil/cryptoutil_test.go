@@ -61,7 +61,7 @@ func TestWrapAES128Key(t *testing.T) {
 			KEKLabel: "key",
 			Expected: &ttnpb.KeyEnvelope{
 				EncryptedKey: cipherKey,
-				KEKLabel:     "key",
+				KekLabel:     "key",
 			},
 		},
 	} {
@@ -89,7 +89,7 @@ func TestWrapAES128Key(t *testing.T) {
 		{
 			Name: "UnwrapWithKEK",
 			Envelope: &ttnpb.KeyEnvelope{
-				KEKLabel:     "key",
+				KekLabel:     "key",
 				EncryptedKey: cipherKey,
 			},
 			ExpectedKey: key,
@@ -97,7 +97,7 @@ func TestWrapAES128Key(t *testing.T) {
 		{
 			Name: "UnwrapInvalid",
 			Envelope: &ttnpb.KeyEnvelope{
-				KEKLabel:     "other",
+				KekLabel:     "other",
 				EncryptedKey: cipherOther,
 			},
 			ExpectedError: errors.IsInvalidArgument,
@@ -196,7 +196,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "encrypted AppSKey/no prefix/paths(app_s_key)",
 			SessionKeys: ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					KEKLabel:     "key",
+					KekLabel:     "key",
 					EncryptedKey: cipherKey,
 				},
 			},
@@ -214,7 +214,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "encrypted AppSKey/no prefix/paths(app_s_key.key)",
 			SessionKeys: ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					KEKLabel:     "key",
+					KekLabel:     "key",
 					EncryptedKey: cipherKey,
 				},
 			},
@@ -232,7 +232,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "encrypted AppSKey, decrypted Nwk keys/no prefix/paths(app_s_key.key,f_nwk_s_int_key.key,nwk_s_enc_key,s_nwk_s_int_key)",
 			SessionKeys: ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					KEKLabel:     "key",
+					KekLabel:     "key",
 					EncryptedKey: cipherKey,
 				},
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
@@ -356,7 +356,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "encrypted AppSKey/prefix(test)/paths(test.app_s_key)",
 			SessionKeys: ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					KEKLabel:     "key",
+					KekLabel:     "key",
 					EncryptedKey: cipherKey,
 				},
 			},
@@ -375,7 +375,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "encrypted AppSKey/prefix(test)/paths(test.app_s_key.key)",
 			SessionKeys: ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					KEKLabel:     "key",
+					KekLabel:     "key",
 					EncryptedKey: cipherKey,
 				},
 			},
@@ -394,7 +394,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Name: "encrypted AppSKey, decrypted Nwk keys/prefix(test)/paths(test)",
 			SessionKeys: ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
-					KEKLabel:     "key",
+					KekLabel:     "key",
 					EncryptedKey: cipherKey,
 				},
 				FNwkSIntKey: &ttnpb.KeyEnvelope{

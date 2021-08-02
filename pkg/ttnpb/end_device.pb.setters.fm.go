@@ -1698,10 +1698,10 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				return fmt.Errorf("'network_server_kek_label' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.NetworkServerKEKLabel = src.NetworkServerKEKLabel
+				dst.NetworkServerKekLabel = src.NetworkServerKekLabel
 			} else {
 				var zero string
-				dst.NetworkServerKEKLabel = zero
+				dst.NetworkServerKekLabel = zero
 			}
 		case "application_server_address":
 			if len(subs) > 0 {
@@ -1718,10 +1718,10 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				return fmt.Errorf("'application_server_kek_label' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ApplicationServerKEKLabel = src.ApplicationServerKEKLabel
+				dst.ApplicationServerKekLabel = src.ApplicationServerKekLabel
 			} else {
 				var zero string
-				dst.ApplicationServerKEKLabel = zero
+				dst.ApplicationServerKekLabel = zero
 			}
 		case "application_server_id":
 			if len(subs) > 0 {

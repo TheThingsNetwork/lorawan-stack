@@ -505,7 +505,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		}
 		key, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.NwkSEncKey, ns.KeyVault)
 		if err != nil {
-			logger.WithField("kek_label", dev.Session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
+			logger.WithField("kek_label", dev.Session.NwkSEncKey.KekLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, genState, err
 		}
 		fCnt := pld.FullFCnt
@@ -575,7 +575,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	}
 	key, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.SNwkSIntKey, ns.KeyVault)
 	if err != nil {
-		logger.WithField("kek_label", dev.Session.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
+		logger.WithField("kek_label", dev.Session.SNwkSIntKey.KekLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
 		return nil, genState, err
 	}
 

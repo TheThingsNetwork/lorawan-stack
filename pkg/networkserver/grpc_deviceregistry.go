@@ -562,7 +562,7 @@ func setKeyEqual(m map[string]*ttnpb.EndDevice, getA, getB func(*ttnpb.EndDevice
 	if a, b := getA(m[pathA+".encrypted_key"]).GetEncryptedKey(), getB(m[pathB+".encrypted_key"]).GetEncryptedKey(); !bytes.Equal(a, b) {
 		return false
 	}
-	if a, b := getA(m[pathA+".kek_label"]).GetKEKLabel(), getB(m[pathB+".kek_label"]).GetKEKLabel(); a != b {
+	if a, b := getA(m[pathA+".kek_label"]).GetKekLabel(), getB(m[pathB+".kek_label"]).GetKekLabel(); a != b {
 		return false
 	}
 	return true

@@ -61,13 +61,13 @@ message ClaimEndDeviceRequest {
   // If not set, the device shall not be registered on a Network Server.
   string target_network_server_address = 7 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
   // The KEK label of the Network Server to use for wrapping network session keys.
-  string target_network_server_kek_label = 8 [(gogoproto.customname) = "TargetNetworkServerKEKLabel", (validate.rules).string.max_len = 2048];
+  string target_network_server_kek_label = 8 [(validate.rules).string.max_len = 2048];
   // The address of the Application Server where the device will be registered.
   // If set and if the source device is currently registered on an Application Server, settings will be transferred.
   // If not set, the device shall not be registered on an Application Server.
   string target_application_server_address = 9 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
   // The KEK label of the Application Server to use for wrapping the application session key.
-  string target_application_server_kek_label = 10 [(gogoproto.customname) = "TargetApplicationServerKEKLabel", (validate.rules).string.max_len = 2048];
+  string target_application_server_kek_label = 10 [(validate.rules).string.max_len = 2048];
   // The AS-ID of the Application Server to use.
   string target_application_server_id = 11 [(validate.rules).string.max_len = 100];
   reserved 12; // target_join_server_address

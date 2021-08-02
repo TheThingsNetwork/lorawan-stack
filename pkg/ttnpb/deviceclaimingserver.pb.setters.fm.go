@@ -53,10 +53,10 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 				return fmt.Errorf("'target_network_server_kek_label' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TargetNetworkServerKEKLabel = src.TargetNetworkServerKEKLabel
+				dst.TargetNetworkServerKekLabel = src.TargetNetworkServerKekLabel
 			} else {
 				var zero string
-				dst.TargetNetworkServerKEKLabel = zero
+				dst.TargetNetworkServerKekLabel = zero
 			}
 		case "target_application_server_address":
 			if len(subs) > 0 {
@@ -73,10 +73,10 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 				return fmt.Errorf("'target_application_server_kek_label' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TargetApplicationServerKEKLabel = src.TargetApplicationServerKEKLabel
+				dst.TargetApplicationServerKekLabel = src.TargetApplicationServerKekLabel
 			} else {
 				var zero string
-				dst.TargetApplicationServerKEKLabel = zero
+				dst.TargetApplicationServerKekLabel = zero
 			}
 		case "target_application_server_id":
 			if len(subs) > 0 {

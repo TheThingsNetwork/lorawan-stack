@@ -108,11 +108,11 @@ func TestInteropJoinRequest(t *testing.T) {
 					SessionKeys: ttnpb.SessionKeys{
 						SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							KEKLabel:     "test",
+							KekLabel:     "test",
 							EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 						},
 						AppSKey: &ttnpb.KeyEnvelope{
-							KEKLabel:     "test",
+							KekLabel:     "test",
 							EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 						},
 					},
@@ -134,11 +134,11 @@ func TestInteropJoinRequest(t *testing.T) {
 				},
 				Lifetime: 3600,
 				NwkSKey: &interop.KeyEnvelope{
-					KEKLabel:     "test",
+					KekLabel:     "test",
 					EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				},
 				AppSKey: &interop.KeyEnvelope{
-					KEKLabel:     "test",
+					KekLabel:     "test",
 					EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				},
 				SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
@@ -187,19 +187,19 @@ func TestInteropJoinRequest(t *testing.T) {
 					SessionKeys: ttnpb.SessionKeys{
 						SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							KEKLabel:     "test",
+							KekLabel:     "test",
 							EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							KEKLabel:     "test",
+							KekLabel:     "test",
 							EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 						},
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							KEKLabel:     "test",
+							KekLabel:     "test",
 							EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 						},
 						AppSKey: &ttnpb.KeyEnvelope{
-							KEKLabel:     "test",
+							KekLabel:     "test",
 							EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 						},
 					},
@@ -221,19 +221,19 @@ func TestInteropJoinRequest(t *testing.T) {
 				},
 				Lifetime: 3600,
 				FNwkSIntKey: &interop.KeyEnvelope{
-					KEKLabel:     "test",
+					KekLabel:     "test",
 					EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				},
 				SNwkSIntKey: &interop.KeyEnvelope{
-					KEKLabel:     "test",
+					KekLabel:     "test",
 					EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				},
 				NwkSEncKey: &interop.KeyEnvelope{
-					KEKLabel:     "test",
+					KekLabel:     "test",
 					EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				},
 				AppSKey: &interop.KeyEnvelope{
-					KEKLabel:     "test",
+					KekLabel:     "test",
 					EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				},
 				SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
@@ -586,7 +586,7 @@ func TestInteropAppSKeyRequest(t *testing.T) {
 			GetAppSKeyFunc: func() (*ttnpb.AppSKeyResponse, error) {
 				return &ttnpb.AppSKeyResponse{
 					AppSKey: ttnpb.KeyEnvelope{
-						KEKLabel:     "test",
+						KekLabel:     "test",
 						EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 					},
 				}, nil
@@ -605,7 +605,7 @@ func TestInteropAppSKeyRequest(t *testing.T) {
 				},
 				DevEUI: interop.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				AppSKey: interop.KeyEnvelope{
-					KEKLabel:     "test",
+					KekLabel:     "test",
 					EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				},
 				SessionKeyID: interop.Buffer{0x1, 0x2, 0x3, 0x4},

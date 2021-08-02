@@ -633,7 +633,7 @@ func (EndDeviceOptionNamespace) WithNetworkServerAddress(v string) EndDeviceOpti
 // WithNetworkServerKEKLabel returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with NetworkServerKEKLabel set to v.
 func (EndDeviceOptionNamespace) WithNetworkServerKEKLabel(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.NetworkServerKEKLabel = v
+		x.NetworkServerKekLabel = v
 		return x
 	}
 }
@@ -649,7 +649,7 @@ func (EndDeviceOptionNamespace) WithApplicationServerAddress(v string) EndDevice
 // WithApplicationServerKEKLabel returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ApplicationServerKEKLabel set to v.
 func (EndDeviceOptionNamespace) WithApplicationServerKEKLabel(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.ApplicationServerKEKLabel = v
+		x.ApplicationServerKekLabel = v
 		return x
 	}
 }

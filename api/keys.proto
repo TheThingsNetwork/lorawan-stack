@@ -36,7 +36,7 @@ message KeyEnvelope {
   // The unencrypted AES key.
   bytes key = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.AES128Key"];
   // The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key.
-  string kek_label = 2 [(gogoproto.customname) = "KEKLabel", (validate.rules).string.max_len = 2048];
+  string kek_label = 2 [(validate.rules).string.max_len = 2048];
   bytes encrypted_key = 3 [(validate.rules).bytes.max_len = 1024];
 }
 
