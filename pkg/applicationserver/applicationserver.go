@@ -306,8 +306,8 @@ func (as *ApplicationServer) Publish(ctx context.Context, up *ttnpb.ApplicationU
 
 func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
-	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
-	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
+	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	registerReceiveUp(ctx, up)
 
 	now := time.Now().UTC()
@@ -540,7 +540,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 		return err
 	}
 	for _, item := range items {
-		item.CorrelationIDs = append(item.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+		item.CorrelationIds = append(item.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
 	}
 	registerReceiveDownlinks(ctx, ids, items)
 	_, err = as.deviceRegistry.Set(ctx, ids,
@@ -989,7 +989,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		uplink.Locations["frm-payload"] = loc
 		err := as.processUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ids,
-			CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+			CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 			ReceivedAt:           &uplink.ReceivedAt,
 			Up: &ttnpb.ApplicationUp_LocationSolved{
 				LocationSolved: &ttnpb.ApplicationLocation{

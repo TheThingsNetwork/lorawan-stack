@@ -215,7 +215,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 		},
 		RxDelay: conf.RXDelay,
 		CFList:  frequencyplans.CFList(*test.FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
-		CorrelationIDs: CopyStrings(func() []string {
+		CorrelationIds: CopyStrings(func() []string {
 			if len(conf.CorrelationIDs) == 0 {
 				return JoinRequestCorrelationIDs[:]
 			}
@@ -1024,7 +1024,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 
 			expectedCIDs := conf.CorrelationIDs
 			if conf.Uplink != nil {
-				expectedCIDs = append(expectedCIDs, conf.Uplink.CorrelationIDs...)
+				expectedCIDs = append(expectedCIDs, conf.Uplink.CorrelationIds...)
 			}
 			for i, expectedAttempt := range expectedAttempts {
 				if !a.So(test.AssertClusterAuthRequest(
@@ -1043,7 +1043,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 					lastDown = req.Message
 
 					if !test.AllTrue(
-						a.So(req.Message.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, expectedCIDs),
+						a.So(req.Message.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual, expectedCIDs),
 						a.So(req.Message, should.Resemble, &ttnpb.DownlinkMessage{
 							RawPayload: conf.Payload,
 							Settings: &ttnpb.DownlinkMessage_Request{
@@ -1072,7 +1072,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 									return txReq
 								}(),
 							},
-							CorrelationIDs: req.Message.CorrelationIDs,
+							CorrelationIds: req.Message.CorrelationIds,
 						}),
 					) {
 						if !bytes.Equal(req.Message.RawPayload, conf.Payload) {
@@ -1137,7 +1137,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 				Uplink:          LastUplink(dev.PendingMACState.RecentUplinks...),
 				Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 				Payload:         dev.PendingMACState.QueuedJoinAccept.Payload,
-				CorrelationIDs:  dev.PendingMACState.QueuedJoinAccept.CorrelationIDs,
+				CorrelationIDs:  dev.PendingMACState.QueuedJoinAccept.CorrelationIds,
 				PeerIndexes:     []uint{1},
 				Responses: []NsGsScheduleDownlinkResponse{
 					{
@@ -1169,14 +1169,14 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 							},
 						},
 						Settings:       scheduledDown.Settings,
-						CorrelationIDs: scheduledDown.CorrelationIDs,
+						CorrelationIds: scheduledDown.CorrelationIds,
 					}),
 					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
 				).New(ctx),
 				EvtScheduleJoinAcceptSuccess.With(
 					events.WithData(&ttnpb.ScheduleDownlinkResponse{}),
 					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
-				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIDs...)),
+				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIds...)),
 			)
 			dev.PendingSession = &ttnpb.Session{
 				DevAddr:     dev.PendingMACState.QueuedJoinAccept.DevAddr,
@@ -1236,14 +1236,14 @@ func (env TestEnvironment) AssertScheduleDataDownlink(ctx context.Context, conf 
 						RawPayload:     conf.RawPayload,
 						Payload:        conf.Payload,
 						Settings:       scheduledDown.Settings,
-						CorrelationIDs: scheduledDown.CorrelationIDs,
+						CorrelationIds: scheduledDown.CorrelationIds,
 					}),
 					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
 				).New(ctx),
 				EvtScheduleDataDownlinkSuccess.With(
 					events.WithData(&ttnpb.ScheduleDownlinkResponse{}),
 					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
-				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIDs...)),
+				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIds...)),
 			)
 			dev.MACState.RecentDownlinks = AppendRecentDownlink(dev.MACState.RecentDownlinks, scheduledDown, RecentDownlinkCount)
 		},
@@ -1504,7 +1504,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					ctx,
 					func(ctx, reqCtx context.Context, peerIDs cluster.EntityIdentifiers) bool {
 						return test.AllTrue(
-							a.So(events.CorrelationIDsFromContext(reqCtx), should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIDs),
+							a.So(events.CorrelationIDsFromContext(reqCtx), should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIds),
 							a.So(peerIDs.GetEntityIdentifiers().GetDeviceIds(), should.Resemble, &conf.Device.EndDeviceIdentifiers),
 						)
 					},
@@ -1515,7 +1515,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 							a.So(req.DevAddr, should.NotBeEmpty),
 							a.So(req.DevAddr.NwkID(), should.Resemble, env.Config.NetID.ID()),
 							a.So(req.DevAddr.NetIDType(), should.Equal, env.Config.NetID.Type()),
-							a.So(req.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIDs),
+							a.So(req.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIds),
 							a.So(req, should.Resemble, MakeNsJsJoinRequest(NsJsJoinRequestConfig{
 								JoinEUI:            *conf.Device.JoinEui,
 								DevEUI:             *conf.Device.DevEui,
@@ -1529,7 +1529,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 								RXDelay:            desiredRX1Delay,
 								FrequencyPlanID:    conf.Device.FrequencyPlanID,
 								PHYVersion:         conf.Device.LorawanPhyVersion,
-								CorrelationIDs:     req.CorrelationIDs,
+								CorrelationIDs:     req.CorrelationIds,
 							})),
 						)
 					},
@@ -1611,7 +1611,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 						}
 						return keys
 					}(),
-					CorrelationIDs: joinResp.CorrelationIDs,
+					CorrelationIds: joinResp.CorrelationIds,
 				},
 				RxWindowsAvailable: true,
 				RecentUplinks: []*ttnpb.UplinkMessage{
@@ -1669,11 +1669,11 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 		recvAt := up.GetJoinAccept().GetReceivedAt()
 		appUp = up
 		return test.AllTrue(
-			a.So(up.CorrelationIDs, should.HaveSameElementsDeep, append(joinReq.CorrelationIDs, joinResp.CorrelationIDs...)),
+			a.So(up.CorrelationIds, should.HaveSameElementsDeep, append(joinReq.CorrelationIds, joinResp.CorrelationIds...)),
 			a.So([]time.Time{start, recvAt, time.Now()}, should.BeChronological),
 			a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: idsWithDevAddr,
-				CorrelationIDs:       up.CorrelationIDs,
+				CorrelationIds:       up.CorrelationIds,
 				Up: &ttnpb.ApplicationUp_JoinAccept{
 					JoinAccept: &ttnpb.ApplicationJoinAccept{
 						AppSKey:      joinResp.AppSKey,
@@ -1699,7 +1699,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 	}),
 		EvtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &idsWithDevAddr, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: idsWithDevAddr,
-			CorrelationIDs:       appUp.CorrelationIDs,
+			CorrelationIds:       appUp.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_JoinAccept{
 				JoinAccept: ApplicationJoinAcceptWithoutAppSKey(appUp.GetJoinAccept()),
 			},
@@ -1814,12 +1814,12 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 				recvAt := up.GetUplinkMessage().GetReceivedAt()
 				appUp = up
 				return test.AllTrue(
-					a.So(up.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual, deduplicatedUp.CorrelationIDs),
+					a.So(up.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual, deduplicatedUp.CorrelationIds),
 					a.So(up.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, deduplicatedUp.RxMetadata),
 					a.So([]time.Time{start, recvAt, time.Now()}, should.BeChronological),
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIDs:       up.CorrelationIDs,
+						CorrelationIds:       up.CorrelationIds,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{
 							UplinkMessage: &ttnpb.ApplicationUplink{
 								Confirmed:    conf.Confirmed,
@@ -2104,7 +2104,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 			Keys:           *MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
 			DevAddr:        test.DefaultDevAddr,
 			NetId:          test.DefaultNetID,
-			CorrelationIDs: []string{"join-request"},
+			CorrelationIds: []string{"join-request"},
 		})(*macState)))(x)
 	}
 }
@@ -2162,7 +2162,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 							// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
 						},
 					},
-					CorrelationIDs: []string{"join-accept"},
+					CorrelationIds: []string{"join-accept"},
 				}),
 			),
 		)(x)

@@ -142,7 +142,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 				}
 			}
 			if ack := msg.TxAcknowledgment; ack != nil {
-				if token, ok := s.tokens.ParseTokenFromCorrelationIDs(ack.GetCorrelationIDs()); ok {
+				if token, ok := s.tokens.ParseTokenFromCorrelationIDs(ack.GetCorrelationIds()); ok {
 					if down, _, ok := s.tokens.Get(token, time.Now()); ok {
 						ack.DownlinkMessage = down
 					}
@@ -160,7 +160,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 			return conn.Context().Err()
 		case down := <-conn.Down():
 			token := s.tokens.Next(down, time.Now())
-			down.CorrelationIDs = append(down.CorrelationIDs, s.tokens.FormatCorrelationID(token))
+			down.CorrelationIds = append(down.CorrelationIds, s.tokens.FormatCorrelationID(token))
 			msg := &ttnpb.GatewayDown{
 				DownlinkMessage: down,
 			}

@@ -45,7 +45,7 @@ message Event {
   // Optional data attached to the event.
   google.protobuf.Any data = 4;
   // Correlation IDs can be used to find related events and actions such as API calls.
-  repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+  repeated string correlation_ids = 5 [(validate.rules).repeated.items.string.max_len = 100];
   // The origin of the event. Typically the hostname of the server that created it.
   string origin = 6;
   // Event context, internal use only.
@@ -84,7 +84,6 @@ message StreamEventsRequest {
 
 message FindRelatedEventsRequest {
   string correlation_id = 1 [
-    (gogoproto.customname) = "CorrelationID",
     (validate.rules).string = {
       min_len: 1,
       max_len: 100,

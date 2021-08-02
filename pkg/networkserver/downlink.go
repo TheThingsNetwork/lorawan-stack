@@ -355,7 +355,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 					logger.Debug("Drop application downlink for unknown session")
 					genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
+						CorrelationIds:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 								ApplicationDownlink: *down,
@@ -369,7 +369,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Drop application downlink with too low FCnt")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-					CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+					CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 					Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 						DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 							Downlinks:    dev.Session.QueuedApplicationDownlinks[i:],
@@ -384,7 +384,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				logger.Debug("Drop confirmed application downlink for multicast device")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-					CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+					CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 					Up: &ttnpb.ApplicationUp_DownlinkFailed{
 						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 							ApplicationDownlink: *down,
@@ -398,7 +398,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				logger.Debug("Drop expired downlink")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-					CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
+					CorrelationIds:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
 					Up: &ttnpb.ApplicationUp_DownlinkFailed{
 						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 							ApplicationDownlink: *down,
@@ -422,7 +422,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 					logger.Debug("Drop application downlink with payload length exceeding band regulations")
 					genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
+						CorrelationIds:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 								ApplicationDownlink: *down,
@@ -525,7 +525,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	if pld.FPort == 0 && dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		genState.ifScheduledApplicationUps = append(genState.ifScheduledApplicationUps, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-			CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+			CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 			Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 				DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 					Downlinks:    dev.Session.QueuedApplicationDownlinks,
@@ -906,7 +906,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: req.TxRequest,
 			},
-			CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+			CorrelationIds: events.CorrelationIDsFromContext(ctx),
 		}
 		queuedEvents = append(queuedEvents, attemptEvent.New(ctx, eventIDOpt, events.WithData(down)))
 		registerAttempt(ctx)
@@ -914,7 +914,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 		delay, err := a.Schedule(ctx, &ttnpb.DownlinkMessage{
 			RawPayload:     down.RawPayload,
 			Settings:       down.Settings,
-			CorrelationIDs: down.CorrelationIDs,
+			CorrelationIds: down.CorrelationIds,
 		}, ns.WithClusterAuth())
 		if err != nil {
 			queuedEvents = append(queuedEvents, failEvent.New(ctx, eventIDOpt, events.WithData(err)))
@@ -923,7 +923,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 		}
 		transmitAt := time.Now().Add(delay)
 		if err := ns.scheduledDownlinkMatcher.Add(ctx, &ttnpb.DownlinkMessage{
-			CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+			CorrelationIds: events.CorrelationIDsFromContext(ctx),
 			EndDeviceIds:   &req.EndDeviceIdentifiers,
 			Payload:        req.Payload,
 			SessionKeyId:   req.SessionKeyID,
@@ -1071,7 +1071,7 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, ne
 	msg := &ttnpb.DownlinkMessage{
 		Payload:        down.Message.Payload,
 		Settings:       down.Message.Settings,
-		CorrelationIDs: down.Message.CorrelationIDs,
+		CorrelationIds: down.Message.CorrelationIds,
 	}
 	dev.MACState.RecentDownlinks = appendRecentDownlink(dev.MACState.RecentDownlinks, msg, recentDownlinkCount)
 	dev.MACState.RxWindowsAvailable = false
@@ -1093,7 +1093,7 @@ type downlinkAttemptResult struct {
 }
 
 func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, slot *classADownlinkSlot, maxUpLength uint16) downlinkAttemptResult {
-	ctx = events.ContextWithCorrelationID(ctx, slot.Uplink.CorrelationIDs...)
+	ctx = events.ContextWithCorrelationID(ctx, slot.Uplink.CorrelationIds...)
 	if !dev.MACState.RxWindowsAvailable {
 		log.FromContext(ctx).Error("RX windows not available, skip class A downlink slot")
 		dev.MACState.QueuedResponses = nil
@@ -1229,7 +1229,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 
 	if genState.ApplicationDownlink != nil {
-		ctx = events.ContextWithCorrelationID(ctx, genState.ApplicationDownlink.CorrelationIDs...)
+		ctx = events.ContextWithCorrelationID(ctx, genState.ApplicationDownlink.CorrelationIds...)
 	}
 	logger := log.FromContext(ctx)
 
@@ -1353,7 +1353,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		}
 	}
 	if genState.ApplicationDownlink != nil {
-		ctx = events.ContextWithCorrelationID(ctx, genState.ApplicationDownlink.CorrelationIDs...)
+		ctx = events.ContextWithCorrelationID(ctx, genState.ApplicationDownlink.CorrelationIds...)
 	}
 
 	absTime := genState.ApplicationDownlink.GetClassBC().GetAbsoluteTime()
@@ -1446,7 +1446,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 						SetPaths: ttnpb.AddFields(sets, "session.queued_application_downlinks"),
 						QueuedApplicationUplinks: append(genState.appendApplicationUplinks(nil, false), &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-							CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+							CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 									ApplicationDownlink: *genState.ApplicationDownlink,
@@ -1464,7 +1464,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 						SetPaths: ttnpb.AddFields(sets, "session.queued_application_downlinks"),
 						QueuedApplicationUplinks: append(genState.appendApplicationUplinks(nil, false), &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-							CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+							CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 									ApplicationDownlink: *genState.ApplicationDownlink,
@@ -1581,8 +1581,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						logger.Error("Last uplink is neither join-request, nor rejoin-request, skip downlink slot")
 						return dev, nil, nil
 					}
-					ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
-					ctx = events.ContextWithCorrelationID(ctx, dev.PendingMACState.QueuedJoinAccept.CorrelationIDs...)
+					ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIds...)
+					ctx = events.ContextWithCorrelationID(ctx, dev.PendingMACState.QueuedJoinAccept.CorrelationIds...)
 
 					paths := downlinkPathsFromRecentUplinks(up)
 					if len(paths) == 0 {
@@ -1704,7 +1704,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							JoinEui:                dev.JoinEui,
 							DevAddr:                &dev.PendingMACState.QueuedJoinAccept.DevAddr,
 						},
-						CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+						CorrelationIds: events.CorrelationIDsFromContext(ctx),
 						Up: &ttnpb.ApplicationUp_JoinAccept{
 							JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:              dev.PendingMACState.QueuedJoinAccept.Keys.AppSKey,
@@ -1730,7 +1730,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					dev.PendingMACState.RecentDownlinks = appendRecentDownlink(dev.PendingMACState.RecentDownlinks, &ttnpb.DownlinkMessage{
 						Payload:        down.Message.Payload,
 						Settings:       down.Message.Settings,
-						CorrelationIDs: down.Message.CorrelationIDs,
+						CorrelationIds: down.Message.CorrelationIds,
 					}, recentDownlinkCount)
 					return dev, []string{
 						"pending_mac_state.pending_join_request",

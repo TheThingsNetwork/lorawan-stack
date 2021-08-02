@@ -48,7 +48,7 @@ message ErrorDetails {
   google.protobuf.Struct attributes = 4;
   // The correlation ID of the error can be used to correlate the error to stack
   // traces the network may (or may not) store about recent errors.
-  string correlation_id = 5 [(gogoproto.customname) = "CorrelationID"];
+  string correlation_id = 5;
   // The error that caused this error.
   ErrorDetails cause = 6;
   // The status code of the error.

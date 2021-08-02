@@ -65,10 +65,10 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 	}
 
 	ctx = events.ContextWithCorrelationID(ctx, append(
-		up.CorrelationIDs,
+		up.CorrelationIds,
 		fmt.Sprintf("pba:uplink:%s", events.NewCorrelationID()),
 	)...)
-	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 	msg, err := toPBUplink(ctx, up, s.config)
 	if err != nil {

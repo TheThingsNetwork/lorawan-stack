@@ -34,7 +34,7 @@ func TestDownlinkTokens(t *testing.T) {
 
 		msgs = append(msgs, &ttnpb.DownlinkMessage{
 			RawPayload:     []byte{byte(i)},
-			CorrelationIDs: []string{fmt.Sprintf("corr_%d", i)},
+			CorrelationIds: []string{fmt.Sprintf("corr_%d", i)},
 		})
 		all = append(all, tokens.Next(msgs[i], time.Unix(int64(i), 0)))
 
@@ -58,7 +58,7 @@ func TestCorrelationIDs(t *testing.T) {
 
 	msg := &ttnpb.DownlinkMessage{
 		RawPayload:     []byte{0x00, 0x01},
-		CorrelationIDs: []string{"cid_downlink"},
+		CorrelationIds: []string{"cid_downlink"},
 	}
 	token := tokens.Next(msg, time.Now())
 	cid := tokens.FormatCorrelationID(token)

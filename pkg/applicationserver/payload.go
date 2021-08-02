@@ -53,7 +53,7 @@ func (as *ApplicationServer) encodeAndEncryptDownlinks(ctx context.Context, dev 
 				Confirmed:      item.Confirmed,
 				ClassBC:        item.ClassBC,
 				Priority:       item.Priority,
-				CorrelationIDs: item.CorrelationIDs,
+				CorrelationIds: item.CorrelationIds,
 			}
 			if !skipPayloadCrypto {
 				if err := as.encodeAndEncryptDownlink(ctx, dev, session, encryptedItem, link.DefaultFormatters); err != nil {

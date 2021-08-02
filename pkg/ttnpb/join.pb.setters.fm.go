@@ -133,9 +133,9 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 		case "consumed_airtime":
 			if len(subs) > 0 {
@@ -199,9 +199,9 @@ func (dst *JoinResponse) SetFields(src *JoinResponse, paths ...string) error {
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 
 		default:

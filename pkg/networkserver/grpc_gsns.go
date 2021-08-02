@@ -638,7 +638,7 @@ macLoop:
 					Up: &ttnpb.ApplicationUp_DownlinkAck{
 						DownlinkAck: pendingAppDown,
 					},
-					CorrelationIDs: append(pendingAppDown.CorrelationIDs, up.CorrelationIDs...),
+					CorrelationIds: append(pendingAppDown.CorrelationIds, up.CorrelationIds...),
 				},
 			}
 		} else {
@@ -648,7 +648,7 @@ macLoop:
 					Up: &ttnpb.ApplicationUp_DownlinkNack{
 						DownlinkNack: pendingAppDown,
 					},
-					CorrelationIDs: append(pendingAppDown.CorrelationIDs, up.CorrelationIDs...),
+					CorrelationIds: append(pendingAppDown.CorrelationIds, up.CorrelationIds...),
 				},
 			}
 		}
@@ -876,7 +876,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				Settings:           up.Settings,
 				RxMetadata:         up.RxMetadata,
 				ReceivedAt:         up.ReceivedAt,
-				CorrelationIDs:     up.CorrelationIDs,
+				CorrelationIds:     up.CorrelationIds,
 				DeviceChannelIndex: up.DeviceChannelIndex,
 				ConsumedAirtime:    up.ConsumedAirtime,
 			}, recentUplinkCount)
@@ -926,7 +926,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	if !matched.IsRetransmission {
 		queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: stored.EndDeviceIdentifiers,
-			CorrelationIDs:       up.CorrelationIDs,
+			CorrelationIds:       up.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_UplinkMessage{
 				UplinkMessage: &ttnpb.ApplicationUplink{
 					Confirmed:       up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
@@ -958,7 +958,7 @@ func joinResponseWithoutKeys(resp *ttnpb.JoinResponse) *ttnpb.JoinResponse {
 			SessionKeyID: resp.SessionKeys.SessionKeyID,
 		},
 		Lifetime:       resp.Lifetime,
-		CorrelationIDs: resp.CorrelationIDs,
+		CorrelationIds: resp.CorrelationIds,
 	}
 }
 
@@ -1106,7 +1106,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, &ttnpb.JoinRequest{
 		Payload:            up.Payload,
 		CFList:             cfList,
-		CorrelationIDs:     events.CorrelationIDsFromContext(ctx),
+		CorrelationIds:     events.CorrelationIDsFromContext(ctx),
 		DevAddr:            devAddr,
 		NetId:              ns.netID,
 		RawPayload:         up.RawPayload,
@@ -1127,7 +1127,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		keys.SNwkSIntKey = keys.FNwkSIntKey
 	}
 	macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
-		CorrelationIDs: resp.CorrelationIDs,
+		CorrelationIds: resp.CorrelationIds,
 		Keys:           keys,
 		Payload:        resp.RawPayload,
 		DevAddr:        devAddr,
@@ -1139,7 +1139,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		},
 	}
 	macState.RxWindowsAvailable = true
-	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIDs...)
+	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIds...)
 
 	publishEvents(ctx, queuedEvents...)
 	queuedEvents = nil
@@ -1155,7 +1155,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		Settings:           up.Settings,
 		RxMetadata:         up.RxMetadata,
 		ReceivedAt:         up.ReceivedAt,
-		CorrelationIDs:     up.CorrelationIDs,
+		CorrelationIds:     up.CorrelationIds,
 		DeviceChannelIndex: up.DeviceChannelIndex,
 		ConsumedAirtime:    up.ConsumedAirtime,
 	}}
@@ -1214,10 +1214,10 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	}
 
 	ctx = events.ContextWithCorrelationID(ctx, append(
-		up.CorrelationIDs,
+		up.CorrelationIds,
 		fmt.Sprintf("ns:uplink:%s", events.NewCorrelationID()),
 	)...)
-	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 	registerUplinkLatency(ctx, up)
 
@@ -1311,7 +1311,7 @@ func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, up *ttnpb.G
 				FRMPayload:     pld.GetFRMPayload(),
 				FPort:          pld.GetFPort(),
 				FCnt:           pld.GetFullFCnt(),
-				CorrelationIDs: ack.GetCorrelationIDs(),
+				CorrelationIds: ack.GetCorrelationIds(),
 				Priority:       down.GetRequest().GetPriority(),
 			},
 		},

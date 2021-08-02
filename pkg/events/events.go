@@ -62,7 +62,7 @@ func local(evt Event) *event {
 				Name:           evt.Name(),
 				Time:           evt.Time(),
 				Identifiers:    evt.Identifiers(),
-				CorrelationIDs: evt.CorrelationIDs(),
+				CorrelationIds: evt.CorrelationIDs(),
 				Origin:         evt.Origin(),
 				Visibility:     evt.Visibility(),
 				UserAgent:      evt.UserAgent(),
@@ -143,7 +143,7 @@ func (e event) Name() string                            { return e.innerEvent.Na
 func (e event) Time() time.Time                         { return e.innerEvent.Time }
 func (e event) Identifiers() []*ttnpb.EntityIdentifiers { return e.innerEvent.Identifiers }
 func (e event) Data() interface{}                       { return e.data }
-func (e event) CorrelationIDs() []string                { return e.innerEvent.CorrelationIDs }
+func (e event) CorrelationIDs() []string                { return e.innerEvent.CorrelationIds }
 func (e event) Origin() string                          { return e.innerEvent.Origin }
 func (e event) Caller() string                          { return e.caller }
 func (e event) Visibility() *ttnpb.Rights               { return e.innerEvent.Visibility }
@@ -243,7 +243,7 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 			Name:           pb.Name,
 			Time:           pb.Time,
 			Identifiers:    pb.Identifiers,
-			CorrelationIDs: pb.CorrelationIDs,
+			CorrelationIds: pb.CorrelationIds,
 			Origin:         pb.Origin,
 			Visibility:     pb.Visibility,
 			Authentication: pb.Authentication,

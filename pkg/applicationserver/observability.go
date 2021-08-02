@@ -321,7 +321,7 @@ func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids ttnp
 	for _, item := range items {
 		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ids,
-			CorrelationIDs:       item.CorrelationIDs,
+			CorrelationIds:       item.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_DownlinkFailed{
 				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 					ApplicationDownlink: *item,
@@ -339,7 +339,7 @@ func (as *ApplicationServer) registerForwardDownlinks(ctx context.Context, ids t
 	for _, item := range items {
 		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ids,
-			CorrelationIDs:       item.CorrelationIDs,
+			CorrelationIds:       item.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_DownlinkQueued{
 				DownlinkQueued: item,
 			},

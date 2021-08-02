@@ -173,7 +173,7 @@ var (
 
 	DefaultApplicationDownlinkQueue = []*ttnpb.ApplicationDownlink{
 		{
-			CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+			CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 			FCnt:           0x22,
 			FPort:          0x1,
 			FRMPayload:     []byte("testPayload"),
@@ -181,7 +181,7 @@ var (
 			SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 		},
 		{
-			CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
+			CorrelationIds: []string{"correlation-app-down-3", "correlation-app-down-4"},
 			FCnt:           0x23,
 			FPort:          0x1,
 			FRMPayload:     []byte("testPayload"),
@@ -406,7 +406,7 @@ func MakeUplinkMessage(conf UplinkMessageConfig) *ttnpb.UplinkMessage {
 		Settings:           MakeUplinkSettings(conf.DataRate, conf.DataRateIndex, conf.Frequency),
 		RxMetadata:         deepcopy.Copy(conf.RxMetadata).([]*ttnpb.RxMetadata),
 		ReceivedAt:         conf.ReceivedAt,
-		CorrelationIDs:     CopyStrings(conf.CorrelationIDs),
+		CorrelationIds:     CopyStrings(conf.CorrelationIDs),
 		DeviceChannelIndex: uint32(conf.ChannelIndex),
 	}
 }

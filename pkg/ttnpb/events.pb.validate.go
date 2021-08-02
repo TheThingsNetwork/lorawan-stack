@@ -85,7 +85,7 @@ func (m *Event) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
-			for idx, item := range m.GetCorrelationIDs() {
+			for idx, item := range m.GetCorrelationIds() {
 				_, _ = idx, item
 
 				if utf8.RuneCountInString(item) > 100 {
@@ -324,7 +324,7 @@ func (m *FindRelatedEventsRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "correlation_id":
 
-			if l := utf8.RuneCountInString(m.GetCorrelationID()); l < 1 || l > 100 {
+			if l := utf8.RuneCountInString(m.GetCorrelationId()); l < 1 || l > 100 {
 				return FindRelatedEventsRequestValidationError{
 					field:  "correlation_id",
 					reason: "value length must be between 1 and 100 runes, inclusive",

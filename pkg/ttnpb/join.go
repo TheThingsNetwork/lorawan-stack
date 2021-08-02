@@ -37,7 +37,7 @@ func (v *JoinRequest) FieldIsZero(p string) bool {
 	case "consumed_airtime":
 		return v.ConsumedAirtime == nil
 	case "correlation_ids":
-		return v.CorrelationIDs == nil
+		return v.CorrelationIds == nil
 	case "dev_addr":
 		return v.DevAddr == types.DevAddr{}
 	case "downlink_settings":

@@ -265,7 +265,7 @@ func TestTraffic(t *testing.T) {
 						FPort:          1,
 						FRMPayload:     []byte{0x01, 0x01, 0x01},
 						Confirmed:      true,
-						CorrelationIDs: []string{"test"},
+						CorrelationIds: []string{"test"},
 					},
 					{
 						FPort:      2,
@@ -297,7 +297,7 @@ func TestTraffic(t *testing.T) {
 					FPort:          1,
 					Confirmed:      true,
 					FRMPayload:     []byte{0x01, 0x01, 0x01},
-					CorrelationIDs: []string{"test"},
+					CorrelationIds: []string{"test"},
 				},
 				{
 					FPort:      2,

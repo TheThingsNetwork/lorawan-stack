@@ -79,7 +79,7 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error
 				return err
 			}
 			for _, up := range ups {
-				ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
+				ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIds...)
 				switch pld := up.Up.(type) {
 				case *ttnpb.ApplicationUp_UplinkMessage:
 					registerForwardDataUplink(ctx, pld.UplinkMessage)
@@ -87,7 +87,7 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error
 				case *ttnpb.ApplicationUp_JoinAccept:
 					events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: up.EndDeviceIdentifiers,
-						CorrelationIDs:       up.CorrelationIDs,
+						CorrelationIds:       up.CorrelationIds,
 						Up: &ttnpb.ApplicationUp_JoinAccept{
 							JoinAccept: applicationJoinAcceptWithoutAppSKey(pld.JoinAccept),
 						},

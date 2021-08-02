@@ -86,9 +86,9 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 		case "device_channel_index":
 			if len(subs) > 0 {
@@ -184,9 +184,9 @@ func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) err
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 		case "session_key_id":
 			if len(subs) > 0 {
@@ -300,9 +300,9 @@ func (dst *TxAcknowledgment) SetFields(src *TxAcknowledgment, paths ...string) e
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 		case "result":
 			if len(subs) > 0 {
@@ -902,9 +902,9 @@ func (dst *ApplicationDownlink) SetFields(src *ApplicationDownlink, paths ...str
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 
 		default:
@@ -1143,9 +1143,9 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 		case "received_at":
 			if len(subs) > 0 {

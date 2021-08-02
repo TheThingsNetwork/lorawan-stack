@@ -42,7 +42,7 @@ func (e errorDetails) PublicAttributes() map[string]interface{} {
 	}
 	return attributes
 }
-func (e errorDetails) CorrelationID() string { return e.GetCorrelationID() }
+func (e errorDetails) CorrelationID() string { return e.GetCorrelationId() }
 func (e errorDetails) Cause() error {
 	cause := e.GetCause()
 	if cause == nil {
@@ -75,7 +75,7 @@ func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 		Namespace:     e.Namespace(),
 		Name:          e.Name(),
 		MessageFormat: e.MessageFormat(),
-		CorrelationID: e.CorrelationID(),
+		CorrelationId: e.CorrelationID(),
 		Code:          e.Code(),
 	}
 	if attributes := e.PublicAttributes(); len(attributes) > 0 {

@@ -465,7 +465,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 			CodingRate:    msg.Message.CodingRate,
 		},
 		ReceivedAt:     receivedAt,
-		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 	}
 
 	var receiveTime *time.Time
@@ -695,7 +695,7 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 
 	down := &ttnpb.DownlinkMessage{
 		RawPayload:     msg.PhyPayload,
-		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 		Settings: &ttnpb.DownlinkMessage_Request{
 			Request: req,
 		},

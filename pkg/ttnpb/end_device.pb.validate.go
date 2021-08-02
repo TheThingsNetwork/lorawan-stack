@@ -3804,7 +3804,7 @@ func (m *MACState_JoinAccept) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
-			for idx, item := range m.GetCorrelationIDs() {
+			for idx, item := range m.GetCorrelationIds() {
 				_, _ = idx, item
 
 				if utf8.RuneCountInString(item) > 100 {

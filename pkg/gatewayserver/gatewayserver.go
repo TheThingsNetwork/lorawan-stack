@@ -685,8 +685,8 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 						BandID:        msg.BandID,
 						UplinkMessage: &up,
 					}
-					msg.CorrelationIDs = append(make([]string, 0, len(msg.CorrelationIDs)+1), msg.CorrelationIDs...)
-					msg.CorrelationIDs = append(msg.CorrelationIDs, host.correlationID)
+					msg.CorrelationIds = append(make([]string, 0, len(msg.CorrelationIds)+1), msg.CorrelationIds...)
+					msg.CorrelationIds = append(msg.CorrelationIds, host.correlationID)
 					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 						logger := logger.WithError(err)
 						if ids.JoinEui != nil {
@@ -769,7 +769,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 			return
 		case msg := <-conn.Up():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
-			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+			msg.CorrelationIds = append(msg.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
 			if msg.Payload == nil {
 				pld := &ttnpb.Message{}
 				if err := lorawan.UnmarshalMessage(msg.RawPayload, pld); err != nil {
@@ -787,7 +787,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 		case msg := <-conn.TxAck():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
 			if d := msg.DownlinkMessage; d != nil {
-				d.CorrelationIDs = append(d.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+				d.CorrelationIds = append(d.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
 			}
 			if msg.Result == ttnpb.TxAcknowledgment_SUCCESS {
 				registerSuccessDownlink(ctx, gtw, protocol)

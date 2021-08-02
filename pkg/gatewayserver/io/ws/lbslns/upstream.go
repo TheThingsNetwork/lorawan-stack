@@ -411,7 +411,7 @@ func (conf TxConfirmation) ToTxAck(ctx context.Context, tokens io.DownlinkTokens
 	var txAck ttnpb.TxAcknowledgment
 	if msg, _, ok := tokens.Get(uint16(conf.Diid), receivedAt); ok && msg != nil {
 		txAck.DownlinkMessage = msg
-		txAck.CorrelationIDs = msg.CorrelationIDs
+		txAck.CorrelationIds = msg.CorrelationIds
 		txAck.Result = ttnpb.TxAcknowledgment_SUCCESS
 	} else {
 		logger := log.FromContext(ctx)

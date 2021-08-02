@@ -69,7 +69,7 @@ func (m *ErrorDetails) ValidateFields(paths ...string) error {
 			}
 
 		case "correlation_id":
-			// no validation rules for CorrelationID
+			// no validation rules for CorrelationId
 		case "cause":
 
 			if v, ok := interface{}(m.GetCause()).(interface{ ValidateFields(...string) error }); ok {

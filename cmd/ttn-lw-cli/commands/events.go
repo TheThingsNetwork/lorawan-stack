@@ -123,7 +123,7 @@ var eventsFindRelatedCommand = &cobra.Command{
 			correlationID, _ = cmd.Flags().GetString("correlation-id")
 		}
 		req := &ttnpb.FindRelatedEventsRequest{
-			CorrelationID: correlationID,
+			CorrelationId: correlationID,
 		}
 
 		g, gCtx := errgroup.WithContext(ctx)

@@ -905,7 +905,7 @@ func TestTraffic(t *testing.T) {
 						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
-				CorrelationIDs: []string{"correlation1", "correlation2"},
+				CorrelationIds: []string{"correlation1", "correlation2"},
 			},
 
 			InputDownlinkPath: &ttnpb.DownlinkPath{
@@ -949,10 +949,10 @@ func TestTraffic(t *testing.T) {
 							// Will only test that `Scheduled` field is set, not individual values.
 						},
 					},
-					CorrelationIDs: []string{"correlation1", "correlation2"},
+					CorrelationIds: []string{"correlation1", "correlation2"},
 				},
 				Result:         ttnpb.TxAcknowledgment_SUCCESS,
-				CorrelationIDs: []string{"correlation1", "correlation2"},
+				CorrelationIds: []string{"correlation1", "correlation2"},
 			},
 		},
 		{
@@ -973,10 +973,10 @@ func TestTraffic(t *testing.T) {
 							// Will only test that `Scheduled` field is set, not individual values.
 						},
 					},
-					CorrelationIDs: []string{"correlation1", "correlation2"},
+					CorrelationIds: []string{"correlation1", "correlation2"},
 				},
 				Result:         ttnpb.TxAcknowledgment_SUCCESS,
-				CorrelationIDs: []string{"correlation1", "correlation2"},
+				CorrelationIds: []string{"correlation1", "correlation2"},
 			},
 		},
 		{
@@ -1207,7 +1207,7 @@ func TestRTT(t *testing.T) {
 						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
-				CorrelationIDs: []string{"correlation1", "correlation2"},
+				CorrelationIds: []string{"correlation1", "correlation2"},
 			},
 
 			InputDownlinkPath: &ttnpb.DownlinkPath{

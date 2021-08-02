@@ -336,7 +336,7 @@ func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "correlation_ids":
-		return v.CorrelationIDs == nil
+		return v.CorrelationIds == nil
 	case "dev_addr":
 		return v.DevAddr == types.DevAddr{}
 	case "keys":

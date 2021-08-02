@@ -317,7 +317,7 @@ message MACState {
     JoinRequest request = 2 [(gogoproto.nullable) = false];
     // Network session keys associated with the join.
     SessionKeys keys = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-    repeated string correlation_ids = 4 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+    repeated string correlation_ids = 4 [(validate.rules).repeated.items.string.max_len = 100];
     bytes dev_addr = 5 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
     bytes net_id = 6 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
   }

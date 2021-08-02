@@ -55,7 +55,7 @@ func parseDownlinkCorrelationID(cids []string) (string, bool) {
 var errMissingDownlinkCorrelationID = errors.DefineNotFound("missing_downlink_correlation_id", "missing identifier correlation ID on downlink message")
 
 func (m *ScheduledDownlinkMatcher) Add(ctx context.Context, down *ttnpb.DownlinkMessage) error {
-	cid, ok := parseDownlinkCorrelationID(down.GetCorrelationIDs())
+	cid, ok := parseDownlinkCorrelationID(down.GetCorrelationIds())
 	if !ok {
 		return errMissingDownlinkCorrelationID.New()
 	}
@@ -64,7 +64,7 @@ func (m *ScheduledDownlinkMatcher) Add(ctx context.Context, down *ttnpb.Downlink
 }
 
 func (m *ScheduledDownlinkMatcher) Match(ctx context.Context, ack *ttnpb.TxAcknowledgment) (*ttnpb.DownlinkMessage, error) {
-	cid, ok := parseDownlinkCorrelationID(ack.GetDownlinkMessage().GetCorrelationIDs())
+	cid, ok := parseDownlinkCorrelationID(ack.GetDownlinkMessage().GetCorrelationIds())
 	if !ok {
 		return nil, errMissingDownlinkCorrelationID.New()
 	}

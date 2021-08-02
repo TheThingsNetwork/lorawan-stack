@@ -53,7 +53,14 @@ func WithData(data interface{}) Option {
 			if cids := data.GetCorrelationIDs(); len(cids) > 0 {
 				cids = append(cids[:0:0], cids...)
 				sort.Strings(cids)
-				e.innerEvent.CorrelationIDs = mergeStrings(e.innerEvent.CorrelationIDs, cids)
+				e.innerEvent.CorrelationIds = mergeStrings(e.innerEvent.CorrelationIds, cids)
+			}
+		}
+		if data, ok := data.(interface{ GetCorrelationIds() []string }); ok {
+			if cids := data.GetCorrelationIds(); len(cids) > 0 {
+				cids = append(cids[:0:0], cids...)
+				sort.Strings(cids)
+				e.innerEvent.CorrelationIds = mergeStrings(e.innerEvent.CorrelationIds, cids)
 			}
 		}
 	})
