@@ -162,7 +162,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 						test.SessionKeysOptions.WithDefaultNwkKeys(dev.LorawanVersion),
 					),
 					Lifetime:       time.Hour,
-					CorrelationIDs: []string{"NsJs-1", "NsJs-2"},
+					CorrelationIds: []string{"NsJs-1", "NsJs-2"},
 				},
 			},
 		})
@@ -195,7 +195,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			}
 		}
 
-		fp := test.FrequencyPlan(dev.FrequencyPlanID)
+		fp := test.FrequencyPlan(dev.FrequencyPlanId)
 		phy := LoRaWANBands[fp.BandID][dev.LorawanPhyVersion]
 
 		deviceChannels, ok := ApplyCFList(dev.PendingMACState.PendingJoinRequest.CFList, phy, dev.PendingMACState.CurrentParameters.Channels...)
@@ -228,7 +228,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 
-		fpCmders, fpEvBuilders := frequencyPlanMACCommands(dev.MACState.LorawanVersion, dev.LorawanPhyVersion, dev.FrequencyPlanID, true)
+		fpCmders, fpEvBuilders := frequencyPlanMACCommands(dev.MACState.LorawanVersion, dev.LorawanPhyVersion, dev.FrequencyPlanId, true)
 		downEvBuilders := append(conf.DownlinkEventBuilders, fpEvBuilders...)
 		downCmders = append(downCmders, conf.DownlinkMACCommanders...)
 		downCmders = append(downCmders, fpCmders...)
@@ -272,7 +272,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 		if !a.So(env.Events, should.ReceiveEventsResembling, events.Builders(downEvBuilders).New(
-			events.ContextWithCorrelationID(ctx, LastDownlink(dev.MACState.RecentDownlinks...).CorrelationIDs...),
+			events.ContextWithCorrelationID(ctx, LastDownlink(dev.MACState.RecentDownlinks...).CorrelationIds...),
 			events.WithIdentifiers(&dev.EndDeviceIdentifiers)),
 		) {
 			t.Error("Data downlink event assertion failed")
@@ -291,7 +291,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 					// a.So(up.CorrelationIDs, should.HaveSameElementsDeep, LastDownlink(dev.RecentDownlinks...).CorrelationIDs),
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIDs:       up.CorrelationIDs,
+						CorrelationIds:       up.CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 							DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 								SessionKeyID: dev.Session.SessionKeyID,

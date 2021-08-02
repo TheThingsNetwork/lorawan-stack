@@ -64,7 +64,7 @@ func (m *EncodeDownlinkMessageRequest) ValidateFields(paths ...string) error {
 
 		case "end_device_version_ids":
 
-			if v, ok := interface{}(&m.EndDeviceVersionIDs).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.EndDeviceVersionIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EncodeDownlinkMessageRequestValidationError{
 						field:  "end_device_version_ids",
@@ -186,7 +186,7 @@ func (m *DecodeUplinkMessageRequest) ValidateFields(paths ...string) error {
 
 		case "end_device_version_ids":
 
-			if v, ok := interface{}(&m.EndDeviceVersionIDs).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.EndDeviceVersionIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return DecodeUplinkMessageRequestValidationError{
 						field:  "end_device_version_ids",
@@ -308,7 +308,7 @@ func (m *DecodeDownlinkMessageRequest) ValidateFields(paths ...string) error {
 
 		case "end_device_version_ids":
 
-			if v, ok := interface{}(&m.EndDeviceVersionIDs).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.EndDeviceVersionIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return DecodeDownlinkMessageRequestValidationError{
 						field:  "end_device_version_ids",

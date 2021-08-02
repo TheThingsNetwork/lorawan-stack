@@ -370,22 +370,22 @@ func TestBleve(t *testing.T) {
 
 			for _, ids := range []ttnpb.EndDeviceVersionIdentifiers{
 				{
-					BrandID: "unknown-vendor",
+					BrandId: "unknown-vendor",
 				},
 				{
-					BrandID: "foo-vendor",
-					ModelID: "unknown-model",
+					BrandId: "foo-vendor",
+					ModelId: "unknown-model",
 				},
 				{
-					BrandID:         "foo-vendor",
-					ModelID:         "dev1",
+					BrandId:         "foo-vendor",
+					ModelId:         "dev1",
 					FirmwareVersion: "unknown-version",
 				},
 				{
-					BrandID:         "foo-vendor",
-					ModelID:         "dev1",
+					BrandId:         "foo-vendor",
+					ModelId:         "dev1",
 					FirmwareVersion: "1.0",
-					BandID:          "unknown-band",
+					BandId:          "unknown-band",
 				},
 			} {
 				tmpl, err := s.GetTemplate(&ids)
@@ -397,11 +397,11 @@ func TestBleve(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
 			tmpl, err := s.GetTemplate(&ttnpb.EndDeviceVersionIdentifiers{
-				BrandID:         "foo-vendor",
-				ModelID:         "dev2",
+				BrandId:         "foo-vendor",
+				ModelId:         "dev2",
 				FirmwareVersion: "1.1",
 				HardwareVersion: "2.0",
-				BandID:          "EU_433",
+				BandId:          "EU_433",
 			})
 			a.So(err, should.BeNil)
 			a.So(tmpl, should.NotBeNil)
@@ -414,25 +414,25 @@ func TestBleve(t *testing.T) {
 
 			for _, ids := range []ttnpb.EndDeviceVersionIdentifiers{
 				{
-					BrandID: "unknown-vendor",
+					BrandId: "unknown-vendor",
 				},
 				{
-					BrandID: "foo-vendor",
-					ModelID: "unknown-model",
+					BrandId: "foo-vendor",
+					ModelId: "unknown-model",
 				},
 				{
-					BrandID:         "foo-vendor",
-					ModelID:         "dev1",
+					BrandId:         "foo-vendor",
+					ModelId:         "dev1",
 					FirmwareVersion: "unknown-version",
 				},
 				{
-					BrandID:         "foo-vendor",
-					ModelID:         "dev1",
+					BrandId:         "foo-vendor",
+					ModelId:         "dev1",
 					FirmwareVersion: "1.0",
-					BandID:          "unknown-band",
+					BandId:          "unknown-band",
 				},
 			} {
-				codec, err := s.GetDownlinkDecoder(&ttnpb.GetPayloadFormatterRequest{VersionIDs: &ids})
+				codec, err := s.GetDownlinkDecoder(&ttnpb.GetPayloadFormatterRequest{VersionIds: &ids})
 				a.So(errors.IsNotFound(err), should.BeTrue)
 				a.So(codec, should.Equal, nil)
 			}
@@ -471,16 +471,15 @@ func TestBleve(t *testing.T) {
 				a := assertions.New(t)
 
 				versionIDs := &ttnpb.EndDeviceVersionIdentifiers{
-					BrandID:         "foo-vendor",
-					ModelID:         "dev2",
+					BrandId:         "foo-vendor",
+					ModelId:         "dev2",
 					FirmwareVersion: "1.1",
-					BandID:          "EU_433",
+					BandId:          "EU_433",
 				}
-				codec, err := tc.f(&ttnpb.GetPayloadFormatterRequest{VersionIDs: versionIDs})
+				codec, err := tc.f(&ttnpb.GetPayloadFormatterRequest{VersionIds: versionIDs})
 				a.So(err, should.BeNil)
 				a.So(codec, should.Resemble, tc.codec)
 			})
 		}
 	})
-
 }

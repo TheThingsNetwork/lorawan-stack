@@ -167,7 +167,7 @@ func CleanDownlinks(items []*ttnpb.ApplicationDownlink) []*ttnpb.ApplicationDown
 			ClassBC:        item.ClassBC,
 			Priority:       item.Priority,
 			Confirmed:      item.Confirmed,
-			CorrelationIDs: item.CorrelationIDs,
+			CorrelationIds: item.CorrelationIds,
 		})
 	}
 	return res

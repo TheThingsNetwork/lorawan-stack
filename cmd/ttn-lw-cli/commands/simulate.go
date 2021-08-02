@@ -286,7 +286,7 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 }
 
 func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *ttnpb.DownlinkMessage) error {
-	phy, err := band.GetByID(dev.FrequencyPlanID)
+	phy, err := band.GetByID(dev.FrequencyPlanId)
 	if err != nil {
 		return err
 	}
@@ -514,7 +514,7 @@ var (
 					if err := processDownlink(&ttnpb.EndDevice{
 						LorawanVersion:    uplinkParams.LoRaWANVersion,
 						LorawanPhyVersion: uplinkParams.LoRaWANPHYVersion,
-						FrequencyPlanID:   uplinkParams.BandID,
+						FrequencyPlanId:   uplinkParams.BandID,
 						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 							JoinEui: &joinParams.JoinEUI,
 							DevEui:  &joinParams.DevEUI,
@@ -657,7 +657,7 @@ var (
 					if err := processDownlink(&ttnpb.EndDevice{
 						LorawanVersion:    uplinkParams.LoRaWANVersion,
 						LorawanPhyVersion: uplinkParams.LoRaWANPHYVersion,
-						FrequencyPlanID:   uplinkParams.BandID,
+						FrequencyPlanId:   uplinkParams.BandID,
 						Session: &ttnpb.Session{
 							LastNFCntDown: lastNFCntDown,
 							SessionKeys: ttnpb.SessionKeys{

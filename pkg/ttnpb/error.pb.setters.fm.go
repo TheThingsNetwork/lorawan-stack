@@ -51,10 +51,10 @@ func (dst *ErrorDetails) SetFields(src *ErrorDetails, paths ...string) error {
 				return fmt.Errorf("'correlation_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationID = src.CorrelationID
+				dst.CorrelationId = src.CorrelationId
 			} else {
 				var zero string
-				dst.CorrelationID = zero
+				dst.CorrelationId = zero
 			}
 		case "cause":
 			if len(subs) > 0 {

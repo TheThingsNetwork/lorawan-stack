@@ -219,7 +219,7 @@ func TestProfile(t *testing.T) {
 				CodecId: tc.codec,
 			}
 
-			tc.template.EndDevice.VersionIDs = ids
+			tc.template.EndDevice.VersionIds = ids
 			template, err := profile.ToTemplatePB(ids, fwProfile)
 			a.So(err, should.BeNil)
 			a.So(template, should.Resemble, tc.template)

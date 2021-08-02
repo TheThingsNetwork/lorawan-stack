@@ -118,7 +118,7 @@ var (
 				_, err = ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
 					UserIds:   *usrID,
 					ClientIds: *cliID,
-					ID:        token.ID,
+					Id:        token.Id,
 				})
 				if err != nil {
 					return err
@@ -196,7 +196,7 @@ var (
 			_, err = ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
 				UserIds:   *usrID,
 				ClientIds: *cliID,
-				ID:        tokenID,
+				Id:        tokenID,
 			})
 
 			return err

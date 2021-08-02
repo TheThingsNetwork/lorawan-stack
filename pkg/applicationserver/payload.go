@@ -53,7 +53,7 @@ func (as *ApplicationServer) encodeAndEncryptDownlinks(ctx context.Context, dev 
 				Confirmed:      item.Confirmed,
 				ClassBC:        item.ClassBC,
 				Priority:       item.Priority,
-				CorrelationIDs: item.CorrelationIDs,
+				CorrelationIds: item.CorrelationIds,
 			}
 			if !skipPayloadCrypto {
 				if err := as.encodeAndEncryptDownlink(ctx, dev, session, encryptedItem, link.DefaultFormatters); err != nil {
@@ -85,7 +85,7 @@ func (as *ApplicationServer) encodeAndEncryptDownlink(ctx context.Context, dev *
 			formatter, parameter = defaultFormatters.DownFormatter, defaultFormatters.DownFormatterParameter
 		}
 		if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
-			if err := as.formatters.EncodeDownlink(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, downlink, formatter, parameter); err != nil {
+			if err := as.formatters.EncodeDownlink(ctx, dev.EndDeviceIdentifiers, dev.VersionIds, downlink, formatter, parameter); err != nil {
 				events.Publish(evtEncodeFailDataDown.NewWithIdentifiersAndData(ctx, &dev.EndDeviceIdentifiers, err))
 				return err
 			}
@@ -138,7 +138,7 @@ func (as *ApplicationServer) decodeUplink(ctx context.Context, dev *ttnpb.EndDev
 		formatter, parameter = defaultFormatters.UpFormatter, defaultFormatters.UpFormatterParameter
 	}
 	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
-		if err := as.formatters.DecodeUplink(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, uplink, formatter, parameter); err != nil {
+		if err := as.formatters.DecodeUplink(ctx, dev.EndDeviceIdentifiers, dev.VersionIds, uplink, formatter, parameter); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to decode uplink")
 			events.Publish(evtDecodeFailDataUp.NewWithIdentifiersAndData(ctx, &dev.EndDeviceIdentifiers, err))
 		} else if len(uplink.DecodedPayloadWarnings) > 0 {
@@ -191,7 +191,7 @@ func (as *ApplicationServer) decodeDownlink(ctx context.Context, dev *ttnpb.EndD
 		formatter, parameter = defaultFormatters.DownFormatter, defaultFormatters.DownFormatterParameter
 	}
 	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
-		if err := as.formatters.DecodeDownlink(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, downlink, formatter, parameter); err != nil {
+		if err := as.formatters.DecodeDownlink(ctx, dev.EndDeviceIdentifiers, dev.VersionIds, downlink, formatter, parameter); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to decode downlink")
 			events.Publish(evtDecodeFailDataDown.NewWithIdentifiersAndData(ctx, &dev.EndDeviceIdentifiers, err))
 		} else if len(downlink.DecodedPayloadWarnings) > 0 {

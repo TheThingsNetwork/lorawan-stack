@@ -369,10 +369,10 @@ func (dst *OAuthAccessTokenIdentifiers) SetFields(src *OAuthAccessTokenIdentifie
 				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ID = src.ID
+				dst.Id = src.Id
 			} else {
 				var zero string
-				dst.ID = zero
+				dst.Id = zero
 			}
 
 		default:
@@ -436,10 +436,10 @@ func (dst *OAuthAccessToken) SetFields(src *OAuthAccessToken, paths ...string) e
 				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ID = src.ID
+				dst.Id = src.Id
 			} else {
 				var zero string
-				dst.ID = zero
+				dst.Id = zero
 			}
 		case "access_token":
 			if len(subs) > 0 {

@@ -108,7 +108,7 @@ func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 		gateway = gateway.PublicSafe()
 	}
 
-	freqPlanURL := s.inferServerAddress(r) + "/api/v2/frequency-plans/" + gateway.FrequencyPlanID
+	freqPlanURL := s.inferServerAddress(r) + "/api/v2/frequency-plans/" + gateway.FrequencyPlanId
 
 	var rtr *router
 	if gateway.GatewayServerAddress != "" {
@@ -123,7 +123,7 @@ func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res := &gatewayInfoResponse{
-		FrequencyPlan:    gateway.FrequencyPlanID,
+		FrequencyPlan:    gateway.FrequencyPlanId,
 		FrequencyPlanURL: freqPlanURL,
 		AutoUpdate:       gateway.AutoUpdate,
 	}

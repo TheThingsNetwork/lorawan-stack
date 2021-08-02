@@ -53,9 +53,9 @@ func (dst *Event) SetFields(src *Event, paths ...string) error {
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 		case "origin":
 			if len(subs) > 0 {
@@ -211,10 +211,10 @@ func (dst *FindRelatedEventsRequest) SetFields(src *FindRelatedEventsRequest, pa
 				return fmt.Errorf("'correlation_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationID = src.CorrelationID
+				dst.CorrelationId = src.CorrelationId
 			} else {
 				var zero string
-				dst.CorrelationID = zero
+				dst.CorrelationId = zero
 			}
 
 		default:

@@ -111,7 +111,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 }
 
 func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.ApplicationUp, loraUp *objects.LoRaUplink, data *packageData) error {
-	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loraclouddmsv1:%s", events.NewCorrelationID()))...)
+	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:packages:loraclouddmsv1:%s", events.NewCorrelationID()))...)
 	logger := log.FromContext(ctx)
 	eui := objects.EUI(*up.DevEui)
 
@@ -186,7 +186,7 @@ func (p *DeviceManagementPackage) sendDownlink(ctx context.Context, ids ttnpb.En
 func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: ids,
-		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+		CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 		ReceivedAt:           timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
@@ -214,7 +214,7 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids tt
 	}
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: ids,
-		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+		CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 		ReceivedAt:           timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{

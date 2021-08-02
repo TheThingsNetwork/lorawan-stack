@@ -102,7 +102,7 @@ func (v *ApplicationDownlink) FieldIsZero(p string) bool {
 	case "confirmed":
 		return !v.Confirmed
 	case "correlation_ids":
-		return v.CorrelationIDs == nil
+		return v.CorrelationIds == nil
 	case "decoded_payload":
 		return v.DecodedPayload == nil
 	case "decoded_payload_warnings":

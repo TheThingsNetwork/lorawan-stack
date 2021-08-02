@@ -53,7 +53,7 @@ var (
 	serverAddress          = "127.0.0.1:0"
 	registeredGatewayUID   = "eui-0101010101010101"
 	registeredGatewayID    = ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayUID}
-	registeredGateway      = ttnpb.Gateway{GatewayIdentifiers: registeredGatewayID, FrequencyPlanID: "EU_863_870"}
+	registeredGateway      = ttnpb.Gateway{GatewayIdentifiers: registeredGatewayID, FrequencyPlanId: "EU_863_870"}
 	registeredGatewayToken = "secrettoken"
 
 	discoveryEndPoint      = "/router-info"
@@ -902,10 +902,10 @@ func TestTraffic(t *testing.T) {
 						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,
 						Rx1Frequency:     868100000,
-						FrequencyPlanID:  test.EUFrequencyPlanID,
+						FrequencyPlanId:  test.EUFrequencyPlanID,
 					},
 				},
-				CorrelationIDs: []string{"correlation1", "correlation2"},
+				CorrelationIds: []string{"correlation1", "correlation2"},
 			},
 
 			InputDownlinkPath: &ttnpb.DownlinkPath{
@@ -949,10 +949,10 @@ func TestTraffic(t *testing.T) {
 							// Will only test that `Scheduled` field is set, not individual values.
 						},
 					},
-					CorrelationIDs: []string{"correlation1", "correlation2"},
+					CorrelationIds: []string{"correlation1", "correlation2"},
 				},
 				Result:         ttnpb.TxAcknowledgment_SUCCESS,
-				CorrelationIDs: []string{"correlation1", "correlation2"},
+				CorrelationIds: []string{"correlation1", "correlation2"},
 			},
 		},
 		{
@@ -973,10 +973,10 @@ func TestTraffic(t *testing.T) {
 							// Will only test that `Scheduled` field is set, not individual values.
 						},
 					},
-					CorrelationIDs: []string{"correlation1", "correlation2"},
+					CorrelationIds: []string{"correlation1", "correlation2"},
 				},
 				Result:         ttnpb.TxAcknowledgment_SUCCESS,
-				CorrelationIDs: []string{"correlation1", "correlation2"},
+				CorrelationIds: []string{"correlation1", "correlation2"},
 			},
 		},
 		{
@@ -1204,10 +1204,10 @@ func TestRTT(t *testing.T) {
 						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,
 						Rx1Frequency:     868100000,
-						FrequencyPlanID:  test.EUFrequencyPlanID,
+						FrequencyPlanId:  test.EUFrequencyPlanID,
 					},
 				},
-				CorrelationIDs: []string{"correlation1", "correlation2"},
+				CorrelationIds: []string{"correlation1", "correlation2"},
 			},
 
 			InputDownlinkPath: &ttnpb.DownlinkPath{

@@ -86,9 +86,9 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 		case "device_channel_index":
 			if len(subs) > 0 {
@@ -184,9 +184,9 @@ func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) err
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 		case "session_key_id":
 			if len(subs) > 0 {
@@ -300,9 +300,9 @@ func (dst *TxAcknowledgment) SetFields(src *TxAcknowledgment, paths ...string) e
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 		case "result":
 			if len(subs) > 0 {
@@ -441,10 +441,10 @@ func (dst *GatewayUplinkMessage) SetFields(src *GatewayUplinkMessage, paths ...s
 				return fmt.Errorf("'band_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.BandID = src.BandID
+				dst.BandId = src.BandId
 			} else {
 				var zero string
-				dst.BandID = zero
+				dst.BandId = zero
 			}
 
 		default:
@@ -616,26 +616,26 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 		case "version_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceVersionIdentifiers
-				if (src == nil || src.VersionIDs == nil) && dst.VersionIDs == nil {
+				if (src == nil || src.VersionIds == nil) && dst.VersionIds == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.VersionIDs
+					newSrc = src.VersionIds
 				}
-				if dst.VersionIDs != nil {
-					newDst = dst.VersionIDs
+				if dst.VersionIds != nil {
+					newDst = dst.VersionIds
 				} else {
 					newDst = &EndDeviceVersionIdentifiers{}
-					dst.VersionIDs = newDst
+					dst.VersionIds = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.VersionIDs = src.VersionIDs
+					dst.VersionIds = src.VersionIds
 				} else {
-					dst.VersionIDs = nil
+					dst.VersionIds = nil
 				}
 			}
 		case "network_ids":
@@ -902,9 +902,9 @@ func (dst *ApplicationDownlink) SetFields(src *ApplicationDownlink, paths ...str
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 
 		default:
@@ -1143,9 +1143,9 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 		case "received_at":
 			if len(subs) > 0 {

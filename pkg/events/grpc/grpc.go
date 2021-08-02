@@ -99,7 +99,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		Time:           time.Now().UTC(),
 		Identifiers:    req.Identifiers,
 		Origin:         hostname,
-		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 	}); err != nil {
 		return err
 	}
@@ -148,7 +148,7 @@ func (srv *EventsServer) FindRelated(ctx context.Context, req *ttnpb.FindRelated
 		return nil, err
 	}
 
-	evts, err := store.FindRelated(ctx, req.GetCorrelationID())
+	evts, err := store.FindRelated(ctx, req.GetCorrelationId())
 	if err != nil {
 		return nil, err
 	}

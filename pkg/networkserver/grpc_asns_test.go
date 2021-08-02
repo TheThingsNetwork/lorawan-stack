@@ -129,7 +129,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"session",
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -199,7 +199,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 
 				getDevice := &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -278,7 +278,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 
 				getDevice := &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -381,7 +381,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 
 				getDevice := &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -457,7 +457,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 
 				getDevice := &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -530,7 +530,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 
 				getDevice := &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -608,7 +608,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 
 				getDevice := &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -823,7 +823,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"session",
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -893,7 +893,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 
 				getDevice := &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -972,7 +972,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 
 				getDevice := &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -1059,7 +1059,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"session",
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -1129,7 +1129,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"session",
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",
@@ -1194,7 +1194,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"session",
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceId:               "test-dev-id",

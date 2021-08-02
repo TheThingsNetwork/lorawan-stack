@@ -62,7 +62,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 					return nil, err
 				}
 				validation = &ttnpb.ContactInfoValidation{
-					ID:        id,
+					Id:        id,
 					Token:     key,
 					Entity:    ids,
 					CreatedAt: &now,
@@ -106,7 +106,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 			data.SetEntity(validation.Entity)
 			return emails.Validate{
 				Data:  data,
-				ID:    validation.ID,
+				ID:    validation.Id,
 				Token: validation.Token,
 				TTL:   ttl,
 			}
@@ -122,7 +122,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 	}
 
 	return &ttnpb.ContactInfoValidation{
-		ID:          id,
+		Id:          id,
 		Entity:      ids,
 		ContactInfo: pendingContactInfo,
 		CreatedAt:   &now,

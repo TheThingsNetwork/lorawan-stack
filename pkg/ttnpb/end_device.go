@@ -336,7 +336,7 @@ func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "correlation_ids":
-		return v.CorrelationIDs == nil
+		return v.CorrelationIds == nil
 	case "dev_addr":
 		return v.DevAddr == types.DevAddr{}
 	case "keys":
@@ -842,15 +842,15 @@ func (v *EndDeviceVersionIdentifiers) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "brand_id":
-		return v.BrandID == ""
+		return v.BrandId == ""
 	case "firmware_version":
 		return v.FirmwareVersion == ""
 	case "hardware_version":
 		return v.HardwareVersion == ""
 	case "model_id":
-		return v.ModelID == ""
+		return v.ModelId == ""
 	case "band_id":
-		return v.BandID == ""
+		return v.BandId == ""
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -898,7 +898,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "formatters.up_formatter_parameter":
 		return v.Formatters.FieldIsZero("up_formatter_parameter")
 	case "frequency_plan_id":
-		return v.FrequencyPlanID == ""
+		return v.FrequencyPlanId == ""
 	case "ids":
 		return v.EndDeviceIdentifiers == EndDeviceIdentifiers{}
 	case "ids.application_ids":
@@ -1216,17 +1216,17 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "used_dev_nonces":
 		return v.UsedDevNonces == nil
 	case "version_ids":
-		return v.VersionIDs == nil
+		return v.VersionIds == nil
 	case "version_ids.brand_id":
-		return v.VersionIDs.FieldIsZero("brand_id")
+		return v.VersionIds.FieldIsZero("brand_id")
 	case "version_ids.firmware_version":
-		return v.VersionIDs.FieldIsZero("firmware_version")
+		return v.VersionIds.FieldIsZero("firmware_version")
 	case "version_ids.hardware_version":
-		return v.VersionIDs.FieldIsZero("hardware_version")
+		return v.VersionIds.FieldIsZero("hardware_version")
 	case "version_ids.model_id":
-		return v.VersionIDs.FieldIsZero("model_id")
+		return v.VersionIds.FieldIsZero("model_id")
 	case "version_ids.band_id":
-		return v.VersionIDs.FieldIsZero("band_id")
+		return v.VersionIds.FieldIsZero("band_id")
 	}
 	switch {
 	case strings.HasPrefix(p, "mac_state."):

@@ -81,7 +81,7 @@ type LoradConfig struct {
 
 // BuildLorad builds Lorad configuration for the given gateway, using the given frequency plan store.
 func BuildLorad(gtw *ttnpb.Gateway, fps *frequencyplans.Store) (*LoradConfig, error) {
-	fp, err := fps.GetByID(gtw.FrequencyPlanID)
+	fp, err := fps.GetByID(gtw.FrequencyPlanId)
 	if err != nil {
 		return nil, err
 	}

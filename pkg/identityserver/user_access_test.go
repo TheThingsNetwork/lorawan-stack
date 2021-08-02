@@ -46,13 +46,13 @@ func TestUserAccessNotFound(t *testing.T) {
 		reg := ttnpb.NewUserAccessClient(cc)
 
 		apiKey := ttnpb.APIKey{
-			ID:   "does-not-exist-id",
+			Id:   "does-not-exist-id",
 			Name: "test-user-api-key-name",
 		}
 
 		got, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
 			UserIdentifiers: userID,
-			KeyId:           apiKey.ID,
+			KeyId:           apiKey.Id,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -115,7 +115,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := population.Users[defaultUserIdx].UserIdentifiers
-		APIKeyID := userAPIKeys(&userID).APIKeys[0].ID
+		APIKeyID := userAPIKeys(&userID).APIKeys[0].Id
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
@@ -219,12 +219,12 @@ func TestUserAccessCRUD(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			KeyId:           userKey.ID,
+			KeyId:           userKey.Id,
 		}, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(APIKey, should.NotBeNil) {
-			a.So(APIKey.ID, should.Equal, userKey.ID)
+			a.So(APIKey.Id, should.Equal, userKey.Id)
 			a.So(APIKey.Key, should.BeEmpty)
 		}
 
@@ -239,7 +239,7 @@ func TestUserAccessCRUD(t *testing.T) {
 		a.So(len(apiKeys.APIKeys), should.Equal, len(userAPIKeys.APIKeys))
 		for i, APIkey := range apiKeys.APIKeys {
 			a.So(APIkey.Name, should.Equal, userAPIKeys.APIKeys[i].Name)
-			a.So(APIkey.ID, should.Equal, userAPIKeys.APIKeys[i].ID)
+			a.So(APIkey.Id, should.Equal, userAPIKeys.APIKeys[i].Id)
 		}
 
 		createdAPIKeyName := "test-created-api-key"

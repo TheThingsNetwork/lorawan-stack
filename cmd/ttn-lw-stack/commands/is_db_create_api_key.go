@@ -32,63 +32,61 @@ var (
 	errInvalidDateFormat = errors.DefineInvalidArgument("expiry_date_format_invalid", "invalid expiry date format (RFC3339: YYYY-MM-DDTHH:MM:SSZ)")
 )
 
-var (
-	createAPIKeyCommand = &cobra.Command{
-		Use:   "create-user-api-key",
-		Short: "Create an API key with full rights on the user in the Identity Server database",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-			defer cancel()
+var createAPIKeyCommand = &cobra.Command{
+	Use:   "create-user-api-key",
+	Short: "Create an API key with full rights on the user in the Identity Server database",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
 
-			logger.Info("Connecting to Identity Server database...")
-			db, err := store.Open(ctx, config.IS.DatabaseURI)
+		logger.Info("Connecting to Identity Server database...")
+		db, err := store.Open(ctx, config.IS.DatabaseURI)
+		if err != nil {
+			return err
+		}
+		defer db.Close()
+
+		userID, err := cmd.Flags().GetString("user-id")
+		if err != nil {
+			return err
+		}
+		name, _ := cmd.Flags().GetString("name")
+
+		expiry, _ := cmd.Flags().GetString("api-key-expiry")
+		var expiryDate *time.Time
+
+		if expiry != "" {
+			expiryDate, err := time.Parse(time.RFC3339, expiry)
 			if err != nil {
-				return err
+				return errInvalidDateFormat
 			}
-			defer db.Close()
+			if expiryDate.Before(time.Now()) {
+				return errExpiryDateInPast
+			}
+		}
 
-			userID, err := cmd.Flags().GetString("user-id")
-			if err != nil {
-				return err
-			}
-			name, _ := cmd.Flags().GetString("name")
+		usr := &ttnpb.User{
+			UserIdentifiers: ttnpb.UserIdentifiers{UserId: userID},
+		}
+		rights := []ttnpb.Right{ttnpb.RIGHT_ALL}
+		apiKeyStore := store.GetAPIKeyStore(db)
+		key, token, err := is.GenerateAPIKey(ctx, name, expiryDate, rights...)
+		if err != nil {
+			return err
+		}
+		key, err = apiKeyStore.CreateAPIKey(ctx, usr.GetEntityIdentifiers(), key)
+		if err != nil {
+			return err
+		}
+		key.Key = token
+		logger.Infof("API key ID: %s", key.Id)
+		logger.Infof("API key value: %s", key.Key)
+		logger.Warn("The API key value will never be shown again")
+		logger.Warn("Make sure to copy it to a safe place")
 
-			expiry, _ := cmd.Flags().GetString("api-key-expiry")
-			var expiryDate *time.Time
-
-			if expiry != "" {
-				expiryDate, err := time.Parse(time.RFC3339, expiry)
-				if err != nil {
-					return errInvalidDateFormat
-				}
-				if expiryDate.Before(time.Now()) {
-					return errExpiryDateInPast
-				}
-			}
-
-			usr := &ttnpb.User{
-				UserIdentifiers: ttnpb.UserIdentifiers{UserId: userID},
-			}
-			rights := []ttnpb.Right{ttnpb.RIGHT_ALL}
-			apiKeyStore := store.GetAPIKeyStore(db)
-			key, token, err := is.GenerateAPIKey(ctx, name, expiryDate, rights...)
-			if err != nil {
-				return err
-			}
-			key, err = apiKeyStore.CreateAPIKey(ctx, usr.GetEntityIdentifiers(), key)
-			if err != nil {
-				return err
-			}
-			key.Key = token
-			logger.Infof("API key ID: %s", key.ID)
-			logger.Infof("API key value: %s", key.Key)
-			logger.Warn("The API key value will never be shown again")
-			logger.Warn("Make sure to copy it to a safe place")
-
-			return io.Write(os.Stdout, config.OutputFormat, key)
-		},
-	}
-)
+		return io.Write(os.Stdout, config.OutputFormat, key)
+	},
+}
 
 func init() {
 	createAPIKeyCommand.Flags().String("user-id", "admin", "User ID")

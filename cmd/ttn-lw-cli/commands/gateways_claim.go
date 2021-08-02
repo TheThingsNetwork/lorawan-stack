@@ -167,7 +167,7 @@ If no API key is provided, a new one will be created.`,
 					return err
 				}
 
-				logger.Infof("Created API Key with ID: %s", res.ID)
+				logger.Infof("Created API Key with ID: %s", res.Id)
 				key = res.Key
 			}
 

@@ -83,7 +83,7 @@ func New(processor messageprocessors.PayloadProcessor, cluster Cluster) messagep
 }
 
 func cacheKey(codec codecType, version *ttnpb.EndDeviceVersionIdentifiers) string {
-	return fmt.Sprintf("%s:%s:%s:%s:%v", version.BrandID, version.ModelID, version.FirmwareVersion, version.BandID, codec)
+	return fmt.Sprintf("%s:%s:%s:%s:%v", version.BrandId, version.ModelId, version.FirmwareVersion, version.BandId, codec)
 }
 
 var errNoVersionIdentifiers = errors.DefineInvalidArgument("no_version_identifiers", "no version identifiers for device")
@@ -108,7 +108,7 @@ func (h *host) retrieve(ctx context.Context, codec codecType, ids ttnpb.Applicat
 		)
 		req := &ttnpb.GetPayloadFormatterRequest{
 			ApplicationIds: ids,
-			VersionIDs:     version,
+			VersionIds:     version,
 		}
 		client := ttnpb.NewDeviceRepositoryClient(cc)
 		switch codec {

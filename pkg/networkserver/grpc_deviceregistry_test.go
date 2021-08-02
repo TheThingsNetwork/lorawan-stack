@@ -114,7 +114,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					FrequencyPlanID: test.EUFrequencyPlanID,
+					FrequencyPlanId: test.EUFrequencyPlanID,
 				}, ctx, nil
 			},
 			Request: &ttnpb.GetEndDeviceRequest{
@@ -133,7 +133,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanId: test.EUFrequencyPlanID,
 			},
 			GetByIDCalls: 1,
 		},
@@ -167,7 +167,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					FrequencyPlanID: test.EUFrequencyPlanID,
+					FrequencyPlanId: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
@@ -198,7 +198,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FrequencyPlanID: test.EUFrequencyPlanID,
+				FrequencyPlanId: test.EUFrequencyPlanID,
 				Session: &ttnpb.Session{
 					SessionKeys: ttnpb.SessionKeys{
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
@@ -834,7 +834,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						}()),
 						fmt.Sprintf("MAC:%s", dev.LorawanVersion.String()),
 						fmt.Sprintf("PHY:%s", dev.LorawanPhyVersion.String()),
-						fmt.Sprintf("fp:%s", dev.FrequencyPlanID),
+						fmt.Sprintf("fp:%s", dev.FrequencyPlanId),
 						fmt.Sprintf("paths:[%s]", strings.Join(tc.SetDevice.Paths, ",")),
 					}
 				}()...),

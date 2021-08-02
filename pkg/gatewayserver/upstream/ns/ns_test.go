@@ -65,7 +65,7 @@ func TestNSHandler(t *testing.T) {
 		{
 			Name: "OneUplink",
 			Message: &ttnpb.GatewayUplinkMessage{
-				BandID: band.EU_863_870,
+				BandId: band.EU_863_870,
 				UplinkMessage: &ttnpb.UplinkMessage{
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},

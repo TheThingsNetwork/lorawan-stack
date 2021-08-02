@@ -87,7 +87,7 @@ message UplinkMessage {
   // Server time when a component received the message.
   // The Gateway Server and Network Server set this value to their local server time of reception.
   google.protobuf.Timestamp received_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  repeated string correlation_ids = 7 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+  repeated string correlation_ids = 7 [(validate.rules).repeated.items.string.max_len = 100];
   reserved 8; // gateway_channel_index (obsolete).
   // Index of the device channel that received the message.
   // Set by Network Server.
@@ -148,7 +148,7 @@ message DownlinkMessage {
     TxRequest request = 4;
     TxSettings scheduled = 5;
   }
-  repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+  repeated string correlation_ids = 6 [(validate.rules).repeated.items.string.max_len = 100];
   bytes session_key_id = 7 [(validate.rules).bytes.max_len = 2048];
 }
 
@@ -156,7 +156,7 @@ message TxAcknowledgment {
   // Correlation IDs for the downlink message.
   // Set automatically by the UDP and LBS frontends.
   // For gRPC and the MQTT v3 frontends, the correlation IDs must match the ones of the downlink message the Tx acknowledgment message refers to.
-  repeated string correlation_ids = 1 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+  repeated string correlation_ids = 1 [(validate.rules).repeated.items.string.max_len = 100];
 
   enum Result {
     SUCCESS = 0;
@@ -183,7 +183,7 @@ message GatewayTxAcknowledgment {
 message GatewayUplinkMessage {
   UplinkMessage message = 1 [(gogoproto.embed) = true, (validate.rules).message.required = true];
   // LoRaWAN band ID of the gateway.
-  string band_id = 2 [(gogoproto.customname) = "BandID"];
+  string band_id = 2;
 }
 
 message ApplicationUplink {
@@ -234,7 +234,7 @@ message ApplicationUplink {
   map<string,Location> locations = 14;
 
   // End device version identifiers, set by the Application Server while handling the message.
-  EndDeviceVersionIdentifiers version_ids = 15 [(gogoproto.customname) = "VersionIDs"];
+  EndDeviceVersionIdentifiers version_ids = 15;
 
   // Network identifiers, set by the Network Server that handles the message.
   NetworkIdentifiers network_ids = 16;
@@ -310,7 +310,7 @@ message ApplicationDownlink {
   // Priority for scheduling the downlink message.
   TxSchedulePriority priority = 8 [(validate.rules).enum.defined_only = true];
 
-  repeated string correlation_ids = 9 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+  repeated string correlation_ids = 9 [(validate.rules).repeated.items.string.max_len = 100];
 
   // next: 11
 }
@@ -356,7 +356,7 @@ message ApplicationUp {
   option (gogoproto.populate) = true;
 
   EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+  repeated string correlation_ids = 2 [(validate.rules).repeated.items.string.max_len = 100];
   // Server time when the Application Server received the message.
   google.protobuf.Timestamp received_at = 12 [(gogoproto.stdtime) = true];
 

@@ -478,10 +478,10 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 				return fmt.Errorf("'frequency_plan_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.FrequencyPlanID = src.FrequencyPlanID
+				dst.FrequencyPlanId = src.FrequencyPlanId
 			} else {
 				var zero string
-				dst.FrequencyPlanID = zero
+				dst.FrequencyPlanId = zero
 			}
 		case "photos":
 			if len(subs) > 0 {
@@ -1651,26 +1651,26 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 		case "version_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceVersionIdentifiers
-				if (src == nil || src.VersionIDs == nil) && dst.VersionIDs == nil {
+				if (src == nil || src.VersionIds == nil) && dst.VersionIds == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.VersionIDs
+					newSrc = src.VersionIds
 				}
-				if dst.VersionIDs != nil {
-					newDst = dst.VersionIDs
+				if dst.VersionIds != nil {
+					newDst = dst.VersionIds
 				} else {
 					newDst = &EndDeviceVersionIdentifiers{}
-					dst.VersionIDs = newDst
+					dst.VersionIds = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.VersionIDs = src.VersionIDs
+					dst.VersionIds = src.VersionIds
 				} else {
-					dst.VersionIDs = nil
+					dst.VersionIds = nil
 				}
 			}
 		case "service_profile_id":
@@ -1822,10 +1822,10 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				return fmt.Errorf("'frequency_plan_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.FrequencyPlanID = src.FrequencyPlanID
+				dst.FrequencyPlanId = src.FrequencyPlanId
 			} else {
 				var zero string
-				dst.FrequencyPlanID = zero
+				dst.FrequencyPlanId = zero
 			}
 		case "min_frequency":
 			if len(subs) > 0 {
@@ -2883,9 +2883,9 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CorrelationIDs = src.CorrelationIDs
+				dst.CorrelationIds = src.CorrelationIds
 			} else {
-				dst.CorrelationIDs = nil
+				dst.CorrelationIds = nil
 			}
 		case "dev_addr":
 			if len(subs) > 0 {

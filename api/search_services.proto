@@ -44,7 +44,6 @@ option (gogoproto.stringer_all) = true;
 message SearchApplicationsRequest {
   // Find applications where the ID contains this substring.
   string id_contains = 1 [
-    (gogoproto.customname) = "IDContains",
     (validate.rules).string.max_len = 50
   ];
   // Find applications where the name contains this substring.
@@ -81,7 +80,6 @@ message SearchApplicationsRequest {
 message SearchClientsRequest {
   // Find OAuth clients where the ID contains this substring.
   string id_contains = 1 [
-    (gogoproto.customname) = "IDContains",
     (validate.rules).string.max_len = 50
   ];
   // Find OAuth clients where the name contains this substring.
@@ -124,7 +122,6 @@ message SearchClientsRequest {
 message SearchGatewaysRequest {
   // Find gateways where the ID contains this substring.
   string id_contains = 1 [
-    (gogoproto.customname) = "IDContains",
     (validate.rules).string.max_len = 50
   ];
   // Find gateways where the name contains this substring.
@@ -164,7 +161,6 @@ message SearchGatewaysRequest {
 message SearchOrganizationsRequest {
   // Find organizations where the ID contains this substring.
   string id_contains = 1 [
-    (gogoproto.customname) = "IDContains",
     (validate.rules).string.max_len = 50
   ];
   // Find organizations where the name contains this substring.
@@ -201,7 +197,6 @@ message SearchOrganizationsRequest {
 message SearchUsersRequest {
   // Find users where the ID contains this substring.
   string id_contains = 1 [
-    (gogoproto.customname) = "IDContains",
     (validate.rules).string.max_len = 50
   ];
   // Find users where the name contains this substring.
@@ -290,7 +285,6 @@ message SearchEndDevicesRequest {
 
   // Find end devices where the ID contains this substring.
   string id_contains = 2 [
-    (gogoproto.customname) = "IDContains",
     (validate.rules).string.max_len = 50
   ];
   // Find end devices where the name contains this substring.

@@ -211,7 +211,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 		UserIds:       userSessionIDs.UserIdentifiers,
 		UserSessionID: userSessionIDs.SessionID,
 		Rights:        rights,
-		ID:            accessID,
+		Id:            accessID,
 		AccessToken:   accessHash,
 		RefreshToken:  refreshHash,
 		CreatedAt:     data.CreatedAt,

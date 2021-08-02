@@ -42,7 +42,7 @@ func init() {
 
 func (k APIKey) toPB() *ttnpb.APIKey {
 	return &ttnpb.APIKey{
-		ID:        k.APIKeyID,
+		Id:        k.APIKeyID,
 		Key:       k.Key,
 		Name:      k.Name,
 		Rights:    k.Rights.Rights,

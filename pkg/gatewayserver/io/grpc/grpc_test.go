@@ -454,7 +454,7 @@ func TestTraffic(t *testing.T) {
 							Rx1Frequency:     868100000,
 							Rx2DataRateIndex: 0,
 							Rx2Frequency:     869525000,
-							FrequencyPlanID:  test.EUFrequencyPlanID,
+							FrequencyPlanId:  test.EUFrequencyPlanID,
 						},
 					},
 				},
@@ -518,7 +518,7 @@ func TestTraffic(t *testing.T) {
 				select {
 				case down := <-downCh:
 					if tc.ErrorAssertion == nil {
-						cids = down.DownlinkMessage.CorrelationIDs
+						cids = down.DownlinkMessage.CorrelationIds
 						a.So(down.DownlinkMessage, should.Resemble, tc.Message)
 					} else {
 						t.Fatalf("Unexpected message: %v", down.DownlinkMessage)
@@ -535,7 +535,7 @@ func TestTraffic(t *testing.T) {
 				select {
 				case upCh <- &ttnpb.GatewayUp{
 					TxAcknowledgment: &ttnpb.TxAcknowledgment{
-						CorrelationIDs: cids,
+						CorrelationIds: cids,
 						Result:         ttnpb.TxAcknowledgment_SUCCESS,
 					},
 				}:

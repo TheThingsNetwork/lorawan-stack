@@ -319,7 +319,7 @@ func TestTraffic(t *testing.T) {
 							Rx1Frequency:     868100000,
 							Rx2DataRateIndex: 0,
 							Rx2Frequency:     869525000,
-							FrequencyPlanID:  test.EUFrequencyPlanID,
+							FrequencyPlanId:  test.EUFrequencyPlanID,
 						},
 					},
 				},
@@ -401,7 +401,7 @@ func TestTraffic(t *testing.T) {
 				case down := <-downCh:
 					if tc.ErrorAssertion == nil {
 						a.So(down, should.Resemble, tc.Message)
-						cids = down.GetCorrelationIDs()
+						cids = down.GetCorrelationIds()
 					} else {
 						t.Fatalf("Unexpected message: %v", down)
 					}
@@ -415,7 +415,7 @@ func TestTraffic(t *testing.T) {
 					return
 				}
 				buf, err := proto.Marshal(&ttnpb.TxAcknowledgment{
-					CorrelationIDs: cids,
+					CorrelationIds: cids,
 					Result:         ttnpb.TxAcknowledgment_SUCCESS,
 				})
 				if !a.So(err, should.BeNil) {

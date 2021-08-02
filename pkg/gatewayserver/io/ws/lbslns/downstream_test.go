@@ -58,7 +58,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 						Timestamp: 1553300787,
 					},
 				},
-				CorrelationIDs: []string{"correlation1"},
+				CorrelationIds: []string{"correlation1"},
 			},
 			ExpectedDownlinkMessage: DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-01",
@@ -89,7 +89,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 						},
 					},
 				},
-				CorrelationIDs: []string{"correlation2"},
+				CorrelationIds: []string{"correlation2"},
 			},
 			ExpectedDownlinkMessage: DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-01",

@@ -686,7 +686,7 @@ func (m *OAuthAccessTokenIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "id":
-			// no validation rules for ID
+			// no validation rules for Id
 		default:
 			return OAuthAccessTokenIdentifiersValidationError{
 				field:  name,
@@ -803,7 +803,7 @@ func (m *OAuthAccessToken) ValidateFields(paths ...string) error {
 			}
 
 		case "id":
-			// no validation rules for ID
+			// no validation rules for Id
 		case "access_token":
 			// no validation rules for AccessToken
 		case "refresh_token":

@@ -37,10 +37,10 @@ func (s *nsPbaServer) PublishDownlink(ctx context.Context, down *ttnpb.DownlinkM
 	}
 
 	ctx = events.ContextWithCorrelationID(ctx, append(
-		down.CorrelationIDs,
+		down.CorrelationIds,
 		fmt.Sprintf("pba:downlink:%s", events.NewCorrelationID()),
 	)...)
-	down.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+	down.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 	msg, token, err := toPBDownlink(ctx, down)
 	if err != nil {

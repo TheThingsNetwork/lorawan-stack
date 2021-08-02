@@ -47,7 +47,7 @@ func (b *builder) New(ctx context.Context, opts ...Option) Event {
 			Name:           b.definition.name,
 			Time:           time.Now().UTC(),
 			Origin:         hostname,
-			CorrelationIDs: CorrelationIDsFromContext(ctx),
+			CorrelationIds: CorrelationIDsFromContext(ctx),
 		},
 	}
 	for _, opt := range b.options {

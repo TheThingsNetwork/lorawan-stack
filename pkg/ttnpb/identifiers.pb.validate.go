@@ -991,16 +991,16 @@ func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "brand_id":
 
-			if m.GetBrandID() != "" {
+			if m.GetBrandId() != "" {
 
-				if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+				if utf8.RuneCountInString(m.GetBrandId()) > 36 {
 					return EndDeviceVersionIdentifiersValidationError{
 						field:  "brand_id",
 						reason: "value length must be at most 36 runes",
 					}
 				}
 
-				if !_EndDeviceVersionIdentifiers_BrandID_Pattern.MatchString(m.GetBrandID()) {
+				if !_EndDeviceVersionIdentifiers_BrandId_Pattern.MatchString(m.GetBrandId()) {
 					return EndDeviceVersionIdentifiersValidationError{
 						field:  "brand_id",
 						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -1011,16 +1011,16 @@ func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
 
 		case "model_id":
 
-			if m.GetModelID() != "" {
+			if m.GetModelId() != "" {
 
-				if utf8.RuneCountInString(m.GetModelID()) > 36 {
+				if utf8.RuneCountInString(m.GetModelId()) > 36 {
 					return EndDeviceVersionIdentifiersValidationError{
 						field:  "model_id",
 						reason: "value length must be at most 36 runes",
 					}
 				}
 
-				if !_EndDeviceVersionIdentifiers_ModelID_Pattern.MatchString(m.GetModelID()) {
+				if !_EndDeviceVersionIdentifiers_ModelId_Pattern.MatchString(m.GetModelId()) {
 					return EndDeviceVersionIdentifiersValidationError{
 						field:  "model_id",
 						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -1049,7 +1049,7 @@ func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
 
 		case "band_id":
 
-			if utf8.RuneCountInString(m.GetBandID()) > 32 {
+			if utf8.RuneCountInString(m.GetBandId()) > 32 {
 				return EndDeviceVersionIdentifiersValidationError{
 					field:  "band_id",
 					reason: "value length must be at most 32 runes",
@@ -1123,9 +1123,9 @@ var _ interface {
 	ErrorName() string
 } = EndDeviceVersionIdentifiersValidationError{}
 
-var _EndDeviceVersionIdentifiers_BrandID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _EndDeviceVersionIdentifiers_BrandId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
-var _EndDeviceVersionIdentifiers_ModelID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _EndDeviceVersionIdentifiers_ModelId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on NetworkIdentifiers with the rules
 // defined in the proto definition for this message. If any rules are

@@ -67,7 +67,7 @@ func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 		return nil, err
 	}
 	model := &APIKey{
-		APIKeyID:   key.ID,
+		APIKeyID:   key.Id,
 		Key:        key.Key,
 		Rights:     Rights{Rights: key.Rights},
 		Name:       key.Name,
@@ -144,7 +144,7 @@ func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 	query := s.query(ctx, APIKey{})
 	var keyModel APIKey
 	err = query.Where(APIKey{
-		APIKeyID:   key.ID,
+		APIKeyID:   key.Id,
 		EntityID:   entity.PrimaryKey(),
 		EntityType: entityTypeForID(entityID),
 	}).First(&keyModel).Error

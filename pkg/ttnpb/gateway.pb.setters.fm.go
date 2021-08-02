@@ -16,10 +16,10 @@ func (dst *GatewayBrand) SetFields(src *GatewayBrand, paths ...string) error {
 				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ID = src.ID
+				dst.Id = src.Id
 			} else {
 				var zero string
-				dst.ID = zero
+				dst.Id = zero
 			}
 		case "name":
 			if len(subs) > 0 {
@@ -66,20 +66,20 @@ func (dst *GatewayModel) SetFields(src *GatewayModel, paths ...string) error {
 				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.BrandID = src.BrandID
+				dst.BrandId = src.BrandId
 			} else {
 				var zero string
-				dst.BrandID = zero
+				dst.BrandId = zero
 			}
 		case "id":
 			if len(subs) > 0 {
 				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ID = src.ID
+				dst.Id = src.Id
 			} else {
 				var zero string
-				dst.ID = zero
+				dst.Id = zero
 			}
 		case "name":
 			if len(subs) > 0 {
@@ -107,20 +107,20 @@ func (dst *GatewayVersionIdentifiers) SetFields(src *GatewayVersionIdentifiers, 
 				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.BrandID = src.BrandID
+				dst.BrandId = src.BrandId
 			} else {
 				var zero string
-				dst.BrandID = zero
+				dst.BrandId = zero
 			}
 		case "model_id":
 			if len(subs) > 0 {
 				return fmt.Errorf("'model_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ModelID = src.ModelID
+				dst.ModelId = src.ModelId
 			} else {
 				var zero string
-				dst.ModelID = zero
+				dst.ModelId = zero
 			}
 		case "hardware_version":
 			if len(subs) > 0 {
@@ -421,19 +421,19 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 				return fmt.Errorf("'frequency_plan_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.FrequencyPlanID = src.FrequencyPlanID
+				dst.FrequencyPlanId = src.FrequencyPlanId
 			} else {
 				var zero string
-				dst.FrequencyPlanID = zero
+				dst.FrequencyPlanId = zero
 			}
 		case "frequency_plan_ids":
 			if len(subs) > 0 {
 				return fmt.Errorf("'frequency_plan_ids' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.FrequencyPlanIDs = src.FrequencyPlanIDs
+				dst.FrequencyPlanIds = src.FrequencyPlanIds
 			} else {
-				dst.FrequencyPlanIDs = nil
+				dst.FrequencyPlanIds = nil
 			}
 		case "antennas":
 			if len(subs) > 0 {

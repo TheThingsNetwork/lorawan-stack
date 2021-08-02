@@ -107,7 +107,7 @@ func (m *UplinkMessage) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
-			for idx, item := range m.GetCorrelationIDs() {
+			for idx, item := range m.GetCorrelationIds() {
 				_, _ = idx, item
 
 				if utf8.RuneCountInString(item) > 100 {
@@ -247,7 +247,7 @@ func (m *DownlinkMessage) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
-			for idx, item := range m.GetCorrelationIDs() {
+			for idx, item := range m.GetCorrelationIds() {
 				_, _ = idx, item
 
 				if utf8.RuneCountInString(item) > 100 {
@@ -398,7 +398,7 @@ func (m *TxAcknowledgment) ValidateFields(paths ...string) error {
 		switch name {
 		case "correlation_ids":
 
-			for idx, item := range m.GetCorrelationIDs() {
+			for idx, item := range m.GetCorrelationIds() {
 				_, _ = idx, item
 
 				if utf8.RuneCountInString(item) > 100 {
@@ -635,7 +635,7 @@ func (m *GatewayUplinkMessage) ValidateFields(paths ...string) error {
 			}
 
 		case "band_id":
-			// no validation rules for BandID
+			// no validation rules for BandId
 		default:
 			return GatewayUplinkMessageValidationError{
 				field:  name,
@@ -850,7 +850,7 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 
 		case "version_ids":
 
-			if v, ok := interface{}(m.GetVersionIDs()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetVersionIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationUplinkValidationError{
 						field:  "version_ids",
@@ -1290,7 +1290,7 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
-			for idx, item := range m.GetCorrelationIDs() {
+			for idx, item := range m.GetCorrelationIds() {
 				_, _ = idx, item
 
 				if utf8.RuneCountInString(item) > 100 {
@@ -1918,7 +1918,7 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
-			for idx, item := range m.GetCorrelationIDs() {
+			for idx, item := range m.GetCorrelationIds() {
 				_, _ = idx, item
 
 				if utf8.RuneCountInString(item) > 100 {

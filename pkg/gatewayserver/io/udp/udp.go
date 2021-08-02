@@ -336,7 +336,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		var rtt *time.Duration
 		if downlink, delta, ok := state.tokens.Get(uint16(packet.Token[0])<<8|uint16(packet.Token[1]), packet.ReceivedAt); ok {
 			msg.TxAcknowledgment.DownlinkMessage = downlink
-			msg.TxAcknowledgment.CorrelationIDs = downlink.CorrelationIDs
+			msg.TxAcknowledgment.CorrelationIds = downlink.CorrelationIds
 			rtt = &delta
 		}
 		if err := state.io.HandleTxAck(msg.TxAcknowledgment); err != nil {

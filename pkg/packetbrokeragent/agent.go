@@ -728,7 +728,7 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 		"attempt_rx2", req.Rx2Frequency != 0,
 		"downlink_class", req.Class,
 		"downlink_priority", req.Priority,
-		"frequency_plan", req.FrequencyPlanID,
+		"frequency_plan", req.FrequencyPlanId,
 	}
 	if req.Rx1Frequency != 0 {
 		pairs = append(pairs,

@@ -86,9 +86,9 @@ func TestApplicationServer(t *testing.T) {
 			JoinEui:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			DevEui:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 		},
-		VersionIDs: &ttnpb.EndDeviceVersionIdentifiers{
-			BrandID:         "thethingsproducts",
-			ModelID:         "thethingsnode",
+		VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+			BrandId:         "thethingsproducts",
+			ModelId:         "thethingsnode",
 			HardwareVersion: "1.0",
 			FirmwareVersion: "1.1",
 		},
@@ -932,7 +932,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyID: []byte{0x11},
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -979,7 +979,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyID: []byte{0x22},
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -1038,10 +1038,10 @@ func TestApplicationServer(t *testing.T) {
 												},
 											},
 										},
-										VersionIDs: registeredDevice.VersionIDs,
+										VersionIds: registeredDevice.VersionIds,
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -1099,7 +1099,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyID: []byte{0x33},
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -1200,10 +1200,10 @@ func TestApplicationServer(t *testing.T) {
 												},
 											},
 										},
-										VersionIDs: registeredDevice.VersionIDs,
+										VersionIds: registeredDevice.VersionIds,
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -1243,7 +1243,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -1314,7 +1314,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -1364,7 +1364,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -1404,7 +1404,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -1452,7 +1452,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -1533,7 +1533,7 @@ func TestApplicationServer(t *testing.T) {
 										PendingSession: true,
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -1634,10 +1634,10 @@ func TestApplicationServer(t *testing.T) {
 												},
 											},
 										},
-										VersionIDs: registeredDevice.VersionIDs,
+										VersionIds: registeredDevice.VersionIds,
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -1880,10 +1880,10 @@ func TestApplicationServer(t *testing.T) {
 												},
 											},
 										},
-										VersionIDs: registeredDevice.VersionIDs,
+										VersionIds: registeredDevice.VersionIds,
 									},
 								},
-								CorrelationIDs: up.CorrelationIDs,
+								CorrelationIds: up.CorrelationIds,
 								ReceivedAt:     up.ReceivedAt,
 							})
 						},
@@ -2098,7 +2098,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
-								CorrelationIDs: res[0].CorrelationIDs,
+								CorrelationIds: res[0].CorrelationIds,
 							},
 							{
 								SessionKeyID: []byte{0x11},
@@ -2114,7 +2114,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
-								CorrelationIDs: res[1].CorrelationIDs,
+								CorrelationIds: res[1].CorrelationIds,
 							},
 							{
 								SessionKeyID: []byte{0x11},
@@ -2130,7 +2130,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
-								CorrelationIDs: res[2].CorrelationIDs,
+								CorrelationIds: res[2].CorrelationIds,
 							},
 						})
 					}
@@ -2184,7 +2184,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
-								CorrelationIDs: res[0].CorrelationIDs,
+								CorrelationIds: res[0].CorrelationIds,
 							},
 							{
 								SessionKeyID: []byte{0x11},
@@ -2200,7 +2200,7 @@ func TestApplicationServer(t *testing.T) {
 										},
 									},
 								},
-								CorrelationIDs: res[1].CorrelationIDs,
+								CorrelationIds: res[1].CorrelationIds,
 							},
 						})
 					}
@@ -2460,7 +2460,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 											},
 										},
 									},
-									CorrelationIDs: up.CorrelationIDs,
+									CorrelationIds: up.CorrelationIds,
 									ReceivedAt:     up.ReceivedAt,
 								})
 							} else {
@@ -2471,7 +2471,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 											SessionKeyID: []byte{0x22},
 										},
 									},
-									CorrelationIDs: up.CorrelationIDs,
+									CorrelationIds: up.CorrelationIds,
 									ReceivedAt:     up.ReceivedAt,
 								})
 							}
@@ -2526,10 +2526,10 @@ func TestSkipPayloadCrypto(t *testing.T) {
 												EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
 												KEKLabel:     kekLabel,
 											},
-											VersionIDs: registeredDevice.VersionIDs,
+											VersionIds: registeredDevice.VersionIds,
 										},
 									},
-									CorrelationIDs: up.CorrelationIDs,
+									CorrelationIds: up.CorrelationIds,
 									ReceivedAt:     up.ReceivedAt,
 								})
 							} else {
@@ -2545,7 +2545,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 											FRMPayload:   []byte{0xc1},
 										},
 									},
-									CorrelationIDs: up.CorrelationIDs,
+									CorrelationIds: up.CorrelationIds,
 									ReceivedAt:     up.ReceivedAt,
 								})
 							}
@@ -2587,7 +2587,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 											SessionKeyID: []byte{0x22},
 										},
 									},
-									CorrelationIDs: up.CorrelationIDs,
+									CorrelationIds: up.CorrelationIds,
 									ReceivedAt:     up.ReceivedAt,
 								})
 							} else {
@@ -2694,14 +2694,14 @@ func TestSkipPayloadCrypto(t *testing.T) {
 								FPort:          11,
 								FCnt:           1,
 								FRMPayload:     []byte{0x1, 0x1, 0x1},
-								CorrelationIDs: res[0].CorrelationIDs,
+								CorrelationIds: res[0].CorrelationIds,
 							},
 							{
 								SessionKeyID:   []byte{0x11},
 								FPort:          22,
 								FCnt:           2,
 								FRMPayload:     []byte{0x2, 0x2, 0x2},
-								CorrelationIDs: res[1].CorrelationIDs,
+								CorrelationIds: res[1].CorrelationIds,
 							},
 						})
 					}

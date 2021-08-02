@@ -469,8 +469,8 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		logger.Warn("Connect unregistered gateway")
 		gtw = &ttnpb.Gateway{
 			GatewayIdentifiers:     ids,
-			FrequencyPlanID:        fpID,
-			FrequencyPlanIDs:       []string{fpID},
+			FrequencyPlanId:        fpID,
+			FrequencyPlanIds:       []string{fpID},
 			EnforceDutyCycle:       true,
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
 			Antennas:               []ttnpb.GatewayAntenna{},
@@ -567,12 +567,12 @@ func requireDisconnect(connected, current *ttnpb.Gateway) bool {
 		connected.ScheduleDownlinkLate != current.ScheduleDownlinkLate ||
 		connected.StatusPublic != current.StatusPublic ||
 		connected.UpdateLocationFromStatus != current.UpdateLocationFromStatus ||
-		connected.FrequencyPlanID != current.FrequencyPlanID ||
-		len(connected.FrequencyPlanIDs) != len(current.FrequencyPlanIDs) {
+		connected.FrequencyPlanId != current.FrequencyPlanId ||
+		len(connected.FrequencyPlanIds) != len(current.FrequencyPlanIds) {
 		return true
 	}
-	for i := range connected.FrequencyPlanIDs {
-		if connected.FrequencyPlanIDs[i] != current.FrequencyPlanIDs[i] {
+	for i := range connected.FrequencyPlanIds {
+		if connected.FrequencyPlanIds[i] != current.FrequencyPlanIds[i] {
 			return true
 		}
 	}
@@ -682,11 +682,11 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 				case *ttnpb.GatewayUplinkMessage:
 					up := *msg.UplinkMessage
 					msg = &ttnpb.GatewayUplinkMessage{
-						BandID:        msg.BandID,
+						BandId:        msg.BandId,
 						UplinkMessage: &up,
 					}
-					msg.CorrelationIDs = append(make([]string, 0, len(msg.CorrelationIDs)+1), msg.CorrelationIDs...)
-					msg.CorrelationIDs = append(msg.CorrelationIDs, host.correlationID)
+					msg.CorrelationIds = append(make([]string, 0, len(msg.CorrelationIds)+1), msg.CorrelationIds...)
+					msg.CorrelationIds = append(msg.CorrelationIds, host.correlationID)
 					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 						logger := logger.WithError(err)
 						if ids.JoinEui != nil {
@@ -769,7 +769,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 			return
 		case msg := <-conn.Up():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
-			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+			msg.CorrelationIds = append(msg.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
 			if msg.Payload == nil {
 				pld := &ttnpb.Message{}
 				if err := lorawan.UnmarshalMessage(msg.RawPayload, pld); err != nil {
@@ -787,7 +787,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 		case msg := <-conn.TxAck():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
 			if d := msg.DownlinkMessage; d != nil {
-				d.CorrelationIDs = append(d.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+				d.CorrelationIds = append(d.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
 			}
 			if msg.Result == ttnpb.TxAcknowledgment_SUCCESS {
 				registerSuccessDownlink(ctx, gtw, protocol)
@@ -964,7 +964,7 @@ func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.Gatewa
 	})
 	var fpIDs []string
 	if err == nil {
-		fpIDs = gtw.FrequencyPlanIDs
+		fpIDs = gtw.FrequencyPlanIds
 	} else if errors.IsNotFound(err) {
 		fpID, ok := frequencyplans.FallbackIDFromContext(ctx)
 		if !ok {

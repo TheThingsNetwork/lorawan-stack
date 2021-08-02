@@ -105,7 +105,7 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 	}{
 		{
 			fields:   []string{"mac_state", "frequency_plan_id"},
-			expected: []string{"MACState", "FrequencyPlanID"},
+			expected: []string{"MACState", "FrequencyPlanId"},
 		},
 		{
 			fields:   []string{"session.last_f_cnt_up"},

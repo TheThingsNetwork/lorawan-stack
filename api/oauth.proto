@@ -34,12 +34,12 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.stringer_all) = true;
 
 message OAuthClientAuthorizationIdentifiers {
-  UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message OAuthClientAuthorization {
-  UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated Right rights = 3;
   google.protobuf.Timestamp created_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -64,7 +64,7 @@ message ListOAuthClientAuthorizationsRequest {
 }
 
 message OAuthAuthorizationCode {
-  UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   string user_session_id = 9 [(gogoproto.customname) = "UserSessionID", (validate.rules).string.max_len = 64];
   ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated Right rights = 3;
@@ -76,16 +76,16 @@ message OAuthAuthorizationCode {
 }
 
 message OAuthAccessTokenIdentifiers {
-  UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  string id = 3 [(gogoproto.customname) = "ID"];
+  string id = 3;
 }
 
 message OAuthAccessToken {
-  UserIdentifiers user_ids = 1 [(gogoproto.customname) = "UserIds", (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   string user_session_id = 9 [(gogoproto.customname) = "UserSessionID", (validate.rules).string.max_len = 64];
   ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  string id = 3 [(gogoproto.customname) = "ID"];
+  string id = 3;
   string access_token = 4;
   string refresh_token = 5;
   repeated Right rights = 6;

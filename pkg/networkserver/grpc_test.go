@@ -192,14 +192,14 @@ func TestGetDefaultMACSettings(t *testing.T) {
 			name:      "NoLoRaWANVersion",
 			assertion: errors.IsInvalidArgument,
 			req: &ttnpb.GetDefaultMACSettingsRequest{
-				FrequencyPlanID: "EU_863_870",
+				FrequencyPlanId: "EU_863_870",
 			},
 		},
 		{
 			name:      "OK",
 			assertion: func(err error) bool { return err == nil },
 			req: &ttnpb.GetDefaultMACSettingsRequest{
-				FrequencyPlanID:   "EU_863_870",
+				FrequencyPlanId:   "EU_863_870",
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 			},
 		},

@@ -572,7 +572,7 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 
 		case "frequency_plan_id":
 
-			if utf8.RuneCountInString(m.GetFrequencyPlanID()) > 64 {
+			if utf8.RuneCountInString(m.GetFrequencyPlanId()) > 64 {
 				return EndDeviceVersionValidationError{
 					field:  "frequency_plan_id",
 					reason: "value length must be at most 64 runes",
@@ -1689,7 +1689,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "version_ids":
 
-			if v, ok := interface{}(m.GetVersionIDs()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetVersionIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceValidationError{
 						field:  "version_ids",
@@ -1829,7 +1829,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "frequency_plan_id":
 
-			if utf8.RuneCountInString(m.GetFrequencyPlanID()) > 64 {
+			if utf8.RuneCountInString(m.GetFrequencyPlanId()) > 64 {
 				return EndDeviceValidationError{
 					field:  "frequency_plan_id",
 					reason: "value length must be at most 64 runes",
@@ -3804,7 +3804,7 @@ func (m *MACState_JoinAccept) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
-			for idx, item := range m.GetCorrelationIDs() {
+			for idx, item := range m.GetCorrelationIds() {
 				_, _ = idx, item
 
 				if utf8.RuneCountInString(item) > 100 {

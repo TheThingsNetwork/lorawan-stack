@@ -136,7 +136,7 @@ func request_DeviceRepository_GetBrand_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "brand_id")
 	}
 
-	protoReq.BrandID, err = runtime.String(val)
+	protoReq.BrandId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
@@ -181,7 +181,7 @@ func local_request_DeviceRepository_GetBrand_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "brand_id")
 	}
 
-	protoReq.BrandID, err = runtime.String(val)
+	protoReq.BrandId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
@@ -230,7 +230,7 @@ func request_DeviceRepository_ListModels_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "brand_id")
 	}
 
-	protoReq.BrandID, err = runtime.String(val)
+	protoReq.BrandId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
@@ -275,7 +275,7 @@ func local_request_DeviceRepository_ListModels_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "brand_id")
 	}
 
-	protoReq.BrandID, err = runtime.String(val)
+	protoReq.BrandId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
@@ -396,7 +396,7 @@ func request_DeviceRepository_GetModel_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "brand_id")
 	}
 
-	protoReq.BrandID, err = runtime.String(val)
+	protoReq.BrandId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
@@ -407,7 +407,7 @@ func request_DeviceRepository_GetModel_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "model_id")
 	}
 
-	protoReq.ModelID, err = runtime.String(val)
+	protoReq.ModelId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "model_id", err)
@@ -452,7 +452,7 @@ func local_request_DeviceRepository_GetModel_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "brand_id")
 	}
 
-	protoReq.BrandID, err = runtime.String(val)
+	protoReq.BrandId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "brand_id", err)
@@ -463,7 +463,7 @@ func local_request_DeviceRepository_GetModel_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "model_id")
 	}
 
-	protoReq.ModelID, err = runtime.String(val)
+	protoReq.ModelId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "model_id", err)

@@ -57,13 +57,13 @@ func TestOrganizationAccessNotFound(t *testing.T) {
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
 		apiKey := ttnpb.APIKey{
-			ID:   "does-not-exist-id",
+			Id:   "does-not-exist-id",
 			Name: "test-application-api-key-name",
 		}
 
 		got, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
-			KeyId:                   apiKey.ID,
+			KeyId:                   apiKey.Id,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -114,7 +114,7 @@ func TestOrganizationAccessRightsPermissionDenied(t *testing.T) {
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Name:   APIKey.Name,
 				Rights: []ttnpb.Right{right},
 			},
@@ -148,7 +148,7 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 		userID := defaultUser.UserIdentifiers
 		organizationID := userOrganizations(&userID).Organizations[0].OrganizationIdentifiers
 		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
-		APIKeyID := organizationAPIKeys(&organizationID).APIKeys[0].ID
+		APIKeyID := organizationAPIKeys(&organizationID).APIKeys[0].Id
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
@@ -278,12 +278,12 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
-			KeyId:                   organizationKey.ID,
+			KeyId:                   organizationKey.Id,
 		}, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(APIKey, should.NotBeNil) {
-			a.So(APIKey.ID, should.Equal, organizationKey.ID)
+			a.So(APIKey.Id, should.Equal, organizationKey.Id)
 			a.So(APIKey.Key, should.BeEmpty)
 		}
 
@@ -296,7 +296,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 			a.So(len(APIKeys.APIKeys), should.Equal, len(organizationAPIKeys.APIKeys))
 			for i, APIkey := range APIKeys.APIKeys {
 				a.So(APIkey.Name, should.Equal, organizationAPIKeys.APIKeys[i].Name)
-				a.So(APIkey.ID, should.Equal, organizationAPIKeys.APIKeys[i].ID)
+				a.So(APIkey.Id, should.Equal, organizationAPIKeys.APIKeys[i].Id)
 			}
 		}
 
@@ -426,7 +426,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
 			APIKey: ttnpb.APIKey{
-				ID: APIKey.ID,
+				Id: APIKey.Id,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
 					ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
@@ -456,7 +456,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 		key, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: newRights.Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -471,7 +471,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 		key, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: newRights.Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -509,7 +509,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_DELETE)).Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -552,7 +552,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
 			APIKey: ttnpb.APIKey{
-				ID:     APIKey.ID,
+				Id:     APIKey.Id,
 				Rights: []ttnpb.Right{},
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -562,7 +562,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 
 		_, err = reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
-			KeyId:                   APIKey.ID,
+			KeyId:                   APIKey.Id,
 		}, collaboratorCreds)
 
 		if a.So(err, should.NotBeNil) {

@@ -625,7 +625,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 					return err
 				}
 				for _, token := range tokens {
-					err = oauthStore.DeleteAccessToken(ctx, token.ID)
+					err = oauthStore.DeleteAccessToken(ctx, token.Id)
 					if err != nil {
 						return err
 					}

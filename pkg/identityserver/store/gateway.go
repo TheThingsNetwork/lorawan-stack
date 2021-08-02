@@ -95,14 +95,14 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	attributesField:  func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Attributes = attributes(gtw.Attributes).toMap() },
 	versionIDsField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		pb.GatewayVersionIdentifiers = ttnpb.GatewayVersionIdentifiers{
-			BrandID:         gtw.BrandID,
-			ModelID:         gtw.ModelID,
+			BrandId:         gtw.BrandID,
+			ModelId:         gtw.ModelID,
 			HardwareVersion: gtw.HardwareVersion,
 			FirmwareVersion: gtw.FirmwareVersion,
 		}
 	},
-	brandIDField:              func(pb *ttnpb.Gateway, gtw *Gateway) { pb.BrandID = gtw.BrandID },
-	modelIDField:              func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ModelID = gtw.ModelID },
+	brandIDField:              func(pb *ttnpb.Gateway, gtw *Gateway) { pb.BrandId = gtw.BrandID },
+	modelIDField:              func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ModelId = gtw.ModelID },
 	hardwareVersionField:      func(pb *ttnpb.Gateway, gtw *Gateway) { pb.HardwareVersion = gtw.HardwareVersion },
 	firmwareVersionField:      func(pb *ttnpb.Gateway, gtw *Gateway) { pb.FirmwareVersion = gtw.FirmwareVersion },
 	gatewayServerAddressField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.GatewayServerAddress = gtw.GatewayServerAddress },
@@ -110,9 +110,9 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	updateChannelField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.UpdateChannel = gtw.UpdateChannel },
 	frequencyPlanIDsField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		if gtw.FrequencyPlanID == "" {
-			pb.FrequencyPlanIDs = nil
+			pb.FrequencyPlanIds = nil
 		} else {
-			pb.FrequencyPlanIDs = strings.Split(gtw.FrequencyPlanID, " ")
+			pb.FrequencyPlanIds = strings.Split(gtw.FrequencyPlanID, " ")
 		}
 	},
 	statusPublicField:         func(pb *ttnpb.Gateway, gtw *Gateway) { pb.StatusPublic = gtw.StatusPublic },
@@ -195,19 +195,19 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 		gtw.Attributes = attributes(gtw.Attributes).updateFromMap(pb.Attributes)
 	},
 	versionIDsField: func(gtw *Gateway, pb *ttnpb.Gateway) {
-		gtw.BrandID = pb.BrandID
-		gtw.ModelID = pb.ModelID
+		gtw.BrandID = pb.BrandId
+		gtw.ModelID = pb.ModelId
 		gtw.HardwareVersion = pb.HardwareVersion
 		gtw.FirmwareVersion = pb.FirmwareVersion
 	},
-	brandIDField:              func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.BrandID = pb.BrandID },
-	modelIDField:              func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ModelID = pb.ModelID },
+	brandIDField:              func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.BrandID = pb.BrandId },
+	modelIDField:              func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ModelID = pb.ModelId },
 	hardwareVersionField:      func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.HardwareVersion = pb.HardwareVersion },
 	firmwareVersionField:      func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FirmwareVersion = pb.FirmwareVersion },
 	gatewayServerAddressField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayServerAddress = pb.GatewayServerAddress },
 	autoUpdateField:           func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.AutoUpdate = pb.AutoUpdate },
 	updateChannelField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.UpdateChannel = pb.UpdateChannel },
-	frequencyPlanIDsField:     func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FrequencyPlanID = strings.Join(pb.FrequencyPlanIDs, " ") },
+	frequencyPlanIDsField:     func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FrequencyPlanID = strings.Join(pb.FrequencyPlanIds, " ") },
 	statusPublicField:         func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.StatusPublic = pb.StatusPublic },
 	locationPublicField:       func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.LocationPublic = pb.LocationPublic },
 	scheduleDownlinkLateField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ScheduleDownlinkLate = pb.ScheduleDownlinkLate },

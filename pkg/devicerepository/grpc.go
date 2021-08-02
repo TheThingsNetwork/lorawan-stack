@@ -95,7 +95,7 @@ func (dr *DeviceRepository) GetBrand(ctx context.Context, req *ttnpb.GetEndDevic
 		return nil, err
 	}
 	response, err := dr.store.GetBrands(store.GetBrandsRequest{
-		BrandID: req.BrandID,
+		BrandID: req.BrandId,
 		Paths:   withDefaultBrandFields(req.FieldMask.GetPaths()),
 		Limit:   1,
 	})
@@ -103,7 +103,7 @@ func (dr *DeviceRepository) GetBrand(ctx context.Context, req *ttnpb.GetEndDevic
 		return nil, err
 	}
 	if len(response.Brands) == 0 {
-		return nil, errBrandNotFound.WithAttributes("brand_id", req.BrandID)
+		return nil, errBrandNotFound.WithAttributes("brand_id", req.BrandId)
 	}
 	brand := response.Brands[0]
 	brand.Logo = dr.assetURL(brand.BrandId, brand.Logo)
@@ -119,7 +119,7 @@ func (dr *DeviceRepository) ListModels(ctx context.Context, req *ttnpb.ListEndDe
 		req.Limit = defaultLimit
 	}
 	response, err := dr.store.GetModels(store.GetModelsRequest{
-		BrandID: req.BrandID,
+		BrandID: req.BrandId,
 		Limit:   req.Limit,
 		Page:    req.Page,
 		Paths:   withDefaultModelFields(req.FieldMask.GetPaths()),
@@ -144,8 +144,8 @@ func (dr *DeviceRepository) GetModel(ctx context.Context, req *ttnpb.GetEndDevic
 		return nil, err
 	}
 	response, err := dr.store.GetModels(store.GetModelsRequest{
-		BrandID: req.BrandID,
-		ModelID: req.ModelID,
+		BrandID: req.BrandId,
+		ModelID: req.ModelId,
 		Limit:   1,
 		Paths:   withDefaultModelFields(req.FieldMask.GetPaths()),
 	})
@@ -153,7 +153,7 @@ func (dr *DeviceRepository) GetModel(ctx context.Context, req *ttnpb.GetEndDevic
 		return nil, err
 	}
 	if len(response.Models) == 0 {
-		return nil, errModelNotFound.WithAttributes("brand_id", req.BrandID, "model_id", req.ModelID)
+		return nil, errModelNotFound.WithAttributes("brand_id", req.BrandId, "model_id", req.ModelId)
 	}
 	dr.ensureBaseAssetURLs(response.Models)
 

@@ -289,8 +289,8 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 	}
 
 	var ok bool
-	if up.GatewayRegion, ok = toPBRegion[msg.BandID]; !ok {
-		return nil, errUnknownBand.WithAttributes("band_id", msg.BandID)
+	if up.GatewayRegion, ok = toPBRegion[msg.BandId]; !ok {
+		return nil, errUnknownBand.WithAttributes("band_id", msg.BandId)
 	}
 	if up.DataRateIndex, ok = toPBDataRateIndex(up.GatewayRegion, msg.Settings.DataRate); !ok {
 		return nil, errUnknownDataRate.WithAttributes("region", up.GatewayRegion)
@@ -465,7 +465,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 			CodingRate:    msg.Message.CodingRate,
 		},
 		ReceivedAt:     receivedAt,
-		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 	}
 
 	var receiveTime *time.Time
@@ -695,7 +695,7 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 
 	down := &ttnpb.DownlinkMessage{
 		RawPayload:     msg.PhyPayload,
-		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 		Settings: &ttnpb.DownlinkMessage_Request{
 			Request: req,
 		},

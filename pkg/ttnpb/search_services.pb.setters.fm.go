@@ -12,10 +12,10 @@ func (dst *SearchApplicationsRequest) SetFields(src *SearchApplicationsRequest, 
 				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.IDContains = src.IDContains
+				dst.IdContains = src.IdContains
 			} else {
 				var zero string
-				dst.IDContains = zero
+				dst.IdContains = zero
 			}
 		case "name_contains":
 			if len(subs) > 0 {
@@ -111,10 +111,10 @@ func (dst *SearchClientsRequest) SetFields(src *SearchClientsRequest, paths ...s
 				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.IDContains = src.IDContains
+				dst.IdContains = src.IdContains
 			} else {
 				var zero string
-				dst.IDContains = zero
+				dst.IdContains = zero
 			}
 		case "name_contains":
 			if len(subs) > 0 {
@@ -219,10 +219,10 @@ func (dst *SearchGatewaysRequest) SetFields(src *SearchGatewaysRequest, paths ..
 				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.IDContains = src.IDContains
+				dst.IdContains = src.IdContains
 			} else {
 				var zero string
-				dst.IDContains = zero
+				dst.IdContains = zero
 			}
 		case "name_contains":
 			if len(subs) > 0 {
@@ -328,10 +328,10 @@ func (dst *SearchOrganizationsRequest) SetFields(src *SearchOrganizationsRequest
 				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.IDContains = src.IDContains
+				dst.IdContains = src.IdContains
 			} else {
 				var zero string
-				dst.IDContains = zero
+				dst.IdContains = zero
 			}
 		case "name_contains":
 			if len(subs) > 0 {
@@ -427,10 +427,10 @@ func (dst *SearchUsersRequest) SetFields(src *SearchUsersRequest, paths ...strin
 				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.IDContains = src.IDContains
+				dst.IdContains = src.IdContains
 			} else {
 				var zero string
-				dst.IDContains = zero
+				dst.IdContains = zero
 			}
 		case "name_contains":
 			if len(subs) > 0 {
@@ -553,10 +553,10 @@ func (dst *SearchEndDevicesRequest) SetFields(src *SearchEndDevicesRequest, path
 				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.IDContains = src.IDContains
+				dst.IdContains = src.IdContains
 			} else {
 				var zero string
-				dst.IDContains = zero
+				dst.IdContains = zero
 			}
 		case "name_contains":
 			if len(subs) > 0 {

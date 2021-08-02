@@ -51,7 +51,7 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 		return nil, err
 	}
 	var searchFields []string
-	if req.IDContains != "" {
+	if req.IdContains != "" {
 		searchFields = append(searchFields, "ids")
 	}
 	if req.NameContains != "" {
@@ -109,7 +109,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 		return nil, err
 	}
 	var searchFields []string
-	if req.IDContains != "" {
+	if req.IdContains != "" {
 		searchFields = append(searchFields, "ids")
 	}
 	if req.NameContains != "" {
@@ -176,7 +176,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 		}
 	}
 	var searchFields []string
-	if req.IDContains != "" {
+	if req.IdContains != "" {
 		searchFields = append(searchFields, "ids")
 	}
 	if req.NameContains != "" {
@@ -227,8 +227,8 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 	}
 	for _, gtw := range res.Gateways {
 		// Backwards compatibility for frequency_plan_id field.
-		if len(gtw.FrequencyPlanIDs) > 0 {
-			gtw.FrequencyPlanID = gtw.FrequencyPlanIDs[0]
+		if len(gtw.FrequencyPlanIds) > 0 {
+			gtw.FrequencyPlanId = gtw.FrequencyPlanIds[0]
 		}
 	}
 	return res, nil
@@ -240,7 +240,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 		return nil, err
 	}
 	var searchFields []string
-	if req.IDContains != "" {
+	if req.IdContains != "" {
 		searchFields = append(searchFields, "ids")
 	}
 	if req.NameContains != "" {
@@ -301,7 +301,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 		return nil, errSearchForbidden.New()
 	}
 	var searchFields []string
-	if req.IDContains != "" {
+	if req.IdContains != "" {
 		searchFields = append(searchFields, "ids")
 	}
 	if req.NameContains != "" {
@@ -362,7 +362,7 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 		return nil, err
 	}
 	var searchFields []string
-	if req.IDContains != "" {
+	if req.IdContains != "" {
 		searchFields = append(searchFields, "ids")
 	}
 	if req.NameContains != "" {

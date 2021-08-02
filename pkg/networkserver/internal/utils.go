@@ -83,7 +83,7 @@ func FrequencyPlanAndBand(frequencyPlanID string, phyVersion ttnpb.PHYVersion, f
 }
 
 func DeviceFrequencyPlanAndBand(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*frequencyplans.FrequencyPlan, *band.Band, error) {
-	return FrequencyPlanAndBand(dev.FrequencyPlanID, dev.LorawanPhyVersion, fps)
+	return FrequencyPlanAndBand(dev.FrequencyPlanId, dev.LorawanPhyVersion, fps)
 }
 
 func DeviceBand(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*band.Band, error) {

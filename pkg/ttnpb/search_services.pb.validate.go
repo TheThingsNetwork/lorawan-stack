@@ -52,7 +52,7 @@ func (m *SearchApplicationsRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "id_contains":
 
-			if utf8.RuneCountInString(m.GetIDContains()) > 50 {
+			if utf8.RuneCountInString(m.GetIdContains()) > 50 {
 				return SearchApplicationsRequestValidationError{
 					field:  "id_contains",
 					reason: "value length must be at most 50 runes",
@@ -242,7 +242,7 @@ func (m *SearchClientsRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "id_contains":
 
-			if utf8.RuneCountInString(m.GetIDContains()) > 50 {
+			if utf8.RuneCountInString(m.GetIdContains()) > 50 {
 				return SearchClientsRequestValidationError{
 					field:  "id_contains",
 					reason: "value length must be at most 50 runes",
@@ -456,7 +456,7 @@ func (m *SearchGatewaysRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "id_contains":
 
-			if utf8.RuneCountInString(m.GetIDContains()) > 50 {
+			if utf8.RuneCountInString(m.GetIdContains()) > 50 {
 				return SearchGatewaysRequestValidationError{
 					field:  "id_contains",
 					reason: "value length must be at most 50 runes",
@@ -656,7 +656,7 @@ func (m *SearchOrganizationsRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "id_contains":
 
-			if utf8.RuneCountInString(m.GetIDContains()) > 50 {
+			if utf8.RuneCountInString(m.GetIdContains()) > 50 {
 				return SearchOrganizationsRequestValidationError{
 					field:  "id_contains",
 					reason: "value length must be at most 50 runes",
@@ -846,7 +846,7 @@ func (m *SearchUsersRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "id_contains":
 
-			if utf8.RuneCountInString(m.GetIDContains()) > 50 {
+			if utf8.RuneCountInString(m.GetIdContains()) > 50 {
 				return SearchUsersRequestValidationError{
 					field:  "id_contains",
 					reason: "value length must be at most 50 runes",
@@ -1078,7 +1078,7 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 
 		case "id_contains":
 
-			if utf8.RuneCountInString(m.GetIDContains()) > 50 {
+			if utf8.RuneCountInString(m.GetIdContains()) > 50 {
 				return SearchEndDevicesRequestValidationError{
 					field:  "id_contains",
 					reason: "value length must be at most 50 runes",

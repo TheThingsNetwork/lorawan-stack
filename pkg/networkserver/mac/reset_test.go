@@ -59,7 +59,7 @@ func TestHandleResetInd(t *testing.T) {
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
 					DesiredParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
@@ -71,7 +71,7 @@ func TestHandleResetInd(t *testing.T) {
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					SupportsJoin:      false,
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 				}
 				macState, err := NewState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
 				if err != nil {
@@ -104,7 +104,7 @@ func TestHandleResetInd(t *testing.T) {
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
 					DesiredParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
@@ -120,7 +120,7 @@ func TestHandleResetInd(t *testing.T) {
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					SupportsJoin:      false,
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 				}
 				macState, err := NewState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
 				if err != nil {

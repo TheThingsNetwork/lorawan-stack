@@ -424,10 +424,10 @@ func (dst *GetEndDeviceBrandRequest) SetFields(src *GetEndDeviceBrandRequest, pa
 				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.BrandID = src.BrandID
+				dst.BrandId = src.BrandId
 			} else {
 				var zero string
-				dst.BrandID = zero
+				dst.BrandId = zero
 			}
 		case "field_mask":
 			if len(subs) > 0 {
@@ -550,20 +550,20 @@ func (dst *GetEndDeviceModelRequest) SetFields(src *GetEndDeviceModelRequest, pa
 				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.BrandID = src.BrandID
+				dst.BrandId = src.BrandId
 			} else {
 				var zero string
-				dst.BrandID = zero
+				dst.BrandId = zero
 			}
 		case "model_id":
 			if len(subs) > 0 {
 				return fmt.Errorf("'model_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ModelID = src.ModelID
+				dst.ModelId = src.ModelId
 			} else {
 				var zero string
-				dst.ModelID = zero
+				dst.ModelId = zero
 			}
 		case "field_mask":
 			if len(subs) > 0 {
@@ -608,10 +608,10 @@ func (dst *ListEndDeviceModelsRequest) SetFields(src *ListEndDeviceModelsRequest
 				return fmt.Errorf("'brand_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.BrandID = src.BrandID
+				dst.BrandId = src.BrandId
 			} else {
 				var zero string
-				dst.BrandID = zero
+				dst.BrandId = zero
 			}
 		case "limit":
 			if len(subs) > 0 {
@@ -748,26 +748,26 @@ func (dst *GetPayloadFormatterRequest) SetFields(src *GetPayloadFormatterRequest
 		case "version_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceVersionIdentifiers
-				if (src == nil || src.VersionIDs == nil) && dst.VersionIDs == nil {
+				if (src == nil || src.VersionIds == nil) && dst.VersionIds == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.VersionIDs
+					newSrc = src.VersionIds
 				}
-				if dst.VersionIDs != nil {
-					newDst = dst.VersionIDs
+				if dst.VersionIds != nil {
+					newDst = dst.VersionIds
 				} else {
 					newDst = &EndDeviceVersionIdentifiers{}
-					dst.VersionIDs = newDst
+					dst.VersionIds = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.VersionIDs = src.VersionIDs
+					dst.VersionIds = src.VersionIds
 				} else {
-					dst.VersionIDs = nil
+					dst.VersionIds = nil
 				}
 			}
 		case "field_mask":

@@ -263,7 +263,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	t, a := test.MustNewTFromContext(ctx)
 
 	pb := &ttnpb.EndDevice{
-		FrequencyPlanID:   test.EUFrequencyPlanID,
+		FrequencyPlanId:   test.EUFrequencyPlanID,
 		LorawanVersion:    ttnpb.MAC_V1_0_3,
 		LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{

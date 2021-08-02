@@ -369,7 +369,7 @@ message TxRequest {
   google.protobuf.Timestamp absolute_time = 9 [(gogoproto.stdtime) = true];
 
   // Frequency plan ID from which the frequencies in this message are retrieved.
-  string frequency_plan_id = 10 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
+  string frequency_plan_id = 10 [(validate.rules).string.max_len = 64];
 
   // The regional parameters version used to interpret the data rate indices in this message.
   PHYVersion lorawan_phy_version = 11 [(validate.rules).enum.defined_only = true];

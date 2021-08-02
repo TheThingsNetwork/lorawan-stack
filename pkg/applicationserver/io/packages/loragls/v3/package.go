@@ -59,7 +59,7 @@ var (
 // HandleUp implements packages.ApplicationPackageHandler.
 func (p *GeolocationPackage) HandleUp(ctx context.Context, def *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) (err error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages/loragls/v1")
-	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:packages:loracloudglsv3:%s", events.NewCorrelationID()))...)
+	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:packages:loracloudglsv3:%s", events.NewCorrelationID()))...)
 
 	if def == nil && assoc == nil {
 		return errNoAssociation.New()
@@ -245,7 +245,7 @@ func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceI
 func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: ids,
-		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+		CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 		ReceivedAt:           timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
@@ -259,7 +259,7 @@ func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids ttnpb.EndD
 func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, result api.AbstractLocationSolverResult) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: ids,
-		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+		CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 		ReceivedAt:           timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{

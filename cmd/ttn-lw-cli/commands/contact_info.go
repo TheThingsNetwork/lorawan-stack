@@ -268,7 +268,7 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 				return err
 			}
 			res, err := ttnpb.NewContactInfoRegistryClient(is).Validate(ctx, &ttnpb.ContactInfoValidation{
-				ID:    reference,
+				Id:    reference,
 				Token: token,
 			})
 			if err != nil {

@@ -609,7 +609,7 @@ func (EndDeviceOptionNamespace) WithAttributes(v map[string]string) EndDeviceOpt
 // WithVersionIDs returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with VersionIDs set to v.
 func (EndDeviceOptionNamespace) WithVersionIDs(v *ttnpb.EndDeviceVersionIdentifiers) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.VersionIDs = v
+		x.VersionIds = v
 		return x
 	}
 }
@@ -721,7 +721,7 @@ func (EndDeviceOptionNamespace) WithLoRaWANPHYVersion(v ttnpb.PHYVersion) EndDev
 // WithFrequencyPlanID returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with FrequencyPlanID set to v.
 func (EndDeviceOptionNamespace) WithFrequencyPlanID(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.FrequencyPlanID = v
+		x.FrequencyPlanId = v
 		return x
 	}
 }

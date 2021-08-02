@@ -54,7 +54,7 @@ func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error)
 	server.Enabled = true
 	c.GatewayConf.Servers = append(c.GatewayConf.Servers, server)
 
-	frequencyPlan, err := store.GetByID(gateway.FrequencyPlanID)
+	frequencyPlan, err := store.GetByID(gateway.FrequencyPlanId)
 	if err != nil {
 		return nil, err
 	}

@@ -43,7 +43,7 @@ message GenerateDevAddrResponse {
 
 // Request of GetDefaultMACSettings.
 message GetDefaultMACSettingsRequest {
-  string frequency_plan_id = 1 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
+  string frequency_plan_id = 1 [(validate.rules).string.max_len = 64];
   PHYVersion lorawan_phy_version = 2 [(validate.rules).enum.defined_only = true];
 }
 

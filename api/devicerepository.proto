@@ -230,7 +230,7 @@ message GetEndDeviceBrandRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false];
 
   // Brand identifier, as defined in the Device Repository.
-  string brand_id = 2 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+  string brand_id = 2 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   // Field mask paths.
   google.protobuf.FieldMask field_mask = 3;
@@ -262,9 +262,9 @@ message GetEndDeviceModelRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false];
 
   // Brand identifier, as defined in the Device Repository.
-  string brand_id = 2 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+  string brand_id = 2 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   // Model identifier, as defined in the Device Repository.
-  string model_id = 3 [(gogoproto.customname) = "ModelID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+  string model_id = 3 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   // Field mask paths.
   google.protobuf.FieldMask field_mask = 4;
@@ -275,7 +275,7 @@ message ListEndDeviceModelsRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false];
 
   // List end devices from a specific brand.
-  string brand_id = 2 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$" , max_len: 36}];
+  string brand_id = 2 [(validate.rules).string = {pattern: "^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$" , max_len: 36}];
 
   // Limit the number of results per page.
   uint32 limit = 3 [(validate.rules).uint32.lte = 1000];
@@ -306,7 +306,7 @@ message GetPayloadFormatterRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false];
 
   // End device version information.
-  EndDeviceVersionIdentifiers version_ids = 2 [(gogoproto.customname) = "VersionIDs"];
+  EndDeviceVersionIdentifiers version_ids = 2;
 
   // Field mask paths.
   google.protobuf.FieldMask field_mask = 3;

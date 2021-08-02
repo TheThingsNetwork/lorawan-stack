@@ -113,9 +113,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				_, a := test.MustNewTFromContext(ctx)
 				return resp, test.AllTrue(
 					a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
-					a.So(msg.CorrelationIDs, should.NotBeEmpty),
+					a.So(msg.CorrelationIds, should.NotBeEmpty),
 					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-						CorrelationIDs: msg.CorrelationIDs,
+						CorrelationIds: msg.CorrelationIds,
 						RawPayload:     payload,
 						Settings: &ttnpb.DownlinkMessage_Request{
 							Request: makeTxRequest(func() []*ttnpb.DownlinkPath {
@@ -185,7 +185,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	makeAssertReceiveScheduleFailAttemptEvents := func(attempt, fail events.Builder) func(context.Context, TestEnvironment, *ttnpb.DownlinkMessage, ttnpb.EndDeviceIdentifiers, error, uint) bool {
 		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids ttnpb.EndDeviceIdentifiers, err error, n uint) bool {
 			_, a := test.MustNewTFromContext(ctx)
-			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIDs...)
+			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIds...)
 			evIDOpt := events.WithIdentifiers(&ids)
 			for i := uint(0); i < n; i++ {
 				if !test.AllTrue(
@@ -204,7 +204,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	makeAssertReceiveScheduleSuccessAttemptEvents := func(attempt, success events.Builder) func(context.Context, TestEnvironment, *ttnpb.DownlinkMessage, ttnpb.EndDeviceIdentifiers, *ttnpb.ScheduleDownlinkResponse, ...events.Builder) bool {
 		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids ttnpb.EndDeviceIdentifiers, resp *ttnpb.ScheduleDownlinkResponse, evs ...events.Builder) bool {
 			_, a := test.MustNewTFromContext(ctx)
-			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIDs...)
+			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIds...)
 			evIDOpt := events.WithIdentifiers(&ids)
 			return test.AllTrue(
 				a.So(env.Events, should.ReceiveEventFunc, attemptEventEqual,
@@ -345,7 +345,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 			},
 		},
@@ -358,7 +358,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -403,7 +403,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -434,7 +434,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -468,7 +468,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -518,7 +518,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -567,7 +567,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
@@ -606,7 +606,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x22,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -614,7 +614,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 						{
-							CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
+							CorrelationIds: []string{"correlation-app-down-3", "correlation-app-down-4"},
 							FCnt:           0x23,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -632,7 +632,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIDs:       LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs,
+						CorrelationIds:       LastUplink(dev.MACState.RecentUplinks...).CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 							DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 								LastFCntDown: dev.Session.LastNFCntDown,
@@ -652,7 +652,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
@@ -691,7 +691,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     bytes.Repeat([]byte("x"), 250),
@@ -709,7 +709,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIDs:       append(LastUplink(dev.MACState.RecentUplinks...).CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+						CorrelationIds:       append(LastUplink(dev.MACState.RecentUplinks...).CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 								ApplicationDownlink: *dev.Session.QueuedApplicationDownlinks[0],
@@ -728,7 +728,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -772,7 +772,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -846,7 +846,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:      dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -860,8 +860,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 				return nil, time.Time{}, test.AllTrue(
 					ok,
-					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-						append(lastUp.CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 3),
 				)
@@ -880,7 +880,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -924,7 +924,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -998,7 +998,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:      dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1011,8 +1011,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return nil, time.Time{}, false
 				}
 				return lastDown, now.Add(time.Second), test.AllTrue(
-					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-						append(lastUp.CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
@@ -1042,7 +1042,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -1086,7 +1086,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x15,
 							FRMPayload:     bytes.Repeat([]byte{0x42}, 46),
@@ -1154,7 +1154,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:      dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1167,8 +1167,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return nil, time.Time{}, false
 				}
 				return lastDown, now.Add(time.Second), test.AllTrue(
-					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-						lastUp.CorrelationIDs,
+					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						lastUp.CorrelationIds,
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
@@ -1198,7 +1198,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -1242,7 +1242,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x15,
 							FRMPayload:     []byte("AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUU="),
@@ -1314,7 +1314,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1DataRateIndex:  lastUp.Settings.DataRateIndex,
 							Rx1Delay:          dev.MACState.CurrentParameters.Rx1Delay,
 							Rx1Frequency:      dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1327,8 +1327,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return nil, time.Time{}, false
 				}
 				return lastDown, now.Add(time.Second), test.AllTrue(
-					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-						append(lastUp.CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
@@ -1357,7 +1357,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassBTimeout: DurationPtr(42 * time.Second),
@@ -1398,7 +1398,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							Confirmed:      true,
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -1406,7 +1406,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 						{
-							CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
+							CorrelationIds: []string{"correlation-app-down-3", "correlation-app-down-4"},
 							FCnt:           0x43,
 							FPort:          0x2,
 							FRMPayload:     []byte("nextTestPayload"),
@@ -1461,7 +1461,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_3,
 							Rx2Frequency:      DefaultEU868RX2Frequency,
 							AbsoluteTime:      TimePtr(pingAt),
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1472,8 +1472,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return nil, time.Time{}, false
 				}
 				return lastDown, now.Add(time.Second), test.AllTrue(
-					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-						dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
 				)
@@ -1497,7 +1497,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout: DurationPtr(42 * time.Second),
@@ -1543,7 +1543,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -1617,7 +1617,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:      dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1630,8 +1630,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return nil, time.Time{}, false
 				}
 				return lastDown, now.Add(time.Second), test.AllTrue(
-					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-						append(lastUp.CorrelationIDs, dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
+					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
@@ -1661,7 +1661,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout: DurationPtr(42 * time.Second),
@@ -1707,7 +1707,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -1761,7 +1761,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:          ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1774,8 +1774,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return nil, time.Time{}, false
 				}
 				return lastDown, now.Add(time.Second), test.AllTrue(
-					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-						dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
@@ -1798,7 +1798,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:         test.EUFrequencyPlanID,
+				FrequencyPlanId:         test.EUFrequencyPlanID,
 				LastDevStatusReceivedAt: TimePtr(now),
 				LorawanPhyVersion:       ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -1837,7 +1837,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -1895,7 +1895,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_0,
 							Rx2Frequency:      DefaultEU868RX2Frequency,
 							AbsoluteTime:      TimePtr(now.Add(InfrastructureDelay)),
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1908,8 +1908,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return nil, time.Time{}, false
 				}
 				return lastDown, now.Add(time.Second), test.AllTrue(
-					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-						dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
 					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
@@ -1932,7 +1932,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout: DurationPtr(42 * time.Second),
@@ -1968,7 +1968,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -2026,7 +2026,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							AbsoluteTime:      TimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -2058,8 +2058,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return nil, time.Time{}, false
 				}
 				return nil, time.Time{}, test.AllTrue(
-					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-						dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 3),
 				)
@@ -2074,7 +2074,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIDs:       dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+						CorrelationIds:       dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 								ApplicationDownlink: *dev.Session.QueuedApplicationDownlinks[0],
@@ -2093,7 +2093,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout: DurationPtr(42 * time.Second),
@@ -2129,7 +2129,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -2186,7 +2186,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:          ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -2218,8 +2218,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return nil, time.Time{}, false
 				}
 				return nil, time.Time{}, test.AllTrue(
-					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-						dev.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
+					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
 					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 3),
 				)
@@ -2234,7 +2234,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout:          DurationPtr(42 * time.Second),
@@ -2273,7 +2273,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -2296,7 +2296,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout:          DurationPtr(42 * time.Second),
@@ -2335,7 +2335,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -2346,7 +2346,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 						{
-							CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
+							CorrelationIds: []string{"correlation-app-down-3", "correlation-app-down-4"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -2371,7 +2371,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					JoinEui:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					DevEui:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				PendingMACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -2409,7 +2409,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					SessionKeys:   *sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -2440,7 +2440,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:      dev.PendingMACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex:  dev.PendingMACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.PendingMACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -2453,8 +2453,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return nil, time.Time{}, false
 				}
 				return lastDown, now.Add(time.Second), test.AllTrue(
-					a.So(lastDown.CorrelationIDs, should.BeProperSupersetOfElementsFunc, test.StringEqual,
-						lastUp.CorrelationIDs,
+					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
+						lastUp.CorrelationIds,
 					),
 					assertReceiveScheduleJoinFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
 					assertReceiveScheduleJoinSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
@@ -2482,14 +2482,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					JoinEui:                dev.JoinEui,
 					DevAddr:                &dev.PendingMACState.QueuedJoinAccept.DevAddr,
 				}
-				cids := LastUplink(dev.PendingMACState.RecentUplinks...).CorrelationIDs
+				cids := LastUplink(dev.PendingMACState.RecentUplinks...).CorrelationIds
 				recvAt := LastUplink(dev.PendingMACState.RecentUplinks...).ReceivedAt
 
 				ok := false
 				if a.So(ups, should.HaveLength, 1) {
 					ok = a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: ids,
-						CorrelationIDs:       cids,
+						CorrelationIds:       cids,
 						Up: &ttnpb.ApplicationUp_JoinAccept{
 							JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:              dev.PendingMACState.QueuedJoinAccept.Keys.AppSKey,
@@ -2508,7 +2508,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						events.WithIdentifiers(&ids),
 						events.WithData(&ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: ids,
-							CorrelationIDs:       cids,
+							CorrelationIds:       cids,
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									InvalidatedDownlinks: dev.Session.QueuedApplicationDownlinks,

@@ -84,9 +84,7 @@ func (s *remoteStore) GetBrands(req store.GetBrandsRequest) (*store.GetBrandsRes
 	}, nil
 }
 
-var (
-	errBrandNotFound = errors.DefineNotFound("brand_not_found", "brand `{brand_id}` not found")
-)
+var errBrandNotFound = errors.DefineNotFound("brand_not_found", "brand `{brand_id}` not found")
 
 // listModelsByBrand gets available end device models by a single brand.
 func (s *remoteStore) listModelsByBrand(req store.GetModelsRequest) (*store.GetModelsResponse, error) {
@@ -174,8 +172,8 @@ var (
 // GetTemplate retrieves an end device template for an end device definition.
 func (s *remoteStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.EndDeviceTemplate, error) {
 	models, err := s.GetModels(store.GetModelsRequest{
-		BrandID: ids.BrandID,
-		ModelID: ids.ModelID,
+		BrandID: ids.BrandId,
+		ModelID: ids.ModelId,
 		Paths: []string{
 			"firmware_versions",
 		},
@@ -184,7 +182,7 @@ func (s *remoteStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnp
 		return nil, err
 	}
 	if len(models.Models) == 0 {
-		return nil, errModelNotFound.WithAttributes("brand_id", ids.BrandID, "model_id", ids.ModelID)
+		return nil, errModelNotFound.WithAttributes("brand_id", ids.BrandId, "model_id", ids.ModelId)
 	}
 	model := models.Models[0]
 	for _, ver := range model.FirmwareVersions {
@@ -192,17 +190,17 @@ func (s *remoteStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnp
 			continue
 		}
 
-		if _, ok := bandIDToRegion[ids.BandID]; !ok {
-			return nil, errBandNotFound.WithAttributes("unknown_band", ids.BandID)
+		if _, ok := bandIDToRegion[ids.BandId]; !ok {
+			return nil, errBandNotFound.WithAttributes("unknown_band", ids.BandId)
 		}
-		profileInfo, ok := ver.Profiles[ids.BandID]
+		profileInfo, ok := ver.Profiles[ids.BandId]
 		if !ok {
 			return nil, errNoProfileForBand.WithAttributes(
-				"band_id", ids.BandID,
+				"band_id", ids.BandId,
 			)
 		}
 
-		profileVendorID := ids.BrandID
+		profileVendorID := ids.BrandId
 		if id := profileInfo.VendorId; id != "" {
 			profileVendorID = id
 		}
@@ -218,20 +216,18 @@ func (s *remoteStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnp
 		return profile.ToTemplatePB(ids, profileInfo)
 	}
 	return nil, errFirmwareVersionNotFound.WithAttributes(
-		"brand_id", ids.BrandID,
-		"model_id", ids.ModelID,
+		"brand_id", ids.BrandId,
+		"model_id", ids.ModelId,
 		"firmware_version", ids.FirmwareVersion,
 	)
 }
 
-var (
-	errNoCodec = errors.DefineNotFound("no_codec", "no codec defined for firmware version `{firmware_version}` and band `{band_id}`")
-)
+var errNoCodec = errors.DefineNotFound("no_codec", "no codec defined for firmware version `{firmware_version}` and band `{band_id}`")
 
 func (s *remoteStore) getCodecs(ids *ttnpb.EndDeviceVersionIdentifiers) (*EndDeviceCodecs, error) {
 	models, err := s.GetModels(store.GetModelsRequest{
-		BrandID: ids.BrandID,
-		ModelID: ids.ModelID,
+		BrandID: ids.BrandId,
+		ModelID: ids.ModelId,
 		Paths: []string{
 			"firmware_versions",
 		},
@@ -240,7 +236,7 @@ func (s *remoteStore) getCodecs(ids *ttnpb.EndDeviceVersionIdentifiers) (*EndDev
 		return nil, err
 	}
 	if len(models.Models) == 0 {
-		return nil, errModelNotFound.WithAttributes("brand_id", ids.BrandID, "model_id", ids.ModelID)
+		return nil, errModelNotFound.WithAttributes("brand_id", ids.BrandId, "model_id", ids.ModelId)
 	}
 	model := models.Models[0]
 	var version *ttnpb.EndDeviceModel_FirmwareVersion = nil
@@ -253,29 +249,29 @@ func (s *remoteStore) getCodecs(ids *ttnpb.EndDeviceVersionIdentifiers) (*EndDev
 
 	if version == nil {
 		return nil, errFirmwareVersionNotFound.WithAttributes(
-			"brand_id", ids.BrandID,
-			"model_id", ids.ModelID,
+			"brand_id", ids.BrandId,
+			"model_id", ids.ModelId,
 			"firmware_version", ids.FirmwareVersion,
 		)
 	}
 
-	if _, ok := bandIDToRegion[ids.BandID]; !ok {
-		return nil, errBandNotFound.WithAttributes("band_id", ids.BandID)
+	if _, ok := bandIDToRegion[ids.BandId]; !ok {
+		return nil, errBandNotFound.WithAttributes("band_id", ids.BandId)
 	}
-	profileInfo, ok := version.Profiles[ids.BandID]
+	profileInfo, ok := version.Profiles[ids.BandId]
 	if !ok {
 		return nil, errNoProfileForBand.WithAttributes(
-			"band_id", ids.BandID,
+			"band_id", ids.BandId,
 		)
 	}
 	if profileInfo.CodecId == "" {
-		return nil, errNoCodec.WithAttributes("firmware_version", ids.FirmwareVersion, "band_id", ids.BandID)
+		return nil, errNoCodec.WithAttributes("firmware_version", ids.FirmwareVersion, "band_id", ids.BandId)
 	}
 
 	codecs := &EndDeviceCodecs{
 		CodecID: profileInfo.CodecId,
 	}
-	b, err := s.fetcher.File("vendor", ids.BrandID, codecs.CodecID+".yaml")
+	b, err := s.fetcher.File("vendor", ids.BrandId, codecs.CodecID+".yaml")
 	if err != nil {
 		return nil, err
 	}
@@ -291,7 +287,7 @@ var (
 )
 
 func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *EndDeviceCodecs) *EndDeviceDecoderCodec) (*ttnpb.MessagePayloadDecoder, error) {
-	codecs, err := s.getCodecs(req.GetVersionIDs())
+	codecs, err := s.getCodecs(req.GetVersionIds())
 	if err != nil {
 		return nil, err
 	}
@@ -300,7 +296,7 @@ func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *
 		return nil, errNoDecoder.WithAttributes("codec_id", codecs.CodecID)
 	}
 
-	b, err := s.fetcher.File("vendor", req.GetVersionIDs().BrandID, codec.FileName)
+	b, err := s.fetcher.File("vendor", req.GetVersionIds().BrandId, codec.FileName)
 	if err != nil {
 		return nil, err
 	}
@@ -352,17 +348,17 @@ func (s *remoteStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.Mess
 
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
 func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadEncoder, error) {
-	codecs, err := s.getCodecs(req.GetVersionIDs())
+	codecs, err := s.getCodecs(req.GetVersionIds())
 	if err != nil {
 		return nil, err
 	}
 	codec := codecs.DownlinkEncoder
 
 	if codec.FileName == "" {
-		return nil, errNoEncoder.WithAttributes("firmware_version", req.GetVersionIDs().FirmwareVersion, "band_id", req.GetVersionIDs().BandID)
+		return nil, errNoEncoder.WithAttributes("firmware_version", req.GetVersionIds().FirmwareVersion, "band_id", req.GetVersionIds().BandId)
 	}
 
-	b, err := s.fetcher.File("vendor", req.GetVersionIDs().BrandID, codec.FileName)
+	b, err := s.fetcher.File("vendor", req.GetVersionIds().BrandId, codec.FileName)
 	if err != nil {
 		return nil, err
 	}

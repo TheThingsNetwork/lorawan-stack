@@ -150,8 +150,8 @@ func MakeEventEqual(conf EventEqualConfig) func(a, b events.Event) bool {
 			bp.Data = nil
 		}
 		if !conf.CorrelationIDs {
-			ap.CorrelationIDs = nil
-			bp.CorrelationIDs = nil
+			ap.CorrelationIds = nil
+			bp.CorrelationIds = nil
 		}
 		if !conf.Origin {
 			ap.Origin = ""

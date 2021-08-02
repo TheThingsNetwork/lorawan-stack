@@ -650,7 +650,7 @@ func TestTxAck(t *testing.T) {
 	}
 	msg := &ttnpb.DownlinkMessage{
 		RawPayload:     []byte{0x00, 0x00},
-		CorrelationIDs: []string{"cid:1", "cid:2"},
+		CorrelationIds: []string{"cid:1", "cid:2"},
 	}
 	var lnsLNS lbsLNS
 	now := time.Now()
@@ -658,7 +658,7 @@ func TestTxAck(t *testing.T) {
 	txAck := txConf.ToTxAck(context.Background(), lnsLNS.tokens, now)
 	if !a.So(txAck, should.Resemble, &ttnpb.TxAcknowledgment{
 		DownlinkMessage: msg,
-		CorrelationIDs:  msg.CorrelationIDs,
+		CorrelationIds:  msg.CorrelationIds,
 		Result:          ttnpb.TxAcknowledgment_SUCCESS,
 	}) {
 		t.Fatalf("Unexpected TxAck: %v", txAck)

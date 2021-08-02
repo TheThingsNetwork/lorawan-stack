@@ -750,7 +750,7 @@ func TestTokenExchange(t *testing.T) {
 					UserIds:       mockUser.UserIdentifiers,
 					ClientIds:     mockClient.ClientIdentifiers,
 					UserSessionID: mockSession.SessionID,
-					ID:            "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
+					Id:            "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
 					RefreshToken:  "PBKDF2$sha256$20000$IGAiKs46xX_M64E5$4xpyqnQT8SOa_Vf4xhEPk6WOZnhmAjG2mqGQiYBhm2s",
 					Rights:        mockClient.Rights,
 					CreatedAt:     time.Now().Truncate(time.Second),

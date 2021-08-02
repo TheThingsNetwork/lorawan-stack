@@ -35,10 +35,10 @@ func (dst *APIKey) SetFields(src *APIKey, paths ...string) error {
 				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.ID = src.ID
+				dst.Id = src.Id
 			} else {
 				var zero string
-				dst.ID = zero
+				dst.Id = zero
 			}
 		case "key":
 			if len(subs) > 0 {

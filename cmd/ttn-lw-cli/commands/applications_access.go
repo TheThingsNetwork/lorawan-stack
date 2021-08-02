@@ -269,7 +269,7 @@ var (
 			if err != nil {
 				return err
 			}
-			logger.Infof("API key ID: %s", res.ID)
+			logger.Infof("API key ID: %s", res.Id)
 			logger.Infof("API key value: %s", res.Key)
 			logger.Warn("The API key value will never be shown again")
 			logger.Warn("Make sure to copy it to a safe place")
@@ -308,7 +308,7 @@ var (
 			_, err = ttnpb.NewApplicationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 				ApplicationIdentifiers: *appID,
 				APIKey: ttnpb.APIKey{
-					ID:        id,
+					Id:        id,
 					Name:      name,
 					Rights:    rights,
 					ExpiresAt: expiryDate,
@@ -343,7 +343,7 @@ var (
 			_, err = ttnpb.NewApplicationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 				ApplicationIdentifiers: *appID,
 				APIKey: ttnpb.APIKey{
-					ID:     id,
+					Id:     id,
 					Rights: nil,
 				},
 				FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},

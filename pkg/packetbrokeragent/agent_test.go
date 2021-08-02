@@ -161,7 +161,7 @@ func TestForwarder(t *testing.T) {
 							Frequency:     869525000,
 						},
 					},
-					BandID: "EU_863_870",
+					BandId: "EU_863_870",
 				},
 				RoutedUplinkMessage: &packetbroker.RoutedUplinkMessage{
 					ForwarderNetId:     0x000013,
@@ -281,7 +281,7 @@ func TestForwarder(t *testing.T) {
 							Frequency:     868300000,
 						},
 					},
-					BandID: "EU_863_870",
+					BandId: "EU_863_870",
 				},
 				RoutedUplinkMessage: &packetbroker.RoutedUplinkMessage{
 					ForwarderNetId:     0x000013,
@@ -408,7 +408,7 @@ func TestForwarder(t *testing.T) {
 		}
 		a.So(gtwMsg, should.Resemble, &ttnpb.DownlinkMessage{
 			RawPayload:     []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
-			CorrelationIDs: gtwMsg.CorrelationIDs,
+			CorrelationIds: gtwMsg.CorrelationIds,
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
 					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
@@ -818,8 +818,8 @@ func TestHomeNetwork(t *testing.T) {
 				case <-time.After(timeout):
 					t.Fatal("Expected uplink message from Forwarder")
 				}
-				a.So(nsMsg.CorrelationIDs, should.HaveLength, 2)
-				nsMsg.CorrelationIDs = nil
+				a.So(nsMsg.CorrelationIds, should.HaveLength, 2)
+				nsMsg.CorrelationIds = nil
 				a.So(nsMsg.ReceivedAt, should.HappenBetween, before, time.Now()) // Packet Broker Agent sets local time on receive.
 				nsMsg.ReceivedAt = time.Time{}
 				a.So(nsMsg, should.Resemble, tc.UplinkMessage)

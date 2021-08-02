@@ -32,7 +32,7 @@ func (ns *NetworkServer) GenerateDevAddr(ctx context.Context, req *pbtypes.Empty
 }
 
 func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.GetDefaultMACSettingsRequest) (*ttnpb.MACSettings, error) {
-	fp, phy, err := FrequencyPlanAndBand(req.FrequencyPlanID, req.LorawanPhyVersion, ns.FrequencyPlans)
+	fp, phy, err := FrequencyPlanAndBand(req.FrequencyPlanId, req.LorawanPhyVersion, ns.FrequencyPlans)
 	if err != nil {
 		return nil, err
 	}

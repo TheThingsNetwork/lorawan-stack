@@ -231,7 +231,7 @@ func RightsFrom(rights ...Right) *Rights { return &Rights{Rights: rights} }
 
 // PrettyName returns the key ID (Name if present)
 func (m *APIKey) PrettyName() string {
-	identifier := m.GetID()
+	identifier := m.GetId()
 	if name := m.GetName(); name != "" {
 		identifier = fmt.Sprintf("%v (%v)", identifier, name)
 	}

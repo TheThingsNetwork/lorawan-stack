@@ -165,7 +165,7 @@ func (c *connection) setup(ctx context.Context) (err error) {
 				return
 			case down := <-c.io.Down():
 				token := c.tokens.Next(down, time.Now())
-				down.CorrelationIDs = append(down.CorrelationIDs, c.tokens.FormatCorrelationID(token))
+				down.CorrelationIds = append(down.CorrelationIds, c.tokens.FormatCorrelationID(token))
 
 				buf, err := c.format.FromDownlink(down, c.io.Gateway().GatewayIdentifiers)
 				if err != nil {
@@ -346,7 +346,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgment message")
 			return
 		}
-		if token, ok := c.tokens.ParseTokenFromCorrelationIDs(ack.GetCorrelationIDs()); ok {
+		if token, ok := c.tokens.ParseTokenFromCorrelationIDs(ack.GetCorrelationIds()); ok {
 			if down, _, ok := c.tokens.Get(token, time.Now()); ok {
 				ack.DownlinkMessage = down
 			}

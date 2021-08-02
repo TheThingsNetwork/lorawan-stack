@@ -119,7 +119,7 @@ func TestContactInfoValidation(t *testing.T) {
 		expiresAt := time.Now().Add(time.Hour)
 
 		_, err = s.CreateValidation(ctx, &ttnpb.ContactInfoValidation{
-			ID:          "validation-id",
+			Id:          "validation-id",
 			Token:       "validation-token",
 			Entity:      usr.GetEntityIdentifiers(),
 			ContactInfo: info,
@@ -129,7 +129,7 @@ func TestContactInfoValidation(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		_, err = s.CreateValidation(ctx, &ttnpb.ContactInfoValidation{
-			ID:          "validation-id",
+			Id:          "validation-id",
 			Token:       "other-token",
 			Entity:      usr.GetEntityIdentifiers(),
 			ContactInfo: info,
@@ -141,7 +141,7 @@ func TestContactInfoValidation(t *testing.T) {
 		}
 
 		err = s.Validate(ctx, &ttnpb.ContactInfoValidation{
-			ID:    "validation-id",
+			Id:    "validation-id",
 			Token: "validation-token",
 		})
 
@@ -155,7 +155,7 @@ func TestContactInfoValidation(t *testing.T) {
 		}
 
 		err = s.Validate(ctx, &ttnpb.ContactInfoValidation{
-			ID:    "validation-id",
+			Id:    "validation-id",
 			Token: "validation-token",
 		})
 

@@ -102,7 +102,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	if err != nil {
 		return nil, err
 	}
-	logger.WithField("api_key_id", cupsKey.ID).Info("Created gateway API key for CUPS")
+	logger.WithField("api_key_id", cupsKey.Id).Info("Created gateway API key for CUPS")
 	lnsKey, err := accessRegistry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 		GatewayIdentifiers: gtw.GatewayIdentifiers,
 		Name:               fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
@@ -132,7 +132,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	if err != nil {
 		return nil, err
 	}
-	logger.WithField("api_key_id", lnsKey.ID).Info("Created gateway API key for LNS")
+	logger.WithField("api_key_id", lnsKey.Id).Info("Created gateway API key for LNS")
 	return gtw, nil
 }
 

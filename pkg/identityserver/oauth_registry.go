@@ -109,8 +109,8 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		oauthStore := store.GetOAuthStore(db)
-		if accessToken != nil && accessToken.ID != req.ID {
-			accessToken, err := oauthStore.GetAccessToken(ctx, req.ID)
+		if accessToken != nil && accessToken.Id != req.Id {
+			accessToken, err := oauthStore.GetAccessToken(ctx, req.Id)
 			if err != nil {
 				return err
 			}
@@ -118,7 +118,7 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 				return errAccessTokenMismatch.New()
 			}
 		}
-		return oauthStore.DeleteAccessToken(ctx, req.ID)
+		return oauthStore.DeleteAccessToken(ctx, req.Id)
 	})
 	if err != nil {
 		return nil, err
