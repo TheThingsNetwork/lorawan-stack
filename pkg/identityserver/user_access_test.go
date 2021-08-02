@@ -31,7 +31,7 @@ import (
 func init() {
 	userAccessUser.Admin = false
 	userAccessUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&userAccessUser.UserIdentifiers).APIKeys {
+	for _, apiKey := range userAPIKeys(&userAccessUser.UserIdentifiers).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_SETTINGS_API_KEYS}
 	}
 }
@@ -93,7 +93,7 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 		}
 		a.So(APIKey, should.BeNil)
 
-		APIKey = userAPIKeys(&userID).APIKeys[0]
+		APIKey = userAPIKeys(&userID).ApiKeys[0]
 		APIKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_ALL}
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
@@ -115,7 +115,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := population.Users[defaultUserIdx].UserIdentifiers
-		APIKeyID := userAPIKeys(&userID).APIKeys[0].Id
+		APIKeyID := userAPIKeys(&userID).ApiKeys[0].Id
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
@@ -156,7 +156,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		}
 		a.So(APIKey, should.BeNil)
 
-		APIKey = userAPIKeys(&userID).APIKeys[0]
+		APIKey = userAPIKeys(&userID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIdentifiers: userID,
@@ -215,7 +215,7 @@ func TestUserAccessCRUD(t *testing.T) {
 		}
 
 		userAPIKeys := userAPIKeys(&user.UserIdentifiers)
-		userKey := userAPIKeys.APIKeys[0]
+		userKey := userAPIKeys.ApiKeys[0]
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
 			UserIdentifiers: user.UserIdentifiers,
@@ -228,18 +228,18 @@ func TestUserAccessCRUD(t *testing.T) {
 			a.So(APIKey.Key, should.BeEmpty)
 		}
 
-		sort.Slice(userAPIKeys.APIKeys, func(i int, j int) bool { return userAPIKeys.APIKeys[i].Name < userAPIKeys.APIKeys[j].Name })
+		sort.Slice(userAPIKeys.ApiKeys, func(i int, j int) bool { return userAPIKeys.ApiKeys[i].Name < userAPIKeys.ApiKeys[j].Name })
 		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
 			UserIdentifiers: user.UserIdentifiers,
 		}, creds)
-		sort.Slice(apiKeys.APIKeys, func(i int, j int) bool { return apiKeys.APIKeys[i].Name < apiKeys.APIKeys[j].Name })
+		sort.Slice(apiKeys.ApiKeys, func(i int, j int) bool { return apiKeys.ApiKeys[i].Name < apiKeys.ApiKeys[j].Name })
 
 		a.So(err, should.BeNil)
 		a.So(apiKeys, should.NotBeNil)
-		a.So(len(apiKeys.APIKeys), should.Equal, len(userAPIKeys.APIKeys))
-		for i, APIkey := range apiKeys.APIKeys {
-			a.So(APIkey.Name, should.Equal, userAPIKeys.APIKeys[i].Name)
-			a.So(APIkey.Id, should.Equal, userAPIKeys.APIKeys[i].Id)
+		a.So(len(apiKeys.ApiKeys), should.Equal, len(userAPIKeys.ApiKeys))
+		for i, APIkey := range apiKeys.ApiKeys {
+			a.So(APIkey.Name, should.Equal, userAPIKeys.ApiKeys[i].Name)
+			a.So(APIkey.Id, should.Equal, userAPIKeys.ApiKeys[i].Id)
 		}
 
 		createdAPIKeyName := "test-created-api-key"

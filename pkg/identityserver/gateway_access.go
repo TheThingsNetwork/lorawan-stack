@@ -122,13 +122,13 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.Lis
 	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GatewayIdentifiers.GetEntityIdentifiers())
+		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GatewayIdentifiers.GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
-	for _, key := range keys.APIKeys {
+	for _, key := range keys.ApiKeys {
 		key.Key = ""
 	}
 	return keys, nil

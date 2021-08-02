@@ -42,8 +42,8 @@ func TestEntityAccess(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(md.Get("warning"), should.Contain, "Restricted rights until email address validated")
 			a.So(md.Get("warning"), should.Contain, "Restricted rights while account pending")
-			if a.So(authInfo.GetAPIKey(), should.NotBeNil) {
-				rights := ttnpb.RightsFrom(authInfo.GetAPIKey().GetRights()...)
+			if a.So(authInfo.GetApiKey(), should.NotBeNil) {
+				rights := ttnpb.RightsFrom(authInfo.GetApiKey().GetRights()...)
 				a.So(rights.IncludesAll(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_SETTINGS_BASIC, ttnpb.RIGHT_USER_DELETE), should.BeTrue)
 			}
 		})
@@ -57,8 +57,8 @@ func TestEntityAccess(t *testing.T) {
 			if warnings := md.Get("warning"); a.So(warnings, should.HaveLength, 1) {
 				a.So(warnings[0], should.ContainSubstring, "Restricted rights after account rejection")
 			}
-			if a.So(authInfo.GetAPIKey(), should.NotBeNil) {
-				rights := ttnpb.RightsFrom(authInfo.GetAPIKey().GetRights()...)
+			if a.So(authInfo.GetApiKey(), should.NotBeNil) {
+				rights := ttnpb.RightsFrom(authInfo.GetApiKey().GetRights()...)
 				a.So(rights.IncludesAll(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_DELETE), should.BeTrue)
 			}
 		})
@@ -72,8 +72,8 @@ func TestEntityAccess(t *testing.T) {
 			if warnings := md.Get("warning"); a.So(warnings, should.HaveLength, 1) {
 				a.So(warnings[0], should.ContainSubstring, "Restricted rights after account suspension")
 			}
-			if a.So(authInfo.GetAPIKey(), should.NotBeNil) {
-				rights := ttnpb.RightsFrom(authInfo.GetAPIKey().GetRights()...)
+			if a.So(authInfo.GetApiKey(), should.NotBeNil) {
+				rights := ttnpb.RightsFrom(authInfo.GetApiKey().GetRights()...)
 				a.So(rights.IncludesAll(ttnpb.RIGHT_USER_INFO), should.BeTrue)
 			}
 		})

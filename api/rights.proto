@@ -198,7 +198,7 @@ message APIKey {
 }
 
 message APIKeys {
-  repeated APIKey api_keys = 1 [(gogoproto.customname) = "APIKeys"];
+  repeated APIKey api_keys = 1;
 }
 
 message Collaborator {

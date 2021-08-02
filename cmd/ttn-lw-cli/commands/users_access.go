@@ -75,7 +75,7 @@ var (
 			}
 			getTotal()
 
-			return io.Write(os.Stdout, config.OutputFormat, res.APIKeys)
+			return io.Write(os.Stdout, config.OutputFormat, res.ApiKeys)
 		},
 	}
 	userAPIKeysGet = &cobra.Command{

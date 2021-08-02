@@ -29,7 +29,7 @@ import (
 func init() {
 	gatewayAccessUser.Admin = false
 	gatewayAccessUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&gatewayAccessUser.UserIdentifiers).APIKeys {
+	for _, apiKey := range userAPIKeys(&gatewayAccessUser.UserIdentifiers).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_LINK,
 			ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS,
@@ -38,7 +38,7 @@ func init() {
 	}
 	gtwAccessCollaboratorUser.Admin = false
 	gtwAccessCollaboratorUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&gtwAccessCollaboratorUser.UserIdentifiers).APIKeys {
+	for _, apiKey := range userAPIKeys(&gtwAccessCollaboratorUser.UserIdentifiers).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_ALL,
 		}
@@ -110,7 +110,7 @@ func TestGatewayAccessRightsPermissionDenied(t *testing.T) {
 
 		// Choose right that the user does not have and hence cannot add
 		right := ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC
-		APIKey = gatewayAPIKeys(&gatewayID).APIKeys[0]
+		APIKey = gatewayAPIKeys(&gatewayID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
@@ -149,7 +149,7 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 		userID := defaultUser.UserIdentifiers
 		gatewayID := userGateways(&userID).Gateways[0].GatewayIdentifiers
 		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
-		APIKeyID := gatewayAPIKeys(&gatewayID).APIKeys[0].Id
+		APIKeyID := gatewayAPIKeys(&gatewayID).ApiKeys[0].Id
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
@@ -200,7 +200,7 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 		}
 		a.So(APIKey, should.BeNil)
 
-		APIKey = gatewayAPIKeys(&gatewayID).APIKeys[0]
+		APIKey = gatewayAPIKeys(&gatewayID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
@@ -275,7 +275,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		}
 
 		gatewayAPIKeys := gatewayAPIKeys(&gatewayID)
-		gatewayKey := gatewayAPIKeys.APIKeys[0]
+		gatewayKey := gatewayAPIKeys.ApiKeys[0]
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
@@ -294,10 +294,10 @@ func TestGatewayAccessCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(APIKeys, should.NotBeNil) {
-			a.So(len(APIKeys.APIKeys), should.Equal, len(gatewayAPIKeys.APIKeys))
-			for i, APIkey := range APIKeys.APIKeys {
-				a.So(APIkey.Name, should.Equal, gatewayAPIKeys.APIKeys[i].Name)
-				a.So(APIkey.Id, should.Equal, gatewayAPIKeys.APIKeys[i].Id)
+			a.So(len(APIKeys.ApiKeys), should.Equal, len(gatewayAPIKeys.ApiKeys))
+			for i, APIkey := range APIKeys.ApiKeys {
+				a.So(APIkey.Name, should.Equal, gatewayAPIKeys.ApiKeys[i].Name)
+				a.So(APIkey.Id, should.Equal, gatewayAPIKeys.ApiKeys[i].Id)
 			}
 		}
 

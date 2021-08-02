@@ -127,8 +127,8 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			}
 			apiKey.Key = ""
 			apiKey.Rights = ttnpb.RightsFrom(apiKey.Rights...).Implied().GetRights()
-			res.AccessMethod = &ttnpb.AuthInfoResponse_APIKey{
-				APIKey: &ttnpb.AuthInfoResponse_APIKeyAccess{
+			res.AccessMethod = &ttnpb.AuthInfoResponse_ApiKey{
+				ApiKey: &ttnpb.AuthInfoResponse_APIKeyAccess{
 					APIKey:    *apiKey,
 					EntityIds: *ids.GetEntityIdentifiers(),
 				},
@@ -168,8 +168,8 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			}
 			accessToken.AccessToken, accessToken.RefreshToken = "", ""
 			accessToken.Rights = ttnpb.RightsFrom(accessToken.Rights...).Implied().GetRights()
-			res.AccessMethod = &ttnpb.AuthInfoResponse_OAuthAccessToken{
-				OAuthAccessToken: accessToken,
+			res.AccessMethod = &ttnpb.AuthInfoResponse_OauthAccessToken{
+				OauthAccessToken: accessToken,
 			}
 			user, err = store.GetUserStore(db).GetUser(ctx, &accessToken.UserIds, userFieldMask)
 			if err != nil {
@@ -357,9 +357,9 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 			return err
 		}
 	}
-	if apiKey := authInfo.GetAPIKey(); apiKey != nil {
+	if apiKey := authInfo.GetApiKey(); apiKey != nil {
 		return nil
-	} else if accessToken := authInfo.GetOAuthAccessToken(); accessToken != nil {
+	} else if accessToken := authInfo.GetOauthAccessToken(); accessToken != nil {
 		return nil
 	} else if userSession := authInfo.GetUserSession(); userSession != nil {
 		return nil
@@ -399,9 +399,9 @@ func (is *IdentityServer) RequireAdmin(ctx context.Context) error {
 }
 
 func restrictRights(info *ttnpb.AuthInfoResponse, rights *ttnpb.Rights) {
-	if apiKey := info.GetAPIKey(); apiKey != nil {
+	if apiKey := info.GetApiKey(); apiKey != nil {
 		apiKey.Rights = ttnpb.RightsFrom(apiKey.Rights...).Intersect(rights).GetRights()
-	} else if token := info.GetOAuthAccessToken(); token != nil {
+	} else if token := info.GetOauthAccessToken(); token != nil {
 		token.Rights = ttnpb.RightsFrom(token.Rights...).Intersect(rights).GetRights()
 	}
 	info.UniversalRights = info.UniversalRights.Intersect(rights)

@@ -29,7 +29,7 @@ import (
 func init() {
 	organizationAccessUser.Admin = false
 	organizationAccessUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&organizationAccessUser.UserIdentifiers).APIKeys {
+	for _, apiKey := range userAPIKeys(&organizationAccessUser.UserIdentifiers).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_LINK,
 			ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
@@ -39,7 +39,7 @@ func init() {
 
 	orgAccessCollaboratorUser.Admin = false
 	orgAccessCollaboratorUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&orgAccessCollaboratorUser.UserIdentifiers).APIKeys {
+	for _, apiKey := range userAPIKeys(&orgAccessCollaboratorUser.UserIdentifiers).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_ORGANIZATION_ALL,
 		}
@@ -109,7 +109,7 @@ func TestOrganizationAccessRightsPermissionDenied(t *testing.T) {
 
 		// Choose right that the user does not have and hence cannot add
 		right := ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC
-		APIKey = organizationAPIKeys(&organizationID).APIKeys[0]
+		APIKey = organizationAPIKeys(&organizationID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
@@ -148,7 +148,7 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 		userID := defaultUser.UserIdentifiers
 		organizationID := userOrganizations(&userID).Organizations[0].OrganizationIdentifiers
 		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
-		APIKeyID := organizationAPIKeys(&organizationID).APIKeys[0].Id
+		APIKeyID := organizationAPIKeys(&organizationID).ApiKeys[0].Id
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
@@ -199,7 +199,7 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 		}
 		a.So(APIKey, should.BeNil)
 
-		APIKey = organizationAPIKeys(&organizationID).APIKeys[0]
+		APIKey = organizationAPIKeys(&organizationID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
@@ -274,7 +274,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 		}
 
 		organizationAPIKeys := organizationAPIKeys(&organizationID)
-		organizationKey := organizationAPIKeys.APIKeys[0]
+		organizationKey := organizationAPIKeys.ApiKeys[0]
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
@@ -293,10 +293,10 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(APIKeys, should.NotBeNil) {
-			a.So(len(APIKeys.APIKeys), should.Equal, len(organizationAPIKeys.APIKeys))
-			for i, APIkey := range APIKeys.APIKeys {
-				a.So(APIkey.Name, should.Equal, organizationAPIKeys.APIKeys[i].Name)
-				a.So(APIkey.Id, should.Equal, organizationAPIKeys.APIKeys[i].Id)
+			a.So(len(APIKeys.ApiKeys), should.Equal, len(organizationAPIKeys.ApiKeys))
+			for i, APIkey := range APIKeys.ApiKeys {
+				a.So(APIkey.Name, should.Equal, organizationAPIKeys.ApiKeys[i].Name)
+				a.So(APIkey.Id, should.Equal, organizationAPIKeys.ApiKeys[i].Id)
 			}
 		}
 

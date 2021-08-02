@@ -177,7 +177,7 @@ If no API key is provided, a new one will be created.`,
 			}
 			_, err = ttnpb.NewGatewayClaimingServerClient(dcs).AuthorizeGateway(ctx, &ttnpb.AuthorizeGatewayRequest{
 				GatewayIdentifiers: *gtwID,
-				APIKey:             key,
+				ApiKey:             key,
 			})
 			return err
 		},

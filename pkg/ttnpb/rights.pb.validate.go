@@ -290,7 +290,7 @@ func (m *APIKeys) ValidateFields(paths ...string) error {
 		switch name {
 		case "api_keys":
 
-			for idx, item := range m.GetAPIKeys() {
+			for idx, item := range m.GetApiKeys() {
 				_, _ = idx, item
 
 				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {

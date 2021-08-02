@@ -61,7 +61,6 @@ key is provided, a new API key will be created.`,
 					},
 					ExpiresAt: expiryDate,
 				})
-
 				if err != nil {
 					return err
 				}
@@ -74,7 +73,7 @@ key is provided, a new API key will be created.`,
 			}
 			_, err = ttnpb.NewEndDeviceClaimingServerClient(dcs).AuthorizeApplication(ctx, &ttnpb.AuthorizeApplicationRequest{
 				ApplicationIdentifiers: *appID,
-				APIKey:                 key,
+				ApiKey:                 key,
 			})
 			return err
 		},

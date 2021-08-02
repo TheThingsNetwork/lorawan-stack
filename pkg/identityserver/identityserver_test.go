@@ -153,13 +153,13 @@ func userAPIKeys(userID *ttnpb.UserIdentifiers) ttnpb.APIKeys {
 	for id, apiKeys := range population.APIKeys {
 		if id.GetUserIds().GetUserId() == userID.GetUserId() {
 			return ttnpb.APIKeys{
-				APIKeys: apiKeys,
+				ApiKeys: apiKeys,
 			}
 		}
 	}
 
 	return ttnpb.APIKeys{
-		APIKeys: []*ttnpb.APIKey{},
+		ApiKeys: []*ttnpb.APIKey{},
 	}
 }
 
@@ -167,13 +167,13 @@ func applicationAPIKeys(applicationID *ttnpb.ApplicationIdentifiers) ttnpb.APIKe
 	for id, apiKeys := range population.APIKeys {
 		if id.GetApplicationIds().GetApplicationId() == applicationID.GetApplicationId() {
 			return ttnpb.APIKeys{
-				APIKeys: apiKeys,
+				ApiKeys: apiKeys,
 			}
 		}
 	}
 
 	return ttnpb.APIKeys{
-		APIKeys: []*ttnpb.APIKey{},
+		ApiKeys: []*ttnpb.APIKey{},
 	}
 }
 
@@ -181,13 +181,13 @@ func gatewayAPIKeys(gatewayID *ttnpb.GatewayIdentifiers) ttnpb.APIKeys {
 	for id, apiKeys := range population.APIKeys {
 		if id.GetGatewayIds().GetGatewayId() == gatewayID.GetGatewayId() {
 			return ttnpb.APIKeys{
-				APIKeys: apiKeys,
+				ApiKeys: apiKeys,
 			}
 		}
 	}
 
 	return ttnpb.APIKeys{
-		APIKeys: []*ttnpb.APIKey{},
+		ApiKeys: []*ttnpb.APIKey{},
 	}
 }
 
@@ -195,13 +195,13 @@ func organizationAPIKeys(organizationID *ttnpb.OrganizationIdentifiers) ttnpb.AP
 	for id, apiKeys := range population.APIKeys {
 		if id.GetOrganizationIds().GetOrganizationId() == organizationID.GetOrganizationId() {
 			return ttnpb.APIKeys{
-				APIKeys: apiKeys,
+				ApiKeys: apiKeys,
 			}
 		}
 	}
 
 	return ttnpb.APIKeys{
-		APIKeys: []*ttnpb.APIKey{},
+		ApiKeys: []*ttnpb.APIKey{},
 	}
 }
 

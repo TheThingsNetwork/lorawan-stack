@@ -212,10 +212,10 @@ func (dst *AuthorizeApplicationRequest) SetFields(src *AuthorizeApplicationReque
 				return fmt.Errorf("'api_key' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.APIKey = src.APIKey
+				dst.ApiKey = src.ApiKey
 			} else {
 				var zero string
-				dst.APIKey = zero
+				dst.ApiKey = zero
 			}
 
 		default:
@@ -517,10 +517,10 @@ func (dst *AuthorizeGatewayRequest) SetFields(src *AuthorizeGatewayRequest, path
 				return fmt.Errorf("'api_key' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.APIKey = src.APIKey
+				dst.ApiKey = src.ApiKey
 			} else {
 				var zero string
-				dst.APIKey = zero
+				dst.ApiKey = zero
 			}
 
 		default:

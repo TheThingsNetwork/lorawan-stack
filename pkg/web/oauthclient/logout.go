@@ -86,7 +86,7 @@ func (oc *OAuthClient) HandleLogout(c echo.Context) error {
 
 	if cc, err := oc.component.GetPeerConn(ctx, ttnpb.ClusterRole_ACCESS, nil); err == nil {
 		if res, err := ttnpb.NewEntityAccessClient(cc).AuthInfo(ctx, ttnpb.Empty, creds); err == nil {
-			if tokenInfo := res.GetOAuthAccessToken(); tokenInfo != nil {
+			if tokenInfo := res.GetOauthAccessToken(); tokenInfo != nil {
 				_, err := ttnpb.NewOAuthAuthorizationRegistryClient(cc).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
 					UserIds:   tokenInfo.UserIds,
 					ClientIds: tokenInfo.ClientIds,

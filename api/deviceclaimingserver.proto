@@ -81,7 +81,6 @@ message ClaimEndDeviceRequest {
 message AuthorizeApplicationRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string api_key = 2 [
-    (gogoproto.customname) = "APIKey",
     (validate.rules).string = { min_len: 1, max_len: 128 }
   ];
 }
@@ -172,7 +171,7 @@ message ClaimGatewayRequest {
 
 message AuthorizeGatewayRequest {
   GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  string api_key = 2 [(gogoproto.customname) = "APIKey", (validate.rules).string.min_len = 1];
+  string api_key = 2 [(validate.rules).string.min_len = 1];
 }
 
 service GatewayClaimingServer {

@@ -74,12 +74,12 @@ func (m *AuthInfoResponse) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "api_key":
-					w, ok := m.AccessMethod.(*AuthInfoResponse_APIKey)
+					w, ok := m.AccessMethod.(*AuthInfoResponse_ApiKey)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetAPIKey()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetApiKey()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return AuthInfoResponseValidationError{
 								field:  "api_key",
@@ -90,12 +90,12 @@ func (m *AuthInfoResponse) ValidateFields(paths ...string) error {
 					}
 
 				case "oauth_access_token":
-					w, ok := m.AccessMethod.(*AuthInfoResponse_OAuthAccessToken)
+					w, ok := m.AccessMethod.(*AuthInfoResponse_OauthAccessToken)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetOAuthAccessToken()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetOauthAccessToken()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return AuthInfoResponseValidationError{
 								field:  "oauth_access_token",
@@ -1072,7 +1072,7 @@ func (m *IsConfiguration_UserRegistration_Invitation) ValidateFields(paths ...st
 
 		case "token_ttl":
 
-			if v, ok := interface{}(m.GetTokenTTL()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetTokenTtl()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return IsConfiguration_UserRegistration_InvitationValidationError{
 						field:  "token_ttl",
