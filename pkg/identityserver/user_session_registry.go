@@ -59,7 +59,7 @@ func (is *IdentityServer) deleteUserSession(ctx context.Context, req *ttnpb.User
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return store.GetUserSessionStore(db).DeleteSession(ctx, &req.UserIdentifiers, req.GetSessionID())
+		return store.GetUserSessionStore(db).DeleteSession(ctx, &req.UserIdentifiers, req.GetSessionId())
 	})
 	if err != nil {
 		return nil, err

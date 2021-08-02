@@ -103,7 +103,7 @@ func TestPba(t *testing.T) {
 									DevAddr: devAddrPtr(types.DevAddr{0x26, 0x0, 0x0, 0x0}),
 									Length:  24,
 								},
-								HomeNetworkClusterID: "test-cluster",
+								HomeNetworkClusterId: "test-cluster",
 							},
 						},
 						ContactInfo: []*ttnpb.ContactInfo{
@@ -177,7 +177,7 @@ func TestPba(t *testing.T) {
 								DevAddr: devAddrPtr(types.DevAddr{0x26, 0x0, 0x0, 0x0}),
 								Length:  24,
 							},
-							HomeNetworkClusterID: "test-cluster",
+							HomeNetworkClusterId: "test-cluster",
 						},
 					},
 					ContactInfo: []*ttnpb.ContactInfo{
@@ -278,7 +278,7 @@ func TestPba(t *testing.T) {
 								DevAddr: devAddrPtr(types.DevAddr{0x26, 0x0, 0x0, 0x0}),
 								Length:  24,
 							},
-							HomeNetworkClusterID: "test-cluster",
+							HomeNetworkClusterId: "test-cluster",
 						},
 					},
 					ContactInfo: []*ttnpb.ContactInfo{

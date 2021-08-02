@@ -327,7 +327,7 @@ func (s *remoteStore) getDecoder(req store.GetCodecRequest, choose func(codecs *
 		Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 		FormatterParameter: string(b),
 		Examples:           examples,
-		CodecID:            codecs.CodecID,
+		CodecId:            codecs.CodecID,
 	}
 	pb := &ttnpb.MessagePayloadDecoder{}
 	if err := pb.SetFields(formatter, paths...); err != nil {
@@ -387,7 +387,7 @@ func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.Mess
 		Formatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
 		FormatterParameter: string(b),
 		Examples:           examples,
-		CodecID:            codecs.CodecID,
+		CodecId:            codecs.CodecID,
 	}
 	pb := &ttnpb.MessagePayloadEncoder{}
 	if err := pb.SetFields(formatter, paths...); err != nil {

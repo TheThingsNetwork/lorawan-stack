@@ -462,9 +462,9 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SessionKeyID = src.SessionKeyID
+				dst.SessionKeyId = src.SessionKeyId
 			} else {
-				dst.SessionKeyID = nil
+				dst.SessionKeyId = nil
 			}
 		case "f_port":
 			if len(subs) > 0 {
@@ -727,9 +727,9 @@ func (dst *ApplicationJoinAccept) SetFields(src *ApplicationJoinAccept, paths ..
 				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SessionKeyID = src.SessionKeyID
+				dst.SessionKeyId = src.SessionKeyId
 			} else {
-				dst.SessionKeyID = nil
+				dst.SessionKeyId = nil
 			}
 		case "app_s_key":
 			if len(subs) > 0 {
@@ -801,9 +801,9 @@ func (dst *ApplicationDownlink) SetFields(src *ApplicationDownlink, paths ...str
 				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SessionKeyID = src.SessionKeyID
+				dst.SessionKeyId = src.SessionKeyId
 			} else {
-				dst.SessionKeyID = nil
+				dst.SessionKeyId = nil
 			}
 		case "f_port":
 			if len(subs) > 0 {
@@ -1008,9 +1008,9 @@ func (dst *ApplicationInvalidatedDownlinks) SetFields(src *ApplicationInvalidate
 				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SessionKeyID = src.SessionKeyID
+				dst.SessionKeyId = src.SessionKeyId
 			} else {
-				dst.SessionKeyID = nil
+				dst.SessionKeyId = nil
 			}
 
 		default:
@@ -1037,9 +1037,9 @@ func (dst *DownlinkQueueOperationErrorDetails) SetFields(src *DownlinkQueueOpera
 				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SessionKeyID = src.SessionKeyID
+				dst.SessionKeyId = src.SessionKeyId
 			} else {
-				dst.SessionKeyID = nil
+				dst.SessionKeyId = nil
 			}
 		case "min_f_cnt_down":
 			if len(subs) > 0 {
@@ -1065,9 +1065,9 @@ func (dst *DownlinkQueueOperationErrorDetails) SetFields(src *DownlinkQueueOpera
 				return fmt.Errorf("'pending_session_key_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.PendingSessionKeyID = src.PendingSessionKeyID
+				dst.PendingSessionKeyId = src.PendingSessionKeyId
 			} else {
-				dst.PendingSessionKeyID = nil
+				dst.PendingSessionKeyId = nil
 			}
 		case "pending_min_f_cnt_down":
 			if len(subs) > 0 {

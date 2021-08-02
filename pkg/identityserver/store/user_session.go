@@ -36,7 +36,7 @@ func init() {
 }
 
 func (sess UserSession) toPB(pb *ttnpb.UserSession) {
-	pb.SessionID = sess.ID
+	pb.SessionId = sess.ID
 	pb.SessionSecret = sess.SessionSecret
 	pb.CreatedAt = cleanTime(sess.CreatedAt)
 	pb.UpdatedAt = cleanTime(sess.UpdatedAt)

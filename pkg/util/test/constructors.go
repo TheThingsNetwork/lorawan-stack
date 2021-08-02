@@ -23,7 +23,7 @@ import (
 
 var (
 	baseRootKeys = ttnpb.RootKeys{
-		RootKeyID: DefaultRootKeyID,
+		RootKeyId: DefaultRootKeyID,
 	}
 
 	baseSessionKeys = ttnpb.SessionKeys{}

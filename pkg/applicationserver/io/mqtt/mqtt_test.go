@@ -212,7 +212,7 @@ func TestTraffic(t *testing.T) {
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_JoinAccept{
-						JoinAccept: &ttnpb.ApplicationJoinAccept{SessionKeyID: []byte{0x1, 0x1, 0x1}},
+						JoinAccept: &ttnpb.ApplicationJoinAccept{SessionKeyId: []byte{0x1, 0x1, 0x1}},
 					},
 				},
 				OK: true,

@@ -932,10 +932,10 @@ func (dst *UserSessionIdentifiers) SetFields(src *UserSessionIdentifiers, paths 
 				return fmt.Errorf("'session_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SessionID = src.SessionID
+				dst.SessionId = src.SessionId
 			} else {
 				var zero string
-				dst.SessionID = zero
+				dst.SessionId = zero
 			}
 
 		default:
@@ -971,10 +971,10 @@ func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
 				return fmt.Errorf("'session_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SessionID = src.SessionID
+				dst.SessionId = src.SessionId
 			} else {
 				var zero string
-				dst.SessionID = zero
+				dst.SessionId = zero
 			}
 		case "created_at":
 			if len(subs) > 0 {

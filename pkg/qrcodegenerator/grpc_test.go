@@ -49,7 +49,7 @@ func TestGenerateEndDeviceQRCode(t *testing.T) {
 	client := ttnpb.NewEndDeviceQRCodeGeneratorClient(c.LoopbackConn())
 
 	format, err := client.GetFormat(ctx, &ttnpb.GetQRCodeFormatRequest{
-		FormatID: "test",
+		FormatId: "test",
 	})
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -78,7 +78,7 @@ func TestGenerateEndDeviceQRCode(t *testing.T) {
 	}
 
 	res, err := client.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
-		FormatID:  "test",
+		FormatId:  "test",
 		EndDevice: dev,
 		Image: &ttnpb.GenerateEndDeviceQRCodeRequest_Image{
 			ImageSize: 100,

@@ -521,7 +521,7 @@ func (m *OAuthAuthorizationCode) ValidateFields(paths ...string) error {
 
 		case "user_session_id":
 
-			if utf8.RuneCountInString(m.GetUserSessionID()) > 64 {
+			if utf8.RuneCountInString(m.GetUserSessionId()) > 64 {
 				return OAuthAuthorizationCodeValidationError{
 					field:  "user_session_id",
 					reason: "value length must be at most 64 runes",
@@ -783,7 +783,7 @@ func (m *OAuthAccessToken) ValidateFields(paths ...string) error {
 
 		case "user_session_id":
 
-			if utf8.RuneCountInString(m.GetUserSessionID()) > 64 {
+			if utf8.RuneCountInString(m.GetUserSessionId()) > 64 {
 				return OAuthAccessTokenValidationError{
 					field:  "user_session_id",
 					reason: "value length must be at most 64 runes",

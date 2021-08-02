@@ -38,7 +38,7 @@ message ListFrequencyPlansRequest {
 message FrequencyPlanDescription {
   string id = 1;
   // The ID of the frequency that the current frequency plan is based on.
-  string base_id = 2 [(gogoproto.customname) = "BaseID"];
+  string base_id = 2;
   string name = 3;
   // Base frequency in MHz for hardware support (433, 470, 868 or 915)
   uint32 base_frequency = 4;

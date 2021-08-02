@@ -2166,14 +2166,14 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 		switch name {
 		case "cid":
 
-			if _, ok := _MACCommand_CID_NotInLookup[m.GetCID()]; ok {
+			if _, ok := _MACCommand_Cid_NotInLookup[m.GetCid()]; ok {
 				return MACCommandValidationError{
 					field:  "cid",
 					reason: "value must not be in list [0]",
 				}
 			}
 
-			if _, ok := MACCommandIdentifier_name[int32(m.GetCID())]; !ok {
+			if _, ok := MACCommandIdentifier_name[int32(m.GetCid())]; !ok {
 				return MACCommandValidationError{
 					field:  "cid",
 					reason: "value must be one of the defined enum values",
@@ -2741,7 +2741,7 @@ var _ interface {
 	ErrorName() string
 } = MACCommandValidationError{}
 
-var _MACCommand_CID_NotInLookup = map[MACCommandIdentifier]struct{}{
+var _MACCommand_Cid_NotInLookup = map[MACCommandIdentifier]struct{}{
 	0: {},
 }
 

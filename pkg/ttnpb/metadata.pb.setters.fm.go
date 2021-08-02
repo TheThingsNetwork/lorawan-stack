@@ -107,10 +107,10 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 				return fmt.Errorf("'encrypted_fine_timestamp_key_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.EncryptedFineTimestampKeyID = src.EncryptedFineTimestampKeyID
+				dst.EncryptedFineTimestampKeyId = src.EncryptedFineTimestampKeyId
 			} else {
 				var zero string
-				dst.EncryptedFineTimestampKeyID = zero
+				dst.EncryptedFineTimestampKeyId = zero
 			}
 		case "rssi":
 			if len(subs) > 0 {

@@ -21,7 +21,7 @@ func (m *AuthInfoResponse) GetEntityIdentifiers() *EntityIdentifiers {
 	}
 	switch accessMethod := m.GetAccessMethod().(type) {
 	case *AuthInfoResponse_APIKey:
-		return &accessMethod.APIKey.EntityIDs
+		return &accessMethod.APIKey.EntityIds
 	case *AuthInfoResponse_OAuthAccessToken:
 		return accessMethod.OAuthAccessToken.UserIds.GetEntityIdentifiers()
 	case *AuthInfoResponse_UserSession:

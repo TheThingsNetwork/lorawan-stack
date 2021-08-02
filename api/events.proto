@@ -58,7 +58,7 @@ message Event {
     // The type of token that was used. Common types are APIKey, AccessToken and SessionToken.
     string token_type = 2;
     // The ID of the token that was used.
-    string token_id = 3 [(gogoproto.customname) = "TokenID"];
+    string token_id = 3;
   }
   // Details on the authentication provided by the caller that triggered this event.
   Authentication authentication = 9;
@@ -67,7 +67,7 @@ message Event {
   // The IP address of the caller that triggered this event.
   string user_agent = 11;
   // The unique identifier of the event, assigned on creation.
-  string unique_id = 12 [(gogoproto.customname) = "UniqueID"];
+  string unique_id = 12;
 }
 
 message StreamEventsRequest {

@@ -36,16 +36,16 @@ func (as *ApplicationServer) encodeAndEncryptDownlinks(ctx context.Context, dev 
 		skipPayloadCrypto := as.skipPayloadCrypto(ctx, link, dev, session)
 		for _, item := range items {
 			fCnt := session.LastAFCntDown + 1
-			sessionKeyID := session.SessionKeyID
+			sessionKeyID := session.SessionKeyId
 			if skipPayloadCrypto {
 				fCnt = item.FCnt
 
-				if len(item.SessionKeyID) > 0 {
-					sessionKeyID = item.SessionKeyID
+				if len(item.SessionKeyId) > 0 {
+					sessionKeyID = item.SessionKeyId
 				}
 			}
 			encryptedItem := &ttnpb.ApplicationDownlink{
-				SessionKeyID:   sessionKeyID,
+				SessionKeyId:   sessionKeyID,
 				FPort:          item.FPort,
 				FCnt:           fCnt,
 				FRMPayload:     item.FRMPayload,
@@ -158,11 +158,11 @@ func (as *ApplicationServer) decryptAndDecodeDownlink(ctx context.Context, dev *
 func (as *ApplicationServer) decryptDownlink(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink, ternarySession *ttnpb.Session) error {
 	var session *ttnpb.Session
 	switch {
-	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyID, downlink.SessionKeyID):
+	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyId, downlink.SessionKeyId):
 		session = dev.Session
-	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, downlink.SessionKeyID):
+	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyId, downlink.SessionKeyId):
 		session = dev.PendingSession
-	case ternarySession != nil && bytes.Equal(ternarySession.SessionKeyID, downlink.SessionKeyID):
+	case ternarySession != nil && bytes.Equal(ternarySession.SessionKeyId, downlink.SessionKeyId):
 		session = ternarySession
 	default:
 		return errUnknownSession.New()

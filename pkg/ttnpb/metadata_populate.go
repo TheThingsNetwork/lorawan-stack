@@ -36,7 +36,7 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 	for i := 0; i < v2; i++ {
 		this.EncryptedFineTimestamp[i] = byte(r.Intn(256))
 	}
-	this.EncryptedFineTimestampKeyID = randStringMetadata(r)
+	this.EncryptedFineTimestampKeyId = randStringMetadata(r)
 	this.RSSI = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.RSSI *= -1

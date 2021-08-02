@@ -1284,7 +1284,7 @@ func request_UserSessionRegistry_Delete_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "session_id")
 	}
 
-	protoReq.SessionID, err = runtime.String(val)
+	protoReq.SessionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "session_id", err)
@@ -1329,7 +1329,7 @@ func local_request_UserSessionRegistry_Delete_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "session_id")
 	}
 
-	protoReq.SessionID, err = runtime.String(val)
+	protoReq.SessionId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "session_id", err)

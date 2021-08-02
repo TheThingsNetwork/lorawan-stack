@@ -169,7 +169,7 @@ func TestPubSub(t *testing.T) {
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
 						UplinkMessage: &ttnpb.ApplicationUplink{
-							SessionKeyID: []byte{0x11},
+							SessionKeyId: []byte{0x11},
 							FPort:        42,
 							FCnt:         42,
 							FRMPayload:   []byte{0x1, 0x2, 0x3},
@@ -184,7 +184,7 @@ func TestPubSub(t *testing.T) {
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_JoinAccept{
 						JoinAccept: &ttnpb.ApplicationJoinAccept{
-							SessionKeyID: []byte{0x22},
+							SessionKeyId: []byte{0x22},
 						},
 					},
 				},
@@ -196,7 +196,7 @@ func TestPubSub(t *testing.T) {
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_DownlinkAck{
 						DownlinkAck: &ttnpb.ApplicationDownlink{
-							SessionKeyID: []byte{0x22},
+							SessionKeyId: []byte{0x22},
 							FCnt:         42,
 							FPort:        42,
 							FRMPayload:   []byte{0x1, 0x2, 0x3},
@@ -211,7 +211,7 @@ func TestPubSub(t *testing.T) {
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_DownlinkNack{
 						DownlinkNack: &ttnpb.ApplicationDownlink{
-							SessionKeyID: []byte{0x22},
+							SessionKeyId: []byte{0x22},
 							FCnt:         42,
 							FPort:        42,
 							FRMPayload:   []byte{0x1, 0x2, 0x3},
@@ -226,7 +226,7 @@ func TestPubSub(t *testing.T) {
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_DownlinkSent{
 						DownlinkSent: &ttnpb.ApplicationDownlink{
-							SessionKeyID: []byte{0x22},
+							SessionKeyId: []byte{0x22},
 							FCnt:         42,
 							FPort:        42,
 							FRMPayload:   []byte{0x1, 0x2, 0x3},
@@ -241,7 +241,7 @@ func TestPubSub(t *testing.T) {
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_DownlinkQueued{
 						DownlinkQueued: &ttnpb.ApplicationDownlink{
-							SessionKeyID: []byte{0x22},
+							SessionKeyId: []byte{0x22},
 							FCnt:         42,
 							FPort:        42,
 							FRMPayload:   []byte{0x1, 0x2, 0x3},
@@ -258,14 +258,14 @@ func TestPubSub(t *testing.T) {
 						DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 							Downlinks: []*ttnpb.ApplicationDownlink{
 								{
-									SessionKeyID: []byte{0x22},
+									SessionKeyId: []byte{0x22},
 									FCnt:         42,
 									FPort:        42,
 									FRMPayload:   []byte{0x1, 0x2, 0x3},
 								},
 							},
 							LastFCntDown: 42,
-							SessionKeyID: []byte{0x22},
+							SessionKeyId: []byte{0x22},
 						},
 					},
 				},
@@ -278,7 +278,7 @@ func TestPubSub(t *testing.T) {
 					Up: &ttnpb.ApplicationUp_DownlinkFailed{
 						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 							ApplicationDownlink: ttnpb.ApplicationDownlink{
-								SessionKeyID: []byte{0x22},
+								SessionKeyId: []byte{0x22},
 								FCnt:         42,
 								FPort:        42,
 								FRMPayload:   []byte{0x1, 0x2, 0x3},

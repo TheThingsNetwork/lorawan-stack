@@ -385,7 +385,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		return &ttnpb.Session{
 			DevAddr: *devAddr,
 			SessionKeys: ttnpb.SessionKeys{
-				SessionKeyID: sessionKeyID,
+				SessionKeyId: sessionKeyID,
 				AppSKey:      &appSKey,
 			},
 			LastAFCntDown: lastAFCntDownFromMinFCnt(minFCntDown),
@@ -417,12 +417,12 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		switch {
 		// If the SessionKeyID and DevAddr did not change, just update the LastAFCntDown.
 		case dev.Session != nil &&
-			bytes.Equal(diagnostics.SessionKeyID, dev.Session.SessionKeyID) &&
+			bytes.Equal(diagnostics.SessionKeyId, dev.Session.SessionKeyId) &&
 			dev.Session.DevAddr.Equal(*diagnostics.DevAddr):
 			dev.Session.LastAFCntDown = lastAFCntDownFromMinFCnt(diagnostics.MinFCntDown)
 		// If there is a SessionKeyID on the Network Server side, rebuild the session.
-		case len(diagnostics.SessionKeyID) > 0:
-			session, err := reconstructSession(diagnostics.SessionKeyID, diagnostics.DevAddr, diagnostics.MinFCntDown)
+		case len(diagnostics.SessionKeyId) > 0:
+			session, err := reconstructSession(diagnostics.SessionKeyId, diagnostics.DevAddr, diagnostics.MinFCntDown)
 			if err != nil {
 				return nil, err
 			}
@@ -441,12 +441,12 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		switch {
 		// If the SessionKeyID did not change, just update the LastAFcntDown.
 		case dev.PendingSession != nil &&
-			bytes.Equal(diagnostics.PendingSessionKeyID, dev.PendingSession.SessionKeyID) &&
+			bytes.Equal(diagnostics.PendingSessionKeyId, dev.PendingSession.SessionKeyId) &&
 			dev.PendingSession.DevAddr.Equal(*diagnostics.PendingDevAddr):
 			dev.PendingSession.LastAFCntDown = lastAFCntDownFromMinFCnt(diagnostics.PendingMinFCntDown)
 		// If there is a SessionKeyID on the Network Server side, rebuild the session.
-		case len(diagnostics.PendingSessionKeyID) > 0:
-			session, err := reconstructSession(diagnostics.PendingSessionKeyID, diagnostics.PendingDevAddr, diagnostics.PendingMinFCntDown)
+		case len(diagnostics.PendingSessionKeyId) > 0:
+			session, err := reconstructSession(diagnostics.PendingSessionKeyId, diagnostics.PendingDevAddr, diagnostics.PendingMinFCntDown)
 			if err != nil {
 				return nil, err
 			}
@@ -490,11 +490,11 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 		ctx := log.NewContextWithField(ctx, "attempt", attempt)
 
 		sessions := make([]*ttnpb.Session, 0, 2)
-		if dev.Session != nil && !op.shouldSkip(dev.Session.SessionKeyID) {
+		if dev.Session != nil && !op.shouldSkip(dev.Session.SessionKeyId) {
 			sessions = append(sessions, dev.Session)
 			mask = ttnpb.AddFields(mask, "session.last_a_f_cnt_down")
 		}
-		if dev.PendingSession != nil && !op.shouldSkip(dev.PendingSession.SessionKeyID) {
+		if dev.PendingSession != nil && !op.shouldSkip(dev.PendingSession.SessionKeyId) {
 			// Downlink can be encrypted with the pending session while the device first joined but not confirmed the
 			// session by sending an uplink.
 			sessions = append(sessions, dev.PendingSession)
@@ -630,7 +630,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if session.AppSKey == nil {
 		return nil, errNoAppSKey.New()
 	}
-	queue, _ = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.SessionKeyID, res.Downlinks...)
+	queue, _ = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.SessionKeyId, res.Downlinks...)
 	if as.skipPayloadCrypto(ctx, link, dev, session) {
 		return queue, nil
 	}
@@ -646,7 +646,7 @@ var errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join
 
 func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, sessionKeyID []byte) (ttnpb.KeyEnvelope, error) {
 	req := &ttnpb.SessionKeyRequest{
-		SessionKeyID: sessionKeyID,
+		SessionKeyId: sessionKeyID,
 		DevEui:       *ids.DevEui,
 		JoinEui:      *ids.JoinEui,
 	}
@@ -723,7 +723,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"join_eui", ids.JoinEui,
 		"dev_eui", ids.DevEui,
-		"session_key_id", joinAccept.SessionKeyID,
+		"session_key_id", joinAccept.SessionKeyId,
 	))
 	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
 	if err != nil {
@@ -746,7 +746,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				logger.Debug("Received AppSKey from Network Server")
 			} else {
 				logger.Debug("Fetch AppSKey from Join Server")
-				key, err := as.fetchAppSKey(ctx, ids, joinAccept.SessionKeyID)
+				key, err := as.fetchAppSKey(ctx, ids, joinAccept.SessionKeyId)
 				if err != nil {
 					return nil, nil, errFetchAppSKey.WithCause(err)
 				}
@@ -757,7 +757,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 			dev.PendingSession = &ttnpb.Session{
 				DevAddr: *ids.DevAddr,
 				SessionKeys: ttnpb.SessionKeys{
-					SessionKeyID: joinAccept.SessionKeyID,
+					SessionKeyId: joinAccept.SessionKeyId,
 					AppSKey:      joinAccept.AppSKey,
 				},
 				StartedAt: time.Now().UTC(),
@@ -797,7 +797,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				Operation: ttnpb.AsNsClient.DownlinkQueuePush,
 				// The session from which the downlinks originate already contains them. As such
 				// we don't need to push them there.
-				SkipSessionKeyIDs: [][]byte{items[0].SessionKeyID},
+				SkipSessionKeyIDs: [][]byte{items[0].SessionKeyId},
 			})
 			if err != nil {
 				as.registerDropDownlinks(ctx, ids, items, err)
@@ -824,8 +824,8 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids ttnpb.EndDevi
 	logger := log.FromContext(ctx)
 	var mask []string
 	switch {
-	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyID, sessionKeyID):
-	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, sessionKeyID):
+	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyId, sessionKeyID):
+	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyId, sessionKeyID):
 		dev.Session = dev.PendingSession
 		dev.PendingSession = nil
 		mask = ttnpb.AddFields(mask, "session", "pending_session")
@@ -838,7 +838,7 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids ttnpb.EndDevi
 		dev.Session = &ttnpb.Session{
 			DevAddr: *ids.DevAddr,
 			SessionKeys: ttnpb.SessionKeys{
-				SessionKeyID: sessionKeyID,
+				SessionKeyId: sessionKeyID,
 				AppSKey:      &appSKey,
 			},
 			StartedAt: time.Now().UTC(),
@@ -929,7 +929,7 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 }
 
 func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
-	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
+	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyId)
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"activated_at",
@@ -943,7 +943,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
-			mask, err := as.matchSession(ctx, ids, dev, link, uplink.SessionKeyID)
+			mask, err := as.matchSession(ctx, ids, dev, link, uplink.SessionKeyId)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -1011,7 +1011,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 }
 
 func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
-	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyID)
+	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyId)
 	dev, err := as.deviceRegistry.Get(ctx, ids,
 		[]string{
 			"formatters",
@@ -1060,7 +1060,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 				return dev, mask, nil
 			}
 
-			matchMask, err := as.matchSession(ctx, ids, dev, link, invalid.SessionKeyID)
+			matchMask, err := as.matchSession(ctx, ids, dev, link, invalid.SessionKeyId)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -1120,7 +1120,7 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 				return dev, nil, nil
 			}
 
-			matchMask, err := as.matchSession(ctx, ids, dev, link, msg.SessionKeyID)
+			matchMask, err := as.matchSession(ctx, ids, dev, link, msg.SessionKeyId)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -1201,9 +1201,9 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 	}
 	var session *ttnpb.Session
 	switch {
-	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyID, msg.SessionKeyID):
+	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyId, msg.SessionKeyId):
 		session = dev.Session
-	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, msg.SessionKeyID):
+	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyId, msg.SessionKeyId):
 		session = dev.PendingSession
 	}
 	if as.skipPayloadCrypto(ctx, link, dev, session) {

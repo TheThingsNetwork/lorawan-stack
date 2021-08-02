@@ -90,7 +90,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 		}
 		ar.UserData = userData{UserSessionIdentifiers: ttnpb.UserSessionIdentifiers{
 			UserIdentifiers: session.UserIdentifiers,
-			SessionID:       session.SessionID,
+			SessionId:       session.SessionId,
 		}}
 		client := ttnpb.Client(ar.Client.(osinClient))
 		if !clientHasGrant(&client, ttnpb.GRANT_AUTHORIZATION_CODE) {

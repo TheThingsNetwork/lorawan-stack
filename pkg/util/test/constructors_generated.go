@@ -22,7 +22,7 @@ type (
 // WithRootKeyID returns a RootKeysOption, which returns a copy of ttnpb.RootKeys with RootKeyID set to v.
 func (RootKeysOptionNamespace) WithRootKeyID(v string) RootKeysOption {
 	return func(x ttnpb.RootKeys) ttnpb.RootKeys {
-		x.RootKeyID = v
+		x.RootKeyId = v
 		return x
 	}
 }
@@ -85,7 +85,7 @@ type (
 // WithSessionKeyID returns a SessionKeysOption, which returns a copy of ttnpb.SessionKeys with SessionKeyID set to v.
 func (SessionKeysOptionNamespace) WithSessionKeyID(v []byte) SessionKeysOption {
 	return func(x ttnpb.SessionKeys) ttnpb.SessionKeys {
-		x.SessionKeyID = v
+		x.SessionKeyId = v
 		return x
 	}
 }
@@ -617,7 +617,7 @@ func (EndDeviceOptionNamespace) WithVersionIDs(v *ttnpb.EndDeviceVersionIdentifi
 // WithServiceProfileID returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ServiceProfileID set to v.
 func (EndDeviceOptionNamespace) WithServiceProfileID(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.ServiceProfileID = v
+		x.ServiceProfileId = v
 		return x
 	}
 }
@@ -657,7 +657,7 @@ func (EndDeviceOptionNamespace) WithApplicationServerKEKLabel(v string) EndDevic
 // WithApplicationServerID returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ApplicationServerID set to v.
 func (EndDeviceOptionNamespace) WithApplicationServerID(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.ApplicationServerID = v
+		x.ApplicationServerId = v
 		return x
 	}
 }
@@ -905,7 +905,7 @@ func (EndDeviceOptionNamespace) WithFormatters(v *ttnpb.MessagePayloadFormatters
 // WithProvisionerID returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ProvisionerID set to v.
 func (EndDeviceOptionNamespace) WithProvisionerID(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.ProvisionerID = v
+		x.ProvisionerId = v
 		return x
 	}
 }

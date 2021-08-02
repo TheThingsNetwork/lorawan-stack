@@ -711,7 +711,7 @@ func fromPBDevAddrBlocks(blocks []*packetbroker.DevAddrBlock) []*ttnpb.PacketBro
 				DevAddr: &types.DevAddr{},
 				Length:  b.GetPrefix().GetLength(),
 			},
-			HomeNetworkClusterID: b.GetHomeNetworkClusterId(),
+			HomeNetworkClusterId: b.GetHomeNetworkClusterId(),
 		}
 		res[i].DevAddrPrefix.DevAddr.UnmarshalNumber(b.GetPrefix().GetValue())
 	}
@@ -726,7 +726,7 @@ func toPBDevAddrBlocks(blocks []*ttnpb.PacketBrokerDevAddrBlock) []*packetbroker
 				Value:  b.GetDevAddrPrefix().DevAddr.MarshalNumber(),
 				Length: b.GetDevAddrPrefix().GetLength(),
 			},
-			HomeNetworkClusterId: b.GetHomeNetworkClusterID(),
+			HomeNetworkClusterId: b.GetHomeNetworkClusterId(),
 		}
 	}
 	return res

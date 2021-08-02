@@ -407,7 +407,7 @@ enum MACCommandIdentifier {
 }
 
 message MACCommand {
-  MACCommandIdentifier cid = 1 [(gogoproto.customname) = "CID", (validate.rules).enum = {defined_only: true, not_in:[0]}];
+  MACCommandIdentifier cid = 1 [(validate.rules).enum = {defined_only: true, not_in:[0]}];
 
   oneof payload {
     bytes raw_payload = 2;

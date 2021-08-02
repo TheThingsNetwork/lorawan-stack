@@ -1690,14 +1690,14 @@ func (m *MessagePayloadDecoder) ValidateFields(paths ...string) error {
 			// no validation rules for FormatterParameter
 		case "codec_id":
 
-			if utf8.RuneCountInString(m.GetCodecID()) > 36 {
+			if utf8.RuneCountInString(m.GetCodecId()) > 36 {
 				return MessagePayloadDecoderValidationError{
 					field:  "codec_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_MessagePayloadDecoder_CodecID_Pattern.MatchString(m.GetCodecID()) {
+			if !_MessagePayloadDecoder_CodecId_Pattern.MatchString(m.GetCodecId()) {
 				return MessagePayloadDecoderValidationError{
 					field:  "codec_id",
 					reason: "value does not match regex pattern \"^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$\"",
@@ -1794,7 +1794,7 @@ var _ interface {
 	ErrorName() string
 } = MessagePayloadDecoderValidationError{}
 
-var _MessagePayloadDecoder_CodecID_Pattern = regexp.MustCompile("^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$")
+var _MessagePayloadDecoder_CodecId_Pattern = regexp.MustCompile("^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$")
 
 // ValidateFields checks the field values on MessagePayloadEncoder with the
 // rules defined in the proto definition for this message. If any rules are
@@ -1824,14 +1824,14 @@ func (m *MessagePayloadEncoder) ValidateFields(paths ...string) error {
 			// no validation rules for FormatterParameter
 		case "codec_id":
 
-			if utf8.RuneCountInString(m.GetCodecID()) > 36 {
+			if utf8.RuneCountInString(m.GetCodecId()) > 36 {
 				return MessagePayloadEncoderValidationError{
 					field:  "codec_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_MessagePayloadEncoder_CodecID_Pattern.MatchString(m.GetCodecID()) {
+			if !_MessagePayloadEncoder_CodecId_Pattern.MatchString(m.GetCodecId()) {
 				return MessagePayloadEncoderValidationError{
 					field:  "codec_id",
 					reason: "value does not match regex pattern \"^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$\"",
@@ -1928,7 +1928,7 @@ var _ interface {
 	ErrorName() string
 } = MessagePayloadEncoderValidationError{}
 
-var _MessagePayloadEncoder_CodecID_Pattern = regexp.MustCompile("^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$")
+var _MessagePayloadEncoder_CodecId_Pattern = regexp.MustCompile("^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$")
 
 // ValidateFields checks the field values on EndDeviceModel_HardwareVersion
 // with the rules defined in the proto definition for this message. If any

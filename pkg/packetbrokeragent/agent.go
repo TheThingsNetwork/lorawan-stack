@@ -231,7 +231,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 						DevAddr: &p.DevAddr,
 						Length:  uint32(p.Length),
 					},
-					HomeNetworkClusterID: homeNetworkClusterID,
+					HomeNetworkClusterId: homeNetworkClusterID,
 				}
 			}
 			contactInfo := make([]*ttnpb.ContactInfo, 0, 2)

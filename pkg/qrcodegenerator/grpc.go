@@ -28,7 +28,7 @@ type endDeviceQRCodeGeneratorServer struct {
 }
 
 func (s *endDeviceQRCodeGeneratorServer) GetFormat(ctx context.Context, req *ttnpb.GetQRCodeFormatRequest) (*ttnpb.QRCodeFormat, error) {
-	format := qrcode.GetEndDeviceFormat(req.FormatID)
+	format := qrcode.GetEndDeviceFormat(req.FormatId)
 	if format == nil {
 		return nil, errFormatNotFound.New()
 	}
@@ -46,7 +46,7 @@ func (s *endDeviceQRCodeGeneratorServer) ListFormats(ctx context.Context, _ *pbt
 }
 
 func (s *endDeviceQRCodeGeneratorServer) Generate(ctx context.Context, req *ttnpb.GenerateEndDeviceQRCodeRequest) (*ttnpb.GenerateQRCodeResponse, error) {
-	formatter := qrcode.GetEndDeviceFormat(req.FormatID)
+	formatter := qrcode.GetEndDeviceFormat(req.FormatId)
 	if formatter == nil {
 		return nil, errFormatNotFound.New()
 	}

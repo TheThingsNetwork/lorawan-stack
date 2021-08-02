@@ -156,7 +156,7 @@ func (s *server) CreateUserSession(c echo.Context, userIDs ttnpb.UserIdentifiers
 	events.Publish(oauth.EvtUserLogin.NewWithIdentifiersAndData(ctx, &userIDs, nil))
 	return s.session.UpdateAuthCookie(c, func(cookie *auth.CookieShape) error {
 		cookie.UserID = session.UserIdentifiers.UserId
-		cookie.SessionID = session.SessionID
+		cookie.SessionID = session.SessionId
 		cookie.SessionSecret = tokenSecret
 		return nil
 	})
@@ -169,7 +169,7 @@ func (s *server) Logout(c echo.Context) error {
 		return err
 	}
 	events.Publish(oauth.EvtUserLogout.NewWithIdentifiersAndData(ctx, &session.UserIdentifiers, nil))
-	if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionID); err != nil {
+	if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionId); err != nil {
 		return err
 	}
 	s.session.RemoveAuthCookie(c)

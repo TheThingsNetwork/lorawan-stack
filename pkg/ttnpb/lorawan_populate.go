@@ -131,8 +131,8 @@ func NewPopulatedMACCommand_BeaconFreqReq(r randyLorawan, easy bool) *MACCommand
 
 func NewPopulatedMACCommand(r randyLorawan, easy bool) *MACCommand {
 	out := &MACCommand{}
-	out.CID = MACCommandIdentifier([]int32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 32}[r.Intn(20)])
-	switch out.CID {
+	out.Cid = MACCommandIdentifier([]int32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 32}[r.Intn(20)])
+	switch out.Cid {
 	case CID_RESET:
 		if r.Intn(2) == 1 {
 			out.Payload = &MACCommand_ResetInd_{ResetInd: NewPopulatedMACCommand_ResetInd(r, easy)}

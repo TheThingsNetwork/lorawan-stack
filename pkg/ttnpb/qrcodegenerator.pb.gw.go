@@ -50,7 +50,7 @@ func request_EndDeviceQRCodeGenerator_GetFormat_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "format_id")
 	}
 
-	protoReq.FormatID, err = runtime.String(val)
+	protoReq.FormatId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "format_id", err)
@@ -77,7 +77,7 @@ func local_request_EndDeviceQRCodeGenerator_GetFormat_0(ctx context.Context, mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "format_id")
 	}
 
-	protoReq.FormatID, err = runtime.String(val)
+	protoReq.FormatId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "format_id", err)

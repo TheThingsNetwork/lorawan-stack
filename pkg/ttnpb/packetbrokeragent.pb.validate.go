@@ -573,7 +573,7 @@ func (m *PacketBrokerDevAddrBlock) ValidateFields(paths ...string) error {
 			}
 
 		case "home_network_cluster_id":
-			// no validation rules for HomeNetworkClusterID
+			// no validation rules for HomeNetworkClusterId
 		default:
 			return PacketBrokerDevAddrBlockValidationError{
 				field:  name,

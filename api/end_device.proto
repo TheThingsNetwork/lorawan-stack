@@ -412,7 +412,7 @@ message EndDevice {
   EndDeviceVersionIdentifiers version_ids = 7;
 
   // Default service profile. Stored in Entity Registry.
-  string service_profile_id = 8 [(gogoproto.customname) = "ServiceProfileID", (validate.rules).string.max_len = 64];
+  string service_profile_id = 8 [(validate.rules).string.max_len = 64];
 
   // The address of the Network Server where this device is supposed to be registered.
   // Stored in Entity Registry and Join Server.
@@ -436,7 +436,7 @@ message EndDevice {
   string application_server_kek_label = 48 [(gogoproto.customname) = "ApplicationServerKEKLabel", (validate.rules).string.max_len = 2048];
   // The AS-ID of the Application Server to use.
   // Stored in Join Server.
-  string application_server_id = 49 [(gogoproto.customname) = "ApplicationServerID", (validate.rules).string.max_len = 100];
+  string application_server_id = 49 [(validate.rules).string.max_len = 100];
   // The address of the Join Server where this device is supposed to be registered.
   // Stored in Entity Registry.
   // The typical format of the address is "host:port". If the port is omitted,
@@ -543,7 +543,7 @@ message EndDevice {
   MessagePayloadFormatters formatters = 41;
 
   // ID of the provisioner. Stored in Join Server.
-  string provisioner_id = 42 [(gogoproto.customname) = "ProvisionerID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", max_len: 36}];
+  string provisioner_id = 42 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", max_len: 36}];
   // Vendor-specific provisioning data. Stored in Join Server.
   google.protobuf.Struct provisioning_data = 43;
 
@@ -655,7 +655,7 @@ message EndDeviceTemplateFormats {
 
 message ConvertEndDeviceTemplateRequest {
   // ID of the format.
-  string format_id = 1 [(gogoproto.customname) = "FormatID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string format_id = 1 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
   // Data to convert.
   bytes data = 2;
 }

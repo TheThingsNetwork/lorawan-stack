@@ -156,7 +156,7 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 		}
 		if signal.ETime != "" {
 			if etime, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(signal.ETime, "=")); err == nil {
-				signalMetadata.EncryptedFineTimestampKeyID = strconv.Itoa(int(rx.Aesk))
+				signalMetadata.EncryptedFineTimestampKeyId = strconv.Itoa(int(rx.Aesk))
 				signalMetadata.EncryptedFineTimestamp = etime
 			}
 		}

@@ -273,14 +273,14 @@ func (m *GetQRCodeFormatRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "format_id":
 
-			if utf8.RuneCountInString(m.GetFormatID()) > 36 {
+			if utf8.RuneCountInString(m.GetFormatId()) > 36 {
 				return GetQRCodeFormatRequestValidationError{
 					field:  "format_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_GetQRCodeFormatRequest_FormatID_Pattern.MatchString(m.GetFormatID()) {
+			if !_GetQRCodeFormatRequest_FormatId_Pattern.MatchString(m.GetFormatId()) {
 				return GetQRCodeFormatRequestValidationError{
 					field:  "format_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -353,7 +353,7 @@ var _ interface {
 	ErrorName() string
 } = GetQRCodeFormatRequestValidationError{}
 
-var _GetQRCodeFormatRequest_FormatID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GetQRCodeFormatRequest_FormatId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on GenerateEndDeviceQRCodeRequest
 // with the rules defined in the proto definition for this message. If any
@@ -372,14 +372,14 @@ func (m *GenerateEndDeviceQRCodeRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "format_id":
 
-			if utf8.RuneCountInString(m.GetFormatID()) > 36 {
+			if utf8.RuneCountInString(m.GetFormatId()) > 36 {
 				return GenerateEndDeviceQRCodeRequestValidationError{
 					field:  "format_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
-			if !_GenerateEndDeviceQRCodeRequest_FormatID_Pattern.MatchString(m.GetFormatID()) {
+			if !_GenerateEndDeviceQRCodeRequest_FormatId_Pattern.MatchString(m.GetFormatId()) {
 				return GenerateEndDeviceQRCodeRequestValidationError{
 					field:  "format_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
@@ -477,7 +477,7 @@ var _ interface {
 	ErrorName() string
 } = GenerateEndDeviceQRCodeRequestValidationError{}
 
-var _GenerateEndDeviceQRCodeRequest_FormatID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _GenerateEndDeviceQRCodeRequest_FormatId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on GenerateQRCodeResponse with the
 // rules defined in the proto definition for this message. If any rules are

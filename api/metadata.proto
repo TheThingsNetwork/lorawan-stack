@@ -49,7 +49,7 @@ message RxMetadata {
   uint64 fine_timestamp = 5;
   // Encrypted gateway's internal fine timestamp when the Rx finished (nanoseconds).
   bytes encrypted_fine_timestamp = 6;
-  string encrypted_fine_timestamp_key_id = 7 [(gogoproto.customname) = "EncryptedFineTimestampKeyID"];
+  string encrypted_fine_timestamp_key_id = 7;
   // Received signal strength indicator (dBm).
   // This value equals `channel_rssi`.
   float rssi = 8 [(gogoproto.customname) = "RSSI"];

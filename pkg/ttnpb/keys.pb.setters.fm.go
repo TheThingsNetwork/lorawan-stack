@@ -51,10 +51,10 @@ func (dst *RootKeys) SetFields(src *RootKeys, paths ...string) error {
 				return fmt.Errorf("'root_key_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RootKeyID = src.RootKeyID
+				dst.RootKeyId = src.RootKeyId
 			} else {
 				var zero string
-				dst.RootKeyID = zero
+				dst.RootKeyId = zero
 			}
 		case "app_key":
 			if len(subs) > 0 {
@@ -122,9 +122,9 @@ func (dst *SessionKeys) SetFields(src *SessionKeys, paths ...string) error {
 				return fmt.Errorf("'session_key_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SessionKeyID = src.SessionKeyID
+				dst.SessionKeyId = src.SessionKeyId
 			} else {
-				dst.SessionKeyID = nil
+				dst.SessionKeyId = nil
 			}
 		case "f_nwk_s_int_key":
 			if len(subs) > 0 {

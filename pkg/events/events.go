@@ -58,7 +58,7 @@ func local(evt Event) *event {
 		localEvent = &event{
 			ctx: evt.Context(),
 			innerEvent: ttnpb.Event{
-				UniqueID:       evt.UniqueID(),
+				UniqueId:       evt.UniqueID(),
 				Name:           evt.Name(),
 				Time:           evt.Time(),
 				Identifiers:    evt.Identifiers(),
@@ -74,9 +74,9 @@ func local(evt Event) *event {
 		authentication := &ttnpb.Event_Authentication{
 			Type:      evt.AuthType(),
 			TokenType: evt.AuthTokenType(),
-			TokenID:   evt.AuthTokenID(),
+			TokenId:   evt.AuthTokenID(),
 		}
-		if authentication.TokenID != "" || authentication.TokenType != "" || authentication.Type != "" {
+		if authentication.TokenId != "" || authentication.TokenType != "" || authentication.Type != "" {
 			localEvent.innerEvent.Authentication = authentication
 		}
 	}
@@ -137,7 +137,7 @@ func (e *event) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (e event) UniqueID() string                        { return e.innerEvent.UniqueID }
+func (e event) UniqueID() string                        { return e.innerEvent.UniqueId }
 func (e event) Context() context.Context                { return e.ctx }
 func (e event) Name() string                            { return e.innerEvent.Name }
 func (e event) Time() time.Time                         { return e.innerEvent.Time }
@@ -151,7 +151,7 @@ func (e event) UserAgent() string                       { return e.innerEvent.Us
 func (e event) RemoteIP() string                        { return e.innerEvent.RemoteIP }
 func (e event) AuthType() string                        { return e.innerEvent.GetAuthentication().GetType() }
 func (e event) AuthTokenType() string                   { return e.innerEvent.GetAuthentication().GetTokenType() }
-func (e event) AuthTokenID() string                     { return e.innerEvent.GetAuthentication().GetTokenID() }
+func (e event) AuthTokenID() string                     { return e.innerEvent.GetAuthentication().GetTokenId() }
 
 var hostname string
 
@@ -239,7 +239,7 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 		ctx:  ctx,
 		data: data,
 		innerEvent: ttnpb.Event{
-			UniqueID:       pb.UniqueID,
+			UniqueId:       pb.UniqueId,
 			Name:           pb.Name,
 			Time:           pb.Time,
 			Identifiers:    pb.Identifiers,

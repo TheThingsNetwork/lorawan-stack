@@ -1344,10 +1344,10 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 				return fmt.Errorf("'cid' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CID = src.CID
+				dst.Cid = src.Cid
 			} else {
 				var zero MACCommandIdentifier
-				dst.CID = zero
+				dst.Cid = zero
 			}
 
 		case "payload":

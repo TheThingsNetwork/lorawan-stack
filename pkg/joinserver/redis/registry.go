@@ -45,12 +45,12 @@ type DeviceRegistry struct {
 }
 
 func provisionerUniqueID(dev *ttnpb.EndDevice) (string, error) {
-	if dev.ProvisionerID == "" {
+	if dev.ProvisionerId == "" {
 		return "", nil
 	}
-	provisioner := provisioning.Get(dev.ProvisionerID)
+	provisioner := provisioning.Get(dev.ProvisionerId)
 	if provisioner == nil {
-		return "", errProvisionerNotFound.WithAttributes("id", dev.ProvisionerID)
+		return "", errProvisionerNotFound.WithAttributes("id", dev.ProvisionerId)
 	}
 	return provisioner.UniqueID(dev.ProvisioningData)
 }
@@ -182,7 +182,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 				return err
 			}
 			if pid != "" {
-				p.Del(ctx, r.provisionerKey(stored.ProvisionerID, pid))
+				p.Del(ctx, r.provisionerKey(stored.ProvisionerId, pid))
 			}
 			return nil
 		}
@@ -235,7 +235,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.DevEui, stored.DevEui) {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.dev_eui")
 			}
-			if ttnpb.HasAnyField(sets, "provisioner_id") && pb.ProvisionerID != stored.ProvisionerID {
+			if ttnpb.HasAnyField(sets, "provisioner_id") && pb.ProvisionerId != stored.ProvisionerId {
 				return nil, errReadOnlyField.WithAttributes("field", "provisioner_id")
 			}
 			if ttnpb.HasAnyField(sets, "provisioning_data") && !pb.ProvisioningData.Equal(stored.ProvisioningData) {
@@ -270,7 +270,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			}
 
 			if updatedPID != "" {
-				pk := r.provisionerKey(updated.ProvisionerID, updatedPID)
+				pk := r.provisionerKey(updated.ProvisionerId, updatedPID)
 				if err := tx.Watch(ctx, pk).Err(); err != nil {
 					return err
 				}
@@ -457,7 +457,7 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 				if err != nil {
 					return err
 				}
-				if !bytes.Equal(updated.SessionKeyID, id) {
+				if !bytes.Equal(updated.SessionKeyId, id) {
 					return errInvalidIdentifiers.New()
 				}
 			} else {

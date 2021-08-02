@@ -151,7 +151,7 @@ func (m *RootKeys) ValidateFields(paths ...string) error {
 		switch name {
 		case "root_key_id":
 
-			if utf8.RuneCountInString(m.GetRootKeyID()) > 2048 {
+			if utf8.RuneCountInString(m.GetRootKeyId()) > 2048 {
 				return RootKeysValidationError{
 					field:  "root_key_id",
 					reason: "value length must be at most 2048 runes",
@@ -263,7 +263,7 @@ func (m *SessionKeys) ValidateFields(paths ...string) error {
 		switch name {
 		case "session_key_id":
 
-			if len(m.GetSessionKeyID()) > 2048 {
+			if len(m.GetSessionKeyId()) > 2048 {
 				return SessionKeysValidationError{
 					field:  "session_key_id",
 					reason: "value length must be at most 2048 bytes",

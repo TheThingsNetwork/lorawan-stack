@@ -719,7 +719,7 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 		switch name {
 		case "session_key_id":
 
-			if len(m.GetSessionKeyID()) > 2048 {
+			if len(m.GetSessionKeyId()) > 2048 {
 				return ApplicationUplinkValidationError{
 					field:  "session_key_id",
 					reason: "value length must be at most 2048 bytes",
@@ -1091,7 +1091,7 @@ func (m *ApplicationJoinAccept) ValidateFields(paths ...string) error {
 		switch name {
 		case "session_key_id":
 
-			if len(m.GetSessionKeyID()) > 2048 {
+			if len(m.GetSessionKeyId()) > 2048 {
 				return ApplicationJoinAcceptValidationError{
 					field:  "session_key_id",
 					reason: "value length must be at most 2048 bytes",
@@ -1224,7 +1224,7 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 		switch name {
 		case "session_key_id":
 
-			if len(m.GetSessionKeyID()) > 2048 {
+			if len(m.GetSessionKeyId()) > 2048 {
 				return ApplicationDownlinkValidationError{
 					field:  "session_key_id",
 					reason: "value length must be at most 2048 bytes",
@@ -1612,7 +1612,7 @@ func (m *ApplicationInvalidatedDownlinks) ValidateFields(paths ...string) error 
 			// no validation rules for LastFCntDown
 		case "session_key_id":
 
-			if len(m.GetSessionKeyID()) > 2048 {
+			if len(m.GetSessionKeyId()) > 2048 {
 				return ApplicationInvalidatedDownlinksValidationError{
 					field:  "session_key_id",
 					reason: "value length must be at most 2048 bytes",
@@ -1705,7 +1705,7 @@ func (m *DownlinkQueueOperationErrorDetails) ValidateFields(paths ...string) err
 			// no validation rules for DevAddr
 		case "session_key_id":
 
-			if len(m.GetSessionKeyID()) > 2048 {
+			if len(m.GetSessionKeyId()) > 2048 {
 				return DownlinkQueueOperationErrorDetailsValidationError{
 					field:  "session_key_id",
 					reason: "value length must be at most 2048 bytes",
@@ -1718,7 +1718,7 @@ func (m *DownlinkQueueOperationErrorDetails) ValidateFields(paths ...string) err
 			// no validation rules for PendingDevAddr
 		case "pending_session_key_id":
 
-			if len(m.GetPendingSessionKeyID()) > 2048 {
+			if len(m.GetPendingSessionKeyId()) > 2048 {
 				return DownlinkQueueOperationErrorDetailsValidationError{
 					field:  "pending_session_key_id",
 					reason: "value length must be at most 2048 bytes",

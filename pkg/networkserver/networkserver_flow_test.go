@@ -294,7 +294,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 						CorrelationIds:       up.CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 							DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
-								SessionKeyID: dev.Session.SessionKeyID,
+								SessionKeyId: dev.Session.SessionKeyId,
 							},
 						},
 					}),

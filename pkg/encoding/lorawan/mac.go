@@ -56,7 +56,7 @@ func newMACUnmarshaler(cid ttnpb.MACCommandIdentifier, name string, n uint8, f f
 		if len(b) != int(n) {
 			return errExpectedLengthEqual(name, int(n))(len(b))
 		}
-		cmd.CID = cid
+		cmd.Cid = cid
 		if f == nil {
 			return nil
 		}
@@ -919,10 +919,10 @@ func (spec MACCommandSpec) read(phy band.Band, r io.Reader, isUplink bool, cmd *
 	}
 
 	ret := ttnpb.MACCommand{
-		CID: ttnpb.MACCommandIdentifier(b[0]),
+		Cid: ttnpb.MACCommandIdentifier(b[0]),
 	}
 
-	desc, ok := spec[ret.CID]
+	desc, ok := spec[ret.Cid]
 	if !ok || desc == nil {
 		b, err := ioutil.ReadAll(r)
 		if err != nil {
@@ -946,7 +946,7 @@ func (spec MACCommandSpec) read(phy band.Band, r io.Reader, isUplink bool, cmd *
 		unmarshaler = desc.UnmarshalDownlink
 	}
 	if unmarshaler == nil {
-		return errNoUnmarshaler.WithAttributes("cid", fmt.Sprintf("0x%X", int32(ret.CID)))
+		return errNoUnmarshaler.WithAttributes("cid", fmt.Sprintf("0x%X", int32(ret.Cid)))
 	}
 
 	if n == 0 {
@@ -959,7 +959,7 @@ func (spec MACCommandSpec) read(phy band.Band, r io.Reader, isUplink bool, cmd *
 		}
 	}
 	if err := unmarshaler(phy, b, cmd); err != nil {
-		return errDecodingMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(ret.CID))).WithCause(err)
+		return errDecodingMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(ret.Cid))).WithCause(err)
 	}
 	return nil
 }
@@ -982,28 +982,28 @@ var (
 )
 
 func (spec MACCommandSpec) append(phy band.Band, b []byte, isUplink bool, cmd ttnpb.MACCommand) ([]byte, error) {
-	desc, ok := spec[cmd.CID]
+	desc, ok := spec[cmd.Cid]
 	if !ok || desc == nil {
-		return nil, errUnknownMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cmd.CID)))
+		return nil, errUnknownMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cmd.Cid)))
 	}
-	b = append(b, byte(cmd.CID))
+	b = append(b, byte(cmd.Cid))
 
 	var appender func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error)
 	if isUplink {
 		appender = desc.AppendUplink
 		if appender == nil {
-			return nil, errMACCommandUplink.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cmd.CID)))
+			return nil, errMACCommandUplink.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cmd.Cid)))
 		}
 	} else {
 		appender = desc.AppendDownlink
 		if appender == nil {
-			return nil, errMACCommandDownlink.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cmd.CID)))
+			return nil, errMACCommandDownlink.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cmd.Cid)))
 		}
 	}
 
 	b, err := appender(phy, b, cmd)
 	if err != nil {
-		return nil, errEncodingMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cmd.CID))).WithCause(err)
+		return nil, errEncodingMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cmd.Cid))).WithCause(err)
 	}
 	return b, nil
 }

@@ -941,10 +941,10 @@ func (dst *MessagePayloadDecoder) SetFields(src *MessagePayloadDecoder, paths ..
 				return fmt.Errorf("'codec_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CodecID = src.CodecID
+				dst.CodecId = src.CodecId
 			} else {
 				var zero string
-				dst.CodecID = zero
+				dst.CodecId = zero
 			}
 		case "examples":
 			if len(subs) > 0 {
@@ -991,10 +991,10 @@ func (dst *MessagePayloadEncoder) SetFields(src *MessagePayloadEncoder, paths ..
 				return fmt.Errorf("'codec_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.CodecID = src.CodecID
+				dst.CodecId = src.CodecId
 			} else {
 				var zero string
-				dst.CodecID = zero
+				dst.CodecId = zero
 			}
 		case "examples":
 			if len(subs) > 0 {

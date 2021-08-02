@@ -224,7 +224,7 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 			ReceiverID: EUI64(req.JoinEui),
 		},
 		DevEUI:       EUI64(req.DevEui),
-		SessionKeyID: Buffer(req.SessionKeyID),
+		SessionKeyID: Buffer(req.SessionKeyId),
 	}, interopAns); err != nil {
 		return nil, err
 	}
@@ -307,7 +307,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	return &ttnpb.JoinResponse{
 		RawPayload: interopAns.PHYPayload,
 		SessionKeys: ttnpb.SessionKeys{
-			SessionKeyID: sessionKeyID,
+			SessionKeyId: sessionKeyID,
 			FNwkSIntKey:  (*ttnpb.KeyEnvelope)(fNwkSIntKey),
 			SNwkSIntKey:  (*ttnpb.KeyEnvelope)(interopAns.SNwkSIntKey),
 			NwkSEncKey:   (*ttnpb.KeyEnvelope)(interopAns.NwkSEncKey),

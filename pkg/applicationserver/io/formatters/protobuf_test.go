@@ -43,7 +43,7 @@ func TestProtobufUpstream(t *testing.T) {
 				},
 				Up: &ttnpb.ApplicationUp_UplinkMessage{
 					UplinkMessage: &ttnpb.ApplicationUplink{
-						SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+						SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 						FPort:        42,
 						FCnt:         42,
 						FRMPayload:   []byte{0x1, 0x2, 0x3},
@@ -70,7 +70,7 @@ func TestProtobufUpstream(t *testing.T) {
 				},
 				Up: &ttnpb.ApplicationUp_JoinAccept{
 					JoinAccept: &ttnpb.ApplicationJoinAccept{
-						SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+						SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						PendingSession: false,
 					},
 				},

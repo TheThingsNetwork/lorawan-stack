@@ -2301,7 +2301,7 @@ func (m *UserSessionIdentifiers) ValidateFields(paths ...string) error {
 
 		case "session_id":
 
-			if utf8.RuneCountInString(m.GetSessionID()) > 64 {
+			if utf8.RuneCountInString(m.GetSessionId()) > 64 {
 				return UserSessionIdentifiersValidationError{
 					field:  "session_id",
 					reason: "value length must be at most 64 runes",
@@ -2403,7 +2403,7 @@ func (m *UserSession) ValidateFields(paths ...string) error {
 
 		case "session_id":
 
-			if utf8.RuneCountInString(m.GetSessionID()) > 64 {
+			if utf8.RuneCountInString(m.GetSessionId()) > 64 {
 				return UserSessionValidationError{
 					field:  "session_id",
 					reason: "value length must be at most 64 runes",

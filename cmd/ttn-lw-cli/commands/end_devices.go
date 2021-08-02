@@ -395,7 +395,7 @@ var (
 					paths = append(paths, "supports_join")
 				}
 				if withSession, _ := cmd.Flags().GetBool("with-session"); withSession {
-					if device.ProvisionerID != "" {
+					if device.ProvisionerId != "" {
 						return errEndDeviceKeysWithProvisioner
 					}
 					ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
@@ -454,12 +454,12 @@ var (
 					}
 				}
 				if withKeys, _ := cmd.Flags().GetBool("with-root-keys"); withKeys {
-					if device.ProvisionerID != "" {
+					if device.ProvisionerId != "" {
 						return errEndDeviceKeysWithProvisioner
 					}
 					// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsNetwork/lorawan-stack/issues/47).
 					device.RootKeys = &ttnpb.RootKeys{
-						RootKeyID: "ttn-lw-cli-generated",
+						RootKeyId: "ttn-lw-cli-generated",
 						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey()},
 						NwkKey:    &ttnpb.KeyEnvelope{Key: generateKey()},
 					}
@@ -709,7 +709,7 @@ var (
 
 			req := &ttnpb.ProvisionEndDevicesRequest{
 				ApplicationIdentifiers: *appID,
-				ProvisionerID:          provisionerID,
+				ProvisionerId:          provisionerID,
 				ProvisioningData:       data,
 			}
 
@@ -976,7 +976,7 @@ values will be stored in the Join Server.`,
 				req.TargetApplicationServerAddress = config.ApplicationServerGRPCAddress
 			}
 			req.TargetApplicationServerKEKLabel, _ = cmd.Flags().GetString("target-application-server-kek-label")
-			req.TargetApplicationServerID, _ = cmd.Flags().GetString("target-application-server-id")
+			req.TargetApplicationServerId, _ = cmd.Flags().GetString("target-application-server-id")
 			req.InvalidateAuthenticationCode, _ = cmd.Flags().GetBool("invalidate-authentication-code")
 
 			dcs, err := api.Dial(ctx, config.DeviceClaimingServerGRPCAddress)
@@ -1056,7 +1056,7 @@ This command may take end device identifiers from stdin.`,
 			}
 			client := ttnpb.NewEndDeviceQRCodeGeneratorClient(qrg)
 			format, err := client.GetFormat(ctx, &ttnpb.GetQRCodeFormatRequest{
-				FormatID: formatID,
+				FormatId: formatID,
 			})
 			if err != nil {
 				return err
@@ -1106,7 +1106,7 @@ This command may take end device identifiers from stdin.`,
 
 			size, _ := cmd.Flags().GetUint32("size")
 			res, err := client.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
-				FormatID:  formatID,
+				FormatId:  formatID,
 				EndDevice: *device,
 				Image: &ttnpb.GenerateEndDeviceQRCodeRequest_Image{
 					ImageSize: size,

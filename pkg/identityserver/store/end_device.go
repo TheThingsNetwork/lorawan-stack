@@ -103,7 +103,7 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	networkServerAddressField:     func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.NetworkServerAddress = dev.NetworkServerAddress },
 	applicationServerAddressField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ApplicationServerAddress = dev.ApplicationServerAddress },
 	joinServerAddressField:        func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.JoinServerAddress = dev.JoinServerAddress },
-	serviceProfileIDField:         func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ServiceProfileID = dev.ServiceProfileID },
+	serviceProfileIDField:         func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ServiceProfileId = dev.ServiceProfileID },
 	locationsField:                func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Locations = deviceLocations(dev.Locations).toMap() },
 	pictureField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		if dev.Picture == nil {
@@ -143,7 +143,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	networkServerAddressField:     func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.NetworkServerAddress = pb.NetworkServerAddress },
 	applicationServerAddressField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ApplicationServerAddress = pb.ApplicationServerAddress },
 	joinServerAddressField:        func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.JoinServerAddress = pb.JoinServerAddress },
-	serviceProfileIDField:         func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ServiceProfileID = pb.ServiceProfileID },
+	serviceProfileIDField:         func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ServiceProfileID = pb.ServiceProfileId },
 	locationsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.Locations = deviceLocations(dev.Locations).updateFromMap(pb.Locations)
 	},

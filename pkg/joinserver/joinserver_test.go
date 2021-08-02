@@ -2135,8 +2135,8 @@ func TestHandleJoin(t *testing.T) {
 					t.FailNow()
 				}
 				expectedResp := deepcopy.Copy(tc.JoinResponse).(*ttnpb.JoinResponse)
-				a.So(res.SessionKeyID, should.NotBeEmpty)
-				expectedResp.SessionKeyID = res.SessionKeyID
+				a.So(res.SessionKeyId, should.NotBeEmpty)
+				expectedResp.SessionKeyId = res.SessionKeyId
 				a.So(res, should.Resemble, expectedResp)
 
 				retCtx, err := devReg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEui, *pb.EndDeviceIdentifiers.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
@@ -2211,7 +2211,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: nil,
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -2244,7 +2244,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: nil,
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -2273,7 +2273,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: nil,
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -2302,7 +2302,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: nil,
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -2324,7 +2324,7 @@ func TestGetNwkSKeys(t *testing.T) {
 					"s_nwk_s_int_key",
 				})
 				return &ttnpb.SessionKeys{
-					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 					},
@@ -2341,7 +2341,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: &ttnpb.NwkSKeysResponse{
 				FNwkSIntKey: ttnpb.KeyEnvelope{
@@ -2422,7 +2422,7 @@ func TestGetAppSKey(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: nil,
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -2450,7 +2450,7 @@ func TestGetAppSKey(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: nil,
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -2474,7 +2474,7 @@ func TestGetAppSKey(t *testing.T) {
 					"app_s_key",
 				})
 				return &ttnpb.SessionKeys{
-					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KEKLabel:     "test-kek",
@@ -2499,7 +2499,7 @@ func TestGetAppSKey(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrCallerNotAuthorized)
@@ -2526,7 +2526,7 @@ func TestGetAppSKey(t *testing.T) {
 					"app_s_key",
 				})
 				return &ttnpb.SessionKeys{
-					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KEKLabel:     "test-kek",
@@ -2553,7 +2553,7 @@ func TestGetAppSKey(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -2572,7 +2572,7 @@ func TestGetAppSKey(t *testing.T) {
 					"app_s_key",
 				})
 				return &ttnpb.SessionKeys{
-					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KEKLabel:     "test-kek",
@@ -2582,7 +2582,7 @@ func TestGetAppSKey(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
@@ -2612,7 +2612,7 @@ func TestGetAppSKey(t *testing.T) {
 					"app_s_key",
 				})
 				return &ttnpb.SessionKeys{
-					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KEKLabel:     "test-kek",
@@ -2639,7 +2639,7 @@ func TestGetAppSKey(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
@@ -2665,7 +2665,7 @@ func TestGetAppSKey(t *testing.T) {
 					"app_s_key",
 				})
 				return &ttnpb.SessionKeys{
-					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KEKLabel:     "test-kek",
@@ -2696,7 +2696,7 @@ func TestGetAppSKey(t *testing.T) {
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
@@ -2722,7 +2722,7 @@ func TestGetAppSKey(t *testing.T) {
 					"app_s_key",
 				})
 				return &ttnpb.SessionKeys{
-					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
 						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KEKLabel:     "test-kek",
@@ -2747,14 +2747,14 @@ func TestGetAppSKey(t *testing.T) {
 							DeviceId: "test-app",
 						},
 						ApplicationServerAddress: asAddr,
-						ApplicationServerID:      "test-as-id",
+						ApplicationServerId:      "test-as-id",
 					},
 				}, nil
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
 				JoinEui:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEui:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{

@@ -86,7 +86,7 @@ func (ps *PubSubStore) loadEventData(ctx context.Context, evts ...*ttnpb.Event) 
 	}
 	keys := make([]string, 0, len(evts))
 	for _, evt := range evts {
-		keys = append(keys, ps.eventDataKey(ctx, evt.UniqueID))
+		keys = append(keys, ps.eventDataKey(ctx, evt.UniqueId))
 	}
 	bs, err := ps.client.MGet(ctx, keys...).Result()
 	if err != nil {
@@ -342,7 +342,7 @@ func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([
 	}
 	evtPBs := make([]*ttnpb.Event, len(uids))
 	for i, uid := range uids {
-		evtPBs[i] = &ttnpb.Event{UniqueID: uid}
+		evtPBs[i] = &ttnpb.Event{UniqueId: uid}
 	}
 	if err = ps.loadEventData(ctx, evtPBs...); err != nil {
 		return nil, err

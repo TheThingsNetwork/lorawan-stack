@@ -261,7 +261,7 @@ func TestTraffic(t *testing.T) {
 				EndDeviceIdentifiers: ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
-						SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+						SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						FPort:          1,
 						FRMPayload:     []byte{0x01, 0x01, 0x01},
 						Confirmed:      true,
@@ -293,7 +293,7 @@ func TestTraffic(t *testing.T) {
 			a.So(res.Downlinks, should.HaveLength, 3)
 			a.So(res.Downlinks, should.Resemble, []*ttnpb.ApplicationDownlink{
 				{
-					SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+					SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 					FPort:          1,
 					Confirmed:      true,
 					FRMPayload:     []byte{0x01, 0x01, 0x01},

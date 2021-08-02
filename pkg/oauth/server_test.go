@@ -56,7 +56,7 @@ type authorizeFormData struct {
 var (
 	mockSession = &ttnpb.UserSession{
 		UserIdentifiers: ttnpb.UserIdentifiers{UserId: "user"},
-		SessionID:       "session_id",
+		SessionId:       "session_id",
 		CreatedAt:       time.Now().Truncate(time.Second),
 		SessionSecret:   "secret-1234",
 	}
@@ -73,7 +73,7 @@ var (
 	}
 	mockAccessToken = &ttnpb.OAuthAccessToken{
 		UserIds:       ttnpb.UserIdentifiers{UserId: "user"},
-		UserSessionID: "session_id",
+		UserSessionId: "session_id",
 	}
 )
 
@@ -343,7 +343,7 @@ func TestOAuthFlow(t *testing.T) {
 				a.So(s.calls, should.Contain, "CreateAuthorizationCode")
 				a.So(s.req.authorizationCode.UserIds, should.Resemble, mockUser.UserIdentifiers)
 				a.So(s.req.authorizationCode.ClientIds, should.Resemble, mockClient.ClientIdentifiers)
-				a.So(s.req.authorizationCode.UserSessionID, should.Equal, mockSession.SessionID)
+				a.So(s.req.authorizationCode.UserSessionId, should.Equal, mockSession.SessionId)
 				a.So(s.req.authorizationCode.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.authorizationCode.Code, should.NotBeEmpty)
 				a.So(s.req.authorizationCode.RedirectURI, should.Equal, "http://uri/callback")
@@ -666,7 +666,7 @@ func TestTokenExchange(t *testing.T) {
 				s.res.authorizationCode = &ttnpb.OAuthAuthorizationCode{
 					UserIds:       mockUser.UserIdentifiers,
 					ClientIds:     mockClient.ClientIdentifiers,
-					UserSessionID: mockSession.SessionID,
+					UserSessionId: mockSession.SessionId,
 					Rights:        mockClient.Rights,
 					Code:          "the code",
 					RedirectURI:   "http://uri/callback",
@@ -694,7 +694,7 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.calls, should.Contain, "CreateAccessToken")
 				a.So(s.req.token.UserIds, should.Resemble, mockUser.UserIdentifiers)
 				a.So(s.req.token.ClientIds, should.Resemble, mockClient.ClientIdentifiers)
-				a.So(s.req.token.UserSessionID, should.Equal, mockSession.SessionID)
+				a.So(s.req.token.UserSessionId, should.Equal, mockSession.SessionId)
 				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.token.AccessToken, should.NotBeEmpty)
 				a.So(s.req.token.AccessToken, should.NotBeEmpty)
@@ -708,7 +708,7 @@ func TestTokenExchange(t *testing.T) {
 				s.res.authorizationCode = &ttnpb.OAuthAuthorizationCode{
 					UserIds:       mockUser.UserIdentifiers,
 					ClientIds:     mockClient.ClientIdentifiers,
-					UserSessionID: mockSession.SessionID,
+					UserSessionId: mockSession.SessionId,
 					Rights:        mockClient.Rights,
 					Code:          "the code",
 					RedirectURI:   "http://uri/callback",
@@ -735,7 +735,7 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.calls, should.Contain, "CreateAccessToken")
 				a.So(s.req.token.UserIds, should.Resemble, mockUser.UserIdentifiers)
 				a.So(s.req.token.ClientIds, should.Resemble, mockClient.ClientIdentifiers)
-				a.So(s.req.token.UserSessionID, should.Equal, mockSession.SessionID)
+				a.So(s.req.token.UserSessionId, should.Equal, mockSession.SessionId)
 				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.token.AccessToken, should.NotBeEmpty)
 				a.So(s.req.token.AccessToken, should.NotBeEmpty)
@@ -749,7 +749,7 @@ func TestTokenExchange(t *testing.T) {
 				s.res.accessToken = &ttnpb.OAuthAccessToken{
 					UserIds:       mockUser.UserIdentifiers,
 					ClientIds:     mockClient.ClientIdentifiers,
-					UserSessionID: mockSession.SessionID,
+					UserSessionId: mockSession.SessionId,
 					Id:            "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
 					RefreshToken:  "PBKDF2$sha256$20000$IGAiKs46xX_M64E5$4xpyqnQT8SOa_Vf4xhEPk6WOZnhmAjG2mqGQiYBhm2s",
 					Rights:        mockClient.Rights,
@@ -777,7 +777,7 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.token.AccessToken, should.NotBeEmpty)
 				a.So(s.req.token.RefreshToken, should.NotBeEmpty)
-				a.So(s.req.token.UserSessionID, should.Equal, mockSession.SessionID)
+				a.So(s.req.token.UserSessionId, should.Equal, mockSession.SessionId)
 				a.So(s.req.previousID, should.Equal, "IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A")
 			},
 		},

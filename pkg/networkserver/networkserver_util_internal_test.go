@@ -1600,7 +1600,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					},
 					Keys: func() ttnpb.SessionKeys {
 						keys := ttnpb.SessionKeys{
-							SessionKeyID: joinResp.SessionKeys.SessionKeyID,
+							SessionKeyId: joinResp.SessionKeys.SessionKeyId,
 							FNwkSIntKey:  joinResp.SessionKeys.FNwkSIntKey,
 							NwkSEncKey:   joinResp.SessionKeys.NwkSEncKey,
 							SNwkSIntKey:  joinResp.SessionKeys.SNwkSIntKey,
@@ -1677,7 +1677,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				Up: &ttnpb.ApplicationUp_JoinAccept{
 					JoinAccept: &ttnpb.ApplicationJoinAccept{
 						AppSKey:      joinResp.AppSKey,
-						SessionKeyID: joinResp.SessionKeyID,
+						SessionKeyId: joinResp.SessionKeyId,
 						ReceivedAt:   recvAt,
 					},
 				},
@@ -1828,7 +1828,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 								ReceivedAt:   up.GetUplinkMessage().GetReceivedAt(),
 								RxMetadata:   up.GetUplinkMessage().GetRxMetadata(),
 								Settings:     deduplicatedUp.Settings,
-								SessionKeyID: upConf.SessionKeys.SessionKeyID,
+								SessionKeyId: upConf.SessionKeys.SessionKeyId,
 								NetworkIds:   up.GetUplinkMessage().GetNetworkIds(),
 							},
 						},
@@ -2121,7 +2121,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 			o.WithPendingSession(&ttnpb.Session{
 				DevAddr: x.PendingMACState.QueuedJoinAccept.DevAddr,
 				SessionKeys: ttnpb.SessionKeys{
-					SessionKeyID: x.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+					SessionKeyId: x.PendingMACState.QueuedJoinAccept.Keys.SessionKeyId,
 					FNwkSIntKey:  x.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey,
 					SNwkSIntKey:  x.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey,
 					NwkSEncKey:   x.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey,

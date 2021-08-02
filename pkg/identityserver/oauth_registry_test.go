@@ -46,7 +46,7 @@ func TestOAuthRegistry(t *testing.T) {
 		err = oauthStore.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 			UserIds:       user.UserIdentifiers,
 			ClientIds:     client.ClientIdentifiers,
-			UserSessionID: "12345678-1234-5678-1234-567812345678",
+			UserSessionId: "12345678-1234-5678-1234-567812345678",
 			Id:            "access_token_id",
 			Rights:        client.Rights,
 			AccessToken:   "access_token",
@@ -75,7 +75,7 @@ func TestOAuthRegistry(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(tokens, should.NotBeNil) && a.So(tokens.Tokens, should.HaveLength, 1) {
 			a.So(tokens.Tokens[0].Id, should.Equal, "access_token_id")
-			a.So(tokens.Tokens[0].UserSessionID, should.Equal, "12345678-1234-5678-1234-567812345678")
+			a.So(tokens.Tokens[0].UserSessionId, should.Equal, "12345678-1234-5678-1234-567812345678")
 		}
 
 		_, err = reg.DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{

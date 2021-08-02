@@ -396,7 +396,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 					return nil, nil, err
 				}
 				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
-			} else if cc != nil && dev.ProvisionerID != "" {
+			} else if cc != nil && dev.ProvisionerId != "" {
 				networkCryptoService = cryptoservices.NewNetworkRPCClient(cc, js.KeyVault, js.WithClusterAuth())
 			}
 
@@ -411,7 +411,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 					// LoRaWAN 1.0.x use the AppKey for network security operations.
 					networkCryptoService = cryptoservices.NewMemory(nil, &appKey)
 				}
-			} else if cc != nil && dev.ProvisionerID != "" {
+			} else if cc != nil && dev.ProvisionerId != "" {
 				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cc, js.KeyVault, js.WithClusterAuth())
 			}
 			if networkCryptoService == nil {
@@ -510,13 +510,13 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			}
 
 			sk := ttnpb.SessionKeys{
-				SessionKeyID: skID[:],
+				SessionKeyId: skID[:],
 				FNwkSIntKey:  fNwkSIntKeyEnvelope,
 				NwkSEncKey:   nwkSEncKeyEnvelope,
 				SNwkSIntKey:  sNwkSIntKeyEnvelope,
 				AppSKey:      appSKeyEnvelope,
 			}
-			_, err = js.keys.SetByID(ctx, *dev.JoinEui, *dev.DevEui, sk.SessionKeyID,
+			_, err = js.keys.SetByID(ctx, *dev.JoinEui, *dev.DevEui, sk.SessionKeyId,
 				[]string{
 					"session_key_id",
 					"f_nwk_s_int_key",
@@ -593,7 +593,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		}
 	}
 
-	ks, err := js.keys.GetByID(ctx, req.JoinEui, req.DevEui, req.SessionKeyID,
+	ks, err := js.keys.GetByID(ctx, req.JoinEui, req.DevEui, req.SessionKeyId,
 		[]string{
 			"f_nwk_s_int_key",
 			"nwk_s_enc_key",
@@ -637,8 +637,8 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
-		if dev.ApplicationServerID != "" {
-			if err := trustedOriginAuth.RequireID(ctx, dev.ApplicationServerID); err != nil {
+		if dev.ApplicationServerId != "" {
+			if err := trustedOriginAuth.RequireID(ctx, dev.ApplicationServerId); err != nil {
 				return nil, err
 			}
 		} else if dev.ApplicationServerAddress != "" {
@@ -655,10 +655,10 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 				}
 				return nil, errNoApplicationServerID.New()
 			}
-			if sets.ApplicationServerID == "" {
+			if sets.ApplicationServerId == "" {
 				return nil, errNoApplicationServerID.New()
 			}
-			if err := trustedOriginAuth.RequireID(ctx, sets.ApplicationServerID); err != nil {
+			if err := trustedOriginAuth.RequireID(ctx, sets.ApplicationServerId); err != nil {
 				return nil, err
 			}
 		}
@@ -673,7 +673,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		}
 	}
 
-	ks, err := js.keys.GetByID(ctx, req.JoinEui, req.DevEui, req.SessionKeyID,
+	ks, err := js.keys.GetByID(ctx, req.JoinEui, req.DevEui, req.SessionKeyId,
 		[]string{
 			"app_s_key",
 		},
