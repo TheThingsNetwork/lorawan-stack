@@ -90,7 +90,7 @@ import {
       'name',
       'description',
       'enforce_duty_cycle',
-      'frequency_plan_id',
+      'frequency_plan_ids',
       'gateway_server_address',
       'antennas',
       'location_public',
