@@ -7181,6 +7181,15 @@
       "file": "agent.go"
     }
   },
+  "error:pkg/packetbrokeragent:data_rate_not_found": {
+    "translations": {
+      "en": "no data rate with index `{index}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
   "error:pkg/packetbrokeragent:decode_payload": {
     "translations": {
       "en": "decode LoRaWAN payload"
@@ -7193,6 +7202,24 @@
   "error:pkg/packetbrokeragent:downlink_path": {
     "translations": {
       "en": "invalid uplink token downlink path"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:frequency_plan_not_configured": {
+    "translations": {
+      "en": "frequency plan `{id}` is not configured"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:incompatible_data_rate": {
+    "translations": {
+      "en": "incompatible data rate in Rx{rx_window}"
     },
     "description": {
       "package": "pkg/packetbrokeragent",
@@ -7336,7 +7363,16 @@
   },
   "error:pkg/packetbrokeragent:unknown_data_rate": {
     "translations": {
-      "en": "unknown data rate in region `{region}`"
+      "en": "unknown data rate"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unknown_data_rate_index": {
+    "translations": {
+      "en": "unknown data rate `{index}` in region `{region}`"
     },
     "description": {
       "package": "pkg/packetbrokeragent",
@@ -7355,6 +7391,15 @@
   "error:pkg/packetbrokeragent:unknown_priority": {
     "translations": {
       "en": "unknown priority `{priority}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unknown_region": {
+    "translations": {
+      "en": "unknown region `{region}`"
     },
     "description": {
       "package": "pkg/packetbrokeragent",

@@ -335,6 +335,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		a.grpc.nsPba = &nsPbaServer{
 			contextDecoupler: a,
 			downstreamCh:     a.downstreamCh,
+			frequencyPlans:   a.FrequencyPlans,
 		}
 	} else {
 		a.grpc.nsPba = &disabledServer{}

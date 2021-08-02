@@ -177,6 +177,7 @@ func TestForwarder(t *testing.T) {
 							},
 						},
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
+						DataRate:             packetbroker.NewLoRaDataRate(7, 125000),
 						DataRateIndex:        5,
 						Frequency:            869525000,
 						CodingRate:           "4/5",
@@ -231,7 +232,8 @@ func TestForwarder(t *testing.T) {
 						GatewayRegion: packetbroker.Region_EU_863_870,
 						PhyPayload: &packetbroker.UplinkMessage_PHYPayload{
 							Teaser: &packetbroker.PHYPayloadTeaser{
-								Hash: []byte{0x76, 0x9f, 0xce, 0x31, 0xe8, 0x1a, 0x90, 0xa1, 0x17, 0x07, 0x69, 0x18, 0x3b, 0x24, 0x0f, 0xd9, 0x8b, 0x7f, 0x38, 0xc7, 0x86, 0xb3, 0xd4, 0xe3, 0x8d, 0xae, 0xe1, 0x73, 0xe3, 0xa4, 0xcf, 0xbd},
+								Hash:   []byte{0x76, 0x9f, 0xce, 0x31, 0xe8, 0x1a, 0x90, 0xa1, 0x17, 0x07, 0x69, 0x18, 0x3b, 0x24, 0x0f, 0xd9, 0x8b, 0x7f, 0x38, 0xc7, 0x86, 0xb3, 0xd4, 0xe3, 0x8d, 0xae, 0xe1, 0x73, 0xe3, 0xa4, 0xcf, 0xbd},
+								Length: 15,
 								Payload: &packetbroker.PHYPayloadTeaser_Mac{
 									Mac: &packetbroker.PHYPayloadTeaser_MACPayloadTeaser{
 										FOpts:            true,
@@ -297,6 +299,7 @@ func TestForwarder(t *testing.T) {
 							},
 						},
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
+						DataRate:             packetbroker.NewLoRaDataRate(9, 125000),
 						DataRateIndex:        3,
 						Frequency:            868300000,
 						CodingRate:           "4/5",
@@ -328,7 +331,8 @@ func TestForwarder(t *testing.T) {
 						GatewayRegion: packetbroker.Region_EU_863_870,
 						PhyPayload: &packetbroker.UplinkMessage_PHYPayload{
 							Teaser: &packetbroker.PHYPayloadTeaser{
-								Hash: []byte{0xce, 0xb5, 0x2a, 0x44, 0x27, 0xb9, 0x4d, 0x8a, 0xff, 0x4c, 0x6d, 0x20, 0xf5, 0x7d, 0x81, 0x66, 0x62, 0x9e, 0x6a, 0x26, 0xe6, 0x4c, 0x5f, 0x77, 0x2f, 0x70, 0xa7, 0xac, 0x34, 0x6a, 0x38, 0x81},
+								Hash:   []byte{0xce, 0xb5, 0x2a, 0x44, 0x27, 0xb9, 0x4d, 0x8a, 0xff, 0x4c, 0x6d, 0x20, 0xf5, 0x7d, 0x81, 0x66, 0x62, 0x9e, 0x6a, 0x26, 0xe6, 0x4c, 0x5f, 0x77, 0x2f, 0x70, 0xa7, 0xac, 0x34, 0x6a, 0x38, 0x81},
+								Length: 23,
 								Payload: &packetbroker.PHYPayloadTeaser_JoinRequest{
 									JoinRequest: &packetbroker.PHYPayloadTeaser_JoinRequestTeaser{
 										JoinEui:  0x42FFFFFFFFFFFFFF,
@@ -382,18 +386,19 @@ func TestForwarder(t *testing.T) {
 			Id:                  "test",
 			Message: &packetbroker.DownlinkMessage{
 				PhyPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
+				Region:     packetbroker.Region_EU_863_870,
 				RegionalParametersVersion: &packetbroker.RegionalParametersVersionValue{
 					Value: packetbroker.RegionalParametersVersion_RP001_V1_0_2_B,
 				},
 				Class:    packetbroker.DownlinkMessageClass_CLASS_A,
 				Priority: packetbroker.DownlinkMessagePriority_NORMAL,
 				Rx1: &packetbroker.DownlinkMessage_RXSettings{
-					Frequency:     868100000,
-					DataRateIndex: 5,
+					Frequency: 868100000,
+					DataRate:  packetbroker.NewLoRaDataRate(7, 125000),
 				},
 				Rx2: &packetbroker.DownlinkMessage_RXSettings{
-					Frequency:     869525000,
-					DataRateIndex: 0,
+					Frequency: 869525000,
+					DataRate:  packetbroker.NewLoRaDataRate(12, 125000),
 				},
 				Rx1Delay:           pbtypes.DurationProto(5 * time.Second),
 				GatewayUplinkToken: []byte(tokenCompact),
@@ -524,6 +529,8 @@ func TestHomeNetwork(t *testing.T) {
 			},
 		},
 	})
+	c.FrequencyPlans = test.FrequencyPlanStore
+
 	dp, addr := mustServePBDataPlane(ctx, t)
 
 	ns := test.Must(mock.NewNetworkServer(c)).(*mock.NetworkServer)
@@ -555,11 +562,12 @@ func TestHomeNetwork(t *testing.T) {
 			RoutedUplinkMessage *packetbroker.RoutedUplinkMessage
 			UplinkMessage       *ttnpb.UplinkMessage
 		}{
+			// With location information and without fully defined data rate.
 			{
 				RoutedUplinkMessage: &packetbroker.RoutedUplinkMessage{
 					ForwarderNetId:       0x000042,
-					ForwarderClusterId:   "test",
 					ForwarderTenantId:    "foo-tenant",
+					ForwarderClusterId:   "test",
 					HomeNetworkNetId:     0x000013,
 					HomeNetworkTenantId:  "foo-tenant",
 					HomeNetworkClusterId: "test",
@@ -573,7 +581,7 @@ func TestHomeNetwork(t *testing.T) {
 								Plain: "foo-gateway",
 							},
 						},
-						DataRateIndex:        5,
+						DataRateIndex:        5, // NOTE: Fallback behavior; DataRate is not defined, only the DataRateIndex
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						Frequency:            869525000,
 						CodingRate:           "4/5",
@@ -694,6 +702,7 @@ func TestHomeNetwork(t *testing.T) {
 					},
 				},
 			},
+			// Without location and with fully described data rate.
 			{
 				RoutedUplinkMessage: &packetbroker.RoutedUplinkMessage{
 					ForwarderNetId:       0x000042,
@@ -712,7 +721,7 @@ func TestHomeNetwork(t *testing.T) {
 								Plain: "foo-gateway",
 							},
 						},
-						DataRateIndex:        3,
+						DataRate:             packetbroker.NewLoRaDataRate(9, 125000),
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						Frequency:            869525000,
 						CodingRate:           "4/5",
@@ -842,6 +851,7 @@ func TestHomeNetwork(t *testing.T) {
 			RawPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
+					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					Class:             ttnpb.CLASS_A,
 					DownlinkPaths: []*ttnpb.DownlinkPath{
@@ -884,6 +894,7 @@ func TestHomeNetwork(t *testing.T) {
 			HomeNetworkTenantId:  "foo-tenant",
 			HomeNetworkClusterId: "test",
 			Message: &packetbroker.DownlinkMessage{
+				Region: packetbroker.Region_EU_863_870,
 				RegionalParametersVersion: &packetbroker.RegionalParametersVersionValue{
 					Value: packetbroker.RegionalParametersVersion_RP001_V1_1_B,
 				},
@@ -892,10 +903,12 @@ func TestHomeNetwork(t *testing.T) {
 				Priority:   packetbroker.DownlinkMessagePriority_NORMAL,
 				Rx1: &packetbroker.DownlinkMessage_RXSettings{
 					Frequency:     868100000,
+					DataRate:      packetbroker.NewLoRaDataRate(7, 125000),
 					DataRateIndex: 5,
 				},
 				Rx2: &packetbroker.DownlinkMessage_RXSettings{
 					Frequency:     869525000,
+					DataRate:      packetbroker.NewLoRaDataRate(12, 125000),
 					DataRateIndex: 0,
 				},
 				Rx1Delay:           pbtypes.DurationProto(5 * time.Second),
