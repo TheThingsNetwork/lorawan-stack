@@ -454,7 +454,7 @@ func TestTraffic(t *testing.T) {
 							Rx1Frequency:     868100000,
 							Rx2DataRateIndex: 0,
 							Rx2Frequency:     869525000,
-							FrequencyPlanID:  test.EUFrequencyPlanID,
+							FrequencyPlanId:  test.EUFrequencyPlanID,
 						},
 					},
 				},

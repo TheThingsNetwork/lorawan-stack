@@ -82,7 +82,7 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 			ModelId:         dev.ModelID,
 			HardwareVersion: dev.HardwareVersion,
 			FirmwareVersion: dev.FirmwareVersion,
-			BandID:          dev.BandID,
+			BandId:          dev.BandID,
 		}
 	},
 	brandIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
@@ -98,7 +98,7 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 		mustEndDeviceVersionIDs(pb).FirmwareVersion = dev.FirmwareVersion
 	},
 	bandIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
-		mustEndDeviceVersionIDs(pb).BandID = dev.BandID
+		mustEndDeviceVersionIDs(pb).BandId = dev.BandID
 	},
 	networkServerAddressField:     func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.NetworkServerAddress = dev.NetworkServerAddress },
 	applicationServerAddressField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ApplicationServerAddress = dev.ApplicationServerAddress },
@@ -129,7 +129,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 		dev.ModelID = pb.GetVersionIDs().GetModelId()
 		dev.HardwareVersion = pb.GetVersionIDs().GetHardwareVersion()
 		dev.FirmwareVersion = pb.GetVersionIDs().GetFirmwareVersion()
-		dev.BandID = pb.GetVersionIDs().GetBandID()
+		dev.BandID = pb.GetVersionIDs().GetBandId()
 	},
 	brandIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.BrandID = pb.GetVersionIDs().GetBrandId() },
 	modelIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ModelID = pb.GetVersionIDs().GetModelId() },
@@ -139,7 +139,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	firmwareVersionField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.FirmwareVersion = pb.GetVersionIDs().GetFirmwareVersion()
 	},
-	bandIDField:                   func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.BandID = pb.GetVersionIDs().GetBandID() },
+	bandIDField:                   func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.BandID = pb.GetVersionIDs().GetBandId() },
 	networkServerAddressField:     func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.NetworkServerAddress = pb.NetworkServerAddress },
 	applicationServerAddressField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ApplicationServerAddress = pb.ApplicationServerAddress },
 	joinServerAddressField:        func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.JoinServerAddress = pb.JoinServerAddress },

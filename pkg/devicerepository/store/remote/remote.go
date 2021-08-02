@@ -190,13 +190,13 @@ func (s *remoteStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnp
 			continue
 		}
 
-		if _, ok := bandIDToRegion[ids.BandID]; !ok {
-			return nil, errBandNotFound.WithAttributes("unknown_band", ids.BandID)
+		if _, ok := bandIDToRegion[ids.BandId]; !ok {
+			return nil, errBandNotFound.WithAttributes("unknown_band", ids.BandId)
 		}
-		profileInfo, ok := ver.Profiles[ids.BandID]
+		profileInfo, ok := ver.Profiles[ids.BandId]
 		if !ok {
 			return nil, errNoProfileForBand.WithAttributes(
-				"band_id", ids.BandID,
+				"band_id", ids.BandId,
 			)
 		}
 
@@ -255,17 +255,17 @@ func (s *remoteStore) getCodecs(ids *ttnpb.EndDeviceVersionIdentifiers) (*EndDev
 		)
 	}
 
-	if _, ok := bandIDToRegion[ids.BandID]; !ok {
-		return nil, errBandNotFound.WithAttributes("band_id", ids.BandID)
+	if _, ok := bandIDToRegion[ids.BandId]; !ok {
+		return nil, errBandNotFound.WithAttributes("band_id", ids.BandId)
 	}
-	profileInfo, ok := version.Profiles[ids.BandID]
+	profileInfo, ok := version.Profiles[ids.BandId]
 	if !ok {
 		return nil, errNoProfileForBand.WithAttributes(
-			"band_id", ids.BandID,
+			"band_id", ids.BandId,
 		)
 	}
 	if profileInfo.CodecId == "" {
-		return nil, errNoCodec.WithAttributes("firmware_version", ids.FirmwareVersion, "band_id", ids.BandID)
+		return nil, errNoCodec.WithAttributes("firmware_version", ids.FirmwareVersion, "band_id", ids.BandId)
 	}
 
 	codecs := &EndDeviceCodecs{
@@ -355,7 +355,7 @@ func (s *remoteStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.Mess
 	codec := codecs.DownlinkEncoder
 
 	if codec.FileName == "" {
-		return nil, errNoEncoder.WithAttributes("firmware_version", req.GetVersionIDs().FirmwareVersion, "band_id", req.GetVersionIDs().BandID)
+		return nil, errNoEncoder.WithAttributes("firmware_version", req.GetVersionIDs().FirmwareVersion, "band_id", req.GetVersionIDs().BandId)
 	}
 
 	b, err := s.fetcher.File("vendor", req.GetVersionIDs().BrandId, codec.FileName)

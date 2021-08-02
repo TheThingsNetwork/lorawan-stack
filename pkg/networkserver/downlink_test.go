@@ -345,7 +345,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 			},
 		},
@@ -358,7 +358,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -403,7 +403,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -434,7 +434,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -468,7 +468,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -518,7 +518,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -567,7 +567,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
@@ -652,7 +652,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
@@ -728,7 +728,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -846,7 +846,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:      dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -880,7 +880,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -998,7 +998,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:      dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1042,7 +1042,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -1154,7 +1154,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:      dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1198,7 +1198,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -1314,7 +1314,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1DataRateIndex:  lastUp.Settings.DataRateIndex,
 							Rx1Delay:          dev.MACState.CurrentParameters.Rx1Delay,
 							Rx1Frequency:      dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1357,7 +1357,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassBTimeout: DurationPtr(42 * time.Second),
@@ -1461,7 +1461,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_3,
 							Rx2Frequency:      DefaultEU868RX2Frequency,
 							AbsoluteTime:      TimePtr(pingAt),
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1497,7 +1497,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout: DurationPtr(42 * time.Second),
@@ -1617,7 +1617,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:      dev.MACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1661,7 +1661,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout: DurationPtr(42 * time.Second),
@@ -1761,7 +1761,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:          ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1798,7 +1798,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:         test.EUFrequencyPlanID,
+				FrequencyPlanId:         test.EUFrequencyPlanID,
 				LastDevStatusReceivedAt: TimePtr(now),
 				LorawanPhyVersion:       ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -1895,7 +1895,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_0,
 							Rx2Frequency:      DefaultEU868RX2Frequency,
 							AbsoluteTime:      TimePtr(now.Add(InfrastructureDelay)),
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1932,7 +1932,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout: DurationPtr(42 * time.Second),
@@ -2026,7 +2026,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							AbsoluteTime:      TimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -2093,7 +2093,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout: DurationPtr(42 * time.Second),
@@ -2186,7 +2186,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:          ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRateIndex:  dev.MACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.MACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -2234,7 +2234,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout:          DurationPtr(42 * time.Second),
@@ -2296,7 +2296,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &test.DefaultDevAddr,
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
 					ClassCTimeout:          DurationPtr(42 * time.Second),
@@ -2371,7 +2371,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					JoinEui:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					DevEui:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				},
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				PendingMACState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -2440,7 +2440,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:      dev.PendingMACState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRateIndex:  dev.PendingMACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      dev.PendingMACState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanID:   dev.FrequencyPlanID,
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},

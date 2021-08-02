@@ -850,7 +850,7 @@ func (v *EndDeviceVersionIdentifiers) FieldIsZero(p string) bool {
 	case "model_id":
 		return v.ModelId == ""
 	case "band_id":
-		return v.BandID == ""
+		return v.BandId == ""
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -898,7 +898,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "formatters.up_formatter_parameter":
 		return v.Formatters.FieldIsZero("up_formatter_parameter")
 	case "frequency_plan_id":
-		return v.FrequencyPlanID == ""
+		return v.FrequencyPlanId == ""
 	case "ids":
 		return v.EndDeviceIdentifiers == EndDeviceIdentifiers{}
 	case "ids.application_ids":

@@ -89,8 +89,8 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	if err := validateContactInfo(req.Gateway.ContactInfo); err != nil {
 		return nil, err
 	}
-	if len(req.FrequencyPlanIDs) == 0 && req.FrequencyPlanID != "" {
-		req.FrequencyPlanIDs = []string{req.FrequencyPlanID}
+	if len(req.FrequencyPlanIds) == 0 && req.FrequencyPlanId != "" {
+		req.FrequencyPlanIds = []string{req.FrequencyPlanId}
 	}
 
 	if req.LBSLNSSecret != nil {
@@ -252,8 +252,8 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	}
 
 	// Backwards compatibility for frequency_plan_id field.
-	if len(gtw.FrequencyPlanIDs) > 0 {
-		gtw.FrequencyPlanID = gtw.FrequencyPlanIDs[0]
+	if len(gtw.FrequencyPlanIds) > 0 {
+		gtw.FrequencyPlanId = gtw.FrequencyPlanIds[0]
 	}
 
 	if gtw.TargetCUPSKey != nil {
@@ -362,8 +362,8 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 
 	for i, gtw := range gtws.Gateways {
 		// Backwards compatibility for frequency_plan_id field.
-		if len(gtw.FrequencyPlanIDs) > 0 {
-			gtw.FrequencyPlanID = gtw.FrequencyPlanIDs[0]
+		if len(gtw.FrequencyPlanIds) > 0 {
+			gtw.FrequencyPlanId = gtw.FrequencyPlanIds[0]
 		}
 
 		if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO) != nil {
@@ -448,8 +448,8 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "frequency_plan_ids")
 		}
 	}
-	if len(req.FrequencyPlanIDs) == 0 && req.FrequencyPlanID != "" {
-		req.FrequencyPlanIDs = []string{req.FrequencyPlanID}
+	if len(req.FrequencyPlanIds) == 0 && req.FrequencyPlanId != "" {
+		req.FrequencyPlanIds = []string{req.FrequencyPlanId}
 	}
 
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, nil, append(getPaths, "frequency_plan_id"))

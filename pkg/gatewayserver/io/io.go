@@ -127,8 +127,8 @@ var (
 
 // NewConnection instantiates a new gateway connection.
 func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps *frequencyplans.Store, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
-	gatewayFPs := make(map[string]*frequencyplans.FrequencyPlan, len(gateway.FrequencyPlanIDs))
-	fp0ID := gateway.FrequencyPlanID
+	gatewayFPs := make(map[string]*frequencyplans.FrequencyPlan, len(gateway.FrequencyPlanIds))
+	fp0ID := gateway.FrequencyPlanId
 	fp0, err := fps.GetByID(fp0ID)
 	if err != nil {
 		return nil, err
@@ -136,19 +136,19 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 	gatewayFPs[fp0ID] = fp0
 	bandID := fp0.BandID
 
-	if len(gateway.FrequencyPlanIDs) > 0 {
-		if gateway.FrequencyPlanIDs[0] != fp0ID {
+	if len(gateway.FrequencyPlanIds) > 0 {
+		if gateway.FrequencyPlanIds[0] != fp0ID {
 			return nil, errInconsistentFrequencyPlans.New()
 		}
-		for i := 1; i < len(gateway.FrequencyPlanIDs); i++ {
-			fpn, err := fps.GetByID(gateway.FrequencyPlanIDs[i])
+		for i := 1; i < len(gateway.FrequencyPlanIds); i++ {
+			fpn, err := fps.GetByID(gateway.FrequencyPlanIds[i])
 			if err != nil {
 				return nil, err
 			}
 			if fpn.BandID != fp0.BandID {
 				return nil, errFrequencyPlansNotFromSameBand.New()
 			}
-			gatewayFPs[gateway.FrequencyPlanIDs[i]] = fpn
+			gatewayFPs[gateway.FrequencyPlanIds[i]] = fpn
 		}
 	}
 
@@ -249,7 +249,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 
 	msg := &ttnpb.GatewayUplinkMessage{
 		UplinkMessage: up,
-		BandID:        c.bandID,
+		BandId:        c.bandID,
 	}
 
 	select {
@@ -384,14 +384,14 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	}
 
 	var fp *frequencyplans.FrequencyPlan
-	fpID := request.GetFrequencyPlanID()
+	fpID := request.GetFrequencyPlanId()
 	if fpID != "" {
 		fp = c.gatewayFPs[fpID]
 		if fp == nil {
 			// The requested frequency plan is not configured for the gateway. Load the plan and enforce that it's in the same band.
 			fp, err = c.fps.GetByID(fpID)
 			if err != nil {
-				return false, false, 0, errFrequencyPlanNotConfigured.WithCause(err).WithAttributes("id", request.FrequencyPlanID)
+				return false, false, 0, errFrequencyPlanNotConfigured.WithCause(err).WithAttributes("id", request.FrequencyPlanId)
 			}
 			if fp.BandID != c.bandID {
 				return false, false, 0, errFrequencyPlansNotFromSameBand.New()

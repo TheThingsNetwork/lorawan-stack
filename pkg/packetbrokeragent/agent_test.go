@@ -161,7 +161,7 @@ func TestForwarder(t *testing.T) {
 							Frequency:     869525000,
 						},
 					},
-					BandID: "EU_863_870",
+					BandId: "EU_863_870",
 				},
 				RoutedUplinkMessage: &packetbroker.RoutedUplinkMessage{
 					ForwarderNetId:     0x000013,
@@ -281,7 +281,7 @@ func TestForwarder(t *testing.T) {
 							Frequency:     868300000,
 						},
 					},
-					BandID: "EU_863_870",
+					BandId: "EU_863_870",
 				},
 				RoutedUplinkMessage: &packetbroker.RoutedUplinkMessage{
 					ForwarderNetId:     0x000013,

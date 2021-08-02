@@ -721,7 +721,7 @@ func (EndDeviceOptionNamespace) WithLoRaWANPHYVersion(v ttnpb.PHYVersion) EndDev
 // WithFrequencyPlanID returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with FrequencyPlanID set to v.
 func (EndDeviceOptionNamespace) WithFrequencyPlanID(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.FrequencyPlanID = v
+		x.FrequencyPlanId = v
 		return x
 	}
 }

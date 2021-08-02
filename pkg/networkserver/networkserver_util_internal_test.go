@@ -1052,7 +1052,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 										Class:             conf.Class,
 										DownlinkPaths:     expectedAttempt.RequestPaths,
 										Priority:          conf.Priority,
-										FrequencyPlanID:   conf.FrequencyPlanID,
+										FrequencyPlanId:   conf.FrequencyPlanID,
 										AbsoluteTime:      conf.AbsoluteTime,
 										LorawanPhyVersion: conf.PHYVersion,
 									}
@@ -1122,13 +1122,13 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 		Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 			t.Helper()
 
-			fp := test.FrequencyPlan(dev.FrequencyPlanID)
+			fp := test.FrequencyPlan(dev.FrequencyPlanId)
 			phy := LoRaWANBands[fp.BandID][dev.LorawanPhyVersion]
 
 			scheduledDown, ok := env.AssertScheduleDownlink(ctx, DownlinkSchedulingAssertionConfig{
 				SetRX1:          true,
 				SetRX2:          true,
-				FrequencyPlanID: dev.FrequencyPlanID,
+				FrequencyPlanID: dev.FrequencyPlanId,
 				PHYVersion:      dev.LorawanPhyVersion,
 				MACState:        dev.PendingMACState,
 				Session:         dev.PendingSession,
@@ -1217,7 +1217,7 @@ func (env TestEnvironment) AssertScheduleDataDownlink(ctx context.Context, conf 
 			scheduledDown, ok := env.AssertScheduleDownlink(ctx, DownlinkSchedulingAssertionConfig{
 				SetRX1:          conf.SetRX1,
 				SetRX2:          conf.SetRX2,
-				FrequencyPlanID: dev.FrequencyPlanID,
+				FrequencyPlanID: dev.FrequencyPlanId,
 				PHYVersion:      dev.LorawanPhyVersion,
 				MACState:        dev.MACState,
 				Session:         dev.Session,
@@ -1448,7 +1448,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 	t, a := test.MustNewTFromContext(ctx)
 	t.Helper()
 
-	fp := test.FrequencyPlan(conf.Device.FrequencyPlanID)
+	fp := test.FrequencyPlan(conf.Device.FrequencyPlanId)
 	phy := LoRaWANBands[fp.BandID][conf.Device.LorawanPhyVersion]
 	upCh := phy.UplinkChannels[conf.ChannelIndex]
 	upDR := phy.DataRates[conf.DataRateIndex].Rate
@@ -1527,7 +1527,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 								RX1DataRateOffset:  defaultRX1DROffset,
 								RX2DataRateIndex:   defaultRX2DRIdx,
 								RXDelay:            desiredRX1Delay,
-								FrequencyPlanID:    conf.Device.FrequencyPlanID,
+								FrequencyPlanID:    conf.Device.FrequencyPlanId,
 								PHYVersion:         conf.Device.LorawanPhyVersion,
 								CorrelationIDs:     req.CorrelationIds,
 							})),
@@ -2066,7 +2066,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 		if !x.SupportsJoin {
 			panic("join request requested for non-OTAA device")
 		}
-		phy := Band(x.FrequencyPlanID, x.LorawanPhyVersion)
+		phy := Band(x.FrequencyPlanId, x.LorawanPhyVersion)
 		drIdx := func() ttnpb.DataRateIndex {
 			for idx := ttnpb.DATA_RATE_0; idx <= ttnpb.DATA_RATE_15; idx++ {
 				if _, ok := phy.DataRates[idx]; ok {
@@ -2099,7 +2099,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 					OptNeg:      x.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 				},
 				RxDelay: macState.DesiredParameters.Rx1Delay,
-				CFList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanID), x.LorawanPhyVersion),
+				CFList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),
 			},
 			Keys:           *MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
 			DevAddr:        test.DefaultDevAddr,
@@ -2153,8 +2153,8 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 						Request: &ttnpb.TxRequest{
 							Class:             ttnpb.CLASS_A,
 							Priority:          priority,
-							FrequencyPlanID:   x.FrequencyPlanID,
-							Rx1Delay:          ttnpb.RxDelay(Band(x.FrequencyPlanID, x.LorawanPhyVersion).JoinAcceptDelay1 / time.Second),
+							FrequencyPlanId:   x.FrequencyPlanId,
+							Rx1Delay:          ttnpb.RxDelay(Band(x.FrequencyPlanId, x.LorawanPhyVersion).JoinAcceptDelay1 / time.Second),
 							Rx2DataRateIndex:  x.PendingMACState.CurrentParameters.Rx2DataRateIndex,
 							Rx2Frequency:      x.PendingMACState.CurrentParameters.Rx2Frequency,
 							LorawanPhyVersion: x.LorawanPhyVersion,

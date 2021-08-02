@@ -98,7 +98,7 @@ func (dr *mockDR) GetTemplate(_ context.Context, _ *ttnpb.GetTemplateRequest) (*
 }
 
 func (dr *mockDR) key(ids *ttnpb.EndDeviceVersionIdentifiers) string {
-	return fmt.Sprintf("%s:%s:%s:%s", ids.BrandId, ids.ModelId, ids.FirmwareVersion, ids.BandID)
+	return fmt.Sprintf("%s:%s:%s:%s", ids.BrandId, ids.ModelId, ids.FirmwareVersion, ids.BandId)
 }
 
 var errMock = fmt.Errorf("mock_error")
@@ -155,14 +155,14 @@ func TestDeviceRepository(t *testing.T) {
 		ModelId:         "model",
 		FirmwareVersion: "1.0",
 		HardwareVersion: "1.1",
-		BandID:          "band",
+		BandId:          "band",
 	}
 	idsNotFound := &ttnpb.EndDeviceVersionIdentifiers{
 		BrandId:         "brand2",
 		ModelId:         "model1",
 		FirmwareVersion: "1.0",
 		HardwareVersion: "1.1",
-		BandID:          "band",
+		BandId:          "band",
 	}
 	devID := ttnpb.EndDeviceIdentifiers{
 		DeviceId: "dev1",

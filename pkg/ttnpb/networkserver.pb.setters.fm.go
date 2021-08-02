@@ -32,10 +32,10 @@ func (dst *GetDefaultMACSettingsRequest) SetFields(src *GetDefaultMACSettingsReq
 				return fmt.Errorf("'frequency_plan_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.FrequencyPlanID = src.FrequencyPlanID
+				dst.FrequencyPlanId = src.FrequencyPlanId
 			} else {
 				var zero string
-				dst.FrequencyPlanID = zero
+				dst.FrequencyPlanId = zero
 			}
 		case "lorawan_phy_version":
 			if len(subs) > 0 {

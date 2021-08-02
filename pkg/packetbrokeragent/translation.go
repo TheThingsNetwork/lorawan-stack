@@ -289,8 +289,8 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 	}
 
 	var ok bool
-	if up.GatewayRegion, ok = toPBRegion[msg.BandID]; !ok {
-		return nil, errUnknownBand.WithAttributes("band_id", msg.BandID)
+	if up.GatewayRegion, ok = toPBRegion[msg.BandId]; !ok {
+		return nil, errUnknownBand.WithAttributes("band_id", msg.BandId)
 	}
 	if up.DataRateIndex, ok = toPBDataRateIndex(up.GatewayRegion, msg.Settings.DataRate); !ok {
 		return nil, errUnknownDataRate.WithAttributes("region", up.GatewayRegion)

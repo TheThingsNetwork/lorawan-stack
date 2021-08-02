@@ -110,9 +110,9 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	updateChannelField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.UpdateChannel = gtw.UpdateChannel },
 	frequencyPlanIDsField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		if gtw.FrequencyPlanID == "" {
-			pb.FrequencyPlanIDs = nil
+			pb.FrequencyPlanIds = nil
 		} else {
-			pb.FrequencyPlanIDs = strings.Split(gtw.FrequencyPlanID, " ")
+			pb.FrequencyPlanIds = strings.Split(gtw.FrequencyPlanID, " ")
 		}
 	},
 	statusPublicField:         func(pb *ttnpb.Gateway, gtw *Gateway) { pb.StatusPublic = gtw.StatusPublic },
@@ -207,7 +207,7 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	gatewayServerAddressField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayServerAddress = pb.GatewayServerAddress },
 	autoUpdateField:           func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.AutoUpdate = pb.AutoUpdate },
 	updateChannelField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.UpdateChannel = pb.UpdateChannel },
-	frequencyPlanIDsField:     func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FrequencyPlanID = strings.Join(pb.FrequencyPlanIDs, " ") },
+	frequencyPlanIDsField:     func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FrequencyPlanID = strings.Join(pb.FrequencyPlanIds, " ") },
 	statusPublicField:         func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.StatusPublic = pb.StatusPublic },
 	locationPublicField:       func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.LocationPublic = pb.LocationPublic },
 	scheduleDownlinkLateField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ScheduleDownlinkLate = pb.ScheduleDownlinkLate },

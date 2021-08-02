@@ -42,7 +42,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.0.2/EU868",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -61,7 +61,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.0.2/EU868/DesiredMaxEirp",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -80,7 +80,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.0.2/EU868/multicast/class A",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -98,7 +98,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.0.2/EU868/multicast/class B",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -128,7 +128,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.0.2/EU868/multicast/class C",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -158,7 +158,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.0.3/EU868/factory preset frequencies",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_3,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
 				MACSettings: &ttnpb.MACSettings{
@@ -267,7 +267,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.1/EU868",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -286,7 +286,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.1/EU868/multicast/class A",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -304,7 +304,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.1/EU868/multicast/class B",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -334,7 +334,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.1/EU868/multicast/class C",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -364,7 +364,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.0.2/US915_FSB2",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.USFrequencyPlanID,
+				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
@@ -383,7 +383,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.0.3/US915_FSB2/factory preset frequencies",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.USFrequencyPlanID,
+				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_3,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
 				MACSettings: &ttnpb.MACSettings{
@@ -456,7 +456,7 @@ func TestNewState(t *testing.T) {
 		{
 			Name: "1.1/US915_FSB2",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.USFrequencyPlanID,
+				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{

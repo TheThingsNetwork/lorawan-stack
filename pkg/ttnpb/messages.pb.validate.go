@@ -635,7 +635,7 @@ func (m *GatewayUplinkMessage) ValidateFields(paths ...string) error {
 			}
 
 		case "band_id":
-			// no validation rules for BandID
+			// no validation rules for BandId
 		default:
 			return GatewayUplinkMessageValidationError{
 				field:  name,

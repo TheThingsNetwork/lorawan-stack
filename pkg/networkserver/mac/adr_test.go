@@ -73,7 +73,7 @@ func TestAdaptDataRate(t *testing.T) {
 		{
 			Name: "adapted example from Semtech paper/no rejections",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
@@ -104,7 +104,7 @@ func TestAdaptDataRate(t *testing.T) {
 		{
 			Name: "adapted example from Semtech paper/rejected DR:(1,4)",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
@@ -135,7 +135,7 @@ func TestAdaptDataRate(t *testing.T) {
 		{
 			Name: "adapted example from Semtech paper/rejected TXPower:(1)",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
@@ -166,7 +166,7 @@ func TestAdaptDataRate(t *testing.T) {
 		{
 			Name: "adapted example from Semtech paper/rejected TXPower:(0,1)",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
@@ -197,7 +197,7 @@ func TestAdaptDataRate(t *testing.T) {
 		{
 			Name: "adapted example from Semtech paper/rejected DR:(1,4), rejected TXPower:(0,2,3)",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
@@ -231,7 +231,7 @@ func TestAdaptDataRate(t *testing.T) {
 		{
 			Name: "adapted example from Semtech paper/rejected DR:(3), rejected TXPower:(0,1)",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
@@ -269,7 +269,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				dev := CopyEndDevice(tc.Device)
-				fp := test.FrequencyPlan(dev.FrequencyPlanID)
+				fp := test.FrequencyPlan(dev.FrequencyPlanId)
 				err := AdaptDataRate(ctx, dev, LoRaWANBands[fp.BandID][dev.LorawanPhyVersion], ttnpb.MACSettings{})
 				if !a.So(err, should.Equal, tc.Error) {
 					t.Fatalf("ADR failed with: %s", err)
@@ -341,7 +341,7 @@ func TestIssue458(t *testing.T) {
 		{
 			Name: "initial uplinks, no change",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.USFrequencyPlanID,
+				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
@@ -353,7 +353,7 @@ func TestIssue458(t *testing.T) {
 		{
 			Name: "all uplinks, increase nbTrans",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.USFrequencyPlanID,
+				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
@@ -372,7 +372,7 @@ func TestIssue458(t *testing.T) {
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				dev := CopyEndDevice(tc.Device)
-				fp := test.FrequencyPlan(dev.FrequencyPlanID)
+				fp := test.FrequencyPlan(dev.FrequencyPlanId)
 				err := AdaptDataRate(ctx, dev, LoRaWANBands[fp.BandID][dev.LorawanPhyVersion], ttnpb.MACSettings{})
 				if !a.So(err, should.Equal, tc.Error) {
 					t.Fatalf("ADR failed with: %s", err)

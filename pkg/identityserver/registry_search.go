@@ -227,8 +227,8 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 	}
 	for _, gtw := range res.Gateways {
 		// Backwards compatibility for frequency_plan_id field.
-		if len(gtw.FrequencyPlanIDs) > 0 {
-			gtw.FrequencyPlanID = gtw.FrequencyPlanIDs[0]
+		if len(gtw.FrequencyPlanIds) > 0 {
+			gtw.FrequencyPlanId = gtw.FrequencyPlanIds[0]
 		}
 	}
 	return res, nil

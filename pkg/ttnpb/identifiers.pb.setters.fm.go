@@ -570,10 +570,10 @@ func (dst *EndDeviceVersionIdentifiers) SetFields(src *EndDeviceVersionIdentifie
 				return fmt.Errorf("'band_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.BandID = src.BandID
+				dst.BandId = src.BandId
 			} else {
 				var zero string
-				dst.BandID = zero
+				dst.BandId = zero
 			}
 
 		default:

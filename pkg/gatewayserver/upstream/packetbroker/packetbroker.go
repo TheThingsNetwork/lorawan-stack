@@ -118,7 +118,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 				Eui:       ids.Eui,
 			},
 			Antennas:         antennas,
-			FrequencyPlanIds: gtw.FrequencyPlanIDs,
+			FrequencyPlanIds: gtw.FrequencyPlanIds,
 			StatusPublic:     gtw.StatusPublic,
 			LocationPublic:   gtw.LocationPublic,
 			Online:           true,

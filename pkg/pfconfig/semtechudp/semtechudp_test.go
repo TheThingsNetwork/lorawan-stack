@@ -55,7 +55,7 @@ func TestBuild(t *testing.T) {
 		}
 	}
 
-	var shouldResembleReference = func(actual interface{}, expected ...interface{}) string {
+	shouldResembleReference := func(actual interface{}, expected ...interface{}) string {
 		referenceBytes, err := referenceFetcher.File(expected[0].(string))
 		if err != nil {
 			panic(err)
@@ -80,7 +80,7 @@ func TestBuild(t *testing.T) {
 		{
 			Name: "Reference: EU global_conf",
 			Gateway: &ttnpb.Gateway{
-				FrequencyPlanID:      "EU_863_870_TTN",
+				FrequencyPlanId:      "EU_863_870_TTN",
 				GatewayServerAddress: "router.eu.thethings.network",
 			},
 			Assert: func(a *assertions.Assertion, config *Config) {
@@ -90,7 +90,7 @@ func TestBuild(t *testing.T) {
 		{
 			Name: "Reference: US global_conf",
 			Gateway: &ttnpb.Gateway{
-				FrequencyPlanID:      "US_902_928_FSB_2",
+				FrequencyPlanId:      "US_902_928_FSB_2",
 				GatewayServerAddress: "router.us.thethings.network",
 			},
 			Assert: func(a *assertions.Assertion, config *Config) {
@@ -100,7 +100,7 @@ func TestBuild(t *testing.T) {
 		{
 			Name: "Reference: AU global_conf",
 			Gateway: &ttnpb.Gateway{
-				FrequencyPlanID:      "AU_915_928_FSB_2",
+				FrequencyPlanId:      "AU_915_928_FSB_2",
 				GatewayServerAddress: "router.au.thethings.network",
 			},
 			Assert: func(a *assertions.Assertion, config *Config) {
@@ -110,7 +110,7 @@ func TestBuild(t *testing.T) {
 		{
 			Name: "Reference: AS1 global_conf",
 			Gateway: &ttnpb.Gateway{
-				FrequencyPlanID:      "AS_920_923_LBT",
+				FrequencyPlanId:      "AS_920_923_LBT",
 				GatewayServerAddress: "router.as1.thethings.network",
 			},
 			Assert: func(a *assertions.Assertion, config *Config) {
@@ -120,7 +120,7 @@ func TestBuild(t *testing.T) {
 		{
 			Name: "Reference: KR global_conf",
 			Gateway: &ttnpb.Gateway{
-				FrequencyPlanID:      "KR_920_923_TTN",
+				FrequencyPlanId:      "KR_920_923_TTN",
 				GatewayServerAddress: "router.kr.thethings.network",
 			},
 			Assert: func(a *assertions.Assertion, config *Config) {
@@ -136,7 +136,6 @@ func TestBuild(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func removeDescs(m map[string]interface{}) {

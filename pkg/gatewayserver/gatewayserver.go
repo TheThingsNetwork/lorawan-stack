@@ -469,8 +469,8 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		logger.Warn("Connect unregistered gateway")
 		gtw = &ttnpb.Gateway{
 			GatewayIdentifiers:     ids,
-			FrequencyPlanID:        fpID,
-			FrequencyPlanIDs:       []string{fpID},
+			FrequencyPlanId:        fpID,
+			FrequencyPlanIds:       []string{fpID},
 			EnforceDutyCycle:       true,
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
 			Antennas:               []ttnpb.GatewayAntenna{},
@@ -567,12 +567,12 @@ func requireDisconnect(connected, current *ttnpb.Gateway) bool {
 		connected.ScheduleDownlinkLate != current.ScheduleDownlinkLate ||
 		connected.StatusPublic != current.StatusPublic ||
 		connected.UpdateLocationFromStatus != current.UpdateLocationFromStatus ||
-		connected.FrequencyPlanID != current.FrequencyPlanID ||
-		len(connected.FrequencyPlanIDs) != len(current.FrequencyPlanIDs) {
+		connected.FrequencyPlanId != current.FrequencyPlanId ||
+		len(connected.FrequencyPlanIds) != len(current.FrequencyPlanIds) {
 		return true
 	}
-	for i := range connected.FrequencyPlanIDs {
-		if connected.FrequencyPlanIDs[i] != current.FrequencyPlanIDs[i] {
+	for i := range connected.FrequencyPlanIds {
+		if connected.FrequencyPlanIds[i] != current.FrequencyPlanIds[i] {
 			return true
 		}
 	}
@@ -682,7 +682,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 				case *ttnpb.GatewayUplinkMessage:
 					up := *msg.UplinkMessage
 					msg = &ttnpb.GatewayUplinkMessage{
-						BandID:        msg.BandID,
+						BandId:        msg.BandId,
 						UplinkMessage: &up,
 					}
 					msg.CorrelationIds = append(make([]string, 0, len(msg.CorrelationIds)+1), msg.CorrelationIds...)
@@ -964,7 +964,7 @@ func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.Gatewa
 	})
 	var fpIDs []string
 	if err == nil {
-		fpIDs = gtw.FrequencyPlanIDs
+		fpIDs = gtw.FrequencyPlanIds
 	} else if errors.IsNotFound(err) {
 		fpID, ok := frequencyplans.FallbackIDFromContext(ctx)
 		if !ok {

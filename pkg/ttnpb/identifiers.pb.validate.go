@@ -1049,7 +1049,7 @@ func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
 
 		case "band_id":
 
-			if utf8.RuneCountInString(m.GetBandID()) > 32 {
+			if utf8.RuneCountInString(m.GetBandId()) > 32 {
 				return EndDeviceVersionIdentifiersValidationError{
 					field:  "band_id",
 					reason: "value length must be at most 32 runes",

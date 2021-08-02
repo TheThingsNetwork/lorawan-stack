@@ -969,7 +969,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	if err := st.ValidateSetField(
-		func() bool { return st.Device.FrequencyPlanID != "" },
+		func() bool { return st.Device.FrequencyPlanId != "" },
 		"frequency_plan_id",
 	); err != nil {
 		return nil, err
@@ -1202,7 +1202,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
 			fp, phy, err := DeviceFrequencyPlanAndBand(&ttnpb.EndDevice{
-				FrequencyPlanID:   m["frequency_plan_id"].FrequencyPlanID,
+				FrequencyPlanId:   m["frequency_plan_id"].FrequencyPlanId,
 				LorawanPhyVersion: m["lorawan_phy_version"].LorawanPhyVersion,
 			}, ns.FrequencyPlans)
 			if err != nil {
@@ -1230,7 +1230,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		) {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
-					if devBandID := dev.GetVersionIDs().GetBandID(); devBandID != "" && devBandID != fp.BandID {
+					if devBandID := dev.GetVersionIDs().GetBandId(); devBandID != "" && devBandID != fp.BandID {
 						return newInvalidFieldValueError("version_ids.band_id").WithCause(
 							errDeviceAndFrequencyPlanBandMismatch.WithAttributes(
 								"dev_band_id", devBandID,

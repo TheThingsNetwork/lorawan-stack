@@ -93,7 +93,7 @@ func TestGetGateway(t *testing.T) {
 					Attributes: map[string]string{
 						"key": "some-key",
 					},
-					FrequencyPlanID:      "EU_863_870",
+					FrequencyPlanId:      "EU_863_870",
 					GatewayServerAddress: "gatewayserver",
 					Antennas: []ttnpb.GatewayAntenna{
 						{Location: &ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 90}},
@@ -118,7 +118,7 @@ func TestGetGateway(t *testing.T) {
 					Attributes: map[string]string{
 						"key": "some-key",
 					},
-					FrequencyPlanID:      "EU_863_870",
+					FrequencyPlanId:      "EU_863_870",
 					GatewayServerAddress: "gatewayserver",
 					Antennas: []ttnpb.GatewayAntenna{
 						{Location: &ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 90}},
@@ -143,7 +143,7 @@ func TestGetGateway(t *testing.T) {
 					Attributes: map[string]string{
 						"key": "some-key",
 					},
-					FrequencyPlanID:      "EU_863_870",
+					FrequencyPlanId:      "EU_863_870",
 					GatewayServerAddress: "gatewayserver",
 					Antennas: []ttnpb.GatewayAntenna{
 						{Location: &ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 90}},

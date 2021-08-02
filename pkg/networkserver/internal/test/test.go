@@ -544,7 +544,7 @@ func WithDeviceDataUplinkConfig(dev *ttnpb.EndDevice, pending bool, drIdx ttnpb.
 		conf.MACVersion = macState.LorawanVersion
 		conf.DevAddr = session.DevAddr
 		conf.FCnt = session.LastFCntUp + fCntDelta
-		conf.DataRate = LoRaWANBands[test.FrequencyPlan(dev.FrequencyPlanID).BandID][dev.LorawanPhyVersion].DataRates[drIdx].Rate
+		conf.DataRate = LoRaWANBands[test.FrequencyPlan(dev.FrequencyPlanId).BandID][dev.LorawanPhyVersion].DataRates[drIdx].Rate
 		conf.DataRateIndex = drIdx
 		conf.Frequency = macState.CurrentParameters.Channels[chIdx].UplinkFrequency
 		conf.ChannelIndex = chIdx

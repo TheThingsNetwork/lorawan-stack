@@ -195,7 +195,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			}
 		}
 
-		fp := test.FrequencyPlan(dev.FrequencyPlanID)
+		fp := test.FrequencyPlan(dev.FrequencyPlanId)
 		phy := LoRaWANBands[fp.BandID][dev.LorawanPhyVersion]
 
 		deviceChannels, ok := ApplyCFList(dev.PendingMACState.PendingJoinRequest.CFList, phy, dev.PendingMACState.CurrentParameters.Channels...)
@@ -228,7 +228,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 
-		fpCmders, fpEvBuilders := frequencyPlanMACCommands(dev.MACState.LorawanVersion, dev.LorawanPhyVersion, dev.FrequencyPlanID, true)
+		fpCmders, fpEvBuilders := frequencyPlanMACCommands(dev.MACState.LorawanVersion, dev.LorawanPhyVersion, dev.FrequencyPlanId, true)
 		downEvBuilders := append(conf.DownlinkEventBuilders, fpEvBuilders...)
 		downCmders = append(downCmders, conf.DownlinkMACCommanders...)
 		downCmders = append(downCmders, fpCmders...)

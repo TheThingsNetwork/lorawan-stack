@@ -126,7 +126,7 @@ func TestGRPC(t *testing.T) {
 		ModelId:         "model",
 		FirmwareVersion: "1.0",
 		HardwareVersion: "1.0",
-		BandID:          "band",
+		BandId:          "band",
 	}
 
 	registeredApplicationID := ttnpb.ApplicationIdentifiers{

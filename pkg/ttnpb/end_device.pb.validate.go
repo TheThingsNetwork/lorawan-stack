@@ -572,7 +572,7 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 
 		case "frequency_plan_id":
 
-			if utf8.RuneCountInString(m.GetFrequencyPlanID()) > 64 {
+			if utf8.RuneCountInString(m.GetFrequencyPlanId()) > 64 {
 				return EndDeviceVersionValidationError{
 					field:  "frequency_plan_id",
 					reason: "value length must be at most 64 runes",
@@ -1829,7 +1829,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "frequency_plan_id":
 
-			if utf8.RuneCountInString(m.GetFrequencyPlanID()) > 64 {
+			if utf8.RuneCountInString(m.GetFrequencyPlanId()) > 64 {
 				return EndDeviceValidationError{
 					field:  "frequency_plan_id",
 					reason: "value length must be at most 64 runes",

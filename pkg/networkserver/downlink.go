@@ -959,7 +959,7 @@ func loggerWithTxRequestFields(logger log.Interface, req *ttnpb.TxRequest, rx1, 
 		"attempt_rx2", rx2,
 		"downlink_class", req.Class,
 		"downlink_priority", req.Priority,
-		"frequency_plan", req.FrequencyPlanID,
+		"frequency_plan", req.FrequencyPlanId,
 	}
 	if rx1 {
 		pairs = append(pairs,
@@ -1236,7 +1236,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	req := &ttnpb.TxRequest{
 		Class:             ttnpb.CLASS_A,
 		Priority:          genDown.Priority,
-		FrequencyPlanID:   dev.FrequencyPlanID,
+		FrequencyPlanId:   dev.FrequencyPlanId,
 		Rx1Delay:          ttnpb.RxDelay(slot.RxDelay / time.Second),
 		LorawanPhyVersion: dev.LorawanPhyVersion,
 	}
@@ -1410,7 +1410,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	req := &ttnpb.TxRequest{
 		Class:             slot.Class,
 		Priority:          genDown.Priority,
-		FrequencyPlanID:   dev.FrequencyPlanID,
+		FrequencyPlanId:   dev.FrequencyPlanId,
 		Rx2DataRateIndex:  drIdx,
 		Rx2Frequency:      freq,
 		AbsoluteTime:      absTime,
@@ -1558,7 +1558,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 				logger = logger.WithFields(log.Fields(
 					"band_id", phy.ID,
-					"frequency_plan_id", dev.FrequencyPlanID,
+					"frequency_plan_id", dev.FrequencyPlanId,
 				))
 				ctx = log.NewContext(ctx, logger)
 
@@ -1639,7 +1639,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					req := &ttnpb.TxRequest{
 						Class:             ttnpb.CLASS_A,
 						Priority:          ns.downlinkPriorities.JoinAccept,
-						FrequencyPlanID:   dev.FrequencyPlanID,
+						FrequencyPlanId:   dev.FrequencyPlanId,
 						Rx1Delay:          ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second),
 						LorawanPhyVersion: dev.LorawanPhyVersion,
 					}

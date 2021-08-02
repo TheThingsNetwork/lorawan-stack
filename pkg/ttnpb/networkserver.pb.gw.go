@@ -69,7 +69,7 @@ func request_Ns_GetDefaultMACSettings_0(ctx context.Context, marshaler runtime.M
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "frequency_plan_id")
 	}
 
-	protoReq.FrequencyPlanID, err = runtime.String(val)
+	protoReq.FrequencyPlanId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "frequency_plan_id", err)
@@ -110,7 +110,7 @@ func local_request_Ns_GetDefaultMACSettings_0(ctx context.Context, marshaler run
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "frequency_plan_id")
 	}
 
-	protoReq.FrequencyPlanID, err = runtime.String(val)
+	protoReq.FrequencyPlanId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "frequency_plan_id", err)

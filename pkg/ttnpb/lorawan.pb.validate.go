@@ -2057,7 +2057,7 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 
 		case "frequency_plan_id":
 
-			if utf8.RuneCountInString(m.GetFrequencyPlanID()) > 64 {
+			if utf8.RuneCountInString(m.GetFrequencyPlanId()) > 64 {
 				return TxRequestValidationError{
 					field:  "frequency_plan_id",
 					reason: "value length must be at most 64 runes",

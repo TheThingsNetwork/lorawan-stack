@@ -74,7 +74,7 @@ func TestWeb(t *testing.T) {
 	is, isAddr := startMockIS(ctx)
 	is.res.Get = &ttnpb.Gateway{
 		GatewayIdentifiers:   registeredGatewayID,
-		FrequencyPlanID:      "EU_863_870",
+		FrequencyPlanId:      "EU_863_870",
 		GatewayServerAddress: "localhost",
 	}
 

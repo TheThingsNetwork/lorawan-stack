@@ -437,14 +437,14 @@ func TestHandleLinkADRAns(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
@@ -455,14 +455,14 @@ func TestHandleLinkADRAns(t *testing.T) {
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
@@ -485,7 +485,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 		{
 			Name: "1 request/all ack",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
@@ -512,7 +512,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
@@ -552,7 +552,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 		{
 			Name: "1.1/2 requests/all ack",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
@@ -600,7 +600,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
@@ -646,7 +646,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name:     "1.0.2/2 requests/all ack",
 			DupCount: 1,
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0_2,
@@ -694,7 +694,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0_2,
@@ -739,7 +739,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 		{
 			Name: "1.0/2 requests/all ack",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0,
@@ -788,7 +788,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.EUFrequencyPlanID,
+				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0,
@@ -844,7 +844,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 		{
 			Name: "1.0.2/2 requests/US915 FSB2",
 			Device: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.USFrequencyPlanID,
+				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion:    ttnpb.MAC_V1_0_2,
@@ -879,7 +879,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				FrequencyPlanID:   test.USFrequencyPlanID,
+				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MACState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0_2,

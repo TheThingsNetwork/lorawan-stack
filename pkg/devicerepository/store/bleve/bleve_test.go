@@ -385,7 +385,7 @@ func TestBleve(t *testing.T) {
 					BrandId:         "foo-vendor",
 					ModelId:         "dev1",
 					FirmwareVersion: "1.0",
-					BandID:          "unknown-band",
+					BandId:          "unknown-band",
 				},
 			} {
 				tmpl, err := s.GetTemplate(&ids)
@@ -401,7 +401,7 @@ func TestBleve(t *testing.T) {
 				ModelId:         "dev2",
 				FirmwareVersion: "1.1",
 				HardwareVersion: "2.0",
-				BandID:          "EU_433",
+				BandId:          "EU_433",
 			})
 			a.So(err, should.BeNil)
 			a.So(tmpl, should.NotBeNil)
@@ -429,7 +429,7 @@ func TestBleve(t *testing.T) {
 					BrandId:         "foo-vendor",
 					ModelId:         "dev1",
 					FirmwareVersion: "1.0",
-					BandID:          "unknown-band",
+					BandId:          "unknown-band",
 				},
 			} {
 				codec, err := s.GetDownlinkDecoder(&ttnpb.GetPayloadFormatterRequest{VersionIDs: &ids})
@@ -474,7 +474,7 @@ func TestBleve(t *testing.T) {
 					BrandId:         "foo-vendor",
 					ModelId:         "dev2",
 					FirmwareVersion: "1.1",
-					BandID:          "EU_433",
+					BandId:          "EU_433",
 				}
 				codec, err := tc.f(&ttnpb.GetPayloadFormatterRequest{VersionIDs: versionIDs})
 				a.So(err, should.BeNil)

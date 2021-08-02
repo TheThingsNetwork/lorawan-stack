@@ -82,7 +82,7 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 	if !ok {
 		gtw = &ttnpb.Gateway{
 			GatewayIdentifiers: ids,
-			FrequencyPlanID:    test.EUFrequencyPlanID,
+			FrequencyPlanId:    test.EUFrequencyPlanID,
 		}
 	}
 	conn, err := io.NewConnection(ctx, frontend, gtw, s.FrequencyPlans, true, nil)
@@ -102,7 +102,7 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 func (s *server) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	var fpID string
 	if gtw, ok := s.gateways[unique.ID(ctx, ids)]; ok {
-		fpID = gtw.FrequencyPlanID
+		fpID = gtw.FrequencyPlanId
 	} else {
 		fpID = test.EUFrequencyPlanID
 	}
@@ -138,8 +138,8 @@ func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifi
 
 func (s *server) RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway) {
 	uid := unique.ID(ctx, ids)
-	if len(gateway.FrequencyPlanIDs) > 0 {
-		gateway.FrequencyPlanID = gateway.FrequencyPlanIDs[0]
+	if len(gateway.FrequencyPlanIds) > 0 {
+		gateway.FrequencyPlanId = gateway.FrequencyPlanIds[0]
 	}
 	s.gateways[uid] = gateway
 }
