@@ -66,7 +66,7 @@ func local(evt Event) *event {
 				Origin:         evt.Origin(),
 				Visibility:     evt.Visibility(),
 				UserAgent:      evt.UserAgent(),
-				RemoteIP:       evt.RemoteIP(),
+				RemoteIp:       evt.RemoteIP(),
 			},
 			data:   evt.Data(),
 			caller: evt.Caller(),
@@ -148,7 +148,7 @@ func (e event) Origin() string                          { return e.innerEvent.Or
 func (e event) Caller() string                          { return e.caller }
 func (e event) Visibility() *ttnpb.Rights               { return e.innerEvent.Visibility }
 func (e event) UserAgent() string                       { return e.innerEvent.UserAgent }
-func (e event) RemoteIP() string                        { return e.innerEvent.RemoteIP }
+func (e event) RemoteIP() string                        { return e.innerEvent.RemoteIp }
 func (e event) AuthType() string                        { return e.innerEvent.GetAuthentication().GetType() }
 func (e event) AuthTokenType() string                   { return e.innerEvent.GetAuthentication().GetTokenType() }
 func (e event) AuthTokenID() string                     { return e.innerEvent.GetAuthentication().GetTokenId() }
@@ -247,7 +247,7 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 			Origin:         pb.Origin,
 			Visibility:     pb.Visibility,
 			Authentication: pb.Authentication,
-			RemoteIP:       pb.RemoteIP,
+			RemoteIp:       pb.RemoteIp,
 			UserAgent:      pb.UserAgent,
 		},
 	}, nil

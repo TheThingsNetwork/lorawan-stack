@@ -63,7 +63,7 @@ message Event {
   // Details on the authentication provided by the caller that triggered this event.
   Authentication authentication = 9;
   // The IP address of the caller that triggered this event.
-  string remote_ip = 10 [(gogoproto.customname) = "RemoteIP"];
+  string remote_ip = 10;
   // The IP address of the caller that triggered this event.
   string user_agent = 11;
   // The unique identifier of the event, assigned on creation.

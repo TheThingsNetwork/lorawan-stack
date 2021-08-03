@@ -131,10 +131,10 @@ func (dst *Event) SetFields(src *Event, paths ...string) error {
 				return fmt.Errorf("'remote_ip' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RemoteIP = src.RemoteIP
+				dst.RemoteIp = src.RemoteIp
 			} else {
 				var zero string
-				dst.RemoteIP = zero
+				dst.RemoteIp = zero
 			}
 		case "user_agent":
 			if len(subs) > 0 {
