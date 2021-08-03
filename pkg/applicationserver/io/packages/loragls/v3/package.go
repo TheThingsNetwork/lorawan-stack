@@ -114,7 +114,7 @@ func (p *GeolocationPackage) singleFrameQuery(ctx context.Context, ids ttnpb.End
 
 func (p *GeolocationPackage) gnssQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
 	req := &api.GNSSRequest{
-		Payload: up.FRMPayload[:],
+		Payload: up.FrmPayload[:],
 	}
 	resp, err := client.SolveGNSS(ctx, req)
 	if err != nil {
@@ -132,8 +132,8 @@ func minInt(a int, b int) int {
 
 func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
 	count := data.MultiFrameWindowSize
-	if count == 0 && len(up.FRMPayload) > 0 {
-		count = int(up.FRMPayload[0])
+	if count == 0 && len(up.FrmPayload) > 0 {
+		count = int(up.FrmPayload[0])
 		count = minInt(count, 16)
 	}
 	if count == 0 {

@@ -48,7 +48,7 @@ func (as *ApplicationServer) encodeAndEncryptDownlinks(ctx context.Context, dev 
 				SessionKeyId:   sessionKeyID,
 				FPort:          item.FPort,
 				FCnt:           fCnt,
-				FRMPayload:     item.FRMPayload,
+				FrmPayload:     item.FrmPayload,
 				DecodedPayload: item.DecodedPayload,
 				Confirmed:      item.Confirmed,
 				ClassBC:        item.ClassBC,
@@ -73,10 +73,10 @@ func (as *ApplicationServer) encodeAndEncryptDownlink(ctx context.Context, dev *
 	if session == nil || session.AppSKey == nil {
 		return errNoAppSKey.New()
 	}
-	if downlink.FRMPayload == nil && downlink.DecodedPayload == nil {
+	if downlink.FrmPayload == nil && downlink.DecodedPayload == nil {
 		return errNoPayload.New()
 	}
-	if downlink.FRMPayload == nil && downlink.DecodedPayload != nil {
+	if downlink.FrmPayload == nil && downlink.DecodedPayload != nil {
 		var formatter ttnpb.PayloadFormatter
 		var parameter string
 		if dev.Formatters != nil {
@@ -98,11 +98,11 @@ func (as *ApplicationServer) encodeAndEncryptDownlink(ctx context.Context, dev *
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.EncryptDownlink(appSKey, session.DevAddr, downlink.FCnt, downlink.FRMPayload, false)
+	frmPayload, err := crypto.EncryptDownlink(appSKey, session.DevAddr, downlink.FCnt, downlink.FrmPayload, false)
 	if err != nil {
 		return err
 	}
-	downlink.FRMPayload = frmPayload
+	downlink.FrmPayload = frmPayload
 	return nil
 }
 
@@ -121,11 +121,11 @@ func (as *ApplicationServer) decryptUplink(ctx context.Context, dev *ttnpb.EndDe
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.DecryptUplink(appSKey, dev.Session.DevAddr, uplink.FCnt, uplink.FRMPayload, false)
+	frmPayload, err := crypto.DecryptUplink(appSKey, dev.Session.DevAddr, uplink.FCnt, uplink.FrmPayload, false)
 	if err != nil {
 		return err
 	}
-	uplink.FRMPayload = frmPayload
+	uplink.FrmPayload = frmPayload
 	return nil
 }
 
@@ -174,11 +174,11 @@ func (as *ApplicationServer) decryptDownlink(ctx context.Context, dev *ttnpb.End
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.DecryptDownlink(appSKey, session.DevAddr, downlink.FCnt, downlink.FRMPayload, false)
+	frmPayload, err := crypto.DecryptDownlink(appSKey, session.DevAddr, downlink.FCnt, downlink.FrmPayload, false)
 	if err != nil {
 		return err
 	}
-	downlink.FRMPayload = frmPayload
+	downlink.FrmPayload = frmPayload
 	return nil
 }
 

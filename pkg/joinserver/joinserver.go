@@ -211,13 +211,13 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 
 	supported := false
 	for _, ver := range supportedMACVersions {
-		if req.SelectedMACVersion == ver {
+		if req.SelectedMacVersion == ver {
 			supported = true
 			break
 		}
 	}
 	if !supported {
-		return nil, errUnsupportedMACVersion.WithAttributes("version", req.SelectedMACVersion)
+		return nil, errUnsupportedMACVersion.WithAttributes("version", req.SelectedMacVersion)
 	}
 
 	req.Payload = &ttnpb.Message{}
@@ -316,7 +316,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			paths := make([]string, 0, 3)
 
 			dn := uint32(binary.BigEndian.Uint16(pld.DevNonce[:]))
-			if req.SelectedMACVersion.IncrementDevNonce() {
+			if req.SelectedMacVersion.IncrementDevNonce() {
 				if (dn != 0 || dev.LastDevNonce != 0 || dev.LastJoinNonce != 0) && !dev.ResetsJoinNonces {
 					if dn <= dev.LastDevNonce {
 						return nil, nil, errDevNonceTooSmall.New()
@@ -337,7 +337,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			}
 
 			var b []byte
-			if req.CFList == nil {
+			if req.CfList == nil {
 				b = make([]byte, 0, 17)
 			} else {
 				b = make([]byte, 0, 33)
@@ -364,7 +364,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			b, err = lorawan.AppendJoinAcceptPayload(b, ttnpb.JoinAcceptPayload{
 				NetId:      req.NetId,
 				JoinNonce:  jn,
-				CFList:     req.CFList,
+				CfList:     req.CfList,
 				DevAddr:    req.DevAddr,
 				DLSettings: req.DownlinkSettings,
 				RxDelay:    req.RxDelay,
@@ -389,7 +389,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			}
 
 			var networkCryptoService cryptoservices.Network
-			if req.SelectedMACVersion.UseNwkKey() && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
+			if req.SelectedMacVersion.UseNwkKey() && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
 				// LoRaWAN 1.1 and higher use a NwkKey.
 				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.NwkKey, js.KeyVault)
 				if err != nil {
@@ -407,7 +407,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 					return nil, nil, err
 				}
 				applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
-				if !req.SelectedMACVersion.UseNwkKey() {
+				if !req.SelectedMacVersion.UseNwkKey() {
 					// LoRaWAN 1.0.x use the AppKey for network security operations.
 					networkCryptoService = cryptoservices.NewMemory(nil, &appKey)
 				}
@@ -425,26 +425,26 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if err := cryptoDev.SetFields(dev, "ids", "provisioner_id", "provisioning_data"); err != nil {
 				return nil, nil, err
 			}
-			reqMIC, err := networkCryptoService.JoinRequestMIC(ctx, cryptoDev, req.SelectedMACVersion, req.RawPayload[:19])
+			reqMIC, err := networkCryptoService.JoinRequestMIC(ctx, cryptoDev, req.SelectedMacVersion, req.RawPayload[:19])
 			if err != nil {
 				return nil, nil, errComputeMIC.WithCause(err)
 			}
 			if !bytes.Equal(reqMIC[:], req.RawPayload[19:]) {
 				return nil, nil, errMICMismatch.New()
 			}
-			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, cryptoDev, req.SelectedMACVersion, 0xff, pld.DevNonce, b)
+			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, cryptoDev, req.SelectedMacVersion, 0xff, pld.DevNonce, b)
 			if err != nil {
 				return nil, nil, errComputeMIC.WithCause(err)
 			}
-			enc, err := networkCryptoService.EncryptJoinAccept(ctx, cryptoDev, req.SelectedMACVersion, append(b[1:], resMIC[:]...))
+			enc, err := networkCryptoService.EncryptJoinAccept(ctx, cryptoDev, req.SelectedMacVersion, append(b[1:], resMIC[:]...))
 			if err != nil {
 				return nil, nil, errEncryptPayload.WithCause(err)
 			}
-			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoDev, req.SelectedMACVersion, jn, pld.DevNonce, req.NetId)
+			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoDev, req.SelectedMacVersion, jn, pld.DevNonce, req.NetId)
 			if err != nil {
 				return nil, nil, errDeriveNwkSKeys.WithCause(err)
 			}
-			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoDev, req.SelectedMACVersion, jn, pld.DevNonce, req.NetId)
+			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoDev, req.SelectedMacVersion, jn, pld.DevNonce, req.NetId)
 			if err != nil {
 				return nil, nil, errDeriveAppSKey.WithCause(err)
 			}
@@ -467,7 +467,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if err != nil {
 				return nil, nil, err
 			}
-			if req.SelectedMACVersion.UseNwkKey() {
+			if req.SelectedMacVersion.UseNwkKey() {
 				sNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.SNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
 				if err != nil {
 					return nil, nil, err

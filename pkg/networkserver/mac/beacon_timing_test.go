@@ -47,7 +47,7 @@ func TestNeedsBeaconTimingReq(t *testing.T) {
 			TestCase{
 				Name: makeClassName("empty parameters"),
 				InputDevice: &ttnpb.EndDevice{
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DeviceClass: class,
 					},
 				},
@@ -84,12 +84,12 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						// TODO: Support BeaconTimingReq. (https://github.com/TheThingsNetwork/lorawan-stack/issues/2431)
 					},
@@ -99,7 +99,7 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
 						{},
@@ -108,7 +108,7 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
 						{},

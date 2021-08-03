@@ -40,7 +40,7 @@ func TestNeedsDutyCycleReq(t *testing.T) {
 		{
 			Name: "current(max-duty-cycle:1024),desired(max-duty-cycle:1024)",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_1024,
 					},
@@ -53,7 +53,7 @@ func TestNeedsDutyCycleReq(t *testing.T) {
 		{
 			Name: "current(max-duty-cycle:1024),desired(max-duty-cycle:2048)",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_1024,
 					},
@@ -93,10 +93,10 @@ func TestHandleDutyCycleAns(t *testing.T) {
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Events: events.Builders{
 				EvtReceiveDutyCycleAnswer,
@@ -106,7 +106,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 		{
 			Name: "2048",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DutyCycleReq{
 							MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
@@ -115,7 +115,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					CurrentParameters: ttnpb.MACParameters{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,

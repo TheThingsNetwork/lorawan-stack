@@ -1155,8 +1155,8 @@ func TestGatewayServer(t *testing.T) {
 										{
 											Settings: ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
-													Modulation: &ttnpb.DataRate_FSK{
-														FSK: &ttnpb.FSKDataRate{
+													Modulation: &ttnpb.DataRate_Fsk{
+														Fsk: &ttnpb.FSKDataRate{
 															BitRate: 50000,
 														},
 													},

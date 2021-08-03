@@ -126,7 +126,7 @@ func (m *Event) ValidateFields(paths ...string) error {
 			}
 
 		case "remote_ip":
-			// no validation rules for RemoteIP
+			// no validation rules for RemoteIp
 		case "user_agent":
 			// no validation rules for UserAgent
 		case "unique_id":

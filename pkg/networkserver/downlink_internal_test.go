@@ -117,7 +117,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 
 	encodeMessage := func(msg *ttnpb.Message, ver ttnpb.MACVersion, confFCnt uint32) []byte {
 		msg = deepcopy.Copy(msg).(*ttnpb.Message)
-		pld := msg.GetMACPayload()
+		pld := msg.GetMacPayload()
 
 		b, err := lorawan.MarshalMessage(*msg)
 		if err != nil {
@@ -158,14 +158,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
 						},
 					}},
 				},
@@ -183,10 +183,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion:      ttnpb.MAC_V1_1,
 					LastDevStatusFCntUp: 2,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
@@ -194,7 +194,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							MHDR: ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
 						},
 					}},
 				},
@@ -215,17 +215,17 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity: DurationPtr(24 * time.Hour),
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
 						},
 					}},
 				},
@@ -244,15 +244,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
 								MType: ttnpb.MType_CONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
+							Payload: &ttnpb.Message_MacPayload{
+								MacPayload: &ttnpb.MACPayload{
 									FHDR: ttnpb.FHDR{
 										FCnt: 24,
 									},
@@ -289,8 +289,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
@@ -311,15 +311,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_CONFIRMED_UP,
 								},
-								Payload: &ttnpb.Message_MACPayload{
-									MACPayload: &ttnpb.MACPayload{
+								Payload: &ttnpb.Message_MacPayload{
+									MacPayload: &ttnpb.MACPayload{
 										FHDR: ttnpb.FHDR{
 											FCnt: 24,
 										},
@@ -361,14 +361,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
 						},
 					}},
 					RxWindowsAvailable: true,
@@ -388,7 +388,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							Confirmed:  false,
 							FCnt:       42,
 							FPort:      1,
-							FRMPayload: []byte("test"),
+							FrmPayload: []byte("test"),
 						},
 					},
 				},
@@ -400,8 +400,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
@@ -412,7 +412,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 						FullFCnt:   42,
 						FPort:      1,
-						FRMPayload: []byte("test"),
+						FrmPayload: []byte("test"),
 					},
 				},
 			},
@@ -421,7 +421,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Confirmed:  false,
 					FCnt:       42,
 					FPort:      1,
-					FRMPayload: []byte("test"),
+					FrmPayload: []byte("test"),
 				})
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
@@ -431,14 +431,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
 								},
-								Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
 							},
 						}},
 						RxWindowsAvailable: true,
@@ -468,15 +468,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
 								MType: ttnpb.MType_CONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
+							Payload: &ttnpb.Message_MacPayload{
+								MacPayload: &ttnpb.MACPayload{
 									FHDR: ttnpb.FHDR{
 										FCnt: 24,
 									},
@@ -502,7 +502,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							Confirmed:  false,
 							FCnt:       42,
 							FPort:      1,
-							FRMPayload: []byte("test"),
+							FrmPayload: []byte("test"),
 						},
 					},
 				},
@@ -514,8 +514,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
@@ -526,7 +526,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 						FullFCnt:   42,
 						FPort:      1,
-						FRMPayload: []byte("test"),
+						FrmPayload: []byte("test"),
 					},
 				},
 			},
@@ -536,7 +536,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Confirmed:  false,
 					FCnt:       42,
 					FPort:      1,
-					FRMPayload: []byte("test"),
+					FrmPayload: []byte("test"),
 				})
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
@@ -546,15 +546,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_CONFIRMED_UP,
 								},
-								Payload: &ttnpb.Message_MACPayload{
-									MACPayload: &ttnpb.MACPayload{
+								Payload: &ttnpb.Message_MacPayload{
+									MacPayload: &ttnpb.MACPayload{
 										FHDR: ttnpb.FHDR{
 											FCnt: 24,
 										},
@@ -590,14 +590,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
 						},
 					}},
 				},
@@ -616,7 +616,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							Confirmed:  true,
 							FCnt:       42,
 							FPort:      1,
-							FRMPayload: []byte("test"),
+							FrmPayload: []byte("test"),
 						},
 					},
 				},
@@ -628,8 +628,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 					MType: ttnpb.MType_CONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
@@ -640,7 +640,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 						FullFCnt:   42,
 						FPort:      1,
-						FRMPayload: []byte("test"),
+						FrmPayload: []byte("test"),
 					},
 				},
 			},
@@ -649,12 +649,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Confirmed:  true,
 					FCnt:       42,
 					FPort:      1,
-					FRMPayload: []byte("test"),
+					FrmPayload: []byte("test"),
 				})
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
-				if !a.So(dev.MACState, should.NotBeNil) {
+				if !a.So(dev.MacState, should.NotBeNil) {
 					t.FailNow()
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
@@ -663,14 +663,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
 								},
-								Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
 							},
 						}},
 					},
@@ -699,15 +699,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
 								MType: ttnpb.MType_CONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
+							Payload: &ttnpb.Message_MacPayload{
+								MacPayload: &ttnpb.MACPayload{
 									FHDR: ttnpb.FHDR{
 										FCnt: 24,
 									},
@@ -733,7 +733,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							Confirmed:  true,
 							FCnt:       42,
 							FPort:      1,
-							FRMPayload: []byte("test"),
+							FrmPayload: []byte("test"),
 						},
 					},
 				},
@@ -745,8 +745,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 					MType: ttnpb.MType_CONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
@@ -757,7 +757,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 						FullFCnt:   42,
 						FPort:      1,
-						FRMPayload: []byte("test"),
+						FrmPayload: []byte("test"),
 					},
 				},
 			},
@@ -767,12 +767,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Confirmed:  true,
 					FCnt:       42,
 					FPort:      1,
-					FRMPayload: []byte("test"),
+					FrmPayload: []byte("test"),
 				})
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
-				if !a.So(dev.MACState, should.NotBeNil) {
+				if !a.So(dev.MacState, should.NotBeNil) {
 					t.FailNow()
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
@@ -781,15 +781,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_CONFIRMED_UP,
 								},
-								Payload: &ttnpb.Message_MACPayload{
-									MACPayload: &ttnpb.MACPayload{
+								Payload: &ttnpb.Message_MacPayload{
+									MacPayload: &ttnpb.MACPayload{
 										FHDR: ttnpb.FHDR{
 											FCnt: 24,
 										},
@@ -825,10 +825,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion:      ttnpb.MAC_V1_1,
 					LastDevStatusFCntUp: 4,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
@@ -836,7 +836,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							MHDR: ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
 						},
 					}},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
@@ -867,8 +867,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
@@ -887,7 +887,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
-				if !a.So(dev.MACState, should.NotBeNil) {
+				if !a.So(dev.MacState, should.NotBeNil) {
 					t.FailNow()
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
@@ -896,10 +896,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
-					MACSettings: &ttnpb.MACSettings{
+					MacSettings: &ttnpb.MACSettings{
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						LorawanVersion:      ttnpb.MAC_V1_1,
 						LastDevStatusFCntUp: 4,
 						PendingRequests: []*ttnpb.MACCommand{
@@ -910,7 +910,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
 								},
-								Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
 							},
 						}},
 						RecentDownlinks: []*ttnpb.DownlinkMessage{
@@ -946,17 +946,17 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DeviceId:               devID,
 					DevAddr:                &devAddr,
 				},
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity: DurationPtr(time.Nanosecond),
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
 						},
 					}},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
@@ -986,8 +986,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
 							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
@@ -1006,7 +1006,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
-				if !a.So(dev.MACState, should.NotBeNil) {
+				if !a.So(dev.MacState, should.NotBeNil) {
 					t.FailNow()
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
@@ -1015,10 +1015,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DeviceId:               devID,
 						DevAddr:                &devAddr,
 					},
-					MACSettings: &ttnpb.MACSettings{
+					MacSettings: &ttnpb.MACSettings{
 						StatusTimePeriodicity: DurationPtr(time.Nanosecond),
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						LorawanVersion: ttnpb.MAC_V1_1,
 						PendingRequests: []*ttnpb.MACCommand{
 							ttnpb.CID_DEV_STATUS.MACCommand(),
@@ -1028,7 +1028,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
 								},
-								Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
 							},
 						}},
 						RecentDownlinks: []*ttnpb.DownlinkMessage{
@@ -1090,7 +1090,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					return
 				}
 
-				genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, dev.MACState.DeviceClass, time.Now(), math.MaxUint16, math.MaxUint16)
+				genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, dev.MacState.DeviceClass, time.Now(), math.MaxUint16, math.MaxUint16)
 				if tc.Error != nil {
 					a.So(err, should.EqualErrorOrDefinition, tc.Error)
 					a.So(genDown, should.BeNil)
@@ -1103,10 +1103,10 @@ func TestGenerateDataDownlink(t *testing.T) {
 					return
 				}
 
-				b := encodeMessage(tc.Payload, dev.MACState.LorawanVersion, tc.ConfFCnt)
+				b := encodeMessage(tc.Payload, dev.MacState.LorawanVersion, tc.ConfFCnt)
 				a.So(genDown.RawPayload, should.Resemble, b)
 				pld := CopyMessage(tc.Payload)
-				pld.MIC = b[len(b)-4:]
+				pld.Mic = b[len(b)-4:]
 				a.So(genDown.Payload, should.Resemble, pld)
 				if tc.ApplicationDownlinkAssertion != nil {
 					a.So(tc.ApplicationDownlinkAssertion(t, genState.ApplicationDownlink), should.BeTrue)

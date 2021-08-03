@@ -88,15 +88,15 @@ func TestInteropJoinRequest(t *testing.T) {
 			ExpectedJoinRequest: &ttnpb.JoinRequest{
 				RawPayload:         []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:            types.DevAddr{0x1, 0x2, 0x3, 0x4},
-				SelectedMACVersion: ttnpb.MAC_V1_0_3,
+				SelectedMacVersion: ttnpb.MAC_V1_0_3,
 				NetId:              types.NetID{0x0, 0x0, 0x13},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x6,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x6,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: ttnpb.RX_DELAY_5,
-				CFList: &ttnpb.CFList{
+				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
 				},
@@ -167,15 +167,15 @@ func TestInteropJoinRequest(t *testing.T) {
 			ExpectedJoinRequest: &ttnpb.JoinRequest{
 				RawPayload:         []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:            types.DevAddr{0x1, 0x2, 0x3, 0x4},
-				SelectedMACVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MAC_V1_1,
 				NetId:              types.NetID{0x0, 0x0, 0x13},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x6,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x6,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: ttnpb.RX_DELAY_5,
-				CFList: &ttnpb.CFList{
+				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
 				},
@@ -262,15 +262,15 @@ func TestInteropJoinRequest(t *testing.T) {
 			ExpectedJoinRequest: &ttnpb.JoinRequest{
 				RawPayload:         []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:            types.DevAddr{0x1, 0x2, 0x3, 0x4},
-				SelectedMACVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MAC_V1_1,
 				NetId:              types.NetID{0x0, 0x0, 0x13},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x6,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x6,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: ttnpb.RX_DELAY_5,
-				CFList: &ttnpb.CFList{
+				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
 				},
@@ -306,15 +306,15 @@ func TestInteropJoinRequest(t *testing.T) {
 			ExpectedJoinRequest: &ttnpb.JoinRequest{
 				RawPayload:         []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:            types.DevAddr{0x1, 0x2, 0x3, 0x4},
-				SelectedMACVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MAC_V1_1,
 				NetId:              types.NetID{0x0, 0x0, 0x13},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x6,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x6,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: ttnpb.RX_DELAY_5,
-				CFList: &ttnpb.CFList{
+				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
 				},
@@ -350,15 +350,15 @@ func TestInteropJoinRequest(t *testing.T) {
 			ExpectedJoinRequest: &ttnpb.JoinRequest{
 				RawPayload:         []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:            types.DevAddr{0x1, 0x2, 0x3, 0x4},
-				SelectedMACVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MAC_V1_1,
 				NetId:              types.NetID{0x0, 0x0, 0x13},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x6,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x6,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: ttnpb.RX_DELAY_5,
-				CFList: &ttnpb.CFList{
+				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
 				},

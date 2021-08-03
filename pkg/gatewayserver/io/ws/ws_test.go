@@ -792,7 +792,7 @@ func TestTraffic(t *testing.T) {
 			ExpectedNetworkUpstream: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
-					MIC:  []byte{0x4E, 0x61, 0xBC, 0x00},
+					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEui:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
 						DevEui:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
@@ -847,10 +847,10 @@ func TestTraffic(t *testing.T) {
 			ExpectedNetworkUpstream: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
-					MIC:  []byte{0x4E, 0x61, 0xBC, 0x00},
-					Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
+					Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 						FPort:      0,
-						FRMPayload: []byte{0x5F, 0xCC},
+						FrmPayload: []byte{0x5F, 0xCC},
 						FHDR: ttnpb.FHDR{
 							DevAddr: [4]byte{0x11, 0x22, 0x33, 0x44},
 							FCtrl: ttnpb.FCtrl{

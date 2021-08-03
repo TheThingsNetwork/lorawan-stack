@@ -46,9 +46,9 @@ message ClaimEndDeviceRequest {
   oneof source_device {
     option (validate.required) = true;
     // Authenticated identifiers.
-    AuthenticatedIdentifiers authenticated_identifiers = 1 [(gogoproto.customname) = "AuthenticatedIdentifiers"];
+    AuthenticatedIdentifiers authenticated_identifiers = 1;
     // Raw QR code contents.
-    bytes qr_code = 2 [(validate.rules).bytes = {min_len: 0, max_len: 1024}, (gogoproto.customname) = "QRCode"];
+    bytes qr_code = 2 [(validate.rules).bytes = {min_len: 0, max_len: 1024}];
   }
 
   // Application identifiers of the target end device.
@@ -147,8 +147,8 @@ message ClaimGatewayRequest {
   }
   oneof source_gateway {
     option (validate.required) = true;
-    AuthenticatedIdentifiers authenticated_identifiers = 1 [(gogoproto.customname) = "AuthenticatedIdentifiers"];
-    bytes qr_code = 2 [(validate.rules).bytes = {min_len: 0, max_len: 1024}, (gogoproto.customname) = "QRCode"];
+    AuthenticatedIdentifiers authenticated_identifiers = 1;
+    bytes qr_code = 2 [(validate.rules).bytes = {min_len: 0, max_len: 1024}];
   }
 
   // Collaborator to grant all rights on the target gateway.

@@ -38,12 +38,12 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					DeviceClass: ttnpb.CLASS_B,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					DeviceClass: ttnpb.CLASS_B,
 				},
 			},
@@ -52,12 +52,12 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 		{
 			Name: "class B device",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					DeviceClass: ttnpb.CLASS_B,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					DeviceClass: ttnpb.CLASS_B,
 				},
 			},
@@ -73,12 +73,12 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					DeviceClass: ttnpb.CLASS_A,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					DeviceClass:         ttnpb.CLASS_A,
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: 42},
 					QueuedResponses: []*ttnpb.MACCommand{
@@ -99,7 +99,7 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					DeviceClass: ttnpb.CLASS_A,
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
@@ -109,7 +109,7 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					DeviceClass:         ttnpb.CLASS_A,
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: 42},
 					QueuedResponses: []*ttnpb.MACCommand{

@@ -184,13 +184,13 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 			FCnt:    42,
 		},
 		FPort:      fPort,
-		FRMPayload: random.Bytes(size),
+		FrmPayload: random.Bytes(size),
 	}
-	buf, err := crypto.EncryptUplink(appSKey, devAddr, pld.FCnt, pld.FRMPayload, false)
+	buf, err := crypto.EncryptUplink(appSKey, devAddr, pld.FCnt, pld.FrmPayload, false)
 	if err != nil {
 		panic(err)
 	}
-	pld.FRMPayload = buf
+	pld.FrmPayload = buf
 
 	msg := &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
@@ -198,8 +198,8 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 				MType: ttnpb.MType_UNCONFIRMED_UP,
 				Major: ttnpb.Major_LORAWAN_R1,
 			},
-			Payload: &ttnpb.Message_MACPayload{
-				MACPayload: pld,
+			Payload: &ttnpb.Message_MacPayload{
+				MacPayload: pld,
 			},
 		},
 	}
@@ -225,21 +225,21 @@ func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte
 			FCnt:    42,
 		},
 		FPort:      fPort,
-		FRMPayload: random.Bytes(size),
+		FrmPayload: random.Bytes(size),
 	}
-	buf, err := crypto.EncryptDownlink(appSKey, devAddr, pld.FCnt, pld.FRMPayload, false)
+	buf, err := crypto.EncryptDownlink(appSKey, devAddr, pld.FCnt, pld.FrmPayload, false)
 	if err != nil {
 		panic(err)
 	}
-	pld.FRMPayload = buf
+	pld.FrmPayload = buf
 
 	msg := ttnpb.Message{
 		MHDR: ttnpb.MHDR{
 			MType: ttnpb.MType_UNCONFIRMED_DOWN,
 			Major: ttnpb.Major_LORAWAN_R1,
 		},
-		Payload: &ttnpb.Message_MACPayload{
-			MACPayload: pld,
+		Payload: &ttnpb.Message_MacPayload{
+			MacPayload: pld,
 		},
 	}
 	buf, err = lorawan.MarshalMessage(msg)

@@ -175,7 +175,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		var upCmders []MACCommander
 		var upEvBuilders []events.Builder
 		var downCmders []MACCommander
-		if dev.PendingMACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+		if dev.PendingMacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 			rekeyInd := &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: ttnpb.MINOR_1,
 			}
@@ -198,12 +198,12 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		fp := test.FrequencyPlan(dev.FrequencyPlanId)
 		phy := LoRaWANBands[fp.BandID][dev.LorawanPhyVersion]
 
-		deviceChannels, ok := ApplyCFList(dev.PendingMACState.PendingJoinRequest.CFList, phy, dev.PendingMACState.CurrentParameters.Channels...)
+		deviceChannels, ok := ApplyCFList(dev.PendingMacState.PendingJoinRequest.CfList, phy, dev.PendingMacState.CurrentParameters.Channels...)
 		if !a.So(ok, should.BeTrue) {
 			t.Error("Failed to apply CFList")
 			return
 		}
-		dev.PendingMACState.CurrentParameters.Channels = deviceChannels
+		dev.PendingMacState.CurrentParameters.Channels = deviceChannels
 		dev.EndDeviceIdentifiers.DevAddr = &dev.PendingSession.DevAddr
 		dev, ok = env.AssertHandleDataUplink(ctx, DataUplinkAssertionConfig{
 			Device:        dev,
@@ -228,7 +228,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 
-		fpCmders, fpEvBuilders := frequencyPlanMACCommands(dev.MACState.LorawanVersion, dev.LorawanPhyVersion, dev.FrequencyPlanId, true)
+		fpCmders, fpEvBuilders := frequencyPlanMACCommands(dev.MacState.LorawanVersion, dev.LorawanPhyVersion, dev.FrequencyPlanId, true)
 		downEvBuilders := append(conf.DownlinkEventBuilders, fpEvBuilders...)
 		downCmders = append(downCmders, conf.DownlinkMACCommanders...)
 		downCmders = append(downCmders, fpCmders...)
@@ -242,7 +242,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		down := MakeDataDownlink(DataDownlinkConfig{
 			DecodePayload: true,
 
-			MACVersion: dev.MACState.LorawanVersion,
+			MACVersion: dev.MacState.LorawanVersion,
 			DevAddr:    dev.Session.DevAddr,
 			FCtrl: ttnpb.FCtrl{
 				Adr: true,
@@ -272,14 +272,14 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 		if !a.So(env.Events, should.ReceiveEventsResembling, events.Builders(downEvBuilders).New(
-			events.ContextWithCorrelationID(ctx, LastDownlink(dev.MACState.RecentDownlinks...).CorrelationIds...),
+			events.ContextWithCorrelationID(ctx, LastDownlink(dev.MacState.RecentDownlinks...).CorrelationIds...),
 			events.WithIdentifiers(&dev.EndDeviceIdentifiers)),
 		) {
 			t.Error("Data downlink event assertion failed")
 			return
 		}
 
-		if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			if !a.So(env.AssertNsAsHandleUplink(ctx, dev.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
 				if !a.So(ups, should.HaveLength, 1) {

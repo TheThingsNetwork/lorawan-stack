@@ -22,10 +22,10 @@ func (dst *MQTTConnectionInfo) SetFields(src *MQTTConnectionInfo, paths ...strin
 				return fmt.Errorf("'public_tls_address' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.PublicTLSAddress = src.PublicTLSAddress
+				dst.PublicTlsAddress = src.PublicTlsAddress
 			} else {
 				var zero string
-				dst.PublicTLSAddress = zero
+				dst.PublicTlsAddress = zero
 			}
 		case "username":
 			if len(subs) > 0 {

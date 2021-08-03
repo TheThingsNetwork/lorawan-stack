@@ -112,7 +112,7 @@ func (v *ApplicationDownlink) FieldIsZero(p string) bool {
 	case "f_port":
 		return v.FPort == 0
 	case "frm_payload":
-		return v.FRMPayload == nil
+		return v.FrmPayload == nil
 	case "priority":
 		return v.Priority == 0
 	case "session_key_id":

@@ -471,7 +471,7 @@ var errNoUplinkMatch = errors.DefineNotFound("no_uplink_match", "no device match
 func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, *networkserver.UplinkMatch) (bool, error)) error {
 	defer trace.StartRegion(ctx, "range end devices by dev_addr").End()
 
-	pld := up.Payload.GetMACPayload()
+	pld := up.Payload.GetMacPayload()
 	lsb := uint16(pld.FCnt)
 
 	addrKey := r.addrKey(pld.DevAddr)
@@ -776,17 +776,17 @@ func removeAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string
 
 func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
 	return msgpack.Marshal(UplinkMatchSession{
-		LoRaWANVersion:    dev.GetMACState().GetLorawanVersion(),
+		LoRaWANVersion:    dev.GetMacState().GetLorawanVersion(),
 		FNwkSIntKey:       dev.GetSession().GetFNwkSIntKey(),
 		LastFCnt:          dev.GetSession().GetLastFCntUp(),
-		ResetsFCnt:        dev.GetMACSettings().GetResetsFCnt(),
-		Supports32BitFCnt: dev.GetMACSettings().GetSupports32BitFCnt(),
+		ResetsFCnt:        dev.GetMacSettings().GetResetsFCnt(),
+		Supports32BitFCnt: dev.GetMacSettings().GetSupports_32BitFCnt(),
 	})
 }
 
 func MarshalDevicePendingSession(dev *ttnpb.EndDevice) ([]byte, error) {
 	return msgpack.Marshal(UplinkMatchSession{
-		LoRaWANVersion: dev.GetPendingMACState().GetLorawanVersion(),
+		LoRaWANVersion: dev.GetPendingMacState().GetLorawanVersion(),
 		FNwkSIntKey:    dev.GetPendingSession().GetFNwkSIntKey(),
 	})
 }
@@ -933,8 +933,8 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				updated.CreatedAt = updated.UpdatedAt
 			}
 
-			if updated.Session != nil && updated.MACState == nil ||
-				updated.PendingSession != nil && updated.PendingMACState == nil {
+			if updated.Session != nil && updated.MacState == nil ||
+				updated.PendingSession != nil && updated.PendingMacState == nil {
 				return errInvalidDevice.New()
 			}
 
@@ -949,9 +949,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					case !updated.PendingSession.DevAddr.Equal(storedPendingSession.DevAddr):
 						return true, true, true
 					}
-					storedPendingMACState := stored.GetPendingMACState()
+					storedPendingMACState := stored.GetPendingMacState()
 					return false, false, storedPendingMACState == nil ||
-						updated.PendingMACState.LorawanVersion != storedPendingMACState.LorawanVersion ||
+						updated.PendingMacState.LorawanVersion != storedPendingMACState.LorawanVersion ||
 						!updated.PendingSession.FNwkSIntKey.Equal(storedPendingSession.FNwkSIntKey)
 				}()
 				if removeStored {
@@ -985,13 +985,13 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					case updated.Session.LastFCntUp != storedSession.LastFCntUp:
 						return false, true, true
 					}
-					storedMACState := stored.GetMACState()
-					storedMACSettings := stored.GetMACSettings()
+					storedMACState := stored.GetMacState()
+					storedMACSettings := stored.GetMacSettings()
 					return false, false, storedMACState == nil ||
-						updated.MACState.LorawanVersion != storedMACState.LorawanVersion ||
+						updated.MacState.LorawanVersion != storedMACState.LorawanVersion ||
 						!updated.Session.FNwkSIntKey.Equal(storedSession.FNwkSIntKey) ||
-						!updated.MACSettings.GetResetsFCnt().Equal(storedMACSettings.GetResetsFCnt()) ||
-						!updated.MACSettings.GetSupports32BitFCnt().Equal(storedMACSettings.GetSupports32BitFCnt())
+						!updated.MacSettings.GetResetsFCnt().Equal(storedMACSettings.GetResetsFCnt()) ||
+						!updated.MacSettings.GetSupports_32BitFCnt().Equal(storedMACSettings.GetSupports_32BitFCnt())
 				}()
 				if removeStored {
 					removeAddrMapping(ctx, p, CurrentAddrKey(r.addrKey(storedSession.DevAddr)), uid)

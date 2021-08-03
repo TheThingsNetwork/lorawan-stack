@@ -38,22 +38,22 @@ func TestHandleDeviceModeInd(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Error: ErrNoPayload,
 		},
 		{
 			Name: "does not support class C/empty queue",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					DeviceClass: ttnpb.CLASS_A,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DeviceModeConf{
 							Class: ttnpb.CLASS_A,
@@ -78,13 +78,13 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Name: "supports class C/empty queue",
 			Device: &ttnpb.EndDevice{
 				SupportsClassC: true,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					DeviceClass: ttnpb.CLASS_A,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				SupportsClassC: true,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DeviceModeConf{
 							Class: ttnpb.CLASS_C,
@@ -110,7 +110,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Name: "supports class C/non-empty queue",
 			Device: &ttnpb.EndDevice{
 				SupportsClassC: true,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
 						{},
@@ -121,7 +121,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				SupportsClassC: true,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
 						{},

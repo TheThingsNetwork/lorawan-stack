@@ -75,7 +75,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
@@ -89,16 +89,16 @@ func TestAdaptDataRate(t *testing.T) {
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_4
-				dev.MACState.DesiredParameters.AdrTxPowerIndex = 1
-				dev.MACState.DesiredParameters.AdrNbTrans = 1
+				dev.MacState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_4
+				dev.MacState.DesiredParameters.AdrTxPowerIndex = 1
+				dev.MacState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 		{
@@ -106,7 +106,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
@@ -120,16 +120,16 @@ func TestAdaptDataRate(t *testing.T) {
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_3
-				dev.MACState.DesiredParameters.AdrTxPowerIndex = 2
-				dev.MACState.DesiredParameters.AdrNbTrans = 1
+				dev.MacState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_3
+				dev.MacState.DesiredParameters.AdrTxPowerIndex = 2
+				dev.MacState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 		{
@@ -137,7 +137,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
@@ -151,16 +151,16 @@ func TestAdaptDataRate(t *testing.T) {
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_4
-				dev.MACState.DesiredParameters.AdrTxPowerIndex = 0
-				dev.MACState.DesiredParameters.AdrNbTrans = 1
+				dev.MacState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_4
+				dev.MacState.DesiredParameters.AdrTxPowerIndex = 0
+				dev.MacState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 		{
@@ -168,7 +168,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
@@ -182,16 +182,16 @@ func TestAdaptDataRate(t *testing.T) {
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_3
-				dev.MACState.DesiredParameters.AdrTxPowerIndex = 2
-				dev.MACState.DesiredParameters.AdrNbTrans = 1
+				dev.MacState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_3
+				dev.MacState.DesiredParameters.AdrTxPowerIndex = 2
+				dev.MacState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 		{
@@ -199,7 +199,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
@@ -216,16 +216,16 @@ func TestAdaptDataRate(t *testing.T) {
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_3
-				dev.MACState.DesiredParameters.AdrTxPowerIndex = 1
-				dev.MACState.DesiredParameters.AdrNbTrans = 1
+				dev.MacState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_3
+				dev.MacState.DesiredParameters.AdrTxPowerIndex = 1
+				dev.MacState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 		{
@@ -233,7 +233,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
@@ -250,16 +250,16 @@ func TestAdaptDataRate(t *testing.T) {
 					},
 					RecentUplinks: semtechPaperUplinks,
 				},
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					AdrMargin: &pbtypes.FloatValue{
 						Value: 2,
 					},
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_2
-				dev.MACState.DesiredParameters.AdrTxPowerIndex = 3
-				dev.MACState.DesiredParameters.AdrNbTrans = 1
+				dev.MacState.DesiredParameters.AdrDataRateIndex = ttnpb.DATA_RATE_2
+				dev.MacState.DesiredParameters.AdrTxPowerIndex = 3
+				dev.MacState.DesiredParameters.AdrNbTrans = 1
 			},
 		},
 	} {
@@ -343,7 +343,7 @@ func TestIssue458(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
 					DesiredParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
 					RecentUplinks:     issue458Uplinks[:9],
@@ -355,14 +355,14 @@ func TestIssue458(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
 					DesiredParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
 					RecentUplinks:     issue458Uplinks[:],
 				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
-				dev.MACState.DesiredParameters.AdrNbTrans = 3
+				dev.MacState.DesiredParameters.AdrNbTrans = 3
 			},
 		},
 	} {

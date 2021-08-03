@@ -40,7 +40,7 @@ const (
 )
 
 func DeviceStatusCountPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
-	if v := dev.GetMACSettings().GetStatusCountPeriodicity(); v != nil {
+	if v := dev.GetMacSettings().GetStatusCountPeriodicity(); v != nil {
 		return v.Value
 	}
 	if defaults.StatusCountPeriodicity != nil {
@@ -50,7 +50,7 @@ func DeviceStatusCountPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettin
 }
 
 func DeviceStatusTimePeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
-	if v := dev.GetMACSettings().GetStatusTimePeriodicity(); v != nil {
+	if v := dev.GetMacSettings().GetStatusTimePeriodicity(); v != nil {
 		return *v
 	}
 	if defaults.StatusTimePeriodicity != nil {
@@ -60,7 +60,7 @@ func DeviceStatusTimePeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSetting
 }
 
 func DeviceNeedsDevStatusReqAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) (time.Time, bool) {
-	if dev.MACState == nil {
+	if dev.MacState == nil {
 		return time.Time{}, false
 	}
 	tp := DeviceStatusTimePeriodicity(dev, defaults)
@@ -74,13 +74,13 @@ func DeviceNeedsDevStatusReqAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings)
 }
 
 func DeviceNeedsDevStatusReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, transmitAt time.Time) bool {
-	if dev.GetMulticast() || dev.GetMACState() == nil {
+	if dev.GetMulticast() || dev.GetMacState() == nil {
 		return false
 	}
 	timedAt, timeBound := DeviceNeedsDevStatusReqAt(dev, defaults)
 	cp := DeviceStatusCountPeriodicity(dev, defaults)
 	return (cp != 0 || timeBound) && dev.LastDevStatusReceivedAt == nil ||
-		cp != 0 && dev.MACState.LastDevStatusFCntUp+cp <= dev.Session.LastFCntUp ||
+		cp != 0 && dev.MacState.LastDevStatusFCntUp+cp <= dev.Session.LastFCntUp ||
 		timeBound && !timedAt.After(transmitAt)
 }
 
@@ -94,7 +94,7 @@ func EnqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 	}
 
 	var st EnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DEV_STATUS, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DEV_STATUS, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
@@ -107,7 +107,7 @@ func EnqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 				EvtEnqueueDevStatusRequest,
 			},
 			true
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return st
 }
 
@@ -117,7 +117,7 @@ func HandleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 	}
 
 	var err error
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DEV_STATUS, func(*ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_DEV_STATUS, func(*ttnpb.MACCommand) error {
 		switch pld.Battery {
 		case 0:
 			dev.PowerState = ttnpb.PowerState_POWER_EXTERNAL
@@ -131,9 +131,9 @@ func HandleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		}
 		dev.DownlinkMargin = pld.Margin
 		dev.LastDevStatusReceivedAt = &recvAt
-		dev.MACState.LastDevStatusFCntUp = fCntUp
+		dev.MacState.LastDevStatusFCntUp = fCntUp
 		return nil
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return events.Builders{
 		EvtReceiveDevStatusAnswer.With(events.WithData(pld)),
 	}, err

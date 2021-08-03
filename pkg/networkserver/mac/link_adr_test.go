@@ -327,7 +327,7 @@ func TestLinkADRReq(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				makeDevice := func() *ttnpb.EndDevice {
 					return CopyEndDevice(&ttnpb.EndDevice{
-						MACState: &ttnpb.MACState{
+						MacState: &ttnpb.MACState{
 							LorawanVersion: tc.LoRaWANVersion,
 							CurrentParameters: ttnpb.MACParameters{
 								Channels:         tc.CurrentChannels,
@@ -406,7 +406,7 @@ func TestLinkADRReq(t *testing.T) {
 							expectedDevice := makeDevice()
 							var expectedEventBuilders []events.Builder
 							for _, cmd := range cmds {
-								expectedDevice.MACState.PendingRequests = append(expectedDevice.MACState.PendingRequests, cmd.MACCommand())
+								expectedDevice.MacState.PendingRequests = append(expectedDevice.MacState.PendingRequests, cmd.MACCommand())
 								expectedEventBuilders = append(expectedEventBuilders, EvtEnqueueLinkADRRequest.BindData(cmd))
 							}
 							a.So(st.QueuedEvents, should.ResembleEventBuilders, events.Builders(expectedEventBuilders))
@@ -439,14 +439,14 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 				},
 			},
@@ -457,14 +457,14 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 				},
 			},
@@ -487,7 +487,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
@@ -514,7 +514,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						AdrDataRateIndex: ttnpb.DATA_RATE_4,
@@ -554,7 +554,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
@@ -602,7 +602,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: ttnpb.MACParameters{
 						AdrDataRateIndex: ttnpb.DATA_RATE_10,
@@ -648,7 +648,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0_2,
 					CurrentParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
@@ -696,7 +696,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0_2,
 					CurrentParameters: ttnpb.MACParameters{
 						AdrDataRateIndex: ttnpb.DATA_RATE_10,
@@ -741,7 +741,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0,
 					CurrentParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
@@ -790,7 +790,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0,
 					CurrentParameters: ttnpb.MACParameters{
 						AdrDataRateIndex: ttnpb.DATA_RATE_5,
@@ -846,7 +846,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion:    ttnpb.MAC_V1_0_2,
 					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
 					DesiredParameters: MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.RP001_V1_0_2_REV_B),
@@ -881,7 +881,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0_2,
 					CurrentParameters: func() ttnpb.MACParameters {
 						params := MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.RP001_V1_0_2_REV_B)

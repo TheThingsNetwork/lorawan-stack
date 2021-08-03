@@ -45,7 +45,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
@@ -64,7 +64,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					DesiredMaxEirp: &ttnpb.DeviceEIRPValue{
 						Value: ttnpb.DEVICE_EIRP_18,
 					},
@@ -72,7 +72,7 @@ func TestNewState(t *testing.T) {
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
-				macState.DesiredParameters.MaxEIRP = 18
+				macState.DesiredParameters.MaxEirp = 18
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -83,7 +83,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
@@ -101,7 +101,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
@@ -131,7 +131,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
@@ -161,7 +161,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_3,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					FactoryPresetFrequencies: []uint64{
 						868100000,
 						868500000,
@@ -270,7 +270,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
@@ -289,7 +289,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
@@ -307,7 +307,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
@@ -337,7 +337,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
@@ -367,7 +367,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_2,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
@@ -386,7 +386,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_0_3,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					FactoryPresetFrequencies: []uint64{
 						904300000,
 						904700000,
@@ -459,7 +459,7 @@ func TestNewState(t *testing.T) {
 				FrequencyPlanId:   test.USFrequencyPlanID,
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
@@ -569,13 +569,13 @@ func TestNextPingSlotAt(t *testing.T) {
 		{
 			Name: "no session/no devAddr",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 		},
 		{
 			Name: "no devAddr",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 				Session:  &ttnpb.Session{},
 			},
 		},
@@ -583,7 +583,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			Name:       "earliestAt:beaconAt;periodicity:0",
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_1S},
 				},
 				Session: &ttnpb.Session{
@@ -597,7 +597,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			Name:       "earliestAt:beaconAt;periodicity:1",
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_2S},
 				},
 				Session: &ttnpb.Session{
@@ -611,7 +611,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			Name:       "earliestAt:beaconAt;periodicity:2",
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_4S},
 				},
 				Session: &ttnpb.Session{
@@ -625,7 +625,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			Name:       "earliestAt:beaconAt;periodicity:3",
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_8S},
 				},
 				Session: &ttnpb.Session{
@@ -639,7 +639,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			Name:       "earliestAt:beaconAt;periodicity:4",
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
@@ -653,7 +653,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			Name:       "earliestAt:beaconAt+12s120ms15ns;periodicity:3",
 			EarliestAt: beaconAt.Add(12*time.Second + 120*time.Millisecond + 1*time.Microsecond + 500*time.Nanosecond),
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_8S},
 				},
 				Session: &ttnpb.Session{
@@ -667,7 +667,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			Name:       "earliestAt:beaconAt+20s;periodicity:4",
 			EarliestAt: beaconAt.Add(20 * time.Second),
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
@@ -681,7 +681,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			Name:       "earliestAt:beaconAt+38s;periodicity:4",
 			EarliestAt: beaconAt.Add(38 * time.Second),
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
@@ -695,7 +695,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			Name:       "earliestAt:beaconAt+50s;periodicity:4",
 			EarliestAt: beaconAt.Add(50 * time.Second),
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{

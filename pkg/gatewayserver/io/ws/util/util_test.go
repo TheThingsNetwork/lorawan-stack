@@ -63,7 +63,7 @@ func TestGetDataRateFromDataRateIndex(t *testing.T) {
 			BandID:        "EU_863_870",
 			IsLora:        false,
 			DataRateIndex: 7,
-			ExpectedDataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{
+			ExpectedDataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Fsk{Fsk: &ttnpb.FSKDataRate{
 				BitRate: 50000,
 			}}},
 		},
@@ -115,7 +115,7 @@ func TestGetDataRateIndexFromDataRate(t *testing.T) {
 		{
 			Name:   "Valid_EU_FSK",
 			BandID: "EU_863_870",
-			DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{
+			DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Fsk{Fsk: &ttnpb.FSKDataRate{
 				BitRate: 50000,
 			}}},
 			ExpectedDataRateIndex: 7,

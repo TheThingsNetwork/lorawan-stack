@@ -159,12 +159,12 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 					}
 
 				case "qr_code":
-					w, ok := m.SourceDevice.(*ClaimEndDeviceRequest_QRCode)
+					w, ok := m.SourceDevice.(*ClaimEndDeviceRequest_QrCode)
 					if !ok || w == nil {
 						continue
 					}
 
-					if l := len(m.GetQRCode()); l < 0 || l > 1024 {
+					if l := len(m.GetQrCode()); l < 0 || l > 1024 {
 						return ClaimEndDeviceRequestValidationError{
 							field:  "qr_code",
 							reason: "value length must be between 0 and 1024 bytes, inclusive",
@@ -585,12 +585,12 @@ func (m *ClaimGatewayRequest) ValidateFields(paths ...string) error {
 					}
 
 				case "qr_code":
-					w, ok := m.SourceGateway.(*ClaimGatewayRequest_QRCode)
+					w, ok := m.SourceGateway.(*ClaimGatewayRequest_QrCode)
 					if !ok || w == nil {
 						continue
 					}
 
-					if l := len(m.GetQRCode()); l < 0 || l > 1024 {
+					if l := len(m.GetQrCode()); l < 0 || l > 1024 {
 						return ClaimGatewayRequestValidationError{
 							field:  "qr_code",
 							reason: "value length must be between 0 and 1024 bytes, inclusive",

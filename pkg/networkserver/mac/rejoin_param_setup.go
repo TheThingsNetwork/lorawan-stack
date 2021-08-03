@@ -35,10 +35,10 @@ var (
 
 func DeviceNeedsRejoinParamSetupReq(dev *ttnpb.EndDevice) bool {
 	return !dev.GetMulticast() &&
-		dev.GetMACState() != nil &&
-		dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 &&
-		(dev.MACState.DesiredParameters.RejoinTimePeriodicity != dev.MACState.CurrentParameters.RejoinTimePeriodicity ||
-			dev.MACState.DesiredParameters.RejoinCountPeriodicity != dev.MACState.CurrentParameters.RejoinCountPeriodicity)
+		dev.GetMacState() != nil &&
+		dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 &&
+		(dev.MacState.DesiredParameters.RejoinTimePeriodicity != dev.MacState.CurrentParameters.RejoinTimePeriodicity ||
+			dev.MacState.DesiredParameters.RejoinCountPeriodicity != dev.MacState.CurrentParameters.RejoinCountPeriodicity)
 }
 
 func EnqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) EnqueueState {
@@ -51,14 +51,14 @@ func EnqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDo
 	}
 
 	var st EnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_REJOIN_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_REJOIN_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
 
 		req := &ttnpb.MACCommand_RejoinParamSetupReq{
-			MaxTimeExponent:  dev.MACState.DesiredParameters.RejoinTimePeriodicity,
-			MaxCountExponent: dev.MACState.DesiredParameters.RejoinCountPeriodicity,
+			MaxTimeExponent:  dev.MacState.DesiredParameters.RejoinTimePeriodicity,
+			MaxCountExponent: dev.MacState.DesiredParameters.RejoinCountPeriodicity,
 		}
 		log.FromContext(ctx).WithFields(log.Fields(
 			"max_time_exponent", req.MaxTimeExponent,
@@ -72,7 +72,7 @@ func EnqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDo
 				EvtEnqueueRejoinParamSetupRequest.With(events.WithData(req)),
 			},
 			true
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return st
 }
 
@@ -82,15 +82,15 @@ func HandleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *t
 	}
 
 	var err error
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_REJOIN_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_REJOIN_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetRejoinParamSetupReq()
 
-		dev.MACState.CurrentParameters.RejoinCountPeriodicity = req.MaxCountExponent
+		dev.MacState.CurrentParameters.RejoinCountPeriodicity = req.MaxCountExponent
 		if pld.MaxTimeExponentAck {
-			dev.MACState.CurrentParameters.RejoinTimePeriodicity = req.MaxTimeExponent
+			dev.MacState.CurrentParameters.RejoinTimePeriodicity = req.MaxTimeExponent
 		}
 		return nil
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return events.Builders{
 		EvtReceiveRejoinParamSetupAnswer.With(events.WithData(pld)),
 	}, err

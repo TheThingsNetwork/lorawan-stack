@@ -318,7 +318,7 @@ func TestProtoConversion(t *testing.T) {
 				},
 			},
 			Output: &ttnpb.ConcentratorConfig{
-				FSKChannel: &ttnpb.ConcentratorConfig_FSKChannel{
+				FskChannel: &ttnpb.ConcentratorConfig_FSKChannel{
 					Frequency: 868800000,
 					Radio:     1,
 				},
@@ -342,7 +342,7 @@ func TestProtoConversion(t *testing.T) {
 				},
 			},
 			Output: &ttnpb.ConcentratorConfig{
-				LBT: &ttnpb.ConcentratorConfig_LBTConfiguration{
+				Lbt: &ttnpb.ConcentratorConfig_LBTConfiguration{
 					ScanTime: 32,
 				},
 				PingSlot: &ttnpb.ConcentratorConfig_Channel{

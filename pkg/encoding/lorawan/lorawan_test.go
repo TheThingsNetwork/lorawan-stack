@@ -40,9 +40,9 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 					MType: ttnpb.MType_UNCONFIRMED_UP,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				MIC: []byte{0x1, 0x2, 0x3, 0x4},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
+				Mic: []byte{0x1, 0x2, 0x3, 0x4},
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
 							DevAddr: test.DefaultDevAddr,
 							FCtrl: ttnpb.FCtrl{
@@ -54,7 +54,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 							FOpts: []byte{0x42, 0xff},
 						},
 						FPort:      42,
-						FRMPayload: []byte{0x11, 0x22, 0x33},
+						FrmPayload: []byte{0x11, 0x22, 0x33},
 					},
 				},
 			},
@@ -66,9 +66,9 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 					MType: ttnpb.MType_CONFIRMED_UP,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				MIC: []byte{0x4, 0x3, 0x2, 0x1},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
+				Mic: []byte{0x4, 0x3, 0x2, 0x1},
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
 							DevAddr: test.DefaultDevAddr,
 							FCtrl: ttnpb.FCtrl{
@@ -81,7 +81,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 							FOpts: []byte{0xff, 0x42},
 						},
 						FPort:      42,
-						FRMPayload: []byte{0x11, 0x22, 0x33, 0x44},
+						FrmPayload: []byte{0x11, 0x22, 0x33, 0x44},
 					},
 				},
 			},
@@ -93,9 +93,9 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				MIC: []byte{0x1, 0x2, 0x3, 0x4},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
+				Mic: []byte{0x1, 0x2, 0x3, 0x4},
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
 							DevAddr: test.DefaultDevAddr,
 							FCtrl: ttnpb.FCtrl{
@@ -105,7 +105,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 							FOpts: []byte{0x42, 0xff},
 						},
 						FPort:      42,
-						FRMPayload: []byte{0x11, 0x22, 0x33},
+						FrmPayload: []byte{0x11, 0x22, 0x33},
 					},
 				},
 			},
@@ -117,9 +117,9 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 					MType: ttnpb.MType_CONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				MIC: []byte{0x4, 0x3, 0x2, 0x1},
-				Payload: &ttnpb.Message_MACPayload{
-					MACPayload: &ttnpb.MACPayload{
+				Mic: []byte{0x4, 0x3, 0x2, 0x1},
+				Payload: &ttnpb.Message_MacPayload{
+					MacPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
 							DevAddr: test.DefaultDevAddr,
 							FCtrl: ttnpb.FCtrl{
@@ -129,7 +129,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 							FOpts: []byte{0xff, 0x42},
 						},
 						FPort:      42,
-						FRMPayload: []byte{0x11, 0x22, 0x33, 0x44},
+						FrmPayload: []byte{0x11, 0x22, 0x33, 0x44},
 					},
 				},
 			},
@@ -141,7 +141,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 					MType: ttnpb.MType_JOIN_REQUEST,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				MIC: []byte{0x1, 0x2, 0x3, 0x4},
+				Mic: []byte{0x1, 0x2, 0x3, 0x4},
 				Payload: &ttnpb.Message_JoinRequestPayload{
 					JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEui:  test.DefaultJoinEUI,
@@ -158,7 +158,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 					MType: ttnpb.MType_REJOIN_REQUEST,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				MIC: []byte{0x1, 0x2, 0x3, 0x4},
+				Mic: []byte{0x1, 0x2, 0x3, 0x4},
 				Payload: &ttnpb.Message_RejoinRequestPayload{
 					RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 						RejoinType: ttnpb.RejoinRequestType_CONTEXT,
@@ -176,7 +176,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 					MType: ttnpb.MType_REJOIN_REQUEST,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				MIC: []byte{0x1, 0x2, 0x3, 0x4},
+				Mic: []byte{0x1, 0x2, 0x3, 0x4},
 				Payload: &ttnpb.Message_RejoinRequestPayload{
 					RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 						RejoinType: ttnpb.RejoinRequestType_SESSION,
@@ -194,7 +194,7 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 					MType: ttnpb.MType_REJOIN_REQUEST,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
-				MIC: []byte{0x1, 0x2, 0x3, 0x4},
+				Mic: []byte{0x1, 0x2, 0x3, 0x4},
 				Payload: &ttnpb.Message_RejoinRequestPayload{
 					RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
 						RejoinType: ttnpb.RejoinRequestType_KEYS,
@@ -260,7 +260,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 					DevEui:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevNonce: types.DevNonce{0x42, 0xff},
 				}},
-				MIC: []byte{0x42, 0xff, 0xff, 0xff},
+				Mic: []byte{0x42, 0xff, 0xff, 0xff},
 			},
 			[]byte{
 				/* MHDR */
@@ -297,7 +297,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			"Uplink/Unconfirmed",
 			&ttnpb.Message{
 				MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: 0},
-				Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHDR: ttnpb.FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 						FCtrl: ttnpb.FCtrl{
@@ -311,9 +311,9 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 						FOpts: []byte{0xfe, 0xff},
 					},
 					FPort:      0x42,
-					FRMPayload: []byte{0xfe, 0xff},
+					FrmPayload: []byte{0xfe, 0xff},
 				}},
-				MIC: []byte{0x42, 0xff, 0xff, 0xff},
+				Mic: []byte{0x42, 0xff, 0xff, 0xff},
 			},
 			[]byte{
 				/* MHDR */
@@ -345,7 +345,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			"Downlink/Unconfirmed",
 			&ttnpb.Message{
 				MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_DOWN, Major: 0},
-				Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHDR: ttnpb.FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 						FCtrl: ttnpb.FCtrl{
@@ -359,9 +359,9 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 						FOpts: []byte{0xfe, 0xff},
 					},
 					FPort:      0x42,
-					FRMPayload: []byte{0xfe, 0xff},
+					FrmPayload: []byte{0xfe, 0xff},
 				}},
-				MIC: []byte{0x42, 0xff, 0xff, 0xff},
+				Mic: []byte{0x42, 0xff, 0xff, 0xff},
 			},
 			[]byte{
 				/* MHDR */
@@ -393,7 +393,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			"Downlink/Unconfirmed/no FPort",
 			&ttnpb.Message{
 				MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_DOWN, Major: 0},
-				Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHDR: ttnpb.FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 						FCtrl: ttnpb.FCtrl{
@@ -407,7 +407,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 						FOpts: []byte{0xfe, 0xff},
 					},
 				}},
-				MIC: []byte{0x42, 0xff, 0xff, 0xff},
+				Mic: []byte{0x42, 0xff, 0xff, 0xff},
 			},
 			[]byte{
 				/* MHDR */
@@ -433,7 +433,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			"Downlink/Confirmed",
 			&ttnpb.Message{
 				MHDR: ttnpb.MHDR{MType: ttnpb.MType_CONFIRMED_UP, Major: 0},
-				Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHDR: ttnpb.FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 						FCtrl: ttnpb.FCtrl{
@@ -447,9 +447,9 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 						FOpts: []byte{0xfe, 0xff},
 					},
 					FPort:      0x42,
-					FRMPayload: []byte{0xfe, 0xff},
+					FrmPayload: []byte{0xfe, 0xff},
 				}},
-				MIC: []byte{0x42, 0xff, 0xff, 0xff},
+				Mic: []byte{0x42, 0xff, 0xff, 0xff},
 			},
 			[]byte{
 				/* MHDR */
@@ -481,7 +481,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			"Downlink/Confirmed",
 			&ttnpb.Message{
 				MHDR: ttnpb.MHDR{MType: ttnpb.MType_CONFIRMED_DOWN, Major: 0},
-				Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+				Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 					FHDR: ttnpb.FHDR{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 						FCtrl: ttnpb.FCtrl{
@@ -495,9 +495,9 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 						FOpts: []byte{0xfe, 0xff},
 					},
 					FPort:      0x42,
-					FRMPayload: []byte{0xfe, 0xff},
+					FrmPayload: []byte{0xfe, 0xff},
 				}},
-				MIC: []byte{0x42, 0xff, 0xff, 0xff},
+				Mic: []byte{0x42, 0xff, 0xff, 0xff},
 			},
 			[]byte{
 				/* MHDR */
@@ -535,7 +535,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					RejoinCnt:  0xff42,
 				}},
-				MIC: []byte{0x42, 0xff, 0xff, 0xff},
+				Mic: []byte{0x42, 0xff, 0xff, 0xff},
 			},
 			[]byte{
 				/* MHDR */
@@ -565,7 +565,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					RejoinCnt:  0xff42,
 				}},
-				MIC: []byte{0x42, 0xff, 0xff, 0xff},
+				Mic: []byte{0x42, 0xff, 0xff, 0xff},
 			},
 			[]byte{
 				/* MHDR */
@@ -595,7 +595,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 					DevEui:     types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					RejoinCnt:  0xff42,
 				}},
-				MIC: []byte{0x42, 0xff, 0xff, 0xff},
+				Mic: []byte{0x42, 0xff, 0xff, 0xff},
 			},
 			[]byte{
 				/* MHDR */
@@ -836,12 +836,12 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 				NetId:     test.DefaultNetID,
 				DevAddr:   test.DefaultDevAddr,
 				DLSettings: ttnpb.DLSettings{
-					Rx1DROffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
-					Rx2DR:       ttnpb.DATA_RATE_1,
+					Rx1DrOffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
+					Rx2Dr:       ttnpb.DATA_RATE_1,
 					OptNeg:      false,
 				},
 				RxDelay: ttnpb.RX_DELAY_5,
-				CFList: &ttnpb.CFList{
+				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{
 						867100,
@@ -860,8 +860,8 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 				NetId:     test.DefaultNetID,
 				DevAddr:   test.DefaultDevAddr,
 				DLSettings: ttnpb.DLSettings{
-					Rx1DROffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
-					Rx2DR:       ttnpb.DATA_RATE_1,
+					Rx1DrOffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
+					Rx2Dr:       ttnpb.DATA_RATE_1,
 					OptNeg:      false,
 				},
 				RxDelay: ttnpb.RX_DELAY_5,
@@ -903,8 +903,8 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DLSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x6,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x6,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -929,11 +929,11 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DLSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x6,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x6,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList: &ttnpb.CFList{
+				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
 				},
@@ -963,11 +963,11 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				DLSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x6,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x6,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList: &ttnpb.CFList{
+				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_CHANNEL_MASKS,
 					ChMasks: []bool{
 						false, true, false, false, false, false, true, false,

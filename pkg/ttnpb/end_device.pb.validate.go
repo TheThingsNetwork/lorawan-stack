@@ -262,7 +262,7 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "max_eirp":
-			// no validation rules for MaxEIRP
+			// no validation rules for MaxEirp
 		case "adr_data_rate_index":
 
 			if _, ok := DataRateIndex_name[int32(m.GetAdrDataRateIndex())]; !ok {
@@ -594,7 +594,7 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 			// no validation rules for SupportsClassC
 		case "default_mac_settings":
 
-			if v, ok := interface{}(m.GetDefaultMACSettings()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetDefaultMacSettings()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceVersionValidationError{
 						field:  "default_mac_settings",
@@ -846,7 +846,7 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 		case "supports_32_bit_f_cnt":
 
-			if v, ok := interface{}(m.GetSupports32BitFCnt()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetSupports_32BitFCnt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "supports_32_bit_f_cnt",
@@ -1860,7 +1860,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 			// no validation rules for NetId
 		case "mac_settings":
 
-			if v, ok := interface{}(m.GetMACSettings()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetMacSettings()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceValidationError{
 						field:  "mac_settings",
@@ -1872,7 +1872,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "mac_state":
 
-			if v, ok := interface{}(m.GetMACState()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetMacState()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceValidationError{
 						field:  "mac_state",
@@ -1884,7 +1884,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "pending_mac_state":
 
-			if v, ok := interface{}(m.GetPendingMACState()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetPendingMacState()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceValidationError{
 						field:  "pending_mac_state",
@@ -1925,9 +1925,9 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 		case "last_join_nonce":
 			// no validation rules for LastJoinNonce
 		case "last_rj_count_0":
-			// no validation rules for LastRJCount0
+			// no validation rules for LastRjCount_0
 		case "last_rj_count_1":
-			// no validation rules for LastRJCount1
+			// no validation rules for LastRjCount_1
 		case "last_dev_status_received_at":
 
 			if v, ok := interface{}(m.GetLastDevStatusReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
@@ -3678,7 +3678,7 @@ func (m *MACState_JoinRequest) ValidateFields(paths ...string) error {
 
 		case "cf_list":
 
-			if v, ok := interface{}(m.GetCFList()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCfList()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACState_JoinRequestValidationError{
 						field:  "cf_list",

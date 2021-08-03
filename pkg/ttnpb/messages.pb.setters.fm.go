@@ -491,9 +491,9 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 				return fmt.Errorf("'frm_payload' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.FRMPayload = src.FRMPayload
+				dst.FrmPayload = src.FrmPayload
 			} else {
-				dst.FRMPayload = nil
+				dst.FrmPayload = nil
 			}
 		case "decoded_payload":
 			if len(subs) > 0 {
@@ -830,9 +830,9 @@ func (dst *ApplicationDownlink) SetFields(src *ApplicationDownlink, paths ...str
 				return fmt.Errorf("'frm_payload' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.FRMPayload = src.FRMPayload
+				dst.FrmPayload = src.FrmPayload
 			} else {
-				dst.FRMPayload = nil
+				dst.FrmPayload = nil
 			}
 		case "decoded_payload":
 			if len(subs) > 0 {

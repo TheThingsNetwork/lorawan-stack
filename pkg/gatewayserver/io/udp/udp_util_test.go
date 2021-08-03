@@ -56,7 +56,7 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 		case *ttnpb.DataRate_Lora:
 			modulation = "LORA"
 			codr = up.Settings.CodingRate
-		case *ttnpb.DataRate_FSK:
+		case *ttnpb.DataRate_Fsk:
 			modulation = "FSK"
 		case *ttnpb.DataRate_Lrfhss:
 			modulation = "LR-FHSS"

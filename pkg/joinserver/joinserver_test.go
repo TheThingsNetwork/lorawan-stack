@@ -151,7 +151,7 @@ func TestInvalidJoinRequests(t *testing.T) {
 
 				ctx = clusterauth.NewContext(ctx, nil)
 				req := &ttnpb.JoinRequest{
-					SelectedMACVersion: ttnpb.MAC_V1_1,
+					SelectedMacVersion: ttnpb.MAC_V1_1,
 					RawPayload: []byte{
 						/* MHDR */
 						0x00,
@@ -169,8 +169,8 @@ func TestInvalidJoinRequests(t *testing.T) {
 					NetId:   types.NetID{0x42, 0xff, 0xff},
 					DownlinkSettings: ttnpb.DLSettings{
 						OptNeg:      true,
-						Rx1DROffset: 0x7,
-						Rx2DR:       0xf,
+						Rx1DrOffset: 0x7,
+						Rx2Dr:       0xf,
 					},
 					RxDelay: 0x42,
 				}
@@ -230,7 +230,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -250,8 +250,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -336,7 +336,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -356,8 +356,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -467,7 +467,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -487,8 +487,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -601,7 +601,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -621,8 +621,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -710,7 +710,7 @@ func TestHandleJoin(t *testing.T) {
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
 			NextLastJoinNonce:             1,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -730,8 +730,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -815,7 +815,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastDevNonce:              0x2442,
 			NextLastJoinNonce:             0x42fffe,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -835,8 +835,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -919,7 +919,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastDevNonce:  0x2442,
 			NextLastJoinNonce: 0x42fffd,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -939,8 +939,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -969,7 +969,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce:             1,
 			NextUsedDevNonces:             []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0_3,
+				SelectedMacVersion: ttnpb.MAC_V1_0_3,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -989,8 +989,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1055,7 +1055,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce:             1,
 			NextUsedDevNonces:             []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0_2,
+				SelectedMacVersion: ttnpb.MAC_V1_0_2,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1075,8 +1075,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1141,7 +1141,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce:             1,
 			NextUsedDevNonces:             []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0_1,
+				SelectedMacVersion: ttnpb.MAC_V1_0_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1161,8 +1161,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1227,7 +1227,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce:             1,
 			NextUsedDevNonces:             []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1247,8 +1247,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1315,7 +1315,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce:             0x42fffe,
 			NextUsedDevNonces:             []uint32{23, 41, 42, 52, 0x2442, 0x2444},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1335,8 +1335,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1404,7 +1404,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce:             0x42fffe,
 			NextUsedDevNonces:             []uint32{23, 41, 42, 52, 0x2442, 0x2444},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1424,8 +1424,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1495,7 +1495,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce:             1,
 			NextUsedDevNonces:             []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1515,8 +1515,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1585,7 +1585,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce: 1,
 			NextUsedDevNonces: []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1605,8 +1605,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0x42, 0x42},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1638,7 +1638,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce: 1,
 			NextUsedDevNonces: []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1658,8 +1658,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1692,7 +1692,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce: 1,
 			NextUsedDevNonces: []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1712,8 +1712,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1743,7 +1743,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1762,8 +1762,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId: types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1793,12 +1793,12 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				NetId:              types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1828,7 +1828,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
@@ -1838,8 +1838,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId: types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1869,7 +1869,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
@@ -1880,8 +1880,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId: types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1911,7 +1911,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
@@ -1926,8 +1926,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId: types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1957,15 +1957,15 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				RawPayload: []byte{
 					0x23, 0x42, 0xff, 0xff, 0xaa, 0x42, 0x42, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff,
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -1995,7 +1995,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMACVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MAC_V1_0,
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
@@ -2010,8 +2010,8 @@ func TestHandleJoin(t *testing.T) {
 				NetId: types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: ttnpb.DLSettings{
 					OptNeg:      true,
-					Rx1DROffset: 0x7,
-					Rx2DR:       0xf,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
 				},
 				RxDelay: 0x42,
 			},
@@ -2148,7 +2148,7 @@ func TestHandleJoin(t *testing.T) {
 				a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
 				pb.UpdatedAt = ret.UpdatedAt
 				pb.LastJoinNonce = tc.NextLastJoinNonce
-				if tc.JoinRequest.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+				if tc.JoinRequest.SelectedMacVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 					pb.UsedDevNonces = tc.NextUsedDevNonces
 				} else {
 					pb.LastDevNonce = tc.NextLastDevNonce

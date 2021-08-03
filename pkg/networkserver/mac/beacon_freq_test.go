@@ -72,7 +72,7 @@ func TestNeedsBeaconFreqReq(t *testing.T) {
 				TestCase{
 					Name: makeClassName(conf.Suffix),
 					InputDevice: &ttnpb.EndDevice{
-						MACState: &ttnpb.MACState{
+						MacState: &ttnpb.MACState{
 							DeviceClass:       class,
 							CurrentParameters: conf.CurrentParameters,
 							DesiredParameters: conf.DesiredParameters,
@@ -114,20 +114,20 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Error: ErrNoPayload,
 		},
 		{
 			Name: "ack/no request",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{
 				FrequencyAck: true,
@@ -142,10 +142,10 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 		{
 			Name: "nack/no request",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{},
 			Events: events.Builders{
@@ -156,7 +156,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 		{
 			Name: "ack/valid request",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_BeaconFreqReq{
 							Frequency: 42,
@@ -165,7 +165,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					CurrentParameters: ttnpb.MACParameters{
 						BeaconFrequency: 42,
@@ -184,7 +184,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 		{
 			Name: "nack/valid request",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_BeaconFreqReq{
 							Frequency: 42,
@@ -193,7 +193,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
 			},

@@ -39,10 +39,10 @@ var (
 
 func DeviceNeedsRxParamSetupReq(dev *ttnpb.EndDevice) bool {
 	return !dev.GetMulticast() &&
-		dev.GetMACState() != nil &&
-		(dev.MACState.DesiredParameters.Rx1DataRateOffset != dev.MACState.CurrentParameters.Rx1DataRateOffset ||
-			dev.MACState.DesiredParameters.Rx2DataRateIndex != dev.MACState.CurrentParameters.Rx2DataRateIndex ||
-			dev.MACState.DesiredParameters.Rx2Frequency != dev.MACState.CurrentParameters.Rx2Frequency)
+		dev.GetMacState() != nil &&
+		(dev.MacState.DesiredParameters.Rx1DataRateOffset != dev.MacState.CurrentParameters.Rx1DataRateOffset ||
+			dev.MacState.DesiredParameters.Rx2DataRateIndex != dev.MacState.CurrentParameters.Rx2DataRateIndex ||
+			dev.MacState.DesiredParameters.Rx2Frequency != dev.MacState.CurrentParameters.Rx2Frequency)
 }
 
 func EnqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) EnqueueState {
@@ -55,14 +55,14 @@ func EnqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 	}
 
 	var st EnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_RX_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_RX_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
 		req := &ttnpb.MACCommand_RxParamSetupReq{
-			Rx1DataRateOffset: dev.MACState.DesiredParameters.Rx1DataRateOffset,
-			Rx2DataRateIndex:  dev.MACState.DesiredParameters.Rx2DataRateIndex,
-			Rx2Frequency:      dev.MACState.DesiredParameters.Rx2Frequency,
+			Rx1DataRateOffset: dev.MacState.DesiredParameters.Rx1DataRateOffset,
+			Rx2DataRateIndex:  dev.MacState.DesiredParameters.Rx2DataRateIndex,
+			Rx2Frequency:      dev.MacState.DesiredParameters.Rx2Frequency,
 		}
 		log.FromContext(ctx).WithFields(log.Fields(
 			"rx1_data_rate_offset", req.Rx1DataRateOffset,
@@ -77,7 +77,7 @@ func EnqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 				EvtEnqueueRxParamSetupRequest.With(events.WithData(req)),
 			},
 			true
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return st
 }
 
@@ -87,18 +87,18 @@ func HandleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 	}
 
 	var err error
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
 			return nil
 		}
 
 		req := cmd.GetRxParamSetupReq()
 
-		dev.MACState.CurrentParameters.Rx1DataRateOffset = req.Rx1DataRateOffset
-		dev.MACState.CurrentParameters.Rx2DataRateIndex = req.Rx2DataRateIndex
-		dev.MACState.CurrentParameters.Rx2Frequency = req.Rx2Frequency
+		dev.MacState.CurrentParameters.Rx1DataRateOffset = req.Rx1DataRateOffset
+		dev.MacState.CurrentParameters.Rx2DataRateIndex = req.Rx2DataRateIndex
+		dev.MacState.CurrentParameters.Rx2Frequency = req.Rx2Frequency
 		return nil
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	ev := EvtReceiveRxParamSetupAccept
 	if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
 		ev = EvtReceiveRxParamSetupReject

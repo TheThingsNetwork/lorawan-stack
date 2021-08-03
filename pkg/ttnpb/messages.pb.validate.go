@@ -745,7 +745,7 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 		case "f_cnt":
 			// no validation rules for FCnt
 		case "frm_payload":
-			// no validation rules for FRMPayload
+			// no validation rules for FrmPayload
 		case "decoded_payload":
 
 			if v, ok := interface{}(m.GetDecodedPayload()).(interface{ ValidateFields(...string) error }); ok {
@@ -1250,7 +1250,7 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 		case "f_cnt":
 			// no validation rules for FCnt
 		case "frm_payload":
-			// no validation rules for FRMPayload
+			// no validation rules for FrmPayload
 		case "decoded_payload":
 
 			if v, ok := interface{}(m.GetDecodedPayload()).(interface{ ValidateFields(...string) error }); ok {

@@ -40,7 +40,7 @@ func TestNeedsPingSlotChannelReq(t *testing.T) {
 		{
 			Name: "current(data-rate-index:1,frequency:123),desired(data-rate-index:1,frequency:123)",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
 						PingSlotFrequency:          123,
@@ -55,7 +55,7 @@ func TestNeedsPingSlotChannelReq(t *testing.T) {
 		{
 			Name: "current(data-rate-index:1,frequency:123),desired(data-rate-index:2,frequency:123)",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
 						PingSlotFrequency:          123,
@@ -71,7 +71,7 @@ func TestNeedsPingSlotChannelReq(t *testing.T) {
 		{
 			Name: "current(data-rate-index:1,frequency:123),desired(data-rate-index:1,frequency:124)",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
 						PingSlotFrequency:          123,
@@ -114,20 +114,20 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Error: ErrNoPayload,
 		},
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Payload: &ttnpb.MACCommand_PingSlotChannelAns{
 				FrequencyAck:     true,
@@ -144,7 +144,7 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 		{
 			Name: "both ack",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_PingSlotChannelReq{
 							Frequency:     42,
@@ -154,7 +154,7 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					CurrentParameters: ttnpb.MACParameters{
 						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: 43},

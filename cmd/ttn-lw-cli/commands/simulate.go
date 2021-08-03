@@ -326,7 +326,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		}
 
 		joinAcceptBytes := payload[:len(payload)-4]
-		downMsg.Payload.MIC = payload[len(payload)-4:]
+		downMsg.Payload.Mic = payload[len(payload)-4:]
 
 		if err = lorawan.UnmarshalJoinAcceptPayload(joinAcceptBytes, joinAcceptPayload); err != nil {
 			return err
@@ -352,8 +352,8 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		if err != nil {
 			return err
 		}
-		if !bytes.Equal(downMsg.Payload.MIC, expectedMIC[:]) {
-			logger.Warnf("Expected MIC %x but got %x", expectedMIC, downMsg.Payload.MIC)
+		if !bytes.Equal(downMsg.Payload.Mic, expectedMIC[:]) {
+			logger.Warnf("Expected MIC %x but got %x", expectedMIC, downMsg.Payload.Mic)
 		}
 
 		dev.DevAddr, dev.Session.DevAddr = &joinAcceptPayload.DevAddr, joinAcceptPayload.DevAddr
@@ -386,7 +386,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 			logger.Infof("Derived NwkSKey %X (%s)", nwkSKey[:], base64.StdEncoding.EncodeToString(nwkSKey[:]))
 		}
 	case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
-		macPayload := downMsg.Payload.GetMACPayload()
+		macPayload := downMsg.Payload.GetMacPayload()
 
 		var expectedMIC [4]byte
 		if dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
@@ -394,15 +394,15 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		} else {
 			var confFCnt uint32
 			if lastUpMsg.GetMType() == ttnpb.MType_CONFIRMED_UP {
-				confFCnt = lastUpMsg.GetMACPayload().FCnt
+				confFCnt = lastUpMsg.GetMacPayload().FCnt
 			}
 			expectedMIC, err = crypto.ComputeDownlinkMIC(*dev.Session.SessionKeys.GetSNwkSIntKey().Key, macPayload.DevAddr, confFCnt, macPayload.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
 		}
 		if err != nil {
 			return err
 		}
-		if !bytes.Equal(downMsg.Payload.MIC, expectedMIC[:]) {
-			logger.Warnf("Expected MIC %x but got %x", expectedMIC, downMsg.Payload.MIC)
+		if !bytes.Equal(downMsg.Payload.Mic, expectedMIC[:]) {
+			logger.Warnf("Expected MIC %x but got %x", expectedMIC, downMsg.Payload.Mic)
 		}
 
 		var payloadKey types.AES128Key
@@ -418,14 +418,14 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 				macPayload.FOpts = fOpts
 			}
 		}
-		macPayload.FRMPayload, err = crypto.DecryptDownlink(payloadKey, macPayload.DevAddr, macPayload.FCnt, macPayload.FRMPayload, false)
+		macPayload.FrmPayload, err = crypto.DecryptDownlink(payloadKey, macPayload.DevAddr, macPayload.FCnt, macPayload.FrmPayload, false)
 		if err != nil {
 			return err
 		}
 
 		cmdBuf := macPayload.FOpts
-		if macPayload.FPort == 0 && len(macPayload.FRMPayload) > 0 {
-			cmdBuf = macPayload.FRMPayload
+		if macPayload.FPort == 0 && len(macPayload.FrmPayload) > 0 {
+			cmdBuf = macPayload.FrmPayload
 		}
 		var cmds []*ttnpb.MACCommand
 		for r := bytes.NewReader(cmdBuf); r.Len() > 0; {
@@ -506,8 +506,8 @@ var (
 					if err != nil {
 						return err
 					}
-					joinRequest.MIC = mic[:]
-					upMsg.RawPayload = append(buf, joinRequest.MIC...)
+					joinRequest.Mic = mic[:]
+					upMsg.RawPayload = append(buf, joinRequest.Mic...)
 					return nil
 				},
 				func(downMsg *ttnpb.DownlinkMessage) error {
@@ -603,8 +603,8 @@ var (
 							MType: mType,
 							Major: ttnpb.Major_LORAWAN_R1,
 						},
-						Payload: &ttnpb.Message_MACPayload{
-							MACPayload: &ttnpb.MACPayload{
+						Payload: &ttnpb.Message_MacPayload{
+							MacPayload: &ttnpb.MACPayload{
 								FHDR: ttnpb.FHDR{
 									DevAddr: dataUplinkParams.DevAddr,
 									FCtrl: ttnpb.FCtrl{
@@ -616,7 +616,7 @@ var (
 									FOpts: fOpts,
 								},
 								FPort:      dataUplinkParams.FPort,
-								FRMPayload: frmPayload,
+								FrmPayload: frmPayload,
 							},
 						},
 					}
@@ -648,8 +648,8 @@ var (
 					if err != nil {
 						return err
 					}
-					dataUplink.MIC = mic[:]
-					upMsg.RawPayload = append(buf, dataUplink.MIC...)
+					dataUplink.Mic = mic[:]
+					upMsg.RawPayload = append(buf, dataUplink.Mic...)
 					return nil
 				},
 				func(downMsg *ttnpb.DownlinkMessage) error {

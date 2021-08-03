@@ -170,8 +170,8 @@ func MakeEventEqual(conf EventEqualConfig) func(a, b events.Event) bool {
 			bp.Authentication = nil
 		}
 		if !conf.RemoteIP {
-			ap.RemoteIP = ""
-			bp.RemoteIP = ""
+			ap.RemoteIp = ""
+			bp.RemoteIp = ""
 		}
 		if !conf.UserAgent {
 			ap.UserAgent = ""

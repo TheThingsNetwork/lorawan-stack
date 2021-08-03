@@ -197,7 +197,7 @@ message ApplicationUplink {
   // The frame payload of the uplink message.
   // The payload is still encrypted if the skip_payload_crypto field of the EndDevice
   // is true, which is indicated by the presence of the app_s_key field.
-  bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
+  bytes frm_payload = 4;
 
   // The decoded frame payload of the uplink message.
   // This field is set by the message processor that is configured for the end device (see formatters) or application (see default_formatters).
@@ -279,7 +279,7 @@ message ApplicationDownlink {
   // The frame payload of the downlink message.
   // The payload is encrypted if the skip_payload_crypto field of the EndDevice
   // is true.
-  bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
+  bytes frm_payload = 4;
 
   // The decoded frame payload of the downlink message.
   // When scheduling downlink with a message processor configured for the end device (see formatters) or application (see default_formatters),

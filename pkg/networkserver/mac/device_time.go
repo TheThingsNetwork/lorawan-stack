@@ -35,7 +35,7 @@ func HandleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.U
 	ans := &ttnpb.MACCommand_DeviceTimeAns{
 		Time: msg.ReceivedAt,
 	}
-	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ans.MACCommand())
+	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, ans.MACCommand())
 	return events.Builders{
 		EvtReceiveDeviceTimeRequest,
 		EvtEnqueueDeviceTimeAnswer.With(events.WithData(ans)),

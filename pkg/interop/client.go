@@ -256,8 +256,8 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}
 
 	var cfList []byte
-	if req.CFList != nil {
-		cfList, err = lorawan.MarshalCFList(*req.CFList)
+	if req.CfList != nil {
+		cfList, err = lorawan.MarshalCFList(*req.CfList)
 		if err != nil {
 			return nil, err
 		}
@@ -274,7 +274,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 			ReceiverID: EUI64(pld.JoinEui),
 			SenderNSID: NetID(netID),
 		},
-		MACVersion: MACVersion(req.SelectedMACVersion),
+		MACVersion: MACVersion(req.SelectedMacVersion),
 		PHYPayload: Buffer(req.RawPayload),
 		DevEUI:     EUI64(pld.DevEui),
 		DevAddr:    DevAddr(req.DevAddr),
@@ -289,7 +289,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}
 
 	fNwkSIntKey := interopAns.FNwkSIntKey
-	if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) <= 0 {
+	if req.SelectedMacVersion.Compare(ttnpb.MAC_V1_1) <= 0 {
 		fNwkSIntKey = interopAns.NwkSKey
 	}
 

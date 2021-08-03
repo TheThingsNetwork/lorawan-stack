@@ -36,14 +36,14 @@ var (
 func DeviceNeedsPingSlotChannelReq(dev *ttnpb.EndDevice) bool {
 	switch {
 	case dev.GetMulticast(),
-		dev.GetMACState() == nil:
+		dev.GetMacState() == nil:
 		return false
-	case dev.MACState.DesiredParameters.PingSlotFrequency != dev.MACState.CurrentParameters.PingSlotFrequency:
+	case dev.MacState.DesiredParameters.PingSlotFrequency != dev.MacState.CurrentParameters.PingSlotFrequency:
 		return true
-	case dev.MACState.DesiredParameters.PingSlotDataRateIndexValue == nil:
+	case dev.MacState.DesiredParameters.PingSlotDataRateIndexValue == nil:
 		return false
-	case dev.MACState.CurrentParameters.PingSlotDataRateIndexValue == nil,
-		dev.MACState.DesiredParameters.PingSlotDataRateIndexValue.Value != dev.MACState.CurrentParameters.PingSlotDataRateIndexValue.Value:
+	case dev.MacState.CurrentParameters.PingSlotDataRateIndexValue == nil,
+		dev.MacState.DesiredParameters.PingSlotDataRateIndexValue.Value != dev.MacState.CurrentParameters.PingSlotDataRateIndexValue.Value:
 		return true
 	}
 	return false
@@ -59,13 +59,13 @@ func EnqueuePingSlotChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDow
 	}
 
 	var st EnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_PING_SLOT_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_PING_SLOT_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
 		req := &ttnpb.MACCommand_PingSlotChannelReq{
-			Frequency:     dev.MACState.DesiredParameters.PingSlotFrequency,
-			DataRateIndex: dev.MACState.DesiredParameters.PingSlotDataRateIndexValue.Value,
+			Frequency:     dev.MacState.DesiredParameters.PingSlotFrequency,
+			DataRateIndex: dev.MacState.DesiredParameters.PingSlotDataRateIndexValue.Value,
 		}
 		log.FromContext(ctx).WithFields(log.Fields(
 			"frequency", req.Frequency,
@@ -79,7 +79,7 @@ func EnqueuePingSlotChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDow
 				EvtEnqueuePingSlotChannelRequest.With(events.WithData(req)),
 			},
 			true
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return st
 }
 
@@ -89,13 +89,13 @@ func HandlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *tt
 	}
 
 	var err error
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_PING_SLOT_CHANNEL, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_PING_SLOT_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetPingSlotChannelReq()
 
-		dev.MACState.CurrentParameters.PingSlotFrequency = req.Frequency
-		dev.MACState.CurrentParameters.PingSlotDataRateIndexValue = &ttnpb.DataRateIndexValue{Value: req.DataRateIndex}
+		dev.MacState.CurrentParameters.PingSlotFrequency = req.Frequency
+		dev.MacState.CurrentParameters.PingSlotDataRateIndexValue = &ttnpb.DataRateIndexValue{Value: req.DataRateIndex}
 		return nil
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return events.Builders{
 		EvtReceivePingSlotChannelAnswer.With(events.WithData(pld)),
 	}, err

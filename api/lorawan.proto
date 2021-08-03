@@ -36,7 +36,7 @@ option (gogoproto.stringer_all) = true;
 // Message represents a LoRaWAN message
 message Message {
   MHDR m_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  bytes mic = 2 [(gogoproto.customname) = "MIC", (validate.rules).bytes = { min_len: 0, max_len: 4 }];
+  bytes mic = 2 [(validate.rules).bytes = { min_len: 0, max_len: 4 }];
 
   // Payload represents either MACPayload, RejoinRequestPayload, JoinRequestPayload or JoinAcceptPayload
   // - MACPayload length is in range [7:M] bytes, where M is PHY specific.
@@ -46,7 +46,7 @@ message Message {
   oneof Payload {
     option (validate.required) = true;
 
-    MACPayload mac_payload = 3 [(gogoproto.customname) = "MACPayload"];
+    MACPayload mac_payload = 3;
     JoinRequestPayload join_request_payload = 4;
     JoinAcceptPayload join_accept_payload = 5;
     RejoinRequestPayload rejoin_request_payload = 6;
@@ -149,7 +149,7 @@ message MHDR {
 message MACPayload {
   FHDR f_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   uint32 f_port = 2 [(validate.rules).uint32.lte = 255];
-  bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
+  bytes frm_payload = 3;
   google.protobuf.Struct decoded_payload = 4;
   // Full 32-bit FCnt value. Used internally by Network Server.
   uint32 full_f_cnt = 5;
@@ -206,14 +206,14 @@ message JoinAcceptPayload {
   bytes dev_addr = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
   DLSettings dl_settings = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   RxDelay rx_delay = 6 [(validate.rules).enum.defined_only = true];
-  CFList cf_list = 7 [(gogoproto.customname) = "CFList"];
+  CFList cf_list = 7;
 }
 
 message DLSettings {
-  DataRateOffset rx1_dr_offset = 1 [(gogoproto.customname) = "Rx1DROffset", (validate.rules).enum.defined_only = true];
-  DataRateIndex rx2_dr = 2 [(gogoproto.customname) = "Rx2DR", (validate.rules).enum.defined_only = true];
+  DataRateOffset rx1_dr_offset = 1 [(validate.rules).enum.defined_only = true];
+  DataRateIndex rx2_dr = 2 [(validate.rules).enum.defined_only = true];
   // OptNeg is set if Network Server implements LoRaWAN 1.1 or greater.
-  bool opt_neg = 3 [(gogoproto.customname) = "OptNeg"];
+  bool opt_neg = 3;
 }
 
 enum CFListType {
@@ -272,7 +272,7 @@ message DataRate {
     option (validate.required) = true;
 
     LoRaDataRate lora = 1;
-    FSKDataRate fsk = 2 [(gogoproto.customname) = "FSK"];
+    FSKDataRate fsk = 2;
     LRFHSSDataRate lrfhss = 3;
   };
 }
@@ -300,7 +300,7 @@ message TxSettings {
   // Frequency (Hz).
   uint64 frequency = 4;
   // Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled.
-  bool enable_crc = 5 [(gogoproto.customname) = "EnableCRC"];
+  bool enable_crc = 5;
   // Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds).
   // On downlink, set timestamp to 0 and time to null to use immediate scheduling.
   uint32 timestamp = 6;
@@ -422,8 +422,8 @@ message MACCommand {
     DevStatusAns dev_status_ans = 11;
     NewChannelReq new_channel_req = 12;
     NewChannelAns new_channel_ans = 13;
-    DLChannelReq dl_channel_req = 14 [(gogoproto.customname) = "DLChannelReq"];
-    DLChannelAns dl_channel_ans = 15 [(gogoproto.customname) = "DLChannelAns"];
+    DLChannelReq dl_channel_req = 14;
+    DLChannelAns dl_channel_ans = 15;
     RxTimingSetupReq rx_timing_setup_req = 16;
     TxParamSetupReq tx_param_setup_req = 17;
     RekeyInd rekey_ind = 18;
@@ -520,7 +520,7 @@ message MACCommand {
     option (gogoproto.populate) = true;
     // Indicates the maximum EIRP value in dBm, indexed by the following vector:
     // [ 8 10 12 13 14 16 18 20 21 24 26 27 29 30 33 36 ]
-    DeviceEIRP max_eirp_index = 1 [(gogoproto.customname) = "MaxEIRPIndex", (validate.rules).enum.defined_only = true];
+    DeviceEIRP max_eirp_index = 1 [(validate.rules).enum.defined_only = true];
     bool uplink_dwell_time = 2;
     bool downlink_dwell_time = 3;
   }

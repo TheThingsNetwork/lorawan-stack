@@ -12,20 +12,20 @@ func (dst *PeerInfo) SetFields(src *PeerInfo, paths ...string) error {
 				return fmt.Errorf("'grpc_port' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.GRPCPort = src.GRPCPort
+				dst.GrpcPort = src.GrpcPort
 			} else {
 				var zero uint32
-				dst.GRPCPort = zero
+				dst.GrpcPort = zero
 			}
 		case "tls":
 			if len(subs) > 0 {
 				return fmt.Errorf("'tls' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.TLS = src.TLS
+				dst.Tls = src.Tls
 			} else {
 				var zero bool
-				dst.TLS = zero
+				dst.Tls = zero
 			}
 		case "roles":
 			if len(subs) > 0 {

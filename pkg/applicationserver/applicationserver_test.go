@@ -1013,7 +1013,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x22},
 									FPort:        22,
 									FCnt:         22,
-									FRMPayload:   []byte{0x01},
+									FrmPayload:   []byte{0x01},
 								},
 							},
 						},
@@ -1028,7 +1028,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyId: []byte{0x22},
 										FPort:        22,
 										FCnt:         22,
-										FRMPayload:   []byte{0xc1},
+										FrmPayload:   []byte{0xc1},
 										DecodedPayload: &pbtypes.Struct{
 											Fields: map[string]*pbtypes.Value{
 												"sum": {
@@ -1054,13 +1054,13 @@ func TestApplicationServer(t *testing.T) {
 								SessionKeyId: []byte{0x22},
 								FPort:        11,
 								FCnt:         11,
-								FRMPayload:   []byte{0x69, 0x65, 0x9f, 0x8f},
+								FrmPayload:   []byte{0x69, 0x65, 0x9f, 0x8f},
 							},
 							{
 								SessionKeyId: []byte{0x22},
 								FPort:        22,
 								FCnt:         22,
-								FRMPayload:   []byte{0xb, 0x8f, 0x94, 0xe6},
+								FrmPayload:   []byte{0xb, 0x8f, 0x94, 0xe6},
 							},
 						},
 						Message: &ttnpb.ApplicationUp{
@@ -1078,13 +1078,13 @@ func TestApplicationServer(t *testing.T) {
 											SessionKeyId: []byte{0x22},
 											FPort:        11,
 											FCnt:         11,
-											FRMPayload:   []byte{0x69, 0x65, 0x9f, 0x8f},
+											FrmPayload:   []byte{0x69, 0x65, 0x9f, 0x8f},
 										},
 										{
 											SessionKeyId: []byte{0x22},
 											FPort:        22,
 											FCnt:         22,
-											FRMPayload:   []byte{0xb, 0x8f, 0x94, 0xe6},
+											FrmPayload:   []byte{0xb, 0x8f, 0x94, 0xe6},
 										},
 									},
 								},
@@ -1134,7 +1134,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x22},
 									FPort:        11,
 									FCnt:         11,
-									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1149,7 +1149,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x22},
 									FPort:        22,
 									FCnt:         22,
-									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
+									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1175,7 +1175,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x33},
 									FPort:        42,
 									FCnt:         42,
-									FRMPayload:   []byte{0xca, 0xa9, 0x42},
+									FrmPayload:   []byte{0xca, 0xa9, 0x42},
 								},
 							},
 						},
@@ -1190,7 +1190,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyId: []byte{0x33},
 										FPort:        42,
 										FCnt:         42,
-										FRMPayload:   []byte{0x01, 0x02, 0x03},
+										FrmPayload:   []byte{0x01, 0x02, 0x03},
 										DecodedPayload: &pbtypes.Struct{
 											Fields: map[string]*pbtypes.Value{
 												"sum": {
@@ -1218,7 +1218,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x33},
 									FPort:        42,
 									FCnt:         42,
-									FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+									FrmPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
 								},
 							},
 						},
@@ -1231,7 +1231,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyId: []byte{0x33},
 										FPort:        42,
 										FCnt:         42,
-										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+										FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 										DecodedPayload: &pbtypes.Struct{
 											Fields: map[string]*pbtypes.Value{
 												"sum": {
@@ -1260,7 +1260,7 @@ func TestApplicationServer(t *testing.T) {
 											SessionKeyId: []byte{0x33},
 											FPort:        42,
 											FCnt:         42,
-											FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+											FrmPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
 										},
 									},
 									LastFCntDown: 42,
@@ -1280,7 +1280,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x33},
 									FPort:        42,
 									FCnt:         42,
-									FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+									FrmPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1302,7 +1302,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyId: []byte{0x33},
 										FPort:        42,
 										FCnt:         42,
-										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+										FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 										DecodedPayload: &pbtypes.Struct{
 											Fields: map[string]*pbtypes.Value{
 												"sum": {
@@ -1330,7 +1330,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyId: []byte{0x33},
 										FPort:        42,
 										FCnt:         42,
-										FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+										FrmPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
 									},
 									Error: ttnpb.ErrorDetails{
 										Name: "test",
@@ -1348,7 +1348,7 @@ func TestApplicationServer(t *testing.T) {
 											SessionKeyId: []byte{0x33},
 											FPort:        42,
 											FCnt:         42,
-											FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+											FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 											DecodedPayload: &pbtypes.Struct{
 												Fields: map[string]*pbtypes.Value{
 													"sum": {
@@ -1379,7 +1379,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x33},
 									FPort:        42,
 									FCnt:         42,
-									FRMPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
+									FrmPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
 								},
 							},
 						},
@@ -1392,7 +1392,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyId: []byte{0x33},
 										FPort:        42,
 										FCnt:         42,
-										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+										FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 										DecodedPayload: &pbtypes.Struct{
 											Fields: map[string]*pbtypes.Value{
 												"sum": {
@@ -1417,7 +1417,7 @@ func TestApplicationServer(t *testing.T) {
 								SessionKeyId: []byte{0x33},
 								FPort:        22,
 								FCnt:         2,
-								FRMPayload:   []byte{0x92, 0xfe, 0x93, 0xf5},
+								FrmPayload:   []byte{0x92, 0xfe, 0x93, 0xf5},
 							},
 						},
 						Message: &ttnpb.ApplicationUp{
@@ -1427,7 +1427,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x33},
 									FPort:        11,
 									FCnt:         1,
-									FRMPayload:   []byte{0x5f, 0x38, 0x7c, 0xb0},
+									FrmPayload:   []byte{0x5f, 0x38, 0x7c, 0xb0},
 								},
 							},
 						},
@@ -1440,7 +1440,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyId: []byte{0x33},
 										FPort:        11,
 										FCnt:         1,
-										FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+										FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 										DecodedPayload: &pbtypes.Struct{
 											Fields: map[string]*pbtypes.Value{
 												"sum": {
@@ -1463,7 +1463,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x33},
 									FPort:        22,
 									FCnt:         2,
-									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
+									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1478,7 +1478,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x33},
 									FPort:        11,
 									FCnt:         44,
-									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1511,13 +1511,13 @@ func TestApplicationServer(t *testing.T) {
 											SessionKeyId: []byte{0x33},
 											FPort:        11,
 											FCnt:         2,
-											FRMPayload:   []byte{0x91, 0xfd, 0x90, 0xf6},
+											FrmPayload:   []byte{0x91, 0xfd, 0x90, 0xf6},
 										},
 										{
 											SessionKeyId: []byte{0x33},
 											FPort:        22,
 											FCnt:         3,
-											FRMPayload:   []byte{0x2f, 0x3f, 0x31, 0x2c},
+											FrmPayload:   []byte{0x2f, 0x3f, 0x31, 0x2c},
 										},
 									},
 								},
@@ -1568,7 +1568,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x33},
 									FPort:        22,
 									FCnt:         2,
-									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
+									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1583,7 +1583,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x33},
 									FPort:        11,
 									FCnt:         44,
-									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1609,7 +1609,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x44},
 									FPort:        24,
 									FCnt:         24,
-									FRMPayload:   []byte{0x14, 0x4e, 0x3c},
+									FrmPayload:   []byte{0x14, 0x4e, 0x3c},
 								},
 							},
 						},
@@ -1624,7 +1624,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyId: []byte{0x44},
 										FPort:        24,
 										FCnt:         24,
-										FRMPayload:   []byte{0x64, 0x64, 0x64},
+										FrmPayload:   []byte{0x64, 0x64, 0x64},
 										DecodedPayload: &pbtypes.Struct{
 											Fields: map[string]*pbtypes.Value{
 												"sum": {
@@ -1661,7 +1661,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x44},
 									FPort:        11,
 									FCnt:         1,
-									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1676,7 +1676,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x44},
 									FPort:        22,
 									FCnt:         2,
-									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
+									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1703,13 +1703,13 @@ func TestApplicationServer(t *testing.T) {
 											SessionKeyId: []byte{0x44},
 											FPort:        11,
 											FCnt:         11,
-											FRMPayload:   []byte{0x65, 0x98, 0xa7, 0xfc},
+											FrmPayload:   []byte{0x65, 0x98, 0xa7, 0xfc},
 										},
 										{
 											SessionKeyId: []byte{0x44},
 											FPort:        22,
 											FCnt:         22,
-											FRMPayload:   []byte{0x1b, 0x4b, 0x97, 0xb9},
+											FrmPayload:   []byte{0x1b, 0x4b, 0x97, 0xb9},
 										},
 									},
 									LastFCntDown: 42,
@@ -1725,7 +1725,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x44},
 									FPort:        11,
 									FCnt:         43,
-									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1740,7 +1740,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x44},
 									FPort:        22,
 									FCnt:         44,
-									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
+									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1786,19 +1786,19 @@ func TestApplicationServer(t *testing.T) {
 											SessionKeyId: []byte{0x44},
 											FPort:        11,
 											FCnt:         11,
-											FRMPayload:   []byte{0x65, 0x98, 0xa7, 0xfc},
+											FrmPayload:   []byte{0x65, 0x98, 0xa7, 0xfc},
 										},
 										{
 											SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 											FPort:        12,
 											FCnt:         12,
-											FRMPayload:   []byte{0xff, 0xff, 0xff, 0xff},
+											FrmPayload:   []byte{0xff, 0xff, 0xff, 0xff},
 										},
 										{
 											SessionKeyId: []byte{0x44},
 											FPort:        22,
 											FCnt:         22,
-											FRMPayload:   []byte{0x1b, 0x4b, 0x97, 0xb9},
+											FrmPayload:   []byte{0x1b, 0x4b, 0x97, 0xb9},
 										},
 									},
 									LastFCntDown: 84,
@@ -1814,7 +1814,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x44},
 									FPort:        11,
 									FCnt:         85,
-									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
+									FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1829,7 +1829,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x44},
 									FPort:        22,
 									FCnt:         86,
-									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
+									FrmPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 									DecodedPayload: &pbtypes.Struct{
 										Fields: map[string]*pbtypes.Value{
 											"sum": {
@@ -1855,7 +1855,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x55},
 									FPort:        42,
 									FCnt:         42,
-									FRMPayload:   []byte{0xd1, 0x43, 0x6a},
+									FrmPayload:   []byte{0xd1, 0x43, 0x6a},
 								},
 							},
 						},
@@ -1870,7 +1870,7 @@ func TestApplicationServer(t *testing.T) {
 										SessionKeyId: []byte{0x55},
 										FPort:        42,
 										FCnt:         42,
-										FRMPayload:   []byte{0x2a, 0x2a, 0x2a},
+										FrmPayload:   []byte{0x2a, 0x2a, 0x2a},
 										DecodedPayload: &pbtypes.Struct{
 											Fields: map[string]*pbtypes.Value{
 												"sum": {
@@ -1936,7 +1936,7 @@ func TestApplicationServer(t *testing.T) {
 									SessionKeyId: []byte{0x55},
 									FPort:        11,
 									FCnt:         11,
-									FRMPayload:   []byte{0xaa, 0x64, 0xb7, 0x7},
+									FrmPayload:   []byte{0xaa, 0x64, 0xb7, 0x7},
 								},
 							},
 						},
@@ -2011,7 +2011,7 @@ func TestApplicationServer(t *testing.T) {
 						Downlinks: []*ttnpb.ApplicationDownlink{
 							{
 								FPort:      11,
-								FRMPayload: []byte{0x1, 0x1, 0x1},
+								FrmPayload: []byte{0x1, 0x1, 0x1},
 							},
 						},
 					}
@@ -2037,11 +2037,11 @@ func TestApplicationServer(t *testing.T) {
 						{
 							{
 								FPort:      11,
-								FRMPayload: []byte{0x1, 0x1, 0x1},
+								FrmPayload: []byte{0x1, 0x1, 0x1},
 							},
 							{
 								FPort:      22,
-								FRMPayload: []byte{0x2, 0x2, 0x2},
+								FrmPayload: []byte{0x2, 0x2, 0x2},
 							},
 						},
 						{
@@ -2088,7 +2088,7 @@ func TestApplicationServer(t *testing.T) {
 								SessionKeyId: []byte{0x11},
 								FPort:        11,
 								FCnt:         1,
-								FRMPayload:   []byte{0x1, 0x1, 0x1},
+								FrmPayload:   []byte{0x1, 0x1, 0x1},
 								DecodedPayload: &pbtypes.Struct{
 									Fields: map[string]*pbtypes.Value{
 										"sum": {
@@ -2104,7 +2104,7 @@ func TestApplicationServer(t *testing.T) {
 								SessionKeyId: []byte{0x11},
 								FPort:        22,
 								FCnt:         2,
-								FRMPayload:   []byte{0x2, 0x2, 0x2},
+								FrmPayload:   []byte{0x2, 0x2, 0x2},
 								DecodedPayload: &pbtypes.Struct{
 									Fields: map[string]*pbtypes.Value{
 										"sum": {
@@ -2120,7 +2120,7 @@ func TestApplicationServer(t *testing.T) {
 								SessionKeyId: []byte{0x11},
 								FPort:        33,
 								FCnt:         3,
-								FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1, 0x1, 0x1},
+								FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1, 0x1, 0x1},
 								DecodedPayload: &pbtypes.Struct{
 									Fields: map[string]*pbtypes.Value{
 										"sum": {
@@ -2142,11 +2142,11 @@ func TestApplicationServer(t *testing.T) {
 						Downlinks: []*ttnpb.ApplicationDownlink{
 							{
 								FPort:      11,
-								FRMPayload: []byte{0x1, 0x1, 0x1},
+								FrmPayload: []byte{0x1, 0x1, 0x1},
 							},
 							{
 								FPort:      22,
-								FRMPayload: []byte{0x2, 0x2, 0x2},
+								FrmPayload: []byte{0x2, 0x2, 0x2},
 							},
 						},
 					}
@@ -2174,7 +2174,7 @@ func TestApplicationServer(t *testing.T) {
 								SessionKeyId: []byte{0x11},
 								FPort:        11,
 								FCnt:         4,
-								FRMPayload:   []byte{0x1, 0x1, 0x1},
+								FrmPayload:   []byte{0x1, 0x1, 0x1},
 								DecodedPayload: &pbtypes.Struct{
 									Fields: map[string]*pbtypes.Value{
 										"sum": {
@@ -2190,7 +2190,7 @@ func TestApplicationServer(t *testing.T) {
 								SessionKeyId: []byte{0x11},
 								FPort:        22,
 								FCnt:         5,
-								FRMPayload:   []byte{0x2, 0x2, 0x2},
+								FrmPayload:   []byte{0x2, 0x2, 0x2},
 								DecodedPayload: &pbtypes.Struct{
 									Fields: map[string]*pbtypes.Value{
 										"sum": {
@@ -2504,7 +2504,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									SessionKeyId: []byte{0x22},
 									FPort:        22,
 									FCnt:         22,
-									FRMPayload:   []byte{0x01},
+									FrmPayload:   []byte{0x01},
 								},
 							},
 						},
@@ -2521,7 +2521,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 											SessionKeyId: []byte{0x22},
 											FPort:        22,
 											FCnt:         22,
-											FRMPayload:   []byte{0x01},
+											FrmPayload:   []byte{0x01},
 											AppSKey: &ttnpb.KeyEnvelope{
 												EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
 												KekLabel:     kekLabel,
@@ -2542,7 +2542,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 											SessionKeyId: []byte{0x22},
 											FPort:        22,
 											FCnt:         22,
-											FRMPayload:   []byte{0xc1},
+											FrmPayload:   []byte{0xc1},
 										},
 									},
 									CorrelationIds: up.CorrelationIds,
@@ -2562,7 +2562,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 											SessionKeyId: []byte{0x22},
 											FPort:        22,
 											FCnt:         22,
-											FRMPayload:   []byte{0x01},
+											FrmPayload:   []byte{0x01},
 										},
 									},
 									SessionKeyId: []byte{0x22},
@@ -2581,7 +2581,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 													SessionKeyId: []byte{0x22},
 													FPort:        22,
 													FCnt:         22,
-													FRMPayload:   []byte{0x01},
+													FrmPayload:   []byte{0x01},
 												},
 											},
 											SessionKeyId: []byte{0x22},
@@ -2655,12 +2655,12 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							{
 								FPort:      11,
 								FCnt:       1,
-								FRMPayload: []byte{0x1, 0x1, 0x1},
+								FrmPayload: []byte{0x1, 0x1, 0x1},
 							},
 							{
 								FPort:      22,
 								FCnt:       2,
-								FRMPayload: []byte{0x2, 0x2, 0x2},
+								FrmPayload: []byte{0x2, 0x2, 0x2},
 							},
 						},
 					} {
@@ -2693,14 +2693,14 @@ func TestSkipPayloadCrypto(t *testing.T) {
 								SessionKeyId:   []byte{0x11},
 								FPort:          11,
 								FCnt:           1,
-								FRMPayload:     []byte{0x1, 0x1, 0x1},
+								FrmPayload:     []byte{0x1, 0x1, 0x1},
 								CorrelationIds: res[0].CorrelationIds,
 							},
 							{
 								SessionKeyId:   []byte{0x11},
 								FPort:          22,
 								FCnt:           2,
-								FRMPayload:     []byte{0x2, 0x2, 0x2},
+								FrmPayload:     []byte{0x2, 0x2, 0x2},
 								CorrelationIds: res[1].CorrelationIds,
 							},
 						})
@@ -2840,7 +2840,7 @@ func TestLocationFromPayload(t *testing.T) {
 				SessionKeyId: []byte{0x11},
 				FPort:        11,
 				FCnt:         11,
-				FRMPayload:   []byte{0x11},
+				FrmPayload:   []byte{0x11},
 			},
 		},
 	})

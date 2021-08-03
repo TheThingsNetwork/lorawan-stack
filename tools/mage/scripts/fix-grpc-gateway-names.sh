@@ -30,17 +30,6 @@ for f in "${protos[@]}"; do
   if grep -q '(google\.protobuf\.Empty)' "${f}"; then
     perlArgs+=( "-pe s!empty\\.Empty!types.Empty!g;" )
   fi
-
-  if grep -q '(gogoproto.customname)' "${f}"; then
-    for l in $(grep '(gogoproto.customname)' "${f}"); do
-      from=$(echo "${l}" | perl \
-        -pe 's![[:space:]]*(repeated[[:space:]]+)?([[:alnum:]_.]+|map<[[:space:]]*[[:alnum:]]+[[:space:]]*,[[:space:]]*[[:alnum:]_.]+[[:space:]]*>)[[:space:]]+([[:alnum:]_]+)[[:space:]]*=[[:space:]]*[0-9]+.*!\3!;' \
-        -pe 's!(^[[:alnum:]])([[:alnum:]]*)|_([[:alnum:]])([[:alnum:]]*)!\U\1\3\E\2\4!g;')
-      to=$(echo "${l}" | perl \
-        -pe 's!.*\(gogoproto.customname\)[[:space:]]*=[[:space:]]*"([[:alnum:]_]+)".*!\1!')
-      ! [ "${from}" = "${to}" ]; perlArgs+=("-pe s!(^[[:space:]]*protoReq\.)${from}(, err =)!\\1${to}\\2!g;")
-    done
-  fi
 done
 
 if [[ ${#perlArgs[@]} -ne 0 ]]; then

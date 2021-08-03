@@ -51,9 +51,9 @@ func (m *PeerInfo) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "grpc_port":
-			// no validation rules for GRPCPort
+			// no validation rules for GrpcPort
 		case "tls":
-			// no validation rules for TLS
+			// no validation rules for Tls
 		case "roles":
 
 		case "tags":

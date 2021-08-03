@@ -47,51 +47,51 @@ func (dst *ConcentratorConfig) SetFields(src *ConcentratorConfig, paths ...strin
 		case "fsk_channel":
 			if len(subs) > 0 {
 				var newDst, newSrc *ConcentratorConfig_FSKChannel
-				if (src == nil || src.FSKChannel == nil) && dst.FSKChannel == nil {
+				if (src == nil || src.FskChannel == nil) && dst.FskChannel == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.FSKChannel
+					newSrc = src.FskChannel
 				}
-				if dst.FSKChannel != nil {
-					newDst = dst.FSKChannel
+				if dst.FskChannel != nil {
+					newDst = dst.FskChannel
 				} else {
 					newDst = &ConcentratorConfig_FSKChannel{}
-					dst.FSKChannel = newDst
+					dst.FskChannel = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.FSKChannel = src.FSKChannel
+					dst.FskChannel = src.FskChannel
 				} else {
-					dst.FSKChannel = nil
+					dst.FskChannel = nil
 				}
 			}
 		case "lbt":
 			if len(subs) > 0 {
 				var newDst, newSrc *ConcentratorConfig_LBTConfiguration
-				if (src == nil || src.LBT == nil) && dst.LBT == nil {
+				if (src == nil || src.Lbt == nil) && dst.Lbt == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.LBT
+					newSrc = src.Lbt
 				}
-				if dst.LBT != nil {
-					newDst = dst.LBT
+				if dst.Lbt != nil {
+					newDst = dst.Lbt
 				} else {
 					newDst = &ConcentratorConfig_LBTConfiguration{}
-					dst.LBT = newDst
+					dst.Lbt = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.LBT = src.LBT
+					dst.Lbt = src.Lbt
 				} else {
-					dst.LBT = nil
+					dst.Lbt = nil
 				}
 			}
 		case "ping_slot":

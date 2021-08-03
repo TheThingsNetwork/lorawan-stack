@@ -98,13 +98,13 @@ func WithClientInfoFromContext() Option {
 	return optionFunc(func(e *event) {
 		if p, ok := peer.FromContext(e.ctx); ok && p.Addr != nil && p.Addr.String() != "pipe" {
 			if host, _, err := net.SplitHostPort(p.Addr.String()); err == nil {
-				e.innerEvent.RemoteIP = host
+				e.innerEvent.RemoteIp = host
 			}
 		}
 		md := rpcmetadata.FromIncomingContext(e.ctx)
 		if md.XForwardedFor != "" {
 			xff := strings.Split(md.XForwardedFor, ",")
-			e.innerEvent.RemoteIP = strings.Trim(xff[0], " ")
+			e.innerEvent.RemoteIp = strings.Trim(xff[0], " ")
 		}
 		if md := rpcmetadata.FromIncomingContext(e.ctx); md.UserAgent != "" {
 			e.innerEvent.UserAgent = md.UserAgent

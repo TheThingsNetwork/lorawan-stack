@@ -28,7 +28,7 @@ func TestDataRate(t *testing.T) {
 
 	table := map[string]datarate.DR{
 		`"SF7BW125"`: {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}},
-		`50000`:      {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{BitRate: 50000}}}},
+		`50000`:      {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Fsk{Fsk: &ttnpb.FSKDataRate{BitRate: 50000}}}},
 		`"M0CW137"`:  {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lrfhss{Lrfhss: &ttnpb.LRFHSSDataRate{ModulationType: 0, OperatingChannelWidth: 137}}}},
 	}
 
@@ -83,7 +83,7 @@ func TestStringer(t *testing.T) {
 		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 6, Bandwidth: 125000}}}}:               "SF6BW125",
 		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 500000}}}}:               "SF9BW500",
 		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 5, Bandwidth: 31250}}}}:                "SF5BW31.25",
-		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{BitRate: 50000}}}}:                                         "50000",
+		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Fsk{Fsk: &ttnpb.FSKDataRate{BitRate: 50000}}}}:                                         "50000",
 		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lrfhss{Lrfhss: &ttnpb.LRFHSSDataRate{ModulationType: 0, OperatingChannelWidth: 137}}}}: "M0CW137",
 	}
 

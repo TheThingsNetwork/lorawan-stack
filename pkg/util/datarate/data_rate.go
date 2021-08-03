@@ -33,7 +33,7 @@ func (dr DR) MarshalJSON() ([]byte, error) {
 	if dr.GetLora() != nil {
 		return []byte(strconv.Quote(dr.String())), nil
 	}
-	if dr.GetFSK() != nil {
+	if dr.GetFsk() != nil {
 		return []byte(dr.String()), nil
 	}
 	if dr.GetLrfhss() != nil {
@@ -69,8 +69,8 @@ func (dr *DR) UnmarshalJSON(data []byte) error {
 	}
 	*dr = DR{
 		DataRate: ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_FSK{
-				FSK: &ttnpb.FSKDataRate{
+			Modulation: &ttnpb.DataRate_Fsk{
+				Fsk: &ttnpb.FSKDataRate{
 					BitRate: uint32(i),
 				},
 			},
@@ -91,7 +91,7 @@ func (dr DR) String() string {
 	if lora := dr.GetLora(); lora != nil {
 		return fmt.Sprintf("SF%dBW%v", lora.SpreadingFactor, float32(lora.Bandwidth)/1000)
 	}
-	if fsk := dr.GetFSK(); fsk != nil {
+	if fsk := dr.GetFsk(); fsk != nil {
 		return fmt.Sprintf("%d", fsk.BitRate)
 	}
 	if lrfhss := dr.GetLrfhss(); lrfhss != nil {

@@ -62,7 +62,7 @@ func TestLegacyEncodeDownlink(t *testing.T) {
 		`
 		err := host.EncodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		a.So(message.FRMPayload, should.Resemble, []byte{1, 2, 3})
+		a.So(message.FrmPayload, should.Resemble, []byte{1, 2, 3})
 	}
 
 	// Encode temperature.
@@ -78,7 +78,7 @@ func TestLegacyEncodeDownlink(t *testing.T) {
 		`
 		err := host.EncodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		a.So(message.FRMPayload, should.Resemble, []byte{247, 174})
+		a.So(message.FrmPayload, should.Resemble, []byte{247, 174})
 	}
 
 	// Return an object.
@@ -135,7 +135,7 @@ func TestEncodeDownlink(t *testing.T) {
 		`
 		err := host.EncodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		a.So(message.FRMPayload, should.Resemble, []byte{1, 2, 3})
+		a.So(message.FrmPayload, should.Resemble, []byte{1, 2, 3})
 		a.So(message.FPort, should.Equal, 42)
 	}
 
@@ -161,7 +161,7 @@ func TestEncodeDownlink(t *testing.T) {
 		`
 		err := host.EncodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		a.So(message.FRMPayload, should.Resemble, []byte{247, 174})
+		a.So(message.FrmPayload, should.Resemble, []byte{247, 174})
 		a.So(message.DecodedPayloadWarnings, should.Resemble, []string{"it's cold"})
 	}
 
@@ -189,7 +189,7 @@ func TestEncodeDownlink(t *testing.T) {
 		`
 		err := host.EncodeDownlink(ctx, ids, nil, message, script)
 		a.So(err, should.BeNil)
-		a.So(message.FRMPayload, should.Resemble, []byte{0x2})
+		a.So(message.FrmPayload, should.Resemble, []byte{0x2})
 		a.So(message.FPort, should.Equal, 4)
 	}
 
@@ -246,7 +246,7 @@ func TestLegacyDecodeUplink(t *testing.T) {
 	}
 
 	message := &ttnpb.ApplicationUplink{
-		FRMPayload: []byte{0xF7, 0xAE},
+		FrmPayload: []byte{0xF7, 0xAE},
 	}
 
 	// Return constant object.
@@ -324,7 +324,7 @@ func TestDecodeUplink(t *testing.T) {
 	}
 
 	message := &ttnpb.ApplicationUplink{
-		FRMPayload: []byte{0xF7, 0xAE},
+		FrmPayload: []byte{0xF7, 0xAE},
 	}
 
 	// Decode bytes.
@@ -358,7 +358,7 @@ func TestDecodeUplink(t *testing.T) {
 	{
 		message := &ttnpb.ApplicationUplink{
 			FPort:      4,
-			FRMPayload: []byte{0x0C, 0xB2, 0x04, 0x80, 0xF7, 0xAE},
+			FrmPayload: []byte{0x0C, 0xB2, 0x04, 0x80, 0xF7, 0xAE},
 		}
 		script := `
 		function decodeUplink(input) {
@@ -459,7 +459,7 @@ func TestDecodeDownlink(t *testing.T) {
 	}
 
 	message := &ttnpb.ApplicationDownlink{
-		FRMPayload: []byte{0xF7, 0xAE},
+		FrmPayload: []byte{0xF7, 0xAE},
 		FPort:      4,
 	}
 
@@ -487,7 +487,7 @@ func TestDecodeDownlink(t *testing.T) {
 	{
 		message := &ttnpb.ApplicationDownlink{
 			FPort:      4,
-			FRMPayload: []byte{0x02},
+			FrmPayload: []byte{0x02},
 		}
 		script := `
 		function decodeDownlink(input) {

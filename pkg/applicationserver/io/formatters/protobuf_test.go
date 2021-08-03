@@ -46,7 +46,7 @@ func TestProtobufUpstream(t *testing.T) {
 						SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 						FPort:        42,
 						FCnt:         42,
-						FRMPayload:   []byte{0x1, 0x2, 0x3},
+						FrmPayload:   []byte{0x1, 0x2, 0x3},
 						DecodedPayload: &pbtypes.Struct{
 							Fields: map[string]*pbtypes.Value{
 								"test_key": {
@@ -112,12 +112,12 @@ func TestProtobufDownstream(t *testing.T) {
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x1, 0x1, 0x1},
+							FrmPayload: []byte{0x1, 0x1, 0x1},
 							Confirmed:  true,
 						},
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x2, 0x2, 0x2},
+							FrmPayload: []byte{0x2, 0x2, 0x2},
 							Confirmed:  true,
 						},
 					},
@@ -165,12 +165,12 @@ func TestProtobufDownstream(t *testing.T) {
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x1, 0x1, 0x1},
+							FrmPayload: []byte{0x1, 0x1, 0x1},
 							Confirmed:  true,
 						},
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x2, 0x2, 0x2},
+							FrmPayload: []byte{0x2, 0x2, 0x2},
 							Confirmed:  true,
 						},
 					},

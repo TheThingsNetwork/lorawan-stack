@@ -168,8 +168,8 @@ func TestFSK(t *testing.T) {
 	scheduled := ttnpb.TxSettings{
 		Frequency: 868300000,
 		DataRate: ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_FSK{
-				FSK: &ttnpb.FSKDataRate{
+			Modulation: &ttnpb.DataRate_Fsk{
+				Fsk: &ttnpb.FSKDataRate{
 					BitRate: 50000,
 				},
 			},
@@ -344,7 +344,7 @@ func TestDifferentLoRa2400CRCs(t *testing.T) {
 				},
 			},
 		}, "4/5LI")
-		dl.GetScheduled().EnableCRC = crc
+		dl.GetScheduled().EnableCrc = crc
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)

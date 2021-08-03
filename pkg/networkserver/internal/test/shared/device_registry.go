@@ -95,9 +95,9 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
 
-		expectedSession, expectedMACState := expectedMatch.Session, expectedMatch.MACState
+		expectedSession, expectedMACState := expectedMatch.Session, expectedMatch.MacState
 		if expectedMatch.IsPending {
-			expectedSession, expectedMACState = expectedMatch.PendingSession, expectedMatch.PendingMACState
+			expectedSession, expectedMACState = expectedMatch.PendingSession, expectedMatch.PendingMacState
 		}
 		var matched bool
 		var attempts []*UplinkMatch
@@ -111,8 +111,8 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 				LoRaWANVersion:         expectedMACState.LorawanVersion,
 				FNwkSIntKey:            expectedSession.FNwkSIntKey,
 				LastFCnt:               expectedSession.LastFCntUp,
-				ResetsFCnt:             expectedMatch.GetMACSettings().GetResetsFCnt(),
-				Supports32BitFCnt:      expectedMatch.GetMACSettings().GetSupports32BitFCnt(),
+				ResetsFCnt:             expectedMatch.GetMacSettings().GetResetsFCnt(),
+				Supports32BitFCnt:      expectedMatch.GetMacSettings().GetSupports_32BitFCnt(),
 				IsPending:              expectedMatch.IsPending,
 			})
 			return matched, nil
@@ -281,7 +281,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 				},
 			},
 		},
-		MACState: MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.RP001_V1_0_3_REV_A),
+		MacState: MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.RP001_V1_0_3_REV_A),
 		PendingSession: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x43, 0xff, 0xff, 0xff},
 			SessionKeys: ttnpb.SessionKeys{
@@ -299,7 +299,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 				},
 			},
 		},
-		PendingMACState: MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B),
+		PendingMacState: MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B),
 	}
 	pbFields := []string{
 		"frequency_plan_id",
@@ -352,7 +352,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	}
 
 	pbOther := CopyEndDevice(pb)
-	pbOther.Session.LastFCntUp = pbCurrentUp.Payload.GetMACPayload().FCnt
+	pbOther.Session.LastFCntUp = pbCurrentUp.Payload.GetMacPayload().FCnt
 	pbOther.Session.FNwkSIntKey.Key = &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe}
 	pbOther.PendingSession = nil
 	pbOther.EndDeviceIdentifiers.DeviceId = "test-dev-other"

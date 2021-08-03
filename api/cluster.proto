@@ -33,9 +33,9 @@ option (gogoproto.stringer_all) = true;
 // PeerInfo
 message PeerInfo {
   // Port on which the gRPC server is exposed.
-  uint32 grpc_port = 1 [(gogoproto.customname) = "GRPCPort"];
+  uint32 grpc_port = 1;
   // Indicates whether the gRPC server uses TLS.
-  bool tls = 2 [(gogoproto.customname) = "TLS"];
+  bool tls = 2;
   // Roles of the peer.
   repeated ClusterRole roles = 3;
 

@@ -81,7 +81,7 @@ func (m *ConcentratorConfig) ValidateFields(paths ...string) error {
 
 		case "fsk_channel":
 
-			if v, ok := interface{}(m.GetFSKChannel()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetFskChannel()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ConcentratorConfigValidationError{
 						field:  "fsk_channel",
@@ -93,7 +93,7 @@ func (m *ConcentratorConfig) ValidateFields(paths ...string) error {
 
 		case "lbt":
 
-			if v, ok := interface{}(m.GetLBT()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetLbt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ConcentratorConfigValidationError{
 						field:  "lbt",

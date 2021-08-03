@@ -358,7 +358,7 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 	if channel := frequencyPlan.FSKChannel; channel != nil {
 		dr, ok := phy.DataRates[ttnpb.DataRateIndex(channel.DataRate)]
 		if ok {
-			if fsk := dr.Rate.GetFSK(); fsk != nil {
+			if fsk := dr.Rate.GetFsk(); fsk != nil {
 				conf.FSKChannel = &IFConfig{
 					Enable:    true,
 					Radio:     channel.Radio,

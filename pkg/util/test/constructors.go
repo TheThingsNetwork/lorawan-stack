@@ -159,22 +159,22 @@ func (o EndDeviceOptionNamespace) WithDefaultLoRaWANPHYVersion() EndDeviceOption
 
 func (o EndDeviceOptionNamespace) WithMACStateOptions(opts ...MACStateOption) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		if x.MACState == nil {
+		if x.MacState == nil {
 			panic("MACState is nil")
 		}
-		v := MACStateOptions.Compose(opts...)(*x.MACState)
-		x.MACState = &v
+		v := MACStateOptions.Compose(opts...)(*x.MacState)
+		x.MacState = &v
 		return x
 	}
 }
 
 func (o EndDeviceOptionNamespace) WithPendingMACStateOptions(opts ...MACStateOption) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		if x.PendingMACState == nil {
+		if x.PendingMacState == nil {
 			panic("PendingMACState is nil")
 		}
-		v := MACStateOptions.Compose(opts...)(*x.PendingMACState)
-		x.PendingMACState = &v
+		v := MACStateOptions.Compose(opts...)(*x.PendingMacState)
+		x.PendingMacState = &v
 		return x
 	}
 }
