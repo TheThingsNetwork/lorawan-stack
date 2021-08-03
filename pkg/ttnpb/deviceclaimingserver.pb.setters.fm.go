@@ -157,11 +157,11 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 						}
 					}
 				case "qr_code":
-					_, srcOk := src.SourceDevice.(*ClaimEndDeviceRequest_QRCode)
+					_, srcOk := src.SourceDevice.(*ClaimEndDeviceRequest_QrCode)
 					if !srcOk && src.SourceDevice != nil {
 						return fmt.Errorf("attempt to set oneof 'qr_code', while different oneof is set in source")
 					}
-					_, dstOk := dst.SourceDevice.(*ClaimEndDeviceRequest_QRCode)
+					_, dstOk := dst.SourceDevice.(*ClaimEndDeviceRequest_QrCode)
 					if !dstOk && dst.SourceDevice != nil {
 						return fmt.Errorf("attempt to set oneof 'qr_code', while different oneof is set in destination")
 					}
@@ -462,11 +462,11 @@ func (dst *ClaimGatewayRequest) SetFields(src *ClaimGatewayRequest, paths ...str
 						}
 					}
 				case "qr_code":
-					_, srcOk := src.SourceGateway.(*ClaimGatewayRequest_QRCode)
+					_, srcOk := src.SourceGateway.(*ClaimGatewayRequest_QrCode)
 					if !srcOk && src.SourceGateway != nil {
 						return fmt.Errorf("attempt to set oneof 'qr_code', while different oneof is set in source")
 					}
-					_, dstOk := dst.SourceGateway.(*ClaimGatewayRequest_QRCode)
+					_, dstOk := dst.SourceGateway.(*ClaimGatewayRequest_QrCode)
 					if !dstOk && dst.SourceGateway != nil {
 						return fmt.Errorf("attempt to set oneof 'qr_code', while different oneof is set in destination")
 					}

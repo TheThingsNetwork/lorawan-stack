@@ -957,8 +957,8 @@ values will be stored in the Join Server.`,
 				}
 				qrCode = qrCode[:len(qrCode)-1]
 				logger.WithField("code", string(qrCode)).Debug("Scanned QR code")
-				req.SourceDevice = &ttnpb.ClaimEndDeviceRequest_QRCode{
-					QRCode: qrCode,
+				req.SourceDevice = &ttnpb.ClaimEndDeviceRequest_QrCode{
+					QrCode: qrCode,
 				}
 			}
 
