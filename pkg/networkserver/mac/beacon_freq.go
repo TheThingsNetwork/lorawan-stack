@@ -39,8 +39,8 @@ var (
 
 func DeviceNeedsBeaconFreqReq(dev *ttnpb.EndDevice) bool {
 	return !dev.GetMulticast() &&
-		dev.GetMACState().GetDeviceClass() == ttnpb.CLASS_B &&
-		dev.MACState.DesiredParameters.BeaconFrequency != dev.MACState.CurrentParameters.BeaconFrequency
+		dev.GetMacState().GetDeviceClass() == ttnpb.CLASS_B &&
+		dev.MacState.DesiredParameters.BeaconFrequency != dev.MacState.CurrentParameters.BeaconFrequency
 }
 
 func EnqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) EnqueueState {
@@ -53,13 +53,13 @@ func EnqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 	}
 
 	var st EnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_BEACON_FREQ, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_BEACON_FREQ, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
 
 		req := &ttnpb.MACCommand_BeaconFreqReq{
-			Frequency: dev.MACState.DesiredParameters.BeaconFrequency,
+			Frequency: dev.MacState.DesiredParameters.BeaconFrequency,
 		}
 		log.FromContext(ctx).WithFields(log.Fields(
 			"frequency", req.Frequency,
@@ -72,7 +72,7 @@ func EnqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 				EvtEnqueueBeaconFreqRequest.With(events.WithData(req)),
 			},
 			true
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return st
 }
 
@@ -87,15 +87,15 @@ func HandleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 	}
 
 	var err error
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) error {
 		if !pld.FrequencyAck {
 			return nil
 		}
 		req := cmd.GetBeaconFreqReq()
 
-		dev.MACState.CurrentParameters.BeaconFrequency = req.Frequency
+		dev.MacState.CurrentParameters.BeaconFrequency = req.Frequency
 		return nil
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return events.Builders{
 		ev.With(events.WithData(pld)),
 	}, err

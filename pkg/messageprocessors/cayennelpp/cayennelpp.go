@@ -27,8 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-type host struct {
-}
+type host struct{}
 
 type decodedMap map[string]interface{}
 
@@ -67,7 +66,7 @@ func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 			}
 		}
 	}
-	msg.FRMPayload = encoder.Bytes()
+	msg.FrmPayload = encoder.Bytes()
 	return nil
 }
 
@@ -75,7 +74,7 @@ func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
 	defer trace.StartRegion(ctx, "decode uplink message").End()
 
-	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FRMPayload))
+	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FrmPayload))
 	m := decodedMap(make(map[string]interface{}))
 	if err := decoder.DecodeUplink(m); err != nil {
 		return errOutput.WithCause(err)
@@ -92,7 +91,7 @@ func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
 	defer trace.StartRegion(ctx, "decode downlink message").End()
 
-	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FRMPayload))
+	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FrmPayload))
 	m := decodedMap(make(map[string]interface{}))
 	if err := decoder.DecodeDownlink(m); err != nil {
 		return errOutput.WithCause(err)

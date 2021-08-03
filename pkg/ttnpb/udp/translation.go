@@ -286,7 +286,7 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 		case *ttnpb.DataRate_Lora:
 			modulation = lora
 			codr = msg.Settings.CodingRate
-		case *ttnpb.DataRate_FSK:
+		case *ttnpb.DataRate_Fsk:
 			modulation = fsk
 		case *ttnpb.DataRate_Lrfhss:
 			modulation = lrfhss
@@ -380,9 +380,9 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	switch scheduled.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
 		tx.CodR = scheduled.CodingRate
-		tx.NCRC = !scheduled.EnableCRC
+		tx.NCRC = !scheduled.EnableCrc
 		tx.Modu = lora
-	case *ttnpb.DataRate_FSK:
+	case *ttnpb.DataRate_Fsk:
 		tx.Modu = fsk
 	default:
 		return tx, errModulation.WithAttributes("modulation", scheduled.DataRate)

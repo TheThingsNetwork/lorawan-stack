@@ -107,22 +107,22 @@ func searchUint64(v uint64, vs ...uint64) int {
 }
 
 func deviceRejectedADRDataRateIndex(dev *ttnpb.EndDevice, idx ttnpb.DataRateIndex) bool {
-	i := searchDataRateIndex(idx, dev.MACState.RejectedAdrDataRateIndexes...)
-	return i < len(dev.MACState.RejectedAdrDataRateIndexes) && dev.MACState.RejectedAdrDataRateIndexes[i] == idx
+	i := searchDataRateIndex(idx, dev.MacState.RejectedAdrDataRateIndexes...)
+	return i < len(dev.MacState.RejectedAdrDataRateIndexes) && dev.MacState.RejectedAdrDataRateIndexes[i] == idx
 }
 
 func deviceRejectedADRTXPowerIndex(dev *ttnpb.EndDevice, idx uint32) bool {
-	i := searchUint32(idx, dev.MACState.RejectedAdrTxPowerIndexes...)
-	return i < len(dev.MACState.RejectedAdrTxPowerIndexes) && dev.MACState.RejectedAdrTxPowerIndexes[i] == idx
+	i := searchUint32(idx, dev.MacState.RejectedAdrTxPowerIndexes...)
+	return i < len(dev.MacState.RejectedAdrTxPowerIndexes) && dev.MacState.RejectedAdrTxPowerIndexes[i] == idx
 }
 
 func deviceRejectedFrequency(dev *ttnpb.EndDevice, freq uint64) bool {
-	i := searchUint64(freq, dev.MACState.RejectedFrequencies...)
-	return i < len(dev.MACState.RejectedFrequencies) && dev.MACState.RejectedFrequencies[i] == freq
+	i := searchUint64(freq, dev.MacState.RejectedFrequencies...)
+	return i < len(dev.MacState.RejectedFrequencies) && dev.MacState.RejectedFrequencies[i] == freq
 }
 
 func deviceRejectedDataRateRange(dev *ttnpb.EndDevice, freq uint64, min, max ttnpb.DataRateIndex) bool {
-	for _, r := range dev.MACState.RejectedDataRateRanges[freq].GetRanges() {
+	for _, r := range dev.MacState.RejectedDataRateRanges[freq].GetRanges() {
 		if r.MinDataRateIndex == min && r.MaxDataRateIndex == max {
 			return true
 		}

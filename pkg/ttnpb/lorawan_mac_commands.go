@@ -143,8 +143,8 @@ func (pld *MACCommand_NewChannelAns) MACCommand() *MACCommand {
 func (pld *MACCommand_DLChannelReq) MACCommand() *MACCommand {
 	return &MACCommand{
 		Cid: CID_DL_CHANNEL,
-		Payload: &MACCommand_DLChannelReq_{
-			DLChannelReq: pld,
+		Payload: &MACCommand_DlChannelReq{
+			DlChannelReq: pld,
 		},
 	}
 }
@@ -153,8 +153,8 @@ func (pld *MACCommand_DLChannelReq) MACCommand() *MACCommand {
 func (pld *MACCommand_DLChannelAns) MACCommand() *MACCommand {
 	return &MACCommand{
 		Cid: CID_DL_CHANNEL,
-		Payload: &MACCommand_DLChannelAns_{
-			DLChannelAns: pld,
+		Payload: &MACCommand_DlChannelAns{
+			DlChannelAns: pld,
 		},
 	}
 }

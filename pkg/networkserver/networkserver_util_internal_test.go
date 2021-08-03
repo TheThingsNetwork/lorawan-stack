@@ -134,7 +134,7 @@ func MakeJoinRequestDecodedPayload(joinEUI, devEUI types.EUI64, devNonce types.D
 			MType: ttnpb.MType_JOIN_REQUEST,
 			Major: ttnpb.Major_LORAWAN_R1,
 		},
-		MIC: CopyBytes(mic[:]),
+		Mic: CopyBytes(mic[:]),
 		Payload: &ttnpb.Message_JoinRequestPayload{
 			JoinRequestPayload: &ttnpb.JoinRequestPayload{
 				JoinEui:  *joinEUI.Copy(&types.EUI64{}),
@@ -206,15 +206,15 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 		RawPayload:         MakeJoinRequestPHYPayload(conf.JoinEUI, conf.DevEUI, conf.DevNonce, conf.MIC),
 		Payload:            MakeJoinRequestDecodedPayload(conf.JoinEUI, conf.DevEUI, conf.DevNonce, conf.MIC),
 		DevAddr:            *conf.DevAddr.Copy(&types.DevAddr{}),
-		SelectedMACVersion: conf.SelectedMACVersion,
+		SelectedMacVersion: conf.SelectedMACVersion,
 		NetId:              *conf.NetID.Copy(&types.NetID{}),
 		DownlinkSettings: ttnpb.DLSettings{
-			Rx1DROffset: conf.RX1DataRateOffset,
-			Rx2DR:       conf.RX2DataRateIndex,
+			Rx1DrOffset: conf.RX1DataRateOffset,
+			Rx2Dr:       conf.RX2DataRateIndex,
 			OptNeg:      conf.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 		},
 		RxDelay: conf.RXDelay,
-		CFList:  frequencyplans.CFList(*test.FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
+		CfList:  frequencyplans.CFList(*test.FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
 		CorrelationIds: CopyStrings(func() []string {
 			if len(conf.CorrelationIDs) == 0 {
 				return JoinRequestCorrelationIDs[:]
@@ -1081,7 +1081,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							a.So(lorawan.UnmarshalMessage(req.Message.RawPayload, actual), should.BeNil)
 							a.So(lorawan.UnmarshalMessage(conf.Payload, expected), should.BeNil)
 							a.So(actual, should.Resemble, expected)
-							if aPld, ePld := actual.GetMACPayload(), expected.GetMACPayload(); !conf.MACState.LorawanVersion.EncryptFOpts() &&
+							if aPld, ePld := actual.GetMacPayload(), expected.GetMacPayload(); !conf.MACState.LorawanVersion.EncryptFOpts() &&
 								aPld != nil && ePld != nil &&
 								!bytes.Equal(aPld.FHDR.FOpts, ePld.FHDR.FOpts) {
 								macCommands := func(b []byte) (cmds []*ttnpb.MACCommand) {
@@ -1130,14 +1130,14 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 				SetRX2:          true,
 				FrequencyPlanID: dev.FrequencyPlanId,
 				PHYVersion:      dev.LorawanPhyVersion,
-				MACState:        dev.PendingMACState,
+				MACState:        dev.PendingMacState,
 				Session:         dev.PendingSession,
 				Class:           ttnpb.CLASS_A,
 				RX1Delay:        ttnpb.RxDelay(phy.JoinAcceptDelay1.Seconds()),
-				Uplink:          LastUplink(dev.PendingMACState.RecentUplinks...),
+				Uplink:          LastUplink(dev.PendingMacState.RecentUplinks...),
 				Priority:        ttnpb.TxSchedulePriority_HIGHEST,
-				Payload:         dev.PendingMACState.QueuedJoinAccept.Payload,
-				CorrelationIDs:  dev.PendingMACState.QueuedJoinAccept.CorrelationIds,
+				Payload:         dev.PendingMacState.QueuedJoinAccept.Payload,
+				CorrelationIDs:  dev.PendingMacState.QueuedJoinAccept.CorrelationIds,
 				PeerIndexes:     []uint{1},
 				Responses: []NsGsScheduleDownlinkResponse{
 					{
@@ -1152,7 +1152,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 			a.So(env.Events, should.ReceiveEventsResembling,
 				EvtScheduleJoinAcceptAttempt.With(
 					events.WithData(&ttnpb.DownlinkMessage{
-						RawPayload: dev.PendingMACState.QueuedJoinAccept.Payload,
+						RawPayload: dev.PendingMacState.QueuedJoinAccept.Payload,
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
 								MType: ttnpb.MType_JOIN_ACCEPT,
@@ -1160,11 +1160,11 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 							},
 							Payload: &ttnpb.Message_JoinAcceptPayload{
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-									NetId:      dev.PendingMACState.QueuedJoinAccept.NetId,
-									DevAddr:    dev.PendingMACState.QueuedJoinAccept.DevAddr,
-									DLSettings: dev.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
-									RxDelay:    dev.PendingMACState.QueuedJoinAccept.Request.RxDelay,
-									CFList:     dev.PendingMACState.QueuedJoinAccept.Request.CFList,
+									NetId:      dev.PendingMacState.QueuedJoinAccept.NetId,
+									DevAddr:    dev.PendingMacState.QueuedJoinAccept.DevAddr,
+									DLSettings: dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+									RxDelay:    dev.PendingMacState.QueuedJoinAccept.Request.RxDelay,
+									CfList:     dev.PendingMacState.QueuedJoinAccept.Request.CfList,
 								},
 							},
 						},
@@ -1179,13 +1179,13 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIds...)),
 			)
 			dev.PendingSession = &ttnpb.Session{
-				DevAddr:     dev.PendingMACState.QueuedJoinAccept.DevAddr,
-				SessionKeys: dev.PendingMACState.QueuedJoinAccept.Keys,
+				DevAddr:     dev.PendingMacState.QueuedJoinAccept.DevAddr,
+				SessionKeys: dev.PendingMacState.QueuedJoinAccept.Keys,
 			}
-			dev.PendingMACState.PendingJoinRequest = &dev.PendingMACState.QueuedJoinAccept.Request
-			dev.PendingMACState.QueuedJoinAccept = nil
-			dev.PendingMACState.RxWindowsAvailable = false
-			dev.PendingMACState.RecentDownlinks = AppendRecentDownlink(dev.PendingMACState.RecentDownlinks, scheduledDown, RecentDownlinkCount)
+			dev.PendingMacState.PendingJoinRequest = &dev.PendingMacState.QueuedJoinAccept.Request
+			dev.PendingMacState.QueuedJoinAccept = nil
+			dev.PendingMacState.RxWindowsAvailable = false
+			dev.PendingMacState.RecentDownlinks = AppendRecentDownlink(dev.PendingMacState.RecentDownlinks, scheduledDown, RecentDownlinkCount)
 		},
 	}), should.BeTrue)
 }
@@ -1219,11 +1219,11 @@ func (env TestEnvironment) AssertScheduleDataDownlink(ctx context.Context, conf 
 				SetRX2:          conf.SetRX2,
 				FrequencyPlanID: dev.FrequencyPlanId,
 				PHYVersion:      dev.LorawanPhyVersion,
-				MACState:        dev.MACState,
+				MACState:        dev.MacState,
 				Session:         dev.Session,
 				Class:           conf.Class,
-				RX1Delay:        dev.MACState.CurrentParameters.Rx1Delay,
-				Uplink:          LastUplink(dev.MACState.RecentUplinks...),
+				RX1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
+				Uplink:          LastUplink(dev.MacState.RecentUplinks...),
 				Priority:        conf.Priority,
 				Payload:         conf.RawPayload,
 				PeerIndexes:     conf.PeerIndexes,
@@ -1245,7 +1245,7 @@ func (env TestEnvironment) AssertScheduleDataDownlink(ctx context.Context, conf 
 					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
 				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIds...)),
 			)
-			dev.MACState.RecentDownlinks = AppendRecentDownlink(dev.MACState.RecentDownlinks, scheduledDown, RecentDownlinkCount)
+			dev.MacState.RecentDownlinks = AppendRecentDownlink(dev.MacState.RecentDownlinks, scheduledDown, RecentDownlinkCount)
 		},
 	}), should.BeTrue)
 }
@@ -1548,9 +1548,9 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			}
 
 			dev = CopyEndDevice(conf.Device)
-			dev.PendingMACState = &ttnpb.MACState{
+			dev.PendingMacState = &ttnpb.MACState{
 				CurrentParameters: ttnpb.MACParameters{
-					MaxEIRP:                    phy.DefaultMaxEIRP,
+					MaxEirp:                    phy.DefaultMaxEIRP,
 					AdrDataRateIndex:           ttnpb.DATA_RATE_0,
 					AdrNbTrans:                 1,
 					Rx1Delay:                   mac.DeviceDefaultRX1Delay(dev, phy, defaultMACSettings),
@@ -1568,7 +1568,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					PingSlotDataRateIndexValue: mac.DeviceDefaultPingSlotDataRateIndexValue(dev, phy, defaultMACSettings),
 				},
 				DesiredParameters: ttnpb.MACParameters{
-					MaxEIRP:                    mac.DeviceDesiredMaxEIRP(dev, phy, fp, defaultMACSettings),
+					MaxEirp:                    mac.DeviceDesiredMaxEIRP(dev, phy, fp, defaultMACSettings),
 					AdrDataRateIndex:           ttnpb.DATA_RATE_0,
 					AdrNbTrans:                 1,
 					Rx1Delay:                   desiredRX1Delay,
@@ -1596,7 +1596,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					Request: ttnpb.MACState_JoinRequest{
 						DownlinkSettings: joinReq.DownlinkSettings,
 						RxDelay:          joinReq.RxDelay,
-						CFList:           joinReq.CFList,
+						CfList:           joinReq.CfList,
 					},
 					Keys: func() ttnpb.SessionKeys {
 						keys := ttnpb.SessionKeys{
@@ -1794,16 +1794,16 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 
 			deduplicatedUp := MakeDataUplink(deduplicatedUpConf)
 			if conf.Pending {
-				dev.MACState = dev.PendingMACState
-				dev.MACState.CurrentParameters.Rx1Delay = dev.PendingMACState.PendingJoinRequest.RxDelay
-				dev.MACState.CurrentParameters.Rx1DataRateOffset = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx1DROffset
-				dev.MACState.CurrentParameters.Rx2DataRateIndex = dev.PendingMACState.PendingJoinRequest.DownlinkSettings.Rx2DR
-				dev.MACState.PendingJoinRequest = nil
+				dev.MacState = dev.PendingMacState
+				dev.MacState.CurrentParameters.Rx1Delay = dev.PendingMacState.PendingJoinRequest.RxDelay
+				dev.MacState.CurrentParameters.Rx1DataRateOffset = dev.PendingMacState.PendingJoinRequest.DownlinkSettings.Rx1DrOffset
+				dev.MacState.CurrentParameters.Rx2DataRateIndex = dev.PendingMacState.PendingJoinRequest.DownlinkSettings.Rx2Dr
+				dev.MacState.PendingJoinRequest = nil
 				dev.Session = dev.PendingSession
-				dev.PendingMACState = nil
+				dev.PendingMacState = nil
 				dev.PendingSession = nil
 			}
-			dev.MACState.RecentUplinks = AppendRecentUplink(dev.MACState.RecentUplinks, deduplicatedUp, RecentUplinkCount)
+			dev.MacState.RecentUplinks = AppendRecentUplink(dev.MacState.RecentUplinks, deduplicatedUp, RecentUplinkCount)
 			var appUp *ttnpb.ApplicationUp
 			if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
@@ -1823,8 +1823,8 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 						Up: &ttnpb.ApplicationUp_UplinkMessage{
 							UplinkMessage: &ttnpb.ApplicationUplink{
 								Confirmed:    conf.Confirmed,
-								FPort:        deduplicatedUp.Payload.GetMACPayload().FPort,
-								FRMPayload:   deduplicatedUp.Payload.GetMACPayload().FRMPayload,
+								FPort:        deduplicatedUp.Payload.GetMacPayload().FPort,
+								FrmPayload:   deduplicatedUp.Payload.GetMacPayload().FrmPayload,
 								ReceivedAt:   up.GetUplinkMessage().GetReceivedAt(),
 								RxMetadata:   up.GetUplinkMessage().GetRxMetadata(),
 								Settings:     deduplicatedUp.Settings,
@@ -2094,12 +2094,12 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 			Payload: bytes.Repeat([]byte{0xff}, 17),
 			Request: ttnpb.MACState_JoinRequest{
 				DownlinkSettings: ttnpb.DLSettings{
-					Rx1DROffset: macState.DesiredParameters.Rx1DataRateOffset,
-					Rx2DR:       macState.DesiredParameters.Rx2DataRateIndex,
+					Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
+					Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
 					OptNeg:      x.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 				},
 				RxDelay: macState.DesiredParameters.Rx1Delay,
-				CFList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),
+				CfList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),
 			},
 			Keys:           *MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
 			DevAddr:        test.DefaultDevAddr,
@@ -2114,25 +2114,25 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 		if !x.SupportsJoin {
 			panic("join accept requested for non-OTAA device")
 		}
-		if x.PendingMACState == nil {
+		if x.PendingMacState == nil {
 			panic("PendingMACState is nil")
 		}
 		return o.Compose(
 			o.WithPendingSession(&ttnpb.Session{
-				DevAddr: x.PendingMACState.QueuedJoinAccept.DevAddr,
+				DevAddr: x.PendingMacState.QueuedJoinAccept.DevAddr,
 				SessionKeys: ttnpb.SessionKeys{
-					SessionKeyId: x.PendingMACState.QueuedJoinAccept.Keys.SessionKeyId,
-					FNwkSIntKey:  x.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey,
-					SNwkSIntKey:  x.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey,
-					NwkSEncKey:   x.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey,
+					SessionKeyId: x.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId,
+					FNwkSIntKey:  x.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey,
+					SNwkSIntKey:  x.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey,
+					NwkSEncKey:   x.PendingMacState.QueuedJoinAccept.Keys.NwkSEncKey,
 				},
 			}),
 			o.WithPendingMACStateOptions(
-				MACStateOptions.WithPendingJoinRequest(&x.PendingMACState.QueuedJoinAccept.Request),
+				MACStateOptions.WithPendingJoinRequest(&x.PendingMacState.QueuedJoinAccept.Request),
 				MACStateOptions.WithQueuedJoinAccept(nil),
 				MACStateOptions.WithRxWindowsAvailable(false),
 				MACStateOptions.AppendRecentDownlinks(&ttnpb.DownlinkMessage{
-					RawPayload: x.PendingMACState.QueuedJoinAccept.Payload,
+					RawPayload: x.PendingMacState.QueuedJoinAccept.Payload,
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
 							MType: ttnpb.MType_JOIN_ACCEPT,
@@ -2140,11 +2140,11 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 						},
 						Payload: &ttnpb.Message_JoinAcceptPayload{
 							JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
-								NetId:      x.PendingMACState.QueuedJoinAccept.NetId,
-								DevAddr:    x.PendingMACState.QueuedJoinAccept.DevAddr,
-								DLSettings: x.PendingMACState.QueuedJoinAccept.Request.DownlinkSettings,
-								RxDelay:    x.PendingMACState.QueuedJoinAccept.Request.RxDelay,
-								CFList:     x.PendingMACState.QueuedJoinAccept.Request.CFList,
+								NetId:      x.PendingMacState.QueuedJoinAccept.NetId,
+								DevAddr:    x.PendingMacState.QueuedJoinAccept.DevAddr,
+								DLSettings: x.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+								RxDelay:    x.PendingMacState.QueuedJoinAccept.Request.RxDelay,
+								CfList:     x.PendingMacState.QueuedJoinAccept.Request.CfList,
 							},
 						},
 					},
@@ -2155,8 +2155,8 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 							Priority:          priority,
 							FrequencyPlanId:   x.FrequencyPlanId,
 							Rx1Delay:          ttnpb.RxDelay(Band(x.FrequencyPlanId, x.LorawanPhyVersion).JoinAcceptDelay1 / time.Second),
-							Rx2DataRateIndex:  x.PendingMACState.CurrentParameters.Rx2DataRateIndex,
-							Rx2Frequency:      x.PendingMACState.CurrentParameters.Rx2Frequency,
+							Rx2DataRateIndex:  x.PendingMacState.CurrentParameters.Rx2DataRateIndex,
+							Rx2Frequency:      x.PendingMacState.CurrentParameters.Rx2Frequency,
 							LorawanPhyVersion: x.LorawanPhyVersion,
 							// TODO: Generate RX1 transmission parameters if necessary.
 							// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
@@ -2192,7 +2192,7 @@ func (o EndDeviceOptionNamespace) Activate(defaults ttnpb.MACSettings, wrapKeys 
 					o.WithEndDeviceIdentifiersOptions(
 						test.EndDeviceIdentifiersOptions.WithDevAddr(&x.PendingSession.DevAddr),
 					),
-					o.WithMACState(x.PendingMACState),
+					o.WithMACState(x.PendingMacState),
 					o.WithSession(x.PendingSession),
 				)(x)
 			},

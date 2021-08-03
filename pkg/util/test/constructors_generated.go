@@ -777,7 +777,7 @@ func (EndDeviceOptionNamespace) WithNetID(v *types.NetID) EndDeviceOption {
 // WithMACSettings returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with MACSettings set to v.
 func (EndDeviceOptionNamespace) WithMACSettings(v *ttnpb.MACSettings) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.MACSettings = v
+		x.MacSettings = v
 		return x
 	}
 }
@@ -785,7 +785,7 @@ func (EndDeviceOptionNamespace) WithMACSettings(v *ttnpb.MACSettings) EndDeviceO
 // WithMACState returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with MACState set to v.
 func (EndDeviceOptionNamespace) WithMACState(v *ttnpb.MACState) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.MACState = v
+		x.MacState = v
 		return x
 	}
 }
@@ -793,7 +793,7 @@ func (EndDeviceOptionNamespace) WithMACState(v *ttnpb.MACState) EndDeviceOption 
 // WithPendingMACState returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with PendingMACState set to v.
 func (EndDeviceOptionNamespace) WithPendingMACState(v *ttnpb.MACState) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.PendingMACState = v
+		x.PendingMacState = v
 		return x
 	}
 }
@@ -841,7 +841,7 @@ func (EndDeviceOptionNamespace) WithLastJoinNonce(v uint32) EndDeviceOption {
 // WithLastRJCount0 returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LastRJCount0 set to v.
 func (EndDeviceOptionNamespace) WithLastRJCount0(v uint32) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.LastRJCount0 = v
+		x.LastRjCount_0 = v
 		return x
 	}
 }
@@ -849,7 +849,7 @@ func (EndDeviceOptionNamespace) WithLastRJCount0(v uint32) EndDeviceOption {
 // WithLastRJCount1 returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LastRJCount1 set to v.
 func (EndDeviceOptionNamespace) WithLastRJCount1(v uint32) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.LastRJCount1 = v
+		x.LastRjCount_1 = v
 		return x
 	}
 }

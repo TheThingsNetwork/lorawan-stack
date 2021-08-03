@@ -43,13 +43,13 @@ func TestHandleResetInd(t *testing.T) {
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
-				MACState:          &ttnpb.MACState{},
+				MacState:          &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
 				LorawanVersion:    ttnpb.MAC_V1_1,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
-				MACState:          &ttnpb.MACState{},
+				MacState:          &ttnpb.MACState{},
 			},
 			Error: ErrNoPayload,
 		},
@@ -60,7 +60,7 @@ func TestHandleResetInd(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
 					DesiredParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
 					QueuedResponses:   []*ttnpb.MACCommand{},
@@ -77,9 +77,9 @@ func TestHandleResetInd(t *testing.T) {
 				if err != nil {
 					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
 				}
-				dev.MACState = macState
-				dev.MACState.LorawanVersion = ttnpb.MAC_V1_1
-				dev.MACState.QueuedResponses = []*ttnpb.MACCommand{
+				dev.MacState = macState
+				dev.MacState.LorawanVersion = ttnpb.MAC_V1_1
+				dev.MacState.QueuedResponses = []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_ResetConf{
 						MinorVersion: 1,
 					}).MACCommand(),
@@ -105,7 +105,7 @@ func TestHandleResetInd(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
 					DesiredParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
 					QueuedResponses: []*ttnpb.MACCommand{
@@ -126,9 +126,9 @@ func TestHandleResetInd(t *testing.T) {
 				if err != nil {
 					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
 				}
-				dev.MACState = macState
-				dev.MACState.LorawanVersion = ttnpb.MAC_V1_1
-				dev.MACState.QueuedResponses = []*ttnpb.MACCommand{
+				dev.MacState = macState
+				dev.MacState.LorawanVersion = ttnpb.MAC_V1_1
+				dev.MacState.QueuedResponses = []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_ResetConf{
 						MinorVersion: 1,
 					}).MACCommand(),

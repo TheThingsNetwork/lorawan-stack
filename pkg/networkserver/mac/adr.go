@@ -82,7 +82,7 @@ const (
 )
 
 func DeviceADRMargin(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) float32 {
-	if v := dev.GetMACSettings().GetAdrMargin(); v != nil {
+	if v := dev.GetMacSettings().GetAdrMargin(); v != nil {
 		return v.Value
 	}
 	if defaults.AdrMargin != nil {
@@ -96,11 +96,11 @@ func adrLossRate(ups ...*ttnpb.UplinkMessage) float32 {
 		return 0
 	}
 
-	min := ups[0].Payload.GetMACPayload().FullFCnt
+	min := ups[0].Payload.GetMacPayload().FullFCnt
 	lastFCnt := min
 	var lost uint32
 	for i, up := range ups[1:] {
-		fCnt := up.Payload.GetMACPayload().FullFCnt
+		fCnt := up.Payload.GetMacPayload().FullFCnt
 		switch {
 		case fCnt < lastFCnt:
 			return adrLossRate(ups[1+i:]...)
@@ -109,7 +109,7 @@ func adrLossRate(ups ...*ttnpb.UplinkMessage) float32 {
 		}
 		lastFCnt = fCnt
 	}
-	return float32(lost) / float32(1+LastUplink(ups...).Payload.GetMACPayload().FullFCnt-min)
+	return float32(lost) / float32(1+LastUplink(ups...).Payload.GetMacPayload().FullFCnt-min)
 }
 
 func maxSNRFromMetadata(mds ...*ttnpb.RxMetadata) (float32, bool) {
@@ -145,35 +145,35 @@ func txPowerStep(phy *band.Band, from, to uint8) float32 {
 }
 
 func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) error {
-	if dev.MACState == nil {
+	if dev.MacState == nil {
 		return nil
 	}
 
 	adrUplinks := func() []*ttnpb.UplinkMessage {
-		for i := len(dev.MACState.RecentUplinks) - 1; i >= 0; i-- {
-			up := dev.MACState.RecentUplinks[i]
+		for i := len(dev.MacState.RecentUplinks) - 1; i >= 0; i-- {
+			up := dev.MacState.RecentUplinks[i]
 			switch {
 			case up.Payload.MType != ttnpb.MType_UNCONFIRMED_UP && up.Payload.MType != ttnpb.MType_CONFIRMED_UP,
-				dev.MACState.LastAdrChangeFCntUp != 0 && up.Payload.GetMACPayload().FullFCnt <= dev.MACState.LastAdrChangeFCntUp,
-				up.Settings.DataRateIndex != dev.MACState.CurrentParameters.AdrDataRateIndex:
-				return dev.MACState.RecentUplinks[i+1:]
+				dev.MacState.LastAdrChangeFCntUp != 0 && up.Payload.GetMacPayload().FullFCnt <= dev.MacState.LastAdrChangeFCntUp,
+				up.Settings.DataRateIndex != dev.MacState.CurrentParameters.AdrDataRateIndex:
+				return dev.MacState.RecentUplinks[i+1:]
 			}
 		}
-		return dev.MACState.RecentUplinks
+		return dev.MacState.RecentUplinks
 	}()
 	if len(adrUplinks) == 0 {
 		return nil
 	}
 
-	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MACState.CurrentParameters.Channels...)
+	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MacState.CurrentParameters.Channels...)
 	if !ok {
 		return ErrCorruptedMACState
 	}
 	if maxDataRateIndex > phy.MaxADRDataRateIndex {
 		maxDataRateIndex = phy.MaxADRDataRateIndex
 	}
-	rejectedDataRateIndexes := make(map[ttnpb.DataRateIndex]struct{}, len(dev.MACState.RejectedAdrDataRateIndexes))
-	for _, idx := range dev.MACState.RejectedAdrDataRateIndexes {
+	rejectedDataRateIndexes := make(map[ttnpb.DataRateIndex]struct{}, len(dev.MacState.RejectedAdrDataRateIndexes))
+	for _, idx := range dev.MacState.RejectedAdrDataRateIndexes {
 		rejectedDataRateIndexes[idx] = struct{}{}
 	}
 	_, ok = rejectedDataRateIndexes[minDataRateIndex]
@@ -190,14 +190,14 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		log.FromContext(ctx).Debug("Device has rejected all possible data rate values given the channels enabled, avoid ADR.")
 		return nil
 	}
-	if dev.MACState.CurrentParameters.AdrDataRateIndex > minDataRateIndex {
-		minDataRateIndex = dev.MACState.CurrentParameters.AdrDataRateIndex
+	if dev.MacState.CurrentParameters.AdrDataRateIndex > minDataRateIndex {
+		minDataRateIndex = dev.MacState.CurrentParameters.AdrDataRateIndex
 	}
 
 	minTxPowerIndex := uint8(0)
 	maxTxPowerIndex := phy.MaxTxPowerIndex()
-	rejectedTxPowerIndexes := make(map[uint8]struct{}, len(dev.MACState.RejectedAdrTxPowerIndexes))
-	for _, idx := range dev.MACState.RejectedAdrTxPowerIndexes {
+	rejectedTxPowerIndexes := make(map[uint8]struct{}, len(dev.MacState.RejectedAdrTxPowerIndexes))
+	for _, idx := range dev.MacState.RejectedAdrTxPowerIndexes {
 		rejectedTxPowerIndexes[uint8(idx)] = struct{}{}
 	}
 	_, ok = rejectedTxPowerIndexes[minTxPowerIndex]
@@ -241,15 +241,15 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 
 	// NOTE: Network Server may only increase the data rate index of the device.
 	// NOTE(2): TX output power is reset whenever data rate is increased.
-	dev.MACState.DesiredParameters.AdrDataRateIndex = dev.MACState.CurrentParameters.AdrDataRateIndex
-	dev.MACState.DesiredParameters.AdrTxPowerIndex = dev.MACState.CurrentParameters.AdrTxPowerIndex
-	if dev.MACState.CurrentParameters.AdrDataRateIndex < minDataRateIndex {
-		margin -= float32(minDataRateIndex-dev.MACState.CurrentParameters.AdrDataRateIndex) * drStep
-		dev.MACState.DesiredParameters.AdrDataRateIndex = minDataRateIndex
-		dev.MACState.DesiredParameters.AdrTxPowerIndex = 0
+	dev.MacState.DesiredParameters.AdrDataRateIndex = dev.MacState.CurrentParameters.AdrDataRateIndex
+	dev.MacState.DesiredParameters.AdrTxPowerIndex = dev.MacState.CurrentParameters.AdrTxPowerIndex
+	if dev.MacState.CurrentParameters.AdrDataRateIndex < minDataRateIndex {
+		margin -= float32(minDataRateIndex-dev.MacState.CurrentParameters.AdrDataRateIndex) * drStep
+		dev.MacState.DesiredParameters.AdrDataRateIndex = minDataRateIndex
+		dev.MacState.DesiredParameters.AdrTxPowerIndex = 0
 	}
-	if marginSteps := (margin - txPowerStep(phy, 0, minTxPowerIndex)) / drStep; marginSteps >= 0 && marginSteps < float32(maxDataRateIndex-dev.MACState.DesiredParameters.AdrDataRateIndex) {
-		maxDataRateIndex = dev.MACState.DesiredParameters.AdrDataRateIndex + ttnpb.DataRateIndex(marginSteps)
+	if marginSteps := (margin - txPowerStep(phy, 0, minTxPowerIndex)) / drStep; marginSteps >= 0 && marginSteps < float32(maxDataRateIndex-dev.MacState.DesiredParameters.AdrDataRateIndex) {
+		maxDataRateIndex = dev.MacState.DesiredParameters.AdrDataRateIndex + ttnpb.DataRateIndex(marginSteps)
 	} else if marginSteps < 0 {
 		maxDataRateIndex = minDataRateIndex
 	}
@@ -257,44 +257,44 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 		if _, ok := rejectedDataRateIndexes[drIdx]; ok {
 			continue
 		}
-		margin -= float32(drIdx-dev.MACState.DesiredParameters.AdrDataRateIndex) * drStep
-		dev.MACState.DesiredParameters.AdrDataRateIndex = drIdx
-		dev.MACState.DesiredParameters.AdrTxPowerIndex = 0
+		margin -= float32(drIdx-dev.MacState.DesiredParameters.AdrDataRateIndex) * drStep
+		dev.MacState.DesiredParameters.AdrDataRateIndex = drIdx
+		dev.MacState.DesiredParameters.AdrTxPowerIndex = 0
 		break
 	}
 
-	if dev.MACState.DesiredParameters.AdrTxPowerIndex < uint32(minTxPowerIndex) {
-		margin -= txPowerStep(phy, uint8(dev.MACState.DesiredParameters.AdrTxPowerIndex), minTxPowerIndex)
-		dev.MACState.DesiredParameters.AdrTxPowerIndex = uint32(minTxPowerIndex)
+	if dev.MacState.DesiredParameters.AdrTxPowerIndex < uint32(minTxPowerIndex) {
+		margin -= txPowerStep(phy, uint8(dev.MacState.DesiredParameters.AdrTxPowerIndex), minTxPowerIndex)
+		dev.MacState.DesiredParameters.AdrTxPowerIndex = uint32(minTxPowerIndex)
 	}
-	if dev.MACState.DesiredParameters.AdrTxPowerIndex > uint32(maxTxPowerIndex) {
-		margin += txPowerStep(phy, maxTxPowerIndex, uint8(dev.MACState.DesiredParameters.AdrTxPowerIndex))
-		dev.MACState.DesiredParameters.AdrTxPowerIndex = uint32(maxTxPowerIndex)
+	if dev.MacState.DesiredParameters.AdrTxPowerIndex > uint32(maxTxPowerIndex) {
+		margin += txPowerStep(phy, maxTxPowerIndex, uint8(dev.MacState.DesiredParameters.AdrTxPowerIndex))
+		dev.MacState.DesiredParameters.AdrTxPowerIndex = uint32(maxTxPowerIndex)
 	}
 	// If we still have margin left, we decrease the TX output power (increase the index).
 	for txPowerIdx := maxTxPowerIndex; txPowerIdx > minTxPowerIndex; txPowerIdx-- {
-		diff := txPowerStep(phy, uint8(dev.MACState.DesiredParameters.AdrTxPowerIndex), txPowerIdx)
+		diff := txPowerStep(phy, uint8(dev.MacState.DesiredParameters.AdrTxPowerIndex), txPowerIdx)
 		if _, ok := rejectedTxPowerIndexes[txPowerIdx]; ok || diff > margin {
 			continue
 		}
 		margin -= diff
-		dev.MACState.DesiredParameters.AdrTxPowerIndex = uint32(txPowerIdx)
+		dev.MacState.DesiredParameters.AdrTxPowerIndex = uint32(txPowerIdx)
 		break
 	}
 
-	dev.MACState.DesiredParameters.AdrNbTrans = dev.MACState.CurrentParameters.AdrNbTrans
-	if dev.MACState.DesiredParameters.AdrNbTrans > maxNbTrans {
-		dev.MACState.DesiredParameters.AdrNbTrans = maxNbTrans
+	dev.MacState.DesiredParameters.AdrNbTrans = dev.MacState.CurrentParameters.AdrNbTrans
+	if dev.MacState.DesiredParameters.AdrNbTrans > maxNbTrans {
+		dev.MacState.DesiredParameters.AdrNbTrans = maxNbTrans
 	}
 	if len(adrUplinks) >= OptimalADRUplinkCount/2 {
 		switch r := adrLossRate(adrUplinks...); {
 		case r < 0.05:
-			dev.MACState.DesiredParameters.AdrNbTrans = 1 + dev.MACState.DesiredParameters.AdrNbTrans/3
+			dev.MacState.DesiredParameters.AdrNbTrans = 1 + dev.MacState.DesiredParameters.AdrNbTrans/3
 		case r < 0.10:
 		case r < 0.30:
-			dev.MACState.DesiredParameters.AdrNbTrans = 2 + dev.MACState.DesiredParameters.AdrNbTrans/2
+			dev.MacState.DesiredParameters.AdrNbTrans = 2 + dev.MacState.DesiredParameters.AdrNbTrans/2
 		default:
-			dev.MACState.DesiredParameters.AdrNbTrans = maxNbTrans
+			dev.MacState.DesiredParameters.AdrNbTrans = maxNbTrans
 		}
 	}
 	return nil

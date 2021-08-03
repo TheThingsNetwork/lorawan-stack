@@ -204,7 +204,7 @@ func TestTraffic(t *testing.T) {
 			},
 			Up: &ttnpb.ApplicationUp_UplinkMessage{
 				UplinkMessage: &ttnpb.ApplicationUplink{
-					FRMPayload: []byte{0x01, 0x02, 0x03},
+					FrmPayload: []byte{0x01, 0x02, 0x03},
 				},
 			},
 		}
@@ -248,7 +248,7 @@ func TestTraffic(t *testing.T) {
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      1,
-						FRMPayload: []byte{0x01, 0x01, 0x01},
+						FrmPayload: []byte{0x01, 0x01, 0x01},
 					},
 				},
 			}, badCreds)
@@ -263,13 +263,13 @@ func TestTraffic(t *testing.T) {
 					{
 						SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 						FPort:          1,
-						FRMPayload:     []byte{0x01, 0x01, 0x01},
+						FrmPayload:     []byte{0x01, 0x01, 0x01},
 						Confirmed:      true,
 						CorrelationIds: []string{"test"},
 					},
 					{
 						FPort:      2,
-						FRMPayload: []byte{0x02, 0x02, 0x02},
+						FrmPayload: []byte{0x02, 0x02, 0x02},
 					},
 				},
 			}, creds)
@@ -281,7 +281,7 @@ func TestTraffic(t *testing.T) {
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      3,
-						FRMPayload: []byte{0x03, 0x03, 0x03},
+						FrmPayload: []byte{0x03, 0x03, 0x03},
 					},
 				},
 			}, creds)
@@ -296,16 +296,16 @@ func TestTraffic(t *testing.T) {
 					SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 					FPort:          1,
 					Confirmed:      true,
-					FRMPayload:     []byte{0x01, 0x01, 0x01},
+					FrmPayload:     []byte{0x01, 0x01, 0x01},
 					CorrelationIds: []string{"test"},
 				},
 				{
 					FPort:      2,
-					FRMPayload: []byte{0x02, 0x02, 0x02},
+					FrmPayload: []byte{0x02, 0x02, 0x02},
 				},
 				{
 					FPort:      3,
-					FRMPayload: []byte{0x03, 0x03, 0x03},
+					FrmPayload: []byte{0x03, 0x03, 0x03},
 				},
 			})
 		}
@@ -317,7 +317,7 @@ func TestTraffic(t *testing.T) {
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      4,
-						FRMPayload: []byte{0x04, 0x04, 0x04},
+						FrmPayload: []byte{0x04, 0x04, 0x04},
 					},
 				},
 			}, badCreds)
@@ -331,7 +331,7 @@ func TestTraffic(t *testing.T) {
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      4,
-						FRMPayload: []byte{0x04, 0x04, 0x04},
+						FrmPayload: []byte{0x04, 0x04, 0x04},
 						Confirmed:  true,
 					},
 				},
@@ -345,7 +345,7 @@ func TestTraffic(t *testing.T) {
 			a.So(res.Downlinks, should.Resemble, []*ttnpb.ApplicationDownlink{
 				{
 					FPort:      4,
-					FRMPayload: []byte{0x04, 0x04, 0x04},
+					FrmPayload: []byte{0x04, 0x04, 0x04},
 					Confirmed:  true,
 				},
 			})
@@ -595,7 +595,7 @@ func TestMessageProcessors(t *testing.T) {
 		}
 		if a.So(resp.Downlink, should.NotBeNil) {
 			a.So(resp.Downlink.FPort, should.Equal, 1)
-			a.So(resp.Downlink.FRMPayload, should.Resemble, []byte{2, 236, 69})
+			a.So(resp.Downlink.FrmPayload, should.Resemble, []byte{2, 236, 69})
 		}
 	}
 
@@ -606,7 +606,7 @@ func TestMessageProcessors(t *testing.T) {
 				DeviceId:               "foobar",
 			},
 			Uplink: &ttnpb.ApplicationUplink{
-				FRMPayload: []byte{1, 0, 255},
+				FrmPayload: []byte{1, 0, 255},
 				RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 				Settings:   ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 				FPort:      1,
@@ -635,7 +635,7 @@ func TestMessageProcessors(t *testing.T) {
 				DeviceId:               "foobar",
 			},
 			Downlink: &ttnpb.ApplicationDownlink{
-				FRMPayload: []byte{2, 236, 69},
+				FrmPayload: []byte{2, 236, 69},
 				FPort:      1,
 			},
 			Formatter: ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,

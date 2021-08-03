@@ -34,29 +34,29 @@ var (
 )
 
 func deviceADRAckLimit(dev *ttnpb.EndDevice, phy *band.Band) ttnpb.ADRAckLimitExponent {
-	if dev.MACState.CurrentParameters.AdrAckLimitExponent != nil {
-		return dev.MACState.CurrentParameters.AdrAckLimitExponent.Value
+	if dev.MacState.CurrentParameters.AdrAckLimitExponent != nil {
+		return dev.MacState.CurrentParameters.AdrAckLimitExponent.Value
 	}
 	return phy.ADRAckLimit
 }
 
 func deviceADRAckDelay(dev *ttnpb.EndDevice, phy *band.Band) ttnpb.ADRAckDelayExponent {
-	if dev.MACState.CurrentParameters.AdrAckDelayExponent != nil {
-		return dev.MACState.CurrentParameters.AdrAckDelayExponent.Value
+	if dev.MacState.CurrentParameters.AdrAckDelayExponent != nil {
+		return dev.MacState.CurrentParameters.AdrAckDelayExponent.Value
 	}
 	return phy.ADRAckDelay
 }
 
 func DeviceNeedsADRParamSetupReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
 	if dev.GetMulticast() ||
-		dev.GetMACState() == nil ||
-		dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		dev.GetMacState() == nil ||
+		dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		return false
 	}
-	return dev.MACState.DesiredParameters.AdrAckLimitExponent != nil &&
-		deviceADRAckLimit(dev, phy) != dev.MACState.DesiredParameters.AdrAckLimitExponent.Value ||
-		dev.MACState.DesiredParameters.AdrAckDelayExponent != nil &&
-			deviceADRAckDelay(dev, phy) != dev.MACState.DesiredParameters.AdrAckDelayExponent.Value
+	return dev.MacState.DesiredParameters.AdrAckLimitExponent != nil &&
+		deviceADRAckLimit(dev, phy) != dev.MacState.DesiredParameters.AdrAckLimitExponent.Value ||
+		dev.MacState.DesiredParameters.AdrAckDelayExponent != nil &&
+			deviceADRAckDelay(dev, phy) != dev.MacState.DesiredParameters.AdrAckDelayExponent.Value
 }
 
 func EnqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy *band.Band) EnqueueState {
@@ -69,21 +69,21 @@ func EnqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 	}
 
 	var desiredLimit ttnpb.ADRAckLimitExponent
-	if dev.MACState.DesiredParameters.AdrAckLimitExponent != nil {
-		desiredLimit = dev.MACState.DesiredParameters.AdrAckLimitExponent.Value
+	if dev.MacState.DesiredParameters.AdrAckLimitExponent != nil {
+		desiredLimit = dev.MacState.DesiredParameters.AdrAckLimitExponent.Value
 	} else {
 		desiredLimit = deviceADRAckLimit(dev, phy)
 	}
 
 	var desiredDelay ttnpb.ADRAckDelayExponent
-	if dev.MACState.DesiredParameters.AdrAckDelayExponent != nil {
-		desiredDelay = dev.MACState.DesiredParameters.AdrAckDelayExponent.Value
+	if dev.MacState.DesiredParameters.AdrAckDelayExponent != nil {
+		desiredDelay = dev.MacState.DesiredParameters.AdrAckDelayExponent.Value
 	} else {
 		desiredDelay = deviceADRAckDelay(dev, phy)
 	}
 
 	var st EnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_ADR_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_ADR_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
@@ -104,20 +104,20 @@ func EnqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 				EvtEnqueueADRParamSetupRequest.With(events.WithData(req)),
 			},
 			true
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return st
 }
 
 func HandleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
 	var err error
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetAdrParamSetupReq()
 
-		dev.MACState.CurrentParameters.AdrAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: req.AdrAckLimitExponent}
-		dev.MACState.CurrentParameters.AdrAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: req.AdrAckDelayExponent}
+		dev.MacState.CurrentParameters.AdrAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: req.AdrAckLimitExponent}
+		dev.MacState.CurrentParameters.AdrAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: req.AdrAckDelayExponent}
 
 		return nil
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return events.Builders{
 		EvtReceiveADRParamSetupAnswer,
 	}, err

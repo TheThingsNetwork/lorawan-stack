@@ -2022,8 +2022,8 @@ func (v LoRaDataRate) DataRate() DataRate {
 
 func (v FSKDataRate) DataRate() DataRate {
 	return DataRate{
-		Modulation: &DataRate_FSK{
-			FSK: &v,
+		Modulation: &DataRate_Fsk{
+			Fsk: &v,
 		},
 	}
 }
@@ -2053,9 +2053,9 @@ func (v *DLSettings) FieldIsZero(p string) bool {
 	case "opt_neg":
 		return !v.OptNeg
 	case "rx1_dr_offset":
-		return v.Rx1DROffset == 0
+		return v.Rx1DrOffset == 0
 	case "rx2_dr":
-		return v.Rx2DR == 0
+		return v.Rx2Dr == 0
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -2081,13 +2081,13 @@ func (v *JoinAcceptPayload) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "cf_list":
-		return v.CFList == nil
+		return v.CfList == nil
 	case "cf_list.ch_masks":
-		return v.CFList.FieldIsZero("ch_masks")
+		return v.CfList.FieldIsZero("ch_masks")
 	case "cf_list.freq":
-		return v.CFList.FieldIsZero("freq")
+		return v.CfList.FieldIsZero("freq")
 	case "cf_list.type":
-		return v.CFList.FieldIsZero("type")
+		return v.CfList.FieldIsZero("type")
 	case "dev_addr":
 		return v.DevAddr == types.DevAddr{}
 	case "dl_settings":
@@ -2205,7 +2205,7 @@ func (v *MACPayload) FieldIsZero(p string) bool {
 	case "f_port":
 		return v.FPort == 0
 	case "frm_payload":
-		return v.FRMPayload == nil
+		return v.FrmPayload == nil
 	case "full_f_cnt":
 		return v.FullFCnt == 0
 	}
@@ -2277,35 +2277,35 @@ func (v *Message) FieldIsZero(p string) bool {
 	case "Payload.join_request_payload.join_eui":
 		return v.GetJoinRequestPayload().FieldIsZero("join_eui")
 	case "Payload.mac_payload":
-		return v.GetMACPayload() == nil
+		return v.GetMacPayload() == nil
 	case "Payload.mac_payload.decoded_payload":
-		return v.GetMACPayload().FieldIsZero("decoded_payload")
+		return v.GetMacPayload().FieldIsZero("decoded_payload")
 	case "Payload.mac_payload.f_hdr":
-		return v.GetMACPayload().FieldIsZero("f_hdr")
+		return v.GetMacPayload().FieldIsZero("f_hdr")
 	case "Payload.mac_payload.f_hdr.dev_addr":
-		return v.GetMACPayload().FieldIsZero("f_hdr.dev_addr")
+		return v.GetMacPayload().FieldIsZero("f_hdr.dev_addr")
 	case "Payload.mac_payload.f_hdr.f_cnt":
-		return v.GetMACPayload().FieldIsZero("f_hdr.f_cnt")
+		return v.GetMacPayload().FieldIsZero("f_hdr.f_cnt")
 	case "Payload.mac_payload.f_hdr.f_ctrl":
-		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl")
+		return v.GetMacPayload().FieldIsZero("f_hdr.f_ctrl")
 	case "Payload.mac_payload.f_hdr.f_ctrl.ack":
-		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl.ack")
+		return v.GetMacPayload().FieldIsZero("f_hdr.f_ctrl.ack")
 	case "Payload.mac_payload.f_hdr.f_ctrl.adr":
-		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl.adr")
+		return v.GetMacPayload().FieldIsZero("f_hdr.f_ctrl.adr")
 	case "Payload.mac_payload.f_hdr.f_ctrl.adr_ack_req":
-		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl.adr_ack_req")
+		return v.GetMacPayload().FieldIsZero("f_hdr.f_ctrl.adr_ack_req")
 	case "Payload.mac_payload.f_hdr.f_ctrl.class_b":
-		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl.class_b")
+		return v.GetMacPayload().FieldIsZero("f_hdr.f_ctrl.class_b")
 	case "Payload.mac_payload.f_hdr.f_ctrl.f_pending":
-		return v.GetMACPayload().FieldIsZero("f_hdr.f_ctrl.f_pending")
+		return v.GetMacPayload().FieldIsZero("f_hdr.f_ctrl.f_pending")
 	case "Payload.mac_payload.f_hdr.f_opts":
-		return v.GetMACPayload().FieldIsZero("f_hdr.f_opts")
+		return v.GetMacPayload().FieldIsZero("f_hdr.f_opts")
 	case "Payload.mac_payload.f_port":
-		return v.GetMACPayload().FieldIsZero("f_port")
+		return v.GetMacPayload().FieldIsZero("f_port")
 	case "Payload.mac_payload.frm_payload":
-		return v.GetMACPayload().FieldIsZero("frm_payload")
+		return v.GetMacPayload().FieldIsZero("frm_payload")
 	case "Payload.mac_payload.full_f_cnt":
-		return v.GetMACPayload().FieldIsZero("full_f_cnt")
+		return v.GetMacPayload().FieldIsZero("full_f_cnt")
 	case "Payload.rejoin_request_payload":
 		return v.GetRejoinRequestPayload() == nil
 	case "Payload.rejoin_request_payload.dev_eui":
@@ -2325,7 +2325,7 @@ func (v *Message) FieldIsZero(p string) bool {
 	case "m_hdr.major":
 		return v.MHDR.FieldIsZero("major")
 	case "mic":
-		return v.MIC == nil
+		return v.Mic == nil
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }

@@ -176,7 +176,7 @@ var (
 			CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
 			FCnt:           0x22,
 			FPort:          0x1,
-			FRMPayload:     []byte("testPayload"),
+			FrmPayload:     []byte("testPayload"),
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 			SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 		},
@@ -184,7 +184,7 @@ var (
 			CorrelationIds: []string{"correlation-app-down-3", "correlation-app-down-4"},
 			FCnt:           0x23,
 			FPort:          0x1,
-			FRMPayload:     []byte("testPayload"),
+			FrmPayload:     []byte("testPayload"),
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 			SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 		},
@@ -231,7 +231,7 @@ func MakeDefaultEU868CurrentMACParameters(phyVersion ttnpb.PHYVersion) ttnpb.MAC
 		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 		AdrNbTrans:                 1,
 		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
-		MaxEIRP:                    16,
+		MaxEirp:                    16,
 		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
 		PingSlotFrequency:          869525000,
 		RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
@@ -332,7 +332,7 @@ func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParamet
 		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 		AdrNbTrans:                 1,
 		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
-		MaxEIRP:                    30,
+		MaxEirp:                    30,
 		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_8},
 		RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
 		RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
@@ -381,7 +381,7 @@ func MakeUplinkSettings(dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint6
 	return ttnpb.TxSettings{
 		DataRate:      *deepcopy.Copy(&dr).(*ttnpb.DataRate),
 		DataRateIndex: drIdx,
-		EnableCRC:     true,
+		EnableCrc:     true,
 		Frequency:     freq,
 		Timestamp:     42,
 	}
@@ -535,10 +535,10 @@ type DataUplinkConfig struct {
 
 func WithDeviceDataUplinkConfig(dev *ttnpb.EndDevice, pending bool, drIdx ttnpb.DataRateIndex, chIdx uint8, fCntDelta uint32) func(DataUplinkConfig) DataUplinkConfig {
 	session := dev.Session
-	macState := dev.MACState
+	macState := dev.MacState
 	if pending {
 		session = dev.PendingSession
-		macState = dev.PendingMACState
+		macState = dev.PendingMacState
 	}
 	return func(conf DataUplinkConfig) DataUplinkConfig {
 		conf.MACVersion = macState.LorawanVersion
@@ -582,11 +582,11 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	}
 	phyPayload := test.Must(lorawan.MarshalMessage(ttnpb.Message{
 		MHDR: mhdr,
-		Payload: &ttnpb.Message_MACPayload{
-			MACPayload: &ttnpb.MACPayload{
+		Payload: &ttnpb.Message_MacPayload{
+			MacPayload: &ttnpb.MACPayload{
 				FHDR:       fhdr,
 				FPort:      uint32(conf.FPort),
-				FRMPayload: frmPayload,
+				FrmPayload: frmPayload,
 			},
 		},
 	})).([]byte)
@@ -605,12 +605,12 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 			if conf.DecodePayload {
 				return &ttnpb.Message{
 					MHDR: mhdr,
-					MIC:  phyPayload[len(phyPayload)-4:],
-					Payload: &ttnpb.Message_MACPayload{
-						MACPayload: &ttnpb.MACPayload{
+					Mic:  phyPayload[len(phyPayload)-4:],
+					Payload: &ttnpb.Message_MacPayload{
+						MacPayload: &ttnpb.MACPayload{
 							FHDR:       fhdr,
 							FPort:      uint32(conf.FPort),
-							FRMPayload: CopyBytes(frmPayload),
+							FrmPayload: CopyBytes(frmPayload),
 							FullFCnt:   conf.FCnt,
 						},
 					},
@@ -687,8 +687,8 @@ func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
 			MType: mType,
 			Major: ttnpb.Major_LORAWAN_R1,
 		},
-		Payload: &ttnpb.Message_MACPayload{
-			MACPayload: &ttnpb.MACPayload{
+		Payload: &ttnpb.Message_MacPayload{
+			MacPayload: &ttnpb.MACPayload{
 				FHDR: ttnpb.FHDR{
 					DevAddr: devAddr,
 					FCtrl:   conf.FCtrl,
@@ -697,7 +697,7 @@ func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
 				},
 				FullFCnt:   conf.FCnt,
 				FPort:      uint32(conf.FPort),
-				FRMPayload: frmPayload,
+				FrmPayload: frmPayload,
 			},
 		},
 	}
@@ -709,7 +709,7 @@ func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
 	default:
 		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, conf.ConfFCntUp, conf.FCnt, phyPayload)).([4]byte)
 	}
-	msg.MIC = mic[:]
+	msg.Mic = mic[:]
 	return &ttnpb.DownlinkMessage{
 		Settings: &ttnpb.DownlinkMessage_Request{
 			Request: deepcopy.Copy(&conf.Request).(*ttnpb.TxRequest),

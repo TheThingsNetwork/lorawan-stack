@@ -34,8 +34,8 @@ var (
 
 func DeviceNeedsDutyCycleReq(dev *ttnpb.EndDevice) bool {
 	return !dev.GetMulticast() &&
-		dev.GetMACState() != nil &&
-		dev.MACState.DesiredParameters.MaxDutyCycle != dev.MACState.CurrentParameters.MaxDutyCycle
+		dev.GetMacState() != nil &&
+		dev.MacState.DesiredParameters.MaxDutyCycle != dev.MacState.CurrentParameters.MaxDutyCycle
 }
 
 func EnqueueDutyCycleReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) EnqueueState {
@@ -48,12 +48,12 @@ func EnqueueDutyCycleReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 	}
 
 	var st EnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DUTY_CYCLE, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DUTY_CYCLE, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
 		req := &ttnpb.MACCommand_DutyCycleReq{
-			MaxDutyCycle: dev.MACState.DesiredParameters.MaxDutyCycle,
+			MaxDutyCycle: dev.MacState.DesiredParameters.MaxDutyCycle,
 		}
 		log.FromContext(ctx).WithFields(log.Fields(
 			"max_duty_cycle", req.MaxDutyCycle,
@@ -66,18 +66,18 @@ func EnqueueDutyCycleReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 				EvtEnqueueDutyCycleRequest.With(events.WithData(req)),
 			},
 			true
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return st
 }
 
 func HandleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
 	var err error
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DUTY_CYCLE, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_DUTY_CYCLE, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetDutyCycleReq()
 
-		dev.MACState.CurrentParameters.MaxDutyCycle = req.MaxDutyCycle
+		dev.MacState.CurrentParameters.MaxDutyCycle = req.MaxDutyCycle
 		return nil
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return events.Builders{
 		EvtReceiveDutyCycleAnswer,
 	}, err

@@ -135,10 +135,10 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 				return fmt.Errorf("'max_eirp' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.MaxEIRP = src.MaxEIRP
+				dst.MaxEirp = src.MaxEirp
 			} else {
 				var zero float32
-				dst.MaxEIRP = zero
+				dst.MaxEirp = zero
 			}
 		case "adr_data_rate_index":
 			if len(subs) > 0 {
@@ -515,26 +515,26 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 		case "default_mac_settings":
 			if len(subs) > 0 {
 				var newDst, newSrc *MACSettings
-				if (src == nil || src.DefaultMACSettings == nil) && dst.DefaultMACSettings == nil {
+				if (src == nil || src.DefaultMacSettings == nil) && dst.DefaultMacSettings == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.DefaultMACSettings
+					newSrc = src.DefaultMacSettings
 				}
-				if dst.DefaultMACSettings != nil {
-					newDst = dst.DefaultMACSettings
+				if dst.DefaultMacSettings != nil {
+					newDst = dst.DefaultMacSettings
 				} else {
 					newDst = &MACSettings{}
-					dst.DefaultMACSettings = newDst
+					dst.DefaultMacSettings = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.DefaultMACSettings = src.DefaultMACSettings
+					dst.DefaultMacSettings = src.DefaultMacSettings
 				} else {
-					dst.DefaultMACSettings = nil
+					dst.DefaultMacSettings = nil
 				}
 			}
 		case "min_frequency":
@@ -861,26 +861,26 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 		case "supports_32_bit_f_cnt":
 			if len(subs) > 0 {
 				var newDst, newSrc *BoolValue
-				if (src == nil || src.Supports32BitFCnt == nil) && dst.Supports32BitFCnt == nil {
+				if (src == nil || src.Supports_32BitFCnt == nil) && dst.Supports_32BitFCnt == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.Supports32BitFCnt
+					newSrc = src.Supports_32BitFCnt
 				}
-				if dst.Supports32BitFCnt != nil {
-					newDst = dst.Supports32BitFCnt
+				if dst.Supports_32BitFCnt != nil {
+					newDst = dst.Supports_32BitFCnt
 				} else {
 					newDst = &BoolValue{}
-					dst.Supports32BitFCnt = newDst
+					dst.Supports_32BitFCnt = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.Supports32BitFCnt = src.Supports32BitFCnt
+					dst.Supports_32BitFCnt = src.Supports_32BitFCnt
 				} else {
-					dst.Supports32BitFCnt = nil
+					dst.Supports_32BitFCnt = nil
 				}
 			}
 		case "use_adr":
@@ -1904,76 +1904,76 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 		case "mac_settings":
 			if len(subs) > 0 {
 				var newDst, newSrc *MACSettings
-				if (src == nil || src.MACSettings == nil) && dst.MACSettings == nil {
+				if (src == nil || src.MacSettings == nil) && dst.MacSettings == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.MACSettings
+					newSrc = src.MacSettings
 				}
-				if dst.MACSettings != nil {
-					newDst = dst.MACSettings
+				if dst.MacSettings != nil {
+					newDst = dst.MacSettings
 				} else {
 					newDst = &MACSettings{}
-					dst.MACSettings = newDst
+					dst.MacSettings = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.MACSettings = src.MACSettings
+					dst.MacSettings = src.MacSettings
 				} else {
-					dst.MACSettings = nil
+					dst.MacSettings = nil
 				}
 			}
 		case "mac_state":
 			if len(subs) > 0 {
 				var newDst, newSrc *MACState
-				if (src == nil || src.MACState == nil) && dst.MACState == nil {
+				if (src == nil || src.MacState == nil) && dst.MacState == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.MACState
+					newSrc = src.MacState
 				}
-				if dst.MACState != nil {
-					newDst = dst.MACState
+				if dst.MacState != nil {
+					newDst = dst.MacState
 				} else {
 					newDst = &MACState{}
-					dst.MACState = newDst
+					dst.MacState = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.MACState = src.MACState
+					dst.MacState = src.MacState
 				} else {
-					dst.MACState = nil
+					dst.MacState = nil
 				}
 			}
 		case "pending_mac_state":
 			if len(subs) > 0 {
 				var newDst, newSrc *MACState
-				if (src == nil || src.PendingMACState == nil) && dst.PendingMACState == nil {
+				if (src == nil || src.PendingMacState == nil) && dst.PendingMacState == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.PendingMACState
+					newSrc = src.PendingMacState
 				}
-				if dst.PendingMACState != nil {
-					newDst = dst.PendingMACState
+				if dst.PendingMacState != nil {
+					newDst = dst.PendingMacState
 				} else {
 					newDst = &MACState{}
-					dst.PendingMACState = newDst
+					dst.PendingMacState = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.PendingMACState = src.PendingMACState
+					dst.PendingMacState = src.PendingMacState
 				} else {
-					dst.PendingMACState = nil
+					dst.PendingMacState = nil
 				}
 			}
 		case "session":
@@ -2060,20 +2060,20 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				return fmt.Errorf("'last_rj_count_0' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LastRJCount0 = src.LastRJCount0
+				dst.LastRjCount_0 = src.LastRjCount_0
 			} else {
 				var zero uint32
-				dst.LastRJCount0 = zero
+				dst.LastRjCount_0 = zero
 			}
 		case "last_rj_count_1":
 			if len(subs) > 0 {
 				return fmt.Errorf("'last_rj_count_1' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.LastRJCount1 = src.LastRJCount1
+				dst.LastRjCount_1 = src.LastRjCount_1
 			} else {
 				var zero uint32
-				dst.LastRJCount1 = zero
+				dst.LastRjCount_1 = zero
 			}
 		case "last_dev_status_received_at":
 			if len(subs) > 0 {
@@ -2800,26 +2800,26 @@ func (dst *MACState_JoinRequest) SetFields(src *MACState_JoinRequest, paths ...s
 		case "cf_list":
 			if len(subs) > 0 {
 				var newDst, newSrc *CFList
-				if (src == nil || src.CFList == nil) && dst.CFList == nil {
+				if (src == nil || src.CfList == nil) && dst.CfList == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.CFList
+					newSrc = src.CfList
 				}
-				if dst.CFList != nil {
-					newDst = dst.CFList
+				if dst.CfList != nil {
+					newDst = dst.CfList
 				} else {
 					newDst = &CFList{}
-					dst.CFList = newDst
+					dst.CfList = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.CFList = src.CFList
+					dst.CfList = src.CfList
 				} else {
-					dst.CFList = nil
+					dst.CfList = nil
 				}
 			}
 

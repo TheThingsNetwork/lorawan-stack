@@ -34,8 +34,8 @@ var (
 
 func DeviceNeedsRxTimingSetupReq(dev *ttnpb.EndDevice) bool {
 	return !dev.GetMulticast() &&
-		dev.GetMACState() != nil &&
-		dev.MACState.DesiredParameters.Rx1Delay != dev.MACState.CurrentParameters.Rx1Delay
+		dev.GetMacState() != nil &&
+		dev.MacState.DesiredParameters.Rx1Delay != dev.MacState.CurrentParameters.Rx1Delay
 }
 
 func EnqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) EnqueueState {
@@ -48,12 +48,12 @@ func EnqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 	}
 
 	var st EnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_RX_TIMING_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_RX_TIMING_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
 		req := &ttnpb.MACCommand_RxTimingSetupReq{
-			Delay: dev.MACState.DesiredParameters.Rx1Delay,
+			Delay: dev.MacState.DesiredParameters.Rx1Delay,
 		}
 		log.FromContext(ctx).WithFields(log.Fields(
 			"delay", req.Delay,
@@ -66,18 +66,18 @@ func EnqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 				EvtEnqueueRxTimingSetupRequest.With(events.WithData(req)),
 			},
 			true
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return st
 }
 
 func HandleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
 	var err error
-	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_TIMING_SETUP, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_TIMING_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetRxTimingSetupReq()
 
-		dev.MACState.CurrentParameters.Rx1Delay = req.Delay
+		dev.MacState.CurrentParameters.Rx1Delay = req.Delay
 		return nil
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return events.Builders{
 		EvtReceiveRxTimingSetupAnswer,
 	}, err

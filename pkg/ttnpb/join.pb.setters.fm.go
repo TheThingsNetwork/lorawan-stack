@@ -60,10 +60,10 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 				return fmt.Errorf("'selected_mac_version' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.SelectedMACVersion = src.SelectedMACVersion
+				dst.SelectedMacVersion = src.SelectedMacVersion
 			} else {
 				var zero MACVersion
-				dst.SelectedMACVersion = zero
+				dst.SelectedMacVersion = zero
 			}
 		case "net_id":
 			if len(subs) > 0 {
@@ -106,26 +106,26 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 		case "cf_list":
 			if len(subs) > 0 {
 				var newDst, newSrc *CFList
-				if (src == nil || src.CFList == nil) && dst.CFList == nil {
+				if (src == nil || src.CfList == nil) && dst.CfList == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.CFList
+					newSrc = src.CfList
 				}
-				if dst.CFList != nil {
-					newDst = dst.CFList
+				if dst.CfList != nil {
+					newDst = dst.CfList
 				} else {
 					newDst = &CFList{}
-					dst.CFList = newDst
+					dst.CfList = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.CFList = src.CFList
+					dst.CfList = src.CfList
 				} else {
-					dst.CFList = nil
+					dst.CfList = nil
 				}
 			}
 		case "correlation_ids":

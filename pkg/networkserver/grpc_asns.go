@@ -116,7 +116,7 @@ func minAFCntDown(session *ttnpb.Session, macState *ttnpb.MACState) (uint32, err
 			pld := macState.RecentDownlinks[i].Payload
 			switch pld.MType {
 			case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
-				macPayload := pld.GetMACPayload()
+				macPayload := pld.GetMacPayload()
 				if macPayload == nil {
 					return 0, errInvalidPayload.New()
 				}
@@ -162,8 +162,8 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 
 	for _, down := range downs {
 		switch {
-		case len(down.FRMPayload) > int(maxDownLen):
-			return unmatched, errApplicationDownlinkTooLong.WithAttributes("length", len(down.FRMPayload), "max", maxDownLen)
+		case len(down.FrmPayload) > int(maxDownLen):
+			return unmatched, errApplicationDownlinkTooLong.WithAttributes("length", len(down.FrmPayload), "max", maxDownLen)
 
 		case down.FCnt < minFCnt:
 			return unmatched, errFCntTooLow.WithAttributes("f_cnt", down.FCnt, "min_f_cnt", minFCnt).WithDetails(makeQueueOperationErrorDetails())
@@ -215,11 +215,11 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 		maxDownLen -= 8
 	}
 
-	minCurrentFCntDown, err := minAFCntDown(dev.Session, dev.MACState)
+	minCurrentFCntDown, err := minAFCntDown(dev.Session, dev.MacState)
 	if err != nil {
 		return err
 	}
-	minPendingFCntDown, err := minAFCntDown(dev.PendingSession, dev.PendingMACState)
+	minPendingFCntDown, err := minAFCntDown(dev.PendingSession, dev.PendingMacState)
 	if err != nil {
 		return err
 	}
@@ -239,11 +239,11 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 		return d
 	}
 
-	unmatched, err := matchApplicationDownlinks(dev.Session, dev.MACState, dev.Multicast, maxDownLen, minCurrentFCntDown, makeDownlinkQueueOperationErrorDetails, downs...)
+	unmatched, err := matchApplicationDownlinks(dev.Session, dev.MacState, dev.Multicast, maxDownLen, minCurrentFCntDown, makeDownlinkQueueOperationErrorDetails, downs...)
 	if err != nil {
 		return err
 	}
-	unmatched, err = matchApplicationDownlinks(dev.PendingSession, dev.PendingMACState, dev.Multicast, maxDownLen, minPendingFCntDown, makeDownlinkQueueOperationErrorDetails, unmatched...)
+	unmatched, err = matchApplicationDownlinks(dev.PendingSession, dev.PendingMacState, dev.Multicast, maxDownLen, minPendingFCntDown, makeDownlinkQueueOperationErrorDetails, unmatched...)
 	if err != nil {
 		return err
 	}

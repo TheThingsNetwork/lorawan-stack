@@ -73,8 +73,8 @@ func TestProfile(t *testing.T) {
 					LorawanVersion:    ttnpb.MAC_V1_0_2,
 					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 					SupportsJoin:      true,
-					MACSettings: &ttnpb.MACSettings{
-						Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
+					MacSettings: &ttnpb.MACSettings{
+						Supports_32BitFCnt: &ttnpb.BoolValue{Value: true},
 					},
 				},
 				FieldMask: &pbtypes.FieldMask{
@@ -101,7 +101,7 @@ func TestProfile(t *testing.T) {
 						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 					},
-					MACSettings: &ttnpb.MACSettings{
+					MacSettings: &ttnpb.MACSettings{
 						Rx1Delay:          &ttnpb.RxDelayValue{Value: ttnpb.RX_DELAY_1},
 						Rx1DataRateOffset: &ttnpb.DataRateOffsetValue{Value: ttnpb.DataRateOffset_DATA_RATE_OFFSET_0},
 						Rx2DataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
@@ -116,11 +116,11 @@ func TestProfile(t *testing.T) {
 							867700000,
 							867900000,
 						},
-						Supports32BitFCnt: &ttnpb.BoolValue{Value: true},
+						Supports_32BitFCnt: &ttnpb.BoolValue{Value: true},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DesiredParameters: ttnpb.MACParameters{
-							MaxEIRP: 14,
+							MaxEirp: 14,
 						},
 					},
 				},
@@ -152,7 +152,7 @@ func TestProfile(t *testing.T) {
 					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 					SupportsClassB:    true,
 					SupportsJoin:      true,
-					MACSettings: &ttnpb.MACSettings{
+					MacSettings: &ttnpb.MACSettings{
 						ClassBTimeout:         durationPtr(8 * time.Second),
 						PingSlotPeriodicity:   &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
 						PingSlotDataRateIndex: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
@@ -183,7 +183,7 @@ func TestProfile(t *testing.T) {
 					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 					SupportsClassC:    true,
 					SupportsJoin:      true,
-					MACSettings: &ttnpb.MACSettings{
+					MacSettings: &ttnpb.MACSettings{
 						ClassCTimeout: durationPtr(64 * time.Second),
 					},
 				},

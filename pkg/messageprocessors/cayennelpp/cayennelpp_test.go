@@ -58,7 +58,7 @@ func TestEncode(t *testing.T) {
 
 		err := host.EncodeDownlink(ctx, ids, nil, message, "")
 		a.So(err, should.BeNil)
-		a.So(message.FRMPayload, should.Resemble, []byte{2, 236, 69})
+		a.So(message.FrmPayload, should.Resemble, []byte{2, 236, 69})
 
 		message.DecodedPayload = nil
 		err = host.DecodeDownlink(ctx, ids, nil, message, "")
@@ -107,7 +107,7 @@ func TestEncode(t *testing.T) {
 
 		err := host.EncodeDownlink(ctx, ids, nil, message, "")
 		a.So(err, should.BeNil)
-		a.So(message.FRMPayload, should.BeEmpty)
+		a.So(message.FrmPayload, should.BeEmpty)
 	}
 }
 
@@ -127,7 +127,7 @@ func TestDecode(t *testing.T) {
 	}
 
 	message := &ttnpb.ApplicationUplink{
-		FRMPayload: []byte{
+		FrmPayload: []byte{
 			1, lpp.DigitalInput, 255,
 			2, lpp.DigitalOutput, 100,
 			3, lpp.AnalogInput, 21, 74,

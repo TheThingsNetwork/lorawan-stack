@@ -41,18 +41,18 @@ func HandleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		EvtReceiveDeviceModeIndication.With(events.WithData(pld)),
 	}
 	switch {
-	case pld.Class == ttnpb.CLASS_C && dev.SupportsClassC && dev.MACState.DeviceClass != ttnpb.CLASS_C:
-		evs = append(evs, EvtClassCSwitch.With(events.WithData(dev.MACState.DeviceClass)))
-		dev.MACState.DeviceClass = ttnpb.CLASS_C
+	case pld.Class == ttnpb.CLASS_C && dev.SupportsClassC && dev.MacState.DeviceClass != ttnpb.CLASS_C:
+		evs = append(evs, EvtClassCSwitch.With(events.WithData(dev.MacState.DeviceClass)))
+		dev.MacState.DeviceClass = ttnpb.CLASS_C
 
-	case pld.Class == ttnpb.CLASS_A && dev.MACState.DeviceClass != ttnpb.CLASS_A:
-		evs = append(evs, EvtClassASwitch.With(events.WithData(dev.MACState.DeviceClass)))
-		dev.MACState.DeviceClass = ttnpb.CLASS_A
+	case pld.Class == ttnpb.CLASS_A && dev.MacState.DeviceClass != ttnpb.CLASS_A:
+		evs = append(evs, EvtClassASwitch.With(events.WithData(dev.MacState.DeviceClass)))
+		dev.MacState.DeviceClass = ttnpb.CLASS_A
 	}
 	conf := &ttnpb.MACCommand_DeviceModeConf{
-		Class: dev.MACState.DeviceClass,
+		Class: dev.MacState.DeviceClass,
 	}
-	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
+	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, conf.MACCommand())
 	return append(evs,
 		EvtEnqueueDeviceModeConfirmation.With(events.WithData(conf)),
 	), nil

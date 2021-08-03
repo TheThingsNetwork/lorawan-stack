@@ -44,19 +44,19 @@ func HandleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	if !dev.SupportsJoin {
 		return evs, nil
 	}
-	if dev.PendingSession != nil && dev.MACState.PendingJoinRequest != nil && dev.PendingSession.DevAddr == devAddr {
+	if dev.PendingSession != nil && dev.MacState.PendingJoinRequest != nil && dev.PendingSession.DevAddr == devAddr {
 		dev.EndDeviceIdentifiers.DevAddr = &dev.PendingSession.DevAddr
 		dev.Session = dev.PendingSession
 	}
-	dev.MACState.LorawanVersion = ttnpb.MAC_V1_1
-	dev.MACState.PendingJoinRequest = nil
-	dev.PendingMACState = nil
+	dev.MacState.LorawanVersion = ttnpb.MAC_V1_1
+	dev.MacState.PendingJoinRequest = nil
+	dev.PendingMacState = nil
 	dev.PendingSession = nil
 
 	conf := &ttnpb.MACCommand_RekeyConf{
 		MinorVersion: pld.MinorVersion,
 	}
-	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
+	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, conf.MACCommand())
 	return append(evs,
 		EvtEnqueueRekeyConfirmation.With(events.WithData(conf)),
 	), nil

@@ -74,7 +74,7 @@ func (m *JoinRequest) ValidateFields(paths ...string) error {
 		case "dev_addr":
 			// no validation rules for DevAddr
 		case "selected_mac_version":
-			// no validation rules for SelectedMACVersion
+			// no validation rules for SelectedMacVersion
 		case "net_id":
 			// no validation rules for NetId
 		case "downlink_settings":
@@ -100,7 +100,7 @@ func (m *JoinRequest) ValidateFields(paths ...string) error {
 
 		case "cf_list":
 
-			if v, ok := interface{}(m.GetCFList()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCfList()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return JoinRequestValidationError{
 						field:  "cf_list",

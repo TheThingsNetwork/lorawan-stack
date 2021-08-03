@@ -305,15 +305,15 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				DevNonce: uint32(pld.JoinRequestPayload.DevNonce.MarshalNumber()),
 			},
 		}
-	case *ttnpb.Message_MACPayload:
+	case *ttnpb.Message_MacPayload:
 		up.PhyPayload.Teaser.Payload = &packetbroker.PHYPayloadTeaser_Mac{
 			Mac: &packetbroker.PHYPayloadTeaser_MACPayloadTeaser{
-				Confirmed:        pld.MACPayload.Ack,
-				DevAddr:          pld.MACPayload.DevAddr.MarshalNumber(),
-				FOpts:            len(pld.MACPayload.FOpts) > 0,
-				FCnt:             pld.MACPayload.FCnt,
-				FPort:            pld.MACPayload.FPort,
-				FrmPayloadLength: uint32(len(pld.MACPayload.FRMPayload)),
+				Confirmed:        pld.MacPayload.Ack,
+				DevAddr:          pld.MacPayload.DevAddr.MarshalNumber(),
+				FOpts:            len(pld.MacPayload.FOpts) > 0,
+				FCnt:             pld.MacPayload.FCnt,
+				FPort:            pld.MacPayload.FPort,
+				FrmPayloadLength: uint32(len(pld.MacPayload.FrmPayload)),
 			},
 		}
 	default:
@@ -866,7 +866,7 @@ func toPBFrequencyPlan(fps ...*frequencyplans.FrequencyPlan) (*packetbroker.Gate
 					continue
 				}
 				switch mod := dr.Rate.Modulation.(type) {
-				case *ttnpb.DataRate_FSK:
+				case *ttnpb.DataRate_Fsk:
 					res.FskChannel = &packetbroker.GatewayFrequencyPlan_FSKChannel{
 						Frequency: ch.Frequency,
 					}

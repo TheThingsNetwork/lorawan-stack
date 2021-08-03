@@ -51,7 +51,7 @@ var (
 				SessionKeyId: []byte{0x11},
 				FPort:        42,
 				FCnt:         42,
-				FRMPayload:   []byte{0x1, 0x2, 0x3},
+				FrmPayload:   []byte{0x1, 0x2, 0x3},
 			},
 		},
 	}

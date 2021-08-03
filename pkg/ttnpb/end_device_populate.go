@@ -64,7 +64,7 @@ func NewPopulatedMACParameters_Channel(r randyEndDevice, easy bool) *MACParamete
 
 func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	out := &MACParameters{}
-	out.MaxEIRP = r.Float32()
+	out.MaxEirp = r.Float32()
 	if r.Intn(2) == 0 {
 		out.UplinkDwellTime = &BoolValue{Value: r.Uint32()%2 == 0}
 	}

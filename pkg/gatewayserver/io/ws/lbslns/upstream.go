@@ -145,7 +145,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	}
 	up.Payload = &ttnpb.Message{
 		MHDR: parsedMHDR,
-		MIC:  micBytes,
+		Mic:  micBytes,
 		Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 			JoinEui:  req.JoinEUI.EUI64,
 			DevEui:   req.DevEUI.EUI64,
@@ -207,7 +207,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 		return errUplinkMessage.New()
 	}
 	req.MHdr = (uint(payload.MHDR.GetMType()) << 5) | uint(payload.MHDR.GetMajor())
-	req.MIC = int32(binary.LittleEndian.Uint32(payload.MIC[:]))
+	req.MIC = int32(binary.LittleEndian.Uint32(payload.Mic[:]))
 	jreqPayload := payload.GetJoinRequestPayload()
 	if jreqPayload == nil {
 		return errUplinkMessage.New()
@@ -298,10 +298,10 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 
 	up.Payload = &ttnpb.Message{
 		MHDR: parsedMHDR,
-		MIC:  micBytes,
-		Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+		Mic:  micBytes,
+		Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 			FPort:      fPort,
-			FRMPayload: decFRMPayload,
+			FrmPayload: decFRMPayload,
 			FHDR: ttnpb.FHDR{
 				DevAddr: devAddr,
 				FCtrl:   fctrl,
@@ -365,7 +365,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	}
 	updf.MHdr = (uint(payload.MHDR.GetMType()) << 5) | uint(payload.MHDR.GetMajor())
 
-	macPayload := payload.GetMACPayload()
+	macPayload := payload.GetMacPayload()
 	if macPayload == nil {
 		return errUplinkMessage.New()
 	}
@@ -377,8 +377,8 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 
 	updf.FCtrl = util.GetFCtrlAsUint(macPayload.FCtrl)
 	updf.FCnt = uint(macPayload.GetFCnt())
-	updf.FRMPayload = hex.EncodeToString(macPayload.GetFRMPayload())
-	updf.MIC = int32(binary.LittleEndian.Uint32(payload.MIC[:]))
+	updf.FRMPayload = hex.EncodeToString(macPayload.GetFrmPayload())
+	updf.MIC = int32(binary.LittleEndian.Uint32(payload.Mic[:]))
 
 	dr, err := util.GetDataRateIndexFromDataRate(bandID, up.Settings.GetDataRate())
 	if err != nil {

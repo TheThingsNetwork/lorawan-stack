@@ -437,7 +437,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 	activateOpt := EndDeviceOptions.Activate(customMACSettings, false, activeSessionOpts, activeMACStateOpts...)
 
 	macStateWithoutRX1DelayOpt := func(dev ttnpb.EndDevice) ttnpb.EndDevice {
-		dev.MACState.CurrentParameters.Rx1Delay = 0
+		dev.MacState.CurrentParameters.Rx1Delay = 0
 		return dev
 	}
 
@@ -1198,8 +1198,8 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					expected.BatteryPercentage = nil
 					expected.DownlinkMargin = 0
 					expected.LastDevStatusReceivedAt = nil
-					expected.MACState = macState
-					expected.PendingMACState = nil
+					expected.MacState = macState
+					expected.PendingMacState = nil
 					expected.PendingSession = nil
 					expected.PowerState = ttnpb.PowerState_POWER_UNKNOWN
 					expected.Session = session

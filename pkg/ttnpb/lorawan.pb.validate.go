@@ -64,7 +64,7 @@ func (m *Message) ValidateFields(paths ...string) error {
 
 		case "mic":
 
-			if l := len(m.GetMIC()); l < 0 || l > 4 {
+			if l := len(m.GetMic()); l < 0 || l > 4 {
 				return MessageValidationError{
 					field:  "mic",
 					reason: "value length must be between 0 and 4 bytes, inclusive",
@@ -87,12 +87,12 @@ func (m *Message) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "mac_payload":
-					w, ok := m.Payload.(*Message_MACPayload)
+					w, ok := m.Payload.(*Message_MacPayload)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetMACPayload()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetMacPayload()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return MessageValidationError{
 								field:  "mac_payload",
@@ -349,7 +349,7 @@ func (m *MACPayload) ValidateFields(paths ...string) error {
 			}
 
 		case "frm_payload":
-			// no validation rules for FRMPayload
+			// no validation rules for FrmPayload
 		case "decoded_payload":
 
 			if v, ok := interface{}(m.GetDecodedPayload()).(interface{ ValidateFields(...string) error }); ok {
@@ -858,7 +858,7 @@ func (m *JoinAcceptPayload) ValidateFields(paths ...string) error {
 
 		case "cf_list":
 
-			if v, ok := interface{}(m.GetCFList()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCfList()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return JoinAcceptPayloadValidationError{
 						field:  "cf_list",
@@ -951,7 +951,7 @@ func (m *DLSettings) ValidateFields(paths ...string) error {
 		switch name {
 		case "rx1_dr_offset":
 
-			if _, ok := DataRateOffset_name[int32(m.GetRx1DROffset())]; !ok {
+			if _, ok := DataRateOffset_name[int32(m.GetRx1DrOffset())]; !ok {
 				return DLSettingsValidationError{
 					field:  "rx1_dr_offset",
 					reason: "value must be one of the defined enum values",
@@ -960,7 +960,7 @@ func (m *DLSettings) ValidateFields(paths ...string) error {
 
 		case "rx2_dr":
 
-			if _, ok := DataRateIndex_name[int32(m.GetRx2DR())]; !ok {
+			if _, ok := DataRateIndex_name[int32(m.GetRx2Dr())]; !ok {
 				return DLSettingsValidationError{
 					field:  "rx2_dr",
 					reason: "value must be one of the defined enum values",
@@ -1419,12 +1419,12 @@ func (m *DataRate) ValidateFields(paths ...string) error {
 					}
 
 				case "fsk":
-					w, ok := m.Modulation.(*DataRate_FSK)
+					w, ok := m.Modulation.(*DataRate_Fsk)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetFSK()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetFsk()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return DataRateValidationError{
 								field:  "fsk",
@@ -1557,7 +1557,7 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 		case "frequency":
 			// no validation rules for Frequency
 		case "enable_crc":
-			// no validation rules for EnableCRC
+			// no validation rules for EnableCrc
 		case "timestamp":
 			// no validation rules for Timestamp
 		case "time":
@@ -2372,12 +2372,12 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "dl_channel_req":
-					w, ok := m.Payload.(*MACCommand_DLChannelReq_)
+					w, ok := m.Payload.(*MACCommand_DlChannelReq)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetDLChannelReq()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetDlChannelReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return MACCommandValidationError{
 								field:  "dl_channel_req",
@@ -2388,12 +2388,12 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "dl_channel_ans":
-					w, ok := m.Payload.(*MACCommand_DLChannelAns_)
+					w, ok := m.Payload.(*MACCommand_DlChannelAns)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetDLChannelAns()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetDlChannelAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return MACCommandValidationError{
 								field:  "dl_channel_ans",
@@ -5035,7 +5035,7 @@ func (m *MACCommand_TxParamSetupReq) ValidateFields(paths ...string) error {
 		switch name {
 		case "max_eirp_index":
 
-			if _, ok := DeviceEIRP_name[int32(m.GetMaxEIRPIndex())]; !ok {
+			if _, ok := DeviceEIRP_name[int32(m.GetMaxEirpIndex())]; !ok {
 				return MACCommand_TxParamSetupReqValidationError{
 					field:  "max_eirp_index",
 					reason: "value must be one of the defined enum values",

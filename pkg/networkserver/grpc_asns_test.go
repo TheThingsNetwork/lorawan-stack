@@ -37,8 +37,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			MHDR: ttnpb.MHDR{
 				MType: ttnpb.MType_UNCONFIRMED_UP,
 			},
-			Payload: &ttnpb.Message_MACPayload{
-				MACPayload: &ttnpb.MACPayload{},
+			Payload: &ttnpb.Message_MacPayload{
+				MacPayload: &ttnpb.MACPayload{},
 			},
 		},
 		RxMetadata: DefaultRxMetadata[:],
@@ -205,7 +205,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
@@ -284,7 +284,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
@@ -300,7 +300,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							{SessionKeyId: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
-					PendingMACState: &ttnpb.MACState{
+					PendingMacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LorawanVersion: ttnpb.MAC_V1_1,
 					},
@@ -387,7 +387,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
@@ -536,7 +536,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
@@ -614,7 +614,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
@@ -731,8 +731,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 			MHDR: ttnpb.MHDR{
 				MType: ttnpb.MType_UNCONFIRMED_UP,
 			},
-			Payload: &ttnpb.Message_MACPayload{
-				MACPayload: &ttnpb.MACPayload{},
+			Payload: &ttnpb.Message_MacPayload{
+				MacPayload: &ttnpb.MACPayload{},
 			},
 		},
 		RxMetadata: DefaultRxMetadata[:],
@@ -899,7 +899,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
@@ -978,7 +978,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
@@ -994,7 +994,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 							{SessionKeyId: []byte("testSession"), FPort: 42, FCnt: 5},
 						},
 					},
-					PendingMACState: &ttnpb.MACState{
+					PendingMacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
 						LorawanVersion: ttnpb.MAC_V1_1,
 					},
@@ -1065,7 +1065,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks:  ups,
@@ -1135,7 +1135,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
 						LorawanVersion: ttnpb.MAC_V1_0_2,
 						RecentUplinks:  ups,
@@ -1200,7 +1200,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						DeviceId:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
-					MACState: &ttnpb.MACState{
+					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
 						LorawanVersion: ttnpb.MAC_V1_0_2,
 						RecentUplinks:  ups,

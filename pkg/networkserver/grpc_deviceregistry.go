@@ -235,16 +235,16 @@ func unwrapSelectedSessionKeys(ctx context.Context, kv crypto.KeyVault, dev *ttn
 		}
 		dev.Session.SessionKeys = sk
 	}
-	if dev.PendingMACState.GetQueuedJoinAccept() != nil && ttnpb.HasAnyField(paths,
+	if dev.PendingMacState.GetQueuedJoinAccept() != nil && ttnpb.HasAnyField(paths,
 		"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
 		"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
 		"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
 	) {
-		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, kv, dev.PendingMACState.QueuedJoinAccept.Keys, "pending_mac_state.queued_join_accept.keys", paths...)
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, kv, dev.PendingMacState.QueuedJoinAccept.Keys, "pending_mac_state.queued_join_accept.keys", paths...)
 		if err != nil {
 			return err
 		}
-		dev.PendingMACState.QueuedJoinAccept.Keys = sk
+		dev.PendingMacState.QueuedJoinAccept.Keys = sk
 	}
 	return nil
 }
@@ -721,7 +721,7 @@ var (
 			{
 				Func: func(m map[string]*ttnpb.EndDevice) (bool, string) {
 					if !m["supports_class_b"].GetSupportsClassB() ||
-						m["mac_settings.ping_slot_periodicity.value"].GetMACSettings().GetPingSlotPeriodicity() != nil {
+						m["mac_settings.ping_slot_periodicity.value"].GetMacSettings().GetPingSlotPeriodicity() != nil {
 						return true, ""
 					}
 					return false, "mac_settings.ping_slot_periodicity.value"
@@ -773,7 +773,7 @@ var (
 					return a.MaxDutyCycle == b.MaxDutyCycle
 				},
 				"max_eirp": func(a, b ttnpb.MACParameters) bool {
-					return a.MaxEIRP == b.MaxEIRP
+					return a.MaxEirp == b.MaxEirp
 				},
 				"ping_slot_data_rate_index_value.value": func(a, b ttnpb.MACParameters) bool {
 					return a.PingSlotDataRateIndexValue.Equal(b.PingSlotDataRateIndexValue)
@@ -816,7 +816,7 @@ var (
 							}
 							return true, ""
 						}
-						if !eq(curDev.MACState.CurrentParameters, desDev.MACState.DesiredParameters) {
+						if !eq(curDev.MacState.CurrentParameters, desDev.MacState.DesiredParameters) {
 							return false, desPath
 						}
 						return true, ""
@@ -846,7 +846,7 @@ var (
 			ifThenFuncFieldRight{
 				Func: func(m map[string]*ttnpb.EndDevice) (bool, string) {
 					if !m["supports_class_b"].GetSupportsClassB() ||
-						m["mac_settings.ping_slot_periodicity.value"].GetMACSettings().GetPingSlotPeriodicity() != nil {
+						m["mac_settings.ping_slot_periodicity.value"].GetMacSettings().GetPingSlotPeriodicity() != nil {
 						return true, ""
 					}
 					return false, "mac_settings.ping_slot_periodicity.value"
@@ -988,10 +988,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 	if err := st.ValidateSetFieldWithCause(
 		func() error {
-			if st.Device.MACState == nil {
+			if st.Device.MacState == nil {
 				return nil
 			}
-			return st.Device.MACState.LorawanVersion.Validate()
+			return st.Device.MacState.LorawanVersion.Validate()
 		},
 		"mac_state.lorawan_version",
 	); err != nil {
@@ -999,10 +999,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 	if err := st.ValidateSetFieldWithCause(
 		func() error {
-			if st.Device.PendingMACState == nil {
+			if st.Device.PendingMacState == nil {
 				return nil
 			}
-			return st.Device.PendingMACState.LorawanVersion.Validate()
+			return st.Device.PendingMacState.LorawanVersion.Validate()
 		},
 		"pending_mac_state.lorawan_version",
 	); err != nil {
@@ -1250,11 +1250,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"mac_state.current_parameters.rx2_data_rate_index",
 		) {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				if dev.GetMACState() == nil {
+				if dev.GetMacState() == nil {
 					return nil
 				}
 				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
-					_, ok := phy.DataRates[dev.MACState.CurrentParameters.Rx2DataRateIndex]
+					_, ok := phy.DataRates[dev.MacState.CurrentParameters.Rx2DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError("mac_state.current_parameters.rx2_data_rate_index")
 					}
@@ -1272,11 +1272,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"mac_state.desired_parameters.rx2_data_rate_index",
 		) {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				if dev.GetMACState() == nil {
+				if dev.GetMacState() == nil {
 					return nil
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					_, ok := phy.DataRates[dev.MACState.DesiredParameters.Rx2DataRateIndex]
+					_, ok := phy.DataRates[dev.MacState.DesiredParameters.Rx2DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError("mac_state.desired_parameters.rx2_data_rate_index")
 					}
@@ -1295,11 +1295,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"pending_mac_state.current_parameters.rx2_data_rate_index",
 		) {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				if dev.GetPendingMACState() == nil {
+				if dev.GetPendingMacState() == nil {
 					return nil
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					_, ok := phy.DataRates[dev.PendingMACState.CurrentParameters.Rx2DataRateIndex]
+					_, ok := phy.DataRates[dev.PendingMacState.CurrentParameters.Rx2DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError("pending_mac_state.current_parameters.rx2_data_rate_index")
 					}
@@ -1317,11 +1317,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"pending_mac_state.desired_parameters.rx2_data_rate_index",
 		) {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				if dev.GetPendingMACState() == nil {
+				if dev.GetPendingMacState() == nil {
 					return nil
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					_, ok := phy.DataRates[dev.PendingMACState.DesiredParameters.Rx2DataRateIndex]
+					_, ok := phy.DataRates[dev.PendingMacState.DesiredParameters.Rx2DataRateIndex]
 					if !ok {
 						return newInvalidFieldValueError("pending_mac_state.desired_parameters.rx2_data_rate_index")
 					}
@@ -1340,11 +1340,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"mac_state.current_parameters.ping_slot_data_rate_index_value.value",
 		) {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				if dev.GetMACState() == nil || dev.MACState.CurrentParameters.PingSlotDataRateIndexValue == nil {
+				if dev.GetMacState() == nil || dev.MacState.CurrentParameters.PingSlotDataRateIndexValue == nil {
 					return nil
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					_, ok := phy.DataRates[dev.MACState.CurrentParameters.PingSlotDataRateIndexValue.Value]
+					_, ok := phy.DataRates[dev.MacState.CurrentParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
 						return newInvalidFieldValueError("mac_state.current_parameters.ping_slot_data_rate_index_value.value")
 					}
@@ -1362,11 +1362,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
 		) {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				if dev.GetMACState() == nil || dev.MACState.DesiredParameters.PingSlotDataRateIndexValue == nil {
+				if dev.GetMacState() == nil || dev.MacState.DesiredParameters.PingSlotDataRateIndexValue == nil {
 					return nil
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					_, ok := phy.DataRates[dev.MACState.DesiredParameters.PingSlotDataRateIndexValue.Value]
+					_, ok := phy.DataRates[dev.MacState.DesiredParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
 						return newInvalidFieldValueError("mac_state.desired_parameters.ping_slot_data_rate_index_value.value")
 					}
@@ -1385,11 +1385,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"pending_mac_state.current_parameters.ping_slot_data_rate_index_value.value",
 		) {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				if dev.GetPendingMACState() == nil || dev.PendingMACState.CurrentParameters.PingSlotDataRateIndexValue == nil {
+				if dev.GetPendingMacState() == nil || dev.PendingMacState.CurrentParameters.PingSlotDataRateIndexValue == nil {
 					return nil
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					_, ok := phy.DataRates[dev.PendingMACState.CurrentParameters.PingSlotDataRateIndexValue.Value]
+					_, ok := phy.DataRates[dev.PendingMacState.CurrentParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
 						return newInvalidFieldValueError("pending_mac_state.current_parameters.ping_slot_data_rate_index_value.value")
 					}
@@ -1407,11 +1407,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"pending_mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
 		) {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				if dev.GetPendingMACState() == nil || dev.PendingMACState.DesiredParameters.PingSlotDataRateIndexValue == nil {
+				if dev.GetPendingMacState() == nil || dev.PendingMacState.DesiredParameters.PingSlotDataRateIndexValue == nil {
 					return nil
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					_, ok := phy.DataRates[dev.PendingMACState.DesiredParameters.PingSlotDataRateIndexValue.Value]
+					_, ok := phy.DataRates[dev.PendingMacState.DesiredParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
 						return newInvalidFieldValueError("pending_mac_state.desired_parameters.ping_slot_data_rate_index_value.value")
 					}
@@ -1430,7 +1430,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"mac_settings.factory_preset_frequencies",
 		) {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				if dev.GetMACSettings() == nil || len(dev.MACSettings.FactoryPresetFrequencies) == 0 {
+				if dev.GetMacSettings() == nil || len(dev.MacSettings.FactoryPresetFrequencies) == 0 {
 					return nil
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
@@ -1455,7 +1455,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		) {
 			if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
 				if !m["supports_class_b"].GetSupportsClassB() ||
-					m["mac_settings.ping_slot_frequency.value"].GetMACSettings().GetPingSlotFrequency().GetValue() > 0 {
+					m["mac_settings.ping_slot_frequency.value"].GetMacSettings().GetPingSlotFrequency().GetValue() > 0 {
 					return nil
 				}
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
@@ -1474,43 +1474,43 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 		for p, isValid := range map[string]func(*ttnpb.EndDevice, *band.Band) bool{
 			"mac_settings.use_adr.value": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return !dev.GetMACSettings().GetUseAdr().GetValue() || phy.EnableADR
+				return !dev.GetMacSettings().GetUseAdr().GetValue() || phy.EnableADR
 			},
 			"mac_state.current_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMACState().GetCurrentParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetMacState().GetCurrentParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
 			},
 			"mac_state.current_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMACState().GetCurrentParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetMacState().GetCurrentParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
 			},
 			"mac_state.current_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return len(dev.GetMACState().GetCurrentParameters().Channels) <= int(phy.MaxUplinkChannels)
+				return len(dev.GetMacState().GetCurrentParameters().Channels) <= int(phy.MaxUplinkChannels)
 			},
 			"mac_state.desired_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMACState().GetDesiredParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetMacState().GetDesiredParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
 			},
 			"mac_state.desired_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMACState().GetDesiredParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetMacState().GetDesiredParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
 			},
 			"mac_state.desired_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return len(dev.GetMACState().GetDesiredParameters().Channels) <= int(phy.MaxUplinkChannels)
+				return len(dev.GetMacState().GetDesiredParameters().Channels) <= int(phy.MaxUplinkChannels)
 			},
 			"pending_mac_state.current_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMACState().GetCurrentParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetPendingMacState().GetCurrentParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
 			},
 			"pending_mac_state.current_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMACState().GetCurrentParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetPendingMacState().GetCurrentParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
 			},
 			"pending_mac_state.current_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return len(dev.GetPendingMACState().GetCurrentParameters().Channels) <= int(phy.MaxUplinkChannels)
+				return len(dev.GetPendingMacState().GetCurrentParameters().Channels) <= int(phy.MaxUplinkChannels)
 			},
 			"pending_mac_state.desired_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMACState().GetDesiredParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetPendingMacState().GetDesiredParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
 			},
 			"pending_mac_state.desired_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMACState().GetDesiredParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetPendingMacState().GetDesiredParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
 			},
 			"pending_mac_state.desired_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return len(dev.GetPendingMACState().GetDesiredParameters().Channels) <= int(phy.MaxUplinkChannels)
+				return len(dev.GetPendingMacState().GetDesiredParameters().Channels) <= int(phy.MaxUplinkChannels)
 			},
 		} {
 			if !st.HasSetField(
@@ -1666,66 +1666,66 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			})
 		}
 	}
-	if st.Device.PendingMACState.GetQueuedJoinAccept() != nil {
+	if st.Device.PendingMacState.GetQueuedJoinAccept() != nil {
 		for p, isZero := range map[string]func() bool{
-			"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key": st.Device.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey.IsZero,
-			"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key":   st.Device.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey.IsZero,
-			"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key": st.Device.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey.IsZero,
-			"pending_mac_state.queued_join_accept.keys.session_key_id":      func() bool { return len(st.Device.PendingMACState.QueuedJoinAccept.Keys.SessionKeyId) == 0 },
-			"pending_mac_state.queued_join_accept.payload":                  func() bool { return len(st.Device.PendingMACState.QueuedJoinAccept.Payload) == 0 },
-			"pending_mac_state.queued_join_accept.dev_addr":                 st.Device.PendingMACState.QueuedJoinAccept.DevAddr.IsZero,
+			"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key": st.Device.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey.IsZero,
+			"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key":   st.Device.PendingMacState.QueuedJoinAccept.Keys.NwkSEncKey.IsZero,
+			"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key": st.Device.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey.IsZero,
+			"pending_mac_state.queued_join_accept.keys.session_key_id":      func() bool { return len(st.Device.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId) == 0 },
+			"pending_mac_state.queued_join_accept.payload":                  func() bool { return len(st.Device.PendingMacState.QueuedJoinAccept.Payload) == 0 },
+			"pending_mac_state.queued_join_accept.dev_addr":                 st.Device.PendingMacState.QueuedJoinAccept.DevAddr.IsZero,
 		} {
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
 				return nil, err
 			}
 		}
 		if st.HasSetField("pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key") {
-			k := st.Device.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey.Key
+			k := st.Device.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey.Key
 			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
-			st.Device.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey = fNwkSIntKey
+			st.Device.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey = fNwkSIntKey
 			st.AddSetFields(
 				"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.encrypted_key",
 				"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
-				dev.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{
+				dev.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{
 					Key: k,
 				}
 			})
 		}
 		if st.HasSetField("pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key") {
-			k := st.Device.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey.Key
+			k := st.Device.PendingMacState.QueuedJoinAccept.Keys.NwkSEncKey.Key
 			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
-			st.Device.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey = nwkSEncKey
+			st.Device.PendingMacState.QueuedJoinAccept.Keys.NwkSEncKey = nwkSEncKey
 			st.AddSetFields(
 				"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.encrypted_key",
 				"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
-				dev.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{
+				dev.PendingMacState.QueuedJoinAccept.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{
 					Key: k,
 				}
 			})
 		}
 		if st.HasSetField("pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key") {
-			k := st.Device.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey.Key
+			k := st.Device.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey.Key
 			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
-			st.Device.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey = sNwkSIntKey
+			st.Device.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey = sNwkSIntKey
 			st.AddSetFields(
 				"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.encrypted_key",
 				"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
-				dev.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{
+				dev.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{
 					Key: k,
 				}
 			})
@@ -1743,7 +1743,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		for k, v := range m {
 			switch {
 			case strings.HasPrefix(k, "mac_state."):
-				if v.MACState != nil {
+				if v.MacState != nil {
 					hasMACState = true
 				}
 			case strings.HasPrefix(k, "session."):
@@ -1772,17 +1772,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if hasMACState {
 			// NOTE: If not set, this will be derived from top-level device model.
 			if isMulticast {
-				if dev, ok := m["mac_state.device_class"]; ok && dev.MACState.GetDeviceClass() == ttnpb.CLASS_A {
+				if dev, ok := m["mac_state.device_class"]; ok && dev.MacState.GetDeviceClass() == ttnpb.CLASS_A {
 					return false, "mac_state.device_class"
 				}
 			}
 			// NOTE: If not set, this will be derived from top-level device model.
-			if dev, ok := m["mac_state.lorawan_version"]; ok && dev.MACState == nil {
+			if dev, ok := m["mac_state.lorawan_version"]; ok && dev.MacState == nil {
 				return false, "mac_state.lorawan_version"
 			} else if !ok {
 				macVersion = m["lorawan_version"].LorawanVersion
 			} else {
-				macVersion = dev.MACState.LorawanVersion
+				macVersion = dev.MacState.LorawanVersion
 			}
 		} else {
 			macVersion = m["lorawan_version"].LorawanVersion
@@ -1932,7 +1932,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		for k, v := range m {
 			switch {
 			case strings.HasPrefix(k, "pending_mac_state."):
-				if v.PendingMACState != nil {
+				if v.PendingMacState != nil {
 					hasPendingMACState = true
 				}
 			case strings.HasPrefix(k, "pending_session."):
@@ -1951,17 +1951,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return false, "pending_mac_state"
 		}
 		for k, v := range m {
-			if strings.HasPrefix(k, "pending_mac_state.queued_join_accept.") && v.PendingMACState.GetQueuedJoinAccept() != nil {
+			if strings.HasPrefix(k, "pending_mac_state.queued_join_accept.") && v.PendingMacState.GetQueuedJoinAccept() != nil {
 				hasQueuedJoinAccept = true
 				break
 			}
 		}
 
 		var macVersion ttnpb.MACVersion
-		if dev, ok := m["pending_mac_state.lorawan_version"]; !ok || dev.PendingMACState == nil {
+		if dev, ok := m["pending_mac_state.lorawan_version"]; !ok || dev.PendingMacState == nil {
 			return false, "pending_mac_state.lorawan_version"
 		} else {
-			macVersion = dev.PendingMACState.LorawanVersion
+			macVersion = dev.PendingMacState.LorawanVersion
 		}
 		supports1_1 := macVersion.Compare(ttnpb.MAC_V1_1) >= 0
 
@@ -2006,21 +2006,21 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 		if hasQueuedJoinAccept {
 			getFNwkSIntKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-				keys := dev.GetPendingMACState().GetQueuedJoinAccept().GetKeys()
+				keys := dev.GetPendingMacState().GetQueuedJoinAccept().GetKeys()
 				return keys.GetFNwkSIntKey()
 			}
 			if setKeyIsZero(m, getFNwkSIntKey, "pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key") {
 				return false, "pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key"
 			}
 			getNwkSEncKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-				keys := dev.GetPendingMACState().GetQueuedJoinAccept().GetKeys()
+				keys := dev.GetPendingMacState().GetQueuedJoinAccept().GetKeys()
 				return keys.GetNwkSEncKey()
 			}
 			if setKeyIsZero(m, getNwkSEncKey, "pending_mac_state.queued_join_accept.keys.nwk_s_enc_key") {
 				return false, "pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key"
 			}
 			getSNwkSIntKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-				keys := dev.GetPendingMACState().GetQueuedJoinAccept().GetKeys()
+				keys := dev.GetPendingMacState().GetQueuedJoinAccept().GetKeys()
 				return keys.GetSNwkSIntKey()
 			}
 			if setKeyIsZero(m, getSNwkSIntKey, "pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key") {
@@ -2036,13 +2036,13 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				}
 			}
 
-			if dev, ok := m["pending_mac_state.queued_join_accept.keys.session_key_id"]; !ok || dev.PendingMACState.GetQueuedJoinAccept() == nil {
+			if dev, ok := m["pending_mac_state.queued_join_accept.keys.session_key_id"]; !ok || dev.PendingMacState.GetQueuedJoinAccept() == nil {
 				return false, "pending_mac_state.queued_join_accept.keys.session_key_id"
 			}
-			if dev, ok := m["pending_mac_state.queued_join_accept.payload"]; !ok || dev.PendingMACState.GetQueuedJoinAccept() == nil {
+			if dev, ok := m["pending_mac_state.queued_join_accept.payload"]; !ok || dev.PendingMacState.GetQueuedJoinAccept() == nil {
 				return false, "pending_mac_state.queued_join_accept.payload"
 			}
-			if dev, ok := m["pending_mac_state.queued_join_accept.request.dev_addr"]; !ok || dev.PendingMACState.GetQueuedJoinAccept() == nil {
+			if dev, ok := m["pending_mac_state.queued_join_accept.request.dev_addr"]; !ok || dev.PendingMacState.GetQueuedJoinAccept() == nil {
 				return false, "pending_mac_state.queued_join_accept.request.dev_addr"
 			}
 		}
@@ -2214,24 +2214,24 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	var evt events.Event
 	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.EndDeviceIdentifiers.ApplicationIdentifiers, st.Device.EndDeviceIdentifiers.DeviceId, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
 		if hasSession {
-			macVersion := stored.GetMACState().GetLorawanVersion()
-			if stored.GetMACState() == nil && !st.HasSetField("mac_state") {
+			macVersion := stored.GetMacState().GetLorawanVersion()
+			if stored.GetMacState() == nil && !st.HasSetField("mac_state") {
 				macState, err := mac.NewState(st.Device, ns.FrequencyPlans, ns.defaultMACSettings)
 				if err != nil {
 					return err
 				}
 				if macSets := ttnpb.FieldsWithoutPrefix("mac_state", st.SetFields()...); len(macSets) != 0 {
-					if err := macState.SetFields(st.Device.MACState, macSets...); err != nil {
+					if err := macState.SetFields(st.Device.MacState, macSets...); err != nil {
 						return err
 					}
 				}
-				st.Device.MACState = macState
+				st.Device.MacState = macState
 				st.AddSetFields(
 					"mac_state",
 				)
 				macVersion = macState.LorawanVersion
 			} else if st.HasSetField("mac_state.lorawan_version") {
-				macVersion = st.Device.MACState.LorawanVersion
+				macVersion = st.Device.MacState.LorawanVersion
 			}
 
 			if st.HasSetField("session.keys.f_nwk_s_int_key.key") && macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
@@ -2259,9 +2259,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if hasPendingSession {
 			var macVersion ttnpb.MACVersion
 			if st.HasSetField("pending_mac_state.lorawan_version") {
-				macVersion = st.Device.GetPendingMACState().GetLorawanVersion()
+				macVersion = st.Device.GetPendingMacState().GetLorawanVersion()
 			} else {
-				macVersion = stored.GetPendingMACState().GetLorawanVersion()
+				macVersion = stored.GetPendingMacState().GetLorawanVersion()
 			}
 
 			supports1_1 := macVersion.Compare(ttnpb.MAC_V1_1) >= 0
@@ -2278,8 +2278,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				)
 			}
 			if st.HasSetField("pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key") && hasQueuedJoinAccept && !supports1_1 {
-				st.Device.PendingMACState.QueuedJoinAccept.Keys.NwkSEncKey = st.Device.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey
-				st.Device.PendingMACState.QueuedJoinAccept.Keys.SNwkSIntKey = st.Device.PendingMACState.QueuedJoinAccept.Keys.FNwkSIntKey
+				st.Device.PendingMacState.QueuedJoinAccept.Keys.NwkSEncKey = st.Device.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey
+				st.Device.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey = st.Device.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey
 				st.AddSetFields(
 					"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.encrypted_key",
 					"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.kek_label",
@@ -2353,8 +2353,8 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 		stored.BatteryPercentage = nil
 		stored.DownlinkMargin = 0
 		stored.LastDevStatusReceivedAt = nil
-		stored.MACState = nil
-		stored.PendingMACState = nil
+		stored.MacState = nil
+		stored.PendingMacState = nil
 		stored.PendingSession = nil
 		stored.PowerState = ttnpb.PowerState_POWER_UNKNOWN
 		if stored.SupportsJoin {
@@ -2368,7 +2368,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 			if err != nil {
 				return nil, nil, err
 			}
-			stored.MACState = macState
+			stored.MacState = macState
 			stored.Session = &ttnpb.Session{
 				DevAddr:                    stored.Session.DevAddr,
 				SessionKeys:                stored.Session.SessionKeys,

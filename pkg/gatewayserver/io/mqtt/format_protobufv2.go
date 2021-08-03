@@ -72,17 +72,17 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdent
 		return nil, errNotScheduled.New()
 	}
 	lorawan := &ttnpbv2.LoRaWANTxConfiguration{}
-	if pld, ok := down.GetPayload().GetPayload().(*ttnpb.Message_MACPayload); ok && pld != nil {
-		lorawan.FCnt = pld.MACPayload.FHDR.FCnt
+	if pld, ok := down.GetPayload().GetPayload().(*ttnpb.Message_MacPayload); ok && pld != nil {
+		lorawan.FCnt = pld.MacPayload.FHDR.FCnt
 	}
 	switch dr := settings.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
 		lorawan.Modulation = ttnpbv2.Modulation_LORA
 		lorawan.CodingRate = settings.CodingRate
 		lorawan.DataRate = fmt.Sprintf("SF%dBW%d", dr.Lora.SpreadingFactor, dr.Lora.Bandwidth/1000)
-	case *ttnpb.DataRate_FSK:
+	case *ttnpb.DataRate_Fsk:
 		lorawan.Modulation = ttnpbv2.Modulation_FSK
-		lorawan.BitRate = dr.FSK.BitRate
+		lorawan.BitRate = dr.Fsk.BitRate
 	default:
 		return nil, errModulation.New()
 	}
@@ -154,8 +154,8 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		settings.DataRateIndex = drIndex
 	case ttnpbv2.Modulation_FSK:
 		settings.DataRate = ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_FSK{
-				FSK: &ttnpb.FSKDataRate{
+			Modulation: &ttnpb.DataRate_Fsk{
+				Fsk: &ttnpb.FSKDataRate{
 					BitRate: lorawanMetadata.BitRate,
 				},
 			},

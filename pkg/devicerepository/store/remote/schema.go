@@ -360,83 +360,83 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 		paths = append(paths, "formatters")
 	}
 
-	dev.MACSettings = &ttnpb.MACSettings{}
+	dev.MacSettings = &ttnpb.MACSettings{}
 	if p.ClassBTimeout > 0 {
 		t := time.Duration(p.ClassBTimeout) * time.Second
-		dev.MACSettings.ClassBTimeout = &t
+		dev.MacSettings.ClassBTimeout = &t
 		paths = append(paths, "mac_settings.class_b_timeout")
 	}
 	if p.ClassCTimeout > 0 {
 		t := time.Duration(p.ClassCTimeout) * time.Second
-		dev.MACSettings.ClassCTimeout = &t
+		dev.MacSettings.ClassCTimeout = &t
 		paths = append(paths, "mac_settings.class_c_timeout")
 	}
 	if v := p.PingSlotDataRateIndex; v != nil {
-		dev.MACSettings.PingSlotDataRateIndex = &ttnpb.DataRateIndexValue{
+		dev.MacSettings.PingSlotDataRateIndex = &ttnpb.DataRateIndexValue{
 			Value: *v,
 		}
 		paths = append(paths, "mac_settings.ping_slot_data_rate_index")
 	}
 	if p.PingSlotFrequency > 0 {
-		dev.MACSettings.PingSlotFrequency = &ttnpb.FrequencyValue{
+		dev.MacSettings.PingSlotFrequency = &ttnpb.FrequencyValue{
 			Value: uint64(p.PingSlotFrequency * mhz),
 		}
 		paths = append(paths, "mac_settings.ping_slot_frequency")
 	}
 	if p.PingSlotPeriod > 0 {
-		dev.MACSettings.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
+		dev.MacSettings.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
 			Value: pingSlotPeriodToPB[p.PingSlotPeriod],
 		}
 		paths = append(paths, "mac_settings.ping_slot_periodicity")
 	}
 	if v := p.Rx1Delay; v != nil {
-		dev.MACSettings.Rx1Delay = &ttnpb.RxDelayValue{
+		dev.MacSettings.Rx1Delay = &ttnpb.RxDelayValue{
 			Value: *v,
 		}
 		paths = append(paths, "mac_settings.rx1_delay")
 	}
 	if v := p.Rx1DataRateOffset; v != nil {
-		dev.MACSettings.Rx1DataRateOffset = &ttnpb.DataRateOffsetValue{
+		dev.MacSettings.Rx1DataRateOffset = &ttnpb.DataRateOffsetValue{
 			Value: *v,
 		}
 		paths = append(paths, "mac_settings.rx1_data_rate_offset")
 	}
 	if v := p.Rx2DataRateIndex; v != nil {
-		dev.MACSettings.Rx2DataRateIndex = &ttnpb.DataRateIndexValue{
+		dev.MacSettings.Rx2DataRateIndex = &ttnpb.DataRateIndexValue{
 			Value: *v,
 		}
 		paths = append(paths, "mac_settings.rx2_data_rate_index")
 	}
 	if p.Rx2Frequency > 0 {
-		dev.MACSettings.Rx2Frequency = &ttnpb.FrequencyValue{
+		dev.MacSettings.Rx2Frequency = &ttnpb.FrequencyValue{
 			Value: uint64(p.Rx2Frequency * mhz),
 		}
 		paths = append(paths, "mac_settings.rx2_frequency")
 	}
 	if p.Supports32BitFCnt {
-		dev.MACSettings.Supports32BitFCnt = &ttnpb.BoolValue{
+		dev.MacSettings.Supports_32BitFCnt = &ttnpb.BoolValue{
 			Value: true,
 		}
 		paths = append(paths, "mac_settings.supports_32_bit_f_cnt")
 	}
 	if fs := p.FactoryPresetFrequencies; len(fs) > 0 {
-		dev.MACSettings.FactoryPresetFrequencies = make([]uint64, 0, len(fs))
+		dev.MacSettings.FactoryPresetFrequencies = make([]uint64, 0, len(fs))
 		for _, freq := range fs {
-			dev.MACSettings.FactoryPresetFrequencies = append(dev.MACSettings.FactoryPresetFrequencies, uint64(freq*mhz))
+			dev.MacSettings.FactoryPresetFrequencies = append(dev.MacSettings.FactoryPresetFrequencies, uint64(freq*mhz))
 		}
 		paths = append(paths, "mac_settings.factory_preset_frequencies")
 	}
 	if dc := p.MaxDutyCycle; dc > 0 {
-		dev.MACSettings.MaxDutyCycle = &ttnpb.AggregatedDutyCycleValue{
+		dev.MacSettings.MaxDutyCycle = &ttnpb.AggregatedDutyCycleValue{
 			Value: dutyCycleFromFloat(dc),
 		}
 		paths = append(paths, "mac_settings.max_duty_cycle")
 	}
 
 	if !p.SupportsJoin && p.MaxEIRP > 0 {
-		dev.MACState = &ttnpb.MACState{
+		dev.MacState = &ttnpb.MACState{
 			DesiredParameters: ttnpb.MACParameters{
-				MaxEIRP: p.MaxEIRP,
+				MaxEirp: p.MaxEIRP,
 			},
 		}
 		paths = append(paths, "mac_state.desired_parameters.max_eirp")

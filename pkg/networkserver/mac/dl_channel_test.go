@@ -238,7 +238,7 @@ func TestDLChannelReq(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				makeDevice := func() *ttnpb.EndDevice {
 					return CopyEndDevice(&ttnpb.EndDevice{
-						MACState: &ttnpb.MACState{
+						MacState: &ttnpb.MACState{
 							CurrentParameters: ttnpb.MACParameters{
 								Channels: tc.CurrentChannels,
 							},
@@ -256,8 +256,8 @@ func TestDLChannelReq(t *testing.T) {
 					Parallel: true,
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						dev := makeDevice()
-						max := len(dev.MACState.CurrentParameters.Channels)
-						if n := len(dev.MACState.DesiredParameters.Channels); n > max {
+						max := len(dev.MacState.CurrentParameters.Channels)
+						if n := len(dev.MacState.DesiredParameters.Channels); n > max {
 							max = n
 						}
 						needs := make(map[int]struct{}, max)
@@ -318,7 +318,7 @@ func TestDLChannelReq(t *testing.T) {
 							expectedDevice := makeDevice()
 							var expectedEventBuilders []events.Builder
 							for _, cmd := range cmds {
-								expectedDevice.MACState.PendingRequests = append(expectedDevice.MACState.PendingRequests, cmd.MACCommand())
+								expectedDevice.MacState.PendingRequests = append(expectedDevice.MacState.PendingRequests, cmd.MACCommand())
 								expectedEventBuilders = append(expectedEventBuilders, EvtEnqueueDLChannelRequest.BindData(cmd))
 							}
 							a.So(st.QueuedEvents, should.ResembleEventBuilders, events.Builders(expectedEventBuilders))
@@ -347,20 +347,20 @@ func TestHandleDLChannelAns(t *testing.T) {
 		{
 			Name: "nil payload",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Error: ErrNoPayload,
 		},
 		{
 			Name: "frequency ack/chanel index ack/no request",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{
 				FrequencyAck:    true,
@@ -377,10 +377,10 @@ func TestHandleDLChannelAns(t *testing.T) {
 		{
 			Name: "frequency nack/channel index ack/no request",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{
 				ChannelIndexAck: true,
@@ -395,7 +395,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 		{
 			Name: "frequency nack/channel index nack/valid request/no rejections",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DLChannelReq{
 							ChannelIndex: 2,
@@ -416,7 +416,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					CurrentParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
@@ -440,7 +440,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 		{
 			Name: "frequency nack/channel index ack/valid request/rejected frequencies:(1,2,100)",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DLChannelReq{
 							ChannelIndex: 2,
@@ -462,7 +462,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					CurrentParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
@@ -490,7 +490,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 		{
 			Name: "frequency ack/channel index ack/no channel",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DLChannelReq{
 							ChannelIndex: 2,
@@ -500,7 +500,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DLChannelReq{
 							ChannelIndex: 2,
@@ -524,7 +524,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 		{
 			Name: "frequency ack/channel index ack/channel exists",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DLChannelReq{
 							ChannelIndex: 2,
@@ -545,7 +545,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					CurrentParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{

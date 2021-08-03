@@ -147,11 +147,11 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		New:          "mac_state.current_parameters.adr_ack_delay_exponent",
 		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
-			if dev.MACState == nil {
+			if dev.MacState == nil {
 				return nil
 			}
 			// Replicate old behavior for backwards-compatibility.
-			dev.MACState.CurrentParameters.AdrAckDelay = 0
+			dev.MacState.CurrentParameters.AdrAckDelay = 0
 			return nil
 		},
 	},
@@ -160,11 +160,11 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		New:          "mac_state.current_parameters.adr_ack_limit_exponent",
 		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
-			if dev.MACState == nil {
+			if dev.MacState == nil {
 				return nil
 			}
 			// Replicate old behavior for backwards-compatibility.
-			dev.MACState.CurrentParameters.AdrAckLimit = 0
+			dev.MacState.CurrentParameters.AdrAckLimit = 0
 			return nil
 		},
 	},
@@ -173,11 +173,11 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		New:          "mac_state.current_parameters.ping_slot_data_rate_index_value",
 		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
-			if dev.MACState == nil {
+			if dev.MacState == nil {
 				return nil
 			}
 			// Replicate old behavior for backwards-compatibility.
-			dev.MACState.CurrentParameters.PingSlotDataRateIndex = 0
+			dev.MacState.CurrentParameters.PingSlotDataRateIndex = 0
 			return nil
 		},
 	},
@@ -186,11 +186,11 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		New:          "mac_state.desired_parameters.adr_ack_delay_exponent",
 		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
-			if dev.MACState == nil {
+			if dev.MacState == nil {
 				return nil
 			}
 			// Replicate old behavior for backwards-compatibility.
-			dev.MACState.DesiredParameters.AdrAckDelay = 0
+			dev.MacState.DesiredParameters.AdrAckDelay = 0
 			return nil
 		},
 	},
@@ -199,11 +199,11 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		New:          "mac_state.desired_parameters.adr_ack_limit_exponent",
 		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
-			if dev.MACState == nil {
+			if dev.MacState == nil {
 				return nil
 			}
 			// Replicate old behavior for backwards-compatibility.
-			dev.MACState.DesiredParameters.AdrAckLimit = 0
+			dev.MacState.DesiredParameters.AdrAckLimit = 0
 			return nil
 		},
 	},
@@ -212,11 +212,11 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 		New:          "mac_state.desired_parameters.ping_slot_data_rate_index_value",
 		GetTransform: func(dev *ttnpb.EndDevice) {},
 		SetTransform: func(dev *ttnpb.EndDevice, _, _ bool) error {
-			if dev.MACState == nil {
+			if dev.MacState == nil {
 				return nil
 			}
 			// Replicate old behavior for backwards-compatibility.
-			dev.MACState.DesiredParameters.PingSlotDataRateIndex = 0
+			dev.MacState.DesiredParameters.PingSlotDataRateIndex = 0
 			return nil
 		},
 	},

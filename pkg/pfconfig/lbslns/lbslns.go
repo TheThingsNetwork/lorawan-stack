@@ -311,7 +311,7 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 			loraDR.GetSpreadingFactor()
 			drs[i][0] = int(loraDR.GetSpreadingFactor())
 			drs[i][1] = int(loraDR.GetBandwidth() / 1000)
-		} else if fskDR := dr.Rate.GetFSK(); fskDR != nil {
+		} else if fskDR := dr.Rate.GetFsk(); fskDR != nil {
 			drs[i][0] = 0 // must be set to 0 for FSK, the BW field is ignored.
 		}
 	}

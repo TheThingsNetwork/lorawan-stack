@@ -55,8 +55,8 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
-				PendingMACState: &ttnpb.MACState{},
-				MACState: &ttnpb.MACState{
+				PendingMacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
 					PendingJoinRequest: &ttnpb.MACState_JoinRequest{},
 					QueuedResponses:    []*ttnpb.MACCommand{},
 				},
@@ -71,7 +71,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RekeyConf{
@@ -109,8 +109,8 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastFCntUp:    101,
 					LastNFCntDown: 2,
 				},
-				PendingMACState: &ttnpb.MACState{},
-				MACState: &ttnpb.MACState{
+				PendingMacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
 					PendingJoinRequest: &ttnpb.MACState_JoinRequest{},
 					QueuedResponses:    []*ttnpb.MACCommand{},
 				},
@@ -125,7 +125,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RekeyConf{
@@ -158,7 +158,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
 				SupportsJoin: true,
@@ -170,7 +170,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RekeyConf{
@@ -200,8 +200,8 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
-				PendingMACState: &ttnpb.MACState{},
-				MACState: &ttnpb.MACState{
+				PendingMacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
 					PendingJoinRequest: &ttnpb.MACState_JoinRequest{},
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
@@ -220,7 +220,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},

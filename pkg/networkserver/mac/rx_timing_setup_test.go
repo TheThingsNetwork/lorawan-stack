@@ -41,7 +41,7 @@ func TestNeedsRxTimingSetupReq(t *testing.T) {
 		{
 			Name: "current(delay:1),desired(delay:1)",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: ttnpb.RX_DELAY_1,
 					},
@@ -54,7 +54,7 @@ func TestNeedsRxTimingSetupReq(t *testing.T) {
 		{
 			Name: "current(delay:1),desired(delay:5)",
 			InputDevice: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: ttnpb.RX_DELAY_1,
 					},
@@ -94,10 +94,10 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Events: events.Builders{
 				EvtReceiveRxTimingSetupAnswer,
@@ -107,7 +107,7 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 		{
 			Name: "42",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RxTimingSetupReq{
 							Delay: 42,
@@ -116,7 +116,7 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: 42,
 					},

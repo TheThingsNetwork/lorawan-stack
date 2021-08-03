@@ -617,7 +617,7 @@ paths:
 func TestHandleJoinRequest(t *testing.T) {
 	makeJoinRequest := func() *ttnpb.JoinRequest {
 		return &ttnpb.JoinRequest{
-			SelectedMACVersion: ttnpb.MAC_V1_0_3,
+			SelectedMacVersion: ttnpb.MAC_V1_0_3,
 			DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
 			RxDelay:            ttnpb.RX_DELAY_5,
 			Payload: &ttnpb.Message{

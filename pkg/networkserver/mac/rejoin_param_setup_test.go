@@ -86,7 +86,7 @@ func TestNeedsRejoinParamSetupReq(t *testing.T) {
 				TestCase{
 					Name: makeMACName(conf.Suffix),
 					InputDevice: &ttnpb.EndDevice{
-						MACState: &ttnpb.MACState{
+						MacState: &ttnpb.MACState{
 							LorawanVersion:    macVersion,
 							CurrentParameters: conf.CurrentParameters,
 							DesiredParameters: conf.DesiredParameters,
@@ -128,20 +128,20 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Error: ErrNoPayload,
 		},
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: true,
@@ -156,7 +156,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 		{
 			Name: "ack",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RejoinParamSetupReq{
 							MaxCountExponent: ttnpb.REJOIN_COUNT_128,
@@ -166,7 +166,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
 						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
@@ -186,7 +186,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 		{
 			Name: "nack",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						RejoinTimePeriodicity: ttnpb.REJOIN_TIME_1,
 					},
@@ -199,7 +199,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_1024,
 						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_1,

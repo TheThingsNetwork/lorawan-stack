@@ -53,7 +53,7 @@ func HandleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Up
 		Margin:       uint32(uint8(maxSNR - floor)),
 		GatewayCount: uint32(gtwCount),
 	}
-	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ans.MACCommand())
+	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, ans.MACCommand())
 	return append(evs,
 		EvtEnqueueLinkCheckAnswer.With(events.WithData(ans)),
 	), nil

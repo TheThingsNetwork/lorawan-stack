@@ -54,11 +54,11 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 	req := &ttnpb.JoinRequest{
 		RawPayload:         in.PHYPayload,
 		DevAddr:            types.DevAddr(in.DevAddr),
-		SelectedMACVersion: ttnpb.MACVersion(in.MACVersion),
+		SelectedMacVersion: ttnpb.MACVersion(in.MACVersion),
 		NetId:              types.NetID(in.SenderID),
 		DownlinkSettings:   dlSettings,
 		RxDelay:            in.RxDelay,
-		CFList:             cfList,
+		CfList:             cfList,
 	}
 	if err := req.ValidateFields(
 		"raw_payload",

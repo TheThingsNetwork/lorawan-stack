@@ -226,9 +226,9 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 	case "status_time_periodicity":
 		return v.StatusTimePeriodicity == nil
 	case "supports_32_bit_f_cnt":
-		return v.Supports32BitFCnt == nil
+		return v.Supports_32BitFCnt == nil
 	case "supports_32_bit_f_cnt.value":
-		return v.Supports32BitFCnt.FieldIsZero("value")
+		return v.Supports_32BitFCnt.FieldIsZero("value")
 	case "use_adr":
 		return v.UseAdr == nil
 	case "use_adr.value":
@@ -272,7 +272,7 @@ func (v *MACParameters) FieldIsZero(p string) bool {
 	case "max_duty_cycle":
 		return v.MaxDutyCycle == 0
 	case "max_eirp":
-		return v.MaxEIRP == 0
+		return v.MaxEirp == 0
 	case "ping_slot_data_rate_index":
 		return v.PingSlotDataRateIndex == 0
 	case "ping_slot_data_rate_index_value":
@@ -308,13 +308,13 @@ func (v *MACState_JoinRequest) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "cf_list":
-		return v.CFList == nil
+		return v.CfList == nil
 	case "cf_list.ch_masks":
-		return v.CFList.FieldIsZero("ch_masks")
+		return v.CfList.FieldIsZero("ch_masks")
 	case "cf_list.freq":
-		return v.CFList.FieldIsZero("freq")
+		return v.CfList.FieldIsZero("freq")
 	case "cf_list.type":
-		return v.CFList.FieldIsZero("type")
+		return v.CfList.FieldIsZero("type")
 	case "downlink_settings":
 		return v.DownlinkSettings == DLSettings{}
 	case "downlink_settings.opt_neg":
@@ -922,9 +922,9 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "last_join_nonce":
 		return v.LastJoinNonce == 0
 	case "last_rj_count_0":
-		return v.LastRJCount0 == 0
+		return v.LastRjCount_0 == 0
 	case "last_rj_count_1":
-		return v.LastRJCount1 == 0
+		return v.LastRjCount_1 == 0
 	case "locations":
 		return v.Locations == nil
 	case "lorawan_phy_version":
@@ -932,113 +932,113 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "lorawan_version":
 		return v.LorawanVersion == 0
 	case "mac_settings":
-		return v.MACSettings == nil
+		return v.MacSettings == nil
 	case "mac_settings.adr_margin":
-		return v.MACSettings.FieldIsZero("adr_margin")
+		return v.MacSettings.FieldIsZero("adr_margin")
 	case "mac_settings.beacon_frequency":
-		return v.MACSettings.FieldIsZero("beacon_frequency")
+		return v.MacSettings.FieldIsZero("beacon_frequency")
 	case "mac_settings.beacon_frequency.value":
-		return v.MACSettings.FieldIsZero("beacon_frequency.value")
+		return v.MacSettings.FieldIsZero("beacon_frequency.value")
 	case "mac_settings.class_b_timeout":
-		return v.MACSettings.FieldIsZero("class_b_timeout")
+		return v.MacSettings.FieldIsZero("class_b_timeout")
 	case "mac_settings.class_c_timeout":
-		return v.MACSettings.FieldIsZero("class_c_timeout")
+		return v.MacSettings.FieldIsZero("class_c_timeout")
 	case "mac_settings.desired_adr_ack_delay_exponent":
-		return v.MACSettings.FieldIsZero("desired_adr_ack_delay_exponent")
+		return v.MacSettings.FieldIsZero("desired_adr_ack_delay_exponent")
 	case "mac_settings.desired_adr_ack_delay_exponent.value":
-		return v.MACSettings.FieldIsZero("desired_adr_ack_delay_exponent.value")
+		return v.MacSettings.FieldIsZero("desired_adr_ack_delay_exponent.value")
 	case "mac_settings.desired_adr_ack_limit_exponent":
-		return v.MACSettings.FieldIsZero("desired_adr_ack_limit_exponent")
+		return v.MacSettings.FieldIsZero("desired_adr_ack_limit_exponent")
 	case "mac_settings.desired_adr_ack_limit_exponent.value":
-		return v.MACSettings.FieldIsZero("desired_adr_ack_limit_exponent.value")
+		return v.MacSettings.FieldIsZero("desired_adr_ack_limit_exponent.value")
 	case "mac_settings.desired_beacon_frequency":
-		return v.MACSettings.FieldIsZero("desired_beacon_frequency")
+		return v.MacSettings.FieldIsZero("desired_beacon_frequency")
 	case "mac_settings.desired_beacon_frequency.value":
-		return v.MACSettings.FieldIsZero("desired_beacon_frequency.value")
+		return v.MacSettings.FieldIsZero("desired_beacon_frequency.value")
 	case "mac_settings.desired_max_duty_cycle":
-		return v.MACSettings.FieldIsZero("desired_max_duty_cycle")
+		return v.MacSettings.FieldIsZero("desired_max_duty_cycle")
 	case "mac_settings.desired_max_duty_cycle.value":
-		return v.MACSettings.FieldIsZero("desired_max_duty_cycle.value")
+		return v.MacSettings.FieldIsZero("desired_max_duty_cycle.value")
 	case "mac_settings.desired_max_eirp":
-		return v.MACSettings.FieldIsZero("desired_max_eirp")
+		return v.MacSettings.FieldIsZero("desired_max_eirp")
 	case "mac_settings.desired_max_eirp.value":
-		return v.MACSettings.FieldIsZero("desired_max_eirp.value")
+		return v.MacSettings.FieldIsZero("desired_max_eirp.value")
 	case "mac_settings.desired_ping_slot_data_rate_index":
-		return v.MACSettings.FieldIsZero("desired_ping_slot_data_rate_index")
+		return v.MacSettings.FieldIsZero("desired_ping_slot_data_rate_index")
 	case "mac_settings.desired_ping_slot_data_rate_index.value":
-		return v.MACSettings.FieldIsZero("desired_ping_slot_data_rate_index.value")
+		return v.MacSettings.FieldIsZero("desired_ping_slot_data_rate_index.value")
 	case "mac_settings.desired_ping_slot_frequency":
-		return v.MACSettings.FieldIsZero("desired_ping_slot_frequency")
+		return v.MacSettings.FieldIsZero("desired_ping_slot_frequency")
 	case "mac_settings.desired_ping_slot_frequency.value":
-		return v.MACSettings.FieldIsZero("desired_ping_slot_frequency.value")
+		return v.MacSettings.FieldIsZero("desired_ping_slot_frequency.value")
 	case "mac_settings.desired_rx1_data_rate_offset":
-		return v.MACSettings.FieldIsZero("desired_rx1_data_rate_offset")
+		return v.MacSettings.FieldIsZero("desired_rx1_data_rate_offset")
 	case "mac_settings.desired_rx1_data_rate_offset.value":
-		return v.MACSettings.FieldIsZero("desired_rx1_data_rate_offset.value")
+		return v.MacSettings.FieldIsZero("desired_rx1_data_rate_offset.value")
 	case "mac_settings.desired_rx1_delay":
-		return v.MACSettings.FieldIsZero("desired_rx1_delay")
+		return v.MacSettings.FieldIsZero("desired_rx1_delay")
 	case "mac_settings.desired_rx1_delay.value":
-		return v.MACSettings.FieldIsZero("desired_rx1_delay.value")
+		return v.MacSettings.FieldIsZero("desired_rx1_delay.value")
 	case "mac_settings.desired_rx2_data_rate_index":
-		return v.MACSettings.FieldIsZero("desired_rx2_data_rate_index")
+		return v.MacSettings.FieldIsZero("desired_rx2_data_rate_index")
 	case "mac_settings.desired_rx2_data_rate_index.value":
-		return v.MACSettings.FieldIsZero("desired_rx2_data_rate_index.value")
+		return v.MacSettings.FieldIsZero("desired_rx2_data_rate_index.value")
 	case "mac_settings.desired_rx2_frequency":
-		return v.MACSettings.FieldIsZero("desired_rx2_frequency")
+		return v.MacSettings.FieldIsZero("desired_rx2_frequency")
 	case "mac_settings.desired_rx2_frequency.value":
-		return v.MACSettings.FieldIsZero("desired_rx2_frequency.value")
+		return v.MacSettings.FieldIsZero("desired_rx2_frequency.value")
 	case "mac_settings.factory_preset_frequencies":
-		return v.MACSettings.FieldIsZero("factory_preset_frequencies")
+		return v.MacSettings.FieldIsZero("factory_preset_frequencies")
 	case "mac_settings.max_duty_cycle":
-		return v.MACSettings.FieldIsZero("max_duty_cycle")
+		return v.MacSettings.FieldIsZero("max_duty_cycle")
 	case "mac_settings.max_duty_cycle.value":
-		return v.MACSettings.FieldIsZero("max_duty_cycle.value")
+		return v.MacSettings.FieldIsZero("max_duty_cycle.value")
 	case "mac_settings.ping_slot_data_rate_index":
-		return v.MACSettings.FieldIsZero("ping_slot_data_rate_index")
+		return v.MacSettings.FieldIsZero("ping_slot_data_rate_index")
 	case "mac_settings.ping_slot_data_rate_index.value":
-		return v.MACSettings.FieldIsZero("ping_slot_data_rate_index.value")
+		return v.MacSettings.FieldIsZero("ping_slot_data_rate_index.value")
 	case "mac_settings.ping_slot_frequency":
-		return v.MACSettings.FieldIsZero("ping_slot_frequency")
+		return v.MacSettings.FieldIsZero("ping_slot_frequency")
 	case "mac_settings.ping_slot_frequency.value":
-		return v.MACSettings.FieldIsZero("ping_slot_frequency.value")
+		return v.MacSettings.FieldIsZero("ping_slot_frequency.value")
 	case "mac_settings.ping_slot_periodicity":
-		return v.MACSettings.FieldIsZero("ping_slot_periodicity")
+		return v.MacSettings.FieldIsZero("ping_slot_periodicity")
 	case "mac_settings.ping_slot_periodicity.value":
-		return v.MACSettings.FieldIsZero("ping_slot_periodicity.value")
+		return v.MacSettings.FieldIsZero("ping_slot_periodicity.value")
 	case "mac_settings.resets_f_cnt":
-		return v.MACSettings.FieldIsZero("resets_f_cnt")
+		return v.MacSettings.FieldIsZero("resets_f_cnt")
 	case "mac_settings.resets_f_cnt.value":
-		return v.MACSettings.FieldIsZero("resets_f_cnt.value")
+		return v.MacSettings.FieldIsZero("resets_f_cnt.value")
 	case "mac_settings.rx1_data_rate_offset":
-		return v.MACSettings.FieldIsZero("rx1_data_rate_offset")
+		return v.MacSettings.FieldIsZero("rx1_data_rate_offset")
 	case "mac_settings.rx1_data_rate_offset.value":
-		return v.MACSettings.FieldIsZero("rx1_data_rate_offset.value")
+		return v.MacSettings.FieldIsZero("rx1_data_rate_offset.value")
 	case "mac_settings.rx1_delay":
-		return v.MACSettings.FieldIsZero("rx1_delay")
+		return v.MacSettings.FieldIsZero("rx1_delay")
 	case "mac_settings.rx1_delay.value":
-		return v.MACSettings.FieldIsZero("rx1_delay.value")
+		return v.MacSettings.FieldIsZero("rx1_delay.value")
 	case "mac_settings.rx2_data_rate_index":
-		return v.MACSettings.FieldIsZero("rx2_data_rate_index")
+		return v.MacSettings.FieldIsZero("rx2_data_rate_index")
 	case "mac_settings.rx2_data_rate_index.value":
-		return v.MACSettings.FieldIsZero("rx2_data_rate_index.value")
+		return v.MacSettings.FieldIsZero("rx2_data_rate_index.value")
 	case "mac_settings.rx2_frequency":
-		return v.MACSettings.FieldIsZero("rx2_frequency")
+		return v.MacSettings.FieldIsZero("rx2_frequency")
 	case "mac_settings.rx2_frequency.value":
-		return v.MACSettings.FieldIsZero("rx2_frequency.value")
+		return v.MacSettings.FieldIsZero("rx2_frequency.value")
 	case "mac_settings.status_count_periodicity":
-		return v.MACSettings.FieldIsZero("status_count_periodicity")
+		return v.MacSettings.FieldIsZero("status_count_periodicity")
 	case "mac_settings.status_time_periodicity":
-		return v.MACSettings.FieldIsZero("status_time_periodicity")
+		return v.MacSettings.FieldIsZero("status_time_periodicity")
 	case "mac_settings.supports_32_bit_f_cnt":
-		return v.MACSettings.FieldIsZero("supports_32_bit_f_cnt")
+		return v.MacSettings.FieldIsZero("supports_32_bit_f_cnt")
 	case "mac_settings.supports_32_bit_f_cnt.value":
-		return v.MACSettings.FieldIsZero("supports_32_bit_f_cnt.value")
+		return v.MacSettings.FieldIsZero("supports_32_bit_f_cnt.value")
 	case "mac_settings.use_adr":
-		return v.MACSettings.FieldIsZero("use_adr")
+		return v.MacSettings.FieldIsZero("use_adr")
 	case "mac_settings.use_adr.value":
-		return v.MACSettings.FieldIsZero("use_adr.value")
+		return v.MacSettings.FieldIsZero("use_adr.value")
 	case "mac_state":
-		return v.MACState == nil
+		return v.MacState == nil
 	case "max_frequency":
 		return v.MaxFrequency == 0
 	case "min_frequency":
@@ -1054,7 +1054,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "network_server_kek_label":
 		return v.NetworkServerKekLabel == ""
 	case "pending_mac_state":
-		return v.PendingMACState == nil
+		return v.PendingMacState == nil
 	case "pending_session":
 		return v.PendingSession == nil
 	case "pending_session.dev_addr":
@@ -1230,9 +1230,9 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	}
 	switch {
 	case strings.HasPrefix(p, "mac_state."):
-		return v.MACState.FieldIsZero(strings.TrimPrefix(p, "mac_state."))
+		return v.MacState.FieldIsZero(strings.TrimPrefix(p, "mac_state."))
 	case strings.HasPrefix(p, "pending_mac_state."):
-		return v.PendingMACState.FieldIsZero(strings.TrimPrefix(p, "pending_mac_state."))
+		return v.PendingMacState.FieldIsZero(strings.TrimPrefix(p, "pending_mac_state."))
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }

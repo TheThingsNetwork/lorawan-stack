@@ -72,7 +72,7 @@ message BoolValue {
 // This is used internally by the Network Server.
 message MACParameters {
   // Maximum EIRP (dBm).
-  float max_eirp = 1 [(gogoproto.customname) = "MaxEIRP"];
+  float max_eirp = 1;
   reserved 2; // Deprecated: uplink_dwell_time
   reserved 3; // Deprecated: downlink_dwell_time
   // ADR: data rate index to use.
@@ -159,7 +159,7 @@ message EndDeviceVersion {
   // Whether the device supports class C.
   bool supports_class_c = 7;
   // Default MAC layer settings of the device.
-  MACSettings default_mac_settings = 8 [(gogoproto.customname) = "DefaultMACSettings"];
+  MACSettings default_mac_settings = 8;
   // Minimum frequency the device is capable of using (Hz).
   uint64 min_frequency = 9;
   // Maximum frequency the device is capable of using (Hz).
@@ -215,7 +215,7 @@ message MACSettings {
 
   // Whether the device supports 32-bit frame counters.
   // If unset, the default value from Network Server configuration will be used.
-  BoolValue supports_32_bit_f_cnt = 12 [(gogoproto.customname) = "Supports32BitFCnt"];
+  BoolValue supports_32_bit_f_cnt = 12;
 
   // Whether the Network Server should use ADR for the device.
   // If unset, the default value from Network Server configuration will be used.
@@ -309,7 +309,7 @@ message MACState {
     reserved 1,2,3,4,5,9,10; // deprecated JoinRequest fields.
     DLSettings downlink_settings = 6 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
     RxDelay rx_delay = 7 [(validate.rules).enum.defined_only = true];
-    CFList cf_list = 8 [(gogoproto.customname) = "CFList"];
+    CFList cf_list = 8;
   }
   message JoinAccept {
     // Payload of the join-accept received from Join Server.
@@ -485,11 +485,11 @@ message EndDevice {
   // Home NetID. Stored in Join Server.
   bytes net_id = 23 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
   // Settings for how the Network Server handles MAC layer for this device. Stored in Network Server.
-  MACSettings mac_settings = 24 [(gogoproto.customname) = "MACSettings"];
+  MACSettings mac_settings = 24;
   // MAC state of the device. Stored in Network Server.
-  MACState mac_state = 25 [(gogoproto.customname) = "MACState"];
+  MACState mac_state = 25;
   // Pending MAC state of the device. Stored in Network Server.
-  MACState pending_mac_state = 44 [(gogoproto.customname) = "PendingMACState"];
+  MACState pending_mac_state = 44;
   // Current session of the device. Stored in Network Server and Application Server.
   Session session = 26;
   // Pending session. Stored in Network Server and Application Server until RekeyInd is received.
@@ -508,10 +508,10 @@ message EndDevice {
   uint32 last_join_nonce = 30;
   // Last Rejoin counter value used (type 0/2).
   // Stored in Join Server.
-  uint32 last_rj_count_0 = 31 [(gogoproto.customname) = "LastRJCount0"];
+  uint32 last_rj_count_0 = 31;
   // Last Rejoin counter value used (type 1).
   // Stored in Join Server.
-  uint32 last_rj_count_1 = 32 [(gogoproto.customname) = "LastRJCount1"];
+  uint32 last_rj_count_1 = 32;
 
   // Time when last DevStatus MAC command was received.
   // Stored in Network Server.

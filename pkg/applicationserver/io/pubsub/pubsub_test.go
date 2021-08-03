@@ -172,7 +172,7 @@ func TestPubSub(t *testing.T) {
 							SessionKeyId: []byte{0x11},
 							FPort:        42,
 							FCnt:         42,
-							FRMPayload:   []byte{0x1, 0x2, 0x3},
+							FrmPayload:   []byte{0x1, 0x2, 0x3},
 						},
 					},
 				},
@@ -199,7 +199,7 @@ func TestPubSub(t *testing.T) {
 							SessionKeyId: []byte{0x22},
 							FCnt:         42,
 							FPort:        42,
-							FRMPayload:   []byte{0x1, 0x2, 0x3},
+							FrmPayload:   []byte{0x1, 0x2, 0x3},
 						},
 					},
 				},
@@ -214,7 +214,7 @@ func TestPubSub(t *testing.T) {
 							SessionKeyId: []byte{0x22},
 							FCnt:         42,
 							FPort:        42,
-							FRMPayload:   []byte{0x1, 0x2, 0x3},
+							FrmPayload:   []byte{0x1, 0x2, 0x3},
 						},
 					},
 				},
@@ -229,7 +229,7 @@ func TestPubSub(t *testing.T) {
 							SessionKeyId: []byte{0x22},
 							FCnt:         42,
 							FPort:        42,
-							FRMPayload:   []byte{0x1, 0x2, 0x3},
+							FrmPayload:   []byte{0x1, 0x2, 0x3},
 						},
 					},
 				},
@@ -244,7 +244,7 @@ func TestPubSub(t *testing.T) {
 							SessionKeyId: []byte{0x22},
 							FCnt:         42,
 							FPort:        42,
-							FRMPayload:   []byte{0x1, 0x2, 0x3},
+							FrmPayload:   []byte{0x1, 0x2, 0x3},
 						},
 					},
 				},
@@ -261,7 +261,7 @@ func TestPubSub(t *testing.T) {
 									SessionKeyId: []byte{0x22},
 									FCnt:         42,
 									FPort:        42,
-									FRMPayload:   []byte{0x1, 0x2, 0x3},
+									FrmPayload:   []byte{0x1, 0x2, 0x3},
 								},
 							},
 							LastFCntDown: 42,
@@ -281,7 +281,7 @@ func TestPubSub(t *testing.T) {
 								SessionKeyId: []byte{0x22},
 								FCnt:         42,
 								FPort:        42,
-								FRMPayload:   []byte{0x1, 0x2, 0x3},
+								FrmPayload:   []byte{0x1, 0x2, 0x3},
 							},
 							Error: ttnpb.ErrorDetails{
 								Name: "test",
@@ -381,14 +381,14 @@ func TestPubSub(t *testing.T) {
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x1, 0x1, 0x1},
+							FrmPayload: []byte{0x1, 0x1, 0x1},
 						},
 					},
 				},
 				Expected: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      42,
-						FRMPayload: []byte{0x1, 0x1, 0x1},
+						FrmPayload: []byte{0x1, 0x1, 0x1},
 					},
 				},
 			},
@@ -400,14 +400,14 @@ func TestPubSub(t *testing.T) {
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x2, 0x2, 0x2},
+							FrmPayload: []byte{0x2, 0x2, 0x2},
 						},
 					},
 				},
 				Expected: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      42,
-						FRMPayload: []byte{0x2, 0x2, 0x2},
+						FrmPayload: []byte{0x2, 0x2, 0x2},
 					},
 				},
 			},
@@ -419,14 +419,14 @@ func TestPubSub(t *testing.T) {
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x3, 0x3, 0x3},
+							FrmPayload: []byte{0x3, 0x3, 0x3},
 						},
 					},
 				},
 				Expected: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      42,
-						FRMPayload: []byte{0x2, 0x2, 0x2}, // Do not expect a change.
+						FrmPayload: []byte{0x2, 0x2, 0x2}, // Do not expect a change.
 					},
 				},
 			},
@@ -438,14 +438,14 @@ func TestPubSub(t *testing.T) {
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x4, 0x4, 0x4},
+							FrmPayload: []byte{0x4, 0x4, 0x4},
 						},
 					},
 				},
 				Expected: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      42,
-						FRMPayload: []byte{0x2, 0x2, 0x2}, // Do not expect a change.
+						FrmPayload: []byte{0x2, 0x2, 0x2}, // Do not expect a change.
 					},
 				},
 			},

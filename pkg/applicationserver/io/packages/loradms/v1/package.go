@@ -95,7 +95,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 			Type:      objects.UplinkUplinkType,
 			FCnt:      uint32Ptr(msg.GetFCnt()),
 			Port:      uint8Ptr(uint8(msg.GetFPort())),
-			Payload:   hexPtr(objects.Hex(msg.FRMPayload)),
+			Payload:   hexPtr(objects.Hex(msg.FrmPayload)),
 			DR:        uint8Ptr(uint8(settings.DataRateIndex)),
 			Freq:      uint32Ptr(uint32(settings.Frequency)),
 			Timestamp: float64Ptr(float64(msg.ReceivedAt.UTC().Unix())),
@@ -179,7 +179,7 @@ func (p *DeviceManagementPackage) sendDownlink(ctx context.Context, ids ttnpb.En
 	}
 	return p.server.DownlinkQueuePush(ctx, ids, []*ttnpb.ApplicationDownlink{{
 		FPort:      uint32(downlink.Port),
-		FRMPayload: []byte(downlink.Payload),
+		FrmPayload: []byte(downlink.Payload),
 	}})
 }
 

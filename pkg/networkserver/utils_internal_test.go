@@ -49,8 +49,8 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			MHDR: ttnpb.MHDR{
 				MType: ttnpb.MType_UNCONFIRMED_UP,
 			},
-			Payload: &ttnpb.Message_MACPayload{
-				MACPayload: &ttnpb.MACPayload{},
+			Payload: &ttnpb.Message_MacPayload{
+				MacPayload: &ttnpb.MACPayload{},
 			},
 		},
 		RxMetadata: DefaultRxMetadata[:],
@@ -88,7 +88,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class A/MAC diff/RX1,RX2 available",
 			EarliestAt: beforeRX1,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -108,7 +108,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class A/RX1,RX2 available/application downlink",
 			EarliestAt: beforeRX1,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -134,7 +134,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class A/RX1,RX2 available/class BC application downlink",
 			EarliestAt: beforeRX1,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -146,7 +146,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RxWindowsAvailable: true,
 					RecentUplinks:      ups,
 				},
-				MACSettings: &ttnpb.MACSettings{
+				MacSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity:  DurationPtr(0),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 				},
@@ -164,7 +164,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class A/MAC diff/RX2 available",
 			EarliestAt: rx2,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -184,7 +184,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class A/MAC diff/RX windows closed",
 			EarliestAt: afterRX2,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -201,7 +201,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class B/MAC diff/RX1,RX2 available",
 			EarliestAt: rx1,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -224,7 +224,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class B/MAC diff/RX windows closed/no application downlink",
 			EarliestAt: rx1,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -242,7 +242,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 		},
 		func() TestCase {
 			dev := &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -275,7 +275,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class C/RX1,RX2 available",
 			EarliestAt: beforeRX1,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -295,7 +295,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class C/RX windows closed",
 			EarliestAt: beforeRX1,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -312,7 +312,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class C/RX windows closed/application downlink",
 			EarliestAt: rx1,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -337,7 +337,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class C/no uplink/no application downlink",
 			EarliestAt: rx1,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -353,7 +353,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class C/no uplink/application downlink",
 			EarliestAt: rx1,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -386,7 +386,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class C/no uplink/absolute-time application downlink",
 			EarliestAt: absTime,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -422,7 +422,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class C/no uplink/expired absolute-time application downlink",
 			EarliestAt: absTime.Add(time.Nanosecond),
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -452,7 +452,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name:       "unicast/class C/no uplink/absolute-time application downlink/no paths",
 			EarliestAt: absTime,
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -476,7 +476,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: absTime,
 			Device: &ttnpb.EndDevice{
 				Multicast: true,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
@@ -499,7 +499,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Name: "multicast/class C/no uplink/application downlink with forced gateways",
 			Device: &ttnpb.EndDevice{
 				Multicast: true,
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},

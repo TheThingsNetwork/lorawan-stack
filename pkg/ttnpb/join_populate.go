@@ -28,12 +28,12 @@ func NewPopulatedJoinRequest(r randyJoin, easy bool) *JoinRequest {
 	}()
 
 	out := &JoinRequest{}
-	out.SelectedMACVersion = MACVersion(r.Intn(5))
+	out.SelectedMacVersion = MACVersion(r.Intn(5))
 	out.NetId = *types.NewPopulatedNetID(r)
 	out.DownlinkSettings = *NewPopulatedDLSettings(r, easy)
 	out.RxDelay = RxDelay(r.Uint32() % 16)
 	if r.Intn(10) != 0 {
-		out.CFList = NewPopulatedCFList(r, false)
+		out.CfList = NewPopulatedCFList(r, false)
 	}
 
 	msg := NewPopulatedMessageJoinRequest(r)

@@ -54,19 +54,19 @@ type linkADRReqParameters struct {
 }
 
 func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band) (linkADRReqParameters, bool, error) {
-	if dev.GetMulticast() || dev.GetMACState() == nil {
+	if dev.GetMulticast() || dev.GetMacState() == nil {
 		return linkADRReqParameters{}, false, nil
 	}
-	if len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) {
+	if len(dev.MacState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) {
 		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
 	}
 
 	currentChs := make([]bool, phy.MaxUplinkChannels)
-	for i, ch := range dev.MACState.CurrentParameters.Channels {
+	for i, ch := range dev.MacState.CurrentParameters.Channels {
 		currentChs[i] = ch.GetEnableUplink()
 	}
 	desiredChs := make([]bool, phy.MaxUplinkChannels)
-	for i, ch := range dev.MACState.DesiredParameters.Channels {
+	for i, ch := range dev.MacState.DesiredParameters.Channels {
 		isEnabled := ch.GetEnableUplink()
 		if isEnabled && ch.UplinkFrequency == 0 {
 			return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
@@ -80,9 +80,9 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 	switch {
 	case !band.EqualChMasks(currentChs, desiredChs):
 		// NOTE: LinkADRReq is scheduled regardless of ADR settings if channel mask is required, which often is the case with ABP devices or when ChMask CFList is not supported/used.
-	case dev.MACState.DesiredParameters.AdrNbTrans != dev.MACState.CurrentParameters.AdrNbTrans,
-		dev.MACState.DesiredParameters.AdrDataRateIndex != dev.MACState.CurrentParameters.AdrDataRateIndex,
-		dev.MACState.DesiredParameters.AdrTxPowerIndex != dev.MACState.CurrentParameters.AdrTxPowerIndex:
+	case dev.MacState.DesiredParameters.AdrNbTrans != dev.MacState.CurrentParameters.AdrNbTrans,
+		dev.MacState.DesiredParameters.AdrDataRateIndex != dev.MacState.CurrentParameters.AdrDataRateIndex,
+		dev.MacState.DesiredParameters.AdrTxPowerIndex != dev.MacState.CurrentParameters.AdrTxPowerIndex:
 	default:
 		return linkADRReqParameters{}, false, nil
 	}
@@ -100,29 +100,29 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		txPowerIdx uint32
 		nbTrans    uint32
 	)
-	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MACState.DesiredParameters.Channels...)
+	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MacState.DesiredParameters.Channels...)
 	if !ok ||
-		dev.MACState.DesiredParameters.AdrTxPowerIndex > uint32(phy.MaxTxPowerIndex()) ||
-		dev.MACState.DesiredParameters.AdrDataRateIndex > phy.MaxADRDataRateIndex {
+		dev.MacState.DesiredParameters.AdrTxPowerIndex > uint32(phy.MaxTxPowerIndex()) ||
+		dev.MacState.DesiredParameters.AdrDataRateIndex > phy.MaxADRDataRateIndex {
 		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
 	}
-	if dev.MACState.DesiredParameters.AdrDataRateIndex < minDataRateIndex || dev.MACState.DesiredParameters.AdrDataRateIndex > maxDataRateIndex {
+	if dev.MacState.DesiredParameters.AdrDataRateIndex < minDataRateIndex || dev.MacState.DesiredParameters.AdrDataRateIndex > maxDataRateIndex {
 		return linkADRReqParameters{}, false, ErrCorruptedMACState.New()
 	}
 
-	drIdx = dev.MACState.DesiredParameters.AdrDataRateIndex
-	txPowerIdx = dev.MACState.DesiredParameters.AdrTxPowerIndex
-	nbTrans = dev.MACState.DesiredParameters.AdrNbTrans
+	drIdx = dev.MacState.DesiredParameters.AdrDataRateIndex
+	txPowerIdx = dev.MacState.DesiredParameters.AdrTxPowerIndex
+	nbTrans = dev.MacState.DesiredParameters.AdrNbTrans
 	switch {
 	case !deviceRejectedADRDataRateIndex(dev, drIdx) && !deviceRejectedADRTXPowerIndex(dev, txPowerIdx):
 		// Only send the desired DataRateIndex and TXPowerIndex if neither of them were rejected.
 
-	case len(desiredMasks) == 0 && dev.MACState.DesiredParameters.AdrNbTrans == dev.MACState.CurrentParameters.AdrNbTrans:
+	case len(desiredMasks) == 0 && dev.MacState.DesiredParameters.AdrNbTrans == dev.MacState.CurrentParameters.AdrNbTrans:
 		log.FromContext(ctx).Debug("Either desired data rate index or TX power output index have been rejected and there are no channel mask and NbTrans changes desired, avoid enqueueing LinkADRReq")
 		return linkADRReqParameters{}, false, nil
 
-	case dev.MACState.LorawanVersion.HasNoChangeDataRateIndex() && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) &&
-		dev.MACState.LorawanVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex):
+	case dev.MacState.LorawanVersion.HasNoChangeDataRateIndex() && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) &&
+		dev.MacState.LorawanVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex):
 		drIdx = noChangeDataRateIndex
 		txPowerIdx = noChangeTXPowerIndex
 
@@ -132,8 +132,8 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 			// desired ADR adjustments step-by-step until possibly fitting index pair is found.
 			if drIdx == minDataRateIndex && (deviceRejectedADRDataRateIndex(dev, drIdx) || txPowerIdx == 0) {
 				log.FromContext(ctx).WithFields(log.Fields(
-					"current_adr_nb_trans", dev.MACState.CurrentParameters.AdrNbTrans,
-					"desired_adr_nb_trans", dev.MACState.DesiredParameters.AdrNbTrans,
+					"current_adr_nb_trans", dev.MacState.CurrentParameters.AdrNbTrans,
+					"desired_adr_nb_trans", dev.MacState.DesiredParameters.AdrNbTrans,
 					"desired_mask_count", len(desiredMasks),
 				)).Warn("Device rejected either all available data rate indexes or all available TX power output indexes and there are channel mask or NbTrans changes desired, avoid enqueueing LinkADRReq")
 				return linkADRReqParameters{}, false, nil
@@ -150,10 +150,10 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 			}
 		}
 	}
-	if drIdx == dev.MACState.CurrentParameters.AdrDataRateIndex && dev.MACState.LorawanVersion.HasNoChangeDataRateIndex() && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) {
+	if drIdx == dev.MacState.CurrentParameters.AdrDataRateIndex && dev.MacState.LorawanVersion.HasNoChangeDataRateIndex() && !deviceRejectedADRDataRateIndex(dev, noChangeDataRateIndex) {
 		drIdx = noChangeDataRateIndex
 	}
-	if txPowerIdx == dev.MACState.CurrentParameters.AdrTxPowerIndex && dev.MACState.LorawanVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex) {
+	if txPowerIdx == dev.MacState.CurrentParameters.AdrTxPowerIndex && dev.MacState.LorawanVersion.HasNoChangeTXPowerIndex() && !deviceRejectedADRTXPowerIndex(dev, noChangeTXPowerIndex) {
 		txPowerIdx = noChangeTXPowerIndex
 	}
 	return linkADRReqParameters{
@@ -186,13 +186,13 @@ func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 	}
 
 	var st EnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if int(nDown) < len(params.Masks) {
 			return nil, 0, nil, false
 		}
 
 		uplinksNeeded := uint16(1)
-		if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			uplinksNeeded = uint16(len(params.Masks))
 		}
 		if nUp < uplinksNeeded {
@@ -219,7 +219,7 @@ func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 			)).Debug("Enqueued LinkADRReq")
 		}
 		return cmds, uplinksNeeded, evs, true
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	return st, nil
 }
 
@@ -227,7 +227,7 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	if pld == nil {
 		return nil, ErrNoPayload.New()
 	}
-	if (dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) < 0 || dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0) && dupCount != 0 {
+	if (dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) < 0 || dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0) && dupCount != 0 {
 		return nil, ErrInvalidPayload.New()
 	}
 
@@ -248,13 +248,13 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 
 	handler := handleMACResponseBlock
-	if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
+	if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
 		handler = handleMACResponse
 	}
 	var n uint
 	var req *ttnpb.MACCommand_LinkADRReq
-	dev.MACState.PendingRequests, err = handler(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
-		if dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MACState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && n > dupCount+1 {
+	dev.MacState.PendingRequests, err = handler(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && n > dupCount+1 {
 			return ErrInvalidPayload.New()
 		}
 		n++
@@ -275,48 +275,48 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			return err
 		}
 		for i, masked := range m {
-			if int(i) >= len(dev.MACState.CurrentParameters.Channels) || dev.MACState.CurrentParameters.Channels[i] == nil {
+			if int(i) >= len(dev.MacState.CurrentParameters.Channels) || dev.MacState.CurrentParameters.Channels[i] == nil {
 				if !masked {
 					continue
 				}
 				return ErrCorruptedMACState.WithCause(ErrUnknownChannel)
 			}
-			dev.MACState.CurrentParameters.Channels[i].EnableUplink = masked
+			dev.MacState.CurrentParameters.Channels[i].EnableUplink = masked
 		}
 		return nil
-	}, dev.MACState.PendingRequests...)
+	}, dev.MacState.PendingRequests...)
 	if err != nil || req == nil {
 		return evs, err
 	}
 
 	if !pld.DataRateIndexAck {
-		if i := searchDataRateIndex(req.DataRateIndex, dev.MACState.RejectedAdrDataRateIndexes...); i == len(dev.MACState.RejectedAdrDataRateIndexes) || dev.MACState.RejectedAdrDataRateIndexes[i] != req.DataRateIndex {
-			dev.MACState.RejectedAdrDataRateIndexes = append(dev.MACState.RejectedAdrDataRateIndexes, ttnpb.DATA_RATE_0)
-			copy(dev.MACState.RejectedAdrDataRateIndexes[i+1:], dev.MACState.RejectedAdrDataRateIndexes[i:])
-			dev.MACState.RejectedAdrDataRateIndexes[i] = req.DataRateIndex
+		if i := searchDataRateIndex(req.DataRateIndex, dev.MacState.RejectedAdrDataRateIndexes...); i == len(dev.MacState.RejectedAdrDataRateIndexes) || dev.MacState.RejectedAdrDataRateIndexes[i] != req.DataRateIndex {
+			dev.MacState.RejectedAdrDataRateIndexes = append(dev.MacState.RejectedAdrDataRateIndexes, ttnpb.DATA_RATE_0)
+			copy(dev.MacState.RejectedAdrDataRateIndexes[i+1:], dev.MacState.RejectedAdrDataRateIndexes[i:])
+			dev.MacState.RejectedAdrDataRateIndexes[i] = req.DataRateIndex
 		}
 	}
 	if !pld.TxPowerIndexAck {
-		if i := searchUint32(req.TxPowerIndex, dev.MACState.RejectedAdrTxPowerIndexes...); i == len(dev.MACState.RejectedAdrTxPowerIndexes) || dev.MACState.RejectedAdrTxPowerIndexes[i] != req.TxPowerIndex {
-			dev.MACState.RejectedAdrTxPowerIndexes = append(dev.MACState.RejectedAdrTxPowerIndexes, 0)
-			copy(dev.MACState.RejectedAdrTxPowerIndexes[i+1:], dev.MACState.RejectedAdrTxPowerIndexes[i:])
-			dev.MACState.RejectedAdrTxPowerIndexes[i] = req.TxPowerIndex
+		if i := searchUint32(req.TxPowerIndex, dev.MacState.RejectedAdrTxPowerIndexes...); i == len(dev.MacState.RejectedAdrTxPowerIndexes) || dev.MacState.RejectedAdrTxPowerIndexes[i] != req.TxPowerIndex {
+			dev.MacState.RejectedAdrTxPowerIndexes = append(dev.MacState.RejectedAdrTxPowerIndexes, 0)
+			copy(dev.MacState.RejectedAdrTxPowerIndexes[i+1:], dev.MacState.RejectedAdrTxPowerIndexes[i:])
+			dev.MacState.RejectedAdrTxPowerIndexes[i] = req.TxPowerIndex
 		}
 	}
 	if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
 		return evs, nil
 	}
-	if !dev.MACState.LorawanVersion.HasNoChangeDataRateIndex() || req.DataRateIndex != noChangeDataRateIndex {
-		dev.MACState.CurrentParameters.AdrDataRateIndex = req.DataRateIndex
-		dev.MACState.LastAdrChangeFCntUp = fCntUp
+	if !dev.MacState.LorawanVersion.HasNoChangeDataRateIndex() || req.DataRateIndex != noChangeDataRateIndex {
+		dev.MacState.CurrentParameters.AdrDataRateIndex = req.DataRateIndex
+		dev.MacState.LastAdrChangeFCntUp = fCntUp
 	}
-	if !dev.MACState.LorawanVersion.HasNoChangeTXPowerIndex() || req.TxPowerIndex != noChangeTXPowerIndex {
-		dev.MACState.CurrentParameters.AdrTxPowerIndex = req.TxPowerIndex
-		dev.MACState.LastAdrChangeFCntUp = fCntUp
+	if !dev.MacState.LorawanVersion.HasNoChangeTXPowerIndex() || req.TxPowerIndex != noChangeTXPowerIndex {
+		dev.MacState.CurrentParameters.AdrTxPowerIndex = req.TxPowerIndex
+		dev.MacState.LastAdrChangeFCntUp = fCntUp
 	}
-	if req.NbTrans > 0 && dev.MACState.CurrentParameters.AdrNbTrans != req.NbTrans {
-		dev.MACState.CurrentParameters.AdrNbTrans = req.NbTrans
-		dev.MACState.LastAdrChangeFCntUp = fCntUp
+	if req.NbTrans > 0 && dev.MacState.CurrentParameters.AdrNbTrans != req.NbTrans {
+		dev.MacState.CurrentParameters.AdrNbTrans = req.NbTrans
+		dev.MacState.LastAdrChangeFCntUp = fCntUp
 	}
 	return evs, nil
 }

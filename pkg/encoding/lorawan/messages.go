@@ -140,10 +140,10 @@ func AppendMACPayload(dst []byte, msg ttnpb.MACPayload, isUplink bool) ([]byte, 
 	if msg.FPort > math.MaxUint8 {
 		return nil, errExpectedLowerOrEqual("FPort", math.MaxUint8)(msg.FPort)
 	}
-	if len(msg.FRMPayload) > 0 || msg.FPort != 0 {
+	if len(msg.FrmPayload) > 0 || msg.FPort != 0 {
 		dst = append(dst, byte(msg.FPort))
 	}
-	dst = append(dst, msg.FRMPayload...)
+	dst = append(dst, msg.FrmPayload...)
 	return dst, nil
 }
 
@@ -173,8 +173,8 @@ func UnmarshalMACPayload(b []byte, msg *ttnpb.MACPayload, isUplink bool) error {
 
 		frmPayloadIdx := fPortIdx + 1
 		if n > frmPayloadIdx {
-			msg.FRMPayload = make([]byte, 0, n-frmPayloadIdx)
-			msg.FRMPayload = append(msg.FRMPayload, b[frmPayloadIdx:]...)
+			msg.FrmPayload = make([]byte, 0, n-frmPayloadIdx)
+			msg.FrmPayload = append(msg.FrmPayload, b[frmPayloadIdx:]...)
 		}
 	}
 	return nil
@@ -182,14 +182,14 @@ func UnmarshalMACPayload(b []byte, msg *ttnpb.MACPayload, isUplink bool) error {
 
 // AppendDLSettings appends encoded msg to dst.
 func AppendDLSettings(dst []byte, msg ttnpb.DLSettings) ([]byte, error) {
-	if msg.Rx1DROffset > 7 {
-		return nil, errExpectedLowerOrEqual("Rx1DROffset", 7)(msg.Rx1DROffset)
+	if msg.Rx1DrOffset > 7 {
+		return nil, errExpectedLowerOrEqual("Rx1DROffset", 7)(msg.Rx1DrOffset)
 	}
-	if msg.Rx2DR > 15 {
-		return nil, errExpectedLowerOrEqual("Rx2DR", 15)(msg.Rx2DR)
+	if msg.Rx2Dr > 15 {
+		return nil, errExpectedLowerOrEqual("Rx2DR", 15)(msg.Rx2Dr)
 	}
-	b := byte(msg.Rx2DR)
-	b |= byte(msg.Rx1DROffset << 4)
+	b := byte(msg.Rx2Dr)
+	b |= byte(msg.Rx1DrOffset << 4)
 	if msg.OptNeg {
 		b |= (1 << 7)
 	}
@@ -208,8 +208,8 @@ func UnmarshalDLSettings(b []byte, msg *ttnpb.DLSettings) error {
 	}
 	v := uint32(b[0])
 	msg.OptNeg = (v >> 7) != 0
-	msg.Rx1DROffset = ttnpb.DataRateOffset((v >> 4) & 0x7)
-	msg.Rx2DR = ttnpb.DataRateIndex(v & 0xf)
+	msg.Rx1DrOffset = ttnpb.DataRateOffset((v >> 4) & 0x7)
+	msg.Rx2Dr = ttnpb.DataRateIndex(v & 0xf)
 	return nil
 }
 
@@ -308,8 +308,8 @@ func AppendJoinAcceptPayload(dst []byte, msg ttnpb.JoinAcceptPayload) ([]byte, e
 		return nil, errExpectedLowerOrEqual("RxDelay", math.MaxUint8)(msg.RxDelay)
 	}
 	dst = append(dst, byte(msg.RxDelay))
-	if msg.GetCFList() != nil {
-		dst, err = AppendCFList(dst, *msg.CFList)
+	if msg.GetCfList() != nil {
+		dst, err = AppendCFList(dst, *msg.CfList)
 		if err != nil {
 			return nil, errFailedEncoding("CFList").WithCause(err)
 		}
@@ -319,7 +319,7 @@ func AppendJoinAcceptPayload(dst []byte, msg ttnpb.JoinAcceptPayload) ([]byte, e
 
 // MarshalJoinAcceptPayload returns encoded msg.
 func MarshalJoinAcceptPayload(msg ttnpb.JoinAcceptPayload) ([]byte, error) {
-	if msg.GetCFList() != nil {
+	if msg.GetCfList() != nil {
 		return AppendJoinAcceptPayload(make([]byte, 0, 28), msg)
 	}
 	return AppendJoinAcceptPayload(make([]byte, 0, 12), msg)
@@ -342,8 +342,8 @@ func UnmarshalJoinAcceptPayload(b []byte, msg *ttnpb.JoinAcceptPayload) error {
 	if n == 12 {
 		return nil
 	}
-	msg.CFList = &ttnpb.CFList{}
-	if err := UnmarshalCFList(b[12:], msg.CFList); err != nil {
+	msg.CfList = &ttnpb.CFList{}
+	if err := UnmarshalCFList(b[12:], msg.CfList); err != nil {
 		return errFailedDecoding("CFList").WithCause(err)
 	}
 	return nil
@@ -437,7 +437,7 @@ func AppendMessage(dst []byte, msg ttnpb.Message) ([]byte, error) {
 	}
 	switch msg.MType {
 	case ttnpb.MType_CONFIRMED_DOWN, ttnpb.MType_UNCONFIRMED_DOWN:
-		pld := msg.GetMACPayload()
+		pld := msg.GetMacPayload()
 		if pld == nil {
 			return nil, errMissing("MACPayload")
 		}
@@ -446,7 +446,7 @@ func AppendMessage(dst []byte, msg ttnpb.Message) ([]byte, error) {
 			return nil, errFailedEncoding("downlink MACPayload").WithCause(err)
 		}
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-		pld := msg.GetMACPayload()
+		pld := msg.GetMacPayload()
 		if pld == nil {
 			return nil, errMissing("MACPayload")
 		}
@@ -485,7 +485,7 @@ func AppendMessage(dst []byte, msg ttnpb.Message) ([]byte, error) {
 	default:
 		return nil, errUnknown("MType")(msg.MType.String())
 	}
-	dst = append(dst, msg.MIC...)
+	dst = append(dst, msg.Mic...)
 	return dst, nil
 }
 
@@ -527,8 +527,8 @@ func UnmarshalMessage(b []byte, msg *ttnpb.Message) error {
 		if err := UnmarshalMACPayload(b[1:n-4], pld, false); err != nil {
 			return errFailedDecoding("MACPayload").WithCause(err)
 		}
-		msg.Payload = &ttnpb.Message_MACPayload{MACPayload: pld}
-		msg.MIC = b[n-4:]
+		msg.Payload = &ttnpb.Message_MacPayload{MacPayload: pld}
+		msg.Mic = b[n-4:]
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		if n < 12 {
 			return errExpectedLengthHigherOrEqual("FHDR", 7)(n - 5)
@@ -537,8 +537,8 @@ func UnmarshalMessage(b []byte, msg *ttnpb.Message) error {
 		if err := UnmarshalMACPayload(b[1:n-4], pld, true); err != nil {
 			return errFailedDecoding("MACPayload").WithCause(err)
 		}
-		msg.Payload = &ttnpb.Message_MACPayload{MACPayload: pld}
-		msg.MIC = b[n-4:]
+		msg.Payload = &ttnpb.Message_MacPayload{MacPayload: pld}
+		msg.Mic = b[n-4:]
 	case ttnpb.MType_JOIN_REQUEST:
 		if n != 23 {
 			return errExpectedLengthEqual("JoinRequestPHYPayload", 23)(n)
@@ -548,7 +548,7 @@ func UnmarshalMessage(b []byte, msg *ttnpb.Message) error {
 			return errFailedDecoding("JoinRequestPayload").WithCause(err)
 		}
 		msg.Payload = &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: pld}
-		msg.MIC = b[19:]
+		msg.Mic = b[19:]
 	case ttnpb.MType_REJOIN_REQUEST:
 		if n < 2 {
 			return errExpectedLengthTwoChoices("RejoinRequestPHYPayload", 19, 24)(n)
@@ -569,7 +569,7 @@ func UnmarshalMessage(b []byte, msg *ttnpb.Message) error {
 			return errFailedDecoding("RejoinRequestPayload").WithCause(err)
 		}
 		msg.Payload = &ttnpb.Message_RejoinRequestPayload{RejoinRequestPayload: pld}
-		msg.MIC = b[micIdx:]
+		msg.Mic = b[micIdx:]
 	case ttnpb.MType_JOIN_ACCEPT:
 		if n != 17 && n != 33 {
 			return errExpectedLengthTwoChoices("JoinAcceptPHYPayload", 17, 33)(n)

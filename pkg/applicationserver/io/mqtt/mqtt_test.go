@@ -192,7 +192,7 @@ func TestTraffic(t *testing.T) {
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
-						UplinkMessage: &ttnpb.ApplicationUplink{FRMPayload: []byte{0x1, 0x1, 0x1}},
+						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x1, 0x1, 0x1}},
 					},
 				},
 				OK: true,
@@ -202,7 +202,7 @@ func TestTraffic(t *testing.T) {
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
-						UplinkMessage: &ttnpb.ApplicationUplink{FRMPayload: []byte{0x2, 0x2, 0x2}},
+						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x2, 0x2, 0x2}},
 					},
 				},
 				OK: true,
@@ -222,7 +222,7 @@ func TestTraffic(t *testing.T) {
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
-						UplinkMessage: &ttnpb.ApplicationUplink{FRMPayload: []byte{0x3, 0x3, 0x3}},
+						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x3, 0x3, 0x3}},
 					},
 				},
 				OK: false, // Invalid topic
@@ -232,7 +232,7 @@ func TestTraffic(t *testing.T) {
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
-						UplinkMessage: &ttnpb.ApplicationUplink{FRMPayload: []byte{0x4, 0x4, 0x4}},
+						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x4, 0x4, 0x4}},
 					},
 				},
 				OK: false, // Invalid application ID
@@ -299,14 +299,14 @@ func TestTraffic(t *testing.T) {
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x1, 0x1, 0x1},
+							FrmPayload: []byte{0x1, 0x1, 0x1},
 						},
 					},
 				},
 				Expected: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      42,
-						FRMPayload: []byte{0x1, 0x1, 0x1},
+						FrmPayload: []byte{0x1, 0x1, 0x1},
 					},
 				},
 			},
@@ -317,14 +317,14 @@ func TestTraffic(t *testing.T) {
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x2, 0x2, 0x2},
+							FrmPayload: []byte{0x2, 0x2, 0x2},
 						},
 					},
 				},
 				Expected: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      42,
-						FRMPayload: []byte{0x2, 0x2, 0x2},
+						FrmPayload: []byte{0x2, 0x2, 0x2},
 					},
 				},
 			},
@@ -335,14 +335,14 @@ func TestTraffic(t *testing.T) {
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x3, 0x3, 0x3},
+							FrmPayload: []byte{0x3, 0x3, 0x3},
 						},
 					},
 				},
 				Expected: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      42,
-						FRMPayload: []byte{0x2, 0x2, 0x2}, // Do not expect a change.
+						FrmPayload: []byte{0x2, 0x2, 0x2}, // Do not expect a change.
 					},
 				},
 			},
@@ -353,14 +353,14 @@ func TestTraffic(t *testing.T) {
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
-							FRMPayload: []byte{0x4, 0x4, 0x4},
+							FrmPayload: []byte{0x4, 0x4, 0x4},
 						},
 					},
 				},
 				Expected: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      42,
-						FRMPayload: []byte{0x2, 0x2, 0x2}, // Do not expect a change.
+						FrmPayload: []byte{0x2, 0x2, 0x2}, // Do not expect a change.
 					},
 				},
 			},

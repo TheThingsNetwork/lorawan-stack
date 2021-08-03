@@ -165,7 +165,7 @@ var (
 							}
 							p := tx.TxPipeline()
 							if dev.Session != nil && dev.Session.DevAddr.Equal(devAddr) {
-								if dev.MACState == nil {
+								if dev.MacState == nil {
 									logger.Error("Device is missing MAC state, skip migrating current session")
 								} else {
 									b, err := nsredis.MarshalDeviceCurrentSession(dev)
@@ -180,7 +180,7 @@ var (
 								}
 							}
 							if dev.PendingSession != nil && dev.PendingSession.DevAddr.Equal(devAddr) {
-								if dev.PendingMACState == nil {
+								if dev.PendingMacState == nil {
 									logger.Error("Device is missing MAC state, skip migrating pending session")
 								} else {
 									b, err := nsredis.MarshalDevicePendingSession(dev)
@@ -222,7 +222,7 @@ var (
 								logger.WithError(err).Error("Failed to get device proto")
 								return err
 							}
-							if dev.Session == nil || dev.MACState == nil {
+							if dev.Session == nil || dev.MacState == nil {
 								logger.Error("Device is missing session or MAC state, skip")
 								return nil
 							}
@@ -279,7 +279,7 @@ var (
 								logger.WithError(err).Error("Failed to get device proto")
 								return false, err
 							}
-							if dev.PendingSession == nil || dev.PendingMACState == nil {
+							if dev.PendingSession == nil || dev.PendingMacState == nil {
 								logger.Error("Device is missing pending session or MAC state, skip")
 								return true, nil
 							}

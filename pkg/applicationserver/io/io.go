@@ -162,7 +162,7 @@ func CleanDownlinks(items []*ttnpb.ApplicationDownlink) []*ttnpb.ApplicationDown
 			SessionKeyId:   item.SessionKeyId, // SessionKeyID must be set when skipping application payload crypto.
 			FPort:          item.FPort,
 			FCnt:           item.FCnt, // FCnt must be set when skipping application payload crypto.
-			FRMPayload:     item.FRMPayload,
+			FrmPayload:     item.FrmPayload,
 			DecodedPayload: item.DecodedPayload,
 			ClassBC:        item.ClassBC,
 			Priority:       item.Priority,

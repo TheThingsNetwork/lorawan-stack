@@ -308,7 +308,7 @@ func TestNewChannelReq(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				makeDevice := func() *ttnpb.EndDevice {
 					return CopyEndDevice(&ttnpb.EndDevice{
-						MACState: &ttnpb.MACState{
+						MacState: &ttnpb.MACState{
 							CurrentParameters: ttnpb.MACParameters{
 								Channels: tc.CurrentChannels,
 							},
@@ -326,8 +326,8 @@ func TestNewChannelReq(t *testing.T) {
 					Parallel: true,
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						dev := makeDevice()
-						max := len(dev.MACState.CurrentParameters.Channels)
-						if n := len(dev.MACState.DesiredParameters.Channels); n > max {
+						max := len(dev.MacState.CurrentParameters.Channels)
+						if n := len(dev.MacState.DesiredParameters.Channels); n > max {
 							max = n
 						}
 						needs := make(map[int]struct{}, max)
@@ -383,7 +383,7 @@ func TestNewChannelReq(t *testing.T) {
 							expectedDevice := makeDevice()
 							var expectedEventBuilders []events.Builder
 							for _, cmd := range cmds {
-								expectedDevice.MACState.PendingRequests = append(expectedDevice.MACState.PendingRequests, cmd.MACCommand())
+								expectedDevice.MacState.PendingRequests = append(expectedDevice.MacState.PendingRequests, cmd.MACCommand())
 								expectedEventBuilders = append(expectedEventBuilders, EvtEnqueueNewChannelRequest.BindData(cmd))
 							}
 							a.So(st.QueuedEvents, should.ResembleEventBuilders, events.Builders(expectedEventBuilders))
@@ -412,10 +412,10 @@ func TestHandleNewChannelAns(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Payload: nil,
 			Error:   ErrNoPayload,
@@ -423,10 +423,10 @@ func TestHandleNewChannelAns(t *testing.T) {
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{},
 			},
 			Payload: &ttnpb.MACCommand_NewChannelAns{
 				FrequencyAck: true,
@@ -443,7 +443,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 		{
 			Name: "frequency nack/data rate ack/no rejections",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_NewChannelReq{
 							ChannelIndex:     4,
@@ -455,7 +455,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests:     []*ttnpb.MACCommand{},
 					RejectedFrequencies: []uint64{42},
 				},
@@ -472,7 +472,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 		{
 			Name: "frequency nack/data rate nack/rejected frequencies:(1,2,100)",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_NewChannelReq{
 							ChannelIndex:     4,
@@ -485,7 +485,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests:     []*ttnpb.MACCommand{},
 					RejectedFrequencies: []uint64{1, 2, 42, 100},
 					RejectedDataRateRanges: map[uint64]*ttnpb.MACState_DataRateRanges{
@@ -508,7 +508,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 		{
 			Name: "both ack",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_NewChannelReq{
 							ChannelIndex:     4,
@@ -520,7 +520,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{
+				MacState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							nil,

@@ -53,7 +53,7 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 		Rx2DataRateIndex:             &ttnpb.DataRateIndexValue{Value: mac.DeviceDefaultRX2DataRateIndex(nil, phy, ns.defaultMACSettings)},
 		Rx2Frequency:                 &ttnpb.FrequencyValue{Value: mac.DeviceDefaultRX2Frequency(nil, phy, ns.defaultMACSettings)},
 		MaxDutyCycle:                 &ttnpb.AggregatedDutyCycleValue{Value: mac.DeviceDefaultMaxDutyCycle(nil, ns.defaultMACSettings)},
-		Supports32BitFCnt:            &ttnpb.BoolValue{Value: mac.DeviceSupports32BitFCnt(nil, ns.defaultMACSettings)},
+		Supports_32BitFCnt:           &ttnpb.BoolValue{Value: mac.DeviceSupports32BitFCnt(nil, ns.defaultMACSettings)},
 		UseAdr:                       &ttnpb.BoolValue{Value: mac.DeviceUseADR(nil, ns.defaultMACSettings, phy)},
 		AdrMargin:                    &pbtypes.FloatValue{Value: adrMargin},
 		ResetsFCnt:                   &ttnpb.BoolValue{Value: mac.DeviceResetsFCnt(nil, ns.defaultMACSettings)},
