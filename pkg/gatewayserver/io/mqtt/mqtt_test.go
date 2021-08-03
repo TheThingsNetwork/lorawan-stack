@@ -217,7 +217,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/status", registeredGatewayUID),
 				Message: &ttnpb.GatewayStatus{
-					IP: []string{"1.1.1.1"},
+					Ip: []string{"1.1.1.1"},
 				},
 				OK: true,
 			},
@@ -231,14 +231,14 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/status", "invalid-gateway"),
 				Message: &ttnpb.GatewayStatus{
-					IP: []string{"2.2.2.2"},
+					Ip: []string{"2.2.2.2"},
 				},
 				OK: false, // invalid gateway ID
 			},
 			{
 				Topic: "invalid/format",
 				Message: &ttnpb.GatewayStatus{
-					IP: []string{"3.3.3.3"},
+					Ip: []string{"3.3.3.3"},
 				},
 				OK: false, // invalid topic format
 			},

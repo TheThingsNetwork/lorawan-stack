@@ -1355,9 +1355,9 @@ func (dst *GatewayStatus) SetFields(src *GatewayStatus, paths ...string) error {
 				return fmt.Errorf("'ip' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.IP = src.IP
+				dst.Ip = src.Ip
 			} else {
-				dst.IP = nil
+				dst.Ip = nil
 			}
 		case "metrics":
 			if len(subs) > 0 {

@@ -254,7 +254,7 @@ func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.G
 	return &ttnpb.GatewayStatus{
 		AntennaLocations: antennasLocation,
 		BootTime:         time.Unix(0, v2status.BootTime),
-		IP:               v2status.Ip,
+		Ip:               v2status.Ip,
 		Metrics:          metrics,
 		Time:             time.Unix(0, v2status.Time),
 		Versions:         versions,

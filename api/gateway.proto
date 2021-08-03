@@ -340,7 +340,6 @@ message GatewayStatus {
   // IP addresses of this gateway.
   // Repeated addresses can be used to communicate addresses of multiple interfaces (LAN, Public IP, ...).
   repeated string ip = 5 [
-    (gogoproto.customname) = "IP",
     (validate.rules).repeated = {
       max_items: 10,
       items: { string: { ip: true } }

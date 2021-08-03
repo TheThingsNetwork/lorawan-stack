@@ -249,7 +249,7 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 	status := &ttnpb.GatewayStatus{
 		Metrics:  map[string]float32{},
 		Versions: map[string]string{},
-		IP:       []string{md.IP},
+		Ip:       []string{md.IP},
 	}
 
 	if stat.Lati != nil && stat.Long != nil {

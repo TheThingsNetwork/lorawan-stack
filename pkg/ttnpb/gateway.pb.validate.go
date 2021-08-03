@@ -2652,14 +2652,14 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 
 		case "ip":
 
-			if len(m.GetIP()) > 10 {
+			if len(m.GetIp()) > 10 {
 				return GatewayStatusValidationError{
 					field:  "ip",
 					reason: "value must contain no more than 10 item(s)",
 				}
 			}
 
-			for idx, item := range m.GetIP() {
+			for idx, item := range m.GetIp() {
 				_, _ = idx, item
 
 				if ip := net.ParseIP(item); ip == nil {

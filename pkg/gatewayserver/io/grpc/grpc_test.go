@@ -220,7 +220,7 @@ func TestTraffic(t *testing.T) {
 			{},
 			{
 				GatewayStatus: &ttnpb.GatewayStatus{
-					IP: []string{"1.1.1.1"},
+					Ip: []string{"1.1.1.1"},
 				},
 			},
 			{
@@ -269,7 +269,7 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 				GatewayStatus: &ttnpb.GatewayStatus{
-					IP: []string{"2.2.2.2"},
+					Ip: []string{"2.2.2.2"},
 				},
 			},
 			{
@@ -333,7 +333,7 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 				GatewayStatus: &ttnpb.GatewayStatus{
-					IP: []string{"3.3.3.3"},
+					Ip: []string{"3.3.3.3"},
 				},
 			},
 			{
