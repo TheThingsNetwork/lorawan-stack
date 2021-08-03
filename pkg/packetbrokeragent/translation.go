@@ -109,8 +109,8 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr ttnpb.DataRate, codingR
 		}, mod.Lora.CodingRate, true
 	case *packetbroker.DataRate_Fsk:
 		return ttnpb.DataRate{
-			Modulation: &ttnpb.DataRate_FSK{
-				FSK: &ttnpb.FSKDataRate{
+			Modulation: &ttnpb.DataRate_Fsk{
+				Fsk: &ttnpb.FSKDataRate{
 					BitRate: mod.Fsk.BitsPerSecond,
 				},
 			},
@@ -145,11 +145,11 @@ func toPBDataRate(dataRate ttnpb.DataRate, codingRate string) (*packetbroker.Dat
 				},
 			},
 		}, true
-	case *ttnpb.DataRate_FSK:
+	case *ttnpb.DataRate_Fsk:
 		return &packetbroker.DataRate{
 			Modulation: &packetbroker.DataRate_Fsk{
 				Fsk: &packetbroker.FSKDataRate{
-					BitsPerSecond: mod.FSK.BitRate,
+					BitsPerSecond: mod.Fsk.BitRate,
 				},
 			},
 		}, true
