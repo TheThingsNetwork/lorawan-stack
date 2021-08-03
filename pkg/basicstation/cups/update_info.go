@@ -383,7 +383,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 		return err
 	}
 
-	registerUpdateInfoRequestSucceeded(c.Request().Context(), updateInfoRequestLabel, req.Package, req.Model, req.Station)
+	registerUpdateInfoRequestSucceeded(c.Request().Context(), updateInfoRequestLabel, req.Station)
 
 	return c.Blob(http.StatusOK, echo.MIMEOctetStream, b)
 }
