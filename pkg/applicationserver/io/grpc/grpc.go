@@ -202,7 +202,7 @@ func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.Application
 	}
 	return &ttnpb.MQTTConnectionInfo{
 		PublicAddress:    config.PublicAddress,
-		PublicTLSAddress: config.PublicTLSAddress,
+		PublicTlsAddress: config.PublicTLSAddress,
 		Username:         unique.ID(ctx, *ids),
 	}, nil
 }

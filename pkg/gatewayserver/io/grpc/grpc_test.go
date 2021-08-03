@@ -675,7 +675,7 @@ func TestMQTTConfig(t *testing.T) {
 	a.So(info, should.Resemble, &ttnpb.MQTTConnectionInfo{
 		Username:         registeredGatewayUID,
 		PublicAddress:    "example.com:1883",
-		PublicTLSAddress: "example.com:8883",
+		PublicTlsAddress: "example.com:8883",
 	})
 
 	infov2, err := client.GetMQTTV2ConnectionInfo(ctx, &registeredGatewayID, creds)
@@ -685,6 +685,6 @@ func TestMQTTConfig(t *testing.T) {
 	a.So(infov2, should.Resemble, &ttnpb.MQTTConnectionInfo{
 		Username:         registeredGatewayUID,
 		PublicAddress:    "v2.example.com:1883",
-		PublicTLSAddress: "v2.example.com:8883",
+		PublicTlsAddress: "v2.example.com:8883",
 	})
 }

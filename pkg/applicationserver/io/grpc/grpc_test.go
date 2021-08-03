@@ -407,7 +407,7 @@ func TestMQTTConfig(t *testing.T) {
 	a.So(info, should.Resemble, &ttnpb.MQTTConnectionInfo{
 		Username:         registeredApplicationUID,
 		PublicAddress:    "example.com:1883",
-		PublicTLSAddress: "example.com:8883",
+		PublicTlsAddress: "example.com:8883",
 	})
 }
 
