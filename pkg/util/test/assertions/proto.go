@@ -18,9 +18,10 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/kr/pretty"
+	"github.com/google/go-cmp/cmp"
 )
 
 func getProtoMessage(i interface{}) proto.Message {
@@ -43,6 +44,24 @@ func getProtoMessage(i interface{}) proto.Message {
 	return nil
 }
 
+const shouldHaveEmptyProtoDiff = "Expected:\n%v\nActual:\n%v\nDiff:\n%s\n(should be empty diff)!"
+
+// indentBlock indents a block of text with an indent string.
+func indentBlock(text, indent string) string {
+	if text[len(text)-1:] == "\n" {
+		result := ""
+		for _, j := range strings.Split(text[:len(text)-1], "\n") {
+			result += indent + j + "\n"
+		}
+		return result
+	}
+	result := ""
+	for _, j := range strings.Split(strings.TrimRight(text, "\n"), "\n") {
+		result += indent + j + "\n"
+	}
+	return result[:len(result)-1]
+}
+
 func shouldEqualProto(actual, expected proto.Message) string {
 	var actualBuf bytes.Buffer
 	err := proto.MarshalText(&actualBuf, actual)
@@ -55,8 +74,8 @@ func shouldEqualProto(actual, expected proto.Message) string {
 		return fmt.Sprintf("can't marshal expected proto for equality check: %v", err)
 	}
 	expectedText, actualText := expectedBuf.String(), actualBuf.String()
-	if diff := pretty.Diff(actualText, expectedText); len(diff) > 0 {
-		return fmt.Sprintf(shouldHaveEmptyDiff, expectedText, actualText, diff)
+	if diff := cmp.Diff(actualText, expectedText); len(diff) > 0 {
+		return fmt.Sprintf(shouldHaveEmptyProtoDiff, indentBlock(expectedText, "    "), indentBlock(actualText, "    "), diff)
 	}
 	return success
 }

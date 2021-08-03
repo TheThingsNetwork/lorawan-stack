@@ -335,6 +335,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		a.grpc.nsPba = &nsPbaServer{
 			contextDecoupler: a,
 			downstreamCh:     a.downstreamCh,
+			frequencyPlans:   a.FrequencyPlans,
 		}
 	} else {
 		a.grpc.nsPba = &disabledServer{}
@@ -720,6 +721,7 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 		logger.WithField("gateway_uid", uid).WithError(err).Warn("Failed to get gateway identifier")
 		return err
 	}
+	report.ForwarderGatewayId = toPBGatewayIdentifier(&ids, a.forwarderConfig)
 
 	req := msg.GetRequest()
 	pairs := []interface{}{
@@ -757,6 +759,9 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, &ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to get Gateway Server peer")
+		report.Result = &packetbroker.DownlinkMessageDeliveryStateChange_Error{
+			Error: packetbroker.DownlinkMessageProcessingError_GATEWAY_NOT_CONNECTED,
+		}
 		return err
 	}
 
@@ -1101,9 +1106,10 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 
 	_, err = ttnpb.NewGsNsClient(conn).HandleUplink(ctx, msg, a.WithClusterAuth())
 	if err != nil {
+		logger.WithError(err).Debug("Network Server failed to handle uplink message")
 		reportError := packetbroker.UplinkMessageProcessingError_UPLINK_UNKNOWN_ERROR
 		if errors.IsNotFound(err) {
-			reportError = packetbroker.UplinkMessageProcessingError_MATCH_SESSION
+			reportError = packetbroker.UplinkMessageProcessingError_NOT_FOUND
 		}
 		report.Error = &packetbroker.UplinkMessageProcessingErrorValue{
 			Value: reportError,

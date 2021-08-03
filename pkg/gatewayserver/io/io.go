@@ -398,7 +398,11 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			}
 		}
 	} else {
-		// Backwards compatibility. If there's no FrequencyPlanID in the TxRequest, then there must be only one Frequency Plan configured.
+		// Backwards compatibility. If there's no FrequencyPlanID in the TxRequest, then there must be only one Frequency
+		// Plan configured.
+		// When implementing https://github.com/TheThingsNetwork/lorawan-stack/issues/1394, having multiple frequency plans
+		// or even bands should not error. Instead, the minimum MaxEIRP in any frequency plan for the given frequency should
+		// be used below to make sure that regional regulations are respected.
 		if len(c.gatewayFPs) != 1 {
 			return false, false, 0, errNoFrequencyPlanIDInTxRequest.New()
 		}
@@ -414,7 +418,8 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	}
 
 	lwPhyVersion := request.GetLorawanPhyVersion()
-	// Backwards compatibility. If there's no LoRaWANPhyVersion defined, assume that the band is already versioned.
+	// Backwards compatibility. If there's no PHY version defined, assume that the band is already versioned.
+	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
 	if lwPhyVersion != ttnpb.PHY_UNKNOWN {
 		phy, err = phy.Version(request.GetLorawanPhyVersion())
 		if err != nil {
@@ -422,6 +427,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		}
 	}
 
+	// TODO: Take fully defined data rate from TxRequest (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
 	var rxErrs []errors.ErrorDetails
 	for i, rx := range []struct {
 		dataRateIndex ttnpb.DataRateIndex
@@ -473,7 +479,8 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			eirp = *sb.MaxEIRP
 		}
 		settings := ttnpb.TxSettings{
-			DataRate:      dr.Rate,
+			DataRate: dr.Rate,
+			// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
 			DataRateIndex: rx.dataRateIndex,
 			Frequency:     rx.frequency,
 			Downlink: &ttnpb.TxSettings_Downlink{
@@ -485,6 +492,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			settings.Downlink.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
 		}
 		if lora := dr.Rate.GetLora(); lora != nil {
+			// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466).
 			settings.CodingRate = phy.LoRaCodingRate
 			settings.Downlink.InvertPolarization = true
 		}
