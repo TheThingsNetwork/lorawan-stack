@@ -53,7 +53,7 @@ message ConcentratorConfig {
     uint64 frequency = 1;
     uint32 radio = 2;
   }
-  FSKChannel fsk_channel = 3 [(gogoproto.customname) = "FSKChannel"];
+  FSKChannel fsk_channel = 3;
 
   message LBTConfiguration {
     // Received signal strength (dBm).
@@ -62,7 +62,7 @@ message ConcentratorConfig {
     float rssi_offset = 2;
     google.protobuf.Duration scan_time = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
   }
-  LBTConfiguration lbt = 4 [(gogoproto.customname) = "LBT"];
+  LBTConfiguration lbt = 4;
 
   Channel ping_slot = 5;
 

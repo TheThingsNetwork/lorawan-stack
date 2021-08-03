@@ -493,8 +493,8 @@ func (fp *FrequencyPlan) ToConcentratorConfig() (*ttnpb.ConcentratorConfig, erro
 		return nil, err
 	}
 	cc.LoraStandardChannel = lora
-	cc.FSKChannel = fp.FSKChannel.ToConcentratorConfig()
-	cc.LBT = fp.LBT.ToConcentratorConfig()
+	cc.FskChannel = fp.FSKChannel.ToConcentratorConfig()
+	cc.Lbt = fp.LBT.ToConcentratorConfig()
 	cc.PingSlot = fp.PingSlot.ToConcentratorConfig()
 	for _, radio := range fp.Radios {
 		cc.Radios = append(cc.Radios, radio.ToConcentratorConfig())
