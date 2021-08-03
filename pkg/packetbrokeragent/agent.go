@@ -721,6 +721,7 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 		logger.WithField("gateway_uid", uid).WithError(err).Warn("Failed to get gateway identifier")
 		return err
 	}
+	report.ForwarderGatewayId = toPBGatewayIdentifier(&ids, a.forwarderConfig)
 
 	req := msg.GetRequest()
 	pairs := []interface{}{
