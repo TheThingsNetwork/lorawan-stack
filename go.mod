@@ -66,6 +66,7 @@ require (
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	// NOTE: github.com/golang/protobuf is actually pinned to v1.3.5 above.
 	github.com/golang/protobuf v1.5.1
+	github.com/google/go-cmp v0.5.5
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
@@ -119,11 +120,11 @@ require (
 	github.com/throttled/throttled/v2 v2.7.1
 	github.com/vmihailenco/msgpack/v5 v5.3.1
 	go.opencensus.io v0.23.0
-	go.packetbroker.org/api/iam v1.5.15-tts
-	go.packetbroker.org/api/iam/v2 v2.6.14-tts
-	go.packetbroker.org/api/mapping/v2 v2.1.13-tts
-	go.packetbroker.org/api/routing v1.8.6-tts
-	go.packetbroker.org/api/v3 v3.10.6-tts
+	go.packetbroker.org/api/iam v1.5.16-tts
+	go.packetbroker.org/api/iam/v2 v2.6.15-tts
+	go.packetbroker.org/api/mapping/v2 v2.1.14-tts
+	go.packetbroker.org/api/routing v1.8.7-tts
+	go.packetbroker.org/api/v3 v3.10.7-tts
 	go.thethings.network/lorawan-application-payload v0.0.0-20210625082552-27377194bcca
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
 	go.uber.org/zap v1.13.0

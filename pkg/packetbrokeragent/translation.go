@@ -95,9 +95,10 @@ var (
 	}
 )
 
-func fromPBDataRate(dataRate *packetbroker.DataRate) (dr ttnpb.DataRate, ok bool) {
+func fromPBDataRate(dataRate *packetbroker.DataRate) (dr ttnpb.DataRate, codingRate string, ok bool) {
 	switch mod := dataRate.GetModulation().(type) {
 	case *packetbroker.DataRate_Lora:
+		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 		return ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
@@ -105,7 +106,7 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr ttnpb.DataRate, ok bool
 					Bandwidth:       mod.Lora.Bandwidth,
 				},
 			},
-		}, true
+		}, mod.Lora.CodingRate, true
 	case *packetbroker.DataRate_Fsk:
 		return ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_FSK{
@@ -113,7 +114,7 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr ttnpb.DataRate, ok bool
 					BitRate: mod.Fsk.BitsPerSecond,
 				},
 			},
-		}, true
+		}, "", true
 	// TODO: Support LR-FHSS (https://github.com/TheThingsNetwork/lorawan-stack/issues/3806)
 	// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 	// case *packetbroker.DataRate_Lrfhss:
@@ -125,9 +126,9 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr ttnpb.DataRate, ok bool
 	//  			CodingRate:            mod.Lrfhss.CodingRate,
 	// 			},
 	// 		},
-	// 	}, true
+	// 	}, mod.Lrfhss.CodingRate, true
 	default:
-		return ttnpb.DataRate{}, false
+		return ttnpb.DataRate{}, "", false
 	}
 }
 
@@ -488,9 +489,10 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 	var (
 		dataRate      ttnpb.DataRate
 		dataRateIndex ttnpb.DataRateIndex
+		codingRate    = msg.Message.CodingRate
 	)
 	if msg.Message.DataRate != nil {
-		dataRate, ok = fromPBDataRate(msg.Message.DataRate)
+		dataRate, codingRate, ok = fromPBDataRate(msg.Message.DataRate)
 		if !ok {
 			return nil, errUnknownDataRate.New()
 		}
@@ -509,6 +511,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 				"region", msg.Message.GatewayRegion,
 			)
 		}
+		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 		dataRate, dataRateIndex = phyDR.Rate, ttnpb.DataRateIndex(msg.Message.DataRateIndex)
 	}
 
@@ -543,7 +546,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 			DataRate:      dataRate,
 			DataRateIndex: dataRateIndex,
 			Frequency:     msg.Message.Frequency,
-			CodingRate:    msg.Message.CodingRate,
+			CodingRate:    codingRate,
 		},
 		ReceivedAt:     receivedAt,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
@@ -846,7 +849,7 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 			continue
 		}
 		if rx.settings.DataRate != nil && phy != nil {
-			dr, ok := fromPBDataRate(rx.settings.DataRate)
+			dr, _, ok := fromPBDataRate(rx.settings.DataRate)
 			if !ok {
 				return "", nil, errIncompatibleDataRate.WithAttributes("rx_window", i+1)
 			}
