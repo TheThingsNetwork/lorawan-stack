@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"golang.org/x/sync/semaphore"
 	"google.golang.org/grpc"
 )
 
@@ -55,6 +56,11 @@ const (
 
 	// networkInitiatedDownlinkInterval is the minimum time.Duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink.
 	networkInitiatedDownlinkInterval = time.Second
+
+	// maxUplinkSubmissionConcurrency represents the maximum number of concurrent tasks that submit uplinks to the Application Server
+	// on the fast path. The fast path is achieved by skipping the enqueuing process and submitting the uplinks directly.
+	// When the concurrency limit is reached, uplinks are enqueued instead.
+	maxUplinkSubmissionConcurrency = 1024
 )
 
 // windowDurationFunc is a function, which is used by Network Server to determine the duration of deduplication and cooldown windows.
@@ -127,6 +133,8 @@ type NetworkServer struct {
 	downlinkQueueCapacity int
 
 	scheduledDownlinkMatcher ScheduledDownlinkMatcher
+
+	uplinkQueueSemaphore *semaphore.Weighted
 }
 
 // Option configures the NetworkServer.
@@ -144,6 +152,7 @@ var (
 const (
 	applicationUplinkProcessTaskName = "process_application_uplink"
 	downlinkProcessTaskName          = "process_downlink"
+	sendApplicationUplinkTaskName    = "send_application_uplink"
 
 	maxInt = int(^uint(0) >> 1)
 )
@@ -229,6 +238,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		deviceKEKLabel:           conf.DeviceKEKLabel,
 		downlinkQueueCapacity:    conf.DownlinkQueueCapacity,
 		scheduledDownlinkMatcher: conf.ScheduledDownlinkMatcher,
+		uplinkQueueSemaphore:     semaphore.NewWeighted(maxUplinkSubmissionConcurrency),
 	}
 	ctx = ns.Context()
 

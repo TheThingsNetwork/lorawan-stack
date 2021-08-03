@@ -232,6 +232,14 @@ var nsMetrics = &messageMetrics{
 		},
 		[]string{messageType},
 	),
+
+	uplinkSenders: metrics.NewGauge(
+		prometheus.GaugeOpts{
+			Subsystem: subsystem,
+			Name:      "uplink_senders_count",
+			Help:      "Application Uplink sender workers count",
+		},
+	),
 }
 
 func init() {
@@ -251,6 +259,8 @@ type messageMetrics struct {
 
 	downlinkAttempted *metrics.ContextualCounterVec
 	downlinkForwarded *metrics.ContextualCounterVec
+
+	uplinkSenders prometheus.Gauge
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -266,6 +276,8 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 
 	m.downlinkAttempted.Describe(ch)
 	m.downlinkForwarded.Describe(ch)
+
+	m.uplinkSenders.Describe(ch)
 }
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
@@ -281,6 +293,8 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 
 	m.downlinkAttempted.Collect(ch)
 	m.downlinkForwarded.Collect(ch)
+
+	m.uplinkSenders.Collect(ch)
 }
 
 func mTypeLabel(mType ttnpb.MType) string {
@@ -364,4 +378,12 @@ func registerForwardConfirmedDataDownlink(ctx context.Context) {
 
 func registerForwardJoinAcceptDownlink(ctx context.Context) {
 	nsMetrics.downlinkForwarded.WithLabelValues(ctx, joinAcceptDownlinkMTypeLabel).Inc()
+}
+
+func registerUplinkSenderStarted() {
+	nsMetrics.uplinkSenders.Inc()
+}
+
+func registerUplinkSenderFinished() {
+	nsMetrics.uplinkSenders.Dec()
 }

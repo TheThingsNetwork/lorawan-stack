@@ -59,6 +59,31 @@ const (
 	applicationUplinkLimit             = 100
 )
 
+func (ns *NetworkServer) sendApplicationUplinks(ctx context.Context, cl ttnpb.NsAsClient, appID ttnpb.ApplicationIdentifiers, ups ...*ttnpb.ApplicationUp) error {
+	if _, err := cl.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
+		ApplicationUps: ups,
+	}, ns.WithClusterAuth()); err != nil {
+		return err
+	}
+	for _, up := range ups {
+		ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIds...)
+		switch pld := up.Up.(type) {
+		case *ttnpb.ApplicationUp_UplinkMessage:
+			registerForwardDataUplink(ctx, pld.UplinkMessage)
+			events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, up))
+		case *ttnpb.ApplicationUp_JoinAccept:
+			events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: up.EndDeviceIdentifiers,
+				CorrelationIds:       up.CorrelationIds,
+				Up: &ttnpb.ApplicationUp_JoinAccept{
+					JoinAccept: applicationJoinAcceptWithoutAppSKey(pld.JoinAccept),
+				},
+			}))
+		}
+	}
+	return nil
+}
+
 func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error {
 	return ns.applicationUplinks.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, drain ApplicationUplinkQueueDrainFunc) (time.Time, error) {
 		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, &appID)
@@ -68,37 +93,10 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error
 		}
 
 		cl := ttnpb.NewNsAsClient(conn)
-		var sendErr bool
-		if err = drain(applicationUplinkLimit, func(ups ...*ttnpb.ApplicationUp) error {
-			_, err := cl.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
-				ApplicationUps: ups,
-			}, ns.WithClusterAuth())
-			if err != nil {
-				sendErr = true
-				log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks to Application Server")
-				return err
-			}
-			for _, up := range ups {
-				ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIds...)
-				switch pld := up.Up.(type) {
-				case *ttnpb.ApplicationUp_UplinkMessage:
-					registerForwardDataUplink(ctx, pld.UplinkMessage)
-					events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, up))
-				case *ttnpb.ApplicationUp_JoinAccept:
-					events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: up.EndDeviceIdentifiers,
-						CorrelationIds:       up.CorrelationIds,
-						Up: &ttnpb.ApplicationUp_JoinAccept{
-							JoinAccept: applicationJoinAcceptWithoutAppSKey(pld.JoinAccept),
-						},
-					}))
-				}
-			}
-			return nil
+		if err := drain(applicationUplinkLimit, func(ups ...*ttnpb.ApplicationUp) error {
+			return ns.sendApplicationUplinks(ctx, cl, appID, ups...)
 		}); err != nil {
-			if !sendErr {
-				log.FromContext(ctx).WithError(err).Error("Failed to drain application uplinks")
-			}
+			log.FromContext(ctx).WithError(err).Error("Failed to drain application uplinks")
 			return time.Now().Add(applicationUplinkTaskRetryInterval), nil
 		}
 		return time.Time{}, nil
