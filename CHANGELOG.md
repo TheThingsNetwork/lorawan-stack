@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Improved errors when ordering search requests by non-existent fields.
+- LNS authentication key handling for gateways in the Console.
 
 ### Security
 

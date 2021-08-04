@@ -33,18 +33,17 @@ import GatewayGeneralSettings from '@console/views/gateway-general-settings'
 import GatewayApiKeys from '@console/views/gateway-api-keys'
 import GatewayOverview from '@console/views/gateway-overview'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
-  checkFromState,
   mayViewGatewayInfo,
   mayViewGatewayEvents,
   mayViewOrEditGatewayLocation,
   mayViewOrEditGatewayCollaborators,
   mayViewOrEditGatewayApiKeys,
   mayEditBasicGatewayInformation,
-  mayViewGatewaySecrets,
 } from '@console/lib/feature-checks'
 
 import {
@@ -73,19 +72,18 @@ import {
       error: selectGatewayError(state) || selectGatewayRightsError(state),
       fetching: selectGatewayFetching(state) || selectGatewayRightsFetching(state),
       rights: selectGatewayRights(state),
-      mayViewSecrets: checkFromState(mayViewGatewaySecrets, state),
     }
   },
   dispatch => ({
-    loadData: (id, meta) => {
-      dispatch(getGateway(id, meta))
-      dispatch(getGatewaysRightsList(id))
-    },
+    getRights: id => dispatch(attachPromise(getGatewaysRightsList(id))),
+    getGateway: (id, meta) => dispatch(getGateway(id, meta)),
     stopStream: id => dispatch(stopGatewayEventsStream(id)),
   }),
 )
 @withRequest(
-  ({ gtwId, loadData, mayViewSecrets }) => {
+  async ({ gtwId, getRights, getGateway }) => {
+    const rights = await getRights(gtwId)
+
     const selector = [
       'name',
       'description',
@@ -105,11 +103,11 @@ import {
       'disable_packet_broker_forwarding',
     ]
 
-    if (mayViewSecrets) {
+    if (rights.includes('RIGHT_GATEWAY_READ_SECRETS')) {
       selector.push('lbs_lns_secret')
     }
 
-    return loadData(gtwId, selector)
+    return getGateway(gtwId, selector)
   },
   ({ fetching, gateway }) => fetching || !Boolean(gateway),
 )
