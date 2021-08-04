@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback, forwardRef, useMemo } from 'react'
 import classnames from 'classnames'
-import bind from 'autobind-decorator'
-import { injectIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
 import Spinner from '@ttn-lw/components/spinner'
@@ -27,6 +26,14 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import ButtonIcon from './button-icon'
 
 import style from './button.styl'
+
+const filterDataProps = props =>
+  Object.keys(props)
+    .filter(key => key.startsWith('data-'))
+    .reduce((acc, key) => {
+      acc[key] = props[key]
+      return acc
+    }, {})
 
 const assembleClassnames = ({
   message,
@@ -83,57 +90,60 @@ const buttonChildren = props => {
   )
 }
 
-@injectIntl
-class Button extends React.PureComponent {
-  @bind
-  handleClick(evt) {
-    const { busy, disabled, onClick } = this.props
+const Button = forwardRef((props, ref) => {
+  const {
+    autoFocus,
+    disabled,
+    name,
+    type,
+    value,
+    title: rawTitle,
+    busy,
+    onBlur,
+    onClick,
+    ...rest
+  } = props
 
-    if (busy || disabled) {
-      return
-    }
+  const dataProps = useMemo(() => filterDataProps(rest), [rest])
 
-    onClick(evt)
+  const handleClick = useCallback(
+    evt => {
+      if (busy || disabled) {
+        return
+      }
+
+      onClick(evt)
+    },
+    [busy, disabled, onClick],
+  )
+
+  const intl = useIntl()
+
+  let title = rawTitle
+  if (typeof rawTitle === 'object' && rawTitle.id && rawTitle.defaultMessage) {
+    title = intl.formatMessage(title)
   }
 
-  render() {
-    const {
-      autoFocus,
-      disabled,
-      name,
-      type,
-      value,
-      title: rawTitle,
-      intl,
-      busy,
-      onBlur,
-    } = this.props
-
-    let title = rawTitle
-    if (typeof rawTitle === 'object' && rawTitle.id && rawTitle.defaultMessage) {
-      title = intl.formatMessage(title)
-    }
-
-    const htmlProps = { autoFocus, name, type, value, title, onBlur }
-    const buttonClassNames = assembleClassnames(this.props)
-    return (
-      <button
-        className={buttonClassNames}
-        onClick={this.handleClick}
-        children={buttonChildren(this.props)}
-        disabled={busy || disabled}
-        {...htmlProps}
-      />
-    )
-  }
-}
+  const htmlProps = { autoFocus, name, type, value, title, onBlur, ...dataProps }
+  const buttonClassNames = assembleClassnames(props)
+  return (
+    <button
+      className={buttonClassNames}
+      onClick={handleClick}
+      children={buttonChildren(props)}
+      disabled={busy || disabled}
+      ref={ref}
+      {...htmlProps}
+    />
+  )
+})
 
 Button.defaultProps = {
   onClick: () => null,
   onBlur: undefined,
 }
 
-Button.Link = props => {
+const LinkButton = props => {
   const { disabled, titleMessage } = props
   const buttonClassNames = assembleClassnames(props)
   const { to } = props
@@ -147,25 +157,21 @@ Button.Link = props => {
     />
   )
 }
-Button.Link.displayName = 'Button.Link'
 
-Button.AnchorLink = props => {
-  const { target, title, name } = props
-  const htmlProps = { target, title, name }
+const AnchorLinkButton = props => {
+  const { target, title, name, href, ...rest } = props
+  const dataProps = useMemo(() => filterDataProps(rest), [rest])
+  const htmlProps = { target, title, name, ...dataProps }
   const buttonClassNames = assembleClassnames(props)
   return (
     <Link.Anchor
       className={buttonClassNames}
-      href={props.href}
+      href={href}
       children={buttonChildren(props)}
       {...htmlProps}
     />
   )
 }
-Button.AnchorLink.displayName = 'Button.AnchorLink'
-
-Button.Icon = ButtonIcon
-Button.Icon.displayName = 'Button.Icon'
 
 const commonPropTypes = {
   /** The message to be displayed within the button. */
@@ -261,14 +267,23 @@ Button.propTypes = {
   ...commonPropTypes,
 }
 
-Button.Link.propTypes = {
+LinkButton.propTypes = {
   ...commonPropTypes,
   ...Link.propTypes,
 }
 
-Button.AnchorLink.propTypes = {
+Button.Link = LinkButton
+Button.Link.displayName = 'Button.Link'
+
+AnchorLinkButton.propTypes = {
   ...commonPropTypes,
   ...Link.Anchor.propTypes,
 }
+
+Button.AnchorLink = AnchorLinkButton
+Button.AnchorLink.displayName = 'Button.AnchorLink'
+
+Button.Icon = ButtonIcon
+Button.Icon.displayName = 'Button.Icon'
 
 export default Button
