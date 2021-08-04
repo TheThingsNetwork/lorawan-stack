@@ -364,7 +364,34 @@ func (m *CUPSRedirection) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "target_cups_uri":
-			// no validation rules for TargetCupsUri
+
+			if utf8.RuneCountInString(m.GetTargetCupsUri()) > 256 {
+				return CUPSRedirectionValidationError{
+					field:  "target_cups_uri",
+					reason: "value length must be at most 256 runes",
+				}
+			}
+
+			if uri, err := url.Parse(m.GetTargetCupsUri()); err != nil {
+				return CUPSRedirectionValidationError{
+					field:  "target_cups_uri",
+					reason: "value must be a valid URI",
+					cause:  err,
+				}
+			} else if !uri.IsAbs() {
+				return CUPSRedirectionValidationError{
+					field:  "target_cups_uri",
+					reason: "value must be absolute",
+				}
+			}
+
+			if !_CUPSRedirection_TargetCupsUri_Pattern.MatchString(m.GetTargetCupsUri()) {
+				return CUPSRedirectionValidationError{
+					field:  "target_cups_uri",
+					reason: "value does not match regex pattern \"^https\"",
+				}
+			}
+
 		case "current_gateway_key":
 
 			if utf8.RuneCountInString(m.GetCurrentGatewayKey()) > 2048 {
@@ -479,6 +506,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CUPSRedirectionValidationError{}
+
+var _CUPSRedirection_TargetCupsUri_Pattern = regexp.MustCompile("^https")
 
 // ValidateFields checks the field values on ClaimGatewayRequest with the rules
 // defined in the proto definition for this message. If any rules are

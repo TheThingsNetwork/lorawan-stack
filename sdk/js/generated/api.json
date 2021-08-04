@@ -8444,7 +8444,23 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 256
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^https"
+                  },
+                  {
+                    "name": "string.uri",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "current_gateway_key",
@@ -8904,7 +8920,7 @@
             },
             {
               "name": "target_gateway_id",
-              "description": "Gateway ID for the target gateway. This must be a unique value.\nIf this is not set, the target ID for the target gateway will be set to `eui-\u003cgateway-eui\u003e`",
+              "description": "Gateway ID for the target gateway. This must be a unique value.\nIf this is not set, the target ID for the target gateway will be set to `\u003cgateway-eui\u003e`.",
               "label": "",
               "type": "string",
               "longType": "string",

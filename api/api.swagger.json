@@ -12757,7 +12757,7 @@
         },
         "target_gateway_id": {
           "type": "string",
-          "title": "Gateway ID for the target gateway. This must be a unique value.\nIf this is not set, the target ID for the target gateway will be set to `eui-\u003cgateway-eui\u003e`"
+          "description": "Gateway ID for the target gateway. This must be a unique value.\nIf this is not set, the target ID for the target gateway will be set to `\u003cgateway-eui\u003e`."
         },
         "target_gateway_server_address": {
           "type": "string",
