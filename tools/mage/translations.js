@@ -20,7 +20,6 @@ const path = require('path')
 const yargs = require('yargs')
 const mkdirp = require('mkdirp')
 const g = require('glob')
-const xx = require('./xx')
 
 const argv = yargs.argv
 const env = process.env
@@ -297,11 +296,6 @@ const main = async function () {
       message.locales = message.locales || {}
       message.locales[locale] = msg
     }
-
-    // Set xx to default locale replaced by x'es
-    const x = xx(updated[defaultLocale][message.id])
-    updated.xx = updated.xx || {}
-    updated.xx[message.id] = x
   }
 
   await writeLocales(updated)

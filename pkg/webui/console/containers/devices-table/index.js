@@ -182,6 +182,7 @@ class DevicesTable extends React.Component {
           icon="import_devices"
           to={`/applications/${appId}/devices/import`}
           secondary
+          noMargin
         />
       )
     )

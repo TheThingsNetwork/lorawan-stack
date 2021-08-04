@@ -25,14 +25,15 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './dropdown.styl'
 
-const Dropdown = ({ className, children, larger, onItemsClick }) => (
+const Dropdown = React.forwardRef(({ className, children, larger, onItemsClick }, ref) => (
   <ul
     onClick={onItemsClick}
     className={classnames(style.dropdown, className, { [style.larger]: larger })}
+    ref={ref}
   >
     {children}
   </ul>
-)
+))
 
 Dropdown.propTypes = {
   children: PropTypes.node.isRequired,
@@ -47,29 +48,57 @@ Dropdown.defaultProps = {
   onItemsClick: () => null,
 }
 
-const DropdownItem = ({ icon, title, path, action, exact, showActive, tabIndex, external }) => {
+const DropdownItem = ({
+  active,
+  icon,
+  title,
+  path,
+  action,
+  exact,
+  showActive,
+  tabIndex,
+  external,
+  ...rest
+}) => {
   const iconElement = icon && <Icon className={style.icon} icon={icon} nudgeUp />
   const activeClassName = classnames({
-    [style.active]: showActive,
+    [style.active]: (!Boolean(action) && showActive) || active,
   })
   const ItemElement = action ? (
-    <button onClick={action} onKeyPress={action} role="tab" tabIndex={tabIndex}>
+    <button
+      onClick={action}
+      onKeyPress={action}
+      role="tab"
+      tabIndex={tabIndex}
+      className={classnames(style.button, activeClassName)}
+    >
       {iconElement}
       <Message content={title} />
     </button>
   ) : external ? (
-    <Link.Anchor href={path} external tabIndex={tabIndex}>
-      {iconElement}
+    <Link.Anchor
+      href={path}
+      external
+      tabIndex={tabIndex}
+      className={classnames(style.button, activeClassName)}
+    >
+      {Boolean(iconElement) ? iconElement : null}
       <Message content={title} />
     </Link.Anchor>
   ) : (
-    <NavLink activeClassName={activeClassName} to={path} exact={exact} tabIndex={tabIndex}>
+    <NavLink
+      className={style.button}
+      activeClassName={activeClassName}
+      to={path}
+      exact={exact}
+      tabIndex={tabIndex}
+    >
       {iconElement}
       <Message content={title} />
     </NavLink>
   )
   return (
-    <li className={style.dropdownItem} key={title.id || title}>
+    <li className={style.dropdownItem} key={title.id || title} {...rest}>
       {ItemElement}
     </li>
   )
@@ -77,9 +106,10 @@ const DropdownItem = ({ icon, title, path, action, exact, showActive, tabIndex, 
 
 DropdownItem.propTypes = {
   action: PropTypes.func,
+  active: PropTypes.bool,
   exact: PropTypes.bool,
   external: PropTypes.bool,
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.string,
   path: PropTypes.string,
   showActive: PropTypes.bool,
   tabIndex: PropTypes.string,
@@ -87,9 +117,11 @@ DropdownItem.propTypes = {
 }
 
 DropdownItem.defaultProps = {
+  active: false,
   action: undefined,
   exact: false,
   external: false,
+  icon: undefined,
   path: undefined,
   showActive: true,
   tabIndex: '0',

@@ -35,7 +35,7 @@ const RelativeTime = props => {
   return (
     <DateTime className={className} value={value} firstToLower={firstToLower}>
       {dateTime => {
-        const from = new Date(dateTime)
+        const from = new Date(value)
         const to = new Date()
 
         const delta = computeDelta(from, to)

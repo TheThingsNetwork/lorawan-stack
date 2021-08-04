@@ -50,6 +50,7 @@ const assembleClassnames = ({
   raw,
   disabled,
   responsiveLabel,
+  noMargin,
 }) => {
   if (unstyled) {
     return className
@@ -67,6 +68,7 @@ const assembleClassnames = ({
     [style.raw]: raw,
     [style.disabled]: disabled,
     [style.responsiveLabel]: responsiveLabel,
+    [style.noMargin]: noMargin,
   })
 }
 

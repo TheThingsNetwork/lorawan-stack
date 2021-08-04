@@ -57,7 +57,7 @@ const FrontView = ({ location }) => (
       </div>
     </section>
     <section className={style.visual} />
-    <Footer className={style.footer} />
+    <Footer className={style.footer} transparent />
   </div>
 )
 
