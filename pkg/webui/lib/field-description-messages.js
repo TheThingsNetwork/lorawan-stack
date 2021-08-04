@@ -211,6 +211,9 @@ const m = defineMessages({
     'This is dependant on your exact use case. It can help to consider the following implications: timeouts that are too long can be prone to blocking communication when replies are not sent immediately. On the other hand, timeouts that are too short might miss the reply when it arrives later.',
   classCTimeoutAbsence:
     'Leave this field empty to let the network apply a default value that should be applicable for most use cases.',
+
+  gatewayPlacementDescription:
+    'Informs whether the gateway antenna is placed inside or outside. This information is used solely for display purposes, e.g. on public gateway maps (if your gateway is set as public) and has no technical or functional effects.',
 })
 
 const descriptions = Object.freeze({
@@ -405,6 +408,9 @@ const descriptions = Object.freeze({
     description: m.classCTimeoutDescription,
     location: m.classCTimeoutLocation,
     absence: m.classCTimeoutAbsence,
+  },
+  [TOOLTIP_IDS.GATEWAY_PLACEMENT]: {
+    description: m.gatewayPlacementDescription,
   },
 })
 
