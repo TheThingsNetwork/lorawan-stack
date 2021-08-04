@@ -600,12 +600,12 @@ Application is the message that defines an Application in the network.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
-| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `name` | [`string`](#string) |  |  |
-| `description` | [`string`](#string) |  |  |
+| `ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | The identifiers of the application. These are public and can be seen by any authenticated user in the network. |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the application was created. This information is public and can be seen by any authenticated user in the network. |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the application was last updated. This information is public and can be seen by any authenticated user in the network. |
+| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the application was deleted. This information is public and can be seen by any authenticated user in the network. |
+| `name` | [`string`](#string) |  | The name of the application. |
+| `description` | [`string`](#string) |  | A description for the application. |
 | `attributes` | [`Application.AttributesEntry`](#ttn.lorawan.v3.Application.AttributesEntry) | repeated | Key-value attributes for this application. Typically used for organizing applications or for storing integration-specific data. |
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application. |
 | `dev_eui_counter` | [`uint32`](#uint32) |  |  |
@@ -1917,23 +1917,23 @@ An OAuth client on the network.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `ids` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
-| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `name` | [`string`](#string) |  |  |
-| `description` | [`string`](#string) |  |  |
+| `ids` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) |  | The identifiers of the OAuth client. These are public and can be seen by any authenticated user in the network. |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the OAuth client was created. This information is public and can be seen by any authenticated user in the network. |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the OAuth client was last updated. This information is public and can be seen by any authenticated user in the network. |
+| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the OAuth client was deleted. This information is public and can be seen by any authenticated user in the network. |
+| `name` | [`string`](#string) |  | The name of the OAuth client. This information is public and can be seen by any authenticated user in the network. |
+| `description` | [`string`](#string) |  | A description for the OAuth client. This information is public and can be seen by any authenticated user in the network. |
 | `attributes` | [`Client.AttributesEntry`](#ttn.lorawan.v3.Client.AttributesEntry) | repeated | Key-value attributes for this client. Typically used for organizing clients or for storing integration-specific data. |
-| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application. |
+| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application. This information is public and can be seen by any authenticated user in the network. |
 | `secret` | [`string`](#string) |  | The client secret is only visible to collaborators of the client. |
-| `redirect_uris` | [`string`](#string) | repeated | The allowed redirect URIs against which authorization requests are checked. If the authorization request does not pass a redirect URI, the first one from this list is taken. |
-| `logout_redirect_uris` | [`string`](#string) | repeated | The allowed logout redirect URIs against which client initiated logout requests are checked. If the authorization request does not pass a redirect URI, the first one from this list is taken. |
-| `state` | [`State`](#ttn.lorawan.v3.State) |  | The reviewing state of the client. This field can only be modified by admins. If state_description is not updated when updating state, state_description is cleared. |
+| `redirect_uris` | [`string`](#string) | repeated | The allowed redirect URIs against which authorization requests are checked. If the authorization request does not pass a redirect URI, the first one from this list is taken. This information is public and can be seen by any authenticated user in the network. |
+| `logout_redirect_uris` | [`string`](#string) | repeated | The allowed logout redirect URIs against which client initiated logout requests are checked. If the authorization request does not pass a redirect URI, the first one from this list is taken. This information is public and can be seen by any authenticated user in the network. |
+| `state` | [`State`](#ttn.lorawan.v3.State) |  | The reviewing state of the client. This information is public and can be seen by any authenticated user in the network. This field can only be modified by admins. If state_description is not updated when updating state, state_description is cleared. |
 | `state_description` | [`string`](#string) |  | A description for the state field. This field can only be modified by admins, and should typically only be updated when also updating `state`. |
-| `skip_authorization` | [`bool`](#bool) |  | If set, the authorization page will be skipped. This field can only be modified by admins. |
-| `endorsed` | [`bool`](#bool) |  | If set, the authorization page will show endorsement. This field can only be modified by admins. |
-| `grants` | [`GrantType`](#ttn.lorawan.v3.GrantType) | repeated | OAuth flows that can be used for the client to get a token. After a client is created, this field can only be modified by admins. |
-| `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated | Rights denotes what rights the client will have access to. Users that previously authorized this client will have to re-authorize the client after rights are added to this list. |
+| `skip_authorization` | [`bool`](#bool) |  | If set, the authorization page will be skipped. This information is public and can be seen by any authenticated user in the network. This field can only be modified by admins. |
+| `endorsed` | [`bool`](#bool) |  | If set, the authorization page will show endorsement. This information is public and can be seen by any authenticated user in the network. This field can only be modified by admins. |
+| `grants` | [`GrantType`](#ttn.lorawan.v3.GrantType) | repeated | OAuth flows that can be used for the client to get a token. This information is public and can be seen by any authenticated user in the network. After a client is created, this field can only be modified by admins. |
+| `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated | Rights denotes what rights the client will have access to. This information is public and can be seen by any authenticated user in the network. Users that previously authorized this client will have to re-authorize the client after rights are added to this list. |
 
 #### Field Rules
 
@@ -3627,21 +3627,21 @@ Gateway is the message that defines a gateway on the network.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
-| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `name` | [`string`](#string) |  |  |
-| `description` | [`string`](#string) |  |  |
+| `ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  | The identifiers of the gateway. These are public and can be seen by any authenticated user in the network. |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the gateway was created. This information is public and can be seen by any authenticated user in the network. |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the gateway was last updated. This information is public and can be seen by any authenticated user in the network. |
+| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the gateway was deleted. This information is public and can be seen by any authenticated user in the network. |
+| `name` | [`string`](#string) |  | The name of the gateway. This information is public and can be seen by any authenticated user in the network. |
+| `description` | [`string`](#string) |  | A description for the gateway. This information is public and can be seen by any authenticated user in the network. |
 | `attributes` | [`Gateway.AttributesEntry`](#ttn.lorawan.v3.Gateway.AttributesEntry) | repeated | Key-value attributes for this gateway. Typically used for organizing gateways or for storing integration-specific data. |
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway. |
 | `version_ids` | [`GatewayVersionIdentifiers`](#ttn.lorawan.v3.GatewayVersionIdentifiers) |  |  |
-| `gateway_server_address` | [`string`](#string) |  | The address of the Gateway Server to connect to. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
+| `gateway_server_address` | [`string`](#string) |  | The address of the Gateway Server to connect to. This information is public and can be seen by any authenticated user in the network if status_public is true. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | `auto_update` | [`bool`](#bool) |  |  |
 | `update_channel` | [`string`](#string) |  |  |
-| `frequency_plan_id` | [`string`](#string) |  | Frequency plan ID of the gateway. This equals the first element of the frequency_plan_ids field. |
-| `frequency_plan_ids` | [`string`](#string) | repeated | Frequency plan IDs of the gateway. The first element equals the frequency_plan_id field. |
-| `antennas` | [`GatewayAntenna`](#ttn.lorawan.v3.GatewayAntenna) | repeated |  |
+| `frequency_plan_id` | [`string`](#string) |  | Frequency plan ID of the gateway. This information is public and can be seen by any authenticated user in the network. DEPRECATED: use frequency_plan_ids. This equals the first element of the frequency_plan_ids field. |
+| `frequency_plan_ids` | [`string`](#string) | repeated | Frequency plan IDs of the gateway. This information is public and can be seen by any authenticated user in the network. The first element equals the frequency_plan_id field. |
+| `antennas` | [`GatewayAntenna`](#ttn.lorawan.v3.GatewayAntenna) | repeated | Antennas of the gateway. Location information of the antennas is public and can be seen by any authenticated user in the network if location_public=true. |
 | `status_public` | [`bool`](#bool) |  | The status of this gateway may be publicly displayed. |
 | `location_public` | [`bool`](#bool) |  | The location of this gateway may be publicly displayed. |
 | `schedule_downlink_late` | [`bool`](#bool) |  | Enable server-side buffering of downlink messages. This is recommended for gateways using the Semtech UDP Packet Forwarder v2.x or older, as it does not feature a just-in-time queue. If enabled, the Gateway Server schedules the downlink message late to the gateway so that it does not overwrite previously scheduled downlink messages that have not been transmitted yet. |
@@ -6873,12 +6873,12 @@ is used to manage OAuth client authorizations for users.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
-| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `name` | [`string`](#string) |  |  |
-| `description` | [`string`](#string) |  |  |
+| `ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  | The identifiers of the organization. These are public and can be seen by any authenticated user in the network. |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the organization was created. This information is public and can be seen by any authenticated user in the network. |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the organization was last updated. This information is public and can be seen by any authenticated user in the network. |
+| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the organization was deleted. This information is public and can be seen by any authenticated user in the network. |
+| `name` | [`string`](#string) |  | The name of the organization. This information is public and can be seen by any authenticated user in the network. |
+| `description` | [`string`](#string) |  | A description for the organization. |
 | `attributes` | [`Organization.AttributesEntry`](#ttn.lorawan.v3.Organization.AttributesEntry) | repeated | Key-value attributes for this organization. Typically used for organizing organizations or for storing integration-specific data. |
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization. |
 
@@ -8162,12 +8162,12 @@ User is the message that defines a user on the network.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
-| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `name` | [`string`](#string) |  |  |
-| `description` | [`string`](#string) |  |  |
+| `ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  | The identifiers of the user. These are public and can be seen by any authenticated user in the network. |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the user was created. This information is public and can be seen by any authenticated user in the network. |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the user was last updated. This information is public and can be seen by any authenticated user in the network. |
+| `deleted_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the user was deleted. This information is public and can be seen by any authenticated user in the network. |
+| `name` | [`string`](#string) |  | The name of the user. This information is public and can be seen by any authenticated user in the network. |
+| `description` | [`string`](#string) |  | A description for the user. This information is public and can be seen by any authenticated user in the network. |
 | `attributes` | [`User.AttributesEntry`](#ttn.lorawan.v3.User.AttributesEntry) | repeated | Key-value attributes for this users. Typically used for storing integration-specific data. |
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user. |
 | `primary_email_address` | [`string`](#string) |  | Primary email address that can be used for logging in. This address is not public, use contact_info for that. |
@@ -8175,13 +8175,13 @@ User is the message that defines a user on the network.
 | `password` | [`string`](#string) |  | The password field is only considered when creating a user. It is not returned on API calls, and can not be updated by updating the User. See the UpdatePassword method of the UserRegistry service for more information. |
 | `password_updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `require_password_update` | [`bool`](#bool) |  |  |
-| `state` | [`State`](#ttn.lorawan.v3.State) |  | The reviewing state of the user. This field can only be modified by admins. |
+| `state` | [`State`](#ttn.lorawan.v3.State) |  | The reviewing state of the user. This information is public and can be seen by any authenticated user in the network. This field can only be modified by admins. |
 | `state_description` | [`string`](#string) |  | A description for the state field. This field can only be modified by admins, and should typically only be updated when also updating `state`. |
-| `admin` | [`bool`](#bool) |  | This user is an admin. This field can only be modified by other admins. |
+| `admin` | [`bool`](#bool) |  | This user is an admin. This information is public and can be seen by any authenticated user in the network. This field can only be modified by other admins. |
 | `temporary_password` | [`string`](#string) |  | The temporary password can only be used to update a user's password; never returned on API calls. It is not returned on API calls, and can not be updated by updating the User. See the CreateTemporaryPassword method of the UserRegistry service for more information. |
 | `temporary_password_created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `temporary_password_expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `profile_picture` | [`Picture`](#ttn.lorawan.v3.Picture) |  |  |
+| `profile_picture` | [`Picture`](#ttn.lorawan.v3.Picture) |  | A profile picture for the user. This information is public and can be seen by any authenticated user in the network. |
 
 #### Field Rules
 

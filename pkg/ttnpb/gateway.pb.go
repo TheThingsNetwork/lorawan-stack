@@ -406,18 +406,25 @@ func (m *GatewayClaimAuthenticationCode) GetValidTo() *time.Time {
 
 // Gateway is the message that defines a gateway on the network.
 type Gateway struct {
+	// The identifiers of the gateway. These are public and can be seen by any authenticated user in the network.
 	GatewayIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	CreatedAt          time.Time  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
-	UpdatedAt          time.Time  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
-	DeletedAt          *time.Time `protobuf:"bytes,26,opt,name=deleted_at,json=deletedAt,proto3,stdtime" json:"deleted_at,omitempty"`
-	Name               string     `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Description        string     `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	// When the gateway was created. This information is public and can be seen by any authenticated user in the network.
+	CreatedAt time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	// When the gateway was last updated. This information is public and can be seen by any authenticated user in the network.
+	UpdatedAt time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	// When the gateway was deleted. This information is public and can be seen by any authenticated user in the network.
+	DeletedAt *time.Time `protobuf:"bytes,26,opt,name=deleted_at,json=deletedAt,proto3,stdtime" json:"deleted_at,omitempty"`
+	// The name of the gateway. This information is public and can be seen by any authenticated user in the network.
+	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	// A description for the gateway. This information is public and can be seen by any authenticated user in the network.
+	Description string `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
 	// Key-value attributes for this gateway. Typically used for organizing gateways or for storing integration-specific data.
 	Attributes map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.
 	ContactInfo               []*ContactInfo `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
 	GatewayVersionIdentifiers `protobuf:"bytes,8,opt,name=version_ids,json=versionIds,proto3,embedded=version_ids" json:"version_ids"`
 	// The address of the Gateway Server to connect to.
+	// This information is public and can be seen by any authenticated user in the network if status_public is true.
 	// The typical format of the address is "host:port". If the port is omitted,
 	// the normal port inference (with DNS lookup, otherwise defaults) is used.
 	// The connection shall be established with transport layer security (TLS).
@@ -426,12 +433,16 @@ type Gateway struct {
 	AutoUpdate           bool   `protobuf:"varint,10,opt,name=auto_update,json=autoUpdate,proto3" json:"auto_update,omitempty"`
 	UpdateChannel        string `protobuf:"bytes,11,opt,name=update_channel,json=updateChannel,proto3" json:"update_channel,omitempty"`
 	// Frequency plan ID of the gateway.
+	// This information is public and can be seen by any authenticated user in the network.
+	// DEPRECATED: use frequency_plan_ids.
 	// This equals the first element of the frequency_plan_ids field.
 	FrequencyPlanId string `protobuf:"bytes,12,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
 	// Frequency plan IDs of the gateway.
+	// This information is public and can be seen by any authenticated user in the network.
 	// The first element equals the frequency_plan_id field.
-	FrequencyPlanIds []string         `protobuf:"bytes,20,rep,name=frequency_plan_ids,json=frequencyPlanIds,proto3" json:"frequency_plan_ids,omitempty"`
-	Antennas         []GatewayAntenna `protobuf:"bytes,13,rep,name=antennas,proto3" json:"antennas"`
+	FrequencyPlanIds []string `protobuf:"bytes,20,rep,name=frequency_plan_ids,json=frequencyPlanIds,proto3" json:"frequency_plan_ids,omitempty"`
+	// Antennas of the gateway. Location information of the antennas is public and can be seen by any authenticated user in the network if location_public=true.
+	Antennas []GatewayAntenna `protobuf:"bytes,13,rep,name=antennas,proto3" json:"antennas"`
 	// The status of this gateway may be publicly displayed.
 	StatusPublic bool `protobuf:"varint,14,opt,name=status_public,json=statusPublic,proto3" json:"status_public,omitempty"`
 	// The location of this gateway may be publicly displayed.

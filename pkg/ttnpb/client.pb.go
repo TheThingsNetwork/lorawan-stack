@@ -62,27 +62,37 @@ func (GrantType) EnumDescriptor() ([]byte, []int) {
 
 // An OAuth client on the network.
 type Client struct {
+	// The identifiers of the OAuth client. These are public and can be seen by any authenticated user in the network.
 	ClientIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	CreatedAt         time.Time  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
-	UpdatedAt         time.Time  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
-	DeletedAt         *time.Time `protobuf:"bytes,16,opt,name=deleted_at,json=deletedAt,proto3,stdtime" json:"deleted_at,omitempty"`
-	Name              string     `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Description       string     `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	// When the OAuth client was created. This information is public and can be seen by any authenticated user in the network.
+	CreatedAt time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	// When the OAuth client was last updated. This information is public and can be seen by any authenticated user in the network.
+	UpdatedAt time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	// When the OAuth client was deleted. This information is public and can be seen by any authenticated user in the network.
+	DeletedAt *time.Time `protobuf:"bytes,16,opt,name=deleted_at,json=deletedAt,proto3,stdtime" json:"deleted_at,omitempty"`
+	// The name of the OAuth client. This information is public and can be seen by any authenticated user in the network.
+	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	// A description for the OAuth client. This information is public and can be seen by any authenticated user in the network.
+	Description string `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
 	// Key-value attributes for this client. Typically used for organizing clients or for storing integration-specific data.
 	Attributes map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.
+	// This information is public and can be seen by any authenticated user in the network.
 	ContactInfo []*ContactInfo `protobuf:"bytes,7,rep,name=contact_info,json=contactInfo,proto3" json:"contact_info,omitempty"`
 	// The client secret is only visible to collaborators of the client.
 	Secret string `protobuf:"bytes,8,opt,name=secret,proto3" json:"secret,omitempty"`
 	// The allowed redirect URIs against which authorization requests are checked.
 	// If the authorization request does not pass a redirect URI, the first one
 	// from this list is taken.
+	// This information is public and can be seen by any authenticated user in the network.
 	RedirectUris []string `protobuf:"bytes,9,rep,name=redirect_uris,json=redirectUris,proto3" json:"redirect_uris,omitempty"`
 	// The allowed logout redirect URIs against which client initiated logout
 	// requests are checked. If the authorization request does not pass a redirect
 	// URI, the first one from this list is taken.
+	// This information is public and can be seen by any authenticated user in the network.
 	LogoutRedirectUris []string `protobuf:"bytes,15,rep,name=logout_redirect_uris,json=logoutRedirectUris,proto3" json:"logout_redirect_uris,omitempty"`
 	// The reviewing state of the client.
+	// This information is public and can be seen by any authenticated user in the network.
 	// This field can only be modified by admins.
 	// If state_description is not updated when updating state, state_description is cleared.
 	State State `protobuf:"varint,10,opt,name=state,proto3,enum=ttn.lorawan.v3.State" json:"state,omitempty"`
@@ -91,15 +101,19 @@ type Client struct {
 	// when also updating `state`.
 	StateDescription string `protobuf:"bytes,17,opt,name=state_description,json=stateDescription,proto3" json:"state_description,omitempty"`
 	// If set, the authorization page will be skipped.
+	// This information is public and can be seen by any authenticated user in the network.
 	// This field can only be modified by admins.
 	SkipAuthorization bool `protobuf:"varint,11,opt,name=skip_authorization,json=skipAuthorization,proto3" json:"skip_authorization,omitempty"`
 	// If set, the authorization page will show endorsement.
+	// This information is public and can be seen by any authenticated user in the network.
 	// This field can only be modified by admins.
 	Endorsed bool `protobuf:"varint,12,opt,name=endorsed,proto3" json:"endorsed,omitempty"`
 	// OAuth flows that can be used for the client to get a token.
+	// This information is public and can be seen by any authenticated user in the network.
 	// After a client is created, this field can only be modified by admins.
 	Grants []GrantType `protobuf:"varint,13,rep,packed,name=grants,proto3,enum=ttn.lorawan.v3.GrantType" json:"grants,omitempty"`
 	// Rights denotes what rights the client will have access to.
+	// This information is public and can be seen by any authenticated user in the network.
 	// Users that previously authorized this client will have to re-authorize the
 	// client after rights are added to this list.
 	Rights               []Right  `protobuf:"varint,14,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`

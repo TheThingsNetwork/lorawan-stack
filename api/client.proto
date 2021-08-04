@@ -52,12 +52,18 @@ enum GrantType {
 message Client {
   option (gogoproto.populate) = true;
 
+  // The identifiers of the OAuth client. These are public and can be seen by any authenticated user in the network.
   ClientIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // When the OAuth client was created. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // When the OAuth client was last updated. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // When the OAuth client was deleted. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp deleted_at = 16 [(gogoproto.stdtime) = true];
 
+  // The name of the OAuth client. This information is public and can be seen by any authenticated user in the network.
   string name = 4 [(validate.rules).string.max_len = 50];
+  // A description for the OAuth client. This information is public and can be seen by any authenticated user in the network.
   string description = 5 [(validate.rules).string.max_len = 2000];
 
   // Key-value attributes for this client. Typically used for organizing clients or for storing integration-specific data.
@@ -70,6 +76,7 @@ message Client {
   ];
 
   // Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.
+  // This information is public and can be seen by any authenticated user in the network.
   repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
 
   // The client secret is only visible to collaborators of the client.
@@ -77,6 +84,7 @@ message Client {
   // The allowed redirect URIs against which authorization requests are checked.
   // If the authorization request does not pass a redirect URI, the first one
   // from this list is taken.
+  // This information is public and can be seen by any authenticated user in the network.
   repeated string redirect_uris = 9 [
     (validate.rules).repeated = {
       max_items: 10,
@@ -86,6 +94,7 @@ message Client {
   // The allowed logout redirect URIs against which client initiated logout
   // requests are checked. If the authorization request does not pass a redirect
   // URI, the first one from this list is taken.
+  // This information is public and can be seen by any authenticated user in the network.
   repeated string logout_redirect_uris = 15 [
     (validate.rules).repeated = {
       max_items: 10,
@@ -93,6 +102,7 @@ message Client {
     }
   ];
   // The reviewing state of the client.
+  // This information is public and can be seen by any authenticated user in the network.
   // This field can only be modified by admins.
   // If state_description is not updated when updating state, state_description is cleared.
   State state = 10 [(validate.rules).enum.defined_only = true];
@@ -101,15 +111,19 @@ message Client {
   // when also updating `state`.
   string state_description = 17 [(validate.rules).string.max_len = 128];
   // If set, the authorization page will be skipped.
+  // This information is public and can be seen by any authenticated user in the network.
   // This field can only be modified by admins.
   bool skip_authorization = 11;
   // If set, the authorization page will show endorsement.
+  // This information is public and can be seen by any authenticated user in the network.
   // This field can only be modified by admins.
   bool endorsed = 12;
   // OAuth flows that can be used for the client to get a token.
+  // This information is public and can be seen by any authenticated user in the network.
   // After a client is created, this field can only be modified by admins.
   repeated GrantType grants = 13 [(validate.rules).repeated.items.enum.defined_only = true];
   // Rights denotes what rights the client will have access to.
+  // This information is public and can be seen by any authenticated user in the network.
   // Users that previously authorized this client will have to re-authorize the
   // client after rights are added to this list.
   repeated Right rights = 14 [(validate.rules).repeated.items.enum.defined_only = true];

@@ -41,12 +41,18 @@ option (gogoproto.stringer_all) = true;
 message User {
   option (gogoproto.populate) = true;
 
+  // The identifiers of the user. These are public and can be seen by any authenticated user in the network.
   UserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // When the user was created. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // When the user was last updated. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // When the user was deleted. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp deleted_at = 19 [(gogoproto.stdtime) = true];
 
+  // The name of the user. This information is public and can be seen by any authenticated user in the network.
   string name = 4 [(validate.rules).string.max_len = 50];
+  // A description for the user. This information is public and can be seen by any authenticated user in the network.
   string description = 5 [(validate.rules).string.max_len = 2000];
 
   // Key-value attributes for this users. Typically used for storing integration-specific data.
@@ -76,6 +82,7 @@ message User {
   bool require_password_update = 12;
 
   // The reviewing state of the user.
+  // This information is public and can be seen by any authenticated user in the network.
   // This field can only be modified by admins.
   State state = 13 [(validate.rules).enum.defined_only = true];
   // A description for the state field.
@@ -83,6 +90,7 @@ message User {
   // when also updating `state`.
   string state_description = 20 [(validate.rules).string.max_len = 128];
   // This user is an admin.
+  // This information is public and can be seen by any authenticated user in the network.
   // This field can only be modified by other admins.
   bool admin = 14;
 
@@ -93,6 +101,8 @@ message User {
   google.protobuf.Timestamp temporary_password_created_at = 16 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp temporary_password_expires_at = 17 [(gogoproto.stdtime) = true];
 
+  // A profile picture for the user.
+  // This information is public and can be seen by any authenticated user in the network.
   Picture profile_picture = 18;
 
   // next: 21

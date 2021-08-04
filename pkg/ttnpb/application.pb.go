@@ -34,12 +34,18 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Application is the message that defines an Application in the network.
 type Application struct {
+	// The identifiers of the application. These are public and can be seen by any authenticated user in the network.
 	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	CreatedAt              time.Time  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
-	UpdatedAt              time.Time  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
-	DeletedAt              *time.Time `protobuf:"bytes,8,opt,name=deleted_at,json=deletedAt,proto3,stdtime" json:"deleted_at,omitempty"`
-	Name                   string     `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Description            string     `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	// When the application was created. This information is public and can be seen by any authenticated user in the network.
+	CreatedAt time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	// When the application was last updated. This information is public and can be seen by any authenticated user in the network.
+	UpdatedAt time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	// When the application was deleted. This information is public and can be seen by any authenticated user in the network.
+	DeletedAt *time.Time `protobuf:"bytes,8,opt,name=deleted_at,json=deletedAt,proto3,stdtime" json:"deleted_at,omitempty"`
+	// The name of the application.
+	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	// A description for the application.
+	Description string `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
 	// Key-value attributes for this application. Typically used for organizing applications or for storing integration-specific data.
 	Attributes map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.

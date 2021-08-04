@@ -33,12 +33,18 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // User is the message that defines a user on the network.
 type User struct {
+	// The identifiers of the user. These are public and can be seen by any authenticated user in the network.
 	UserIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	CreatedAt       time.Time  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
-	UpdatedAt       time.Time  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
-	DeletedAt       *time.Time `protobuf:"bytes,19,opt,name=deleted_at,json=deletedAt,proto3,stdtime" json:"deleted_at,omitempty"`
-	Name            string     `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Description     string     `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	// When the user was created. This information is public and can be seen by any authenticated user in the network.
+	CreatedAt time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	// When the user was last updated. This information is public and can be seen by any authenticated user in the network.
+	UpdatedAt time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	// When the user was deleted. This information is public and can be seen by any authenticated user in the network.
+	DeletedAt *time.Time `protobuf:"bytes,19,opt,name=deleted_at,json=deletedAt,proto3,stdtime" json:"deleted_at,omitempty"`
+	// The name of the user. This information is public and can be seen by any authenticated user in the network.
+	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	// A description for the user. This information is public and can be seen by any authenticated user in the network.
+	Description string `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
 	// Key-value attributes for this users. Typically used for storing integration-specific data.
 	Attributes map[string]string `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user.
@@ -55,6 +61,7 @@ type User struct {
 	PasswordUpdatedAt     *time.Time `protobuf:"bytes,11,opt,name=password_updated_at,json=passwordUpdatedAt,proto3,stdtime" json:"password_updated_at,omitempty"`
 	RequirePasswordUpdate bool       `protobuf:"varint,12,opt,name=require_password_update,json=requirePasswordUpdate,proto3" json:"require_password_update,omitempty"`
 	// The reviewing state of the user.
+	// This information is public and can be seen by any authenticated user in the network.
 	// This field can only be modified by admins.
 	State State `protobuf:"varint,13,opt,name=state,proto3,enum=ttn.lorawan.v3.State" json:"state,omitempty"`
 	// A description for the state field.
@@ -62,6 +69,7 @@ type User struct {
 	// when also updating `state`.
 	StateDescription string `protobuf:"bytes,20,opt,name=state_description,json=stateDescription,proto3" json:"state_description,omitempty"`
 	// This user is an admin.
+	// This information is public and can be seen by any authenticated user in the network.
 	// This field can only be modified by other admins.
 	Admin bool `protobuf:"varint,14,opt,name=admin,proto3" json:"admin,omitempty"`
 	// The temporary password can only be used to update a user's password; never returned on API calls.
@@ -70,9 +78,11 @@ type User struct {
 	TemporaryPassword          string     `protobuf:"bytes,15,opt,name=temporary_password,json=temporaryPassword,proto3" json:"temporary_password,omitempty"`
 	TemporaryPasswordCreatedAt *time.Time `protobuf:"bytes,16,opt,name=temporary_password_created_at,json=temporaryPasswordCreatedAt,proto3,stdtime" json:"temporary_password_created_at,omitempty"`
 	TemporaryPasswordExpiresAt *time.Time `protobuf:"bytes,17,opt,name=temporary_password_expires_at,json=temporaryPasswordExpiresAt,proto3,stdtime" json:"temporary_password_expires_at,omitempty"`
-	ProfilePicture             *Picture   `protobuf:"bytes,18,opt,name=profile_picture,json=profilePicture,proto3" json:"profile_picture,omitempty"`
-	XXX_NoUnkeyedLiteral       struct{}   `json:"-"`
-	XXX_sizecache              int32      `json:"-"`
+	// A profile picture for the user.
+	// This information is public and can be seen by any authenticated user in the network.
+	ProfilePicture       *Picture `protobuf:"bytes,18,opt,name=profile_picture,json=profilePicture,proto3" json:"profile_picture,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *User) Reset()      { *m = User{} }

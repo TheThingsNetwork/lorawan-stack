@@ -91,12 +91,18 @@ message GatewayClaimAuthenticationCode {
 message Gateway {
   option (gogoproto.populate) = true;
 
+  // The identifiers of the gateway. These are public and can be seen by any authenticated user in the network.
   GatewayIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // When the gateway was created. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // When the gateway was last updated. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // When the gateway was deleted. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp deleted_at = 26 [(gogoproto.stdtime) = true];
 
+  // The name of the gateway. This information is public and can be seen by any authenticated user in the network.
   string name = 4 [(validate.rules).string.max_len = 50];
+  // A description for the gateway. This information is public and can be seen by any authenticated user in the network.
   string description = 5 [(validate.rules).string.max_len = 2000];
 
   // Key-value attributes for this gateway. Typically used for organizing gateways or for storing integration-specific data.
@@ -114,6 +120,7 @@ message Gateway {
   GatewayVersionIdentifiers version_ids = 8 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   // The address of the Gateway Server to connect to.
+  // This information is public and can be seen by any authenticated user in the network if status_public is true.
   // The typical format of the address is "host:port". If the port is omitted,
   // the normal port inference (with DNS lookup, otherwise defaults) is used.
   // The connection shall be established with transport layer security (TLS).
@@ -123,10 +130,13 @@ message Gateway {
   string update_channel = 11 [(validate.rules).string.max_len = 128];
 
   // Frequency plan ID of the gateway.
+  // This information is public and can be seen by any authenticated user in the network.
+  // DEPRECATED: use frequency_plan_ids.
   // This equals the first element of the frequency_plan_ids field.
   string frequency_plan_id = 12 [(validate.rules).string.max_len = 64];
 
   // Frequency plan IDs of the gateway.
+  // This information is public and can be seen by any authenticated user in the network.
   // The first element equals the frequency_plan_id field.
   repeated string frequency_plan_ids = 20 [
     (validate.rules).repeated = {
@@ -135,6 +145,7 @@ message Gateway {
     }
   ];
 
+  // Antennas of the gateway. Location information of the antennas is public and can be seen by any authenticated user in the network if location_public=true.
   repeated GatewayAntenna antennas = 13 [
     (gogoproto.nullable) = false,
     (validate.rules).repeated.max_items = 8
