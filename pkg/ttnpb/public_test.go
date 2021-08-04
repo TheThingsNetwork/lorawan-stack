@@ -19,7 +19,6 @@ import (
 
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -28,11 +27,17 @@ func TestApplicationPublicSafe(t *testing.T) {
 
 	a.So(((*Application)(nil)).PublicSafe(), should.BeNil)
 
-	src := NewPopulatedApplication(test.Randy, true)
+	src := &Application{
+		ApplicationIdentifiers: ApplicationIdentifiers{ApplicationId: "foo"},
+		Name:                   "Name",
+		Description:            "Description",
+		Attributes:             map[string]string{"key": "value"},
+	}
 	safe := src.PublicSafe()
 
-	a.So(safe, should.NotResemble, src)
 	a.So(safe.Name, should.BeEmpty)
+	a.So(safe.Description, should.BeEmpty)
+	a.So(safe.Attributes, should.BeEmpty)
 }
 
 func TestClientPublicSafe(t *testing.T) {
@@ -40,11 +45,17 @@ func TestClientPublicSafe(t *testing.T) {
 
 	a.So(((*Client)(nil)).PublicSafe(), should.BeNil)
 
-	src := NewPopulatedClient(test.Randy, true)
+	src := &Client{
+		ClientIdentifiers: ClientIdentifiers{ClientId: "foo"},
+		Name:              "Name",
+		Description:       "Description",
+		Attributes:        map[string]string{"key": "value"},
+	}
 	safe := src.PublicSafe()
 
-	a.So(safe, should.NotResemble, src)
-	a.So(safe.Name, should.Equal, src.Name)
+	a.So(safe.Name, should.NotBeEmpty)
+	a.So(safe.Description, should.NotBeEmpty)
+	a.So(safe.Attributes, should.BeEmpty)
 }
 
 func TestGatewayPublicSafe(t *testing.T) {
@@ -52,11 +63,17 @@ func TestGatewayPublicSafe(t *testing.T) {
 
 	a.So(((*Gateway)(nil)).PublicSafe(), should.BeNil)
 
-	src := NewPopulatedGateway(test.Randy, true)
+	src := &Gateway{
+		GatewayIdentifiers: GatewayIdentifiers{GatewayId: "foo"},
+		Name:               "Name",
+		Description:        "Description",
+		Attributes:         map[string]string{"key": "value"},
+	}
 	safe := src.PublicSafe()
 
-	a.So(safe, should.NotResemble, src)
-	a.So(safe.Name, should.Equal, src.Name)
+	a.So(safe.Name, should.NotBeEmpty)
+	a.So(safe.Description, should.NotBeEmpty)
+	a.So(safe.Attributes, should.BeEmpty)
 }
 
 func TestOrganizationPublicSafe(t *testing.T) {
@@ -64,11 +81,17 @@ func TestOrganizationPublicSafe(t *testing.T) {
 
 	a.So(((*Organization)(nil)).PublicSafe(), should.BeNil)
 
-	src := NewPopulatedOrganization(test.Randy, true)
+	src := &Organization{
+		OrganizationIdentifiers: OrganizationIdentifiers{OrganizationId: "foo"},
+		Name:                    "Name",
+		Description:             "Description",
+		Attributes:              map[string]string{"key": "value"},
+	}
 	safe := src.PublicSafe()
 
-	a.So(safe, should.NotResemble, src)
-	a.So(safe.Name, should.Equal, src.Name)
+	a.So(safe.Name, should.NotBeEmpty)
+	a.So(safe.Description, should.BeEmpty)
+	a.So(safe.Attributes, should.BeEmpty)
 }
 
 func TestUserPublicSafe(t *testing.T) {
@@ -76,9 +99,15 @@ func TestUserPublicSafe(t *testing.T) {
 
 	a.So(((*User)(nil)).PublicSafe(), should.BeNil)
 
-	src := NewPopulatedUser(test.Randy, true)
+	src := &User{
+		UserIdentifiers: UserIdentifiers{UserId: "foo"},
+		Name:            "Name",
+		Description:     "Description",
+		Attributes:      map[string]string{"key": "value"},
+	}
 	safe := src.PublicSafe()
 
-	a.So(safe, should.NotResemble, src)
-	a.So(safe.Name, should.Equal, src.Name)
+	a.So(safe.Name, should.NotBeEmpty)
+	a.So(safe.Description, should.NotBeEmpty)
+	a.So(safe.Attributes, should.BeEmpty)
 }
