@@ -158,6 +158,8 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 	defer func() {
 		if err != nil {
 			registerUpdateInfoRequestFailed(c.Request().Context(), updateInfoRequestLabel, err)
+		} else {
+			registerUpdateInfoRequestSucceeded(c.Request().Context(), updateInfoRequestLabel)
 		}
 	}()
 
@@ -382,8 +384,5 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-
-	registerUpdateInfoRequestSucceeded(c.Request().Context(), updateInfoRequestLabel, req.Station)
-
 	return c.Blob(http.StatusOK, echo.MIMEOctetStream, b)
 }
