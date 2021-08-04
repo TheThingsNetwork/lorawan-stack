@@ -37,8 +37,6 @@ option (gogoproto.stringer_all) = true;
 
 // Application is the message that defines an Application in the network.
 message Application {
-  option (gogoproto.populate) = true;
-
   // The identifiers of the application. These are public and can be seen by any authenticated user in the network.
   ApplicationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // When the application was created. This information is public and can be seen by any authenticated user in the network.

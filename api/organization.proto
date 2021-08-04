@@ -36,8 +36,6 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.stringer_all) = true;
 
 message Organization {
-  option (gogoproto.populate) = true;
-
   // The identifiers of the organization. These are public and can be seen by any authenticated user in the network.
   OrganizationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // When the organization was created. This information is public and can be seen by any authenticated user in the network.

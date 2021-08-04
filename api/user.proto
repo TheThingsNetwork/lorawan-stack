@@ -39,8 +39,6 @@ option (gogoproto.stringer_all) = true;
 
 // User is the message that defines a user on the network.
 message User {
-  option (gogoproto.populate) = true;
-
   // The identifiers of the user. These are public and can be seen by any authenticated user in the network.
   UserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // When the user was created. This information is public and can be seen by any authenticated user in the network.

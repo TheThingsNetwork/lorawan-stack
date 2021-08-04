@@ -50,8 +50,6 @@ enum GrantType {
 
 // An OAuth client on the network.
 message Client {
-  option (gogoproto.populate) = true;
-
   // The identifiers of the OAuth client. These are public and can be seen by any authenticated user in the network.
   ClientIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // When the OAuth client was created. This information is public and can be seen by any authenticated user in the network.
