@@ -2307,6 +2307,7 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 
 | Field | Validations |
 | ----- | ----------- |
+| `target_cups_uri` | <p>`string.max_len`: `256`</p><p>`string.pattern`: `^https`</p><p>`string.uri`: `true`</p> |
 | `current_gateway_key` | <p>`string.max_len`: `2048`</p> |
 | `auth_token` | <p>`string.max_len`: `2048`</p> |
 
@@ -2374,7 +2375,7 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | `authenticated_identifiers` | [`ClaimGatewayRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers) |  |  |
 | `qr_code` | [`bytes`](#bytes) |  |  |
 | `collaborator` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  | Collaborator to grant all rights on the target gateway. |
-| `target_gateway_id` | [`string`](#string) |  | Gateway ID for the target gateway. This must be a unique value. If this is not set, the target ID for the target gateway will be set to `eui-<gateway-eui>` |
+| `target_gateway_id` | [`string`](#string) |  | Gateway ID for the target gateway. This must be a unique value. If this is not set, the target ID for the target gateway will be set to `<gateway-eui>`. |
 | `target_gateway_server_address` | [`string`](#string) |  | Target Gateway Server Address for the target gateway. |
 | `cups_redirection` | [`CUPSRedirection`](#ttn.lorawan.v3.CUPSRedirection) |  | Parameters to set CUPS redirection for the gateway. |
 | `target_frequency_plan_id` | [`string`](#string) |  | Frequency plan ID of the target gateway. This equals the first element of the frequency_plan_ids field. |
