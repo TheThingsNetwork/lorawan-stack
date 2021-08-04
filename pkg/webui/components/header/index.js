@@ -18,7 +18,6 @@ import classnames from 'classnames'
 import hamburgerMenuNormal from '@assets/misc/hamburger-menu-normal.svg'
 import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
 
-import Icon from '@ttn-lw/components/icon'
 import NavigationBar from '@ttn-lw/components/navigation/bar'
 import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
 import MobileMenu from '@ttn-lw/components/mobile-menu'
@@ -76,7 +75,6 @@ const Header = ({
               {dropdownItems}
             </ProfileDropdown>
             <button onClick={handleMobileMenuClick} className={style.mobileMenuButton}>
-              <Icon className={style.preloadIcons} icon="." />
               <div className={style.hamburger}>
                 <img src={hamburgerGraphic} alt="Open Mobile Menu" />
               </div>
