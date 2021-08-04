@@ -121,7 +121,7 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.3.1
 	go.opencensus.io v0.23.0
 	go.packetbroker.org/api/iam v1.5.16-tts
-	go.packetbroker.org/api/iam/v2 v2.6.15-tts
+	go.packetbroker.org/api/iam/v2 v2.6.16-tts
 	go.packetbroker.org/api/mapping/v2 v2.1.14-tts
 	go.packetbroker.org/api/routing v1.8.7-tts
 	go.packetbroker.org/api/v3 v3.10.7-tts

@@ -462,6 +462,10 @@ func (s *pbaServer) ListNetworks(ctx context.Context, req *ttnpb.ListPacketBroke
 			Limit:            req.Limit,
 			TenantIdContains: req.TenantIdContains,
 			NameContains:     req.NameContains,
+			PolicyReference: &iampbv2.ListNetworksRequest_PolicyReference{
+				NetId:    s.netID.MarshalNumber(),
+				TenantId: s.tenantIDExtractor(ctx),
+			},
 		})
 		return res.GetNetworks(), res.GetTotal(), err
 	})
@@ -478,6 +482,10 @@ func (s *pbaServer) ListHomeNetworks(ctx context.Context, req *ttnpb.ListPacketB
 			Limit:            req.Limit,
 			TenantIdContains: req.TenantIdContains,
 			NameContains:     req.NameContains,
+			PolicyReference: &iampbv2.ListNetworksRequest_PolicyReference{
+				NetId:    s.netID.MarshalNumber(),
+				TenantId: s.tenantIDExtractor(ctx),
+			},
 		})
 		return res.GetNetworks(), res.GetTotal(), err
 	})
