@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import clipboard from 'clipboard'
@@ -100,9 +100,35 @@ const FullViewErrorInner = ({ error }) => {
         <Message content={sharedMessages.backToOverview} />
       </Link.Anchor>
     )
-  }
+  } else {
+    const errorDetails = JSON.stringify(error, undefined, 2)
 
-  const errorDetails = useMemo(() => JSON.stringify(error, undefined, 2), [error])
+    action = (
+      <details>
+        <summary>
+          <Message content={m.errorDetails} />
+        </summary>
+        <pre>{errorDetails}</pre>
+        <Button
+          onClick={handleCopyClick}
+          ref={copyButton}
+          data-clipboard-text={errorDetails}
+          message={copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard}
+          icon={copied ? 'done' : 'file_copy'}
+          secondary
+        />
+        {Boolean(supportLink) && (
+          <Button.AnchorLink
+            href={supportLink}
+            message={sharedMessages.getSupport}
+            icon="contact_support"
+            target="_blank"
+            secondary
+          />
+        )}
+      </details>
+    )
+  }
 
   return (
     <div className={style.fullViewError} data-test-id="full-error-view">
@@ -116,29 +142,6 @@ const FullViewErrorInner = ({ error }) => {
               content={errorTitleMessage}
             />
             <ErrorMessage className={style.fullViewErrorSub} content={errorMessageMessage} />
-            <details>
-              <summary>
-                <Message content={m.errorDetails} />
-              </summary>
-              <pre>{errorDetails}</pre>
-              <Button
-                onClick={handleCopyClick}
-                ref={copyButton}
-                data-clipboard-text={errorDetails}
-                message={copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard}
-                icon={copied ? 'done' : 'file_copy'}
-                secondary
-              />
-              {Boolean(supportLink) && (
-                <Button.AnchorLink
-                  href={supportLink}
-                  message={sharedMessages.getSupport}
-                  icon="contact_support"
-                  target="_blank"
-                  secondary
-                />
-              )}
-            </details>
             {action}
           </Col>
         </Row>
