@@ -31,10 +31,10 @@ import (
 )
 
 const (
-	publishUplinkTimeout = 2 * time.Second
-	updateGatewayTimeout = 2 * time.Second
+	publishUplinkTimeout = 3 * time.Second
+	updateGatewayTimeout = 5 * time.Second
 
-	DefaultUpdateGatewayInterval = 5 * time.Minute
+	DefaultUpdateGatewayInterval = 10 * time.Minute
 	DefaultUpdateGatewayJitter   = 0.2
 	DefaultOnlineTTLMargin       = 10 * time.Second
 )
