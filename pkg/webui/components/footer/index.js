@@ -202,8 +202,8 @@ const Footer = ({
             <Message content={sharedMessages.documentation} />
           </FooterSection>
         )}
-        {true && (
-          <FooterSection link={'http://localhost'} primary>
+        {supportLink && (
+          <FooterSection link={supportLink} primary>
             <Icon icon="contact_support" textPaddedRight nudgeDown />
             <Message content={sharedMessages.getSupport} />
           </FooterSection>
