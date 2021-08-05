@@ -22,6 +22,7 @@ For details about compatibility between different releases, see the **Commitment
 - Cache Root CA for client TLS configuration.
 - Identity Server no longer allows removing the `_ALL` right from entity collaborators if that leaves the entity without any collaborator that has the `_ALL` right.
 - The Network Server application uplink queue may now be skipped if the Application Server peer is available at enqueue time.
+- The interval for updating gateways in Packet Broker is now 10 minutes (was 5 minutes) and the timeout is 5 seconds (was 2 seconds).
 
 ### Deprecated
 
