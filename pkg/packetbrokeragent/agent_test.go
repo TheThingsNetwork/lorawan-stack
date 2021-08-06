@@ -47,7 +47,12 @@ import (
 
 var (
 	timeout     = (1 << 7) * test.Delay
-	testOptions []Option
+	testOptions = []Option{
+		WithTestAuthenticator(ttnpb.PacketBrokerNetworkIdentifier{
+			NetId:    0x000013,
+			TenantId: "foo-tenant",
+		}),
+	}
 )
 
 func TestComponent(t *testing.T) {

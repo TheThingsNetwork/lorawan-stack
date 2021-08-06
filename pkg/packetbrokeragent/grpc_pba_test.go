@@ -747,7 +747,7 @@ func TestPba(t *testing.T) {
 						},
 					},
 				},
-			}, append(append([]Option{}, testOptions...), WithInsecureDialOptions())...)
+			}, testOptions...)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
