@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.14.1] - 2021-08-06
+
+### Added
+
 - New config option `--as.packages.timeout` to control the message processing timeout of application packages.
 - Option to view and copy error details in full view errors in the Console.
 - Metrics for CUPS requests.
@@ -24,16 +38,10 @@ For details about compatibility between different releases, see the **Commitment
 - The Network Server application uplink queue may now be skipped if the Application Server peer is available at enqueue time.
 - The interval for updating gateways in Packet Broker is now 10 minutes (was 5 minutes) and the timeout is 5 seconds (was 2 seconds).
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Improved errors when ordering search requests by non-existent fields.
 - LNS authentication key handling for gateways in the Console.
-
-### Security
 
 ## [3.14.0] - 2021-07-23
 
@@ -1683,7 +1691,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.0...v3.14
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.1...v3.14
+[3.14.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.0...v3.14.1
 [3.14.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.3...v3.14.0
 [3.13.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.2...v3.13.3
 [3.13.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.1...v3.13.2
