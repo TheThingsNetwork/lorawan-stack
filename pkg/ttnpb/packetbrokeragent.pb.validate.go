@@ -901,6 +901,8 @@ func (m *PacketBrokerInfo) ValidateFields(paths ...string) error {
 			// no validation rules for ForwarderEnabled
 		case "home_network_enabled":
 			// no validation rules for HomeNetworkEnabled
+		case "register_enabled":
+			// no validation rules for RegisterEnabled
 		default:
 			return PacketBrokerInfoValidationError{
 				field:  name,

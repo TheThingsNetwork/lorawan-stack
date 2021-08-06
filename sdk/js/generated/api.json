@@ -32963,6 +32963,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "register_enabled",
+              "description": "Whether the registration can be changed.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -33594,7 +33606,7 @@
             },
             {
               "name": "Register",
-              "description": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.",
+              "description": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.\nPacket Broker registration is only supported for tenants and requires Packet Broker Agent to be configured with\nNetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.",
               "requestType": "Empty",
               "requestLongType": ".google.protobuf.Empty",
               "requestFullType": "google.protobuf.Empty",
@@ -33620,7 +33632,7 @@
             },
             {
               "name": "Deregister",
-              "description": "Deregister from Packet Broker.\nPacket Broker deregistration requires administrative access.",
+              "description": "Deregister from Packet Broker.\nPacket Broker deregistration requires administrative access.\nPacket Broker deregistration is only supported for tenants and requires Packet Broker Agent to be configured with\nNetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.",
               "requestType": "Empty",
               "requestLongType": ".google.protobuf.Empty",
               "requestFullType": "google.protobuf.Empty",

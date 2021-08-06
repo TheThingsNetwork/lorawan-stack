@@ -143,6 +143,8 @@ message PacketBrokerInfo {
   bool forwarder_enabled = 2;
   // Whether the server is configured as Home Network (with end devices).
   bool home_network_enabled = 3;
+  // Whether the registration can be changed.
+  bool register_enabled = 4;
 }
 
 message PacketBrokerRoutingPolicyUplink {
@@ -262,6 +264,8 @@ service Pba {
   // Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.
   // All registration settings are taken from Packet Broker Agent configuration and caller context.
   // Packet Broker registration requires administrative access.
+  // Packet Broker registration is only supported for tenants and requires Packet Broker Agent to be configured with
+  // NetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.
   rpc Register(google.protobuf.Empty) returns (PacketBrokerNetwork) {
     option (google.api.http) = {
       put: "/pba/registration"
@@ -273,6 +277,8 @@ service Pba {
 
   // Deregister from Packet Broker.
   // Packet Broker deregistration requires administrative access.
+  // Packet Broker deregistration is only supported for tenants and requires Packet Broker Agent to be configured with
+  // NetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.
   rpc Deregister(google.protobuf.Empty) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/pba/registration"

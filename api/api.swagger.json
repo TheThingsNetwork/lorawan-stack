@@ -7932,7 +7932,7 @@
     },
     "/pba/registration": {
       "delete": {
-        "summary": "Deregister from Packet Broker.\nPacket Broker deregistration requires administrative access.",
+        "summary": "Deregister from Packet Broker.\nPacket Broker deregistration requires administrative access.\nPacket Broker deregistration is only supported for tenants and requires Packet Broker Agent to be configured with\nNetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.",
         "operationId": "Pba_Deregister",
         "responses": {
           "200": {
@@ -7953,7 +7953,7 @@
         ]
       },
       "post": {
-        "summary": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.",
+        "summary": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.\nPacket Broker registration is only supported for tenants and requires Packet Broker Agent to be configured with\nNetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.",
         "operationId": "Pba_Register2",
         "responses": {
           "200": {
@@ -7974,7 +7974,7 @@
         ]
       },
       "put": {
-        "summary": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.",
+        "summary": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.\nPacket Broker registration is only supported for tenants and requires Packet Broker Agent to be configured with\nNetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.",
         "operationId": "Pba_Register",
         "responses": {
           "200": {
@@ -16010,6 +16010,10 @@
         "home_network_enabled": {
           "type": "boolean",
           "description": "Whether the server is configured as Home Network (with end devices)."
+        },
+        "register_enabled": {
+          "type": "boolean",
+          "description": "Whether the registration can be changed."
         }
       }
     },

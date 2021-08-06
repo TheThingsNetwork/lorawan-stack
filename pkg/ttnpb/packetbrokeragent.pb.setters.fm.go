@@ -409,6 +409,16 @@ func (dst *PacketBrokerInfo) SetFields(src *PacketBrokerInfo, paths ...string) e
 				var zero bool
 				dst.HomeNetworkEnabled = zero
 			}
+		case "register_enabled":
+			if len(subs) > 0 {
+				return fmt.Errorf("'register_enabled' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RegisterEnabled = src.RegisterEnabled
+			} else {
+				var zero bool
+				dst.RegisterEnabled = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
