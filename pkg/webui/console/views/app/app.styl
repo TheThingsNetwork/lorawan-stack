@@ -24,6 +24,8 @@
     min-height: "calc(100vh - %s - %s)" % ($header-height $footer-height)
   +media-query($bp.s)
     min-height: "calc(100vh - %s - %s)" % ($header-height-mobile $footer-height)
+  +media-query($bp.xs)
+    min-height: "calc(100vh - %s - %s)" % ($header-height-mobile $footer-height * 2)
 
 // Global classes attached by the sidebar component.
 :global(.with-sidebar) .main
