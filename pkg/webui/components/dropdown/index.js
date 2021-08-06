@@ -76,12 +76,7 @@ const DropdownItem = ({
       <Message content={title} />
     </button>
   ) : external ? (
-    <Link.Anchor
-      href={path}
-      external
-      tabIndex={tabIndex}
-      className={classnames(style.button, activeClassName)}
-    >
+    <Link.Anchor href={path} external tabIndex={tabIndex} className={style.button}>
       {Boolean(iconElement) ? iconElement : null}
       <Message content={title} />
     </Link.Anchor>
