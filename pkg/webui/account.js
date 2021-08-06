@@ -23,7 +23,7 @@ import store, { history } from '@account/store'
 import WithLocale from '@ttn-lw/lib/components/with-locale'
 import Init from '@ttn-lw/lib/components/init'
 
-import { selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
+import { selectSentryDsnConfig, selectAssetsRootPath } from '@ttn-lw/lib/selectors/env'
 
 import '@ttn-lw/lib/yup'
 
@@ -31,6 +31,12 @@ import '@ttn-lw/lib/yup'
 if (selectSentryDsnConfig()) {
   Sentry.init(sentryConfig)
 }
+
+const assetsRoot = selectAssetsRootPath()
+
+// Set asset path based on passed env configuration.
+// eslint-disable-next-line no-undef
+__webpack_public_path__ = `${assetsRoot}/`
 
 const render = () => {
   const App = require('./account/views/app').default
