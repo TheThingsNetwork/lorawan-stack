@@ -23,6 +23,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Removed
 
+- TLS mutual authentication for Packet Broker; only OAuth 2.0 is supported now.
+
 ### Fixed
 
 - Generated CLI configuration for The Things Stack Community Edition.
