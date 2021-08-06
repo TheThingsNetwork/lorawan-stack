@@ -20,7 +20,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc/credentials"
 )
 
@@ -53,17 +52,9 @@ func (c *clientCredentials) RequireTransportSecurity() bool {
 }
 
 // OAuth2 returns per RPC client credentials using the OAuth Client Credentials flow.
-// The token is being refreshed as-needed.
-func OAuth2(ctx context.Context, tokenURL, clientID, clientSecret string, scopes []string, insecure bool) credentials.PerRPCCredentials {
-	config := clientcredentials.Config{
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		Scopes:       scopes,
-		AuthStyle:    oauth2.AuthStyleInParams,
-		TokenURL:     tokenURL,
-	}
+func OAuth2(tokenSource oauth2.TokenSource, insecure bool) credentials.PerRPCCredentials {
 	return &clientCredentials{
-		tokenSource: config.TokenSource(ctx),
+		tokenSource: tokenSource,
 		insecure:    insecure,
 	}
 }
