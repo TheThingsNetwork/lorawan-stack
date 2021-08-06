@@ -76,9 +76,15 @@ func (s *pbaServer) GetInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Packe
 		registration = nil
 	}
 
+	// Register and deregister is only available if Packet Broker Agent is configured with NetID level authorization, and
+	// if the registration is a tenant within that NetID.
+	id, err := s.authenticator.AuthInfo(ctx)
+	registerEnabled := err == nil && id.TenantId == "" && tenantID != ""
+
 	res := &ttnpb.PacketBrokerInfo{
 		ForwarderEnabled:   s.forwarderConfig.Enable,
 		HomeNetworkEnabled: s.homeNetworkConfig.Enable,
+		RegisterEnabled:    registerEnabled,
 	}
 	if registration != nil {
 		res.Registration = &ttnpb.PacketBrokerNetwork{
