@@ -18,21 +18,29 @@ export default defineMessages({
   packetBrokerInfoText:
     'Packet Broker can be used to exchange traffic with other LoRaWAN networks to share coverage and improve the overall network performance.',
   packetBrokerWebsite: 'Packet Broker website',
-  registerNetwork: 'Register network',
   registerThisNetwork: 'Register this network',
-  network: 'Network: {network}',
-  homeNetworkEnabled: 'Home network enabled',
-  homeNetworkDisabled: 'Home network disabled',
-  forwarderEnabled: 'Forwarder enabled',
-  forwarderDisabled: 'Forwarder disabled',
+  registerNetwork: 'Register network',
   packetBrokerRegistrationDesc:
     "To enable packet exchange from or to your home network, it is necessary to register your network. This will make your network known to Packet Broker and enable you to configure your network's packet exchange behavior.",
   packetBrokerDisabledDesc:
     'The Things Stack is not set up to use Packet Broker. Please refer to the documentation link above for instructions on how to set up The Things Stack for peering with Packet Broker.',
   packetBrokerRegistrationDisabledDesc:
     'The Things Stack is set up to use Packet Broker, but security settings disallow (de)registering your network here. Please contact Packet Broker to manage your registration. Refer to the documentation link above for contact information.',
+  network: 'Network: {network}',
+  homeNetworkEnabled: 'Home network enabled',
+  homeNetworkDisabled: 'Home network disabled',
+  forwarderEnabled: 'Forwarder enabled',
+  forwarderDisabled: 'Forwarder disabled',
+  listNetwork: 'List network publicly',
+  listNetworkDesc:
+    'Listing your network allows other network administrators to see your network. This allows them to easily configure routing policies with your network.',
+  unlistNetwork: 'Unlist this network',
+  confirmUnlist: 'Confirm unlist',
+  unlistModal:
+    'Are you sure you want to unlist your network in Packet Broker?{lineBreak}' +
+    'This will hide your network. Other network administrators will not be able to see your network to configure routing policies.',
   routingPolicyInformation:
-    'You can use the checkboxes below to control the default forwarding behavior of your network. You can additionally set up individual per-network routing policies via the Network tab.',
+    'You can use the checkboxes below to control the default forwarding behavior of your network. You can additionally set up individual per-network routing policies via the Networks tab.',
   defaultRoutingPolicySet: 'Default routing policy set',
   routingPolicySet: 'Routing policy set',
   defaultRoutingPolicy: 'Default routing policy',
@@ -51,5 +59,8 @@ export default defineMessages({
   backToAllNetworks: 'Back to all networks',
   deregisterNetwork: 'Deregister this network',
   confirmDeregister: 'Confirm deregistration',
-  deregisterModal: `Are you sure you want to deregister your network from the Packet Broker?{lineBreak}This will <b>instantly disable any packet exchange</b> with foreign networks.`,
+  deregisterModal:
+    'Are you sure you want to deregister your network from Packet Broker?{lineBreak}' +
+    'This will <b>permanently delete</b> all routing policies and may stop traffic from flowing.{lineBreak}' +
+    'Traffic may still be forwarded to your network based on default routing policies configured by forwarders.',
 })

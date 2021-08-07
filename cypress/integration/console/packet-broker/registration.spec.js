@@ -66,7 +66,7 @@ describe('Packet Broker registration', () => {
     cy.findByText('Packet Broker website', { selector: 'a' }).should('be.visible')
     cy.findByText('Register network', { selector: 'span' }).should('be.visible')
     cy.findByTestId('switch').should('be.visible').and('not.have.attr', 'disabled')
-    cy.findByText(/To enable package exchange/).should('be.visible')
+    cy.findByText(/To enable packet exchange/).should('be.visible')
 
     cy.findByTestId('notification').should('not.exist')
     cy.findByTestId('error-notification').should('not.exist')

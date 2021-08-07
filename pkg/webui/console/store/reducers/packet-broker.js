@@ -41,6 +41,7 @@ const defaultState = {
   registered: false,
   registerEnabled: false,
   enabled: false,
+  listed: false,
   defaultHomeNetworkRoutingPolicy: {},
   networks: {
     entities: {},
@@ -69,11 +70,13 @@ export default handleActions(
       info: payload,
       registered: Boolean(payload.registration),
       registerEnabled: Boolean(payload.register_enabled),
+      listed: payload.registration && Boolean(payload.registration.listed),
       enabled: true,
     }),
-    [REGISTER_PACKET_BROKER_SUCCESS]: state => ({
+    [REGISTER_PACKET_BROKER_SUCCESS]: (state, { payload }) => ({
       ...state,
       registered: true,
+      listed: Boolean(payload.listed),
     }),
     [DEREGISTER_PACKET_BROKER_SUCCESS]: state => ({
       ...state,

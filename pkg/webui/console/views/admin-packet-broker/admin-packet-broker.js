@@ -48,6 +48,7 @@ import {
   selectRegistered,
   selectRegisterEnabled,
   selectEnabled,
+  selectListed,
   selectInfo,
   selectInfoError,
 } from '@console/store/selectors/packet-broker'
@@ -60,10 +61,12 @@ import style from './admin-packet-broker.styl'
 
 const PacketBroker = ({ match }) => {
   const [activeTab, setActiveTab] = useState('default-routing-policy')
-  const [modalVisible, setModalVisible] = useState(false)
+  const [deregisterModalVisible, setDeregisterModalVisible] = useState(false)
   const registered = useSelector(selectRegistered)
   const registerEnabled = useSelector(selectRegisterEnabled)
   const enabled = useSelector(selectEnabled)
+  const [unlistModalVisible, setUnlistModalVisible] = useState(false)
+  const listed = useSelector(selectListed)
   const info = useSelector(selectInfo)
   const infoError = useSelector(selectInfoError)
   const dispatch = useDispatch()
@@ -72,20 +75,38 @@ const PacketBroker = ({ match }) => {
 
   const handleRegisterChange = useCallback(() => {
     if (!registered) {
-      dispatch(registerPacketBroker())
+      dispatch(registerPacketBroker({}))
     } else {
-      setModalVisible(true)
+      setDeregisterModalVisible(true)
     }
-  }, [dispatch, registered, setModalVisible])
+  }, [dispatch, registered, setDeregisterModalVisible])
 
-  const handleModalComplete = useCallback(
+  const handleDeregisterModalComplete = useCallback(
     approved => {
-      setModalVisible(false)
+      setDeregisterModalVisible(false)
       if (approved) {
         dispatch(deregisterPacketBroker())
       }
     },
-    [dispatch, setModalVisible],
+    [dispatch, setDeregisterModalVisible],
+  )
+
+  const handleListedChange = useCallback(() => {
+    if (!listed) {
+      dispatch(registerPacketBroker({ listed: true }))
+    } else {
+      setUnlistModalVisible(true)
+    }
+  }, [dispatch, listed, setUnlistModalVisible])
+
+  const handleUnlistModalComplete = useCallback(
+    approved => {
+      setUnlistModalVisible(false)
+      if (approved) {
+        dispatch(registerPacketBroker({ listed: false }))
+      }
+    },
+    [dispatch, setUnlistModalVisible],
   )
 
   const tabs = React.useMemo(
@@ -122,9 +143,15 @@ const PacketBroker = ({ match }) => {
           <hr className={style.hRule} />
           <Message content={m.registerThisNetwork} component="h3" />
           {!enabled && <Notification info small content={m.packetBrokerDisabledDesc} />}
-          {enabled && !registerEnabled && <Notification info small content={m.packetBrokerRegistrationDisabledDesc} />}
+          {enabled && !registerEnabled && (
+            <Notification info small content={m.packetBrokerRegistrationDisabledDesc} />
+          )}
           {showError && <ErrorNotification small content={infoError} />}
-          <label className={classnames(style.toggleContainer, { [style.disabled]: !enabled || !registerEnabled })}>
+          <label
+            className={classnames(style.toggleContainer, {
+              [style.disabled]: !enabled || !registerEnabled,
+            })}
+          >
             <Message content={m.registerNetwork} component="span" />
             <Switch
               onChange={handleRegisterChange}
@@ -134,10 +161,10 @@ const PacketBroker = ({ match }) => {
             />
           </label>
           <PortalledModal
-            visible={modalVisible}
+            visible={deregisterModalVisible}
             title={m.confirmDeregister}
             buttonMessage={m.deregisterNetwork}
-            onComplete={handleModalComplete}
+            onComplete={handleDeregisterModalComplete}
             danger
             approval
           >
@@ -174,6 +201,26 @@ const PacketBroker = ({ match }) => {
                 </span>
               )}
             </div>
+            <label className={classnames(style.toggleContainer)}>
+              <Message content={m.listNetwork} component="span" />
+              <Switch onChange={handleListedChange} checked={listed} className={style.toggle} />
+            </label>
+            <PortalledModal
+              visible={unlistModalVisible}
+              title={m.confirmUnlist}
+              buttonMessage={m.unlistNetwork}
+              onComplete={handleUnlistModalComplete}
+              danger
+              approval
+            >
+              <Message
+                content={m.unlistModal}
+                values={{ lineBreak: <br />, b: chunks => <b>{chunks}</b> }}
+                component="span"
+              />
+            </PortalledModal>
+            <Message className={style.description} content={m.listNetworkDesc} />
+            <hr className={style.hRule} />
             <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
             <RequireRequest requestAction={getHomeNetworkDefaultRoutingPolicy()}>
               <RouteSwitch>
