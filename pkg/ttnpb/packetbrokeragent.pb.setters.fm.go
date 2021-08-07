@@ -427,6 +427,26 @@ func (dst *PacketBrokerInfo) SetFields(src *PacketBrokerInfo, paths ...string) e
 	return nil
 }
 
+func (dst *PacketBrokerRegisterRequest) SetFields(src *PacketBrokerRegisterRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "listed":
+			if len(subs) > 0 {
+				return fmt.Errorf("'listed' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Listed = src.Listed
+			} else {
+				dst.Listed = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *PacketBrokerRoutingPolicyUplink) SetFields(src *PacketBrokerRoutingPolicyUplink, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

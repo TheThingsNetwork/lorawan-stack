@@ -7953,7 +7953,7 @@
         ]
       },
       "post": {
-        "summary": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.\nPacket Broker registration is only supported for tenants and requires Packet Broker Agent to be configured with\nNetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.",
+        "summary": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nRegistration settings not in the request message are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.\nPacket Broker registration is only supported for tenants and requires Packet Broker Agent to be configured with\nNetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.",
         "operationId": "Pba_Register2",
         "responses": {
           "200": {
@@ -7969,12 +7969,22 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3PacketBrokerRegisterRequest"
+            }
+          }
+        ],
         "tags": [
           "Pba"
         ]
       },
       "put": {
-        "summary": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.\nPacket Broker registration is only supported for tenants and requires Packet Broker Agent to be configured with\nNetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.",
+        "summary": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nRegistration settings not in the request message are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.\nPacket Broker registration is only supported for tenants and requires Packet Broker Agent to be configured with\nNetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.",
         "operationId": "Pba_Register",
         "responses": {
           "200": {
@@ -7990,6 +8000,16 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3PacketBrokerRegisterRequest"
+            }
+          }
+        ],
         "tags": [
           "Pba"
         ]
@@ -16121,6 +16141,15 @@
           "items": {
             "$ref": "#/definitions/v3PacketBrokerNetwork"
           }
+        }
+      }
+    },
+    "v3PacketBrokerRegisterRequest": {
+      "type": "object",
+      "properties": {
+        "listed": {
+          "type": "boolean",
+          "description": "Whether the network should be listed in Packet Broker.\nIf unset, the value is taken from the registration settings."
         }
       }
     },

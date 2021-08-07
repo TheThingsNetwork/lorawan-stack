@@ -147,6 +147,12 @@ message PacketBrokerInfo {
   bool register_enabled = 4;
 }
 
+message PacketBrokerRegisterRequest {
+  // Whether the network should be listed in Packet Broker.
+  // If unset, the value is taken from the registration settings.
+  google.protobuf.BoolValue listed = 1;
+}
+
 message PacketBrokerRoutingPolicyUplink {
   // Forward join-request messages.
   bool join_request = 1;
@@ -262,15 +268,17 @@ service Pba {
   };
 
   // Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.
-  // All registration settings are taken from Packet Broker Agent configuration and caller context.
+  // Registration settings not in the request message are taken from Packet Broker Agent configuration and caller context.
   // Packet Broker registration requires administrative access.
   // Packet Broker registration is only supported for tenants and requires Packet Broker Agent to be configured with
   // NetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.
-  rpc Register(google.protobuf.Empty) returns (PacketBrokerNetwork) {
+  rpc Register(PacketBrokerRegisterRequest) returns (PacketBrokerNetwork) {
     option (google.api.http) = {
       put: "/pba/registration"
+      body: "*"
       additional_bindings {
         post: "/pba/registration"
+        body: "*"
       }
     };
   };

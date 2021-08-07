@@ -121,6 +121,13 @@ var PacketBrokerInfoFieldPathsTopLevel = []string{
 	"register_enabled",
 	"registration",
 }
+var PacketBrokerRegisterRequestFieldPathsNested = []string{
+	"listed",
+}
+
+var PacketBrokerRegisterRequestFieldPathsTopLevel = []string{
+	"listed",
+}
 var PacketBrokerRoutingPolicyUplinkFieldPathsNested = []string{
 	"application_data",
 	"join_request",
