@@ -107,7 +107,7 @@ var (
 	errRegistration = errors.Define("registration", "get registration information")
 )
 
-func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.PacketBrokerNetwork, error) {
+func (s *pbaServer) Register(ctx context.Context, req *ttnpb.PacketBrokerRegisterRequest) (*ttnpb.PacketBrokerNetwork, error) {
 	if err := rights.RequireIsAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -133,6 +133,7 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 	if err != nil {
 		return nil, errRegistration.WithCause(err)
 	}
+	listed := req.Listed != nil && req.Listed.Value || req.Listed == nil && registration.Listed
 	devAddrBlocks := toPBDevAddrBlocks(registration.DevAddrBlocks)
 	adminContact, technicalContact := toPBContactInfo(registration.ContactInfo)
 
@@ -145,7 +146,7 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 				DevAddrBlocks:         devAddrBlocks,
 				AdministrativeContact: adminContact,
 				TechnicalContact:      technicalContact,
-				Listed:                registration.Listed,
+				Listed:                listed,
 			},
 		})
 	} else {
@@ -165,7 +166,7 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 				Value: technicalContact,
 			},
 			Listed: &pbtypes.BoolValue{
-				Value: registration.Listed,
+				Value: listed,
 			},
 		})
 	}
@@ -182,7 +183,7 @@ func (s *pbaServer) Register(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Pack
 		Name:          registration.Name,
 		DevAddrBlocks: fromPBDevAddrBlocks(devAddrBlocks),
 		ContactInfo:   fromPBContactInfo(adminContact, technicalContact),
-		Listed:        registration.Listed,
+		Listed:        listed,
 	}, nil
 }
 

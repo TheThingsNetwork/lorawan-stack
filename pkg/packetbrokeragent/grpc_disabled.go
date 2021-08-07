@@ -31,7 +31,7 @@ func (s disabledServer) GetInfo(context.Context, *pbtypes.Empty) (*ttnpb.PacketB
 	return nil, errNotEnabled.New()
 }
 
-func (s disabledServer) Register(context.Context, *pbtypes.Empty) (*ttnpb.PacketBrokerNetwork, error) {
+func (s disabledServer) Register(context.Context, *ttnpb.PacketBrokerRegisterRequest) (*ttnpb.PacketBrokerNetwork, error) {
 	return nil, errNotEnabled.New()
 }
 
