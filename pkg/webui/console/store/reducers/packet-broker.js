@@ -39,6 +39,7 @@ import {
 const defaultState = {
   info: {},
   registered: false,
+  registerEnabled: false,
   enabled: false,
   defaultHomeNetworkRoutingPolicy: {},
   networks: {
@@ -67,6 +68,7 @@ export default handleActions(
       ...state,
       info: payload,
       registered: Boolean(payload.registration),
+      registerEnabled: Boolean(payload.register_enabled),
       enabled: true,
     }),
     [REGISTER_PACKET_BROKER_SUCCESS]: state => ({

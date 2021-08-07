@@ -46,9 +46,10 @@ import {
 
 import {
   selectRegistered,
+  selectRegisterEnabled,
+  selectEnabled,
   selectInfo,
   selectInfoError,
-  selectEnabled,
 } from '@console/store/selectors/packet-broker'
 
 import DefaultRoutingPolicyView from './default-routing-policy'
@@ -61,6 +62,7 @@ const PacketBroker = ({ match }) => {
   const [activeTab, setActiveTab] = useState('default-routing-policy')
   const [modalVisible, setModalVisible] = useState(false)
   const registered = useSelector(selectRegistered)
+  const registerEnabled = useSelector(selectRegisterEnabled)
   const enabled = useSelector(selectEnabled)
   const info = useSelector(selectInfo)
   const infoError = useSelector(selectInfoError)
@@ -120,14 +122,15 @@ const PacketBroker = ({ match }) => {
           <hr className={style.hRule} />
           <Message content={m.registerThisNetwork} component="h3" />
           {!enabled && <Notification info small content={m.packetBrokerDisabledDesc} />}
+          {enabled && !registerEnabled && <Notification info small content={m.packetBrokerRegistrationDisabledDesc} />}
           {showError && <ErrorNotification small content={infoError} />}
-          <label className={classnames(style.toggleContainer, { [style.disabled]: !enabled })}>
+          <label className={classnames(style.toggleContainer, { [style.disabled]: !enabled || !registerEnabled })}>
             <Message content={m.registerNetwork} component="span" />
             <Switch
               onChange={handleRegisterChange}
               checked={registered}
               className={style.toggle}
-              disabled={!enabled}
+              disabled={!enabled || !registerEnabled}
             />
           </label>
           <PortalledModal

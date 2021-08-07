@@ -26,9 +26,11 @@ export default defineMessages({
   forwarderEnabled: 'Forwarder enabled',
   forwarderDisabled: 'Forwarder disabled',
   packetBrokerRegistrationDesc:
-    "To enable package exchange from or to your home network, it is necessary to register your network. This will make your network known to the Packet Broker and enable you to configure your network's package exchange behavior.",
+    "To enable packet exchange from or to your home network, it is necessary to register your network. This will make your network known to Packet Broker and enable you to configure your network's packet exchange behavior.",
   packetBrokerDisabledDesc:
-    'It appears like The Things Stack is currently not set up to use Packet Broker. Please refer to the documentation link above for more information about how to set up The Things Stack for peering via Packet Broker.',
+    'The Things Stack is not set up to use Packet Broker. Please refer to the documentation link above for instructions on how to set up The Things Stack for peering with Packet Broker.',
+  packetBrokerRegistrationDisabledDesc:
+    'The Things Stack is set up to use Packet Broker, but security settings disallow (de)registering your network here. Please contact Packet Broker to manage your registration. Refer to the documentation link above for contact information.',
   routingPolicyInformation:
     'You can use the checkboxes below to control the default forwarding behavior of your network. You can additionally set up individual per-network routing policies via the Network tab.',
   defaultRoutingPolicySet: 'Default routing policy set',
@@ -49,5 +51,5 @@ export default defineMessages({
   backToAllNetworks: 'Back to all networks',
   deregisterNetwork: 'Deregister this network',
   confirmDeregister: 'Confirm deregistration',
-  deregisterModal: `Are you sure you want to deregister your network from the Packet Broker?{lineBreak}This will <b>instantly disable any package exchange</b> with foreign networks.`,
+  deregisterModal: `Are you sure you want to deregister your network from the Packet Broker?{lineBreak}This will <b>instantly disable any packet exchange</b> with foreign networks.`,
 })
