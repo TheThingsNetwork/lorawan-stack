@@ -21,9 +21,14 @@ import (
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+)
+
+var (
+	registerPacketBrokerFlags = &pflag.FlagSet{}
 )
 
 func packetBrokerNetworkIDFlags(allowDefault bool) *pflag.FlagSet {
@@ -169,11 +174,15 @@ var (
 		Use:   "register",
 		Short: "Register with Packet Broker",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			req := &ttnpb.PacketBrokerRegisterRequest{}
+			if err := util.SetFields(req, registerPacketBrokerFlags); err != nil {
+				return err
+			}
 			pba, err := api.Dial(ctx, config.PacketBrokerAgentGRPCAddress)
 			if err != nil {
 				return err
 			}
-			reg, err := ttnpb.NewPbaClient(pba).Register(ctx, ttnpb.Empty)
+			reg, err := ttnpb.NewPbaClient(pba).Register(ctx, req)
 			if err != nil {
 				return err
 			}
@@ -429,7 +438,12 @@ for the Home Network (by NetID and tenant ID).`,
 )
 
 func init() {
+	util.FieldFlags(&ttnpb.PacketBrokerRegisterRequest{}).VisitAll(func(flag *pflag.Flag) {
+		registerPacketBrokerFlags.AddFlag(flag)
+	})
+
 	packetBrokerCommand.AddCommand(packetBrokerInfoCommand)
+	packetBrokerRegisterCommand.Flags().AddFlagSet(registerPacketBrokerFlags)
 	packetBrokerCommand.AddCommand(packetBrokerRegisterCommand)
 	packetBrokerCommand.AddCommand(packetBrokerDeregisterCommand)
 	packetBrokerNetworksListCommand.Flags().AddFlagSet(paginationFlags())
