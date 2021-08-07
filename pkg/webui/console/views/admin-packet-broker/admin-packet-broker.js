@@ -113,7 +113,7 @@ const PacketBroker = ({ match }) => {
               Packet Broker
             </Link.DocLink>
             {' | '}
-            <Link.Anchor href="https://www.packetbroker.org" external secondary>
+            <Link.Anchor href="https://www.packetbroker.net" external secondary>
               <Message content={m.packetBrokerWebsite} />
             </Link.Anchor>
           </div>
