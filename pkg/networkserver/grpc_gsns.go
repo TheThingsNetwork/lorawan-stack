@@ -216,14 +216,14 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		pendingMatch
 	)
 	var matchType sessionMatchType
-	switch {
+
 	// Pending session match
-	case !pld.Ack &&
+	if !pld.Ack &&
 		cmacFMatchResult.IsPending &&
 		dev.PendingSession != nil &&
 		dev.PendingMacState != nil &&
 		pld.DevAddr.Equal(dev.PendingSession.DevAddr) &&
-		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.PendingMacState.LorawanVersion.UseLegacyMIC():
+		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.PendingMacState.LorawanVersion.UseLegacyMIC() {
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.PendingSession.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.PendingSession.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
@@ -253,18 +253,17 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.PendingSession.StartedAt = up.ReceivedAt
 
 			matchType = pendingMatch
-			break
 		}
-		// Key mismatch, attempt to match current session.
-		fallthrough
+	}
 
 	// Current session match
-	case dev.Session != nil &&
+	if matchType == currentOriginalMatch &&
+		dev.Session != nil &&
 		dev.MacState != nil &&
 		pld.DevAddr.Equal(dev.Session.DevAddr) &&
 		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.MacState.LorawanVersion.UseLegacyMIC() &&
 		(cmacFMatchResult.FullFCnt == FullFCnt(uint16(pld.FCnt), dev.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(dev, ns.defaultMACSettings)) ||
-			cmacFMatchResult.FullFCnt == pld.FCnt):
+			cmacFMatchResult.FullFCnt == pld.FCnt) {
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.Session.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
@@ -366,12 +365,10 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 
 				matchType = currentRetransmissionMatch
 			}
-			break
+		} else {
+			return nil, false, nil
 		}
-		// Key mismatch
-		return nil, false, nil
-
-	default:
+	} else if matchType != pendingMatch {
 		return nil, false, nil
 	}
 
@@ -702,8 +699,6 @@ var handleDataUplinkGetPaths = [...]string{
 
 // mergeMetadata merges the metadata collected for up.
 // mergeMetadata mutates up.RxMetadata discarding any existing up.RxMetadata value.
-// NOTE: Since events are published async we need ensure that up passed to an event earlier is not mutated,
-// hence up is taken by value here.
 func (ns *NetworkServer) mergeMetadata(ctx context.Context, up *ttnpb.UplinkMessage) {
 	mds, err := ns.uplinkDeduplicator.AccumulatedMetadata(ctx, up)
 	if err != nil {
