@@ -174,8 +174,11 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 		t.FailNow()
 	}
 
-	expectSlot := func(t *testing.T, expectedID ttnpb.EndDeviceIdentifiers, expectedAt time.Time) {
-		nextPop <- struct{}{}
+	receivedSlots := make(map[ttnpb.EndDeviceIdentifiers][]time.Time)
+	for i := 0; i < 3; i++ {
+		for w := 0; w < q.Shards(); w++ {
+			nextPop[w] <- struct{}{}
+		}
 
 		t.Helper()
 
@@ -183,8 +186,7 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 
 		select {
 		case s := <-slotCh:
-			a.So(s.id, should.Resemble, expectedID)
-			a.So(s.t, should.Equal, expectedAt)
+			receivedSlots[s.id] = append(receivedSlots[s.id], s.t)
 			a.So(s.ctx, should.HaveParentContextOrEqual, popCtx)
 			s.respCh <- TaskPopFuncResponse{}
 
@@ -207,9 +209,11 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 		}
 	}
 
-	expectSlot(t, pbs[0], time.Unix(0, 42))
-	expectSlot(t, pbs[1], time.Unix(42, 0))
-	expectSlot(t, pbs[2], time.Unix(42, 42))
+	a.So(receivedSlots, should.Resemble, map[ttnpb.EndDeviceIdentifiers][]time.Time{
+		pbs[0]: {time.Unix(0, 42).UTC()},
+		pbs[1]: {time.Unix(42, 0).UTC()},
+		pbs[2]: {time.Unix(42, 42).UTC()},
+	})
 }
 
 // HandleDownlinkTaskQueueTest runs a DownlinkTaskQueue test suite on reg.

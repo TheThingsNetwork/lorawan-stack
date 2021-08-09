@@ -271,7 +271,6 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			genericApp2Ups[0],
 		), should.BeTrue),
 		!a.So(assertAdd(ctx,
-			genericApp1Ups[1],
 			genericApp2Ups[1],
 		), should.BeTrue),
 		!a.So(assertDrainApplication(ctx, true,
@@ -280,6 +279,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		), should.BeTrue),
 
 		!a.So(assertAdd(ctx,
+			genericApp1Ups[1],
 			genericApp1Ups[2],
 			invalidations[0],
 			genericApp1Ups[3],
