@@ -164,42 +164,48 @@ const PacketBroker = ({ match }) => {
                     />
                   </label>
                 )}
-                <div className={style.featureInfo}>
-                  {info.forwarder_enabled ? (
-                    <span>
-                      <Icon icon="check" className="c-active" textPaddedRight />
-                      <Message content={m.forwarderEnabled} values={boldMessage} component="span" />
-                    </span>
-                  ) : (
-                    <span>
-                      <Icon icon="close" className="c-error" textPaddedRight />
-                      <Message
-                        content={m.forwarderDisabled}
-                        values={boldMessage}
-                        component="span"
-                      />
-                    </span>
-                  )}
-                  {info.home_network_enabled ? (
-                    <span>
-                      <Icon icon="check" className="c-active" textPaddedRight />
-                      <Message
-                        content={m.homeNetworkEnabled}
-                        values={boldMessage}
-                        component="span"
-                      />
-                    </span>
-                  ) : (
-                    <span>
-                      <Icon icon="close" className="c-error" textPaddedRight />
-                      <Message
-                        content={m.homeNetworkDisabled}
-                        values={boldMessage}
-                        component="span"
-                      />
-                    </span>
-                  )}
-                </div>
+                {registered && (
+                  <div className={style.featureInfo}>
+                    {info.forwarder_enabled ? (
+                      <span data-test-id="feature-info-forwarder-enabled">
+                        <Icon icon="check" className="c-active" textPaddedRight />
+                        <Message
+                          content={m.forwarderEnabled}
+                          values={boldMessage}
+                          component="span"
+                        />
+                      </span>
+                    ) : (
+                      <span data-test-id="feature-info-forwarder-disabled">
+                        <Icon icon="close" className="c-error" textPaddedRight />
+                        <Message
+                          content={m.forwarderDisabled}
+                          values={boldMessage}
+                          component="span"
+                        />
+                      </span>
+                    )}
+                    {info.home_network_enabled ? (
+                      <span data-test-id="feature-info-home-network-enabled">
+                        <Icon icon="check" className="c-active" textPaddedRight />
+                        <Message
+                          content={m.homeNetworkEnabled}
+                          values={boldMessage}
+                          component="span"
+                        />
+                      </span>
+                    ) : (
+                      <span data-test-id="feature-info-forwarder-disabled">
+                        <Icon icon="close" className="c-error" textPaddedRight />
+                        <Message
+                          content={m.homeNetworkDisabled}
+                          values={boldMessage}
+                          component="span"
+                        />
+                      </span>
+                    )}
+                  </div>
+                )}
               </Col>
               <Col md={8} className={style.switchInfo}>
                 <Message
@@ -229,7 +235,7 @@ const PacketBroker = ({ match }) => {
             />
           </PortalledModal>
         </Col>
-        {enabled && registered ? (
+        {registered && (
           <>
             <Col lg={8} md={12}>
               <Message content={m.networkVisibility} component="h3" className={style.subTitle} />
@@ -275,10 +281,6 @@ const PacketBroker = ({ match }) => {
               </RequireRequest>
             </Col>
           </>
-        ) : (
-          <Col lg={8} md={12}>
-            <Message content={m.packetBrokerRegistrationDesc} component="p" />
-          </Col>
         )}
       </Row>
     </Container>
