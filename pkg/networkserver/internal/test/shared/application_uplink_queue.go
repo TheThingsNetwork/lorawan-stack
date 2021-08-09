@@ -58,20 +58,24 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		}
 		reqCh := make(chan popFuncReq, 1)
 		errCh := make(chan error, 1)
-		go func() {
-			errCh <- q.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueDrainFunc) (time.Time, error) {
-				respCh := make(chan TaskPopFuncResponse, 1)
-				reqCh <- popFuncReq{
-					Context:                ctx,
-					ApplicationIdentifiers: appID,
-					Func:                   f,
-					Response:               respCh,
-				}
-				resp := <-respCh
-				return resp.Time, resp.Error
-			})
-		}()
-
+		if q.Shards() < 1 {
+			t.Fatal("Expected at least one shard!")
+		}
+		for s := 0; s < q.Shards(); s++ {
+			go func(s int) {
+				errCh <- q.Pop(ctx, s, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueDrainFunc) (time.Time, error) {
+					respCh := make(chan TaskPopFuncResponse, 1)
+					reqCh <- popFuncReq{
+						Context:                ctx,
+						ApplicationIdentifiers: appID,
+						Func:                   f,
+						Response:               respCh,
+					}
+					resp := <-respCh
+					return resp.Time, resp.Error
+				})
+			}(s)
+		}
 		select {
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for Pop callback to be called")

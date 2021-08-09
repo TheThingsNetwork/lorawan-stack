@@ -58,33 +58,43 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 		respCh chan<- TaskPopFuncResponse
 	}
 
+	if q.Shards() < 1 {
+		t.Fatal("Expected at least one shard!")
+	}
 	popCtx := context.WithValue(ctx, &struct{}{}, "pop")
-	nextPop := make(chan struct{})
 	slotCh := make(chan slot)
 	errCh := make(chan error)
-	go func() {
-		for {
-			<-nextPop
-			select {
-			case <-ctx.Done():
-				return
-			case errCh <- q.Pop(popCtx, func(ctx context.Context, id ttnpb.EndDeviceIdentifiers, t time.Time) (time.Time, error) {
-				respCh := make(chan TaskPopFuncResponse)
-				slotCh <- slot{
-					ctx:    ctx,
-					id:     id,
-					t:      t,
-					respCh: respCh,
+	nextPop := make([]chan struct{}, q.Shards())
+	for s := 0; s < q.Shards(); s++ {
+		nextPop[s] = make(chan struct{}, 10)
+	}
+	for s := 0; s < q.Shards(); s++ {
+		go func(s int) {
+			for {
+				<-nextPop[s]
+				select {
+				case <-ctx.Done():
+					return
+				case errCh <- q.Pop(popCtx, s, func(ctx context.Context, id ttnpb.EndDeviceIdentifiers, t time.Time) (time.Time, error) {
+					respCh := make(chan TaskPopFuncResponse)
+					slotCh <- slot{
+						ctx:    ctx,
+						id:     id,
+						t:      t,
+						respCh: respCh,
+					}
+					resp := <-respCh
+					return resp.Time, resp.Error
+				}):
 				}
-				resp := <-respCh
-				return resp.Time, resp.Error
-			}):
 			}
-		}
-	}()
+		}(s)
+	}
 
-	// Ensure the goroutine has started
-	nextPop <- struct{}{}
+	// Ensure the goroutines have started
+	for s := 0; s < q.Shards(); s++ {
+		nextPop[s] <- struct{}{}
+	}
 
 	// Ensure Pop is blocking on empty queue.
 	select {
