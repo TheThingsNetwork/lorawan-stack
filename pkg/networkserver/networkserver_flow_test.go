@@ -212,6 +212,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			RxMetadatas: [][]*ttnpb.RxMetadata{
 				DefaultRxMetadata[:2],
 				DefaultRxMetadata[2:],
+				PacketBrokerRxMetadata[:],
 			},
 			CorrelationIDs: []string{"GsNs-data-0"},
 
@@ -409,6 +410,7 @@ func TestFlow(t *testing.T) {
 						return &d
 					}()
 					nsConf.NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
+					nsConf.ClusterID = "test-cluster"
 					nsConf.DeduplicationWindow = (1 << 8) * test.Delay
 					nsConf.CooldownWindow = (1 << 11) * test.Delay
 
