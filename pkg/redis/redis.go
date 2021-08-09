@@ -27,8 +27,12 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
+	goproto "github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"google.golang.org/grpc/codes"
 )
 
 //go:generate go run ./generate_scripts.go
@@ -404,19 +408,19 @@ const (
 	lastIDKey  = "last_id"
 )
 
-// InputTaskKey returns the subkey of k, where input tasks are stored.
-func InputTaskKey(k string) string {
-	return Key(k, "input")
+// InputTaskKey returns the subkey of k, where input tasks are stored for shard s.
+func InputTaskKey(k string, s int) string {
+	return Key(k, "input", fmt.Sprintf("%d", s))
 }
 
-// ReadyTaskKey returns the subkey of k, where ready tasks are stored.
-func ReadyTaskKey(k string) string {
-	return Key(k, "ready")
+// ReadyTaskKey returns the subkey of k, where ready tasks are stored for shard s.
+func ReadyTaskKey(k string, s int) string {
+	return Key(k, "ready", fmt.Sprintf("%d", s))
 }
 
-// WaitingTaskKey returns the subkey of k, where waiting tasks are stored.
-func WaitingTaskKey(k string) string {
-	return Key(k, "waiting")
+// WaitingTaskKey returns the subkey of k, where waiting tasks are stored for shard s.
+func WaitingTaskKey(k string, s int) string {
+	return Key(k, "waiting", fmt.Sprintf("%d", s))
 }
 
 // IsConsumerGroupExistsErr returns true if error represents the redis BUSYGROUP error.
@@ -426,21 +430,26 @@ func IsConsumerGroupExistsErr(err error) bool {
 
 // initTaskGroup initializes the task group for streams at InputTaskKey(k) and ReadyTaskKey(k).
 // It must be called before all other task-related functions at subkeys of k.
-func initTaskGroup(ctx context.Context, r redis.Cmdable, group, k string) error {
-	_, err := r.Pipelined(ctx, func(p redis.Pipeliner) error {
-		p.XGroupCreateMkStream(ctx, InputTaskKey(k), group, "$")
-		p.XGroupCreateMkStream(ctx, ReadyTaskKey(k), group, "$")
-		return nil
-	})
-	if IsConsumerGroupExistsErr(err) {
-		return nil
+func initTaskGroup(ctx context.Context, r redis.Cmdable, group, k string, shards int) error {
+	for s := 0; s < shards; s++ {
+		_, err := r.Pipelined(ctx, func(p redis.Pipeliner) error {
+			p.XGroupCreateMkStream(ctx, InputTaskKey(k, s), group, "$")
+			p.XGroupCreateMkStream(ctx, ReadyTaskKey(k, s), group, "$")
+			return nil
+		})
+		if IsConsumerGroupExistsErr(err) {
+			continue
+		}
+		if err != nil {
+			return ConvertError(err)
+		}
 	}
-	return ConvertError(err)
+	return nil
 }
 
-// addTask adds a task identified by payload with timestamp startAt to the stream at InputTaskKey(k).
+// addTask adds a task identified by payload with timestamp startAt to the stream at InputTaskKey(k, s).
 // maxLen is the approximate length of the stream, to which it may be trimmed.
-func addTask(ctx context.Context, r redis.Cmdable, k string, maxLen int64, payload string, startAt time.Time, replace bool) error {
+func addTask(ctx context.Context, r redis.Cmdable, k string, maxLen int64, payload string, startAt time.Time, replace bool, s int) error {
 	m := make(map[string]interface{}, 2)
 	m[payloadKey] = payload
 	if replace {
@@ -450,7 +459,7 @@ func addTask(ctx context.Context, r redis.Cmdable, k string, maxLen int64, paylo
 		m[startAtKey] = startAt.UnixNano()
 	}
 	return ConvertError(r.XAdd(ctx, &redis.XAddArgs{
-		Stream:       InputTaskKey(k),
+		Stream:       InputTaskKey(k, s),
 		MaxLenApprox: maxLen,
 		Values:       m,
 	}).Err())
@@ -469,13 +478,14 @@ func parseTime(s string) (time.Time, error) {
 // group is the consumer group name.
 // id is the consumer group ID.
 // k is the keys to pop from.
+// s is the shard to pop from.
 // Pipeline is executed even if f returns an error.
 // Tasks are acked only if f returns without error.
-func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int64, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string) (err error) {
+func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int64, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string, s int) (err error) {
 	var (
-		readyStream   = ReadyTaskKey(k)
-		inputStream   = InputTaskKey(k)
-		waitingStream = WaitingTaskKey(k)
+		readyStream   = ReadyTaskKey(k, s)
+		inputStream   = InputTaskKey(k, s)
+		waitingStream = WaitingTaskKey(k, s)
 	)
 	for {
 		vs, err := RunInterfaceSliceScript(ctx, r, popTaskScript, []string{readyStream, inputStream, waitingStream}, group, id, time.Now().UnixNano(), maxLen).Result()
@@ -587,40 +597,65 @@ type TaskQueue struct {
 	MaxLen    int64
 	Group, ID string
 	Key       string
+	Shards    int
 }
 
 // Init initializes the task queue.
 // It must be called at least once before using the queue.
 func (q *TaskQueue) Init(ctx context.Context) error {
-	return initTaskGroup(ctx, q.Redis, q.Group, q.Key)
+	if q.Shards <= 0 {
+		panic(fmt.Sprintf("Cannot initialize task queue with %d shards", q.Shards))
+	}
+	return initTaskGroup(ctx, q.Redis, q.Group, q.Key, q.Shards)
+}
+
+var errCloseQueueFailed = errors.DefineInternal("close_queue_failed", "failed to close task queue")
+
+func toProtoMessage(err error) goproto.Message {
+	if ttnErr, ok := errors.From(err); ok {
+		return ttnpb.ErrorDetailsToProto(ttnErr)
+	}
+	return &ttnpb.ErrorDetails{
+		Code:          uint32(codes.Unknown),
+		MessageFormat: err.Error(),
+	}
 }
 
 // Close closes the TaskQueue.
 func (q *TaskQueue) Close(ctx context.Context) error {
-	_, err := q.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
-		p.XGroupDelConsumer(ctx, InputTaskKey(q.Key), q.Group, q.ID)
-		p.XGroupDelConsumer(ctx, ReadyTaskKey(q.Key), q.Group, q.ID)
-		return nil
-	})
-	return ConvertError(err)
+	details := make([]goproto.Message, 0, q.Shards)
+	for w := 0; w < q.Shards; w++ {
+		_, err := q.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+			p.XGroupDelConsumer(ctx, InputTaskKey(q.Key, w), q.Group, q.ID)
+			p.XGroupDelConsumer(ctx, ReadyTaskKey(q.Key, w), q.Group, q.ID)
+			return nil
+		})
+		if err != nil {
+			details = append(details, toProtoMessage(err))
+		}
+	}
+	if len(details) > 0 {
+		return errCloseQueueFailed.WithDetails(details...)
+	}
+	return nil
 }
 
 // Add adds a task s to the queue with a timestamp startAt.
-func (q *TaskQueue) Add(ctx context.Context, r redis.Cmdable, s string, startAt time.Time, replace bool) error {
+func (q *TaskQueue) Add(ctx context.Context, r redis.Cmdable, s string, startAt time.Time, replace bool, shard int) error {
 	if r == nil {
 		r = q.Redis
 	}
-	return addTask(ctx, r, q.Key, q.MaxLen, s, startAt, replace)
+	return addTask(ctx, r, q.Key, q.MaxLen, s, startAt, replace, shard)
 }
 
 // Pop calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()],
 // if such is available, otherwise it blocks until it is or context is done.
 // Pipeline is executed even if f returns an error.
-func (q *TaskQueue) Pop(ctx context.Context, r redis.Cmdable, f func(redis.Pipeliner, string, time.Time) error) error {
+func (q *TaskQueue) Pop(ctx context.Context, r redis.Cmdable, f func(redis.Pipeliner, string, time.Time) error, shard int) error {
 	if r == nil {
 		r = q.Redis
 	}
-	return popTask(ctx, r, q.Group, q.ID, q.MaxLen, f, q.Key)
+	return popTask(ctx, r, q.Group, q.ID, q.MaxLen, f, q.Key, shard)
 }
 
 // Scripter is redis.scripter.

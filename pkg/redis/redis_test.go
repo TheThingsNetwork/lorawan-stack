@@ -47,11 +47,11 @@ func TestInitTaskGroup(t *testing.T) {
 			Name: "streams exist/groups exist",
 			Populate: func(ctx context.Context, cl *Client) bool {
 				_, a := test.MustNewTFromContext(ctx)
-				_, err := cl.XGroupCreateMkStream(ctx, InputTaskKey(cl.Key("testKey")), cl.Key("testGroup"), "0").Result()
+				_, err := cl.XGroupCreateMkStream(ctx, InputTaskKey(cl.Key("testKey"), 0), cl.Key("testGroup"), "0").Result()
 				if !a.So(err, should.BeNil) {
 					return false
 				}
-				_, err = cl.XGroupCreateMkStream(ctx, ReadyTaskKey(cl.Key("testKey")), cl.Key("testGroup"), "0").Result()
+				_, err = cl.XGroupCreateMkStream(ctx, ReadyTaskKey(cl.Key("testKey"), 0), cl.Key("testGroup"), "0").Result()
 				return a.So(err, should.BeNil)
 			},
 			Group:          "testGroup",
@@ -69,7 +69,7 @@ func TestInitTaskGroup(t *testing.T) {
 
 				a.So(tc.Populate(ctx, cl), should.BeTrue)
 
-				err := InitTaskGroup(ctx, cl, cl.Key(tc.Group), cl.Key(tc.Key))
+				err := InitTaskGroup(ctx, cl, cl.Key(tc.Group), cl.Key(tc.Key), 1)
 				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 			},
 		})
@@ -83,13 +83,13 @@ func TestAddTask(t *testing.T) {
 	defer flush()
 	defer cl.Close()
 
-	err := AddTask(ctx, cl, cl.Key("testKey"), 10, "testPayload", time.Unix(0, 42), false)
+	err := AddTask(ctx, cl, cl.Key("testKey"), 10, "testPayload", time.Unix(0, 42), false, 0)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
 	rets, err := cl.Client.XRead(ctx, &redis.XReadArgs{
-		Streams: []string{InputTaskKey(cl.Key("testKey")), "0"},
+		Streams: []string{InputTaskKey(cl.Key("testKey"), 0), "0"},
 		Count:   10,
 		Block:   -1,
 	}).Result()
@@ -98,7 +98,7 @@ func TestAddTask(t *testing.T) {
 	}
 
 	if a.So(rets, should.HaveLength, 1) {
-		a.So(rets[0].Stream, should.Equal, InputTaskKey(cl.Key("testKey")))
+		a.So(rets[0].Stream, should.Equal, InputTaskKey(cl.Key("testKey"), 0))
 		if a.So(rets[0].Messages, should.HaveLength, 1) {
 			msg := rets[0].Messages[0]
 			a.So(msg, should.Resemble, redis.XMessage{
@@ -111,13 +111,13 @@ func TestAddTask(t *testing.T) {
 		}
 	}
 
-	err = AddTask(ctx, cl, cl.Key("testKey"), 10, "testPayload", time.Unix(0, 42), true)
+	err = AddTask(ctx, cl, cl.Key("testKey"), 10, "testPayload", time.Unix(0, 42), true, 0)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
 	rets, err = cl.Client.XRead(ctx, &redis.XReadArgs{
-		Streams: []string{InputTaskKey(cl.Key("testKey")), "0"},
+		Streams: []string{InputTaskKey(cl.Key("testKey"), 0), "0"},
 		Count:   10,
 		Block:   -1,
 	}).Result()
@@ -126,7 +126,7 @@ func TestAddTask(t *testing.T) {
 	}
 
 	if a.So(rets, should.HaveLength, 1) {
-		a.So(rets[0].Stream, should.Equal, InputTaskKey(cl.Key("testKey")))
+		a.So(rets[0].Stream, should.Equal, InputTaskKey(cl.Key("testKey"), 0))
 		if a.So(rets[0].Messages, should.HaveLength, 2) {
 			msg0 := rets[0].Messages[0]
 			a.So(msg0, should.Resemble, redis.XMessage{
@@ -181,7 +181,7 @@ func TestPopTask(t *testing.T) {
 				}
 				called = true
 				return nil
-			}, inputKey)
+			}, inputKey, 0)
 		}()
 
 		select {
@@ -202,12 +202,12 @@ func TestPopTask(t *testing.T) {
 		cl.Key("testKey2"),
 	}
 	for _, k := range testKeys {
-		_, err := cl.XGroupCreateMkStream(ctx, InputTaskKey(k), testGroup, "0").Result()
+		_, err := cl.XGroupCreateMkStream(ctx, InputTaskKey(k, 0), testGroup, "0").Result()
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
 
-		_, err = cl.XGroupCreateMkStream(ctx, ReadyTaskKey(k), testGroup, "0").Result()
+		_, err = cl.XGroupCreateMkStream(ctx, ReadyTaskKey(k, 0), testGroup, "0").Result()
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
@@ -217,7 +217,7 @@ func TestPopTask(t *testing.T) {
 		timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 		err = PopTask(timeoutCtx, cl.Client, testGroup, "testID", 10, func(redis.Pipeliner, string, time.Time) error {
 			panic("must not be called")
-		}, k)
+		}, k, 0)
 		cancel()
 		if a.So(err, should.BeError) {
 			a.So(errors.IsDeadlineExceeded(err), should.BeTrue)
@@ -227,7 +227,7 @@ func TestPopTask(t *testing.T) {
 		time.AfterFunc(timeout, cancel)
 		err = PopTask(cancelCtx, cl.Client, testGroup, "testID", 10, func(redis.Pipeliner, string, time.Time) error {
 			panic("must not be called")
-		}, k)
+		}, k, 0)
 		cancel()
 		if a.So(err, should.BeError) {
 			a.So(errors.IsCanceled(err), should.BeTrue)
@@ -235,8 +235,8 @@ func TestPopTask(t *testing.T) {
 	}
 
 	inputKeys := [...]string{
-		InputTaskKey(testKeys[0]),
-		InputTaskKey(testKeys[1]),
+		InputTaskKey(testKeys[0], 0),
+		InputTaskKey(testKeys[1], 0),
 	}
 
 	payloads := [...]string{
@@ -299,7 +299,7 @@ func TestPopTask(t *testing.T) {
 			},
 		},
 		{
-			Stream: InputTaskKey(cl.Key("testKeyUnrelated")),
+			Stream: InputTaskKey(cl.Key("testKeyUnrelated"), 0),
 			Values: map[string]interface{}{
 				"start_at": "0",
 				"payload":  "testPayloadUnrelated",
@@ -330,6 +330,7 @@ func TestTaskQueue(t *testing.T) {
 		Group:  "testGroup",
 		ID:     "testID",
 		Key:    cl.Key("test"),
+		Shards: 1,
 	}
 
 	err := q.Init(ctx)
@@ -360,7 +361,7 @@ func TestTaskQueue(t *testing.T) {
 				a.So(startAt, should.Resemble, expectedStartAt)
 				called = true
 				return nil
-			})
+			}, 0)
 		}()
 
 		select {
@@ -378,17 +379,17 @@ func TestTaskQueue(t *testing.T) {
 
 	p := cl.Pipeline()
 	switch {
-	case !a.So(q.Add(ctx, nil, "test", time.Now(), true), should.BeNil),
-		!a.So(q.Add(ctx, p, "test", time.Unix(0, 42), true), should.BeNil),
-		!a.So(q.Add(ctx, nil, "test", time.Unix(0, 24), false), should.BeNil),
-		!a.So(q.Add(ctx, p, "test2", time.Unix(0, 43), false), should.BeNil),
-		!a.So(q.Add(ctx, p, "test", time.Unix(0, 420), false), should.BeNil),
+	case !a.So(q.Add(ctx, nil, "test", time.Now(), true, 0), should.BeNil),
+		!a.So(q.Add(ctx, p, "test", time.Unix(0, 42), true, 0), should.BeNil),
+		!a.So(q.Add(ctx, nil, "test", time.Unix(0, 24), false, 0), should.BeNil),
+		!a.So(q.Add(ctx, p, "test2", time.Unix(0, 43), false, 0), should.BeNil),
+		!a.So(q.Add(ctx, p, "test", time.Unix(0, 420), false, 0), should.BeNil),
 		!a.So(func() error {
 			_, err := p.Exec(ctx)
 			return err
 		}(), should.BeNil),
 		!a.So(assertPop(ctx, nil, "test", time.Unix(0, 42).UTC()), should.BeTrue),
-		!a.So(q.Add(ctx, nil, "test2", time.Unix(0, 41), true), should.BeNil),
+		!a.So(q.Add(ctx, nil, "test2", time.Unix(0, 41), true, 0), should.BeNil),
 		!a.So(assertPop(ctx, nil, "test2", time.Unix(0, 43).UTC()), should.BeTrue),
 		!a.So(assertPop(ctx, nil, "test2", time.Unix(0, 41).UTC()), should.BeTrue):
 	}
