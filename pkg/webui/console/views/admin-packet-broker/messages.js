@@ -16,21 +16,22 @@ import { defineMessages } from 'react-intl'
 
 export default defineMessages({
   packetBrokerInfoText:
-    'Packet Broker can be used to exchange traffic with other LoRaWAN networks to share coverage and improve the overall network performance.',
+    'Packet Broker can be used to exchange traffic (peering) with other LoRaWAN networks to share coverage and improve the overall network performance.',
   packetBrokerWebsite: 'Packet Broker website',
-  registerThisNetwork: 'Register this network',
+  registrationStatus: 'Registration status',
   registerNetwork: 'Register network',
+  networkVisibility: 'Network visibility',
   packetBrokerRegistrationDesc:
-    "To enable packet exchange from or to your home network, it is necessary to register your network. This will make your network known to Packet Broker and enable you to configure your network's packet exchange behavior.",
+    "To enable peering from or to your home network, it is necessary to register your network. This will make your network known to Packet Broker and enable you to configure your network's peering behavior.",
   packetBrokerDisabledDesc:
     'The Things Stack is not set up to use Packet Broker. Please refer to the documentation link above for instructions on how to set up The Things Stack for peering with Packet Broker.',
   packetBrokerRegistrationDisabledDesc:
     'The Things Stack is set up to use Packet Broker, but security settings disallow (de)registering your network here. Please contact Packet Broker to manage your registration. Refer to the documentation link above for contact information.',
   network: 'Network: {network}',
-  homeNetworkEnabled: 'Home network enabled',
-  homeNetworkDisabled: 'Home network disabled',
-  forwarderEnabled: 'Forwarder enabled',
-  forwarderDisabled: 'Forwarder disabled',
+  homeNetworkEnabled: 'Home network <b>enabled</b>',
+  homeNetworkDisabled: 'Home network <b>disabled</b>',
+  forwarderEnabled: 'Forwarder <b>enabled</b>',
+  forwarderDisabled: 'Forwarder <b>disabled</b>',
   listNetwork: 'List network publicly',
   listNetworkDesc:
     'Listing your network allows other network administrators to see your network. This allows them to easily configure routing policies with your network.',

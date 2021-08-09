@@ -23,7 +23,8 @@
   margin-top: 0
 
 .h-rule
-  margin-bottom: $ls.m
+  margin-top: $ls.m
+  margin-bottom: $ls.xs
 
 .logo
   display: block
@@ -32,21 +33,29 @@
 .further-resources
   margin-bottom: $cs.xs
 
+.sub-title
+  margin-top: $ls.m
+
+.switch-info
+  +media-query-min($bp.s)
+    border-dark('left')
+
+  +media-query($bp.s)
+    margin-top: $cs.xs
+    color: $tc-subtle-gray
+
 .description
   font-weight: $fw.normal
-  color: $tc-subtle-gray
+  display: block
 
 .feature-info
-  margin-top: $ls.xs
-  margin-bottom: $ls.xs
+  &:not(:first-child)
+    margin-top: $ls.xxs
 
-  span
+  & > span
     display: flex
     flex-direction: row
     align-items: center
-
-  span
-    margin-right: $cs.xxs
 
 .toggle-container
   display: flex
