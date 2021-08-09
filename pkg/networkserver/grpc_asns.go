@@ -38,11 +38,15 @@ type ApplicationUplinkQueue interface {
 	// Implementations must ensure that Add returns fast.
 	Add(ctx context.Context, ups ...*ttnpb.ApplicationUp) error
 
-	// PopApplication calls f on the most recent application uplink task in the schedule, for which timestamp is in range [0, time.Now()],
+	// Pop calls f on the most recent application uplink task in the schedule, for which timestamp is in range [0, time.Now()],
 	// if such is available, otherwise it blocks until it is.
 	// Context passed to f must be derived from ctx.
 	// Implementations must respect ctx.Done() value on best-effort basis.
-	Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, ApplicationUplinkQueueDrainFunc) (time.Time, error)) error
+	// Pop needs to be called separately for each shard. Shard ID is integer in range [0, Shards()-1]).
+	Pop(ctx context.Context, shard int, f func(context.Context, ttnpb.ApplicationIdentifiers, ApplicationUplinkQueueDrainFunc) (time.Time, error)) error
+
+	// Shards returns the number of queue shards.
+	Shards() int
 }
 
 func applicationJoinAcceptWithoutAppSKey(pld *ttnpb.ApplicationJoinAccept) *ttnpb.ApplicationJoinAccept {
@@ -84,8 +88,14 @@ func (ns *NetworkServer) sendApplicationUplinks(ctx context.Context, cl ttnpb.Ns
 	return nil
 }
 
-func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context) error {
-	return ns.applicationUplinks.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, drain ApplicationUplinkQueueDrainFunc) (time.Time, error) {
+func (ns *NetworkServer) createProcessApplicationUplinkTask(shard int) func(context.Context) error {
+	return func(ctx context.Context) error {
+		return ns.processApplicationUplinkTask(ctx, shard)
+	}
+}
+
+func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context, shard int) error {
+	return ns.applicationUplinks.Pop(ctx, shard, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, drain ApplicationUplinkQueueDrainFunc) (time.Time, error) {
 		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, &appID)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")

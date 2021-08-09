@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -42,7 +43,7 @@ const (
 )
 
 // NewApplicationUplinkQueue returns new application uplink queue.
-func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group, id string, minIdle time.Duration) *ApplicationUplinkQueue {
+func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group, id string, minIdle time.Duration, shards int) *ApplicationUplinkQueue {
 	return &ApplicationUplinkQueue{
 		applicationQueue: &ttnredis.TaskQueue{
 			Redis:  cl,
@@ -50,6 +51,7 @@ func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group, id stri
 			Group:  group,
 			ID:     id,
 			Key:    cl.Key("application"),
+			Shards: shards,
 		},
 		redis:   cl,
 		maxLen:  maxLen,
@@ -123,7 +125,7 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 			}
 		}
 		for uid, t := range taskMap {
-			if err := q.applicationQueue.Add(ctx, p, uid, t, false); err != nil {
+			if err := q.applicationQueue.Add(ctx, p, uid, t, false, random.IntnWithSeed(q.applicationQueue.Shards, uid)); err != nil {
 				return err
 			}
 		}
@@ -140,7 +142,7 @@ var (
 	errMissingPayload = errors.DefineDataLoss("missing_payload", "missing payload")
 )
 
-func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueDrainFunc) (time.Time, error)) error {
+func (q *ApplicationUplinkQueue) Pop(ctx context.Context, s int, f func(context.Context, ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueDrainFunc) (time.Time, error)) error {
 	return q.applicationQueue.Pop(ctx, nil, func(p redis.Pipeliner, uid string, _ time.Time) error {
 		appID, err := unique.ToApplicationID(uid)
 		if err != nil {
@@ -227,6 +229,10 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context
 		if err != nil || t.IsZero() {
 			return err
 		}
-		return q.applicationQueue.Add(ctx, p, uid, t, true)
-	})
+		return q.applicationQueue.Add(ctx, p, uid, t, true, s)
+	}, s)
+}
+
+func (q *ApplicationUplinkQueue) Shards() int {
+	return q.applicationQueue.Shards
 }

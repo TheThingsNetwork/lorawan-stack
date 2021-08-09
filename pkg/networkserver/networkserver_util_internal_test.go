@@ -97,8 +97,8 @@ var (
 	EvtUpdateEndDevice             = evtUpdateEndDevice
 
 	NewDeviceRegistry           func(context.Context) (DeviceRegistry, func())
-	NewApplicationUplinkQueue   func(context.Context) (ApplicationUplinkQueue, func())
-	NewDownlinkTaskQueue        func(context.Context) (DownlinkTaskQueue, func())
+	NewApplicationUplinkQueue   func(context.Context, int) (ApplicationUplinkQueue, func())
+	NewDownlinkTaskQueue        func(context.Context, int) (DownlinkTaskQueue, func())
 	NewUplinkDeduplicator       func(context.Context) (UplinkDeduplicator, func())
 	NewScheduledDownlinkMatcher func(context.Context) (ScheduledDownlinkMatcher, func())
 )
@@ -1934,18 +1934,18 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 		conf.NetworkServer.Devices = v
 	}
 	if conf.NetworkServer.ApplicationUplinkQueue.Queue == nil {
-		v, closeFn := NewApplicationUplinkQueue(ctx)
+		v, closeFn := NewApplicationUplinkQueue(ctx, 1)
 		if closeFn != nil {
 			closeFuncs = append(closeFuncs, closeFn)
 		}
 		conf.NetworkServer.ApplicationUplinkQueue.Queue = v
 	}
-	if conf.NetworkServer.DownlinkTasks == nil {
-		v, closeFn := NewDownlinkTaskQueue(ctx)
+	if conf.NetworkServer.DownlinkTasks.Queue == nil {
+		v, closeFn := NewDownlinkTaskQueue(ctx, 1)
 		if closeFn != nil {
 			closeFuncs = append(closeFuncs, closeFn)
 		}
-		conf.NetworkServer.DownlinkTasks = v
+		conf.NetworkServer.DownlinkTasks.Queue = v
 	}
 	if conf.NetworkServer.UplinkDeduplicator == nil {
 		v, closeFn := NewUplinkDeduplicator(ctx)
@@ -2368,11 +2368,15 @@ func (m MockDownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIde
 }
 
 // Pop calls PopFunc if set and panics otherwise.
-func (m MockDownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
+func (m MockDownlinkTaskQueue) Pop(ctx context.Context, w int, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
 	if m.PopFunc == nil {
 		panic("Pop called, but not set")
 	}
 	return m.PopFunc(ctx, f)
+}
+
+func (m MockDownlinkTaskQueue) Shards() int {
+	return 1
 }
 
 var _ DeviceRegistry = MockDeviceRegistry{}

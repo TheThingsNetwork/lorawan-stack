@@ -28,6 +28,13 @@ import (
 type ApplicationUplinkQueueConfig struct {
 	Queue      ApplicationUplinkQueue `name:"-"`
 	BufferSize uint64                 `name:"buffer-size"`
+	NumShards  uint64                 `name:"num-shards"`
+}
+
+// DownlinkTaskQueueConfig defines downlink task queue configuration.
+type DownlinkTaskQueueConfig struct {
+	Queue     DownlinkTaskQueue `name:"-"`
+	NumShards uint64            `name:"num-shards"`
 }
 
 // MACSettingConfig defines MAC-layer configuration.
@@ -116,7 +123,7 @@ func (c DownlinkPriorityConfig) Parse() (DownlinkPriorities, error) {
 type Config struct {
 	ApplicationUplinkQueue   ApplicationUplinkQueueConfig `name:"application-uplink-queue"`
 	Devices                  DeviceRegistry               `name:"-"`
-	DownlinkTasks            DownlinkTaskQueue            `name:"-"`
+	DownlinkTasks            DownlinkTaskQueueConfig      `name:"downlink-tasks"`
 	UplinkDeduplicator       UplinkDeduplicator           `name:"-"`
 	ScheduledDownlinkMatcher ScheduledDownlinkMatcher     `name:"-"`
 	NetID                    types.NetID                  `name:"net-id" description:"NetID of this Network Server"`
@@ -135,6 +142,10 @@ type Config struct {
 var DefaultConfig = Config{
 	ApplicationUplinkQueue: ApplicationUplinkQueueConfig{
 		BufferSize: 1000,
+		NumShards:  1,
+	},
+	DownlinkTasks: DownlinkTaskQueueConfig{
+		NumShards: 1,
 	},
 	DeduplicationWindow: 200 * time.Millisecond,
 	CooldownWindow:      time.Second,

@@ -255,6 +255,7 @@ var startCommand = &cobra.Command{
 			applicationUplinkQueue := nsredis.NewApplicationUplinkQueue(
 				NewNetworkServerApplicationUplinkQueueRedis(*config),
 				int64(applicationUplinkQueueSize), redisConsumerGroup, redisConsumerID, time.Minute,
+				int(config.NS.ApplicationUplinkQueue.NumShards),
 			)
 			if err := applicationUplinkQueue.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
@@ -275,12 +276,13 @@ var startCommand = &cobra.Command{
 			downlinkTasks := nsredis.NewDownlinkTaskQueue(
 				NewNetworkServerDownlinkTaskRedis(*config),
 				100000, redisConsumerGroup, redisConsumerID,
+				int(config.NS.DownlinkTasks.NumShards),
 			)
 			if err := downlinkTasks.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
 			defer downlinkTasks.Close(ctx)
-			config.NS.DownlinkTasks = downlinkTasks
+			config.NS.DownlinkTasks.Queue = downlinkTasks
 			config.NS.ScheduledDownlinkMatcher = &nsredis.ScheduledDownlinkMatcher{
 				Redis: redis.New(config.Redis.WithNamespace("ns", "scheduled-downlinks")),
 			}

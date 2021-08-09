@@ -168,7 +168,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		return nil, errInvalidConfiguration.WithCause(errors.New("CooldownWindow must be greater than 0"))
 	case conf.Devices == nil:
 		panic(errInvalidConfiguration.WithCause(errors.New("Devices is not specified")))
-	case conf.DownlinkTasks == nil:
+	case conf.DownlinkTasks.Queue == nil:
 		panic(errInvalidConfiguration.WithCause(errors.New("DownlinkTasks is not specified")))
 	case conf.UplinkDeduplicator == nil:
 		panic(errInvalidConfiguration.WithCause(errors.New("UplinkDeduplicator is not specified")))
@@ -230,7 +230,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		deduplicationWindow:      makeWindowDurationFunc(conf.DeduplicationWindow),
 		collectionWindow:         makeWindowDurationFunc(conf.DeduplicationWindow + conf.CooldownWindow),
 		devices:                  wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
-		downlinkTasks:            conf.DownlinkTasks,
+		downlinkTasks:            conf.DownlinkTasks.Queue,
 		downlinkPriorities:       downlinkPriorities,
 		defaultMACSettings:       conf.DefaultMACSettings.Parse(),
 		interopClient:            interopCl,
@@ -258,14 +258,21 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Ns", cluster.HookName, c.ClusterAuthUnaryHook())
 
-	for id, f := range map[string]func(context.Context) error{
-		applicationUplinkProcessTaskName: ns.processApplicationUplinkTask,
-		downlinkProcessTaskName:          ns.processDownlinkTask,
-	} {
+	for s := 0; s < ns.applicationUplinks.Shards(); s++ {
 		ns.RegisterTask(&component.TaskConfig{
 			Context: ctx,
-			ID:      id,
-			Func:    f,
+			ID:      fmt.Sprintf("%s_%d", applicationUplinkProcessTaskName, s),
+			Func:    ns.createProcessApplicationUplinkTask(s),
+			Restart: component.TaskRestartAlways,
+			Backoff: processTaskBackoff,
+		})
+	}
+
+	for s := 0; s < ns.downlinkTasks.Shards(); s++ {
+		ns.RegisterTask(&component.TaskConfig{
+			Context: ctx,
+			ID:      fmt.Sprintf("%s_%d", downlinkProcessTaskName, s),
+			Func:    ns.createProcessDownlinkTask(s),
 			Restart: component.TaskRestartAlways,
 			Backoff: processTaskBackoff,
 		})

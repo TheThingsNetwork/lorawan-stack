@@ -31,10 +31,10 @@ const (
 	redisConsumerID    = "test"
 )
 
-func NewRedisApplicationUplinkQueue(ctx context.Context) (ApplicationUplinkQueue, func()) {
+func NewRedisApplicationUplinkQueue(ctx context.Context, shards int) (ApplicationUplinkQueue, func()) {
 	tb := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "application-uplinks")...)
-	q := redis.NewApplicationUplinkQueue(cl, 100, redisConsumerGroup, redisConsumerID, 0)
+	q := redis.NewApplicationUplinkQueue(cl, 100, redisConsumerGroup, redisConsumerID, 0, shards)
 	if err := q.Init(ctx); err != nil {
 		tb.Fatalf("Failed to initialize Redis application uplink queue: %s", test.FormatError(err))
 	}
@@ -69,10 +69,10 @@ func NewRedisDeviceRegistry(ctx context.Context) (DeviceRegistry, func()) {
 		}
 }
 
-func NewRedisDownlinkTaskQueue(ctx context.Context) (DownlinkTaskQueue, func()) {
+func NewRedisDownlinkTaskQueue(ctx context.Context, shards int) (DownlinkTaskQueue, func()) {
 	tb := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "downlink-tasks")...)
-	q := redis.NewDownlinkTaskQueue(cl, 10000, redisConsumerGroup, redisConsumerID)
+	q := redis.NewDownlinkTaskQueue(cl, 10000, redisConsumerGroup, redisConsumerID, shards)
 	if err := q.Init(ctx); err != nil {
 		tb.Fatalf("Failed to initialize Redis downlink task queue: %s", test.FormatError(err))
 	}

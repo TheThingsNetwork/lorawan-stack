@@ -15,6 +15,7 @@
 package redis_test
 
 import (
+	"fmt"
 	"testing"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
@@ -26,8 +27,12 @@ import (
 var _ networkserver.DownlinkTaskQueue = &DownlinkTaskQueue{}
 
 func TestDownlinkTaskQueue(t *testing.T) {
-	_, ctx := test.New(t)
-	q, closeFn := NewRedisDownlinkTaskQueue(ctx)
-	t.Cleanup(closeFn)
-	HandleDownlinkTaskQueueTest(t, q)
+	for _, workers := range []int{1, 2, 5} {
+		t.Run(fmt.Sprintf("Workers=%d", workers), func(t *testing.T) {
+			_, ctx := test.New(t)
+			q, closeFn := NewRedisDownlinkTaskQueue(ctx, workers)
+			t.Cleanup(closeFn)
+			HandleDownlinkTaskQueueTest(t, q)
+		})
+	}
 }

@@ -83,3 +83,11 @@ func TestJitter(t *testing.T) {
 		a.So(t, should.BeBetweenOrEqual, df-df*p, df+df*p)
 	}
 }
+
+func TestIntnWithSeed(t *testing.T) {
+	a := assertions.New(t)
+	for i := 1; i < 100; i++ {
+		s := String(10)
+		a.So(IntnWithSeed(i, s), should.Resemble, IntnWithSeed(i, s))
+	}
+}

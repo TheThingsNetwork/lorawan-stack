@@ -19,6 +19,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -34,7 +35,7 @@ const (
 )
 
 // NewDownlinkTaskQueue returns new downlink task queue.
-func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group, id string) *DownlinkTaskQueue {
+func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group, id string, shards int) *DownlinkTaskQueue {
 	return &DownlinkTaskQueue{
 		queue: &ttnredis.TaskQueue{
 			Redis:  cl,
@@ -42,6 +43,7 @@ func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group, id string) *
 			Group:  group,
 			ID:     id,
 			Key:    cl.Key(downlinkKey),
+			Shards: shards,
 		},
 	}
 }
@@ -58,12 +60,13 @@ func (q *DownlinkTaskQueue) Close(ctx context.Context) error {
 
 // Add adds downlink task for device identified by devID at time startAt.
 func (q *DownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-	return q.queue.Add(ctx, nil, unique.ID(ctx, devID), startAt, replace)
+	uid := unique.ID(ctx, devID)
+	return q.queue.Add(ctx, nil, uid, startAt, replace, random.IntnWithSeed(q.queue.Shards, uid))
 }
 
 // Pop calls f on the earliest downlink task in the schedule, for which timestamp is in range [0, time.Now()],
-// if such is available, otherwise it blocks until it is.
-func (q *DownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
+// if such is available in shard s, otherwise it blocks until it is.
+func (q *DownlinkTaskQueue) Pop(ctx context.Context, s int, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
 	return q.queue.Pop(ctx, nil, func(p redis.Pipeliner, uid string, startAt time.Time) error {
 		ids, err := unique.ToDeviceID(uid)
 		if err != nil {
@@ -77,6 +80,10 @@ func (q *DownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttn
 		if err != nil || t.IsZero() {
 			return err
 		}
-		return q.queue.Add(ctx, p, uid, t, true)
-	})
+		return q.queue.Add(ctx, p, uid, t, true, s)
+	}, s)
+}
+
+func (q *DownlinkTaskQueue) Shards() int {
+	return q.queue.Shards
 }

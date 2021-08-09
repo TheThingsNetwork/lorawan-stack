@@ -17,6 +17,7 @@ package random
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
 	"io"
 	"math/big"
@@ -91,4 +92,15 @@ func Jitter(d time.Duration, p float64) time.Duration {
 	df := float64(d)
 	v := time.Duration(mathrand.Int63n(int64(df*p*2)) - int64(df*p))
 	return d + v
+}
+
+// IntnWithSeed returns a random number in the range [0,n), using seed as the random source.
+func IntnWithSeed(max int, seed string) int {
+	h := sha256.New()
+	h.Write([]byte(seed))
+	i := 0
+	for _, b := range h.Sum(nil) {
+		i += int(b) % max
+	}
+	return i % max
 }

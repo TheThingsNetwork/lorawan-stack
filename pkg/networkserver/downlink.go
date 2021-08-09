@@ -48,7 +48,11 @@ type DownlinkTaskQueue interface {
 	// if such is available, otherwise it blocks until it is.
 	// Context passed to f must be derived from ctx.
 	// Implementations must respect ctx.Done() value on best-effort basis.
-	Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error
+	// Pop needs to be called separately for each shard. Shard ID is integer in range [0, Shards()-1]).
+	Pop(ctx context.Context, shard int, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error
+
+	// Shards returns the number of queue shards.
+	Shards() int
 }
 
 func loggerWithApplicationDownlinkFields(logger log.Interface, down *ttnpb.ApplicationDownlink) log.Interface {
@@ -1513,12 +1517,18 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	}
 }
 
+func (ns *NetworkServer) createProcessDownlinkTask(shard int) func(ctx context.Context) error {
+	return func(ctx context.Context) error {
+		return ns.processDownlinkTask(ctx, shard)
+	}
+}
+
 // processDownlinkTask processes the most recent downlink task ready for execution, if such is available or wait until it is before processing it.
 // NOTE: ctx.Done() is not guaranteed to be respected by processDownlinkTask.
-func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
+func (ns *NetworkServer) processDownlinkTask(ctx context.Context, shard int) error {
 	var setErr bool
 	var computeNextErr bool
-	err := ns.downlinkTasks.Pop(ctx, func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) (time.Time, error) {
+	err := ns.downlinkTasks.Pop(ctx, shard, func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) (time.Time, error) {
 		ctx = log.NewContextWithFields(ctx, log.Fields(
 			"device_uid", unique.ID(ctx, devID),
 			"started_at", time.Now().UTC(),
