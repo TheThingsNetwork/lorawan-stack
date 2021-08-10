@@ -46,20 +46,18 @@ message EndDeviceBrand {
   // Private Enterprise Number (PEN) assigned by IANA.
   uint32 private_enterprise_number = 3;
   // Organization Unique Identifiers (OUI) assigned by IEEE.
-  repeated string organization_unique_identifiers = 4;
+  repeated string organization_unique_identifiers = 4 [(validate.rules).repeated.items.string.pattern = "[0-9A-F]{6}"];
   // VendorID managed by the LoRa Alliance, as defined in TR005.
   uint32 lora_alliance_vendor_id = 5;
   // Brand website URL.
-  string website = 6;
+  string website = 6 [(validate.rules).string = {uri: true, ignore_empty: true}];
   // Contact email address.
-  string email = 7;
+  string email = 7 [(validate.rules).string = {email: true, ignore_empty: true}];
   // Path to brand logo.
-  string logo = 8;
+  string logo = 8 [(validate.rules).string.pattern = "^$|^(([a-z0-9-]+\\/)+)?([a-z0-9_-]+\\.)+(png|svg)$"];
 }
 
 enum KeyProvisioning {
-  option (gogoproto.goproto_enum_prefix) = false;
-
   // Unknown Key Provisioning.
   KEY_PROVISIONING_UNKNOWN = 0;
   // Custom Key Provisioning.
@@ -71,8 +69,6 @@ enum KeyProvisioning {
 }
 
 enum KeySecurity {
-  option (gogoproto.goproto_enum_prefix) = false;
-
   // Unknown key security.
   KEY_SECURITY_UNKNOWN = 0;
   // No key security.
@@ -89,9 +85,9 @@ message EndDeviceModel {
   // Model identifier, as defined in the Device Repository.
   string model_id = 2 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   // Model name, as defined in the Device Repository.
-  string name = 3 [(validate.rules).string.max_len = 50];
+  string name = 3;
   // Model description.
-  string description = 4 [(validate.rules).string.max_len = 2000];
+  string description = 4;
 
   message HardwareVersion {
     // Hardware version string.
@@ -109,27 +105,27 @@ message EndDeviceModel {
       // Vendor ID of the profile, as defined in the Device Repository.
       // If this value is set, the profile is loaded from this vendor's folder.
       // If this value is not set, the profile is loaded from the current (end device's) vendor.
-      string vendor_id = 4;
+      string vendor_id = 4 [(validate.rules).string = {pattern: "^$|^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
       // Profile identifier, as defined in the Device Repository.
-      string profile_id = 1;
+      string profile_id = 1 [(validate.rules).string = {pattern: "^$|^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
       // Whether the device is LoRaWAN certified.
       bool lorawan_certified = 2;
       // Payload formatter codec identifier, as defined in the Device Repository.
-      string codec_id = 3;
+      string codec_id = 3 [(validate.rules).string = {pattern: "^$|^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
     }
     // Firmware version string.
     string version = 1;
     // Numeric firmware revision number.
     uint32 numeric = 2;
     // Hardware versions supported by this firmware version.
-    repeated string supported_hardware_versions = 3;
+    repeated string supported_hardware_versions = 3 [(validate.rules).repeated.unique = true];
     // Device profiles for each supported region (band).
     map<string, Profile> profiles = 4;
   }
   // Available firmware versions.
   repeated FirmwareVersion firmware_versions = 6;
   // List of sensors included in the device.
-  repeated string sensors = 7;
+  repeated string sensors = 7 [(validate.rules).repeated.unique = true];
   message Dimensions {
     // Device width (mm).
     google.protobuf.FloatValue width = 1;
@@ -169,31 +165,40 @@ message EndDeviceModel {
   // Device IP rating code.
   string ip_code = 12;
   // Supported key provisioning methods.
-  repeated KeyProvisioning key_provisioning = 13;
+  repeated KeyProvisioning key_provisioning = 13 [(validate.rules).repeated = {
+    unique: true,
+    items: {enum: {defined_only: true}},
+  }];
   // Device key security.
-  KeySecurity key_security = 14;
+  KeySecurity key_security = 14 [(validate.rules).enum.defined_only = true];
 
   message Photos {
     // Main device photo.
-    string main = 1;
+    string main = 1 [(validate.rules).string.pattern = "^$|^(([a-z0-9-]+\\/)+)?([a-z0-9_-]+\\.)+(png|jpg|jpeg)$"];
     // List of other device photos.
-    repeated string other = 2;
+    repeated string other = 2 [(validate.rules).repeated = {
+      unique: true,
+      items: {string: {pattern: "^$|^(([a-z0-9-]+\\/)+)?([a-z0-9_-]+\\.)+(png|jpg|jpeg)$"}},
+    }];
   }
   // Device photos.
   Photos photos = 15;
   message Videos {
     // Link to main device video.
-    string main = 1;
+    string main = 1 [(validate.rules).string.pattern = "^(?:https?:\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)(?:[\\w\\-_]*)(?:&(amp;)?[\\w\\?=]*)?)$|^(?:https?:\\/\\/(?:www\\.)?vimeo\\.com\\/(?:channels\\/(?:\\w+\\/)?|groups\\/([^\\/]*)\\/videos\\/|)(?:\\d+)(?:|\\/\\?))$"];
     // Links to other device videos.
-    repeated string other = 2;
+    repeated string other = 2 [(validate.rules).repeated = {
+      unique: true,
+      items: {string: {pattern: "^(?:https?:\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)(?:[\\w\\-_]*)(?:&(amp;)?[\\w\\?=]*)?)$|^(?:https?:\\/\\/(?:www\\.)?vimeo\\.com\\/(?:channels\\/(?:\\w+\\/)?|groups\\/([^\\/]*)\\/videos\\/|)(?:\\d+)(?:|\\/\\?))$"}},
+    }];
   }
   // Device videos.
   Videos videos = 16;
 
   // Device information page URL.
-  string product_url = 17;
+  string product_url = 17 [(validate.rules).string = {uri: true, ignore_empty: true}];
   // Device datasheet URL.
-  string datasheet_url = 18;
+  string datasheet_url = 18 [(validate.rules).string = {uri: true, ignore_empty: true}];
 
   message Reseller {
     // Reseller name.
@@ -201,7 +206,7 @@ message EndDeviceModel {
     // Reseller regions.
     repeated string region = 2;
     // Reseller URL.
-    string url = 3;
+    string url = 3 [(validate.rules).string = {uri: true, ignore_empty: true}];
   }
   // Reseller URLs.
   repeated Reseller resellers = 19;
@@ -222,12 +227,12 @@ message EndDeviceModel {
   Compliances compliances = 20;
 
   // List of any additional radios included in the device.
-  repeated string additional_radios = 21;
+  repeated string additional_radios = 21 [(validate.rules).repeated.unique = true];
 }
 
 message GetEndDeviceBrandRequest {
   // Application identifiers.
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
 
   // Brand identifier, as defined in the Device Repository.
   string brand_id = 2 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
@@ -238,7 +243,7 @@ message GetEndDeviceBrandRequest {
 
 message ListEndDeviceBrandsRequest {
   // Application identifiers.
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
 
   // Limit the number of results per page.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
@@ -259,7 +264,7 @@ message ListEndDeviceBrandsRequest {
 
 message GetEndDeviceModelRequest {
   // Application identifiers.
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];;
 
   // Brand identifier, as defined in the Device Repository.
   string brand_id = 2 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
@@ -272,7 +277,7 @@ message GetEndDeviceModelRequest {
 
 message ListEndDeviceModelsRequest {
   // Application identifiers.
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
 
   // List end devices from a specific brand.
   string brand_id = 2 [(validate.rules).string = {pattern: "^([a-z0-9](?:[-]?[a-z0-9]){2,}|)?$" , max_len: 36}];
@@ -295,7 +300,7 @@ message ListEndDeviceModelsRequest {
 
 message GetTemplateRequest {
   // Application identifiers.
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
 
   // End device version information.
   EndDeviceVersionIdentifiers version_ids = 2;
@@ -303,7 +308,7 @@ message GetTemplateRequest {
 
 message GetPayloadFormatterRequest {
   // Application identifiers.
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
 
   // End device version information.
   EndDeviceVersionIdentifiers version_ids = 2;
