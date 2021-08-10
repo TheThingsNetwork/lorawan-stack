@@ -23,6 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Generated CLI configuration for The Things Stack Community Edition.
+- End device access with limited rights in the Console.
 
 ### Security
 

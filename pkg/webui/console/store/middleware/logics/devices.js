@@ -75,9 +75,12 @@ const getDevicesListLogic = createRequestLogic({
 
     if (options.withLastSeen) {
       const macStateFetching = data.end_devices.map(async device => {
-        const deviceResult = await api.device.get(appId, device.ids.device_id, 'mac_state', [
-          STACK_COMPONENTS_MAP.ns,
-        ])
+        const deviceResult = await api.device.get(
+          appId,
+          device.ids.device_id,
+          'mac_state.recent_uplinks',
+          [STACK_COMPONENTS_MAP.ns],
+        )
         if ('mac_state' in deviceResult) {
           device.mac_state = deviceResult.mac_state
         }
