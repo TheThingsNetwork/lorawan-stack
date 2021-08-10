@@ -344,10 +344,9 @@ func (l logger) Print(v ...interface{}) {
 	case "log", "error":
 		if err, ok := v[2].(error); ok {
 			err = convertError(err)
-			if errors.IsAlreadyExists(err) {
-				return // no problem.
+			if errors.Resemble(err, errDatabase) {
+				logger.WithError(err).Error("Database error")
 			}
-			logger.WithError(err).Error("Database error")
 			return
 		}
 		logger.Error(fmt.Sprint(v[2:]...))
