@@ -8036,6 +8036,51 @@
       "file": "eui.go"
     }
   },
+  "error:pkg/types:invalid_aes_key": {
+    "translations": {
+      "en": "invalid AES key"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "aeskey.go"
+    }
+  },
+  "error:pkg/types:invalid_dev_addr": {
+    "translations": {
+      "en": "invalid DevAddr"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "devaddr.go"
+    }
+  },
+  "error:pkg/types:invalid_dev_nonce": {
+    "translations": {
+      "en": "invalid DevNonce"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "dev_nonce.go"
+    }
+  },
+  "error:pkg/types:invalid_eui": {
+    "translations": {
+      "en": "invalid EUI"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "eui.go"
+    }
+  },
+  "error:pkg/types:invalid_join_nonce": {
+    "translations": {
+      "en": "invalid JoinNonce"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "join_nonce.go"
+    }
+  },
   "error:pkg/types:invalid_json": {
     "translations": {
       "en": "invalid JSON: `{json}`"
@@ -8047,11 +8092,20 @@
   },
   "error:pkg/types:invalid_length": {
     "translations": {
-      "en": "invalid slice length"
+      "en": "invalid length: want {want} bytes, got {got}"
     },
     "description": {
       "package": "pkg/types",
       "file": "types.go"
+    }
+  },
+  "error:pkg/types:invalid_net_id": {
+    "translations": {
+      "en": "invalid NetID"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "netid.go"
     }
   },
   "error:pkg/types:net_id_bits": {

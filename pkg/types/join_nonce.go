@@ -17,7 +17,11 @@ package types
 import (
 	"encoding/hex"
 	"strings"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
+
+var errInvalidJoinNonce = errors.DefineInvalidArgument("invalid_join_nonce", "invalid JoinNonce")
 
 // JoinNonce is Join Server nonce used in the join procedure.
 // - If LoRaWAN version <1.1 - it is randomly generated.
@@ -54,7 +58,10 @@ func (jn JoinNonce) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(j
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (jn *JoinNonce) UnmarshalJSON(data []byte) error {
 	*jn = [3]byte{}
-	return unmarshalJSONHexBytes(jn[:], data)
+	if err := unmarshalJSONHexBytes(jn[:], data); err != nil {
+		return errInvalidJoinNonce.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
@@ -63,7 +70,10 @@ func (jn JoinNonce) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 func (jn *JoinNonce) UnmarshalBinary(data []byte) error {
 	*jn = [3]byte{}
-	return unmarshalBinaryBytes(jn[:], data)
+	if err := unmarshalBinaryBytes(jn[:], data); err != nil {
+		return errInvalidJoinNonce.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalText implements the encoding.TextMarshaler interface.
@@ -72,5 +82,8 @@ func (jn JoinNonce) MarshalText() ([]byte, error) { return marshalTextBytes(jn[:
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 func (jn *JoinNonce) UnmarshalText(data []byte) error {
 	*jn = [3]byte{}
-	return unmarshalTextBytes(jn[:], data)
+	if err := unmarshalTextBytes(jn[:], data); err != nil {
+		return errInvalidJoinNonce.WithCause(err)
+	}
+	return nil
 }

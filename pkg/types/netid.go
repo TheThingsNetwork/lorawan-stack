@@ -23,6 +23,8 @@ import (
 
 const unmatchedNetID = "unmatched NetID type"
 
+var errInvalidNetID = errors.DefineInvalidArgument("invalid_net_id", "invalid NetID")
+
 // NetID is issued by the LoRa Alliance.
 type NetID [3]byte
 
@@ -56,7 +58,10 @@ func (id NetID) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(id[:]
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (id *NetID) UnmarshalJSON(data []byte) error {
 	*id = [3]byte{}
-	return unmarshalJSONHexBytes(id[:], data)
+	if err := unmarshalJSONHexBytes(id[:], data); err != nil {
+		return errInvalidNetID.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
@@ -65,7 +70,10 @@ func (id NetID) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(id[:
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 func (id *NetID) UnmarshalBinary(data []byte) error {
 	*id = [3]byte{}
-	return unmarshalBinaryBytes(id[:], data)
+	if err := unmarshalBinaryBytes(id[:], data); err != nil {
+		return errInvalidNetID.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalText implements the encoding.TextMarshaler interface.
@@ -74,7 +82,10 @@ func (id NetID) MarshalText() ([]byte, error) { return marshalTextBytes(id[:]) }
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 func (id *NetID) UnmarshalText(data []byte) error {
 	*id = [3]byte{}
-	return unmarshalTextBytes(id[:], data)
+	if err := unmarshalTextBytes(id[:], data); err != nil {
+		return errInvalidNetID.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalNumber returns the numeric value.

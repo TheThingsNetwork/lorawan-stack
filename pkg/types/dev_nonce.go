@@ -18,7 +18,11 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"strings"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
+
+var errInvalidDevNonce = errors.DefineInvalidArgument("invalid_dev_nonce", "invalid DevNonce")
 
 // DevNonce is device nonce used in the join procedure.
 // - If LoRaWAN version <1.1 - it is randomly generated.
@@ -66,7 +70,10 @@ func (dn DevNonce) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(dn
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (dn *DevNonce) UnmarshalJSON(data []byte) error {
 	*dn = [2]byte{}
-	return unmarshalJSONHexBytes(dn[:], data)
+	if err := unmarshalJSONHexBytes(dn[:], data); err != nil {
+		return errInvalidDevNonce.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
@@ -75,7 +82,10 @@ func (dn DevNonce) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(d
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 func (dn *DevNonce) UnmarshalBinary(data []byte) error {
 	*dn = [2]byte{}
-	return unmarshalBinaryBytes(dn[:], data)
+	if err := unmarshalBinaryBytes(dn[:], data); err != nil {
+		return errInvalidDevNonce.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalText implements the encoding.TextMarshaler interface.
@@ -84,5 +94,8 @@ func (dn DevNonce) MarshalText() ([]byte, error) { return marshalTextBytes(dn[:]
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 func (dn *DevNonce) UnmarshalText(data []byte) error {
 	*dn = [2]byte{}
-	return unmarshalTextBytes(dn[:], data)
+	if err := unmarshalTextBytes(dn[:], data); err != nil {
+		return errInvalidDevNonce.WithCause(err)
+	}
+	return nil
 }
