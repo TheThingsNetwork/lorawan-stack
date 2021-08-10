@@ -24,6 +24,17 @@ class Ns {
 
     return Marshaler.payloadSingleResponse(result)
   }
+
+  async getDefaultMacSettings(freqPlan, phyVersion) {
+    const result = await this._api.GetDefaultMACSettings({
+      routeParams: {
+        frequency_plan_id: freqPlan,
+        lorawan_phy_version: phyVersion,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(result)
+  }
 }
 
 export default Ns

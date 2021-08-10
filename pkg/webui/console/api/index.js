@@ -15,6 +15,8 @@
 import axios from 'axios'
 import TTS, { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from 'ttn-lw'
 
+import TTS, { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from 'ttn-lw'
+
 import toast from '@ttn-lw/components/toast'
 
 import {
@@ -313,6 +315,7 @@ export default {
   },
   ns: {
     generateDevAddress: tts.Ns.generateDevAddress.bind(tts.Ns),
+    getDefaultMacSettings: tts.Ns.getDefaultMacSettings.bind(tts.Ns),
   },
   is: {
     getConfiguration: tts.Is.getConfiguration.bind(tts.Is),
