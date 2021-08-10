@@ -216,14 +216,14 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		pendingMatch
 	)
 	var matchType sessionMatchType
-	switch {
+
 	// Pending session match
-	case !pld.Ack &&
+	if !pld.Ack &&
 		cmacFMatchResult.IsPending &&
 		dev.PendingSession != nil &&
 		dev.PendingMacState != nil &&
 		pld.DevAddr.Equal(dev.PendingSession.DevAddr) &&
-		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.PendingMacState.LorawanVersion.UseLegacyMIC():
+		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.PendingMacState.LorawanVersion.UseLegacyMIC() {
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.PendingSession.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.PendingSession.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
@@ -253,18 +253,17 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.PendingSession.StartedAt = up.ReceivedAt
 
 			matchType = pendingMatch
-			break
 		}
-		// Key mismatch, attempt to match current session.
-		fallthrough
+	}
 
 	// Current session match
-	case dev.Session != nil &&
+	if matchType == currentOriginalMatch &&
+		dev.Session != nil &&
 		dev.MacState != nil &&
 		pld.DevAddr.Equal(dev.Session.DevAddr) &&
 		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.MacState.LorawanVersion.UseLegacyMIC() &&
 		(cmacFMatchResult.FullFCnt == FullFCnt(uint16(pld.FCnt), dev.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(dev, ns.defaultMACSettings)) ||
-			cmacFMatchResult.FullFCnt == pld.FCnt):
+			cmacFMatchResult.FullFCnt == pld.FCnt) {
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.Session.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
@@ -366,12 +365,10 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 
 				matchType = currentRetransmissionMatch
 			}
-			break
+		} else {
+			return nil, false, nil
 		}
-		// Key mismatch
-		return nil, false, nil
-
-	default:
+	} else if matchType != pendingMatch {
 		return nil, false, nil
 	}
 
@@ -701,9 +698,7 @@ var handleDataUplinkGetPaths = [...]string{
 }
 
 // mergeMetadata merges the metadata collected for up.
-// mergeMetadata mutates up.RxMetadata discarding any existing up.RxMetadata value.
-// NOTE: Since events are published async we need ensure that up passed to an event earlier is not mutated,
-// hence up is taken by value here.
+// mergeMetadata mutates up.RxMetadata.
 func (ns *NetworkServer) mergeMetadata(ctx context.Context, up *ttnpb.UplinkMessage) {
 	mds, err := ns.uplinkDeduplicator.AccumulatedMetadata(ctx, up)
 	if err != nil {
@@ -713,6 +708,31 @@ func (ns *NetworkServer) mergeMetadata(ctx context.Context, up *ttnpb.UplinkMess
 	up.RxMetadata = mds
 	log.FromContext(ctx).WithField("metadata_count", len(up.RxMetadata)).Debug("Merged metadata")
 	registerMergeMetadata(ctx, up)
+}
+
+// filterMetadata filters the collected metadata.
+// filterMetadata removes metadata from Packet Broker that has been received from a forwarder that identifies like this
+// Network Server identifies itself. This is to avoid that failed downlink attempts through Gateway Server lead to
+// downlink scheduling attempts through Packet Broker, ending up on the same Gateway Server that already failed to schedule.
+// filterMetadata mutates up.RxMetadata.
+func (ns *NetworkServer) filterMetadata(ctx context.Context, up *ttnpb.UplinkMessage) {
+	mds := make([]*ttnpb.RxMetadata, 0, len(up.RxMetadata))
+	for _, md := range up.RxMetadata {
+		if pbMD := md.GetPacketBroker(); pbMD != nil {
+			if pbMD.ForwarderNetId.Equal(ns.netID) &&
+				pbMD.ForwarderClusterId == ns.clusterID {
+				continue
+			}
+		}
+		mds = append(mds, md)
+	}
+	up.RxMetadata = mds
+	if d := cap(mds) - len(mds); d > 0 {
+		log.FromContext(ctx).WithFields(log.Fields(
+			"metadata_count", len(mds),
+			"filtered_count", d,
+		)).Debug("Filtered metadata")
+	}
 }
 
 func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
@@ -830,6 +850,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	case <-ns.deduplicationDone(ctx, up):
 	}
 	ns.mergeMetadata(ctx, up)
+	ns.filterMetadata(ctx, up)
 
 	for _, f := range matched.DeferredMACHandlers {
 		evs, err := f(ctx, matched.Device, up)
@@ -1150,6 +1171,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	case <-ns.deduplicationDone(ctx, up):
 	}
 	ns.mergeMetadata(ctx, up)
+	ns.filterMetadata(ctx, up)
 	macState.RecentUplinks = []*ttnpb.UplinkMessage{{
 		Payload:            up.Payload,
 		Settings:           up.Settings,

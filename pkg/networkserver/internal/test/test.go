@@ -24,6 +24,7 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
@@ -168,6 +169,28 @@ var (
 			Snr:                    -7,
 			UplinkToken:            []byte("token-gtw-4"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
+		},
+	}
+	PacketBrokerRxMetadata = [...]*ttnpb.RxMetadata{
+		{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
+			Snr:                4.2,
+			UplinkToken:        []byte("token-pb-1"),
+			PacketBroker: &ttnpb.PacketBrokerMetadata{
+				ForwarderNetId:     test.DefaultNetID,
+				ForwarderClusterId: "test-cluster",
+			},
+			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
+		},
+		{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
+			Snr:                1.8,
+			UplinkToken:        []byte("token-pb-2"),
+			PacketBroker: &ttnpb.PacketBrokerMetadata{
+				ForwarderNetId:     test.DefaultNetID,
+				ForwarderClusterId: "other-cluster",
+			},
+			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
 		},
 	}
 
