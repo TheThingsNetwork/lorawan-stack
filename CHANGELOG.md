@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- The Identity Server now returns a validation error when trying to update the EUIs of an end device.
+
 ### Deprecated
 
 ### Removed
