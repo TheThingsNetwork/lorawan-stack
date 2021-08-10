@@ -25,9 +25,9 @@ import (
 func TestCause(t *testing.T) {
 	a := assertions.New(t)
 
-	var cause = errors.New("cause")
+	cause := errors.New("cause")
 
-	var errInvalidFoo = errors.DefineInvalidArgument("test_cause_invalid_foo", "Invalid Foo: {foo}", "foo")
+	errInvalidFoo := errors.DefineInvalidArgument("test_cause_invalid_foo", "Invalid Foo: {foo}", "foo")
 
 	a.So(errInvalidFoo.Cause(), should.EqualErrorOrDefinition, nil)
 	a.So(errors.RootCause(errInvalidFoo), should.EqualErrorOrDefinition, errInvalidFoo)
@@ -39,15 +39,15 @@ func TestCause(t *testing.T) {
 	}, should.Panic)
 
 	a.So(err1, should.HaveSameErrorDefinitionAs, errInvalidFoo)
-	a.So(err1.Cause(), should.EqualErrorOrDefinition, &cause)
-	a.So(errors.RootCause(err1), should.EqualErrorOrDefinition, &cause)
-	a.So(errors.Stack(err1), should.Resemble, []error{err1, &cause})
+	a.So(err1.Cause(), should.EqualErrorOrDefinition, cause)
+	a.So(errors.RootCause(err1), should.EqualErrorOrDefinition, cause)
+	a.So(errors.Stack(err1), should.Resemble, []error{err1, cause})
 
-	var errInvalidBar = errors.DefineInvalidArgument("test_cause_invalid_bar", "Invalid Bar")
-	err2 := errInvalidBar.WithCause(&err1)
+	errInvalidBar := errors.DefineInvalidArgument("test_cause_invalid_bar", "Invalid Bar")
+	err2 := errInvalidBar.WithCause(err1)
 
 	a.So(err2, should.HaveSameErrorDefinitionAs, errInvalidBar)
-	a.So(err2.Cause(), should.EqualErrorOrDefinition, &err1)
-	a.So(errors.RootCause(err2), should.EqualErrorOrDefinition, &cause)
-	a.So(errors.Stack(err2), should.Resemble, []error{err2, &err1, &cause})
+	a.So(err2.Cause(), should.EqualErrorOrDefinition, err1)
+	a.So(errors.RootCause(err2), should.EqualErrorOrDefinition, cause)
+	a.So(errors.Stack(err2), should.Resemble, []error{err2, err1, cause})
 }

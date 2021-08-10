@@ -48,13 +48,26 @@ type DefinitionInterface interface {
 }
 
 // Namespace of the error.
-func (d Definition) Namespace() string { return d.namespace }
+func (d *Definition) Namespace() string {
+	if d == nil {
+		return ""
+	}
+	return d.namespace
+}
 
 // Name of the error.
-func (d Definition) Name() string { return d.name }
+func (d *Definition) Name() string {
+	if d == nil {
+		return ""
+	}
+	return d.name
+}
 
 // FullName returns the full name (namespace:name) of the error.
-func (d Definition) FullName() string {
+func (d *Definition) FullName() string {
+	if d == nil {
+		return ""
+	}
 	namespace := d.namespace
 	if namespace == "" {
 		namespace = "unknown"
@@ -67,18 +80,36 @@ func (d Definition) FullName() string {
 }
 
 // MessageFormat of the error.
-func (d Definition) MessageFormat() string { return d.messageFormat }
+func (d *Definition) MessageFormat() string {
+	if d == nil {
+		return ""
+	}
+	return d.messageFormat
+}
 
 // Code of the error.
 // This code is consistent with google.golang.org/genproto/googleapis/rpc/code and google.golang.org/grpc/codes.
-func (d Definition) Code() uint32 { return d.code }
+func (d *Definition) Code() uint32 {
+	if d == nil {
+		return 0
+	}
+	return d.code
+}
 
-func (d Definition) String() string {
+func (d *Definition) String() string {
+	if d == nil {
+		return ""
+	}
 	return fmt.Sprintf("error:%s (%s)", d.FullName(), d.messageFormat)
 }
 
 // Error implements the error interface.
-func (d Definition) Error() string { return d.String() }
+func (d *Definition) Error() string {
+	if d == nil {
+		return ""
+	}
+	return d.String()
+}
 
 var messageFormatArgument = regexp.MustCompile(`\{[\s]*([a-z0-9_]+)`)
 
@@ -99,7 +130,7 @@ func messageFormatArguments(messageFormat string) (args []string) {
 	return
 }
 
-func define(code uint32, name, messageFormat string, publicAttributes ...string) Definition {
+func define(code uint32, name, messageFormat string, publicAttributes ...string) *Definition {
 	ns := namespace(3)
 	if code == 0 {
 		code = uint32(codes.Unknown)
@@ -143,7 +174,7 @@ nextArg:
 	desc := i18n.Define(fmt.Sprintf("error:%s", fullName), def.messageFormat)
 	desc.SetSource(2)
 
-	return def
+	return &def
 }
 
 // Definitions of registered errors.
@@ -151,36 +182,36 @@ nextArg:
 var Definitions = make(map[string]*Definition)
 
 // Define defines a registered error of type Unknown.
-func Define(name, messageFormat string, publicAttributes ...string) Definition {
+func Define(name, messageFormat string, publicAttributes ...string) *Definition {
 	return define(uint32(codes.Unknown), name, messageFormat, publicAttributes...)
 }
 
 // DefineInvalidArgument defines a registered error of type InvalidArgument.
-func DefineInvalidArgument(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineInvalidArgument(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.InvalidArgument), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineDeadlineExceeded defines a registered error of type DeadlineExceeded.
-func DefineDeadlineExceeded(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineDeadlineExceeded(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.DeadlineExceeded), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineCanceled defines a registered error of type Canceled.
-func DefineCanceled(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineCanceled(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.Canceled), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineNotFound defines a registered error of type NotFound.
-func DefineNotFound(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineNotFound(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.NotFound), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineAlreadyExists defines a registered error of type AlreadyExists.
-func DefineAlreadyExists(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineAlreadyExists(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.AlreadyExists), name, messageFormat, publicAttributes...)
 	return def
 }
@@ -191,13 +222,13 @@ func DefineAlreadyExists(name, messageFormat string, publicAttributes ...string)
 // using incorrect credentials or credentials with insufficient rights.
 // If the client attempts to perform the action without providing any form
 // of authentication, Unauthenticated should be used instead.
-func DefinePermissionDenied(name, messageFormat string, publicAttributes ...string) Definition {
+func DefinePermissionDenied(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.PermissionDenied), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineResourceExhausted defines a registered error of type ResourceExhausted.
-func DefineResourceExhausted(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineResourceExhausted(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.ResourceExhausted), name, messageFormat, publicAttributes...)
 	return def
 }
@@ -205,13 +236,13 @@ func DefineResourceExhausted(name, messageFormat string, publicAttributes ...str
 // DefineFailedPrecondition defines a registered error of type FailedPrecondition.
 // Use Unavailable if the client can retry just the failing call.
 // Use Aborted if the client should retry at a higher-level.
-func DefineFailedPrecondition(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineFailedPrecondition(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.FailedPrecondition), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineAborted defines a registered error of type Aborted.
-func DefineAborted(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineAborted(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.Aborted), name, messageFormat, publicAttributes...)
 	return def
 }
@@ -219,31 +250,31 @@ func DefineAborted(name, messageFormat string, publicAttributes ...string) Defin
 // OutOfRange - not used for now
 
 // Unimplemented defines a registered error of type Unimplemented.
-func DefineUnimplemented(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineUnimplemented(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.Unimplemented), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineInternal defines a registered error of type Internal.
-func DefineInternal(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineInternal(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.Internal), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineUnavailable defines a registered error of type Unavailable.
-func DefineUnavailable(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineUnavailable(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.Unavailable), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineDataLoss defines a registered error of type DataLoss.
-func DefineDataLoss(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineDataLoss(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.DataLoss), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineCorruption is the same as DefineDataLoss.
-func DefineCorruption(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineCorruption(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.DataLoss), name, messageFormat, publicAttributes...)
 	return def
 }
@@ -253,13 +284,16 @@ func DefineCorruption(name, messageFormat string, publicAttributes ...string) De
 // without providing any form of authentication.
 // If the client attempts to perform the action using incorrect credentials
 // or credentials with insufficient rights, PermissionDenied should be used instead.
-func DefineUnauthenticated(name, messageFormat string, publicAttributes ...string) Definition {
+func DefineUnauthenticated(name, messageFormat string, publicAttributes ...string) *Definition {
 	def := define(uint32(codes.Unauthenticated), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // New returns a new error from the definition. This is not required, but will
 // add a stack trace for improved debugging.
-func (d Definition) New() Error {
+func (d *Definition) New() *Error {
+	if d == nil {
+		return nil
+	}
 	return build(d, 0) // Don't refactor this to build(...).WithCause(...)
 }

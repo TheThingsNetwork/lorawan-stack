@@ -204,7 +204,7 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 			} else if _, isURIValidationError := resp.InternalError.(osin.UriValidationError); isURIValidationError {
 				osinErr = errInvalidRedirectURI.WithCause(resp.InternalError)
 			} else {
-				osinErr = osinErr.(errors.Definition).WithCause(resp.InternalError)
+				osinErr = osinErr.(*errors.Definition).WithCause(resp.InternalError)
 			}
 		}
 		log.FromContext(c.Request().Context()).WithError(osinErr).Warn("OAuth error")

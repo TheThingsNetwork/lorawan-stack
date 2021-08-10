@@ -100,23 +100,38 @@ func (e *Error) mergeAttributes(kv ...interface{}) {
 
 // WithAttributes returns the error with the given attributes set.
 // Any conflicting attributes in the Error will be overwritten.
-func (e Error) WithAttributes(kv ...interface{}) Error {
-	e.mergeAttributes(kv...)
-	return e
+func (e *Error) WithAttributes(kv ...interface{}) *Error {
+	if e == nil {
+		return e
+	}
+	deriv := *e
+	deriv.mergeAttributes(kv...)
+	return &deriv
 }
 
 // WithAttributes returns a new error from the definition, and sets the given attributes.
-func (d Definition) WithAttributes(kv ...interface{}) Error {
+func (d *Definition) WithAttributes(kv ...interface{}) *Error {
+	if d == nil {
+		return nil
+	}
 	e := build(d, 0) // Don't refactor this to build(...).WithAttributes(...)
 	e.mergeAttributes(kv...)
 	return e
 }
 
 // Attributes of the error.
-func (e Error) Attributes() map[string]interface{} { return e.attributes }
+func (e *Error) Attributes() map[string]interface{} {
+	if e == nil {
+		return nil
+	}
+	return e.attributes
+}
 
 // PublicAttributes of the error.
-func (e Error) PublicAttributes() map[string]interface{} {
+func (e *Error) PublicAttributes() map[string]interface{} {
+	if e == nil {
+		return nil
+	}
 	if len(e.attributes) == 0 {
 		return nil
 	}
@@ -137,10 +152,10 @@ nextAttr:
 }
 
 // Attributes are not present in the error definition, so this just returns nil.
-func (d Definition) Attributes() map[string]interface{} { return nil }
+func (d *Definition) Attributes() map[string]interface{} { return nil }
 
 // PublicAttributes are not present in the error definition, so this just returns nil.
-func (d Definition) PublicAttributes() map[string]interface{} { return nil }
+func (d *Definition) PublicAttributes() map[string]interface{} { return nil }
 
 // Attributes returns the attributes of the errors, if they implement Attributes().
 // If more than one error is passed, subsequent error attributes will be added if not set.

@@ -26,21 +26,30 @@ var (
 )
 
 // Unwrap makes the Error implement error unwrapping.
-func (e Error) Unwrap() error {
+func (e *Error) Unwrap() error {
+	if e == nil {
+		return nil
+	}
 	return e.cause
 }
 
 // Is makes the Error implement error comparison.
-func (e Error) Is(target error) bool {
+func (e *Error) Is(target error) bool {
+	if e == nil {
+		return target == nil
+	}
 	return Resemble(e, target)
 }
 
 // Unwrap makes the Definition implement error unwrapping.
-func (Definition) Unwrap() error {
+func (*Definition) Unwrap() error {
 	return nil
 }
 
 // Is makes the Definition implement error comparison.
-func (d Definition) Is(target error) bool {
+func (d *Definition) Is(target error) bool {
+	if d == nil {
+		return target == nil
+	}
 	return Resemble(d, target)
 }

@@ -129,12 +129,12 @@ func init() {
 	}
 }
 
-type valueErr func(interface{}) errors.Error
+type valueErr func(interface{}) *errors.Error
 
 func unexpectedValue(err interface {
-	WithAttributes(kv ...interface{}) errors.Error
+	WithAttributes(kv ...interface{}) *errors.Error
 }) valueErr {
-	return func(value interface{}) errors.Error {
+	return func(value interface{}) *errors.Error {
 		return err.WithAttributes(valueKey, value)
 	}
 }
@@ -160,6 +160,6 @@ func errCouldNotParse(lorawanField string) valueErr {
 	return unexpectedValue(errParse.WithAttributes("field", lorawanField))
 }
 
-func errMissing(lorawanField string) errors.Error {
+func errMissing(lorawanField string) *errors.Error {
 	return errMissingField.WithAttributes("field", lorawanField)
 }

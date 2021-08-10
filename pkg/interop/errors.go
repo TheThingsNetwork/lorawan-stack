@@ -49,10 +49,12 @@ var (
 	ErrFrameSize          = defineError("frame_size", ResultFrameSizeError, "frame size error")
 )
 
-var errorResults = make(map[string]ResultCode)
-var resultErrors = make(map[ResultCode]errors.Definition)
+var (
+	errorResults = make(map[string]ResultCode)
+	resultErrors = make(map[ResultCode]*errors.Definition)
+)
 
-func defineError(name string, result ResultCode, message string) errors.Definition {
+func defineError(name string, result ResultCode, message string) *errors.Definition {
 	definition := errors.DefineInvalidArgument(name, message)
 	errorResults[definition.FullName()] = result
 	resultErrors[result] = definition

@@ -47,41 +47,32 @@ func From(err error) (out *Error, ok bool) {
 	}
 	defer func() {
 		if out != nil {
-			var copy = *out
+			copy := *out
 			out = &copy
 		}
 	}()
 	if err == context.Canceled {
-		e := build(errContextCanceled, 0)
-		return &e, true
+		return build(errContextCanceled, 0), true
 	} else if err == context.DeadlineExceeded {
-		e := build(errContextDeadlineExceeded, 0)
-		return &e, true
+		return build(errContextDeadlineExceeded, 0), true
 	}
 	switch err := err.(type) {
-	case Error:
-		return &err, true
 	case *Error:
 		if err == nil {
 			return nil, false // This is invalid.
 		}
 		return err, true
-	case Definition:
-		e := build(err, 0)
-		return &e, true
 	case *Definition:
 		if err == nil {
 			return nil, false // This is invalid.
 		}
-		e := build(*err, 0)
-		return &e, true
+		return build(err, 0), true
 	case ErrorDetails: // Received over an API.
 		var e Error
 		setErrorDetails(&e, err)
 		return &e, true
 	case interface{ GRPCStatus() *status.Status }:
-		e := FromGRPCStatus(err.GRPCStatus())
-		return &e, true
+		return FromGRPCStatus(err.GRPCStatus()), true
 	case validationError:
 		e := build(errValidation, 0).WithAttributes(
 			"field", err.Field(),
@@ -91,23 +82,20 @@ func From(err error) (out *Error, ok bool) {
 		if cause := err.Cause(); cause != nil {
 			e = e.WithCause(cause)
 		}
-		return &e, true
+		return e, true
 	case *net.DNSError:
 		e := build(errNetDNS, 0).WithAttributes(
 			"not_found", err.IsNotFound,
 		).WithAttributes(
 			netErrorDetails(err)...,
 		)
-		return &e, true
+		return e, true
 	case *net.AddrError:
-		e := build(errNetAddr, 0).WithAttributes(netErrorDetails(err)...)
-		return &e, true
+		return build(errNetAddr, 0).WithAttributes(netErrorDetails(err)...), true
 	case net.InvalidAddrError:
-		e := build(errNetInvalidAddr, 0).WithAttributes(netErrorDetails(err)...)
-		return &e, true
+		return build(errNetInvalidAddr, 0).WithAttributes(netErrorDetails(err)...), true
 	case net.UnknownNetworkError:
-		e := build(errNetUnknownNetwork, 0).WithAttributes(netErrorDetails(err)...)
-		return &e, true
+		return build(errNetUnknownNetwork, 0).WithAttributes(netErrorDetails(err)...), true
 	case *net.OpError:
 		// Do not use netErrorDetails(err) as err.Error() will panic if err.Err is nil.
 		e := build(errNetOperation, 0).WithAttributes(
@@ -125,7 +113,7 @@ func From(err error) (out *Error, ok bool) {
 		if err.Err != nil {
 			e = e.WithAttributes("message", err.Error())
 		}
-		return &e, true
+		return e, true
 	case *url.Error:
 		e := build(errRequest, 0).WithAttributes(
 			"url", err.URL,
@@ -133,10 +121,9 @@ func From(err error) (out *Error, ok bool) {
 		if err.Err != nil {
 			e = e.WithCause(err.Err)
 		}
-		return &e, true
+		return e, true
 	case x509.UnknownAuthorityError, *x509.UnknownAuthorityError:
-		e := build(errX509UnknownAuthority, 0)
-		return &e, true
+		return build(errX509UnknownAuthority, 0), true
 	}
 	return nil, false
 }
@@ -155,6 +142,9 @@ type ErrorDetails interface {
 }
 
 func setErrorDetails(err *Error, details ErrorDetails) {
+	if err.Definition == nil {
+		err.Definition = &Definition{}
+	}
 	if namespace := details.Namespace(); namespace != "" {
 		err.namespace = namespace
 	}

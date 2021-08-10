@@ -40,11 +40,8 @@ func TestResembles(t *testing.T) {
 	errInvalidArgument := defInvalidArgument.WithAttributes("foo", "bar")
 	grpcErrInvalidArgument := errInvalidArgument.GRPCStatus().Err()
 
-	// Errors and definitions resemble all pointer/non-pointer combinations:
+	// Errors and definitions resemble:
 	a.So(errors.Resemble(errInvalidArgument, defInvalidArgument), should.BeTrue)
-	a.So(errors.Resemble(errInvalidArgument, &defInvalidArgument), should.BeTrue)
-	a.So(errors.Resemble(&errInvalidArgument, defInvalidArgument), should.BeTrue)
-	a.So(errors.Resemble(&errInvalidArgument, &defInvalidArgument), should.BeTrue)
 
 	// Should resemble gRPC error:
 	a.So(errors.Resemble(grpcErrInvalidArgument, defInvalidArgument), should.BeTrue)

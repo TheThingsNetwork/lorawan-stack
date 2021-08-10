@@ -16,7 +16,6 @@ package oauthclient
 
 import (
 	"context"
-	"encoding/json"
 	stderrors "errors"
 	"net/http"
 
@@ -95,8 +94,8 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 		var retrieveError *oauth2.RetrieveError
 		if stderrors.As(err, &retrieveError) {
 			var ttnErr errors.Error
-			if decErr := json.Unmarshal(retrieveError.Body, &ttnErr); decErr == nil {
-				return errExchange.WithCause(ttnErr)
+			if decErr := ttnErr.UnmarshalJSON(retrieveError.Body); decErr == nil {
+				return errExchange.WithCause(&ttnErr)
 			}
 		}
 		return errExchange.WithCause(err)
