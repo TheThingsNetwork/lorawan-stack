@@ -131,7 +131,7 @@ type EndDeviceModel struct {
 		Other []string `yaml:"other"`
 	} `yaml:"videos"`
 	ProductURL   string `yaml:"productURL"`
-	DatasheetURL string `yaml:"datasheetURL"`
+	DataSheetURL string `yaml:"dataSheetURL"`
 	ResellerURLs []struct {
 		Name   string   `yaml:"name"`
 		Region []string `yaml:"region"`
@@ -167,7 +167,7 @@ func (d EndDeviceModel) ToPB(brandID, modelID string, paths ...string) (*ttnpb.E
 		KeyProvisioning:  d.KeyProvisioning,
 		KeySecurity:      d.KeySecurity,
 		ProductUrl:       d.ProductURL,
-		DatasheetUrl:     d.DatasheetURL,
+		DatasheetUrl:     d.DataSheetURL,
 		AdditionalRadios: d.AdditionalRadios,
 	}
 
