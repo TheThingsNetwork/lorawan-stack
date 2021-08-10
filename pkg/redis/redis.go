@@ -27,12 +27,8 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
-	goproto "github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"google.golang.org/grpc/codes"
 )
 
 //go:generate go run ./generate_scripts.go
@@ -609,35 +605,16 @@ func (q *TaskQueue) Init(ctx context.Context) error {
 	return initTaskGroup(ctx, q.Redis, q.Group, q.Key, q.Shards)
 }
 
-var errCloseQueueFailed = errors.DefineInternal("close_queue_failed", "failed to close task queue")
-
-func toProtoMessage(err error) goproto.Message {
-	if ttnErr, ok := errors.From(err); ok {
-		return ttnpb.ErrorDetailsToProto(ttnErr)
-	}
-	return &ttnpb.ErrorDetails{
-		Code:          uint32(codes.Unknown),
-		MessageFormat: err.Error(),
-	}
-}
-
 // Close closes the TaskQueue.
 func (q *TaskQueue) Close(ctx context.Context) error {
-	details := make([]goproto.Message, 0, q.Shards)
-	for w := 0; w < q.Shards; w++ {
-		_, err := q.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+	_, err := q.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+		for w := 0; w < q.Shards; w++ {
 			p.XGroupDelConsumer(ctx, InputTaskKey(q.Key, w), q.Group, q.ID)
 			p.XGroupDelConsumer(ctx, ReadyTaskKey(q.Key, w), q.Group, q.ID)
-			return nil
-		})
-		if err != nil {
-			details = append(details, toProtoMessage(err))
 		}
-	}
-	if len(details) > 0 {
-		return errCloseQueueFailed.WithDetails(details...)
-	}
-	return nil
+		return nil
+	})
+	return ConvertError(err)
 }
 
 // Add adds a task s to the queue with a timestamp startAt.
