@@ -21,7 +21,7 @@ import (
 
 var errTLVRecordTooSmall = errors.DefineInvalidArgument("tlv_record_too_small", "TLV record payload is too small")
 
-func parseTLVPayload(record objects.Hex, f func(uint8, int, []byte) error) error {
+func parseTLVPayload(record objects.Hex, f func(uint8, []byte) error) error {
 	for len(record) >= 2 {
 		tag := record[0]
 		length := int(record[1])
@@ -32,7 +32,7 @@ func parseTLVPayload(record objects.Hex, f func(uint8, int, []byte) error) error
 		bytes := []byte(record[2 : 2+length])
 		record = record[length+2:]
 
-		if err := f(tag, length, bytes); err != nil {
+		if err := f(tag, bytes); err != nil {
 			return err
 		}
 	}

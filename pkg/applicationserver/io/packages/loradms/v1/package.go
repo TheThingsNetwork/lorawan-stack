@@ -231,11 +231,13 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids tt
 	})
 }
 
+const tlvWiFiHeaderLength = 5
+
 func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, records []objects.StreamRecord, up *ttnpb.ApplicationUp, data *packageData, originalTimestamp *float64) error {
 	if records == nil || !data.GetUseTLVEncoding() {
 		return nil
 	}
-	f := func(tag uint8, length int, bytes []byte) error {
+	f := func(tag uint8, bytes []byte) error {
 		loraUp := &objects.LoRaUplink{
 			Timestamp: originalTimestamp,
 		}
@@ -244,7 +246,13 @@ func (p *DeviceManagementPackage) parseStreamRecords(ctx context.Context, record
 			payload := objects.Hex(bytes)
 			loraUp.Type = objects.GNSSUplinkType
 			loraUp.Payload = &payload
-		case 0x08: // WiFi data
+		case 0x0E: // WiFi data
+			if len(bytes) < tlvWiFiHeaderLength {
+				return nil
+			}
+			bytes = bytes[tlvWiFiHeaderLength:]
+			fallthrough
+		case 0x08: // Legacy WiFi data
 			payload := append(objects.Hex{0x01}, bytes...)
 			loraUp.Type = objects.WiFiUplinkType
 			loraUp.Payload = &payload
