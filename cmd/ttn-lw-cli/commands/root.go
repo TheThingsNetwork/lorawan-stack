@@ -194,6 +194,12 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 			},
 		}
 
+		if wantAll, err := cmd.Flags().GetBool("all"); err == nil && wantAll {
+			logger.Warn("The --all flag is not covered by our compatibility commitment.")
+			logger.Warn("This means that it may not work (or behave differently) with future versions of The Things Stack.")
+			logger.Warn("Only use the --all flag for development.")
+		}
+
 		for _, task := range tasks {
 			if err := task(); err != nil {
 				return err
