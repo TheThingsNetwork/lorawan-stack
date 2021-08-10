@@ -11,6 +11,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- CLI warnings about insecure connections.
+- CLI warnings about using the `--all` flag.
+
 ### Changed
 
 - The Identity Server now returns a validation error when trying to update the EUIs of an end device.
@@ -25,6 +28,7 @@ For details about compatibility between different releases, see the **Commitment
 - Generated CLI configuration for The Things Stack Community Edition.
 - End device access with limited rights in the Console.
 - Parsing of ID6 encoded EUIs from Basic Station gateways.
+- Warnings about unknown fields when getting or searching for gateways.
 
 ### Security
 
