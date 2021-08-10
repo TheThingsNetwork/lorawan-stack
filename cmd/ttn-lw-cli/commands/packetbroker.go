@@ -76,7 +76,7 @@ func getPacketBrokerNetworkID(flagSet *pflag.FlagSet, args []string, allowDefaul
 	}
 	var netID types.NetID
 	if err := netID.UnmarshalText([]byte(netIDHex)); err != nil {
-		return nil, err
+		return nil, errInvalidNetID.WithCause(err)
 	}
 	return &ttnpb.PacketBrokerNetworkIdentifier{
 		NetId:    netID.MarshalNumber(),

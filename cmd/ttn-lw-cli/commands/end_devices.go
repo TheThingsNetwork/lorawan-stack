@@ -94,9 +94,12 @@ var (
 	errEndDeviceKeysWithProvisioner = errors.DefineInvalidArgument("end_device_keys_provisioner", "end device ABP or OTAA keys cannot be set when there is a provisioner")
 	errInconsistentEndDeviceEUI     = errors.DefineInvalidArgument("inconsistent_end_device_eui", "given end device EUIs do not match registered EUIs")
 	errInvalidDataRateIndex         = errors.DefineInvalidArgument("data_rate_index", "Data rate index is invalid")
-	errInvalidMACVerson             = errors.DefineInvalidArgument("mac_version", "LoRaWAN MAC version is invalid")
-	errInvalidPHYVerson             = errors.DefineInvalidArgument("phy_version", "LoRaWAN PHY version is invalid")
+	errInvalidMACVersion            = errors.DefineInvalidArgument("mac_version", "LoRaWAN MAC version is invalid")
+	errInvalidPHYVersion            = errors.DefineInvalidArgument("phy_version", "LoRaWAN PHY version is invalid")
 	errNoEndDeviceEUI               = errors.DefineInvalidArgument("no_end_device_eui", "no end device EUIs set")
+	errInvalidJoinEUI               = errors.DefineInvalidArgument("invalid_join_eui", "invalid JoinEUI")
+	errInvalidDevEUI                = errors.DefineInvalidArgument("invalid_dev_eui", "invalid DevEUI")
+	errInvalidNetID                 = errors.DefineInvalidArgument("invalid_net_id", "invalid NetID")
 	errNoEndDeviceID                = errors.DefineInvalidArgument("no_end_device_id", "no end device ID set")
 )
 
@@ -129,14 +132,14 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 	if joinEUIHex, _ := flagSet.GetString("join-eui"); joinEUIHex != "" {
 		var joinEUI types.EUI64
 		if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
-			return nil, err
+			return nil, errInvalidJoinEUI.WithCause(err)
 		}
 		ids.JoinEui = &joinEUI
 	}
 	if devEUIHex, _ := flagSet.GetString("dev-eui"); devEUIHex != "" {
 		var devEUI types.EUI64
 		if err := devEUI.UnmarshalText([]byte(devEUIHex)); err != nil {
-			return nil, err
+			return nil, errInvalidDevEUI.WithCause(err)
 		}
 		ids.DevEui = &devEUI
 	}
@@ -426,10 +429,10 @@ var (
 						return err
 					}
 					if err := macVersion.UnmarshalText([]byte(s)); err != nil {
-						return err
+						return errInvalidMACVersion.WithCause(err)
 					}
 					if err := macVersion.Validate(); err != nil {
-						return errInvalidMACVerson
+						return errInvalidMACVersion.WithCause(err)
 					}
 					if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 						device.Session.SessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey()}
@@ -716,7 +719,7 @@ var (
 			var joinEUI types.EUI64
 			if joinEUIHex, _ := cmd.Flags().GetString("join-eui"); joinEUIHex != "" {
 				if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
-					return err
+					return errInvalidJoinEUI.WithCause(err)
 				}
 			}
 			if inputDecoder != nil {
@@ -742,7 +745,7 @@ var (
 				if startDevEUIHex, _ := cmd.Flags().GetString("start-dev-eui"); startDevEUIHex != "" {
 					var startDevEUI types.EUI64
 					if err := startDevEUI.UnmarshalText([]byte(startDevEUIHex)); err != nil {
-						return err
+						return errInvalidDevEUI.WithCause(err)
 					}
 					req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_Range{
 						Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
@@ -924,13 +927,13 @@ values will be stored in the Join Server.`,
 			if joinEUIHex, _ := cmd.Flags().GetString("source-join-eui"); joinEUIHex != "" {
 				joinEUI = new(types.EUI64)
 				if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
-					return err
+					return errInvalidJoinEUI.WithCause(err)
 				}
 			}
 			if devEUIHex, _ := cmd.Flags().GetString("source-dev-eui"); devEUIHex != "" {
 				devEUI = new(types.EUI64)
 				if err := devEUI.UnmarshalText([]byte(devEUIHex)); err != nil {
-					return err
+					return errInvalidDevEUI.WithCause(err)
 				}
 			}
 			if joinEUI != nil && devEUI != nil {
@@ -965,7 +968,7 @@ values will be stored in the Join Server.`,
 			req.TargetDeviceId, _ = cmd.Flags().GetString("target-device-id")
 			if netIDHex, _ := cmd.Flags().GetString("target-net-id"); netIDHex != "" {
 				if err := req.TargetNetId.UnmarshalText([]byte(netIDHex)); err != nil {
-					return err
+					return errInvalidNetID.WithCause(err)
 				}
 			}
 			if config.NetworkServerEnabled {

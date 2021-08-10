@@ -1430,6 +1430,24 @@
       "file": "gateways_claim.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:invalid_dev_eui": {
+    "translations": {
+      "en": "invalid DevEUI"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:invalid_gateway_eui": {
+    "translations": {
+      "en": "invalid gateway EUI"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "gateways.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:invalid_hostname": {
     "translations": {
       "en": "`{hostname}` is not a valid hostname"
@@ -1437,6 +1455,24 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "use.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:invalid_join_eui": {
+    "translations": {
+      "en": "invalid JoinEUI"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:invalid_net_id": {
+    "translations": {
+      "en": "invalid NetID"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:invalid_target_cups_trust": {

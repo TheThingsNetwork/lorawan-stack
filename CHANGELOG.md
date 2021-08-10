@@ -14,6 +14,7 @@ For details about compatibility between different releases, see the **Commitment
 - CLI warnings about insecure connections.
 - CLI warnings about using the `--all` flag.
 - Packet Broker network listed switch in the Console.
+- Improved errors for invalid command-line flags.
 
 ### Changed
 

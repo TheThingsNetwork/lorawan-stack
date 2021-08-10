@@ -47,8 +47,9 @@ func gatewayIDFlags() *pflag.FlagSet {
 }
 
 var (
-	errNoGatewayID  = errors.DefineInvalidArgument("no_gateway_id", "no gateway ID set")
-	errNoGatewayEUI = errors.DefineInvalidArgument("no_gateway_eui", "no gateway EUI set")
+	errNoGatewayID       = errors.DefineInvalidArgument("no_gateway_id", "no gateway ID set")
+	errNoGatewayEUI      = errors.DefineInvalidArgument("no_gateway_eui", "no gateway EUI set")
+	errInvalidGatewayEUI = errors.DefineInvalidArgument("invalid_gateway_eui", "invalid gateway EUI")
 )
 
 func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb.GatewayIdentifiers, error) {
@@ -73,7 +74,7 @@ func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb
 	if gatewayEUIHex != "" {
 		var gatewayEUI ttntypes.EUI64
 		if err := gatewayEUI.UnmarshalText([]byte(gatewayEUIHex)); err != nil {
-			return nil, err
+			return nil, errInvalidGatewayEUI.WithCause(err)
 		}
 		ids.Eui = &gatewayEUI
 	}
@@ -97,7 +98,7 @@ func getGatewayEUI(flagSet *pflag.FlagSet, args []string, requireEUI bool) (*ttn
 	if gatewayEUIHex != "" {
 		var gatewayEUI ttntypes.EUI64
 		if err := gatewayEUI.UnmarshalText([]byte(gatewayEUIHex)); err != nil {
-			return nil, err
+			return nil, errInvalidGatewayEUI.WithCause(err)
 		}
 		ids.Eui = &gatewayEUI
 	}

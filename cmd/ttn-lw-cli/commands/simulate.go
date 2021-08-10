@@ -468,11 +468,11 @@ var (
 			}
 
 			if err := uplinkParams.LoRaWANVersion.Validate(); err != nil {
-				return errInvalidMACVerson
+				return errInvalidMACVersion.WithCause(err)
 			}
 
 			if err := uplinkParams.LoRaWANPHYVersion.Validate(); err != nil {
-				return errInvalidPHYVerson
+				return errInvalidPHYVersion.WithCause(err)
 			}
 
 			var joinRequest *ttnpb.Message
@@ -552,11 +552,11 @@ var (
 			}
 
 			if err := uplinkParams.LoRaWANVersion.Validate(); err != nil {
-				return errInvalidMACVerson
+				return errInvalidMACVersion.WithCause(err)
 			}
 
 			if err := uplinkParams.LoRaWANPHYVersion.Validate(); err != nil {
-				return errInvalidPHYVerson
+				return errInvalidPHYVersion.WithCause(err)
 			}
 
 			var dataUplink *ttnpb.Message
