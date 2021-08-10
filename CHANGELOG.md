@@ -24,6 +24,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Generated CLI configuration for The Things Stack Community Edition.
 - End device access with limited rights in the Console.
+- Parsing of ID6 encoded EUIs from Basic Station gateways.
 
 ### Security
 
