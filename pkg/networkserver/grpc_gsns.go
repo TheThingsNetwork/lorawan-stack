@@ -257,7 +257,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	}
 
 	// Current session match
-	if matchType == currentOriginalMatch &&
+	if matchType != pendingMatch &&
 		dev.Session != nil &&
 		dev.MacState != nil &&
 		pld.DevAddr.Equal(dev.Session.DevAddr) &&
