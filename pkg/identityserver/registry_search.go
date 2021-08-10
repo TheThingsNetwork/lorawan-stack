@@ -188,7 +188,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 	if len(req.AttributesContain) > 0 {
 		searchFields = append(searchFields, "attributes")
 	}
-	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, append(getPaths, searchFields...), nil)
+	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, append(getPaths, searchFields...), []string{"frequency_plan_id"})
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
