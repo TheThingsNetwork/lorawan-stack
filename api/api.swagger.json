@@ -11669,25 +11669,31 @@
       "type": "object",
       "properties": {
         "ids": {
-          "$ref": "#/definitions/v3ApplicationIdentifiers"
+          "$ref": "#/definitions/v3ApplicationIdentifiers",
+          "description": "The identifiers of the application. These are public and can be seen by any authenticated user in the network."
         },
         "created_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the application was created. This information is public and can be seen by any authenticated user in the network."
         },
         "updated_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the application was last updated. This information is public and can be seen by any authenticated user in the network."
         },
         "deleted_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the application was deleted. This information is public and can be seen by any authenticated user in the network."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the application."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "description": "A description for the application."
         },
         "attributes": {
           "type": "object",
@@ -12799,25 +12805,31 @@
       "type": "object",
       "properties": {
         "ids": {
-          "$ref": "#/definitions/v3ClientIdentifiers"
+          "$ref": "#/definitions/v3ClientIdentifiers",
+          "description": "The identifiers of the OAuth client. These are public and can be seen by any authenticated user in the network."
         },
         "created_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the OAuth client was created. This information is public and can be seen by any authenticated user in the network."
         },
         "updated_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the OAuth client was last updated. This information is public and can be seen by any authenticated user in the network."
         },
         "deleted_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the OAuth client was deleted. This information is public and can be seen by any authenticated user in the network."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the OAuth client. This information is public and can be seen by any authenticated user in the network."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "description": "A description for the OAuth client. This information is public and can be seen by any authenticated user in the network."
         },
         "attributes": {
           "type": "object",
@@ -12831,7 +12843,7 @@
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
           },
-          "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application."
+          "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.\nThis information is public and can be seen by any authenticated user in the network."
         },
         "secret": {
           "type": "string",
@@ -12842,18 +12854,18 @@
           "items": {
             "type": "string"
           },
-          "description": "The allowed redirect URIs against which authorization requests are checked.\nIf the authorization request does not pass a redirect URI, the first one\nfrom this list is taken."
+          "description": "The allowed redirect URIs against which authorization requests are checked.\nIf the authorization request does not pass a redirect URI, the first one\nfrom this list is taken.\nThis information is public and can be seen by any authenticated user in the network."
         },
         "logout_redirect_uris": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "The allowed logout redirect URIs against which client initiated logout\nrequests are checked. If the authorization request does not pass a redirect\nURI, the first one from this list is taken."
+          "description": "The allowed logout redirect URIs against which client initiated logout\nrequests are checked. If the authorization request does not pass a redirect\nURI, the first one from this list is taken.\nThis information is public and can be seen by any authenticated user in the network."
         },
         "state": {
           "$ref": "#/definitions/v3State",
-          "description": "The reviewing state of the client.\nThis field can only be modified by admins.\nIf state_description is not updated when updating state, state_description is cleared."
+          "description": "The reviewing state of the client.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by admins.\nIf state_description is not updated when updating state, state_description is cleared."
         },
         "state_description": {
           "type": "string",
@@ -12861,25 +12873,25 @@
         },
         "skip_authorization": {
           "type": "boolean",
-          "description": "If set, the authorization page will be skipped.\nThis field can only be modified by admins."
+          "description": "If set, the authorization page will be skipped.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by admins."
         },
         "endorsed": {
           "type": "boolean",
-          "description": "If set, the authorization page will show endorsement.\nThis field can only be modified by admins."
+          "description": "If set, the authorization page will show endorsement.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by admins."
         },
         "grants": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3GrantType"
           },
-          "description": "OAuth flows that can be used for the client to get a token.\nAfter a client is created, this field can only be modified by admins."
+          "description": "OAuth flows that can be used for the client to get a token.\nThis information is public and can be seen by any authenticated user in the network.\nAfter a client is created, this field can only be modified by admins."
         },
         "rights": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3Right"
           },
-          "description": "Rights denotes what rights the client will have access to.\nUsers that previously authorized this client will have to re-authorize the\nclient after rights are added to this list."
+          "description": "Rights denotes what rights the client will have access to.\nThis information is public and can be seen by any authenticated user in the network.\nUsers that previously authorized this client will have to re-authorize the\nclient after rights are added to this list."
         }
       },
       "description": "An OAuth client on the network."
@@ -14269,25 +14281,31 @@
       "type": "object",
       "properties": {
         "ids": {
-          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers",
+          "description": "The identifiers of the gateway. These are public and can be seen by any authenticated user in the network."
         },
         "created_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the gateway was created. This information is public and can be seen by any authenticated user in the network."
         },
         "updated_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the gateway was last updated. This information is public and can be seen by any authenticated user in the network."
         },
         "deleted_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the gateway was deleted. This information is public and can be seen by any authenticated user in the network."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the gateway. This information is public and can be seen by any authenticated user in the network."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "description": "A description for the gateway. This information is public and can be seen by any authenticated user in the network."
         },
         "attributes": {
           "type": "object",
@@ -14308,7 +14326,7 @@
         },
         "gateway_server_address": {
           "type": "string",
-          "description": "The address of the Gateway Server to connect to.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band."
+          "description": "The address of the Gateway Server to connect to.\nThis information is public and can be seen by any authenticated user in the network if status_public is true.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band."
         },
         "auto_update": {
           "type": "boolean"
@@ -14318,20 +14336,21 @@
         },
         "frequency_plan_id": {
           "type": "string",
-          "description": "Frequency plan ID of the gateway.\nThis equals the first element of the frequency_plan_ids field."
+          "description": "Frequency plan ID of the gateway.\nThis information is public and can be seen by any authenticated user in the network.\nDEPRECATED: use frequency_plan_ids.\nThis equals the first element of the frequency_plan_ids field."
         },
         "frequency_plan_ids": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Frequency plan IDs of the gateway.\nThe first element equals the frequency_plan_id field."
+          "description": "Frequency plan IDs of the gateway.\nThis information is public and can be seen by any authenticated user in the network.\nThe first element equals the frequency_plan_id field."
         },
         "antennas": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3GatewayAntenna"
-          }
+          },
+          "description": "Antennas of the gateway. Location information of the antennas is public and can be seen by any authenticated user in the network if location_public=true."
         },
         "status_public": {
           "type": "boolean",
@@ -15795,25 +15814,31 @@
       "type": "object",
       "properties": {
         "ids": {
-          "$ref": "#/definitions/v3OrganizationIdentifiers"
+          "$ref": "#/definitions/v3OrganizationIdentifiers",
+          "description": "The identifiers of the organization. These are public and can be seen by any authenticated user in the network."
         },
         "created_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the organization was created. This information is public and can be seen by any authenticated user in the network."
         },
         "updated_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the organization was last updated. This information is public and can be seen by any authenticated user in the network."
         },
         "deleted_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the organization was deleted. This information is public and can be seen by any authenticated user in the network."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the organization. This information is public and can be seen by any authenticated user in the network."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "description": "A description for the organization."
         },
         "attributes": {
           "type": "object",
@@ -17287,25 +17312,31 @@
       "type": "object",
       "properties": {
         "ids": {
-          "$ref": "#/definitions/v3UserIdentifiers"
+          "$ref": "#/definitions/v3UserIdentifiers",
+          "description": "The identifiers of the user. These are public and can be seen by any authenticated user in the network."
         },
         "created_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the user was created. This information is public and can be seen by any authenticated user in the network."
         },
         "updated_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the user was last updated. This information is public and can be seen by any authenticated user in the network."
         },
         "deleted_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "When the user was deleted. This information is public and can be seen by any authenticated user in the network."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the user. This information is public and can be seen by any authenticated user in the network."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "description": "A description for the user. This information is public and can be seen by any authenticated user in the network."
         },
         "attributes": {
           "type": "object",
@@ -17343,7 +17374,7 @@
         },
         "state": {
           "$ref": "#/definitions/v3State",
-          "description": "The reviewing state of the user.\nThis field can only be modified by admins."
+          "description": "The reviewing state of the user.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by admins."
         },
         "state_description": {
           "type": "string",
@@ -17351,7 +17382,7 @@
         },
         "admin": {
           "type": "boolean",
-          "description": "This user is an admin.\nThis field can only be modified by other admins."
+          "description": "This user is an admin.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by other admins."
         },
         "temporary_password": {
           "type": "string",
@@ -17366,7 +17397,8 @@
           "format": "date-time"
         },
         "profile_picture": {
-          "$ref": "#/definitions/v3Picture"
+          "$ref": "#/definitions/v3Picture",
+          "description": "A profile picture for the user.\nThis information is public and can be seen by any authenticated user in the network."
         }
       },
       "description": "User is the message that defines a user on the network."

@@ -36,14 +36,18 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.stringer_all) = true;
 
 message Organization {
-  option (gogoproto.populate) = true;
-
+  // The identifiers of the organization. These are public and can be seen by any authenticated user in the network.
   OrganizationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // When the organization was created. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // When the organization was last updated. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // When the organization was deleted. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp deleted_at = 8 [(gogoproto.stdtime) = true];
 
+  // The name of the organization. This information is public and can be seen by any authenticated user in the network.
   string name = 4 [(validate.rules).string.max_len = 50];
+  // A description for the organization.
   string description = 5 [(validate.rules).string.max_len = 2000];
 
   // Key-value attributes for this organization. Typically used for organizing organizations or for storing integration-specific data.

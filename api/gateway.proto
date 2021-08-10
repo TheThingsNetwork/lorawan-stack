@@ -56,8 +56,6 @@ message GatewayModel {
 
 // Identifies an end device model with version information.
 message GatewayVersionIdentifiers {
-  option (gogoproto.populate) = true;
-
   string brand_id = 1 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36, ignore_empty: true}];
   string model_id = 2 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36, ignore_empty: true}];
   string hardware_version = 3 [(validate.rules).string.max_len = 32];
@@ -80,8 +78,6 @@ message GatewayRadio {
 
 // Authentication code for claiming gateways.
 message GatewayClaimAuthenticationCode {
-  option (gogoproto.populate) = true;
-
   Secret secret = 1;
   google.protobuf.Timestamp valid_from = 2 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp valid_to = 3 [(gogoproto.stdtime) = true];
@@ -89,14 +85,18 @@ message GatewayClaimAuthenticationCode {
 
 // Gateway is the message that defines a gateway on the network.
 message Gateway {
-  option (gogoproto.populate) = true;
-
+  // The identifiers of the gateway. These are public and can be seen by any authenticated user in the network.
   GatewayIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // When the gateway was created. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // When the gateway was last updated. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // When the gateway was deleted. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp deleted_at = 26 [(gogoproto.stdtime) = true];
 
+  // The name of the gateway. This information is public and can be seen by any authenticated user in the network.
   string name = 4 [(validate.rules).string.max_len = 50];
+  // A description for the gateway. This information is public and can be seen by any authenticated user in the network.
   string description = 5 [(validate.rules).string.max_len = 2000];
 
   // Key-value attributes for this gateway. Typically used for organizing gateways or for storing integration-specific data.
@@ -114,6 +114,7 @@ message Gateway {
   GatewayVersionIdentifiers version_ids = 8 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   // The address of the Gateway Server to connect to.
+  // This information is public and can be seen by any authenticated user in the network if status_public is true.
   // The typical format of the address is "host:port". If the port is omitted,
   // the normal port inference (with DNS lookup, otherwise defaults) is used.
   // The connection shall be established with transport layer security (TLS).
@@ -123,10 +124,13 @@ message Gateway {
   string update_channel = 11 [(validate.rules).string.max_len = 128];
 
   // Frequency plan ID of the gateway.
+  // This information is public and can be seen by any authenticated user in the network.
+  // DEPRECATED: use frequency_plan_ids.
   // This equals the first element of the frequency_plan_ids field.
   string frequency_plan_id = 12 [(validate.rules).string.max_len = 64];
 
   // Frequency plan IDs of the gateway.
+  // This information is public and can be seen by any authenticated user in the network.
   // The first element equals the frequency_plan_id field.
   repeated string frequency_plan_ids = 20 [
     (validate.rules).repeated = {
@@ -135,6 +139,7 @@ message Gateway {
     }
   ];
 
+  // Antennas of the gateway. Location information of the antennas is public and can be seen by any authenticated user in the network if location_public=true.
   repeated GatewayAntenna antennas = 13 [
     (gogoproto.nullable) = false,
     (validate.rules).repeated.max_items = 8
@@ -177,8 +182,6 @@ message Gateway {
 
   // LR-FHSS gateway capabilities.
   message LRFHSS {
-    option (gogoproto.populate) = true;
-
     // The gateway supports the LR-FHSS uplink channels.
     bool supported = 1;
   }
@@ -296,8 +299,6 @@ enum GatewayAntennaPlacement {
 
 // GatewayAntenna is the message that defines a gateway antenna.
 message GatewayAntenna {
-  option (gogoproto.populate) = true;
-
   // Antenna gain relative to the gateway, in dBi.
   float gain = 1;
   // location is the antenna's location.

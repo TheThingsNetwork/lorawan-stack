@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
@@ -29,14 +30,18 @@ import (
 // NewPopulator returns a new database populator with a population of the given size.
 // It is seeded by the given seed.
 func NewPopulator(size int, seed int64) *Populator {
+	now := time.Now()
 	randy := randutil.NewLockedRand(rand.NewSource(seed))
 	p := &Populator{
 		APIKeys:     make(map[*ttnpb.EntityIdentifiers][]*ttnpb.APIKey),
 		Memberships: make(map[*ttnpb.EntityIdentifiers][]*ttnpb.Collaborator),
 	}
 	for i := 0; i < size; i++ {
-		application := ttnpb.NewPopulatedApplication(randy, false)
-		application.Description = fmt.Sprintf("Random Application %d", i+1)
+		application := &ttnpb.Application{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: fmt.Sprintf("random-app-%d", i+1)},
+			Name:                   fmt.Sprintf("Random %d", i+1),
+			Description:            fmt.Sprintf("Randomly generated Application %d", i+1),
+		}
 		applicationID := application.GetEntityIdentifiers()
 		p.Applications = append(p.Applications, application)
 		p.APIKeys[applicationID] = append(
@@ -46,11 +51,17 @@ func NewPopulator(size int, seed int64) *Populator {
 				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			},
 		)
-		client := ttnpb.NewPopulatedClient(randy, false)
-		client.Description = fmt.Sprintf("Random Client %d", i+1)
+		client := &ttnpb.Client{
+			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: fmt.Sprintf("random-cli-%d", i+1)},
+			Name:              fmt.Sprintf("Random %d", i+1),
+			Description:       fmt.Sprintf("Randomly generated Client %d", i+1),
+		}
 		p.Clients = append(p.Clients, client)
-		gateway := ttnpb.NewPopulatedGateway(randy, false)
-		gateway.Description = fmt.Sprintf("Random Gateway %d", i+1)
+		gateway := &ttnpb.Gateway{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: fmt.Sprintf("random-gtw-%d", i+1)},
+			Name:               fmt.Sprintf("Random %d", i+1),
+			Description:        fmt.Sprintf("Randomly generated Gateway %d", i+1),
+		}
 		gatewayID := gateway.GetEntityIdentifiers()
 
 		// This is to prevent the IS trying to use the randomly generated key IDs to decrypt the secrets.
@@ -72,8 +83,11 @@ func NewPopulator(size int, seed int64) *Populator {
 				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			},
 		)
-		organization := ttnpb.NewPopulatedOrganization(randy, false)
-		organization.Description = fmt.Sprintf("Random Organization %d", i+1)
+		organization := &ttnpb.Organization{
+			OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationId: fmt.Sprintf("random-org-%d", i+1)},
+			Name:                    fmt.Sprintf("Random %d", i+1),
+			Description:             fmt.Sprintf("Randomly generated Organization %d", i+1),
+		}
 		organizationID := organization.GetEntityIdentifiers()
 		p.Organizations = append(p.Organizations, organization)
 		p.APIKeys[organizationID] = append(
@@ -83,8 +97,13 @@ func NewPopulator(size int, seed int64) *Populator {
 				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
 			},
 		)
-		user := ttnpb.NewPopulatedUser(randy, false)
-		user.Description = fmt.Sprintf("Random User %d", i+1)
+		user := &ttnpb.User{
+			UserIdentifiers:                ttnpb.UserIdentifiers{UserId: fmt.Sprintf("random-usr-%d", i+1)},
+			Name:                           fmt.Sprintf("Random %d", i+1),
+			Description:                    fmt.Sprintf("Randomly generated User %d", i+1),
+			PrimaryEmailAddress:            fmt.Sprintf("user-%d@example.com", i+1),
+			PrimaryEmailAddressValidatedAt: &now,
+		}
 		userID := user.GetEntityIdentifiers()
 		p.Users = append(p.Users, user)
 		p.APIKeys[userID] = append(

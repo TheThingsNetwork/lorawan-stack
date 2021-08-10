@@ -36,7 +36,7 @@
           "fields": [
             {
               "name": "ids",
-              "description": "",
+              "description": "The identifiers of the application. These are public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "ApplicationIdentifiers",
               "longType": "ApplicationIdentifiers",
@@ -56,7 +56,7 @@
             },
             {
               "name": "created_at",
-              "description": "",
+              "description": "When the application was created. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -68,7 +68,7 @@
             },
             {
               "name": "updated_at",
-              "description": "",
+              "description": "When the application was last updated. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -80,7 +80,7 @@
             },
             {
               "name": "deleted_at",
-              "description": "",
+              "description": "When the application was deleted. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -92,7 +92,7 @@
             },
             {
               "name": "name",
-              "description": "",
+              "description": "The name of the application.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -112,7 +112,7 @@
             },
             {
               "name": "description",
-              "description": "",
+              "description": "A description for the application.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -6632,7 +6632,7 @@
           "fields": [
             {
               "name": "ids",
-              "description": "",
+              "description": "The identifiers of the OAuth client. These are public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "ClientIdentifiers",
               "longType": "ClientIdentifiers",
@@ -6652,7 +6652,7 @@
             },
             {
               "name": "created_at",
-              "description": "",
+              "description": "When the OAuth client was created. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -6664,7 +6664,7 @@
             },
             {
               "name": "updated_at",
-              "description": "",
+              "description": "When the OAuth client was last updated. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -6676,7 +6676,7 @@
             },
             {
               "name": "deleted_at",
-              "description": "",
+              "description": "When the OAuth client was deleted. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -6688,7 +6688,7 @@
             },
             {
               "name": "name",
-              "description": "",
+              "description": "The name of the OAuth client. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -6708,7 +6708,7 @@
             },
             {
               "name": "description",
-              "description": "",
+              "description": "A description for the OAuth client. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -6760,7 +6760,7 @@
             },
             {
               "name": "contact_info",
-              "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.",
+              "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.\nThis information is public and can be seen by any authenticated user in the network.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -6800,7 +6800,7 @@
             },
             {
               "name": "redirect_uris",
-              "description": "The allowed redirect URIs against which authorization requests are checked.\nIf the authorization request does not pass a redirect URI, the first one\nfrom this list is taken.",
+              "description": "The allowed redirect URIs against which authorization requests are checked.\nIf the authorization request does not pass a redirect URI, the first one\nfrom this list is taken.\nThis information is public and can be seen by any authenticated user in the network.",
               "label": "repeated",
               "type": "string",
               "longType": "string",
@@ -6824,7 +6824,7 @@
             },
             {
               "name": "logout_redirect_uris",
-              "description": "The allowed logout redirect URIs against which client initiated logout\nrequests are checked. If the authorization request does not pass a redirect\nURI, the first one from this list is taken.",
+              "description": "The allowed logout redirect URIs against which client initiated logout\nrequests are checked. If the authorization request does not pass a redirect\nURI, the first one from this list is taken.\nThis information is public and can be seen by any authenticated user in the network.",
               "label": "repeated",
               "type": "string",
               "longType": "string",
@@ -6848,7 +6848,7 @@
             },
             {
               "name": "state",
-              "description": "The reviewing state of the client.\nThis field can only be modified by admins.\nIf state_description is not updated when updating state, state_description is cleared.",
+              "description": "The reviewing state of the client.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by admins.\nIf state_description is not updated when updating state, state_description is cleared.",
               "label": "",
               "type": "State",
               "longType": "State",
@@ -6888,7 +6888,7 @@
             },
             {
               "name": "skip_authorization",
-              "description": "If set, the authorization page will be skipped.\nThis field can only be modified by admins.",
+              "description": "If set, the authorization page will be skipped.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by admins.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -6900,7 +6900,7 @@
             },
             {
               "name": "endorsed",
-              "description": "If set, the authorization page will show endorsement.\nThis field can only be modified by admins.",
+              "description": "If set, the authorization page will show endorsement.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by admins.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -6912,7 +6912,7 @@
             },
             {
               "name": "grants",
-              "description": "OAuth flows that can be used for the client to get a token.\nAfter a client is created, this field can only be modified by admins.",
+              "description": "OAuth flows that can be used for the client to get a token.\nThis information is public and can be seen by any authenticated user in the network.\nAfter a client is created, this field can only be modified by admins.",
               "label": "repeated",
               "type": "GrantType",
               "longType": "GrantType",
@@ -6932,7 +6932,7 @@
             },
             {
               "name": "rights",
-              "description": "Rights denotes what rights the client will have access to.\nUsers that previously authorized this client will have to re-authorize the\nclient after rights are added to this list.",
+              "description": "Rights denotes what rights the client will have access to.\nThis information is public and can be seen by any authenticated user in the network.\nUsers that previously authorized this client will have to re-authorize the\nclient after rights are added to this list.",
               "label": "repeated",
               "type": "Right",
               "longType": "Right",
@@ -16039,7 +16039,7 @@
           "fields": [
             {
               "name": "ids",
-              "description": "",
+              "description": "The identifiers of the gateway. These are public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "GatewayIdentifiers",
               "longType": "GatewayIdentifiers",
@@ -16059,7 +16059,7 @@
             },
             {
               "name": "created_at",
-              "description": "",
+              "description": "When the gateway was created. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -16071,7 +16071,7 @@
             },
             {
               "name": "updated_at",
-              "description": "",
+              "description": "When the gateway was last updated. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -16083,7 +16083,7 @@
             },
             {
               "name": "deleted_at",
-              "description": "",
+              "description": "When the gateway was deleted. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -16095,7 +16095,7 @@
             },
             {
               "name": "name",
-              "description": "",
+              "description": "The name of the gateway. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -16115,7 +16115,7 @@
             },
             {
               "name": "description",
-              "description": "",
+              "description": "A description for the gateway. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -16207,7 +16207,7 @@
             },
             {
               "name": "gateway_server_address",
-              "description": "The address of the Gateway Server to connect to.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band.",
+              "description": "The address of the Gateway Server to connect to.\nThis information is public and can be seen by any authenticated user in the network if status_public is true.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -16259,7 +16259,7 @@
             },
             {
               "name": "frequency_plan_id",
-              "description": "Frequency plan ID of the gateway.\nThis equals the first element of the frequency_plan_ids field.",
+              "description": "Frequency plan ID of the gateway.\nThis information is public and can be seen by any authenticated user in the network.\nDEPRECATED: use frequency_plan_ids.\nThis equals the first element of the frequency_plan_ids field.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -16279,7 +16279,7 @@
             },
             {
               "name": "frequency_plan_ids",
-              "description": "Frequency plan IDs of the gateway.\nThe first element equals the frequency_plan_id field.",
+              "description": "Frequency plan IDs of the gateway.\nThis information is public and can be seen by any authenticated user in the network.\nThe first element equals the frequency_plan_id field.",
               "label": "repeated",
               "type": "string",
               "longType": "string",
@@ -16303,7 +16303,7 @@
             },
             {
               "name": "antennas",
-              "description": "",
+              "description": "Antennas of the gateway. Location information of the antennas is public and can be seen by any authenticated user in the network if location_public=true.",
               "label": "repeated",
               "type": "GatewayAntenna",
               "longType": "GatewayAntenna",
@@ -31591,7 +31591,7 @@
           "fields": [
             {
               "name": "ids",
-              "description": "",
+              "description": "The identifiers of the organization. These are public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "OrganizationIdentifiers",
               "longType": "OrganizationIdentifiers",
@@ -31611,7 +31611,7 @@
             },
             {
               "name": "created_at",
-              "description": "",
+              "description": "When the organization was created. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -31623,7 +31623,7 @@
             },
             {
               "name": "updated_at",
-              "description": "",
+              "description": "When the organization was last updated. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -31635,7 +31635,7 @@
             },
             {
               "name": "deleted_at",
-              "description": "",
+              "description": "When the organization was deleted. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -31647,7 +31647,7 @@
             },
             {
               "name": "name",
-              "description": "",
+              "description": "The name of the organization. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -31667,7 +31667,7 @@
             },
             {
               "name": "description",
-              "description": "",
+              "description": "A description for the organization.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -38182,7 +38182,7 @@
           "fields": [
             {
               "name": "ids",
-              "description": "",
+              "description": "The identifiers of the user. These are public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "UserIdentifiers",
               "longType": "UserIdentifiers",
@@ -38202,7 +38202,7 @@
             },
             {
               "name": "created_at",
-              "description": "",
+              "description": "When the user was created. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -38214,7 +38214,7 @@
             },
             {
               "name": "updated_at",
-              "description": "",
+              "description": "When the user was last updated. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -38226,7 +38226,7 @@
             },
             {
               "name": "deleted_at",
-              "description": "",
+              "description": "When the user was deleted. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -38238,7 +38238,7 @@
             },
             {
               "name": "name",
-              "description": "",
+              "description": "The name of the user. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -38258,7 +38258,7 @@
             },
             {
               "name": "description",
-              "description": "",
+              "description": "A description for the user. This information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -38406,7 +38406,7 @@
             },
             {
               "name": "state",
-              "description": "The reviewing state of the user.\nThis field can only be modified by admins.",
+              "description": "The reviewing state of the user.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by admins.",
               "label": "",
               "type": "State",
               "longType": "State",
@@ -38446,7 +38446,7 @@
             },
             {
               "name": "admin",
-              "description": "This user is an admin.\nThis field can only be modified by other admins.",
+              "description": "This user is an admin.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by other admins.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -38502,7 +38502,7 @@
             },
             {
               "name": "profile_picture",
-              "description": "",
+              "description": "A profile picture for the user.\nThis information is public and can be seen by any authenticated user in the network.",
               "label": "",
               "type": "Picture",
               "longType": "Picture",
