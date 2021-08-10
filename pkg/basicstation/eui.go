@@ -55,7 +55,7 @@ func (eui EUI) MarshalJSON() ([]byte, error) {
 var (
 	hexPatternWithDashes = regexp.MustCompile(`^"([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})-([a-fA-F0-9]{2})"$`)
 	hexPatternWithColons = regexp.MustCompile(`^"([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2}):([a-fA-F0-9]{2})"$`)
-	id6Pattern           = regexp.MustCompile(`^"(?:([a-z]+)-)?(?:([a-f0-9]{0,4}):)?([a-f0-9]{0,4}):([a-f0-9]{0,4}):([a-f0-9]{0,4})"$`)
+	id6Pattern           = regexp.MustCompile(`^"(?:([a-z]+)-)?(?:([a-f0-9]{0,4}):?)([a-f0-9]{0,4})?:([a-f0-9]{0,4})?:([a-f0-9]{0,4})"$`)
 )
 
 var errFormat = errors.DefineInvalidArgument("format", "invalid format")
