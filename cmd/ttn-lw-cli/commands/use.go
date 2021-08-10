@@ -123,7 +123,7 @@ var (
 				clusterID := matches[1]
 				logger.WithField("cluster_id", clusterID).Info("Configuring for The Things Stack Community Edition")
 				conf.OAuthServerAddress = "https://eu1.cloud.thethings.network/oauth"
-				conf.IdentityServerGRPCAddress = fmt.Sprintf("eu1.cloud.thethings.industries:%d", discover.DefaultPorts[!insecure])
+				conf.IdentityServerGRPCAddress = fmt.Sprintf("eu1.cloud.thethings.network:%d", discover.DefaultPorts[!insecure])
 				logger.WithField("address", conf.OAuthServerAddress).Info("Set OAuth Server address")
 				logger.WithField("address", conf.IdentityServerGRPCAddress).Info("Set Identity Server gRPC address")
 			}
