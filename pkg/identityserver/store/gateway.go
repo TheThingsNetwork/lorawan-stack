@@ -175,7 +175,12 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	requireAuthenticatedConnectionField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		pb.RequireAuthenticatedConnection = gtw.RequireAuthenticatedConnection
 	},
-	supportsLRFHSSField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+	lrfhssField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.Lrfhss = &ttnpb.Gateway_LRFHSS{
+			Supported: gtw.SupportsLRFHSS,
+		}
+	},
+	lrfhssSupportedField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		if pb.Lrfhss == nil {
 			pb.Lrfhss = &ttnpb.Gateway_LRFHSS{}
 		}
@@ -277,7 +282,10 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	requireAuthenticatedConnectionField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		gtw.RequireAuthenticatedConnection = pb.RequireAuthenticatedConnection
 	},
-	supportsLRFHSSField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+	lrfhssField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.SupportsLRFHSS = pb.GetLrfhss().GetSupported()
+	},
+	lrfhssSupportedField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		gtw.SupportsLRFHSS = pb.GetLrfhss().GetSupported()
 	},
 	disablePacketBrokerForwardingField: func(gtw *Gateway, pb *ttnpb.Gateway) {
@@ -327,6 +335,8 @@ var gatewayColumnNames = map[string][]string{
 	updateLocationFromStatusField:       {updateLocationFromStatusField},
 	versionIDsField:                     {"brand_id", "model_id", "hardware_version", "firmware_version"},
 	requireAuthenticatedConnectionField: {requireAuthenticatedConnectionField},
+	lrfhssField:                         {"supports_lrfhss"},
+	lrfhssSupportedField:                {"supports_lrfhss"},
 	disablePacketBrokerForwardingField:  {disablePacketBrokerForwardingField},
 }
 

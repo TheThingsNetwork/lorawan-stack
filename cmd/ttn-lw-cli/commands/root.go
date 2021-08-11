@@ -142,11 +142,26 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 			}(ctx)
 		}
 
+		// Drop default HTTP port numbers from OAuth server address if present.
+		// Causes issues with `--http.redirect-to-tls` stack option.
+		u, err := url.Parse(config.OAuthServerAddress)
+		if err != nil {
+			return err
+		}
+		if u.Port() == "443" && u.Scheme == "https" || u.Port() == "80" && u.Scheme == "http" {
+			u.Host = u.Hostname()
+			config.OAuthServerAddress = u.String()
+		}
+		if u.Scheme == "http" {
+			logger.Warn("Using insecure connection to OAuth server")
+		}
+
 		// prepare the API
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{}
 		api.SetLogger(logger)
 		if config.Insecure {
 			api.SetInsecure(true)
+			logger.Warn("Using insecure connection to API")
 		}
 		if config.DumpRequests {
 			api.SetDumpRequests(true)
@@ -169,17 +184,6 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 			}
 		}
 
-		// Drop default HTTP port numbers from OAuth server address if present.
-		// Causes issues with `--http.redirect-to-tls` stack option.
-		u, err := url.Parse(config.OAuthServerAddress)
-		if err != nil {
-			return err
-		}
-		if u.Port() == "443" && u.Scheme == "https" || u.Port() == "80" && u.Scheme == "http" {
-			u.Host = u.Hostname()
-			config.OAuthServerAddress = u.String()
-		}
-
 		// OAuth
 		oauth2Config = &oauth2.Config{
 			ClientID: "cli",
@@ -188,6 +192,12 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 				TokenURL:  fmt.Sprintf("%s/token", config.OAuthServerAddress),
 				AuthStyle: oauth2.AuthStyleInParams,
 			},
+		}
+
+		if wantAll, err := cmd.Flags().GetBool("all"); err == nil && wantAll {
+			logger.Warn("The --all flag is not covered by our compatibility commitment.")
+			logger.Warn("This means that it may not work (or behave differently) with future versions of The Things Stack.")
+			logger.Warn("Only use the --all flag for development.")
 		}
 
 		for _, task := range tasks {
