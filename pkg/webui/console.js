@@ -27,26 +27,17 @@ import Init from '@ttn-lw/lib/components/init'
 import WithLocale from '@ttn-lw/lib/components/with-locale'
 
 import env from '@ttn-lw/lib/env'
-import {
-  selectApplicationRootPath,
-  selectAssetsRootPath,
-  selectSentryDsnConfig,
-} from '@ttn-lw/lib/selectors/env'
+import { selectApplicationRootPath, selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
 
 import createStore from './console/store'
 
 const sentryDsn = selectSentryDsnConfig()
 const appRoot = selectApplicationRootPath()
-const assetsRoot = selectAssetsRootPath()
 
 const history = createBrowserHistory({ basename: `${appRoot}/` })
 // Initialize sentry before creating store.
 if (sentryDsn) Sentry.init(sentryConfig)
 const store = createStore(history)
-
-// Set asset path based on passed env configuration.
-// eslint-disable-next-line no-undef
-__webpack_public_path__ = `${assetsRoot}/`
 
 const rootElement = document.getElementById('app')
 
