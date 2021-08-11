@@ -140,10 +140,9 @@ class Http {
           statusCode = response.status
         } catch (err) {
           if (
-            typeof err === 'object' &&
+            isObject(err) &&
             'response' in err &&
-            typeof err.response === 'object' &&
-            err.response !== null &&
+            isObject(err.response) &&
             'status' in err.response &&
             err.response.status === 429 &&
             retries <= RATE_LIMIT_RETRIES
@@ -174,7 +173,7 @@ class Http {
 
       return response
     } catch (err) {
-      if ('response' in err && err.response && 'data' in err.response) {
+      if (isObject(err) && 'response' in err && err.response && 'data' in err.response) {
         const error = cloneDeep(err.response.data)
         // Augment the default error with config entries as well as the stack component
         // abbreviation that threw an error.
