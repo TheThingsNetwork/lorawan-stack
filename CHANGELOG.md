@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - CLI warnings about insecure connections.
 - CLI warnings about using the `--all` flag.
+- Packet Broker network listed switch in the Console.
 
 ### Changed
 
@@ -22,6 +23,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Deprecated
 
 ### Removed
+
+- Packet Broker mutual TLS authentication; only OAuth 2.0 is supported now.
 
 ### Fixed
 

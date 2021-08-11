@@ -17,7 +17,6 @@ package packetbrokeragent
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"gopkg.in/square/go-jose.v2"
@@ -25,21 +24,20 @@ import (
 
 // Config configures Packet Broker clients.
 type Config struct {
-	Registration         RegistrationConfig   `name:"registration" description:"Registration with Packet Broker"`
-	IAMAddress           string               `name:"iam-address" description:"Address of Packet Broker IAM"`
-	ControlPlaneAddress  string               `name:"control-plane-address" description:"Address of Packet Broker Control Plane"`
-	DataPlaneAddress     string               `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
-	MapperAddress        string               `name:"mapper-address" description:"Address of Packet Broker Mapper"`
-	Insecure             bool                 `name:"insecure" description:"Connect without using TLS"`
-	NetID                types.NetID          `name:"net-id" description:"LoRa Alliance NetID"`
-	TenantID             string               `name:"tenant-id" description:"Tenant ID within the NetID"`
-	ClusterID            string               `name:"cluster-id" description:"Cluster ID uniquely identifying the Forwarder in the NetID and Tenant ID"`
-	HomeNetworkClusterID string               `name:"home-network-cluster-id" description:"Home Network Cluster ID, if different from the Cluster ID"`
-	AuthenticationMode   string               `name:"authentication-mode" description:"Authentication mode (tls, oauth2)"`
-	TLS                  tlsconfig.ClientAuth `name:"tls" description:"TLS client certificate (DEPRECATED)"`
-	OAuth2               OAuth2Config         `name:"oauth2" description:"OAuth 2.0 configuration"`
-	Forwarder            ForwarderConfig      `name:"forwarder" description:"Forwarder configuration for publishing uplink messages and subscribing to downlink messages"`
-	HomeNetwork          HomeNetworkConfig    `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
+	Registration         RegistrationConfig `name:"registration" description:"Registration with Packet Broker"`
+	IAMAddress           string             `name:"iam-address" description:"Address of Packet Broker IAM"`
+	ControlPlaneAddress  string             `name:"control-plane-address" description:"Address of Packet Broker Control Plane"`
+	DataPlaneAddress     string             `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
+	MapperAddress        string             `name:"mapper-address" description:"Address of Packet Broker Mapper"`
+	Insecure             bool               `name:"insecure" description:"Connect without using TLS"`
+	NetID                types.NetID        `name:"net-id" description:"LoRa Alliance NetID"`
+	TenantID             string             `name:"tenant-id" description:"Tenant ID within the NetID"`
+	ClusterID            string             `name:"cluster-id" description:"Cluster ID uniquely identifying the Forwarder in the NetID and Tenant ID"`
+	HomeNetworkClusterID string             `name:"home-network-cluster-id" description:"Home Network Cluster ID, if different from the Cluster ID"`
+	AuthenticationMode   string             `name:"authentication-mode" description:"Authentication mode (oauth2)"`
+	OAuth2               OAuth2Config       `name:"oauth2" description:"OAuth 2.0 configuration"`
+	Forwarder            ForwarderConfig    `name:"forwarder" description:"Forwarder configuration for publishing uplink messages and subscribing to downlink messages"`
+	HomeNetwork          HomeNetworkConfig  `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
 }
 
 type RegistrationConfig struct {

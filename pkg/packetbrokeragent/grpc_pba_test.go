@@ -161,7 +161,7 @@ func TestPba(t *testing.T) {
 			},
 			do: func(ctx context.Context, client ttnpb.PbaClient) {
 				t, a := test.MustNewTFromContext(ctx)
-				res, err := client.Register(ctx, ttnpb.Empty)
+				res, err := client.Register(ctx, &ttnpb.PacketBrokerRegisterRequest{})
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
@@ -262,7 +262,7 @@ func TestPba(t *testing.T) {
 			},
 			do: func(ctx context.Context, client ttnpb.PbaClient) {
 				t, a := test.MustNewTFromContext(ctx)
-				res, err := client.Register(ctx, ttnpb.Empty)
+				res, err := client.Register(ctx, &ttnpb.PacketBrokerRegisterRequest{})
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
@@ -747,7 +747,7 @@ func TestPba(t *testing.T) {
 						},
 					},
 				},
-			}, append(append([]Option{}, testOptions...), WithInsecureDialOptions())...)
+			}, testOptions...)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}

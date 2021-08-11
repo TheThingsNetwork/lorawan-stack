@@ -16,8 +16,6 @@ package mock
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -26,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 // PBDataPlane is a mock Packet Broker Data Plane.
@@ -41,15 +38,9 @@ type PBDataPlane struct {
 }
 
 // NewPBDataPlane instantiates a new mock Packet Broker Data Plane.
-func NewPBDataPlane(tb testing.TB, cert tls.Certificate, clientCAs *x509.CertPool) *PBDataPlane {
-	creds := credentials.NewTLS(&tls.Config{
-		Certificates: []tls.Certificate{cert},
-		ClientAuth:   tls.RequireAndVerifyClientCert,
-		ClientCAs:    clientCAs,
-	})
+func NewPBDataPlane(tb testing.TB) *PBDataPlane {
 	dp := &PBDataPlane{
 		Server: grpc.NewServer(
-			grpc.Creds(creds),
 			grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 				ctx = test.ContextWithTB(ctx, tb)
 				return handler(ctx, req)

@@ -46,7 +46,7 @@ export const [
     success: registerPacketBrokerSuccess,
     failure: registerPacketBrokerFailure,
   },
-] = createRequestActions(REGISTER_PACKET_BROKER_BASE)
+] = createRequestActions(REGISTER_PACKET_BROKER_BASE, registration => ({ registration }))
 
 export const DEREGISTER_PACKET_BROKER_BASE = 'DEREGISTER_PACKET_BROKER'
 export const [

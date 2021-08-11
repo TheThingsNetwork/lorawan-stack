@@ -32963,6 +32963,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "register_enabled",
+              "description": "Whether the registration can be changed.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -33103,6 +33115,30 @@
               "type": "PacketBrokerNetwork",
               "longType": "PacketBrokerNetwork",
               "fullType": "ttn.lorawan.v3.PacketBrokerNetwork",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerRegisterRequest",
+          "longName": "PacketBrokerRegisterRequest",
+          "fullName": "ttn.lorawan.v3.PacketBrokerRegisterRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "listed",
+              "description": "Whether the network should be listed in Packet Broker.\nIf unset, the value is taken from the registration settings.",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -33594,10 +33630,10 @@
             },
             {
               "name": "Register",
-              "description": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nAll registration settings are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.",
-              "requestType": "Empty",
-              "requestLongType": ".google.protobuf.Empty",
-              "requestFullType": "google.protobuf.Empty",
+              "description": "Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated.\nRegistration settings not in the request message are taken from Packet Broker Agent configuration and caller context.\nPacket Broker registration requires administrative access.\nPacket Broker registration is only supported for tenants and requires Packet Broker Agent to be configured with\nNetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.",
+              "requestType": "PacketBrokerRegisterRequest",
+              "requestLongType": "PacketBrokerRegisterRequest",
+              "requestFullType": "ttn.lorawan.v3.PacketBrokerRegisterRequest",
               "requestStreaming": false,
               "responseType": "PacketBrokerNetwork",
               "responseLongType": "PacketBrokerNetwork",
@@ -33608,11 +33644,13 @@
                   "rules": [
                     {
                       "method": "PUT",
-                      "pattern": "/pba/registration"
+                      "pattern": "/pba/registration",
+                      "body": "*"
                     },
                     {
                       "method": "POST",
-                      "pattern": "/pba/registration"
+                      "pattern": "/pba/registration",
+                      "body": "*"
                     }
                   ]
                 }
@@ -33620,7 +33658,7 @@
             },
             {
               "name": "Deregister",
-              "description": "Deregister from Packet Broker.\nPacket Broker deregistration requires administrative access.",
+              "description": "Deregister from Packet Broker.\nPacket Broker deregistration requires administrative access.\nPacket Broker deregistration is only supported for tenants and requires Packet Broker Agent to be configured with\nNetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled.",
               "requestType": "Empty",
               "requestLongType": ".google.protobuf.Empty",
               "requestFullType": "google.protobuf.Empty",

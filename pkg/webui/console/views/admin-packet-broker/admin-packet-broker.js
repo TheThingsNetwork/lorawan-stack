@@ -46,9 +46,11 @@ import {
 
 import {
   selectRegistered,
+  selectRegisterEnabled,
+  selectEnabled,
+  selectListed,
   selectInfo,
   selectInfoError,
-  selectEnabled,
 } from '@console/store/selectors/packet-broker'
 
 import DefaultRoutingPolicyView from './default-routing-policy'
@@ -59,9 +61,12 @@ import style from './admin-packet-broker.styl'
 
 const PacketBroker = ({ match }) => {
   const [activeTab, setActiveTab] = useState('default-routing-policy')
-  const [modalVisible, setModalVisible] = useState(false)
+  const [deregisterModalVisible, setDeregisterModalVisible] = useState(false)
   const registered = useSelector(selectRegistered)
+  const registerEnabled = useSelector(selectRegisterEnabled)
   const enabled = useSelector(selectEnabled)
+  const [unlistModalVisible, setUnlistModalVisible] = useState(false)
+  const listed = useSelector(selectListed)
   const info = useSelector(selectInfo)
   const infoError = useSelector(selectInfoError)
   const dispatch = useDispatch()
@@ -70,20 +75,38 @@ const PacketBroker = ({ match }) => {
 
   const handleRegisterChange = useCallback(() => {
     if (!registered) {
-      dispatch(registerPacketBroker())
+      dispatch(registerPacketBroker({}))
     } else {
-      setModalVisible(true)
+      setDeregisterModalVisible(true)
     }
-  }, [dispatch, registered, setModalVisible])
+  }, [dispatch, registered, setDeregisterModalVisible])
 
-  const handleModalComplete = useCallback(
+  const handleDeregisterModalComplete = useCallback(
     approved => {
-      setModalVisible(false)
+      setDeregisterModalVisible(false)
       if (approved) {
         dispatch(deregisterPacketBroker())
       }
     },
-    [dispatch, setModalVisible],
+    [dispatch, setDeregisterModalVisible],
+  )
+
+  const handleListedChange = useCallback(() => {
+    if (!listed) {
+      dispatch(registerPacketBroker({ listed: true }))
+    } else {
+      setUnlistModalVisible(true)
+    }
+  }, [dispatch, listed, setUnlistModalVisible])
+
+  const handleUnlistModalComplete = useCallback(
+    approved => {
+      setUnlistModalVisible(false)
+      if (approved) {
+        dispatch(registerPacketBroker({ listed: false }))
+      }
+    },
+    [dispatch, setUnlistModalVisible],
   )
 
   const tabs = React.useMemo(
@@ -93,6 +116,8 @@ const PacketBroker = ({ match }) => {
     ],
     [url],
   )
+
+  const boldMessage = { b: msg => <b>{msg}</b> }
 
   return (
     <Container>
@@ -113,28 +138,93 @@ const PacketBroker = ({ match }) => {
               Packet Broker
             </Link.DocLink>
             {' | '}
-            <Link.Anchor href="https://www.packetbroker.org" external secondary>
+            <Link.Anchor href="https://www.packetbroker.net" external secondary>
               <Message content={m.packetBrokerWebsite} />
             </Link.Anchor>
           </div>
           <hr className={style.hRule} />
-          <Message content={m.registerThisNetwork} component="h3" />
-          {!enabled && <Notification info small content={m.packetBrokerDisabledDesc} />}
+          <Message content={m.registrationStatus} component="h3" />
+          {!enabled && <Notification warning small content={m.packetBrokerDisabledDesc} />}
           {showError && <ErrorNotification small content={infoError} />}
-          <label className={classnames(style.toggleContainer, { [style.disabled]: !enabled })}>
-            <Message content={m.registerNetwork} component="span" />
-            <Switch
-              onChange={handleRegisterChange}
-              checked={registered}
-              className={style.toggle}
-              disabled={!enabled}
-            />
-          </label>
+          {enabled && (
+            <Row gutterWidth={48}>
+              <Col md={4}>
+                {registerEnabled && (
+                  <label
+                    className={classnames(style.toggleContainer, {
+                      [style.disabled]: !enabled || !registerEnabled,
+                    })}
+                  >
+                    <Message content={m.registerNetwork} component="span" />
+                    <Switch
+                      onChange={handleRegisterChange}
+                      checked={registered}
+                      className={style.toggle}
+                      disabled={!enabled}
+                    />
+                  </label>
+                )}
+                {registered && (
+                  <div className={style.featureInfo}>
+                    {info.forwarder_enabled ? (
+                      <span data-test-id="feature-info-forwarder-enabled">
+                        <Icon icon="check" className="c-active" textPaddedRight />
+                        <Message
+                          content={m.forwarderEnabled}
+                          values={boldMessage}
+                          component="span"
+                        />
+                      </span>
+                    ) : (
+                      <span data-test-id="feature-info-forwarder-disabled">
+                        <Icon icon="close" className="c-error" textPaddedRight />
+                        <Message
+                          content={m.forwarderDisabled}
+                          values={boldMessage}
+                          component="span"
+                        />
+                      </span>
+                    )}
+                    {info.home_network_enabled ? (
+                      <span data-test-id="feature-info-home-network-enabled">
+                        <Icon icon="check" className="c-active" textPaddedRight />
+                        <Message
+                          content={m.homeNetworkEnabled}
+                          values={boldMessage}
+                          component="span"
+                        />
+                      </span>
+                    ) : (
+                      <span data-test-id="feature-info-forwarder-disabled">
+                        <Icon icon="close" className="c-error" textPaddedRight />
+                        <Message
+                          content={m.homeNetworkDisabled}
+                          values={boldMessage}
+                          component="span"
+                        />
+                      </span>
+                    )}
+                  </div>
+                )}
+              </Col>
+              <Col md={8} className={style.switchInfo}>
+                <Message
+                  content={
+                    registerEnabled
+                      ? m.packetBrokerRegistrationDesc
+                      : m.packetBrokerRegistrationDisabledDesc
+                  }
+                  component="span"
+                  className={style.description}
+                />
+              </Col>
+            </Row>
+          )}
           <PortalledModal
-            visible={modalVisible}
+            visible={deregisterModalVisible}
             title={m.confirmDeregister}
             buttonMessage={m.deregisterNetwork}
-            onComplete={handleModalComplete}
+            onComplete={handleDeregisterModalComplete}
             danger
             approval
           >
@@ -145,45 +235,52 @@ const PacketBroker = ({ match }) => {
             />
           </PortalledModal>
         </Col>
-        {enabled && registered ? (
-          <Col md={12}>
-            <div className={style.featureInfo}>
-              {info.forwarder_enabled ? (
-                <span>
-                  <Icon icon="check" />
-                  <Message content={m.forwarderEnabled} />
-                </span>
-              ) : (
-                <span>
-                  <Icon icon="close" className="c-error" />
-                  <Message content={m.forwarderDisabled} />
-                </span>
-              )}
-              {info.home_network_enabled ? (
-                <span>
-                  <Icon icon="check" />
-                  <Message content={m.homeNetworkEnabled} />
-                </span>
-              ) : (
-                <span>
-                  <Icon icon="close" className="c-error" />
-                  <Message content={m.homeNetworkDisabled} />
-                </span>
-              )}
-            </div>
-            <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
-            <RequireRequest requestAction={getHomeNetworkDefaultRoutingPolicy()}>
-              <RouteSwitch>
-                <Route path={url} exact component={DefaultRoutingPolicyView} />
-                <Route path={`${url}/networks`} exact component={NetworkRoutingPoliciesView} />
-                <NotFoundRoute />
-              </RouteSwitch>
-            </RequireRequest>
-          </Col>
-        ) : (
-          <Col lg={8} md={12}>
-            <Message content={m.packetBrokerRegistrationDesc} component="p" />
-          </Col>
+        {registered && (
+          <>
+            <Col lg={8} md={12}>
+              <Message content={m.networkVisibility} component="h3" className={style.subTitle} />
+              <Row gutterWidth={48}>
+                <Col md={4}>
+                  <label className={style.toggleContainer}>
+                    <Message content={m.listNetwork} component="span" />
+                    <Switch
+                      onChange={handleListedChange}
+                      checked={listed}
+                      className={style.toggle}
+                    />
+                  </label>
+                </Col>
+                <Col md={8} className={style.switchInfo}>
+                  <Message className={style.description} content={m.listNetworkDesc} />
+                </Col>
+              </Row>
+              <PortalledModal
+                visible={unlistModalVisible}
+                title={m.confirmUnlist}
+                buttonMessage={m.unlistNetwork}
+                onComplete={handleUnlistModalComplete}
+                danger
+                approval
+              >
+                <Message
+                  content={m.unlistModal}
+                  values={{ lineBreak: <br />, b: chunks => <b>{chunks}</b> }}
+                  component="span"
+                />
+              </PortalledModal>
+              <hr className={style.hRule} />
+            </Col>
+            <Col md={12}>
+              <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
+              <RequireRequest requestAction={getHomeNetworkDefaultRoutingPolicy()}>
+                <RouteSwitch>
+                  <Route path={url} exact component={DefaultRoutingPolicyView} />
+                  <Route path={`${url}/networks`} exact component={NetworkRoutingPoliciesView} />
+                  <NotFoundRoute />
+                </RouteSwitch>
+              </RequireRequest>
+            </Col>
+          </>
         )}
       </Row>
     </Container>

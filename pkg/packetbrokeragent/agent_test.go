@@ -47,7 +47,12 @@ import (
 
 var (
 	timeout     = (1 << 7) * test.Delay
-	testOptions []Option
+	testOptions = []Option{
+		WithTestAuthenticator(ttnpb.PacketBrokerNetworkIdentifier{
+			NetId:    0x000013,
+			TenantId: "foo-tenant",
+		}),
+	}
 )
 
 func TestComponent(t *testing.T) {
@@ -90,17 +95,11 @@ func TestForwarder(t *testing.T) {
 		Key:       tokenKey,
 	}, nil)).(jose.Encrypter)
 	test.Must(New(c, &Config{
-		DataPlaneAddress:   fmt.Sprintf("localhost:%d", dpAddr.(*net.TCPAddr).Port),
-		MapperAddress:      fmt.Sprintf("localhost:%d", mpAddr.(*net.TCPAddr).Port),
-		NetID:              types.NetID{0x0, 0x0, 0x13},
-		TenantID:           "foo-tenant",
-		ClusterID:          "test",
-		AuthenticationMode: "tls",
-		TLS: tlsconfig.ClientAuth{
-			Source:      "file",
-			Certificate: "testdata/clientcert.pem",
-			Key:         "testdata/clientkey.pem",
-		},
+		DataPlaneAddress: fmt.Sprintf("localhost:%d", dpAddr.(*net.TCPAddr).Port),
+		MapperAddress:    fmt.Sprintf("localhost:%d", mpAddr.(*net.TCPAddr).Port),
+		NetID:            types.NetID{0x0, 0x0, 0x13},
+		TenantID:         "foo-tenant",
+		ClusterID:        "test",
 		Forwarder: ForwarderConfig{
 			Enable: true,
 			WorkerPool: WorkerPoolConfig{
@@ -535,16 +534,10 @@ func TestHomeNetwork(t *testing.T) {
 
 	ns := test.Must(mock.NewNetworkServer(c)).(*mock.NetworkServer)
 	test.Must(New(c, &Config{
-		DataPlaneAddress:   fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
-		NetID:              types.NetID{0x0, 0x0, 0x13},
-		TenantID:           "foo-tenant",
-		ClusterID:          "test",
-		AuthenticationMode: "tls",
-		TLS: tlsconfig.ClientAuth{
-			Source:      "file",
-			Certificate: "testdata/clientcert.pem",
-			Key:         "testdata/clientkey.pem",
-		},
+		DataPlaneAddress: fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
+		NetID:            types.NetID{0x0, 0x0, 0x13},
+		TenantID:         "foo-tenant",
+		ClusterID:        "test",
 		HomeNetwork: HomeNetworkConfig{
 			Enable: true,
 			WorkerPool: WorkerPoolConfig{

@@ -38,7 +38,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -91,7 +90,7 @@ type Agent struct {
 	subscriptionTenantID,
 	clusterID,
 	homeNetworkClusterID string
-	dialOptions       func(context.Context) ([]grpc.DialOption, error)
+	authenticator     authenticator
 	forwarderConfig   ForwarderConfig
 	homeNetworkConfig HomeNetworkConfig
 	devAddrPrefixes   []types.DevAddrPrefix
@@ -162,46 +161,14 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		}
 	}
 
-	var dialOptions func(context.Context) ([]grpc.DialOption, error)
+	var authenticator authenticator
 	switch mode := conf.AuthenticationMode; mode {
-	case "tls":
-		dialOptions = func(ctx context.Context) ([]grpc.DialOption, error) {
-			tlsConfig, err := c.GetTLSClientConfig(ctx)
-			if err != nil {
-				return nil, err
-			}
-			if conf.TLS.Source == "key-vault" {
-				conf.TLS.KeyVault.KeyVault = c.KeyVault
-			}
-			if err = conf.TLS.ApplyTo(tlsConfig); err != nil {
-				return nil, err
-			}
-			return []grpc.DialOption{
-				grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
-			}, nil
-		}
 	case "oauth2":
-		dialOptions = func(ctx context.Context) ([]grpc.DialOption, error) {
-			tlsConfig, err := c.GetTLSClientConfig(ctx)
-			if err != nil {
-				return nil, err
-			}
-			res := make([]grpc.DialOption, 2)
-			res[0] = grpc.WithPerRPCCredentials(rpcclient.OAuth2(
-				ctx,
-				conf.OAuth2.TokenURL,
-				conf.OAuth2.ClientID,
-				conf.OAuth2.ClientSecret,
-				[]string{"networks"},
-				conf.Insecure,
-			))
-			if conf.Insecure {
-				res[1] = grpc.WithInsecure()
-			} else {
-				res[1] = grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig))
-			}
-			return res, nil
+		var tlsConfig tlsConfigurator
+		if !conf.Insecure {
+			tlsConfig = c
 		}
+		authenticator = newOAuth2(ctx, conf.OAuth2, tlsConfig)
 	}
 
 	homeNetworkClusterID := conf.HomeNetworkClusterID
@@ -216,7 +183,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		subscriptionTenantID: conf.TenantID,
 		clusterID:            conf.ClusterID,
 		homeNetworkClusterID: homeNetworkClusterID,
-		dialOptions:          dialOptions,
+		authenticator:        authenticator,
 		forwarderConfig:      conf.Forwarder,
 		homeNetworkConfig:    conf.HomeNetwork,
 		devAddrPrefixes:      devAddrPrefixes,
@@ -291,7 +258,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	for _, opt := range opts {
 		opt(a)
 	}
-	if a.dialOptions == nil {
+	if a.authenticator == nil {
 		return nil, errAuthenticationMode.WithAttributes("mode", conf.AuthenticationMode)
 	}
 
@@ -389,7 +356,7 @@ func (a *Agent) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 }
 
 func (a *Agent) dialContext(ctx context.Context, target string, dialOpts ...grpc.DialOption) (*grpc.ClientConn, error) {
-	baseDialOpts, err := a.dialOptions(ctx)
+	baseDialOpts, err := a.authenticator.DialOptions(ctx)
 	if err != nil {
 		return nil, err
 	}

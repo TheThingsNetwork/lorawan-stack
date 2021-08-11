@@ -25,8 +25,8 @@ class PacketBrokerAgent {
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async register() {
-    const result = await this._api.Register()
+  async register(registration) {
+    const result = await this._api.Register(undefined, registration)
 
     return Marshaler.payloadSingleResponse(result)
   }

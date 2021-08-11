@@ -502,6 +502,7 @@
   - [Message `PacketBrokerNetwork`](#ttn.lorawan.v3.PacketBrokerNetwork)
   - [Message `PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier)
   - [Message `PacketBrokerNetworks`](#ttn.lorawan.v3.PacketBrokerNetworks)
+  - [Message `PacketBrokerRegisterRequest`](#ttn.lorawan.v3.PacketBrokerRegisterRequest)
   - [Message `PacketBrokerRoutingPolicies`](#ttn.lorawan.v3.PacketBrokerRoutingPolicies)
   - [Message `PacketBrokerRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerRoutingPolicy)
   - [Message `PacketBrokerRoutingPolicyDownlink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink)
@@ -7130,6 +7131,7 @@ There is no (longer) wire compatibility needed; new fields may use any tag.
 | `registration` | [`PacketBrokerNetwork`](#ttn.lorawan.v3.PacketBrokerNetwork) |  | The current registration, unset if there isn't a registration. |
 | `forwarder_enabled` | [`bool`](#bool) |  | Whether the server is configured as Forwarder (with gateways). |
 | `home_network_enabled` | [`bool`](#bool) |  | Whether the server is configured as Home Network (with end devices). |
+| `register_enabled` | [`bool`](#bool) |  | Whether the registration can be changed. |
 
 ### <a name="ttn.lorawan.v3.PacketBrokerNetwork">Message `PacketBrokerNetwork`</a>
 
@@ -7159,6 +7161,12 @@ There is no (longer) wire compatibility needed; new fields may use any tag.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `networks` | [`PacketBrokerNetwork`](#ttn.lorawan.v3.PacketBrokerNetwork) | repeated |  |
+
+### <a name="ttn.lorawan.v3.PacketBrokerRegisterRequest">Message `PacketBrokerRegisterRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `listed` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Whether the network should be listed in Packet Broker. If unset, the value is taken from the registration settings. |
 
 ### <a name="ttn.lorawan.v3.PacketBrokerRoutingPolicies">Message `PacketBrokerRoutingPolicies`</a>
 
@@ -7270,8 +7278,8 @@ The Pba service allows clients to manage peering through Packet Broker.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetInfo` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`PacketBrokerInfo`](#ttn.lorawan.v3.PacketBrokerInfo) | Get information about the Packet Broker registration. Viewing Packet Packet information requires administrative access. |
-| `Register` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`PacketBrokerNetwork`](#ttn.lorawan.v3.PacketBrokerNetwork) | Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated. All registration settings are taken from Packet Broker Agent configuration and caller context. Packet Broker registration requires administrative access. |
-| `Deregister` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Deregister from Packet Broker. Packet Broker deregistration requires administrative access. |
+| `Register` | [`PacketBrokerRegisterRequest`](#ttn.lorawan.v3.PacketBrokerRegisterRequest) | [`PacketBrokerNetwork`](#ttn.lorawan.v3.PacketBrokerNetwork) | Register with Packet Broker. If no registration exists, it will be created. Any existing registration will be updated. Registration settings not in the request message are taken from Packet Broker Agent configuration and caller context. Packet Broker registration requires administrative access. Packet Broker registration is only supported for tenants and requires Packet Broker Agent to be configured with NetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled. |
+| `Deregister` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Deregister from Packet Broker. Packet Broker deregistration requires administrative access. Packet Broker deregistration is only supported for tenants and requires Packet Broker Agent to be configured with NetID level authentication. Use rpc GetInfo and check register_enabled to check whether this rpc is enabled. |
 | `GetHomeNetworkDefaultRoutingPolicy` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`PacketBrokerDefaultRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy) | Get the default routing policy. Getting routing policies requires administrative access. |
 | `SetHomeNetworkDefaultRoutingPolicy` | [`SetPacketBrokerDefaultRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the default routing policy. Setting routing policies requires administrative access. |
 | `DeleteHomeNetworkDefaultRoutingPolicy` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Deletes the default routing policy. Deleting routing policies requires administrative access. |
@@ -7288,8 +7296,8 @@ The Pba service allows clients to manage peering through Packet Broker.
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `GetInfo` | `GET` | `/api/v3/pba/info` |  |
-| `Register` | `PUT` | `/api/v3/pba/registration` |  |
-| `Register` | `POST` | `/api/v3/pba/registration` |  |
+| `Register` | `PUT` | `/api/v3/pba/registration` | `*` |
+| `Register` | `POST` | `/api/v3/pba/registration` | `*` |
 | `Deregister` | `DELETE` | `/api/v3/pba/registration` |  |
 | `GetHomeNetworkDefaultRoutingPolicy` | `GET` | `/api/v3/pba/home-networks/policies/default` |  |
 | `SetHomeNetworkDefaultRoutingPolicy` | `PUT` | `/api/v3/pba/home-networks/policies/default` | `*` |

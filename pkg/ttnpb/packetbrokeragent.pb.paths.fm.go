@@ -104,6 +104,7 @@ var PacketBrokerNetworksFieldPathsTopLevel = []string{
 var PacketBrokerInfoFieldPathsNested = []string{
 	"forwarder_enabled",
 	"home_network_enabled",
+	"register_enabled",
 	"registration",
 	"registration.contact_info",
 	"registration.dev_addr_blocks",
@@ -117,7 +118,15 @@ var PacketBrokerInfoFieldPathsNested = []string{
 var PacketBrokerInfoFieldPathsTopLevel = []string{
 	"forwarder_enabled",
 	"home_network_enabled",
+	"register_enabled",
 	"registration",
+}
+var PacketBrokerRegisterRequestFieldPathsNested = []string{
+	"listed",
+}
+
+var PacketBrokerRegisterRequestFieldPathsTopLevel = []string{
+	"listed",
 }
 var PacketBrokerRoutingPolicyUplinkFieldPathsNested = []string{
 	"application_data",

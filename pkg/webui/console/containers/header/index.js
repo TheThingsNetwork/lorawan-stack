@@ -54,6 +54,7 @@ const accountUrl = selectAccountUrl()
         mayViewOrganizations: checkFromState(mayViewOrganizationsOfUser, state),
         mayManageUsers: checkFromState(mayManageUsers, state),
         mayViewOrEditApiKeys: checkFromState(mayViewOrEditApiKeys, state),
+        mayConfigurePacketBroker: checkFromState(mayConfigurePacketBroker, state),
       }
     }
     return { user }
@@ -66,6 +67,7 @@ class Header extends Component {
     handleLogout: PropTypes.func.isRequired,
     /** A handler for when the user used the search input. */
     handleSearchRequest: PropTypes.func,
+    mayConfigurePacketBroker: PropTypes.bool,
     mayManageUsers: PropTypes.bool,
     mayViewApplications: PropTypes.bool,
     mayViewGateways: PropTypes.bool,
@@ -89,6 +91,7 @@ class Header extends Component {
     mayViewGateways: false,
     mayViewOrganizations: false,
     mayViewOrEditApiKeys: false,
+    mayConfigurePacketBroker: false,
   }
 
   render() {
@@ -102,6 +105,7 @@ class Header extends Component {
       mayViewOrganizations,
       mayManageUsers,
       mayViewOrEditApiKeys,
+      mayConfigurePacketBroker,
     } = this.props
 
     const navigation = [

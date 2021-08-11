@@ -94,7 +94,11 @@ const getPacketBrokerInfoLogic = createRequestLogic({
 
 const registerPacketBrokerLogic = createRequestLogic({
   type: packetBroker.REGISTER_PACKET_BROKER,
-  process: api.packetBroker.register,
+  process: async ({ action }) => {
+    const { registration } = action.payload
+
+    return await api.packetBroker.register(registration)
+  },
 })
 
 const deregisterPacketBrokerLogic = createRequestLogic({

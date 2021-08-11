@@ -38,7 +38,9 @@ export const selectInfoFetching = createFetchingSelector(GET_PACKET_BROKER_INFO_
 export const selectInfoError = createErrorSelector(GET_PACKET_BROKER_INFO_BASE)
 
 export const selectRegistered = state => selectPacketBrokerStore(state).registered
+export const selectRegisterEnabled = state => selectPacketBrokerStore(state).registerEnabled
 export const selectEnabled = state => selectPacketBrokerStore(state).enabled
+export const selectListed = state => selectPacketBrokerStore(state).listed
 
 export const selectHomeNetworkDefaultRoutingPolicy = state =>
   selectPacketBrokerStore(state).defaultHomeNetworkRoutingPolicy

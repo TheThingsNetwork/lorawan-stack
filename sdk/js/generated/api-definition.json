@@ -4500,11 +4500,13 @@
         {
           "method": "put",
           "pattern": "/pba/registration",
+          "body": "*",
           "parameters": []
         },
         {
           "method": "post",
           "pattern": "/pba/registration",
+          "body": "*",
           "parameters": []
         }
       ]

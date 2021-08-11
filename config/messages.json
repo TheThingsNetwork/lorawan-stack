@@ -7316,6 +7316,15 @@
       "file": "grpc_disabled.go"
     }
   },
+  "error:pkg/packetbrokeragent:oauth2_token": {
+    "translations": {
+      "en": "invalid OAuth 2.0 token for network authentication"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "authenticator.go"
+    }
+  },
   "error:pkg/packetbrokeragent:packet_broker_internal": {
     "translations": {
       "en": "internal Packet Broker error"

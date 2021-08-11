@@ -16,9 +16,6 @@ package packetbrokeragent_test
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
-	"io/ioutil"
 	"net"
 	"testing"
 	"time"
@@ -40,23 +37,11 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 }
 
 func mustServePBDataPlane(ctx context.Context, tb testing.TB) (*mock.PBDataPlane, net.Addr) {
-	cert, err := tls.LoadX509KeyPair("testdata/servercert.pem", "testdata/serverkey.pem")
-	if err != nil {
-		panic(err)
-	}
-	clientCA, err := ioutil.ReadFile("testdata/clientca.pem")
-	if err != nil {
-		panic(err)
-	}
-	clientCAs := x509.NewCertPool()
-	if !clientCAs.AppendCertsFromPEM(clientCA) {
-		panic("failed to append client CA from PEM")
-	}
 	lis, err := net.Listen("tcp", ":0")
 	if err != nil {
 		panic(err)
 	}
-	dp := mock.NewPBDataPlane(tb, cert, clientCAs)
+	dp := mock.NewPBDataPlane(tb)
 	go dp.Serve(lis)
 	go func() {
 		<-ctx.Done()
@@ -66,23 +51,11 @@ func mustServePBDataPlane(ctx context.Context, tb testing.TB) (*mock.PBDataPlane
 }
 
 func mustServePBMapper(ctx context.Context, tb testing.TB) (*mock.PBMapper, net.Addr) {
-	cert, err := tls.LoadX509KeyPair("testdata/servercert.pem", "testdata/serverkey.pem")
-	if err != nil {
-		panic(err)
-	}
-	clientCA, err := ioutil.ReadFile("testdata/clientca.pem")
-	if err != nil {
-		panic(err)
-	}
-	clientCAs := x509.NewCertPool()
-	if !clientCAs.AppendCertsFromPEM(clientCA) {
-		panic("failed to append client CA from PEM")
-	}
 	lis, err := net.Listen("tcp", ":0")
 	if err != nil {
 		panic(err)
 	}
-	mp := mock.NewPBMapper(tb, cert, clientCAs)
+	mp := mock.NewPBMapper(tb)
 	go mp.Serve(lis)
 	go func() {
 		<-ctx.Done()
