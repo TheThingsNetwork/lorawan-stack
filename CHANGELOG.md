@@ -29,6 +29,7 @@ For details about compatibility between different releases, see the **Commitment
 - End device access with limited rights in the Console.
 - Parsing of ID6 encoded EUIs from Basic Station gateways.
 - Warnings about unknown fields when getting or searching for gateways.
+- Internal Server Errors from `pkg/identityserver/store`.
 
 ### Security
 

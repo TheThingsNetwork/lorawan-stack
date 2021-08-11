@@ -59,7 +59,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		MedianRTT               *time.Duration
 		ExpectedToa             time.Duration
 		ExpectedStarts          scheduling.ConcentratorTime
-		ExpectedError           *errors.Definition
+		ExpectedError           errors.DefinitionInterface
 	}{
 		{
 			PayloadSize: 10,
@@ -79,7 +79,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			ExpectedToa: 41216 * time.Microsecond,
 			// Too late for transmission with ScheduleTimeShort.
-			ExpectedError: &scheduling.ErrTooLate,
+			ExpectedError: scheduling.ErrTooLate,
 		},
 		{
 			SyncWithGatewayAbsolute: true,
@@ -100,7 +100,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			ExpectedToa: 2465792 * time.Microsecond,
 			// Too late for transmission with ScheduleTimeShort.
-			ExpectedError: &scheduling.ErrTooLate,
+			ExpectedError: scheduling.ErrTooLate,
 		},
 		{
 			PayloadSize: 10,
@@ -121,7 +121,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			NPercentileRTT: durationPtr(550 * time.Millisecond),
 			ExpectedToa:    41216 * time.Microsecond,
 			// Too late for transmission with RTT.
-			ExpectedError: &scheduling.ErrTooLate,
+			ExpectedError: scheduling.ErrTooLate,
 		},
 		{
 			SyncWithGatewayAbsolute: true,
@@ -143,7 +143,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			NPercentileRTT: durationPtr(500 * time.Millisecond),
 			ExpectedToa:    2465792 * time.Microsecond,
 			// Too late for transmission with RTT.
-			ExpectedError: &scheduling.ErrTooLate,
+			ExpectedError: scheduling.ErrTooLate,
 		},
 		{
 			PayloadSize: 51,
@@ -163,7 +163,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			ExpectedToa: 2465792 * time.Microsecond,
 			// Exceeding dwell time of 2 seconds.
-			ExpectedError: &scheduling.ErrDwellTime,
+			ExpectedError: scheduling.ErrDwellTime,
 		},
 		{
 			PayloadSize: 16,
@@ -242,7 +242,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			ExpectedToa: 41216 * time.Microsecond,
 			// Overlapping with previous transmission.
-			ExpectedError: &scheduling.ErrConflict,
+			ExpectedError: scheduling.ErrConflict,
 		},
 		{
 			PayloadSize: 10,
@@ -262,7 +262,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			ExpectedToa: 41216 * time.Microsecond,
 			// Right after previous transmission; not respecting time-off-air.
-			ExpectedError: &scheduling.ErrConflict,
+			ExpectedError: scheduling.ErrConflict,
 		},
 		{
 			PayloadSize: 10,
@@ -301,7 +301,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			ExpectedToa: 1318912 * time.Microsecond,
 			// Exceeds duty-cycle limitation of 1% in 868.0 - 868.6.
-			ExpectedError: &scheduling.ErrDutyCycle,
+			ExpectedError: scheduling.ErrDutyCycle,
 		},
 	} {
 		tcok := t.Run(strconv.Itoa(i), func(t *testing.T) {
@@ -330,7 +330,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 				Priority:    tc.Priority,
 			})
 			if tc.ExpectedError != nil {
-				if !a.So(err, should.HaveSameErrorDefinitionAs, *tc.ExpectedError) {
+				if !a.So(err, should.HaveSameErrorDefinitionAs, tc.ExpectedError) {
 					t.Fatalf("Unexpected error: %v", err)
 				}
 				return

@@ -270,7 +270,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.GetPaths()...)
 }
 
-func newInvalidFieldValueError(field string) errors.Error {
+func newInvalidFieldValueError(field string) *errors.Error {
 	return errInvalidFieldValue.WithAttributes("field", field)
 }
 

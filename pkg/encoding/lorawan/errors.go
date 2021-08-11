@@ -35,12 +35,12 @@ var (
 
 const valueKey = "value"
 
-type valueErr func(interface{}) errors.Error
+type valueErr func(interface{}) *errors.Error
 
 func unexpectedValue(err interface {
-	WithAttributes(kv ...interface{}) errors.Error
+	WithAttributes(kv ...interface{}) *errors.Error
 }) valueErr {
-	return func(value interface{}) errors.Error {
+	return func(value interface{}) *errors.Error {
 		return err.WithAttributes(valueKey, value)
 	}
 }
@@ -77,11 +77,11 @@ func errExpectedLengthEncodedTwoChoices(lorawanField string, expected1, expected
 	return unexpectedValue(errEncodedFieldLengthTwoChoices.WithAttributes("lorawan_field", lorawanField, "expected_1", expected1, "expected_2", expected2))
 }
 
-func errFailedEncoding(lorawanField string) errors.Error {
+func errFailedEncoding(lorawanField string) *errors.Error {
 	return errEncode.WithAttributes("lorawan_field", lorawanField)
 }
 
-func errFailedDecoding(lorawanField string) errors.Error {
+func errFailedDecoding(lorawanField string) *errors.Error {
 	return errDecode.WithAttributes("lorawan_field", lorawanField)
 }
 
@@ -89,7 +89,7 @@ func errUnknown(lorawanField string) valueErr {
 	return unexpectedValue(errUnknownField.WithAttributes("lorawan_field", lorawanField))
 }
 
-func errMissing(lorawanField string) errors.Error {
+func errMissing(lorawanField string) *errors.Error {
 	return errUnknownField.WithAttributes("lorawan_field", lorawanField)
 }
 

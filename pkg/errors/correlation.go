@@ -15,7 +15,12 @@
 package errors
 
 // CorrelationID of the error.
-func (e Error) CorrelationID() string { return e.correlationID }
+func (e *Error) CorrelationID() string {
+	if e == nil {
+		return ""
+	}
+	return e.correlationID
+}
 
 // CorrelationID is not present in the error definition, so this just returns an empty string.
-func (d Definition) CorrelationID() string { return "" }
+func (*Definition) CorrelationID() string { return "" }

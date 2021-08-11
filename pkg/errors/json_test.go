@@ -35,7 +35,7 @@ func TestJSONConversion(t *testing.T) {
 	var unmarshaledDef errors.Definition
 	err = json.Unmarshal(b, &unmarshaledDef)
 	a.So(err, should.BeNil)
-	a.So(unmarshaledDef, should.EqualErrorOrDefinition, errDef)
+	a.So(&unmarshaledDef, should.EqualErrorOrDefinition, errDef)
 
 	errHello := errDef.WithAttributes("foo", "bar", "baz", "qux")
 	errHelloExpected := errDef.WithAttributes("foo", "bar")
@@ -46,5 +46,5 @@ func TestJSONConversion(t *testing.T) {
 	var unmarshaled errors.Error
 	err = json.Unmarshal(b, &unmarshaled)
 	a.So(err, should.BeNil)
-	a.So(unmarshaled, should.EqualErrorOrDefinition, errHelloExpected)
+	a.So(&unmarshaled, should.EqualErrorOrDefinition, errHelloExpected)
 }

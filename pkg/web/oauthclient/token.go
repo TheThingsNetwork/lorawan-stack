@@ -15,7 +15,6 @@
 package oauthclient
 
 import (
-	"encoding/json"
 	stderrors "errors"
 	"net/http"
 	"time"
@@ -52,8 +51,8 @@ func (oc *OAuthClient) freshToken(c echo.Context) (*oauth2.Token, error) {
 		var retrieveError *oauth2.RetrieveError
 		if stderrors.As(err, &retrieveError) {
 			var ttnErr errors.Error
-			if decErr := json.Unmarshal(retrieveError.Body, &ttnErr); decErr == nil {
-				return nil, errRefresh.WithCause(ttnErr)
+			if decErr := ttnErr.UnmarshalJSON(retrieveError.Body); decErr == nil {
+				return nil, errRefresh.WithCause(&ttnErr)
 			}
 		}
 		return nil, errRefresh.WithCause(err)

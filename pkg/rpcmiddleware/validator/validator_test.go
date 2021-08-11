@@ -21,10 +21,10 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/validator"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 )
 
@@ -122,7 +122,7 @@ func TestUnaryServerInterceptor(t *testing.T) {
 		err: testErr,
 	}}, info, handler)
 	if a.So(err, should.BeError) {
-		a.So(err, should.Resemble, &testErr)
+		a.So(err, should.EqualErrorOrDefinition, testErr)
 	}
 
 	res, err = intercept(ctx, &msgWithValidateContext{}, info, handler)
@@ -136,7 +136,7 @@ func TestUnaryServerInterceptor(t *testing.T) {
 		err: testErr,
 	}}, info, handler)
 	if a.So(err, should.BeError) {
-		a.So(err, should.Resemble, &testErr)
+		a.So(err, should.EqualErrorOrDefinition, testErr)
 	}
 
 	_, err = intercept(ctx, &msgWithFieldMask{
@@ -256,7 +256,7 @@ func TestStreamServerInterceptor(t *testing.T) {
 		}}
 		err = stream.RecvMsg(subject)
 		if a.So(err, should.BeError) {
-			a.So(err, should.Resemble, &testErr)
+			a.So(err, should.EqualErrorOrDefinition, testErr)
 		}
 
 		subject = &msgWithValidateContext{}
@@ -271,7 +271,7 @@ func TestStreamServerInterceptor(t *testing.T) {
 		}}
 		err = stream.RecvMsg(subject)
 		if a.So(err, should.BeError) {
-			a.So(err, should.Resemble, &testErr)
+			a.So(err, should.EqualErrorOrDefinition, testErr)
 		}
 
 		subject = &msgWithFieldMask{

@@ -19,15 +19,15 @@ import (
 	"encoding/hex"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 // FromGRPCStatus converts the gRPC status message into an Error.
-func FromGRPCStatus(status *status.Status) Error {
-	err := build(Definition{
+func FromGRPCStatus(status *status.Status) *Error {
+	err := build(&Definition{
 		code:          uint32(status.Code()),
 		messageFormat: status.Message(),
 	}, 0)
@@ -46,7 +46,7 @@ func FromGRPCStatus(status *status.Status) Error {
 		err.details = rest
 	}
 	if details != nil {
-		setErrorDetails(&err, details)
+		setErrorDetails(err, details)
 	}
 	return err
 }
@@ -82,7 +82,10 @@ func (d *Definition) setGRPCStatus() {
 }
 
 // GRPCStatus returns the Definition as a gRPC status message.
-func (d Definition) GRPCStatus() *status.Status {
+func (d *Definition) GRPCStatus() *status.Status {
+	if d == nil {
+		return nil
+	}
 	return d.grpcStatus // initialized when defined (with setGRPCStatus).
 }
 
@@ -159,6 +162,7 @@ func (w wrappedStream) SendMsg(m interface{}) error {
 	}
 	return err
 }
+
 func (w wrappedStream) RecvMsg(m interface{}) error {
 	err := w.ClientStream.RecvMsg(m)
 	if ttnErr, ok := From(err); ok {
