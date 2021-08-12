@@ -15,6 +15,8 @@
 package sentry
 
 import (
+	"strings"
+
 	"github.com/getsentry/sentry-go"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
@@ -27,40 +29,33 @@ func NewEvent(err error) *sentry.Event {
 	}
 
 	evt.Level = sentry.LevelError
-	evt.Message = err.Error()
-
-	// Error Tags.
-	if ttnErr, ok := errors.From(err); ok && ttnErr != nil {
-		evt.Tags["error.namespace"] = ttnErr.Namespace()
-		evt.Tags["error.name"] = ttnErr.Name()
-		if correlationID := ttnErr.CorrelationID(); correlationID != "" {
-			evt.EventID = sentry.EventID(correlationID)
-		}
-	}
 
 	errStack := errors.Stack(err)
 
-	// Error Attributes.
-	for k, v := range errors.Attributes(errStack...) {
-		evt.Extra["error.attributes."+k] = v
-	}
+	var messages []string
 
-	// Error Stack.
-	for i := len(errStack) - 1; i >= 0; i-- {
-		err := errStack[i]
-		exception := sentry.Exception{
-			Value: err.Error(),
-		}
+	for i, err := range errStack {
+		messages = append(messages, err.Error())
+		exception := sentry.Exception{Value: err.Error()}
 		if ttnErr, ok := errors.From(err); ok && ttnErr != nil {
-			exception.Type = ttnErr.Name()
 			exception.Module = ttnErr.Namespace()
-			exception.Value = ttnErr.FormatMessage(ttnErr.PublicAttributes())
-		}
-		if stackTrace := sentry.ExtractStacktrace(err); stackTrace != nil {
-			exception.Stacktrace = stackTrace
+			exception.Type = ttnErr.Name()
+			if i == 0 { // We set the namespace, name and ID from the first error in the chain.
+				evt.Tags["error.namespace"] = ttnErr.Namespace()
+				evt.Tags["error.name"] = ttnErr.Name()
+				if correlationID := ttnErr.CorrelationID(); correlationID != "" {
+					evt.EventID = sentry.EventID(correlationID)
+				}
+			}
+			evt.Contexts[ttnErr.FullName()+" attributes"] = ttnErr.Attributes()
+			if stackTrace := sentry.ExtractStacktrace(err); stackTrace != nil {
+				exception.Stacktrace = stackTrace
+			}
 		}
 		evt.Exception = append(evt.Exception, exception)
 	}
+
+	evt.Message = strings.Join(messages, "\n--- ")
 
 	return evt
 }
