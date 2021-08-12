@@ -43,6 +43,7 @@ For details about compatibility between different releases, see the **Commitment
 - Error in edit user form (Console) when submitting without making any changes.
 - `description` field not being fetched in edit user form (admin only) in the Console.
 - Ignore invalid configuration when printing configuration with `ttn-lw-cli config` or `ttn-lw-stack config`.
+- Emails about API key changes.
 
 ### Security
 
