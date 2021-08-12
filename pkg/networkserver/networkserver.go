@@ -19,6 +19,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -262,14 +263,27 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Ns", cluster.HookName, c.ClusterAuthUnaryHook())
 
-	for id, f := range map[string]func(context.Context) error{
-		applicationUplinkProcessTaskName: ns.processApplicationUplinkTask,
-		downlinkProcessTaskName:          ns.processDownlinkTask,
-	} {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return nil, err
+	}
+	consumerIDPrefix := fmt.Sprintf("%s:%d", hostname, os.Getpid())
+	for i := uint64(0); i < conf.ApplicationUplinkQueue.NumConsumers; i++ {
+		consumerID := fmt.Sprintf("%s:%d", consumerIDPrefix, i)
 		ns.RegisterTask(&component.TaskConfig{
 			Context: ctx,
-			ID:      id,
-			Func:    f,
+			ID:      fmt.Sprintf("%s_%d", applicationUplinkProcessTaskName, i),
+			Func:    ns.createProcessApplicationUplinkTask(consumerID),
+			Restart: component.TaskRestartAlways,
+			Backoff: processTaskBackoff,
+		})
+	}
+	for i := uint64(0); i < conf.DownlinkTaskQueue.NumConsumers; i++ {
+		consumerID := fmt.Sprintf("%s:%d", consumerIDPrefix, i)
+		ns.RegisterTask(&component.TaskConfig{
+			Context: ctx,
+			ID:      fmt.Sprintf("%s_%d", downlinkProcessTaskName, i),
+			Func:    ns.createProcessDownlinkTask(consumerID),
 			Restart: component.TaskRestartAlways,
 			Backoff: processTaskBackoff,
 		})
