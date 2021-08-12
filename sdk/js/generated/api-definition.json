@@ -931,6 +931,28 @@
         "up.service_data.data",
         "up.service_data.service"
       ]
+    },
+    "GetStoredApplicationUpCount": {
+      "file": "lorawan-stack/api/applicationserver_integrations_storage.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/storage/{type}/count",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id",
+            "type"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/as/applications/{application_ids.application_id}/packages/storage/{type}/count",
+          "parameters": [
+            "application_ids.application_id",
+            "type"
+          ]
+        }
+      ]
     }
   },
   "ApplicationPackageRegistry": {
