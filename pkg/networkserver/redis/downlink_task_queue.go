@@ -34,13 +34,12 @@ const (
 )
 
 // NewDownlinkTaskQueue returns new downlink task queue.
-func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group, id string) *DownlinkTaskQueue {
+func NewDownlinkTaskQueue(cl *ttnredis.Client, maxLen int64, group string) *DownlinkTaskQueue {
 	return &DownlinkTaskQueue{
 		queue: &ttnredis.TaskQueue{
 			Redis:  cl,
 			MaxLen: maxLen,
 			Group:  group,
-			ID:     id,
 			Key:    cl.Key(downlinkKey),
 		},
 	}
@@ -63,8 +62,8 @@ func (q *DownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdenti
 
 // Pop calls f on the earliest downlink task in the schedule, for which timestamp is in range [0, time.Now()],
 // if such is available, otherwise it blocks until it is.
-func (q *DownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
-	return q.queue.Pop(ctx, nil, func(p redis.Pipeliner, uid string, startAt time.Time) error {
+func (q *DownlinkTaskQueue) Pop(ctx context.Context, consumerID string, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
+	return q.queue.Pop(ctx, consumerID, nil, func(p redis.Pipeliner, uid string, startAt time.Time) error {
 		ids, err := unique.ToDeviceID(uid)
 		if err != nil {
 			return err

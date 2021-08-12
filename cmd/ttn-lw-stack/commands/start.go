@@ -17,8 +17,6 @@ package commands
 import (
 	"math"
 	"net/http"
-	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -183,13 +181,6 @@ var startCommand = &cobra.Command{
 		c.RegisterGRPC(events_grpc.NewEventsServer(c.Context(), events.DefaultPubSub()))
 		c.RegisterGRPC(component.NewConfigurationServer(c))
 
-		host, err := os.Hostname()
-		if err != nil {
-			return err
-		}
-
-		redisConsumerID := redis.Key(host, strconv.Itoa(os.Getpid()))
-
 		for _, httpClient := range []**http.Client{
 			&config.ServiceBase.FrequencyPlans.HTTPClient,
 			&config.ServiceBase.Interop.SenderClientCA.HTTPClient,
@@ -254,7 +245,7 @@ var startCommand = &cobra.Command{
 			}
 			applicationUplinkQueue := nsredis.NewApplicationUplinkQueue(
 				NewNetworkServerApplicationUplinkQueueRedis(*config),
-				int64(applicationUplinkQueueSize), redisConsumerGroup, redisConsumerID, time.Minute,
+				int64(applicationUplinkQueueSize), redisConsumerGroup, time.Minute,
 			)
 			if err := applicationUplinkQueue.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
@@ -274,13 +265,13 @@ var startCommand = &cobra.Command{
 			}
 			downlinkTasks := nsredis.NewDownlinkTaskQueue(
 				NewNetworkServerDownlinkTaskRedis(*config),
-				100000, redisConsumerGroup, redisConsumerID,
+				100000, redisConsumerGroup,
 			)
 			if err := downlinkTasks.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
 			defer downlinkTasks.Close(ctx)
-			config.NS.DownlinkTasks = downlinkTasks
+			config.NS.DownlinkTaskQueue.Queue = downlinkTasks
 			config.NS.ScheduledDownlinkMatcher = &nsredis.ScheduledDownlinkMatcher{
 				Redis: redis.New(config.Redis.WithNamespace("ns", "scheduled-downlinks")),
 			}

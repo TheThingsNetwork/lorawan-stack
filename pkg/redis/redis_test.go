@@ -220,7 +220,9 @@ func TestPopTask(t *testing.T) {
 		}, k)
 		cancel()
 		if a.So(err, should.BeError) {
-			a.So(errors.IsDeadlineExceeded(err), should.BeTrue)
+			if !a.So(errors.IsDeadlineExceeded(err), should.BeTrue) {
+				t.FailNow()
+			}
 		}
 
 		cancelCtx, cancel := context.WithCancel(ctx)
@@ -328,7 +330,6 @@ func TestTaskQueue(t *testing.T) {
 		Redis:  cl,
 		MaxLen: 42,
 		Group:  "testGroup",
-		ID:     "testID",
 		Key:    cl.Key("test"),
 	}
 
@@ -353,7 +354,7 @@ func TestTaskQueue(t *testing.T) {
 		var called bool
 		errCh := make(chan error, 1)
 		go func() {
-			errCh <- q.Pop(ctx, r, func(p redis.Pipeliner, payload string, startAt time.Time) error {
+			errCh <- q.Pop(ctx, "testID", r, func(p redis.Pipeliner, payload string, startAt time.Time) error {
 				p.Ping(ctx)
 				a.So(called, should.BeFalse)
 				a.So(payload, should.Equal, expectedPayload)

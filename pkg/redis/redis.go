@@ -23,6 +23,7 @@ import (
 	"net"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -581,10 +582,12 @@ func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int6
 
 // TaskQueue is a task queue.
 type TaskQueue struct {
-	Redis     WatchCmdable
-	MaxLen    int64
-	Group, ID string
-	Key       string
+	Redis  WatchCmdable
+	MaxLen int64
+	Group  string
+	Key    string
+
+	consumerIDs sync.Map // map[string]struct{} of all used consumer ids
 }
 
 // Init initializes the task queue.
@@ -596,8 +599,11 @@ func (q *TaskQueue) Init(ctx context.Context) error {
 // Close closes the TaskQueue.
 func (q *TaskQueue) Close(ctx context.Context) error {
 	_, err := q.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
-		p.XGroupDelConsumer(ctx, InputTaskKey(q.Key), q.Group, q.ID)
-		p.XGroupDelConsumer(ctx, ReadyTaskKey(q.Key), q.Group, q.ID)
+		q.consumerIDs.Range(func(k, v interface{}) bool {
+			p.XGroupDelConsumer(ctx, InputTaskKey(q.Key), q.Group, k.(string))
+			p.XGroupDelConsumer(ctx, ReadyTaskKey(q.Key), q.Group, k.(string))
+			return true
+		})
 		return nil
 	})
 	return ConvertError(err)
@@ -614,11 +620,13 @@ func (q *TaskQueue) Add(ctx context.Context, r redis.Cmdable, s string, startAt 
 // Pop calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()],
 // if such is available, otherwise it blocks until it is or context is done.
 // Pipeline is executed even if f returns an error.
-func (q *TaskQueue) Pop(ctx context.Context, r redis.Cmdable, f func(redis.Pipeliner, string, time.Time) error) error {
+// consumerID is used to identify the consumer and should be unique for all concurrent calls to Pop.
+func (q *TaskQueue) Pop(ctx context.Context, consumerID string, r redis.Cmdable, f func(redis.Pipeliner, string, time.Time) error) error {
+	q.consumerIDs.LoadOrStore(consumerID, struct{}{})
 	if r == nil {
 		r = q.Redis
 	}
-	return popTask(ctx, r, q.Group, q.ID, q.MaxLen, f, q.Key)
+	return popTask(ctx, r, q.Group, consumerID, q.MaxLen, f, q.Key)
 }
 
 // Scripter is redis.scripter.
