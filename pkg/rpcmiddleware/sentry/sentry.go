@@ -18,15 +18,18 @@ package sentry
 import (
 	"context"
 	"fmt"
+	"net"
 	"strings"
 
 	"github.com/getsentry/sentry-go"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 )
 
 func reportError(ctx context.Context, method string, err error) {
@@ -38,7 +41,6 @@ func reportError(ctx context.Context, method string, err error) {
 	switch code {
 	case codes.Unknown,
 		codes.Internal,
-		codes.Unimplemented,
 		codes.DataLoss:
 	default:
 		return // ignore
@@ -52,35 +54,76 @@ func reportError(ctx context.Context, method string, err error) {
 		errEvent.Request = &sentry.Request{}
 	}
 	errEvent.Request.URL = method
-	errEvent.Request.Headers = make(map[string]string)
-	errEvent.Tags["grpc.method"] = method
+	if p, ok := peer.FromContext(ctx); ok && p.Addr != nil && p.Addr.String() != "pipe" {
+		if host, _, err := net.SplitHostPort(p.Addr.String()); err == nil {
+			errEvent.User.IPAddress = host
+		}
+	}
 	errEvent.Tags["grpc.code"] = code.String()
+	errEvent.Request.Headers = make(map[string]string)
+
 	if md, ok := metadata.FromOutgoingContext(ctx); ok {
-		if requestID := md["x-request-id"]; len(requestID) > 0 {
-			errEvent.Tags["grpc.request_id"] = requestID[0]
-		}
 		for k, v := range md {
-			if k == "grpc-trace-bin" {
+			if len(v) == 0 {
 				continue
+			}
+			switch strings.ToLower(k) {
+			case "cookie", "grpc-trace-bin":
+				continue // ingored header
+			case "authorization":
+				parts := strings.SplitN(v[len(v)-1], " ", 2)
+				if len(parts) == 2 && strings.ToLower(parts[0]) == "bearer" {
+					if tokenType, tokenID, _, err := auth.SplitToken(parts[1]); err == nil {
+						errEvent.Tags["auth.token_type"] = tokenType.String()
+						errEvent.Tags["auth.token_id"] = tokenID
+					}
+				}
+				continue // ignored header
+			case "x-request-id":
+				errEvent.Tags["request_id"] = v[len(v)-1]
 			}
 			errEvent.Request.Headers[k] = strings.Join(v, " ")
 		}
 	}
+
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		if requestID := md["x-request-id"]; len(requestID) > 0 {
-			errEvent.Tags["grpc.request_id"] = requestID[0]
-		}
 		for k, v := range md {
-			if k == "grpc-trace-bin" {
+			if len(v) == 0 {
 				continue
+			}
+			switch strings.ToLower(k) {
+			case "grpcgateway-authorization",
+				"cookie", "grpcgateway-cookie",
+				"grpc-trace-bin":
+				continue // ingored header
+			case "authorization":
+				parts := strings.SplitN(v[len(v)-1], " ", 2)
+				if len(parts) == 2 && strings.ToLower(parts[0]) == "bearer" {
+					if tokenType, tokenID, _, err := auth.SplitToken(parts[1]); err == nil {
+						errEvent.Tags["auth.token_type"] = tokenType.String()
+						errEvent.Tags["auth.token_id"] = tokenID
+					}
+				}
+				continue // ingored header
+			case "x-request-id":
+				errEvent.Tags["request_id"] = v[len(v)-1]
 			}
 			errEvent.Request.Headers[k] = strings.Join(v, " ")
 		}
 	}
+
 	for k, v := range grpc_ctxtags.Extract(ctx).Values() {
-		if val := fmt.Sprint(v); len(val) < 64 {
-			errEvent.Tags[k] = val
+		if strings.HasPrefix(k, "grpc.request.") {
+			k = "req." + strings.TrimPrefix(k, "grpc.request.")
 		}
+		if len(k) > 32 {
+			continue
+		}
+		val := fmt.Sprint(v)
+		if len(val) > 200 {
+			continue
+		}
+		errEvent.Tags[k] = val
 	}
 
 	// Capture the event.
