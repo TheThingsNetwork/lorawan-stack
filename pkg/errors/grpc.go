@@ -16,10 +16,8 @@ package errors
 
 import (
 	"context"
-	"encoding/hex"
 
 	"github.com/golang/protobuf/proto"
-	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -117,9 +115,6 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		res, err := handler(ctx, req)
 		if ttnErr, ok := From(err); ok {
-			if ttnErr.correlationID == "" {
-				ttnErr.correlationID = hex.EncodeToString(uuid.NewV4().Bytes()) // Compliant with Sentry.
-			}
 			err = ttnErr
 		}
 		return res, err
@@ -131,9 +126,6 @@ func StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		err := handler(srv, stream)
 		if ttnErr, ok := From(err); ok {
-			if ttnErr.correlationID == "" {
-				ttnErr.correlationID = hex.EncodeToString(uuid.NewV4().Bytes()) // Compliant with Sentry.
-			}
 			err = ttnErr
 		}
 		return err

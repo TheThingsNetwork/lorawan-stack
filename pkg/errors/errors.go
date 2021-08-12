@@ -17,10 +17,12 @@
 package errors
 
 import (
+	"encoding/hex"
 	"fmt"
 	"sync/atomic"
 
 	"github.com/golang/protobuf/proto"
+	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc/codes"
 )
 
@@ -87,7 +89,11 @@ type Interface interface {
 
 // build an error from the definition, skipping the first frames of the call stack.
 func build(d *Definition, skip int) *Error {
-	e := Error{Definition: d, grpcStatus: new(atomic.Value)}
+	e := Error{
+		Definition:    d,
+		correlationID: hex.EncodeToString(uuid.NewV4().Bytes()),
+		grpcStatus:    new(atomic.Value),
+	}
 	if skip > 0 {
 		e.stack = callers(skip)
 	}
