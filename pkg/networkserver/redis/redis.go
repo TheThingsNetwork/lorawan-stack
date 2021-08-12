@@ -23,8 +23,6 @@ import (
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 )
 
-//go:generate go run ./../../redis/generate_scripts.go
-
 type keyer interface {
 	Key(ks ...string) string
 }
