@@ -736,7 +736,7 @@ var (
 						return err
 					}
 					ids.ApplicationIdentifiers = *appID
-					list.EndDeviceIds = append(list.EndDeviceIds, ids)
+					list.EndDeviceIds = append(list.EndDeviceIds, &ids)
 				}
 				req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_List{
 					List: list,
