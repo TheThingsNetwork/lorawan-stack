@@ -31,8 +31,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
-//go:generate go run ./generate_scripts.go
-
 const (
 	// separator is character used to separate the keys.
 	separator = ':'
