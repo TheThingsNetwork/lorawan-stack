@@ -1632,7 +1632,7 @@ func (m *JoinEUIPrefixes) ValidateFields(paths ...string) error {
 		switch name {
 		case "prefixes":
 
-			for idx, item := range m.Prefixes {
+			for idx, item := range m.GetPrefixes() {
 				_, _ = idx, item
 
 				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {

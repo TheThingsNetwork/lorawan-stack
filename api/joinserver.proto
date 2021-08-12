@@ -295,7 +295,7 @@ message JoinEUIPrefix {
 }
 
 message JoinEUIPrefixes {
-  repeated JoinEUIPrefix prefixes = 1 [(gogoproto.nullable) = false];
+  repeated JoinEUIPrefix prefixes = 1;
 }
 
 service Js {
