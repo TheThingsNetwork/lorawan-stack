@@ -2558,7 +2558,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				if tc.CreateDevice != nil {
 					created, ctx = MustCreateDevice(ctx, env.Devices, tc.CreateDevice)
 				}
-				test.Must(nil, env.DownlinkTasks.Add(ctx, ttnpb.EndDeviceIdentifiers{
+				test.Must(nil, env.DownlinkTaskQueue.Queue.Add(ctx, ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: appID,
 					DeviceId:               devID,
 				}, time.Now(), true))

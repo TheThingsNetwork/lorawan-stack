@@ -168,8 +168,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		return nil, errInvalidConfiguration.WithCause(errors.New("CooldownWindow must be greater than 0"))
 	case conf.Devices == nil:
 		panic(errInvalidConfiguration.WithCause(errors.New("Devices is not specified")))
-	case conf.DownlinkTasks == nil:
-		panic(errInvalidConfiguration.WithCause(errors.New("DownlinkTasks is not specified")))
+	case conf.DownlinkTaskQueue.NumConsumers == 0:
+		return nil, errInvalidConfiguration.WithCause(errors.New("DownlinkTaskQueue.NumConsumers must be greater than 0"))
+	case conf.ApplicationUplinkQueue.NumConsumers == 0:
+		return nil, errInvalidConfiguration.WithCause(errors.New("ApplicationUplinkQueue.NumConsumers must be greater than 0"))
+	case conf.DownlinkTaskQueue.Queue == nil:
+		panic(errInvalidConfiguration.WithCause(errors.New("DownlinkTaskQueue is not specified")))
 	case conf.UplinkDeduplicator == nil:
 		panic(errInvalidConfiguration.WithCause(errors.New("UplinkDeduplicator is not specified")))
 	case conf.ScheduledDownlinkMatcher == nil:

@@ -1943,12 +1943,12 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 		}
 		conf.NetworkServer.ApplicationUplinkQueue.Queue = v
 	}
-	if conf.NetworkServer.DownlinkTasks == nil {
+	if conf.NetworkServer.DownlinkTaskQueue.Queue == nil {
 		v, closeFn := NewDownlinkTaskQueue(ctx)
 		if closeFn != nil {
 			closeFuncs = append(closeFuncs, closeFn)
 		}
-		conf.NetworkServer.DownlinkTasks = v
+		conf.NetworkServer.DownlinkTaskQueue.Queue = v
 	}
 	if conf.NetworkServer.UplinkDeduplicator == nil {
 		v, closeFn := NewUplinkDeduplicator(ctx)
