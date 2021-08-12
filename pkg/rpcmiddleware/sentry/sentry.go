@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"path"
 	"strings"
 
 	"github.com/getsentry/sentry-go"
@@ -54,12 +55,16 @@ func reportError(ctx context.Context, method string, err error) {
 		errEvent.Request = &sentry.Request{}
 	}
 	errEvent.Request.URL = method
+	errEvent.Tags["grpc.service"] = path.Dir(method)[1:]
+	errEvent.Tags["grpc.method"] = path.Base(method)
+	errEvent.Tags["grpc.code"] = code.String()
+
 	if p, ok := peer.FromContext(ctx); ok && p.Addr != nil && p.Addr.String() != "pipe" {
 		if host, _, err := net.SplitHostPort(p.Addr.String()); err == nil {
 			errEvent.User.IPAddress = host
 		}
 	}
-	errEvent.Tags["grpc.code"] = code.String()
+
 	errEvent.Request.Headers = make(map[string]string)
 
 	if md, ok := metadata.FromOutgoingContext(ctx); ok {
@@ -113,8 +118,8 @@ func reportError(ctx context.Context, method string, err error) {
 	}
 
 	for k, v := range grpc_ctxtags.Extract(ctx).Values() {
-		if strings.HasPrefix(k, "grpc.request.") {
-			k = "req." + strings.TrimPrefix(k, "grpc.request.")
+		if strings.HasPrefix(k, "grpc.request.") && (strings.HasSuffix(k, "_id") || strings.HasSuffix(k, "_uid") || strings.HasSuffix(k, "_eui")) {
+			k = strings.TrimPrefix(k, "grpc.request.")
 		}
 		if len(k) > 32 {
 			continue

@@ -16,6 +16,9 @@
 package sentry
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/getsentry/sentry-go"
 	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -42,35 +45,46 @@ func (s *Sentry) Wrap(next log.Handler) log.Handler {
 
 func (s *Sentry) forward(e log.Entry) *sentry.EventID {
 	fields := e.Fields().Fields()
-	var err error
-	if namespaceField, ok := fields["namespace"]; ok {
-		switch namespaceField {
-		case "grpc", "web": // gRPC and web have their own Sentry integration.
-			return nil
-		}
+
+	switch fields["namespace"] {
+	case "grpc", "web": // gRPC and web have their own Sentry integration.
+		return nil
 	}
+
+	var err error
 	if errField, ok := fields["error"]; ok {
 		if errField, ok := errField.(error); ok {
 			err = errField
 		}
 	}
 	evt := sentryerrors.NewEvent(err)
-
 	evt.Message = e.Message()
+	if err == nil {
+		evt.Level = sentry.LevelError
+	}
 
-	// Add log fields.
-	if fld, ok := err.(log.Fielder); ok {
-		errFields := fld.Fields()
-		for k, v := range fields {
-			// Filter out error fields.
-			if _, isErrField := errFields[k]; isErrField {
-				continue
+	evt.Contexts["log fields"] = fields
+
+	for k, v := range fields {
+		switch k {
+		case "namespace":
+			evt.Tags["log.namespace"] = fmt.Sprint(v)
+		case "auth.user_id":
+			evt.User.ID = fmt.Sprint(v)
+		case "peer.real_ip":
+			evt.User.IPAddress = fmt.Sprint(v)
+		case "grpc.service", "grpc.method",
+			"auth.token_type", "auth.token_id":
+			evt.Tags[k] = fmt.Sprint(v)
+		case "dev_addr", "mac_version", "phy_version":
+			evt.Tags[k] = fmt.Sprint(v)
+		default:
+			if strings.HasSuffix(k, "_id") || strings.HasSuffix(k, "_uid") || strings.HasSuffix(k, "_eui") {
+				if strings.HasPrefix(k, "grpc.request.") {
+					k = strings.TrimPrefix(k, "grpc.request.")
+				}
+				evt.Tags[k] = fmt.Sprint(v)
 			}
-			evt.Extra[k] = v
-		}
-	} else {
-		for k, v := range fields {
-			evt.Extra[k] = v
 		}
 	}
 
