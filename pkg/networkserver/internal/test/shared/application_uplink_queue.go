@@ -15,11 +15,14 @@
 package test
 
 import (
+	"bytes"
 	"context"
 	"testing"
 	"time"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -27,7 +30,7 @@ import (
 )
 
 // handleApplicationUplinkQueueTest runs a test suite on q.
-func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQueue) {
+func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQueue, consumerIDs []string) {
 	assertAdd := func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
@@ -58,71 +61,113 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		}
 		reqCh := make(chan popFuncReq, 1)
 		errCh := make(chan error, 1)
-		go func() {
-			errCh <- q.Pop(ctx, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueDrainFunc) (time.Time, error) {
-				respCh := make(chan TaskPopFuncResponse, 1)
-				reqCh <- popFuncReq{
-					Context:                ctx,
-					ApplicationIdentifiers: appID,
-					Func:                   f,
-					Response:               respCh,
-				}
-				resp := <-respCh
-				return resp.Time, resp.Error
-			})
-		}()
+		popCtx, cancelPopCtx := context.WithCancel(ctx)
+		defer cancelPopCtx()
+		for _, consumerID := range consumerIDs {
+			go func(consumerID string) {
+				errCh <- q.Pop(popCtx, consumerID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueDrainFunc) (time.Time, error) {
+					respCh := make(chan TaskPopFuncResponse, 1)
+					reqCh <- popFuncReq{
+						Context:                ctx,
+						ApplicationIdentifiers: appID,
+						Func:                   f,
+						Response:               respCh,
+					}
+					resp := <-respCh
+					return resp.Time, resp.Error
+				})
+			}(consumerID)
+		}
 
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for Pop callback to be called")
-			return false
-
-		case err := <-errCh:
-			t.Errorf("Received unexpected Pop error: %v", err)
-			return false
-
-		case req := <-reqCh:
-			if !test.AllTrue(
-				a.So(req.Context, should.HaveParentContextOrEqual, ctx),
-				a.So(req.ApplicationIdentifiers, should.Resemble, expected[0].ApplicationIdentifiers),
-			) {
-				t.Error("Pop callback assertion failed")
+		var collected []*ttnpb.ApplicationUp
+		var requests int
+		for ; len(collected) < len(expected); requests++ {
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for Pop callback to be called")
 				return false
-			}
 
-			if withError {
-				if !a.So(req.Func(2, func(ups ...*ttnpb.ApplicationUp) error {
-					a.So(ups, should.NotBeEmpty)
-					return test.ErrInternal
-				}), should.HaveSameErrorDefinitionAs, test.ErrInternal) {
+			case req := <-reqCh:
+				if !test.AllTrue(
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx),
+					a.So(req.ApplicationIdentifiers, should.Resemble, expected[0].ApplicationIdentifiers),
+				) {
+					t.Error("Pop callback assertion failed")
 					return false
 				}
-			}
 
-			var collected []*ttnpb.ApplicationUp
-			if !a.So(req.Func(2, func(ups ...*ttnpb.ApplicationUp) error {
-				a.So(ups, should.NotBeEmpty)
-				collected = append(collected, ups...)
-				return nil
-			}), should.BeNil) {
-				return false
-			}
-			if a.So(len(collected), should.Equal, len(expected)) {
-				for i := range collected {
-					a.So(collected[i], should.Resemble, expected[i])
+				if withError {
+					if !a.So(req.Func(2, func(ups ...*ttnpb.ApplicationUp) error {
+						a.So(ups, should.NotBeEmpty)
+						return test.ErrInternal
+					}), should.HaveSameErrorDefinitionAs, test.ErrInternal) {
+						return false
+					}
 				}
-			}
-			close(req.Response)
 
+				if !a.So(req.Func(2, func(ups ...*ttnpb.ApplicationUp) error {
+					a.So(ups, should.NotBeEmpty)
+					collected = append(collected, ups...)
+					return nil
+				}), should.BeNil) {
+					return false
+				}
+				close(req.Response)
+			}
+		}
+
+		for i := 0; i < requests; i++ {
 			select {
 			case <-ctx.Done():
 				t.Error("Timed out while waiting for Pop to return")
 				return false
-
 			case err := <-errCh:
-				return a.So(err, should.BeNil)
+				if !a.So(err, should.BeNil) {
+					return false
+				}
 			}
 		}
+
+		cancelPopCtx()
+
+		for i := requests; i < len(consumerIDs); i++ {
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for Pop to return")
+				return false
+			case err := <-errCh:
+				if !a.So(errors.IsCanceled(err), should.BeTrue) {
+					return false
+				}
+			}
+		}
+
+		if a.So(len(collected), should.Equal, len(expected)) {
+			for _, ex := range expected {
+				expectedB, err := proto.Marshal(ex)
+				if !a.So(err, should.BeNil) {
+					return false
+				}
+
+				var found bool
+				for _, coll := range collected {
+					collectedB, err := proto.Marshal(coll)
+					if !a.So(err, should.BeNil) {
+						return false
+					}
+
+					if bytes.Equal(expectedB, collectedB) {
+						found = true
+					}
+				}
+
+				if !a.So(found, should.BeTrue) {
+					return false
+				}
+			}
+		}
+
+		return true
 	}
 
 	appID1 := ttnpb.ApplicationIdentifiers{
@@ -267,7 +312,6 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			genericApp2Ups[0],
 		), should.BeTrue),
 		!a.So(assertAdd(ctx,
-			genericApp1Ups[1],
 			genericApp2Ups[1],
 		), should.BeTrue),
 		!a.So(assertDrainApplication(ctx, true,
@@ -276,6 +320,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		), should.BeTrue),
 
 		!a.So(assertAdd(ctx,
+			genericApp1Ups[1],
 			genericApp1Ups[2],
 			invalidations[0],
 			genericApp1Ups[3],
@@ -300,16 +345,15 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 }
 
 // HandleApplicationUplinkQueueTest runs a ApplicationUplinkQueue test suite on reg.
-func HandleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue) {
+func HandleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue, consumerIDs []string) {
 	t.Helper()
 	test.RunTest(t, test.TestConfig{
-		Parallel: true,
 		Func: func(ctx context.Context, a *assertions.Assertion) {
 			t.Helper()
 			test.RunSubtestFromContext(ctx, test.SubtestConfig{
 				Name: "1st run",
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-					handleApplicationUplinkQueueTest(ctx, q)
+					handleApplicationUplinkQueueTest(ctx, q, consumerIDs)
 				},
 			})
 			if t.Failed() {
@@ -318,7 +362,7 @@ func HandleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue) {
 			test.RunSubtestFromContext(ctx, test.SubtestConfig{
 				Name: "2nd run",
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-					handleApplicationUplinkQueueTest(ctx, q)
+					handleApplicationUplinkQueueTest(ctx, q, consumerIDs)
 				},
 			})
 		},

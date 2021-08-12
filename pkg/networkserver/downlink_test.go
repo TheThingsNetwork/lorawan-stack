@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -2543,7 +2544,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				_, ctx, env, stop := StartTest(ctx, TestConfig{
 					NetworkServer: DefaultConfig,
 					TaskStarter: component.StartTaskFunc(func(conf *component.TaskConfig) {
-						if conf.ID != DownlinkProcessTaskName {
+						if !strings.HasPrefix(conf.ID, DownlinkProcessTaskName) {
 							component.DefaultStartTask(conf)
 							return
 						}

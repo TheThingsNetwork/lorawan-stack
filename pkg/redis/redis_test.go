@@ -220,7 +220,7 @@ func TestPopTask(t *testing.T) {
 		}, k)
 		cancel()
 		if a.So(err, should.BeError) {
-			if !a.So(errors.IsDeadlineExceeded(err), should.BeTrue) {
+			if !a.So(errors.IsDeadlineExceeded(err) || errors.IsUnavailable(err), should.BeTrue) {
 				t.FailNow()
 			}
 		}
@@ -538,7 +538,7 @@ func TestMutex(t *testing.T) {
 	case <-ctx.Done():
 		t.Fatalf("Timed out while waiting for LockMutex with a deadline to return")
 	case err := <-timeoutErrCh:
-		if !a.So(errors.IsDeadlineExceeded(err), should.BeTrue) {
+		if !a.So(errors.IsDeadlineExceeded(err) || errors.IsUnavailable(err), should.BeTrue) {
 			t.Fatal(err)
 		}
 	}

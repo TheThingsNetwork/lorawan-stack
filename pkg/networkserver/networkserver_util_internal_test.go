@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"sort"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -1871,14 +1871,9 @@ func DownlinkProtoPaths(paths ...DownlinkPath) (pbs []*ttnpb.DownlinkPath) {
 }
 
 func StartTaskExclude(names ...string) component.StartTaskFunc {
-	if !sort.StringsAreSorted(names) {
-		panic("names must be sorted alphabetically")
-	}
 	return func(conf *component.TaskConfig) {
 		for _, name := range names {
-			if i := sort.Search(len(names), func(i int) bool {
-				return names[i] == name
-			}); i < len(names) && names[i] == name {
+			if strings.HasPrefix(conf.ID, name) {
 				return
 			}
 		}
@@ -1910,6 +1905,12 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 	}
 	if conf.NetworkServer.CooldownWindow == 0 {
 		conf.NetworkServer.CooldownWindow = conf.NetworkServer.DeduplicationWindow + time.Nanosecond
+	}
+	if conf.NetworkServer.ApplicationUplinkQueue.NumConsumers == 0 {
+		conf.NetworkServer.ApplicationUplinkQueue.NumConsumers = 1
+	}
+	if conf.NetworkServer.DownlinkTaskQueue.NumConsumers == 0 {
+		conf.NetworkServer.DownlinkTaskQueue.NumConsumers = 1
 	}
 
 	cmpOpts := []component.Option{
