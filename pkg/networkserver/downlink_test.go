@@ -96,7 +96,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					GatewayIdentifiers: &ids.GatewayIdentifiers,
 					DownlinkPath: &ttnpb.DownlinkPath{
 						Path: &ttnpb.DownlinkPath_Fixed{
-							Fixed: &DefaultGatewayAntennaIdentifiers[i],
+							Fixed: DefaultGatewayAntennaIdentifiers[i],
 						},
 					},
 				})

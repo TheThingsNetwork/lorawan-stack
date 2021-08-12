@@ -1387,7 +1387,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 				GatewayIdentifiers: &fixedPaths[i].GatewayIdentifiers,
 				DownlinkPath: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_Fixed{
-						Fixed: &fixedPaths[i],
+						Fixed: fixedPaths[i],
 					},
 				},
 			})
