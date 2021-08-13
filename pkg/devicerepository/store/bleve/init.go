@@ -116,8 +116,8 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 		return err
 	}
 
-	batch := index.NewBatch()
 	for _, brand := range brands.Brands {
+		batch := index.NewBatch()
 		models, err := s.GetModels(store.GetModelsRequest{
 			Paths:   ttnpb.EndDeviceModelFieldPathsNested,
 			BrandID: brand.BrandId,
@@ -134,14 +134,15 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 		if err != nil {
 			return err
 		}
-		if err := batch.Index(brand.BrandId, indexableBrand{
+		b := indexableBrand{
 			Type:      brandDocumentType,
 			BrandJSON: string(brandJSON),
 			Brand:     brand,
 			Models:    models.Models,
 			BrandID:   brand.BrandId,
 			BrandName: brand.Name,
-		}); err != nil {
+		}
+		if err := batch.Index(brand.BrandId, b); err != nil {
 			return err
 		}
 		for _, model := range models.Models {
@@ -149,19 +150,24 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 			if err != nil {
 				return err
 			}
-			if err := batch.Index(fmt.Sprintf("%s:%s", model.BrandId, model.ModelId), indexableModel{
+			m := indexableModel{
 				Type:      modelDocumentType,
 				ModelJSON: string(modelJSON),
 				Brand:     brand,
 				Model:     model,
 				BrandID:   model.BrandId,
 				ModelID:   model.ModelId,
-			}); err != nil {
+			}
+			if err := batch.Index(fmt.Sprintf("%s:%s", model.BrandId, model.ModelId), m); err != nil {
 				return err
 			}
 		}
+		log.FromContext(ctx).WithField("brand_id", brand.BrandId).Debug("Adding brand to index")
+		if err := index.Batch(batch); err != nil {
+			return err
+		}
 	}
-	return index.Batch(batch)
+	return nil
 }
 
 // prepareWorkingDirectory copies vendor information from source to the working directory.
