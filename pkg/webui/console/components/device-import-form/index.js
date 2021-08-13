@@ -28,6 +28,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import DeviceTemplateFormatSelect from '@console/containers/device-template-format-select'
 
+import TOOLTIP_IDS from '@ttn-lw/lib/constants/tooltip-ids'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -38,7 +39,6 @@ const m = defineMessages({
   fileImport: 'File import',
   file: 'File',
   formatInfo: 'Format information',
-  createDevices: 'Create end devices',
   selectAFile: 'Please select a template file',
   fileInfoPlaceholder: 'Please select a template format',
   claiming: 'Claiming',
@@ -168,9 +168,10 @@ export default class DeviceBulkCreateForm extends Component {
           label={m.setClaimAuthCode}
           component={Checkbox}
           name="set_claim_auth_code"
+          tooltipId={TOOLTIP_IDS.SET_CLAIM_AUTH_CODE}
         />
         <SubmitBar>
-          <Form.Submit component={SubmitButton} message={m.createDevices} />
+          <Form.Submit component={SubmitButton} message={sharedMessages.importDevices} />
         </SubmitBar>
       </Form>
     )

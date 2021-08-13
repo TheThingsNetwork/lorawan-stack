@@ -214,6 +214,9 @@ const m = defineMessages({
 
   gatewayPlacementDescription:
     'Informs whether the gateway antenna is placed inside or outside. This information is used solely for display purposes, e.g. on public gateway maps (if your gateway is set as public) and has no technical or functional effects.',
+
+  setClaimAuthCodeDescription:
+    'The claim authentication code is used to transfer ownership of an end device using a process called end device claiming. Checking this checkbox will cause a claim authentication code being generated and set for each imported end device so you can eventually transfer the ownership.',
 })
 
 const descriptions = Object.freeze({
@@ -412,6 +415,9 @@ const descriptions = Object.freeze({
   [TOOLTIP_IDS.GATEWAY_PLACEMENT]: {
     description: m.gatewayPlacementDescription,
   },
+  [TOOLTIP_IDS.SET_CLAIM_AUTH_CODE]: {
+    description: m.setClaimAuthCodeDescription,
+  },
 })
 
 const links = Object.freeze({
@@ -435,6 +441,9 @@ const links = Object.freeze({
   },
   [TOOLTIP_IDS.ACTIVATION_MODE]: {
     documentationPath: '/devices/abp-vs-otaa',
+  },
+  [TOOLTIP_IDS.SET_CLAIM_AUTH_CODE]: {
+    documentationPath: '/devices/device-claiming',
   },
 })
 
