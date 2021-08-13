@@ -1430,6 +1430,24 @@
       "file": "gateways_claim.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:invalid_dev_eui": {
+    "translations": {
+      "en": "invalid DevEUI"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:invalid_gateway_eui": {
+    "translations": {
+      "en": "invalid gateway EUI"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "gateways.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:invalid_hostname": {
     "translations": {
       "en": "`{hostname}` is not a valid hostname"
@@ -1437,6 +1455,24 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "use.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:invalid_join_eui": {
+    "translations": {
+      "en": "invalid JoinEUI"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:invalid_net_id": {
+    "translations": {
+      "en": "invalid NetID"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:invalid_target_cups_trust": {
@@ -8000,6 +8036,51 @@
       "file": "eui.go"
     }
   },
+  "error:pkg/types:invalid_aes_key": {
+    "translations": {
+      "en": "invalid AES key"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "aeskey.go"
+    }
+  },
+  "error:pkg/types:invalid_dev_addr": {
+    "translations": {
+      "en": "invalid DevAddr"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "devaddr.go"
+    }
+  },
+  "error:pkg/types:invalid_dev_nonce": {
+    "translations": {
+      "en": "invalid DevNonce"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "dev_nonce.go"
+    }
+  },
+  "error:pkg/types:invalid_eui": {
+    "translations": {
+      "en": "invalid EUI"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "eui.go"
+    }
+  },
+  "error:pkg/types:invalid_join_nonce": {
+    "translations": {
+      "en": "invalid JoinNonce"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "join_nonce.go"
+    }
+  },
   "error:pkg/types:invalid_json": {
     "translations": {
       "en": "invalid JSON: `{json}`"
@@ -8011,11 +8092,20 @@
   },
   "error:pkg/types:invalid_length": {
     "translations": {
-      "en": "invalid slice length"
+      "en": "invalid length: want {want} bytes, got {got}"
     },
     "description": {
       "package": "pkg/types",
       "file": "types.go"
+    }
+  },
+  "error:pkg/types:invalid_net_id": {
+    "translations": {
+      "en": "invalid NetID"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "netid.go"
     }
   },
   "error:pkg/types:net_id_bits": {

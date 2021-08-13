@@ -19,7 +19,10 @@ import (
 	"strings"
 
 	"github.com/vmihailenco/msgpack/v5"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
+
+var errInvalidAESKey = errors.DefineInvalidArgument("invalid_aes_key", "invalid AES key")
 
 // AES128Key is an 128-bit AES key.
 type AES128Key [16]byte
@@ -54,7 +57,10 @@ func (key AES128Key) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (key *AES128Key) UnmarshalJSON(data []byte) error {
 	*key = [16]byte{}
-	return unmarshalJSONHexBytes(key[:], data)
+	if err := unmarshalJSONHexBytes(key[:], data); err != nil {
+		return errInvalidAESKey.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
@@ -63,7 +69,10 @@ func (key AES128Key) MarshalBinary() ([]byte, error) { return marshalBinaryBytes
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 func (key *AES128Key) UnmarshalBinary(data []byte) error {
 	*key = [16]byte{}
-	return unmarshalBinaryBytes(key[:], data)
+	if err := unmarshalBinaryBytes(key[:], data); err != nil {
+		return errInvalidAESKey.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalText implements the encoding.TextMarshaler interface.
@@ -72,7 +81,10 @@ func (key AES128Key) MarshalText() ([]byte, error) { return marshalTextBytes(key
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 func (key *AES128Key) UnmarshalText(data []byte) error {
 	*key = [16]byte{}
-	return unmarshalTextBytes(key[:], data)
+	if err := unmarshalTextBytes(key[:], data); err != nil {
+		return errInvalidAESKey.WithCause(err)
+	}
+	return nil
 }
 
 // EncodeMsgpack implements msgpack.CustomEncoder interface.
@@ -91,7 +103,7 @@ func (key *AES128Key) DecodeMsgpack(dec *msgpack.Decoder) error {
 		return err
 	}
 	if len(b) != 16 {
-		return errInvalidLength.New()
+		return errInvalidLength.WithAttributes("want", 16, "got", len(b))
 	}
 	copy(key[:], b[:])
 	return nil

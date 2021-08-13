@@ -24,6 +24,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
+var errInvalidDevAddr = errors.DefineInvalidArgument("invalid_dev_addr", "invalid DevAddr")
+
 // DevAddr is a 32-bit LoRaWAN device address.
 type DevAddr [4]byte
 
@@ -63,7 +65,10 @@ func (addr DevAddr) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(a
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (addr *DevAddr) UnmarshalJSON(data []byte) error {
 	*addr = [4]byte{}
-	return unmarshalJSONHexBytes(addr[:], data)
+	if err := unmarshalJSONHexBytes(addr[:], data); err != nil {
+		return errInvalidDevAddr.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
@@ -72,7 +77,10 @@ func (addr DevAddr) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 func (addr *DevAddr) UnmarshalBinary(data []byte) error {
 	*addr = [4]byte{}
-	return unmarshalBinaryBytes(addr[:], data)
+	if err := unmarshalBinaryBytes(addr[:], data); err != nil {
+		return errInvalidDevAddr.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalText implements the encoding.TextMarshaler interface.
@@ -81,7 +89,10 @@ func (addr DevAddr) MarshalText() ([]byte, error) { return marshalTextBytes(addr
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 func (addr *DevAddr) UnmarshalText(data []byte) error {
 	*addr = [4]byte{}
-	return unmarshalTextBytes(addr[:], data)
+	if err := unmarshalTextBytes(addr[:], data); err != nil {
+		return errInvalidDevAddr.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalNumber returns the DevAddr in a decimal form.

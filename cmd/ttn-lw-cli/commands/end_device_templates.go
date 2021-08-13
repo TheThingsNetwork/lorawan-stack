@@ -228,11 +228,11 @@ This command takes end device templates from stdin.`,
 
 			var joinEUI types.EUI64
 			if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
-				return err
+				return errInvalidJoinEUI.WithCause(err)
 			}
 			var startDevEUI types.EUI64
 			if err := startDevEUI.UnmarshalText([]byte(startDevEUIHex)); err != nil {
-				return err
+				return errInvalidDevEUI.WithCause(err)
 			}
 			devEUIInt := binary.BigEndian.Uint64(startDevEUI[:])
 

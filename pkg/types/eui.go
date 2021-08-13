@@ -24,6 +24,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
+var errInvalidEUI = errors.DefineInvalidArgument("invalid_eui", "invalid EUI")
+
 // EUI64 is a 64-bit Extended Unique Identifier.
 type EUI64 [8]byte
 
@@ -57,7 +59,10 @@ func (eui EUI64) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(eui[
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (eui *EUI64) UnmarshalJSON(data []byte) error {
 	*eui = [8]byte{}
-	return unmarshalJSONHexBytes(eui[:], data)
+	if err := unmarshalJSONHexBytes(eui[:], data); err != nil {
+		return errInvalidEUI.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
@@ -66,7 +71,10 @@ func (eui EUI64) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(eui
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 func (eui *EUI64) UnmarshalBinary(data []byte) error {
 	*eui = [8]byte{}
-	return unmarshalBinaryBytes(eui[:], data)
+	if err := unmarshalBinaryBytes(eui[:], data); err != nil {
+		return errInvalidEUI.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalText implements the encoding.TextMarshaler interface.
@@ -75,7 +83,10 @@ func (eui EUI64) MarshalText() ([]byte, error) { return marshalTextBytes(eui[:])
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 func (eui *EUI64) UnmarshalText(data []byte) error {
 	*eui = [8]byte{}
-	return unmarshalTextBytes(eui[:], data)
+	if err := unmarshalTextBytes(eui[:], data); err != nil {
+		return errInvalidEUI.WithCause(err)
+	}
+	return nil
 }
 
 // MarshalNumber returns the EUI64 in a decimal form.
@@ -88,6 +99,8 @@ func (eui *EUI64) UnmarshalNumber(n uint64) {
 	*eui = [8]byte{}
 	binary.BigEndian.PutUint64(eui[:], n)
 }
+
+var errInvalidEUIPrefix = errors.DefineInvalidArgument("eui_prefix", "invalid EUI prefix")
 
 // EUI64Prefix is an EUI64 with a prefix length.
 type EUI64Prefix struct {
@@ -132,8 +145,6 @@ func (prefix EUI64Prefix) MarshalJSON() ([]byte, error) {
 	result = append(result, []byte(length)...)
 	return append(result, '"'), nil
 }
-
-var errInvalidEUIPrefix = errors.DefineInvalidArgument("eui_prefix", "invalid EUI prefix")
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (prefix *EUI64Prefix) UnmarshalJSON(data []byte) error {
