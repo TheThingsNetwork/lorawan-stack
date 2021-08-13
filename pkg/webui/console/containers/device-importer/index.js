@@ -17,6 +17,8 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
+import { Col, Row } from 'react-grid-system'
+import { isObject } from 'lodash'
 
 import api from '@console/api'
 
@@ -25,14 +27,19 @@ import ProgressBar from '@ttn-lw/components/progress-bar'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Button from '@ttn-lw/components/button'
 import ErrorNotification from '@ttn-lw/components/error-notification'
+import Notification from '@ttn-lw/components/notification'
 import Status from '@ttn-lw/components/status'
+import Link from '@ttn-lw/components/link'
 
+import ErrorMessage from '@ttn-lw/lib/components/error-message'
 import Message from '@ttn-lw/lib/components/message'
 
 import DeviceImportForm from '@console/components/device-import-form'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { createFrontendError, isFrontend } from '@ttn-lw/lib/errors/utils'
 import { selectNsConfig, selectJsConfig, selectAsConfig } from '@ttn-lw/lib/selectors/env'
+import { getDeviceId } from '@ttn-lw/lib/selectors/id'
 
 import randomByteString from '@console/lib/random-bytes'
 
@@ -41,23 +48,49 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 import style from './device-importer.styl'
 
 const m = defineMessages({
-  proceed: 'Proceed',
-  retry: 'Retry',
+  proceed: 'Proceed to end device list',
+  retry: 'Retry from scratch',
+  abort: 'Abort',
   converting: 'Converting templates…',
   creating: 'Creating end devices…',
   operationInProgress: 'Operation in progress',
   operationHalted: 'Operation halted',
   operationFinished: 'Operation finished',
+  operationAborted: 'Operation aborted',
   errorTitle: 'There was an error and the operation could not be completed',
+  conversionErrorTitle: 'Could not import devices',
+  conversionErrorMessage:
+    'An error occurred while processing the provided end device template. This could be due to invalid format, syntax or file encoding. Please check the provided template file and try again. See also our documentation on <DocLink>Importing End Devices</DocLink> for more information.',
+  incompleteWarningTitle: 'Not all devices imported successfully',
+  incompleteWarningMessage:
+    '{count} {count, plural, one {end device} other {end devices}} could not be imported successfully, because {count, plural, one {its} other {their}} registration attempt resulted in an error',
+  incompleteStatus:
+    'The registration of the following {count, plural, one {end device} other {end devices}} failed:',
+  noneWarningTitle: 'No end device was created',
+  noneWarningMessage:
+    'None of your specified end devices was imported, because each registration attempt resulted in an error',
+  processLog: 'Process log',
+  progress:
+    'Successfully converted {errorCount} of {deviceCount} {deviceCount, plural, one {end device} other {end devices}}',
+  successInfoTitle: 'All end devices imported successfully',
+  successInfoMessage:
+    'All of the specified end devices have been converted and imported successfully',
+  documentationHint:
+    'Please also see our documentation on <DocLink>Importing End Devices</DocLink> for more information and possible resolutions.',
+  abortWarningTitle: 'Device import aborted',
+  abortWarningMessage:
+    'The end device import was aborted and the remaining {count} {count, plural, one {end device} other {end devices}} have not been imported',
 })
 
 const initialState = {
   log: '',
-  totalDevices: undefined,
-  devicesComplete: 0,
+  currentDeviceIndex: 0,
+  convertedDevices: [],
+  deviceErrors: [],
   status: 'initial',
   step: 'inital',
   error: undefined,
+  aborted: false,
 }
 
 const statusMap = {
@@ -65,6 +98,13 @@ const statusMap = {
   error: 'bad',
   finished: 'good',
 }
+
+const conversionError = createFrontendError(m.conversionErrorTitle, m.conversionErrorMessage)
+const docLinkValue = msg => (
+  <Link.DocLink secondary path="/getting-started/migrating/import-devices/">
+    {msg}
+  </Link.DocLink>
+)
 
 @connect(
   state => {
@@ -109,6 +149,7 @@ export default class DeviceImporter extends Component {
 
     this.state = { ...initialState }
     this.editorRef = React.createRef()
+    this.createStream = null
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -128,15 +169,45 @@ export default class DeviceImporter extends Component {
   }
 
   @bind
-  handleCreationProgress(device) {
+  handleCreationSuccess(device) {
     this.appendToLog(device)
-    this.setState(({ devicesComplete }) => ({ devicesComplete: devicesComplete + 1 }))
+    this.setState(({ currentDeviceIndex }) => ({
+      currentDeviceIndex: currentDeviceIndex + 1,
+    }))
   }
 
   @bind
-  handleError(error) {
-    const json = JSON.stringify(error, null, 2)
-    this.setState(({ log }) => ({ error, status: 'error', log: `${log}\n${json}` }))
+  handleCreationError(error) {
+    this.logError(error)
+    const { convertedDevices, currentDeviceIndex } = this.state
+    const currentDevice =
+      convertedDevices.length > currentDeviceIndex ? convertedDevices[currentDeviceIndex] : {}
+    const currentDeviceId =
+      'end_device' in currentDevice
+        ? getDeviceId(currentDevice.end_device)
+        : `unknown device ID ${Date.now()}`
+    this.setState(({ currentDeviceIndex, deviceErrors }) => ({
+      currentDeviceIndex: currentDeviceIndex + 1,
+      deviceErrors: [...deviceErrors, { deviceId: currentDeviceId, error }],
+    }))
+  }
+
+  @bind
+  logError(error) {
+    if (isObject(error)) {
+      if (!isFrontend(error)) {
+        const json = JSON.stringify(error, null, 2)
+        this.setState(({ log }) => ({ log: `${log}\n${json}` }))
+      }
+    }
+  }
+
+  @bind
+  handleFatalError(error) {
+    this.logError(error)
+
+    const logAppend = '\n\nImport process cancelled due to error.'
+    this.setState(({ log }) => ({ error, status: 'error', log: `${log}\n${logAppend}` }))
   }
 
   @bind
@@ -149,12 +220,14 @@ export default class DeviceImporter extends Component {
       components: { js: jsSelected, as: asSelected, ns: nsSelected },
     } = values
 
+    let devices = []
+
     try {
       // Start template conversion.
       this.setState({ step: 'conversion', status: 'processing' })
       this.appendToLog('Converting end device templates…')
       const templateStream = await api.deviceTemplates.convert(format_id, data)
-      const devices = await new Promise((resolve, reject) => {
+      devices = await new Promise((resolve, reject) => {
         const chunks = []
 
         templateStream.on('chunk', message => {
@@ -163,7 +236,15 @@ export default class DeviceImporter extends Component {
         })
         templateStream.on('error', reject)
         templateStream.on('close', () => resolve(chunks))
+
+        templateStream.open()
       })
+
+      if (devices.length === 0) {
+        throw conversionError
+      }
+
+      await this.setState({ convertedDevices: devices })
 
       // Apply default values.
       for (const deviceAndFieldMask of devices) {
@@ -185,24 +266,44 @@ export default class DeviceImporter extends Component {
           field_mask.paths.push('network_server_address')
         }
       }
+    } catch (error) {
+      this.handleFatalError(error)
+      return
+    }
 
-      // Start batch device creation.
-      this.setState({
-        step: 'creation',
-        totalDevices: devices.length,
+    // Start batch device creation.
+    this.setState({
+      step: 'creation',
+    })
+    this.appendToLog('Creating end devices…')
+
+    try {
+      this.createStream = api.device.bulkCreate(appId, devices)
+
+      await new Promise(resolve => {
+        this.createStream.on('chunk', this.handleCreationSuccess)
+        this.createStream.on('error', this.handleCreationError)
+        this.createStream.on('close', resolve)
+
+        this.createStream.start()
       })
-      this.appendToLog('Creating end devices…')
-      const createStream = api.device.bulkCreate(appId, devices)
 
-      await new Promise((resolve, reject) => {
-        createStream.on('chunk', this.handleCreationProgress)
-        createStream.on('error', reject)
-        createStream.on('close', resolve)
-      })
-
+      if (!this.state.aborted) {
+        this.appendToLog('\nImport operation complete')
+      } else {
+        this.appendToLog('\nImport operation aborted')
+      }
       this.setState({ status: 'finished' })
     } catch (error) {
-      this.handleError(error)
+      this.handleCreationError(error)
+    }
+  }
+
+  @bind
+  handleAbort() {
+    if (this.createStream !== null) {
+      this.createStream.abort()
+      this.setState({ aborted: true })
     }
   }
 
@@ -212,38 +313,125 @@ export default class DeviceImporter extends Component {
   }
 
   get processor() {
-    const { log, totalDevices, devicesComplete, status, step, error } = this.state
+    const {
+      log,
+      currentDeviceIndex,
+      deviceErrors,
+      status,
+      step,
+      error,
+      convertedDevices,
+      aborted,
+    } = this.state
     const hasErrored = status === 'error'
     const { redirectToList } = this.props
     const operationMessage = step === 'conversion' ? m.converting : m.creating
-    let statusMessage = m.operationInProgress
-    if (status === 'error') {
-      statusMessage = m.operationHalted
-    } else if (status === 'finished') {
-      statusMessage = m.operationFinished
+    let statusMessage
+    if (!aborted) {
+      if (status === 'error') {
+        statusMessage = m.operationHalted
+      } else if (status === 'finished') {
+        statusMessage = m.operationFinished
+      } else if (status === 'processing') {
+        statusMessage = m.operationInProgress
+      }
+    } else {
+      statusMessage = m.operationAborted
     }
 
     return (
       <div>
-        <Message className={style.title} component="h4" content={operationMessage} />
         {!hasErrored ? (
-          <React.Fragment>
+          <>
             <Status
               label={statusMessage}
               pulse={status === 'processing'}
-              status={statusMap[status] || 'unknown'}
+              status={aborted ? 'mediocre' : statusMap[status] || 'unknown'}
             />
             <ProgressBar
-              current={devicesComplete}
-              target={totalDevices}
+              current={currentDeviceIndex}
+              target={convertedDevices.length}
               showStatus
-              showEstimation={!hasErrored}
+              showEstimation={!hasErrored && !aborted}
               className={style.progressBar}
-            />
-          </React.Fragment>
+            >
+              <Message
+                content={m.progress}
+                values={{
+                  errorCount: currentDeviceIndex - deviceErrors.length,
+                  deviceCount: convertedDevices.length,
+                }}
+              />
+            </ProgressBar>
+            {status === 'processing' && (
+              <Message className={style.title} component="h4" content={operationMessage} />
+            )}
+          </>
         ) : (
-          <ErrorNotification small content={error} title={m.errorTitle} />
+          <ErrorNotification
+            small
+            content={error}
+            title={!isFrontend(error) ? m.errorTitle : undefined}
+            messageValues={
+              !isFrontend(error)
+                ? undefined
+                : {
+                    DocLink: docLinkValue,
+                  }
+            }
+          />
         )}
+        {status === 'finished' && (
+          <>
+            {aborted && convertedDevices.length - currentDeviceIndex !== 0 && (
+              <Notification
+                small
+                warning
+                content={m.abortWarningMessage}
+                title={m.abortWarningTitle}
+                messageValues={{ count: convertedDevices.length - currentDeviceIndex }}
+              />
+            )}
+            {deviceErrors.length !== 0 ? (
+              <div>
+                {deviceErrors.length >= currentDeviceIndex ? (
+                  <Notification
+                    small
+                    warning
+                    content={m.noneWarningMessage}
+                    title={m.noneWarningTitle}
+                  />
+                ) : (
+                  <Notification
+                    small
+                    warning
+                    content={m.incompleteWarningMessage}
+                    title={m.incompleteWarningTitle}
+                    messageValues={{ count: deviceErrors.length }}
+                  />
+                )}
+                <Message
+                  component="span"
+                  content={m.incompleteStatus}
+                  values={{ count: deviceErrors.length }}
+                />
+                <ul>
+                  {deviceErrors.map(({ deviceId, error }) => (
+                    <li key={deviceId} className={style.deviceErrorEntry}>
+                      <pre>{deviceId}</pre>
+                      <ErrorMessage content={error} />
+                    </li>
+                  ))}
+                </ul>
+                <hr />
+                <Message content={m.documentationHint} values={{ DocLink: docLinkValue }} />
+              </div>
+            ) : (
+              <Notification small info title={m.successInfoTitle} content={m.successInfoMessage} />
+            )}
+          </>
+        )}
+        <Message content={m.processLog} component="h3" className={style.processLogTitle} />
         <CodeEditor
           className={style.logOutput}
           minLines={20}
@@ -257,12 +445,15 @@ export default class DeviceImporter extends Component {
           scrollToBottom
           editorRef={this.editorRef}
         />
-        <SubmitBar>
+        <SubmitBar align="start">
           <Button
             busy={status !== 'finished' && !hasErrored}
             message={hasErrored ? m.retry : m.proceed}
             onClick={hasErrored ? this.handleReset : redirectToList}
           />
+          {status === 'processing' && step === 'creation' && (
+            <Button secondary message={m.abort} onClick={this.handleAbort} />
+          )}
         </SubmitBar>
       </div>
     )
@@ -277,11 +468,15 @@ export default class DeviceImporter extends Component {
       components: availableComponents.reduce((o, c) => ({ ...o, [c]: true }), {}),
     }
     return (
-      <DeviceImportForm
-        components={availableComponents}
-        initialValues={initialValues}
-        onSubmit={this.handleSubmit}
-      />
+      <Row>
+        <Col md={8}>
+          <DeviceImportForm
+            components={availableComponents}
+            initialValues={initialValues}
+            onSubmit={this.handleSubmit}
+          />
+        </Col>
+      </Row>
     )
   }
 

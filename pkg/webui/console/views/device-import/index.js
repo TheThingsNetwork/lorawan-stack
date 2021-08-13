@@ -21,9 +21,6 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Notification from '@ttn-lw/components/notification'
 import PageTitle from '@ttn-lw/components/page-title'
-import Link from '@ttn-lw/components/link'
-
-import Message from '@ttn-lw/lib/components/message'
 
 import DeviceImporter from '@console/containers/device-importer'
 
@@ -35,14 +32,10 @@ import {
   selectDeviceTemplateFormatsFetching,
 } from '@console/store/selectors/device-template-formats'
 
-import style from './device-import.styl'
-
 const m = defineMessages({
   noTemplatesTitle: 'No end device templates found',
   noTemplates:
     'There are currently no end device templates set up. Please set up an end device template to make use of the bulk device import feature. For more information please refer to the documentation.',
-  infoText:
-    'You can use the import functionality to register multiple end devices at once by uploading a file in one of the available formats. For more information, see also our documentation on <DocLink>Importing End Devices</DocLink>.',
 })
 
 @connect(state => ({
@@ -68,22 +61,6 @@ export default class DeviceAddBulk extends Component {
     return (
       <Container>
         <PageTitle title={sharedMessages.importDevices} />
-        <Row>
-          <Col md={8}>
-            <Message
-              content={m.infoText}
-              className={style.info}
-              values={{
-                DocLink: msg => (
-                  <Link.DocLink secondary path="/getting-started/migrating/import-devices/">
-                    {msg}
-                  </Link.DocLink>
-                ),
-              }}
-            />
-            <hr className={style.hRule} />
-          </Col>
-        </Row>
         <Row>
           <Col md={12}>
             {showEmptyWarning && (

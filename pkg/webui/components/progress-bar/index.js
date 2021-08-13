@@ -99,8 +99,9 @@ export default class ProgressBar extends PureComponent {
     } = this.props
     const { percentage = (current / target) * 100 } = this.props
     const { estimatedDuration, startTime, estimations } = this.state
-    const displayPercentage =
-      Math.max(0, Math.min(100, percentage)).toFixed(percentageDecimals) || 0
+    const displayPercentage = (Math.max(0, Math.min(100, percentage)) || 0).toFixed(
+      percentageDecimals,
+    )
     let displayEstimation = null
 
     if (showEstimation && percentage < 100) {

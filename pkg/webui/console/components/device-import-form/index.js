@@ -23,12 +23,13 @@ import FileInput from '@ttn-lw/components/file-input'
 import Checkbox from '@ttn-lw/components/checkbox'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import DeviceTemplateFormatSelect from '@console/containers/device-template-format-select'
 
-import TOOLTIP_IDS from '@ttn-lw/lib/constants/tooltip-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -36,7 +37,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './device-import-form.styl'
 
 const m = defineMessages({
-  fileImport: 'File import',
   file: 'File',
   formatInfo: 'Format information',
   selectAFile: 'Please select a template file',
@@ -44,6 +44,9 @@ const m = defineMessages({
   claiming: 'Claiming',
   setClaimAuthCode: 'Set claim authentication code',
   targetedComponents: 'Targeted components',
+  advancedSectionTitle: 'Advanced claiming and component settings',
+  infoText:
+    'You can use the import functionality to register multiple end devices at once by uploading a file containing the registration information in one of the available formats. For more information, see also our documentation on <DocLink>Importing End Devices</DocLink>.',
 })
 
 const validationSchema = Yup.object({
@@ -131,48 +134,62 @@ export default class DeviceBulkCreateForm extends Component {
         submitEnabledWhenInvalid
         initialValues={initialValues}
       >
-        <Form.SubTitle title={m.fileImport} />
+        <Message
+          content={m.infoText}
+          className={style.info}
+          values={{
+            DocLink: msg => (
+              <Link.DocLink secondary path="/getting-started/migrating/import-devices/">
+                {msg}
+              </Link.DocLink>
+            ),
+          }}
+        />
+        <hr className={style.hRule} />
         <DeviceTemplateFormatSelect onChange={this.handleSelectChange} name="format_id" required />
         <Form.InfoField disabled={!formatSelected} title={m.formatInfo}>
           {formatDescription ? formatDescription : <Message content={m.fileInfoPlaceholder} />}
         </Form.InfoField>
-        <hr className={style.hRule} />
-        <Form.Field
-          disabled={!formatSelected}
-          title={m.file}
-          accept={allowedFileExtensions}
-          component={FileInput}
-          name="data"
-          required
-        />
-        <Form.Field
-          onChange={this.handleComponentChange}
-          component={Checkbox.Group}
-          name="components"
-          title={m.targetedComponents}
-          horizontal
-          disabled={!formatSelected}
-        >
-          {components.map(component => (
-            <Checkbox
-              disabled={component === 'is'}
-              key={component}
-              name={component}
-              label={componentDict[component]}
+        {formatSelected && (
+          <>
+            <Form.Field
+              title={m.file}
+              accept={allowedFileExtensions}
+              component={FileInput}
+              name="data"
+              required
             />
-          ))}
-        </Form.Field>
-        <Form.Field
-          disabled={!formatSelected || !jsSelected}
-          title={m.claiming}
-          label={m.setClaimAuthCode}
-          component={Checkbox}
-          name="set_claim_auth_code"
-          tooltipId={TOOLTIP_IDS.SET_CLAIM_AUTH_CODE}
-        />
-        <SubmitBar>
-          <Form.Submit component={SubmitButton} message={sharedMessages.importDevices} />
-        </SubmitBar>
+            <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
+              <Form.Field
+                onChange={this.handleComponentChange}
+                component={Checkbox.Group}
+                name="components"
+                title={m.targetedComponents}
+                horizontal
+              >
+                {components.map(component => (
+                  <Checkbox
+                    disabled={component === 'is'}
+                    key={component}
+                    name={component}
+                    label={componentDict[component]}
+                  />
+                ))}
+              </Form.Field>
+              <Form.Field
+                disabled={!jsSelected}
+                title={m.claiming}
+                label={m.setClaimAuthCode}
+                component={Checkbox}
+                name="set_claim_auth_code"
+                tooltipId={tooltipIds.SET_CLAIM_AUTH_CODE}
+              />
+            </Form.CollapseSection>
+            <SubmitBar>
+              <Form.Submit component={SubmitButton} message={sharedMessages.importDevices} />
+            </SubmitBar>
+          </>
+        )}
       </Form>
     )
   }
