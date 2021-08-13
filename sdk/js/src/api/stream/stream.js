@@ -40,7 +40,10 @@ import 'web-streams-polyfill/dist/polyfill'
  *      .on('error', error => console.log(error))
  *      .on('close', () => console.log('conn closed'))
  *
- *    // Close the stream after 20 s.
+ *    // Start the stream after attaching listerners.
+ *    stream.open()
+ *
+ *     // Close the stream after 20 s.
  *    setTimeout(() => stream.close(), 20000)
  * })()
  *
@@ -48,7 +51,11 @@ import 'web-streams-polyfill/dist/polyfill'
  * attaching listeners and the `close` function to close the stream.
  */
 export default async (payload, url) => {
-  let listeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
+  const initialListeners = Object.values(EVENTS).reduce(
+    (acc, curr) => ({ ...acc, [curr]: null }),
+    {},
+  )
+  let listeners = initialListeners
   const token = new Token().get()
 
   let Authorization = null
@@ -80,7 +87,7 @@ export default async (payload, url) => {
   const onChunk = ({ done, value }) => {
     if (done) {
       notify(listeners[EVENTS.CLOSE])
-      listeners = {}
+      listeners = initialListeners
       return
     }
 
@@ -94,20 +101,22 @@ export default async (payload, url) => {
 
     return reader.read().then(onChunk)
   }
-  reader
-    .read()
-    .then(data => {
-      notify(listeners[EVENTS.START])
-
-      return data
-    })
-    .then(onChunk)
-    .catch(error => {
-      notify(listeners[EVENTS.ERROR], error)
-      listeners = {}
-    })
 
   return {
+    open: () => {
+      reader
+        .read()
+        .then(data => {
+          notify(listeners[EVENTS.START])
+
+          return data
+        })
+        .then(onChunk)
+        .catch(error => {
+          notify(listeners[EVENTS.ERROR], error)
+          listeners = initialListeners
+        })
+    },
     on(eventName, callback) {
       if (listeners[eventName] === undefined) {
         throw new Error(
