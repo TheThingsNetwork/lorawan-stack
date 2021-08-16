@@ -50,7 +50,6 @@ class InfoField extends React.Component {
       <div className={cls}>
         <label className={style.label}>
           <Message content={title} className={style.title} />
-          <span className={style.reqicon}>&middot;</span>
         </label>
         <div className={classnames(style.componentArea, style.infoArea)}>{children}</div>
       </div>
