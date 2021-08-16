@@ -42,8 +42,9 @@ const approvalStates = [
 ]
 
 const m = defineMessages({
-  adminRights: 'Admin rights',
   adminLabel: 'Grant this user admin status',
+  adminDescription:
+    'Admin status enables overarching rights such as managing other users or modifying entities regardless of collaboration status',
   userDescPlaceholder: 'Description for my new user',
   userDescDescription: 'Optional user description; can also be used to save notes about the user',
   userIdPlaceholder: 'jane-doe',
@@ -227,19 +228,24 @@ class UserForm extends React.Component {
           required
         />
         <Form.Field
-          name="_validate_email"
-          component={Checkbox}
-          label={m.emailAddressValidation}
-          description={m.emailAddressValidationDescription}
-        />
-        <Form.Field
           title={sharedMessages.state}
           name="state"
           component={Select}
           options={approvalStateOptions}
           required
         />
-        <Form.Field title={m.adminRights} name="admin" component={Checkbox} label={m.adminLabel} />
+        <Form.Field
+          name="_validate_email"
+          component={Checkbox}
+          label={m.emailAddressValidation}
+          description={m.emailAddressValidationDescription}
+        />
+        <Form.Field
+          name="admin"
+          component={Checkbox}
+          label={m.adminLabel}
+          description={m.adminDescription}
+        />
         {!update && (
           <Form.Field
             title={sharedMessages.password}

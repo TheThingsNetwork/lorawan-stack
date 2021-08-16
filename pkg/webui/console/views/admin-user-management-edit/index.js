@@ -56,7 +56,8 @@ const m = defineMessages({
   },
 )
 @withRequest(
-  ({ userId, getUser }) => getUser(userId, ['name', 'primary_email_address', 'state', 'admin']),
+  ({ userId, getUser }) =>
+    getUser(userId, ['name', 'primary_email_address', 'state', 'admin', 'description']),
   ({ fetching, user }) => fetching || !Boolean(user),
 )
 @withBreadcrumb('admin.user-management.edit', ({ userId }) => (
@@ -75,8 +76,9 @@ export default class UserManagementEdit extends Component {
   onSubmit(values) {
     const { userId, user, updateUser } = this.props
     const patch = diff(user, values)
+    const submitPatch = Object.keys(patch).length !== 0 ? patch : user
 
-    return updateUser(userId, patch)
+    return updateUser(userId, submitPatch)
   }
 
   onSubmitSuccess(response) {
