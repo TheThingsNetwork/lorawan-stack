@@ -75,6 +75,9 @@
     "yargs": "^17.0.1"
   },
   "dependencies": {
+    "@formatjs/intl-displaynames": "^5.2.2",
+    "@formatjs/intl-listformat": "^6.3.2",
+    "@formatjs/intl-pluralrules": "^4.1.2",
     "@formatjs/intl-relativetimeformat": "^8.0.6",
     "@sentry/browser": "^6.2.0",
     "@tippyjs/react": "^4.2.5",
@@ -90,7 +93,6 @@
     "formik": "^2.2.9",
     "history": "^4.10.1",
     "intl": "^1.2.5",
-    "intl-pluralrules": "^1.2.2",
     "leaflet": "^1.7.1",
     "lodash": "^4.17.21",
     "lottie-web": "^5.7.11",
