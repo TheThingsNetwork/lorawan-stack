@@ -145,9 +145,29 @@ const UserLocale = ({ children }) => {
         )
       }
 
+      if (!window.Intl.DisplayNames) {
+        log(`Polyfilling Intl.DisplayNames`)
+        promises.push(
+          import(
+            /* webpackChunkName: "locale-display-names" */ '@formatjs/intl-displaynames/polyfill'
+          ),
+        )
+      }
+
+      if (!window.Intl.ListFormat) {
+        log(`Polyfilling Intl.ListFormat`)
+        promises.push(
+          import(/* webpackChunkName: "locale-list-format" */ '@formatjs/intl-listformat/polyfill'),
+        )
+      }
+
       if (!window.Intl.PluralRules) {
-        log(`Polyfilling Intl.PluralRules`)
-        promises.push(/* webpackChunkName: "locale-plural-rules" */ import('intl-pluralrules'))
+        log('Polyfilling Intl.PluralRules')
+        promises.push(
+          import(
+            /* webpackChunkName: "locale-plural-rules" */ '@formatjs/intl-pluralrules/polyfill'
+          ),
+        )
       }
 
       if (!window.Intl.RelativeTimeFormat) {
