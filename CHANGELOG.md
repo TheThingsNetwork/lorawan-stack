@@ -20,6 +20,9 @@ For details about compatibility between different releases, see the **Commitment
 
 - The Identity Server now returns a validation error when trying to update the EUIs of an end device.
 - Network Server no longer accepts RX metadata from Packet Broker if the originating forwarder network equals the current Network Server (by NetID and cluster ID, based on`ns.net-id` and `ns.cluster-id` configuration). This avoids duplicate RX metadata as well as redundant downlink scheduling attempts through Packet Broker after the cluster's Gateway Server already failed to schedule.
+- Usability of the end device import function in the Console.
+  - Show a per-device report when errors occur.
+  - More structural changes to the process to improve UX.
 
 ### Deprecated
 
