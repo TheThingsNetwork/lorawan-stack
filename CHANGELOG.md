@@ -37,6 +37,7 @@ For details about compatibility between different releases, see the **Commitment
 - Console rendering blank pages in outdated browsers due to missing or incomplete internationalization API.
 - Error in edit user form (Console) when submitting without making any changes.
 - `description` field not being fetched in edit user form (admin only) in the Console.
+- Ignore invalid configuration when printing configuration with `ttn-lw-cli config` or `ttn-lw-stack config`.
 
 ### Security
 
