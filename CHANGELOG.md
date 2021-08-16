@@ -35,6 +35,8 @@ For details about compatibility between different releases, see the **Commitment
 - Warnings about unknown fields when getting or searching for gateways.
 - Internal Server Errors from `pkg/identityserver/store`.
 - Console rendering blank pages in outdated browsers due to missing or incomplete internationalization API.
+- Error in edit user form (Console) when submitting without making any changes.
+- `description` field not being fetched in edit user form (admin only) in the Console.
 
 ### Security
 
