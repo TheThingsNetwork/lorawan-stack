@@ -48,6 +48,10 @@ func Config(mgr *config.Manager) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			space := 0
 			for _, key := range mgr.AllKeys() {
+				// Skip keys for which no flag is defined (e.g. invalid configuration keys read from a config file)
+				if cmd.Flags().Lookup(key) == nil {
+					continue
+				}
 				if len(key)+8 > space {
 					space = len(key) + 8
 				}
@@ -62,6 +66,10 @@ func Config(mgr *config.Manager) *cobra.Command {
 				return strings.Join(s, ",")
 			}
 			for _, key := range mgr.AllKeys() {
+				// Skip keys for which no flag is defined (e.g. invalid configuration keys read from a config file)
+				if cmd.Flags().Lookup(key) == nil {
+					continue
+				}
 				flagOrEnv, val := key, mgr.Get(key)
 				switch {
 				case useYml:
