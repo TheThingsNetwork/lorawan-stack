@@ -265,6 +265,7 @@ message LRFHSSDataRate {
   uint32 modulation_type = 1;
   // Operating Channel Width (kHz).
   uint32 operating_channel_width = 2;
+  string coding_rate = 3;
 }
 
 message DataRate {

@@ -5054,6 +5054,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | ----- | ---- | ----- | ----------- |
 | `modulation_type` | [`uint32`](#uint32) |  |  |
 | `operating_channel_width` | [`uint32`](#uint32) |  | Operating Channel Width (kHz). |
+| `coding_rate` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.LoRaDataRate">Message `LoRaDataRate`</a>
 

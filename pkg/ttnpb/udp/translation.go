@@ -172,6 +172,7 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 	up := ttnpb.UplinkMessage{
 		Settings: ttnpb.TxSettings{
 			Frequency: uint64(rx.Freq * 1000000),
+			DataRate:  rx.DatR.DataRate,
 		},
 	}
 
@@ -200,12 +201,11 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 		up.Settings.Time = &goTime
 	}
 
-	up.Settings.DataRate = rx.DatR.DataRate
-	if lora := up.Settings.DataRate.GetLora(); lora != nil {
-		up.Settings.CodingRate = rx.CodR
-	} else if lrhfss := up.Settings.DataRate.GetLrfhss(); lrhfss != nil {
+	switch rx.DatR.DataRate.Modulation.(type) {
+	case *ttnpb.DataRate_Lora, *ttnpb.DataRate_Lrfhss:
 		up.Settings.CodingRate = rx.CodR
 	}
+
 	return up, nil
 }
 

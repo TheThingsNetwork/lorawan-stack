@@ -17,6 +17,7 @@ package udp
 import (
 	"encoding/json"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/datarate"
 )
 
@@ -48,6 +49,24 @@ type RxPacket struct {
 	RSig []RSig       `json:"rsig"`           // Received signal information, per antenna (Optional)
 	Brd  uint         `json:"brd"`            // Concentrator board used for Rx (unsigned integer)
 	Aesk uint         `json:"aesk"`           // AES key index used for encrypting fine timestamps (unsigned integer)
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (p *RxPacket) UnmarshalJSON(data []byte) error {
+	type Alias RxPacket
+	aux := struct {
+		*Alias
+	}{
+		Alias: (*Alias)(p),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	switch mod := p.DatR.DataRate.Modulation.(type) {
+	case *ttnpb.DataRate_Lrfhss:
+		mod.Lrfhss.CondingRate = p.CodR
+	}
+	return nil
 }
 
 // RSig contains the metadata associated with the received signal
@@ -96,6 +115,10 @@ func (p *TxPacket) UnmarshalJSON(data []byte) error {
 	}
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
+	}
+	switch mod := p.DatR.DataRate.Modulation.(type) {
+	case *ttnpb.DataRate_Lrfhss:
+		mod.Lrfhss.CondingRate = p.CodR
 	}
 	return nil
 }
