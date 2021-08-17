@@ -308,7 +308,6 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 
 	for i, dr := range phy.DataRates {
 		if loraDR := dr.Rate.GetLora(); loraDR != nil {
-			loraDR.GetSpreadingFactor()
 			drs[i][0] = int(loraDR.GetSpreadingFactor())
 			drs[i][1] = int(loraDR.GetBandwidth() / 1000)
 		} else if fskDR := dr.Rate.GetFsk(); fskDR != nil {

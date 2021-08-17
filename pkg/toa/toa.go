@@ -23,8 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var errModulationTypeNotSupported = errors.Define("modulation_type_not_supported", "TOA calculation not supported for modulation type `{type}`")
-
 // Compute computes the time-on-air for the given payload size and the TxSettings.
 // This function takes into account PHYPayload.
 func Compute(payloadSize int, settings ttnpb.TxSettings) (d time.Duration, err error) {
@@ -34,7 +32,7 @@ func Compute(payloadSize int, settings ttnpb.TxSettings) (d time.Duration, err e
 	case *ttnpb.DataRate_Fsk:
 		return computeFSK(payloadSize, settings.Frequency, dr.Fsk.BitRate, settings.EnableCrc)
 	case *ttnpb.DataRate_Lrfhss:
-		return 0, errModulationTypeNotSupported.WithAttributes("type", "LRFHSS")
+		return computeLRFHSS(payloadSize, settings.CodingRate, settings.EnableCrc)
 	default:
 		panic("invalid modulation")
 	}
@@ -143,4 +141,25 @@ func computeFSK(payloadSize int, frequency uint64, bitRate uint32, crc bool) (ti
 	default:
 		return 0, errFrequency.WithAttributes("frequency", frequency)
 	}
+}
+
+func computeLRFHSS(phyPayloadLength int, codingRate string, crc bool) (time.Duration, error) {
+	var n int
+	switch codingRate {
+	case "1/3":
+		n = 3
+	case "2/3":
+		n = 2
+	default:
+		return 0, errCodingRate.WithAttributes("coding_rate", codingRate)
+	}
+
+	timeOnAir := time.Duration(n) * 233472 * time.Microsecond
+	switch codingRate {
+	case "1/3":
+		timeOnAir += time.Duration(math.Ceil((float64(phyPayloadLength+3) / 2))) * 102400 * time.Microsecond
+	case "2/3":
+		timeOnAir += time.Duration(math.Ceil((float64(phyPayloadLength+3) / 4))) * 102400 * time.Microsecond
+	}
+	return timeOnAir, nil
 }

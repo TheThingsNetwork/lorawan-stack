@@ -491,10 +491,13 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
 			settings.Downlink.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
 		}
-		if lora := dr.Rate.GetLora(); lora != nil {
+		switch mod := dr.Rate.Modulation.(type) {
+		case *ttnpb.DataRate_Lora:
 			// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466).
 			settings.CodingRate = phy.LoRaCodingRate
 			settings.Downlink.InvertPolarization = true
+		case *ttnpb.DataRate_Lrfhss:
+			settings.CodingRate = mod.Lrfhss.CodingRate
 		}
 		var f func(context.Context, scheduling.Options) (scheduling.Emission, error)
 		switch request.Class {
