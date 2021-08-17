@@ -294,8 +294,8 @@ func TestRemoteStore(t *testing.T) {
 					},
 				},
 				IpCode:          "IP67",
-				KeyProvisioning: []ttnpb.KeyProvisioning{ttnpb.KEY_PROVISIONING_CUSTOM},
-				KeySecurity:     ttnpb.KEY_SECURITY_READ_PROTECTED,
+				KeyProvisioning: []ttnpb.KeyProvisioning{ttnpb.KeyProvisioning_KEY_PROVISIONING_CUSTOM},
+				KeySecurity:     ttnpb.KeySecurity_KEY_SECURITY_READ_PROTECTED,
 				Photos: &ttnpb.EndDeviceModel_Photos{
 					Main:  "a.jpg",
 					Other: []string{"b.jpg", "c.jpg"},

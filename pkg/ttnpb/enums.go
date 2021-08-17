@@ -92,13 +92,13 @@ func (v *State) UnmarshalJSON(b []byte) error {
 // MarshalText implements encoding.TextMarshaler interface.
 func (v KeyProvisioning) MarshalText() ([]byte, error) {
 	switch v {
-	case KEY_PROVISIONING_UNKNOWN:
+	case KeyProvisioning_KEY_PROVISIONING_UNKNOWN:
 		return []byte("unknown"), nil
-	case KEY_PROVISIONING_CUSTOM:
+	case KeyProvisioning_KEY_PROVISIONING_CUSTOM:
 		return []byte("custom"), nil
-	case KEY_PROVISIONING_JOIN_SERVER:
+	case KeyProvisioning_KEY_PROVISIONING_JOIN_SERVER:
 		return []byte("join server"), nil
-	case KEY_PROVISIONING_MANIFEST:
+	case KeyProvisioning_KEY_PROVISIONING_MANIFEST:
 		return []byte("manifest"), nil
 	}
 
@@ -114,13 +114,13 @@ func (v *KeyProvisioning) UnmarshalText(b []byte) error {
 	}
 	switch s {
 	case "unknown", "KEY_PROVISIONING_UNKNOWN":
-		*v = KEY_PROVISIONING_UNKNOWN
+		*v = KeyProvisioning_KEY_PROVISIONING_UNKNOWN
 	case "custom", "KEY_PROVISIONING_CUSTOM":
-		*v = KEY_PROVISIONING_CUSTOM
+		*v = KeyProvisioning_KEY_PROVISIONING_CUSTOM
 	case "join server", "KEY_PROVISIONING_JOIN_SERVER":
-		*v = KEY_PROVISIONING_JOIN_SERVER
+		*v = KeyProvisioning_KEY_PROVISIONING_JOIN_SERVER
 	case "manifest", "KEY_PROVISIONING_MANIFEST":
-		*v = KEY_PROVISIONING_MANIFEST
+		*v = KeyProvisioning_KEY_PROVISIONING_MANIFEST
 	default:
 		errCouldNotParse("KeyProvisioning")(string(b))
 	}
@@ -149,13 +149,13 @@ func (v *KeyProvisioning) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error
 // MarshalText implements encoding.TextMarshaler interface.
 func (v KeySecurity) MarshalText() ([]byte, error) {
 	switch v {
-	case KEY_SECURITY_UNKNOWN:
+	case KeySecurity_KEY_SECURITY_UNKNOWN:
 		return []byte("unknown"), nil
-	case KEY_SECURITY_NONE:
+	case KeySecurity_KEY_SECURITY_NONE:
 		return []byte("none"), nil
-	case KEY_SECURITY_READ_PROTECTED:
+	case KeySecurity_KEY_SECURITY_READ_PROTECTED:
 		return []byte("read protected"), nil
-	case KEY_SECURITY_SECURE_ELEMENT:
+	case KeySecurity_KEY_SECURITY_SECURE_ELEMENT:
 		return []byte("secure element"), nil
 	}
 
@@ -171,13 +171,13 @@ func (v *KeySecurity) UnmarshalText(b []byte) error {
 	}
 	switch s {
 	case "unknown", "KEY_SECURITY_UNKNOWN":
-		*v = KEY_SECURITY_UNKNOWN
+		*v = KeySecurity_KEY_SECURITY_UNKNOWN
 	case "none", "KEY_SECURITY_NONE":
-		*v = KEY_SECURITY_NONE
+		*v = KeySecurity_KEY_SECURITY_NONE
 	case "read protected", "KEY_SECURITY_READ_PROTECTED":
-		*v = KEY_SECURITY_READ_PROTECTED
+		*v = KeySecurity_KEY_SECURITY_READ_PROTECTED
 	case "secure element", "KEY_SECURITY_SECURE_ELEMENT":
-		*v = KEY_SECURITY_SECURE_ELEMENT
+		*v = KeySecurity_KEY_SECURITY_SECURE_ELEMENT
 	default:
 		errCouldNotParse("KeySecurity")(string(b))
 	}
