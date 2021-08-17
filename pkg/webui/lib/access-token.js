@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { isPermissionDeniedError } from '@ttn-lw/lib/errors/utils'
+
 import * as cache from './cache'
 
 export default fetchToken => {
@@ -19,12 +21,21 @@ export default fetchToken => {
   let finishedRetrieval = true
 
   const retrieveToken = async () => {
-    const response = await fetchToken()
-    const token = response.data
-    cache.set('accessToken', token)
-    finishedRetrieval = true
+    try {
+      const response = await fetchToken()
+      const token = response.data
+      cache.set('accessToken', token)
+      finishedRetrieval = true
 
-    return token
+      return token
+    } catch (error) {
+      if (isPermissionDeniedError(error)) {
+        // Trigger a refresh to restart the auth flow.
+        window.location.reload()
+      } else {
+        throw error
+      }
+    }
   }
 
   return () => {
