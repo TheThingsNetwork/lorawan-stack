@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
 - CLI warnings about using the `--all` flag.
 - Packet Broker network listed switch in the Console.
 - Improved errors for invalid command-line flags.
+- Validation of entity attributes in the Console, with regards to maximum length for keys and values.
 
 ### Changed
 

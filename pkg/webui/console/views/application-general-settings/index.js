@@ -52,7 +52,12 @@ import {
   mayViewOrEditApplicationCollaborators,
   mayPurgeEntities,
 } from '@console/lib/feature-checks'
-import { attributeValidCheck, attributeTooShortCheck } from '@console/lib/attributes'
+import {
+  attributeValidCheck,
+  attributeTooShortCheck,
+  attributeKeyTooLongCheck,
+  attributeValueTooLongCheck,
+} from '@console/lib/attributes'
 
 import { updateApplication, deleteApplication } from '@console/store/actions/applications'
 import { getCollaboratorsList } from '@console/store/actions/collaborators'
@@ -111,6 +116,16 @@ const validationSchema = Yup.object().shape({
       'has key length longer than 2',
       sharedMessages.attributeKeyValidateTooShort,
       attributeTooShortCheck,
+    )
+    .test(
+      'has key length less than 36',
+      sharedMessages.attributeKeyValidateTooLong,
+      attributeKeyTooLongCheck,
+    )
+    .test(
+      'has value length less than 200',
+      sharedMessages.attributeValueValidateTooLong,
+      attributeValueTooLongCheck,
     ),
 })
 

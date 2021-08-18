@@ -15,7 +15,12 @@
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { attributeValidCheck, attributeTooShortCheck } from '@console/lib/attributes'
+import {
+  attributeValidCheck,
+  attributeTooShortCheck,
+  attributeKeyTooLongCheck,
+  attributeValueTooLongCheck,
+} from '@console/lib/attributes'
 import { id as gatewayIdRegexp, address as addressRegexp } from '@console/lib/regexp'
 
 const validationSchema = Yup.object().shape({
@@ -65,6 +70,16 @@ const validationSchema = Yup.object().shape({
       'has key length longer than 2',
       sharedMessages.attributeKeyValidateTooShort,
       attributeTooShortCheck,
+    )
+    .test(
+      'has key length less than 36',
+      sharedMessages.attributeKeyValidateTooLong,
+      attributeKeyTooLongCheck,
+    )
+    .test(
+      'has value length less than 200',
+      sharedMessages.attributeValueValidateTooLong,
+      attributeValueTooLongCheck,
     ),
 })
 

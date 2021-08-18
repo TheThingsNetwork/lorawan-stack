@@ -48,3 +48,15 @@ export const attributeTooShortCheck = attributes =>
   (attributes instanceof Array &&
     (attributes.length === 0 ||
       attributes.every(attribute => RegExp(idRegexp).test(attribute.key))))
+
+export const attributeKeyTooLongCheck = attributes =>
+  attributes === undefined ||
+  (attributes instanceof Array &&
+    (attributes.length === 0 ||
+      attributes.every(attribute => attribute.key && attribute.key.length <= 36)))
+
+export const attributeValueTooLongCheck = attributes =>
+  attributes === undefined ||
+  (attributes instanceof Array &&
+    (attributes.length === 0 ||
+      attributes.every(attribute => attribute.value && attribute.value.length <= 200)))
