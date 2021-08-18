@@ -305,7 +305,7 @@ export default {
         filepath: path.resolve(context, PUBLIC_DIR, 'libs.bundle.js'),
       }),
       new ShellPlugin({
-        onBuildExit: [`${MAGE} js:translations`],
+        onBuildExit: [`${MAGE} js:extractLocaleFiles`],
       }),
     ],
   }),

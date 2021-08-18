@@ -299,7 +299,7 @@ const main = async function () {
   }
 
   await writeLocales(updated)
-  console.log('Done.')
+  console.log('Locale files updated.')
 }
 
 main().catch(function (err) {
