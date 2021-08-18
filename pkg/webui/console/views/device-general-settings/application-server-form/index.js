@@ -27,7 +27,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
-import { generate16BytesKey } from '@console/lib/device-utils'
+import { generate16BytesKey, isNonZeroSessionKey } from '@console/lib/device-utils'
 
 import messages from '../messages'
 
@@ -46,6 +46,7 @@ const validationSchema = Yup.object()
             app_s_key: Yup.object().shape({
               key: Yup.string()
                 .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // A 16 Byte hex.
+                .test('is-not-all-zero-key', messages.validateSessionKey, isNonZeroSessionKey)
                 .required(sharedMessages.validateRequired),
             }),
           }),

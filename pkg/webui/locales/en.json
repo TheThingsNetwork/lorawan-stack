@@ -623,6 +623,7 @@
   "console.views.device-general-settings.messages.notInCluster": "Not registered in this cluster",
   "console.views.device-general-settings.messages.updateSuccess": "End device updated",
   "console.views.device-general-settings.messages.keysResetWarning": "Viewing the end device keys is prohibited; overwriting is allowed",
+  "console.views.device-general-settings.messages.validateSessionKey": "{field} must have non-zero value",
   "console.views.device-import.index.noTemplatesTitle": "No end device templates found",
   "console.views.device-import.index.noTemplates": "There are currently no end device templates set up. Please set up an end device template to make use of the bulk device import feature. For more information please refer to the documentation.",
   "console.views.device-location.index.setDeviceLocation": "Set end device location",

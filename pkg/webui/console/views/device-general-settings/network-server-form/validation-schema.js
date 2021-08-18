@@ -15,7 +15,13 @@
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { parseLorawanMacVersion, ACTIVATION_MODES } from '@console/lib/device-utils'
+import {
+  parseLorawanMacVersion,
+  ACTIVATION_MODES,
+  isNonZeroSessionKey,
+} from '@console/lib/device-utils'
+
+import messages from '../messages'
 
 const factoryPresetFreqNumericTest = frequencies =>
   frequencies.every(freq => {
@@ -81,33 +87,37 @@ const validationSchema = Yup.object()
               return schema
             }),
             keys: Yup.object().shape({
-              f_nwk_s_int_key: Yup.lazy(value =>
-                Boolean(value) && Boolean(value.key)
+              f_nwk_s_int_key: Yup.object().shape({
+                key: Yup.string()
+                  .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
+                  .test('is-not-all-zero-key', messages.validateSessionKey, isNonZeroSessionKey)
+                  .required(sharedMessages.validateRequired),
+              }),
+              s_nwk_s_int_key: Yup.lazy(() =>
+                isNewVersion
                   ? Yup.object().shape({
-                      key: Yup.string().length(
-                        16 * 2,
-                        Yup.passValues(sharedMessages.validateLength),
-                      ), // 16 Byte hex.
+                      key: Yup.string()
+                        .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
+                        .test(
+                          'is-not-all-zero-key',
+                          messages.validateSessionKey,
+                          isNonZeroSessionKey,
+                        )
+                        .required(sharedMessages.validateRequired),
                     })
                   : Yup.object().strip(),
               ),
-              s_nwk_s_int_key: Yup.lazy(value =>
-                isNewVersion && Boolean(value) && Boolean(value.key)
+              nwk_s_enc_key: Yup.lazy(() =>
+                isNewVersion
                   ? Yup.object().shape({
-                      key: Yup.string().length(
-                        16 * 2,
-                        Yup.passValues(sharedMessages.validateLength),
-                      ), // 16 Byte hex.
-                    })
-                  : Yup.object().strip(),
-              ),
-              nwk_s_enc_key: Yup.lazy(value =>
-                isNewVersion && Boolean(value) && Boolean(value.key)
-                  ? Yup.object().shape({
-                      key: Yup.string().length(
-                        16 * 2,
-                        Yup.passValues(sharedMessages.validateLength),
-                      ), // 16 Byte hex.
+                      key: Yup.string()
+                        .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
+                        .test(
+                          'is-not-all-zero-key',
+                          messages.validateSessionKey,
+                          isNonZeroSessionKey,
+                        )
+                        .required(sharedMessages.validateRequired),
                     })
                   : Yup.object().strip(),
               ),

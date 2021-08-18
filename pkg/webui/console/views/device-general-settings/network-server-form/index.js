@@ -111,12 +111,30 @@ const NetworkServerForm = React.memo(props => {
         'class_b',
         'class_c',
         'mac_settings',
+        'f_nwk_s_int_key',
+        's_nwk_s_int_key',
+        'nwk_s_enc_key',
+        'app_s_key',
       ])
+
+      const mac_settings = castedValues.mac_settings
+      let session
+      if (castedValues.session && castedValues.session.keys) {
+        const { app_s_key, ...keys } = castedValues.session.keys
+        session = {
+          ...updatedValues.session,
+          keys,
+        }
+      }
 
       setError('')
       try {
         // Always submit current `mac_settings` values to avoid overwriting nested entries.
-        await onSubmit({ ...updatedValues, mac_settings: castedValues.mac_settings })
+        await onSubmit({
+          ...updatedValues,
+          mac_settings,
+          session,
+        })
         resetForm({ values: castedValues })
         onSubmitSuccess()
       } catch (err) {
@@ -243,6 +261,7 @@ const NetworkServerForm = React.memo(props => {
             required={mayReadKeys && mayEditKeys}
           />
           <Form.Field
+            required
             title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
             name="session.keys.f_nwk_s_int_key.key"
             type="byte"
@@ -256,6 +275,7 @@ const NetworkServerForm = React.memo(props => {
           />
           {lwVersion >= 110 && (
             <Form.Field
+              required
               title={sharedMessages.sNwkSIKey}
               name="session.keys.s_nwk_s_int_key.key"
               type="byte"
@@ -270,6 +290,7 @@ const NetworkServerForm = React.memo(props => {
           )}
           {lwVersion >= 110 && (
             <Form.Field
+              required
               title={sharedMessages.nwkSEncKey}
               name="session.keys.nwk_s_enc_key.key"
               type="byte"
