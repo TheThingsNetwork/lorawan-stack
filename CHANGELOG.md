@@ -26,6 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Removed
 
 - Packet Broker mutual TLS authentication; only OAuth 2.0 is supported now.
+- `request_details` from errors in the Console.
 
 ### Fixed
 

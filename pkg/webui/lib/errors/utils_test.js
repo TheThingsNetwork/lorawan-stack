@@ -58,7 +58,6 @@ const conflictBackendError = {
       code: 6,
     },
   ],
-  request_details: { url: '/users/kschiffer/applications', method: 'post', stack_component: 'is' },
 }
 
 const frontendError = createFrontendError(
