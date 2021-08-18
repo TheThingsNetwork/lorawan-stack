@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import axios from 'axios'
-import { cloneDeep, get, isObject } from 'lodash'
+import { cloneDeep, isObject } from 'lodash'
 
 import Token from '../util/token'
 import EventHandler from '../util/events'
@@ -175,17 +175,6 @@ class Http {
     } catch (err) {
       if (isObject(err) && 'response' in err && err.response && 'data' in err.response) {
         const error = cloneDeep(err.response.data)
-        // Augment the default error with config entries as well as the stack component
-        // abbreviation that threw an error.
-        // TODO: Consider changing this, see https://github.com/TheThingsNetwork/lorawan-stack/issues/3424.
-        if (isObject(error)) {
-          error.request_details = {
-            url: get(err, 'response.config.url'),
-            method: get(err, 'response.config.method'),
-            request_id: get(err, 'response.headers.x-request-id'),
-            stack_component: parsedComponent,
-          }
-        }
 
         throw error
       } else {
