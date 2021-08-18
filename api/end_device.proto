@@ -270,6 +270,8 @@ message MACSettings {
   // Maximum EIRP (dBm).
   // If unset, the default value from regional parameters specification will be used.
   DeviceEIRPValue desired_max_eirp = 30;
+  // The minimum duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink.
+  google.protobuf.Duration class_b_c_downlink_interval = 31 [(gogoproto.stdduration) = true];
 }
 
 // MACState represents the state of MAC layer of the device.

@@ -68,6 +68,7 @@ var GenerateEndDeviceQRCodeRequestFieldPathsNested = []string{
 	"end_device.mac_settings.adr_margin",
 	"end_device.mac_settings.beacon_frequency",
 	"end_device.mac_settings.beacon_frequency.value",
+	"end_device.mac_settings.class_b_c_downlink_interval",
 	"end_device.mac_settings.class_b_timeout",
 	"end_device.mac_settings.class_c_timeout",
 	"end_device.mac_settings.desired_adr_ack_delay_exponent",

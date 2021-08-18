@@ -1235,6 +1235,15 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 					dst.DesiredMaxEirp = nil
 				}
 			}
+		case "class_b_c_downlink_interval":
+			if len(subs) > 0 {
+				return fmt.Errorf("'class_b_c_downlink_interval' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ClassBCDownlinkInterval = src.ClassBCDownlinkInterval
+			} else {
+				dst.ClassBCDownlinkInterval = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

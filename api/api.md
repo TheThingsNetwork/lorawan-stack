@@ -3267,6 +3267,7 @@ This is used internally by the Network Server.
 | `desired_ping_slot_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `desired_beacon_frequency` | [`FrequencyValue`](#ttn.lorawan.v3.FrequencyValue) |  | The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
 | `desired_max_eirp` | [`DeviceEIRPValue`](#ttn.lorawan.v3.DeviceEIRPValue) |  | Maximum EIRP (dBm). If unset, the default value from regional parameters specification will be used. |
+| `class_b_c_downlink_interval` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | The minimum duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink. |
 
 #### Field Rules
 

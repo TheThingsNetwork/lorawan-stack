@@ -137,6 +137,8 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.BeaconFrequency.FieldIsZero("value")
 	case "class_b_timeout":
 		return v.ClassBTimeout == nil
+	case "class_b_c_downlink_interval":
+		return v.ClassBCDownlinkInterval == nil
 	case "class_c_timeout":
 		return v.ClassCTimeout == nil
 	case "desired_adr_ack_delay_exponent":
@@ -941,6 +943,8 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MacSettings.FieldIsZero("beacon_frequency.value")
 	case "mac_settings.class_b_timeout":
 		return v.MacSettings.FieldIsZero("class_b_timeout")
+	case "mac_settings.class_b_c_downlink_interval":
+		return v.MacSettings.FieldIsZero("class_b_c_downlink_interval")
 	case "mac_settings.class_c_timeout":
 		return v.MacSettings.FieldIsZero("class_c_timeout")
 	case "mac_settings.desired_adr_ack_delay_exponent":
