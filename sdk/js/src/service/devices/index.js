@@ -546,21 +546,20 @@ class Devices {
 
           notify(listeners[EVENTS.CHUNK], result)
           finishedCount++
+        } catch (error) {
+          notify(listeners[EVENTS.ERROR], error)
+          finishedCount++
+        } finally {
           if (finishedCount === devices.length) {
             notify(listeners[EVENTS.CLOSE])
             listeners = null
           }
-        } catch (error) {
-          notify(listeners[EVENTS.ERROR], error)
-          listeners = null
-          break
         }
       }
     }
 
-    runTasks.bind(this)()
-
     return {
+      start: runTasks.bind(this),
       on(eventName, callback) {
         if (listeners[eventName] === undefined) {
           throw new Error(

@@ -25,7 +25,7 @@ import {
 } from '@console/store/selectors/device-template-formats'
 
 const m = defineMessages({
-  title: 'Format',
+  title: 'File format',
   warning: 'End device template formats unavailable',
 })
 

@@ -39,6 +39,9 @@ import { notify, EVENTS } from './shared'
  *      .on('error', error => console.log(error))
  *      .on('close', () => console.log('conn closed'))
  *
+ *    // Start the stream after attaching the listeners.
+ *    stream.open()
+ *
  *    // Close the stream after 20 s.
  *    setTimeout(() => stream.close(), 20000)
  * })()
@@ -48,6 +51,8 @@ import { notify, EVENTS } from './shared'
  */
 export default async (payload, url) => {
   let listeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
+  let reader = null
+
   const token = new Token().get()
 
   let Authorization = null
@@ -57,7 +62,6 @@ export default async (payload, url) => {
     Authorization = `Bearer ${token}`
   }
 
-  let reader = null
   let buffer = ''
   axios({
     url,
@@ -72,9 +76,13 @@ export default async (payload, url) => {
     .then(response => response.data)
     .then(stream => {
       reader = stream
+    })
+
+  return {
+    open: () => {
       notify(listeners[EVENTS.START])
 
-      stream.on('data', data => {
+      reader.on('data', data => {
         const parsed = data.toString('utf8')
         buffer += parsed
         const lines = buffer.split(/\n\n/)
@@ -83,17 +91,15 @@ export default async (payload, url) => {
           notify(listeners[EVENTS.CHUNK], JSON.parse(line).result)
         }
       })
-      stream.on('end', () => {
+      reader.on('end', () => {
         notify(listeners[EVENTS.CLOSE])
         listeners = {}
       })
-      stream.on('error', error => {
+      reader.on('error', error => {
         notify(listeners[EVENTS.ERROR], error)
         listeners = {}
       })
-    })
-
-  return {
+    },
     on(eventName, callback) {
       if (listeners[eventName] === undefined) {
         throw new Error(

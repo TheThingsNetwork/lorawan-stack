@@ -62,7 +62,7 @@ export default class DeviceAddBulk extends Component {
       <Container>
         <PageTitle title={sharedMessages.importDevices} />
         <Row>
-          <Col lg={8} md={12}>
+          <Col md={12}>
             {showEmptyWarning && (
               <Notification warning title={m.noTemplatesTitle} content={m.noTemplates} />
             )}

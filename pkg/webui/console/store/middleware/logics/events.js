@@ -121,6 +121,8 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
           channel.on('chunk', message => dispatch(getEventSuccess(id, message)))
           channel.on('error', error => dispatch(getEventFailure(id, error)))
           channel.on('close', () => dispatch(closeEvents(id)))
+
+          channel.open()
         } catch (error) {
           if (isUnauthenticatedError(error)) {
             // The user is no longer authenticated; reinitiate the auth flow
