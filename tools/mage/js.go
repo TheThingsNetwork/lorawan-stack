@@ -183,7 +183,7 @@ func (js Js) Build() error {
 
 // Serve runs webpack-dev-server.
 func (js Js) Serve() error {
-	mg.Deps(js.Deps, js.Translations, js.BackendTranslations, js.BuildDll)
+	mg.Deps(js.Deps, js.ExtractLocaleFiles, js.BackendTranslations, js.BuildDll)
 	if mg.Verbose() {
 		fmt.Println("Running Webpack for Main Bundle in watch mode")
 	}
@@ -219,9 +219,14 @@ func (js Js) Messages() error {
 	return execYarn(nil, os.Stderr, "babel", filepath.Join("pkg", "webui"))
 }
 
-// Translations builds the frontend locale files.
-func (js Js) Translations() error {
-	mg.Deps(js.Deps, js.Messages)
+// Translations writes the babel message files and converts them into locale files.
+func (js Js) Translations() {
+	mg.Deps(js.Messages)
+	mg.Deps(js.ExtractLocaleFiles)
+}
+
+// ExtractLocaleFiles extracts the locale files from the babel message files.
+func (js Js) ExtractLocaleFiles() error {
 	ok, err := target.Dir(
 		filepath.Join("pkg", "webui", "locales", "en.json"),
 		filepath.Join(".cache", "messages"),
