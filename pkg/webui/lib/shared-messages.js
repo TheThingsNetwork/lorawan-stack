@@ -62,12 +62,14 @@ export default defineMessages({
     'The KEK label of the Application Server to use for wrapping the application session key',
   attributeDescription:
     'Attributes can be used to set arbitrary information about the entity, to be used by scripts, or simply for your own organization',
+  attributeKeyValidateTooLong: 'Attribute keys must have less than 32 characters',
   attributeKeyValidateTooShort:
     'Attribute keys must have at least 3 characters and contain no special characters',
   attributes: 'Attributes',
   attributesValidateRequired:
     'All attribute entry values are required. Please remove empty entries.',
   attributesValidateTooMany: '{field} must be 10 items or fewer',
+  attributeValueValidateTooLong: 'Attribute values must have less than 200 characters',
   automaticUpdates: 'Automatic updates',
   autoUpdateDescription: 'Gateway can be updated automatically',
   backToOverview: 'Back to overview',
