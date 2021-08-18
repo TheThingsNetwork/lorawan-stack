@@ -41,6 +41,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
@@ -776,8 +777,9 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 				cluster.Peer
 				ScheduleDownlink <-chan NsGsScheduleDownlinkRequest
 			}
+
 			peerByIdx := map[uint]Peer{}
-			peerByIDs := map[ttnpb.GatewayIdentifiers]Peer{}
+			peerByIDs := map[string]Peer{}
 			var peerSequence []uint
 			for _, path := range paths {
 				if path.PeerIndex == 0 {
@@ -786,9 +788,10 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 				if len(peerSequence) == 0 || peerSequence[len(peerSequence)-1] != path.PeerIndex {
 					peerSequence = append(peerSequence, path.PeerIndex)
 				}
+				uid := unique.ID(ctx, *path.GatewayIdentifiers)
 				peer, ok := peerByIdx[path.PeerIndex]
 				if ok {
-					peerByIDs[*path.GatewayIdentifiers] = peer
+					peerByIDs[uid] = peer
 					continue
 				}
 				scheduleDownlinkCh := make(chan NsGsScheduleDownlinkRequest)
@@ -799,7 +802,7 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 					ScheduleDownlink: scheduleDownlinkCh,
 				}
 				peerByIdx[path.PeerIndex] = peer
-				peerByIDs[*path.GatewayIdentifiers] = peer
+				peerByIDs[uid] = peer
 			}
 
 			expectedIDs := func() (ids []ttnpb.GatewayIdentifiers) {
@@ -829,7 +832,7 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 						}, false
 					}
 					reqIDs = append(reqIDs, *gtwIDs)
-					peer, ok := peerByIDs[*gtwIDs]
+					peer, ok := peerByIDs[unique.ID(ctx, *gtwIDs)]
 					if !ok {
 						return test.ClusterGetPeerResponse{
 							Error: errPeerNotFound.New(),

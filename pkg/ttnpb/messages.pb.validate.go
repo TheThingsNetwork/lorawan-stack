@@ -2437,7 +2437,7 @@ func (m *ApplicationDownlink_ClassBC) ValidateFields(paths ...string) error {
 		switch name {
 		case "gateways":
 
-			for idx, item := range m.Gateways {
+			for idx, item := range m.GetGateways() {
 				_, _ = idx, item
 
 				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {

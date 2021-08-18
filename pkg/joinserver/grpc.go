@@ -27,9 +27,9 @@ type jsServer struct {
 
 // GetJoinEUIPrefixes returns the JoinEUIPrefixes associated with the join server.
 func (srv jsServer) GetJoinEUIPrefixes(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.JoinEUIPrefixes, error) {
-	prefixes := make([]ttnpb.JoinEUIPrefix, 0, len(srv.JS.euiPrefixes))
+	prefixes := make([]*ttnpb.JoinEUIPrefix, 0, len(srv.JS.euiPrefixes))
 	for _, p := range srv.JS.euiPrefixes {
-		prefixes = append(prefixes, ttnpb.JoinEUIPrefix{
+		prefixes = append(prefixes, &ttnpb.JoinEUIPrefix{
 			JoinEui: p.EUI64,
 			Length:  uint32(p.Length),
 		})

@@ -1632,7 +1632,7 @@ func (m *JoinEUIPrefixes) ValidateFields(paths ...string) error {
 		switch name {
 		case "prefixes":
 
-			for idx, item := range m.Prefixes {
+			for idx, item := range m.GetPrefixes() {
 				_, _ = idx, item
 
 				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
@@ -1730,7 +1730,7 @@ func (m *ProvisionEndDevicesRequest_IdentifiersList) ValidateFields(paths ...str
 			// no validation rules for JoinEui
 		case "end_device_ids":
 
-			for idx, item := range m.EndDeviceIds {
+			for idx, item := range m.GetEndDeviceIds() {
 				_, _ = idx, item
 
 				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
