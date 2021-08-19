@@ -17,12 +17,15 @@ package web
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"sort"
+	"strings"
 
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/gddo/httputil"
 	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
 	_ "go.thethings.network/lorawan-stack/v3/pkg/ttnpb" // imported for side-effect of correct TTN error rendering.
@@ -97,10 +100,32 @@ func ErrorMiddleware(extraRenderers map[string]ErrorRenderer) echo.MiddlewareFun
 			if c.Response().Committed {
 				statusCode = c.Response().Status
 			}
-			if statusCode >= 500 {
+			if statusCode >= 500 && statusCode != http.StatusNotImplemented {
 				errEvent := sentryerrors.NewEvent(err)
 				errEvent.Transaction = c.Path()
 				errEvent.Request = sentry.NewRequest(c.Request())
+				if host, _, err := net.SplitHostPort(c.Request().RemoteAddr); err == nil {
+					errEvent.User.IPAddress = host
+				}
+				for k, v := range errEvent.Request.Headers {
+					switch strings.ToLower(k) {
+					case "authorization":
+						parts := strings.SplitN(v, " ", 2)
+						if len(parts) == 2 && strings.ToLower(parts[0]) == "bearer" {
+							if tokenType, tokenID, _, err := auth.SplitToken(parts[1]); err == nil {
+								errEvent.Tags["auth.token_type"] = tokenType.String()
+								errEvent.Tags["auth.token_id"] = tokenID
+							}
+						}
+						delete(errEvent.Request.Headers, k)
+					case "cookie":
+						delete(errEvent.Request.Headers, k)
+					case "x-request-id":
+						errEvent.Tags["request_id"] = v
+					case "x-real-ip":
+						errEvent.User.IPAddress = v
+					}
+				}
 				sentry.CaptureEvent(errEvent)
 			}
 			if c.Response().Committed {

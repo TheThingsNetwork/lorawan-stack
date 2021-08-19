@@ -17,9 +17,12 @@ package webhandlers
 import (
 	"context"
 	"encoding/json"
+	"net"
 	"net/http"
+	"strings"
 
 	"github.com/getsentry/sentry-go"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
 	weberrors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
@@ -49,9 +52,31 @@ func NewContextWithErrorValue(parent context.Context) (ctx context.Context, getE
 // Error writes the error to the response writer.
 func Error(w http.ResponseWriter, r *http.Request, err error) {
 	code, err := weberrors.ProcessError(err)
-	if code >= 500 {
+	if code >= 500 && code != http.StatusNotImplemented {
 		errEvent := sentryerrors.NewEvent(err)
 		errEvent.Request = sentry.NewRequest(r)
+		if host, _, err := net.SplitHostPort(r.RemoteAddr); err == nil {
+			errEvent.User.IPAddress = host
+		}
+		for k, v := range errEvent.Request.Headers {
+			switch strings.ToLower(k) {
+			case "authorization":
+				parts := strings.SplitN(v, " ", 2)
+				if len(parts) == 2 && strings.ToLower(parts[0]) == "bearer" {
+					if tokenType, tokenID, _, err := auth.SplitToken(parts[1]); err == nil {
+						errEvent.Tags["auth.token_type"] = tokenType.String()
+						errEvent.Tags["auth.token_id"] = tokenID
+					}
+				}
+				delete(errEvent.Request.Headers, k)
+			case "cookie":
+				delete(errEvent.Request.Headers, k)
+			case "x-request-id":
+				errEvent.Tags["request_id"] = v
+			case "x-real-ip":
+				errEvent.User.IPAddress = v
+			}
+		}
 		sentry.CaptureEvent(errEvent)
 	}
 	if errPtr, ok := r.Context().Value(errorContextValue).(*error); ok && errPtr != nil {

@@ -32,6 +32,8 @@ func TestErrorHandling(t *testing.T) {
 
 	ttnNotFound := errors.DefineNotFound("test_not_found", "test not found")
 
+	errors.GenerateCorrelationIDs(false)
+
 	for _, tc := range []struct {
 		Name  string
 		Error error
@@ -110,5 +112,4 @@ func TestErrorHandling(t *testing.T) {
 			a.So(string(b), should.EqualJSON, tc.JSON)
 		})
 	}
-
 }

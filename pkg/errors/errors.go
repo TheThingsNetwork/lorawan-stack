@@ -17,10 +17,12 @@
 package errors
 
 import (
+	"encoding/hex"
 	"fmt"
 	"sync/atomic"
 
 	"github.com/golang/protobuf/proto"
+	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc/codes"
 )
 
@@ -85,9 +87,23 @@ type Interface interface {
 	Details() (details []proto.Message)
 }
 
+var generateCorrelationIDs = true
+
+// GenerateCorrelationIDs configures whether random correlation IDs are generated
+// for each error. This is enabled by default.
+func GenerateCorrelationIDs(enable bool) {
+	generateCorrelationIDs = enable
+}
+
 // build an error from the definition, skipping the first frames of the call stack.
 func build(d *Definition, skip int) *Error {
-	e := Error{Definition: d, grpcStatus: new(atomic.Value)}
+	e := Error{
+		Definition: d,
+		grpcStatus: new(atomic.Value),
+	}
+	if generateCorrelationIDs {
+		e.correlationID = hex.EncodeToString(uuid.NewV4().Bytes())
+	}
 	if skip > 0 {
 		e.stack = callers(skip)
 	}
