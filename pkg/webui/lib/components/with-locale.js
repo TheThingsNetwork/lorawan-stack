@@ -14,9 +14,8 @@
 
 /* eslint-disable capitalized-comments */
 
-import React, { useState, useCallback, useEffect, createContext, useRef, useMemo } from 'react'
+import React, { useState, useCallback, useEffect, createContext, useMemo } from 'react'
 import { IntlProvider, defineMessages } from 'react-intl'
-import CancelablePromise from 'cancelable-promise'
 import { uniq } from 'lodash'
 
 import Overlay from '@ttn-lw/components/overlay'
@@ -72,18 +71,19 @@ const getAppropriateLocale = selectedLocale => {
 }
 
 const supportedLanguages = uniq(SUPPORTED_LOCALES.filter(l => l.split('-')[0]))
-const supportedLocalesMap = SUPPORTED_LOCALES.reduce((acc, locale) => {
-  const loc = locale === 'en' ? `${locale}-${defaultEnglishRegion}` : locale
-  const language = loc.split('-')[0]
-  const region = loc.split('-').length > 1 ? loc.split('-')[1] : undefined
+const getSupportedLocalesMap = () =>
+  SUPPORTED_LOCALES.reduce((acc, locale) => {
+    const loc = locale === 'en' ? `${locale}-${defaultEnglishRegion}` : locale
+    const language = loc.split('-')[0]
+    const region = loc.split('-').length > 1 ? loc.split('-')[1] : undefined
 
-  const title = region
-    ? `${getLanguageName(language)} (${getLanguageName(region, 'region')})`
-    : getLanguageName(language)
+    const title = region
+      ? `${getLanguageName(language)} (${getLanguageName(region, 'region')})`
+      : getLanguageName(language)
 
-  acc[loc] = title
-  return acc
-}, {})
+    acc[loc] = title
+    return acc
+  }, {})
 
 const m = defineMessages({
   switchingLanguage: 'Switching language…',
@@ -91,11 +91,79 @@ const m = defineMessages({
 
 export const LanguageContext = createContext()
 
-// `UserLocale` is a component that fetches the user's preferred language and
+// `WithLocale` is a component that fetches necessary polyfills for `window.Intl`
+// This component has to mount before any other component that makes use of the `Intl` API.
+const WithLocale = ({ children }) => {
+  const [polyfillsLoaded, setPolyfillsLoaded] = useState(false)
+  const [error, setError] = useState(undefined)
+
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        const promises = []
+
+        // Load critical polyfills.
+        if (!window.Intl.DisplayNames) {
+          log('Polyfilling Intl.DisplayNames')
+          promises.push(
+            import(
+              /* webpackChunkName: "locale-display-names" */ '@formatjs/intl-displaynames/polyfill'
+            ),
+          )
+          for (const supportedLanguage of supportedLanguages) {
+            log(`Polyfilling Intl.DisplayNames for ${supportedLanguage}`)
+            promises.push(
+              import(
+                /* webpackChunkName: "locale-display-names.[request]" */ `@formatjs/intl-displaynames/locale-data/${supportedLanguage}`
+              ),
+            )
+          }
+        }
+
+        if (!window.Intl.ListFormat) {
+          log('Polyfilling Intl.ListFormat')
+          promises.push(
+            import(
+              /* webpackChunkName: "locale-list-format" */ '@formatjs/intl-listformat/polyfill'
+            ),
+          )
+        }
+
+        if (!window.Intl.PluralRules) {
+          log('Polyfilling Intl.PluralRules')
+          promises.push(
+            import(
+              /* webpackChunkName: "locale-plural-rules" */ '@formatjs/intl-pluralrules/polyfill'
+            ),
+          )
+        }
+
+        await Promise.all(promises)
+        setPolyfillsLoaded(true)
+      } catch (error) {
+        setError(error)
+      }
+    }
+
+    initialize()
+  }, [setError])
+
+  if (error) {
+    throw error
+  }
+
+  if (!polyfillsLoaded) {
+    // Not using `<Message />`, since we're initializing locales.
+    return <Spinner center>Initializing multi-language support…</Spinner>
+  }
+
+  return <LocaleLoader>{children}</LocaleLoader>
+}
+
+// `LocaleLoader` is a component that fetches the user's preferred language and
 // sets the language in the react-intl provider context. It will asynchronously
-// fetch translated messages and polyfills `window.Intl`.
-const UserLocale = ({ children }) => {
-  const promise = useRef()
+// fetch translated messages.
+const LocaleLoader = ({ children }) => {
   const [intlState, setIntlState] = useState({
     locale: undefined,
     messages: undefined,
@@ -136,7 +204,7 @@ const UserLocale = ({ children }) => {
         ]
       }
 
-      // Load polyfills if needed.
+      // Load locale specific polyfills if needed.
       if (!window.Intl.NumberFormat || !window.Intl.DateTimeFormat) {
         log(`Polyfilling locale ${locale} for language ${language}`)
         promises.push(import('intl'))
@@ -145,48 +213,8 @@ const UserLocale = ({ children }) => {
         )
       }
 
-      if (!window.Intl.DisplayNames) {
-        log(`Polyfilling Intl.DisplayNames`)
-        promises.push(
-          import(
-            /* webpackChunkName: "locale-display-names" */ '@formatjs/intl-displaynames/polyfill'
-          ),
-        )
-      }
-
-      if (!window.Intl.ListFormat) {
-        log(`Polyfilling Intl.ListFormat`)
-        promises.push(
-          import(/* webpackChunkName: "locale-list-format" */ '@formatjs/intl-listformat/polyfill'),
-        )
-      }
-
-      if (!window.Intl.PluralRules) {
-        log('Polyfilling Intl.PluralRules')
-        promises.push(
-          import(
-            /* webpackChunkName: "locale-plural-rules" */ '@formatjs/intl-pluralrules/polyfill'
-          ),
-        )
-      }
-
-      if (!window.Intl.RelativeTimeFormat) {
-        log(`Polyfilling Intl.RelativeTimeFormat data for language ${locale}`)
-        promises.push(
-          import(
-            /* webpackChunkName: "locale-time-polyfill" */ '@formatjs/intl-relativetimeformat/polyfill'
-          ),
-        )
-        promises.push(
-          import(
-            /* webpackChunkName: "locale-time-locales.[request]" */ `@formatjs/intl-relativetimeformat/locale-data/${locale}`
-          ),
-        )
-      }
-
-      promise.current = CancelablePromise.resolve(Promise.all(promises))
       try {
-        const res = await promise.current
+        const res = await Promise.all(promises)
         setIntlState({ locale, messages: res[0] })
 
         // Set `lang` attribute of the `html` tag.
@@ -208,18 +236,13 @@ const UserLocale = ({ children }) => {
   useEffect(() => {
     // Perform the initial locale load.
     setLocale()
-    return () => {
-      if (promise.current && promise.current.cancel) {
-        promise.current.cancel()
-      }
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const languageContext = useMemo(
     () => ({
       locale: intlState.locale,
-      supportedLocales: supportedLocalesMap,
+      supportedLocales: getSupportedLocalesMap(),
       setLocale,
     }),
     [intlState.locale, setLocale],
@@ -246,8 +269,8 @@ const UserLocale = ({ children }) => {
   )
 }
 
-UserLocale.propTypes = {
+LocaleLoader.propTypes = WithLocale.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
 }
 
-export default UserLocale
+export default WithLocale
