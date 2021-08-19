@@ -187,7 +187,7 @@ export default defineMessages({
   general: 'General',
   generalInformation: 'General information',
   generalSettings: 'General settings',
-  getSupport: 'Get Support',
+  getSupport: 'Get support',
   gsServerAddressDescription: 'The address of the Gateway Server to connect to',
   hardware: 'Hardware',
   hardwareVersion: 'Hardware version',
