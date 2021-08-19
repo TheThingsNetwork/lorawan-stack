@@ -56,8 +56,8 @@ You can go to {{.ConsoleURL}} to view and edit this API key in the Console.
 
 If you prefer to use the command-line interface, you can run the following commands to view or edit this API key:
 
-ttn-lw-cli {{.Entity.Type}}s api-keys get --{{.Entity.Type}}-id {{.Entity.ID}} --api-key-id {{.Key.ID}}
-ttn-lw-cli {{.Entity.Type}}s api-keys set --{{.Entity.Type}}-id {{.Entity.ID}} --api-key-id {{.Key.ID}}
+ttn-lw-cli {{.Entity.Type}}s api-keys get --{{.Entity.Type}}-id {{.Entity.ID}} --api-key-id {{.Key.Id}}
+ttn-lw-cli {{.Entity.Type}}s api-keys set --{{.Entity.Type}}-id {{.Entity.ID}} --api-key-id {{.Key.Id}}
 
 For more information on how to use the command-line interface, please refer to the documentation: {{ documentation_url "/getting-started/cli/" }}.
 `
