@@ -44,6 +44,7 @@ For details about compatibility between different releases, see the **Commitment
 - `description` field not being fetched in edit user form (admin only) in the Console.
 - Ignore invalid configuration when printing configuration with `ttn-lw-cli config` or `ttn-lw-stack config`.
 - Emails about API key changes.
+- Avoid rendering blank pages in the Console for certain errors.
 
 ### Security
 
