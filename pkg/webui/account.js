@@ -21,6 +21,8 @@ import sentryConfig from '@ttn-lw/constants/sentry'
 import store, { history } from '@account/store'
 
 import WithLocale from '@ttn-lw/lib/components/with-locale'
+import { ErrorView } from '@ttn-lw/lib/components/error-view'
+import { FullViewErrorRaw } from '@ttn-lw/lib/components/full-view-error'
 import Init from '@ttn-lw/lib/components/init'
 
 import { selectSentryDsnConfig } from '@ttn-lw/lib/selectors/env'
@@ -36,14 +38,16 @@ const render = () => {
   const App = require('./account/views/app').default
 
   DOM.render(
-    <Provider store={store}>
-      <WithLocale>
-        <div id="modal-container" />
-        <Init>
-          <App history={history} />
-        </Init>
-      </WithLocale>
-    </Provider>,
+    <ErrorView ErrorComponent={FullViewErrorRaw}>
+      <Provider store={store}>
+        <WithLocale>
+          <div id="modal-container" />
+          <Init>
+            <App history={history} />
+          </Init>
+        </WithLocale>
+      </Provider>
+    </ErrorView>,
     document.getElementById('app'),
   )
 }
