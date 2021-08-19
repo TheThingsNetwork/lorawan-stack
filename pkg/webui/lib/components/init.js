@@ -104,9 +104,11 @@ export default class Init extends React.PureComponent {
 
     if (!initialized) {
       return (
-        <Spinner center>
-          <Message content={m.initializing} />
-        </Spinner>
+        <div style={{ height: '100vh' }}>
+          <Spinner center>
+            <Message content={m.initializing} />
+          </Spinner>
+        </div>
       )
     }
 
