@@ -44,6 +44,8 @@ import (
 func TestProcessDownlinkTask(t *testing.T) {
 	// TODO: Refactor. (https://github.com/TheThingsNetwork/lorawan-stack/issues/2475)
 
+	errors.GenerateCorrelationIDs(false)
+
 	const appIDString = "process-downlink-test-app-id"
 	appID := ttnpb.ApplicationIdentifiers{ApplicationId: appIDString}
 	const devID = "process-downlink-test-dev-id"
