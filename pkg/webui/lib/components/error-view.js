@@ -18,12 +18,15 @@ import { withRouter } from 'react-router-dom'
 import { ingestError } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-@withRouter
 class ErrorView extends React.Component {
   static propTypes = {
     ErrorComponent: PropTypes.oneOfType([PropTypes.elementType, PropTypes.func]).isRequired,
     children: PropTypes.node.isRequired,
-    history: PropTypes.history.isRequired,
+    history: PropTypes.history,
+  }
+
+  static defaultProps = {
+    history: undefined,
   }
 
   state = {
@@ -47,12 +50,14 @@ class ErrorView extends React.Component {
 
     // Clear the error when the route changes (e.g. user clicking a link).
     const { history } = this.props
-    this.unlisten = history.listen((location, action) => {
-      if (this.state.hasCaught) {
-        this.setState({ hasCaught: false, error: undefined })
-        this.unlisten()
-      }
-    })
+    if (history) {
+      this.unlisten = history.listen((location, action) => {
+        if (this.state.hasCaught) {
+          this.setState({ hasCaught: false, error: undefined })
+          this.unlisten()
+        }
+      })
+    }
   }
 
   render() {
@@ -67,4 +72,6 @@ class ErrorView extends React.Component {
   }
 }
 
-export default ErrorView
+const ErrorViewWithRouter = withRouter(ErrorView)
+
+export { ErrorViewWithRouter as default, ErrorView }
