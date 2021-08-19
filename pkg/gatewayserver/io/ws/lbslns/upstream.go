@@ -178,14 +178,9 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
-	dataRate, isLora, err := util.GetDataRateFromIndex(bandID, req.RadioMetaData.DataRate)
+	dataRate, codingRate, err := util.GetDataRateFromIndex(bandID, req.RadioMetaData.DataRate)
 	if err != nil {
 		return nil, errJoinRequestMessage.WithCause(err)
-	}
-
-	var codingRate string
-	if isLora {
-		codingRate = "4/5"
 	}
 
 	up.Settings = ttnpb.TxSettings{
@@ -336,14 +331,9 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
-	dataRate, isLora, err := util.GetDataRateFromIndex(bandID, updf.RadioMetaData.DataRate)
+	dataRate, codingRate, err := util.GetDataRateFromIndex(bandID, updf.RadioMetaData.DataRate)
 	if err != nil {
 		return nil, errUplinkDataFrame.WithCause(err)
-	}
-
-	var codingRate string
-	if isLora {
-		codingRate = "4/5"
 	}
 
 	up.Settings = ttnpb.TxSettings{

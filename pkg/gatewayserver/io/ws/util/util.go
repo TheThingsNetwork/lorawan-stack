@@ -56,24 +56,27 @@ func GetFCtrlAsUint(fCtrl ttnpb.FCtrl) uint {
 	return ret
 }
 
-func GetDataRateFromIndex(bandID string, index int) (ttnpb.DataRate, bool, error) {
+func GetDataRateFromIndex(bandID string, index int) (ttnpb.DataRate, string, error) {
 	phy, err := band.GetByID(bandID)
 	if err != nil {
-		return ttnpb.DataRate{}, false, errDataRateIndex.WithCause(err)
+		return ttnpb.DataRate{}, "", errDataRateIndex.WithCause(err)
 	}
 	// All protobuf enums are int32-typed, so ensure it does not overflow.
 	if index < 0 || index > math.MaxInt32 {
-		return ttnpb.DataRate{}, false, errDataRateIndex.New()
+		return ttnpb.DataRate{}, "", errDataRateIndex.New()
 	}
 	dr, ok := phy.DataRates[ttnpb.DataRateIndex(index)]
 	if !ok {
-		return ttnpb.DataRate{}, false, errDataRateIndex.New()
+		return ttnpb.DataRate{}, "", errDataRateIndex.New()
 	}
-
-	if dr.Rate.GetLora() != nil {
-		return dr.Rate, true, nil
+	var codingRate string
+	switch mod := dr.Rate.Modulation.(type) {
+	case *ttnpb.DataRate_Lora:
+		codingRate = phy.LoRaCodingRate
+	case *ttnpb.DataRate_Lrfhss:
+		codingRate = mod.Lrfhss.CodingRate
 	}
-	return dr.Rate, false, nil
+	return dr.Rate, codingRate, nil
 }
 
 func GetDataRateIndexFromDataRate(bandID string, dr ttnpb.DataRate) (int, error) {

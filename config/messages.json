@@ -7838,15 +7838,6 @@
       "file": "toa.go"
     }
   },
-  "error:pkg/toa:modulation_type_not_supported": {
-    "translations": {
-      "en": "TOA calculation not supported for modulation type `{type}`"
-    },
-    "description": {
-      "package": "pkg/toa",
-      "file": "toa.go"
-    }
-  },
   "error:pkg/toa:spreading_factor": {
     "translations": {
       "en": "invalid spreading factor `{spreading_factor}`"

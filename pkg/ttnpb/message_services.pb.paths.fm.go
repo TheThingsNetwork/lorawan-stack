@@ -86,6 +86,7 @@ var DecodeUplinkMessageRequestFieldPathsNested = []string{
 	"message.settings.data_rate.modulation.lora.bandwidth",
 	"message.settings.data_rate.modulation.lora.spreading_factor",
 	"message.settings.data_rate.modulation.lrfhss",
+	"message.settings.data_rate.modulation.lrfhss.coding_rate",
 	"message.settings.data_rate.modulation.lrfhss.modulation_type",
 	"message.settings.data_rate.modulation.lrfhss.operating_channel_width",
 	"message.settings.data_rate_index",

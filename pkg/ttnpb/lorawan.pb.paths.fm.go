@@ -210,11 +210,13 @@ var FSKDataRateFieldPathsTopLevel = []string{
 	"bit_rate",
 }
 var LRFHSSDataRateFieldPathsNested = []string{
+	"coding_rate",
 	"modulation_type",
 	"operating_channel_width",
 }
 
 var LRFHSSDataRateFieldPathsTopLevel = []string{
+	"coding_rate",
 	"modulation_type",
 	"operating_channel_width",
 }
@@ -226,6 +228,7 @@ var DataRateFieldPathsNested = []string{
 	"modulation.lora.bandwidth",
 	"modulation.lora.spreading_factor",
 	"modulation.lrfhss",
+	"modulation.lrfhss.coding_rate",
 	"modulation.lrfhss.modulation_type",
 	"modulation.lrfhss.operating_channel_width",
 }
@@ -243,6 +246,7 @@ var TxSettingsFieldPathsNested = []string{
 	"data_rate.modulation.lora.bandwidth",
 	"data_rate.modulation.lora.spreading_factor",
 	"data_rate.modulation.lrfhss",
+	"data_rate.modulation.lrfhss.coding_rate",
 	"data_rate.modulation.lrfhss.modulation_type",
 	"data_rate.modulation.lrfhss.operating_channel_width",
 	"data_rate_index",

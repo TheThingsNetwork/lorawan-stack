@@ -1308,6 +1308,8 @@ func (m *LRFHSSDataRate) ValidateFields(paths ...string) error {
 			// no validation rules for ModulationType
 		case "operating_channel_width":
 			// no validation rules for OperatingChannelWidth
+		case "coding_rate":
+			// no validation rules for CodingRate
 		default:
 			return LRFHSSDataRateValidationError{
 				field:  name,
