@@ -45,6 +45,7 @@ For details about compatibility between different releases, see the **Commitment
 - Ignore invalid configuration when printing configuration with `ttn-lw-cli config` or `ttn-lw-stack config`.
 - Emails about API key changes.
 - Avoid rendering blank pages in the Console for certain errors.
+- Blank page crashes in the Console for certain browsers that do not fully support `Intl` API.
 
 ### Security
 
