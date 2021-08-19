@@ -16,10 +16,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import clipboard from 'clipboard'
+import { Helmet } from 'react-helmet'
+import classnames from 'classnames'
 
 import Link from '@ttn-lw/components/link'
 import Footer from '@ttn-lw/components/footer'
 import Button from '@ttn-lw/components/button'
+import buttonStyle from '@ttn-lw/components/button/button.styl'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
@@ -35,7 +38,12 @@ import {
 } from '@ttn-lw/lib/errors/utils'
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import { selectApplicationRootPath, selectSupportLinkConfig } from '@ttn-lw/lib/selectors/env'
+import {
+  selectApplicationRootPath,
+  selectSupportLinkConfig,
+  selectApplicationSiteName,
+  selectApplicationSiteTitle,
+} from '@ttn-lw/lib/selectors/env'
 
 import style from './error.styl'
 
@@ -44,6 +52,9 @@ const m = defineMessages({
 })
 
 const appRoot = selectApplicationRootPath()
+const siteName = selectApplicationSiteName()
+const siteTitle = selectApplicationSiteTitle()
+const supportLink = selectSupportLinkConfig()
 
 const FullViewErrorInner = ({ error }) => {
   const isUnknown = isUnknownError(error)
@@ -52,8 +63,6 @@ const FullViewErrorInner = ({ error }) => {
   const isFrontend = isFrontendError(error)
 
   const [copied, setCopied] = useState(false)
-
-  const supportLink = selectSupportLinkConfig()
 
   let errorTitleMessage = errorMessages.unknownErrorTitle
   let errorMessageMessage = errorMessages.contactAdministrator
@@ -160,7 +169,59 @@ const FullViewError = ({ error, header, onlineStatus }) => (
   </div>
 )
 
-FullViewErrorInner.propTypes = {
+const FullViewErrorRaw = ({ error }) => {
+  const isUnknown = isUnknownError(error)
+  const statusCode = httpStatusCode(error)
+  const isNotFound = isNotFoundError(error)
+
+  let errorTitle = errorMessages.unknownErrorTitle.defaultMessage
+  let errorMessage = errorMessages.contactAdministrator.defaultMessage
+  if (!isUnknown) {
+    errorMessage = error
+  } else if (isNotFound) {
+    errorMessage = errorMessages.genericNotFound.defaultMessage
+  }
+  if (statusCode) {
+    errorTitle = statusCodeMessages[statusCode].defaultMessage
+  }
+
+  const errorDetails = JSON.stringify(error, undefined, 2)
+
+  return (
+    <div className={style.fullViewError} data-test-id="full-error-view">
+      <Container>
+        <Row>
+          <Col sm={12} md={6}>
+            <Helmet titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}>
+              <title>Error</title>
+            </Helmet>
+            <h2>{errorTitle}</h2>
+            <span className={style.fullViewErrorSub}>{errorMessage}</span>
+            <details>
+              <summary>{m.errorDetails.defaultMessage}</summary>
+              <pre>{errorDetails}</pre>
+              {Boolean(supportLink) && (
+                <a
+                  href={supportLink}
+                  target="_blank"
+                  className={classnames(
+                    buttonStyle.button,
+                    buttonStyle.secondary,
+                    style.supportButton,
+                  )}
+                >
+                  {sharedMessages.getSupport.defaultMessage}
+                </a>
+              )}
+            </details>
+          </Col>
+        </Row>
+      </Container>
+    </div>
+  )
+}
+
+FullViewErrorInner.propTypes = FullViewErrorRaw.propTypes = {
   error: PropTypes.error.isRequired,
 }
 
@@ -174,4 +235,4 @@ FullViewError.defaultProps = {
   header: undefined,
 }
 
-export { FullViewError, FullViewErrorInner }
+export { FullViewError, FullViewErrorInner, FullViewErrorRaw }

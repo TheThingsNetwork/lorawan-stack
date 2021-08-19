@@ -949,7 +949,7 @@
   "lib.shared-messages.general": "General",
   "lib.shared-messages.generalInformation": "General information",
   "lib.shared-messages.generalSettings": "General settings",
-  "lib.shared-messages.getSupport": "Get Support",
+  "lib.shared-messages.getSupport": "Get support",
   "lib.shared-messages.gsServerAddressDescription": "The address of the Gateway Server to connect to",
   "lib.shared-messages.hardware": "Hardware",
   "lib.shared-messages.hardwareVersion": "Hardware version",

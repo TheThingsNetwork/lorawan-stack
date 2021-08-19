@@ -23,6 +23,8 @@ import sentryConfig from '@ttn-lw/constants/sentry'
 import { BreadcrumbsProvider } from '@ttn-lw/components/breadcrumbs/context'
 
 import { EnvProvider } from '@ttn-lw/lib/components/env'
+import { ErrorView } from '@ttn-lw/lib/components/error-view'
+import { FullViewErrorRaw } from '@ttn-lw/lib/components/full-view-error'
 import Init from '@ttn-lw/lib/components/init'
 import WithLocale from '@ttn-lw/lib/components/with-locale'
 
@@ -45,17 +47,19 @@ const render = () => {
   const App = require('./console/views/app').default
 
   DOM.render(
-    <EnvProvider env={env}>
-      <Provider store={store}>
-        <WithLocale>
-          <Init>
-            <BreadcrumbsProvider>
-              <App history={history} />
-            </BreadcrumbsProvider>
-          </Init>
-        </WithLocale>
-      </Provider>
-    </EnvProvider>,
+    <ErrorView ErrorComponent={FullViewErrorRaw}>
+      <EnvProvider env={env}>
+        <Provider store={store}>
+          <WithLocale>
+            <Init>
+              <BreadcrumbsProvider>
+                <App history={history} />
+              </BreadcrumbsProvider>
+            </Init>
+          </WithLocale>
+        </Provider>
+      </EnvProvider>
+    </ErrorView>,
     rootElement,
   )
 }
