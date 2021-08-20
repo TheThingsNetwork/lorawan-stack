@@ -20,6 +20,9 @@ For details about compatibility between different releases, see the **Commitment
 - Options to restore or purge deleted applications, gateways and organizations in the Console.
 - Handling of default mac settings values when manually registering end devices in the Console.
 - Add a new `class_b_c_downlink_interval` field that can be configured to set the minimum interval between a network initiated downlink (Class B & Class C) and an arbitrary downlink per device.
+- Retrieve count of upstream messages from the Storage Integration by end device.
+  - See the new `GetStoredApplicationUpCount` RPC.
+  - See the new `ttn-lw-cli applications storage count` and `ttn-lw-cli end-devices storage count` CLI commands.
 
 ### Changed
 
