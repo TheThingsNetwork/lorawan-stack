@@ -17,8 +17,11 @@ package io
 import (
 	"bufio"
 	"bytes"
+	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"io"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 )
@@ -81,4 +84,39 @@ func fieldPaths(m map[string]interface{}, prefix string) (paths []string) {
 		}
 	}
 	return paths
+}
+
+type bytesDecoder struct {
+	s       *bufio.Scanner
+	decoder func(string) ([]byte, error)
+}
+
+func (d *bytesDecoder) Decode(i interface{}) ([]string, error) {
+	buf, ok := i.(*[]byte)
+	if !ok {
+		panic("bytes decoder only supports *[]byte")
+	}
+	if !d.s.Scan() {
+		return []string{}, io.EOF
+	}
+	var err error
+	*buf, err = d.decoder(strings.TrimSpace(d.s.Text()))
+	if err != nil {
+		return []string{}, err
+	}
+	return []string{}, nil
+}
+
+func NewBase64Decoder(r io.Reader) Decoder {
+	return &bytesDecoder{
+		s:       bufio.NewScanner(r),
+		decoder: base64.StdEncoding.DecodeString,
+	}
+}
+
+func NewHexDecoder(r io.Reader) Decoder {
+	return &bytesDecoder{
+		s:       bufio.NewScanner(r),
+		decoder: hex.DecodeString,
+	}
 }
