@@ -101,6 +101,16 @@ class Organizations {
     return Marshaler.payloadSingleResponse(response)
   }
 
+  async restoreById(id) {
+    const response = await this._api.OrganizationRegistry.Restore({
+      routeParams: {
+        organization_id: id,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   // Deletion.
 
   async deleteById(organizationId) {

@@ -138,6 +138,16 @@ class Applications {
     return Marshaler.unwrapApplication(response)
   }
 
+  async restoreById(id) {
+    const response = await this._api.ApplicationRegistry.Restore({
+      routeParams: {
+        application_id: id,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   // Creation.
 
   async create(ownerId = this._defaultUserId, application, isUserOwner = true) {
