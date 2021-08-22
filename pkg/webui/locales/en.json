@@ -546,7 +546,7 @@
   "console.views.device-add.manual.form.advanced-settings.multicastClassCapabilities": "LoRaWAN class for multicast downlinks",
   "console.views.device-add.manual.form.advanced-settings.factoryFreqWarning": "In LoRaWAN, factory preset frequencies are only supported for bands with a CFList type of frequencies",
   "console.views.device-add.manual.form.form.register": "Register manually",
-  "console.views.device-add.manual.form.warning-tooltip.desiredDescription": "The network will use a <i>desired</i> value of {value} for this property.",
+  "console.views.device-add.manual.form.warning-tooltip.desiredDescription": "The network will use a different <i>desired</i> value of <pre>{value}</pre> for this property.",
   "console.views.device-add.manual.form.warning-tooltip.sessionDescription": "An ABP device is personalized with a session and MAC settings. These MAC settings are considered the current parameters and must match exactly the settings entered here. The Network Server uses desired parameters to change the MAC state with LoRaWAN MAC commands to the desired state. You can use the General Settings page to update the desired setting after you registered the end device.",
   "console.views.device-add.messages.repositoryTabTitle": "From The LoRaWAN Device Repository",
   "console.views.device-add.messages.manualTabTitle": "Manually",

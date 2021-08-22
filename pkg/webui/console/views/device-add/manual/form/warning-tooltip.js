@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import { isNumber } from 'lodash'
 
 import Tooltip from '@ttn-lw/components/tooltip'
 import Icon from '@ttn-lw/components/icon'
@@ -24,41 +25,53 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './form.styl'
 
-// The network will use a <i>desired</i> value of {value} for this property.
-// An ABP device is personalized with a session and MAC settings. These MAC settings are considered the current parameters and must match exactly the settings entered here. The Network Server uses desired parameters to change the MAC state with LoRaWAN MAC commands to the desired state. You can use the General Settings page to update the desired setting after you registered the end device.
+const isEqual = (current, desired) => {
+  if (isNumber(current) || isNumber(desired)) {
+    return Number(current) === Number(desired)
+  }
+
+  return current === desired
+}
 
 const m = defineMessages({
-  desiredDescription: 'The network will use a <i>desired</i> value of {value} for this property.',
+  desiredDescription:
+    'The network will use a different <i>desired</i> value of <pre>{value}</pre> for this property.',
   sessionDescription:
     'An ABP device is personalized with a session and MAC settings. These MAC settings are considered the current parameters and must match exactly the settings entered here. The Network Server uses desired parameters to change the MAC state with LoRaWAN MAC commands to the desired state. You can use the General Settings page to update the desired setting after you registered the end device.',
 })
 
 const Content = props => {
-  const { value } = props
+  const { desired } = props
 
   return (
     <div>
-      <Message content={m.desiredDescription} values={{ value, i: txt => <i>{txt}</i> }} />
+      <Message
+        content={m.desiredDescription}
+        values={{
+          value: desired,
+          i: txt => <i>{txt}</i>,
+          pre: txt => <pre className={style.defaultValue}>{txt}</pre>,
+        }}
+      />
       <Message content={m.sessionDescription} component="p" />
     </div>
   )
 }
 
 Content.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  desired: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 }
 
 const WarningTooltip = props => {
   const { desiredValue, currentValue } = props
-  console.log(desiredValue, currentValue)
 
   const hasDesiredValue = typeof desiredValue !== 'undefined'
   const hasCurrentValue = typeof currentValue !== 'undefined'
 
-  if (hasDesiredValue && hasCurrentValue && desiredValue !== currentValue) {
+  if (hasDesiredValue && hasCurrentValue && !isEqual(currentValue, desiredValue)) {
     return (
-      <Tooltip placement="bottom-start" interactive content={<Content value={currentValue} />}>
-        <Icon icon="warning" small className={style.warningTooltip} />
+      <Tooltip placement="bottom-start" interactive content={<Content desired={desiredValue} />}>
+        <Icon icon="warning" small className={style.warningTooltip} nudgeUp />
       </Tooltip>
     )
   }
