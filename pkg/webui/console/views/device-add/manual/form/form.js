@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
-import { merge } from 'lodash'
+import { merge, isUndefined } from 'lodash'
 import classnames from 'classnames'
 
 import api from '@console/api'
@@ -37,6 +37,7 @@ import JoinEUIPRefixesInput from '@console/components/join-eui-prefixes-input'
 import DevAddrInput from '@console/containers/dev-addr-input'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
+import { isBackend, getBackendErrorName } from '@ttn-lw/lib/errors/utils'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -59,6 +60,10 @@ import validationSchema, { devEUISchema } from './validation-schema'
 
 const m = defineMessages({
   register: 'Register manually',
+  macSettingsError:
+    'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
+  fpNotFoundError:
+    'The LoRaWAN version <code>{lorawanVersion}</code> does not support the <code>{freqPlan}</code> frequency plan. Please choose a different MAC version or frequency plan.',
 })
 
 const defaultValues = {
@@ -90,7 +95,9 @@ const defaultValues = {
   supports_join: false,
   supports_class_b: false,
   supports_class_c: false,
-  mac_settings: {},
+  mac_settings: {
+    ping_slot_periodicity: '',
+  },
   _activation_mode: '',
   _device_class: undefined,
   _external_servers: false,
@@ -123,6 +130,7 @@ const ManualForm = props => {
     createDeviceSuccess,
     applicationDevEUICounter,
     fetchDevEUICounter,
+    getDefaultMacSettings,
   } = props
 
   const asEnabled = asConfig.enabled
@@ -131,6 +139,8 @@ const ManualForm = props => {
   const asUrl = asEnabled ? asConfig.base_url : undefined
   const jsUrl = jsEnabled ? jsConfig.base_url : undefined
   const nsUrl = nsEnabled ? nsConfig.base_url : undefined
+
+  const [macSettings, setMacSettings] = React.useState({})
 
   const validationContext = React.useMemo(
     () => ({
@@ -141,8 +151,34 @@ const ManualForm = props => {
       asUrl,
       asEnabled,
       mayEditKeys,
+      hasRxDelay: !isUndefined(macSettings.rx1_delay),
+      hasRxDataRateOffset: !isUndefined(macSettings.rx1_data_rate_offset),
+      hasRxDataRateIndex: !isUndefined(macSettings.rx2_data_rate_index),
+      hasRxFrequency: !isUndefined(macSettings.rx2_frequency),
+      hasPingSlotDataRateIndex: !isUndefined(macSettings.ping_slot_data_rate_index),
+      hasBeaconFrequency: !isUndefined(macSettings.beacon_frequency),
+      hasClassBTimeout: !isUndefined(macSettings.class_b_timeout),
+      hasClassCTimeout: !isUndefined(macSettings.class_c_timeout),
+      hasPingSlotFrequency: !isUndefined(macSettings.ping_slot_frequency),
     }),
-    [asEnabled, asUrl, jsEnabled, jsUrl, mayEditKeys, nsEnabled, nsUrl],
+    [
+      asEnabled,
+      asUrl,
+      jsEnabled,
+      jsUrl,
+      macSettings.beacon_frequency,
+      macSettings.class_b_timeout,
+      macSettings.class_c_timeout,
+      macSettings.ping_slot_data_rate_index,
+      macSettings.ping_slot_frequency,
+      macSettings.rx1_data_rate_offset,
+      macSettings.rx1_delay,
+      macSettings.rx2_data_rate_index,
+      macSettings.rx2_frequency,
+      mayEditKeys,
+      nsEnabled,
+      nsUrl,
+    ],
   )
   const initialValues = React.useMemo(
     () =>
@@ -201,54 +237,120 @@ const ManualForm = props => {
   const [lorawanVersion, setLorawanVersion] = React.useState(initialValues.lorawan_version)
   const handleLorawanVersionChange = React.useCallback(version => setLorawanVersion(version), [])
 
+  const [defaultNsSettings, setDefaultNsSettings] = React.useState(true)
+  const handleDefaultNsSettings = React.useCallback(checked => setDefaultNsSettings(checked), [])
+
   const [activationMode, setActivationMode] = React.useState(initialValues._activation_mode)
   const handleActivationModeChange = React.useCallback(
     mode => {
       const { setValues, values } = formRef.current
       setValues(
         validationSchema.cast(
-          { ...defaultValues, ...values, _activation_mode: mode },
+          {
+            ...defaultValues,
+            ...values,
+            _activation_mode: mode,
+            mac_settings: defaultNsSettings
+              ? merge({}, defaultValues.mac_settings, values.mac_settings, macSettings)
+              : merge({}, defaultValues.mac_settings, values.mac_settings),
+          },
           { context: validationContext },
         ),
       )
 
       return setActivationMode(mode)
     },
-    [validationContext],
-  )
-
-  const [defaultNsSettings, setDefaultNsSettings] = React.useState(true)
-  const handleDefaultNsSettings = React.useCallback(
-    checked => {
-      const { setValues, values } = formRef.current
-
-      setValues(
-        validationSchema.cast(
-          {
-            ...defaultValues,
-            ...values,
-            mac_settings: defaultValues.mac_settings,
-          },
-          { context: validationContext },
-        ),
-      )
-
-      return setDefaultNsSettings(checked)
-    },
-    [validationContext],
+    [defaultNsSettings, macSettings, validationContext],
   )
 
   const [deviceClass, setDeviceClass] = React.useState(
     initialValues._activation_mode === ACTIVATION_MODES.OTAA ? DEVICE_CLASSES.CLASS_A : undefined,
   )
-  const handleDeviceClassChange = React.useCallback(devClass => {
-    setDeviceClass(devClass)
-  }, [])
+  const handleDeviceClassChange = React.useCallback(
+    devClass => {
+      const { setValues, values } = formRef.current
+
+      setDeviceClass(devClass)
+      setValues(
+        validationSchema.cast(
+          {
+            ...defaultValues,
+            ...values,
+            mac_settings: merge({}, defaultValues.mac_settings, values.mac_settings, macSettings),
+          },
+          { context: validationContext },
+        ),
+      )
+    },
+    [macSettings, validationContext],
+  )
 
   const [freqPlan, setFreqPlan] = React.useState()
+  const freqPlanRef = React.useRef(freqPlan)
   const handleFreqPlanChange = React.useCallback(band => {
     setFreqPlan(band.value)
   }, [])
+
+  const [phyVersion, setPhyVersion] = React.useState()
+  const phyVersionRef = React.useRef(phyVersion)
+  const handlePhyVersionChange = React.useCallback(version => {
+    setPhyVersion(version)
+  }, [])
+
+  React.useEffect(() => {
+    const updateMacSettings = async () => {
+      try {
+        const settings = await getDefaultMacSettings(freqPlan, phyVersion)
+        setMacSettings(settings)
+
+        const { setValues, values } = formRef.current
+        setValues(
+          validationSchema.cast(
+            {
+              ...values,
+              mac_settings: merge({}, defaultValues.mac_settings, values.mac_settings, settings),
+            },
+            { context: validationContext },
+          ),
+        )
+      } catch (err) {
+        if (isBackend(err) && getBackendErrorName(err) === 'no_band_version') {
+          toast({
+            type: toast.types.ERROR,
+            message: m.fpNotFoundError,
+            messageValues: {
+              lorawanVersion,
+              freqPlan,
+              code: msg => <code>{msg}</code>,
+            },
+          })
+        } else {
+          toast({
+            type: toast.types.ERROR,
+            message: m.macSettingsError,
+            messageValues: {
+              freqPlan,
+              code: msg => <code>{msg}</code>,
+            },
+          })
+        }
+      }
+    }
+    const resetMacSettings = () => {
+      setMacSettings({})
+    }
+
+    if (freqPlan && phyVersion) {
+      if (freqPlanRef.current !== freqPlan || phyVersionRef.current !== phyVersion) {
+        freqPlanRef.current = freqPlan
+        phyVersionRef.current = phyVersion
+
+        updateMacSettings()
+      }
+    } else {
+      resetMacSettings()
+    }
+  }, [freqPlan, getDefaultMacSettings, lorawanVersion, phyVersion, validationContext])
 
   const handleIdPrefill = React.useCallback(() => {
     if (formRef.current) {
@@ -296,6 +398,7 @@ const ManualForm = props => {
           ...castedValues
         } = validationSchema.cast(values, {
           context: validationContext,
+          stripUnknown: true,
         })
         const {
           ids,
@@ -364,7 +467,7 @@ const ManualForm = props => {
       type="byte"
       min={8}
       max={8}
-      required
+      required={isOTAA}
       component={Input.Generate}
       tooltipId={tooltipIds.DEV_EUI}
       onBlur={handleIdPrefill}
@@ -381,7 +484,7 @@ const ManualForm = props => {
       type="byte"
       min={8}
       max={8}
-      required
+      required={isOTAA}
       component={Input}
       tooltipId={tooltipIds.DEV_EUI}
       onBlur={handleIdPrefill}
@@ -413,6 +516,7 @@ const ManualForm = props => {
         component={PhyVersionInput}
         lorawanVersion={lorawanVersion}
         tooltipId={tooltipIds.REGIONAL_PARAMETERS}
+        onChange={handlePhyVersionChange}
       />
       <NsFrequencyPlansSelect
         required={nsEnabled}
@@ -431,6 +535,7 @@ const ManualForm = props => {
         onDefaultNsSettingsChange={handleDefaultNsSettings}
         defaultNsSettings={defaultNsSettings}
         freqPlan={freqPlan}
+        defaultMacSettings={macSettings}
       />
       <hr />
       {!isMulticast && devEUIComponent}
@@ -566,6 +671,7 @@ ManualForm.propTypes = {
   createDevice: PropTypes.func.isRequired,
   createDeviceSuccess: PropTypes.func.isRequired,
   fetchDevEUICounter: PropTypes.func.isRequired,
+  getDefaultMacSettings: PropTypes.func.isRequired,
   jsConfig: PropTypes.stackComponent.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,
   nsConfig: PropTypes.stackComponent.isRequired,

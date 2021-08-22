@@ -193,7 +193,7 @@ const m = defineMessages({
     'The data rate used for the RX2 window. For OTAA devices, this is configured as part of join. For ABP devices, a matching value must be programmed in the device.',
 
   networkRxDefaultsDescription:
-    'The network uses a set of default values for Rx delays and frequencies that the end device uses. These are based on the recommendations made for the respective band. In most cases these defaults will be correct for your setup. If you wish to use different settings, you can uncheck this checkbox and use custom values.',
+    'The network uses a set of default MAC settings (e.g. Rx delays, data rates and frequencies) for the end device. These are based on the recommendations made for the respective band. In most cases these defaults will be correct for your setup. If you wish to use different settings, you can uncheck this checkbox and use custom values.',
 
   clusterSettingsDescription:
     'By default, the server components of the current cluster are used. However, for advanced use cases, it is possible to register this end device to different Network Server and/or Join Server.',

@@ -35,7 +35,7 @@ const isEqual = (current, desired) => {
 
 const m = defineMessages({
   desiredDescription:
-    'The network will use a different <i>desired</i> value of <pre>{value}</pre> for this property.',
+    'The network will use a different <i>desired</i> value of <code>{value}</code> for this property.',
   sessionDescription:
     'An ABP device is personalized with a session and MAC settings. These MAC settings are considered the current parameters and must match exactly the settings entered here. The Network Server uses desired parameters to change the MAC state with LoRaWAN MAC commands to the desired state. You can use the General Settings page to update the desired setting after you registered the end device.',
 })
@@ -50,7 +50,7 @@ const Content = props => {
         values={{
           value: desired,
           i: txt => <i>{txt}</i>,
-          pre: txt => <pre className={style.defaultValue}>{txt}</pre>,
+          code: txt => <code>{txt}</code>,
         }}
       />
       <Message content={m.sessionDescription} component="p" />

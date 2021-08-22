@@ -173,26 +173,74 @@ const sessionSchema = Yup.object({
 
 const macSettingsSchema = Yup.object({
   mac_settings: Yup.object().when(
-    ['_activation_mode', 'supports_class_b', 'supports_class_c'],
-    (mode, isClassB, isClassC, schema) =>
+    [
+      '_activation_mode',
+      'supports_class_b',
+      'supports_class_c',
+      '$hasRxDataRateOffset',
+      '$hasRxDelay',
+      '$hasRxDataRateIndex',
+      '$hasPingSlotDataRateIndex',
+      '$hasBeaconFrequency',
+      '$hasClassBTimeout',
+      '$hasClassCTimeout',
+      '$hasPingSlotFrequency',
+    ],
+    (
+      mode,
+      isClassB,
+      isClassC,
+      hasRxDelay,
+      hasRxDataRateOffset,
+      hasRxDataRateIndex,
+      hasPingSlotDataRateIndex,
+      hasBeaconFrequency,
+      hasClassBTimeout,
+      hasClassCTimeout,
+      hasPingSlotFrequency,
+      schema,
+    ) =>
       schema.shape({
+        resets_f_cnt: Yup.lazy(() => {
+          if (mode !== ACTIVATION_MODES.ABP) {
+            return Yup.boolean().strip()
+          }
+
+          return Yup.boolean()
+        }),
         rx1_data_rate_offset: Yup.lazy(value => {
-          if (mode !== ACTIVATION_MODES.ABP || value === undefined) {
+          if (mode !== ACTIVATION_MODES.ABP || (value === undefined && !hasRxDataRateOffset)) {
             return Yup.number().strip()
           }
 
-          return Yup.number()
+          const schema = Yup.number()
             .min(0, Yup.passValues(sharedMessages.validateNumberGte))
             .max(7, Yup.passValues(sharedMessages.validateNumberLte))
+
+          if (hasRxDataRateOffset) {
+            return schema.required(sharedMessages.validateRequired)
+          }
+
+          return schema
         }),
         rx1_delay: Yup.lazy(delay => {
-          if (mode !== ACTIVATION_MODES.ABP || delay === undefined || delay === '') {
+          if (
+            mode !== ACTIVATION_MODES.ABP ||
+            delay === undefined ||
+            (delay === '' && !hasRxDelay)
+          ) {
             return Yup.number().strip()
           }
 
-          return Yup.number()
+          const schema = Yup.number()
             .min(1, Yup.passValues(sharedMessages.validateNumberGte))
             .max(15, Yup.passValues(sharedMessages.validateNumberLte))
+
+          if (hasRxDelay) {
+            return schema.required(sharedMessages.validateRequired)
+          }
+
+          return schema
         }),
         factory_preset_frequencies: Yup.lazy(frequencies => {
           if (!Boolean(frequencies)) {
@@ -218,19 +266,76 @@ const macSettingsSchema = Yup.object({
           }
           return Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
         }),
-        rx2_data_rate_index: Yup.lazy(dataRate => {
-          if (dataRate === '' || dataRate === undefined) {
+        beacon_frequency: Yup.lazy(frequency => {
+          if (!isClassB || ((frequency === undefined || frequency === '') && !hasBeaconFrequency)) {
             return Yup.number().strip()
           }
 
-          return Yup.number()
+          const schema = Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
+
+          if (hasBeaconFrequency) {
+            return schema.required(sharedMessages.validateRequired)
+          }
+
+          return schema
+        }),
+        ping_slot_frequency: Yup.lazy(frequency => {
+          if (
+            !isClassB ||
+            ((frequency === undefined || frequency === '') && !hasPingSlotFrequency)
+          ) {
+            return Yup.number().strip()
+          }
+
+          const schema = Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
+
+          if (hasPingSlotFrequency) {
+            return schema.required(sharedMessages.validateRequired)
+          }
+
+          return schema
+        }),
+        rx2_data_rate_index: Yup.lazy(dataRate => {
+          if ((dataRate === '' || dataRate === undefined) && !hasRxDataRateIndex) {
+            return Yup.number().strip()
+          }
+
+          const schema = Yup.number()
             .min(0, Yup.passValues(sharedMessages.validateNumberGte))
             .max(15, Yup.passValues(sharedMessages.validateNumberLte))
+
+          if (hasRxDataRateIndex) {
+            return schema.required(sharedMessages.validateRequired)
+          }
+
+          return schema
+        }),
+        ping_slot_data_rate_index: Yup.lazy(dataRate => {
+          if (
+            !isClassB ||
+            ((dataRate === '' || dataRate === undefined) && !hasPingSlotDataRateIndex)
+          ) {
+            return Yup.number().strip()
+          }
+
+          const schema = Yup.number()
+            .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+            .max(15, Yup.passValues(sharedMessages.validateNumberLte))
+
+          if (hasPingSlotDataRateIndex) {
+            return schema.required(sharedMessages.validateRequired)
+          }
+
+          return schema
         }),
         ping_slot_periodicity: Yup.lazy(value => {
           if (isClassB) {
             if (mode === ACTIVATION_MODES.MULTICAST || mode === ACTIVATION_MODES.ABP) {
               return Yup.string().required(sharedMessages.validateRequired)
+            }
+
+            if (!value) {
+              return Yup.string().strip()
             }
 
             return Yup.string()
@@ -239,15 +344,23 @@ const macSettingsSchema = Yup.object({
           return Yup.string().strip()
         }),
         class_b_timeout: Yup.lazy(value => {
-          if (!isClassB || !Boolean(value)) {
+          if (!isClassB || (!Boolean(value) && !hasClassBTimeout)) {
             return Yup.string().strip()
+          }
+
+          if (hasClassBTimeout) {
+            return Yup.string().required(sharedMessages.validateRequired)
           }
 
           return Yup.string()
         }),
         class_c_timeout: Yup.lazy(value => {
-          if (!isClassC || !Boolean(value)) {
+          if (!isClassC || (!Boolean(value) && !hasClassCTimeout)) {
             return Yup.string().strip()
+          }
+
+          if (hasClassBTimeout) {
+            return Yup.string().required(sharedMessages.validateRequired)
           }
 
           return Yup.string()
@@ -320,6 +433,7 @@ const validationSchema = Yup.object({
 
     return schema.oneOf(Object.values(DEVICE_CLASS_MAP)).default(DEVICE_CLASS_MAP.CLASS_A)
   }),
+  _default_ns_settings: Yup.bool(),
   _activation_mode: Yup.mixed().when(
     ['$nsEnabled', '$jsEnabled', '$mayEditKeys'],
     (nsEnabled, jsEnabled, mayEditKeys, schema) => {
@@ -444,6 +558,7 @@ const validationSchema = Yup.object({
   .concat(rootKeysSchema)
   .concat(sessionSchema)
   .concat(macSettingsSchema)
+  .noUnknown()
 
 export {
   validationSchema as default,

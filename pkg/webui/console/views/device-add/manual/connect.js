@@ -38,6 +38,8 @@ const mapStateToProps = state => ({
   prefixes: selectJoinEUIPrefixes(state),
   createDevice: (appId, device) => api.device.create(appId, device),
   applicationDevEUICounter: selectApplicationDevEUICount(state),
+  getDefaultMacSettings: (freqPlan, phyVersion) =>
+    api.ns.getDefaultMacSettings(freqPlan, phyVersion),
 })
 
 const mapDispatchToProps = dispatch => ({
