@@ -76,6 +76,7 @@ class Tabular extends React.Component {
       data,
       headers,
       emptyMessage,
+      clickable,
     } = this.props
 
     const columns = (
@@ -108,7 +109,7 @@ class Tabular extends React.Component {
     const rows =
       paginatedData.length > 0 ? (
         paginatedData.map((row, rowKey) => (
-          <Table.Row key={rowKey} id={rowKey} onClick={onRowClick}>
+          <Table.Row key={rowKey} id={rowKey} onClick={onRowClick} clickable={clickable}>
             {headers.map((header, index) => {
               const value = headers[index].getValue
                 ? headers[index].getValue(row)
@@ -157,6 +158,7 @@ class Tabular extends React.Component {
 
 Tabular.propTypes = {
   className: PropTypes.string,
+  clickable: PropTypes.bool,
   /** A list of data entries to display within the table body. */
   data: PropTypes.arrayOf(PropTypes.shape({})),
   /** The empty message to be displayed when no data provided. */
@@ -228,6 +230,7 @@ Tabular.defaultProps = {
   totalCount: 0,
   page: 0,
   pageSize: undefined,
+  clickable: true,
 }
 
 export { Tabular as default, Table }
