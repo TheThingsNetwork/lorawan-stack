@@ -18,6 +18,8 @@ import {
   createPaginationBaseActionType,
   createPaginationDeleteBaseActionType,
   createPaginationDeleteActions,
+  createPaginationRestoreBaseActionType,
+  createPaginationRestoreActions,
 } from '@ttn-lw/lib/store/actions/pagination'
 
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
@@ -100,6 +102,16 @@ export const [
     failure: deleteApplicationFailure,
   },
 ] = createPaginationDeleteActions(SHARED_NAME, id => ({ id }))
+
+export const RESTORE_APP_BASE = createPaginationRestoreBaseActionType(SHARED_NAME)
+export const [
+  { request: RESTORE_APP, success: RESTORE_APP_SUCCESS, failure: RESTORE_APP_FAILURE },
+  {
+    request: restoreApplication,
+    success: restoreApplicationSuccess,
+    failure: restoreApplicationFailure,
+  },
+] = createPaginationRestoreActions(SHARED_NAME, id => ({ id }))
 
 export const GET_APPS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [

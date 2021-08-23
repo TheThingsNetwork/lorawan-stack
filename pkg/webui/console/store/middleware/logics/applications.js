@@ -73,12 +73,23 @@ const deleteApplicationLogic = createRequestLogic({
   },
 })
 
+const restoreApplicationLogic = createRequestLogic({
+  type: applications.RESTORE_APP,
+  process: async ({ action }) => {
+    const { id } = action.payload
+
+    await api.application.restore(id)
+
+    return { id }
+  },
+})
+
 const getApplicationsLogic = createRequestLogic({
   type: applications.GET_APPS_LIST,
   latest: true,
   process: async ({ action }) => {
     const {
-      params: { page, limit, query, order },
+      params: { page, limit, query, order, deleted },
     } = action.payload
     const { selectors, options } = action.meta
 
@@ -89,6 +100,7 @@ const getApplicationsLogic = createRequestLogic({
             limit,
             id_contains: query,
             order,
+            deleted,
           },
           selectors,
         )
@@ -153,6 +165,7 @@ export default [
   getApplicationDeviceCountLogic,
   updateApplicationLogic,
   deleteApplicationLogic,
+  restoreApplicationLogic,
   getApplicationsLogic,
   getApplicationsRightsLogic,
   getApplicationLinkLogic,
