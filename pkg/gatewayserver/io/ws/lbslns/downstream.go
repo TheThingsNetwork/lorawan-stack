@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -84,6 +85,8 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 
 	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
 	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))
+
+	log.FromContext(ctx).WithField("xtime", dnmsg.XTime).Info("Prepare downlink message")
 
 	// This field is not used but needs to be defined for the station to parse the json and should be non-zero for the station to return tx confirmations.
 	dnmsg.DevEUI = "00-00-00-00-00-00-00-01"
