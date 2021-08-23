@@ -18,6 +18,8 @@ import {
   createPaginationBaseActionType,
   createPaginationDeleteBaseActionType,
   createPaginationDeleteActions,
+  createPaginationRestoreBaseActionType,
+  createPaginationRestoreActions,
 } from '@ttn-lw/lib/store/actions/pagination'
 
 import {
@@ -105,6 +107,16 @@ export const [
     failure: deleteORganizationFailure,
   },
 ] = createPaginationDeleteActions(SHARED_NAME, id => ({ id }))
+
+export const RESTORE_ORG_BASE = createPaginationRestoreBaseActionType(SHARED_NAME)
+export const [
+  { request: RESTORE_ORG, success: RESTORE_ORG_SUCCESS, failure: RESTORE_ORG_FAILURE },
+  {
+    request: restoreOrganization,
+    success: restoreOrganizationSuccess,
+    failure: restoreOrganizationFailure,
+  },
+] = createPaginationRestoreActions(SHARED_NAME, id => ({ id }))
 
 export const START_ORG_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_ORG_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)

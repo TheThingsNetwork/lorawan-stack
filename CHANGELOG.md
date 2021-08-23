@@ -17,6 +17,7 @@ For details about compatibility between different releases, see the **Commitment
 - Improved errors for invalid command-line flags.
 - Validation of entity attributes in the Console, with regards to maximum length for keys and values.
 - CLI command to decode raw LoRaWAN frames (`ttn-lw-cli lorawan decode`), useful for debugging purposes.
+- Options to restore or purge deleted applications, gateways and organizations in the Console.
 
 ### Changed
 

@@ -40,7 +40,7 @@ const getOrganizationsLogic = createRequestLogic({
   latest: true,
   process: async ({ action }) => {
     const {
-      params: { page, limit, order, query },
+      params: { page, limit, order, query, deleted },
     } = action.payload
     const { selectors, options } = action.meta
 
@@ -50,6 +50,7 @@ const getOrganizationsLogic = createRequestLogic({
             page,
             limit,
             id_contains: query,
+            deleted,
           },
           selectors,
         )
@@ -98,6 +99,17 @@ const deleteOrganizationLogic = createRequestLogic({
   },
 })
 
+const restoreOrganizationLogic = createRequestLogic({
+  type: organizations.RESTORE_ORG,
+  process: async ({ action }) => {
+    const { id } = action.payload
+
+    await api.organization.restore(id)
+
+    return { id }
+  },
+})
+
 const getOrganizationsRightsLogic = createRequestLogic({
   type: organizations.GET_ORGS_RIGHTS_LIST,
   process: async ({ action }) => {
@@ -113,6 +125,7 @@ export default [
   createOrganizationLogic,
   updateOrganizationLogic,
   deleteOrganizationLogic,
+  restoreOrganizationLogic,
   getOrganizationsRightsLogic,
   ...createEventsConnectLogics(
     organizations.SHARED_NAME,
