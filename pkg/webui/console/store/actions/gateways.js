@@ -18,6 +18,8 @@ import {
   createPaginationBaseActionType,
   createPaginationDeleteBaseActionType,
   createPaginationDeleteActions,
+  createPaginationRestoreBaseActionType,
+  createPaginationRestoreActions,
 } from '@ttn-lw/lib/store/actions/pagination'
 
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
@@ -69,6 +71,12 @@ export const [
   { request: DELETE_GTW, success: DELETE_GTW_SUCCESS, failure: DELETE_GTW_FAILURE },
   { request: deleteGateway, success: deleteGatewaySuccess, failure: deleteGatewayFailure },
 ] = createPaginationDeleteActions(SHARED_NAME)
+
+export const RESTORE_GTW_BASE = createPaginationRestoreBaseActionType(SHARED_NAME)
+export const [
+  { request: RESTORE_GTW, success: RESTORE_GTW_SUCCESS, failure: RESTORE_GTW_FAILURE },
+  { request: restoreGateway, success: restoreGatewaySuccess, failure: restoreGatewayFailure },
+] = createPaginationRestoreActions(SHARED_NAME, id => ({ id }))
 
 export const GET_GTWS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [

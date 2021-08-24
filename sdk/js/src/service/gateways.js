@@ -157,6 +157,16 @@ class Gateways {
     return this._emitDefaults(mask, Marshaler.unwrapGateway(response))
   }
 
+  async restoreById(id) {
+    const response = await this._api.GatewayRegistry.Restore({
+      routeParams: {
+        gateway_id: id,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   // Creation.
 
   async create(ownerId = this._defaultUserId, gateway, isUserOwner = true) {

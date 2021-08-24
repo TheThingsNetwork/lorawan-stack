@@ -43,11 +43,21 @@ const m = defineMessages({
 })
 
 const DeleteModalButton = props => {
-  const { entityId, entityName, onApprove, onCancel, shouldConfirm, mayPurge, message } = props
+  const {
+    entityId,
+    entityName,
+    onApprove,
+    onCancel,
+    shouldConfirm,
+    mayPurge,
+    message,
+    onlyPurge,
+  } = props
+
   const name = entityName ? entityName : entityId
 
   const [confirmId, setConfirmId] = React.useState('')
-  const [purgeEntity, setPurgeEntity] = React.useState(false)
+  const [purgeEntity, setPurgeEntity] = React.useState(onlyPurge)
   const handlePurgeEntityChange = React.useCallback(() => {
     setPurgeEntity(purge => !purge)
     setConfirmId('')
@@ -93,7 +103,7 @@ const DeleteModalButton = props => {
               component="p"
             />
             <Form initialValues={initialValues}>
-              {mayPurge && (
+              {(mayPurge || !onlyPurge) && (
                 <Form.Field
                   name="purge"
                   className={style.hardDeleteCheckbox}
@@ -143,6 +153,7 @@ DeleteModalButton.propTypes = {
   message: PropTypes.message.isRequired,
   onApprove: PropTypes.func,
   onCancel: PropTypes.func,
+  onlyPurge: PropTypes.bool,
   shouldConfirm: PropTypes.bool,
 }
 
@@ -152,6 +163,7 @@ DeleteModalButton.defaultProps = {
   onCancel: undefined,
   shouldConfirm: false,
   mayPurge: false,
+  onlyPurge: false,
 }
 
 export default DeleteModalButton

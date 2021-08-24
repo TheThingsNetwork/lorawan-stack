@@ -12,19 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { defineMessages } from 'react-intl'
+
+import toast from '@ttn-lw/components/toast'
+import Button from '@ttn-lw/components/button'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import DeleteModalButton from '@console/components/delete-modal-button'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { checkFromState, mayCreateOrganizations } from '@console/lib/feature-checks'
 
-import { getOrganizationsList } from '@console/store/actions/organizations'
+import {
+  getOrganizationsList,
+  deleteOrganization,
+  restoreOrganization,
+} from '@console/store/actions/organizations'
 
 import { selectUserIsAdmin } from '@console/store/selectors/user'
 import {
@@ -34,29 +46,16 @@ import {
   selectOrganizationsError,
 } from '@console/store/selectors/organizations'
 
-const headers = [
-  {
-    name: 'ids.organization_id',
-    displayName: sharedMessages.id,
-    width: 25,
-    sortable: true,
-    sortKey: 'organization_id',
-  },
-  {
-    name: 'name',
-    displayName: sharedMessages.name,
-    width: 25,
-    sortable: true,
-  },
-  {
-    name: 'description',
-    displayName: sharedMessages.description,
-    width: 50,
-  },
-]
+const m = defineMessages({
+  restoreSuccess: 'Organization restored',
+  restoreFail: 'There was an error and the organization could not be restored',
+  purgeSuccess: 'Organization purged',
+  purgeFail: 'There was an error and the organization could not be purged',
+})
 
 const OWNED_TAB = 'owned'
 const ALL_TAB = 'all'
+const DELETED_TAB = 'deleted'
 const tabs = [
   {
     title: sharedMessages.organizations,
@@ -66,55 +65,175 @@ const tabs = [
     title: sharedMessages.allAdmin,
     name: ALL_TAB,
   },
+  { title: sharedMessages.deleted, name: DELETED_TAB },
 ]
 
-class OrganizationsTable extends Component {
-  static propTypes = {
-    isAdmin: PropTypes.bool.isRequired,
-    pageSize: PropTypes.number.isRequired,
-  }
+const OrganizationsTable = props => {
+  const { pageSize, isAdmin, purgeOrganization, restoreOrganization } = props
 
-  constructor(props) {
-    super(props)
+  const [tab, setTab] = React.useState(OWNED_TAB)
+  const isDeletedTab = tab === DELETED_TAB
 
-    this.getOrganizationsList = params => {
-      const { tab, query } = params
+  const handleRestore = React.useCallback(
+    async id => {
+      try {
+        await restoreOrganization(id)
+        toast({
+          title: id,
+          message: m.restoreSuccess,
+          type: toast.types.SUCCESS,
+        })
+      } catch (err) {
+        toast({
+          title: id,
+          message: m.restoreFail,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [restoreOrganization],
+  )
 
-      return getOrganizationsList(params, ['name', 'description'], {
-        isSearch: tab === ALL_TAB || query.length > 0,
+  const handlePurge = React.useCallback(
+    async id => {
+      try {
+        await purgeOrganization(id)
+        toast({
+          title: id,
+          message: m.purgeSuccess,
+          type: toast.types.SUCCESS,
+        })
+      } catch (err) {
+        toast({
+          title: id,
+          message: m.purgeFail,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [purgeOrganization],
+  )
+
+  const headers = React.useMemo(() => {
+    const baseHeaders = [
+      {
+        name: 'ids.organization_id',
+        displayName: sharedMessages.id,
+        width: 25,
+        sortable: true,
+        sortKey: 'organization_id',
+      },
+      {
+        name: 'name',
+        displayName: sharedMessages.name,
+        width: 25,
+        sortable: true,
+      },
+      {
+        name: 'description',
+        displayName: sharedMessages.description,
+        width: 50,
+      },
+    ]
+
+    if (isDeletedTab) {
+      baseHeaders.push({
+        name: 'actions',
+        displayName: sharedMessages.actions,
+        width: 50,
+        getValue: row => ({
+          id: row.ids.organization_id,
+          name: row.name,
+          restore: handleRestore.bind(null, row.ids.organization_id),
+          purge: handlePurge.bind(null, row.ids.organization_id),
+        }),
+        render: details => (
+          <>
+            <Button message={sharedMessages.restore} secondary onClick={details.restore} />
+            <DeleteModalButton
+              entityId={details.id}
+              entityName={name}
+              message={sharedMessages.purge}
+              onApprove={details.purge}
+              onlyPurge
+            />
+          </>
+        ),
+      })
+    } else {
+      baseHeaders.push({
+        name: 'description',
+        displayName: sharedMessages.description,
+        width: 50,
       })
     }
-  }
 
-  baseDataSelector(state) {
-    return {
+    return baseHeaders
+  }, [handlePurge, handleRestore, isDeletedTab])
+
+  const baseDataSelector = React.useCallback(
+    state => ({
       organizations: selectOrganizations(state),
       totalCount: selectOrganizationsTotalCount(state),
       fetching: selectOrganizationsFetching(state),
       error: selectOrganizationsError(state),
       mayAdd: checkFromState(mayCreateOrganizations, state),
-    }
-  }
+    }),
+    [],
+  )
 
-  render() {
-    const { pageSize, isAdmin } = this.props
+  const getOrganizations = React.useCallback(filters => {
+    const { tab, query } = filters
+    const isDeletedTab = tab === DELETED_TAB
 
-    return (
-      <FetchTable
-        entity="organizations"
-        headers={headers}
-        addMessage={sharedMessages.addOrganization}
-        tableTitle={<Message content={sharedMessages.organizations} />}
-        getItemsAction={this.getOrganizationsList}
-        baseDataSelector={this.baseDataSelector}
-        pageSize={pageSize}
-        searchable
-        tabs={isAdmin ? tabs : []}
-      />
-    )
-  }
+    setTab(tab)
+
+    return getOrganizationsList({ ...filters, deleted: isDeletedTab }, ['name', 'description'], {
+      isSearch: tab === ALL_TAB || isDeletedTab || query.length > 0,
+    })
+  }, [])
+
+  return (
+    <FetchTable
+      entity="organizations"
+      headers={headers}
+      addMessage={sharedMessages.addOrganization}
+      tableTitle={<Message content={sharedMessages.organizations} />}
+      getItemsAction={getOrganizations}
+      baseDataSelector={baseDataSelector}
+      pageSize={pageSize}
+      searchable
+      clickable={!isDeletedTab}
+      tabs={isAdmin ? tabs : []}
+    />
+  )
 }
 
-export default connect(state => ({
-  isAdmin: selectUserIsAdmin(state),
-}))(OrganizationsTable)
+OrganizationsTable.propTypes = {
+  isAdmin: PropTypes.bool.isRequired,
+  pageSize: PropTypes.number.isRequired,
+  purgeOrganization: PropTypes.func.isRequired,
+  restoreOrganization: PropTypes.func.isRequired,
+}
+
+export default connect(
+  state => ({
+    isAdmin: selectUserIsAdmin(state),
+  }),
+  dispatch => ({
+    ...bindActionCreators(
+      {
+        purgeOrganization: attachPromise(deleteOrganization),
+        restoreOrganization: attachPromise(restoreOrganization),
+      },
+      dispatch,
+    ),
+  }),
+  (stateProps, dispatchProps, ownProps) => ({
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps,
+    purgeOrganization: id => dispatchProps.purgeOrganization(id, { purge: true }),
+    restoreOrganization: id => dispatchProps.restoreOrganization(id),
+  }),
+)(OrganizationsTable)

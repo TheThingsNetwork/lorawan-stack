@@ -17,6 +17,7 @@ import {
   createPaginationRequestActions,
   createPaginationDeleteActions,
   createPaginationByIdDeleteActions,
+  createPaginationRestoreActions,
 } from '@ttn-lw/lib/store/actions/pagination'
 
 const defaultState = {
@@ -27,6 +28,7 @@ const defaultState = {
 export const createNamedPaginationReducer = (reducerName, entityIdSelector) => {
   const [{ success: GET_PAGINATION_SUCCESS }] = createPaginationRequestActions(reducerName)
   const [{ success: DELETE_PAGINATION_SUCCESS }] = createPaginationDeleteActions(reducerName)
+  const [{ success: RESTORE_PAGINATION_SUCCESS }] = createPaginationRestoreActions(reducerName)
 
   return (state = defaultState, { type, payload }) => {
     switch (type) {
@@ -37,6 +39,7 @@ export const createNamedPaginationReducer = (reducerName, entityIdSelector) => {
           ids: payload.entities.map(entityIdSelector),
         }
       case DELETE_PAGINATION_SUCCESS:
+      case RESTORE_PAGINATION_SUCCESS:
         return {
           ...state,
           totalCount: state.totalCount - 1,

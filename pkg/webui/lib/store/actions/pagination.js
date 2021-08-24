@@ -18,6 +18,8 @@ export const createPaginationBaseActionType = name => `GET_${name}_LIST`
 
 export const createPaginationDeleteBaseActionType = name => `DELETE_${name}`
 
+export const createPaginationRestoreBaseActionType = name => `RESTORE_${name}`
+
 export const createPaginationByParentRequestActions = name =>
   createRequestActions(
     createPaginationBaseActionType(name),
@@ -45,8 +47,8 @@ export const createPaginationByIdRequestActions = (
 
 export const createPaginationRequestActions = (
   name,
-  requestPayloadCreator = ({ page, limit, query, order } = {}) => ({
-    params: { page, limit, query, order },
+  requestPayloadCreator = ({ page, limit, query, order, deleted } = {}) => ({
+    params: { page, limit, query, order, deleted },
   }),
   requestMetaCreator = (params, selectors = [], options = {}) => ({ selectors, options }),
 ) =>
@@ -68,3 +70,10 @@ export const createPaginationByIdDeleteActions = name =>
     id,
     targetId,
   }))
+
+export const createPaginationRestoreActions = name =>
+  createRequestActions(
+    createPaginationRestoreBaseActionType(name),
+    id => ({ id }),
+    (id, options = {}) => ({ options }),
+  )

@@ -71,12 +71,23 @@ const deleteGatewayLogic = createRequestLogic({
   },
 })
 
+const restoreGatewayLogic = createRequestLogic({
+  type: gateways.RESTORE_GTW,
+  process: async ({ action }) => {
+    const { id } = action.payload
+
+    await api.gateway.restore(id)
+
+    return { id }
+  },
+})
+
 const getGatewaysLogic = createRequestLogic({
   type: gateways.GET_GTWS_LIST,
   latest: true,
   process: async ({ action }) => {
     const {
-      params: { page, limit, query, order },
+      params: { page, limit, query, order, deleted },
     } = action.payload
     const { selectors, options } = action.meta
 
@@ -87,6 +98,7 @@ const getGatewaysLogic = createRequestLogic({
             limit,
             id_contains: query,
             order,
+            deleted,
           },
           selectors,
         )
@@ -221,6 +233,7 @@ export default [
   getGatewayLogic,
   updateGatewayLogic,
   deleteGatewayLogic,
+  restoreGatewayLogic,
   getGatewaysLogic,
   getGatewaysRightsLogic,
   startGatewayStatisticsLogic,

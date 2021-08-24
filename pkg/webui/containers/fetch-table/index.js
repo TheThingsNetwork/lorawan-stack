@@ -80,6 +80,7 @@ class FetchTable extends Component {
   static propTypes = {
     actionItems: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
     addMessage: PropTypes.message,
+    clickable: PropTypes.bool,
     dispatch: PropTypes.func.isRequired,
     entity: PropTypes.string.isRequired,
     error: PropTypes.error,
@@ -145,6 +146,7 @@ class FetchTable extends Component {
     tabs: [],
     actionItems: null,
     error: undefined,
+    clickable: true,
   }
 
   constructor(props) {
@@ -306,6 +308,7 @@ class FetchTable extends Component {
       entity,
       error,
       searchPlaceholderMessage,
+      clickable,
     } = this.props
     const { page, query, tab, order, initialFetch } = this.state
     let orderDirection, orderBy
@@ -389,6 +392,7 @@ class FetchTable extends Component {
             onSortRequest={this.onOrderChange}
             order={orderDirection}
             orderBy={orderBy}
+            clickable={clickable}
           />
         </Overlay>
       </div>
