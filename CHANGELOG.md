@@ -49,6 +49,7 @@ For details about compatibility between different releases, see the **Commitment
 - Avoid rendering blank pages in the Console for certain errors.
 - Blank page crashes in the Console for certain browsers that do not fully support `Intl` API.
 - End device session keys handling in the Console.
+- Byte input width in Safari in the Console.
 
 ### Security
 
