@@ -278,7 +278,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					continue
 				}
 
-				logger.Info("Send downlink message")
 				wsWriteMu.Lock()
 				err = ws.WriteMessage(websocket.TextMessage, dnmsg)
 				wsWriteMu.Unlock()
