@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -27,7 +28,7 @@ import (
 )
 
 // handleDownlinkTaskQueueTest runs a test suite on q.
-func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
+func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue, consumerIDs []string) {
 	t, a := test.MustNewTFromContext(ctx)
 
 	pbs := [...]ttnpb.EndDeviceIdentifiers{
@@ -52,39 +53,53 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 	}
 
 	type slot struct {
-		ctx    context.Context
-		id     ttnpb.EndDeviceIdentifiers
-		t      time.Time
-		respCh chan<- TaskPopFuncResponse
+		ctx        context.Context
+		id         ttnpb.EndDeviceIdentifiers
+		t          time.Time
+		consumerID string
+		respCh     chan<- TaskPopFuncResponse
 	}
 
-	popCtx := context.WithValue(ctx, &struct{}{}, "pop")
-	nextPop := make(chan struct{})
+	popCtx, cancelPopCtx := context.WithCancel(context.WithValue(ctx, &struct{}{}, "pop"))
+	defer cancelPopCtx()
+	nextPop := make(map[string]chan struct{}, len(consumerIDs))
+	for _, consumerID := range consumerIDs {
+		nextPop[consumerID] = make(chan struct{})
+	}
 	slotCh := make(chan slot)
 	errCh := make(chan error)
-	go func() {
-		for {
-			<-nextPop
-			select {
-			case <-ctx.Done():
-				return
-			case errCh <- q.Pop(popCtx, func(ctx context.Context, id ttnpb.EndDeviceIdentifiers, t time.Time) (time.Time, error) {
-				respCh := make(chan TaskPopFuncResponse)
-				slotCh <- slot{
-					ctx:    ctx,
-					id:     id,
-					t:      t,
-					respCh: respCh,
+	for _, consumerID := range consumerIDs {
+		go func(consumerID string) {
+			for {
+				select {
+				case <-nextPop[consumerID]:
+				case <-popCtx.Done():
+					errCh <- popCtx.Err()
 				}
-				resp := <-respCh
-				return resp.Time, resp.Error
-			}):
+				select {
+				case <-ctx.Done():
+					return
+				case errCh <- q.Pop(popCtx, consumerID, func(ctx context.Context, id ttnpb.EndDeviceIdentifiers, t time.Time) (time.Time, error) {
+					respCh := make(chan TaskPopFuncResponse)
+					slotCh <- slot{
+						ctx:        ctx,
+						id:         id,
+						t:          t,
+						respCh:     respCh,
+						consumerID: consumerID,
+					}
+					resp := <-respCh
+					return resp.Time, resp.Error
+				}):
+				}
 			}
-		}
-	}()
+		}(consumerID)
+	}
 
 	// Ensure the goroutine has started
-	nextPop <- struct{}{}
+	for _, consumerID := range consumerIDs {
+		nextPop[consumerID] <- struct{}{}
+	}
 
 	// Ensure Pop is blocking on empty queue.
 	select {
@@ -111,22 +126,24 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 		}
 		s.respCh <- TaskPopFuncResponse{}
 
+		select {
+		case err := <-errCh:
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+
+		case <-ctx.Done():
+			t.Fatal("Timed out waiting for Pop to return")
+		}
+
+		nextPop[s.consumerID] <- struct{}{}
+
 	case err := <-errCh:
 		a.So(err, should.BeNil)
 		t.Fatal("Pop returned without calling f on non-empty schedule")
 
 	case <-ctx.Done():
 		t.Fatal("Timed out waiting for Pop to call f")
-	}
-
-	select {
-	case err := <-errCh:
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-
-	case <-ctx.Done():
-		t.Fatal("Timed out waiting for Pop to return")
 	}
 
 	err = q.Add(ctx, pbs[0], time.Unix(0, 42), false)
@@ -164,19 +181,27 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 		t.FailNow()
 	}
 
-	expectSlot := func(t *testing.T, expectedID ttnpb.EndDeviceIdentifiers, expectedAt time.Time) {
-		nextPop <- struct{}{}
-
+	// Expect 3 slots
+	receivedSlots := make(map[ttnpb.EndDeviceIdentifiers][]time.Time, 3)
+	for i := 0; i < 3; i++ {
 		t.Helper()
-
 		a := assertions.New(t)
-
 		select {
 		case s := <-slotCh:
-			a.So(s.id, should.Resemble, expectedID)
-			a.So(s.t, should.Equal, expectedAt)
+			receivedSlots[s.id] = append(receivedSlots[s.id], s.t)
 			a.So(s.ctx, should.HaveParentContextOrEqual, popCtx)
 			s.respCh <- TaskPopFuncResponse{}
+
+			select {
+			case err := <-errCh:
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+
+			case <-ctx.Done():
+				t.Fatal("Timed out waiting for Pop to return")
+			}
+			nextPop[s.consumerID] <- struct{}{}
 
 		case err := <-errCh:
 			a.So(err, should.BeNil)
@@ -186,33 +211,34 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue) {
 			t.Fatal("Timed out waiting for Pop to call f")
 		}
 
-		select {
-		case err := <-errCh:
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-
-		case <-ctx.Done():
-			t.Fatal("Timed out waiting for Pop to return")
-		}
 	}
 
-	expectSlot(t, pbs[0], time.Unix(0, 42))
-	expectSlot(t, pbs[1], time.Unix(42, 0))
-	expectSlot(t, pbs[2], time.Unix(42, 42))
+	a.So(receivedSlots, should.Resemble, map[ttnpb.EndDeviceIdentifiers][]time.Time{
+		pbs[0]: {time.Unix(0, 42).UTC()},
+		pbs[1]: {time.Unix(42, 0).UTC()},
+		pbs[2]: {time.Unix(42, 42).UTC()},
+	})
+
+	cancelPopCtx()
+	for range consumerIDs {
+		select {
+		case err := <-errCh:
+			a.So(errors.IsCanceled(err), should.BeTrue)
+		case <-ctx.Done():
+		}
+	}
 }
 
 // HandleDownlinkTaskQueueTest runs a DownlinkTaskQueue test suite on reg.
-func HandleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
+func HandleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue, consumerIDs []string) {
 	t.Helper()
 	test.RunTest(t, test.TestConfig{
-		Parallel: true,
 		Func: func(ctx context.Context, a *assertions.Assertion) {
 			t.Helper()
 			test.RunSubtestFromContext(ctx, test.SubtestConfig{
 				Name: "1st run",
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-					handleDownlinkTaskQueueTest(ctx, q)
+					handleDownlinkTaskQueueTest(ctx, q, consumerIDs)
 				},
 			})
 			if t.Failed() {
@@ -221,7 +247,7 @@ func HandleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
 			test.RunSubtestFromContext(ctx, test.SubtestConfig{
 				Name: "2st run",
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-					handleDownlinkTaskQueueTest(ctx, q)
+					handleDownlinkTaskQueueTest(ctx, q, consumerIDs)
 				},
 			})
 		},

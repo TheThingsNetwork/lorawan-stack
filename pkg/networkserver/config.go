@@ -26,8 +26,15 @@ import (
 
 // ApplicationUplinkQueueConfig defines application uplink queue configuration.
 type ApplicationUplinkQueueConfig struct {
-	Queue      ApplicationUplinkQueue `name:"-"`
-	BufferSize uint64                 `name:"buffer-size"`
+	Queue        ApplicationUplinkQueue `name:"-"`
+	BufferSize   uint64                 `name:"buffer-size"`
+	NumConsumers uint64                 `name:"num-consumers"`
+}
+
+// ApplicationUplinkQueueConfig defines downlink task queue configuration.
+type DownlinkTaskQueueConfig struct {
+	Queue        DownlinkTaskQueue `name:"-"`
+	NumConsumers uint64            `name:"num-consumers"`
 }
 
 // MACSettingConfig defines MAC-layer configuration.
@@ -116,7 +123,7 @@ func (c DownlinkPriorityConfig) Parse() (DownlinkPriorities, error) {
 type Config struct {
 	ApplicationUplinkQueue   ApplicationUplinkQueueConfig `name:"application-uplink-queue"`
 	Devices                  DeviceRegistry               `name:"-"`
-	DownlinkTasks            DownlinkTaskQueue            `name:"-"`
+	DownlinkTaskQueue        DownlinkTaskQueueConfig      `name:"downlink-task-queue"`
 	UplinkDeduplicator       UplinkDeduplicator           `name:"-"`
 	ScheduledDownlinkMatcher ScheduledDownlinkMatcher     `name:"-"`
 	NetID                    types.NetID                  `name:"net-id" description:"NetID of this Network Server"`
@@ -134,7 +141,11 @@ type Config struct {
 // DefaultConfig is the default Network Server configuration.
 var DefaultConfig = Config{
 	ApplicationUplinkQueue: ApplicationUplinkQueueConfig{
-		BufferSize: 1000,
+		BufferSize:   1000,
+		NumConsumers: 1,
+	},
+	DownlinkTaskQueue: DownlinkTaskQueueConfig{
+		NumConsumers: 1,
 	},
 	DeduplicationWindow: 200 * time.Millisecond,
 	CooldownWindow:      time.Second,

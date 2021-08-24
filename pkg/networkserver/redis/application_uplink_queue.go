@@ -32,7 +32,6 @@ type ApplicationUplinkQueue struct {
 	redis   *ttnredis.Client
 	maxLen  int64
 	group   string
-	id      string
 	key     string
 	minIdle time.Duration
 }
@@ -42,19 +41,17 @@ const (
 )
 
 // NewApplicationUplinkQueue returns new application uplink queue.
-func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group, id string, minIdle time.Duration) *ApplicationUplinkQueue {
+func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group string, minIdle time.Duration) *ApplicationUplinkQueue {
 	return &ApplicationUplinkQueue{
 		applicationQueue: &ttnredis.TaskQueue{
 			Redis:  cl,
 			MaxLen: maxLen,
 			Group:  group,
-			ID:     id,
 			Key:    cl.Key("application"),
 		},
 		redis:   cl,
 		maxLen:  maxLen,
 		group:   group,
-		id:      id,
 		key:     cl.Key("application-uplink"),
 		minIdle: minIdle,
 	}
@@ -140,8 +137,8 @@ var (
 	errMissingPayload = errors.DefineDataLoss("missing_payload", "missing payload")
 )
 
-func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueDrainFunc) (time.Time, error)) error {
-	return q.applicationQueue.Pop(ctx, nil, func(p redis.Pipeliner, uid string, _ time.Time) error {
+func (q *ApplicationUplinkQueue) Pop(ctx context.Context, consumerID string, f func(context.Context, ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueDrainFunc) (time.Time, error)) error {
+	return q.applicationQueue.Pop(ctx, consumerID, nil, func(p redis.Pipeliner, uid string, _ time.Time) error {
 		appID, err := unique.ToApplicationID(uid)
 		if err != nil {
 			return err
@@ -175,7 +172,7 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context
 				initErr = err
 				continue
 			}
-			p.XGroupDelConsumer(ctx, streams[i], q.group, q.id)
+			p.XGroupDelConsumer(ctx, streams[i], q.group, consumerID)
 		}
 		if initErr != nil {
 			return ttnredis.ConvertError(initErr)
@@ -222,7 +219,7 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, f func(context.Context
 				}
 				return g(ups...)
 			}
-			return ttnredis.RangeStreams(ctx, q.redis, q.group, q.id, int64(limit), q.minIdle, processMessages, streams[:]...)
+			return ttnredis.RangeStreams(ctx, q.redis, q.group, consumerID, int64(limit), q.minIdle, processMessages, streams[:]...)
 		})
 		if err != nil || t.IsZero() {
 			return err

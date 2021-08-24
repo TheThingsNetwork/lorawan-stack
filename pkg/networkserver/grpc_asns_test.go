@@ -683,10 +683,12 @@ func TestDownlinkQueueReplace(t *testing.T) {
 									return tc.SetByIDFunc(ctx, appID, devID, gets, f)
 								},
 							},
-							DownlinkTasks: &MockDownlinkTaskQueue{
-								AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-									atomic.AddUint64(&addCalls, 1)
-									return tc.AddFunc(ctx, ids, startAt, replace)
+							DownlinkTaskQueue: DownlinkTaskQueueConfig{
+								Queue: &MockDownlinkTaskQueue{
+									AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+										atomic.AddUint64(&addCalls, 1)
+										return tc.AddFunc(ctx, ids, startAt, replace)
+									},
 								},
 							},
 							DefaultMACSettings: MACSettingConfig{
@@ -1251,10 +1253,12 @@ func TestDownlinkQueuePush(t *testing.T) {
 									return tc.SetByIDFunc(ctx, appID, devID, gets, f)
 								},
 							},
-							DownlinkTasks: &MockDownlinkTaskQueue{
-								AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
-									atomic.AddUint64(&addCalls, 1)
-									return tc.AddFunc(ctx, ids, startAt, replace)
+							DownlinkTaskQueue: DownlinkTaskQueueConfig{
+								Queue: &MockDownlinkTaskQueue{
+									AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+										atomic.AddUint64(&addCalls, 1)
+										return tc.AddFunc(ctx, ids, startAt, replace)
+									},
 								},
 							},
 							DownlinkQueueCapacity: 100,

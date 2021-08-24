@@ -15,6 +15,7 @@
 package redis_test
 
 import (
+	"fmt"
 	"testing"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver"
@@ -26,8 +27,16 @@ import (
 var _ networkserver.ApplicationUplinkQueue = &ApplicationUplinkQueue{}
 
 func TestApplicationUplinkQueue(t *testing.T) {
-	_, ctx := test.New(t)
-	q, closeFn := NewRedisApplicationUplinkQueue(ctx)
-	t.Cleanup(closeFn)
-	HandleApplicationUplinkQueueTest(t, q)
+	for _, consumers := range []int{1, 2, 4, 8} {
+		t.Run(fmt.Sprintf("Consumers=%d", consumers), func(t *testing.T) {
+			_, ctx := test.New(t)
+			consumerIDs := make([]string, 0, consumers)
+			for i := 0; i < consumers; i++ {
+				consumerIDs = append(consumerIDs, fmt.Sprintf("consumer-%d-%d", consumers, i))
+			}
+			q, closeFn := NewRedisApplicationUplinkQueue(ctx)
+			t.Cleanup(closeFn)
+			HandleApplicationUplinkQueueTest(t, q, consumerIDs)
+		})
+	}
 }

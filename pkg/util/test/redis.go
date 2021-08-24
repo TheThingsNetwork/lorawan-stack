@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -89,6 +90,10 @@ func NewRedis(ctx context.Context, namespace ...string) (*ttnredis.Client, func(
 		Address:       defaultAddress,
 		Database:      defaultDatabase,
 		RootNamespace: defaultNamespace[:],
+		// CI has at most 1 virtual CPU available, resulting in a default pool size of 10.
+		// Tests that require more than 10 concurrent connections, such as the ones which
+		// subscribe to messages, will fail since no connection will be available.
+		PoolSize: 32 * runtime.NumCPU(),
 	}.WithNamespace(append(append([]string{ulid.MustNew(ulid.Now(), Randy).String()}, namespace...), t.Name())...)
 
 	if addr := os.Getenv("REDIS_ADDRESS"); addr != "" {

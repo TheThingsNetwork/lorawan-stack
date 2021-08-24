@@ -19,6 +19,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -168,8 +169,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		return nil, errInvalidConfiguration.WithCause(errors.New("CooldownWindow must be greater than 0"))
 	case conf.Devices == nil:
 		panic(errInvalidConfiguration.WithCause(errors.New("Devices is not specified")))
-	case conf.DownlinkTasks == nil:
-		panic(errInvalidConfiguration.WithCause(errors.New("DownlinkTasks is not specified")))
+	case conf.DownlinkTaskQueue.NumConsumers == 0:
+		return nil, errInvalidConfiguration.WithCause(errors.New("DownlinkTaskQueue.NumConsumers must be greater than 0"))
+	case conf.ApplicationUplinkQueue.NumConsumers == 0:
+		return nil, errInvalidConfiguration.WithCause(errors.New("ApplicationUplinkQueue.NumConsumers must be greater than 0"))
+	case conf.DownlinkTaskQueue.Queue == nil:
+		panic(errInvalidConfiguration.WithCause(errors.New("DownlinkTaskQueue is not specified")))
 	case conf.UplinkDeduplicator == nil:
 		panic(errInvalidConfiguration.WithCause(errors.New("UplinkDeduplicator is not specified")))
 	case conf.ScheduledDownlinkMatcher == nil:
@@ -230,7 +235,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		deduplicationWindow:      makeWindowDurationFunc(conf.DeduplicationWindow),
 		collectionWindow:         makeWindowDurationFunc(conf.DeduplicationWindow + conf.CooldownWindow),
 		devices:                  wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
-		downlinkTasks:            conf.DownlinkTasks,
+		downlinkTasks:            conf.DownlinkTaskQueue.Queue,
 		downlinkPriorities:       downlinkPriorities,
 		defaultMACSettings:       conf.DefaultMACSettings.Parse(),
 		interopClient:            interopCl,
@@ -258,14 +263,27 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Ns", cluster.HookName, c.ClusterAuthUnaryHook())
 
-	for id, f := range map[string]func(context.Context) error{
-		applicationUplinkProcessTaskName: ns.processApplicationUplinkTask,
-		downlinkProcessTaskName:          ns.processDownlinkTask,
-	} {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return nil, err
+	}
+	consumerIDPrefix := fmt.Sprintf("%s:%d", hostname, os.Getpid())
+	for i := uint64(0); i < conf.ApplicationUplinkQueue.NumConsumers; i++ {
+		consumerID := fmt.Sprintf("%s:%d", consumerIDPrefix, i)
 		ns.RegisterTask(&component.TaskConfig{
 			Context: ctx,
-			ID:      id,
-			Func:    f,
+			ID:      fmt.Sprintf("%s_%d", applicationUplinkProcessTaskName, i),
+			Func:    ns.createProcessApplicationUplinkTask(consumerID),
+			Restart: component.TaskRestartAlways,
+			Backoff: processTaskBackoff,
+		})
+	}
+	for i := uint64(0); i < conf.DownlinkTaskQueue.NumConsumers; i++ {
+		consumerID := fmt.Sprintf("%s:%d", consumerIDPrefix, i)
+		ns.RegisterTask(&component.TaskConfig{
+			Context: ctx,
+			ID:      fmt.Sprintf("%s_%d", downlinkProcessTaskName, i),
+			Func:    ns.createProcessDownlinkTask(consumerID),
 			Restart: component.TaskRestartAlways,
 			Backoff: processTaskBackoff,
 		})
