@@ -46,7 +46,14 @@ const createToast = () => {
     }
 
     const { INFO, SUCCESS, ERROR, WARNING, DEFAULT } = toast.types
-    const { title, message, type = DEFAULT, messageGroup, ...toastOptions } = options
+    const {
+      title,
+      message,
+      messageValues = {},
+      type = DEFAULT,
+      messageGroup,
+      ...toastOptions
+    } = options
     let autoClose = toastOptions.autoClose
 
     if (!autoClose) {
@@ -74,6 +81,7 @@ const createToast = () => {
         small
         title={title}
         content={message}
+        messageValues={messageValues}
         success={type === SUCCESS}
         info={type === INFO}
         error={type === ERROR}
