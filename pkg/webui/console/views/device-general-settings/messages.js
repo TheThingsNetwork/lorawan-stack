@@ -35,6 +35,7 @@ const messages = defineMessages({
   notInCluster: 'Not registered in this cluster',
   updateSuccess: 'End device updated',
   keysResetWarning: 'Viewing the end device keys is prohibited; overwriting is allowed',
+  validateSessionKey: '{field} must have non-zero value',
 })
 
 export default messages

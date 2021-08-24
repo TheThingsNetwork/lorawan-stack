@@ -24,7 +24,6 @@ import Collapse from '@ttn-lw/components/collapse'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
@@ -63,18 +62,14 @@ export default class DeviceGeneralSettings extends React.Component {
   }
 
   @bind
-  async handleSubmit(values) {
+  async handleSubmit(patch) {
     const { device, appId, updateDevice } = this.props
-    const { activation_mode, ...updatedDevice } = values
 
     const {
       ids: { device_id: deviceId },
     } = device
 
-    const changed = diff(device, updatedDevice, ['updated_at', 'created_at'])
-    const update =
-      'attributes' in changed ? { ...changed, attributes: updatedDevice.attributes } : changed
-    return updateDevice(appId, deviceId, update)
+    return updateDevice(appId, deviceId, patch)
   }
 
   @bind

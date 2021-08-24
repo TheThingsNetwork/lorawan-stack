@@ -165,3 +165,11 @@ export const hasCFListTypeChMask = (freqPlan = '') =>
   freqPlan.startsWith('US_902_928') ||
   freqPlan.startsWith('AU_915_928') ||
   freqPlan.startsWith('CN_470_510')
+
+const ALL_ZERO_KEY = '0'.repeat(32)
+
+/**
+ * @param {string} key - The session key.
+ * @returns {boolean} - `true` if the key is non-zero, `false` otherwise.
+ */
+export const isNonZeroSessionKey = key => key !== ALL_ZERO_KEY
