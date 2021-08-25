@@ -21,6 +21,7 @@ import Icon from '@ttn-lw/components/icon'
 import Spinner from '@ttn-lw/components/spinner'
 import Button from '@ttn-lw/components/button'
 
+import { isSafariUserAgent } from '@ttn-lw/lib/navigator'
 import combineRefs from '@ttn-lw/lib/combine-refs'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -114,6 +115,23 @@ class Input extends React.Component {
 
   input = React.createRef(null)
 
+  _computeByteInputWidth() {
+    const { showPerChar, max } = this.props
+    const isSafari = isSafariUserAgent()
+
+    const maxValue = showPerChar ? Math.ceil(max / 2) : max
+    const multiplier = isSafari ? 2.1 : 1.8
+
+    let width
+    if (maxValue === 16) {
+      width = isSafari ? '34rem' : '30rem'
+    } else {
+      width = `${maxValue * multiplier + 0.65}rem`
+    }
+
+    return width
+  }
+
   focus() {
     if (this.input.current) {
       this.input.current.focus()
@@ -172,8 +190,7 @@ class Input extends React.Component {
       Component = ByteInput
       const { max } = this.props
       if (!inputWidthValue && max) {
-        const maxValue = showPerChar ? Math.ceil(max / 2) : max
-        inputStyle = { maxWidth: maxValue === 16 ? '30rem' : `${maxValue * 1.8 + 0.65}rem` }
+        inputStyle = { maxWidth: this._computeByteInputWidth() }
       }
     } else if (type === 'textarea') {
       Component = 'textarea'
