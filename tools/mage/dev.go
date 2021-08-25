@@ -300,6 +300,10 @@ func (Dev) StartDevStack() error {
 		return err
 	}
 	defer logFile.Close()
+	if os.Getenv("CI") == "true" {
+		_, err := sh.ExecFrom("", map[string]string{}, logFile, logFile, "./ttn-lw-stack", "start", "--log.format=json")
+		return err
+	}
 	return execGo(logFile, logFile, "run", "./cmd/ttn-lw-stack", "start", "--log.format=json")
 }
 
