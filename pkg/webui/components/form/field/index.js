@@ -79,6 +79,7 @@ class FormField extends React.Component {
     readOnly: PropTypes.bool,
     required: PropTypes.bool,
     title: PropTypes.message,
+    titleChildren: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
     tooltipId: PropTypes.string,
     warning: PropTypes.message,
   }
@@ -96,6 +97,7 @@ class FormField extends React.Component {
     readOnly: false,
     required: false,
     title: undefined,
+    titleChildren: null,
     tooltipId: '',
   }
 
@@ -172,6 +174,7 @@ class FormField extends React.Component {
       decode,
       name,
       title,
+      titleChildren,
       warning,
       description,
       disabled,
@@ -258,6 +261,7 @@ class FormField extends React.Component {
               htmlFor={fieldComponentProps.id}
             />
             {tooltipIcon}
+            {titleChildren}
           </div>
         )}
         <div className={style.componentArea}>

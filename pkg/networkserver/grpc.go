@@ -46,7 +46,7 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 		PingSlotPeriodicity:          mac.DeviceDefaultPingSlotPeriodicity(nil, ns.defaultMACSettings),
 		PingSlotDataRateIndex:        mac.DeviceDefaultPingSlotDataRateIndexValue(nil, phy, ns.defaultMACSettings),
 		PingSlotFrequency:            &ttnpb.FrequencyValue{Value: mac.DeviceDefaultPingSlotFrequency(nil, phy, ns.defaultMACSettings)},
-		BeaconFrequency:              &ttnpb.FrequencyValue{Value: mac.DeviceDefaultBeaconFrequency(nil, ns.defaultMACSettings)},
+		BeaconFrequency:              ns.defaultMACSettings.GetBeaconFrequency(),
 		ClassCTimeout:                &classCTimeout,
 		Rx1Delay:                     &ttnpb.RxDelayValue{Value: mac.DeviceDefaultRX1Delay(nil, phy, ns.defaultMACSettings)},
 		Rx1DataRateOffset:            &ttnpb.DataRateOffsetValue{Value: mac.DeviceDefaultRX1DataRateOffset(nil, ns.defaultMACSettings)},
@@ -68,7 +68,7 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 		DesiredAdrAckDelayExponent:   mac.DeviceDesiredADRAckDelayExponent(nil, phy, ns.defaultMACSettings),
 		DesiredPingSlotDataRateIndex: mac.DeviceDesiredPingSlotDataRateIndexValue(nil, phy, fp, ns.defaultMACSettings),
 		DesiredPingSlotFrequency:     &ttnpb.FrequencyValue{Value: mac.DeviceDesiredPingSlotFrequency(nil, phy, fp, ns.defaultMACSettings)},
-		DesiredBeaconFrequency:       &ttnpb.FrequencyValue{Value: mac.DeviceDesiredBeaconFrequency(nil, ns.defaultMACSettings)},
+		DesiredBeaconFrequency:       ns.defaultMACSettings.GetBeaconFrequency(),
 		DesiredMaxEirp:               &ttnpb.DeviceEIRPValue{Value: lorawan.Float32ToDeviceEIRP(mac.DeviceDesiredMaxEIRP(nil, phy, fp, ns.defaultMACSettings))},
 	}
 	return settings, nil

@@ -123,6 +123,7 @@ const MacSettingsSection = props => {
             onChange={handleResetsFCntChange}
             warning={resetsFCnt ? m.resetWarning : undefined}
             name="mac_settings.resets_f_cnt"
+            tooltipId={tooltipIds.RESETS_F_CNT}
             component={Checkbox}
           />
         </>

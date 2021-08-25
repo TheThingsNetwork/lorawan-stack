@@ -193,7 +193,7 @@ const m = defineMessages({
     'The data rate used for the RX2 window. For OTAA devices, this is configured as part of join. For ABP devices, a matching value must be programmed in the device.',
 
   networkRxDefaultsDescription:
-    'The network uses a set of default values for Rx delays and frequencies that the end device uses. These are based on the recommendations made for the respective band. In most cases these defaults will be correct for your setup. If you wish to use different settings, you can uncheck this checkbox and use custom values.',
+    'The network uses a set of default MAC settings (e.g. Rx delays, data rates and frequencies) for the end device. These are based on the recommendations made for the respective band. In most cases these defaults will be correct for your setup. If you wish to use different settings, you can uncheck this checkbox and use custom values.',
 
   clusterSettingsDescription:
     'By default, the server components of the current cluster are used. However, for advanced use cases, it is possible to register this end device to different Network Server and/or Join Server.',
@@ -217,6 +217,18 @@ const m = defineMessages({
 
   setClaimAuthCodeDescription:
     'The claim authentication code is used to transfer ownership of an end device using a process called end device claiming. Checking this checkbox will cause a claim authentication code being generated and set for each imported end device so you can eventually transfer the ownership.',
+
+  pingSlotDataRateDescription:
+    'The class B ping slot uses a fixed frequency and data rate. This value configures the data rate to use in class B ping slots.',
+
+  beaconFrequencyDescription:
+    'The class B beacon is sent on a fixed frequency. This value changes the frequency to use in class B beacons.',
+
+  pingSlotFrequencyDescription:
+    'The class B ping slot uses a fixed frequency and data rate. This value configures the frequency to use in class B ping slots.',
+
+  resetsFCntDescription:
+    'Enable this to allow end devices to reset their frame counter (FCnt). This is not LoRaWAN compliant and this is not secure. This is to support ABP end devices that reset their frame counter on a power cycle. Do not use this setting in production.',
 })
 
 const descriptions = Object.freeze({
@@ -417,6 +429,18 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.SET_CLAIM_AUTH_CODE]: {
     description: m.setClaimAuthCodeDescription,
+  },
+  [TOOLTIP_IDS.PING_SLOT_DATA_RATE_INDEX]: {
+    description: m.pingSlotDataRateDescription,
+  },
+  [TOOLTIP_IDS.BEACON_FREQUENCY]: {
+    description: m.beaconFrequencyDescription,
+  },
+  [TOOLTIP_IDS.PING_SLOT_FREQUENCY]: {
+    description: m.pingSlotFrequencyDescription,
+  },
+  [TOOLTIP_IDS.RESETS_F_CNT]: {
+    description: m.resetsFCntDescription,
   },
 })
 
