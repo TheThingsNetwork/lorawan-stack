@@ -55,9 +55,6 @@ const (
 	// When scheduling downlink via peering, the schedule delay is unknown, and should be sufficiently high to avoid conflicts.
 	peeringScheduleDelay = infrastructureDelay + 4*time.Second
 
-	// networkInitiatedDownlinkInterval is the minimum time.Duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink.
-	networkInitiatedDownlinkInterval = time.Second
-
 	// maxUplinkSubmissionConcurrency represents the maximum number of concurrent tasks that submit uplinks to the Application Server
 	// on the fast path. The fast path is achieved by skipping the enqueuing process and submitting the uplinks directly.
 	// When the concurrency limit is reached, uplinks are enqueued instead.

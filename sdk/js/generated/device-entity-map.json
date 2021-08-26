@@ -480,6 +480,10 @@
       "ns",
       "ns"
     ],
+    "class_b_c_downlink_interval": [
+      "ns",
+      "ns"
+    ],
     "class_c_timeout": [
       "ns",
       "ns"

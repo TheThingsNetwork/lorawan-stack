@@ -571,6 +571,18 @@ outer:
 	return chs
 }
 
+const defaultClassBCDownlinkInterval = time.Second
+
+func DeviceClassBCDownlinkInterval(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
+	if t := dev.GetMacSettings().GetClassBCDownlinkInterval(); t != nil {
+		return *t
+	}
+	if t := defaults.GetClassBCDownlinkInterval(); t != nil {
+		return *t
+	}
+	return defaultClassBCDownlinkInterval
+}
+
 func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) (*ttnpb.MACState, error) {
 	fp, phy, err := DeviceFrequencyPlanAndBand(dev, fps)
 	if err != nil {
