@@ -52,38 +52,16 @@ func getStoredUpFlags() *pflag.FlagSet {
 }
 
 func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequest, error) {
-	var err error
-	req := &ttnpb.GetStoredApplicationUpRequest{}
-
-	if flags.Changed("last") && (hasTimestampFlags(flags, "after") || hasTimestampFlags(flags, "before")) {
-		return nil, fmt.Errorf("--last cannot be used with --after or --before flags")
-	}
-	after, err := getTimestampFlags(flags, "after")
+	before, after, last, err := timeRangeFromFlags(flags)
 	if err != nil {
 		return nil, err
 	}
-	if after != nil {
-		if req.After, err = pbtypes.TimestampProto(*after); err != nil {
-			return nil, err
-		}
-	}
-	before, err := getTimestampFlags(flags, "before")
-	if err != nil {
-		return nil, err
-	}
-	if before != nil {
-		if req.Before, err = pbtypes.TimestampProto(*before); err != nil {
-			return nil, err
-		}
+	req := &ttnpb.GetStoredApplicationUpRequest{
+		Before: before,
+		After:  after,
+		Last:   last,
 	}
 
-	if flags.Changed("last") {
-		d, err := flags.GetDuration("last")
-		if err != nil {
-			return nil, err
-		}
-		req.Last = pbtypes.DurationProto(d)
-	}
 	req.Order, _ = flags.GetString("order")
 	req.Type, _ = flags.GetString("type")
 
@@ -107,4 +85,76 @@ func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequ
 		}
 	}
 	return req, nil
+}
+
+func countStoredUpFlags() *pflag.FlagSet {
+	flags := &pflag.FlagSet{}
+
+	flags.Uint32("f-port", 0, "query upstream messages with specific FPort")
+	flags.AddFlagSet(timestampFlags("after", "query upstream messages after specified timestamp"))
+	flags.AddFlagSet(timestampFlags("before", "query upstream messages before specified timestamp"))
+	flags.Duration("last", 0, "query upstream messages in the last hours or minutes")
+
+	types := make([]string, 0, len(ttnpb.StoredApplicationUpTypes))
+	for k := range ttnpb.StoredApplicationUpTypes {
+		types = append(types, k)
+	}
+	sort.Strings(types)
+	flags.String("type", "", fmt.Sprintf("message type (allowed values: %s)", strings.Join(types, ", ")))
+
+	return flags
+}
+
+func countStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpCountRequest, error) {
+	before, after, last, err := timeRangeFromFlags(flags)
+	if err != nil {
+		return nil, err
+	}
+	req := &ttnpb.GetStoredApplicationUpCountRequest{
+		Before: before,
+		After:  after,
+		Last:   last,
+	}
+	if flags.Changed("f-port") {
+		fport, _ := flags.GetUint32("f-port")
+		req.FPort = &pbtypes.UInt32Value{
+			Value: fport,
+		}
+	}
+	req.Type, _ = flags.GetString("type")
+
+	return req, nil
+}
+
+func timeRangeFromFlags(flags *pflag.FlagSet) (beforePB *pbtypes.Timestamp, afterPB *pbtypes.Timestamp, lastPB *pbtypes.Duration, err error) {
+	if flags.Changed("last") && (hasTimestampFlags(flags, "after") || hasTimestampFlags(flags, "before")) {
+		return nil, nil, nil, fmt.Errorf("--last cannot be used with --after or --before flags")
+	}
+	after, err := getTimestampFlags(flags, "after")
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if after != nil {
+		if afterPB, err = pbtypes.TimestampProto(*after); err != nil {
+			return nil, nil, nil, err
+		}
+	}
+	before, err := getTimestampFlags(flags, "before")
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if before != nil {
+		if beforePB, err = pbtypes.TimestampProto(*before); err != nil {
+			return nil, nil, nil, err
+		}
+	}
+
+	if flags.Changed("last") {
+		d, err := flags.GetDuration("last")
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		lastPB = pbtypes.DurationProto(d)
+	}
+	return
 }

@@ -84,6 +84,31 @@ var (
 			return getStoredUp(cmd, args, client, os.Stdout)
 		},
 	}
+	endDeviceStorageCountCommand = &cobra.Command{
+		Use:   "count [application-id] [device-id]",
+		Short: "Count stored upstream messages",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			req, err := countStoredUpRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+			ids, err := getEndDeviceID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+			req = req.WithEndDeviceIds(ids)
+			resp, err := ttnpb.NewApplicationUpStorageClient(as).GetStoredApplicationUpCount(ctx, req)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, resp)
+		},
+	}
 
 	applicationsStorageCommand = &cobra.Command{
 		Use:   "storage",
@@ -114,15 +139,46 @@ var (
 			return getStoredUp(cmd, args, client, os.Stdout)
 		},
 	}
+	applicationsStorageCountCommand = &cobra.Command{
+		Use:   "count [application-id]",
+		Short: "Count stored upstream messages",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			req, err := countStoredUpRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+			ids := getApplicationID(cmd.Flags(), args)
+			if ids == nil {
+				return err
+			}
+			req = req.WithApplicationIds(ids)
+			resp, err := ttnpb.NewApplicationUpStorageClient(as).GetStoredApplicationUpCount(ctx, req)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, resp)
+		},
+	}
 )
 
 func init() {
 	endDeviceStorageGetCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDeviceStorageGetCommand.Flags().AddFlagSet(getStoredUpFlags())
 	endDevicesStorageCommand.AddCommand(endDeviceStorageGetCommand)
+	endDeviceStorageCountCommand.Flags().AddFlagSet(endDeviceIDFlags())
+	endDeviceStorageCountCommand.Flags().AddFlagSet(countStoredUpFlags())
+	endDevicesStorageCommand.AddCommand(endDeviceStorageCountCommand)
 	endDevicesCommand.AddCommand(endDevicesStorageCommand)
 	applicationsStorageGetCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsStorageGetCommand.Flags().AddFlagSet(getStoredUpFlags())
 	applicationsStorageCommand.AddCommand(applicationsStorageGetCommand)
+	applicationsStorageCountCommand.Flags().AddFlagSet(applicationIDFlags())
+	applicationsStorageCountCommand.Flags().AddFlagSet(countStoredUpFlags())
+	applicationsStorageCommand.AddCommand(applicationsStorageCountCommand)
 	applicationsCommand.AddCommand(applicationsStorageCommand)
 }
