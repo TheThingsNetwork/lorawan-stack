@@ -100,15 +100,15 @@ Header.propTypes = {
   /** The classname applied to the component. */
   className: PropTypes.string,
   /** The child node of the dropdown component. */
-  dropdownItems: ProfileDropdown.propTypes.children,
+  dropdownItems: PropTypes.node,
   /** The logo component. */
   logo: PropTypes.node.isRequired,
   /** The child node of the mobile dropdown. */
-  mobileDropdownItems: PropTypes.node.isRequired,
+  mobileDropdownItems: PropTypes.node,
   /** The Child node of the navigation bar. */
-  navigationEntries: NavigationBar.propTypes.children,
+  navigationEntries: PropTypes.node,
   /** A handler for when the user used the search input. */
-  onLogout: PropTypes.func.isRequired,
+  onLogout: PropTypes.func,
   /** Handler of the search function. */
   onSearchRequest: PropTypes.func,
   /* A flag indicating whether the header has a search input. */
@@ -124,7 +124,9 @@ Header.defaultProps = {
   className: undefined,
   dropdownItems: undefined,
   navigationEntries: undefined,
+  mobileDropdownItems: null,
   onSearchRequest: () => null,
+  onLogout: () => null,
   searchable: false,
   user: undefined,
 }

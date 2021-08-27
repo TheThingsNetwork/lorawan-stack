@@ -41,6 +41,7 @@ import {
   selectSupportLinkConfig,
   selectApplicationSiteName,
   selectApplicationSiteTitle,
+  selectDocumentationUrlConfig,
 } from '@ttn-lw/lib/selectors/env'
 
 import style from './error.styl'
@@ -49,6 +50,7 @@ const appRoot = selectApplicationRootPath()
 const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 const supportLink = selectSupportLinkConfig()
+const documentationLink = selectDocumentationUrlConfig()
 
 // Mind any rendering that is dependant on context, since the errors
 // can be rendered before such context is injected. Use the `safe`
@@ -59,7 +61,12 @@ const FullViewError = ({ error, header, onlineStatus, safe }) => (
     <div className={style.flexWrapper}>
       <FullViewErrorInner error={error} safe={safe} />
     </div>
-    <Footer onlineStatus={onlineStatus} safe={safe} />
+    <Footer
+      onlineStatus={onlineStatus}
+      documentationLink={documentationLink}
+      supportLink={supportLink}
+      safe={safe}
+    />
   </div>
 )
 
@@ -146,16 +153,16 @@ const FullViewErrorInner = ({ error, safe }) => {
                 >
                   <Message content={sharedMessages.getSupport} />
                 </a>
-                {hasErrorDetails && <Message content={errorMessages.attachToSupportInquiries} />}
+                {hasErrorDetails && (
+                  <Message component="span" content={errorMessages.attachToSupportInquiries} />
+                )}
               </div>
             )}
             {isNotFound && (
-              <a
-                icon="keyboard_arrow_left"
-                message={sharedMessages.backToOverview}
-                href={appRoot}
-                className={buttonStyle.button}
-              />
+              <a href={appRoot} className={classnames(buttonStyle.button, buttonStyle.secondary)}>
+                <Icon icon="keyboard_arrow_left" textPaddedRight nudgeDown />
+                <Message content={sharedMessages.backToOverview} />
+              </a>
             )}
             {hasErrorDetails && (
               <>
