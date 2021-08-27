@@ -14,15 +14,13 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Container, Row, Col } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
 import clipboard from 'clipboard'
 import { Helmet } from 'react-helmet'
 import classnames from 'classnames'
 
-import Link from '@ttn-lw/components/link'
 import Footer from '@ttn-lw/components/footer'
-import Button from '@ttn-lw/components/button'
 import buttonStyle from '@ttn-lw/components/button/button.styl'
+import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
@@ -47,16 +45,25 @@ import {
 
 import style from './error.styl'
 
-const m = defineMessages({
-  errorDetails: 'Error details',
-})
-
 const appRoot = selectApplicationRootPath()
 const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 const supportLink = selectSupportLinkConfig()
 
-const FullViewErrorInner = ({ error }) => {
+// Mind any rendering that is dependant on context, since the errors
+// can be rendered before such context is injected. Use the `safe`
+// prop to conditionally render any context-dependant nodes.
+const FullViewError = ({ error, header, onlineStatus, safe }) => (
+  <div className={style.wrapper}>
+    {Boolean(header) && header}
+    <div className={style.flexWrapper}>
+      <FullViewErrorInner error={error} safe={safe} />
+    </div>
+    <Footer onlineStatus={onlineStatus} safe={safe} />
+  </div>
+)
+
+const FullViewErrorInner = ({ error, safe }) => {
   const isUnknown = isUnknownError(error)
   const statusCode = httpStatusCode(error)
   const isNotFound = isNotFoundError(error)
@@ -64,20 +71,20 @@ const FullViewErrorInner = ({ error }) => {
 
   const [copied, setCopied] = useState(false)
 
-  let errorTitleMessage = errorMessages.unknownErrorTitle
-  let errorMessageMessage = errorMessages.contactAdministrator
+  let errorTitle = errorMessages.unknownErrorTitle
+  let errorMessage = errorMessages.contactAdministrator
   if (!isUnknown) {
-    errorMessageMessage = error
+    errorMessage = error
   } else if (isNotFound) {
-    errorMessageMessage = errorMessages.genericNotFound
+    errorMessage = errorMessages.genericNotFound
   }
   if (statusCode) {
-    errorTitleMessage = statusCodeMessages[statusCode]
+    errorTitle = statusCodeMessages[statusCode]
   }
   if (isFrontend) {
-    errorMessageMessage = error.errorMessage
+    errorMessage = error.errorMessage
     if (Boolean(error.errorTitle)) {
-      errorTitleMessage = error.errorTitle
+      errorTitle = error.errorTitle
     }
   }
 
@@ -102,118 +109,82 @@ const FullViewErrorInner = ({ error }) => {
     }
   }, [])
 
-  let action = undefined
-  if (isNotFound) {
-    action = (
-      <Link.Anchor icon="keyboard_arrow_left" href={appRoot} primary>
-        <Message content={sharedMessages.backToOverview} />
-      </Link.Anchor>
-    )
-  } else {
-    const errorDetails = JSON.stringify(error, undefined, 2)
-
-    action = (
-      <details>
-        <summary>
-          <Message content={m.errorDetails} />
-        </summary>
-        <pre>{errorDetails}</pre>
-        <Button
-          onClick={handleCopyClick}
-          ref={copyButton}
-          data-clipboard-text={errorDetails}
-          message={copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard}
-          icon={copied ? 'done' : 'file_copy'}
-          secondary
-        />
-        {Boolean(supportLink) && (
-          <Button.AnchorLink
-            href={supportLink}
-            message={sharedMessages.getSupport}
-            icon="contact_support"
-            target="_blank"
-            secondary
-          />
-        )}
-      </details>
-    )
-  }
-
-  return (
-    <div className={style.fullViewError} data-test-id="full-error-view">
-      <Container>
-        <Row>
-          <Col md={6} sm={12}>
-            <IntlHelmet title={errorMessages.error} />
-            <Message
-              className={style.fullViewErrorHeader}
-              component="h2"
-              content={errorTitleMessage}
-            />
-            <ErrorMessage className={style.fullViewErrorSub} content={errorMessageMessage} />
-            {action}
-          </Col>
-        </Row>
-      </Container>
-    </div>
-  )
-}
-
-const FullViewError = ({ error, header, onlineStatus }) => (
-  <div className={style.wrapper}>
-    {Boolean(header) && header}
-    <div className={style.flexWrapper}>
-      <FullViewErrorInner error={error} />
-    </div>
-    <Footer onlineStatus={onlineStatus} />
-  </div>
-)
-
-const FullViewErrorRaw = ({ error }) => {
-  const isUnknown = isUnknownError(error)
-  const statusCode = httpStatusCode(error)
-  const isNotFound = isNotFoundError(error)
-
-  let errorTitle = errorMessages.unknownErrorTitle.defaultMessage
-  let errorMessage = errorMessages.contactAdministrator.defaultMessage
-  if (!isUnknown) {
-    errorMessage = error
-  } else if (isNotFound) {
-    errorMessage = errorMessages.genericNotFound.defaultMessage
-  }
-  if (statusCode) {
-    errorTitle = statusCodeMessages[statusCode].defaultMessage
-  }
-
   const errorDetails = JSON.stringify(error, undefined, 2)
+  const hasErrorDetails = !isNotFound && Boolean(error) && errorDetails.length > 2
 
   return (
     <div className={style.fullViewError} data-test-id="full-error-view">
       <Container>
         <Row>
-          <Col sm={12} md={6}>
-            <Helmet titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}>
-              <title>Error</title>
-            </Helmet>
-            <h2>{errorTitle}</h2>
-            <span className={style.fullViewErrorSub}>{errorMessage}</span>
-            <details>
-              <summary>{m.errorDetails.defaultMessage}</summary>
-              <pre>{errorDetails}</pre>
-              {Boolean(supportLink) && (
+          <Col xl={6} lg={8} md={10} sm={12}>
+            {safe ? (
+              <Helmet titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}>
+                <title>Error</title>
+              </Helmet>
+            ) : (
+              <IntlHelmet title={errorMessages.error} />
+            )}
+            <h1>
+              <Icon className={style.icon} textPaddedRight icon="error_outline" />
+              <Message content={errorTitle} />
+            </h1>
+            <div className={style.fullViewErrorSub}>
+              <ErrorMessage component="span" content={errorMessage} />
+              {!isNotFound && (
+                <>
+                  <br />
+                  <Message component="span" content={errorMessages.inconvenience} />
+                </>
+              )}
+            </div>
+            {Boolean(supportLink && !isNotFound) && (
+              <div className={style.errorActions}>
                 <a
                   href={supportLink}
                   target="_blank"
-                  className={classnames(
-                    buttonStyle.button,
-                    buttonStyle.secondary,
-                    style.supportButton,
-                  )}
+                  className={classnames(buttonStyle.button, style.supportButton)}
                 >
-                  {sharedMessages.getSupport.defaultMessage}
+                  <Message content={sharedMessages.getSupport} />
                 </a>
-              )}
-            </details>
+                {hasErrorDetails && <Message content={errorMessages.attachToSupportInquiries} />}
+              </div>
+            )}
+            {isNotFound && (
+              <a
+                icon="keyboard_arrow_left"
+                message={sharedMessages.backToOverview}
+                href={appRoot}
+                className={buttonStyle.button}
+              />
+            )}
+            {hasErrorDetails && (
+              <>
+                <hr />
+                <details>
+                  <summary>
+                    <Message content={errorMessages.additionalInformation} />
+                  </summary>
+                  <pre>{errorDetails}</pre>
+                  <button
+                    onClick={handleCopyClick}
+                    className={classnames(
+                      buttonStyle.button,
+                      buttonStyle.secondary,
+                      style.supportButton,
+                    )}
+                    data-clipboard-text={errorDetails}
+                    ref={copyButton}
+                  >
+                    <Icon icon={copied ? 'done' : 'file_copy'} textPaddedRight />
+                    <Message
+                      content={
+                        copied ? sharedMessages.copiedToClipboard : sharedMessages.copyToClipboard
+                      }
+                    />
+                  </button>
+                </details>
+              </>
+            )}
           </Col>
         </Row>
       </Container>
@@ -221,18 +192,26 @@ const FullViewErrorRaw = ({ error }) => {
   )
 }
 
-FullViewErrorInner.propTypes = FullViewErrorRaw.propTypes = {
+FullViewErrorInner.propTypes = {
   error: PropTypes.error.isRequired,
+  safe: PropTypes.bool,
+}
+
+FullViewErrorInner.defaultProps = {
+  safe: false,
 }
 
 FullViewError.propTypes = {
   error: PropTypes.error.isRequired,
   header: PropTypes.node,
-  onlineStatus: PropTypes.onlineStatus.isRequired,
+  onlineStatus: PropTypes.onlineStatus,
+  safe: PropTypes.bool,
 }
 
 FullViewError.defaultProps = {
   header: undefined,
+  onlineStatus: undefined,
+  safe: false,
 }
 
-export { FullViewError, FullViewErrorInner, FullViewErrorRaw }
+export { FullViewError, FullViewErrorInner }

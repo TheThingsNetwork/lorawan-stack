@@ -24,39 +24,52 @@
   position: relative
 
 .full-view-error
-  position: absolute
-  top: 0
-  right: 0
-  bottom: 0
-  left: 0
+  box-sizing: border-box
+  width: 100%
   min-height: 30rem
-  background: url('../../../assets/img/layout/bg/ttn-console-bg.png') no-repeat
-  background-size: 160vh
-  background-position: 40vw 20%
-  padding-top: 20vh
-  +media-query($bp.m)
-    background-size: 140vh
-    background-position: 60vw 20%
+  padding-bottom: $ls.s
+  padding-left: 4rem
+  padding-right: 4rem
+  +media-query-min($bp.s)
+    padding-top: 20vh
   +media-query($bp.s)
-    background-size: 160vh
-    background-position: 0 20vh
+    padding-top: $header-height-mobile + $ls.m
 
   &-header
-    h2()
-    margin-bottom: $cs.xs
     +media-query($bp.s)
-      margin-top: $ls.l
+      font-size: $fs.l
 
   &-sub
     display: block
-    margin-bottom: $cs.l
+    margin-bottom: $cs.xl
+
+  summary
+    color: $tc-subtle-gray
 
   pre
     width: 100%
+    box-sizing: border-box
     background-color: $c-backdrop
     color: $tc-black
     font-size: $fs.s
-    y-overflow: auto
+    overflow-y: auto
     padding: $cs.s
-    max-height: 30rem
+    max-height: 26rem
     color: $tc-deep-gray
+
+.error-actions
+  display: flex
+  align-items: center
+  flex-wrap: wrap
+  margin-bottom: $cs.m
+
+  & > span
+    color: $tc-subtle-gray
+
+.icon
+  nudge('up', .1rem)
+  color: $c-error
+  +media-query-min($bp.s)
+    font-size: 2rem
+  +media-query($bp.s)
+    font-size: 1.4rem

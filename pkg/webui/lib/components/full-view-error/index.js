@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FullViewError, FullViewErrorInner, FullViewErrorRaw } from './error'
+import { FullViewError, FullViewErrorInner } from './error'
 import connect from './connect'
 
 const ConnectedFullErrorView = connect(FullViewError)
 
-export { ConnectedFullErrorView as default, FullViewError, FullViewErrorInner, FullViewErrorRaw }
+export { ConnectedFullErrorView as default, FullViewError, FullViewErrorInner }
