@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.14.2] - 2021-08-27
+
+### Added
+
 - CLI warnings about insecure connections.
 - CLI warnings about using the `--all` flag.
 - Packet Broker network listed switch in the Console.
@@ -31,8 +45,6 @@ For details about compatibility between different releases, see the **Commitment
 - Usability of the end device import function in the Console.
   - Show a per-device report when errors occur.
   - More structural changes to the process to improve UX.
-
-### Deprecated
 
 ### Removed
 
@@ -55,8 +67,6 @@ For details about compatibility between different releases, see the **Commitment
 - Blank page crashes in the Console for certain browsers that do not fully support `Intl` API.
 - End device session keys handling in the Console.
 - Byte input width in Safari in the Console.
-
-### Security
 
 ## [3.14.1] - 2021-08-06
 
@@ -1728,7 +1738,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.1...v3.14
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.2...v3.14
+[3.14.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.1...v3.14.2
 [3.14.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.0...v3.14.1
 [3.14.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.3...v3.14.0
 [3.13.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.2...v3.13.3
