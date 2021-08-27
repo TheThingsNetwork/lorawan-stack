@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { FormattedMessage, useIntl } from 'react-intl'
+import React, { useContext } from 'react'
+import { FormattedMessage, IntlContext } from 'react-intl'
 import classnames from 'classnames'
 import reactStringReplace from 'react-string-replace'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { warn } from '@ttn-lw/lib/log'
+import interpolate from '@ttn-lw/lib/interpolate'
 
 import style from './message.styl'
 
@@ -59,15 +61,29 @@ const Message = ({
     [style.capitalize]: capitalize,
   })
 
-  const { formatMessage } = useIntl()
-
-  if (cls) {
-    rest.className = cls
-  }
+  const intlContext = useContext(IntlContext)
 
   let vals = values
   if (content.values && Object.keys(values).length === 0) {
     vals = content.values
+  }
+
+  if (!Boolean(intlContext)) {
+    // Displaying the default message is a last resort that should only
+    // be considered when all other options failed. Note also that this
+    // will only do basic value interpolation! It's still better than not
+    // showing anything at all or crashing altogether.
+    warn(
+      'Attempting to render a <Message /> without Intl context. Falling back to default message!',
+      content,
+    )
+    return renderContent(interpolate(content.defaultMessage, vals), component, rest)
+  }
+
+  const { formatMessage } = intlContext
+
+  if (cls) {
+    rest.className = cls
   }
 
   if (typeof content === 'string' || typeof content === 'number') {
@@ -148,5 +164,4 @@ Message.defaultProps = {
   uppercase: false,
   values: undefined,
 }
-
 export default Message
