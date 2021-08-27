@@ -75,7 +75,7 @@ const LoRaCloud = () => {
           getAppPkgDefaultAssoc(appId, LORA_CLOUD_GLS.DEFAULT_PORT, selector),
         ]}
       >
-        <ErrorView ErrorComponent={SubViewError}>
+        <ErrorView errorRender={SubViewError}>
           <Container>
             <PageTitle title="LoRa Cloud Device & Application Services" />
             <Row>

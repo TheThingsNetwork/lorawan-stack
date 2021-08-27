@@ -50,7 +50,7 @@ class OrganizationApiKeys extends React.Component {
   render() {
     const { match } = this.props
     return (
-      <ErrorView ErrorComponent={SubViewError}>
+      <ErrorView errorRender={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={OrganizationApiKeysList} />
           <Route exact path={`${match.path}/add`} component={OrganizationApiKeyAdd} />

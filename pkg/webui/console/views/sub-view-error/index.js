@@ -27,7 +27,7 @@ import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 
 import style from './sub-view.styl'
 
-const SubViewError = ({ error }) => {
+const SubViewErrorComponent = ({ error }) => {
   const isNotFound = isNotFoundError(error)
   const statusCode = httpStatusCode(error)
   let errorExplanation = errorMessages.subviewErrorExplanation
@@ -64,8 +64,10 @@ const SubViewError = ({ error }) => {
   )
 }
 
-SubViewError.propTypes = {
+SubViewErrorComponent.propTypes = {
   error: PropTypes.error.isRequired,
 }
 
-export default SubViewError
+const subViewErrorRender = error => <SubViewErrorComponent error={error} />
+
+export default subViewErrorRender
