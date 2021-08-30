@@ -88,6 +88,14 @@ class Users {
     return Marshaler.payloadSingleResponse(response)
   }
 
+  async purgeById(id) {
+    const response = await this._api.UserRegistry.Purge({
+      routeParams: { user_id: id },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
     const response = await this._api.UserRegistry.Update(
       {
