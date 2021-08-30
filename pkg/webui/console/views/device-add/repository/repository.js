@@ -204,7 +204,7 @@ const DeviceRepository = props => {
   )
 
   const handleIdPrefill = React.useCallback(() => {
-    if (formRef && formRef.current) {
+    if (formRef.current) {
       const { values, setFieldValue } = formRef.current
 
       // Do not overwrite a value that the user has already set.
@@ -215,7 +215,7 @@ const DeviceRepository = props => {
     }
   }, [])
   const handleIdTextSelect = React.useCallback(idInputRef => {
-    if (idInputRef && idInputRef.current) {
+    if (idInputRef.current && formRef.current) {
       const { values } = formRef.current
       const { setSelectionRange } = idInputRef.current
 
