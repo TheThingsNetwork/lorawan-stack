@@ -100,45 +100,64 @@ const WithLocale = ({ children }) => {
   useEffect(() => {
     const initialize = async () => {
       try {
-        const promises = []
-
         // Load critical polyfills.
+        if (!window.Intl.Locale) {
+          log('Polyfilling Intl.Locale')
+          await import(
+            /* webpackChunkName: "locale-display-names" */ '@formatjs/intl-locale/polyfill'
+          )
+        }
+
         if (!window.Intl.DisplayNames) {
           log('Polyfilling Intl.DisplayNames')
-          promises.push(
-            import(
-              /* webpackChunkName: "locale-display-names" */ '@formatjs/intl-displaynames/polyfill'
-            ),
+          await import(
+            /* webpackChunkName: "locale-display-names" */ '@formatjs/intl-displaynames/polyfill'
           )
-          for (const supportedLanguage of supportedLanguages) {
-            log(`Polyfilling Intl.DisplayNames for ${supportedLanguage}`)
-            promises.push(
-              import(
+          await Promise.all(
+            supportedLanguages.map(async supportedLanguage => {
+              log(`Polyfilling Intl.DisplayNames for locale "${supportedLanguage}"`)
+              await import(
                 /* webpackChunkName: "locale-display-names.[request]" */ `@formatjs/intl-displaynames/locale-data/${supportedLanguage}`
-              ),
-            )
-          }
+              )
+            }),
+          )
         }
 
         if (!window.Intl.ListFormat) {
           log('Polyfilling Intl.ListFormat')
-          promises.push(
-            import(
-              /* webpackChunkName: "locale-list-format" */ '@formatjs/intl-listformat/polyfill'
-            ),
+          await import(
+            /* webpackChunkName: "locale-list-format" */ '@formatjs/intl-listformat/polyfill'
           )
         }
 
         if (!window.Intl.PluralRules) {
           log('Polyfilling Intl.PluralRules')
-          promises.push(
-            import(
-              /* webpackChunkName: "locale-plural-rules" */ '@formatjs/intl-pluralrules/polyfill'
-            ),
+          await import(
+            /* webpackChunkName: "locale-plural-rules" */ '@formatjs/intl-pluralrules/polyfill'
           )
         }
 
-        await Promise.all(promises)
+        if (!window.Intl.NumberFormat) {
+          log('Polyfilling Intl.NumberFormat')
+          await import(
+            /* webpackChunkName: "locale-number-format" */ '@formatjs/intl-numberformat/polyfill'
+          )
+        }
+
+        if (!window.Intl.RelativeTimeFormat) {
+          log('Polyfilling Intl.RelativeTimeFormat')
+          await import(
+            /* webpackChunkName: "locale-date-time-format" */ '@formatjs/intl-relativetimeformat/polyfill'
+          )
+        }
+
+        if (!window.Intl.DateTimeFormat) {
+          log('Polyfilling Intl.DateTimeFormat')
+          await import(
+            /* webpackChunkName: "locale-date-time-format" */ '@formatjs/intl-datetimeformat/polyfill'
+          )
+        }
+
         setPolyfillsLoaded(true)
       } catch (error) {
         setError(error)
@@ -205,11 +224,33 @@ const LocaleLoader = ({ children }) => {
       }
 
       // Load locale specific polyfills if needed.
-      if (!window.Intl.NumberFormat || !window.Intl.DateTimeFormat) {
-        log(`Polyfilling locale ${locale} for language ${language}`)
-        promises.push(import('intl'))
+      if (window.Intl.NumberFormat.polyfilled) {
+        log(`Polyfilling NumberFormat for language ${language}`)
         promises.push(
-          import(/* webpackChunkName: "locale.[request]" */ `intl/locale-data/jsonp/${locale}`),
+          import(
+            /* webpackChunkName: "locale.[request]" */ `@formatjs/intl-numberformat/locale-data/${language}`
+          ),
+        )
+      }
+
+      if (window.Intl.DateTimeFormat.polyfilled) {
+        log(`Polyfilling DateTimeFormat for language ${language}`)
+        promises.push(
+          import(
+            /* webpackChunkName: "locale.[request]" */ '@formatjs/intl-datetimeformat/add-all-tz'
+          ),
+          import(
+            /* webpackChunkName: "locale.[request]" */ `@formatjs/intl-datetimeformat/locale-data/${language}`
+          ),
+        )
+      }
+
+      if (window.Intl.RelativeTimeFormat.polyfilled) {
+        log(`Polyfilling RelativeTimeFormat for language ${language}`)
+        promises.push(
+          import(
+            /* webpackChunkName: "locale.[request]" */ `@formatjs/intl-relativetimeformat/locale-data/${language}`
+          ),
         )
       }
 
