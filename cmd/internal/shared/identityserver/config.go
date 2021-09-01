@@ -41,6 +41,7 @@ var DefaultIdentityServerConfig = identityserver.Config{
 				JSFiles:       []string{"account.js"},
 			},
 			FrontendConfig: oauth.FrontendConfig{
+				DocumentationBaseURL: "https://thethingsindustries.com/docs",
 				StackConfig: oauth.StackConfig{
 					IS: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
 				},
