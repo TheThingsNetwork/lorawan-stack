@@ -17,8 +17,7 @@ import bind from 'autobind-decorator'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
-import DeleteModalButton from '@ttn-lw/console/components/delete-modal-button'
-
+import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import PageTitle from '@ttn-lw/components/page-title'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
