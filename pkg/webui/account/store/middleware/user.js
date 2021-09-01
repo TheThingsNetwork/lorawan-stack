@@ -82,6 +82,11 @@ const deleteUserLogic = createRequestLogic({
   process: async ({ action, getState }) => {
     const userId =
       'payload' in action && action.payload.id ? action.payload.id : selectUserId(getState())
+    const { options } = action.meta
+
+    if (options.purge) {
+      return await tts.Users.purgeById(userId)
+    }
 
     return await tts.Users.deleteById(userId)
   },

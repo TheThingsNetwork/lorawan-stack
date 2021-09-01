@@ -38,4 +38,10 @@ export default defineMessages({
   gravatarImage: 'Gravatar image',
   profilePictureDisabled:
     'Setting a profile picture is currently disabled. Hence, only an administrator can change the profile picture.',
+  deleteWarning:
+    "This will <strong>PERMANENTLY DELETE YOUR ACCOUNT</strong> and <strong>LOCK THE USER ID FOR RE-REGISTRATION</strong>. Associated entities (e.g. gateways, applications and end devices) owned by you that do not have any other collaborators will become <strong>UNACCESSIBLE</strong> and it will <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's AGAIN</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
+  purgeWarning:
+    "This will <strong>PERMANENTLY DELETE YOUR ACCOUNT</strong> and make associated entities (e.g. gateways, applications and end devices) owned by you that do not have other collaborators <strong>UNACCESSIBLE</strong> and it will also <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
+  deleteTitle: 'Are you sure you want to delete your account?',
+  deleteConfirmMessage: 'Please enter your user ID to confirm the account deletion.',
 })

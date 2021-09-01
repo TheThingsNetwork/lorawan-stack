@@ -125,7 +125,12 @@ const DeleteModalButton = props => {
                     values={{ entityId, pre: id => <pre className={style.id}>{id}</pre> }}
                     component="span"
                   />
-                  <Input className={style.confirmInput} value={confirmId} onChange={setConfirmId} />
+                  <Input
+                    className={style.confirmInput}
+                    data-test-id="confirm_deletion"
+                    value={confirmId}
+                    onChange={setConfirmId}
+                  />
                 </>
               )}
             </Form>

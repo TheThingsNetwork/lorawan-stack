@@ -39,6 +39,7 @@ const accountAppInitLogic = createLogic({
               'name',
               'description',
               'primary_email_address',
+              'admin',
             ]),
           ),
         )

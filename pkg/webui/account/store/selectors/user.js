@@ -25,7 +25,7 @@ export const selectUserId = state => {
 
 export const selectUserIsAdmin = state => {
   const user = selectUser(state)
-  return user.isAdmin
+  return user.admin
 }
 
 export const selectUserName = state => selectUser(state).name
