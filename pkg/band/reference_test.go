@@ -247,13 +247,8 @@ func testBand(t *testing.T, band serializableBand, version ttnpb.PHYVersion) {
 }
 
 func TestBandDefinitions(t *testing.T) {
-	for name, rawBand := range band.All {
-		for _, version := range rawBand.Versions() {
-			band, err := rawBand.Version(version)
-			if err != nil {
-				t.Fatal(err)
-			}
-
+	for name, versions := range band.All {
+		for version, band := range versions {
 			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
 				testBand(t, makeBand(band), version)
 			})

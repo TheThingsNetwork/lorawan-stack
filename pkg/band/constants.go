@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@ import (
 )
 
 const (
+	// eirpDelta is the delta between EIRP and ERP.
+	eirpDelta = 2.15
+
 	defaultReceiveDelay1 time.Duration = time.Second
 	defaultReceiveDelay2 time.Duration = defaultReceiveDelay1 + time.Second
 

@@ -2935,7 +2935,7 @@
   },
   "error:pkg/band:band_not_found": {
     "translations": {
-      "en": "band `{id}` not found"
+      "en": "band `{id}@{version}` not found"
     },
     "description": {
       "package": "pkg/band",
