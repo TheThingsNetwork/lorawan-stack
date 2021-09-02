@@ -14,7 +14,11 @@
 
 package band
 
-import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+import (
+	"math"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+)
 
 // Beacon parameters of a specific band.
 type Beacon struct {
@@ -26,3 +30,17 @@ type Beacon struct {
 	// beaconTime is the integer value, converted in float64, of the 4 bytes “Time” field of the beacon frame.
 	ComputeFrequency func(beaconTime float64) uint64
 }
+
+func makeBeaconFrequencyFunc(frequencies [8]uint64) func(float64) uint64 {
+	return func(beaconTime float64) uint64 {
+		floor := math.Floor(beaconTime / float64(128))
+		return frequencies[int32(floor)%8]
+	}
+}
+
+var usAuBeaconFrequencies = func() (freqs [8]uint64) {
+	for i := 0; i < 8; i++ {
+		freqs[i] = 923300000 + uint64(i*600000)
+	}
+	return freqs
+}()
