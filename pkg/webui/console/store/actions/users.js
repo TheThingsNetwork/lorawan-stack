@@ -54,7 +54,11 @@ export const DELETE_USER_BASE = 'DELETE_USER'
 export const [
   { request: DELETE_USER, success: DELETE_USER_SUCCESS, failure: DELETE_USER_FAILURE },
   { request: deleteUser, success: deleteUserSuccess, failure: deleteUserFailure },
-] = createRequestActions(DELETE_USER_BASE, id => ({ id }))
+] = createRequestActions(
+  DELETE_USER_BASE,
+  id => ({ id }),
+  (id, options = {}) => ({ options }),
+)
 
 export const GET_USER_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [

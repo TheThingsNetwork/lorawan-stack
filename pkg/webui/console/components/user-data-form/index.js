@@ -22,7 +22,7 @@ import Select from '@ttn-lw/components/select'
 import Checkbox from '@ttn-lw/components/checkbox'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
-import ModalButton from '@ttn-lw/components/button/modal-button'
+import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -55,8 +55,12 @@ const m = defineMessages({
   emailAddressValidation: 'Treat email address as validated',
   emailAddressValidationDescription:
     'Enable this option if you do not need this user to validate the email address',
-  modalWarning:
-    'Are you sure you want to delete the user "{userId}". This action cannot be undone and it will not be possible to reuse the user ID.',
+  deleteTitle: 'Are you sure you want to delete this account?',
+  deleteWarning:
+    "This will <strong>PERMANENTLY DELETE THIS ACCOUNT</strong> and <strong>LOCK THE USER ID FOR RE-REGISTRATION</strong>. Associated entities (e.g. gateways, applications and end devices) owned by this user that do not have any other collaborators will become <strong>UNACCESSIBLE</strong> and it will <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's AGAIN</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
+  purgeWarning:
+    "This will <strong>PERMANENTLY DELETE THIS ACCOUNT</strong>. Associated entities (e.g. gateways, applications and end devices) owned by this user that do not have any other collaborators will become <strong>UNACCESSIBLE</strong> and it will <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's AGAIN</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
+  deleteConfirmMessage: "Please type in this user's user ID to confirm.",
 })
 
 const baseValidationSchema = Yup.object().shape({
@@ -157,10 +161,10 @@ class UserForm extends React.Component {
   }
 
   @bind
-  async handleDelete() {
+  async handleDelete(shouldPurge) {
     const { onDelete, onDeleteSuccess, onDeleteFailure } = this.props
     try {
-      await onDelete()
+      await onDelete(shouldPurge)
       onDeleteSuccess()
     } catch (error) {
       await this.setState({ error })
@@ -272,19 +276,17 @@ class UserForm extends React.Component {
             component={SubmitButton}
           />
           {update && (
-            <ModalButton
-              type="button"
-              icon="delete"
-              danger
-              naked
+            <DeleteModalButton
               message={sharedMessages.userDelete}
-              modalData={{
-                message: {
-                  values: { userId: initialValues.name || initialValues.ids.user_id },
-                  ...m.modalWarning,
-                },
-              }}
+              entityId={initialValues.ids.user_id}
+              entityName={initialValues.name}
+              title={m.deleteTitle}
+              confirmMessage={m.deleteConfirmMessage}
+              defaultMessage={m.deleteWarning}
+              purgeMessage={m.purgeWarning}
               onApprove={this.handleDelete}
+              shouldConfirm
+              mayPurge
             />
           )}
         </SubmitBar>

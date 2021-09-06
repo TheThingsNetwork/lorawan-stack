@@ -43,12 +43,17 @@ const updateUserLogic = createRequestLogic({
 
 const deleteUserLogic = createRequestLogic({
   type: users.DELETE_USER,
-  process: async ({ action }, dispatch) => {
+  process: async ({ action }) => {
     const {
       payload: { id },
+      meta: { options },
     } = action
 
-    await api.users.delete(id)
+    if (options.purge) {
+      await api.users.purge(id)
+    } else {
+      await api.users.delete(id)
+    }
 
     return { id }
   },

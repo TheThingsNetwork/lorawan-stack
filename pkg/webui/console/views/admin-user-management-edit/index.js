@@ -91,10 +91,10 @@ export default class UserManagementEdit extends Component {
   }
 
   @bind
-  onDelete() {
+  onDelete(shouldPurge) {
     const { userId, deleteUser } = this.props
 
-    return deleteUser(userId)
+    return deleteUser(userId, { purge: shouldPurge })
   }
 
   @bind
