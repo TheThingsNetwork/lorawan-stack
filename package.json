@@ -64,7 +64,7 @@
     "pg": "^8.5.1",
     "prettier": "^2.2.1",
     "stylint": "^2.0.0",
-    "stylus": "^0.54.8",
+    "stylus": "^0.55.0",
     "stylus-loader": "^4.3.3",
     "wait-on": "^6.0.0",
     "webpack": "^4.46.0",
