@@ -50,6 +50,8 @@ const mapStateToProps = state => ({
   mayEditKeys: mayEditApplicationDeviceKeys.check(
     mayEditApplicationDeviceKeys.rightsSelector(state),
   ),
+  getDefaultMacSettings: (freqPlan, phyVersion) =>
+    api.ns.getDefaultMacSettings(freqPlan, phyVersion),
 })
 const mapDispatchToProps = dispatch => ({
   ...bindActionCreators(

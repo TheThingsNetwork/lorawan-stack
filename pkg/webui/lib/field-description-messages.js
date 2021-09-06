@@ -33,7 +33,7 @@ const m = defineMessages({
   joinEuiLocation:
     'It should be provided by the end device manufacturer for pre-provisioned end devices, or by the owner of the Join Server you will use.',
   joinEuiAbsence:
-    'Contact the manufacturer or your reseller. If they can not provide a JoinEUI, and your end device is programmable, it is okay to use all-zeros, but ensure that you use the same JoinEUI in your device as you enter in The Things Stack.',
+    'Contact the manufacturer or your reseller. If they can not provide a JoinEUI, and your end device is programmable, it is okay to use all-zeros, but ensure that you use the same JoinEUI in your end device as you enter in The Things Stack.',
 
   appKeyDescription:
     'An end device specific encryption key used during OTAA to derive the AppSKey (in LoRaWAN 1.1x) or both the NwkSKey and AppSKey in LoRaWAN 1.0x.',
@@ -43,7 +43,7 @@ const m = defineMessages({
     'Contact the manufacturer or your reseller. If they cannot provide an AppKey, and your end device is programmable, it is okay to generate one.',
 
   nwkKeyDescription:
-    'A device specific encryption key used to derive the FNwkSIntKey, SNwkSIntKey, NwkSEncKey in LoRaWAN 1.1. When a LoRaWAN 1.1 capable device connects to a LoRaWAN 1.0x Network Server which does not support dual root keys (NwkKey and AppKey), the NwkKey value is used as the AppKey value.',
+    'An end device specific encryption key used to derive the FNwkSIntKey, SNwkSIntKey, NwkSEncKey in LoRaWAN 1.1. When a LoRaWAN 1.1 capable device connects to a LoRaWAN 1.0x Network Server which does not support dual root keys (NwkKey and AppKey), the NwkKey value is used as the AppKey value.',
   nwkKeyLocation:
     'It is usually pre-provisioned by the end device manufacturer, but some end devices also allow using a user-defined value.',
   nwkKeyAbsence:
@@ -232,6 +232,24 @@ const m = defineMessages({
 
   resetMacDescription:
     'Resetting the session context and MAC state will reset the end device to its initial (factory) state. This includes resetting the frame counters and any other persisted MAC setting on the end device. Over The Air Activation (OTAA) end devices will also lose their session context. This means that such devices must rejoin the network to continue operation. Activation-by-personalization (ABP) end devices will only reset the MAC state, while preserving up/downlink queues.',
+  useAdrDescription:
+    'Controls whether the end device uses adaptive data rate. This will allow the network to adjust the employed data rate based on signal to noise ratio. This adaptively optimizes energy consumption, bandwidth and transmission power.',
+
+  adrMarginDescription:
+    'Signal-to-noise ratio (SNR) margin in dB that is taken into account in the Adaptive Data Rate (ADR) algorithm to optimize the data rate of the end device. A higher margin requires the end device to have a better SNR before the Network Server instructs a higher data rate for the end device to use.',
+
+  adrAckLimitDescription: 'This value changes the limit value defining the ADR back-off algorithm.',
+
+  adrAckDelayDescription: 'This value changes the delay value defining the ADR back-off algorithm.',
+
+  maxDutyCycleDescription:
+    'The maximum aggregated transmit duty cycle of the end device over all sub-bands. The allowed time-on-air is 1/N where N is the given value: 1 is 100%, 1024 is 0.97%, etc. This value is used for traffic shaping. All end devices must respect regional regulations regardless of this value.',
+
+  statusCountPeriodicityDescription:
+    'Number of uplink messages after which the end device status is requested. Set to 0 to disable requesting the device status based on the number of uplink messages.',
+
+  statusTimePeriodicityDescription:
+    'Interval to request the end device status. Set to 0 to disable requesting the end device status on an interval.',
 })
 
 const descriptions = Object.freeze({
@@ -448,6 +466,27 @@ const descriptions = Object.freeze({
   [TOOLTIP_IDS.RESET_MAC]: {
     description: m.resetMacDescription,
   },
+  [TOOLTIP_IDS.ADR_USE]: {
+    description: m.useAdrDescription,
+  },
+  [TOOLTIP_IDS.ADR_MARGIN]: {
+    description: m.adrMarginDescription,
+  },
+  [TOOLTIP_IDS.ADR_ACK_DELAY]: {
+    description: m.adrAckDelayDescription,
+  },
+  [TOOLTIP_IDS.ADR_ACK_LIMIT]: {
+    description: m.adrAckLimitDescription,
+  },
+  [TOOLTIP_IDS.MAX_DUTY_CYCLE]: {
+    description: m.maxDutyCycleDescription,
+  },
+  [TOOLTIP_IDS.STATUS_COUNT_PERIODICITY]: {
+    description: m.statusCountPeriodicityDescription,
+  },
+  [TOOLTIP_IDS.STATUS_TIME_PERIODICITY]: {
+    description: m.statusTimePeriodicityDescription,
+  },
 })
 
 const links = Object.freeze({
@@ -474,6 +513,12 @@ const links = Object.freeze({
   },
   [TOOLTIP_IDS.SET_CLAIM_AUTH_CODE]: {
     documentationPath: '/devices/device-claiming',
+  },
+  [TOOLTIP_IDS.ADR_USE]: {
+    documentationPath: '/reference/adr',
+  },
+  [TOOLTIP_IDS.ADR_MARGIN]: {
+    documentationPath: '/reference/adr',
   },
 })
 
