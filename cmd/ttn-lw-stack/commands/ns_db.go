@@ -465,13 +465,17 @@ var (
 	}
 )
 
+func schemaVersionKey(cl *ttnredis.Client) string {
+	return cl.Key("schema-version")
+}
+
 func recordSchemaVersion(cl *ttnredis.Client) error {
 	logger.WithField("version", nsredis.SchemaVersion).Info("Setting schema version")
-	return cl.Set(ctx, "schema-version", nsredis.SchemaVersion, 0).Err()
+	return cl.Set(ctx, schemaVersionKey(cl), nsredis.SchemaVersion, 0).Err()
 }
 
 func checkLatestSchemaVersion(cl *ttnredis.Client) (bool, error) {
-	schemaVersionString, err := cl.Get(ctx, "schema-version").Result()
+	schemaVersionString, err := cl.Get(ctx, schemaVersionKey(cl)).Result()
 	if err != nil {
 		if errors.IsNotFound(ttnredis.ConvertError(err)) {
 			return true, nil
