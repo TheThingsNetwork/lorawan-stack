@@ -1576,12 +1576,12 @@
     "@formatjs/ecma402-abstract" "1.9.4"
     tslib "^2.1.0"
 
-"@formatjs/intl-listformat@^6.3.2":
-  version "6.3.2"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-listformat/-/intl-listformat-6.3.2.tgz#50602b66b097b5f774ab81e737bf7d715fac7e60"
-  integrity sha512-9RiSmg8VPN+82c3MlHxQVX9pD20KcIyjOeDJBM9K9uieLR4X3v0RJneXj2yv6WyhHNhHvrhPmrWFjQYTowJLzQ==
+"@formatjs/intl-listformat@^6.3.3":
+  version "6.3.3"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-listformat/-/intl-listformat-6.3.3.tgz#0cb83a012c0ae46876e30589a086695298e0fb5c"
+  integrity sha512-3nzAKgVS5rePDa5HiH0OwZgAhqxLtzlMc9Pg4QgajRHSP1TqFiMmQnnn52wd3+xVTb7cjZVm3JBnTv51/MhTOg==
   dependencies:
-    "@formatjs/ecma402-abstract" "1.9.7"
+    "@formatjs/ecma402-abstract" "1.9.8"
     "@formatjs/intl-localematcher" "0.2.20"
     tslib "^2.1.0"
 
@@ -14703,7 +14703,7 @@ tsutils@^3.17.1:
     tslib "^1.8.1"
 
 "ttn-lw@file:sdk/js":
-  version "3.14.1"
+  version "3.14.2"
   dependencies:
     arraybuffer-to-string "^1.0.2"
     axios "^0.21.1"
