@@ -63,6 +63,7 @@ func (ns *NetworkServer) sendApplicationUplinks(ctx context.Context, cl ttnpb.Ns
 	if _, err := cl.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
 		ApplicationUps: ups,
 	}, ns.WithClusterAuth()); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks")
 		return err
 	}
 	for _, up := range ups {
@@ -99,10 +100,17 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context, consu
 		}
 
 		cl := ttnpb.NewNsAsClient(conn)
+		var sendErr bool
 		if err := drain(applicationUplinkLimit, func(ups ...*ttnpb.ApplicationUp) error {
-			return ns.sendApplicationUplinks(ctx, cl, appID, ups...)
+			err := ns.sendApplicationUplinks(ctx, cl, appID, ups...)
+			if err != nil {
+				sendErr = true
+			}
+			return err
 		}); err != nil {
-			log.FromContext(ctx).WithError(err).Error("Failed to drain application uplinks")
+			if !sendErr {
+				log.FromContext(ctx).WithError(err).Error("Failed to drain application uplinks")
+			}
 			return time.Now().Add(applicationUplinkTaskRetryInterval), nil
 		}
 		return time.Time{}, nil

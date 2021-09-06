@@ -399,7 +399,6 @@ func (ns *NetworkServer) enqueueApplicationUplinks(ctx context.Context, ups ...*
 			return err
 		}
 		if err := ns.sendApplicationUplinks(ctx, ttnpb.NewNsAsClient(conn), appID, ups...); err != nil {
-			log.FromContext(ctx).WithError(err).Error("Failed to send application uplinks")
 			return err
 		}
 		return nil
