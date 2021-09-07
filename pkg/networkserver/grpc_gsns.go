@@ -121,7 +121,12 @@ func makeDeferredMACHandler(dev *ttnpb.EndDevice, f macHandler) macHandler {
 	return func(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage) (events.Builders, error) {
 		switch n := len(dev.MacState.QueuedResponses); {
 		case n < queuedLength:
-			return nil, errCorruptedMACState.New()
+			return nil, ErrCorruptedMACState.
+				WithAttributes(
+					"queued_length", queuedLength,
+					"n", n,
+				).
+				WithCause(ErrMACHandler)
 		case n == queuedLength:
 			return f(ctx, dev, up)
 		default:

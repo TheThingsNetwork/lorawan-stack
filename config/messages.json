@@ -6407,6 +6407,24 @@
       "file": "payload.go"
     }
   },
+  "error:pkg/networkserver/internal:channel_data_rate_range": {
+    "translations": {
+      "en": "could not generate channel datarate range"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/internal:channel_mask": {
+    "translations": {
+      "en": "could not generate channel mask"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver/internal:corrupted_mac_state": {
     "translations": {
       "en": "MAC state is corrupted"
@@ -6419,6 +6437,33 @@
   "error:pkg/networkserver/internal:data_rate": {
     "translations": {
       "en": "invalid data rate"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/internal:downlink_channel": {
+    "translations": {
+      "en": "channel does not allow uplinks"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/internal:mac_handler": {
+    "translations": {
+      "en": "missing MAC handler"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/internal:network_downlink_slot": {
+    "translations": {
+      "en": "could not generate network initiated downlink slot"
     },
     "description": {
       "package": "pkg/networkserver/internal",
@@ -6443,9 +6488,27 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver/internal:session": {
+    "translations": {
+      "en": "no device session"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver/internal:unknown_chanel": {
     "translations": {
       "en": "channel is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver/internal",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver/internal:uplink_channel": {
+    "translations": {
+      "en": "channel does not allow downlinks"
     },
     "description": {
       "package": "pkg/networkserver/internal",
@@ -6653,15 +6716,6 @@
   "error:pkg/networkserver:confirmed_too_soon": {
     "translations": {
       "en": "confirmed downlink is scheduled too soon"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:corrupted_mac_state": {
-    "translations": {
-      "en": "MAC state is corrupted"
     },
     "description": {
       "package": "pkg/networkserver",

@@ -167,7 +167,8 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 
 	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MacState.CurrentParameters.Channels...)
 	if !ok {
-		return ErrCorruptedMACState
+		return ErrCorruptedMACState.
+			WithCause(ErrChannelDataRateRange)
 	}
 	if maxDataRateIndex > phy.MaxADRDataRateIndex {
 		maxDataRateIndex = phy.MaxADRDataRateIndex
