@@ -2341,9 +2341,12 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 		"lorawan_phy_version",
 		"lorawan_version",
 		"mac_settings",
+		"multicast",
 		"session.dev_addr",
-		"session.queued_application_downlinks",
 		"session.keys",
+		"session.queued_application_downlinks",
+		"supports_class_b",
+		"supports_class_c",
 		"supports_join",
 	)...), func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if stored == nil {

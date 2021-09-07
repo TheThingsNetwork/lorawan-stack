@@ -359,14 +359,21 @@ func AddField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 		return
 	case reflect.Slice:
 		el := t.Elem()
-		switch el.PkgPath() {
-		case "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
-			switch el.Name() {
-			case "GatewayAntennaIdentifiers":
-				fs.StringSlice(name, nil, "")
-				return
-			}
 
+		if el.Kind() == reflect.Ptr {
+			el := el.Elem()
+
+			switch el.PkgPath() {
+			case "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
+				switch el.Name() {
+				case "GatewayAntennaIdentifiers":
+					fs.StringSlice(name, nil, "")
+					return
+				}
+			}
+		}
+
+		switch el.PkgPath() {
 		case "go.thethings.network/lorawan-stack/v3/pkg/types":
 			switch el.Name() {
 			case "DevAddrPrefix":
@@ -722,22 +729,24 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 						field.Set(reflect.Zero(ft))
 					}
 				case ft.Kind() == reflect.Slice && vt.Kind() == reflect.Slice:
+					fte := ft.Elem()
 					slice := reflect.MakeSlice(ft, v.Len(), v.Len())
 					switch {
-					case vt.Elem().ConvertibleTo(ft.Elem()):
+					case vt.Elem().ConvertibleTo(fte):
 						for i := 0; i < v.Len(); i++ {
-							slice.Index(i).Set(v.Index(i).Convert(ft.Elem()))
+							slice.Index(i).Set(v.Index(i).Convert(fte))
 						}
-					case ft.Elem().PkgPath() == "go.thethings.network/lorawan-stack/v3/pkg/ttnpb" &&
-						ft.Elem().Name() == "GatewayAntennaIdentifiers" && vt.Elem().Kind() == reflect.String:
+					case fte.Kind() == reflect.Ptr &&
+						fte.Elem().PkgPath() == "go.thethings.network/lorawan-stack/v3/pkg/ttnpb" &&
+						fte.Elem().Name() == "GatewayAntennaIdentifiers" && vt.Elem().Kind() == reflect.String:
 						for i := 0; i < v.Len(); i++ {
-							slice.Index(i).Set(reflect.ValueOf(ttnpb.GatewayAntennaIdentifiers{
+							slice.Index(i).Set(reflect.ValueOf(&ttnpb.GatewayAntennaIdentifiers{
 								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 									GatewayId: v.Index(i).String(),
 								},
 							}))
 						}
-					case vt.Elem().Kind() == reflect.String && reflect.PtrTo(ft.Elem()).Implements(textUnmarshalerType):
+					case vt.Elem().Kind() == reflect.String && reflect.PtrTo(fte).Implements(textUnmarshalerType):
 						for i := 0; i < v.Len(); i++ {
 							err := slice.Index(i).Addr().Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.Index(i).String()))
 							if err != nil {
