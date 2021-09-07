@@ -547,7 +547,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	if mType == ttnpb.MType_CONFIRMED_DOWN && class != ttnpb.CLASS_A {
 		confirmedAt, ok := nextConfirmedNetworkInitiatedDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
 		if !ok {
-			return nil, genState, errCorruptedMACState.New()
+			return nil, genState, ErrCorruptedMACState.
+				WithCause(ErrNetworkDownlinkSlot)
 		}
 		if confirmedAt.After(transmitAt) {
 			// Caller must have checked this already.
@@ -1008,9 +1009,20 @@ func rx1Parameters(phy *band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMes
 	if err != nil {
 		return 0, 0, err
 	}
-	if uint(chIdx) >= uint(len(macState.CurrentParameters.Channels)) ||
-		macState.CurrentParameters.Channels[int(chIdx)].GetDownlinkFrequency() == 0 {
-		return 0, 0, errCorruptedMACState.New()
+	if uint(chIdx) >= uint(len(macState.CurrentParameters.Channels)) {
+		return 0, 0, ErrCorruptedMACState.
+			WithAttributes(
+				"channel_id", chIdx,
+				"channels_len", len(macState.CurrentParameters.Channels),
+			).
+			WithCause(ErrUnknownChannel)
+	}
+	if macState.CurrentParameters.Channels[int(chIdx)].GetDownlinkFrequency() == 0 {
+		return 0, 0, ErrCorruptedMACState.
+			WithAttributes(
+				"channel_id", chIdx,
+			).
+			WithCause(ErrUplinkChannel)
 	}
 	drIdx, err := phy.Rx1DataRate(up.Settings.DataRateIndex, macState.CurrentParameters.Rx1DataRateOffset, macState.CurrentParameters.DownlinkDwellTime.GetValue())
 	if err != nil {

@@ -519,7 +519,12 @@ func TestHandleDLChannelAns(t *testing.T) {
 					ChannelIndexAck: true,
 				})),
 			},
-			Error: ErrCorruptedMACState.WithCause(ErrUnknownChannel),
+			Error: ErrCorruptedMACState.
+				WithAttributes(
+					"channels_len", 0,
+					"request_channel_id", uint32(2),
+				).
+				WithCause(ErrUnknownChannel),
 		},
 		{
 			Name: "frequency ack/channel index ack/channel exists",

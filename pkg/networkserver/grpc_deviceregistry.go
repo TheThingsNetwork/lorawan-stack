@@ -2364,7 +2364,8 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 			stored.Session = nil
 		} else {
 			if stored.Session == nil {
-				return nil, nil, errCorruptedMACState.New()
+				return nil, nil, ErrCorruptedMACState.
+					WithCause(ErrSession)
 			}
 
 			macState, err := mac.NewState(stored, ns.FrequencyPlans, ns.defaultMACSettings)

@@ -132,8 +132,20 @@ func HandleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 			return nil
 		}
 
-		if uint(req.ChannelIndex) >= uint(len(dev.MacState.CurrentParameters.Channels)) || dev.MacState.CurrentParameters.Channels[req.ChannelIndex] == nil {
-			return ErrCorruptedMACState.WithCause(ErrUnknownChannel)
+		if uint(req.ChannelIndex) >= uint(len(dev.MacState.CurrentParameters.Channels)) {
+			return ErrCorruptedMACState.
+				WithAttributes(
+					"request_channel_id", req.ChannelIndex,
+					"channels_len", len(dev.MacState.CurrentParameters.Channels),
+				).
+				WithCause(ErrUnknownChannel)
+		}
+		if dev.MacState.CurrentParameters.Channels[req.ChannelIndex] == nil {
+			return ErrCorruptedMACState.
+				WithAttributes(
+					"request_channel_id", req.ChannelIndex,
+				).
+				WithCause(ErrUnknownChannel)
 		}
 		dev.MacState.CurrentParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
 		return nil
