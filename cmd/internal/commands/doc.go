@@ -15,9 +15,11 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -60,6 +62,14 @@ func GenManPages(root *cobra.Command) *cobra.Command {
 	return cmd
 }
 
+const MDDocFrontmatterTemplate = `---
+title: "%s"
+slug: %s
+type: "commands"
+---
+
+`
+
 // GenMDDoc generates markdown documentation for the given root command.
 func GenMDDoc(root *cobra.Command) *cobra.Command {
 	cmd := &cobra.Command{
@@ -74,7 +84,70 @@ func GenMDDoc(root *cobra.Command) *cobra.Command {
 				}
 			}
 			disableAutoGenTag(root)
-			return doc.GenMarkdownTree(root, dir)
+			prepender := func(filename string) string {
+				name := filepath.Base(filename)
+				base := strings.TrimSuffix(name, path.Ext(name))
+				title := strings.Replace(base, "_", " ", -1)
+				fmt.Printf(`Write "%s" to %s`+"\n", title, filename)
+				return fmt.Sprintf(MDDocFrontmatterTemplate, title, base)
+			}
+
+			linkHandler := func(name string) string {
+				base := strings.TrimSuffix(name, path.Ext(name))
+				return fmt.Sprintf(`{{< relref "%s" >}}`, strings.ToLower(base))
+			}
+			return doc.GenMarkdownTreeCustom(root, dir, prepender, linkHandler)
+		},
+	}
+	cmd.Flags().StringP("out", "o", "doc", "output directory")
+	return cmd
+}
+
+type command struct {
+	Short       string             `json:"short,omitempty"`
+	Path        string             `json:"path,omitempty"`
+	SubCommands map[string]command `json:"subCommands,omitempty"`
+}
+
+func commandTree(cmd *cobra.Command) (res command) {
+	res.Path = cmd.CommandPath()
+	res.Short = cmd.Short
+	if len(cmd.Commands()) == 0 {
+		return
+	}
+	res.SubCommands = make(map[string]command, len(cmd.Commands()))
+	for _, cmd := range cmd.Commands() {
+		if !cmd.IsAvailableCommand() || cmd.IsAdditionalHelpTopicCommand() {
+			continue
+		}
+		res.SubCommands[cmd.Name()] = commandTree(cmd)
+	}
+	return
+}
+
+// GenTree generates a JSON tree for the given root command
+func GenJSONTree(root *cobra.Command) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:    "gen-json-tree",
+		Hidden: true,
+		Short:  fmt.Sprintf("Generate JSON tree for %s", root.Name()),
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			dir, _ := cmd.Flags().GetString("out")
+
+			out := filepath.Join(dir, root.Name()+".json")
+
+			f, err := os.Create(out)
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+
+			enc := json.NewEncoder(f)
+			enc.SetIndent("", "  ")
+			return enc.Encode(map[string]command{
+				cmd.Root().Name(): commandTree(cmd.Root()),
+			})
 		},
 	}
 	cmd.Flags().StringP("out", "o", "doc", "output directory")
