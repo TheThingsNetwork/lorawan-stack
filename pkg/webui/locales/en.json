@@ -688,7 +688,6 @@
   "console.views.overview.index.componentStatus": "Component status",
   "console.views.overview.index.versionInfo": "Version info",
   "containers.fetch-table.index.errorMessage": "There was an error and the list of {entity, select, applications {applications} organizations {organizations} keys {API keys} collaborators {collaborators} devices {end devices} gateways {gateways} users {users} webhooks {webhooks} other {entities}} could not be displayed",
-  "lib.components.full-view-error.error.errorDetails": "Error details",
   "lib.components.init.initializing": "Initializing…",
   "lib.components.with-auth.errTooFewRights": "Your account does not possess sufficient rights to use the console.",
   "lib.components.with-auth.errTooFewRightsTitle": "Insufficient rights",
