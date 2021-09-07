@@ -760,7 +760,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		matched *matchResult
 		ok      bool
 	)
-	const matchTTL = time.Minute
+	var matchTTL = ns.collectionWindow(ctx)
 	if err := ns.devices.RangeByUplinkMatches(ctx, up, matchTTL,
 		func(ctx context.Context, match *UplinkMatch) (bool, error) {
 			ctx = log.NewContextWithFields(ctx, log.Fields(
