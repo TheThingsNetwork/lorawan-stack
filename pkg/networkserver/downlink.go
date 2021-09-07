@@ -1731,6 +1731,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 							SNwkSIntKey:  dev.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey,
 							NwkSEncKey:   dev.PendingMacState.QueuedJoinAccept.Keys.NwkSEncKey,
 						},
+						QueuedApplicationDownlinks: nil,
 					}
 					dev.PendingMacState.PendingJoinRequest = &dev.PendingMacState.QueuedJoinAccept.Request
 					dev.PendingMacState.QueuedJoinAccept = nil
@@ -1747,6 +1748,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 						"pending_mac_state.rx_windows_available",
 						"pending_session.dev_addr",
 						"pending_session.keys",
+						"pending_session.queued_application_downlinks",
 					}, nil
 				}
 
