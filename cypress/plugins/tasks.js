@@ -20,6 +20,8 @@ const { Client } = require('pg')
 const yaml = require('js-yaml')
 const codeCoverageTask = require('@cypress/code-coverage/task')
 
+const isCI = process.env.CI === 'true' || process.env.CI === '1'
+
 const client = new Client({
   user: 'root',
   host: 'localhost',
@@ -32,7 +34,7 @@ client.connect()
 // all entries from `cypress.json`.
 const stackConfigTask = (_, config) => {
   try {
-    const out = execSync('go run ./cmd/ttn-lw-stack config --yml')
+    const out = execSync(`${isCI ? './' : 'go run ./cmd/'}ttn-lw-stack config --yml`)
     const yml = yaml.load(out)
 
     // Cluster.

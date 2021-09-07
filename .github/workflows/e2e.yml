@@ -116,8 +116,7 @@ jobs:
         run: tools/bin/mage dev:initDeviceRepo
         if: steps.dr-index-cache.outputs.cache-hit != 'true'
       - name: Run test preparations
-        if: |
-          steps.db-cache.outputs.cache-hit != 'true'
+        if: steps.db-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage -v dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump
       - name: Initialize public folder cache
         id: public-cache
@@ -137,8 +136,24 @@ jobs:
       - name: Build frontend
         if: steps.public-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage js:build
+      - name: Initialize build cache
+        id: build-cache
+        uses: actions/cache@v2
+        with:
+          path: ttn-lw-stack
+          key: build-cache-${{ hashFiles('go.mod', 'go.sum', 'pkg/**',  'config/**', 'cmd/**') }}
+      - name: Build TTS
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        run: go build ./cmd/ttn-lw-stack
+      - name: Zip build artifacts
+        run: zip -r build.zip .cache/sqldump.sql .env/admin_api_key.txt data/lorawan-devices-index public ttn-lw-stack tools/bin/mage
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-files
+          path: build.zip
   end-to-end:
-    name: Frontend based (cypress)
+    name: Main frontend end-to-end tests (Chrome)
     runs-on: ubuntu-18.04
     env:
       TTN_LW_LOG_LEVEL: debug
@@ -147,7 +162,6 @@ jobs:
       COCKROACHDB_COCKROACH_TAG: v19.2.12
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RUN_HASH: ${{ needs.determine-if-required.outputs.hash }}
     strategy:
       matrix:
         machines: [1, 2, 3, 4]
@@ -159,6 +173,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+      - uses: actions/download-artifact@v2
+        name: Download build artifacts
+        with:
+          name: 'build-files'
+      - name: Unzip build artifacts
+        run: unzip -o build.zip
       - name: Initialize Yarn module cache
         id: yarn-cache
         uses: actions/cache@v2
@@ -167,51 +187,84 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: '~1.16'
-      - name: Initialize tool binary cache
-        id: tools-cache
-        uses: actions/cache@v2
-        with:
-          path: tools/bin
-          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-      - name: Initialize SQL dump cache
-        id: db-cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            .cache/sqldump.sql
-            .env/admin_api_key.txt
-          key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go') }}
-      - name: Restore initialized sql db
-        run: tools/bin/mage dev:dbStart dev:sqlRestore
-      - name: Initialize device repository index cache
-        id: dr-index-cache
-        uses: actions/cache@v2
-        with:
-          path: data/lorawan-devices-index
-          key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
       - name: Generate certs
         run: tools/bin/mage dev:certificates
-      - name: Initialize Go module cache
-        uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Download go modules
-        run: go mod download
-      - name: Initialize public folder cache
-        id: public-cache
-        uses: actions/cache@v2
-        with:
-          path: public
-          key: public-cache-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/webpack.config.babel.js', 'yarn.lock', 'sdk/js/yarn.lock')}}
+      - name: Restore initialized sql db
+        run: tools/bin/mage dev:dbStart dev:sqlRestore
+      - name: Run stack
+        run: tools/bin/mage dev:startDevStack &
       - name: Run frontend end-to-end tests
-        run: tools/bin/mage dev:startDevStack & tools/bin/mage -v js:cypressHeadless
+        uses: cypress-io/github-action@v2
+        with:
+          config-file: config/cypress.json
+          config: baseUrl=http://localhost:1885
+          record: true
+          parallel: true
+          group: main-${{ needs.determine-if-required.outputs.hash }}
+      - name: Upload logs
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: logs
+          path: .cache/devStack.log
+      - name: Upload screenshots for failed tests
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+  cross-browser-smoke:
+    name: Cross-browser smoke tests (Firefox 78 ESR)
+    runs-on: ubuntu-18.04
+    env:
+      TTN_LW_LOG_LEVEL: debug
+      # TODO: Remove this after we no longer depend on cockroach dump command
+      # (https://github.com/TheThingsNetwork/lorawan-stack/issues/4184)
+      COCKROACHDB_COCKROACH_TAG: v19.2.12
+      CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    needs: [determine-if-required, preparation]
+    if: needs.determine-if-required.outputs.needs-to-run == 'true'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
+      - uses: actions/download-artifact@v2
+        name: Download build artifacts
+        with:
+          name: 'build-files'
+      - name: Unzip build artifacts
+        run: unzip -o build.zip
+      - name: Initialize Yarn module cache
+        id: yarn-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ needs.determine-if-required.outputs.yarn-cache-dir-path }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install FF 78 ESR
+        run: |
+          wget --no-verbose -O /tmp/firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/firefox/releases/78.13.0esr/linux-x86_64/en-US/firefox-78.13.0esr.tar.bz2
+          tar -C /opt -xjf /tmp/firefox.tar.bz2
+          rm /tmp/firefox.tar.bz2
+          sudo ln -fs /opt/firefox/firefox /usr/bin/firefox
+      - name: Generate certs
+        run: tools/bin/mage dev:certificates
+      - name: Restore initialized sql db
+        run: tools/bin/mage dev:dbStart dev:sqlRestore
+      - name: Run stack
+        run: tools/bin/mage dev:startDevStack &
+      - name: Run end-to-end smoke tests (Firefox)
+        uses: cypress-io/github-action@v2
+        with:
+          config-file: config/cypress.json
+          config: baseUrl=http://localhost:1885
+          browser: firefox
+          record: true
+          spec: cypress/integration/smoke/smoke.spec.js
       - name: Upload logs
         uses: actions/upload-artifact@v2
         if: failure()
@@ -227,7 +280,7 @@ jobs:
   cache-result:
     name: Write result cache
     runs-on: ubuntu-18.04
-    needs: [preparation, end-to-end, determine-if-required]
+    needs: [preparation, end-to-end, cross-browser-smoke, determine-if-required]
     steps:
       - name: Setup result cache to skip redundant runs
         id: run-cache

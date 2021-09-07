@@ -363,12 +363,7 @@ func (js Js) CypressHeadless() error {
 	}
 	ci := os.Getenv("CI")
 	if ci == "true" {
-		hash := os.Getenv("RUN_HASH")
-		shorthash := "none"
-		if len(hash) > 7 {
-			shorthash = hash[:7]
-		}
-		return js.runCypress("run", "--record", "--parallel", "--group", fmt.Sprintf("'%s'", shorthash))
+		return js.runCypress("run", "--record", "--parallel", "--group", fmt.Sprintf("'%s'", os.Getenv("RUN_HASH")))
 	}
 	return js.runCypress("run")
 }
