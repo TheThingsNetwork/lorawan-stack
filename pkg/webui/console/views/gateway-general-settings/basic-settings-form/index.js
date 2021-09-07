@@ -14,8 +14,7 @@
 
 import React from 'react'
 
-import DeleteModalButton from '@ttn-lw/console/components/delete-modal-button'
-
+import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Form from '@ttn-lw/components/form'

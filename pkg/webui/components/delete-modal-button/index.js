@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 
 import Input from '@ttn-lw/components/input'
 import ModalButton from '@ttn-lw/components/button/modal-button'
@@ -24,33 +23,24 @@ import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './delete-modal-button.styl'
 
-const m = defineMessages({
-  modalTitle: 'Are you sure you want to delete <pre>{entityName}</pre>? ',
-  modalDefaultWarning:
-    'This will <strong>PERMANENTLY DELETE THE ENTITY ITSELF AND ALL ASSOCIATED ENTITIES</strong>, including collaborator associations. It will also <strong>NOT BE POSSIBLE TO REUSE THE ENTITY ID</strong>.',
-  modalPurgeWarning:
-    'This will <strong>PERMANENTLY DELETE THE ENTITY ITSELF AND ALL ASSOCIATED ENTITIES</strong>, including collaborator associations.',
-  confirmMessage: 'Please enter <pre>{entityId}</pre> to confirm the deletion.',
-  confirmDeletion: 'Confirm deletion',
-  releaseIdTitle: 'Entity purge (admin only)',
-  releaseIdLabel: 'Also release entity IDs (purge)',
-  purgeWarning:
-    'Releasing the entity IDs will make it possible to register a new entity with the same ID. Note that this <strong>irreversible</strong> and may lead to <strong>other users gaining access to historical data of the entity if they register an entity with the same ID</strong> . Please make sure you understand the implications of purging as described <DocLink>here</DocLink>.',
-})
-
 const DeleteModalButton = props => {
   const {
+    confirmMessage,
+    defaultMessage,
     entityId,
     entityName,
-    onApprove,
-    onCancel,
-    shouldConfirm,
     mayPurge,
     message,
+    onApprove,
+    onCancel,
+    purgeMessage,
+    shouldConfirm,
+    title,
     onlyPurge,
   } = props
 
@@ -84,7 +74,7 @@ const DeleteModalButton = props => {
       onCancel={onCancel}
       message={message}
       modalData={{
-        title: m.confirmDeletion,
+        title: sharedMessages.deleteModalConfirmDeletion,
         approveButtonProps: {
           disabled: shouldConfirm && confirmId !== entityId,
           icon: 'delete',
@@ -93,31 +83,31 @@ const DeleteModalButton = props => {
         children: (
           <div>
             <Message
-              content={m.modalTitle}
+              content={title}
               values={{ entityName: name, pre: name => <pre className={style.id}>{name}</pre> }}
               component="span"
             />
             <Message
-              content={purgeEntity ? m.modalPurgeWarning : m.modalDefaultWarning}
+              content={purgeEntity ? purgeMessage : defaultMessage}
               values={{ strong: txt => <strong>{txt}</strong> }}
               component="p"
             />
             <Form initialValues={initialValues}>
-              {(mayPurge || !onlyPurge) && (
+              {mayPurge && (
                 <Form.Field
                   name="purge"
                   className={style.hardDeleteCheckbox}
                   component={Checkbox}
                   onChange={handlePurgeEntityChange}
-                  title={m.releaseIdTitle}
-                  label={m.releaseIdLabel}
+                  title={sharedMessages.deleteModalReleaseIdTitle}
+                  label={sharedMessages.deleteModalReleaseIdLabel}
                 />
               )}
               {purgeEntity && (
                 <Notification
                   small
                   warning
-                  content={m.purgeWarning}
+                  content={sharedMessages.deleteModalPurgeWarning}
                   messageValues={{
                     strong: txt => <strong>{txt}</strong>,
                     DocLink: txt => (
@@ -131,11 +121,16 @@ const DeleteModalButton = props => {
               {shouldConfirm && (
                 <>
                   <Message
-                    content={m.confirmMessage}
+                    content={confirmMessage}
                     values={{ entityId, pre: id => <pre className={style.id}>{id}</pre> }}
                     component="span"
                   />
-                  <Input className={style.confirmInput} value={confirmId} onChange={setConfirmId} />
+                  <Input
+                    className={style.confirmInput}
+                    data-test-id="confirm_deletion"
+                    value={confirmId}
+                    onChange={setConfirmId}
+                  />
                 </>
               )}
             </Form>
@@ -147,6 +142,8 @@ const DeleteModalButton = props => {
 }
 
 DeleteModalButton.propTypes = {
+  confirmMessage: PropTypes.message,
+  defaultMessage: PropTypes.message,
   entityId: PropTypes.string.isRequired,
   entityName: PropTypes.string,
   mayPurge: PropTypes.bool,
@@ -154,7 +151,9 @@ DeleteModalButton.propTypes = {
   onApprove: PropTypes.func,
   onCancel: PropTypes.func,
   onlyPurge: PropTypes.bool,
+  purgeMessage: PropTypes.message,
   shouldConfirm: PropTypes.bool,
+  title: PropTypes.message,
 }
 
 DeleteModalButton.defaultProps = {
@@ -163,6 +162,10 @@ DeleteModalButton.defaultProps = {
   onCancel: undefined,
   shouldConfirm: false,
   mayPurge: false,
+  defaultMessage: sharedMessages.deleteModalDefaultMessage,
+  purgeMessage: sharedMessages.deleteModalPurgeMessage,
+  title: sharedMessages.deleteModalTitle,
+  confirmMessage: sharedMessages.deleteModalConfirmMessage,
   onlyPurge: false,
 }
 

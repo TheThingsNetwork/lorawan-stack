@@ -86,7 +86,11 @@ describe('End device repository create', () => {
             .and('have.attr', 'href', `/console/applications/${appId}/devices/add/manual`)
           cy.findByRole('link', { name: /Adding Devices/ })
             .should('be.visible')
-            .and('have.attr', 'href', `https://thethingsstack.io/devices/adding-devices/`)
+            .and(
+              'have.attr',
+              'href',
+              `https://thethingsindustries.com/docs/devices/adding-devices/`,
+            )
         })
 
       cy.findByText(

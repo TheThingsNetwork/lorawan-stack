@@ -19,12 +19,11 @@ import { bindActionCreators } from 'redux'
 
 import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
+import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
-
-import DeleteModalButton from '@console/components/delete-modal-button'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'

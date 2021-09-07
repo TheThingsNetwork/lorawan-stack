@@ -118,6 +118,7 @@ export default {
     list: tts.Users.getAll.bind(tts.Users),
     update: tts.Users.updateById.bind(tts.Users),
     delete: tts.Users.deleteById.bind(tts.Users),
+    purge: tts.Users.purgeById.bind(tts.Users),
     search: tts.Users.search.bind(tts.Users),
     authInfo: tts.Auth.getAuthInfo.bind(tts.Auth),
     apiKeys: {

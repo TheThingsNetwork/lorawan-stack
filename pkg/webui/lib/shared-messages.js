@@ -120,6 +120,17 @@ export default defineMessages({
   delayWarning:
     'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
   deleted: 'Deleted (Admin)',
+  deleteModalTitle: 'Are you sure you want to delete <pre>{entityName}</pre>?',
+  deleteModalDefaultMessage:
+    'This will <strong>PERMANENTLY DELETE THE ENTITY ITSELF AND ALL ASSOCIATED ENTITIES</strong>, including collaborator associations. It will also <strong>NOT BE POSSIBLE TO REUSE THE ENTITY ID</strong>.',
+  deleteModalPurgeMessage:
+    'This will <strong>PERMANENTLY DELETE THE ENTITY ITSELF AND ALL ASSOCIATED ENTITIES</strong>, including collaborator associations.',
+  deleteModalConfirmMessage: 'Please enter <pre>{entityId}</pre> to confirm the deletion.',
+  deleteModalConfirmDeletion: 'Confirm deletion',
+  deleteModalPurgeWarning:
+    'Releasing the entity IDs will make it possible to register a new entity with the same ID. Note that this <strong>irreversible</strong> and may lead to <strong>other users gaining access to historical data of the entity if they register an entity with the same ID</strong> . Please make sure you understand the implications of purging as described <DocLink>here</DocLink>.',
+  deleteModalReleaseIdTitle: 'Entity purge (admin only)',
+  deleteModalReleaseIdLabel: 'Also release entity IDs (purge)',
   description: 'Description',
   devAddr: 'Device address',
   devDesc: 'End device description',

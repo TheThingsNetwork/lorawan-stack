@@ -23,11 +23,11 @@ import Radio from '@ttn-lw/components/radio-button'
 import FileInput from '@ttn-lw/components/file-input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
-import ModalButton from '@ttn-lw/components/button/modal-button'
 import ProfilePicture from '@ttn-lw/components/profile-picture'
 import Notification from '@ttn-lw/components/notification'
 import Link from '@ttn-lw/components/link'
 import toast from '@ttn-lw/components/toast'
+import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 
 import {
   getClosestProfilePictureBySize,
@@ -40,9 +40,11 @@ import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import debounce from '@ttn-lw/lib/debounce'
 
+import { checkFromState, mayPurgeEntities } from '@account/lib/feature-checks'
+
 import { updateUser, deleteUser } from '@account/store/actions/user'
 
-import { selectUser } from '@account/store/selectors/user'
+import { selectUser, selectUserId } from '@account/store/selectors/user'
 import {
   selectUseGravatarConfiguration,
   selectDisableUploadConfiguration,
@@ -90,6 +92,7 @@ const ProfileEditForm = () => {
   const dispatch = useDispatch()
 
   const user = useSelector(selectUser)
+  const userId = useSelector(selectUserId)
   const useGravatarConfig = useSelector(selectUseGravatarConfiguration)
   const disableUploadConfig = useSelector(selectDisableUploadConfiguration)
   const initialProfilePictureSource =
@@ -97,6 +100,7 @@ const ProfileEditForm = () => {
     (user.profile_picture === null && useGravatarConfig)
       ? 'gravatar'
       : 'upload'
+  const mayPurge = useSelector(state => checkFromState(mayPurgeEntities, state))
 
   const [profilePictureSource, setProfilePictureSource] = useState(initialProfilePictureSource)
   const [gravatarPreview, setGravatarPreview] = useState(null)
@@ -170,24 +174,27 @@ const ProfileEditForm = () => {
     [dispatch, user, validationContext],
   )
 
-  const handleDelete = useCallback(async () => {
-    try {
-      await dispatch(promisifiedDeleteUser())
+  const handleDelete = useCallback(
+    async shouldPurge => {
+      try {
+        await dispatch(promisifiedDeleteUser(userId, { purge: shouldPurge }))
 
-      // The hard redirect will conclude the deletion by deleting the
-      // (now invalid) session cookie and redirecting back to the login screen.
-      // The `account-deleted` query will cause a success notification to be
-      // shown on the login screen.
-      const appRoot = selectApplicationRootPath()
-      window.location = `${appRoot}/login?account-deleted`
-    } catch {
-      toast({
-        title: m.deleteAccount,
-        message: m.deleteAccountError,
-        type: toast.types.ERROR,
-      })
-    }
-  }, [dispatch])
+        // The hard redirect will conclude the deletion by deleting the
+        // (now invalid) session cookie and redirecting back to the login screen.
+        // The `account-deleted` query will cause a success notification to be
+        // shown on the login screen.
+        const appRoot = selectApplicationRootPath()
+        window.location = `${appRoot}/login?account-deleted`
+      } catch {
+        toast({
+          title: m.deleteAccount,
+          message: m.deleteAccountError,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [dispatch, userId],
+  )
 
   const initialValues = validationSchema.cast(
     { profile_picture: undefined, ...user },
@@ -291,16 +298,17 @@ const ProfileEditForm = () => {
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
-        <ModalButton
-          type="button"
-          icon="delete"
-          danger
-          naked
+        <DeleteModalButton
+          title={m.deleteTitle}
           message={m.deleteAccount}
-          modalData={{
-            message: m.modalWarning,
-          }}
+          entityId={userId}
+          entityName={user.name}
           onApprove={handleDelete}
+          shouldConfirm
+          mayPurge={mayPurge}
+          defaultMessage={m.deleteWarning}
+          purgeMessage={m.purgeWarning}
+          confirmMessage={m.deleteConfirmMessage}
         />
       </SubmitBar>
     </Form>

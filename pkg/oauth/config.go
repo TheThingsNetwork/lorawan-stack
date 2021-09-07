@@ -31,6 +31,7 @@ type StackConfig struct {
 
 // FrontendConfig is the configuration for the OAuth frontend.
 type FrontendConfig struct {
+	DocumentationBaseURL   string `json:"documentation_base_url" name:"documentation-base-url" description:"The base URL for generating documentation links"`
 	Language               string `json:"language" name:"-"`
 	StackConfig            `json:"stack_config" name:",squash"`
 	EnableUserRegistration bool   `json:"enable_user_registration" name:"-"`

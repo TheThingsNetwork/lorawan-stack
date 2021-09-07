@@ -37,12 +37,8 @@ describe('Account App profile settings', () => {
       })
 
     cy.findByText('Profile picture').should('be.visible')
-    cy.findByLabelText('Use Gravatar')
-      .should('exist')
-      .and('be.checked')
-    cy.findByLabelText('Upload an image')
-      .should('exist')
-      .and('not.be.checked')
+    cy.findByLabelText('Use Gravatar').should('exist').and('be.checked')
+    cy.findByLabelText('Upload an image').should('exist').and('not.be.checked')
     cy.findByLabelText('User ID')
       .should('be.visible')
       .and('have.attr', 'value')
@@ -73,9 +69,7 @@ describe('Account App profile settings', () => {
 
     cy.findByLabelText('Use Gravatar').check()
     cy.findByLabelText('Name').type(userUpdate.name)
-    cy.findByLabelText('Email address')
-      .clear()
-      .type(userUpdate.primary_email_address)
+    cy.findByLabelText('Email address').clear().type(userUpdate.primary_email_address)
 
     // Check if the profile picture (preview) was updated properly.
     cy.get('form').within(() => {
@@ -149,7 +143,9 @@ describe('Account App profile settings', () => {
     cy.findByTestId('modal-window')
       .should('be.visible')
       .within(() => {
-        cy.findByText('Delete account', { selector: 'h1' }).should('be.visible')
+        cy.findByText('Confirm deletion', { selector: 'h1' }).should('be.visible')
+        cy.findByRole('button', { name: /Delete account/ }).should('have.attr', 'disabled')
+        cy.findByTestId('confirm_deletion').type(user.ids.user_id)
         cy.findByRole('button', { name: /Delete account/ }).click()
       })
 
