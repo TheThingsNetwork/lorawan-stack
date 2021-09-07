@@ -200,7 +200,7 @@ jobs:
           config: baseUrl=http://localhost:1885
           record: true
           parallel: true
-          group: ${{ needs.determine-if-required.outputs.hash }}
+          group: main-${{ needs.determine-if-required.outputs.hash }}
       - name: Upload logs
         uses: actions/upload-artifact@v2
         if: failure()
@@ -264,9 +264,7 @@ jobs:
           config: baseUrl=http://localhost:1885
           browser: firefox
           record: true
-          parallel: true
           spec: cypress/integration/smoke/smoke.spec.js
-          group: ${{ needs.determine-if-required.outputs.hash }}
       - name: Upload logs
         uses: actions/upload-artifact@v2
         if: failure()
