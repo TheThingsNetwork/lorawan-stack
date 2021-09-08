@@ -58,6 +58,8 @@ const m = defineMessages({
   templateInformation: 'Template information',
   enabledMessages: 'Enabled messages',
   endpointSettings: 'Endpoint settings',
+  updateErrorTitle: 'Could not update webhook',
+  createErrorTitle: 'Could not create webhook',
 })
 
 const headerCheck = headers =>
@@ -209,6 +211,7 @@ export default class WebhookForm extends Component {
           validationSchema={validationSchema}
           initialValues={initialValues}
           error={error}
+          errorTitle={update ? m.updateErrorTitle : m.createErrorTitle}
           formikRef={this.form}
         >
           <Form.SubTitle title={sharedMessages.generalSettings} />

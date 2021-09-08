@@ -297,6 +297,8 @@
   "console.components.webhook-form.index.templateInformation": "Template information",
   "console.components.webhook-form.index.enabledMessages": "Enabled messages",
   "console.components.webhook-form.index.endpointSettings": "Endpoint settings",
+  "console.components.webhook-form.index.updateErrorTitle": "Could not update webhook",
+  "console.components.webhook-form.index.createErrorTitle": "Could not create webhook",
   "console.components.webhook-template-form.index.createTemplate": "Create {template} webhook",
   "console.components.webhook-template-form.index.idPlaceholder": "my-new-{templateId}-webhook",
   "console.components.webhook-template-form.index.templateSettings": "Template settings",
