@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 - URL field validation in webhook forms in the Console when value is not trimmed.
 - Not rendering site header and footer for error pages in some situations.
 - Not providing a copy button for error pages in some situations.
+- Improved errors for invalid URLs.
 
 ### Security
 
