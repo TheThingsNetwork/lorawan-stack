@@ -23,6 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Entity purge handling for non-admin users in the Console.
+- URL field validation in webhook forms in the Console when value is not trimmed.
 
 ### Security
 
