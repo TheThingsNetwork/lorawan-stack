@@ -14,6 +14,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - Update to Go 1.17.
+- LBS timestamp rollover threshold.
 
 ### Deprecated
 

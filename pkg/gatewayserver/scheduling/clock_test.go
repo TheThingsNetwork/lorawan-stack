@@ -26,6 +26,7 @@ import (
 )
 
 func TestRolloverClock(t *testing.T) {
+	a := assertions.New(t)
 	clock := &RolloverClock{}
 
 	for i, stc := range []struct {
@@ -110,6 +111,48 @@ func TestRolloverClock(t *testing.T) {
 				})
 			}
 		})
+	}
+
+	// Test Rollovers where the absolute diff low.
+	const rfc3339Micro = "2006-01-02T15:04:05.999999Z07:00"
+	now, _ := time.Parse(rfc3339Micro, "2021-08-27T09:06:21.001774Z")
+
+	timestamps := []int64{
+		53761741353978084, // Close to a rollover
+		53761744960482044, // Next one arrives an hour later
+	}
+	var (
+		prev      *int64
+		sessionID int64
+	)
+	for i, xtimeIn := range timestamps {
+		xtimeIn := xtimeIn
+		diff := int64(0)
+		if prev != nil {
+			diff = xtimeIn - *prev
+		}
+		prev = &xtimeIn
+
+		timestamp := uint32(xtimeIn & 0xFFFFFFFF)
+		serverTime := now
+		if i != 0 {
+			serverTime, _ = time.Parse(rfc3339Micro, "2021-08-27T10:06:27.487028Z")
+		}
+
+		if i == 0 {
+			t.Log("Synchronizing gateway concentrator")
+			sessionID = xtimeIn >> 48
+			clock.SyncWithGatewayConcentrator(timestamp, serverTime, ConcentratorTime(time.Duration(xtimeIn&0xFFFFFFFFFFFF)*time.Microsecond))
+		}
+		rx := clock.Sync(timestamp, serverTime)
+		tx := clock.FromTimestampTime(timestamp)
+
+		t.Logf("xtimeIn=%016X tmst=%08X concentrator=%016X received=%v diff=%d", xtimeIn, timestamp, tx/1000, serverTime, diff)
+
+		a.So(tx-rx, should.BeZeroValue)
+
+		xtimeOut := sessionID<<48 | (int64(tx) / int64(time.Microsecond) & 0xFFFFFFFFFF)
+		a.So(time.Duration(xtimeOut-xtimeIn)*time.Microsecond, should.BeZeroValue)
 	}
 }
 
