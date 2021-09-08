@@ -171,10 +171,9 @@ func (s *srv) handlePackets() {
 
 			if s.firewall != nil {
 				if err := s.firewall.Filter(packet); err != nil {
-					if errors.IsResourceExhausted(err) && ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(eui.String())) == nil {
-						break
+					if !errors.IsResourceExhausted(err) || ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(eui.String())) == nil {
+						logger.WithError(err).Warn("Packet filtered")
 					}
-					logger.WithError(err).Warn("Packet filtered")
 					break
 				}
 			}
