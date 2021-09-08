@@ -65,12 +65,10 @@ func (c *RolloverClock) Sync(timestamp uint32, server time.Time) ConcentratorTim
 	if passed := int64(timestamp) - int64(c.relative); passed < -0x3938700 {
 		rollovers++
 	}
-
 	// If there are full roll over windows between the last and the current server time, take these into account.
 	if c.server != nil && server.After(*c.server) {
 		rollovers += int64(server.Sub(*c.server)/time.Microsecond) >> 32
 	}
-
 	c.absolute = (ConcentratorTime(rollovers<<32) + ConcentratorTime(timestamp)) * ConcentratorTime(time.Microsecond)
 	c.relative = timestamp
 	c.server = &server
