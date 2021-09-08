@@ -18,6 +18,7 @@ import { Formik, yupToFormErrors, useFormikContext, validateYupSchema } from 'fo
 import bind from 'autobind-decorator'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import classnames from 'classnames'
+import { defineMessages } from 'react-intl'
 
 import Notification from '@ttn-lw/components/notification'
 import ErrorNotification from '@ttn-lw/components/error-notification'
@@ -34,6 +35,10 @@ import FormFieldContainer from './field/container'
 
 import style from './form.styl'
 
+const m = defineMessages({
+  submitFailed: 'Submit failed',
+})
+
 class InnerForm extends React.PureComponent {
   static propTypes = {
     children: PropTypes.node.isRequired,
@@ -49,10 +54,10 @@ class InnerForm extends React.PureComponent {
 
   static defaultProps = {
     className: undefined,
-    formError: undefined,
-    formErrorTitle: undefined,
     formInfo: undefined,
     formInfoTitle: undefined,
+    formError: undefined,
+    formErrorTitle: m.submitFailed,
   }
 
   constructor(props) {

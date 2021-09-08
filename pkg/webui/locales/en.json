@@ -86,6 +86,7 @@
   "components.form.field.tooltip.absenceTitle": "What if I cannot find the correct value?",
   "components.form.field.tooltip.viewGlossaryPage": "View glossary page",
   "components.form.field.tooltip.additionalInfo": "Additional information",
+  "components.form.index.submitFailed": "Submit failed",
   "components.form.section.index.expand": "Expand section",
   "components.form.section.index.collapse": "Collapse section",
   "components.input.generate.generate": "Generate",
