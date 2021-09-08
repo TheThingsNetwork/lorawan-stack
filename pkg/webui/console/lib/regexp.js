@@ -19,6 +19,9 @@ export const apiKey = /^NNSXS.[A-Z0-9]{39}.[A-Z0-9]{52}$/
 export const address = new RegExp(
   '^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$',
 )
+export const addressWithOptionalScheme = new RegExp(
+  '^([a-z]{2,5}://)?(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$',
+)
 export const natsUrl = /^((\w+):)?(\/\/(([a-zA-z-0-9]+)?(:([a-zA-z-0-9]+))?@)?([^/?:]+)(:(\d+))?)?(\/?([^/?#][^?#]*)?)?(\?([^#]+))?(#(\w*))?/
 export const mqttUrl = new RegExp('^(mqtt|mqtts|tcp|ssl|tls|tcps|ws|wss)://[^\\s/$.?#].[^\\s]*$')
 export const mqttPassword = /^(?![\s\S])|.{2,100}/
