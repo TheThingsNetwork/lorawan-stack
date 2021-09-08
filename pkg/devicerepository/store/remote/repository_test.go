@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//+build slowtests
+//go:build slowtests
+// +build slowtests
 
 package remote_test
 
