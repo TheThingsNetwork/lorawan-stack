@@ -26,13 +26,6 @@ const (
 )
 
 var webhookMetrics = &messageMetrics{
-	webhookQueue: metrics.NewGauge(
-		prometheus.GaugeOpts{
-			Subsystem: subsystem,
-			Name:      "queue_size",
-			Help:      "Webhook queue size",
-		},
-	),
 	webhooksSent: metrics.NewCounter(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
@@ -51,35 +44,23 @@ var webhookMetrics = &messageMetrics{
 }
 
 func init() {
-	webhookMetrics.webhookQueue.Set(0)
 	webhookMetrics.webhooksSent.Add(0)
 	metrics.MustRegister(webhookMetrics)
 }
 
 type messageMetrics struct {
-	webhookQueue   prometheus.Gauge
 	webhooksSent   prometheus.Counter
 	webhooksFailed *prometheus.CounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
-	m.webhookQueue.Describe(ch)
 	m.webhooksSent.Describe(ch)
 	m.webhooksFailed.Describe(ch)
 }
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
-	m.webhookQueue.Collect(ch)
 	m.webhooksSent.Collect(ch)
 	m.webhooksFailed.Collect(ch)
-}
-
-func registerWebhookQueued() {
-	webhookMetrics.webhookQueue.Inc()
-}
-
-func registerWebhookDequeued() {
-	webhookMetrics.webhookQueue.Dec()
 }
 
 func registerWebhookSent() {

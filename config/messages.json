@@ -2420,15 +2420,6 @@
       "file": "templates.go"
     }
   },
-  "error:pkg/applicationserver/io/web:queue_full": {
-    "translations": {
-      "en": "the queue is full"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/web",
-      "file": "webhooks.go"
-    }
-  },
   "error:pkg/applicationserver/io/web:rate_limit_exceeded": {
     "translations": {
       "en": "rate limit exceeded"
