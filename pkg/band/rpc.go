@@ -20,13 +20,36 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+var bandIDs = []string{AS_923, AU_915_928, CN_470_510, CN_779_787, EU_433, EU_863_870, IN_865_867, ISM_2400, KR_920_923, RU_864_870, US_902_928}
+
 // GetPhyVersions returns the list of supported phy versions for the given band.
 func GetPhyVersions(ctx context.Context, req *ttnpb.GetPhyVersionsRequest) (*ttnpb.GetPhyVersionsResponse, error) {
-	band, ok := All[req.BandId]
-	if !ok {
-		return nil, errBandNotFound.WithAttributes("id", req.BandId)
+	var res *ttnpb.GetPhyVersionsResponse
+	if req.BandId != "" {
+		band, ok := All[req.BandId]
+		if !ok {
+			return nil, errBandNotFound.WithAttributes("id", req.BandId)
+		}
+		res = &ttnpb.GetPhyVersionsResponse{
+			VersionInfo: []*ttnpb.GetPhyVersionsResponse_VersionInfo{
+				{
+					BandId:      req.BandId,
+					PhyVersions: band.Versions(),
+				},
+			},
+		}
+	} else {
+		versionInfo := []*ttnpb.GetPhyVersionsResponse_VersionInfo{}
+		for _, bandID := range bandIDs {
+			band := All[bandID]
+			versionInfo = append(versionInfo, &ttnpb.GetPhyVersionsResponse_VersionInfo{
+				BandId:      bandID,
+				PhyVersions: band.Versions(),
+			})
+		}
+		res = &ttnpb.GetPhyVersionsResponse{
+			VersionInfo: versionInfo,
+		}
 	}
-	return &ttnpb.GetPhyVersionsResponse{
-		PhyVersions: band.Versions(),
-	}, nil
+	return res, nil
 }
