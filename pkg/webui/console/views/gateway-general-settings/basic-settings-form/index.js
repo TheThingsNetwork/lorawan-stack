@@ -54,10 +54,13 @@ const BasicSettingsForm = React.memo(props => {
   const onGatewayDelete = React.useCallback(
     async shouldPurge => {
       try {
+        setError(undefined)
+
         await onDelete(shouldPurge)
         onDeleteSuccess()
       } catch (error) {
         onDeleteFailure()
+        setError(error)
       }
     },
     [onDelete, onDeleteFailure, onDeleteSuccess],

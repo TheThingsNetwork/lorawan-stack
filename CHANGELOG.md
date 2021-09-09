@@ -22,6 +22,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Entity purge handling for non-admin users in the Console.
+
 ### Security
 
 ## [3.14.2] - 2021-08-27
