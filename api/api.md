@@ -2240,7 +2240,7 @@ PeerInfo
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `ListFrequencyPlans` | `GET` | `/api/v3/configuration/frequency-plans` |  |
-| `GetPhyVersions` | `GET` | `/api/v3/configuration/phy-version` |  |
+| `GetPhyVersions` | `GET` | `/api/v3/configuration/phy-versions/{band_id}` |  |
 
 ## <a name="lorawan-stack/api/contact_info.proto">File `lorawan-stack/api/contact_info.proto`</a>
 

@@ -67,7 +67,7 @@ service Configuration {
   // Returns a list of supported LoRaWAN PHY Versions for the given Band ID.
   rpc GetPhyVersions(GetPhyVersionsRequest) returns (GetPhyVersionsResponse) {
     option (google.api.http) = {
-      get: "/configuration/phy-version"
+      get: "/configuration/phy-versions/{band_id}"
     };
   }
 }

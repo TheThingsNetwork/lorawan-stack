@@ -3787,7 +3787,7 @@
         ]
       }
     },
-    "/configuration/phy-version": {
+    "/configuration/phy-versions/{band_id}": {
       "get": {
         "summary": "Returns a list of supported LoRaWAN PHY Versions for the given Band ID.",
         "operationId": "Configuration_GetPhyVersions",
@@ -3808,8 +3808,8 @@
         "parameters": [
           {
             "name": "band_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],

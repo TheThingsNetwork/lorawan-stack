@@ -8252,7 +8252,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/configuration/phy-version"
+                      "pattern": "/configuration/phy-versions/{band_id}"
                     }
                   ]
                 }
