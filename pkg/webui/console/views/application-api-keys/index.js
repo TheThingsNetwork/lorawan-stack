@@ -50,7 +50,7 @@ export default class ApplicationAccess extends React.Component {
   render() {
     const { match } = this.props
     return (
-      <ErrorView ErrorComponent={SubViewError}>
+      <ErrorView errorRender={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={ApplicationApiKeysList} />
           <Route exact path={`${match.path}/add`} component={ApplicationApiKeyAdd} />

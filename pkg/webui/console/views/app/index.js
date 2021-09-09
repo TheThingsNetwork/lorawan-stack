@@ -56,6 +56,7 @@ import {
 import style from './app.styl'
 
 const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
+const errorRender = error => <FullViewError error={error} header={<Header />} />
 
 @withEnv
 @connect(
@@ -125,12 +126,10 @@ class ConsoleApp extends React.PureComponent {
       },
     } = this.props
 
-    const header = <Header className={style.header} />
-
     if (pageData && pageData.error) {
       return (
         <ConnectedRouter history={history}>
-          <FullViewError error={pageData.error} header={header} />
+          <FullViewError error={pageData.error} header={<Header />} />
         </ConnectedRouter>
       )
     }
@@ -140,14 +139,14 @@ class ConsoleApp extends React.PureComponent {
         <ToastContainer />
         <ConnectedRouter history={history}>
           <ScrollToTop />
-          <ErrorView ErrorComponent={FullViewError}>
+          <ErrorView errorRender={errorRender}>
             <div className={style.app}>
               <IntlHelmet
                 titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
                 defaultTitle={siteName}
               />
               <div id="modal-container" />
-              {header}
+              <Header />
               <main className={style.main}>
                 <WithAuth
                   user={user}

@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Update to Go 1.17.
 - LBS timestamp rollover threshold.
+- Layout of error pages.
 
 ### Deprecated
 
@@ -24,6 +25,8 @@ For details about compatibility between different releases, see the **Commitment
 
 - Entity purge handling for non-admin users in the Console.
 - URL field validation in webhook forms in the Console when value is not trimmed.
+- Not rendering site header and footer for error pages in some situations.
+- Not providing a copy button for error pages in some situations.
 
 ### Security
 

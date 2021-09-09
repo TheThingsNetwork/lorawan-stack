@@ -16,7 +16,6 @@ import React, { useContext, useCallback, useState, useRef } from 'react'
 import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button'
-import Link from '@ttn-lw/components/link'
 import OfflineStatus from '@ttn-lw/components/offline-status'
 import Dropdown from '@ttn-lw/components/dropdown'
 import Icon from '@ttn-lw/components/icon'
@@ -46,10 +45,14 @@ LanguageOption.propTypes = {
   title: PropTypes.string.isRequired,
 }
 
-const FooterSection = ({ className, action, link, children, primary, ...rest }) => {
+const FooterSection = ({ className, action, link, children, primary, safe, ...rest }) => {
   let content
   if (Boolean(link)) {
-    content = (
+    content = safe ? (
+      <a className={style.footerSectionButton} href={link} target="_blank">
+        {children}
+      </a>
+    ) : (
       <Button.AnchorLink
         className={style.footerSectionButton}
         href={link}
@@ -84,6 +87,7 @@ FooterSection.propTypes = {
   className: PropTypes.string,
   link: PropTypes.string,
   primary: PropTypes.bool,
+  safe: PropTypes.bool,
 }
 
 FooterSection.defaultProps = {
@@ -91,6 +95,7 @@ FooterSection.defaultProps = {
   className: undefined,
   link: undefined,
   primary: false,
+  safe: false,
 }
 
 const Footer = ({
@@ -100,8 +105,10 @@ const Footer = ({
   supportLink,
   onlineStatus,
   transparent,
+  safe,
 }) => {
-  const { locale, supportedLocales, setLocale } = useContext(LanguageContext)
+  const languageContext = useContext(LanguageContext)
+  const { locale, supportedLocales, setLocale } = languageContext || {}
   const [languageDropdownVisible, setLanguageDropdownVisible] = useState(false)
   const node = useRef(null)
 
@@ -145,65 +152,64 @@ const Footer = ({
       <div className={style.left}>
         <div>
           © {year}{' '}
-          <Link.Anchor
-            secondary
-            className={style.link}
-            href="https://www.thethingsindustries.com/docs"
-          >
+          <a className={style.link} href="https://www.thethingsindustries.com/docs">
             The Things Stack
-          </Link.Anchor>{' '}
+          </a>{' '}
           <span className={style.copyrightLinks}>
             by{' '}
-            <Link.Anchor secondary className={style.link} href="https://www.thethingsnetwork.org">
+            <a className={style.link} href="https://www.thethingsnetwork.org">
               The Things Network
-            </Link.Anchor>{' '}
+            </a>{' '}
             and{' '}
-            <Link.Anchor
-              secondary
-              className={style.link}
-              href="https://www.thethingsindustries.com"
-            >
+            <a className={style.link} href="https://www.thethingsindustries.com">
               The Things Industries
-            </Link.Anchor>
+            </a>
           </span>
         </div>
       </div>
       <div className={style.right}>
         {links.map((item, key) => (
-          <Link.Anchor secondary key={key} className={style.link} href={item.link}>
+          <FooterSection link={item.link} safe={safe} key={key}>
             <Message content={item.title} />
-          </Link.Anchor>
-        ))}
-        <OfflineStatus onlineStatus={onlineStatus} showOfflineOnly showWarnings />
-        <div className={style.language} ref={node}>
-          <FooterSection action={handleToggleLanguageDropdown} icon="language">
-            <Icon icon="language" className={style.languageIcon} textPaddedRight />
-            {locale.split('-')[0].toUpperCase()}
           </FooterSection>
-          {languageDropdownVisible && (
-            <Dropdown className={style.languageDropdown}>
-              {Object.keys(supportedLocales).map(l => (
-                <LanguageOption
-                  locale={l}
-                  key={l}
-                  title={supportedLocales[l]}
-                  currentLocale={locale}
-                  onSetLocale={handleSetLocale}
-                />
-              ))}
-            </Dropdown>
-          )}
-        </div>
-        <FooterSection link={documentationLink ? `${documentationLink}/whats-new/` : undefined}>
+        ))}
+        {onlineStatus !== undefined && (
+          <OfflineStatus onlineStatus={onlineStatus} showOfflineOnly showWarnings />
+        )}
+        {Boolean(languageContext) && (
+          <div className={style.language} ref={node}>
+            <FooterSection action={handleToggleLanguageDropdown} icon="language">
+              <Icon icon="language" className={style.languageIcon} textPaddedRight />
+              {locale.split('-')[0].toUpperCase()}
+            </FooterSection>
+            {languageDropdownVisible && (
+              <Dropdown className={style.languageDropdown}>
+                {Object.keys(supportedLocales).map(l => (
+                  <LanguageOption
+                    locale={l}
+                    key={l}
+                    title={supportedLocales[l]}
+                    currentLocale={locale}
+                    onSetLocale={handleSetLocale}
+                  />
+                ))}
+              </Dropdown>
+            )}
+          </div>
+        )}
+        <FooterSection
+          safe={safe}
+          link={documentationLink ? `${documentationLink}/whats-new/` : undefined}
+        >
           v{process.env.VERSION}
         </FooterSection>
         {documentationLink && (
-          <FooterSection className={style.documentation} link={documentationLink}>
+          <FooterSection className={style.documentation} safe={safe} link={documentationLink}>
             <Message content={sharedMessages.documentation} />
           </FooterSection>
         )}
         {supportLink && (
-          <FooterSection link={supportLink} primary>
+          <FooterSection link={supportLink} safe={safe} primary>
             <Icon icon="contact_support" textPaddedRight nudgeDown />
             <Message content={sharedMessages.getSupport} />
           </FooterSection>
@@ -231,7 +237,11 @@ Footer.propTypes = {
     }),
   ),
   /** A flag specifying whether the application is connected to the internet. */
-  onlineStatus: PropTypes.onlineStatus.isRequired,
+  onlineStatus: PropTypes.onlineStatus,
+  /** A flag specifying whether the header should be rendered in safe mode,
+   * independent of contexts.
+   */
+  safe: PropTypes.bool,
   /** Optional link for a support button. */
   supportLink: PropTypes.string,
   /** Whether transparent styling should be applied. */
@@ -242,8 +252,10 @@ Footer.defaultProps = {
   className: undefined,
   documentationLink: undefined,
   links: [],
+  onlineStatus: undefined,
   supportLink: undefined,
   transparent: false,
+  safe: false,
 }
 
 export default Footer

@@ -60,7 +60,7 @@ class OrganizationCollaborators extends React.Component {
     const { match } = this.props
 
     return (
-      <ErrorView ErrorComponent={SubViewError}>
+      <ErrorView errorRender={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={OrganizationCollaboratorsList} />
           <Route exact path={`${match.path}/add`} component={OrganizationCollaboratorAdd} />

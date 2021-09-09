@@ -29,7 +29,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const UserApiKeys = ({ match }) => (
-  <ErrorView ErrorComponent={SubViewError}>
+  <ErrorView errorRender={SubViewError}>
     <Switch>
       <Route exact path={match.path} component={UserApiKeysList} />
       <Route exact path={`${match.path}/add`} component={UserApiKeyAdd} />

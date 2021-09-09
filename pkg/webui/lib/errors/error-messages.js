@@ -16,8 +16,10 @@ import { defineMessages } from 'react-intl'
 
 export default defineMessages({
   // Keep these sorted alphabetically.
-  additionalInformation: 'Additional Information (please attach to error inquiries)',
-  contactAdministrator: 'If the error persists after refreshing, please contact an administrator',
+  additionalInformation: 'Additional Information',
+  attachToSupportInquiries: 'Please attach the additional information below to support inquiries',
+  contactAdministrator: 'If the error persists after refreshing, please contact an administrator.',
+  inconvenience: "We're sorry for the inconvenience.",
   error: 'Error',
   genericError: 'An unknown error occurred. Please try again later.',
   genericNotFound: 'The page you requested cannot be found',

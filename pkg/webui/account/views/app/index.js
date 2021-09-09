@@ -24,6 +24,8 @@ import { ToastContainer } from '@ttn-lw/components/toast'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import FullViewError from '@ttn-lw/lib/components/full-view-error'
 
+import Header from '@account/containers/header'
+
 import Landing from '@account/views/landing'
 import Authorize from '@account/views/authorize'
 
@@ -43,6 +45,8 @@ import Front from '../front'
 const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 const pageData = selectPageData()
+
+const errorRender = error => <FullViewError error={error} header={<Header />} />
 
 const AccountApp = ({ history }) => {
   const user = useSelector(selectUser)
@@ -65,7 +69,7 @@ const AccountApp = ({ history }) => {
   if (pageData && pageData.error) {
     return (
       <ConnectedRouter history={history}>
-        <FullViewError error={pageData.error} />
+        <FullViewError error={pageData.error} header={<Header />} />
       </ConnectedRouter>
     )
   }
@@ -74,7 +78,7 @@ const AccountApp = ({ history }) => {
     <>
       <ToastContainer />
       <ConnectedRouter history={history}>
-        <ErrorView ErrorComponent={FullViewError}>
+        <ErrorView errorRender={errorRender}>
           <React.Fragment>
             <Helmet
               titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}

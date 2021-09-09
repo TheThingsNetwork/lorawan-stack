@@ -20,6 +20,6 @@
  *
  * @returns {string} - The interpolated string.
  */
-const interpolate = (str, values) => str.replace(/\{([^}]+)\}/g, (a, b) => values[b])
+const interpolate = (str, values = {}) => str.replace(/\{([^}]+)\}/g, (a, b) => values[b])
 
 export default interpolate

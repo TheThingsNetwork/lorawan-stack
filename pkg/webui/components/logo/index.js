@@ -21,7 +21,24 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './logo.styl'
 
-const Logo = ({ className, logo, brandLogo, vertical }) => {
+const LogoLink = ({ safe, to, ...rest }) => {
+  if (safe) {
+    return <a href={to} {...rest} />
+  }
+
+  return <Link to={to} {...rest} />
+}
+
+LogoLink.propTypes = {
+  safe: PropTypes.bool,
+  to: PropTypes.string.isRequired,
+}
+
+LogoLink.defaultProps = {
+  safe: false,
+}
+
+const Logo = ({ className, logo, brandLogo, vertical, safe }) => {
   const classname = classnames(style.container, className, {
     [style.vertical]: vertical,
     [style.customBranding]: Boolean(brandLogo),
@@ -31,15 +48,15 @@ const Logo = ({ className, logo, brandLogo, vertical }) => {
     <div className={classname}>
       {Boolean(brandLogo) && (
         <div className={style.brandLogo}>
-          <Link to="/" id="brand-logo" className={style.brandLogoContainer}>
+          <LogoLink safe={safe} to="/" id="brand-logo" className={style.brandLogoContainer}>
             <img {...brandLogo} />
-          </Link>
+          </LogoLink>
         </div>
       )}
       <div className={style.logo}>
-        <Link className={style.logoContainer} to="/">
+        <LogoLink safe={safe} className={style.logoContainer} to="/">
           <img {...logo} />
-        </Link>
+        </LogoLink>
       </div>
     </div>
   )
@@ -54,6 +71,7 @@ Logo.propTypes = {
   brandLogo: imgPropType,
   className: PropTypes.string,
   logo: imgPropType.isRequired,
+  safe: PropTypes.bool,
   vertical: PropTypes.bool,
 }
 
@@ -61,6 +79,7 @@ Logo.defaultProps = {
   className: undefined,
   brandLogo: undefined,
   vertical: false,
+  safe: false,
 }
 
 export default Logo

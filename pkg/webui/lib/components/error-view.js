@@ -20,8 +20,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 class ErrorView extends React.Component {
   static propTypes = {
-    ErrorComponent: PropTypes.oneOfType([PropTypes.elementType, PropTypes.func]).isRequired,
     children: PropTypes.node.isRequired,
+    errorRender: PropTypes.func.isRequired,
     history: PropTypes.history,
   }
 
@@ -61,11 +61,11 @@ class ErrorView extends React.Component {
   }
 
   render() {
-    const { children, ErrorComponent } = this.props
+    const { children, errorRender } = this.props
     const { hasCaught, error } = this.state
 
     if (hasCaught) {
-      return <ErrorComponent error={error} />
+      return errorRender(error)
     }
 
     return React.Children.only(children)

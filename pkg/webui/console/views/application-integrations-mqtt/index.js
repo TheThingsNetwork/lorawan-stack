@@ -167,7 +167,7 @@ export default class ApplicationMqtt extends React.Component {
     }
 
     return (
-      <ErrorView ErrorComponent={SubViewError}>
+      <ErrorView errorRender={SubViewError}>
         <Container>
           <PageTitle title={sharedMessages.mqtt} />
           <Row>
