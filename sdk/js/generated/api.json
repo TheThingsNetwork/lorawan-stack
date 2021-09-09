@@ -8122,7 +8122,7 @@
           "fields": [
             {
               "name": "band_id",
-              "description": "",
+              "description": "Optional Band ID to filter the results.\nIf unused, all supported Bands and their versions are returned.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -8144,6 +8144,42 @@
           "hasOneofs": false,
           "extensions": [],
           "fields": [
+            {
+              "name": "version_info",
+              "description": "",
+              "label": "repeated",
+              "type": "VersionInfo",
+              "longType": "GetPhyVersionsResponse.VersionInfo",
+              "fullType": "ttn.lorawan.v3.GetPhyVersionsResponse.VersionInfo",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "VersionInfo",
+          "longName": "GetPhyVersionsResponse.VersionInfo",
+          "fullName": "ttn.lorawan.v3.GetPhyVersionsResponse.VersionInfo",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "band_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
             {
               "name": "phy_versions",
               "description": "",
@@ -8252,7 +8288,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/configuration/phy-versions/{band_id}"
+                      "pattern": "/configuration/phy-versions"
                     }
                   ]
                 }

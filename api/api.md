@@ -130,6 +130,7 @@
   - [Message `FrequencyPlanDescription`](#ttn.lorawan.v3.FrequencyPlanDescription)
   - [Message `GetPhyVersionsRequest`](#ttn.lorawan.v3.GetPhyVersionsRequest)
   - [Message `GetPhyVersionsResponse`](#ttn.lorawan.v3.GetPhyVersionsResponse)
+  - [Message `GetPhyVersionsResponse.VersionInfo`](#ttn.lorawan.v3.GetPhyVersionsResponse.VersionInfo)
   - [Message `ListFrequencyPlansRequest`](#ttn.lorawan.v3.ListFrequencyPlansRequest)
   - [Message `ListFrequencyPlansResponse`](#ttn.lorawan.v3.ListFrequencyPlansResponse)
   - [Service `Configuration`](#ttn.lorawan.v3.Configuration)
@@ -2208,12 +2209,19 @@ PeerInfo
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `band_id` | [`string`](#string) |  |  |
+| `band_id` | [`string`](#string) |  | Optional Band ID to filter the results. If unused, all supported Bands and their versions are returned. |
 
 ### <a name="ttn.lorawan.v3.GetPhyVersionsResponse">Message `GetPhyVersionsResponse`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `version_info` | [`GetPhyVersionsResponse.VersionInfo`](#ttn.lorawan.v3.GetPhyVersionsResponse.VersionInfo) | repeated |  |
+
+### <a name="ttn.lorawan.v3.GetPhyVersionsResponse.VersionInfo">Message `GetPhyVersionsResponse.VersionInfo`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `band_id` | [`string`](#string) |  |  |
 | `phy_versions` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.ListFrequencyPlansRequest">Message `ListFrequencyPlansRequest`</a>
@@ -2240,7 +2248,7 @@ PeerInfo
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `ListFrequencyPlans` | `GET` | `/api/v3/configuration/frequency-plans` |  |
-| `GetPhyVersions` | `GET` | `/api/v3/configuration/phy-versions/{band_id}` |  |
+| `GetPhyVersions` | `GET` | `/api/v3/configuration/phy-versions` |  |
 
 ## <a name="lorawan-stack/api/contact_info.proto">File `lorawan-stack/api/contact_info.proto`</a>
 

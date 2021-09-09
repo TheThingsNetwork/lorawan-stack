@@ -69,26 +69,19 @@ func local_request_Configuration_ListFrequencyPlans_0(ctx context.Context, marsh
 
 }
 
+var (
+	filter_Configuration_GetPhyVersions_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
 func request_Configuration_GetPhyVersions_0(ctx context.Context, marshaler runtime.Marshaler, client ConfigurationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetPhyVersionsRequest
 	var metadata runtime.ServerMetadata
 
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["band_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "band_id")
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-
-	protoReq.BandId, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "band_id", err)
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Configuration_GetPhyVersions_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.GetPhyVersions(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -100,22 +93,11 @@ func local_request_Configuration_GetPhyVersions_0(ctx context.Context, marshaler
 	var protoReq GetPhyVersionsRequest
 	var metadata runtime.ServerMetadata
 
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["band_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "band_id")
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-
-	protoReq.BandId, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "band_id", err)
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Configuration_GetPhyVersions_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.GetPhyVersions(ctx, &protoReq)
@@ -262,7 +244,7 @@ func RegisterConfigurationHandlerClient(ctx context.Context, mux *runtime.ServeM
 var (
 	pattern_Configuration_ListFrequencyPlans_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"configuration", "frequency-plans"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Configuration_GetPhyVersions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"configuration", "phy-versions", "band_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Configuration_GetPhyVersions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"configuration", "phy-versions"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

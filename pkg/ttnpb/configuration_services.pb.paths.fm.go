@@ -37,9 +37,18 @@ var GetPhyVersionsRequestFieldPathsTopLevel = []string{
 	"band_id",
 }
 var GetPhyVersionsResponseFieldPathsNested = []string{
-	"phy_versions",
+	"version_info",
 }
 
 var GetPhyVersionsResponseFieldPathsTopLevel = []string{
+	"version_info",
+}
+var GetPhyVersionsResponse_VersionInfoFieldPathsNested = []string{
+	"band_id",
+	"phy_versions",
+}
+
+var GetPhyVersionsResponse_VersionInfoFieldPathsTopLevel = []string{
+	"band_id",
 	"phy_versions",
 }

@@ -50,11 +50,17 @@ message ListFrequencyPlansResponse {
 }
 
 message GetPhyVersionsRequest {
+  // Optional Band ID to filter the results.
+  // If unused, all supported Bands and their versions are returned.
   string band_id = 1;
 }
 
 message GetPhyVersionsResponse {
-  repeated PHYVersion phy_versions = 1;
+  message VersionInfo {
+    string band_id = 1;
+    repeated PHYVersion phy_versions = 2;
+  }
+  repeated VersionInfo version_info = 2;
 }
 
 service Configuration {
@@ -67,7 +73,7 @@ service Configuration {
   // Returns a list of supported LoRaWAN PHY Versions for the given Band ID.
   rpc GetPhyVersions(GetPhyVersionsRequest) returns (GetPhyVersionsResponse) {
     option (google.api.http) = {
-      get: "/configuration/phy-versions/{band_id}"
+      get: "/configuration/phy-versions"
     };
   }
 }
