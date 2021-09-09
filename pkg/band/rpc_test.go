@@ -30,16 +30,9 @@ func TestGetPhyVersions(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		BandID         string
-		Expected       []ttnpb.PHYVersion
+		Expected       ttnpb.GetPhyVersionsResponse
 		ErrorAssertion func(err error) bool
 	}{
-		{
-			Name:   "Empty",
-			BandID: "",
-			ErrorAssertion: func(err error) bool {
-				return errors.IsNotFound(err)
-			},
-		},
 		{
 			Name:   "Unknown",
 			BandID: "AS_925",
@@ -50,37 +43,184 @@ func TestGetPhyVersions(t *testing.T) {
 		{
 			Name:   "EU868",
 			BandID: "EU_863_870",
-			Expected: []ttnpb.PHYVersion{
-				ttnpb.RP001_V1_1_REV_B,
-				ttnpb.RP001_V1_1_REV_A,
-				ttnpb.RP001_V1_0_3_REV_A,
-				ttnpb.RP001_V1_0_2_REV_B,
-				ttnpb.RP001_V1_0_2,
-				ttnpb.TS001_V1_0_1,
-				ttnpb.TS001_V1_0,
+			Expected: ttnpb.GetPhyVersionsResponse{
+				VersionInfo: []*ttnpb.GetPhyVersionsResponse_VersionInfo{
+					{
+						BandId: "EU_863_870",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+							ttnpb.TS001_V1_0_1,
+							ttnpb.TS001_V1_0,
+						},
+					},
+				},
 			},
 		},
 		{
 			Name:   "AU915",
 			BandID: "AU_915_928",
-			Expected: []ttnpb.PHYVersion{
-				ttnpb.RP001_V1_1_REV_B,
-				ttnpb.RP001_V1_1_REV_A,
-				ttnpb.RP001_V1_0_3_REV_A,
-				ttnpb.RP001_V1_0_2_REV_B,
-				ttnpb.RP001_V1_0_2,
-				ttnpb.TS001_V1_0_1,
+			Expected: ttnpb.GetPhyVersionsResponse{
+				VersionInfo: []*ttnpb.GetPhyVersionsResponse_VersionInfo{
+					{
+						BandId: "AU_915_928",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+							ttnpb.TS001_V1_0_1,
+						},
+					},
+				},
 			},
 		},
 		{
 			Name:   "AS923",
 			BandID: "AS_923",
-			Expected: []ttnpb.PHYVersion{
-				ttnpb.RP001_V1_1_REV_B,
-				ttnpb.RP001_V1_1_REV_A,
-				ttnpb.RP001_V1_0_3_REV_A,
-				ttnpb.RP001_V1_0_2_REV_B,
-				ttnpb.RP001_V1_0_2,
+			Expected: ttnpb.GetPhyVersionsResponse{
+				VersionInfo: []*ttnpb.GetPhyVersionsResponse_VersionInfo{
+					{
+						BandId: "AS_923",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "All",
+			Expected: ttnpb.GetPhyVersionsResponse{
+				VersionInfo: []*ttnpb.GetPhyVersionsResponse_VersionInfo{
+					{
+						BandId: "AS_923",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+						},
+					},
+					{
+						BandId: "AU_915_928",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+							ttnpb.TS001_V1_0_1,
+						},
+					},
+					{
+						BandId: "CN_470_510",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+							ttnpb.TS001_V1_0_1,
+						},
+					},
+					{
+						BandId: "CN_779_787",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+							ttnpb.TS001_V1_0_1,
+							ttnpb.TS001_V1_0,
+						},
+					},
+					{
+						BandId: "EU_433",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+							ttnpb.TS001_V1_0_1,
+							ttnpb.TS001_V1_0,
+						},
+					},
+					{
+						BandId: "EU_863_870",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+							ttnpb.TS001_V1_0_1,
+							ttnpb.TS001_V1_0,
+						},
+					},
+					{
+						BandId: "IN_865_867",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+						},
+					},
+					{
+						BandId: "ISM_2400",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+							ttnpb.TS001_V1_0_1,
+							ttnpb.TS001_V1_0,
+						},
+					},
+					{
+						BandId: "KR_920_923",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+						},
+					},
+					{
+						BandId: "RU_864_870",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+						},
+					},
+					{
+						BandId: "US_902_928",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_1_REV_B,
+							ttnpb.RP001_V1_1_REV_A,
+							ttnpb.RP001_V1_0_3_REV_A,
+							ttnpb.RP001_V1_0_2_REV_B,
+							ttnpb.RP001_V1_0_2,
+							ttnpb.TS001_V1_0_1,
+							ttnpb.TS001_V1_0,
+						},
+					},
+				},
 			},
 		},
 	} {
@@ -98,7 +238,7 @@ func TestGetPhyVersions(t *testing.T) {
 				if !a.So(res, should.NotBeNil) {
 					t.Fatalf("Nil value received. Expected :%v", tc.Expected)
 				}
-				if !a.So(res.PhyVersions, should.Resemble, tc.Expected) {
+				if !a.So(*res, should.Resemble, tc.Expected) {
 					t.Fatalf("Unexpected value: %v", res)
 				}
 			}
