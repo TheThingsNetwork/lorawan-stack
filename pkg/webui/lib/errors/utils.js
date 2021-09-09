@@ -299,7 +299,8 @@ export const getBackendErrorDetailsId = details => `error:${details.namespace}:$
  * @param {object} error - The backend error object.
  * @returns {object} - The details of `error`.
  */
-export const getBackendErrorDetails = error => error.details[0]
+export const getBackendErrorDetails = error =>
+  isBackendErrorDetails(error) ? error : error.details[0]
 
 /**
  * Returns the name of the error extracted from the details array.
@@ -366,21 +367,26 @@ export const getBackendErrorMessageAttributes = error => error.details[0].attrib
 export const toMessageProps = error => {
   let props
   // Check if it is a error message and transform it to a intl message.
-  if (isBackend(error)) {
-    props = {
-      content: {
-        id: getBackendErrorId(error),
-        defaultMessage: getBackendErrorDefaultMessage(error),
-      },
-      values: getBackendErrorMessageAttributes(error),
-    }
-  } else if (isBackendErrorDetails(error)) {
-    props = {
-      content: {
-        id: getBackendErrorDetailsId(error),
-        defaultMessage: error.message_format,
-      },
-      values: error.attributes,
+  if (isBackend(error) || isBackendErrorDetails(error)) {
+    const errorDetails = isBackendErrorDetails(error) ? error : getBackendErrorDetails(error)
+    if (hasCauses(errorDetails)) {
+      // Use the root cause if any.
+      const rootCause = getBackendErrorRootCause(errorDetails)
+      props = {
+        content: {
+          id: getBackendErrorDetailsId(rootCause),
+          defaultMessage: rootCause.message_format,
+        },
+        values: rootCause.attributes,
+      }
+    } else {
+      props = {
+        content: {
+          id: getBackendErrorId(error),
+          defaultMessage: getBackendErrorDefaultMessage(error),
+        },
+        values: getBackendErrorMessageAttributes(error),
+      }
     }
   } else if (isFrontend(error)) {
     props = {
