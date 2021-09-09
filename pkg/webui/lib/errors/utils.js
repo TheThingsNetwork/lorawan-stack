@@ -16,6 +16,7 @@ import * as Sentry from '@sentry/browser'
 import { isPlainObject } from 'lodash'
 
 import { error as errorLog, warn } from '@ttn-lw/lib/log'
+import interpolate from '@ttn-lw/lib/interpolate'
 
 import errorMessages from './error-messages'
 import grpcErrToHttpErr from './grpc-error-map'
@@ -252,7 +253,17 @@ export const getSentryErrorTitle = error => {
   }
 
   if (isBackend(error)) {
-    return error.message
+    const title = error.message
+    if (hasCauses(getBackendErrorDetails(error))) {
+      const rootCause = getBackendErrorRootCause(getBackendErrorDetails(error))
+      const message =
+        'attributes' in rootCause
+          ? interpolate(rootCause.message_format, rootCause.attributes)
+          : rootCause.message_format
+
+      return `${title}; error:${rootCause.namespace}:${rootCause.name} (${message})`
+    }
+    return title
   } else if (isFrontend(error)) {
     return error.errorTitle.defaultMessage
   } else if ('message' in error) {
@@ -402,7 +413,6 @@ export const ingestError = (error, extras = {}, tags = {}) => {
 
   // Send to Sentry if necessary.
   if (isSentryWorthy(error)) {
-    warn('The above error was considered Sentry worthy')
     Sentry.withScope(scope => {
       scope.setTags({ ...tags, frontendOrigin: true })
       scope.setFingerprint(isBackend(error) ? getBackendErrorId(error) : error)
@@ -411,9 +421,9 @@ export const ingestError = (error, extras = {}, tags = {}) => {
       } else {
         scope.setExtras({ error, ...extras })
       }
-      Sentry.captureException(
-        error instanceof Error ? error : new Error(getSentryErrorTitle(error)),
-      )
+      const passedError = error instanceof Error ? error : new Error(getSentryErrorTitle(error))
+      warn('The above error was considered Sentry-worthy.', 'It was captured as:', passedError)
+      Sentry.captureException(passedError)
     })
   }
 }
