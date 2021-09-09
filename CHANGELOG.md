@@ -16,6 +16,7 @@ For details about compatibility between different releases, see the **Commitment
 - Update to Go 1.17.
 - LBS timestamp rollover threshold.
 - Layout of error pages.
+- The Application Server worker pools may now drop workers if they are idle for too long.
 
 ### Deprecated
 
