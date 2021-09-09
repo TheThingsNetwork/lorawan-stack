@@ -8477,6 +8477,15 @@
       "file": "cookie.go"
     }
   },
+  "error:pkg/workerpool:pool_full": {
+    "translations": {
+      "en": "the worker pool is full"
+    },
+    "description": {
+      "package": "pkg/workerpool",
+      "file": "workerpool.go"
+    }
+  },
   "event:account.user.login_failed": {
     "translations": {
       "en": "login user failure"
