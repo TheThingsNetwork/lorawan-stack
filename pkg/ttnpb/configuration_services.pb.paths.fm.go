@@ -29,3 +29,17 @@ var ListFrequencyPlansResponseFieldPathsNested = []string{
 var ListFrequencyPlansResponseFieldPathsTopLevel = []string{
 	"frequency_plans",
 }
+var GetPhyVersionsRequestFieldPathsNested = []string{
+	"band_id",
+}
+
+var GetPhyVersionsRequestFieldPathsTopLevel = []string{
+	"band_id",
+}
+var GetPhyVersionsResponseFieldPathsNested = []string{
+	"phy_versions",
+}
+
+var GetPhyVersionsResponseFieldPathsTopLevel = []string{
+	"phy_versions",
+}

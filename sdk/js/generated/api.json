@@ -8111,6 +8111,54 @@
           ]
         },
         {
+          "name": "GetPhyVersionsRequest",
+          "longName": "GetPhyVersionsRequest",
+          "fullName": "ttn.lorawan.v3.GetPhyVersionsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "band_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetPhyVersionsResponse",
+          "longName": "GetPhyVersionsResponse",
+          "fullName": "ttn.lorawan.v3.GetPhyVersionsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "phy_versions",
+              "description": "",
+              "label": "repeated",
+              "type": "PHYVersion",
+              "longType": "PHYVersion",
+              "fullType": "ttn.lorawan.v3.PHYVersion",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ListFrequencyPlansRequest",
           "longName": "ListFrequencyPlansRequest",
           "fullName": "ttn.lorawan.v3.ListFrequencyPlansRequest",
@@ -8183,6 +8231,28 @@
                     {
                       "method": "GET",
                       "pattern": "/configuration/frequency-plans"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetPhyVersions",
+              "description": "Returns a list of supported LoRaWAN PHY Versions for the given Band ID.",
+              "requestType": "GetPhyVersionsRequest",
+              "requestLongType": "GetPhyVersionsRequest",
+              "requestFullType": "ttn.lorawan.v3.GetPhyVersionsRequest",
+              "requestStreaming": false,
+              "responseType": "GetPhyVersionsResponse",
+              "responseLongType": "GetPhyVersionsResponse",
+              "responseFullType": "ttn.lorawan.v3.GetPhyVersionsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/configuration/phy-version"
                     }
                   ]
                 }

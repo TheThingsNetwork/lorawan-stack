@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "lorawan-stack/api/lorawan.proto";
 
 package ttn.lorawan.v3;
 
@@ -48,10 +49,25 @@ message ListFrequencyPlansResponse {
   repeated FrequencyPlanDescription frequency_plans = 1;
 }
 
+message GetPhyVersionsRequest {
+  string band_id = 1;
+}
+
+message GetPhyVersionsResponse {
+  repeated PHYVersion phy_versions = 1;
+}
+
 service Configuration {
   rpc ListFrequencyPlans(ListFrequencyPlansRequest) returns (ListFrequencyPlansResponse) {
     option (google.api.http) = {
       get: "/configuration/frequency-plans"
+    };
+  }
+
+  // Returns a list of supported LoRaWAN PHY Versions for the given Band ID.
+  rpc GetPhyVersions(GetPhyVersionsRequest) returns (GetPhyVersionsResponse) {
+    option (google.api.http) = {
+      get: "/configuration/phy-version"
     };
   }
 }

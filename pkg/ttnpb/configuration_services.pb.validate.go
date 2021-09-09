@@ -307,3 +307,169 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListFrequencyPlansResponseValidationError{}
+
+// ValidateFields checks the field values on GetPhyVersionsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetPhyVersionsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetPhyVersionsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "band_id":
+			// no validation rules for BandId
+		default:
+			return GetPhyVersionsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetPhyVersionsRequestValidationError is the validation error returned by
+// GetPhyVersionsRequest.ValidateFields if the designated constraints aren't met.
+type GetPhyVersionsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetPhyVersionsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetPhyVersionsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetPhyVersionsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetPhyVersionsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetPhyVersionsRequestValidationError) ErrorName() string {
+	return "GetPhyVersionsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetPhyVersionsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetPhyVersionsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetPhyVersionsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetPhyVersionsRequestValidationError{}
+
+// ValidateFields checks the field values on GetPhyVersionsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetPhyVersionsResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetPhyVersionsResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "phy_versions":
+
+		default:
+			return GetPhyVersionsResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetPhyVersionsResponseValidationError is the validation error returned by
+// GetPhyVersionsResponse.ValidateFields if the designated constraints aren't met.
+type GetPhyVersionsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetPhyVersionsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetPhyVersionsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetPhyVersionsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetPhyVersionsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetPhyVersionsResponseValidationError) ErrorName() string {
+	return "GetPhyVersionsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetPhyVersionsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetPhyVersionsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetPhyVersionsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetPhyVersionsResponseValidationError{}
