@@ -59,6 +59,16 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 	if err := c.Bind(&response); err != nil {
 		return err
 	}
+	if response.Error == "access_denied" {
+		// The `access_denied` error usually means that the authorization request
+		// was actively denied by the user. In that case, it is best to redirect
+		// back to the page root, which will enable to restart the authorization
+		// process if wished.
+		ctx := c.Request().Context()
+		config := oc.configFromContext(ctx)
+		oc.removeStateCookie(c)
+		return c.Redirect(http.StatusFound, config.RootURL)
+	}
 	if err := response.ValidateContext(c.Request().Context()); err != nil {
 		return err
 	}
