@@ -16,6 +16,7 @@ package io
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -23,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -154,6 +156,31 @@ func (s *Subscription) Publish(ctx context.Context, up *ttnpb.ApplicationUp) err
 // Up returns the upstream channel.
 func (s *Subscription) Up() <-chan *ContextualApplicationUp {
 	return s.upCh
+}
+
+// Pipe pipes the output of the Subscription to the provided handler.
+func (s *Subscription) Pipe(ctx context.Context, ts component.TaskStarter, name string, submit func(context.Context, interface{}) error) {
+	f := func(ctx context.Context) error {
+		for {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-s.ctx.Done():
+				return s.ctx.Err()
+			case up := <-s.upCh:
+				if err := submit(up.Context, up.ApplicationUp); err != nil {
+					log.FromContext(up.Context).WithError(err).Warn("Failed to submit message")
+				}
+			}
+		}
+	}
+	ts.StartTask(&component.TaskConfig{
+		Context: ctx,
+		ID:      fmt.Sprintf("pipe_%v", name),
+		Func:    f,
+		Restart: component.TaskRestartOnFailure,
+		Backoff: component.DefaultTaskBackoffConfig,
+	})
 }
 
 // CleanDownlinks returns a copy of the given downlink items with only the fields that can be set by the application.
