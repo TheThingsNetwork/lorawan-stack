@@ -175,6 +175,7 @@ func (wp *workerPool) Publish(ctx context.Context, item interface{}) error {
 			return nil
 
 		case <-time.After(wp.WorkerBusyTimeout):
+			registerWorkDropped(ctx, wp.Name)
 			return errPoolFull.New()
 		}
 	}

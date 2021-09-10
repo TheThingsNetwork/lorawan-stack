@@ -31,6 +31,7 @@ type workPoolMetrics struct {
 	workersStopped *metrics.ContextualCounterVec
 	workEnqueued   *metrics.ContextualCounterVec
 	workDequeued   *metrics.ContextualCounterVec
+	workDropped    *metrics.ContextualCounterVec
 }
 
 func (m workPoolMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -38,6 +39,7 @@ func (m workPoolMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.workersStopped.Describe(ch)
 	m.workEnqueued.Describe(ch)
 	m.workDequeued.Describe(ch)
+	m.workDropped.Describe(ch)
 }
 
 func (m workPoolMetrics) Collect(ch chan<- prometheus.Metric) {
@@ -45,6 +47,7 @@ func (m workPoolMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.workersStopped.Collect(ch)
 	m.workEnqueued.Collect(ch)
 	m.workDequeued.Collect(ch)
+	m.workDropped.Collect(ch)
 }
 
 var poolMetrics = &workPoolMetrics{
@@ -80,6 +83,14 @@ var poolMetrics = &workPoolMetrics{
 		},
 		[]string{poolLabel},
 	),
+	workDropped: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "work_dropped",
+			Help:      "Amount of work dropped",
+		},
+		[]string{poolLabel},
+	),
 }
 
 func init() {
@@ -102,4 +113,8 @@ func registerWorkEnqueued(ctx context.Context, name string) {
 
 func registerWorkDequeued(ctx context.Context, name string) {
 	poolMetrics.workDequeued.WithLabelValues(ctx, name).Inc()
+}
+
+func registerWorkDropped(ctx context.Context, name string) {
+	poolMetrics.workDropped.WithLabelValues(ctx, name).Inc()
 }
