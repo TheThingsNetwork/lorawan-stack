@@ -39,6 +39,24 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
+type mockComponent struct{}
+
+func (mockComponent) StartTask(conf *component.TaskConfig) {
+	component.DefaultStartTask(conf)
+}
+
+func (mockComponent) FromRequestContext(ctx context.Context) context.Context {
+	return ctx
+}
+
+func createdPooledSink(ctx context.Context, t *testing.T, sink web.Sink) web.Sink {
+	q, err := web.NewPooledSink(ctx, mockComponent{}, web.StaticSinkFactory(sink), 1, 4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return q
+}
+
 func TestWebhooks(t *testing.T) {
 	_, ctx := test.New(t)
 
@@ -147,27 +165,14 @@ func TestWebhooks(t *testing.T) {
 				}
 				for _, sink := range []web.Sink{
 					testSink,
-					&web.QueuedSink{
-						Target:  testSink,
-						Queue:   make(chan *http.Request, 4),
-						Workers: 1,
-					},
-					&web.QueuedSink{
-						Target: &web.QueuedSink{
-							Target:  testSink,
-							Queue:   make(chan *http.Request, 4),
-							Workers: 1,
-						},
-						Queue:   make(chan *http.Request, 4),
-						Workers: 1,
-					},
+					createdPooledSink(ctx, t, testSink),
+					createdPooledSink(ctx, t,
+						createdPooledSink(ctx, t, testSink),
+					),
 				} {
 					t.Run(fmt.Sprintf("%T", sink), func(t *testing.T) {
 						ctx, cancel := context.WithCancel(ctx)
 						defer cancel()
-						if controllable, ok := sink.(web.ControllableSink); ok {
-							go controllable.Run(ctx)
-						}
 						c := componenttest.NewComponent(t, &component.Config{})
 						as := mock.NewServer(c)
 						_, err := web.NewWebhooks(ctx, as, registry, sink, downlinks)

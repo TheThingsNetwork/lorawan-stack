@@ -76,6 +76,8 @@ type Server interface {
 	DownlinkQueueOperator
 	UplinkStorage
 	Cluster
+	// FromRequestContext decouples the lifetime of the provided context from the values found in the context.
+	FromRequestContext(context.Context) context.Context
 	// GetBaseConfig returns the component configuration.
 	GetBaseConfig(ctx context.Context) config.ServiceBase
 	// FillContext fills the given context.

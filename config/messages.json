@@ -2420,15 +2420,6 @@
       "file": "templates.go"
     }
   },
-  "error:pkg/applicationserver/io/web:queue_full": {
-    "translations": {
-      "en": "the queue is full"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/web",
-      "file": "webhooks.go"
-    }
-  },
   "error:pkg/applicationserver/io/web:rate_limit_exceeded": {
     "translations": {
       "en": "rate limit exceeded"
@@ -8475,6 +8466,15 @@
     "description": {
       "package": "pkg/webmiddleware",
       "file": "cookie.go"
+    }
+  },
+  "error:pkg/workerpool:pool_full": {
+    "translations": {
+      "en": "the worker pool is full"
+    },
+    "description": {
+      "package": "pkg/workerpool",
+      "file": "workerpool.go"
     }
   },
   "event:account.user.login_failed": {

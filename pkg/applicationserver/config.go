@@ -16,7 +16,6 @@ package applicationserver
 
 import (
 	"context"
-	"net/http"
 	"time"
 
 	"github.com/bluele/gcache"
@@ -30,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -162,18 +160,20 @@ type ApplicationPackagesConfig struct {
 // NewWebhooks returns a new web.Webhooks based on the configuration.
 // If Target is empty, this method returns nil.
 func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.Webhooks, error) {
-	var target web.Sink
+	var factory web.SinkFactory
 	switch c.Target {
 	case "":
 		return nil, nil
 	case "direct":
-		client, err := server.HTTPClient(ctx)
-		if err != nil {
-			return nil, err
-		}
-		client.Timeout = c.Timeout
-		target = &web.HTTPClientSink{
-			Client: client,
+		factory = func() (web.Sink, error) {
+			client, err := server.HTTPClient(ctx)
+			if err != nil {
+				return nil, err
+			}
+			client.Timeout = c.Timeout
+			return &web.HTTPClientSink{
+				Client: client,
+			}, nil
 		}
 	default:
 		return nil, errWebhooksTarget.WithAttributes("target", c.Target)
@@ -182,18 +182,15 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 		return nil, errWebhooksRegistry.New()
 	}
 	if c.QueueSize > 0 || c.Workers > 0 {
-		target = &web.QueuedSink{
-			Target:  target,
-			Queue:   make(chan *http.Request, c.QueueSize),
-			Workers: c.Workers,
+		q, err := web.NewPooledSink(ctx, server, factory, c.Workers, c.QueueSize)
+		if err != nil {
+			return nil, err
 		}
+		return web.NewWebhooks(ctx, server, c.Registry, q, c.Downlinks)
 	}
-	if controllable, ok := target.(web.ControllableSink); ok {
-		go func() {
-			if err := controllable.Run(ctx); err != nil && !errors.IsCanceled(err) {
-				log.FromContext(ctx).WithError(err).Error("Webhooks target sink failed")
-			}
-		}()
+	target, err := factory()
+	if err != nil {
+		return nil, err
 	}
 	return web.NewWebhooks(ctx, server, c.Registry, target, c.Downlinks)
 }

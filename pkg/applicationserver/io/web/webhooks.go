@@ -36,6 +36,7 @@ import (
 	ttnweb "go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
+	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 )
 
 const namespace = "applicationserver/io/web"
@@ -43,12 +44,6 @@ const namespace = "applicationserver/io/web"
 // Sink processes HTTP requests.
 type Sink interface {
 	Process(*http.Request) error
-}
-
-// ControllableSink is a controllable Sink.
-type ControllableSink interface {
-	Sink
-	Run(context.Context) error
 }
 
 // HTTPClientSink contains an HTTP client to make outgoing requests.
@@ -74,70 +69,67 @@ func (s *HTTPClientSink) Process(req *http.Request) error {
 	return errRequest.WithAttributes("code", res.StatusCode)
 }
 
-// QueuedSink is a ControllableSink with queue.
-type QueuedSink struct {
-	Target  Sink
-	Queue   chan *http.Request
-	Workers int
+// SinkFactory creates a sink.
+type SinkFactory func() (Sink, error)
+
+// StaticSinkFactory creates a SinkFactory that always returns the same Sink.
+func StaticSinkFactory(s Sink) SinkFactory {
+	return func() (Sink, error) {
+		return s, nil
+	}
 }
 
-// Run starts concurrent workers to process messages from the queue.
-// If Target is a ControllableSink, this method runs the target.
-// This method blocks until the target (if controllable) and all workers are done.
-func (s *QueuedSink) Run(ctx context.Context) error {
-	if s.Workers < 1 {
-		s.Workers = 1
-	}
-	wg := sync.WaitGroup{}
-	if controllable, ok := s.Target.(ControllableSink); ok {
-		wg.Add(1)
-		go func() {
-			if err := controllable.Run(ctx); err != nil && !errors.IsCanceled(err) {
-				log.FromContext(ctx).WithError(err).Error("Target sink failed")
-			}
-			wg.Done()
-		}()
-	}
-	for i := 0; i < s.Workers; i++ {
-		wg.Add(1)
-		go func() {
-			for {
-				select {
-				case <-ctx.Done():
-					wg.Done()
-					return
-				case req := <-s.Queue:
-					registerWebhookDequeued()
-					ctx := req.Context()
-					if err := s.Target.Process(req); err != nil {
-						registerWebhookFailed(err)
-						log.FromContext(ctx).WithError(err).Warn("Failed to process message")
-					} else {
-						registerWebhookSent()
-					}
-				}
-			}
-		}()
-	}
-	<-ctx.Done()
-	wg.Wait()
-	return ctx.Err()
+// pooledSink is a Sink with worker pool.
+type pooledSink struct {
+	pool workerpool.WorkerPool
 }
 
-var errQueueFull = errors.DefineResourceExhausted("queue_full", "the queue is full")
+func createPoolHandlerFactory(createSink SinkFactory) workerpool.HandlerFactory {
+	factory := func() (workerpool.Handler, error) {
+		sink, err := createSink()
+		if err != nil {
+			return nil, err
+		}
+		h := func(ctx context.Context, item interface{}) {
+			req := item.(*http.Request)
+			if err := sink.Process(req); err != nil {
+				registerWebhookFailed(err)
+				log.FromContext(ctx).WithError(err).Warn("Failed to process message")
+			} else {
+				registerWebhookSent()
+			}
+		}
+		return h, nil
+	}
+	return factory
+}
 
-// Process sends the request to the queue.
-// This method returns immediately. An error is returned when the queue is full.
-func (s *QueuedSink) Process(req *http.Request) error {
-	select {
-	case s.Queue <- req:
-		registerWebhookQueued()
-		return nil
-	default:
-		err := errQueueFull.New()
+// NewPooledSink creates a Sink that queues requests and processes them in parallel workers.
+func NewPooledSink(ctx context.Context, c workerpool.Component, createSink SinkFactory, workers int, queueSize int) (Sink, error) {
+	wp, err := workerpool.NewWorkerPool(workerpool.Config{
+		Component:     c,
+		Context:       ctx,
+		Name:          "webhooks",
+		CreateHandler: createPoolHandlerFactory(createSink),
+		MaxWorkers:    workers,
+		QueueSize:     queueSize,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &pooledSink{
+		pool: wp,
+	}, nil
+}
+
+// Process sends the request to the workers.
+// This method returns immediately. An error is returned when the workers are too busy.
+func (s *pooledSink) Process(req *http.Request) error {
+	if err := s.pool.Publish(req.Context(), req); err != nil {
 		registerWebhookFailed(err)
 		return err
 	}
+	return nil
 }
 
 // Webhooks is an interface for registering incoming webhooks for downlink and creating a subscription to outgoing
