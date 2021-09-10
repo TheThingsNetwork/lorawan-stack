@@ -21,7 +21,6 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -64,43 +63,6 @@ func createPackagePoolHandler(name string, handler ApplicationPackageHandler, ti
 	return workerpool.StaticHandlerFactory(h)
 }
 
-func createFrontendPoolHandler(fanOut func(context.Context, *ttnpb.ApplicationUp) error) workerpool.HandlerFactory {
-	h := func(ctx context.Context, item interface{}) {
-		up := item.(*ttnpb.ApplicationUp)
-
-		if err := fanOut(ctx, up); err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to fanout message")
-			registerMessageFailed("frontend-fanout", err)
-		}
-	}
-	return workerpool.StaticHandlerFactory(h)
-}
-
-func startFrontendSubscriber(ctx context.Context, as io.Server, sub *io.Subscription, submit func(context.Context, interface{}) error) {
-	as.StartTask(&component.TaskConfig{
-		Context: ctx,
-		ID:      "run_application_packages",
-		Func: func(ctx context.Context) error {
-			for {
-				select {
-				case <-ctx.Done():
-					return ctx.Err()
-				case <-sub.Context().Done():
-					return sub.Context().Err()
-				case up := <-sub.Up():
-					ctx := log.NewContextWithField(up.Context, "namespace", namespace)
-					if err := submit(ctx, up.ApplicationUp); err != nil {
-						log.FromContext(ctx).WithError(err).Warn("Failed to submit message")
-						registerMessageFailed("frontend-submit", err)
-					}
-				}
-			}
-		},
-		Restart: component.TaskRestartOnFailure,
-		Backoff: component.DefaultTaskBackoffConfig,
-	})
-}
-
 // New returns an application packages server wrapping the given registries and handlers.
 func New(ctx context.Context, as io.Server, registry Registry, handlers map[string]ApplicationPackageHandler, workers int, timeout time.Duration) (Server, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", namespace)
@@ -111,7 +73,6 @@ func New(ctx context.Context, as io.Server, registry Registry, handlers map[stri
 		handlers: handlers,
 		pools:    make(map[string]workerpool.WorkerPool),
 	}
-
 	for name, handler := range handlers {
 		wp, err := workerpool.NewWorkerPool(workerpool.Config{
 			Component:     as,
@@ -125,24 +86,20 @@ func New(ctx context.Context, as io.Server, registry Registry, handlers map[stri
 		}
 		s.pools[name] = wp
 	}
-
 	sub, err := as.Subscribe(ctx, "applicationpackages", nil, false)
 	if err != nil {
 		return nil, err
 	}
-
 	wp, err := workerpool.NewWorkerPool(workerpool.Config{
 		Component:     as,
 		Context:       ctx,
 		Name:          "application_packages_fanout",
-		CreateHandler: createFrontendPoolHandler(s.fanOut),
-		MaxWorkers:    workers,
+		CreateHandler: workerpool.HandlerFactoryFromUplinkHandler(s.handleUp),
 	})
 	if err != nil {
 		return nil, err
 	}
-
-	startFrontendSubscriber(ctx, as, sub, wp.Publish)
+	sub.Pipe(ctx, as, "application_packages", wp.Publish)
 	return s, nil
 }
 
@@ -190,7 +147,8 @@ func (s *server) findAssociations(ctx context.Context, ids ttnpb.EndDeviceIdenti
 	return m, nil
 }
 
-func (s *server) fanOut(ctx context.Context, msg *ttnpb.ApplicationUp) error {
+func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
+	ctx = log.NewContextWithField(ctx, "namespace", namespace)
 	associations, err := s.findAssociations(ctx, msg.EndDeviceIdentifiers)
 	if err != nil {
 		return err
