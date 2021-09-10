@@ -65,13 +65,11 @@ const abortAuthorization = defineSmokeTest(
     cy.findByLabelText('Password').type(`${user.password}{enter}`)
 
     // Deny authorization.
-    cy.location('pathname').should('contain', `${Cypress.config('accountAppRootPath')}/authorize`)
     cy.findByRole('button', { name: /Cancel/ }).click()
 
-    // Check Console error.
-    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/oauth/callback`)
-    cy.findByTestId('full-error-view').should('exist')
-    cy.findByText('Forbidden').should('be.visible')
+    // Check redirects.
+    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/`)
+    cy.location('pathname').should('contain', `${Cypress.config('accountAppRootPath')}/authorize`)
   },
 )
 
