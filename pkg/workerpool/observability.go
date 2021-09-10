@@ -82,6 +82,10 @@ var poolMetrics = &workPoolMetrics{
 	),
 }
 
+func init() {
+	metrics.MustRegister(poolMetrics)
+}
+
 func registerWorkerStarted(ctx context.Context, name string) {
 	poolMetrics.workersStarted.WithLabelValues(ctx, name).Inc()
 	poolMetrics.workersStopped.WithLabelValues(ctx, name)
