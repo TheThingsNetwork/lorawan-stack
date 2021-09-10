@@ -25,9 +25,7 @@ import (
 
 const (
 	// defaultWorkerIdleTimeout is the duration after which an idle worker stops to save resources.
-	defaultWorkerIdleTimeout = (1 << 7) * time.Millisecond
-	// defaultWorkerBusyTimeout is the duration after which a message is dropped if all workers are busy.
-	defaultWorkerBusyTimeout = (1 << 6) * time.Millisecond
+	defaultWorkerIdleTimeout = (1 << 10) * time.Millisecond
 )
 
 // Component contains a minimal component.Component definition.
@@ -59,7 +57,6 @@ type Config struct {
 	MaxWorkers        int            // The maximum number of workers in the pool.
 	QueueSize         int            // The size of the work queue.
 	WorkerIdleTimeout time.Duration  // The maximum amount of time a worker will stay idle before closing.
-	WorkerBusyTimeout time.Duration  // The maximum amount of time a publisher will wait before dropping the message.
 }
 
 // WorkerPool is a dynamic pool of workers to which work items can be published.
@@ -82,7 +79,7 @@ type workerPool struct {
 	workers int32
 }
 
-func (wp *workerPool) workerBody(handler Handler) func(context.Context) error {
+func (wp *workerPool) workerBody(handler Handler, initialWork *contextualItem) func(context.Context) error {
 	worker := func(ctx context.Context) error {
 		var decremented bool
 		defer func() {
@@ -93,6 +90,10 @@ func (wp *workerPool) workerBody(handler Handler) func(context.Context) error {
 
 		registerWorkerStarted(wp.Config, wp.Name)
 		defer registerWorkerStopped(wp.Context, wp.Name)
+
+		if initialWork != nil {
+			handler(initialWork.ctx, initialWork.item)
+		}
 
 		for {
 			select {
@@ -117,36 +118,36 @@ func (wp *workerPool) workerBody(handler Handler) func(context.Context) error {
 	return worker
 }
 
-func (wp *workerPool) spawnWorker() error {
+// spawnWorker spawns a worker task, if a worker slot is available.
+func (wp *workerPool) spawnWorker(initialWork *contextualItem) (bool, error) {
 	handler, err := wp.CreateHandler()
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	if !incrementIfSmallerThan(&wp.workers, int32(wp.MaxWorkers)) {
-		return nil
+		return false, nil
 	}
 
 	wp.StartTask(&component.TaskConfig{
 		Context: wp.Context,
 		ID:      wp.Name,
-		Func:    wp.workerBody(handler),
+		Func:    wp.workerBody(handler, initialWork),
 		Restart: component.TaskRestartNever,
 		Backoff: component.DefaultTaskBackoffConfig,
 	})
 
-	return nil
+	return true, nil
 }
 
 var errPoolFull = errors.DefineResourceExhausted("pool_full", "the worker pool is full")
 
-// Publish implements WorkerPool.
-func (wp *workerPool) Publish(ctx context.Context, item interface{}) error {
-	it := &contextualItem{
-		ctx:  wp.FromRequestContext(ctx),
-		item: item,
-	}
-
+// enqueueSpawn attempts to enqueue the work item, spawning a worker task if possible.
+// If the pool can pickup the work, the work is enqueued.
+// If the pool is full, enqueueSpawn will attempt to spawn a worker task.
+// If the worker task has been created, it will automatically handle the work item.
+// Otherwise, the work item is dropped.
+func (wp *workerPool) enqueueSpawn(ctx context.Context, it *contextualItem) error {
 	select {
 	case <-wp.Done():
 		return wp.Err()
@@ -159,33 +160,26 @@ func (wp *workerPool) Publish(ctx context.Context, item interface{}) error {
 		return nil
 
 	default:
-		if err := wp.spawnWorker(); err != nil {
+		spawned, err := wp.spawnWorker(it)
+		if err != nil || spawned {
 			return err
 		}
 
-		select {
-		case <-wp.Done():
-			return wp.Err()
-
-		case <-ctx.Done():
-			return ctx.Err()
-
-		case wp.q <- it:
-			registerWorkEnqueued(ctx, wp.Name)
-			return nil
-
-		case <-time.After(wp.WorkerBusyTimeout):
-			registerWorkDropped(ctx, wp.Name)
-			return errPoolFull.New()
-		}
+		registerWorkDropped(ctx, wp.Name)
+		return errPoolFull.New()
 	}
+}
+
+// Publish implements WorkerPool.
+func (wp *workerPool) Publish(ctx context.Context, item interface{}) error {
+	return wp.enqueueSpawn(ctx, &contextualItem{
+		ctx:  wp.FromRequestContext(ctx),
+		item: item,
+	})
 }
 
 // NewWorkerPool creates a new WorkerPool with the provided configuration.
 func NewWorkerPool(cfg Config) (WorkerPool, error) {
-	if cfg.WorkerBusyTimeout == 0 {
-		cfg.WorkerBusyTimeout = defaultWorkerBusyTimeout
-	}
 	if cfg.WorkerIdleTimeout == 0 {
 		cfg.WorkerIdleTimeout = defaultWorkerIdleTimeout
 	}
@@ -195,8 +189,8 @@ func NewWorkerPool(cfg Config) (WorkerPool, error) {
 	if cfg.MaxWorkers <= 0 {
 		cfg.MaxWorkers = 1
 	}
-	if cfg.QueueSize < 0 {
-		cfg.QueueSize = 0
+	if cfg.QueueSize <= 0 {
+		cfg.QueueSize = 1
 	}
 	if cfg.MinWorkers > cfg.MaxWorkers {
 		cfg.MaxWorkers = cfg.MinWorkers
@@ -208,7 +202,7 @@ func NewWorkerPool(cfg Config) (WorkerPool, error) {
 	}
 
 	for i := 0; i < wp.MinWorkers; i++ {
-		if err := wp.spawnWorker(); err != nil {
+		if _, err := wp.spawnWorker(nil); err != nil {
 			return nil, err
 		}
 	}
