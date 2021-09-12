@@ -27,31 +27,34 @@ const (
 )
 
 type workPoolMetrics struct {
-	workersStarted *metrics.ContextualCounterVec
-	workersStopped *metrics.ContextualCounterVec
-	workEnqueued   *metrics.ContextualCounterVec
-	workDequeued   *metrics.ContextualCounterVec
+	workersStarted *prometheus.CounterVec
+	workersIdle    *prometheus.GaugeVec
+	workersStopped *prometheus.CounterVec
+	workQueueSize  *prometheus.GaugeVec
+	workProcessed  *metrics.ContextualCounterVec
 	workDropped    *metrics.ContextualCounterVec
 }
 
 func (m workPoolMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.workersStarted.Describe(ch)
+	m.workersIdle.Describe(ch)
 	m.workersStopped.Describe(ch)
-	m.workEnqueued.Describe(ch)
-	m.workDequeued.Describe(ch)
+	m.workQueueSize.Describe(ch)
+	m.workProcessed.Describe(ch)
 	m.workDropped.Describe(ch)
 }
 
 func (m workPoolMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.workersStarted.Collect(ch)
+	m.workersIdle.Collect(ch)
 	m.workersStopped.Collect(ch)
-	m.workEnqueued.Collect(ch)
-	m.workDequeued.Collect(ch)
+	m.workQueueSize.Collect(ch)
+	m.workProcessed.Collect(ch)
 	m.workDropped.Collect(ch)
 }
 
 var poolMetrics = &workPoolMetrics{
-	workersStarted: metrics.NewContextualCounterVec(
+	workersStarted: metrics.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "workers_started",
@@ -59,7 +62,15 @@ var poolMetrics = &workPoolMetrics{
 		},
 		[]string{poolLabel},
 	),
-	workersStopped: metrics.NewContextualCounterVec(
+	workersIdle: metrics.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Subsystem: subsystem,
+			Name:      "workers_idle",
+			Help:      "Number of idle workers",
+		},
+		[]string{poolLabel},
+	),
+	workersStopped: metrics.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "workers_stopped",
@@ -67,19 +78,19 @@ var poolMetrics = &workPoolMetrics{
 		},
 		[]string{poolLabel},
 	),
-	workEnqueued: metrics.NewContextualCounterVec(
-		prometheus.CounterOpts{
+	workQueueSize: metrics.NewGaugeVec(
+		prometheus.GaugeOpts{
 			Subsystem: subsystem,
-			Name:      "work_enqueued",
+			Name:      "work_queue_size",
 			Help:      "Amount of work enqueued",
 		},
 		[]string{poolLabel},
 	),
-	workDequeued: metrics.NewContextualCounterVec(
+	workProcessed: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "work_dequeued",
-			Help:      "Amount of work dequeued",
+			Name:      "work_processed",
+			Help:      "Amount of work processed",
 		},
 		[]string{poolLabel},
 	),
@@ -97,22 +108,34 @@ func init() {
 	metrics.MustRegister(poolMetrics)
 }
 
-func registerWorkerStarted(ctx context.Context, name string) {
-	poolMetrics.workersStarted.WithLabelValues(ctx, name).Inc()
-	poolMetrics.workersStopped.WithLabelValues(ctx, name)
+func registerWorkerStarted(name string) {
+	poolMetrics.workersStarted.WithLabelValues(name).Inc()
+	poolMetrics.workersIdle.WithLabelValues(name)
+	poolMetrics.workersStopped.WithLabelValues(name)
 }
 
-func registerWorkerStopped(ctx context.Context, name string) {
-	poolMetrics.workersStopped.WithLabelValues(ctx, name).Inc()
+func registerWorkerIdle(name string) {
+	poolMetrics.workersIdle.WithLabelValues(name).Inc()
 }
 
-func registerWorkEnqueued(ctx context.Context, name string) {
-	poolMetrics.workEnqueued.WithLabelValues(ctx, name).Inc()
-	poolMetrics.workDequeued.WithLabelValues(ctx, name)
+func registerWorkerBusy(name string) {
+	poolMetrics.workersIdle.WithLabelValues(name).Dec()
 }
 
-func registerWorkDequeued(ctx context.Context, name string) {
-	poolMetrics.workDequeued.WithLabelValues(ctx, name).Inc()
+func registerWorkerStopped(name string) {
+	poolMetrics.workersStopped.WithLabelValues(name).Inc()
+}
+
+func registerWorkEnqueued(name string) {
+	poolMetrics.workQueueSize.WithLabelValues(name).Inc()
+}
+
+func registerWorkDequeued(name string) {
+	poolMetrics.workQueueSize.WithLabelValues(name).Dec()
+}
+
+func registerWorkProcessed(ctx context.Context, name string) {
+	poolMetrics.workProcessed.WithLabelValues(ctx, name).Inc()
 }
 
 func registerWorkDropped(ctx context.Context, name string) {
