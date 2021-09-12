@@ -559,14 +559,17 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		if err != nil {
 			return errNoUplinkMatch.WithCause(err)
 		}
-		if !ok {
-			if err := r.Redis.Set(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL).Err(); err != nil {
-				return ttnredis.ConvertError(err)
+		if _, err := r.Redis.TxPipelined(ctx, func(p redis.Pipeliner) error {
+			if !ok {
+				p.SetNX(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL)
 			}
-			return errNoUplinkMatch.New()
-		}
-		if err = r.Redis.Expire(ctx, matchResultKey, cacheTTL).Err(); err != nil {
+			p.Expire(ctx, matchResultKey, cacheTTL)
+			return nil
+		}); err != nil {
 			return ttnredis.ConvertError(err)
+		}
+		if !ok {
+			return errNoUplinkMatch.New()
 		}
 		return nil
 	}
@@ -745,22 +748,31 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			}
 		}
 	}
-	ok, err = r.Redis.SetNX(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL).Result()
+
+	var setNXCmd *redis.BoolCmd
+	var getCmd *redis.StringCmd
+	if _, err := r.Redis.TxPipelined(ctx, func(p redis.Pipeliner) error {
+		setNXCmd = p.SetNX(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL)
+		getCmd = p.Get(ctx, matchResultKey)
+		return nil
+	}); err != nil {
+		return ttnredis.ConvertError(err)
+	}
+
+	ok, err = setNXCmd.Result()
 	if err != nil {
 		return ttnredis.ConvertError(err)
 	}
-	if !ok {
-		// Another instance set the result, while this goroutine was busy with processing.
-		// Ideally, this should be done via a Lua script to avoid (highely unlikely) race conditions.
-		// TODO: Redis 6.2.0 introduces `GET` argument to `SET`, which can be used above instead.
-		// https://github.com/TheThingsNetwork/lorawan-stack/issues/3592
-		s, err := r.Redis.Get(ctx, matchResultKey).Result()
-		if err != nil {
-			return ttnredis.ConvertError(err)
-		}
-		return processResult(ctx, s)
+	if ok {
+		return errNoUplinkMatch.New()
 	}
-	return errNoUplinkMatch.New()
+
+	// Another instance set the result, while this goroutine was busy with processing.
+	s, err := getCmd.Result()
+	if err != nil {
+		return ttnredis.ConvertError(err)
+	}
+	return processResult(ctx, s)
 }
 
 func equalEUI64(x, y *types.EUI64) bool {
