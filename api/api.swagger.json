@@ -3787,6 +3787,38 @@
         ]
       }
     },
+    "/configuration/phy-versions": {
+      "get": {
+        "summary": "Returns a list of supported LoRaWAN PHY Versions for the given Band ID.",
+        "operationId": "Configuration_GetPhyVersions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetPhyVersionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "band_id",
+            "description": "Optional Band ID to filter the results.\nIf unused, all supported Bands and their versions are returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Configuration"
+        ]
+      }
+    },
     "/contact_info/validation": {
       "post": {
         "summary": "Request validation for the non-validated contact info for the given entity.",
@@ -10874,6 +10906,20 @@
         }
       }
     },
+    "GetPhyVersionsResponseVersionInfo": {
+      "type": "object",
+      "properties": {
+        "band_id": {
+          "type": "string"
+        },
+        "phy_versions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3PHYVersion"
+          }
+        }
+      }
+    },
     "IsConfigurationEndDevicePicture": {
       "type": "object",
       "properties": {
@@ -14910,6 +14956,17 @@
       "properties": {
         "configuration": {
           "$ref": "#/definitions/v3IsConfiguration"
+        }
+      }
+    },
+    "v3GetPhyVersionsResponse": {
+      "type": "object",
+      "properties": {
+        "version_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GetPhyVersionsResponseVersionInfo"
+          }
         }
       }
     },

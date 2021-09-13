@@ -1922,6 +1922,16 @@
           "parameters": []
         }
       ]
+    },
+    "GetPhyVersions": {
+      "file": "lorawan-stack/api/configuration_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/configuration/phy-versions",
+          "parameters": []
+        }
+      ]
     }
   },
   "ContactInfoRegistry": {

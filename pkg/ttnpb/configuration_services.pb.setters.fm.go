@@ -95,3 +95,74 @@ func (dst *ListFrequencyPlansResponse) SetFields(src *ListFrequencyPlansResponse
 	}
 	return nil
 }
+
+func (dst *GetPhyVersionsRequest) SetFields(src *GetPhyVersionsRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "band_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'band_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BandId = src.BandId
+			} else {
+				var zero string
+				dst.BandId = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetPhyVersionsResponse) SetFields(src *GetPhyVersionsResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "version_info":
+			if len(subs) > 0 {
+				return fmt.Errorf("'version_info' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.VersionInfo = src.VersionInfo
+			} else {
+				dst.VersionInfo = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetPhyVersionsResponse_VersionInfo) SetFields(src *GetPhyVersionsResponse_VersionInfo, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "band_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'band_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BandId = src.BandId
+			} else {
+				var zero string
+				dst.BandId = zero
+			}
+		case "phy_versions":
+			if len(subs) > 0 {
+				return fmt.Errorf("'phy_versions' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PhyVersions = src.PhyVersions
+			} else {
+				dst.PhyVersions = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

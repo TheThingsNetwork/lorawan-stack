@@ -128,6 +128,9 @@
   - [Message `PeerInfo.TagsEntry`](#ttn.lorawan.v3.PeerInfo.TagsEntry)
 - [File `lorawan-stack/api/configuration_services.proto`](#lorawan-stack/api/configuration_services.proto)
   - [Message `FrequencyPlanDescription`](#ttn.lorawan.v3.FrequencyPlanDescription)
+  - [Message `GetPhyVersionsRequest`](#ttn.lorawan.v3.GetPhyVersionsRequest)
+  - [Message `GetPhyVersionsResponse`](#ttn.lorawan.v3.GetPhyVersionsResponse)
+  - [Message `GetPhyVersionsResponse.VersionInfo`](#ttn.lorawan.v3.GetPhyVersionsResponse.VersionInfo)
   - [Message `ListFrequencyPlansRequest`](#ttn.lorawan.v3.ListFrequencyPlansRequest)
   - [Message `ListFrequencyPlansResponse`](#ttn.lorawan.v3.ListFrequencyPlansResponse)
   - [Service `Configuration`](#ttn.lorawan.v3.Configuration)
@@ -2202,6 +2205,25 @@ PeerInfo
 | `name` | [`string`](#string) |  |  |
 | `base_frequency` | [`uint32`](#uint32) |  | Base frequency in MHz for hardware support (433, 470, 868 or 915) |
 
+### <a name="ttn.lorawan.v3.GetPhyVersionsRequest">Message `GetPhyVersionsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `band_id` | [`string`](#string) |  | Optional Band ID to filter the results. If unused, all supported Bands and their versions are returned. |
+
+### <a name="ttn.lorawan.v3.GetPhyVersionsResponse">Message `GetPhyVersionsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `version_info` | [`GetPhyVersionsResponse.VersionInfo`](#ttn.lorawan.v3.GetPhyVersionsResponse.VersionInfo) | repeated |  |
+
+### <a name="ttn.lorawan.v3.GetPhyVersionsResponse.VersionInfo">Message `GetPhyVersionsResponse.VersionInfo`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `band_id` | [`string`](#string) |  |  |
+| `phy_versions` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.ListFrequencyPlansRequest">Message `ListFrequencyPlansRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2219,12 +2241,14 @@ PeerInfo
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `ListFrequencyPlans` | [`ListFrequencyPlansRequest`](#ttn.lorawan.v3.ListFrequencyPlansRequest) | [`ListFrequencyPlansResponse`](#ttn.lorawan.v3.ListFrequencyPlansResponse) |  |
+| `GetPhyVersions` | [`GetPhyVersionsRequest`](#ttn.lorawan.v3.GetPhyVersionsRequest) | [`GetPhyVersionsResponse`](#ttn.lorawan.v3.GetPhyVersionsResponse) | Returns a list of supported LoRaWAN PHY Versions for the given Band ID. |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `ListFrequencyPlans` | `GET` | `/api/v3/configuration/frequency-plans` |  |
+| `GetPhyVersions` | `GET` | `/api/v3/configuration/phy-versions` |  |
 
 ## <a name="lorawan-stack/api/contact_info.proto">File `lorawan-stack/api/contact_info.proto`</a>
 

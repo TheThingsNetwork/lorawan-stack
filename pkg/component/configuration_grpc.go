@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -49,4 +50,9 @@ func (c *ConfigurationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.C
 // ListFrequencyPlans implements the Configuration service's ListFrequencyPlans RPC.
 func (c *ConfigurationServer) ListFrequencyPlans(ctx context.Context, req *ttnpb.ListFrequencyPlansRequest) (*ttnpb.ListFrequencyPlansResponse, error) {
 	return frequencyplans.NewRPCServer(c.component.FrequencyPlans).ListFrequencyPlans(ctx, req)
+}
+
+// GetPhyVersions implements the Configuration service's GetPhyVersions RPC.
+func (c *ConfigurationServer) GetPhyVersions(ctx context.Context, req *ttnpb.GetPhyVersionsRequest) (*ttnpb.GetPhyVersionsResponse, error) {
+	return band.GetPhyVersions(ctx, req)
 }
