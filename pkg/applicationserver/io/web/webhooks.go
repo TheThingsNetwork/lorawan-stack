@@ -29,7 +29,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jtacoma/uritemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -126,7 +125,6 @@ func NewPooledSink(ctx context.Context, c workerpool.Component, createSink SinkF
 // This method returns immediately. An error is returned when the workers are too busy.
 func (s *pooledSink) Process(req *http.Request) error {
 	if err := s.pool.Publish(req.Context(), req); err != nil {
-		registerWebhookFailed(err)
 		return err
 	}
 	return nil
@@ -161,27 +159,16 @@ func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry
 	if err != nil {
 		return nil, err
 	}
-	server.StartTask(&component.TaskConfig{
-		Context: ctx,
-		ID:      "run_webhooks",
-		Func: func(ctx context.Context) error {
-			for {
-				select {
-				case <-ctx.Done():
-					return ctx.Err()
-				case <-sub.Context().Done():
-					return sub.Context().Err()
-				case up := <-sub.Up():
-					ctx := log.NewContextWithField(up.Context, "namespace", namespace)
-					if err := w.handleUp(ctx, up.ApplicationUp); err != nil {
-						log.FromContext(ctx).WithError(err).Warn("Failed to handle message")
-					}
-				}
-			}
-		},
-		Restart: component.TaskRestartOnFailure,
-		Backoff: component.DefaultTaskBackoffConfig,
+	wp, err := workerpool.NewWorkerPool(workerpool.Config{
+		Component:     server,
+		Context:       ctx,
+		Name:          "webhooks_fanout",
+		CreateHandler: workerpool.HandlerFactoryFromUplinkHandler(w.handleUp),
 	})
+	if err != nil {
+		return nil, err
+	}
+	sub.Pipe(ctx, server, "webhooks", wp.Publish)
 	return w, nil
 }
 
@@ -241,6 +228,7 @@ func (w *webhooks) createDomain(ctx context.Context) string {
 }
 
 func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
+	ctx = log.NewContextWithField(ctx, "namespace", namespace)
 	hooks, err := w.registry.List(ctx, msg.ApplicationIdentifiers,
 		[]string{
 			"base_url",
@@ -279,6 +267,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			}
 			logger.WithField("url", req.URL).Debug("Process message")
 			if err := w.target.Process(req); err != nil {
+				registerWebhookFailed(err)
 				logger.WithError(err).Warn("Failed to process message")
 			}
 		}()
