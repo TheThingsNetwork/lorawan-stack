@@ -309,7 +309,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 		}
 
 		// Only fetch Trust and Credentials for TLS end points.
-		if scheme != "ws" {
+		if scheme == "wss" {
 			lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
 			if err != nil {
 				return errServerTrust.WithCause(err).WithAttributes("address", gtw.GatewayServerAddress)
