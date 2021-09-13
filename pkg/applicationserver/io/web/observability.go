@@ -15,6 +15,8 @@
 package web
 
 import (
+	"context"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
@@ -26,14 +28,15 @@ const (
 )
 
 var webhookMetrics = &messageMetrics{
-	webhooksSent: metrics.NewCounter(
+	webhooksSent: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "sent_total",
 			Help:      "Total number of sent webhooks",
 		},
+		[]string{},
 	),
-	webhooksFailed: metrics.NewCounterVec(
+	webhooksFailed: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "failed_total",
@@ -44,13 +47,12 @@ var webhookMetrics = &messageMetrics{
 }
 
 func init() {
-	webhookMetrics.webhooksSent.Add(0)
 	metrics.MustRegister(webhookMetrics)
 }
 
 type messageMetrics struct {
-	webhooksSent   prometheus.Counter
-	webhooksFailed *prometheus.CounterVec
+	webhooksSent   *metrics.ContextualCounterVec
+	webhooksFailed *metrics.ContextualCounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -63,14 +65,14 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.webhooksFailed.Collect(ch)
 }
 
-func registerWebhookSent() {
-	webhookMetrics.webhooksSent.Inc()
+func registerWebhookSent(ctx context.Context) {
+	webhookMetrics.webhooksSent.WithLabelValues(ctx).Inc()
 }
 
-func registerWebhookFailed(err error) {
+func registerWebhookFailed(ctx context.Context, err error) {
 	errorLabel := unknown
 	if ttnErr, ok := errors.From(err); ok {
 		errorLabel = ttnErr.FullName()
 	}
-	webhookMetrics.webhooksFailed.WithLabelValues(errorLabel).Inc()
+	webhookMetrics.webhooksFailed.WithLabelValues(ctx, errorLabel).Inc()
 }

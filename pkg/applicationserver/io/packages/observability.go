@@ -15,6 +15,8 @@
 package packages
 
 import (
+	"context"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
@@ -26,7 +28,7 @@ const (
 )
 
 var packagesMetrics = &messageMetrics{
-	messagesProcessed: metrics.NewCounterVec(
+	messagesProcessed: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "processed_total",
@@ -34,7 +36,7 @@ var packagesMetrics = &messageMetrics{
 		},
 		[]string{"package"},
 	),
-	messagesFailed: metrics.NewCounterVec(
+	messagesFailed: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "failed_total",
@@ -49,8 +51,8 @@ func init() {
 }
 
 type messageMetrics struct {
-	messagesProcessed *prometheus.CounterVec
-	messagesFailed    *prometheus.CounterVec
+	messagesProcessed *metrics.ContextualCounterVec
+	messagesFailed    *metrics.ContextualCounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -63,14 +65,14 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.messagesFailed.Collect(ch)
 }
 
-func registerMessageProcessed(name string) {
-	packagesMetrics.messagesProcessed.WithLabelValues(name).Inc()
+func registerMessageProcessed(ctx context.Context, name string) {
+	packagesMetrics.messagesProcessed.WithLabelValues(ctx, name).Inc()
 }
 
-func registerMessageFailed(name string, err error) {
+func registerMessageFailed(ctx context.Context, name string, err error) {
 	errorLabel := unknown
 	if ttnErr, ok := errors.From(err); ok {
 		errorLabel = ttnErr.FullName()
 	}
-	packagesMetrics.messagesFailed.WithLabelValues(name, errorLabel).Inc()
+	packagesMetrics.messagesFailed.WithLabelValues(ctx, name, errorLabel).Inc()
 }

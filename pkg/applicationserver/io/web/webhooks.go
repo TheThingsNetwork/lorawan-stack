@@ -92,10 +92,10 @@ func createPoolHandlerFactory(createSink SinkFactory) workerpool.HandlerFactory 
 		h := func(ctx context.Context, item interface{}) {
 			req := item.(*http.Request)
 			if err := sink.Process(req); err != nil {
-				registerWebhookFailed(err)
+				registerWebhookFailed(ctx, err)
 				log.FromContext(ctx).WithError(err).Warn("Failed to process message")
 			} else {
-				registerWebhookSent()
+				registerWebhookSent(ctx)
 			}
 		}
 		return h, nil
@@ -267,7 +267,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			}
 			logger.WithField("url", req.URL).Debug("Process message")
 			if err := w.target.Process(req); err != nil {
-				registerWebhookFailed(err)
+				registerWebhookFailed(ctx, err)
 				logger.WithError(err).Warn("Failed to process message")
 			}
 		}()

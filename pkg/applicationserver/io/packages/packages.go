@@ -55,10 +55,10 @@ func createPackagePoolHandler(name string, handler ApplicationPackageHandler, ti
 
 		if err := handler.HandleUp(ctx, pair.defaultAssociation, pair.association, up); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to handle message")
-			registerMessageFailed(name, err)
+			registerMessageFailed(ctx, name, err)
 			return
 		}
-		registerMessageProcessed(name)
+		registerMessageProcessed(ctx, name)
 	}
 	return workerpool.StaticHandlerFactory(h)
 }
@@ -164,7 +164,7 @@ func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 			up:   msg,
 		}); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to handle message")
-			registerMessageFailed(fmt.Sprintf("publish-%v", name), err)
+			registerMessageFailed(ctx, name, err)
 		}
 	}
 	return nil
