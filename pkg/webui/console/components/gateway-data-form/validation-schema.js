@@ -22,7 +22,7 @@ import {
   attributeKeyTooLongCheck,
   attributeValueTooLongCheck,
 } from '@console/lib/attributes'
-import { address as addressWithOptionalScheme, delay as delayRegexp } from '@console/lib/regexp'
+import { addressWithOptionalScheme as addressWithOptionalSchemeRegexp, delay as delayRegexp } from '@console/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   owner_id: Yup.string(),
@@ -45,7 +45,7 @@ const validationSchema = Yup.object().shape({
     .max(64, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   gateway_server_address: Yup.string().matches(
-    addressWithOptionalScheme,
+    addressWithOptionalSchemeRegexp,
     Yup.passValues(sharedMessages.validateAddressFormat),
   ),
   require_authenticated_connection: Yup.boolean().default(false),
