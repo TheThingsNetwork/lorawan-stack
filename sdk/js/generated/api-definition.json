@@ -1928,10 +1928,8 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/configuration/phy-versions/{band_id}",
-          "parameters": [
-            "band_id"
-          ]
+          "pattern": "/configuration/phy-versions",
+          "parameters": []
         }
       ]
     }
