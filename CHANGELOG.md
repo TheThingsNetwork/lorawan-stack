@@ -31,6 +31,7 @@ For details about compatibility between different releases, see the **Commitment
 - Not rendering site header and footer for error pages in some situations.
 - Not providing a copy button for error pages in some situations.
 - Improved errors for invalid URLs.
+- Rendering an error in the Console after the OIDC-authentication was cancelled instead of redirecting back to the login page.
 
 ### Security
 
