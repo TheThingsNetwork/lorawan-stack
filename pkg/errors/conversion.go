@@ -35,6 +35,7 @@ var (
 	errNetOperation      = DefineUnavailable("net_operation", "{message}", "message", "op", "net", "source", "address", "timeout", "temporary")
 
 	errRequest = Define("request", "request to `{url}` failed")
+	errURL     = DefineInvalidArgument("url", "invalid url `{url}`")
 
 	errX509UnknownAuthority = DefineUnavailable("x509_unknown_authority", "unknown certificate authority")
 )
@@ -115,7 +116,11 @@ func From(err error) (out *Error, ok bool) {
 		}
 		return e, true
 	case *url.Error:
-		e := build(errRequest, 0).WithAttributes(
+		definition := errRequest
+		if err.Op == "parse" {
+			definition = errURL
+		}
+		e := build(definition, 0).WithAttributes(
 			"url", err.URL,
 		)
 		if err.Err != nil {
