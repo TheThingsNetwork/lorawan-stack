@@ -25,6 +25,8 @@ import env from '@ttn-lw/lib/env'
 import dev from '@ttn-lw/lib/dev'
 import requestPromiseMiddleware from '@ttn-lw/lib/store/middleware/request-promise-middleware'
 
+import { selectUserId } from '@console/store/selectors/user'
+
 import createRootReducer from './reducers'
 import logics from './middleware/logics'
 
@@ -36,7 +38,7 @@ if (env.sentryDsn) {
     createSentryMiddleware(Sentry, {
       actionTransformer: action => omitDeep(action, sensitiveFields),
       stateTransformer: state => omitDeep(state, sensitiveFields),
-      getUserContext: state => ({ user_id: state.user.user.ids.user_id }),
+      getUserContext: state => ({ user_id: selectUserId(state) }),
     }),
     ...middlewares,
   ]
