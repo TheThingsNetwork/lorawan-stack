@@ -22,7 +22,10 @@ import {
   attributeKeyTooLongCheck,
   attributeValueTooLongCheck,
 } from '@console/lib/attributes'
-import { addressWithOptionalScheme as addressWithOptionalSchemeRegexp, delay as delayRegexp } from '@console/lib/regexp'
+import {
+  addressWithOptionalScheme as addressWithOptionalSchemeRegexp,
+  delay as delayRegexp,
+} from '@console/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   owner_id: Yup.string(),

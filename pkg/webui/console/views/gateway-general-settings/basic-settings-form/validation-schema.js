@@ -21,7 +21,10 @@ import {
   attributeKeyTooLongCheck,
   attributeValueTooLongCheck,
 } from '@console/lib/attributes'
-import { id as gatewayIdRegexp, addressWithOptionalScheme as addressWithOptionalSchemeRegexp } from '@console/lib/regexp'
+import {
+  id as gatewayIdRegexp,
+  addressWithOptionalScheme as addressWithOptionalSchemeRegexp,
+} from '@console/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
