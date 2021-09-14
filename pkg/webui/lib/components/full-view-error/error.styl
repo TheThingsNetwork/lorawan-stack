@@ -41,7 +41,6 @@
 
   &-sub
     display: block
-    margin-bottom: $cs.xl
 
   summary
     color: $tc-subtle-gray
@@ -62,6 +61,7 @@
   align-items: center
   flex-wrap: wrap
   margin-bottom: $cs.m
+  margin-top: $cs.m
 
   & > span
     color: $tc-subtle-gray
@@ -74,5 +74,11 @@
   +media-query($bp.s)
     font-size: 1.4rem
 
-.support-button
+.action-button
   margin-right: $cs.m
+  padding-left: $cs.xs
+
+.detail-colophon
+  color: $tc-subtle-gray
+  span
+    display: block
