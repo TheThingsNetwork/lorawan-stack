@@ -92,6 +92,7 @@ func (wp *workerPool) handle(ctx context.Context, it *contextualItem, handler Ha
 	registerWorkerBusy(wp.Name)
 	defer registerWorkerIdle(wp.Name)
 	defer registerWorkProcessed(it.ctx, wp.Name)
+	defer registerWorkLatency(wp.Name, time.Now())
 	handler(it.ctx, it.item)
 }
 
