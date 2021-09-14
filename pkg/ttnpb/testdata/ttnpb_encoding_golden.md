@@ -928,6 +928,438 @@ JSONPB | ttnpb.RxDelayValue | {6 {} 0} | 6
 JSONPB | ttnpb.RxDelayValue | {7 {} 0} | 7
 JSONPB | ttnpb.RxDelayValue | {8 {} 0} | 8
 JSONPB | ttnpb.RxDelayValue | {9 {} 0} | 9
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1 | "ADR_ACK_DELAY_1"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1024 | "ADR_ACK_DELAY_1024"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_128 | "ADR_ACK_DELAY_128"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_16 | "ADR_ACK_DELAY_16"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_16384 | "ADR_ACK_DELAY_16384"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_2 | "ADR_ACK_DELAY_2"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_2048 | "ADR_ACK_DELAY_2048"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_256 | "ADR_ACK_DELAY_256"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_32 | "ADR_ACK_DELAY_32"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_32768 | "ADR_ACK_DELAY_32768"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_4 | "ADR_ACK_DELAY_4"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_4096 | "ADR_ACK_DELAY_4096"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_512 | "ADR_ACK_DELAY_512"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_64 | "ADR_ACK_DELAY_64"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_8 | "ADR_ACK_DELAY_8"
+ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_8192 | "ADR_ACK_DELAY_8192"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_1 {} 0} | "ADR_ACK_DELAY_1"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_1024 {} 0} | "ADR_ACK_DELAY_1024"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_128 {} 0} | "ADR_ACK_DELAY_128"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_16 {} 0} | "ADR_ACK_DELAY_16"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_16384 {} 0} | "ADR_ACK_DELAY_16384"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_2 {} 0} | "ADR_ACK_DELAY_2"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_2048 {} 0} | "ADR_ACK_DELAY_2048"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_256 {} 0} | "ADR_ACK_DELAY_256"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_32 {} 0} | "ADR_ACK_DELAY_32"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_32768 {} 0} | "ADR_ACK_DELAY_32768"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_4 {} 0} | "ADR_ACK_DELAY_4"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_4096 {} 0} | "ADR_ACK_DELAY_4096"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_512 {} 0} | "ADR_ACK_DELAY_512"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_64 {} 0} | "ADR_ACK_DELAY_64"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_8 {} 0} | "ADR_ACK_DELAY_8"
+ProtoJSON | ttnpb.ADRAckDelayExponentValue | {ADR_ACK_DELAY_8192 {} 0} | "ADR_ACK_DELAY_8192"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_1 | "ADR_ACK_LIMIT_1"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_1024 | "ADR_ACK_LIMIT_1024"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_128 | "ADR_ACK_LIMIT_128"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_16 | "ADR_ACK_LIMIT_16"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_16384 | "ADR_ACK_LIMIT_16384"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_2 | "ADR_ACK_LIMIT_2"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_2048 | "ADR_ACK_LIMIT_2048"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_256 | "ADR_ACK_LIMIT_256"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_32 | "ADR_ACK_LIMIT_32"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_32768 | "ADR_ACK_LIMIT_32768"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_4 | "ADR_ACK_LIMIT_4"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_4096 | "ADR_ACK_LIMIT_4096"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_512 | "ADR_ACK_LIMIT_512"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_64 | "ADR_ACK_LIMIT_64"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_8 | "ADR_ACK_LIMIT_8"
+ProtoJSON | ttnpb.ADRAckLimitExponent | ADR_ACK_LIMIT_8192 | "ADR_ACK_LIMIT_8192"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_1 {} 0} | "ADR_ACK_LIMIT_1"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_1024 {} 0} | "ADR_ACK_LIMIT_1024"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_128 {} 0} | "ADR_ACK_LIMIT_128"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_16 {} 0} | "ADR_ACK_LIMIT_16"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_16384 {} 0} | "ADR_ACK_LIMIT_16384"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_2 {} 0} | "ADR_ACK_LIMIT_2"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_2048 {} 0} | "ADR_ACK_LIMIT_2048"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_256 {} 0} | "ADR_ACK_LIMIT_256"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_32 {} 0} | "ADR_ACK_LIMIT_32"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_32768 {} 0} | "ADR_ACK_LIMIT_32768"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_4 {} 0} | "ADR_ACK_LIMIT_4"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_4096 {} 0} | "ADR_ACK_LIMIT_4096"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_512 {} 0} | "ADR_ACK_LIMIT_512"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_64 {} 0} | "ADR_ACK_LIMIT_64"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_8 {} 0} | "ADR_ACK_LIMIT_8"
+ProtoJSON | ttnpb.ADRAckLimitExponentValue | {ADR_ACK_LIMIT_8192 {} 0} | "ADR_ACK_LIMIT_8192"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_1 | "DUTY_CYCLE_1"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_1024 | "DUTY_CYCLE_1024"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_128 | "DUTY_CYCLE_128"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_16 | "DUTY_CYCLE_16"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_16384 | "DUTY_CYCLE_16384"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_2 | "DUTY_CYCLE_2"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_2048 | "DUTY_CYCLE_2048"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_256 | "DUTY_CYCLE_256"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_32 | "DUTY_CYCLE_32"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_32768 | "DUTY_CYCLE_32768"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_4 | "DUTY_CYCLE_4"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_4096 | "DUTY_CYCLE_4096"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_512 | "DUTY_CYCLE_512"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_64 | "DUTY_CYCLE_64"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_8 | "DUTY_CYCLE_8"
+ProtoJSON | ttnpb.AggregatedDutyCycle | DUTY_CYCLE_8192 | "DUTY_CYCLE_8192"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_1 {} 0} | "DUTY_CYCLE_1"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_1024 {} 0} | "DUTY_CYCLE_1024"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_128 {} 0} | "DUTY_CYCLE_128"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_16 {} 0} | "DUTY_CYCLE_16"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_16384 {} 0} | "DUTY_CYCLE_16384"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_2 {} 0} | "DUTY_CYCLE_2"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_2048 {} 0} | "DUTY_CYCLE_2048"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_256 {} 0} | "DUTY_CYCLE_256"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_32 {} 0} | "DUTY_CYCLE_32"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_32768 {} 0} | "DUTY_CYCLE_32768"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_4 {} 0} | "DUTY_CYCLE_4"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_4096 {} 0} | "DUTY_CYCLE_4096"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_512 {} 0} | "DUTY_CYCLE_512"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_64 {} 0} | "DUTY_CYCLE_64"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_8 {} 0} | "DUTY_CYCLE_8"
+ProtoJSON | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_8192 {} 0} | "DUTY_CYCLE_8192"
+ProtoJSON | ttnpb.BoolValue | {false {} 0} | false
+ProtoJSON | ttnpb.BoolValue | {true {} 0} | true
+ProtoJSON | ttnpb.CFListType | CHANNEL_MASKS | "CHANNEL_MASKS"
+ProtoJSON | ttnpb.CFListType | FREQUENCIES | "FREQUENCIES"
+ProtoJSON | ttnpb.Class | CLASS_A | "CLASS_A"
+ProtoJSON | ttnpb.Class | CLASS_B | "CLASS_B"
+ProtoJSON | ttnpb.Class | CLASS_C | "CLASS_C"
+ProtoJSON | ttnpb.DataRateIndex | 0 | 0
+ProtoJSON | ttnpb.DataRateIndex | 1 | 1
+ProtoJSON | ttnpb.DataRateIndex | 10 | 10
+ProtoJSON | ttnpb.DataRateIndex | 11 | 11
+ProtoJSON | ttnpb.DataRateIndex | 12 | 12
+ProtoJSON | ttnpb.DataRateIndex | 13 | 13
+ProtoJSON | ttnpb.DataRateIndex | 14 | 14
+ProtoJSON | ttnpb.DataRateIndex | 15 | 15
+ProtoJSON | ttnpb.DataRateIndex | 2 | 2
+ProtoJSON | ttnpb.DataRateIndex | 3 | 3
+ProtoJSON | ttnpb.DataRateIndex | 4 | 4
+ProtoJSON | ttnpb.DataRateIndex | 5 | 5
+ProtoJSON | ttnpb.DataRateIndex | 6 | 6
+ProtoJSON | ttnpb.DataRateIndex | 7 | 7
+ProtoJSON | ttnpb.DataRateIndex | 8 | 8
+ProtoJSON | ttnpb.DataRateIndex | 9 | 9
+ProtoJSON | ttnpb.DataRateIndexValue | {0 {} 0} | 0
+ProtoJSON | ttnpb.DataRateIndexValue | {1 {} 0} | 1
+ProtoJSON | ttnpb.DataRateIndexValue | {10 {} 0} | 10
+ProtoJSON | ttnpb.DataRateIndexValue | {11 {} 0} | 11
+ProtoJSON | ttnpb.DataRateIndexValue | {12 {} 0} | 12
+ProtoJSON | ttnpb.DataRateIndexValue | {13 {} 0} | 13
+ProtoJSON | ttnpb.DataRateIndexValue | {14 {} 0} | 14
+ProtoJSON | ttnpb.DataRateIndexValue | {15 {} 0} | 15
+ProtoJSON | ttnpb.DataRateIndexValue | {2 {} 0} | 2
+ProtoJSON | ttnpb.DataRateIndexValue | {3 {} 0} | 3
+ProtoJSON | ttnpb.DataRateIndexValue | {4 {} 0} | 4
+ProtoJSON | ttnpb.DataRateIndexValue | {5 {} 0} | 5
+ProtoJSON | ttnpb.DataRateIndexValue | {6 {} 0} | 6
+ProtoJSON | ttnpb.DataRateIndexValue | {7 {} 0} | 7
+ProtoJSON | ttnpb.DataRateIndexValue | {8 {} 0} | 8
+ProtoJSON | ttnpb.DataRateIndexValue | {9 {} 0} | 9
+ProtoJSON | ttnpb.DataRateOffset | 0 | 0
+ProtoJSON | ttnpb.DataRateOffset | 1 | 1
+ProtoJSON | ttnpb.DataRateOffset | 2 | 2
+ProtoJSON | ttnpb.DataRateOffset | 3 | 3
+ProtoJSON | ttnpb.DataRateOffset | 4 | 4
+ProtoJSON | ttnpb.DataRateOffset | 5 | 5
+ProtoJSON | ttnpb.DataRateOffset | 6 | 6
+ProtoJSON | ttnpb.DataRateOffset | 7 | 7
+ProtoJSON | ttnpb.DataRateOffsetValue | {0 {} 0} | 0
+ProtoJSON | ttnpb.DataRateOffsetValue | {1 {} 0} | 1
+ProtoJSON | ttnpb.DataRateOffsetValue | {2 {} 0} | 2
+ProtoJSON | ttnpb.DataRateOffsetValue | {3 {} 0} | 3
+ProtoJSON | ttnpb.DataRateOffsetValue | {4 {} 0} | 4
+ProtoJSON | ttnpb.DataRateOffsetValue | {5 {} 0} | 5
+ProtoJSON | ttnpb.DataRateOffsetValue | {6 {} 0} | 6
+ProtoJSON | ttnpb.DataRateOffsetValue | {7 {} 0} | 7
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_10 | "DEVICE_EIRP_10"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_12 | "DEVICE_EIRP_12"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_13 | "DEVICE_EIRP_13"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_14 | "DEVICE_EIRP_14"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_16 | "DEVICE_EIRP_16"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_18 | "DEVICE_EIRP_18"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_20 | "DEVICE_EIRP_20"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_21 | "DEVICE_EIRP_21"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_24 | "DEVICE_EIRP_24"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_26 | "DEVICE_EIRP_26"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_27 | "DEVICE_EIRP_27"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_29 | "DEVICE_EIRP_29"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_30 | "DEVICE_EIRP_30"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_33 | "DEVICE_EIRP_33"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_36 | "DEVICE_EIRP_36"
+ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_8 | "DEVICE_EIRP_8"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_10 {} 0} | "DEVICE_EIRP_10"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_12 {} 0} | "DEVICE_EIRP_12"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_13 {} 0} | "DEVICE_EIRP_13"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_14 {} 0} | "DEVICE_EIRP_14"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_16 {} 0} | "DEVICE_EIRP_16"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_18 {} 0} | "DEVICE_EIRP_18"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_20 {} 0} | "DEVICE_EIRP_20"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_21 {} 0} | "DEVICE_EIRP_21"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_24 {} 0} | "DEVICE_EIRP_24"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_26 {} 0} | "DEVICE_EIRP_26"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_27 {} 0} | "DEVICE_EIRP_27"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_29 {} 0} | "DEVICE_EIRP_29"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_30 {} 0} | "DEVICE_EIRP_30"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_33 {} 0} | "DEVICE_EIRP_33"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_36 {} 0} | "DEVICE_EIRP_36"
+ProtoJSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_8 {} 0} | "DEVICE_EIRP_8"
+ProtoJSON | ttnpb.FrequencyValue | {100000 {} 0} | "100000"
+ProtoJSON | ttnpb.FrequencyValue | {2000000 {} 0} | "2000000"
+ProtoJSON | ttnpb.FrequencyValue | {30000000 {} 0} | "30000000"
+ProtoJSON | ttnpb.GatewayAntennaPlacement | INDOOR | "INDOOR"
+ProtoJSON | ttnpb.GatewayAntennaPlacement | OUTDOOR | "OUTDOOR"
+ProtoJSON | ttnpb.GatewayAntennaPlacement | PLACEMENT_UNKNOWN | "PLACEMENT_UNKNOWN"
+ProtoJSON | ttnpb.GrantType | GRANT_AUTHORIZATION_CODE | "GRANT_AUTHORIZATION_CODE"
+ProtoJSON | ttnpb.GrantType | GRANT_PASSWORD | "GRANT_PASSWORD"
+ProtoJSON | ttnpb.GrantType | GRANT_REFRESH_TOKEN | "GRANT_REFRESH_TOKEN"
+ProtoJSON | ttnpb.JoinRequestType | JOIN | "JOIN"
+ProtoJSON | ttnpb.JoinRequestType | REJOIN_CONTEXT | "REJOIN_CONTEXT"
+ProtoJSON | ttnpb.JoinRequestType | REJOIN_KEYS | "REJOIN_KEYS"
+ProtoJSON | ttnpb.JoinRequestType | REJOIN_SESSION | "REJOIN_SESSION"
+ProtoJSON | ttnpb.LocationSource | SOURCE_BT_RSSI_GEOLOCATION | "SOURCE_BT_RSSI_GEOLOCATION"
+ProtoJSON | ttnpb.LocationSource | SOURCE_COMBINED_GEOLOCATION | "SOURCE_COMBINED_GEOLOCATION"
+ProtoJSON | ttnpb.LocationSource | SOURCE_GPS | "SOURCE_GPS"
+ProtoJSON | ttnpb.LocationSource | SOURCE_IP_GEOLOCATION | "SOURCE_IP_GEOLOCATION"
+ProtoJSON | ttnpb.LocationSource | SOURCE_LORA_RSSI_GEOLOCATION | "SOURCE_LORA_RSSI_GEOLOCATION"
+ProtoJSON | ttnpb.LocationSource | SOURCE_LORA_TDOA_GEOLOCATION | "SOURCE_LORA_TDOA_GEOLOCATION"
+ProtoJSON | ttnpb.LocationSource | SOURCE_REGISTRY | "SOURCE_REGISTRY"
+ProtoJSON | ttnpb.LocationSource | SOURCE_UNKNOWN | "SOURCE_UNKNOWN"
+ProtoJSON | ttnpb.LocationSource | SOURCE_WIFI_RSSI_GEOLOCATION | "SOURCE_WIFI_RSSI_GEOLOCATION"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_ADR_PARAM_SETUP | "CID_ADR_PARAM_SETUP"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_BEACON_FREQ | "CID_BEACON_FREQ"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_BEACON_TIMING | "CID_BEACON_TIMING"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_DEVICE_MODE | "CID_DEVICE_MODE"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_DEVICE_TIME | "CID_DEVICE_TIME"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_DEV_STATUS | "CID_DEV_STATUS"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_DL_CHANNEL | "CID_DL_CHANNEL"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_DUTY_CYCLE | "CID_DUTY_CYCLE"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_FORCE_REJOIN | "CID_FORCE_REJOIN"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_LINK_ADR | "CID_LINK_ADR"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_LINK_CHECK | "CID_LINK_CHECK"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_NEW_CHANNEL | "CID_NEW_CHANNEL"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_PING_SLOT_CHANNEL | "CID_PING_SLOT_CHANNEL"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_PING_SLOT_INFO | "CID_PING_SLOT_INFO"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_REJOIN_PARAM_SETUP | "CID_REJOIN_PARAM_SETUP"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_REKEY | "CID_REKEY"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_RESET | "CID_RESET"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_RFU_0 | "CID_RFU_0"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_RX_PARAM_SETUP | "CID_RX_PARAM_SETUP"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_RX_TIMING_SETUP | "CID_RX_TIMING_SETUP"
+ProtoJSON | ttnpb.MACCommandIdentifier | CID_TX_PARAM_SETUP | "CID_TX_PARAM_SETUP"
+ProtoJSON | ttnpb.MACVersion | 1.0.0 | "MAC_V1_0"
+ProtoJSON | ttnpb.MACVersion | 1.0.1 | "MAC_V1_0_1"
+ProtoJSON | ttnpb.MACVersion | 1.0.2 | "MAC_V1_0_2"
+ProtoJSON | ttnpb.MACVersion | 1.0.3 | "MAC_V1_0_3"
+ProtoJSON | ttnpb.MACVersion | 1.0.4 | "MAC_V1_0_4"
+ProtoJSON | ttnpb.MACVersion | 1.1.0 | "MAC_V1_1"
+ProtoJSON | ttnpb.MACVersion | unknown | "MAC_UNKNOWN"
+ProtoJSON | ttnpb.MType | CONFIRMED_DOWN | "CONFIRMED_DOWN"
+ProtoJSON | ttnpb.MType | CONFIRMED_UP | "CONFIRMED_UP"
+ProtoJSON | ttnpb.MType | JOIN_ACCEPT | "JOIN_ACCEPT"
+ProtoJSON | ttnpb.MType | JOIN_REQUEST | "JOIN_REQUEST"
+ProtoJSON | ttnpb.MType | PROPRIETARY | "PROPRIETARY"
+ProtoJSON | ttnpb.MType | REJOIN_REQUEST | "REJOIN_REQUEST"
+ProtoJSON | ttnpb.MType | UNCONFIRMED_DOWN | "UNCONFIRMED_DOWN"
+ProtoJSON | ttnpb.MType | UNCONFIRMED_UP | "UNCONFIRMED_UP"
+ProtoJSON | ttnpb.Major | LORAWAN_R1 | "LORAWAN_R1"
+ProtoJSON | ttnpb.Minor | MINOR_1 | "MINOR_1"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_0 | "MINOR_RFU_0"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_10 | "MINOR_RFU_10"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_11 | "MINOR_RFU_11"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_12 | "MINOR_RFU_12"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_13 | "MINOR_RFU_13"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_14 | "MINOR_RFU_14"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_15 | "MINOR_RFU_15"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_2 | "MINOR_RFU_2"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_3 | "MINOR_RFU_3"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_4 | "MINOR_RFU_4"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_5 | "MINOR_RFU_5"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_6 | "MINOR_RFU_6"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_7 | "MINOR_RFU_7"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_8 | "MINOR_RFU_8"
+ProtoJSON | ttnpb.Minor | MINOR_RFU_9 | "MINOR_RFU_9"
+ProtoJSON | ttnpb.PHYVersion | 1.0.0 | "PHY_V1_0"
+ProtoJSON | ttnpb.PHYVersion | 1.0.1 | "PHY_V1_0_1"
+ProtoJSON | ttnpb.PHYVersion | 1.0.2-a | "PHY_V1_0_2_REV_A"
+ProtoJSON | ttnpb.PHYVersion | 1.0.2-b | "PHY_V1_0_2_REV_B"
+ProtoJSON | ttnpb.PHYVersion | 1.0.3-a | "PHY_V1_0_3_REV_A"
+ProtoJSON | ttnpb.PHYVersion | 1.1.0-a | "PHY_V1_1_REV_A"
+ProtoJSON | ttnpb.PHYVersion | 1.1.0-b | "PHY_V1_1_REV_B"
+ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_0 | "RP002_V1_0_0"
+ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_1 | "RP002_V1_0_1"
+ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_2 | "RP002_V1_0_2"
+ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_3 | "RP002_V1_0_3"
+ProtoJSON | ttnpb.PHYVersion | unknown | "unknown"
+ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_128S | "PING_EVERY_128S"
+ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_16S | "PING_EVERY_16S"
+ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_1S | "PING_EVERY_1S"
+ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_2S | "PING_EVERY_2S"
+ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_32S | "PING_EVERY_32S"
+ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_4S | "PING_EVERY_4S"
+ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_64S | "PING_EVERY_64S"
+ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_8S | "PING_EVERY_8S"
+ProtoJSON | ttnpb.PingSlotPeriodValue | {PING_EVERY_128S {} 0} | "PING_EVERY_128S"
+ProtoJSON | ttnpb.PingSlotPeriodValue | {PING_EVERY_16S {} 0} | "PING_EVERY_16S"
+ProtoJSON | ttnpb.PingSlotPeriodValue | {PING_EVERY_1S {} 0} | "PING_EVERY_1S"
+ProtoJSON | ttnpb.PingSlotPeriodValue | {PING_EVERY_2S {} 0} | "PING_EVERY_2S"
+ProtoJSON | ttnpb.PingSlotPeriodValue | {PING_EVERY_32S {} 0} | "PING_EVERY_32S"
+ProtoJSON | ttnpb.PingSlotPeriodValue | {PING_EVERY_4S {} 0} | "PING_EVERY_4S"
+ProtoJSON | ttnpb.PingSlotPeriodValue | {PING_EVERY_64S {} 0} | "PING_EVERY_64S"
+ProtoJSON | ttnpb.PingSlotPeriodValue | {PING_EVERY_8S {} 0} | "PING_EVERY_8S"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_1024 | "REJOIN_COUNT_1024"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_128 | "REJOIN_COUNT_128"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_131072 | "REJOIN_COUNT_131072"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_16 | "REJOIN_COUNT_16"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_16384 | "REJOIN_COUNT_16384"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_2048 | "REJOIN_COUNT_2048"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_256 | "REJOIN_COUNT_256"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_262144 | "REJOIN_COUNT_262144"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_32 | "REJOIN_COUNT_32"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_32768 | "REJOIN_COUNT_32768"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_4096 | "REJOIN_COUNT_4096"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_512 | "REJOIN_COUNT_512"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_524288 | "REJOIN_COUNT_524288"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_64 | "REJOIN_COUNT_64"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_65536 | "REJOIN_COUNT_65536"
+ProtoJSON | ttnpb.RejoinCountExponent | REJOIN_COUNT_8192 | "REJOIN_COUNT_8192"
+ProtoJSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_0 | "REJOIN_PERIOD_0"
+ProtoJSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_1 | "REJOIN_PERIOD_1"
+ProtoJSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_2 | "REJOIN_PERIOD_2"
+ProtoJSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_3 | "REJOIN_PERIOD_3"
+ProtoJSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_4 | "REJOIN_PERIOD_4"
+ProtoJSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_5 | "REJOIN_PERIOD_5"
+ProtoJSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_6 | "REJOIN_PERIOD_6"
+ProtoJSON | ttnpb.RejoinPeriodExponent | REJOIN_PERIOD_7 | "REJOIN_PERIOD_7"
+ProtoJSON | ttnpb.RejoinRequestType | CONTEXT | "CONTEXT"
+ProtoJSON | ttnpb.RejoinRequestType | KEYS | "KEYS"
+ProtoJSON | ttnpb.RejoinRequestType | SESSION | "SESSION"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_0 | "REJOIN_TIME_0"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_1 | "REJOIN_TIME_1"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_10 | "REJOIN_TIME_10"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_11 | "REJOIN_TIME_11"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_12 | "REJOIN_TIME_12"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_13 | "REJOIN_TIME_13"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_14 | "REJOIN_TIME_14"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_15 | "REJOIN_TIME_15"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_2 | "REJOIN_TIME_2"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_3 | "REJOIN_TIME_3"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_4 | "REJOIN_TIME_4"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_5 | "REJOIN_TIME_5"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_6 | "REJOIN_TIME_6"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_7 | "REJOIN_TIME_7"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_8 | "REJOIN_TIME_8"
+ProtoJSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_9 | "REJOIN_TIME_9"
+ProtoJSON | ttnpb.Right | RIGHT_ALL | "RIGHT_ALL"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_ALL | "RIGHT_APPLICATION_ALL"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_DELETE | "RIGHT_APPLICATION_DELETE"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_DEVICES_READ | "RIGHT_APPLICATION_DEVICES_READ"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_DEVICES_READ_KEYS | "RIGHT_APPLICATION_DEVICES_READ_KEYS"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_DEVICES_WRITE | "RIGHT_APPLICATION_DEVICES_WRITE"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_DEVICES_WRITE_KEYS | "RIGHT_APPLICATION_DEVICES_WRITE_KEYS"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_INFO | "RIGHT_APPLICATION_INFO"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_LINK | "RIGHT_APPLICATION_LINK"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_SETTINGS_API_KEYS | "RIGHT_APPLICATION_SETTINGS_API_KEYS"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_SETTINGS_BASIC | "RIGHT_APPLICATION_SETTINGS_BASIC"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_SETTINGS_COLLABORATORS | "RIGHT_APPLICATION_SETTINGS_COLLABORATORS"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_SETTINGS_PACKAGES | "RIGHT_APPLICATION_SETTINGS_PACKAGES"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE | "RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_TRAFFIC_READ | "RIGHT_APPLICATION_TRAFFIC_READ"
+ProtoJSON | ttnpb.Right | RIGHT_APPLICATION_TRAFFIC_UP_WRITE | "RIGHT_APPLICATION_TRAFFIC_UP_WRITE"
+ProtoJSON | ttnpb.Right | RIGHT_CLIENT_ALL | "RIGHT_CLIENT_ALL"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_ALL | "RIGHT_GATEWAY_ALL"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_DELETE | "RIGHT_GATEWAY_DELETE"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_INFO | "RIGHT_GATEWAY_INFO"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_LINK | "RIGHT_GATEWAY_LINK"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_LOCATION_READ | "RIGHT_GATEWAY_LOCATION_READ"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_READ_SECRETS | "RIGHT_GATEWAY_READ_SECRETS"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_SETTINGS_API_KEYS | "RIGHT_GATEWAY_SETTINGS_API_KEYS"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_SETTINGS_BASIC | "RIGHT_GATEWAY_SETTINGS_BASIC"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_SETTINGS_COLLABORATORS | "RIGHT_GATEWAY_SETTINGS_COLLABORATORS"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_STATUS_READ | "RIGHT_GATEWAY_STATUS_READ"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE | "RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_TRAFFIC_READ | "RIGHT_GATEWAY_TRAFFIC_READ"
+ProtoJSON | ttnpb.Right | RIGHT_GATEWAY_WRITE_SECRETS | "RIGHT_GATEWAY_WRITE_SECRETS"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR | "RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_ALL | "RIGHT_ORGANIZATION_ALL"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_APPLICATIONS_CREATE | "RIGHT_ORGANIZATION_APPLICATIONS_CREATE"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_APPLICATIONS_LIST | "RIGHT_ORGANIZATION_APPLICATIONS_LIST"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_CLIENTS_CREATE | "RIGHT_ORGANIZATION_CLIENTS_CREATE"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_CLIENTS_LIST | "RIGHT_ORGANIZATION_CLIENTS_LIST"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_DELETE | "RIGHT_ORGANIZATION_DELETE"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_GATEWAYS_CREATE | "RIGHT_ORGANIZATION_GATEWAYS_CREATE"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_GATEWAYS_LIST | "RIGHT_ORGANIZATION_GATEWAYS_LIST"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_INFO | "RIGHT_ORGANIZATION_INFO"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_SETTINGS_API_KEYS | "RIGHT_ORGANIZATION_SETTINGS_API_KEYS"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_SETTINGS_BASIC | "RIGHT_ORGANIZATION_SETTINGS_BASIC"
+ProtoJSON | ttnpb.Right | RIGHT_ORGANIZATION_SETTINGS_MEMBERS | "RIGHT_ORGANIZATION_SETTINGS_MEMBERS"
+ProtoJSON | ttnpb.Right | RIGHT_SEND_INVITES | "RIGHT_SEND_INVITES"
+ProtoJSON | ttnpb.Right | RIGHT_USER_ALL | "RIGHT_USER_ALL"
+ProtoJSON | ttnpb.Right | RIGHT_USER_APPLICATIONS_CREATE | "RIGHT_USER_APPLICATIONS_CREATE"
+ProtoJSON | ttnpb.Right | RIGHT_USER_APPLICATIONS_LIST | "RIGHT_USER_APPLICATIONS_LIST"
+ProtoJSON | ttnpb.Right | RIGHT_USER_AUTHORIZED_CLIENTS | "RIGHT_USER_AUTHORIZED_CLIENTS"
+ProtoJSON | ttnpb.Right | RIGHT_USER_CLIENTS_CREATE | "RIGHT_USER_CLIENTS_CREATE"
+ProtoJSON | ttnpb.Right | RIGHT_USER_CLIENTS_LIST | "RIGHT_USER_CLIENTS_LIST"
+ProtoJSON | ttnpb.Right | RIGHT_USER_DELETE | "RIGHT_USER_DELETE"
+ProtoJSON | ttnpb.Right | RIGHT_USER_GATEWAYS_CREATE | "RIGHT_USER_GATEWAYS_CREATE"
+ProtoJSON | ttnpb.Right | RIGHT_USER_GATEWAYS_LIST | "RIGHT_USER_GATEWAYS_LIST"
+ProtoJSON | ttnpb.Right | RIGHT_USER_INFO | "RIGHT_USER_INFO"
+ProtoJSON | ttnpb.Right | RIGHT_USER_ORGANIZATIONS_CREATE | "RIGHT_USER_ORGANIZATIONS_CREATE"
+ProtoJSON | ttnpb.Right | RIGHT_USER_ORGANIZATIONS_LIST | "RIGHT_USER_ORGANIZATIONS_LIST"
+ProtoJSON | ttnpb.Right | RIGHT_USER_SETTINGS_API_KEYS | "RIGHT_USER_SETTINGS_API_KEYS"
+ProtoJSON | ttnpb.Right | RIGHT_USER_SETTINGS_BASIC | "RIGHT_USER_SETTINGS_BASIC"
+ProtoJSON | ttnpb.Right | right_invalid | "right_invalid"
+ProtoJSON | ttnpb.RxDelay | 0 | 0
+ProtoJSON | ttnpb.RxDelay | 1 | 1
+ProtoJSON | ttnpb.RxDelay | 10 | 10
+ProtoJSON | ttnpb.RxDelay | 11 | 11
+ProtoJSON | ttnpb.RxDelay | 12 | 12
+ProtoJSON | ttnpb.RxDelay | 13 | 13
+ProtoJSON | ttnpb.RxDelay | 14 | 14
+ProtoJSON | ttnpb.RxDelay | 15 | 15
+ProtoJSON | ttnpb.RxDelay | 2 | 2
+ProtoJSON | ttnpb.RxDelay | 3 | 3
+ProtoJSON | ttnpb.RxDelay | 4 | 4
+ProtoJSON | ttnpb.RxDelay | 5 | 5
+ProtoJSON | ttnpb.RxDelay | 6 | 6
+ProtoJSON | ttnpb.RxDelay | 7 | 7
+ProtoJSON | ttnpb.RxDelay | 8 | 8
+ProtoJSON | ttnpb.RxDelay | 9 | 9
+ProtoJSON | ttnpb.RxDelayValue | {0 {} 0} | 0
+ProtoJSON | ttnpb.RxDelayValue | {1 {} 0} | 1
+ProtoJSON | ttnpb.RxDelayValue | {10 {} 0} | 10
+ProtoJSON | ttnpb.RxDelayValue | {11 {} 0} | 11
+ProtoJSON | ttnpb.RxDelayValue | {12 {} 0} | 12
+ProtoJSON | ttnpb.RxDelayValue | {13 {} 0} | 13
+ProtoJSON | ttnpb.RxDelayValue | {14 {} 0} | 14
+ProtoJSON | ttnpb.RxDelayValue | {15 {} 0} | 15
+ProtoJSON | ttnpb.RxDelayValue | {2 {} 0} | 2
+ProtoJSON | ttnpb.RxDelayValue | {3 {} 0} | 3
+ProtoJSON | ttnpb.RxDelayValue | {4 {} 0} | 4
+ProtoJSON | ttnpb.RxDelayValue | {5 {} 0} | 5
+ProtoJSON | ttnpb.RxDelayValue | {6 {} 0} | 6
+ProtoJSON | ttnpb.RxDelayValue | {7 {} 0} | 7
+ProtoJSON | ttnpb.RxDelayValue | {8 {} 0} | 8
+ProtoJSON | ttnpb.RxDelayValue | {9 {} 0} | 9
+ProtoJSON | ttnpb.State | STATE_APPROVED | "STATE_APPROVED"
+ProtoJSON | ttnpb.State | STATE_FLAGGED | "STATE_FLAGGED"
+ProtoJSON | ttnpb.State | STATE_REJECTED | "STATE_REJECTED"
+ProtoJSON | ttnpb.State | STATE_REQUESTED | "STATE_REQUESTED"
+ProtoJSON | ttnpb.State | STATE_SUSPENDED | "STATE_SUSPENDED"
+ProtoJSON | ttnpb.TxSchedulePriority | ABOVE_NORMAL | "ABOVE_NORMAL"
+ProtoJSON | ttnpb.TxSchedulePriority | BELOW_NORMAL | "BELOW_NORMAL"
+ProtoJSON | ttnpb.TxSchedulePriority | HIGH | "HIGH"
+ProtoJSON | ttnpb.TxSchedulePriority | HIGHEST | "HIGHEST"
+ProtoJSON | ttnpb.TxSchedulePriority | LOW | "LOW"
+ProtoJSON | ttnpb.TxSchedulePriority | LOWEST | "LOWEST"
+ProtoJSON | ttnpb.TxSchedulePriority | NORMAL | "NORMAL"
 Text | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1 | ADR_ACK_DELAY_1
 Text | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1024 | ADR_ACK_DELAY_1024
 Text | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_128 | ADR_ACK_DELAY_128

@@ -26,6 +26,7 @@ import (
 	"strings"
 	"testing"
 
+	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -336,6 +337,12 @@ func TestMarshalers(t *testing.T) {
 
 		t.Run(typ.String(), func(t *testing.T) {
 			for _, v := range vs {
+				vPtr := func() interface{} {
+					vPtr := reflect.New(typ)
+					vPtr.Elem().Set(reflect.ValueOf(v))
+					return vPtr.Interface()
+				}
+
 				t.Run(fmt.Sprint(v), func(t *testing.T) {
 					if m, ok := v.(encoding.TextMarshaler); ok {
 						t.Run("Text", func(t *testing.T) {
@@ -435,6 +442,40 @@ func TestMarshalers(t *testing.T) {
 								}
 
 								err = got.UnmarshalJSONPB(&jsonpb.Unmarshaler{}, b)
+								if !a.So(err, should.BeNil) {
+									t.Error(test.FormatError(err))
+								}
+								a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
+							}
+
+							{
+								got := newV()
+								err = json.Unmarshal(b, got)
+								if !a.So(err, should.BeNil) {
+									t.Error(test.FormatError(err))
+								}
+								a.So(reflect.Indirect(reflect.ValueOf(got)).Interface(), should.Resemble, v)
+							}
+						})
+					}
+
+					if m, ok := vPtr().(jsonplugin.Marshaler); ok {
+						t.Run("ProtoJSON", func(t *testing.T) {
+							a := assertions.New(t)
+
+							b, err := jsonplugin.MarshalerConfig{EnumsAsInts: true}.Marshal(m)
+							if !a.So(err, should.BeNil) {
+								t.Error(test.FormatError(err))
+							}
+							outLines = append(outLines, fmt.Sprintf(`ProtoJSON | %s | %v | %s`, typ, v, b))
+
+							{
+								got, ok := newV().(jsonplugin.Unmarshaler)
+								if !ok {
+									t.Fatalf("%T Does not implement JSONPBUnmarshaler", got)
+								}
+
+								jsonplugin.UnmarshalerConfig{}.Unmarshal(b, got)
 								if !a.So(err, should.BeNil) {
 									t.Error(test.FormatError(err))
 								}
