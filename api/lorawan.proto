@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/identifiers.proto";
@@ -792,33 +793,42 @@ enum Minor {
 }
 
 message FrequencyValue {
+  option (thethings.json.message) = { wrapper: true };
   uint64 value = 1 [(validate.rules).uint64.gte = 100000];
 }
 message DataRateOffsetValue {
+  option (thethings.json.message) = { wrapper: true };
   DataRateOffset value = 1 [(validate.rules).enum.defined_only = true];
 }
 message DataRateIndexValue {
+  option (thethings.json.message) = { wrapper: true };
   DataRateIndex value = 1 [(validate.rules).enum.defined_only = true];
 }
 message PingSlotPeriodValue {
+  option (thethings.json.message) = { wrapper: true };
   PingSlotPeriod value = 1 [(validate.rules).enum.defined_only = true];
 }
 message AggregatedDutyCycleValue {
+  option (thethings.json.message) = { wrapper: true };
   AggregatedDutyCycle value = 1 [(validate.rules).enum.defined_only = true];
 }
 message RxDelayValue {
+  option (thethings.json.message) = { wrapper: true };
   RxDelay value = 1 [(validate.rules).enum.defined_only = true];
 }
 message ADRAckLimitExponentValue {
+  option (thethings.json.message) = { wrapper: true };
   option (gogoproto.populate) = true;
 
   ADRAckLimitExponent value = 1 [(validate.rules).enum.defined_only = true];
 }
 message ADRAckDelayExponentValue {
+  option (thethings.json.message) = { wrapper: true };
   option (gogoproto.populate) = true;
 
   ADRAckDelayExponent value = 1 [(validate.rules).enum.defined_only = true];
 }
 message DeviceEIRPValue {
+  option (thethings.json.message) = { wrapper: true };
   DeviceEIRP value = 1 [(validate.rules).enum.defined_only = true];
 }
