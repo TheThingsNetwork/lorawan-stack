@@ -16,6 +16,7 @@ package band
 
 import (
 	"context"
+	"sort"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -48,9 +49,9 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "EU_863_870",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 							ttnpb.TS001_V1_0_1,
@@ -68,9 +69,9 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AU_915_928",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 							ttnpb.TS001_V1_0_1,
@@ -87,9 +88,9 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AS_923",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 						},
@@ -104,9 +105,9 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AS_923",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 						},
@@ -114,9 +115,9 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AU_915_928",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 							ttnpb.TS001_V1_0_1,
@@ -125,9 +126,9 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "CN_470_510",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 							ttnpb.TS001_V1_0_1,
@@ -136,9 +137,9 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "CN_779_787",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 							ttnpb.TS001_V1_0_1,
@@ -148,9 +149,9 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "EU_433",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 							ttnpb.TS001_V1_0_1,
@@ -160,9 +161,9 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "EU_863_870",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 							ttnpb.TS001_V1_0_1,
@@ -172,18 +173,18 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "IN_865_867",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 						},
 					},
 					{
 						BandId: "ISM_2400",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 							ttnpb.TS001_V1_0_1,
@@ -193,9 +194,9 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "KR_920_923",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 						},
@@ -203,17 +204,17 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "RU_864_870",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 						},
 					},
 					{
 						BandId: "US_902_928",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_1_REV_B,
 							ttnpb.RP001_V1_1_REV_A,
-							ttnpb.RP001_V1_0_3_REV_A,
 							ttnpb.RP001_V1_0_2_REV_B,
 							ttnpb.RP001_V1_0_2,
 							ttnpb.TS001_V1_0_1,
@@ -237,6 +238,10 @@ func TestGetPhyVersions(t *testing.T) {
 			} else {
 				if !a.So(res, should.NotBeNil) {
 					t.Fatalf("Nil value received. Expected :%v", tc.Expected)
+				}
+				sort.Slice(res.VersionInfo, func(i, j int) bool { return res.VersionInfo[i].BandId <= res.VersionInfo[j].BandId })
+				for _, vi := range res.VersionInfo {
+					sort.Slice(vi.PhyVersions, func(i, j int) bool { return vi.PhyVersions[i] >= vi.PhyVersions[j] })
 				}
 				if !a.So(*res, should.Resemble, tc.Expected) {
 					t.Fatalf("Unexpected value: %v", res)

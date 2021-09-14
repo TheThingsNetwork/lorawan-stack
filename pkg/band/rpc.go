@@ -20,32 +20,36 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// TODO: Replace this with the `band.All` logic in https://github.com/TheThingsNetwork/lorawan-stack/pull/4591
-var bandIDs = []string{AS_923, AU_915_928, CN_470_510, CN_779_787, EU_433, EU_863_870, IN_865_867, ISM_2400, KR_920_923, RU_864_870, US_902_928}
-
 // GetPhyVersions returns the list of supported phy versions for the given band.
 func GetPhyVersions(ctx context.Context, req *ttnpb.GetPhyVersionsRequest) (*ttnpb.GetPhyVersionsResponse, error) {
 	var res *ttnpb.GetPhyVersionsResponse
 	if req.BandId != "" {
-		band, ok := All[req.BandId]
+		versions, ok := All[req.BandId]
 		if !ok {
 			return nil, errBandNotFound.WithAttributes("id", req.BandId)
+		}
+		vs := make([]ttnpb.PHYVersion, 0, len(versions))
+		for version := range versions {
+			vs = append(vs, version)
 		}
 		res = &ttnpb.GetPhyVersionsResponse{
 			VersionInfo: []*ttnpb.GetPhyVersionsResponse_VersionInfo{
 				{
 					BandId:      req.BandId,
-					PhyVersions: band.Versions(),
+					PhyVersions: vs,
 				},
 			},
 		}
 	} else {
-		versionInfo := []*ttnpb.GetPhyVersionsResponse_VersionInfo{}
-		for _, bandID := range bandIDs {
-			band := All[bandID]
+		versionInfo := make([]*ttnpb.GetPhyVersionsResponse_VersionInfo, 0, len(All))
+		for bandID, versions := range All {
+			vs := make([]ttnpb.PHYVersion, 0, len(versions))
+			for version := range versions {
+				vs = append(vs, version)
+			}
 			versionInfo = append(versionInfo, &ttnpb.GetPhyVersionsResponse_VersionInfo{
 				BandId:      bandID,
-				PhyVersions: band.Versions(),
+				PhyVersions: vs,
 			})
 		}
 		res = &ttnpb.GetPhyVersionsResponse{
