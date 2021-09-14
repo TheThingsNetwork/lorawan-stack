@@ -47,6 +47,7 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/TheThingsIndustries/mystique v0.0.0-20200127144137-4aa959111fe7
+	github.com/TheThingsIndustries/protoc-gen-go-json v1.0.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
 	github.com/aws/aws-sdk-go v1.38.31
 	github.com/blang/semver v3.5.1+incompatible
@@ -66,7 +67,7 @@ require (
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	// NOTE: github.com/golang/protobuf is actually pinned to v1.3.5 above.
 	github.com/golang/protobuf v1.5.1
-	github.com/google/go-cmp v0.5.5
+	github.com/google/go-cmp v0.5.6
 	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
@@ -182,6 +183,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/jstemmer/go-junit-report v0.9.1 // indirect
 	github.com/klauspost/compress v1.11.12 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -190,6 +192,8 @@ require (
 	github.com/mattn/go-runewidth v0.0.7 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/highwayhash v1.0.1 // indirect
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/nats-io/jwt/v2 v2.0.1 // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect

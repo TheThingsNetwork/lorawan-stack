@@ -31,6 +31,7 @@ import (
 const (
 	protocOut             = "/out"
 	gogoProtoImage        = "ghcr.io/thethingsindustries/protoc:gen-gogo-1.3.1"
+	jsonProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-json-1.0.0"
 	fieldMaskProtoImage   = "thethingsindustries/protoc:3.1.28-dev-tts"
 	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
 	swaggerProtoImage     = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
@@ -81,18 +82,39 @@ func withProtoc(image string, f func(pCtx *protocContext, protoc func(...string)
 	return f(pCtx, protoc)
 }
 
-var gogoConvString = func() string {
+var gogoConvs = func() []string {
 	var convs []string
 	for _, t := range []string{"any", "duration", "empty", "field_mask", "struct", "timestamp", "wrappers"} {
 		convs = append(convs, fmt.Sprintf("Mgoogle/protobuf/%s.proto=github.com/gogo/protobuf/types", t))
 	}
-	return strings.Join(convs, ",")
+	return convs
 }()
 
 func (p Proto) gogo(context.Context) error {
 	return withProtoc(gogoProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
-			fmt.Sprintf("--gogo_out=plugins=grpc,%s:%s", gogoConvString, protocOut),
+			fmt.Sprintf("--gogo_out=plugins=grpc,%s:%s", strings.Join(gogoConvs, ","), protocOut),
+			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+		); err != nil {
+			return fmt.Errorf("failed to generate protos: %w", err)
+		}
+		return nil
+	})
+}
+
+var jsonConvs = func() []string {
+	var convs []string
+	for _, t := range gogoConvs {
+		convs = append(convs, t+";types")
+	}
+	return convs
+}()
+
+func (p Proto) json(context.Context) error {
+	return withProtoc(jsonProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
+		if err := protoc(
+			"--go-json_opt=lang=gogo",
+			fmt.Sprintf("--go-json_out=%s:%s", strings.Join(jsonConvs, ","), protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
@@ -104,7 +126,7 @@ func (p Proto) gogo(context.Context) error {
 func (p Proto) fieldMask(context.Context) error {
 	return withProtoc(fieldMaskProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
-			fmt.Sprintf("--fieldmask_out=lang=gogo,%s:%s", gogoConvString, protocOut),
+			fmt.Sprintf("--fieldmask_out=lang=gogo,%s:%s", strings.Join(gogoConvs, ","), protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
@@ -116,7 +138,7 @@ func (p Proto) fieldMask(context.Context) error {
 func (p Proto) grpcGateway(context.Context) error {
 	if err := withProtoc(grpcGatewayProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
-			fmt.Sprintf("--grpc-gateway_out=%s:%s", gogoConvString, protocOut),
+			fmt.Sprintf("--grpc-gateway_out=%s:%s", strings.Join(gogoConvs, ","), protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return fmt.Errorf("failed to generate protos: %w", err)
@@ -135,7 +157,7 @@ func (p Proto) grpcGateway(context.Context) error {
 
 // Go generates Go protos.
 func (p Proto) Go(context.Context) error {
-	mg.Deps(p.gogo, p.fieldMask, p.grpcGateway)
+	mg.Deps(p.gogo, p.fieldMask, p.grpcGateway, p.json)
 
 	ttnpb, err := filepath.Abs(filepath.Join("pkg", "ttnpb"))
 	if err != nil {
