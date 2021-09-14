@@ -15,6 +15,7 @@
 package jsonpb
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 
@@ -40,9 +41,19 @@ func (*TTNMarshaler) ContentType() string { return "application/json" }
 
 func (m *TTNMarshaler) Marshal(v interface{}) ([]byte, error) {
 	if marshaler, ok := v.(jsonplugin.Marshaler); ok {
-		return jsonplugin.MarshalerConfig{
+		b, err := jsonplugin.MarshalerConfig{
 			EnumsAsInts: true,
 		}.Marshal(marshaler)
+		if err != nil {
+			return nil, err
+		}
+		if m.GoGoJSONPb.Indent == "" {
+			return b, nil
+		} else {
+			var buf bytes.Buffer
+			json.Indent(&buf, b, "", m.GoGoJSONPb.Indent)
+			return buf.Bytes(), nil
+		}
 	}
 	return m.GoGoJSONPb.Marshal(v)
 }
@@ -64,7 +75,13 @@ func (e *TTNEncoder) Encode(v interface{}) error {
 		if err != nil {
 			return err
 		}
-		_, err = e.w.Write(b)
+		if e.gogo.Indent == "" {
+			_, err = e.w.Write(b)
+		} else {
+			var buf bytes.Buffer
+			json.Indent(&buf, b, "", e.gogo.Indent)
+			io.Copy(e.w, &buf)
+		}
 		return err
 	}
 	return e.gogo.NewEncoder(e.w).Encode(v)
