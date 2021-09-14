@@ -16,8 +16,10 @@ package types
 
 import (
 	"encoding/hex"
+	"fmt"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
@@ -62,6 +64,29 @@ func (jn *JoinNonce) UnmarshalJSON(data []byte) error {
 		return errInvalidJoinNonce.WithCause(err)
 	}
 	return nil
+}
+
+// MarshalProtoJSON implements the jsonplugin.Marshaler interface.
+func (jn *JoinNonce) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if jn == nil {
+		s.WriteNil()
+	}
+	s.WriteString(fmt.Sprintf("%X", jn[:]))
+}
+
+// UnmarshalProtoJSON implements the jsonplugin.Unmarshaler interface.
+func (jn *JoinNonce) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	*jn = [3]byte{}
+	b, err := hex.DecodeString(s.ReadString())
+	if err != nil {
+		s.SetError(err)
+		return
+	}
+	if len(b) != 3 {
+		s.SetError(errInvalidDevAddr.WithCause(errInvalidLength.WithAttributes("want", 3, "got", len(b))))
+		return
+	}
+	copy(jn[:], b)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.

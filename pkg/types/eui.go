@@ -21,6 +21,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
@@ -63,6 +64,29 @@ func (eui *EUI64) UnmarshalJSON(data []byte) error {
 		return errInvalidEUI.WithCause(err)
 	}
 	return nil
+}
+
+// MarshalProtoJSON implements the jsonplugin.Marshaler interface.
+func (eui *EUI64) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if eui == nil {
+		s.WriteNil()
+	}
+	s.WriteString(fmt.Sprintf("%X", eui[:]))
+}
+
+// UnmarshalProtoJSON implements the jsonplugin.Unmarshaler interface.
+func (eui *EUI64) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	*eui = [8]byte{}
+	b, err := hex.DecodeString(s.ReadString())
+	if err != nil {
+		s.SetError(err)
+		return
+	}
+	if len(b) != 8 {
+		s.SetError(errInvalidEUI.WithCause(errInvalidLength.WithAttributes("want", 8, "got", len(b))))
+		return
+	}
+	copy(eui[:], b)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
