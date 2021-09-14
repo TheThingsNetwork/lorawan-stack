@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
@@ -99,6 +100,7 @@ message Location {
 }
 
 enum LocationSource {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "SOURCE" };
   option (gogoproto.goproto_enum_prefix) = false;
   // The source of the location is not known or not set.
   SOURCE_UNKNOWN = 0;

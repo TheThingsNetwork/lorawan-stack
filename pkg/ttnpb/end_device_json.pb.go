@@ -13,6 +13,141 @@ import (
 	types1 "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+// MarshalProtoJSON marshals the PowerState to JSON.
+func (x PowerState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), PowerState_name)
+}
+
+// PowerState_customvalue contains custom string values that extend PowerState_value.
+var PowerState_customvalue = map[string]int32{
+	"UNKNOWN":  0,
+	"BATTERY":  1,
+	"EXTERNAL": 2,
+}
+
+// UnmarshalProtoJSON unmarshals the PowerState from JSON.
+func (x *PowerState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(PowerState_value, PowerState_customvalue)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read PowerState enum: %v", err)
+		return
+	}
+	*x = PowerState(v)
+}
+
+// MarshalProtoJSON marshals the Session message to JSON.
+func (x *Session) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_addr")
+		x.DevAddr.MarshalProtoJSON(s.WithField("dev_addr"))
+	}
+	if true { // (gogoproto.nullable) = false
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("keys")
+		// NOTE: SessionKeys does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, &x.SessionKeys)
+	}
+	if x.LastFCntUp != 0 || s.HasField("last_f_cnt_up") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("last_f_cnt_up")
+		s.WriteUint32(x.LastFCntUp)
+	}
+	if x.LastNFCntDown != 0 || s.HasField("last_n_f_cnt_down") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("last_n_f_cnt_down")
+		s.WriteUint32(x.LastNFCntDown)
+	}
+	if x.LastAFCntDown != 0 || s.HasField("last_a_f_cnt_down") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("last_a_f_cnt_down")
+		s.WriteUint32(x.LastAFCntDown)
+	}
+	if x.LastConfFCntDown != 0 || s.HasField("last_conf_f_cnt_down") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("last_conf_f_cnt_down")
+		s.WriteUint32(x.LastConfFCntDown)
+	}
+	if true { // (gogoproto.nullable) = false
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("started_at")
+		s.WriteTime(x.StartedAt)
+	}
+	if len(x.QueuedApplicationDownlinks) > 0 || s.HasField("queued_application_downlinks") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("queued_application_downlinks")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.QueuedApplicationDownlinks {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("queued_application_downlinks"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// UnmarshalProtoJSON unmarshals the Session message from JSON.
+func (x *Session) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "dev_addr", "devAddr":
+			s.AddField("dev_addr")
+			x.DevAddr.UnmarshalProtoJSON(s.WithField("dev_addr", false))
+		case "keys":
+			s.AddField("keys")
+			// NOTE: SessionKeys does not seem to implement UnmarshalProtoJSON.
+			var v SessionKeys
+			gogo.UnmarshalMessage(s, &v)
+			x.SessionKeys = v
+		case "last_f_cnt_up", "lastFCntUp":
+			s.AddField("last_f_cnt_up")
+			x.LastFCntUp = s.ReadUint32()
+		case "last_n_f_cnt_down", "lastNFCntDown":
+			s.AddField("last_n_f_cnt_down")
+			x.LastNFCntDown = s.ReadUint32()
+		case "last_a_f_cnt_down", "lastAFCntDown":
+			s.AddField("last_a_f_cnt_down")
+			x.LastAFCntDown = s.ReadUint32()
+		case "last_conf_f_cnt_down", "lastConfFCntDown":
+			s.AddField("last_conf_f_cnt_down")
+			x.LastConfFCntDown = s.ReadUint32()
+		case "started_at", "startedAt":
+			s.AddField("started_at")
+			v := s.ReadTime()
+			if s.Err() != nil {
+				return
+			}
+			x.StartedAt = *v
+		case "queued_application_downlinks", "queuedApplicationDownlinks":
+			s.AddField("queued_application_downlinks")
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.QueuedApplicationDownlinks = append(x.QueuedApplicationDownlinks, nil)
+					return
+				}
+				v := &ApplicationDownlink{}
+				v.UnmarshalProtoJSON(s.WithField("queued_application_downlinks", false))
+				if s.Err() != nil {
+					return
+				}
+				x.QueuedApplicationDownlinks = append(x.QueuedApplicationDownlinks, v)
+			})
+		}
+	})
+}
+
 // MarshalProtoJSON marshals the BoolValue message to JSON.
 func (x *BoolValue) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -32,6 +167,70 @@ func (x *BoolValue) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	return
 }
 
+// MarshalProtoJSON marshals the MACParameters_Channel message to JSON.
+func (x *MACParameters_Channel) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.UplinkFrequency != 0 || s.HasField("uplink_frequency") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("uplink_frequency")
+		s.WriteUint64(x.UplinkFrequency)
+	}
+	if x.DownlinkFrequency != 0 || s.HasField("downlink_frequency") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("downlink_frequency")
+		s.WriteUint64(x.DownlinkFrequency)
+	}
+	if x.MinDataRateIndex != 0 || s.HasField("min_data_rate_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("min_data_rate_index")
+		x.MinDataRateIndex.MarshalProtoJSON(s)
+	}
+	if x.MaxDataRateIndex != 0 || s.HasField("max_data_rate_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("max_data_rate_index")
+		x.MaxDataRateIndex.MarshalProtoJSON(s)
+	}
+	if x.EnableUplink || s.HasField("enable_uplink") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("enable_uplink")
+		s.WriteBool(x.EnableUplink)
+	}
+	s.WriteObjectEnd()
+}
+
+// UnmarshalProtoJSON unmarshals the MACParameters_Channel message from JSON.
+func (x *MACParameters_Channel) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "uplink_frequency", "uplinkFrequency":
+			s.AddField("uplink_frequency")
+			x.UplinkFrequency = s.ReadUint64()
+		case "downlink_frequency", "downlinkFrequency":
+			s.AddField("downlink_frequency")
+			x.DownlinkFrequency = s.ReadUint64()
+		case "min_data_rate_index", "minDataRateIndex":
+			s.AddField("min_data_rate_index")
+			x.MinDataRateIndex.UnmarshalProtoJSON(s)
+		case "max_data_rate_index", "maxDataRateIndex":
+			s.AddField("max_data_rate_index")
+			x.MaxDataRateIndex.UnmarshalProtoJSON(s)
+		case "enable_uplink", "enableUplink":
+			s.AddField("enable_uplink")
+			x.EnableUplink = s.ReadBool()
+		}
+	})
+}
+
 // MarshalProtoJSON marshals the MACParameters message to JSON.
 func (x *MACParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -48,7 +247,7 @@ func (x *MACParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.AdrDataRateIndex != 0 || s.HasField("adr_data_rate_index") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("adr_data_rate_index")
-		s.WriteEnum(int32(x.AdrDataRateIndex), DataRateIndex_name)
+		x.AdrDataRateIndex.MarshalProtoJSON(s)
 	}
 	if x.AdrTxPowerIndex != 0 || s.HasField("adr_tx_power_index") {
 		s.WriteMoreIf(&wroteField)
@@ -73,17 +272,17 @@ func (x *MACParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.Rx1Delay != 0 || s.HasField("rx1_delay") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("rx1_delay")
-		s.WriteEnum(int32(x.Rx1Delay), RxDelay_name)
+		x.Rx1Delay.MarshalProtoJSON(s)
 	}
 	if x.Rx1DataRateOffset != 0 || s.HasField("rx1_data_rate_offset") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("rx1_data_rate_offset")
-		s.WriteEnum(int32(x.Rx1DataRateOffset), DataRateOffset_name)
+		x.Rx1DataRateOffset.MarshalProtoJSON(s)
 	}
 	if x.Rx2DataRateIndex != 0 || s.HasField("rx2_data_rate_index") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("rx2_data_rate_index")
-		s.WriteEnum(int32(x.Rx2DataRateIndex), DataRateIndex_name)
+		x.Rx2DataRateIndex.MarshalProtoJSON(s)
 	}
 	if x.Rx2Frequency != 0 || s.HasField("rx2_frequency") {
 		s.WriteMoreIf(&wroteField)
@@ -93,17 +292,17 @@ func (x *MACParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.MaxDutyCycle != 0 || s.HasField("max_duty_cycle") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("max_duty_cycle")
-		s.WriteEnum(int32(x.MaxDutyCycle), AggregatedDutyCycle_name)
+		x.MaxDutyCycle.MarshalProtoJSON(s)
 	}
 	if x.RejoinTimePeriodicity != 0 || s.HasField("rejoin_time_periodicity") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("rejoin_time_periodicity")
-		s.WriteEnum(int32(x.RejoinTimePeriodicity), RejoinTimeExponent_name)
+		x.RejoinTimePeriodicity.MarshalProtoJSON(s)
 	}
 	if x.RejoinCountPeriodicity != 0 || s.HasField("rejoin_count_periodicity") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("rejoin_count_periodicity")
-		s.WriteEnum(int32(x.RejoinCountPeriodicity), RejoinCountExponent_name)
+		x.RejoinCountPeriodicity.MarshalProtoJSON(s)
 	}
 	if x.PingSlotFrequency != 0 || s.HasField("ping_slot_frequency") {
 		s.WriteMoreIf(&wroteField)
@@ -113,7 +312,7 @@ func (x *MACParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.PingSlotDataRateIndex != 0 || s.HasField("ping_slot_data_rate_index") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ping_slot_data_rate_index")
-		s.WriteEnum(int32(x.PingSlotDataRateIndex), DataRateIndex_name)
+		x.PingSlotDataRateIndex.MarshalProtoJSON(s)
 	}
 	if x.BeaconFrequency != 0 || s.HasField("beacon_frequency") {
 		s.WriteMoreIf(&wroteField)
@@ -127,8 +326,7 @@ func (x *MACParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		var wroteElement bool
 		for _, element := range x.Channels {
 			s.WriteMoreIf(&wroteElement)
-			// NOTE: MACParameters_Channel does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, element)
+			element.MarshalProtoJSON(s.WithField("channels"))
 		}
 		s.WriteArrayEnd()
 	}
@@ -174,7 +372,7 @@ func (x *MACParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.MaxEirp = s.ReadFloat32()
 		case "adr_data_rate_index", "adrDataRateIndex":
 			s.AddField("adr_data_rate_index")
-			x.AdrDataRateIndex = DataRateIndex(s.ReadEnum(DataRateIndex_value))
+			x.AdrDataRateIndex.UnmarshalProtoJSON(s)
 		case "adr_tx_power_index", "adrTxPowerIndex":
 			s.AddField("adr_tx_power_index")
 			x.AdrTxPowerIndex = s.ReadUint32()
@@ -189,41 +387,47 @@ func (x *MACParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.AdrAckDelay = s.ReadUint32()
 		case "rx1_delay", "rx1Delay":
 			s.AddField("rx1_delay")
-			x.Rx1Delay = RxDelay(s.ReadEnum(RxDelay_value))
+			x.Rx1Delay.UnmarshalProtoJSON(s)
 		case "rx1_data_rate_offset", "rx1DataRateOffset":
 			s.AddField("rx1_data_rate_offset")
-			x.Rx1DataRateOffset = DataRateOffset(s.ReadEnum(DataRateOffset_value))
+			x.Rx1DataRateOffset.UnmarshalProtoJSON(s)
 		case "rx2_data_rate_index", "rx2DataRateIndex":
 			s.AddField("rx2_data_rate_index")
-			x.Rx2DataRateIndex = DataRateIndex(s.ReadEnum(DataRateIndex_value))
+			x.Rx2DataRateIndex.UnmarshalProtoJSON(s)
 		case "rx2_frequency", "rx2Frequency":
 			s.AddField("rx2_frequency")
 			x.Rx2Frequency = s.ReadUint64()
 		case "max_duty_cycle", "maxDutyCycle":
 			s.AddField("max_duty_cycle")
-			x.MaxDutyCycle = AggregatedDutyCycle(s.ReadEnum(AggregatedDutyCycle_value))
+			x.MaxDutyCycle.UnmarshalProtoJSON(s)
 		case "rejoin_time_periodicity", "rejoinTimePeriodicity":
 			s.AddField("rejoin_time_periodicity")
-			x.RejoinTimePeriodicity = RejoinTimeExponent(s.ReadEnum(RejoinTimeExponent_value))
+			x.RejoinTimePeriodicity.UnmarshalProtoJSON(s)
 		case "rejoin_count_periodicity", "rejoinCountPeriodicity":
 			s.AddField("rejoin_count_periodicity")
-			x.RejoinCountPeriodicity = RejoinCountExponent(s.ReadEnum(RejoinCountExponent_value))
+			x.RejoinCountPeriodicity.UnmarshalProtoJSON(s)
 		case "ping_slot_frequency", "pingSlotFrequency":
 			s.AddField("ping_slot_frequency")
 			x.PingSlotFrequency = s.ReadUint64()
 		case "ping_slot_data_rate_index", "pingSlotDataRateIndex":
 			s.AddField("ping_slot_data_rate_index")
-			x.PingSlotDataRateIndex = DataRateIndex(s.ReadEnum(DataRateIndex_value))
+			x.PingSlotDataRateIndex.UnmarshalProtoJSON(s)
 		case "beacon_frequency", "beaconFrequency":
 			s.AddField("beacon_frequency")
 			x.BeaconFrequency = s.ReadUint64()
 		case "channels":
 			s.AddField("channels")
 			s.ReadArray(func() {
-				// NOTE: MACParameters_Channel does not seem to implement UnmarshalProtoJSON.
-				var v MACParameters_Channel
-				gogo.UnmarshalMessage(s, &v)
-				x.Channels = append(x.Channels, &v)
+				if s.ReadNil() {
+					x.Channels = append(x.Channels, nil)
+					return
+				}
+				v := &MACParameters_Channel{}
+				v.UnmarshalProtoJSON(s.WithField("channels", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Channels = append(x.Channels, v)
 			})
 		case "uplink_dwell_time", "uplinkDwellTime":
 			s.AddField("uplink_dwell_time")
@@ -276,12 +480,12 @@ func (x *EndDeviceVersion) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.LorawanVersion != 0 || s.HasField("lorawan_version") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("lorawan_version")
-		s.WriteEnum(int32(x.LorawanVersion), MACVersion_name)
+		x.LorawanVersion.MarshalProtoJSON(s)
 	}
 	if x.LorawanPhyVersion != 0 || s.HasField("lorawan_phy_version") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("lorawan_phy_version")
-		s.WriteEnum(int32(x.LorawanPhyVersion), PHYVersion_name)
+		x.LorawanPhyVersion.MarshalProtoJSON(s)
 	}
 	if x.FrequencyPlanId != "" || s.HasField("frequency_plan_id") {
 		s.WriteMoreIf(&wroteField)
@@ -331,8 +535,7 @@ func (x *EndDeviceVersion) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("default_formatters")
-		// NOTE: MessagePayloadFormatters does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.DefaultFormatters)
+		x.DefaultFormatters.MarshalProtoJSON(s.WithField("default_formatters"))
 	}
 	s.WriteObjectEnd()
 }
@@ -354,10 +557,10 @@ func (x *EndDeviceVersion) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.EndDeviceVersionIdentifiers = v
 		case "lorawan_version", "lorawanVersion":
 			s.AddField("lorawan_version")
-			x.LorawanVersion = MACVersion(s.ReadEnum(MACVersion_value))
+			x.LorawanVersion.UnmarshalProtoJSON(s)
 		case "lorawan_phy_version", "lorawanPhyVersion":
 			s.AddField("lorawan_phy_version")
-			x.LorawanPhyVersion = PHYVersion(s.ReadEnum(PHYVersion_value))
+			x.LorawanPhyVersion.UnmarshalProtoJSON(s)
 		case "frequency_plan_id", "frequencyPlanId":
 			s.AddField("frequency_plan_id")
 			x.FrequencyPlanId = s.ReadString()
@@ -388,11 +591,9 @@ func (x *EndDeviceVersion) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.AddField("resets_join_nonces")
 			x.ResetsJoinNonces = s.ReadBool()
 		case "default_formatters", "defaultFormatters":
-			s.AddField("default_formatters")
-			// NOTE: MessagePayloadFormatters does not seem to implement UnmarshalProtoJSON.
-			var v MessagePayloadFormatters
-			gogo.UnmarshalMessage(s, &v)
-			x.DefaultFormatters = v
+			if !s.ReadNil() {
+				x.DefaultFormatters.UnmarshalProtoJSON(s.WithField("default_formatters", true))
+			}
 		}
 	})
 }
@@ -782,6 +983,223 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// MarshalProtoJSON marshals the MACState_JoinRequest message to JSON.
+func (x *MACState_JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if true { // (gogoproto.nullable) = false
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("downlink_settings")
+		x.DownlinkSettings.MarshalProtoJSON(s.WithField("downlink_settings"))
+	}
+	if x.RxDelay != 0 || s.HasField("rx_delay") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rx_delay")
+		x.RxDelay.MarshalProtoJSON(s)
+	}
+	if x.CfList != nil || s.HasField("cf_list") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("cf_list")
+		x.CfList.MarshalProtoJSON(s.WithField("cf_list"))
+	}
+	s.WriteObjectEnd()
+}
+
+// UnmarshalProtoJSON unmarshals the MACState_JoinRequest message from JSON.
+func (x *MACState_JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "downlink_settings", "downlinkSettings":
+			if !s.ReadNil() {
+				x.DownlinkSettings.UnmarshalProtoJSON(s.WithField("downlink_settings", true))
+			}
+		case "rx_delay", "rxDelay":
+			s.AddField("rx_delay")
+			x.RxDelay.UnmarshalProtoJSON(s)
+		case "cf_list", "cfList":
+			if !s.ReadNil() {
+				x.CfList = &CFList{}
+				x.CfList.UnmarshalProtoJSON(s.WithField("cf_list", true))
+			}
+		}
+	})
+}
+
+// MarshalProtoJSON marshals the MACState_JoinAccept message to JSON.
+func (x *MACState_JoinAccept) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Payload) > 0 || s.HasField("payload") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("payload")
+		s.WriteBytes(x.Payload)
+	}
+	if true { // (gogoproto.nullable) = false
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("request")
+		x.Request.MarshalProtoJSON(s.WithField("request"))
+	}
+	if true { // (gogoproto.nullable) = false
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("keys")
+		// NOTE: SessionKeys does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, &x.Keys)
+	}
+	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("correlation_ids")
+		s.WriteStringArray(x.CorrelationIds)
+	}
+	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_addr")
+		x.DevAddr.MarshalProtoJSON(s.WithField("dev_addr"))
+	}
+	if len(x.NetId) > 0 || s.HasField("net_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("net_id")
+		x.NetId.MarshalProtoJSON(s.WithField("net_id"))
+	}
+	s.WriteObjectEnd()
+}
+
+// UnmarshalProtoJSON unmarshals the MACState_JoinAccept message from JSON.
+func (x *MACState_JoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "payload":
+			s.AddField("payload")
+			x.Payload = s.ReadBytes()
+		case "request":
+			if !s.ReadNil() {
+				x.Request.UnmarshalProtoJSON(s.WithField("request", true))
+			}
+		case "keys":
+			s.AddField("keys")
+			// NOTE: SessionKeys does not seem to implement UnmarshalProtoJSON.
+			var v SessionKeys
+			gogo.UnmarshalMessage(s, &v)
+			x.Keys = v
+		case "correlation_ids", "correlationIds":
+			s.AddField("correlation_ids")
+			x.CorrelationIds = s.ReadStringArray()
+		case "dev_addr", "devAddr":
+			s.AddField("dev_addr")
+			x.DevAddr.UnmarshalProtoJSON(s.WithField("dev_addr", false))
+		case "net_id", "netId":
+			s.AddField("net_id")
+			x.NetId.UnmarshalProtoJSON(s.WithField("net_id", false))
+		}
+	})
+}
+
+// MarshalProtoJSON marshals the MACState_DataRateRange message to JSON.
+func (x *MACState_DataRateRange) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.MinDataRateIndex != 0 || s.HasField("min_data_rate_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("min_data_rate_index")
+		x.MinDataRateIndex.MarshalProtoJSON(s)
+	}
+	if x.MaxDataRateIndex != 0 || s.HasField("max_data_rate_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("max_data_rate_index")
+		x.MaxDataRateIndex.MarshalProtoJSON(s)
+	}
+	s.WriteObjectEnd()
+}
+
+// UnmarshalProtoJSON unmarshals the MACState_DataRateRange message from JSON.
+func (x *MACState_DataRateRange) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "min_data_rate_index", "minDataRateIndex":
+			s.AddField("min_data_rate_index")
+			x.MinDataRateIndex.UnmarshalProtoJSON(s)
+		case "max_data_rate_index", "maxDataRateIndex":
+			s.AddField("max_data_rate_index")
+			x.MaxDataRateIndex.UnmarshalProtoJSON(s)
+		}
+	})
+}
+
+// MarshalProtoJSON marshals the MACState_DataRateRanges message to JSON.
+func (x *MACState_DataRateRanges) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Ranges) > 0 || s.HasField("ranges") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ranges")
+		s.WriteArrayStart()
+		var wroteElement bool
+		for _, element := range x.Ranges {
+			s.WriteMoreIf(&wroteElement)
+			element.MarshalProtoJSON(s.WithField("ranges"))
+		}
+		s.WriteArrayEnd()
+	}
+	s.WriteObjectEnd()
+}
+
+// UnmarshalProtoJSON unmarshals the MACState_DataRateRanges message from JSON.
+func (x *MACState_DataRateRanges) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "ranges":
+			s.AddField("ranges")
+			s.ReadArray(func() {
+				if s.ReadNil() {
+					x.Ranges = append(x.Ranges, nil)
+					return
+				}
+				v := &MACState_DataRateRange{}
+				v.UnmarshalProtoJSON(s.WithField("ranges", false))
+				if s.Err() != nil {
+					return
+				}
+				x.Ranges = append(x.Ranges, v)
+			})
+		}
+	})
+}
+
 // MarshalProtoJSON marshals the MACState message to JSON.
 func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -803,12 +1221,12 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.DeviceClass != 0 || s.HasField("device_class") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("device_class")
-		s.WriteEnum(int32(x.DeviceClass), Class_name)
+		x.DeviceClass.MarshalProtoJSON(s)
 	}
 	if x.LorawanVersion != 0 || s.HasField("lorawan_version") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("lorawan_version")
-		s.WriteEnum(int32(x.LorawanVersion), MACVersion_name)
+		x.LorawanVersion.MarshalProtoJSON(s)
 	}
 	if x.LastConfirmedDownlinkAt != nil || s.HasField("last_confirmed_downlink_at") {
 		s.WriteMoreIf(&wroteField)
@@ -832,8 +1250,7 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.PendingApplicationDownlink != nil || s.HasField("pending_application_downlink") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("pending_application_downlink")
-		// NOTE: ApplicationDownlink does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.PendingApplicationDownlink)
+		x.PendingApplicationDownlink.MarshalProtoJSON(s.WithField("pending_application_downlink"))
 	}
 	if len(x.QueuedResponses) > 0 || s.HasField("queued_responses") {
 		s.WriteMoreIf(&wroteField)
@@ -842,8 +1259,7 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		var wroteElement bool
 		for _, element := range x.QueuedResponses {
 			s.WriteMoreIf(&wroteElement)
-			// NOTE: MACCommand does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, element)
+			element.MarshalProtoJSON(s.WithField("queued_responses"))
 		}
 		s.WriteArrayEnd()
 	}
@@ -854,22 +1270,19 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		var wroteElement bool
 		for _, element := range x.PendingRequests {
 			s.WriteMoreIf(&wroteElement)
-			// NOTE: MACCommand does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, element)
+			element.MarshalProtoJSON(s.WithField("pending_requests"))
 		}
 		s.WriteArrayEnd()
 	}
 	if x.QueuedJoinAccept != nil || s.HasField("queued_join_accept") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("queued_join_accept")
-		// NOTE: MACState_JoinAccept does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.QueuedJoinAccept)
+		x.QueuedJoinAccept.MarshalProtoJSON(s.WithField("queued_join_accept"))
 	}
 	if x.PendingJoinRequest != nil || s.HasField("pending_join_request") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("pending_join_request")
-		// NOTE: MACState_JoinRequest does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.PendingJoinRequest)
+		x.PendingJoinRequest.MarshalProtoJSON(s.WithField("pending_join_request"))
 	}
 	if x.RxWindowsAvailable || s.HasField("rx_windows_available") {
 		s.WriteMoreIf(&wroteField)
@@ -883,8 +1296,7 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		var wroteElement bool
 		for _, element := range x.RecentUplinks {
 			s.WriteMoreIf(&wroteElement)
-			// NOTE: UplinkMessage does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, element)
+			element.MarshalProtoJSON(s.WithField("recent_uplinks"))
 		}
 		s.WriteArrayEnd()
 	}
@@ -895,8 +1307,7 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		var wroteElement bool
 		for _, element := range x.RecentDownlinks {
 			s.WriteMoreIf(&wroteElement)
-			// NOTE: DownlinkMessage does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, element)
+			element.MarshalProtoJSON(s.WithField("recent_downlinks"))
 		}
 		s.WriteArrayEnd()
 	}
@@ -916,7 +1327,7 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		var wroteElement bool
 		for _, element := range x.RejectedAdrDataRateIndexes {
 			s.WriteMoreIf(&wroteElement)
-			s.WriteEnum(int32(element), DataRateIndex_name)
+			element.MarshalProtoJSON(s)
 		}
 		s.WriteArrayEnd()
 	}
@@ -947,8 +1358,7 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		for k, v := range x.RejectedDataRateRanges {
 			s.WriteMoreIf(&wroteElement)
 			s.WriteObjectUint64Field(k)
-			// NOTE: MACState_DataRateRanges does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, v)
+			v.MarshalProtoJSON(s.WithField("rejected_data_rate_ranges"))
 		}
 		s.WriteObjectEnd()
 	}
@@ -979,10 +1389,10 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 		case "device_class", "deviceClass":
 			s.AddField("device_class")
-			x.DeviceClass = Class(s.ReadEnum(Class_value))
+			x.DeviceClass.UnmarshalProtoJSON(s)
 		case "lorawan_version", "lorawanVersion":
 			s.AddField("lorawan_version")
-			x.LorawanVersion = MACVersion(s.ReadEnum(MACVersion_value))
+			x.LorawanVersion.UnmarshalProtoJSON(s)
 		case "last_confirmed_downlink_at", "lastConfirmedDownlinkAt":
 			s.AddField("last_confirmed_downlink_at")
 			v := s.ReadTime()
@@ -1000,57 +1410,78 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.PingSlotPeriodicity.UnmarshalProtoJSON(s.WithField("ping_slot_periodicity", false))
 			}
 		case "pending_application_downlink", "pendingApplicationDownlink":
-			s.AddField("pending_application_downlink")
-			// NOTE: ApplicationDownlink does not seem to implement UnmarshalProtoJSON.
-			var v ApplicationDownlink
-			gogo.UnmarshalMessage(s, &v)
-			x.PendingApplicationDownlink = &v
+			if !s.ReadNil() {
+				x.PendingApplicationDownlink = &ApplicationDownlink{}
+				x.PendingApplicationDownlink.UnmarshalProtoJSON(s.WithField("pending_application_downlink", true))
+			}
 		case "queued_responses", "queuedResponses":
 			s.AddField("queued_responses")
 			s.ReadArray(func() {
-				// NOTE: MACCommand does not seem to implement UnmarshalProtoJSON.
-				var v MACCommand
-				gogo.UnmarshalMessage(s, &v)
-				x.QueuedResponses = append(x.QueuedResponses, &v)
+				if s.ReadNil() {
+					x.QueuedResponses = append(x.QueuedResponses, nil)
+					return
+				}
+				v := &MACCommand{}
+				v.UnmarshalProtoJSON(s.WithField("queued_responses", false))
+				if s.Err() != nil {
+					return
+				}
+				x.QueuedResponses = append(x.QueuedResponses, v)
 			})
 		case "pending_requests", "pendingRequests":
 			s.AddField("pending_requests")
 			s.ReadArray(func() {
-				// NOTE: MACCommand does not seem to implement UnmarshalProtoJSON.
-				var v MACCommand
-				gogo.UnmarshalMessage(s, &v)
-				x.PendingRequests = append(x.PendingRequests, &v)
+				if s.ReadNil() {
+					x.PendingRequests = append(x.PendingRequests, nil)
+					return
+				}
+				v := &MACCommand{}
+				v.UnmarshalProtoJSON(s.WithField("pending_requests", false))
+				if s.Err() != nil {
+					return
+				}
+				x.PendingRequests = append(x.PendingRequests, v)
 			})
 		case "queued_join_accept", "queuedJoinAccept":
-			s.AddField("queued_join_accept")
-			// NOTE: MACState_JoinAccept does not seem to implement UnmarshalProtoJSON.
-			var v MACState_JoinAccept
-			gogo.UnmarshalMessage(s, &v)
-			x.QueuedJoinAccept = &v
+			if !s.ReadNil() {
+				x.QueuedJoinAccept = &MACState_JoinAccept{}
+				x.QueuedJoinAccept.UnmarshalProtoJSON(s.WithField("queued_join_accept", true))
+			}
 		case "pending_join_request", "pendingJoinRequest":
-			s.AddField("pending_join_request")
-			// NOTE: MACState_JoinRequest does not seem to implement UnmarshalProtoJSON.
-			var v MACState_JoinRequest
-			gogo.UnmarshalMessage(s, &v)
-			x.PendingJoinRequest = &v
+			if !s.ReadNil() {
+				x.PendingJoinRequest = &MACState_JoinRequest{}
+				x.PendingJoinRequest.UnmarshalProtoJSON(s.WithField("pending_join_request", true))
+			}
 		case "rx_windows_available", "rxWindowsAvailable":
 			s.AddField("rx_windows_available")
 			x.RxWindowsAvailable = s.ReadBool()
 		case "recent_uplinks", "recentUplinks":
 			s.AddField("recent_uplinks")
 			s.ReadArray(func() {
-				// NOTE: UplinkMessage does not seem to implement UnmarshalProtoJSON.
-				var v UplinkMessage
-				gogo.UnmarshalMessage(s, &v)
-				x.RecentUplinks = append(x.RecentUplinks, &v)
+				if s.ReadNil() {
+					x.RecentUplinks = append(x.RecentUplinks, nil)
+					return
+				}
+				v := &UplinkMessage{}
+				v.UnmarshalProtoJSON(s.WithField("recent_uplinks", false))
+				if s.Err() != nil {
+					return
+				}
+				x.RecentUplinks = append(x.RecentUplinks, v)
 			})
 		case "recent_downlinks", "recentDownlinks":
 			s.AddField("recent_downlinks")
 			s.ReadArray(func() {
-				// NOTE: DownlinkMessage does not seem to implement UnmarshalProtoJSON.
-				var v DownlinkMessage
-				gogo.UnmarshalMessage(s, &v)
-				x.RecentDownlinks = append(x.RecentDownlinks, &v)
+				if s.ReadNil() {
+					x.RecentDownlinks = append(x.RecentDownlinks, nil)
+					return
+				}
+				v := &DownlinkMessage{}
+				v.UnmarshalProtoJSON(s.WithField("recent_downlinks", false))
+				if s.Err() != nil {
+					return
+				}
+				x.RecentDownlinks = append(x.RecentDownlinks, v)
 			})
 		case "last_network_initiated_downlink_at", "lastNetworkInitiatedDownlinkAt":
 			s.AddField("last_network_initiated_downlink_at")
@@ -1062,7 +1493,9 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "rejected_adr_data_rate_indexes", "rejectedAdrDataRateIndexes":
 			s.AddField("rejected_adr_data_rate_indexes")
 			s.ReadArray(func() {
-				x.RejectedAdrDataRateIndexes = append(x.RejectedAdrDataRateIndexes, DataRateIndex(s.ReadEnum(DataRateIndex_value)))
+				var v DataRateIndex
+				v.UnmarshalProtoJSON(s)
+				x.RejectedAdrDataRateIndexes = append(x.RejectedAdrDataRateIndexes, v)
 			})
 		case "rejected_adr_tx_power_indexes", "rejectedAdrTxPowerIndexes":
 			s.AddField("rejected_adr_tx_power_indexes")
@@ -1081,9 +1514,8 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.AddField("rejected_data_rate_ranges")
 			x.RejectedDataRateRanges = make(map[uint64]*MACState_DataRateRanges)
 			s.ReadUint64Map(func(key uint64) {
-				// NOTE: MACState_DataRateRanges does not seem to implement UnmarshalProtoJSON.
 				var v MACState_DataRateRanges
-				gogo.UnmarshalMessage(s, &v)
+				v.UnmarshalProtoJSON(s)
 				x.RejectedDataRateRanges[key] = &v
 			})
 		case "last_adr_change_f_cnt_up", "lastAdrChangeFCntUp":
@@ -1188,8 +1620,7 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		for k, v := range x.Locations {
 			s.WriteMoreIf(&wroteElement)
 			s.WriteObjectStringField(k)
-			// NOTE: Location does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, v)
+			v.MarshalProtoJSON(s.WithField("locations"))
 		}
 		s.WriteObjectEnd()
 	}
@@ -1212,12 +1643,12 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.LorawanVersion != 0 || s.HasField("lorawan_version") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("lorawan_version")
-		s.WriteEnum(int32(x.LorawanVersion), MACVersion_name)
+		x.LorawanVersion.MarshalProtoJSON(s)
 	}
 	if x.LorawanPhyVersion != 0 || s.HasField("lorawan_phy_version") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("lorawan_phy_version")
-		s.WriteEnum(int32(x.LorawanPhyVersion), PHYVersion_name)
+		x.LorawanPhyVersion.MarshalProtoJSON(s)
 	}
 	if x.FrequencyPlanId != "" || s.HasField("frequency_plan_id") {
 		s.WriteMoreIf(&wroteField)
@@ -1273,14 +1704,12 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.Session != nil || s.HasField("session") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("session")
-		// NOTE: Session does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Session)
+		x.Session.MarshalProtoJSON(s.WithField("session"))
 	}
 	if x.PendingSession != nil || s.HasField("pending_session") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("pending_session")
-		// NOTE: Session does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.PendingSession)
+		x.PendingSession.MarshalProtoJSON(s.WithField("pending_session"))
 	}
 	if x.LastDevNonce != 0 || s.HasField("last_dev_nonce") {
 		s.WriteMoreIf(&wroteField)
@@ -1319,7 +1748,7 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x.PowerState != 0 || s.HasField("power_state") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("power_state")
-		s.WriteEnum(int32(x.PowerState), PowerState_name)
+		x.PowerState.MarshalProtoJSON(s)
 	}
 	if x.BatteryPercentage != nil || s.HasField("battery_percentage") {
 		s.WriteMoreIf(&wroteField)
@@ -1342,16 +1771,14 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		var wroteElement bool
 		for _, element := range x.QueuedApplicationDownlinks {
 			s.WriteMoreIf(&wroteElement)
-			// NOTE: ApplicationDownlink does not seem to implement MarshalProtoJSON.
-			gogo.MarshalMessage(s, element)
+			element.MarshalProtoJSON(s.WithField("queued_application_downlinks"))
 		}
 		s.WriteArrayEnd()
 	}
 	if x.Formatters != nil || s.HasField("formatters") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("formatters")
-		// NOTE: MessagePayloadFormatters does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Formatters)
+		x.Formatters.MarshalProtoJSON(s.WithField("formatters"))
 	}
 	if x.ProvisionerId != "" || s.HasField("provisioner_id") {
 		s.WriteMoreIf(&wroteField)
@@ -1476,9 +1903,8 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.AddField("locations")
 			x.Locations = make(map[string]*Location)
 			s.ReadStringMap(func(key string) {
-				// NOTE: Location does not seem to implement UnmarshalProtoJSON.
 				var v Location
-				gogo.UnmarshalMessage(s, &v)
+				v.UnmarshalProtoJSON(s)
 				x.Locations[key] = &v
 			})
 		case "picture":
@@ -1495,10 +1921,10 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.SupportsClassC = s.ReadBool()
 		case "lorawan_version", "lorawanVersion":
 			s.AddField("lorawan_version")
-			x.LorawanVersion = MACVersion(s.ReadEnum(MACVersion_value))
+			x.LorawanVersion.UnmarshalProtoJSON(s)
 		case "lorawan_phy_version", "lorawanPhyVersion":
 			s.AddField("lorawan_phy_version")
-			x.LorawanPhyVersion = PHYVersion(s.ReadEnum(PHYVersion_value))
+			x.LorawanPhyVersion.UnmarshalProtoJSON(s)
 		case "frequency_plan_id", "frequencyPlanId":
 			s.AddField("frequency_plan_id")
 			x.FrequencyPlanId = s.ReadString()
@@ -1542,17 +1968,15 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.PendingMacState.UnmarshalProtoJSON(s.WithField("pending_mac_state", true))
 			}
 		case "session":
-			s.AddField("session")
-			// NOTE: Session does not seem to implement UnmarshalProtoJSON.
-			var v Session
-			gogo.UnmarshalMessage(s, &v)
-			x.Session = &v
+			if !s.ReadNil() {
+				x.Session = &Session{}
+				x.Session.UnmarshalProtoJSON(s.WithField("session", true))
+			}
 		case "pending_session", "pendingSession":
-			s.AddField("pending_session")
-			// NOTE: Session does not seem to implement UnmarshalProtoJSON.
-			var v Session
-			gogo.UnmarshalMessage(s, &v)
-			x.PendingSession = &v
+			if !s.ReadNil() {
+				x.PendingSession = &Session{}
+				x.PendingSession.UnmarshalProtoJSON(s.WithField("pending_session", true))
+			}
 		case "last_dev_nonce", "lastDevNonce":
 			s.AddField("last_dev_nonce")
 			x.LastDevNonce = s.ReadUint32()
@@ -1577,7 +2001,7 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.LastDevStatusReceivedAt = v
 		case "power_state", "powerState":
 			s.AddField("power_state")
-			x.PowerState = PowerState(s.ReadEnum(PowerState_value))
+			x.PowerState.UnmarshalProtoJSON(s)
 		case "battery_percentage", "batteryPercentage":
 			s.AddField("battery_percentage")
 			if !s.ReadNil() {
@@ -1593,17 +2017,22 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "queued_application_downlinks", "queuedApplicationDownlinks":
 			s.AddField("queued_application_downlinks")
 			s.ReadArray(func() {
-				// NOTE: ApplicationDownlink does not seem to implement UnmarshalProtoJSON.
-				var v ApplicationDownlink
-				gogo.UnmarshalMessage(s, &v)
-				x.QueuedApplicationDownlinks = append(x.QueuedApplicationDownlinks, &v)
+				if s.ReadNil() {
+					x.QueuedApplicationDownlinks = append(x.QueuedApplicationDownlinks, nil)
+					return
+				}
+				v := &ApplicationDownlink{}
+				v.UnmarshalProtoJSON(s.WithField("queued_application_downlinks", false))
+				if s.Err() != nil {
+					return
+				}
+				x.QueuedApplicationDownlinks = append(x.QueuedApplicationDownlinks, v)
 			})
 		case "formatters":
-			s.AddField("formatters")
-			// NOTE: MessagePayloadFormatters does not seem to implement UnmarshalProtoJSON.
-			var v MessagePayloadFormatters
-			gogo.UnmarshalMessage(s, &v)
-			x.Formatters = &v
+			if !s.ReadNil() {
+				x.Formatters = &MessagePayloadFormatters{}
+				x.Formatters.UnmarshalProtoJSON(s.WithField("formatters", true))
+			}
 		case "provisioner_id", "provisionerId":
 			s.AddField("provisioner_id")
 			x.ProvisionerId = s.ReadString()

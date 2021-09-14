@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
@@ -159,6 +160,8 @@ message TxAcknowledgment {
   repeated string correlation_ids = 1 [(validate.rules).repeated.items.string.max_len = 100];
 
   enum Result {
+    option (thethings.json.enum) = { marshal_as_string: true };
+
     SUCCESS = 0;
     UNKNOWN_ERROR = 1;
     TOO_LATE = 2;
@@ -380,6 +383,8 @@ message ApplicationUp {
 }
 
 enum PayloadFormatter {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "FORMATTER" };
+
   // No payload formatter to work with raw payload only.
   FORMATTER_NONE = 0;
   // Use payload formatter for the end device type from a repository.

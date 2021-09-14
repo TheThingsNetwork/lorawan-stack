@@ -57,6 +57,7 @@ message Message {
 }
 
 enum MType {
+  option (thethings.json.enum) = { marshal_as_string: true };
   JOIN_REQUEST = 0;
   JOIN_ACCEPT = 1;
   UNCONFIRMED_UP = 2;
@@ -68,10 +69,12 @@ enum MType {
 }
 
 enum Major {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "LORAWAN" };
   LORAWAN_R1 = 0;
 }
 
 enum MACVersion {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "MAC" };
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_stringer) = false;
 
@@ -85,19 +88,20 @@ enum MACVersion {
 }
 
 enum PHYVersion {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "PHY" };
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_stringer) = false;
 
-  PHY_UNKNOWN = 0;
+  PHY_UNKNOWN = 0 [(thethings.json.enum_value) = { value: "unknown" }];
 
-  TS001_V1_0 = 1;
-  TS001_V1_0_1 = 2;
+  TS001_V1_0 = 1 [(thethings.json.enum_value) = { value: "PHY_V1_0", aliases: ["1.0","1.0.0"] }];
+  TS001_V1_0_1 = 2 [(thethings.json.enum_value) = { value: "PHY_V1_0_1", aliases: ["1.0.1"] }];
 
-  RP001_V1_0_2 = 3;
-  RP001_V1_0_2_REV_B = 4;
-  RP001_V1_1_REV_A = 5;
-  RP001_V1_1_REV_B = 6;
-  RP001_V1_0_3_REV_A = 7;
+  RP001_V1_0_2 = 3 [(thethings.json.enum_value) = { value: "PHY_V1_0_2_REV_A", aliases: ["1.0.2", "1.0.2-a"] }];
+  RP001_V1_0_2_REV_B = 4 [(thethings.json.enum_value) = { value: "PHY_V1_0_2_REV_B", aliases: ["1.0.2-b"] }];
+  RP001_V1_1_REV_A = 5 [(thethings.json.enum_value) = { value: "PHY_V1_1_REV_A", aliases: ["1.1-a", "1.1.0-a"] }];
+  RP001_V1_1_REV_B = 6 [(thethings.json.enum_value) = { value: "PHY_V1_1_REV_B", aliases: ["1.1-b", "1.1.0-b"] }];
+  RP001_V1_0_3_REV_A = 7 [(thethings.json.enum_value) = { value: "PHY_V1_0_3_REV_A", aliases: ["1.0.3-a"] }];
 
   RP002_V1_0_0 = 8;
   RP002_V1_0_1 = 9;
@@ -106,6 +110,7 @@ enum PHYVersion {
 }
 
 enum DataRateIndex {
+  option (thethings.json.enum) = { marshal_as_number: true, prefix: "DATA_RATE" };
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_stringer) = false;
 
@@ -128,6 +133,7 @@ enum DataRateIndex {
 }
 
 enum DataRateOffset {
+  option (thethings.json.enum) = { marshal_as_number: true, prefix: "DATA_RATE_OFFSET" };
   option (gogoproto.enum_stringer) = false;
 
   DATA_RATE_OFFSET_0 = 0;
@@ -180,6 +186,8 @@ message JoinRequestPayload {
 }
 
 enum JoinRequestType {
+  option (thethings.json.enum) = { marshal_as_string: true };
+
   REJOIN_CONTEXT = 0; // Resets DevAddr, Session Keys, Frame Counters, Radio Parameters.
   REJOIN_SESSION = 1; // Equivalent to the initial JoinRequest.
   REJOIN_KEYS = 2; // Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters.
@@ -187,6 +195,8 @@ enum JoinRequestType {
 }
 
 enum RejoinRequestType {
+  option (thethings.json.enum) = { marshal_as_string: true };
+
   CONTEXT = 0; // Resets DevAddr, Session Keys, Frame Counters, Radio Parameters.
   SESSION = 1; // Equivalent to the initial JoinRequest.
   KEYS = 2; // Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters.
@@ -218,6 +228,8 @@ message DLSettings {
 }
 
 enum CFListType {
+  option (thethings.json.enum) = { marshal_as_string: true };
+
   FREQUENCIES = 0;
   CHANNEL_MASKS = 1;
 }
@@ -235,6 +247,7 @@ message CFList {
 }
 
 enum Class {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "CLASS" };
   option (gogoproto.goproto_enum_prefix) = false;
   CLASS_A = 0;
   CLASS_B = 1;
@@ -242,6 +255,7 @@ enum Class {
 }
 
 enum TxSchedulePriority {
+  option (thethings.json.enum) = { marshal_as_string: true };
   LOWEST = 0;
   LOW = 1;
   BELOW_NORMAL = 2;
@@ -383,6 +397,7 @@ message TxRequest {
 }
 
 enum MACCommandIdentifier {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "CID" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   CID_RFU_0 = 0;
@@ -598,6 +613,7 @@ message MACCommand {
 }
 
 enum AggregatedDutyCycle {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "DUTY_CYCLE" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   DUTY_CYCLE_1 = 0;      // 100%.
@@ -619,6 +635,7 @@ enum AggregatedDutyCycle {
 }
 
 enum PingSlotPeriod {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "PING_EVERY" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   PING_EVERY_1S = 0;   // Every second.
@@ -632,6 +649,7 @@ enum PingSlotPeriod {
 }
 
 enum RejoinCountExponent {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "REJOIN_COUNT" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   REJOIN_COUNT_16 = 0;
@@ -653,6 +671,7 @@ enum RejoinCountExponent {
 }
 
 enum RejoinTimeExponent {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "REJOIN_TIME" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   REJOIN_TIME_0 = 0;   // Every ~17.1 minutes.
@@ -674,6 +693,7 @@ enum RejoinTimeExponent {
 }
 
 enum RejoinPeriodExponent {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "REJOIN_PERIOD" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   REJOIN_PERIOD_0 = 0; // Every 32 to 64 seconds.
@@ -687,6 +707,7 @@ enum RejoinPeriodExponent {
 }
 
 enum DeviceEIRP {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "DEVICE_EIRP" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   DEVICE_EIRP_8 = 0;   // 8 dBm.
@@ -708,6 +729,7 @@ enum DeviceEIRP {
 }
 
 enum ADRAckLimitExponent {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "ADR_ACK_LIMIT" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   ADR_ACK_LIMIT_1 = 0;
@@ -729,6 +751,7 @@ enum ADRAckLimitExponent {
 }
 
 enum ADRAckDelayExponent {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "ADR_ACK_DELAY" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   ADR_ACK_DELAY_1 = 0;
@@ -750,6 +773,7 @@ enum ADRAckDelayExponent {
 }
 
 enum RxDelay {
+  option (thethings.json.enum) = { marshal_as_number: true, prefix: "RX_DELAY" };
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_stringer) = false;
 
@@ -772,6 +796,7 @@ enum RxDelay {
 }
 
 enum Minor {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "MINOR" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   MINOR_RFU_0 = 0;

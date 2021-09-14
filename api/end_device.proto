@@ -378,6 +378,7 @@ message MACState {
 
 // Power state of the device.
 enum PowerState {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "POWER" };
   POWER_UNKNOWN = 0;
   POWER_BATTERY = 1;
   POWER_EXTERNAL = 2;

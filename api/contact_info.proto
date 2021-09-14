@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
@@ -35,6 +36,7 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.stringer_all) = true;
 
 enum ContactType {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "CONTACT_TYPE" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   CONTACT_TYPE_OTHER = 0;
@@ -44,6 +46,7 @@ enum ContactType {
 }
 
 enum ContactMethod {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "CONTACT_METHOD" };
   option (gogoproto.goproto_enum_prefix) = false;
 
   CONTACT_METHOD_OTHER = 0;
