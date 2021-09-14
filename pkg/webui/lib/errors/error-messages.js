@@ -16,9 +16,10 @@ import { defineMessages } from 'react-intl'
 
 export default defineMessages({
   // Keep these sorted alphabetically.
-  additionalInformation: 'Additional Information',
-  attachToSupportInquiries: 'Please attach the additional information below to support inquiries',
-  contactAdministrator: 'If the error persists after refreshing, please contact an administrator.',
+  technicalDetails: 'Technical details',
+  attachToSupportInquiries: 'Please attach the technical details below to support inquiries',
+  contactAdministrator: 'If the error persists, please contact an administrator.',
+  contactSupport: 'If the error persists, please contact support.',
   inconvenience: "We're sorry for the inconvenience.",
   error: 'Error',
   genericError: 'An unknown error occurred. Please try again later.',
@@ -26,4 +27,10 @@ export default defineMessages({
   subviewErrorExplanation: 'There was a problem when displaying this section',
   subviewErrorTitle: "We're sorry!",
   unknownErrorTitle: 'An unknown error occurred',
+  errorOccurred: 'An error occurred and the request could not be completed.',
+  errorId: 'Error ID: <code>{errorId}</code>',
+  correlationId: 'Correlation ID: <code>{correlationId}</code>',
+  loginFailed: 'Login failed',
+  loginFailedDescription:
+    'There was an error causing the login to fail. This might be due to server-side misconfiguration or a browser-cookie problem. Please try logging in again.',
 })
