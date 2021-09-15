@@ -113,6 +113,7 @@ class FetchTable extends Component {
     pathname: PropTypes.string.isRequired,
     searchItemsAction: PropTypes.func,
     searchPlaceholderMessage: PropTypes.message,
+    searchQueryMaxLength: PropTypes.number,
     searchable: PropTypes.bool,
     tableTitle: PropTypes.message,
     tabs: PropTypes.arrayOf(
@@ -135,6 +136,7 @@ class FetchTable extends Component {
     mayAdd: false,
     searchable: false,
     searchPlaceholderMessage: sharedMessages.searchById,
+    searchQueryMaxLength: 50,
     handlesPagination: false,
     fetching: false,
     totalCount: 0,
@@ -308,6 +310,7 @@ class FetchTable extends Component {
       entity,
       error,
       searchPlaceholderMessage,
+      searchQueryMaxLength,
       clickable,
     } = this.props
     const { page, query, tab, order, initialFetch } = this.state
@@ -353,6 +356,7 @@ class FetchTable extends Component {
                 placeholder={searchPlaceholderMessage}
                 className={style.searchBar}
                 inputWidth="full"
+                maxlength={searchQueryMaxLength}
               />
             )}
             {(Boolean(actionItems) || mayAdd) && (
