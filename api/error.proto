@@ -34,8 +34,6 @@ option (gogoproto.stringer_all) = true;
 // Error details that are communicated over gRPC (and HTTP) APIs.
 // The messages (for translation) are stored as "error:<namespace>:<name>".
 message ErrorDetails {
-  option (gogoproto.populate) = true;
-
   // Namespace of the error (typically the package name in The Things Stack).
   string namespace = 1;
   // Name of the error.
