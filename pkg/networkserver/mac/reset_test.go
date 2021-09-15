@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -61,8 +62,8 @@ func TestHandleResetInd(t *testing.T) {
 				SupportsJoin:      false,
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
-					DesiredParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
+					CurrentParameters: genMACParameters(),
+					DesiredParameters: genMACParameters(),
 					QueuedResponses:   []*ttnpb.MACCommand{},
 				},
 			},
@@ -106,8 +107,8 @@ func TestHandleResetInd(t *testing.T) {
 				SupportsJoin:      false,
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
-					DesiredParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
+					CurrentParameters: genMACParameters(),
+					DesiredParameters: genMACParameters(),
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
 						{},
@@ -164,5 +165,32 @@ func TestHandleResetInd(t *testing.T) {
 				a.So(evs, should.ResembleEventBuilders, tc.Events)
 			},
 		})
+	}
+}
+
+func genMACParameters() ttnpb.MACParameters {
+	randomVal := random.Intn(100)
+	channels := make([]*ttnpb.MACParameters_Channel, randomVal%16)
+	for i := range channels {
+		channels[i] = &ttnpb.MACParameters_Channel{
+			MinDataRateIndex:  ttnpb.DataRateIndex(randomVal % 5),
+			MaxDataRateIndex:  ttnpb.DataRateIndex(randomVal % 16),
+			UplinkFrequency:   uint64((randomVal + i) * 1000000000),
+			DownlinkFrequency: uint64((randomVal + i) * 1000000000),
+		}
+	}
+	return ttnpb.MACParameters{
+		MaxEirp:           float32(randomVal),
+		AdrDataRateIndex:  ttnpb.DataRateIndex(randomVal % 16),
+		AdrTxPowerIndex:   uint32(randomVal % 16),
+		AdrNbTrans:        uint32(1 + randomVal%15),
+		MaxDutyCycle:      ttnpb.AggregatedDutyCycle(randomVal % 16),
+		Channels:          channels,
+		Rx1Delay:          5,
+		Rx1DataRateOffset: 2,
+		Rx2DataRateIndex:  2,
+		Rx2Frequency:      868100000,
+		BeaconFrequency:   869525000,
+		PingSlotFrequency: 869525000,
 	}
 }

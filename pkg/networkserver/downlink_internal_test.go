@@ -16,6 +16,7 @@ package networkserver
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"math"
 	"testing"
@@ -34,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -169,7 +171,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 					}},
 				},
-				Session:           ttnpb.NewPopulatedSession(test.Randy, false),
+				Session:           generateSession(),
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				FrequencyPlanId:   band.EU_863_870,
 			},
@@ -232,7 +234,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				LorawanPhyVersion:       ttnpb.RP001_V1_1_REV_B,
 				FrequencyPlanId:         band.EU_863_870,
 				LastDevStatusReceivedAt: TimePtr(time.Now()),
-				Session:                 ttnpb.NewPopulatedSession(test.Randy, false),
+				Session:                 generateSession(),
 			},
 			Error: errNoDownlink,
 		},
@@ -1121,5 +1123,49 @@ func TestGenerateDataDownlink(t *testing.T) {
 				}
 			},
 		})
+	}
+}
+
+func generateSession() *ttnpb.Session {
+	randomVal := uint32(random.Intn(100))
+	var key types.AES128Key
+	rand.Read(key[:])
+	keys := ttnpb.SessionKeys{
+		SessionKeyId: []byte{0x01, 0x02, 0x03, 0x04},
+		FNwkSIntKey: &ttnpb.KeyEnvelope{
+			KekLabel: "FNwkSIntKey",
+			Key:      &key,
+		},
+		SNwkSIntKey: &ttnpb.KeyEnvelope{
+			KekLabel: "SNwkSIntKey",
+			Key:      &key,
+		},
+		NwkSEncKey: &ttnpb.KeyEnvelope{
+			KekLabel: "NwkSEncKey",
+			Key:      &key,
+		},
+		AppSKey: &ttnpb.KeyEnvelope{
+			KekLabel: "AppSKey",
+			Key:      &key,
+		},
+	}
+	queuedDownlinks := make([]*ttnpb.ApplicationDownlink, randomVal%5)
+	for i := range queuedDownlinks {
+		payload := make([]byte, randomVal%5)
+		rand.Read(payload[:])
+		queuedDownlinks[i] = &ttnpb.ApplicationDownlink{
+			FPort:      uint32(i + 1),
+			FCnt:       randomVal + uint32(i),
+			FrmPayload: payload,
+		}
+	}
+	return &ttnpb.Session{
+		DevAddr:                    types.DevAddr{0x26, 0x01, 0xff, 0xff},
+		SessionKeys:                keys,
+		LastFCntUp:                 randomVal,
+		LastNFCntDown:              randomVal,
+		LastAFCntDown:              randomVal,
+		StartedAt:                  time.Now(),
+		QueuedApplicationDownlinks: queuedDownlinks,
 	}
 }
