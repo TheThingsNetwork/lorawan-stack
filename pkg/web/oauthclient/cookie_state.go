@@ -17,7 +17,6 @@ package oauthclient
 import (
 	"encoding/gob"
 	"net/http"
-	"time"
 
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
