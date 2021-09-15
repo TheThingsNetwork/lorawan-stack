@@ -23,14 +23,16 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	_ "go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/v3/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/datarate"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -50,29 +52,25 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 		}
 	}
 	for i, t := range timestamps {
-		up := ttnpb.NewPopulatedUplinkMessage(test.Randy, true)
-		var modulation, codr string
-		switch up.Settings.DataRate.Modulation.(type) {
-		case *ttnpb.DataRate_Lora:
-			modulation = "LORA"
-			codr = up.Settings.CodingRate
-		case *ttnpb.DataRate_Fsk:
-			modulation = "FSK"
-		case *ttnpb.DataRate_Lrfhss:
-			modulation = "LR-FHSS"
-			codr = up.Settings.CodingRate
-		}
+		rawPayload := randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, i)
 		abs := encoding.CompactTime(time.Unix(0, 0).Add(t))
 		packet.Data.RxPacket[i] = &encoding.RxPacket{
-			Freq: float64(up.Settings.Frequency) / 1000000,
-			Chan: uint8(up.RxMetadata[0].ChannelIndex),
-			Modu: modulation,
-			CodR: codr,
+			Freq: 868.1,
+			Chan: 2,
+			Modu: "LORA",
+			CodR: "4/5",
 			DatR: datarate.DR{
-				DataRate: up.Settings.DataRate,
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
+							SpreadingFactor: 7,
+							Bandwidth:       125000,
+						},
+					},
+				},
 			},
-			Size: uint16(len(up.RawPayload)),
-			Data: base64.StdEncoding.EncodeToString(up.RawPayload),
+			Size: uint16(len(rawPayload)),
+			Data: base64.StdEncoding.EncodeToString(rawPayload),
 			Tmst: uint32(t / time.Microsecond),
 			Time: &abs,
 		}
@@ -157,4 +155,46 @@ func expectConnection(t *testing.T, server mock.Server, connections *sync.Map, e
 		}
 	}
 	return conn
+}
+
+func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
+	var fNwkSIntKey, sNwkSIntKey, appSKey types.AES128Key
+	random.Read(fNwkSIntKey[:])
+	random.Read(sNwkSIntKey[:])
+	random.Read(appSKey[:])
+
+	pld := &ttnpb.MACPayload{
+		FHDR: ttnpb.FHDR{
+			DevAddr: devAddr,
+			FCnt:    42,
+		},
+		FPort:      fPort,
+		FrmPayload: random.Bytes(size),
+	}
+	buf, err := crypto.EncryptUplink(appSKey, devAddr, pld.FCnt, pld.FrmPayload, false)
+	if err != nil {
+		panic(err)
+	}
+	pld.FrmPayload = buf
+
+	msg := &ttnpb.UplinkMessage{
+		Payload: &ttnpb.Message{
+			MHDR: ttnpb.MHDR{
+				MType: ttnpb.MType_UNCONFIRMED_UP,
+				Major: ttnpb.Major_LORAWAN_R1,
+			},
+			Payload: &ttnpb.Message_MacPayload{
+				MacPayload: pld,
+			},
+		},
+	}
+	buf, err = lorawan.MarshalMessage(*msg.Payload)
+	if err != nil {
+		panic(err)
+	}
+	mic, err := crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, 0, 5, 0, devAddr, pld.FCnt, buf)
+	if err != nil {
+		panic(err)
+	}
+	return append(buf, mic[:]...)
 }
