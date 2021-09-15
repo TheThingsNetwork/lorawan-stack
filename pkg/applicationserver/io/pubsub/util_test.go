@@ -52,8 +52,6 @@ var (
 	}
 	registeredPubSubID = "foo-integration"
 
-	keys = ttnpb.NewPopulatedSessionKeys(test.Randy, false)
-
 	timeout = (1 << 8) * test.Delay
 )
 
