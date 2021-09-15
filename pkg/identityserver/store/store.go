@@ -241,6 +241,7 @@ func Transact(ctx context.Context, db *gorm.DB, f func(db *gorm.DB) error) (err 
 			} else {
 				err = ErrTransactionRecovered.WithAttributes("panic", p)
 			}
+			log.FromContext(ctx).WithError(err).Error("Transaction panicked")
 		}
 		if err != nil {
 			tx.Rollback()
