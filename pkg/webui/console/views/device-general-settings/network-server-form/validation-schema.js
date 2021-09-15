@@ -171,16 +171,20 @@ const validationSchema = Yup.object()
             }
             return Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
           }),
-          ping_slot_periodicity: Yup.lazy(() => {
-            if (!isClassB && mode !== ACTIVATION_MODES.MULTICAST) {
-              return Yup.string().strip()
-            }
+          ping_slot_periodicity: Yup.lazy(value => {
+            if (isClassB) {
+              if (mode === ACTIVATION_MODES.MULTICAST || mode === ACTIVATION_MODES.ABP) {
+                return Yup.string().required(sharedMessages.validateRequired)
+              }
 
-            if (mode !== ACTIVATION_MODES.MULTICAST) {
+              if (!value) {
+                return Yup.string().strip()
+              }
+
               return Yup.string()
             }
 
-            return Yup.string().required(sharedMessages.validateRequired)
+            return Yup.string().strip()
           }),
           ping_slot_frequency: Yup.lazy(frequency => {
             if (!Boolean(frequency) || !isClassB) {
