@@ -87,22 +87,30 @@ const idsSchema = Yup.object({
 
 const rootKeysSchema = Yup.object({
   root_keys: Yup.object().when(
-    ['lorawan_version', '$mayEditKeys', '_activation_mode'],
-    (version, mayEditKeys, mode, schema) => {
-      if (!mayEditKeys || mode !== ACTIVATION_MODES.OTAA) {
+    [
+      'lorawan_version',
+      '$mayEditKeys',
+      '_activation_mode',
+      '$jsEnabled',
+      '$jsUrl',
+      'join_server_address',
+    ],
+    (version, mayEditKeys, mode, jsEnabled, jsUrl, jsHost, schema) => {
+      if (
+        !jsEnabled ||
+        !mayEditKeys ||
+        mode !== ACTIVATION_MODES.OTAA ||
+        getHostFromUrl(jsUrl) !== jsHost
+      ) {
         return schema.strip()
       }
 
       const strippedSchema = Yup.object().strip()
-      const keySchema = Yup.lazy(() =>
-        mayEditKeys
-          ? Yup.object().shape({
-              key: Yup.string()
-                .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-                .required(sharedMessages.validateRequired),
-            })
-          : Yup.object().strip(),
-      )
+      const keySchema = Yup.object().shape({
+        key: Yup.string()
+          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+          .required(sharedMessages.validateRequired),
+      })
 
       if (parseLorawanMacVersion(version) < 110) {
         return schema.shape({

@@ -221,6 +221,36 @@ describe('End device manual create', () => {
         cy.findByTestId('full-error-view').should('not.exist')
       })
     })
+
+    describe('Uses external join server address', () => {
+      it('succeeds registering a new end device', () => {
+        const device = {
+          app_eui: generateHexValue(16),
+          dev_eui: generateHexValue(16),
+          lorawan_version: 'MAC_V1_0',
+          frequency_plan_id: '863-870 MHz',
+          join_server_address: 'external-js-address',
+        }
+
+        cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+        cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+        cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
+        cy.findByLabelText('Use external LoRaWAN backend servers').check()
+        cy.findByLabelText('Join Server address').clear().type(device.join_server_address)
+        cy.findByLabelText('DevEUI').type(device.dev_eui)
+        cy.findByLabelText('AppEUI').type(device.app_eui)
+
+        cy.findByRole('button', { name: 'Register end device' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/eui-${
+            device.dev_eui
+          }`,
+        )
+        cy.findByTestId('full-error-view').should('not.exist')
+      })
+    })
   })
 
   describe('ABP', () => {

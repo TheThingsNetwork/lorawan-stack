@@ -37,6 +37,7 @@ import JoinEUIPRefixesInput from '@console/components/join-eui-prefixes-input'
 import DevAddrInput from '@console/containers/dev-addr-input'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
+import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import { isBackend, getBackendErrorName } from '@ttn-lw/lib/errors/utils'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -139,6 +140,7 @@ const ManualForm = props => {
   const asUrl = asEnabled ? asConfig.base_url : undefined
   const jsUrl = jsEnabled ? jsConfig.base_url : undefined
   const nsUrl = nsEnabled ? nsConfig.base_url : undefined
+  const jsHost = getHostFromUrl(jsUrl)
 
   const [macSettings, setMacSettings] = React.useState({})
 
@@ -231,6 +233,14 @@ const ManualForm = props => {
     fetchDevEUICounter(appId)
   }, [appId, fetchDevEUICounter])
 
+  const [requireRootKeys, setRequireRootKeys] = React.useState(jsEnabled)
+  const handleJsAddressChange = React.useCallback(
+    jsAddress => {
+      setRequireRootKeys(jsHost === jsAddress)
+    },
+    [jsHost],
+  )
+
   const [error, setError] = React.useState(undefined)
   const handleSetError = React.useCallback(error => setError(error), [])
 
@@ -283,6 +293,37 @@ const ManualForm = props => {
       )
     },
     [macSettings, validationContext],
+  )
+
+  const [useExternalServers, setUseExternalServers] = React.useState(false)
+  const handleUseExternalServersChange = React.useCallback(
+    evt => {
+      const { checked } = evt.target
+      const { values, setValues } = formRef.current
+
+      setUseExternalServers(external => !external)
+
+      if (!checked) {
+        setRequireRootKeys(true)
+        setValues(
+          validationSchema.cast(
+            {
+              ...values,
+              join_server_address: initialValues.join_server_address,
+              network_server_address: initialValues.network_server_address,
+              application_server_address: initialValues.application_server_address,
+            },
+            { context: validationContext },
+          ),
+        )
+      }
+    },
+    [
+      initialValues.application_server_address,
+      initialValues.join_server_address,
+      initialValues.network_server_address,
+      validationContext,
+    ],
   )
 
   const [freqPlan, setFreqPlan] = React.useState()
@@ -533,9 +574,12 @@ const ManualForm = props => {
         deviceClass={deviceClass}
         onDeviceClassChange={handleDeviceClassChange}
         onDefaultNsSettingsChange={handleDefaultNsSettings}
+        onUseExternalServersChange={handleUseExternalServersChange}
+        onJsAddressChange={handleJsAddressChange}
         defaultNsSettings={defaultNsSettings}
         freqPlan={freqPlan}
         defaultMacSettings={macSettings}
+        useExternalServers={useExternalServers}
       />
       <hr />
       {!isMulticast && devEUIComponent}
@@ -611,7 +655,7 @@ const ManualForm = props => {
             tooltipId={tooltipIds.JOIN_EUI}
           />
           <Form.Field
-            required
+            required={requireRootKeys}
             disabled={!mayEditKeys}
             title={sharedMessages.appKey}
             name="root_keys.app_key.key"
@@ -626,7 +670,7 @@ const ManualForm = props => {
           />
           {lwVersion >= 110 && (
             <Form.Field
-              required
+              required={requireRootKeys}
               title={sharedMessages.nwkKey}
               name="root_keys.nwk_key.key"
               type="byte"
