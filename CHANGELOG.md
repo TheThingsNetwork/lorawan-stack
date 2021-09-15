@@ -35,6 +35,7 @@ For details about compatibility between different releases, see the **Commitment
 - Improved errors for invalid URLs.
 - Limit length of search queries within tables in the Console to 50 to comply with API validation.
 - External Join Server address handling in end device creation form in the Console.
+- Updating `supports_class_b` field in the end device general settings page in the Console.
 
 ### Security
 

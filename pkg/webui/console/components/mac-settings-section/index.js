@@ -81,11 +81,32 @@ const MacSettingsSection = props => {
     setResetsFCnt(checked)
   }, [])
 
+  const pingPeriodicityRequired = isClassB && (isABP || isMulticast)
+
+  const [isCollapsed, setIsCollapsed] = React.useState(initiallyCollapsed)
+  const handleIsCollapsedChange = React.useCallback(() => {
+    if (!isCollapsed && pingPeriodicityRequired) {
+      // Do not close section if `ping_slot_perdiodicity` is required.
+      return
+    }
+
+    setIsCollapsed(isCollapsed => !isCollapsed)
+  }, [isCollapsed, pingPeriodicityRequired])
+
+  React.useEffect(() => {
+    if (isCollapsed && pingPeriodicityRequired) {
+      // Expand section if `ping_slot_periodicity` is required.
+      setIsCollapsed(false)
+    }
+  }, [handleIsCollapsedChange, isABP, isClassB, isCollapsed, isMulticast, pingPeriodicityRequired])
+
   return (
     <Form.CollapseSection
       id="mac-settings"
       title={m.advancedMacSettings}
       initiallyCollapsed={initiallyCollapsed}
+      onCollapse={handleIsCollapsedChange}
+      isCollapsed={isCollapsed}
     >
       <Form.Field
         title={sharedMessages.frameCounterWidth}
@@ -165,7 +186,7 @@ const MacSettingsSection = props => {
             name="mac_settings.ping_slot_periodicity"
             component={Select}
             options={pingSlotPeriodicityOptions}
-            required={isClassB && isMulticast}
+            required={pingPeriodicityRequired}
             menuPlacement="top"
           />
           <Form.Field
