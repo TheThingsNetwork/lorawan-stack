@@ -31,6 +31,7 @@ For details about compatibility between different releases, see the **Commitment
 - Not rendering site header and footer for error pages in some situations.
 - Not providing a copy button for error pages in some situations.
 - Improved errors for invalid URLs.
+- Limit length of search queries within tables in the Console to 50 to comply with API validation.
 
 ### Security
 
