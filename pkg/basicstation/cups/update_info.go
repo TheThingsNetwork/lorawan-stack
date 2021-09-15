@@ -53,15 +53,6 @@ var (
 	errServerTrust           = errors.Define("server_trust", "failed to fetch server trust for address `{address}`")
 )
 
-func getAuthHeader(ctx context.Context) string {
-	if md, ok := metadata.FromIncomingContext(ctx); ok {
-		if authorization := md.Get("authorization"); len(authorization) > 0 {
-			return authorization[len(authorization)-1]
-		}
-	}
-	return ""
-}
-
 // registerGateway creates a new gateway for the default owner. It also creates the necessary CUPS and LNS credentials.
 // `TargetCUPSURI` is set in order to make the gateway connect once again to this CUPS but using auth and then receive the LNS credentials.
 func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*ttnpb.Gateway, error) {
@@ -304,8 +295,11 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 				gtw.GatewayServerAddress = s.defaultLNSURI
 			}
 		}
+		var (
+			scheme, host, port string
+		)
 		if gtw.GatewayServerAddress != req.LNSURI {
-			scheme, host, port, err := parseAddress("wss", gtw.GatewayServerAddress)
+			scheme, host, port, err = parseAddress("wss", gtw.GatewayServerAddress)
 			if err != nil {
 				return err
 			}
@@ -314,16 +308,19 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 			res.LNSURI = fmt.Sprintf("%s://%s", scheme, address)
 		}
 
-		lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
-		if err != nil {
-			return errServerTrust.WithCause(err).WithAttributes("address", gtw.GatewayServerAddress)
-		}
-		lnsCredentials, err := TokenCredentials(lnsTrust, string(gtw.LbsLnsSecret.Value))
-		if err != nil {
-			return err
-		}
-		if crc32.ChecksumIEEE(lnsCredentials) != req.LNSCredentialsCRC {
-			res.LNSCredentials = lnsCredentials
+		// Only fetch Trust and Credentials for TLS end points.
+		if scheme == "wss" {
+			lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
+			if err != nil {
+				return errServerTrust.WithCause(err).WithAttributes("address", gtw.GatewayServerAddress)
+			}
+			lnsCredentials, err := TokenCredentials(lnsTrust, string(gtw.LbsLnsSecret.Value))
+			if err != nil {
+				return err
+			}
+			if crc32.ChecksumIEEE(lnsCredentials) != req.LNSCredentialsCRC {
+				res.LNSCredentials = lnsCredentials
+			}
 		}
 	}
 
@@ -370,7 +367,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	gtw, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
+	_, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
 		Gateway: *gtw,
 		FieldMask: &pbtypes.FieldMask{Paths: []string{
 			"attributes",

@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - RPC to query supported PHY versions for a given Band ID.
+- Non-TLS LNS endpoint support.
 
 ### Changed
 
