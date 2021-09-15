@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 - LBS timestamp rollover threshold.
 - Layout of error pages.
 - The Application Server worker pools may now drop workers if they are idle for too long.
+- Improved error page UX in the Console.
 
 ### Deprecated
 

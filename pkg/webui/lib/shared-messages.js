@@ -74,6 +74,7 @@ export default defineMessages({
   automaticUpdates: 'Automatic updates',
   autoUpdateDescription: 'Gateway can be updated automatically',
   backToOverview: 'Back to overview',
+  backToLogin: 'Back to login',
   brand: 'Brand',
   cancel: 'Cancel',
   changeLocation: 'Change location settings',

@@ -23,16 +23,17 @@ import buttonStyle from '@ttn-lw/components/button/button.styl'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
-import ErrorMessage from '@ttn-lw/lib/components/error-message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import errorMessages from '@ttn-lw/lib/errors/error-messages'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import {
-  httpStatusCode,
   isUnknown as isUnknownError,
   isNotFoundError,
   isFrontend as isFrontendError,
+  isBackend as isBackendError,
+  getCorrelationId,
+  getBackendErrorId,
 } from '@ttn-lw/lib/errors/utils'
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -51,6 +52,7 @@ const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 const supportLink = selectSupportLinkConfig()
 const documentationLink = selectDocumentationUrlConfig()
+const hasSupportLink = Boolean(supportLink)
 
 // Mind any rendering that is dependant on context, since the errors
 // can be rendered before such context is injected. Use the `safe`
@@ -72,27 +74,35 @@ const FullViewError = ({ error, header, onlineStatus, safe }) => (
 
 const FullViewErrorInner = ({ error, safe }) => {
   const isUnknown = isUnknownError(error)
-  const statusCode = httpStatusCode(error)
   const isNotFound = isNotFoundError(error)
   const isFrontend = isFrontendError(error)
+  const isBackend = isBackendError(error)
+  const isOAuthCallback = window.location.pathname.endsWith('/oauth/callback')
+
+  const errorId = getBackendErrorId(error) || 'n/a'
+  const correlationId = getCorrelationId(error) || 'n/a'
 
   const [copied, setCopied] = useState(false)
 
-  let errorTitle = errorMessages.unknownErrorTitle
-  let errorMessage = errorMessages.contactAdministrator
-  if (!isUnknown) {
-    errorMessage = error
-  } else if (isNotFound) {
+  let errorMessage
+  let errorTitle
+  if (isNotFound) {
+    errorTitle = statusCodeMessages['404']
     errorMessage = errorMessages.genericNotFound
-  }
-  if (statusCode) {
-    errorTitle = statusCodeMessages[statusCode]
-  }
-  if (isFrontend) {
+  } else if (isOAuthCallback) {
+    errorTitle = errorMessages.loginFailed
+    errorMessage = errorMessages.loginFailedDescription
+  } else if (isFrontend) {
     errorMessage = error.errorMessage
     if (Boolean(error.errorTitle)) {
       errorTitle = error.errorTitle
     }
+  } else if (!isUnknown) {
+    errorTitle = errorMessages.error
+    errorMessage = errorMessages.errorOccurred
+  } else {
+    errorTitle = errorMessages.error
+    errorMessage = errorMessages.genericError
   }
 
   const copiedTimer = useRef(undefined)
@@ -118,6 +128,7 @@ const FullViewErrorInner = ({ error, safe }) => {
 
   const errorDetails = JSON.stringify(error, undefined, 2)
   const hasErrorDetails = !isNotFound && Boolean(error) && errorDetails.length > 2
+  const buttonClasses = classnames(buttonStyle.button, buttonStyle.primary, style.actionButton)
 
   return (
     <div className={style.fullViewError} data-test-id="full-error-view">
@@ -136,49 +147,86 @@ const FullViewErrorInner = ({ error, safe }) => {
               <Message content={errorTitle} />
             </h1>
             <div className={style.fullViewErrorSub}>
-              <ErrorMessage component="span" content={errorMessage} />
+              <Message component="span" content={errorMessage} />
               {!isNotFound && (
                 <>
+                  {' '}
+                  <Message
+                    component="span"
+                    content={
+                      hasSupportLink
+                        ? errorMessages.contactSupport
+                        : errorMessages.contactAdministrator
+                    }
+                  />
                   <br />
                   <Message component="span" content={errorMessages.inconvenience} />
                 </>
               )}
             </div>
-            {Boolean(supportLink && !isNotFound) && (
-              <div className={style.errorActions}>
-                <a
-                  href={supportLink}
-                  target="_blank"
-                  className={classnames(buttonStyle.button, style.supportButton)}
-                >
-                  <Message content={sharedMessages.getSupport} />
+            <div className={style.errorActions}>
+              {isNotFound && (
+                <a href={appRoot} className={buttonClasses}>
+                  <Icon icon="keyboard_arrow_left" textPaddedRight nudgeDown />
+                  <Message content={sharedMessages.backToOverview} />
                 </a>
-                {hasErrorDetails && (
-                  <Message component="span" content={errorMessages.attachToSupportInquiries} />
-                )}
-              </div>
-            )}
-            {isNotFound && (
-              <a href={appRoot} className={classnames(buttonStyle.button, buttonStyle.secondary)}>
-                <Icon icon="keyboard_arrow_left" textPaddedRight nudgeDown />
-                <Message content={sharedMessages.backToOverview} />
-              </a>
-            )}
+              )}
+              {isOAuthCallback && (
+                <a href={appRoot} className={buttonClasses}>
+                  <Icon icon="keyboard_arrow_left" textPaddedRight nudgeDown />
+                  <Message content={sharedMessages.backToLogin} />
+                </a>
+              )}
+              {hasSupportLink && !isNotFound && (
+                <>
+                  <a
+                    href={supportLink}
+                    target="_blank"
+                    className={classnames(buttonStyle.button, style.actionButton)}
+                  >
+                    <Icon icon="contact_support" textPaddedRight nudgeDown />
+                    <Message content={sharedMessages.getSupport} />
+                  </a>
+                  {hasErrorDetails && (
+                    <Message component="span" content={errorMessages.attachToSupportInquiries} />
+                  )}
+                </>
+              )}
+            </div>
             {hasErrorDetails && (
               <>
+                {isBackend && (
+                  <>
+                    <hr />
+                    <div className={style.detailColophon}>
+                      <Message
+                        component="span"
+                        content={errorMessages.errorId}
+                        values={{
+                          errorId,
+                          code: msg => <code>{msg}</code>,
+                        }}
+                      />
+                      <Message
+                        component="span"
+                        content={errorMessages.correlationId}
+                        values={{
+                          correlationId,
+                          code: msg => <code>{msg}</code>,
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
                 <hr />
                 <details>
                   <summary>
-                    <Message content={errorMessages.additionalInformation} />
+                    <Message content={errorMessages.technicalDetails} />
                   </summary>
                   <pre>{errorDetails}</pre>
                   <button
                     onClick={handleCopyClick}
-                    className={classnames(
-                      buttonStyle.button,
-                      buttonStyle.secondary,
-                      style.supportButton,
-                    )}
+                    className={classnames(buttonClasses)}
                     data-clipboard-text={errorDetails}
                     ref={copyButton}
                   >
