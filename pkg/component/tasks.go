@@ -29,15 +29,17 @@ import (
 // TaskFunc is the task function.
 type TaskFunc func(context.Context) error
 
-func (f TaskFunc) Execute(ctx context.Context) (err error) {
+func (f TaskFunc) Execute(ctx context.Context, logger log.Interface) (err error) {
 	defer func() {
 		if p := recover(); p != nil {
-			fmt.Fprintf(os.Stderr, "%s\n%s", p, debug.Stack())
+			fmt.Fprintln(os.Stderr, p)
+			os.Stderr.Write(debug.Stack())
 			if pErr, ok := p.(error); ok {
 				err = errTaskRecovered.WithCause(pErr)
 			} else {
 				err = errTaskRecovered.WithAttributes("panic", p)
 			}
+			logger.WithError(err).Error("Task panicked")
 		}
 	}()
 	return f(ctx)
@@ -142,7 +144,7 @@ func (f StartTaskFunc) StartTask(conf *TaskConfig) {
 	f(conf)
 }
 
-var errTaskRecovered = errors.Define("task_recovered", "task recovered")
+var errTaskRecovered = errors.DefineInternal("task_recovered", "task recovered")
 
 func DefaultStartTask(conf *TaskConfig) {
 	logger := log.FromContext(conf.Context).WithField("task_id", conf.ID)
@@ -157,11 +159,12 @@ func DefaultStartTask(conf *TaskConfig) {
 				logger.Warn("Invocation count rollover detected")
 				invocation = 1
 			}
+			logger := logger.WithField("invocation", invocation)
 			startTime := time.Now()
-			err := conf.Func.Execute(conf.Context)
+			err := conf.Func.Execute(conf.Context, logger)
 			executionDuration := time.Since(startTime)
 			if err != nil && err != context.Canceled {
-				logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
+				logger.WithError(err).Warn("Task failed")
 			}
 			switch conf.Restart {
 			case TaskRestartNever:
