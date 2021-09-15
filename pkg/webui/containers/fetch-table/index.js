@@ -356,7 +356,7 @@ class FetchTable extends Component {
                 placeholder={searchPlaceholderMessage}
                 className={style.searchBar}
                 inputWidth="full"
-                maxlength={searchQueryMaxLength}
+                maxLength={searchQueryMaxLength}
               />
             )}
             {(Boolean(actionItems) || mayAdd) && (
