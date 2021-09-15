@@ -57,7 +57,7 @@ const m = defineMessages({
     'Enable this option if you do not need this user to validate the email address',
   deleteTitle: 'Are you sure you want to delete this account?',
   deleteWarning:
-    "This will <strong>PERMANENTLY DELETE THIS ACCOUNT</strong> and <strong>LOCK THE USER ID FOR RE-REGISTRATION</strong>. Associated entities (e.g. gateways, applications and end devices) owned by this user that do not have any other collaborators will become <strong>UNACCESSIBLE</strong> and it will <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's AGAIN</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
+    "This will <strong>PERMANENTLY DELETE THIS ACCOUNT</strong> and <strong>LOCK THE USER ID AND EMAIL FOR RE-REGISTRATION</strong>. Associated entities (e.g. gateways, applications and end devices) owned by this user that do not have any other collaborators will become <strong>UNACCESSIBLE</strong> and it will <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's AGAIN</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
   purgeWarning:
     "This will <strong>PERMANENTLY DELETE THIS ACCOUNT</strong>. Associated entities (e.g. gateways, applications and end devices) owned by this user that do not have any other collaborators will become <strong>UNACCESSIBLE</strong> and it will <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's AGAIN</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
   deleteConfirmMessage: "Please type in this user's user ID to confirm.",
