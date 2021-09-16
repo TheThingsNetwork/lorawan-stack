@@ -634,6 +634,7 @@ describe('End device manual create', () => {
       cy.findByLabelText('Over the air activation (OTAA)').should('have.attr', 'checked')
       cy.findByLabelText('Over the air activation (OTAA)').should('not.have.attr', 'disabled')
       cy.findByLabelText('Network defaults').should('not.exist')
+      cy.findByLabelText('Additional LoRaWAN class capabilities').should('not.exist')
       cy.findByLabelText('DevEUI').type(device.dev_eui)
       cy.findByLabelText('AppEUI').type(device.app_eui)
       cy.findByLabelText('AppKey').type(device.app_key)

@@ -136,24 +136,26 @@ const AdvancedSettingsSection = props => {
           disabled={!nsEnabled}
         />
       </Form.Field>
-      <Form.Field
-        title={isMulticast ? m.multicastClassCapabilities : messages.classCapabilities}
-        required={isMulticast}
-        name="_device_class"
-        component={Select}
-        onChange={onDeviceClassChange}
-        options={isMulticast ? multicastClassOptions : allClassOptions}
-        tooltipId={tooltipIds.CLASSES}
-      />
       {nsEnabled && (
-        <Form.Field
-          title={messages.networkDefaults}
-          label={messages.defaultNetworksSettings}
-          name="_default_ns_settings"
-          component={Checkbox}
-          onChange={handleDefaultNsSettings}
-          tooltipId={tooltipIds.NETWORK_RX_DEFAULTS}
-        />
+        <>
+          <Form.Field
+            title={isMulticast ? m.multicastClassCapabilities : messages.classCapabilities}
+            required={isMulticast}
+            name="_device_class"
+            component={Select}
+            onChange={onDeviceClassChange}
+            options={isMulticast ? multicastClassOptions : allClassOptions}
+            tooltipId={tooltipIds.CLASSES}
+          />
+          <Form.Field
+            title={messages.networkDefaults}
+            label={messages.defaultNetworksSettings}
+            name="_default_ns_settings"
+            component={Checkbox}
+            onChange={handleDefaultNsSettings}
+            tooltipId={tooltipIds.NETWORK_RX_DEFAULTS}
+          />
+        </>
       )}
       {!defaultNsSettings && nsEnabled && (
         <>

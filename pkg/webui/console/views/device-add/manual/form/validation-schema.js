@@ -385,14 +385,21 @@ const macSettingsSchema = Yup.object({
 })
 
 const validationSchema = Yup.object({
-  supports_class_b: Yup.boolean().when(['_device_class'], (deviceClass, schema) =>
-    schema
-      .transform(() => undefined)
-      .default(
-        deviceClass === DEVICE_CLASS_MAP.CLASS_B ||
-          deviceClass === DEVICE_CLASS_MAP.CLASS_B_C ||
-          false,
-      ),
+  supports_class_b: Yup.boolean().when(
+    ['_device_class', '$nsEnabled'],
+    (deviceClass, nsEnabled, schema) => {
+      if (!nsEnabled) {
+        return schema.strip()
+      }
+
+      return schema
+        .transform(() => undefined)
+        .default(
+          deviceClass === DEVICE_CLASS_MAP.CLASS_B ||
+            deviceClass === DEVICE_CLASS_MAP.CLASS_B_C ||
+            false,
+        )
+    },
   ),
   supports_class_c: Yup.boolean().when(['_device_class'], (deviceClass, schema) =>
     schema
