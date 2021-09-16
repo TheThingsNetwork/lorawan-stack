@@ -28,7 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var errNoPayload = errors.Define("no_payload", "no payload")
+var errNoPayload = errors.DefineInvalidArgument("no_payload", "no payload")
 
 func (as *ApplicationServer) encodeAndEncryptDownlinks(ctx context.Context, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, items []*ttnpb.ApplicationDownlink, sessions []*ttnpb.Session) ([]*ttnpb.ApplicationDownlink, error) {
 	var encryptedItems []*ttnpb.ApplicationDownlink
