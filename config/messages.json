@@ -8414,7 +8414,16 @@
       "file": "oauthclient.go"
     }
   },
-  "error:pkg/web/oauthclient:no_state": {
+  "error:pkg/web/oauthclient:no_state_cookie": {
+    "translations": {
+      "en": "no state cookie stored"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:no_state_param": {
     "translations": {
       "en": "no state parameter present in request"
     },
