@@ -18,26 +18,27 @@ import (
 	"context"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 type messageMetrics struct {
-	repeatedUplinks           *metrics.ContextualCounterVec
-	droppedMessagesBufferFull *metrics.ContextualCounterVec
+	repeatedUplinks *metrics.ContextualCounterVec
+	droppedMessages *metrics.ContextualCounterVec
 }
 
 // Describe implements prometheus.Collector.
 func (m *messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.repeatedUplinks.Describe(ch)
-	m.droppedMessagesBufferFull.Describe(ch)
+	m.droppedMessages.Describe(ch)
 }
 
 // Collect implements prometheus.Collector.
 func (m *messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.repeatedUplinks.Collect(ch)
-	m.droppedMessagesBufferFull.Collect(ch)
+	m.droppedMessages.Collect(ch)
 }
 
 var ioMetrics = &messageMetrics{
@@ -49,13 +50,13 @@ var ioMetrics = &messageMetrics{
 		},
 		[]string{"protocol"},
 	),
-	droppedMessagesBufferFull: metrics.NewContextualCounterVec(
+	droppedMessages: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: "gs",
-			Name:      "message_dropped_buffer_full_total",
-			Help:      "Total number of messages dropped due to a full buffer",
+			Name:      "message_dropped_total",
+			Help:      "Total number of messages dropped",
 		},
-		[]string{"type"},
+		[]string{"type", "error"},
 	),
 }
 
@@ -89,7 +90,7 @@ func registerRepeatUp(ctx context.Context, emitEvent bool, gtw *ttnpb.Gateway, p
 	}
 }
 
-func registerDropBufferFull(ctx context.Context, gtw *ttnpb.Gateway, typ string, err error) {
+func registerDropMessage(ctx context.Context, gtw *ttnpb.Gateway, typ string, err error) {
 	switch typ {
 	case "uplink":
 		events.Publish(evtDropUplink.NewWithIdentifiersAndData(ctx, gtw, err))
@@ -98,7 +99,11 @@ func registerDropBufferFull(ctx context.Context, gtw *ttnpb.Gateway, typ string,
 	case "txack":
 		events.Publish(evtDropTxAck.NewWithIdentifiersAndData(ctx, gtw, err))
 	}
-	ioMetrics.droppedMessagesBufferFull.WithLabelValues(ctx, typ).Inc()
+	if ttnErr, ok := errors.From(err); ok {
+		ioMetrics.droppedMessages.WithLabelValues(ctx, typ, ttnErr.FullName()).Inc()
+	} else {
+		ioMetrics.droppedMessages.WithLabelValues(ctx, typ, "unknown").Inc()
+	}
 }
 
 func init() {

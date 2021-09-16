@@ -261,7 +261,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		c.notifyStatsChanged()
 	default:
 		err := errBufferFull.New()
-		registerDropBufferFull(c.ctx, c.gateway, "uplink", err)
+		registerDropMessage(c.ctx, c.gateway, "uplink", err)
 		return err
 	}
 	return nil
@@ -285,7 +285,7 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 		}
 	default:
 		err := errBufferFull.New()
-		registerDropBufferFull(c.ctx, c.gateway, "status", err)
+		registerDropMessage(c.ctx, c.gateway, "status", err)
 		return err
 	}
 	return nil
@@ -300,7 +300,7 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 		c.notifyStatsChanged()
 	default:
 		err := errBufferFull.New()
-		registerDropBufferFull(c.ctx, c.gateway, "txack", err)
+		registerDropMessage(c.ctx, c.gateway, "txack", err)
 		return err
 	}
 	return nil
