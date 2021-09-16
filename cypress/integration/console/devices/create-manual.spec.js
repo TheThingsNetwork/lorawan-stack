@@ -629,6 +629,7 @@ describe('End device manual create', () => {
       }
 
       cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+      cy.findByLabelText('Frequency plan').should('not.exist')
       cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
       cy.findByLabelText('Over the air activation (OTAA)').should('have.attr', 'checked')
       cy.findByLabelText('Over the air activation (OTAA)').should('not.have.attr', 'disabled')

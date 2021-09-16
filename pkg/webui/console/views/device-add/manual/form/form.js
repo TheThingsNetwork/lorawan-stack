@@ -559,12 +559,14 @@ const ManualForm = props => {
         tooltipId={tooltipIds.REGIONAL_PARAMETERS}
         onChange={handlePhyVersionChange}
       />
-      <NsFrequencyPlansSelect
-        required={nsEnabled}
-        tooltipId={tooltipIds.FREQUENCY_PLAN}
-        name="frequency_plan_id"
-        onChange={handleFreqPlanChange}
-      />
+      {nsEnabled && (
+        <NsFrequencyPlansSelect
+          required
+          tooltipId={tooltipIds.FREQUENCY_PLAN}
+          name="frequency_plan_id"
+          onChange={handleFreqPlanChange}
+        />
+      )}
       <hr />
       <AdvancedSettingsSection
         jsEnabled={jsConfig.enabled}
