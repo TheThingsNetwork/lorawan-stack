@@ -447,9 +447,10 @@ const ManualForm = props => {
           lorawan_version,
           lorawan_phy_version,
           frequency_plan_id,
+          mac_settings = {},
         } = castedValues
 
-        if (Object.keys(castedValues.mac_settings).length === 0) {
+        if (Object.keys(mac_settings).length === 0) {
           delete castedValues.mac_settings
         }
 

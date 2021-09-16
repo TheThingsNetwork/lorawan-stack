@@ -182,6 +182,7 @@ const sessionSchema = Yup.object({
 const macSettingsSchema = Yup.object({
   mac_settings: Yup.object().when(
     [
+      '$nsEnabled',
       '_activation_mode',
       'supports_class_b',
       'supports_class_c',
@@ -195,6 +196,7 @@ const macSettingsSchema = Yup.object({
       '$hasPingSlotFrequency',
     ],
     (
+      nsEnabled,
       mode,
       isClassB,
       isClassC,
@@ -207,8 +209,12 @@ const macSettingsSchema = Yup.object({
       hasClassCTimeout,
       hasPingSlotFrequency,
       schema,
-    ) =>
-      schema.shape({
+    ) => {
+      if (!nsEnabled) {
+        return schema.strip()
+      }
+
+      return schema.shape({
         resets_f_cnt: Yup.lazy(() => {
           if (mode !== ACTIVATION_MODES.ABP) {
             return Yup.boolean().strip()
@@ -373,7 +379,8 @@ const macSettingsSchema = Yup.object({
 
           return Yup.string()
         }),
-      }),
+      })
+    },
   ),
 })
 
