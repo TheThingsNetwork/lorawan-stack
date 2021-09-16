@@ -9107,12 +9107,30 @@
       "file": "observability.go"
     }
   },
+  "event:gs.status.io.drop": {
+    "translations": {
+      "en": "drop gateway status"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "observability.go"
+    }
+  },
   "event:gs.status.receive": {
     "translations": {
       "en": "receive gateway status"
     },
     "description": {
       "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.tx.ack.io.drop": {
+    "translations": {
+      "en": "drop tx ack message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
       "file": "observability.go"
     }
   },
@@ -9140,6 +9158,15 @@
     },
     "description": {
       "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.up.io.drop": {
+    "translations": {
+      "en": "drop uplink message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
       "file": "observability.go"
     }
   },
