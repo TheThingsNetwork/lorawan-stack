@@ -33,6 +33,7 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { mapFormValueToAttributes } from '@console/lib/attributes'
 import { mayCreateGateways } from '@console/lib/feature-checks'
@@ -47,8 +48,9 @@ const m = defineMessages({
 @connect(
   state => {
     const userId = selectUserId(state)
+    const { enabled: gsEnabled } = selectGsConfig()
 
-    return { userId }
+    return { userId, gsEnabled }
   },
   dispatch => ({
     createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
@@ -59,6 +61,7 @@ export default class GatewayAdd extends React.Component {
   static propTypes = {
     createSuccess: PropTypes.func.isRequired,
     env: PropTypes.env.isRequired,
+    gsEnabled: PropTypes.bool.isRequired,
     userId: PropTypes.string.isRequired,
   }
 
@@ -96,6 +99,7 @@ export default class GatewayAdd extends React.Component {
         config: { stack },
       },
       userId,
+      gsEnabled,
     } = this.props
 
     const initialValues = {
@@ -121,6 +125,7 @@ export default class GatewayAdd extends React.Component {
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
               update={false}
+              gsEnabled={gsEnabled}
             >
               <FormSubmit component={SubmitButton} message={m.createGateway} />
             </GatewayDataForm>
