@@ -503,8 +503,37 @@ describe('End device manual create', () => {
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
         cy.findByLabelText('LoRaWAN class for multicast downlinks').selectOption('class-b')
-        cy.findByLabelText('Network defaults').uncheck()
         cy.findByLabelText('Ping slot periodicity').selectOption(device.ping_slot_periodicity)
+        cy.findByLabelText('Device address').type(device.dev_addr)
+        cy.findByLabelText('AppSKey').type(device.app_s_key)
+        cy.findByLabelText('NwkSKey').type(device.nwk_s_key)
+        cy.findByLabelText('End device ID').type(device.id)
+
+        cy.findByRole('button', { name: 'Register end device' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
+        )
+        cy.findByTestId('full-error-view').should('not.exist')
+      })
+
+      it('succeeds registering a new class C end device', () => {
+        const device = {
+          id: 'multicast-test-1-0-class-c',
+          dev_addr: generateHexValue(8),
+          lorawan_version: 'MAC_V1_0',
+          frequency_plan_id: '863-870 MHz',
+          app_s_key: generateHexValue(32),
+          nwk_s_key: generateHexValue(32),
+          ping_slot_periodicity: 'EVERY_4S',
+        }
+
+        cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+        cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+        cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
+        cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
+        cy.findByLabelText('LoRaWAN class for multicast downlinks').selectOption('class-c')
         cy.findByLabelText('Device address').type(device.dev_addr)
         cy.findByLabelText('AppSKey').type(device.app_s_key)
         cy.findByLabelText('NwkSKey').type(device.nwk_s_key)

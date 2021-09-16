@@ -395,9 +395,7 @@ const validationSchema = Yup.object({
       return schema
         .transform(() => undefined)
         .default(
-          deviceClass === DEVICE_CLASS_MAP.CLASS_B ||
-            deviceClass === DEVICE_CLASS_MAP.CLASS_B_C ||
-            false,
+          deviceClass === DEVICE_CLASS_MAP.CLASS_B || deviceClass === DEVICE_CLASS_MAP.CLASS_B_C,
         )
     },
   ),
@@ -405,9 +403,7 @@ const validationSchema = Yup.object({
     schema
       .transform(() => undefined)
       .default(
-        deviceClass === DEVICE_CLASS_MAP.CLASS_C ||
-          deviceClass === DEVICE_CLASS_MAP.CLASS_B_C ||
-          false,
+        deviceClass === DEVICE_CLASS_MAP.CLASS_C || deviceClass === DEVICE_CLASS_MAP.CLASS_B_C,
       ),
   ),
   supports_join: Yup.boolean().when(
@@ -453,7 +449,7 @@ const validationSchema = Yup.object({
       return schema.required(sharedMessages.validateRequired)
     }
 
-    return schema.oneOf(Object.values(DEVICE_CLASS_MAP)).default(DEVICE_CLASS_MAP.CLASS_A)
+    return schema.oneOf(Object.values(DEVICE_CLASS_MAP))
   }),
   _default_ns_settings: Yup.bool(),
   _activation_mode: Yup.mixed().when(
