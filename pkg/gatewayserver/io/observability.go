@@ -24,17 +24,20 @@ import (
 )
 
 type messageMetrics struct {
-	repeatedUplinks *metrics.ContextualCounterVec
+	repeatedUplinks           *metrics.ContextualCounterVec
+	droppedMessagesBufferFull *metrics.ContextualCounterVec
 }
 
 // Describe implements prometheus.Collector.
 func (m *messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.repeatedUplinks.Describe(ch)
+	m.droppedMessagesBufferFull.Describe(ch)
 }
 
 // Collect implements prometheus.Collector.
 func (m *messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.repeatedUplinks.Collect(ch)
+	m.droppedMessagesBufferFull.Collect(ch)
 }
 
 var ioMetrics = &messageMetrics{
@@ -46,12 +49,37 @@ var ioMetrics = &messageMetrics{
 		},
 		[]string{"protocol"},
 	),
+	droppedMessagesBufferFull: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: "gs",
+			Name:      "message_dropped_buffer_full_total",
+			Help:      "Total number of messages dropped due to a full buffer",
+		},
+		[]string{"type"},
+	),
 }
 
-var evtRepeatUp = events.Define(
-	"gs.up.repeat", "received repeated uplink message from gateway",
-	events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
-	events.WithDataType(&ttnpb.GatewayIdentifiers{}),
+var (
+	evtRepeatUp = events.Define(
+		"gs.up.repeat", "received repeated uplink message from gateway",
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.GatewayIdentifiers{}),
+	)
+	evtDropUplink = events.Define(
+		"gs.up.io.drop", "drop uplink message",
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithErrorDataType(),
+	)
+	evtDropStatus = events.Define(
+		"gs.status.io.drop", "drop gateway status",
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
+		events.WithErrorDataType(),
+	)
+	evtDropTxAck = events.Define(
+		"gs.tx.ack.io.drop", "drop tx ack message",
+		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithErrorDataType(),
+	)
 )
 
 func registerRepeatUp(ctx context.Context, emitEvent bool, gtw *ttnpb.Gateway, protocol string) {
@@ -59,6 +87,18 @@ func registerRepeatUp(ctx context.Context, emitEvent bool, gtw *ttnpb.Gateway, p
 	if emitEvent {
 		events.Publish(evtRepeatUp.NewWithIdentifiersAndData(ctx, gtw, nil))
 	}
+}
+
+func registerDropBufferFull(ctx context.Context, gtw *ttnpb.Gateway, typ string, err error) {
+	switch typ {
+	case "uplink":
+		events.Publish(evtDropUplink.NewWithIdentifiersAndData(ctx, gtw, err))
+	case "status":
+		events.Publish(evtDropStatus.NewWithIdentifiersAndData(ctx, gtw, err))
+	case "txack":
+		events.Publish(evtDropTxAck.NewWithIdentifiersAndData(ctx, gtw, err))
+	}
+	ioMetrics.droppedMessagesBufferFull.WithLabelValues(ctx, typ).Inc()
 }
 
 func init() {

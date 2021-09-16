@@ -260,7 +260,9 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		atomic.StoreInt64(&c.lastUplinkTime, up.ReceivedAt.UnixNano())
 		c.notifyStatsChanged()
 	default:
-		return errBufferFull.New()
+		err := errBufferFull.New()
+		registerDropBufferFull(c.ctx, c.gateway, "uplink", err)
+		return err
 	}
 	return nil
 }
@@ -282,7 +284,9 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 			}
 		}
 	default:
-		return errBufferFull.New()
+		err := errBufferFull.New()
+		registerDropBufferFull(c.ctx, c.gateway, "status", err)
+		return err
 	}
 	return nil
 }
@@ -295,7 +299,9 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 	case c.txAckCh <- ack:
 		c.notifyStatsChanged()
 	default:
-		return errBufferFull.New()
+		err := errBufferFull.New()
+		registerDropBufferFull(c.ctx, c.gateway, "txack", err)
+		return err
 	}
 	return nil
 }
