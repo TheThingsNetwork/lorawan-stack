@@ -24,6 +24,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+const subsystem = "gs_io"
+
 type messageMetrics struct {
 	repeatedUplinks *metrics.ContextualCounterVec
 	droppedMessages *metrics.ContextualCounterVec
@@ -44,7 +46,7 @@ func (m *messageMetrics) Collect(ch chan<- prometheus.Metric) {
 var ioMetrics = &messageMetrics{
 	repeatedUplinks: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
-			Subsystem: "gs",
+			Subsystem: subsystem,
 			Name:      "uplink_repeated_total",
 			Help:      "Total number of repeated gateway uplinks",
 		},
@@ -52,7 +54,7 @@ var ioMetrics = &messageMetrics{
 	),
 	droppedMessages: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
-			Subsystem: "gs",
+			Subsystem: subsystem,
 			Name:      "message_dropped_total",
 			Help:      "Total number of messages dropped",
 		},
@@ -62,22 +64,22 @@ var ioMetrics = &messageMetrics{
 
 var (
 	evtRepeatUp = events.Define(
-		"gs.up.repeat", "received repeated uplink message from gateway",
+		"gs.io.up.repeat", "received repeated uplink message from gateway",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.GatewayIdentifiers{}),
 	)
 	evtDropUplink = events.Define(
-		"gs.up.io.drop", "drop uplink message",
+		"gs.io.up.drop", "drop uplink message",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtDropStatus = events.Define(
-		"gs.status.io.drop", "drop gateway status",
+		"gs.io.status.drop", "drop gateway status",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
 		events.WithErrorDataType(),
 	)
 	evtDropTxAck = events.Define(
-		"gs.tx.ack.io.drop", "drop tx ack message",
+		"gs.io.tx.ack.drop", "drop tx ack message",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
