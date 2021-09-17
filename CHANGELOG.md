@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.15.0] - 2021-09-17
+
+### Added
+
 - RPC to query supported PHY versions for a given Band ID.
 - Non-TLS LNS endpoint support.
 
@@ -22,10 +36,6 @@ For details about compatibility between different releases, see the **Commitment
 - The Application Server worker pools may now drop workers if they are idle for too long.
 - Improved error page UX in the Console.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Entity purge handling for non-admin users in the Console.
@@ -36,8 +46,6 @@ For details about compatibility between different releases, see the **Commitment
 - Limit length of search queries within tables in the Console to 50 to comply with API validation.
 - External Join Server address handling in end device creation form in the Console.
 - Updating `supports_class_b` field in the end device general settings page in the Console.
-
-### Security
 
 ## [3.14.2] - 2021-08-27
 
@@ -1756,7 +1764,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.2...v3.14
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.0...v3.15
+[3.15.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.2...v3.15.0
 [3.14.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.1...v3.14.2
 [3.14.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.0...v3.14.1
 [3.14.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.3...v3.14.0
