@@ -236,9 +236,7 @@ const LocaleLoader = ({ children }) => {
       if (window.Intl.DateTimeFormat.polyfilled) {
         log(`Polyfilling DateTimeFormat for language ${language}`)
         promises.push(
-          import(
-            /* webpackChunkName: "locale.[request]" */ '@formatjs/intl-datetimeformat/add-all-tz'
-          ),
+          import(/* webpackChunkName: "locale" */ '@formatjs/intl-datetimeformat/add-all-tz'),
           import(
             /* webpackChunkName: "locale.[request]" */ `@formatjs/intl-datetimeformat/locale-data/${language}`
           ),
