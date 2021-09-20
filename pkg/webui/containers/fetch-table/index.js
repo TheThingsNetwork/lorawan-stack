@@ -381,6 +381,7 @@ class FetchTable extends Component {
               className={style.errorMessage}
               content={{ ...m.errorMessage, values: { entity } }}
               details={error}
+              noIngest
             />
           )}
           <Tabular
