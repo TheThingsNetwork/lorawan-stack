@@ -177,7 +177,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{
-				UserIds:   *usrID,
+				UserIds:   usrID,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {

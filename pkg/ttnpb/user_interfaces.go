@@ -17,7 +17,7 @@ package ttnpb
 // All EntityType methods implement the IDStringer interface.
 
 func (m *GetUserRequest) EntityType() string {
-	return m.UserIds.EntityType()
+	return m.GetUserIds().EntityType()
 }
 
 func (m *CreateUserRequest) EntityType() string {
@@ -75,7 +75,7 @@ func (m *CreateLoginTokenRequest) EntityType() string {
 // All IDString methods implement the IDStringer interface.
 
 func (m *GetUserRequest) IDString() string {
-	return m.UserIds.IDString()
+	return m.GetUserIds().IDString()
 }
 
 func (m *CreateUserRequest) IDString() string {
@@ -133,7 +133,7 @@ func (m *CreateLoginTokenRequest) IDString() string {
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
 func (m *GetUserRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.UserIds.ExtractRequestFields(dst)
+	m.GetUserIds().ExtractRequestFields(dst)
 }
 
 func (m *CreateUserRequest) ExtractRequestFields(dst map[string]interface{}) {

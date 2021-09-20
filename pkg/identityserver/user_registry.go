@@ -308,7 +308,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest) (usr *ttnpb.User, err error) {
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, getPaths, nil)
-	if err = rights.RequireUser(ctx, req.GetUserIds(), ttnpb.RIGHT_USER_INFO); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_INFO); err != nil {
 		if err := is.RequireAuthenticated(ctx); err != nil {
 			return nil, err
 		}
@@ -335,7 +335,7 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		usr, err = store.GetUserStore(db).GetUser(ctx, &req.UserIds, req.FieldMask)
+		usr, err = store.GetUserStore(db).GetUser(ctx, req.GetUserIds(), req.FieldMask)
 		if err != nil {
 			return err
 		}

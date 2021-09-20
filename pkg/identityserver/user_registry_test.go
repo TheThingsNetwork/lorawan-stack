@@ -254,7 +254,7 @@ func TestUsersWeakPassword(t *testing.T) {
 		}
 
 		afterUpdate, err := reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"password_updated_at"}},
 		}, creds)
 
@@ -276,7 +276,7 @@ func TestUsersCRUD(t *testing.T) {
 		credsWithoutRights := userCreds(userTestUserIdx, "key without rights")
 
 		got, err := reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name", "admin", "created_at", "updated_at"}},
 		}, creds)
 
@@ -288,14 +288,14 @@ func TestUsersCRUD(t *testing.T) {
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
 
@@ -345,7 +345,7 @@ func TestUsersCRUD(t *testing.T) {
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"state", "state_description"}},
 		}, creds)
 
@@ -367,7 +367,7 @@ func TestUsersCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		afterUpdate, err := reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"password_updated_at"}},
 		}, creds)
 
@@ -381,7 +381,7 @@ func TestUsersCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		empty, err := reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
@@ -393,7 +393,7 @@ func TestUsersCRUD(t *testing.T) {
 		a.So(errors.IsUnauthenticated(err), should.BeTrue)
 
 		empty, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, userCreds(adminUserIdx))
 

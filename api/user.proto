@@ -111,7 +111,7 @@ message Users {
 }
 
 message GetUserRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
   // The names of the user fields that should be returned.
   google.protobuf.FieldMask field_mask = 2;
 }
