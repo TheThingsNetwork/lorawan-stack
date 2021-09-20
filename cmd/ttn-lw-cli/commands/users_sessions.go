@@ -49,7 +49,7 @@ func getUserSessionID(flagSet *pflag.FlagSet, args []string) (*ttnpb.UserSession
 		return nil, errNoSessionID
 	}
 	return &ttnpb.UserSessionIdentifiers{
-		UserIds:   ttnpb.UserIdentifiers{UserId: userID},
+		UserIds:   &ttnpb.UserIdentifiers{UserId: userID},
 		SessionId: sessionID,
 	}, nil
 }

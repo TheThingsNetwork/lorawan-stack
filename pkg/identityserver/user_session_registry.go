@@ -55,11 +55,11 @@ func (is *IdentityServer) listUserSessions(ctx context.Context, req *ttnpb.ListU
 }
 
 func (is *IdentityServer) deleteUserSession(ctx context.Context, req *ttnpb.UserSessionIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireUser(ctx, req.UserIds, ttnpb.RIGHT_USER_ALL); err != nil {
+	if err := rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_ALL); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return store.GetUserSessionStore(db).DeleteSession(ctx, &req.UserIds, req.GetSessionId())
+		return store.GetUserSessionStore(db).DeleteSession(ctx, req.GetUserIds(), req.GetSessionId())
 	})
 	if err != nil {
 		return nil, err

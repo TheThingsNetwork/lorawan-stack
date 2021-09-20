@@ -88,8 +88,8 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 		if ar == nil {
 			return s.output(c, resp)
 		}
-		ar.UserData = userData{UserSessionIdentifiers: ttnpb.UserSessionIdentifiers{
-			UserIds:   session.UserIds,
+		ar.UserData = userData{UserSessionIdentifiers: &ttnpb.UserSessionIdentifiers{
+			UserIds:   &session.UserIds,
 			SessionId: session.SessionId,
 		}}
 		client := ttnpb.Client(ar.Client.(osinClient))
@@ -264,7 +264,7 @@ func (s *server) Token(c echo.Context) error {
 	}
 
 	client := ttnpb.Client(ar.Client.(osinClient))
-	userIDs := ar.UserData.(userData).UserIds
+	userIDs := ar.UserData.(userData).UserSessionIdentifiers.GetUserIds()
 	ar.GenerateRefresh = clientHasGrant(&client, ttnpb.GRANT_REFRESH_TOKEN)
 	switch ar.Type {
 	case osin.AUTHORIZATION_CODE:
@@ -280,7 +280,7 @@ func (s *server) Token(c echo.Context) error {
 		}
 	}
 	if ar.Authorized {
-		events.Publish(evtTokenExchange.New(req.Context(), events.WithIdentifiers(&userIDs, &client.ClientIdentifiers)))
+		events.Publish(evtTokenExchange.New(req.Context(), events.WithIdentifiers(userIDs, &client.ClientIdentifiers)))
 	}
 	oauth2.FinishAccessRequest(resp, req, ar)
 	delete(resp.Output, "scope")

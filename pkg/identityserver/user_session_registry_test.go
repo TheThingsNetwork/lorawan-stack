@@ -46,7 +46,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, &ttnpb.UserSessionIdentifiers{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			SessionId: randomUUID,
 		}, credsWithoutRights)
 		if a.So(err, should.NotBeNil) {
@@ -61,7 +61,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, &ttnpb.UserSessionIdentifiers{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			SessionId: randomUUID,
 		}, creds)
 		if a.So(err, should.NotBeNil) {
@@ -89,7 +89,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, &ttnpb.UserSessionIdentifiers{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			SessionId: created.SessionId,
 		}, creds)
 		a.So(err, should.BeNil)
