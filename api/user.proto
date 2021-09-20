@@ -165,7 +165,7 @@ message ListUserAPIKeysRequest {
 }
 
 message GetUserAPIKeyRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
   // Unique public identifier for the API key.
   string key_id = 2;
 }

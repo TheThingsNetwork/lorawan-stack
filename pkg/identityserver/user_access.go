@@ -118,7 +118,7 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUs
 }
 
 func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	if err = rights.RequireUser(ctx, req.UserIds, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
