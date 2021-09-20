@@ -69,7 +69,7 @@ func (m *LoginToken) EntityType() string {
 }
 
 func (m *CreateLoginTokenRequest) EntityType() string {
-	return m.UserIds.EntityType()
+	return m.GetUserIds().EntityType()
 }
 
 // All IDString methods implement the IDStringer interface.
@@ -127,7 +127,7 @@ func (m *LoginToken) IDString() string {
 }
 
 func (m *CreateLoginTokenRequest) IDString() string {
-	return m.UserIds.IDString()
+	return m.GetUserIds().IDString()
 }
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
@@ -185,7 +185,7 @@ func (m *LoginToken) ExtractRequestFields(dst map[string]interface{}) {
 }
 
 func (m *CreateLoginTokenRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.UserIds.ExtractRequestFields(dst)
+	m.GetUserIds().ExtractRequestFields(dst)
 }
 
 // Wrap methods of m.UserIdentifiers.

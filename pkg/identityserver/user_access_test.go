@@ -276,7 +276,7 @@ func TestUserAccesLoginTokens(t *testing.T) {
 		user, _ := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
 		reg := ttnpb.NewUserAccessClient(cc)
 		_, err := reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-			UserIds: *user.GetIds(),
+			UserIds: user.GetIds(),
 		})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.Resemble(err, errLoginTokensDisabled), should.BeTrue)
@@ -293,28 +293,28 @@ func TestUserAccesLoginTokens(t *testing.T) {
 		reg := ttnpb.NewUserAccessClient(cc)
 
 		token, err := reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-			UserIds: *user.GetIds(),
+			UserIds: user.GetIds(),
 		})
 		if a.So(err, should.BeNil) {
 			a.So(token.Token, should.BeBlank)
 		}
 
 		token, err = reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-			UserIds: *user.GetIds(),
+			UserIds: user.GetIds(),
 		}, adminCreds)
 		if a.So(err, should.BeNil) {
 			a.So(token.Token, should.NotBeBlank)
 		}
 
 		token, err = reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-			UserIds: *adminUser.GetIds(),
+			UserIds: adminUser.GetIds(),
 		}, adminCreds)
 		if a.So(err, should.BeNil) {
 			a.So(token.Token, should.BeBlank)
 		}
 
 		token, err = reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-			UserIds: *adminUser.GetIds(),
+			UserIds: adminUser.GetIds(),
 		}, adminCreds)
 		if a.So(err, should.BeNil) {
 			a.So(token.Token, should.BeBlank)

@@ -201,7 +201,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 
 	var canCreateMoreTokens bool
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		activeTokens, err := store.GetLoginTokenStore(db).FindActiveLoginTokens(ctx, &req.UserIds)
+		activeTokens, err := store.GetLoginTokenStore(db).FindActiveLoginTokens(ctx, req.GetUserIds())
 		if err != nil {
 			return err
 		}
@@ -219,7 +219,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	if is.IsAdmin(ctx) {
 		canSkipEmail = true // Admin callers can skip sending emails.
 		err := is.withDatabase(ctx, func(db *gorm.DB) error {
-			usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIds, &pbtypes.FieldMask{Paths: []string{"admin"}})
+			usr, err := store.GetUserStore(db).GetUser(ctx, req.GetUserIds(), &pbtypes.FieldMask{Paths: []string{"admin"}})
 			if !usr.Admin {
 				canReturnToken = true // Admin callers can get login tokens for non-admin users.
 			}
@@ -236,7 +236,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		_, err := store.GetLoginTokenStore(db).CreateLoginToken(ctx, &ttnpb.LoginToken{
-			UserIds:   req.UserIds,
+			UserIds:   *req.GetUserIds(),
 			ExpiresAt: time.Now().Add(loginTokenConfig.TokenTTL),
 			Token:     token,
 		})
@@ -244,7 +244,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	})
 
 	if !(canSkipEmail && req.SkipEmail) {
-		err = is.SendUserEmail(ctx, &req.UserIds, func(data emails.Data) email.MessageData {
+		err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
 			return &emails.LoginToken{Data: data, LoginToken: token, TTL: loginTokenConfig.TokenTTL}
 		})
 		if err != nil {

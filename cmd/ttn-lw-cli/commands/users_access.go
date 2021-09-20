@@ -242,7 +242,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewUserAccessClient(is).CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-				UserIds: *usrID,
+				UserIds: usrID,
 			})
 			if err != nil {
 				return err

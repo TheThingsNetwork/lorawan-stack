@@ -265,7 +265,7 @@ message LoginToken {
 }
 
 message CreateLoginTokenRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
   // Skip sending the login token to the user by email.
   // This field is only effective when the login token is created by an admin user.
   bool skip_email = 2;
