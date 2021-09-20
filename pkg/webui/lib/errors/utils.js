@@ -248,6 +248,9 @@ export const isSentryWorthy = error =>
  * @returns {string} The Sentry error title.
  */
 export const getSentryErrorTitle = error => {
+  if (typeof error === 'string') {
+    return `invalid string error: "${error}"`
+  }
   if (typeof error !== 'object') {
     return `invalid error type: ${error}`
   }
@@ -272,6 +275,8 @@ export const getSentryErrorTitle = error => {
     return error.code
   } else if ('statusCode' in error) {
     return `status code: ${error.statusCode}`
+  } else if ('id' in error && 'defaultMessage' in error) {
+    return error.defaultMessage
   }
 
   return 'untitled or empty error'
