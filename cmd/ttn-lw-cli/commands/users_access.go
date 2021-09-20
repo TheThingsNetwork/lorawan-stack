@@ -133,7 +133,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewUserAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
-				UserIds:   *usrID,
+				UserIds:   usrID,
 				Name:      name,
 				Rights:    rights,
 				ExpiresAt: expiryDate,

@@ -1394,7 +1394,14 @@ func (m *CreateUserAPIKeyRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIds).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return CreateUserAPIKeyRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateUserAPIKeyRequestValidationError{
 						field:  "user_ids",
