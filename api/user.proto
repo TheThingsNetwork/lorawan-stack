@@ -157,7 +157,7 @@ message UpdateUserPasswordRequest {
 }
 
 message ListUserAPIKeysRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
   // Limit the number of results per page.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.

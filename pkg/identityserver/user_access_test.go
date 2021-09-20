@@ -137,7 +137,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		a.So(APIKey, should.BeNil)
 
 		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
-			UserIds: *userID,
+			UserIds: userID,
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -229,7 +229,7 @@ func TestUserAccessCRUD(t *testing.T) {
 
 		sort.Slice(userAPIKeys.ApiKeys, func(i int, j int) bool { return userAPIKeys.ApiKeys[i].Name < userAPIKeys.ApiKeys[j].Name })
 		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
-			UserIds: *user.GetIds(),
+			UserIds: user.GetIds(),
 		}, creds)
 		sort.Slice(apiKeys.ApiKeys, func(i int, j int) bool { return apiKeys.ApiKeys[i].Name < apiKeys.ApiKeys[j].Name })
 

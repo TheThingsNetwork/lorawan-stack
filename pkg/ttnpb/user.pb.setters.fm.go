@@ -551,10 +551,18 @@ func (dst *ListUserAPIKeysRequest) SetFields(src *ListUserAPIKeysRequest, paths 
 		case "user_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
-				if src != nil {
-					newSrc = &src.UserIds
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
 				}
-				newDst = &dst.UserIds
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -562,8 +570,7 @@ func (dst *ListUserAPIKeysRequest) SetFields(src *ListUserAPIKeysRequest, paths 
 				if src != nil {
 					dst.UserIds = src.UserIds
 				} else {
-					var zero UserIdentifiers
-					dst.UserIds = zero
+					dst.UserIds = nil
 				}
 			}
 		case "limit":

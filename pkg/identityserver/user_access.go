@@ -93,7 +93,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 }
 
 func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUserAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
-	if err = rights.RequireUser(ctx, req.UserIds, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	var total uint64
@@ -105,7 +105,7 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUs
 	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.UserIds.GetEntityIdentifiers())
+		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetUserIds().GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {

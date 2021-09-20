@@ -68,7 +68,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewUserAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
-				UserIds: *usrID, Limit: limit, Page: page,
+				UserIds: usrID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
