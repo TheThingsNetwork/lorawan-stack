@@ -145,7 +145,7 @@ message UpdateUserRequest {
 }
 
 message CreateTemporaryPasswordRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
 }
 
 message UpdateUserPasswordRequest {

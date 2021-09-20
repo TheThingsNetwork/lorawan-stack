@@ -665,7 +665,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 	ttl := time.Hour
 	expires := now.Add(ttl)
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIds, temporaryPasswordFieldMask)
+		usr, err := store.GetUserStore(db).GetUser(ctx, req.GetUserIds(), temporaryPasswordFieldMask)
 		if err != nil {
 			return err
 		}
@@ -681,11 +681,11 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		return nil, err
 	}
 	log.FromContext(ctx).WithFields(log.Fields(
-		"user_uid", unique.ID(ctx, req.UserIds),
+		"user_uid", unique.ID(ctx, req.GetUserIds()),
 		"temporary_password", temporaryPassword,
 	)).Info("Created temporary password")
-	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, &req.UserIds, updateTemporaryPasswordFieldMask))
-	err = is.SendUserEmail(ctx, &req.UserIds, func(data emails.Data) email.MessageData {
+	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.GetUserIds(), updateTemporaryPasswordFieldMask))
+	err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
 		return &emails.TemporaryPassword{
 			Data:              data,
 			TemporaryPassword: temporaryPassword,

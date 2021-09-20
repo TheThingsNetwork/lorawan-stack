@@ -345,7 +345,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewUserRegistryClient(is).CreateTemporaryPassword(ctx, &ttnpb.CreateTemporaryPasswordRequest{
-				UserIds: *usrID,
+				UserIds: usrID,
 			})
 
 			return err

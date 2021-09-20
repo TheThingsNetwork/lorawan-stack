@@ -81,13 +81,13 @@ func TestTemporaryValidPassword(t *testing.T) {
 		reg := ttnpb.NewUserRegistryClient(cc)
 
 		_, err := reg.CreateTemporaryPassword(ctx, &ttnpb.CreateTemporaryPasswordRequest{
-			UserIds: *userID,
+			UserIds: userID,
 		})
 
 		a.So(err, should.BeNil)
 
 		_, err = reg.CreateTemporaryPassword(ctx, &ttnpb.CreateTemporaryPasswordRequest{
-			UserIds: *userID,
+			UserIds: userID,
 		})
 
 		if a.So(err, should.NotBeNil) {
