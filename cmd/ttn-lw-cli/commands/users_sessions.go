@@ -76,7 +76,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewUserSessionRegistryClient(is).List(ctx, &ttnpb.ListUserSessionsRequest{
-				UserIds: *usrID,
+				UserIds: usrID,
 				Limit:   limit,
 				Page:    page,
 				Order:   getOrder(cmd.Flags()),

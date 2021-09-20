@@ -39,7 +39,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 		reg := ttnpb.NewUserSessionRegistryClient(cc)
 
 		_, err := reg.List(ctx, &ttnpb.ListUserSessionsRequest{
-			UserIds: *user.GetIds(),
+			UserIds: user.GetIds(),
 		}, credsWithoutRights)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -54,7 +54,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 		}
 
 		sessions, err := reg.List(ctx, &ttnpb.ListUserSessionsRequest{
-			UserIds: *user.GetIds(),
+			UserIds: user.GetIds(),
 		}, creds)
 		if a.So(err, should.BeNil) {
 			a.So(sessions.Sessions, should.BeEmpty)
@@ -82,7 +82,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 		}
 
 		sessions, err = reg.List(ctx, &ttnpb.ListUserSessionsRequest{
-			UserIds: *user.GetIds(),
+			UserIds: user.GetIds(),
 		}, creds)
 		if a.So(err, should.BeNil) {
 			a.So(sessions.Sessions, should.HaveLength, 1)
@@ -95,7 +95,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		sessions, err = reg.List(ctx, &ttnpb.ListUserSessionsRequest{
-			UserIds: *user.GetIds(),
+			UserIds: user.GetIds(),
 		}, creds)
 		if a.So(err, should.BeNil) {
 			a.So(sessions.Sessions, should.BeEmpty)

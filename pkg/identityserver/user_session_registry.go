@@ -25,7 +25,7 @@ import (
 )
 
 func (is *IdentityServer) listUserSessions(ctx context.Context, req *ttnpb.ListUserSessionsRequest) (sessions *ttnpb.UserSessions, err error) {
-	if err := rights.RequireUser(ctx, req.UserIds, ttnpb.RIGHT_USER_ALL); err != nil {
+	if err := rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_ALL); err != nil {
 		return nil, err
 	}
 	ctx = store.WithOrder(ctx, req.Order)
@@ -38,7 +38,7 @@ func (is *IdentityServer) listUserSessions(ctx context.Context, req *ttnpb.ListU
 	}()
 	sessions = &ttnpb.UserSessions{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		sessions.Sessions, err = store.GetUserSessionStore(db).FindSessions(paginateCtx, &req.UserIds)
+		sessions.Sessions, err = store.GetUserSessionStore(db).FindSessions(paginateCtx, req.GetUserIds())
 		if err != nil {
 			return err
 		}
