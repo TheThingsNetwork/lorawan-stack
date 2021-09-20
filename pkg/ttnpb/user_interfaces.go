@@ -65,7 +65,7 @@ func (m *ListUserSessionsRequest) EntityType() string {
 }
 
 func (m *LoginToken) EntityType() string {
-	return m.UserIds.EntityType()
+	return m.GetUserIds().EntityType()
 }
 
 func (m *CreateLoginTokenRequest) EntityType() string {
@@ -123,7 +123,7 @@ func (m *ListUserSessionsRequest) IDString() string {
 }
 
 func (m *LoginToken) IDString() string {
-	return m.UserIds.IDString()
+	return m.GetUserIds().IDString()
 }
 
 func (m *CreateLoginTokenRequest) IDString() string {
@@ -181,7 +181,7 @@ func (m *ListUserSessionsRequest) ExtractRequestFields(dst map[string]interface{
 }
 
 func (m *LoginToken) ExtractRequestFields(dst map[string]interface{}) {
-	m.UserIds.ExtractRequestFields(dst)
+	m.GetUserIds().ExtractRequestFields(dst)
 }
 
 func (m *CreateLoginTokenRequest) ExtractRequestFields(dst map[string]interface{}) {

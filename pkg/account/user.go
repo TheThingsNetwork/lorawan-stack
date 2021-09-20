@@ -130,7 +130,7 @@ func (s *server) TokenLogin(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	if err := s.CreateUserSession(c, &loginToken.UserIds); err != nil {
+	if err := s.CreateUserSession(c, loginToken.GetUserIds()); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)

@@ -293,7 +293,7 @@ func TestAuthentication(t *testing.T) {
 			Name: "token login",
 			StoreSetup: func(s *mockStore) {
 				s.res.loginToken = &ttnpb.LoginToken{
-					UserIds: *mockUser.GetIds(),
+					UserIds: mockUser.GetIds(),
 				}
 				s.res.session = mockSession
 			},
