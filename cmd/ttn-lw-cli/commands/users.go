@@ -206,10 +206,10 @@ var (
 				return err
 			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
-			if usrID != nil && usrID.UserId != "" {
-				user.Ids = ttnpb.UserIdentifiers{UserId: usrID.UserId}
+			if usrID.GetUserId() != "" {
+				user.Ids = &ttnpb.UserIdentifiers{UserId: usrID.GetUserId()}
 			}
-			if user.Ids.UserId == "" {
+			if user.GetIds().GetUserId() == "" {
 				return errNoUserID
 			}
 
@@ -303,7 +303,7 @@ var (
 				return err
 			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
-			user.Ids = *usrID
+			user.Ids = usrID
 			if profilePicture, err := cmd.Flags().GetString("profile_picture"); err == nil && profilePicture != "" {
 				user.ProfilePicture, err = readPicture(profilePicture)
 				if err != nil {

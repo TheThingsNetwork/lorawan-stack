@@ -92,13 +92,13 @@ var createAdminUserCommand = &cobra.Command{
 			"admin",
 		}}
 		usr := &ttnpb.User{
-			Ids: ttnpb.UserIdentifiers{UserId: userID},
+			Ids: &ttnpb.UserIdentifiers{UserId: userID},
 		}
 
 		usrStore := store.GetUserStore(db)
 
 		var usrExists bool
-		if _, err := usrStore.GetUser(ctx, &usr.Ids, usrFieldMask); err == nil {
+		if _, err := usrStore.GetUser(ctx, usr.GetIds(), usrFieldMask); err == nil {
 			usrExists = true
 		}
 		usr.PrimaryEmailAddress = email

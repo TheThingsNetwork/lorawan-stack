@@ -50,11 +50,11 @@ type Data struct {
 // SetUser sets the user's ID, name and primary email address to the email data.
 // If the user's name is unknown, its ID is used as name.
 func (d *Data) SetUser(user *ttnpb.User) {
-	d.User.ID = user.Ids.UserId
+	d.User.ID = user.GetIds().GetUserId()
 	if user.Name != "" {
 		d.User.Name = user.Name
 	} else {
-		d.User.Name = user.Ids.UserId
+		d.User.Name = user.GetIds().GetUserId()
 	}
 	d.User.Email = user.PrimaryEmailAddress
 }

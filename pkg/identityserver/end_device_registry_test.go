@@ -123,9 +123,9 @@ func TestEndDevicesCRUD(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewEndDeviceRegistryClient(cc)
 
-		userID := defaultUser.Ids
+		userID := defaultUser.GetIds()
 		creds := userCreds(defaultUserIdx)
-		app := userApplications(&userID).Applications[0]
+		app := userApplications(userID).Applications[0]
 
 		joinEUI := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 		devEUI := types.EUI64{8, 7, 6, 5, 4, 3, 2, 1}

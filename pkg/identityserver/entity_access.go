@@ -257,7 +257,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	}
 
 	if user != nil {
-		rpclog.AddField(ctx, "auth.user_id", user.Ids.UserId)
+		rpclog.AddField(ctx, "auth.user_id", user.GetIds().GetUserId())
 
 		if is.configFromContext(ctx).UserRegistration.ContactInfoValidation.Required && user.PrimaryEmailAddressValidatedAt == nil {
 			// Go to profile page, edit basic settings (such as email), delete account.

@@ -64,7 +64,7 @@ var (
 		CreatedAt: time.Now().Truncate(time.Second),
 	}
 	mockUser = &ttnpb.User{
-		Ids: ttnpb.UserIdentifiers{UserId: "user"},
+		Ids: &ttnpb.UserIdentifiers{UserId: "user"},
 	}
 )
 
@@ -293,7 +293,7 @@ func TestAuthentication(t *testing.T) {
 			Name: "token login",
 			StoreSetup: func(s *mockStore) {
 				s.res.loginToken = &ttnpb.LoginToken{
-					UserIds: mockUser.Ids,
+					UserIds: *mockUser.GetIds(),
 				}
 				s.res.session = mockSession
 			},
@@ -307,7 +307,7 @@ func TestAuthentication(t *testing.T) {
 				a.So(s.req.token, should.Equal, "this-is-the-token")
 
 				a.So(s.calls, should.Contain, "CreateSession")
-				a.So(s.req.session.UserIds, should.Resemble, mockUser.Ids)
+				a.So(s.req.session.UserIds, should.Resemble, mockUser.GetIds())
 			},
 		},
 	} {

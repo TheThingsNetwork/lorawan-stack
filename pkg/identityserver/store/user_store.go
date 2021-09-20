@@ -73,7 +73,7 @@ func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.Fi
 func (s *userStore) CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.User, error) {
 	defer trace.StartRegion(ctx, "create user").End()
 	userModel := User{
-		Account: Account{UID: usr.Ids.GetUserId()}, // The ID is not mutated by fromPB.
+		Account: Account{UID: usr.GetIds().GetUserId()}, // The ID is not mutated by fromPB.
 	}
 	fieldMask := &pbtypes.FieldMask{Paths: append(defaultUserFieldMask.GetPaths(), passwordField)}
 	userModel.fromPB(usr, fieldMask)
@@ -156,12 +156,12 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 
 func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *pbtypes.FieldMask) (updated *ttnpb.User, err error) {
 	defer trace.StartRegion(ctx, "update user").End()
-	query := s.query(ctx, User{}, withUserID(usr.Ids.GetUserId()))
+	query := s.query(ctx, User{}, withUserID(usr.GetIds().GetUserId()))
 	query = selectUserFields(ctx, query, fieldMask)
 	var userModel userWithUID
 	if err = query.First(&userModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(usr.Ids)
+			return nil, errNotFoundForID(usr.GetIds())
 		}
 		return nil, err
 	}

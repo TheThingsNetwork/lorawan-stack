@@ -171,7 +171,7 @@ var userColumnNames = map[string][]string{
 }
 
 func (usr User) toPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) {
-	pb.Ids = ttnpb.UserIdentifiers{UserId: usr.Account.UID}
+	pb.Ids = &ttnpb.UserIdentifiers{UserId: usr.Account.UID}
 	pb.CreatedAt = cleanTime(usr.CreatedAt)
 	pb.UpdatedAt = cleanTime(usr.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(usr.DeletedAt)

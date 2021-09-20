@@ -76,18 +76,18 @@ func TestTemporaryValidPassword(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := population.Users[userTestUserIdx].Ids
+		userID := population.Users[userTestUserIdx].GetIds()
 
 		reg := ttnpb.NewUserRegistryClient(cc)
 
 		_, err := reg.CreateTemporaryPassword(ctx, &ttnpb.CreateTemporaryPasswordRequest{
-			UserIds: userID,
+			UserIds: *userID,
 		})
 
 		a.So(err, should.BeNil)
 
 		_, err = reg.CreateTemporaryPassword(ctx, &ttnpb.CreateTemporaryPasswordRequest{
-			UserIds: userID,
+			UserIds: *userID,
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -102,7 +102,7 @@ func TestUserCreate(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		is.config.UserRegistration.Enabled = false
-		userID := ttnpb.UserIdentifiers{UserId: "test-user-id"}
+		userID := &ttnpb.UserIdentifiers{UserId: "test-user-id"}
 		reg := ttnpb.NewUserRegistryClient(cc)
 		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
 			User: ttnpb.User{
@@ -118,7 +118,7 @@ func TestUserCreate(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		is.config.UserRegistration.Invitation.Required = true
-		userID := ttnpb.UserIdentifiers{UserId: "test-user-id"}
+		userID := &ttnpb.UserIdentifiers{UserId: "test-user-id"}
 		reg := ttnpb.NewUserRegistryClient(cc)
 		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
 			User: ttnpb.User{
@@ -133,7 +133,7 @@ func TestUserCreate(t *testing.T) {
 	})
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := ttnpb.UserIdentifiers{UserId: "test-user-id"}
+		userID := &ttnpb.UserIdentifiers{UserId: "test-user-id"}
 		reg := ttnpb.NewUserRegistryClient(cc)
 		created, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
 			User: ttnpb.User{
@@ -152,12 +152,12 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := population.Users[userTestUserIdx].Ids
+		userID := population.Users[userTestUserIdx].GetIds()
 
 		reg := ttnpb.NewUserRegistryClient(cc)
 
 		_, err := reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
-			UserIds: userID,
+			UserIds: *userID,
 			Old:     "wrong-user-password",
 			New:     "new password",
 		})
@@ -229,7 +229,7 @@ func TestUsersWeakPassword(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
 			User: ttnpb.User{
-				Ids:      ttnpb.UserIdentifiers{UserId: "test-user-id"},
+				Ids:      &ttnpb.UserIdentifiers{UserId: "test-user-id"},
 				Password: weakPassword,
 			},
 		})
@@ -244,7 +244,7 @@ func TestUsersWeakPassword(t *testing.T) {
 		newPassword := weakPassword
 
 		_, err = reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
-			UserIds: user.Ids,
+			UserIds: *user.GetIds(),
 			Old:     oldPassword,
 			New:     newPassword,
 		}, creds)
@@ -254,7 +254,7 @@ func TestUsersWeakPassword(t *testing.T) {
 		}
 
 		afterUpdate, err := reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   user.Ids,
+			UserIds:   *user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"password_updated_at"}},
 		}, creds)
 
@@ -276,7 +276,7 @@ func TestUsersCRUD(t *testing.T) {
 		credsWithoutRights := userCreds(userTestUserIdx, "key without rights")
 
 		got, err := reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   user.Ids,
+			UserIds:   *user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name", "admin", "created_at", "updated_at"}},
 		}, creds)
 
@@ -288,14 +288,14 @@ func TestUsersCRUD(t *testing.T) {
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   user.Ids,
+			UserIds:   *user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   user.Ids,
+			UserIds:   *user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
 
@@ -305,7 +305,7 @@ func TestUsersCRUD(t *testing.T) {
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateUserRequest{
 			User: ttnpb.User{
-				Ids:  user.Ids,
+				Ids:  user.GetIds(),
 				Name: "Updated Name",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
@@ -318,7 +318,7 @@ func TestUsersCRUD(t *testing.T) {
 
 		updated, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
 			User: ttnpb.User{
-				Ids:              user.Ids,
+				Ids:              user.GetIds(),
 				State:            ttnpb.STATE_FLAGGED,
 				StateDescription: "something is wrong",
 			},
@@ -333,7 +333,7 @@ func TestUsersCRUD(t *testing.T) {
 
 		updated, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
 			User: ttnpb.User{
-				Ids:   user.Ids,
+				Ids:   user.GetIds(),
 				State: ttnpb.STATE_APPROVED,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"state"}},
@@ -345,7 +345,7 @@ func TestUsersCRUD(t *testing.T) {
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   user.Ids,
+			UserIds:   *user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"state", "state_description"}},
 		}, creds)
 
@@ -359,7 +359,7 @@ func TestUsersCRUD(t *testing.T) {
 		newPassword := "updated user password" // Meets minimum length requirement of 10 characters.
 
 		_, err = reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
-			UserIds: user.Ids,
+			UserIds: *user.GetIds(),
 			Old:     oldPassword,
 			New:     newPassword,
 		}, creds)
@@ -367,7 +367,7 @@ func TestUsersCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		afterUpdate, err := reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   user.Ids,
+			UserIds:   *user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"password_updated_at"}},
 		}, creds)
 
@@ -376,12 +376,12 @@ func TestUsersCRUD(t *testing.T) {
 			a.So(*afterUpdate.PasswordUpdatedAt, should.HappenAfter, passwordUpdateTime)
 		}
 
-		_, err = reg.Delete(ctx, &user.Ids, creds)
+		_, err = reg.Delete(ctx, user.GetIds(), creds)
 
 		a.So(err, should.BeNil)
 
 		empty, err := reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   user.Ids,
+			UserIds:   *user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
@@ -393,7 +393,7 @@ func TestUsersCRUD(t *testing.T) {
 		a.So(errors.IsUnauthenticated(err), should.BeTrue)
 
 		empty, err = reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIds:   user.Ids,
+			UserIds:   *user.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, userCreds(adminUserIdx))
 
@@ -402,12 +402,12 @@ func TestUsersCRUD(t *testing.T) {
 		}
 		a.So(empty, should.BeNil)
 
-		_, err = reg.Purge(ctx, &user.Ids, creds)
+		_, err = reg.Purge(ctx, user.GetIds(), creds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.Purge(ctx, &user.Ids, userCreds(adminUserIdx))
+		_, err = reg.Purge(ctx, user.GetIds(), userCreds(adminUserIdx))
 		a.So(err, should.BeNil)
 	})
 }

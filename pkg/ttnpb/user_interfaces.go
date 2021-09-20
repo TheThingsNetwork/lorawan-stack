@@ -21,11 +21,11 @@ func (m *GetUserRequest) EntityType() string {
 }
 
 func (m *CreateUserRequest) EntityType() string {
-	return m.Ids.EntityType()
+	return m.GetIds().EntityType()
 }
 
 func (m *UpdateUserRequest) EntityType() string {
-	return m.Ids.EntityType()
+	return m.GetIds().EntityType()
 }
 
 func (m *CreateTemporaryPasswordRequest) EntityType() string {

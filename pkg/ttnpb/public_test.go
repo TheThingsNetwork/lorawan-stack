@@ -100,7 +100,7 @@ func TestUserPublicSafe(t *testing.T) {
 	a.So(((*User)(nil)).PublicSafe(), should.BeNil)
 
 	src := &User{
-		Ids:         UserIdentifiers{UserId: "foo"},
+		Ids:         &UserIdentifiers{UserId: "foo"},
 		Name:        "Name",
 		Description: "Description",
 		Attributes:  map[string]string{"key": "value"},

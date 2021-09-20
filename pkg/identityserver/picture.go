@@ -102,7 +102,7 @@ func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *tt
 	if err != nil {
 		return err
 	}
-	id := fmt.Sprintf("%s.%s", unique.ID(ctx, usr.Ids), ulid.MustNew(ulid.Now(), pictureRand).String())
+	id := fmt.Sprintf("%s.%s", unique.ID(ctx, usr.GetIds()), ulid.MustNew(ulid.Now(), pictureRand).String())
 
 	region := trace.StartRegion(ctx, "store profile picture")
 	usr.ProfilePicture, err = picture.Store(ctx, bucket, id, usr.ProfilePicture, profilePictureDimensions...)
