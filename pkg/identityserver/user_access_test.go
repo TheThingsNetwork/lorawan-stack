@@ -61,7 +61,7 @@ func TestUserAccessNotFound(t *testing.T) {
 		a.So(got, should.BeNil)
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-			UserIds:   *userID,
+			UserIds:   userID,
 			APIKey:    apiKey,
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
@@ -97,7 +97,7 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 		APIKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_ALL}
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-			UserIds:   *userID,
+			UserIds:   userID,
 			APIKey:    *APIKey,
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
 		}, creds)
@@ -159,7 +159,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		APIKey = userAPIKeys(userID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-			UserIds:   *userID,
+			UserIds:   userID,
 			APIKey:    *APIKey,
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
 		})
@@ -256,7 +256,7 @@ func TestUserAccessCRUD(t *testing.T) {
 		newAPIKeyName := "test-new-api-key"
 		created.Name = newAPIKeyName
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-			UserIds:   *user.GetIds(),
+			UserIds:   user.GetIds(),
 			APIKey:    *created,
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)

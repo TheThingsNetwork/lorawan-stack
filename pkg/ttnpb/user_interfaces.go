@@ -49,7 +49,7 @@ func (m *CreateUserAPIKeyRequest) EntityType() string {
 }
 
 func (m *UpdateUserAPIKeyRequest) EntityType() string {
-	return m.UserIds.EntityType()
+	return m.GetUserIds().EntityType()
 }
 
 func (m *UserSessionIdentifiers) EntityType() string {
@@ -107,7 +107,7 @@ func (m *CreateUserAPIKeyRequest) IDString() string {
 }
 
 func (m *UpdateUserAPIKeyRequest) IDString() string {
-	return m.UserIds.IDString()
+	return m.GetUserIds().IDString()
 }
 
 func (m *UserSessionIdentifiers) IDString() string {
@@ -165,7 +165,7 @@ func (m *CreateUserAPIKeyRequest) ExtractRequestFields(dst map[string]interface{
 }
 
 func (m *UpdateUserAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.UserIds.ExtractRequestFields(dst)
+	m.GetUserIds().ExtractRequestFields(dst)
 }
 
 func (m *UserSessionIdentifiers) ExtractRequestFields(dst map[string]interface{}) {

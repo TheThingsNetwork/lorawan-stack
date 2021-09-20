@@ -139,7 +139,7 @@ func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserA
 
 func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireUser(ctx, req.UserIds, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -154,11 +154,11 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 			existingRights := ttnpb.RightsFrom(key.Rights...)
 
 			// Require the caller to have all added rights.
-			if err := rights.RequireUser(ctx, req.UserIds, newRights.Sub(existingRights).GetRights()...); err != nil {
+			if err := rights.RequireUser(ctx, *req.GetUserIds(), newRights.Sub(existingRights).GetRights()...); err != nil {
 				return err
 			}
 			// Require the caller to have all removed rights.
-			if err := rights.RequireUser(ctx, req.UserIds, existingRights.Sub(newRights).GetRights()...); err != nil {
+			if err := rights.RequireUser(ctx, *req.GetUserIds(), existingRights.Sub(newRights).GetRights()...); err != nil {
 				return err
 			}
 		}
@@ -170,12 +170,12 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 		return nil, err
 	}
 	if key == nil { // API key was deleted.
-		events.Publish(evtDeleteUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIds, nil))
+		events.Publish(evtDeleteUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIds, nil))
-	err = is.SendUserEmail(ctx, &req.UserIds, func(data emails.Data) email.MessageData {
+	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
+	err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
 		data.SetEntity(req)
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
 	})
