@@ -19,16 +19,20 @@ import Notification from '@ttn-lw/components/notification'
 import { isBackend, toMessageProps, ingestError } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const ErrorNotification = ({ content, title, ...rest }) => {
+const ErrorNotification = ({ content, title, details, noIngest, ...rest }) => {
   const message = toMessageProps(content)
-  let details = undefined
+  let passedDetails = details
 
   useEffect(() => {
-    ingestError(content, { ingestedBy: 'ErrorNotification' })
-  }, [content])
+    if (!noIngest) {
+      ingestError(details, {
+        ingestedBy: 'ErrorNotification',
+      })
+    }
+  }, [content, details, noIngest])
 
-  if (isBackend(content)) {
-    details = content
+  if (isBackend(content) && !details) {
+    passedDetails = content
   }
   return (
     <Notification
@@ -36,7 +40,7 @@ const ErrorNotification = ({ content, title, ...rest }) => {
       content={message.content}
       title={title || message.title}
       messageValues={message.values}
-      details={details}
+      details={passedDetails}
       data-test-id="error-notification"
       {...rest}
     />
@@ -45,10 +49,14 @@ const ErrorNotification = ({ content, title, ...rest }) => {
 
 ErrorNotification.propTypes = {
   content: PropTypes.oneOfType([PropTypes.message, PropTypes.error, PropTypes.string]).isRequired,
+  details: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
+  noIngest: PropTypes.bool,
   title: PropTypes.message,
 }
 
 ErrorNotification.defaultProps = {
+  details: undefined,
+  noIngest: false,
   title: undefined,
 }
 
