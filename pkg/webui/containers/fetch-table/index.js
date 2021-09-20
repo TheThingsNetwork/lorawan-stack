@@ -83,7 +83,6 @@ class FetchTable extends Component {
     clickable: PropTypes.bool,
     dispatch: PropTypes.func.isRequired,
     entity: PropTypes.string.isRequired,
-    error: PropTypes.error,
     fetching: PropTypes.bool,
     fetchingSearch: PropTypes.bool,
     filterValidator: PropTypes.func,
@@ -147,7 +146,6 @@ class FetchTable extends Component {
     tableTitle: undefined,
     tabs: [],
     actionItems: null,
-    error: undefined,
     clickable: true,
   }
 
@@ -183,16 +181,20 @@ class FetchTable extends Component {
   }
 
   @bind
-  fetchItems() {
+  async fetchItems() {
     const { dispatch, pageSize, searchItemsAction, getItemsAction } = this.props
 
     const filters = { ...this.state, limit: pageSize }
 
-    if (filters.query && searchItemsAction) {
-      return dispatch(attachPromise(searchItemsAction(filters)))
-    }
+    try {
+      if (filters.query && searchItemsAction) {
+        await dispatch(attachPromise(searchItemsAction(filters)))
+      }
 
-    return dispatch(attachPromise(getItemsAction(filters)))
+      await dispatch(attachPromise(getItemsAction(filters)))
+    } catch (error) {
+      this.setState({ error })
+    }
   }
 
   @bind
@@ -308,12 +310,11 @@ class FetchTable extends Component {
       pathname,
       actionItems,
       entity,
-      error,
       searchPlaceholderMessage,
       searchQueryMaxLength,
       clickable,
     } = this.props
-    const { page, query, tab, order, initialFetch } = this.state
+    const { page, query, tab, order, initialFetch, error } = this.state
     let orderDirection, orderBy
 
     // Parse order string.
@@ -379,6 +380,7 @@ class FetchTable extends Component {
             <ErrorNotification
               className={style.errorMessage}
               content={{ ...m.errorMessage, values: { entity } }}
+              details={error}
             />
           )}
           <Tabular
