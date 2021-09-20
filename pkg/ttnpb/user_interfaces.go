@@ -33,7 +33,7 @@ func (m *CreateTemporaryPasswordRequest) EntityType() string {
 }
 
 func (m *UpdateUserPasswordRequest) EntityType() string {
-	return m.UserIds.EntityType()
+	return m.GetUserIds().EntityType()
 }
 
 func (m *ListUserAPIKeysRequest) EntityType() string {
@@ -91,7 +91,7 @@ func (m *CreateTemporaryPasswordRequest) IDString() string {
 }
 
 func (m *UpdateUserPasswordRequest) IDString() string {
-	return m.UserIds.IDString()
+	return m.GetUserIds().IDString()
 }
 
 func (m *ListUserAPIKeysRequest) IDString() string {
@@ -149,7 +149,7 @@ func (m *CreateTemporaryPasswordRequest) ExtractRequestFields(dst map[string]int
 }
 
 func (m *UpdateUserPasswordRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.UserIds.ExtractRequestFields(dst)
+	m.GetUserIds().ExtractRequestFields(dst)
 }
 
 func (m *ListUserAPIKeysRequest) ExtractRequestFields(dst map[string]interface{}) {

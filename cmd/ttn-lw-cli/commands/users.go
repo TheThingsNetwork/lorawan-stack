@@ -401,7 +401,7 @@ var (
 			revokeAllAccess, _ := cmd.Flags().GetBool("revoke-all-access")
 
 			res, err := ttnpb.NewUserRegistryClient(is).UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
-				UserIds:         *usrID,
+				UserIds:         usrID,
 				Old:             old,
 				New:             new,
 				RevokeAllAccess: revokeAllAccess,

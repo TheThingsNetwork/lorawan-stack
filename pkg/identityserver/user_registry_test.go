@@ -157,7 +157,7 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 		reg := ttnpb.NewUserRegistryClient(cc)
 
 		_, err := reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
-			UserIds: *userID,
+			UserIds: userID,
 			Old:     "wrong-user-password",
 			New:     "new password",
 		})
@@ -244,7 +244,7 @@ func TestUsersWeakPassword(t *testing.T) {
 		newPassword := weakPassword
 
 		_, err = reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
-			UserIds: *user.GetIds(),
+			UserIds: user.GetIds(),
 			Old:     oldPassword,
 			New:     newPassword,
 		}, creds)
@@ -359,7 +359,7 @@ func TestUsersCRUD(t *testing.T) {
 		newPassword := "updated user password" // Meets minimum length requirement of 10 characters.
 
 		_, err = reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
-			UserIds: *user.GetIds(),
+			UserIds: user.GetIds(),
 			Old:     oldPassword,
 			New:     newPassword,
 		}, creds)

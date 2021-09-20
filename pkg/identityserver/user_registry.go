@@ -554,7 +554,7 @@ var (
 )
 
 func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*pbtypes.Empty, error) {
-	if err := is.validatePasswordStrength(ctx, req.UserIds.GetUserId(), req.New); err != nil {
+	if err := is.validatePasswordStrength(ctx, req.GetUserIds().GetUserId(), req.New); err != nil {
 		return nil, err
 	}
 	if req.Old == req.New {
@@ -566,7 +566,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	}
 	updateMask := updatePasswordFieldMask
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIds, temporaryPasswordFieldMask)
+		usr, err := store.GetUserStore(db).GetUser(ctx, req.GetUserIds(), temporaryPasswordFieldMask)
 		if err != nil {
 			return err
 		}
@@ -583,7 +583,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			// }
 		} else {
 			if usr.TemporaryPassword == "" {
-				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, &req.UserIds, nil))
+				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
 				return errIncorrectPassword.New()
 			}
 			region := trace.StartRegion(ctx, "validate temporary password")
@@ -593,10 +593,10 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			case err != nil:
 				return err
 			case !valid:
-				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, &req.UserIds, nil))
+				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
 				return errIncorrectPassword.New()
 			case usr.TemporaryPasswordExpiresAt.Before(time.Now()):
-				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, &req.UserIds, nil))
+				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
 				return errTemporaryPasswordExpired.New()
 			}
 			usr.TemporaryPassword, usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = "", nil, nil
@@ -604,18 +604,18 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 		}
 		if req.RevokeAllAccess {
 			sessionStore := store.GetUserSessionStore(db)
-			sessions, err := sessionStore.FindSessions(ctx, &req.UserIds)
+			sessions, err := sessionStore.FindSessions(ctx, req.GetUserIds())
 			if err != nil {
 				return err
 			}
 			for _, session := range sessions {
-				err = sessionStore.DeleteSession(ctx, &req.UserIds, session.SessionId)
+				err = sessionStore.DeleteSession(ctx, req.GetUserIds(), session.SessionId)
 				if err != nil {
 					return err
 				}
 			}
 			oauthStore := store.GetOAuthStore(db)
-			authorizations, err := oauthStore.ListAuthorizations(ctx, &req.UserIds)
+			authorizations, err := oauthStore.ListAuthorizations(ctx, req.GetUserIds())
 			if err != nil {
 				return err
 			}
@@ -640,8 +640,8 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, &req.UserIds, updateMask))
-	err = is.SendUserEmail(ctx, &req.UserIds, func(data emails.Data) email.MessageData {
+	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.GetUserIds(), updateMask))
+	err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
 		return &emails.PasswordChanged{Data: data}
 	})
 	if err != nil {
