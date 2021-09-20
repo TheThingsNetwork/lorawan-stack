@@ -49,15 +49,15 @@ func TestUserSessionStore(t *testing.T) {
 
 		store := GetUserSessionStore(db)
 
-		_, err := store.CreateSession(ctx, &ttnpb.UserSession{UserIdentifiers: doesNotExistIDs})
+		_, err := store.CreateSession(ctx, &ttnpb.UserSession{UserIds: doesNotExistIDs})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
 		created, err := store.CreateSession(ctx, &ttnpb.UserSession{
-			UserIdentifiers: userIDs,
-			SessionSecret:   "123412341234123412341234",
+			UserIds:       userIDs,
+			SessionSecret: "123412341234123412341234",
 		})
 
 		a.So(err, should.BeNil)
@@ -95,9 +95,9 @@ func TestUserSessionStore(t *testing.T) {
 
 		later := time.Now().Add(time.Hour)
 		updated, err := store.UpdateSession(ctx, &ttnpb.UserSession{
-			UserIdentifiers: userIDs,
-			SessionId:       created.SessionId,
-			ExpiresAt:       &later,
+			UserIds:   userIDs,
+			SessionId: created.SessionId,
+			ExpiresAt: &later,
 		})
 
 		a.So(err, should.BeNil)
@@ -108,14 +108,14 @@ func TestUserSessionStore(t *testing.T) {
 		}
 
 		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserId: "does_not_exist"},
+			UserIds: ttnpb.UserIdentifiers{UserId: "does_not_exist"},
 		})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{UserIdentifiers: userIDs, SessionId: "00000000-0000-0000-0000-000000000000"})
+		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{UserIds: userIDs, SessionId: "00000000-0000-0000-0000-000000000000"})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
@@ -170,8 +170,8 @@ func TestUserSessionStore(t *testing.T) {
 			"111123124321543453456652532154",
 		} {
 			_, err := store.CreateSession(ctx, &ttnpb.UserSession{
-				UserIdentifiers: userIDs,
-				SessionSecret:   sessionSecret,
+				UserIds:       userIDs,
+				SessionSecret: sessionSecret,
 			})
 			a.So(err, should.BeNil)
 		}

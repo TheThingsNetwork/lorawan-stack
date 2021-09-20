@@ -103,14 +103,14 @@ func TestContactInfoValidation(t *testing.T) {
 		usrStore := GetUserStore(db)
 
 		usr, err := usrStore.CreateUser(ctx, &ttnpb.User{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserId: "foo"},
+			Ids: ttnpb.UserIdentifiers{UserId: "foo"},
 		})
 
 		a.So(err, should.BeNil)
 
 		s := GetContactInfoStore(db)
 
-		info, err := s.SetContactInfo(ctx, usr.UserIdentifiers, []*ttnpb.ContactInfo{
+		info, err := s.SetContactInfo(ctx, usr.Ids, []*ttnpb.ContactInfo{
 			{ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com"},
 		})
 
@@ -147,7 +147,7 @@ func TestContactInfoValidation(t *testing.T) {
 
 		a.So(err, should.BeNil)
 
-		info, err = s.GetContactInfo(ctx, usr)
+		info, err = s.GetContactInfo(ctx, usr.Ids)
 
 		a.So(err, should.BeNil)
 		if a.So(info, should.HaveLength, 1) {

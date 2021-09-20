@@ -88,7 +88,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 	rights := rightsFromScope(data.Scope)
 	_, err := s.oauth.Authorize(s.ctx, &ttnpb.OAuthClientAuthorization{
 		ClientIds: client.ClientIdentifiers,
-		UserIds:   userSessionIDs.UserIdentifiers,
+		UserIds:   userSessionIDs.UserIds,
 		Rights:    rights,
 	})
 	if err != nil {
@@ -99,7 +99,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 	}
 	err = s.oauth.CreateAuthorizationCode(s.ctx, &ttnpb.OAuthAuthorizationCode{
 		ClientIds:     client.ClientIdentifiers,
-		UserIds:       userSessionIDs.UserIdentifiers,
+		UserIds:       userSessionIDs.UserIds,
 		UserSessionId: userSessionIDs.SessionId,
 		Rights:        rights,
 		Code:          data.Code,
@@ -133,8 +133,8 @@ func (s *storage) LoadAuthorize(code string) (data *osin.AuthorizeData, err erro
 		CreatedAt:   authorizationCode.CreatedAt,
 		UserData: userData{
 			UserSessionIdentifiers: ttnpb.UserSessionIdentifiers{
-				UserIdentifiers: authorizationCode.UserIds,
-				SessionId:       authorizationCode.UserSessionId,
+				UserIds:   authorizationCode.UserIds,
+				SessionId: authorizationCode.UserSessionId,
 			},
 		},
 	}, nil
@@ -208,7 +208,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 	}
 	return s.oauth.CreateAccessToken(s.ctx, &ttnpb.OAuthAccessToken{
 		ClientIds:     client.ClientIdentifiers,
-		UserIds:       userSessionIDs.UserIdentifiers,
+		UserIds:       userSessionIDs.UserIds,
 		UserSessionId: userSessionIDs.SessionId,
 		Rights:        rights,
 		Id:            accessID,
@@ -237,8 +237,8 @@ func (s *storage) loadAccess(id string) (*osin.AccessData, error) {
 		CreatedAt:    accessToken.CreatedAt,
 		UserData: userData{
 			UserSessionIdentifiers: ttnpb.UserSessionIdentifiers{
-				UserIdentifiers: accessToken.UserIds,
-				SessionId:       accessToken.UserSessionId,
+				UserIds:   accessToken.UserIds,
+				SessionId: accessToken.UserSessionId,
 			},
 			ID: id,
 		},

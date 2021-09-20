@@ -32,11 +32,15 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/randutil"
 )
 
-const maxProfilePictureStoredDimensions = 1024
-const maxEndDevicePictureStoredDimensions = 1024
+const (
+	maxProfilePictureStoredDimensions   = 1024
+	maxEndDevicePictureStoredDimensions = 1024
+)
 
-var profilePictureDimensions = []int{64, 128, 256, 512}
-var endDevicePictureDimensions = []int{64, 128, 256, 512}
+var (
+	profilePictureDimensions   = []int{64, 128, 256, 512}
+	endDevicePictureDimensions = []int{64, 128, 256, 512}
+)
 
 var pictureRand = randutil.NewLockedRand(rand.NewSource(time.Now().UnixNano()))
 
@@ -98,7 +102,7 @@ func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *tt
 	if err != nil {
 		return err
 	}
-	id := fmt.Sprintf("%s.%s", unique.ID(ctx, usr.UserIdentifiers), ulid.MustNew(ulid.Now(), pictureRand).String())
+	id := fmt.Sprintf("%s.%s", unique.ID(ctx, usr.Ids), ulid.MustNew(ulid.Now(), pictureRand).String())
 
 	region := trace.StartRegion(ctx, "store profile picture")
 	usr.ProfilePicture, err = picture.Store(ctx, bucket, id, usr.ProfilePicture, profilePictureDimensions...)

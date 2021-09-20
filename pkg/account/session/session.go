@@ -131,7 +131,7 @@ func (s *Session) GetUser(c echo.Context) (*ttnpb.User, error) {
 	}
 	user, err := s.Store.GetUser(
 		c.Request().Context(),
-		&ttnpb.UserIdentifiers{UserId: session.UserIdentifiers.UserId},
+		&ttnpb.UserIdentifiers{UserId: session.UserIds.GetUserId()},
 		nil,
 	)
 	if err != nil {
@@ -162,7 +162,7 @@ func (s *Session) DoLogin(ctx context.Context, userID, password string) error {
 	ok, err := auth.Validate(user.Password, password)
 	region.End()
 	if err != nil || !ok {
-		events.Publish(evtUserLoginFailed.NewWithIdentifiersAndData(ctx, &user.UserIdentifiers, nil))
+		events.Publish(evtUserLoginFailed.NewWithIdentifiersAndData(ctx, &user.Ids, nil))
 		return errIncorrectPasswordOrUserID.New()
 	}
 	return nil

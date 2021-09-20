@@ -123,7 +123,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewEndDeviceRegistryClient(cc)
 
-		userID := defaultUser.UserIdentifiers
+		userID := defaultUser.Ids
 		creds := userCreds(defaultUserIdx)
 		app := userApplications(&userID).Applications[0]
 

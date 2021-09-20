@@ -98,7 +98,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			},
 		)
 		user := &ttnpb.User{
-			UserIdentifiers:                ttnpb.UserIdentifiers{UserId: fmt.Sprintf("random-usr-%d", i+1)},
+			Ids:                            ttnpb.UserIdentifiers{UserId: fmt.Sprintf("random-usr-%d", i+1)},
 			Name:                           fmt.Sprintf("Random %d", i+1),
 			Description:                    fmt.Sprintf("Randomly generated User %d", i+1),
 			PrimaryEmailAddress:            fmt.Sprintf("user-%d@example.com", i+1),
@@ -311,7 +311,7 @@ func (p *Populator) populateUsers(ctx context.Context, db *gorm.DB) (err error) 
 			return err
 		}
 		p.Users[i].Password = password
-		p.Users[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, user, user.ContactInfo)
+		p.Users[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, user.Ids, user.ContactInfo)
 		if err != nil {
 			return err
 		}

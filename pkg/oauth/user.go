@@ -83,8 +83,8 @@ func (s *server) ClientLogout(c echo.Context) error {
 		return err
 	}
 	if session != nil {
-		events.Publish(evtUserSessionTerminated.NewWithIdentifiersAndData(ctx, &session.UserIdentifiers, nil))
-		if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionId); err != nil {
+		events.Publish(evtUserSessionTerminated.NewWithIdentifiersAndData(ctx, &session.UserIds, nil))
+		if err = s.store.DeleteSession(ctx, &session.UserIds, session.SessionId); err != nil {
 			return err
 		}
 	}

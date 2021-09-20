@@ -42,9 +42,9 @@ func TestLoginTokenStore(t *testing.T) {
 		s.createEntity(ctx, usr)
 
 		loginToken, err := store.CreateLoginToken(ctx, &ttnpb.LoginToken{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserId: usr.Account.UID},
-			ExpiresAt:       cleanTime(now.Add(-1 * time.Minute)),
-			Token:           "test-expired-login-token",
+			UserIds:   ttnpb.UserIdentifiers{UserId: usr.Account.UID},
+			ExpiresAt: cleanTime(now.Add(-1 * time.Minute)),
+			Token:     "test-expired-login-token",
 		})
 		a.So(err, should.BeNil)
 
@@ -54,9 +54,9 @@ func TestLoginTokenStore(t *testing.T) {
 		}
 
 		loginToken, err = store.CreateLoginToken(ctx, &ttnpb.LoginToken{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserId: usr.Account.UID},
-			ExpiresAt:       cleanTime(now.Add(time.Hour)),
-			Token:           "test-login-token",
+			UserIds:   ttnpb.UserIdentifiers{UserId: usr.Account.UID},
+			ExpiresAt: cleanTime(now.Add(time.Hour)),
+			Token:     "test-login-token",
 		})
 		a.So(err, should.BeNil)
 
@@ -67,7 +67,7 @@ func TestLoginTokenStore(t *testing.T) {
 
 		consumedToken, err := store.ConsumeLoginToken(ctx, loginToken.Token)
 		if a.So(err, should.BeNil) {
-			a.So(consumedToken.UserIdentifiers, should.Resemble, ttnpb.UserIdentifiers{UserId: usr.Account.UID})
+			a.So(consumedToken.UserIds, should.Resemble, ttnpb.UserIdentifiers{UserId: usr.Account.UID})
 		}
 
 		tokens, err = store.FindActiveLoginTokens(ctx, &ttnpb.UserIdentifiers{UserId: usr.Account.UID})

@@ -14,18 +14,18 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "created_at":
@@ -261,18 +261,18 @@ func (dst *GetUserRequest) SetFields(src *GetUserRequest, paths ...string) error
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 		case "field_mask":
@@ -436,18 +436,18 @@ func (dst *CreateTemporaryPasswordRequest) SetFields(src *CreateTemporaryPasswor
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 
@@ -465,18 +465,18 @@ func (dst *UpdateUserPasswordRequest) SetFields(src *UpdateUserPasswordRequest, 
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 		case "new":
@@ -524,18 +524,18 @@ func (dst *ListUserAPIKeysRequest) SetFields(src *ListUserAPIKeysRequest, paths 
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 		case "limit":
@@ -573,18 +573,18 @@ func (dst *GetUserAPIKeyRequest) SetFields(src *GetUserAPIKeyRequest, paths ...s
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 		case "key_id":
@@ -612,18 +612,18 @@ func (dst *CreateUserAPIKeyRequest) SetFields(src *CreateUserAPIKeyRequest, path
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 		case "name":
@@ -669,18 +669,18 @@ func (dst *UpdateUserAPIKeyRequest) SetFields(src *UpdateUserAPIKeyRequest, path
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 		case "api_key":
@@ -913,18 +913,18 @@ func (dst *UserSessionIdentifiers) SetFields(src *UserSessionIdentifiers, paths 
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 		case "session_id":
@@ -952,18 +952,18 @@ func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 		case "session_id":
@@ -1050,18 +1050,18 @@ func (dst *ListUserSessionsRequest) SetFields(src *ListUserSessionsRequest, path
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 		case "order":
@@ -1109,18 +1109,18 @@ func (dst *LoginToken) SetFields(src *LoginToken, paths ...string) error {
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 		case "created_at":
@@ -1188,18 +1188,18 @@ func (dst *CreateLoginTokenRequest) SetFields(src *CreateLoginTokenRequest, path
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
 				if src != nil {
-					newSrc = &src.UserIdentifiers
+					newSrc = &src.UserIds
 				}
-				newDst = &dst.UserIdentifiers
+				newDst = &dst.UserIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
 					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = zero
 				}
 			}
 		case "skip_email":

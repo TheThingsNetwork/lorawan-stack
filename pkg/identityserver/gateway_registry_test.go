@@ -30,7 +30,7 @@ import (
 
 func init() {
 	// remove gateways assigned to the user by the populator
-	userID := paginationUser.UserIdentifiers
+	userID := paginationUser.Ids
 	for _, gw := range population.Gateways {
 		for id, collaborators := range population.Memberships {
 			if gw.IDString() == id.IDString() {
@@ -125,7 +125,7 @@ func TestGatewaysCRUD(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewGatewayRegistryClient(cc)
 
-		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
+		userID, creds := population.Users[defaultUserIdx].Ids, userCreds(defaultUserIdx)
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		eui := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
@@ -256,7 +256,7 @@ func TestGatewaysPagination(t *testing.T) {
 	a := assertions.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := paginationUser.UserIdentifiers
+		userID := paginationUser.Ids
 		creds := userCreds(paginationUserIdx)
 
 		reg := ttnpb.NewGatewayRegistryClient(cc)
@@ -306,7 +306,7 @@ func TestGatewaysSecrets(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewGatewayRegistryClient(cc)
 
-		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
+		userID, creds := population.Users[defaultUserIdx].Ids, userCreds(defaultUserIdx)
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		eui := types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}

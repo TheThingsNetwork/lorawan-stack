@@ -61,7 +61,7 @@ func (s *loginTokenStore) FindActiveLoginTokens(ctx context.Context, userIDs *tt
 
 func (s *loginTokenStore) CreateLoginToken(ctx context.Context, loginToken *ttnpb.LoginToken) (*ttnpb.LoginToken, error) {
 	defer trace.StartRegion(ctx, "create login token").End()
-	user, err := s.findEntity(ctx, loginToken.UserIdentifiers, "id")
+	user, err := s.findEntity(ctx, loginToken.UserIds, "id")
 	if err != nil {
 		return nil, err
 	}

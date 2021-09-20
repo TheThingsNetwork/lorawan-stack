@@ -31,7 +31,7 @@ import (
 func init() {
 	userAccessUser.Admin = false
 	userAccessUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&userAccessUser.UserIdentifiers).ApiKeys {
+	for _, apiKey := range userAPIKeys(&userAccessUser.Ids).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_SETTINGS_API_KEYS}
 	}
 }
@@ -41,7 +41,7 @@ func TestUserAccessNotFound(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
+		userID, creds := population.Users[defaultUserIdx].Ids, userCreds(defaultUserIdx)
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
@@ -51,8 +51,8 @@ func TestUserAccessNotFound(t *testing.T) {
 		}
 
 		got, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
-			UserIdentifiers: userID,
-			KeyId:           apiKey.Id,
+			UserIds: userID,
+			KeyId:   apiKey.Id,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -61,9 +61,9 @@ func TestUserAccessNotFound(t *testing.T) {
 		a.So(got, should.BeNil)
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-			UserIdentifiers: userID,
-			APIKey:          apiKey,
-			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
+			UserIds:   userID,
+			APIKey:    apiKey,
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -78,14 +78,14 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := userAccessUser.UserIdentifiers, userCreds(userAccessUserIdx)
+		userID, creds := userAccessUser.Ids, userCreds(userAccessUserIdx)
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
 		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
-			UserIdentifiers: userID,
-			Name:            "test-api-key-name",
-			Rights:          []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
+			UserIds: userID,
+			Name:    "test-api-key-name",
+			Rights:  []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -97,9 +97,9 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 		APIKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_ALL}
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-			UserIdentifiers: userID,
-			APIKey:          *APIKey,
-			FieldMask:       &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
+			UserIds:   userID,
+			APIKey:    *APIKey,
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -114,7 +114,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := population.Users[defaultUserIdx].UserIdentifiers
+		userID := population.Users[defaultUserIdx].Ids
 		APIKeyID := userAPIKeys(&userID).ApiKeys[0].Id
 
 		reg := ttnpb.NewUserAccessClient(cc)
@@ -127,8 +127,8 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		}
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
-			UserIdentifiers: userID,
-			KeyId:           APIKeyID,
+			UserIds: userID,
+			KeyId:   APIKeyID,
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -137,7 +137,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		a.So(APIKey, should.BeNil)
 
 		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
-			UserIdentifiers: userID,
+			UserIds: userID,
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -146,9 +146,9 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		a.So(APIKeys, should.BeNil)
 
 		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
-			UserIdentifiers: userID,
-			Name:            "test-api-key-name",
-			Rights:          []ttnpb.Right{ttnpb.RIGHT_ALL},
+			UserIds: userID,
+			Name:    "test-api-key-name",
+			Rights:  []ttnpb.Right{ttnpb.RIGHT_ALL},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -159,9 +159,9 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		APIKey = userAPIKeys(&userID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-			UserIdentifiers: userID,
-			APIKey:          *APIKey,
-			FieldMask:       &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
+			UserIds:   userID,
+			APIKey:    *APIKey,
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -176,7 +176,7 @@ func TestUserAccessClusterAuth(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := population.Users[defaultUserIdx].UserIdentifiers
+		userID := population.Users[defaultUserIdx].Ids
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
@@ -197,14 +197,14 @@ func TestUserAccessCRUD(t *testing.T) {
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
-		rights, err := reg.ListRights(ctx, &user.UserIdentifiers, creds)
+		rights, err := reg.ListRights(ctx, &user.Ids, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
 			a.So(rights.Rights, should.NotBeEmpty)
 		}
 
-		modifiedUserID := user.UserIdentifiers
+		modifiedUserID := user.Ids
 		modifiedUserID.UserId = reverse(modifiedUserID.UserId)
 
 		rights, err = reg.ListRights(ctx, &modifiedUserID, creds)
@@ -214,12 +214,12 @@ func TestUserAccessCRUD(t *testing.T) {
 			a.So(rights.Rights, should.BeEmpty)
 		}
 
-		userAPIKeys := userAPIKeys(&user.UserIdentifiers)
+		userAPIKeys := userAPIKeys(&user.Ids)
 		userKey := userAPIKeys.ApiKeys[0]
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
-			UserIdentifiers: user.UserIdentifiers,
-			KeyId:           userKey.Id,
+			UserIds: user.Ids,
+			KeyId:   userKey.Id,
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -230,7 +230,7 @@ func TestUserAccessCRUD(t *testing.T) {
 
 		sort.Slice(userAPIKeys.ApiKeys, func(i int, j int) bool { return userAPIKeys.ApiKeys[i].Name < userAPIKeys.ApiKeys[j].Name })
 		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
-			UserIdentifiers: user.UserIdentifiers,
+			UserIds: user.Ids,
 		}, creds)
 		sort.Slice(apiKeys.ApiKeys, func(i int, j int) bool { return apiKeys.ApiKeys[i].Name < apiKeys.ApiKeys[j].Name })
 
@@ -244,9 +244,9 @@ func TestUserAccessCRUD(t *testing.T) {
 
 		createdAPIKeyName := "test-created-api-key"
 		created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
-			UserIdentifiers: user.UserIdentifiers,
-			Name:            createdAPIKeyName,
-			Rights:          []ttnpb.Right{ttnpb.RIGHT_ALL},
+			UserIds: user.Ids,
+			Name:    createdAPIKeyName,
+			Rights:  []ttnpb.Right{ttnpb.RIGHT_ALL},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -257,9 +257,9 @@ func TestUserAccessCRUD(t *testing.T) {
 		newAPIKeyName := "test-new-api-key"
 		created.Name = newAPIKeyName
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-			UserIdentifiers: user.UserIdentifiers,
-			APIKey:          *created,
-			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
+			UserIds:   user.Ids,
+			APIKey:    *created,
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -277,7 +277,7 @@ func TestUserAccesLoginTokens(t *testing.T) {
 		user, _ := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
 		reg := ttnpb.NewUserAccessClient(cc)
 		_, err := reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-			UserIdentifiers: user.UserIdentifiers,
+			UserIds: user.Ids,
 		})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.Resemble(err, errLoginTokensDisabled), should.BeTrue)
@@ -294,28 +294,28 @@ func TestUserAccesLoginTokens(t *testing.T) {
 		reg := ttnpb.NewUserAccessClient(cc)
 
 		token, err := reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-			UserIdentifiers: user.UserIdentifiers,
+			UserIds: user.Ids,
 		})
 		if a.So(err, should.BeNil) {
 			a.So(token.Token, should.BeBlank)
 		}
 
 		token, err = reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-			UserIdentifiers: user.UserIdentifiers,
+			UserIds: user.Ids,
 		}, adminCreds)
 		if a.So(err, should.BeNil) {
 			a.So(token.Token, should.NotBeBlank)
 		}
 
 		token, err = reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-			UserIdentifiers: adminUser.UserIdentifiers,
+			UserIds: adminUser.Ids,
 		}, adminCreds)
 		if a.So(err, should.BeNil) {
 			a.So(token.Token, should.BeBlank)
 		}
 
 		token, err = reg.CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-			UserIdentifiers: adminUser.UserIdentifiers,
+			UserIds: adminUser.Ids,
 		}, adminCreds)
 		if a.So(err, should.BeNil) {
 			a.So(token.Token, should.BeBlank)

@@ -5,24 +5,27 @@ package ttnpb
 
 import (
 	fmt "fmt"
+	math "math"
+	reflect "reflect"
+	strings "strings"
+	time "time"
+
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
 	types "github.com/gogo/protobuf/types"
 	golang_proto "github.com/golang/protobuf/proto"
-	math "math"
-	reflect "reflect"
-	strings "strings"
-	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var _ = proto.Marshal
-var _ = golang_proto.Marshal
-var _ = fmt.Errorf
-var _ = math.Inf
-var _ = time.Kitchen
+var (
+	_ = proto.Marshal
+	_ = golang_proto.Marshal
+	_ = fmt.Errorf
+	_ = math.Inf
+	_ = time.Kitchen
+)
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -33,7 +36,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // User is the message that defines a user on the network.
 type User struct {
 	// The identifiers of the user. These are public and can be seen by any authenticated user in the network.
-	UserIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	Ids UserIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3" json:"ids"`
 	// When the user was created. This information is public and can be seen by any authenticated user in the network.
 	CreatedAt time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
 	// When the user was last updated. This information is public and can be seen by any authenticated user in the network.
@@ -89,23 +92,35 @@ func (*User) ProtoMessage() {}
 func (*User) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{0}
 }
+
 func (m *User) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_User.Unmarshal(m, b)
 }
+
 func (m *User) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_User.Marshal(b, m, deterministic)
 }
+
 func (m *User) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_User.Merge(m, src)
 }
+
 func (m *User) XXX_Size() int {
 	return xxx_messageInfo_User.Size(m)
 }
+
 func (m *User) XXX_DiscardUnknown() {
 	xxx_messageInfo_User.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_User proto.InternalMessageInfo
+
+func (m *User) GetIds() UserIdentifiers {
+	if m != nil {
+		return m.Ids
+	}
+	return UserIdentifiers{}
+}
 
 func (m *User) GetCreatedAt() time.Time {
 	if m != nil {
@@ -251,18 +266,23 @@ func (*Users) ProtoMessage() {}
 func (*Users) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{1}
 }
+
 func (m *Users) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Users.Unmarshal(m, b)
 }
+
 func (m *Users) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Users.Marshal(b, m, deterministic)
 }
+
 func (m *Users) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Users.Merge(m, src)
 }
+
 func (m *Users) XXX_Size() int {
 	return xxx_messageInfo_Users.Size(m)
 }
+
 func (m *Users) XXX_DiscardUnknown() {
 	xxx_messageInfo_Users.DiscardUnknown(m)
 }
@@ -277,7 +297,7 @@ func (m *Users) GetUsers() []*User {
 }
 
 type GetUserRequest struct {
-	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
+	UserIds UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
 	// The names of the user fields that should be returned.
 	FieldMask            *types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
@@ -289,23 +309,35 @@ func (*GetUserRequest) ProtoMessage() {}
 func (*GetUserRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{2}
 }
+
 func (m *GetUserRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetUserRequest.Unmarshal(m, b)
 }
+
 func (m *GetUserRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_GetUserRequest.Marshal(b, m, deterministic)
 }
+
 func (m *GetUserRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_GetUserRequest.Merge(m, src)
 }
+
 func (m *GetUserRequest) XXX_Size() int {
 	return xxx_messageInfo_GetUserRequest.Size(m)
 }
+
 func (m *GetUserRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_GetUserRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_GetUserRequest proto.InternalMessageInfo
+
+func (m *GetUserRequest) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
 
 func (m *GetUserRequest) GetFieldMask() *types.FieldMask {
 	if m != nil {
@@ -335,18 +367,23 @@ func (*ListUsersRequest) ProtoMessage() {}
 func (*ListUsersRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{3}
 }
+
 func (m *ListUsersRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListUsersRequest.Unmarshal(m, b)
 }
+
 func (m *ListUsersRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_ListUsersRequest.Marshal(b, m, deterministic)
 }
+
 func (m *ListUsersRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ListUsersRequest.Merge(m, src)
 }
+
 func (m *ListUsersRequest) XXX_Size() int {
 	return xxx_messageInfo_ListUsersRequest.Size(m)
 }
+
 func (m *ListUsersRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_ListUsersRequest.DiscardUnknown(m)
 }
@@ -401,18 +438,23 @@ func (*CreateUserRequest) ProtoMessage() {}
 func (*CreateUserRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{4}
 }
+
 func (m *CreateUserRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateUserRequest.Unmarshal(m, b)
 }
+
 func (m *CreateUserRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CreateUserRequest.Marshal(b, m, deterministic)
 }
+
 func (m *CreateUserRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CreateUserRequest.Merge(m, src)
 }
+
 func (m *CreateUserRequest) XXX_Size() int {
 	return xxx_messageInfo_CreateUserRequest.Size(m)
 }
+
 func (m *CreateUserRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_CreateUserRequest.DiscardUnknown(m)
 }
@@ -439,18 +481,23 @@ func (*UpdateUserRequest) ProtoMessage() {}
 func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{5}
 }
+
 func (m *UpdateUserRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateUserRequest.Unmarshal(m, b)
 }
+
 func (m *UpdateUserRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_UpdateUserRequest.Marshal(b, m, deterministic)
 }
+
 func (m *UpdateUserRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_UpdateUserRequest.Merge(m, src)
 }
+
 func (m *UpdateUserRequest) XXX_Size() int {
 	return xxx_messageInfo_UpdateUserRequest.Size(m)
 }
+
 func (m *UpdateUserRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_UpdateUserRequest.DiscardUnknown(m)
 }
@@ -465,9 +512,9 @@ func (m *UpdateUserRequest) GetFieldMask() *types.FieldMask {
 }
 
 type CreateTemporaryPasswordRequest struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	UserIds              UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *CreateTemporaryPasswordRequest) Reset()      { *m = CreateTemporaryPasswordRequest{} }
@@ -475,28 +522,40 @@ func (*CreateTemporaryPasswordRequest) ProtoMessage() {}
 func (*CreateTemporaryPasswordRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{6}
 }
+
 func (m *CreateTemporaryPasswordRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateTemporaryPasswordRequest.Unmarshal(m, b)
 }
+
 func (m *CreateTemporaryPasswordRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CreateTemporaryPasswordRequest.Marshal(b, m, deterministic)
 }
+
 func (m *CreateTemporaryPasswordRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CreateTemporaryPasswordRequest.Merge(m, src)
 }
+
 func (m *CreateTemporaryPasswordRequest) XXX_Size() int {
 	return xxx_messageInfo_CreateTemporaryPasswordRequest.Size(m)
 }
+
 func (m *CreateTemporaryPasswordRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_CreateTemporaryPasswordRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_CreateTemporaryPasswordRequest proto.InternalMessageInfo
 
+func (m *CreateTemporaryPasswordRequest) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
+
 type UpdateUserPasswordRequest struct {
-	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
-	New             string `protobuf:"bytes,2,opt,name=new,proto3" json:"new,omitempty"`
-	Old             string `protobuf:"bytes,3,opt,name=old,proto3" json:"old,omitempty"`
+	UserIds UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	New     string          `protobuf:"bytes,2,opt,name=new,proto3" json:"new,omitempty"`
+	Old     string          `protobuf:"bytes,3,opt,name=old,proto3" json:"old,omitempty"`
 	// Revoke active sessions and access tokens of user if true. To be used if credentials are suspected to be compromised.
 	RevokeAllAccess      bool     `protobuf:"varint,4,opt,name=revoke_all_access,json=revokeAllAccess,proto3" json:"revoke_all_access,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -508,23 +567,35 @@ func (*UpdateUserPasswordRequest) ProtoMessage() {}
 func (*UpdateUserPasswordRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{7}
 }
+
 func (m *UpdateUserPasswordRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateUserPasswordRequest.Unmarshal(m, b)
 }
+
 func (m *UpdateUserPasswordRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_UpdateUserPasswordRequest.Marshal(b, m, deterministic)
 }
+
 func (m *UpdateUserPasswordRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_UpdateUserPasswordRequest.Merge(m, src)
 }
+
 func (m *UpdateUserPasswordRequest) XXX_Size() int {
 	return xxx_messageInfo_UpdateUserPasswordRequest.Size(m)
 }
+
 func (m *UpdateUserPasswordRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_UpdateUserPasswordRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_UpdateUserPasswordRequest proto.InternalMessageInfo
+
+func (m *UpdateUserPasswordRequest) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
 
 func (m *UpdateUserPasswordRequest) GetNew() string {
 	if m != nil {
@@ -548,7 +619,7 @@ func (m *UpdateUserPasswordRequest) GetRevokeAllAccess() bool {
 }
 
 type ListUserAPIKeysRequest struct {
-	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
+	UserIds UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
 	// Limit the number of results per page.
 	Limit uint32 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
 	// Page number for pagination. 0 is interpreted as 1.
@@ -562,23 +633,35 @@ func (*ListUserAPIKeysRequest) ProtoMessage() {}
 func (*ListUserAPIKeysRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{8}
 }
+
 func (m *ListUserAPIKeysRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListUserAPIKeysRequest.Unmarshal(m, b)
 }
+
 func (m *ListUserAPIKeysRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_ListUserAPIKeysRequest.Marshal(b, m, deterministic)
 }
+
 func (m *ListUserAPIKeysRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ListUserAPIKeysRequest.Merge(m, src)
 }
+
 func (m *ListUserAPIKeysRequest) XXX_Size() int {
 	return xxx_messageInfo_ListUserAPIKeysRequest.Size(m)
 }
+
 func (m *ListUserAPIKeysRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_ListUserAPIKeysRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_ListUserAPIKeysRequest proto.InternalMessageInfo
+
+func (m *ListUserAPIKeysRequest) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
 
 func (m *ListUserAPIKeysRequest) GetLimit() uint32 {
 	if m != nil {
@@ -595,7 +678,7 @@ func (m *ListUserAPIKeysRequest) GetPage() uint32 {
 }
 
 type GetUserAPIKeyRequest struct {
-	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
+	UserIds UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
 	// Unique public identifier for the API key.
 	KeyId                string   `protobuf:"bytes,2,opt,name=key_id,json=keyId,proto3" json:"key_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -607,23 +690,35 @@ func (*GetUserAPIKeyRequest) ProtoMessage() {}
 func (*GetUserAPIKeyRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{9}
 }
+
 func (m *GetUserAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetUserAPIKeyRequest.Unmarshal(m, b)
 }
+
 func (m *GetUserAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_GetUserAPIKeyRequest.Marshal(b, m, deterministic)
 }
+
 func (m *GetUserAPIKeyRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_GetUserAPIKeyRequest.Merge(m, src)
 }
+
 func (m *GetUserAPIKeyRequest) XXX_Size() int {
 	return xxx_messageInfo_GetUserAPIKeyRequest.Size(m)
 }
+
 func (m *GetUserAPIKeyRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_GetUserAPIKeyRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_GetUserAPIKeyRequest proto.InternalMessageInfo
+
+func (m *GetUserAPIKeyRequest) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
 
 func (m *GetUserAPIKeyRequest) GetKeyId() string {
 	if m != nil {
@@ -633,12 +728,12 @@ func (m *GetUserAPIKeyRequest) GetKeyId() string {
 }
 
 type CreateUserAPIKeyRequest struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
-	Name                 string     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Rights               []Right    `protobuf:"varint,3,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
-	ExpiresAt            *time.Time `protobuf:"bytes,4,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
-	XXX_sizecache        int32      `json:"-"`
+	UserIds              UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	Name                 string          `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Rights               []Right         `protobuf:"varint,3,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
+	ExpiresAt            *time.Time      `protobuf:"bytes,4,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *CreateUserAPIKeyRequest) Reset()      { *m = CreateUserAPIKeyRequest{} }
@@ -646,23 +741,35 @@ func (*CreateUserAPIKeyRequest) ProtoMessage() {}
 func (*CreateUserAPIKeyRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{10}
 }
+
 func (m *CreateUserAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateUserAPIKeyRequest.Unmarshal(m, b)
 }
+
 func (m *CreateUserAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CreateUserAPIKeyRequest.Marshal(b, m, deterministic)
 }
+
 func (m *CreateUserAPIKeyRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CreateUserAPIKeyRequest.Merge(m, src)
 }
+
 func (m *CreateUserAPIKeyRequest) XXX_Size() int {
 	return xxx_messageInfo_CreateUserAPIKeyRequest.Size(m)
 }
+
 func (m *CreateUserAPIKeyRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_CreateUserAPIKeyRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_CreateUserAPIKeyRequest proto.InternalMessageInfo
+
+func (m *CreateUserAPIKeyRequest) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
 
 func (m *CreateUserAPIKeyRequest) GetName() string {
 	if m != nil {
@@ -686,8 +793,8 @@ func (m *CreateUserAPIKeyRequest) GetExpiresAt() *time.Time {
 }
 
 type UpdateUserAPIKeyRequest struct {
-	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
-	APIKey          `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3,embedded=api_key" json:"api_key"`
+	UserIds UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	APIKey  `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3,embedded=api_key" json:"api_key"`
 	// The names of the api key fields that should be updated.
 	FieldMask            *types.FieldMask `protobuf:"bytes,3,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
@@ -699,23 +806,35 @@ func (*UpdateUserAPIKeyRequest) ProtoMessage() {}
 func (*UpdateUserAPIKeyRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{11}
 }
+
 func (m *UpdateUserAPIKeyRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateUserAPIKeyRequest.Unmarshal(m, b)
 }
+
 func (m *UpdateUserAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_UpdateUserAPIKeyRequest.Marshal(b, m, deterministic)
 }
+
 func (m *UpdateUserAPIKeyRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_UpdateUserAPIKeyRequest.Merge(m, src)
 }
+
 func (m *UpdateUserAPIKeyRequest) XXX_Size() int {
 	return xxx_messageInfo_UpdateUserAPIKeyRequest.Size(m)
 }
+
 func (m *UpdateUserAPIKeyRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_UpdateUserAPIKeyRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_UpdateUserAPIKeyRequest proto.InternalMessageInfo
+
+func (m *UpdateUserAPIKeyRequest) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
 
 func (m *UpdateUserAPIKeyRequest) GetFieldMask() *types.FieldMask {
 	if m != nil {
@@ -741,18 +860,23 @@ func (*Invitation) ProtoMessage() {}
 func (*Invitation) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{12}
 }
+
 func (m *Invitation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Invitation.Unmarshal(m, b)
 }
+
 func (m *Invitation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Invitation.Marshal(b, m, deterministic)
 }
+
 func (m *Invitation) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Invitation.Merge(m, src)
 }
+
 func (m *Invitation) XXX_Size() int {
 	return xxx_messageInfo_Invitation.Size(m)
 }
+
 func (m *Invitation) XXX_DiscardUnknown() {
 	xxx_messageInfo_Invitation.DiscardUnknown(m)
 }
@@ -822,18 +946,23 @@ func (*ListInvitationsRequest) ProtoMessage() {}
 func (*ListInvitationsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{13}
 }
+
 func (m *ListInvitationsRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListInvitationsRequest.Unmarshal(m, b)
 }
+
 func (m *ListInvitationsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_ListInvitationsRequest.Marshal(b, m, deterministic)
 }
+
 func (m *ListInvitationsRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ListInvitationsRequest.Merge(m, src)
 }
+
 func (m *ListInvitationsRequest) XXX_Size() int {
 	return xxx_messageInfo_ListInvitationsRequest.Size(m)
 }
+
 func (m *ListInvitationsRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_ListInvitationsRequest.DiscardUnknown(m)
 }
@@ -865,18 +994,23 @@ func (*Invitations) ProtoMessage() {}
 func (*Invitations) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{14}
 }
+
 func (m *Invitations) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Invitations.Unmarshal(m, b)
 }
+
 func (m *Invitations) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Invitations.Marshal(b, m, deterministic)
 }
+
 func (m *Invitations) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Invitations.Merge(m, src)
 }
+
 func (m *Invitations) XXX_Size() int {
 	return xxx_messageInfo_Invitations.Size(m)
 }
+
 func (m *Invitations) XXX_DiscardUnknown() {
 	xxx_messageInfo_Invitations.DiscardUnknown(m)
 }
@@ -901,18 +1035,23 @@ func (*SendInvitationRequest) ProtoMessage() {}
 func (*SendInvitationRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{15}
 }
+
 func (m *SendInvitationRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SendInvitationRequest.Unmarshal(m, b)
 }
+
 func (m *SendInvitationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SendInvitationRequest.Marshal(b, m, deterministic)
 }
+
 func (m *SendInvitationRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_SendInvitationRequest.Merge(m, src)
 }
+
 func (m *SendInvitationRequest) XXX_Size() int {
 	return xxx_messageInfo_SendInvitationRequest.Size(m)
 }
+
 func (m *SendInvitationRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_SendInvitationRequest.DiscardUnknown(m)
 }
@@ -937,18 +1076,23 @@ func (*DeleteInvitationRequest) ProtoMessage() {}
 func (*DeleteInvitationRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{16}
 }
+
 func (m *DeleteInvitationRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteInvitationRequest.Unmarshal(m, b)
 }
+
 func (m *DeleteInvitationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_DeleteInvitationRequest.Marshal(b, m, deterministic)
 }
+
 func (m *DeleteInvitationRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_DeleteInvitationRequest.Merge(m, src)
 }
+
 func (m *DeleteInvitationRequest) XXX_Size() int {
 	return xxx_messageInfo_DeleteInvitationRequest.Size(m)
 }
+
 func (m *DeleteInvitationRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_DeleteInvitationRequest.DiscardUnknown(m)
 }
@@ -963,10 +1107,10 @@ func (m *DeleteInvitationRequest) GetEmail() string {
 }
 
 type UserSessionIdentifiers struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
-	SessionId            string   `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	UserIds              UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	SessionId            string          `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *UserSessionIdentifiers) Reset()      { *m = UserSessionIdentifiers{} }
@@ -974,23 +1118,35 @@ func (*UserSessionIdentifiers) ProtoMessage() {}
 func (*UserSessionIdentifiers) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{17}
 }
+
 func (m *UserSessionIdentifiers) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UserSessionIdentifiers.Unmarshal(m, b)
 }
+
 func (m *UserSessionIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_UserSessionIdentifiers.Marshal(b, m, deterministic)
 }
+
 func (m *UserSessionIdentifiers) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_UserSessionIdentifiers.Merge(m, src)
 }
+
 func (m *UserSessionIdentifiers) XXX_Size() int {
 	return xxx_messageInfo_UserSessionIdentifiers.Size(m)
 }
+
 func (m *UserSessionIdentifiers) XXX_DiscardUnknown() {
 	xxx_messageInfo_UserSessionIdentifiers.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_UserSessionIdentifiers proto.InternalMessageInfo
+
+func (m *UserSessionIdentifiers) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
 
 func (m *UserSessionIdentifiers) GetSessionId() string {
 	if m != nil {
@@ -1000,11 +1156,11 @@ func (m *UserSessionIdentifiers) GetSessionId() string {
 }
 
 type UserSession struct {
-	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
-	SessionId       string     `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	CreatedAt       time.Time  `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
-	UpdatedAt       time.Time  `protobuf:"bytes,4,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
-	ExpiresAt       *time.Time `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at,omitempty"`
+	UserIds   UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	SessionId string          `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	CreatedAt time.Time       `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt time.Time       `protobuf:"bytes,4,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	ExpiresAt *time.Time      `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at,omitempty"`
 	// The session secret is used to compose an authorization key and is never returned.
 	SessionSecret        string   `protobuf:"bytes,6,opt,name=session_secret,json=sessionSecret,proto3" json:"session_secret,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -1016,23 +1172,35 @@ func (*UserSession) ProtoMessage() {}
 func (*UserSession) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{18}
 }
+
 func (m *UserSession) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UserSession.Unmarshal(m, b)
 }
+
 func (m *UserSession) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_UserSession.Marshal(b, m, deterministic)
 }
+
 func (m *UserSession) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_UserSession.Merge(m, src)
 }
+
 func (m *UserSession) XXX_Size() int {
 	return xxx_messageInfo_UserSession.Size(m)
 }
+
 func (m *UserSession) XXX_DiscardUnknown() {
 	xxx_messageInfo_UserSession.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_UserSession proto.InternalMessageInfo
+
+func (m *UserSession) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
 
 func (m *UserSession) GetSessionId() string {
 	if m != nil {
@@ -1080,18 +1248,23 @@ func (*UserSessions) ProtoMessage() {}
 func (*UserSessions) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{19}
 }
+
 func (m *UserSessions) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UserSessions.Unmarshal(m, b)
 }
+
 func (m *UserSessions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_UserSessions.Marshal(b, m, deterministic)
 }
+
 func (m *UserSessions) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_UserSessions.Merge(m, src)
 }
+
 func (m *UserSessions) XXX_Size() int {
 	return xxx_messageInfo_UserSessions.Size(m)
 }
+
 func (m *UserSessions) XXX_DiscardUnknown() {
 	xxx_messageInfo_UserSessions.DiscardUnknown(m)
 }
@@ -1106,7 +1279,7 @@ func (m *UserSessions) GetSessions() []*UserSession {
 }
 
 type ListUserSessionsRequest struct {
-	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
+	UserIds UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
 	// Order the results by this field path (must be present in the field mask).
 	// Default ordering is by ID. Prepend with a minus (-) to reverse the order.
 	Order string `protobuf:"bytes,2,opt,name=order,proto3" json:"order,omitempty"`
@@ -1123,23 +1296,35 @@ func (*ListUserSessionsRequest) ProtoMessage() {}
 func (*ListUserSessionsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{20}
 }
+
 func (m *ListUserSessionsRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListUserSessionsRequest.Unmarshal(m, b)
 }
+
 func (m *ListUserSessionsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_ListUserSessionsRequest.Marshal(b, m, deterministic)
 }
+
 func (m *ListUserSessionsRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ListUserSessionsRequest.Merge(m, src)
 }
+
 func (m *ListUserSessionsRequest) XXX_Size() int {
 	return xxx_messageInfo_ListUserSessionsRequest.Size(m)
 }
+
 func (m *ListUserSessionsRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_ListUserSessionsRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_ListUserSessionsRequest proto.InternalMessageInfo
+
+func (m *ListUserSessionsRequest) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
 
 func (m *ListUserSessionsRequest) GetOrder() string {
 	if m != nil {
@@ -1163,14 +1348,14 @@ func (m *ListUserSessionsRequest) GetPage() uint32 {
 }
 
 type LoginToken struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
-	CreatedAt            time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
-	UpdatedAt            time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
-	ExpiresAt            time.Time `protobuf:"bytes,4,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at"`
-	Token                string    `protobuf:"bytes,5,opt,name=token,proto3" json:"token,omitempty"`
-	Used                 bool      `protobuf:"varint,6,opt,name=used,proto3" json:"used,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	UserIds              UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
+	CreatedAt            time.Time       `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
+	UpdatedAt            time.Time       `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
+	ExpiresAt            time.Time       `protobuf:"bytes,4,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at"`
+	Token                string          `protobuf:"bytes,5,opt,name=token,proto3" json:"token,omitempty"`
+	Used                 bool            `protobuf:"varint,6,opt,name=used,proto3" json:"used,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *LoginToken) Reset()      { *m = LoginToken{} }
@@ -1178,23 +1363,35 @@ func (*LoginToken) ProtoMessage() {}
 func (*LoginToken) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{21}
 }
+
 func (m *LoginToken) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_LoginToken.Unmarshal(m, b)
 }
+
 func (m *LoginToken) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_LoginToken.Marshal(b, m, deterministic)
 }
+
 func (m *LoginToken) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_LoginToken.Merge(m, src)
 }
+
 func (m *LoginToken) XXX_Size() int {
 	return xxx_messageInfo_LoginToken.Size(m)
 }
+
 func (m *LoginToken) XXX_DiscardUnknown() {
 	xxx_messageInfo_LoginToken.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_LoginToken proto.InternalMessageInfo
+
+func (m *LoginToken) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
 
 func (m *LoginToken) GetCreatedAt() time.Time {
 	if m != nil {
@@ -1232,7 +1429,7 @@ func (m *LoginToken) GetUsed() bool {
 }
 
 type CreateLoginTokenRequest struct {
-	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
+	UserIds UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
 	// Skip sending the login token to the user by email.
 	// This field is only effective when the login token is created by an admin user.
 	SkipEmail            bool     `protobuf:"varint,2,opt,name=skip_email,json=skipEmail,proto3" json:"skip_email,omitempty"`
@@ -1245,23 +1442,35 @@ func (*CreateLoginTokenRequest) ProtoMessage() {}
 func (*CreateLoginTokenRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{22}
 }
+
 func (m *CreateLoginTokenRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateLoginTokenRequest.Unmarshal(m, b)
 }
+
 func (m *CreateLoginTokenRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CreateLoginTokenRequest.Marshal(b, m, deterministic)
 }
+
 func (m *CreateLoginTokenRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CreateLoginTokenRequest.Merge(m, src)
 }
+
 func (m *CreateLoginTokenRequest) XXX_Size() int {
 	return xxx_messageInfo_CreateLoginTokenRequest.Size(m)
 }
+
 func (m *CreateLoginTokenRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_CreateLoginTokenRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_CreateLoginTokenRequest proto.InternalMessageInfo
+
+func (m *CreateLoginTokenRequest) GetUserIds() UserIdentifiers {
+	if m != nil {
+		return m.UserIds
+	}
+	return UserIdentifiers{}
+}
 
 func (m *CreateLoginTokenRequest) GetSkipEmail() bool {
 	if m != nil {
@@ -1283,18 +1492,23 @@ func (*CreateLoginTokenResponse) ProtoMessage() {}
 func (*CreateLoginTokenResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ce30de589ccb9af, []int{23}
 }
+
 func (m *CreateLoginTokenResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateLoginTokenResponse.Unmarshal(m, b)
 }
+
 func (m *CreateLoginTokenResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CreateLoginTokenResponse.Marshal(b, m, deterministic)
 }
+
 func (m *CreateLoginTokenResponse) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CreateLoginTokenResponse.Merge(m, src)
 }
+
 func (m *CreateLoginTokenResponse) XXX_Size() int {
 	return xxx_messageInfo_CreateLoginTokenResponse.Size(m)
 }
+
 func (m *CreateLoginTokenResponse) XXX_DiscardUnknown() {
 	xxx_messageInfo_CreateLoginTokenResponse.DiscardUnknown(m)
 }
@@ -1367,115 +1581,115 @@ func init() {
 }
 
 var fileDescriptor_5ce30de589ccb9af = []byte{
-	// 1721 bytes of a gzipped FileDescriptorProto
+	// 1717 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0x4f, 0x6f, 0x1b, 0xc7,
-	0x15, 0xd7, 0xf0, 0x8f, 0x44, 0x3e, 0xda, 0x12, 0x35, 0xb6, 0xac, 0xad, 0x5c, 0x51, 0xc2, 0x56,
-	0x2d, 0x14, 0xa1, 0x24, 0x03, 0x19, 0x76, 0x12, 0xb7, 0x85, 0xcd, 0x55, 0x5c, 0x57, 0xb0, 0x03,
-	0x18, 0x63, 0xa7, 0x87, 0x06, 0xe9, 0x76, 0xc5, 0x1d, 0xd1, 0x03, 0x2e, 0x77, 0x37, 0x3b, 0x43,
-	0x39, 0x8c, 0x51, 0x20, 0xe8, 0xa1, 0x68, 0x53, 0xa0, 0x09, 0x02, 0xf4, 0xd0, 0x7c, 0x80, 0xa2,
-	0xe7, 0x7e, 0x82, 0x1e, 0x7a, 0xc8, 0xa5, 0x40, 0x80, 0x5c, 0x7a, 0x4a, 0x51, 0x05, 0x05, 0x72,
-	0xec, 0xa5, 0x17, 0x9e, 0x8a, 0x99, 0xd9, 0xe5, 0xae, 0x48, 0xd6, 0x91, 0x6c, 0x11, 0xed, 0x89,
-	0xf3, 0xe7, 0xf7, 0xde, 0x9b, 0x79, 0xf3, 0xde, 0xef, 0xbd, 0x25, 0x7c, 0xd3, 0x0b, 0x22, 0xe7,
-	0x89, 0xe3, 0xd7, 0xb9, 0x70, 0xda, 0xdd, 0xa6, 0x13, 0xb2, 0x66, 0x9f, 0xd3, 0xa8, 0x11, 0x46,
-	0x81, 0x08, 0xf0, 0xa2, 0x10, 0x7e, 0x23, 0x46, 0x34, 0x8e, 0xae, 0xad, 0xb5, 0x3a, 0x4c, 0x3c,
-	0xee, 0x1f, 0x34, 0xda, 0x41, 0xaf, 0x49, 0xfd, 0xa3, 0x60, 0x10, 0x46, 0xc1, 0xbb, 0x83, 0xa6,
-	0x02, 0xb7, 0xeb, 0x1d, 0xea, 0xd7, 0x8f, 0x1c, 0x8f, 0xb9, 0x8e, 0xa0, 0xcd, 0x89, 0x81, 0x56,
-	0xb9, 0x56, 0xcf, 0xa8, 0xe8, 0x04, 0x9d, 0x40, 0x0b, 0x1f, 0xf4, 0x0f, 0xd5, 0x4c, 0x4d, 0xd4,
-	0x28, 0x86, 0x6f, 0x76, 0x82, 0xa0, 0xe3, 0xd1, 0x14, 0x75, 0xc8, 0xa8, 0xe7, 0xda, 0x3d, 0x87,
-	0x77, 0x63, 0xc4, 0xc6, 0x38, 0x42, 0xb0, 0x1e, 0xe5, 0xc2, 0xe9, 0x85, 0x31, 0x60, 0x6b, 0xf2,
-	0x8a, 0xed, 0xc0, 0x17, 0x4e, 0x5b, 0xd8, 0xcc, 0x3f, 0x4c, 0x0c, 0xad, 0x4f, 0xa2, 0xa8, 0xdf,
-	0xef, 0xf1, 0x78, 0xfb, 0x5b, 0x93, 0xdb, 0xcc, 0xa5, 0xbe, 0x60, 0x87, 0x8c, 0x46, 0x09, 0x68,
-	0x63, 0x12, 0x14, 0xb2, 0xb6, 0xe8, 0x47, 0xc9, 0xe5, 0x6b, 0x93, 0x80, 0x88, 0x75, 0x1e, 0x8b,
-	0x58, 0x81, 0xf9, 0xeb, 0x0a, 0x14, 0xde, 0xe4, 0x34, 0xc2, 0x7b, 0x90, 0x67, 0x2e, 0x37, 0xd0,
-	0x26, 0xda, 0xae, 0xec, 0x6e, 0x34, 0x4e, 0x3e, 0x43, 0x43, 0x42, 0xf6, 0x53, 0xeb, 0x56, 0x75,
-	0x68, 0x15, 0x3f, 0x40, 0xb9, 0x2a, 0xfa, 0xf4, 0x8b, 0x8d, 0xb9, 0xcf, 0xbe, 0xd8, 0x40, 0x44,
-	0x4a, 0xe3, 0x3d, 0x80, 0x76, 0x44, 0x1d, 0x41, 0x5d, 0xdb, 0x11, 0x46, 0x4e, 0xe9, 0x5a, 0x6b,
-	0x68, 0x77, 0x35, 0x12, 0x77, 0x35, 0x1e, 0x25, 0xee, 0xb2, 0x4a, 0x52, 0xfc, 0xa3, 0xbf, 0x6f,
-	0x20, 0x52, 0x8e, 0xe5, 0x5a, 0x42, 0x2a, 0xe9, 0x87, 0x6e, 0xa2, 0x24, 0x7f, 0x16, 0x25, 0xb1,
-	0x5c, 0x4b, 0xe0, 0x5b, 0x00, 0x2e, 0xf5, 0x68, 0xac, 0xe4, 0xd2, 0xd7, 0x2a, 0x29, 0x68, 0x05,
-	0xb1, 0x4c, 0x4b, 0xe0, 0xab, 0x50, 0xf0, 0x9d, 0x1e, 0x35, 0x0a, 0x9b, 0x68, 0xbb, 0x6c, 0x2d,
-	0x0c, 0xad, 0x42, 0x94, 0x33, 0x76, 0x89, 0x5a, 0xc4, 0x3b, 0x50, 0x71, 0x29, 0x6f, 0x47, 0x2c,
-	0x14, 0x2c, 0xf0, 0x8d, 0xa2, 0xc2, 0x94, 0x86, 0x56, 0x31, 0xca, 0x1b, 0x9f, 0x2d, 0x91, 0xec,
-	0x26, 0x7e, 0x0a, 0xe0, 0x08, 0x11, 0xb1, 0x83, 0xbe, 0xa0, 0xdc, 0x98, 0xdf, 0xcc, 0x6f, 0x57,
-	0x76, 0xb7, 0xa6, 0xf9, 0xb7, 0xd1, 0x1a, 0xc1, 0xee, 0xf8, 0x22, 0x1a, 0x58, 0xd7, 0x87, 0xd6,
-	0xee, 0x27, 0xa8, 0x59, 0x05, 0x73, 0x2b, 0x32, 0x8d, 0xad, 0xdd, 0xda, 0x4f, 0xdf, 0x72, 0xea,
-	0xef, 0xbd, 0x5c, 0x7f, 0xed, 0xed, 0xed, 0x5b, 0x37, 0xdf, 0xaa, 0xbf, 0x7d, 0x2b, 0x99, 0xbe,
-	0xf4, 0x74, 0xf7, 0xbb, 0x3f, 0xdf, 0xda, 0x91, 0xd6, 0x3f, 0x45, 0x24, 0x63, 0x0e, 0xff, 0x08,
-	0x2e, 0x64, 0x23, 0xcf, 0x58, 0x50, 0xe6, 0xaf, 0x8e, 0x9b, 0xdf, 0xd3, 0x98, 0x7d, 0xff, 0x30,
-	0x50, 0xd7, 0xf8, 0x18, 0xe5, 0xaa, 0x40, 0x2a, 0xed, 0x74, 0x19, 0x7f, 0x0f, 0x56, 0xc2, 0x88,
-	0xf5, 0x9c, 0x68, 0x60, 0xd3, 0x9e, 0xc3, 0x3c, 0xdb, 0x71, 0xdd, 0x88, 0x72, 0x6e, 0x94, 0x32,
-	0x0e, 0xfa, 0x19, 0x22, 0x97, 0x62, 0xd4, 0x1d, 0x09, 0x6a, 0x69, 0x0c, 0xf6, 0xc0, 0x9c, 0x2a,
-	0x6c, 0x27, 0xa9, 0xaa, 0x5e, 0xa9, 0x7c, 0xca, 0x57, 0xaa, 0x4d, 0x31, 0xf1, 0xe3, 0x44, 0x51,
-	0x4b, 0xe0, 0x2d, 0x28, 0x85, 0x0e, 0xe7, 0x4f, 0x82, 0xc8, 0x35, 0x20, 0xfb, 0x34, 0x5f, 0x2d,
-	0x90, 0xd1, 0x0e, 0x7e, 0x00, 0x97, 0x92, 0xb1, 0x9d, 0x89, 0xb7, 0xca, 0x29, 0x0f, 0xb1, 0x9c,
-	0x08, 0xbf, 0x39, 0x8a, 0xb9, 0x1b, 0xb0, 0x1a, 0xd1, 0x77, 0xfa, 0x2c, 0xa2, 0xf6, 0x98, 0x66,
-	0xe3, 0xc2, 0x26, 0xda, 0x2e, 0x91, 0x95, 0x78, 0xfb, 0xc1, 0x09, 0x51, 0x7c, 0x1d, 0x8a, 0x5c,
-	0x48, 0xd4, 0xc5, 0x4d, 0xb4, 0xbd, 0xb8, 0xbb, 0x32, 0xfe, 0x3a, 0x0f, 0xe5, 0xa6, 0xba, 0xc3,
-	0x2f, 0x64, 0xca, 0x11, 0x8d, 0xc6, 0xd7, 0x61, 0x59, 0x0d, 0xec, 0x6c, 0x28, 0x5e, 0xce, 0xde,
-	0xf7, 0x7d, 0x44, 0xaa, 0x0a, 0xf2, 0x7a, 0x26, 0x1e, 0x2f, 0x43, 0xd1, 0x71, 0x7b, 0xcc, 0x37,
-	0x16, 0xd5, 0x99, 0xf4, 0x04, 0xbf, 0x02, 0x58, 0xd0, 0x5e, 0x18, 0x44, 0xf2, 0x8d, 0x46, 0xde,
-	0x5b, 0x1a, 0xf3, 0xde, 0xf2, 0x08, 0x93, 0x5c, 0x01, 0xb7, 0x61, 0x7d, 0x52, 0xd0, 0xce, 0xb0,
-	0x40, 0xf5, 0x94, 0x0e, 0x5d, 0x9b, 0xd0, 0xbd, 0x37, 0xa2, 0x84, 0xe9, 0x46, 0xe8, 0xbb, 0x21,
-	0x8b, 0x28, 0x97, 0x46, 0x96, 0x9f, 0xdb, 0xc8, 0x1d, 0xad, 0xa4, 0x25, 0xf0, 0x6d, 0x58, 0x0a,
-	0xa3, 0xe0, 0x90, 0x79, 0xd4, 0x8e, 0x39, 0xd4, 0xc0, 0x4a, 0xed, 0xea, 0xf8, 0x83, 0x3c, 0xd0,
-	0xdb, 0x64, 0x31, 0xc6, 0xc7, 0xf3, 0xb5, 0x1f, 0xc0, 0xd2, 0x58, 0x0e, 0xe3, 0x2a, 0xe4, 0xbb,
-	0x74, 0xa0, 0x68, 0xb5, 0x4c, 0xe4, 0x50, 0xfa, 0xff, 0xc8, 0xf1, 0xfa, 0x54, 0xd1, 0x63, 0x99,
-	0xe8, 0xc9, 0xcd, 0xdc, 0xab, 0xc8, 0xbc, 0x06, 0x45, 0xc9, 0x03, 0x1c, 0xef, 0x40, 0x51, 0x96,
-	0x44, 0xc9, 0xc6, 0x32, 0x5d, 0x2f, 0x4f, 0x63, 0x0b, 0xa2, 0x21, 0xe6, 0xef, 0x11, 0x2c, 0xde,
-	0xa5, 0x42, 0x2d, 0xd1, 0x77, 0xfa, 0x94, 0x0b, 0x7c, 0x1f, 0x4a, 0x72, 0xcf, 0x7e, 0x21, 0x3e,
-	0x5f, 0xe8, 0x2b, 0x08, 0xc7, 0xaf, 0x01, 0xa4, 0x15, 0xf0, 0xbf, 0x72, 0xfa, 0x0f, 0x25, 0xe4,
-	0x0d, 0x87, 0x77, 0x49, 0xf9, 0x30, 0x19, 0x9a, 0x7f, 0xc9, 0x41, 0xf5, 0x3e, 0xe3, 0xea, 0x70,
-	0x3c, 0x39, 0xdd, 0x49, 0x7d, 0xe8, 0x0c, 0xfa, 0xf0, 0x1f, 0x10, 0x14, 0x83, 0xc8, 0xa5, 0x91,
-	0xf6, 0x9d, 0xf5, 0x21, 0x1a, 0x5a, 0xbf, 0x41, 0xd1, 0xaf, 0x10, 0x99, 0xd3, 0xe7, 0xb5, 0x99,
-	0x4b, 0x4a, 0xf5, 0x64, 0xa4, 0xb8, 0x9a, 0x14, 0xeb, 0xea, 0x67, 0x3a, 0x7b, 0x91, 0x2b, 0xf5,
-	0xe9, 0xeb, 0x3a, 0xc7, 0xc8, 0x7c, 0x5d, 0xff, 0xea, 0x2c, 0x21, 0xf3, 0x75, 0xfd, 0x9b, 0xa9,
-	0x72, 0xa4, 0x52, 0xcf, 0x4c, 0xf4, 0xf1, 0x70, 0x0d, 0x8a, 0x1e, 0xeb, 0x31, 0x5d, 0xbd, 0x2e,
-	0xaa, 0x04, 0xda, 0x51, 0x09, 0xa4, 0x97, 0x31, 0x86, 0x42, 0xe8, 0x74, 0x74, 0x71, 0xb9, 0x48,
-	0xd4, 0x18, 0x1b, 0xb0, 0x10, 0x57, 0x1f, 0x55, 0x4f, 0x4a, 0x24, 0x99, 0x9a, 0xef, 0xc1, 0xb2,
-	0x4e, 0x85, 0xec, 0x23, 0xdf, 0x84, 0x82, 0xbc, 0x67, 0xec, 0xc0, 0xa9, 0x21, 0x32, 0xe5, 0x55,
-	0x95, 0x0c, 0x7e, 0x09, 0xaa, 0xcc, 0x3f, 0x62, 0xc2, 0x91, 0x84, 0x60, 0x8b, 0xa0, 0x4b, 0xfd,
-	0x38, 0x1a, 0x97, 0xd2, 0xf5, 0x47, 0x72, 0xd9, 0xfc, 0x00, 0xc1, 0xb2, 0xa6, 0xa9, 0xf3, 0x32,
-	0xfe, 0x02, 0xf1, 0xe4, 0x43, 0x4d, 0x3b, 0xe2, 0xd1, 0x78, 0x16, 0xcf, 0x24, 0xf4, 0xcd, 0xbf,
-	0x22, 0xf8, 0x46, 0x7a, 0xf9, 0x99, 0xda, 0xc2, 0x6b, 0x90, 0xf7, 0xe9, 0x93, 0x38, 0xb0, 0x53,
-	0xc6, 0x95, 0x8b, 0x72, 0x2f, 0xf0, 0x5c, 0x15, 0x4c, 0x27, 0xf6, 0x02, 0xcf, 0xc5, 0x3b, 0xb0,
-	0x1c, 0xd1, 0xa3, 0xa0, 0x4b, 0x6d, 0xc7, 0xf3, 0x6c, 0xa7, 0xdd, 0x96, 0x35, 0xb9, 0xa0, 0x02,
-	0x68, 0x49, 0x6f, 0xb4, 0x3c, 0xaf, 0xa5, 0x96, 0xcd, 0x4f, 0x10, 0x5c, 0x49, 0xf2, 0xb1, 0xf5,
-	0x60, 0xff, 0x1e, 0x1d, 0xf0, 0xd9, 0x5c, 0x66, 0x14, 0xff, 0xb9, 0x67, 0xc7, 0x7f, 0x3e, 0x8d,
-	0x7f, 0xf3, 0x29, 0x5c, 0x8e, 0x79, 0x4c, 0x1f, 0x6d, 0x36, 0x27, 0x5b, 0x81, 0xf9, 0x2e, 0x1d,
-	0xd8, 0xcc, 0x4d, 0xe8, 0xb7, 0x4b, 0x07, 0xfb, 0xae, 0xf9, 0x61, 0x0e, 0x56, 0xd3, 0x1c, 0x9b,
-	0xe5, 0x01, 0x92, 0xbe, 0x32, 0x37, 0xad, 0xaf, 0xbc, 0x0d, 0xf3, 0xba, 0x3b, 0x37, 0xf2, 0x9b,
-	0xf9, 0x69, 0xad, 0x00, 0x91, 0xbb, 0xd6, 0xf2, 0xd0, 0x5a, 0xfc, 0x18, 0x55, 0x4a, 0xc8, 0x40,
-	0x66, 0xdc, 0x13, 0xc4, 0x72, 0xf8, 0x2e, 0x40, 0xa6, 0x2c, 0x16, 0xbe, 0xb6, 0x2c, 0x5e, 0x18,
-	0x5a, 0xc5, 0x3f, 0xa1, 0xdc, 0x6d, 0xa4, 0xfb, 0x5f, 0x9a, 0x54, 0x43, 0xf3, 0x9f, 0x08, 0x56,
-	0xd3, 0xd8, 0x9f, 0xa5, 0x47, 0x5a, 0xb0, 0xe0, 0x84, 0xcc, 0x96, 0x65, 0x52, 0xb3, 0xc1, 0x95,
-	0x71, 0x65, 0xda, 0xfa, 0x14, 0x1d, 0xf3, 0x4e, 0xc8, 0xee, 0xd1, 0xc1, 0x18, 0xa7, 0xe4, 0xcf,
-	0xc2, 0x29, 0xbf, 0xcb, 0x03, 0xec, 0x8f, 0x48, 0x0f, 0xaf, 0x43, 0x51, 0x15, 0x02, 0x5d, 0xb1,
-	0xd3, 0xb6, 0x56, 0xaf, 0xca, 0xe2, 0x9d, 0xa5, 0x4b, 0x3d, 0x91, 0x5f, 0x2c, 0x19, 0xa7, 0x9f,
-	0xe9, 0x8b, 0x65, 0xe4, 0xf0, 0xb1, 0x6f, 0xa7, 0xc2, 0x79, 0x7c, 0x3b, 0x15, 0x9f, 0xef, 0xdb,
-	0xa9, 0x05, 0x15, 0xc9, 0x23, 0x61, 0xac, 0x65, 0xfe, 0x94, 0xbd, 0x15, 0x24, 0x42, 0xaa, 0x97,
-	0x4a, 0x55, 0x1c, 0x0c, 0x8c, 0x85, 0x53, 0x05, 0x49, 0xaa, 0xc1, 0x1a, 0x98, 0xf7, 0x35, 0x55,
-	0xa5, 0x4f, 0x33, 0xa2, 0xaa, 0x11, 0xb9, 0xa0, 0x67, 0x93, 0x4b, 0x2e, 0x43, 0x2e, 0xf7, 0xa0,
-	0x92, 0xd1, 0x84, 0xbf, 0x0f, 0x95, 0xb4, 0xd0, 0x25, 0x6d, 0xd6, 0xda, 0xf8, 0xf1, 0x52, 0x09,
-	0x92, 0x85, 0x9b, 0x37, 0x60, 0xe5, 0x21, 0xf5, 0xdd, 0xcc, 0x76, 0x7c, 0xb2, 0x67, 0x07, 0x8f,
-	0xf9, 0x2a, 0xac, 0xbe, 0xae, 0x4a, 0xfa, 0x99, 0x25, 0x7f, 0x8b, 0xe0, 0x8a, 0x74, 0xd6, 0x43,
-	0xca, 0x39, 0x0b, 0xfc, 0x8c, 0xcf, 0xce, 0x39, 0x17, 0xbf, 0x03, 0xc0, 0xb5, 0x8d, 0x11, 0x45,
-	0x26, 0x1c, 0x75, 0x9b, 0x94, 0x79, 0x62, 0xde, 0xfc, 0x77, 0x0e, 0x2a, 0x99, 0x03, 0xfd, 0x6f,
-	0x4e, 0x31, 0x96, 0x32, 0xf9, 0xf3, 0x48, 0x99, 0xc2, 0x73, 0xff, 0xdd, 0x90, 0x61, 0x80, 0xe2,
-	0x69, 0xff, 0x6e, 0x48, 0xb3, 0xff, 0xdb, 0xb0, 0x98, 0x5c, 0x99, 0xd3, 0x76, 0x44, 0x75, 0xda,
-	0x95, 0xc9, 0xc5, 0x78, 0xf5, 0xa1, 0x5a, 0x34, 0xef, 0xc2, 0x85, 0x8c, 0xdb, 0x39, 0x7e, 0x05,
-	0x4a, 0x31, 0x20, 0x89, 0xe2, 0xab, 0xd3, 0xfc, 0x1e, 0xe3, 0xc9, 0x08, 0x6c, 0x7e, 0x8e, 0x60,
-	0x35, 0x69, 0x05, 0x12, 0x6d, 0xb3, 0xa1, 0xf7, 0x1b, 0x27, 0x7b, 0xf6, 0xcd, 0xa1, 0xb5, 0x1e,
-	0x5d, 0x25, 0x73, 0xb3, 0xe8, 0xa1, 0xcd, 0xcf, 0x73, 0x00, 0xf7, 0x83, 0x0e, 0xd3, 0xcd, 0xeb,
-	0x39, 0x5f, 0xe4, 0xff, 0xe7, 0xcf, 0xad, 0xbd, 0x33, 0x16, 0xf9, 0xa9, 0xf5, 0x66, 0x54, 0xca,
-	0x8a, 0xd9, 0x52, 0x86, 0x55, 0x67, 0xef, 0xaa, 0xe8, 0x2b, 0xa9, 0x8e, 0xdd, 0x35, 0x7f, 0x89,
-	0x92, 0xe6, 0x28, 0xf5, 0xed, 0x6c, 0x62, 0x65, 0x1d, 0x80, 0x77, 0x59, 0xa8, 0xbf, 0xc5, 0x94,
-	0x8b, 0x4b, 0xa4, 0x2c, 0x57, 0xd4, 0x5f, 0x3d, 0xe6, 0xcb, 0x60, 0x4c, 0x9e, 0x83, 0x87, 0x81,
-	0xcf, 0x69, 0x7a, 0x1d, 0x94, 0xb9, 0x8e, 0xf5, 0xc6, 0xdf, 0xfe, 0x51, 0x9b, 0x7b, 0xff, 0xb8,
-	0x86, 0xfe, 0x78, 0x5c, 0x43, 0x5f, 0x1d, 0xd7, 0xe6, 0xfe, 0x75, 0x5c, 0x43, 0x1f, 0x7d, 0x59,
-	0x9b, 0xfb, 0xf3, 0x97, 0x35, 0xf4, 0x93, 0x66, 0x27, 0x68, 0x88, 0xc7, 0x54, 0x3c, 0x66, 0x7e,
-	0x87, 0x37, 0x7c, 0x2a, 0x9e, 0x04, 0x51, 0xb7, 0x79, 0xf2, 0x1f, 0xd3, 0xa3, 0x6b, 0xcd, 0xb0,
-	0xdb, 0x69, 0x0a, 0xe1, 0x87, 0x07, 0x07, 0xf3, 0xca, 0xb9, 0xd7, 0xfe, 0x13, 0x00, 0x00, 0xff,
-	0xff, 0xf7, 0xf4, 0x50, 0xf9, 0xc4, 0x16, 0x00, 0x00,
+	0x15, 0xd7, 0xf0, 0x8f, 0x44, 0x3e, 0xda, 0x12, 0x39, 0xb6, 0xac, 0xad, 0x5c, 0x51, 0xc4, 0x56,
+	0x2d, 0x14, 0xa1, 0x24, 0x03, 0x19, 0x76, 0x12, 0xb7, 0x85, 0xcd, 0x75, 0x5c, 0x47, 0xb0, 0x03,
+	0x18, 0x63, 0xa7, 0x87, 0x06, 0xe9, 0x76, 0xc5, 0x1d, 0xd1, 0x53, 0x2e, 0x77, 0x37, 0x3b, 0x43,
+	0x29, 0x4c, 0x50, 0x20, 0x08, 0x50, 0xa0, 0x70, 0x0e, 0x0d, 0x02, 0xa4, 0x87, 0x7e, 0x80, 0xa2,
+	0xe7, 0x7e, 0x82, 0x1e, 0x7a, 0x48, 0x4f, 0xc9, 0xb1, 0xa7, 0x14, 0x71, 0x2e, 0x39, 0xb6, 0x57,
+	0x9d, 0x8a, 0x99, 0xd9, 0xe5, 0xae, 0x48, 0xd6, 0x96, 0x5c, 0xba, 0xe8, 0x89, 0xf3, 0xe7, 0xf7,
+	0xde, 0x9b, 0x79, 0xf3, 0xde, 0xef, 0xbd, 0x25, 0x7c, 0xd7, 0x0b, 0x22, 0xe7, 0xc8, 0xf1, 0x9b,
+	0x5c, 0x38, 0xdd, 0x7e, 0xdb, 0x09, 0x59, 0x7b, 0xc8, 0x69, 0xd4, 0x0a, 0xa3, 0x40, 0x04, 0x78,
+	0x59, 0x08, 0xbf, 0x15, 0x23, 0x5a, 0x87, 0x57, 0xd6, 0x3b, 0x3d, 0x26, 0x1e, 0x0d, 0xf7, 0x5b,
+	0xdd, 0x60, 0xd0, 0xa6, 0xfe, 0x61, 0x30, 0x0a, 0xa3, 0xe0, 0xbd, 0x51, 0x5b, 0x81, 0xbb, 0xcd,
+	0x1e, 0xf5, 0x9b, 0x87, 0x8e, 0xc7, 0x5c, 0x47, 0xd0, 0xf6, 0xd4, 0x40, 0xab, 0x5c, 0x6f, 0x66,
+	0x54, 0xf4, 0x82, 0x5e, 0xa0, 0x85, 0xf7, 0x87, 0x07, 0x6a, 0xa6, 0x26, 0x6a, 0x14, 0xc3, 0x1b,
+	0xbd, 0x20, 0xe8, 0x79, 0x34, 0x45, 0x1d, 0x30, 0xea, 0xb9, 0xf6, 0xc0, 0xe1, 0xfd, 0x18, 0xb1,
+	0x39, 0x89, 0x10, 0x6c, 0x40, 0xb9, 0x70, 0x06, 0x61, 0x0c, 0xd8, 0x9a, 0xbe, 0x62, 0x37, 0xf0,
+	0x85, 0xd3, 0x15, 0x36, 0xf3, 0x0f, 0x12, 0x43, 0x1b, 0xd3, 0x28, 0xea, 0x0f, 0x07, 0x3c, 0xde,
+	0xfe, 0xde, 0xf4, 0x36, 0x73, 0xa9, 0x2f, 0xd8, 0x01, 0xa3, 0x51, 0x02, 0xda, 0x9c, 0x06, 0x85,
+	0xac, 0x2b, 0x86, 0x51, 0x72, 0xf9, 0xfa, 0x34, 0x20, 0x62, 0xbd, 0x47, 0x22, 0x56, 0x60, 0xfe,
+	0xa6, 0x02, 0x85, 0xb7, 0x38, 0x8d, 0xf0, 0x0d, 0xc8, 0x33, 0x97, 0x1b, 0xa8, 0x81, 0xb6, 0x2b,
+	0xbb, 0x9b, 0xad, 0x93, 0xcf, 0xd0, 0x92, 0x90, 0xbd, 0xd4, 0xba, 0x75, 0xee, 0xd8, 0x2a, 0x3e,
+	0x46, 0xb9, 0x2a, 0xfa, 0xfc, 0xab, 0xcd, 0x05, 0x22, 0x25, 0xf1, 0x2d, 0x80, 0x6e, 0x44, 0x1d,
+	0x41, 0x5d, 0xdb, 0x11, 0x46, 0x4e, 0xe9, 0x59, 0x6f, 0x69, 0x57, 0xb5, 0x12, 0x57, 0xb5, 0x1e,
+	0x26, 0xae, 0xb2, 0x4a, 0x52, 0xf4, 0x93, 0x7f, 0x6c, 0x22, 0x52, 0x8e, 0xe5, 0x3a, 0x42, 0x2a,
+	0x19, 0x86, 0x6e, 0xa2, 0x24, 0x7f, 0x16, 0x25, 0xb1, 0x5c, 0x47, 0xe0, 0x1b, 0x00, 0x2e, 0xf5,
+	0x68, 0xac, 0xe4, 0xc2, 0x33, 0x95, 0x14, 0xb4, 0x82, 0x58, 0xa6, 0x23, 0xf0, 0x65, 0x28, 0xf8,
+	0xce, 0x80, 0x1a, 0x85, 0x06, 0xda, 0x2e, 0x5b, 0x4b, 0xc7, 0x56, 0x21, 0xca, 0x19, 0xbb, 0x44,
+	0x2d, 0xe2, 0x1d, 0xa8, 0xb8, 0x94, 0x77, 0x23, 0x16, 0x0a, 0x16, 0xf8, 0x46, 0x51, 0x61, 0x4a,
+	0xc7, 0x56, 0x31, 0xca, 0x1b, 0x5f, 0xae, 0x90, 0xec, 0x26, 0xfe, 0x00, 0xc0, 0x11, 0x22, 0x62,
+	0xfb, 0x43, 0x41, 0xb9, 0xb1, 0xd8, 0xc8, 0x6f, 0x57, 0x76, 0xb7, 0x66, 0xf9, 0xb6, 0xd5, 0x19,
+	0xc3, 0x6e, 0xfb, 0x22, 0x1a, 0x59, 0x57, 0x8f, 0xad, 0xdd, 0x3f, 0xa0, 0x76, 0x15, 0xcc, 0xad,
+	0xc8, 0x34, 0xb6, 0x76, 0xeb, 0xbf, 0x78, 0xdb, 0x69, 0xbe, 0xff, 0x72, 0xf3, 0xb5, 0x77, 0xb6,
+	0x6f, 0x5c, 0x7f, 0xbb, 0xf9, 0xce, 0x8d, 0x64, 0xfa, 0xd2, 0x07, 0xbb, 0x3f, 0xfc, 0xf5, 0xd6,
+	0x8e, 0xb4, 0xfe, 0x39, 0x22, 0x19, 0x73, 0xf8, 0x0d, 0x38, 0x97, 0x8d, 0x3a, 0x63, 0x49, 0x99,
+	0xbf, 0x3c, 0x69, 0xfe, 0x96, 0xc6, 0xec, 0xf9, 0x07, 0x81, 0xba, 0xc6, 0xa7, 0x28, 0x57, 0x05,
+	0x52, 0xe9, 0xa6, 0xcb, 0xf8, 0x47, 0xb0, 0x1a, 0x46, 0x6c, 0xe0, 0x44, 0x23, 0x9b, 0x0e, 0x1c,
+	0xe6, 0xd9, 0x8e, 0xeb, 0x46, 0x94, 0x73, 0xa3, 0x94, 0x71, 0xd0, 0x2f, 0x11, 0xb9, 0x10, 0xa3,
+	0x6e, 0x4b, 0x50, 0x47, 0x63, 0xb0, 0x07, 0xe6, 0x4c, 0x61, 0x3b, 0x49, 0x53, 0xf5, 0x4a, 0xe5,
+	0x53, 0xbe, 0x52, 0x7d, 0x86, 0x89, 0x9f, 0x25, 0x8a, 0x3a, 0x02, 0x6f, 0x41, 0x29, 0x74, 0x38,
+	0x3f, 0x0a, 0x22, 0xd7, 0x80, 0xec, 0xd3, 0x7c, 0xbb, 0x44, 0xc6, 0x3b, 0xf8, 0x3e, 0x5c, 0x48,
+	0xc6, 0x76, 0x26, 0xde, 0x2a, 0xa7, 0x3c, 0x44, 0x2d, 0x11, 0x7e, 0x6b, 0x1c, 0x73, 0xd7, 0x60,
+	0x2d, 0xa2, 0xef, 0x0e, 0x59, 0x44, 0xed, 0x09, 0xcd, 0xc6, 0xb9, 0x06, 0xda, 0x2e, 0x91, 0xd5,
+	0x78, 0xfb, 0xfe, 0x09, 0x51, 0x7c, 0x15, 0x8a, 0x5c, 0x48, 0xd4, 0xf9, 0x06, 0xda, 0x5e, 0xde,
+	0x5d, 0x9d, 0x7c, 0x9d, 0x07, 0x72, 0x53, 0xdd, 0xe1, 0x23, 0x99, 0x6e, 0x44, 0xa3, 0xf1, 0x55,
+	0xa8, 0xa9, 0x81, 0x9d, 0x0d, 0xc5, 0x8b, 0xd9, 0xfb, 0x7e, 0x88, 0x48, 0x55, 0x41, 0x5e, 0xcf,
+	0xc4, 0xe3, 0x45, 0x28, 0x3a, 0xee, 0x80, 0xf9, 0xc6, 0xb2, 0x3a, 0x93, 0x9e, 0xe0, 0x57, 0x00,
+	0x0b, 0x3a, 0x08, 0x83, 0x48, 0xbe, 0xd1, 0xd8, 0x7b, 0x2b, 0x13, 0xde, 0xab, 0x8d, 0x31, 0xc9,
+	0x15, 0x70, 0x17, 0x36, 0xa6, 0x05, 0xed, 0x0c, 0x0b, 0x54, 0x4f, 0xe9, 0xd0, 0xf5, 0x29, 0xdd,
+	0xb7, 0xc6, 0x94, 0x30, 0xdb, 0x08, 0x7d, 0x2f, 0x64, 0x11, 0xe5, 0xd2, 0x48, 0xed, 0xb9, 0x8d,
+	0xdc, 0xd6, 0x4a, 0x3a, 0x02, 0xdf, 0x84, 0x95, 0x30, 0x0a, 0x0e, 0x98, 0x47, 0xed, 0x98, 0x3f,
+	0x0d, 0xac, 0xd4, 0xae, 0x4d, 0x3e, 0xc8, 0x7d, 0xbd, 0x4d, 0x96, 0x63, 0x7c, 0x3c, 0x5f, 0xff,
+	0x09, 0xac, 0x4c, 0xe4, 0x30, 0xae, 0x42, 0xbe, 0x4f, 0x47, 0x8a, 0x52, 0xcb, 0x44, 0x0e, 0xa5,
+	0xff, 0x0f, 0x1d, 0x6f, 0x48, 0x15, 0x3d, 0x96, 0x89, 0x9e, 0x5c, 0xcf, 0xbd, 0x8a, 0xcc, 0x2b,
+	0x50, 0x94, 0x3c, 0xc0, 0xf1, 0x0e, 0x14, 0x65, 0x39, 0x94, 0x4c, 0x2c, 0xd3, 0xf5, 0xe2, 0x2c,
+	0xb6, 0x20, 0x1a, 0x62, 0x7e, 0x86, 0x60, 0xf9, 0x0e, 0x15, 0x6a, 0x89, 0xbe, 0x3b, 0xa4, 0x5c,
+	0xe0, 0x37, 0xa0, 0x24, 0xf7, 0xec, 0xe7, 0xe6, 0xf2, 0xa5, 0xa1, 0xda, 0xe6, 0xf8, 0x35, 0x80,
+	0xb4, 0xf2, 0xfd, 0x47, 0x3e, 0xff, 0xa9, 0x84, 0xbc, 0xe9, 0xf0, 0x3e, 0x29, 0x1f, 0x24, 0x43,
+	0xf3, 0xaf, 0x39, 0xa8, 0xde, 0x63, 0x5c, 0x1d, 0x8c, 0x27, 0x27, 0x3b, 0xa9, 0x0f, 0x9d, 0x41,
+	0x1f, 0xfe, 0x23, 0x82, 0x62, 0x10, 0xb9, 0x34, 0xd2, 0x7e, 0xb3, 0x7e, 0x87, 0x8e, 0xad, 0x8f,
+	0x51, 0xf4, 0x5b, 0x44, 0xe2, 0xf3, 0xda, 0xcc, 0x25, 0xa5, 0x66, 0x32, 0x52, 0x3c, 0x4d, 0x8a,
+	0x4d, 0xf5, 0x33, 0x9b, 0xb9, 0xc8, 0xa5, 0xe6, 0xec, 0x75, 0x9d, 0x5f, 0x64, 0xb1, 0xa9, 0x7f,
+	0x75, 0x86, 0x90, 0xc5, 0xa6, 0xfe, 0xcd, 0x54, 0x38, 0x52, 0x69, 0x66, 0x26, 0xfa, 0x78, 0xb8,
+	0x0e, 0x45, 0x8f, 0x0d, 0x98, 0xae, 0x5c, 0xe7, 0x55, 0xf2, 0xec, 0xa8, 0xe4, 0xd1, 0xcb, 0x18,
+	0x43, 0x21, 0x74, 0x7a, 0xba, 0xb0, 0x9c, 0x27, 0x6a, 0x8c, 0x0d, 0x58, 0x8a, 0x2b, 0x8f, 0xaa,
+	0x25, 0x25, 0x92, 0x4c, 0xcd, 0xf7, 0xa1, 0xa6, 0xd3, 0x20, 0xfb, 0xc0, 0xd7, 0xa1, 0x20, 0xef,
+	0x19, 0x3b, 0x70, 0x66, 0x78, 0x58, 0xd5, 0xec, 0x8b, 0x7e, 0xf9, 0xd5, 0x26, 0x22, 0x4a, 0x06,
+	0xbf, 0x04, 0x55, 0xe6, 0x1f, 0x32, 0xe1, 0x48, 0x32, 0xb0, 0x45, 0xd0, 0xa7, 0x7e, 0x1c, 0x89,
+	0x2b, 0xe9, 0xfa, 0x43, 0xb9, 0x6c, 0x3e, 0x46, 0x50, 0xd3, 0x14, 0x35, 0x2f, 0xe3, 0xff, 0x45,
+	0x3c, 0xfd, 0x0a, 0xea, 0xda, 0x11, 0x0f, 0x27, 0x33, 0x78, 0xee, 0x61, 0x6f, 0xfe, 0x0d, 0xc1,
+	0x77, 0xd2, 0x8b, 0xbf, 0x30, 0x3b, 0x78, 0x1d, 0xf2, 0x3e, 0x3d, 0x8a, 0x03, 0x3a, 0x65, 0x59,
+	0xb9, 0x28, 0xf7, 0x02, 0xcf, 0x55, 0x41, 0x74, 0x62, 0x2f, 0xf0, 0x5c, 0xbc, 0x03, 0xb5, 0x88,
+	0x1e, 0x06, 0x7d, 0x6a, 0x3b, 0x9e, 0x67, 0x3b, 0xdd, 0xae, 0xac, 0xc3, 0x05, 0x15, 0x38, 0x2b,
+	0x7a, 0xa3, 0xe3, 0x79, 0x1d, 0xb5, 0x6c, 0xfe, 0x1e, 0xc1, 0xa5, 0x24, 0x0f, 0x3b, 0xf7, 0xf7,
+	0xee, 0xd2, 0x11, 0x9f, 0xff, 0x45, 0xc6, 0x31, 0x9f, 0x7b, 0x7a, 0xcc, 0xe7, 0xd3, 0x98, 0x37,
+	0x8f, 0xe0, 0x62, 0xcc, 0x5b, 0xfa, 0x58, 0xf3, 0x3f, 0xd5, 0x2a, 0x2c, 0xf6, 0xe9, 0xc8, 0x66,
+	0x6e, 0x42, 0xb5, 0x7d, 0x3a, 0xda, 0x73, 0xcd, 0x8f, 0x73, 0xb0, 0x96, 0xe6, 0xd4, 0x8b, 0x32,
+	0x9e, 0xf4, 0x8f, 0xb9, 0x59, 0xfd, 0xe3, 0x4d, 0x58, 0xd4, 0x1d, 0xb8, 0x91, 0x6f, 0xe4, 0x67,
+	0x95, 0x7c, 0x22, 0x77, 0xad, 0xda, 0xb1, 0xb5, 0xfc, 0x29, 0xaa, 0x94, 0x90, 0x81, 0xcc, 0xb8,
+	0xf6, 0xc7, 0x72, 0xf8, 0x0e, 0x40, 0xa6, 0xfc, 0x15, 0x9e, 0x59, 0xfe, 0xe4, 0x29, 0xff, 0x8c,
+	0x72, 0x37, 0x91, 0xee, 0x73, 0x69, 0x52, 0xf5, 0xcc, 0xaf, 0x11, 0xac, 0xa5, 0xb1, 0xfe, 0xa2,
+	0xbc, 0xd1, 0x81, 0x25, 0x27, 0x64, 0xb6, 0x2c, 0x85, 0x3a, 0xeb, 0x2f, 0x4d, 0x2a, 0xd2, 0x96,
+	0x67, 0x30, 0xc7, 0xa2, 0x13, 0xb2, 0xbb, 0x74, 0x34, 0xc1, 0x1d, 0xf9, 0xb3, 0x70, 0xc7, 0x67,
+	0x79, 0x80, 0xbd, 0x31, 0xb9, 0xe1, 0x0d, 0x28, 0x2a, 0xc2, 0xd7, 0x55, 0x39, 0x6d, 0x5d, 0xf5,
+	0xaa, 0x2c, 0xd0, 0x59, 0x5a, 0xd4, 0x13, 0xf9, 0x55, 0x92, 0x71, 0xf8, 0x99, 0xbe, 0x4a, 0xc6,
+	0xce, 0x9e, 0xf8, 0x3e, 0x2a, 0xcc, 0xe3, 0xfb, 0xa8, 0xf8, 0x7c, 0xdf, 0x47, 0x1d, 0xa8, 0x48,
+	0xde, 0x08, 0x63, 0x2d, 0x8b, 0xa7, 0xec, 0x9f, 0x20, 0x11, 0x52, 0xfd, 0x52, 0xaa, 0x62, 0x7f,
+	0x64, 0x2c, 0x9d, 0x2a, 0x40, 0x52, 0x0d, 0xd6, 0xc8, 0xbc, 0xa7, 0xa9, 0x29, 0x7d, 0x9a, 0x31,
+	0x35, 0x8d, 0x09, 0x05, 0x3d, 0x9d, 0x50, 0x72, 0x19, 0x42, 0xb9, 0x0b, 0x95, 0x8c, 0x26, 0xfc,
+	0x63, 0xa8, 0xa4, 0x05, 0x2d, 0x69, 0xa5, 0xd6, 0x27, 0x8f, 0x97, 0x4a, 0x90, 0x2c, 0xdc, 0xbc,
+	0x06, 0xab, 0x0f, 0xa8, 0xef, 0x66, 0xb6, 0xe3, 0x93, 0x3d, 0x3d, 0x78, 0xcc, 0x57, 0x61, 0xed,
+	0x75, 0x55, 0xba, 0xcf, 0x2c, 0xf9, 0x18, 0xc1, 0x25, 0xe9, 0xac, 0x07, 0x94, 0x73, 0x16, 0xf8,
+	0x19, 0x9f, 0xcd, 0x31, 0x0f, 0x7f, 0x00, 0xc0, 0xb5, 0xfe, 0x31, 0x2d, 0x26, 0xdc, 0x74, 0x93,
+	0x94, 0x79, 0x62, 0xda, 0xfc, 0x57, 0x0e, 0x2a, 0x99, 0xc3, 0xfc, 0xef, 0x4f, 0x30, 0x91, 0x2a,
+	0xf9, 0x79, 0xa4, 0x4a, 0xe1, 0xb9, 0xff, 0x4a, 0xc8, 0x64, 0x7e, 0xf1, 0xb4, 0x7f, 0x25, 0xa4,
+	0x59, 0xff, 0x7d, 0x58, 0x4e, 0xae, 0xcc, 0x69, 0x37, 0xa2, 0x3a, 0xdd, 0xca, 0xe4, 0x7c, 0xbc,
+	0xfa, 0x40, 0x2d, 0x9a, 0x77, 0xe0, 0x5c, 0xc6, 0xe5, 0x1c, 0xbf, 0x02, 0xa5, 0x18, 0x90, 0x44,
+	0xef, 0xe5, 0x59, 0x3e, 0x8f, 0xf1, 0x64, 0x0c, 0x36, 0xbf, 0x40, 0xb0, 0x96, 0x94, 0xfc, 0x44,
+	0xdb, 0xfc, 0x29, 0xfd, 0xda, 0xc9, 0x7e, 0xbc, 0x71, 0x6c, 0x6d, 0x44, 0x97, 0xc9, 0xc2, 0x8b,
+	0xe8, 0x8f, 0xcd, 0x2f, 0x72, 0x00, 0xf7, 0x82, 0x1e, 0xd3, 0x8d, 0xe9, 0x1c, 0x2f, 0xf1, 0xff,
+	0xf3, 0x87, 0xd5, 0xad, 0x33, 0x16, 0xf4, 0x99, 0xf5, 0x65, 0x5c, 0xba, 0x8a, 0xd9, 0xd2, 0x85,
+	0x55, 0xc7, 0xee, 0xaa, 0xa8, 0x2b, 0xa9, 0x4e, 0xdc, 0x35, 0x3f, 0x42, 0x49, 0x13, 0x94, 0xfa,
+	0x75, 0xfe, 0x31, 0xb2, 0x01, 0xc0, 0xfb, 0x2c, 0xd4, 0xdf, 0x57, 0xca, 0xbd, 0x25, 0x52, 0x96,
+	0x2b, 0xea, 0xaf, 0x1b, 0xf3, 0x65, 0x30, 0xa6, 0xcf, 0xc0, 0xc3, 0xc0, 0xe7, 0x34, 0xbd, 0x0a,
+	0xca, 0x5c, 0xc5, 0x7a, 0xf3, 0xef, 0x5f, 0xd7, 0x17, 0x3e, 0x7c, 0x52, 0x47, 0x7f, 0x7a, 0x52,
+	0x47, 0xdf, 0x3e, 0xa9, 0x2f, 0xfc, 0xf3, 0x49, 0x1d, 0x7d, 0xf2, 0x4d, 0x7d, 0xe1, 0x2f, 0xdf,
+	0xd4, 0xd1, 0xcf, 0xdb, 0xbd, 0xa0, 0x25, 0x1e, 0x51, 0xf1, 0x88, 0xf9, 0x3d, 0xde, 0xf2, 0xa9,
+	0x38, 0x0a, 0xa2, 0x7e, 0xfb, 0xe4, 0xbf, 0x9f, 0x87, 0x57, 0xda, 0x61, 0xbf, 0xd7, 0x16, 0xc2,
+	0x0f, 0xf7, 0xf7, 0x17, 0x95, 0x63, 0xaf, 0xfc, 0x3b, 0x00, 0x00, 0xff, 0xff, 0x04, 0xe1, 0xbc,
+	0xe4, 0x90, 0x16, 0x00, 0x00,
 }
 
 func (this *User) Equal(that interface{}) bool {
@@ -1497,7 +1711,7 @@ func (this *User) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.Ids.Equal(&that1.Ids) {
 		return false
 	}
 	if !this.CreatedAt.Equal(that1.CreatedAt) {
@@ -1589,6 +1803,7 @@ func (this *User) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *Users) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1618,6 +1833,7 @@ func (this *Users) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *GetUserRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1637,7 +1853,7 @@ func (this *GetUserRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	if !this.FieldMask.Equal(that1.FieldMask) {
@@ -1645,6 +1861,7 @@ func (this *GetUserRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *ListUsersRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1681,6 +1898,7 @@ func (this *ListUsersRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *CreateUserRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1708,6 +1926,7 @@ func (this *CreateUserRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *UpdateUserRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1735,6 +1954,7 @@ func (this *UpdateUserRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *CreateTemporaryPasswordRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1754,11 +1974,12 @@ func (this *CreateTemporaryPasswordRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	return true
 }
+
 func (this *UpdateUserPasswordRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1778,7 +1999,7 @@ func (this *UpdateUserPasswordRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	if this.New != that1.New {
@@ -1792,6 +2013,7 @@ func (this *UpdateUserPasswordRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *ListUserAPIKeysRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1811,7 +2033,7 @@ func (this *ListUserAPIKeysRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	if this.Limit != that1.Limit {
@@ -1822,6 +2044,7 @@ func (this *ListUserAPIKeysRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *GetUserAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1841,7 +2064,7 @@ func (this *GetUserAPIKeyRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	if this.KeyId != that1.KeyId {
@@ -1849,6 +2072,7 @@ func (this *GetUserAPIKeyRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *CreateUserAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1868,7 +2092,7 @@ func (this *CreateUserAPIKeyRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	if this.Name != that1.Name {
@@ -1891,6 +2115,7 @@ func (this *CreateUserAPIKeyRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *UpdateUserAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1910,7 +2135,7 @@ func (this *UpdateUserAPIKeyRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	if !this.APIKey.Equal(&that1.APIKey) {
@@ -1921,6 +2146,7 @@ func (this *UpdateUserAPIKeyRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *Invitation) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1967,6 +2193,7 @@ func (this *Invitation) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *ListInvitationsRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1994,6 +2221,7 @@ func (this *ListInvitationsRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *Invitations) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -2023,6 +2251,7 @@ func (this *Invitations) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *SendInvitationRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -2047,6 +2276,7 @@ func (this *SendInvitationRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *DeleteInvitationRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -2071,6 +2301,7 @@ func (this *DeleteInvitationRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *UserSessionIdentifiers) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -2090,7 +2321,7 @@ func (this *UserSessionIdentifiers) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	if this.SessionId != that1.SessionId {
@@ -2098,6 +2329,7 @@ func (this *UserSessionIdentifiers) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *UserSession) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -2117,7 +2349,7 @@ func (this *UserSession) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	if this.SessionId != that1.SessionId {
@@ -2141,6 +2373,7 @@ func (this *UserSession) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *UserSessions) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -2170,6 +2403,7 @@ func (this *UserSessions) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *ListUserSessionsRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -2189,7 +2423,7 @@ func (this *ListUserSessionsRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	if this.Order != that1.Order {
@@ -2203,6 +2437,7 @@ func (this *ListUserSessionsRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *LoginToken) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -2222,7 +2457,7 @@ func (this *LoginToken) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	if !this.CreatedAt.Equal(that1.CreatedAt) {
@@ -2242,6 +2477,7 @@ func (this *LoginToken) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *CreateLoginTokenRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -2261,7 +2497,7 @@ func (this *CreateLoginTokenRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifiers.Equal(&that1.UserIdentifiers) {
+	if !this.UserIds.Equal(&that1.UserIds) {
 		return false
 	}
 	if this.SkipEmail != that1.SkipEmail {
@@ -2269,6 +2505,7 @@ func (this *CreateLoginTokenRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *CreateLoginTokenResponse) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -2293,6 +2530,7 @@ func (this *CreateLoginTokenResponse) Equal(that interface{}) bool {
 	}
 	return true
 }
+
 func (this *User) String() string {
 	if this == nil {
 		return "nil"
@@ -2312,8 +2550,9 @@ func (this *User) String() string {
 		mapStringForAttributes += fmt.Sprintf("%v: %v,", k, this.Attributes[k])
 	}
 	mapStringForAttributes += "}"
-	s := strings.Join([]string{`&User{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&User{`,
+		`Ids:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Ids), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`DeletedAt:` + strings.Replace(fmt.Sprintf("%v", this.DeletedAt), "Timestamp", "types.Timestamp", 1) + `,`,
@@ -2337,6 +2576,7 @@ func (this *User) String() string {
 	}, "")
 	return s
 }
+
 func (this *Users) String() string {
 	if this == nil {
 		return "nil"
@@ -2346,28 +2586,33 @@ func (this *Users) String() string {
 		repeatedStringForUsers += strings.Replace(f.String(), "User", "User", 1) + ","
 	}
 	repeatedStringForUsers += "}"
-	s := strings.Join([]string{`&Users{`,
+	s := strings.Join([]string{
+		`&Users{`,
 		`Users:` + repeatedStringForUsers + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *GetUserRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&GetUserRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&GetUserRequest{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`FieldMask:` + strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *ListUsersRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ListUsersRequest{`,
+	s := strings.Join([]string{
+		`&ListUsersRequest{`,
 		`FieldMask:` + strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1) + `,`,
 		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
@@ -2377,44 +2622,52 @@ func (this *ListUsersRequest) String() string {
 	}, "")
 	return s
 }
+
 func (this *CreateUserRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CreateUserRequest{`,
+	s := strings.Join([]string{
+		`&CreateUserRequest{`,
 		`User:` + strings.Replace(strings.Replace(this.User.String(), "User", "User", 1), `&`, ``, 1) + `,`,
 		`InvitationToken:` + fmt.Sprintf("%v", this.InvitationToken) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *UpdateUserRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&UpdateUserRequest{`,
+	s := strings.Join([]string{
+		`&UpdateUserRequest{`,
 		`User:` + strings.Replace(strings.Replace(this.User.String(), "User", "User", 1), `&`, ``, 1) + `,`,
 		`FieldMask:` + strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *CreateTemporaryPasswordRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CreateTemporaryPasswordRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&CreateTemporaryPasswordRequest{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *UpdateUserPasswordRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&UpdateUserPasswordRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&UpdateUserPasswordRequest{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`New:` + fmt.Sprintf("%v", this.New) + `,`,
 		`Old:` + fmt.Sprintf("%v", this.Old) + `,`,
 		`RevokeAllAccess:` + fmt.Sprintf("%v", this.RevokeAllAccess) + `,`,
@@ -2422,35 +2675,41 @@ func (this *UpdateUserPasswordRequest) String() string {
 	}, "")
 	return s
 }
+
 func (this *ListUserAPIKeysRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ListUserAPIKeysRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&ListUserAPIKeysRequest{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *GetUserAPIKeyRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&GetUserAPIKeyRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&GetUserAPIKeyRequest{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`KeyId:` + fmt.Sprintf("%v", this.KeyId) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *CreateUserAPIKeyRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CreateUserAPIKeyRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&CreateUserAPIKeyRequest{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
 		`ExpiresAt:` + strings.Replace(fmt.Sprintf("%v", this.ExpiresAt), "Timestamp", "types.Timestamp", 1) + `,`,
@@ -2458,23 +2717,27 @@ func (this *CreateUserAPIKeyRequest) String() string {
 	}, "")
 	return s
 }
+
 func (this *UpdateUserAPIKeyRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&UpdateUserAPIKeyRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&UpdateUserAPIKeyRequest{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`APIKey:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.APIKey), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
 		`FieldMask:` + strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *Invitation) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&Invitation{`,
+	s := strings.Join([]string{
+		`&Invitation{`,
 		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
 		`Token:` + fmt.Sprintf("%v", this.Token) + `,`,
 		`ExpiresAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ExpiresAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
@@ -2486,17 +2749,20 @@ func (this *Invitation) String() string {
 	}, "")
 	return s
 }
+
 func (this *ListInvitationsRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ListInvitationsRequest{`,
+	s := strings.Join([]string{
+		`&ListInvitationsRequest{`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *Invitations) String() string {
 	if this == nil {
 		return "nil"
@@ -2506,49 +2772,58 @@ func (this *Invitations) String() string {
 		repeatedStringForInvitations += strings.Replace(f.String(), "Invitation", "Invitation", 1) + ","
 	}
 	repeatedStringForInvitations += "}"
-	s := strings.Join([]string{`&Invitations{`,
+	s := strings.Join([]string{
+		`&Invitations{`,
 		`Invitations:` + repeatedStringForInvitations + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *SendInvitationRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&SendInvitationRequest{`,
+	s := strings.Join([]string{
+		`&SendInvitationRequest{`,
 		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *DeleteInvitationRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&DeleteInvitationRequest{`,
+	s := strings.Join([]string{
+		`&DeleteInvitationRequest{`,
 		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *UserSessionIdentifiers) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&UserSessionIdentifiers{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&UserSessionIdentifiers{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`SessionId:` + fmt.Sprintf("%v", this.SessionId) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *UserSession) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&UserSession{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&UserSession{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`SessionId:` + fmt.Sprintf("%v", this.SessionId) + `,`,
 		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
@@ -2558,6 +2833,7 @@ func (this *UserSession) String() string {
 	}, "")
 	return s
 }
+
 func (this *UserSessions) String() string {
 	if this == nil {
 		return "nil"
@@ -2567,18 +2843,21 @@ func (this *UserSessions) String() string {
 		repeatedStringForSessions += strings.Replace(f.String(), "UserSession", "UserSession", 1) + ","
 	}
 	repeatedStringForSessions += "}"
-	s := strings.Join([]string{`&UserSessions{`,
+	s := strings.Join([]string{
+		`&UserSessions{`,
 		`Sessions:` + repeatedStringForSessions + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *ListUserSessionsRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ListUserSessionsRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&ListUserSessionsRequest{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
@@ -2586,12 +2865,14 @@ func (this *ListUserSessionsRequest) String() string {
 	}, "")
 	return s
 }
+
 func (this *LoginToken) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&LoginToken{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&LoginToken{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`ExpiresAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ExpiresAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
@@ -2601,27 +2882,32 @@ func (this *LoginToken) String() string {
 	}, "")
 	return s
 }
+
 func (this *CreateLoginTokenRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CreateLoginTokenRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{
+		`&CreateLoginTokenRequest{`,
+		`UserIds:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIds), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`SkipEmail:` + fmt.Sprintf("%v", this.SkipEmail) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func (this *CreateLoginTokenResponse) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CreateLoginTokenResponse{`,
+	s := strings.Join([]string{
+		`&CreateLoginTokenResponse{`,
 		`Token:` + fmt.Sprintf("%v", this.Token) + `,`,
 		`}`,
 	}, "")
 	return s
 }
+
 func valueToStringUser(v interface{}) string {
 	rv := reflect.ValueOf(v)
 	if rv.IsNil() {

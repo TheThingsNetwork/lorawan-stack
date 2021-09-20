@@ -29,7 +29,7 @@ import (
 func init() {
 	gatewayAccessUser.Admin = false
 	gatewayAccessUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&gatewayAccessUser.UserIdentifiers).ApiKeys {
+	for _, apiKey := range userAPIKeys(&gatewayAccessUser.Ids).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_LINK,
 			ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS,
@@ -38,13 +38,13 @@ func init() {
 	}
 	gtwAccessCollaboratorUser.Admin = false
 	gtwAccessCollaboratorUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&gtwAccessCollaboratorUser.UserIdentifiers).ApiKeys {
+	for _, apiKey := range userAPIKeys(&gtwAccessCollaboratorUser.Ids).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_ALL,
 		}
 	}
-	userGateways(&defaultUser.UserIdentifiers).Gateways[0].StatusPublic = false
-	userGateways(&defaultUser.UserIdentifiers).Gateways[0].LocationPublic = false
+	userGateways(&defaultUser.Ids).Gateways[0].StatusPublic = false
+	userGateways(&defaultUser.Ids).Gateways[0].LocationPublic = false
 }
 
 func TestGatewayAccessNotFound(t *testing.T) {
@@ -52,7 +52,7 @@ func TestGatewayAccessNotFound(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
+		userID, creds := defaultUser.Ids, userCreds(defaultUserIdx)
 		gatewayID := userGateways(&userID).Gateways[0].GatewayIdentifiers
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
@@ -90,9 +90,9 @@ func TestGatewayAccessRightsPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := gatewayAccessUser.UserIdentifiers, userCreds(gatewayAccessUserIdx)
+		userID, creds := gatewayAccessUser.Ids, userCreds(gatewayAccessUserIdx)
 		gatewayID := userGateways(&userID).Gateways[0].GatewayIdentifiers
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		collaboratorID := collaboratorUser.Ids.OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
@@ -146,9 +146,9 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.UserIdentifiers
+		userID := defaultUser.Ids
 		gatewayID := userGateways(&userID).Gateways[0].GatewayIdentifiers
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		collaboratorID := collaboratorUser.Ids.OrganizationOrUserIdentifiers()
 		APIKeyID := gatewayAPIKeys(&gatewayID).ApiKeys[0].Id
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
@@ -232,7 +232,7 @@ func TestGatewayAccessClusterAuth(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.UserIdentifiers
+		userID := defaultUser.Ids
 		gatewayID := userGateways(&userID).Gateways[0].GatewayIdentifiers
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
@@ -251,9 +251,9 @@ func TestGatewayAccessCRUD(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
+		userID, creds := defaultUser.Ids, userCreds(defaultUserIdx)
 		gatewayID := userGateways(&userID).Gateways[0].GatewayIdentifiers
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		collaboratorID := collaboratorUser.Ids.OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
@@ -380,11 +380,11 @@ func TestGatewayAccessRights(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, usrCreds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
+		userID, usrCreds := defaultUser.Ids, userCreds(defaultUserIdx)
 		gatewayID := userGateways(&userID).Gateways[0].GatewayIdentifiers
-		collaboratorID := gatewayAccessUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		collaboratorID := gatewayAccessUser.Ids.OrganizationOrUserIdentifiers()
 		collaboratorCreds := userCreds(gatewayAccessUserIdx)
-		removedCollaboratorID := gtwAccessCollaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		removedCollaboratorID := gtwAccessCollaboratorUser.Ids.OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 

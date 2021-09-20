@@ -44,7 +44,7 @@ func (t LoginToken) toPB() *ttnpb.LoginToken {
 		UpdatedAt: cleanTime(t.UpdatedAt),
 	}
 	if t.User != nil {
-		pb.UserIdentifiers = ttnpb.UserIdentifiers{UserId: t.User.Account.UID}
+		pb.UserIds = ttnpb.UserIdentifiers{UserId: t.User.Account.UID}
 	}
 	return pb
 }

@@ -40,7 +40,7 @@ option (gogoproto.stringer_all) = true;
 // User is the message that defines a user on the network.
 message User {
   // The identifiers of the user. These are public and can be seen by any authenticated user in the network.
-  UserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // When the user was created. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   // When the user was last updated. This information is public and can be seen by any authenticated user in the network.
@@ -111,7 +111,7 @@ message Users {
 }
 
 message GetUserRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the user fields that should be returned.
   google.protobuf.FieldMask field_mask = 2;
 }
@@ -145,11 +145,11 @@ message UpdateUserRequest {
 }
 
 message CreateTemporaryPasswordRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message UpdateUserPasswordRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   string new = 2 [(validate.rules).string.max_len = 1000];
   string old = 3 [(validate.rules).string.max_len = 1000];
   // Revoke active sessions and access tokens of user if true. To be used if credentials are suspected to be compromised.
@@ -157,7 +157,7 @@ message UpdateUserPasswordRequest {
 }
 
 message ListUserAPIKeysRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Limit the number of results per page.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -165,13 +165,13 @@ message ListUserAPIKeysRequest {
 }
 
 message GetUserAPIKeyRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Unique public identifier for the API key.
   string key_id = 2;
 }
 
 message CreateUserAPIKeyRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   string name = 2 [(validate.rules).string.max_len = 50];
   repeated Right rights = 3 [
     (validate.rules).repeated = {
@@ -184,7 +184,7 @@ message CreateUserAPIKeyRequest {
 }
 
 message UpdateUserAPIKeyRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the api key fields that should be updated.
   google.protobuf.FieldMask field_mask = 3;
@@ -222,12 +222,12 @@ message DeleteInvitationRequest {
 }
 
 message UserSessionIdentifiers {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   string session_id = 2 [(validate.rules).string.max_len = 64];
 }
 
 message UserSession {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   string session_id = 2 [(validate.rules).string.max_len = 64];
   google.protobuf.Timestamp created_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -241,7 +241,7 @@ message UserSessions {
 }
 
 message ListUserSessionsRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 2 [
@@ -254,7 +254,7 @@ message ListUserSessionsRequest {
 }
 
 message LoginToken {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -265,7 +265,7 @@ message LoginToken {
 }
 
 message CreateLoginTokenRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Skip sending the login token to the user by email.
   // This field is only effective when the login token is created by an admin user.
   bool skip_email = 2;

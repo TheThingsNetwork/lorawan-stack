@@ -33,7 +33,7 @@ type userSessionStore struct {
 
 func (s *userSessionStore) CreateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "create user session").End()
-	user, err := s.findEntity(ctx, sess.UserIdentifiers, "id")
+	user, err := s.findEntity(ctx, sess.UserIds, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.User
 	sessionProtos := make([]*ttnpb.UserSession, len(sessionModels))
 	for i, sessionModel := range sessionModels {
 		sessionProto := &ttnpb.UserSession{}
-		sessionProto.UserId = userIDs.UserId
+		sessionProto.UserIds = *userIDs
 		sessionModel.toPB(sessionProto)
 		sessionProtos[i] = sessionProto
 	}
@@ -87,7 +87,7 @@ func (s *userSessionStore) findSession(ctx context.Context, userIDs *ttnpb.UserI
 	var sessionModel UserSession
 	if err = query.Find(&sessionModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errSessionNotFound.WithAttributes("user_id", userIDs.UserId, "session_id", sessionID)
+			return nil, errSessionNotFound.WithAttributes("user_id", userIDs.GetUserId(), "session_id", sessionID)
 		}
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (s *userSessionStore) GetSession(ctx context.Context, userIDs *ttnpb.UserId
 		return nil, err
 	}
 	sessionProto := &ttnpb.UserSession{}
-	sessionProto.UserId = userIDs.UserId
+	sessionProto.UserIds = *userIDs
 	sessionModel.toPB(sessionProto)
 	return sessionProto, nil
 }
@@ -128,14 +128,14 @@ func (s *userSessionStore) GetSessionByID(ctx context.Context, sessionID string)
 		return nil, err
 	}
 	sessionProto := &ttnpb.UserSession{}
-	sessionProto.UserId = accountModel.UID
+	sessionProto.UserIds = ttnpb.UserIdentifiers{UserId: accountModel.UID}
 	sessionModel.toPB(sessionProto)
 	return sessionProto, nil
 }
 
 func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "update user session").End()
-	sessionModel, err := s.findSession(ctx, &sess.UserIdentifiers, sess.GetSessionId())
+	sessionModel, err := s.findSession(ctx, &sess.UserIds, sess.GetSessionId())
 	if err != nil {
 		return nil, err
 	}

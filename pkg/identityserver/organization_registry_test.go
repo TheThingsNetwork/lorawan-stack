@@ -27,7 +27,7 @@ import (
 )
 
 func init() {
-	userID := paginationUser.UserIdentifiers
+	userID := paginationUser.Ids
 
 	// remove organizations assigned to the user by the populator
 	for _, organization := range population.Organizations {
@@ -58,7 +58,7 @@ func TestOrganizationsNestedError(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.UserIdentifiers
+		userID := defaultUser.Ids
 		creds := userCreds(defaultUserIdx)
 		org := userOrganizations(&userID).Organizations[0]
 
@@ -158,7 +158,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
 
-		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
+		userID, creds := population.Users[defaultUserIdx].Ids, userCreds(defaultUserIdx)
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		is.config.UserRights.CreateOrganizations = false
@@ -263,7 +263,7 @@ func TestOrganizationsPagination(t *testing.T) {
 	a := assertions.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := paginationUser.UserIdentifiers
+		userID := paginationUser.Ids
 		creds := userCreds(paginationUserIdx)
 
 		reg := ttnpb.NewOrganizationRegistryClient(cc)

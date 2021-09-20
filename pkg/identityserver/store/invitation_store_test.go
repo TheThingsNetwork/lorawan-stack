@@ -68,22 +68,22 @@ func TestInvitationStore(t *testing.T) {
 			a.So(invitations[0].Email, should.Equal, invitation.Email)
 		}
 
-		newUser, err := GetUserStore(db).CreateUser(ctx, &ttnpb.User{UserIdentifiers: ttnpb.UserIdentifiers{UserId: "new-user"}, PrimaryEmailAddress: "new-user@example.com"})
+		newUser, err := GetUserStore(db).CreateUser(ctx, &ttnpb.User{Ids: ttnpb.UserIdentifiers{UserId: "new-user"}, PrimaryEmailAddress: "new-user@example.com"})
 		if err != nil {
 			panic(err)
 		}
 
-		err = store.SetInvitationAcceptedBy(ctx, "wrong-invitation-token", &newUser.UserIdentifiers)
+		err = store.SetInvitationAcceptedBy(ctx, "wrong-invitation-token", &newUser.Ids)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		err = store.SetInvitationAcceptedBy(ctx, "invitation-token", &newUser.UserIdentifiers)
+		err = store.SetInvitationAcceptedBy(ctx, "invitation-token", &newUser.Ids)
 
 		a.So(err, should.BeNil)
 
-		err = store.SetInvitationAcceptedBy(ctx, "invitation-token", &newUser.UserIdentifiers)
+		err = store.SetInvitationAcceptedBy(ctx, "invitation-token", &newUser.Ids)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsAlreadyExists(err), should.BeTrue)
