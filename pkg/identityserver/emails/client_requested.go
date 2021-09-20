@@ -52,7 +52,7 @@ Rights:
 {{- end }}
 
 Redirect URIs:
-{{- with .Client.RedirectURIs }}
+{{- with .Client.RedirectUris }}
 {{- range . }}
 - {{ . }}
 {{- end }}
@@ -60,7 +60,7 @@ Redirect URIs:
 {{- end }}
 
 Logout Redirect URIs:
-{{- with .Client.LogoutRedirectURIs }}
+{{- with .Client.LogoutRedirectUris }}
 {{- range . }}
 - {{ . }}
 {{- end }}

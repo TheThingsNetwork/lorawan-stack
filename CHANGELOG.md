@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Emails to admins about requested OAuth clients.
+
 ### Security
 
 ## [3.15.0] - 2021-09-17
