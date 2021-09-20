@@ -89,7 +89,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 			return s.output(c, resp)
 		}
 		ar.UserData = userData{UserSessionIdentifiers: &ttnpb.UserSessionIdentifiers{
-			UserIds:   &session.UserIds,
+			UserIds:   session.GetUserIds(),
 			SessionId: session.SessionId,
 		}}
 		client := ttnpb.Client(ar.Client.(osinClient))
@@ -122,7 +122,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 		if !ar.Authorized {
 			authorization, err := s.store.GetAuthorization(
 				req.Context(),
-				&session.UserIds,
+				session.GetUserIds(),
 				&client.ClientIdentifiers,
 			)
 			if err != nil && !errors.IsNotFound(err) {
@@ -156,7 +156,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 		if ar.Authorized {
-			events.Publish(evtAuthorize.New(req.Context(), events.WithIdentifiers(&session.UserIds, &client.ClientIdentifiers)))
+			events.Publish(evtAuthorize.New(req.Context(), events.WithIdentifiers(session.GetUserIds(), &client.ClientIdentifiers)))
 		}
 		oauth2.FinishAuthorizeRequest(resp, req, ar)
 		return s.output(c, resp)

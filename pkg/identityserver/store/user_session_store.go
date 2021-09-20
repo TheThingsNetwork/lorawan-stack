@@ -33,7 +33,7 @@ type userSessionStore struct {
 
 func (s *userSessionStore) CreateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "create user session").End()
-	user, err := s.findEntity(ctx, sess.UserIds, "id")
+	user, err := s.findEntity(ctx, sess.GetUserIds(), "id")
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.User
 	sessionProtos := make([]*ttnpb.UserSession, len(sessionModels))
 	for i, sessionModel := range sessionModels {
 		sessionProto := &ttnpb.UserSession{}
-		sessionProto.UserIds = *userIDs
+		sessionProto.UserIds = userIDs
 		sessionModel.toPB(sessionProto)
 		sessionProtos[i] = sessionProto
 	}
@@ -101,7 +101,7 @@ func (s *userSessionStore) GetSession(ctx context.Context, userIDs *ttnpb.UserId
 		return nil, err
 	}
 	sessionProto := &ttnpb.UserSession{}
-	sessionProto.UserIds = *userIDs
+	sessionProto.UserIds = userIDs
 	sessionModel.toPB(sessionProto)
 	return sessionProto, nil
 }
@@ -128,14 +128,14 @@ func (s *userSessionStore) GetSessionByID(ctx context.Context, sessionID string)
 		return nil, err
 	}
 	sessionProto := &ttnpb.UserSession{}
-	sessionProto.UserIds = ttnpb.UserIdentifiers{UserId: accountModel.UID}
+	sessionProto.UserIds = &ttnpb.UserIdentifiers{UserId: accountModel.UID}
 	sessionModel.toPB(sessionProto)
 	return sessionProto, nil
 }
 
 func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "update user session").End()
-	sessionModel, err := s.findSession(ctx, &sess.UserIds, sess.GetSessionId())
+	sessionModel, err := s.findSession(ctx, sess.GetUserIds(), sess.GetSessionId())
 	if err != nil {
 		return nil, err
 	}

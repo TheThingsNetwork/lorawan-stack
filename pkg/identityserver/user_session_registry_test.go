@@ -72,7 +72,7 @@ func TestUserSessionsRegistry(t *testing.T) {
 
 		err = is.withDatabase(ctx, func(db *gorm.DB) error {
 			created, err = store.GetUserSessionStore(db).CreateSession(ctx, &ttnpb.UserSession{
-				UserIds:   *user.GetIds(),
+				UserIds:   user.GetIds(),
 				SessionId: randomUUID,
 			})
 			return err

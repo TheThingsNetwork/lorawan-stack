@@ -97,7 +97,7 @@ func (s *server) Login(c echo.Context) error {
 	if err := s.session.DoLogin(ctx, req.UserID, req.Password); err != nil {
 		return err
 	}
-	if err := s.CreateUserSession(c, ttnpb.UserIdentifiers{UserId: req.UserID}); err != nil {
+	if err := s.CreateUserSession(c, &ttnpb.UserIdentifiers{UserId: req.UserID}); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)
@@ -130,13 +130,13 @@ func (s *server) TokenLogin(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	if err := s.CreateUserSession(c, loginToken.GetUserIds()); err != nil {
+	if err := s.CreateUserSession(c, &loginToken.UserIds); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusNoContent)
 }
 
-func (s *server) CreateUserSession(c echo.Context, userIDs ttnpb.UserIdentifiers) error {
+func (s *server) CreateUserSession(c echo.Context, userIDs *ttnpb.UserIdentifiers) error {
 	ctx := c.Request().Context()
 	tokenSecret, err := auth.GenerateKey(ctx)
 	if err != nil {
@@ -153,9 +153,9 @@ func (s *server) CreateUserSession(c echo.Context, userIDs ttnpb.UserIdentifiers
 	if err != nil {
 		return err
 	}
-	events.Publish(oauth.EvtUserLogin.NewWithIdentifiersAndData(ctx, &userIDs, nil))
+	events.Publish(oauth.EvtUserLogin.NewWithIdentifiersAndData(ctx, userIDs, nil))
 	return s.session.UpdateAuthCookie(c, func(cookie *auth.CookieShape) error {
-		cookie.UserID = session.UserIds.UserId
+		cookie.UserID = session.GetUserIds().GetUserId()
 		cookie.SessionID = session.SessionId
 		cookie.SessionSecret = tokenSecret
 		return nil
@@ -168,8 +168,8 @@ func (s *server) Logout(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	events.Publish(oauth.EvtUserLogout.NewWithIdentifiersAndData(ctx, &session.UserIds, nil))
-	if err = s.store.DeleteSession(ctx, &session.UserIds, session.SessionId); err != nil {
+	events.Publish(oauth.EvtUserLogout.NewWithIdentifiersAndData(ctx, session.GetUserIds(), nil))
+	if err = s.store.DeleteSession(ctx, session.GetUserIds(), session.SessionId); err != nil {
 		return err
 	}
 	s.session.RemoveAuthCookie(c)

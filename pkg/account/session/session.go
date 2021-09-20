@@ -131,7 +131,7 @@ func (s *Session) GetUser(c echo.Context) (*ttnpb.User, error) {
 	}
 	user, err := s.Store.GetUser(
 		c.Request().Context(),
-		&ttnpb.UserIdentifiers{UserId: session.UserIds.GetUserId()},
+		&ttnpb.UserIdentifiers{UserId: session.GetUserIds().GetUserId()},
 		nil,
 	)
 	if err != nil {

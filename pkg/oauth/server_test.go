@@ -55,7 +55,7 @@ type authorizeFormData struct {
 
 var (
 	mockSession = &ttnpb.UserSession{
-		UserIds:       ttnpb.UserIdentifiers{UserId: "user"},
+		UserIds:       &ttnpb.UserIdentifiers{UserId: "user"},
 		SessionId:     "session_id",
 		CreatedAt:     time.Now().Truncate(time.Second),
 		SessionSecret: "secret-1234",

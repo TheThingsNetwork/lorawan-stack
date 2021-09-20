@@ -233,7 +233,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			res.AccessMethod = &ttnpb.AuthInfoResponse_UserSession{
 				UserSession: session,
 			}
-			user, err = store.GetUserStore(db).GetUser(ctx, &session.UserIds, userFieldMask)
+			user, err = store.GetUserStore(db).GetUser(ctx, session.GetUserIds(), userFieldMask)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)

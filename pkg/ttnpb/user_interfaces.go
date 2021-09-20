@@ -57,7 +57,7 @@ func (m *UserSessionIdentifiers) EntityType() string {
 }
 
 func (m *UserSession) EntityType() string {
-	return m.UserIds.EntityType()
+	return m.GetUserIds().EntityType()
 }
 
 func (m *ListUserSessionsRequest) EntityType() string {
@@ -115,7 +115,7 @@ func (m *UserSessionIdentifiers) IDString() string {
 }
 
 func (m *UserSession) IDString() string {
-	return m.UserIds.IDString()
+	return m.GetUserIds().IDString()
 }
 
 func (m *ListUserSessionsRequest) IDString() string {
@@ -173,7 +173,7 @@ func (m *UserSessionIdentifiers) ExtractRequestFields(dst map[string]interface{}
 }
 
 func (m *UserSession) ExtractRequestFields(dst map[string]interface{}) {
-	m.UserIds.ExtractRequestFields(dst)
+	m.GetUserIds().ExtractRequestFields(dst)
 }
 
 func (m *ListUserSessionsRequest) ExtractRequestFields(dst map[string]interface{}) {

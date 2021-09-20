@@ -40,8 +40,8 @@ func TestUserSessionStore(t *testing.T) {
 			Name: "Test User",
 		}
 
-		userIDs := ttnpb.UserIdentifiers{UserId: "test"}
-		doesNotExistIDs := ttnpb.UserIdentifiers{UserId: "does_not_exist"}
+		userIDs := &ttnpb.UserIdentifiers{UserId: "test"}
+		doesNotExistIDs := &ttnpb.UserIdentifiers{UserId: "does_not_exist"}
 
 		if err := newStore(db).createEntity(ctx, user); err != nil {
 			panic(err)
@@ -69,13 +69,13 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(created.ExpiresAt, should.BeNil)
 		}
 
-		_, err = store.GetSession(ctx, &doesNotExistIDs, created.SessionId)
+		_, err = store.GetSession(ctx, doesNotExistIDs, created.SessionId)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		got, err := store.GetSession(ctx, &userIDs, created.SessionId)
+		got, err := store.GetSession(ctx, userIDs, created.SessionId)
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -108,7 +108,7 @@ func TestUserSessionStore(t *testing.T) {
 		}
 
 		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{
-			UserIds: ttnpb.UserIdentifiers{UserId: "does_not_exist"},
+			UserIds: &ttnpb.UserIdentifiers{UserId: "does_not_exist"},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -121,13 +121,13 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		_, err = store.FindSessions(ctx, &doesNotExistIDs)
+		_, err = store.FindSessions(ctx, doesNotExistIDs)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		list, err := store.FindSessions(ctx, &userIDs)
+		list, err := store.FindSessions(ctx, userIDs)
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
@@ -136,17 +136,17 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(list[0].ExpiresAt, should.Resemble, updated.ExpiresAt)
 		}
 
-		err = store.DeleteSession(ctx, &doesNotExistIDs, created.SessionId)
+		err = store.DeleteSession(ctx, doesNotExistIDs, created.SessionId)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		err = store.DeleteSession(ctx, &userIDs, created.SessionId)
+		err = store.DeleteSession(ctx, userIDs, created.SessionId)
 
 		a.So(err, should.BeNil)
 
-		_, err = store.GetSession(ctx, &userIDs, created.SessionId)
+		_, err = store.GetSession(ctx, userIDs, created.SessionId)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
@@ -158,7 +158,7 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		list, err = store.FindSessions(ctx, &userIDs)
+		list, err = store.FindSessions(ctx, userIDs)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
@@ -175,14 +175,14 @@ func TestUserSessionStore(t *testing.T) {
 			})
 			a.So(err, should.BeNil)
 		}
-		list, err = store.FindSessions(ctx, &userIDs)
+		list, err = store.FindSessions(ctx, userIDs)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.HaveLength, 4)
 
-		err = store.DeleteAllUserSessions(ctx, &userIDs)
+		err = store.DeleteAllUserSessions(ctx, userIDs)
 
-		list, err = store.FindSessions(ctx, &userIDs)
+		list, err = store.FindSessions(ctx, userIDs)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
