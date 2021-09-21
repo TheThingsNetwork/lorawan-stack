@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Emails to admins about requested OAuth clients.
+- `session` handling for joined OTAA end devices in the Console.
 
 ### Security
 
