@@ -42,7 +42,6 @@ import {
   selectApplications,
   selectApplicationsTotalCount,
   selectApplicationsFetching,
-  selectApplicationsError,
 } from '@console/store/selectors/applications'
 
 const m = defineMessages({
@@ -171,7 +170,6 @@ const ApplicationsTable = props => {
       applications: selectApplications(state),
       totalCount: selectApplicationsTotalCount(state),
       fetching: selectApplicationsFetching(state),
-      error: selectApplicationsError(state),
       mayAdd: checkFromState(mayCreateApplications, state),
     }),
     [],

@@ -39,7 +39,6 @@ import {
   selectGateways,
   selectGatewaysTotalCount,
   selectGatewaysFetching,
-  selectGatewaysError,
 } from '@console/store/selectors/gateways'
 
 const m = defineMessages({
@@ -195,7 +194,6 @@ const GatewaysTable = props => {
       gateways: selectGateways(state),
       totalCount: selectGatewaysTotalCount(state),
       fetching: selectGatewaysFetching(state),
-      error: selectGatewaysError(state),
       mayAdd: checkFromState(mayCreateGateways, state),
     }),
     [],
