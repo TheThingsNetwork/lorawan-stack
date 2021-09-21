@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-)
+import fmt "fmt"
 
 func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -13,10 +10,18 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 		case "target_application_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
-				if src != nil {
-					newSrc = &src.TargetApplicationIds
+				if (src == nil || src.TargetApplicationIds == nil) && dst.TargetApplicationIds == nil {
+					continue
 				}
-				newDst = &dst.TargetApplicationIds
+				if src != nil {
+					newSrc = src.TargetApplicationIds
+				}
+				if dst.TargetApplicationIds != nil {
+					newDst = dst.TargetApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.TargetApplicationIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -24,8 +29,7 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 				if src != nil {
 					dst.TargetApplicationIds = src.TargetApplicationIds
 				} else {
-					var zero ApplicationIdentifiers
-					dst.TargetApplicationIds = zero
+					dst.TargetApplicationIds = nil
 				}
 			}
 		case "target_device_id":
@@ -192,19 +196,26 @@ func (dst *AuthorizeApplicationRequest) SetFields(src *AuthorizeApplicationReque
 		case "application_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
 				}
-				newDst = &dst.ApplicationIdentifiers
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
-					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = nil
 				}
 			}
 		case "api_key":
@@ -342,10 +353,18 @@ func (dst *ClaimGatewayRequest) SetFields(src *ClaimGatewayRequest, paths ...str
 		case "collaborator":
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationOrUserIdentifiers
-				if src != nil {
-					newSrc = &src.Collaborator
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
 				}
-				newDst = &dst.Collaborator
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -353,8 +372,7 @@ func (dst *ClaimGatewayRequest) SetFields(src *ClaimGatewayRequest, paths ...str
 				if src != nil {
 					dst.Collaborator = src.Collaborator
 				} else {
-					var zero OrganizationOrUserIdentifiers
-					dst.Collaborator = zero
+					dst.Collaborator = nil
 				}
 			}
 		case "target_gateway_id":
@@ -497,19 +515,26 @@ func (dst *AuthorizeGatewayRequest) SetFields(src *AuthorizeGatewayRequest, path
 		case "gateway_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
-				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+				if (src == nil || src.GatewayIds == nil) && dst.GatewayIds == nil {
+					continue
 				}
-				newDst = &dst.GatewayIdentifiers
+				if src != nil {
+					newSrc = src.GatewayIds
+				}
+				if dst.GatewayIds != nil {
+					newDst = dst.GatewayIds
+				} else {
+					newDst = &GatewayIdentifiers{}
+					dst.GatewayIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.GatewayIds = src.GatewayIds
 				} else {
-					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.GatewayIds = nil
 				}
 			}
 		case "api_key":
@@ -540,8 +565,7 @@ func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimE
 			if src != nil {
 				dst.JoinEui = src.JoinEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.JoinEui = zero
+				dst.JoinEui = nil
 			}
 		case "dev_eui":
 			if len(subs) > 0 {
@@ -550,8 +574,7 @@ func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimE
 			if src != nil {
 				dst.DevEui = src.DevEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.DevEui = zero
+				dst.DevEui = nil
 			}
 		case "authentication_code":
 			if len(subs) > 0 {
@@ -610,8 +633,7 @@ func (dst *ClaimGatewayRequest_AuthenticatedIdentifiers) SetFields(src *ClaimGat
 			if src != nil {
 				dst.GatewayEui = src.GatewayEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.GatewayEui = zero
+				dst.GatewayEui = nil
 			}
 		case "authentication_code":
 			if len(subs) > 0 {
