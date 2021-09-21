@@ -39,7 +39,13 @@ const validationSchema = Yup.object({
     firmware_version: Yup.string(),
     band_id: Yup.string(),
   }),
-  frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
+  frequency_plan_id: Yup.string().when(['$nsEnabled'], (nsEnabled, schema) => {
+    if (nsEnabled) {
+      return schema.required(sharedMessages.validateRequired)
+    }
+
+    return schema.strip()
+  }),
   ids: Yup.object().when(['supports_join', 'lorawan_version'], (isOTAA, version, schema) => {
     if (isOTAA) {
       return schema.shape({
@@ -68,9 +74,9 @@ const validationSchema = Yup.object({
     })
   }),
   root_keys: Yup.object().when(
-    ['supports_join', 'lorawan_version', '$mayEditKeys'],
-    (isOTAA, version, mayEditKeys, schema) => {
-      if (!mayEditKeys || !isOTAA) {
+    ['supports_join', 'lorawan_version', '$mayEditKeys', '$jsEnabled'],
+    (isOTAA, version, mayEditKeys, jsEnabled, schema) => {
+      if (!mayEditKeys || !isOTAA || !jsEnabled) {
         return schema.strip()
       }
 
@@ -98,49 +104,64 @@ const validationSchema = Yup.object({
       })
     },
   ),
-  session: Yup.object().when(['lorawan_version', 'supports_join'], (version, isOTAA, schema) => {
-    if (isOTAA) {
-      return schema.strip()
-    }
+  session: Yup.object().when(
+    ['lorawan_version', 'supports_join', '$nsEnabled', '$asEnabled'],
+    (version, isOTAA, nsEnabled, asEnabled, schema) => {
+      if (isOTAA || (!nsEnabled && !asEnabled)) {
+        return schema.strip()
+      }
 
-    const lwVersion = parseLorawanMacVersion(version)
+      const lwVersion = parseLorawanMacVersion(version)
 
-    return schema.shape({
-      dev_addr: Yup.string()
-        .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
-        .required(sharedMessages.validateRequired),
-      keys: Yup.object().shape({
-        app_s_key: Yup.object().shape({
-          key: Yup.string()
-            .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-            .required(sharedMessages.validateRequired),
-        }),
-        f_nwk_s_int_key: Yup.object().shape({
-          key: Yup.string()
-            .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-            .required(sharedMessages.validateRequired),
-        }),
-        s_nwk_s_int_key: Yup.lazy(() =>
-          lwVersion >= 110
-            ? Yup.object().shape({
-                key: Yup.string()
-                  .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-                  .required(sharedMessages.validateRequired),
-              })
-            : Yup.object().strip(),
+      return schema.shape({
+        dev_addr: Yup.lazy(() =>
+          nsEnabled
+            ? Yup.string()
+                .length(4 * 2, Yup.passValues(sharedMessages.validateLength))
+                .required(sharedMessages.validateRequired)
+            : Yup.string().strip(),
         ),
-        nwk_s_enc_key: Yup.lazy(() =>
-          lwVersion >= 110
-            ? Yup.object().shape({
-                key: Yup.string()
-                  .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-                  .required(sharedMessages.validateRequired),
-              })
-            : Yup.object().strip(),
-        ),
-      }),
-    })
-  }),
+        keys: Yup.object().shape({
+          app_s_key: Yup.lazy(() =>
+            asEnabled
+              ? Yup.object().shape({
+                  key: Yup.string()
+                    .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+                    .required(sharedMessages.validateRequired),
+                })
+              : Yup.object().strip(),
+          ),
+          f_nwk_s_int_key: Yup.lazy(() =>
+            nsEnabled
+              ? Yup.object().shape({
+                  key: Yup.string()
+                    .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+                    .required(sharedMessages.validateRequired),
+                })
+              : Yup.object().strip(),
+          ),
+          s_nwk_s_int_key: Yup.lazy(() =>
+            lwVersion >= 110 && nsEnabled
+              ? Yup.object().shape({
+                  key: Yup.string()
+                    .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+                    .required(sharedMessages.validateRequired),
+                })
+              : Yup.object().strip(),
+          ),
+          nwk_s_enc_key: Yup.lazy(() =>
+            lwVersion >= 110 && nsEnabled
+              ? Yup.object().shape({
+                  key: Yup.string()
+                    .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+                    .required(sharedMessages.validateRequired),
+                })
+              : Yup.object().strip(),
+          ),
+        }),
+      })
+    },
+  ),
   // Referenced template values.
   supports_join: Yup.bool().default(false),
   lorawan_version: Yup.string(),
