@@ -88,11 +88,11 @@ A PEM encoded CUPS trust may be included in the claim request.
 			req := &ttnpb.ClaimGatewayRequest{
 				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
 					AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
-						GatewayEui:         *gtwIDs.Eui,
+						GatewayEui:         gtwIDs.Eui,
 						AuthenticationCode: []byte(authenticationCode),
 					},
 				},
-				Collaborator:               *collaborator,
+				Collaborator:               collaborator,
 				TargetGatewayServerAddress: targetGatewayServerAddress,
 				TargetGatewayId:            targetGatewayID,
 				TargetFrequencyPlanId:      targetFrequencyPlanId,
@@ -176,8 +176,8 @@ If no API key is provided, a new one will be created.`,
 				return err
 			}
 			_, err = ttnpb.NewGatewayClaimingServerClient(dcs).AuthorizeGateway(ctx, &ttnpb.AuthorizeGatewayRequest{
-				GatewayIdentifiers: *gtwID,
-				ApiKey:             key,
+				GatewayIds: gtwID,
+				ApiKey:     key,
 			})
 			return err
 		},

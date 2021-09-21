@@ -72,8 +72,8 @@ key is provided, a new API key will be created.`,
 				return err
 			}
 			_, err = ttnpb.NewEndDeviceClaimingServerClient(dcs).AuthorizeApplication(ctx, &ttnpb.AuthorizeApplicationRequest{
-				ApplicationIdentifiers: *appID,
-				ApiKey:                 key,
+				ApplicationIds: appID,
+				ApiKey:         key,
 			})
 			return err
 		},

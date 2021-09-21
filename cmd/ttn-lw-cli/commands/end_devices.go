@@ -920,7 +920,7 @@ values will be stored in the Join Server.`,
 			}
 
 			req := &ttnpb.ClaimEndDeviceRequest{
-				TargetApplicationIds: *targetAppID,
+				TargetApplicationIds: targetAppID,
 			}
 
 			var joinEUI, devEUI *types.EUI64
@@ -940,8 +940,8 @@ values will be stored in the Join Server.`,
 				authenticationCode, _ := cmd.Flags().GetString("source-authentication-code")
 				req.SourceDevice = &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
 					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-						JoinEui:            *joinEUI,
-						DevEui:             *devEUI,
+						JoinEui:            joinEUI,
+						DevEui:             devEUI,
 						AuthenticationCode: authenticationCode,
 					},
 				}
