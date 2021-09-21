@@ -329,9 +329,14 @@ var startCommand = &cobra.Command{
 
 		if start.JoinServer {
 			logger.Info("Setting up Join Server")
-			config.JS.Devices = &jsredis.DeviceRegistry{
-				Redis: NewComponentDeviceRegistryRedis(*config, "js"),
+			deviceRegistry := &jsredis.DeviceRegistry{
+				Redis:   NewComponentDeviceRegistryRedis(*config, "js"),
+				LockTTL: defaultLockTTL,
 			}
+			if err := deviceRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeJoinServer.WithCause(err)
+			}
+			config.JS.Devices = deviceRegistry
 			config.JS.Keys = &jsredis.KeyRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("js", "keys")),
 			}
