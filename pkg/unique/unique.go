@@ -41,6 +41,11 @@ func ID(ctx context.Context, id ttnpb.IDStringer) (res string) {
 	return res
 }
 
+// GenericID returns a generic selector identifier for an entity.
+func GenericID(ctx context.Context, uidPattern string) (res string) {
+	return uidPattern
+}
+
 // WithContext returns the given context.
 func WithContext(ctx context.Context, uid string) (context.Context, error) {
 	return ctx, nil

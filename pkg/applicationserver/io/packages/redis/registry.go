@@ -16,6 +16,7 @@ package redis
 
 import (
 	"context"
+	"regexp"
 	"runtime/trace"
 	"strconv"
 	"strings"
@@ -97,6 +98,13 @@ func (r *ApplicationPackagesRegistry) makeAssociationKeyFunc(uid string) func(po
 
 func (r *ApplicationPackagesRegistry) transactionKey(uid string, fPort string, packageName string) string {
 	return r.Redis.Key("transaction", uid, fPort, packageName)
+}
+
+func packagesRegex(uid string) (*regexp.Regexp, error) {
+	keyRegex := strings.ReplaceAll(uid, ":", "\\:")
+	keyRegex = strings.ReplaceAll(keyRegex, "*", ".[^\\:]*")
+	keyRegex = keyRegex + "\\:\\d*$"
+	return regexp.Compile(keyRegex)
 }
 
 // GetAssociation implements applicationpackages.AssociationRegistry.
@@ -519,7 +527,14 @@ func (r ApplicationPackagesRegistry) Range(
 	devFunc func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationPackageAssociation) bool,
 	appFunc func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationPackageDefaultAssociation) bool,
 ) error {
-	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.associationKey(unique.GenericID(ctx), "*"), 1, func(key string) (bool, error) {
+	associationEntityRegex, err := packagesRegex(r.uidKey(unique.GenericID(ctx, "*")))
+	if err != nil {
+		return err
+	}
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.associationKey(unique.GenericID(ctx, "*"), "*"), 1, func(key string) (bool, error) {
+		if !associationEntityRegex.MatchString(key) {
+			return true, nil
+		}
 		if strings.Contains(key, ".") {
 			assoc := &ttnpb.ApplicationPackageAssociation{}
 			if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(assoc); err != nil {
