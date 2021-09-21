@@ -20,6 +20,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"net"
 	"strconv"
 	"strings"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
+	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
@@ -981,6 +983,18 @@ outer:
 			idsArg = append(idsArg, ">")
 		}
 	}
+}
+
+// GenerateLockerID generates a unique locker ID from the provided entropy source.
+// The mutex is acquired and held during entropy extraction.
+func GenerateLockerID(entropy io.Reader, mu *sync.Mutex) (string, error) {
+	mu.Lock()
+	defer mu.Unlock()
+	lockID, err := ulid.New(ulid.Timestamp(time.Now()), entropy)
+	if err != nil {
+		return "", err
+	}
+	return lockID.String(), nil
 }
 
 func init() {

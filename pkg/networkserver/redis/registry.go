@@ -824,17 +824,15 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	uid := unique.ID(ctx, ids)
 	uk := r.uidKey(uid)
 
-	defer trace.StartRegion(ctx, "set end device by id").End()
-
-	var pb *ttnpb.EndDevice
-	r.entropyMu.Lock()
-	lockID, err := ulid.New(ulid.Timestamp(time.Now()), r.entropy)
-	r.entropyMu.Unlock()
+	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
 	if err != nil {
 		return nil, ctx, err
 	}
-	lockIDStr := lockID.String()
-	if err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockIDStr, r.LockTTL, func(tx *redis.Tx) error {
+
+	defer trace.StartRegion(ctx, "set end device by id").End()
+
+	var pb *ttnpb.EndDevice
+	if err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, uk)
 		stored := &ttnpb.EndDevice{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -905,10 +903,6 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				}
 				if pb.JoinEui != nil && pb.DevEui != nil {
 					ek := r.euiKey(*pb.JoinEui, *pb.DevEui)
-
-					if err := ttnredis.LockMutex(ctx, tx, ek, lockIDStr, r.LockTTL); err != nil {
-						return err
-					}
 					if err := tx.Watch(ctx, ek).Err(); err != nil {
 						return err
 					}
@@ -920,7 +914,6 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 						return errDuplicateIdentifiers.New()
 					}
 					p.Set(ctx, ek, uid, 0)
-					ttnredis.UnlockMutex(ctx, p, ek, lockIDStr, r.LockTTL)
 				}
 			} else {
 				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {

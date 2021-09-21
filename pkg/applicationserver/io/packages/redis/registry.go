@@ -482,21 +482,18 @@ func (r ApplicationPackagesRegistry) WithPagination(ctx context.Context, limit, 
 func (r *ApplicationPackagesRegistry) EndDeviceTransaction(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fPort uint32, packageName string, fn func(ctx context.Context) error) error {
 	k := r.transactionKey(unique.ID(ctx, ids), r.fPortStr(fPort), packageName)
 
-	r.entropyMu.Lock()
-	lockID, err := ulid.New(ulid.Timestamp(time.Now()), r.entropy)
-	r.entropyMu.Unlock()
+	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
 	if err != nil {
 		return err
 	}
-	lockIDStr := lockID.String()
 
 	defer trace.StartRegion(ctx, "run end device transaction").End()
 
-	if err := ttnredis.LockMutex(ctx, r.Redis, k, lockIDStr, r.LockTTL); err != nil {
+	if err := ttnredis.LockMutex(ctx, r.Redis, k, lockerID, r.LockTTL); err != nil {
 		return err
 	}
 	defer func() {
-		if err := ttnredis.UnlockMutex(ctx, r.Redis, k, lockIDStr, r.LockTTL); err != nil {
+		if err := ttnredis.UnlockMutex(ctx, r.Redis, k, lockerID, r.LockTTL); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to unlock mutex")
 		}
 	}()
