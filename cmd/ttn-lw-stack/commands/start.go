@@ -50,6 +50,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 )
 
+const defaultLockTTL = 10 * time.Second
+
 func NewComponentDeviceRegistryRedis(conf Config, name string) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace(name, "devices"))
 }
@@ -254,7 +256,7 @@ var startCommand = &cobra.Command{
 			config.NS.ApplicationUplinkQueue.Queue = applicationUplinkQueue
 			devices := &nsredis.DeviceRegistry{
 				Redis:   NewNetworkServerDeviceRegistryRedis(*config),
-				LockTTL: time.Second,
+				LockTTL: defaultLockTTL,
 			}
 			if err := devices.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
@@ -302,7 +304,7 @@ var startCommand = &cobra.Command{
 			}
 			applicationPackagesRegistry := &asioapredis.ApplicationPackagesRegistry{
 				Redis:   redis.New(config.Redis.WithNamespace("as", "io", "applicationpackages")),
-				LockTTL: 10 * time.Second,
+				LockTTL: defaultLockTTL,
 			}
 			if err := applicationPackagesRegistry.Init(ctx); err != nil {
 				return shared.ErrInitializeApplicationServer.WithCause(err)
