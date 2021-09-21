@@ -115,7 +115,10 @@ func (s *deviceStore) CountEndDevices(ctx context.Context, ids *ttnpb.Applicatio
 
 func (s *deviceStore) ListEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, fieldMask *pbtypes.FieldMask) ([]*ttnpb.EndDevice, error) {
 	// NOTE: tracing done in s.findEndDevices.
-	query := s.query(ctx, EndDevice{}, withApplicationID(ids.GetApplicationId()))
+	query := s.query(ctx, EndDevice{})
+	if ids != nil {
+		query = query.Scopes(withApplicationID(ids.GetApplicationId()))
+	}
 	return s.findEndDevices(ctx, query, fieldMask)
 }
 
