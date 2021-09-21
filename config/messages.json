@@ -2627,9 +2627,27 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:no_dev_eui": {
+    "translations": {
+      "en": "no device EUI provided"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
   "error:pkg/applicationserver:no_device_session": {
     "translations": {
       "en": "no device session; check device activation"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:no_join_eui": {
+    "translations": {
+      "en": "no join EUI provided"
     },
     "description": {
       "package": "pkg/applicationserver",

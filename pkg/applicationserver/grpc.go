@@ -137,7 +137,6 @@ func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHa
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Merge downlink queue invalidations (https://github.com/TheThingsNetwork/lorawan-stack/issues/1523)
 	for _, up := range req.ApplicationUps {
 		if err := as.processUp(ctx, up, link); err != nil {
 			return nil, err
