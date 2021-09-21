@@ -18,6 +18,7 @@ import (
 	"context"
 	"runtime/trace"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -511,4 +512,39 @@ func (r *ApplicationPackagesRegistry) EndDeviceTransaction(ctx context.Context, 
 		}
 	}()
 	return fn(ctx)
+}
+
+func (r ApplicationPackagesRegistry) Range(
+	ctx context.Context, paths []string,
+	devFunc func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationPackageAssociation) bool,
+	appFunc func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationPackageDefaultAssociation) bool,
+) error {
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.associationKey(unique.GenericID(ctx), "*"), 1, func(key string) (bool, error) {
+		if strings.Contains(key, ".") {
+			assoc := &ttnpb.ApplicationPackageAssociation{}
+			if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(assoc); err != nil {
+				return false, err
+			}
+			assoc, err := applyAssociationFieldMask(nil, assoc, paths...)
+			if err != nil {
+				return false, err
+			}
+			if !devFunc(ctx, *assoc.GetIds().GetEndDeviceIds(), assoc) {
+				return false, nil
+			}
+		} else {
+			defAssoc := &ttnpb.ApplicationPackageDefaultAssociation{}
+			if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(defAssoc); err != nil {
+				return false, err
+			}
+			defAssoc, err := applyDefaultAssociationFieldMask(nil, defAssoc, paths...)
+			if err != nil {
+				return false, err
+			}
+			if !appFunc(ctx, *defAssoc.GetIds().GetApplicationIds(), defAssoc) {
+				return false, nil
+			}
+		}
+		return true, nil
+	})
 }
