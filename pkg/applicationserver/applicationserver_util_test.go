@@ -48,6 +48,11 @@ func (r MockDeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifi
 	return r.SetFunc(ctx, ids, paths, f)
 }
 
+// Range.
+func (r MockDeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+	return nil
+}
+
 // noopEndDeviceFetcher is a no-op.
 type noopEndDeviceFetcher struct{}
 
