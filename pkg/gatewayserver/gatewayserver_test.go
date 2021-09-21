@@ -1277,13 +1277,13 @@ func TestGatewayServer(t *testing.T) {
 								a := assertions.New(t)
 
 								upEvents := map[string]events.Channel{}
-								for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.up.repeat"} {
+								for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.io.up.repeat"} {
 									upEvents[event] = make(events.Channel, 5)
 								}
 								defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
 									PublishFunc: func(ev events.Event) {
 										switch name := ev.Name(); name {
-										case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.up.repeat":
+										case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.io.up.repeat":
 											go func() {
 												upEvents[name] <- ev
 											}()
@@ -1308,8 +1308,8 @@ func TestGatewayServer(t *testing.T) {
 
 								if tc.RepeatUpEvent && !ptc.DeduplicatesUplinks {
 									select {
-									case evt := <-upEvents["gs.up.repeat"]:
-										a.So(evt.Name(), should.Equal, "gs.up.repeat")
+									case evt := <-upEvents["gs.io.up.repeat"]:
+										a.So(evt.Name(), should.Equal, "gs.io.up.repeat")
 									case <-time.After(timeout):
 										t.Fatal("Expected repeat uplink event timeout")
 									}
