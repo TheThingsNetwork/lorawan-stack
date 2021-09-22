@@ -84,9 +84,9 @@ func NewPopulator(size int, seed int64) *Populator {
 			},
 		)
 		organization := &ttnpb.Organization{
-			OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationId: fmt.Sprintf("random-org-%d", i+1)},
-			Name:                    fmt.Sprintf("Random %d", i+1),
-			Description:             fmt.Sprintf("Randomly generated Organization %d", i+1),
+			Ids:         ttnpb.OrganizationIdentifiers{OrganizationId: fmt.Sprintf("random-org-%d", i+1)},
+			Name:        fmt.Sprintf("Random %d", i+1),
+			Description: fmt.Sprintf("Randomly generated Organization %d", i+1),
 		}
 		organizationID := organization.GetEntityIdentifiers()
 		p.Organizations = append(p.Organizations, organization)

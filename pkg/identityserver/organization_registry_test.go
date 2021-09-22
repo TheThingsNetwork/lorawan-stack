@@ -66,7 +66,7 @@ func TestOrganizationsNestedError(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
 			Organization: ttnpb.Organization{
-				OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
+				Ids: ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
 			},
 			Collaborator: *org.OrganizationOrUserIdentifiers(),
 		}, creds)
@@ -95,7 +95,7 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
 			Organization: ttnpb.Organization{
-				OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
+				Ids: ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
 			},
 			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 		})
@@ -105,8 +105,8 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
-			OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
-			FieldMask:               &pbtypes.FieldMask{Paths: []string{"name"}},
+			OrganizationIds: ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -133,8 +133,8 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
 			Organization: ttnpb.Organization{
-				OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
-				Name:                    "Updated Name",
+				Ids:  ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
+				Name: "Updated Name",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
@@ -165,8 +165,8 @@ func TestOrganizationsCRUD(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
 			Organization: ttnpb.Organization{
-				OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
-				Name:                    "Foo Organization",
+				Ids:  ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
+				Name: "Foo Organization",
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
 		}, creds)
@@ -175,8 +175,8 @@ func TestOrganizationsCRUD(t *testing.T) {
 
 		created, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
 			Organization: ttnpb.Organization{
-				OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
-				Name:                    "Foo Organization",
+				Ids:  ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
+				Name: "Foo Organization",
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
 		}, creds)
@@ -187,8 +187,8 @@ func TestOrganizationsCRUD(t *testing.T) {
 		}
 
 		got, err := reg.Get(ctx, &ttnpb.GetOrganizationRequest{
-			OrganizationIdentifiers: created.OrganizationIdentifiers,
-			FieldMask:               &pbtypes.FieldMask{Paths: []string{"name"}},
+			OrganizationIds: created.Ids,
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -197,15 +197,15 @@ func TestOrganizationsCRUD(t *testing.T) {
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
-			OrganizationIdentifiers: created.OrganizationIdentifiers,
-			FieldMask:               &pbtypes.FieldMask{Paths: []string{"ids"}},
+			OrganizationIds: created.Ids,
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
-			OrganizationIdentifiers: created.OrganizationIdentifiers,
-			FieldMask:               &pbtypes.FieldMask{Paths: []string{"attributes"}},
+			OrganizationIds: created.Ids,
+			FieldMask:       &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
 
 		if a.So(err, should.NotBeNil) {
@@ -214,8 +214,8 @@ func TestOrganizationsCRUD(t *testing.T) {
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
 			Organization: ttnpb.Organization{
-				OrganizationIdentifiers: created.OrganizationIdentifiers,
-				Name:                    "Updated Name",
+				Ids:  created.Ids,
+				Name: "Updated Name",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
@@ -235,7 +235,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 			if a.So(list, should.NotBeNil) && a.So(list.Organizations, should.NotBeEmpty) {
 				var found bool
 				for _, item := range list.Organizations {
-					if item.OrganizationIdentifiers == created.OrganizationIdentifiers {
+					if item.Ids == created.Ids {
 						found = true
 						a.So(item.Name, should.Equal, updated.Name)
 					}
@@ -244,16 +244,16 @@ func TestOrganizationsCRUD(t *testing.T) {
 			}
 		}
 
-		_, err = reg.Delete(ctx, &created.OrganizationIdentifiers, creds)
+		_, err = reg.Delete(ctx, &created.Ids, creds)
 
 		a.So(err, should.BeNil)
 
-		_, err = reg.Purge(ctx, &created.OrganizationIdentifiers, creds)
+		_, err = reg.Purge(ctx, &created.Ids, creds)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		_, err = reg.Purge(ctx, &created.OrganizationIdentifiers, userCreds(adminUserIdx))
+		_, err = reg.Purge(ctx, &created.Ids, userCreds(adminUserIdx))
 
 		a.So(err, should.BeNil)
 	})

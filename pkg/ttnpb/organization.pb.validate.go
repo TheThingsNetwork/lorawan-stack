@@ -52,7 +52,7 @@ func (m *Organization) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return OrganizationValidationError{
 						field:  "ids",
@@ -354,7 +354,7 @@ func (m *GetOrganizationRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "organization_ids":
 
-			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.OrganizationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetOrganizationRequestValidationError{
 						field:  "organization_ids",
@@ -809,7 +809,7 @@ func (m *ListOrganizationAPIKeysRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "organization_ids":
 
-			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.OrganizationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListOrganizationAPIKeysRequestValidationError{
 						field:  "organization_ids",
@@ -914,7 +914,7 @@ func (m *GetOrganizationAPIKeyRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "organization_ids":
 
-			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.OrganizationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetOrganizationAPIKeyRequestValidationError{
 						field:  "organization_ids",
@@ -1010,7 +1010,7 @@ func (m *CreateOrganizationAPIKeyRequest) ValidateFields(paths ...string) error 
 		switch name {
 		case "organization_ids":
 
-			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.OrganizationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateOrganizationAPIKeyRequestValidationError{
 						field:  "organization_ids",
@@ -1160,7 +1160,7 @@ func (m *UpdateOrganizationAPIKeyRequest) ValidateFields(paths ...string) error 
 		switch name {
 		case "organization_ids":
 
-			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.OrganizationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateOrganizationAPIKeyRequestValidationError{
 						field:  "organization_ids",
@@ -1278,7 +1278,7 @@ func (m *ListOrganizationCollaboratorsRequest) ValidateFields(paths ...string) e
 		switch name {
 		case "organization_ids":
 
-			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.OrganizationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListOrganizationCollaboratorsRequestValidationError{
 						field:  "organization_ids",
@@ -1383,7 +1383,7 @@ func (m *GetOrganizationCollaboratorRequest) ValidateFields(paths ...string) err
 		switch name {
 		case "organization_ids":
 
-			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.OrganizationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetOrganizationCollaboratorRequestValidationError{
 						field:  "organization_ids",
@@ -1395,7 +1395,7 @@ func (m *GetOrganizationCollaboratorRequest) ValidateFields(paths ...string) err
 
 		case "collaborator":
 
-			if v, ok := interface{}(&m.OrganizationOrUserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Collaborator).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetOrganizationCollaboratorRequestValidationError{
 						field:  "collaborator",
@@ -1489,7 +1489,7 @@ func (m *SetOrganizationCollaboratorRequest) ValidateFields(paths ...string) err
 		switch name {
 		case "organization_ids":
 
-			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.OrganizationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetOrganizationCollaboratorRequestValidationError{
 						field:  "organization_ids",

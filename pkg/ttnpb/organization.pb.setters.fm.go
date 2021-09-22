@@ -14,18 +14,18 @@ func (dst *Organization) SetFields(src *Organization, paths ...string) error {
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.OrganizationIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero OrganizationIdentifiers
-					dst.OrganizationIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "created_at":
@@ -130,18 +130,18 @@ func (dst *GetOrganizationRequest) SetFields(src *GetOrganizationRequest, paths 
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationIdentifiers
+					newSrc = &src.OrganizationIds
 				}
-				newDst = &dst.OrganizationIdentifiers
+				newDst = &dst.OrganizationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+					dst.OrganizationIds = src.OrganizationIds
 				} else {
 					var zero OrganizationIdentifiers
-					dst.OrganizationIdentifiers = zero
+					dst.OrganizationIds = zero
 				}
 			}
 		case "field_mask":
@@ -338,18 +338,18 @@ func (dst *ListOrganizationAPIKeysRequest) SetFields(src *ListOrganizationAPIKey
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationIdentifiers
+					newSrc = &src.OrganizationIds
 				}
-				newDst = &dst.OrganizationIdentifiers
+				newDst = &dst.OrganizationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+					dst.OrganizationIds = src.OrganizationIds
 				} else {
 					var zero OrganizationIdentifiers
-					dst.OrganizationIdentifiers = zero
+					dst.OrganizationIds = zero
 				}
 			}
 		case "limit":
@@ -387,18 +387,18 @@ func (dst *GetOrganizationAPIKeyRequest) SetFields(src *GetOrganizationAPIKeyReq
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationIdentifiers
+					newSrc = &src.OrganizationIds
 				}
-				newDst = &dst.OrganizationIdentifiers
+				newDst = &dst.OrganizationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+					dst.OrganizationIds = src.OrganizationIds
 				} else {
 					var zero OrganizationIdentifiers
-					dst.OrganizationIdentifiers = zero
+					dst.OrganizationIds = zero
 				}
 			}
 		case "key_id":
@@ -426,18 +426,18 @@ func (dst *CreateOrganizationAPIKeyRequest) SetFields(src *CreateOrganizationAPI
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationIdentifiers
+					newSrc = &src.OrganizationIds
 				}
-				newDst = &dst.OrganizationIdentifiers
+				newDst = &dst.OrganizationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+					dst.OrganizationIds = src.OrganizationIds
 				} else {
 					var zero OrganizationIdentifiers
-					dst.OrganizationIdentifiers = zero
+					dst.OrganizationIds = zero
 				}
 			}
 		case "name":
@@ -483,18 +483,18 @@ func (dst *UpdateOrganizationAPIKeyRequest) SetFields(src *UpdateOrganizationAPI
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationIdentifiers
+					newSrc = &src.OrganizationIds
 				}
-				newDst = &dst.OrganizationIdentifiers
+				newDst = &dst.OrganizationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+					dst.OrganizationIds = src.OrganizationIds
 				} else {
 					var zero OrganizationIdentifiers
-					dst.OrganizationIdentifiers = zero
+					dst.OrganizationIds = zero
 				}
 			}
 		case "api_key":
@@ -539,18 +539,18 @@ func (dst *ListOrganizationCollaboratorsRequest) SetFields(src *ListOrganization
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationIdentifiers
+					newSrc = &src.OrganizationIds
 				}
-				newDst = &dst.OrganizationIdentifiers
+				newDst = &dst.OrganizationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+					dst.OrganizationIds = src.OrganizationIds
 				} else {
 					var zero OrganizationIdentifiers
-					dst.OrganizationIdentifiers = zero
+					dst.OrganizationIds = zero
 				}
 			}
 		case "limit":
@@ -588,36 +588,36 @@ func (dst *GetOrganizationCollaboratorRequest) SetFields(src *GetOrganizationCol
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationIdentifiers
+					newSrc = &src.OrganizationIds
 				}
-				newDst = &dst.OrganizationIdentifiers
+				newDst = &dst.OrganizationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+					dst.OrganizationIds = src.OrganizationIds
 				} else {
 					var zero OrganizationIdentifiers
-					dst.OrganizationIdentifiers = zero
+					dst.OrganizationIds = zero
 				}
 			}
 		case "collaborator":
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationOrUserIdentifiers
+					newSrc = &src.Collaborator
 				}
-				newDst = &dst.OrganizationOrUserIdentifiers
+				newDst = &dst.Collaborator
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationOrUserIdentifiers = src.OrganizationOrUserIdentifiers
+					dst.Collaborator = src.Collaborator
 				} else {
 					var zero OrganizationOrUserIdentifiers
-					dst.OrganizationOrUserIdentifiers = zero
+					dst.Collaborator = zero
 				}
 			}
 
@@ -635,18 +635,18 @@ func (dst *SetOrganizationCollaboratorRequest) SetFields(src *SetOrganizationCol
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationIdentifiers
+					newSrc = &src.OrganizationIds
 				}
-				newDst = &dst.OrganizationIdentifiers
+				newDst = &dst.OrganizationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+					dst.OrganizationIds = src.OrganizationIds
 				} else {
 					var zero OrganizationIdentifiers
-					dst.OrganizationIdentifiers = zero
+					dst.OrganizationIds = zero
 				}
 			}
 		case "collaborator":

@@ -132,6 +132,6 @@ func (req *SetOrganizationCollaboratorRequest) ExtractRequestFields(m map[string
 	if req == nil {
 		return
 	}
-	req.OrganizationIdentifiers.ExtractRequestFields(m)
+	req.OrganizationIds.ExtractRequestFields(m)
 	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
 }

@@ -70,7 +70,7 @@ func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *pb
 func (s *organizationStore) CreateOrganization(ctx context.Context, org *ttnpb.Organization) (*ttnpb.Organization, error) {
 	defer trace.StartRegion(ctx, "create organization").End()
 	orgModel := Organization{
-		Account: Account{UID: org.OrganizationId}, // The ID is not mutated by fromPB.
+		Account: Account{UID: org.Ids.OrganizationId}, // The ID is not mutated by fromPB.
 	}
 	orgModel.fromPB(org, nil)
 	if err := s.createEntity(ctx, &orgModel); err != nil {
@@ -127,12 +127,12 @@ func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.Organ
 
 func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.Organization, fieldMask *pbtypes.FieldMask) (updated *ttnpb.Organization, err error) {
 	defer trace.StartRegion(ctx, "update organization").End()
-	query := s.query(ctx, Organization{}, withOrganizationID(org.GetOrganizationId()))
+	query := s.query(ctx, Organization{}, withOrganizationID(org.Ids.GetOrganizationId()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
 	var orgModel organizationWithUID
 	if err = query.First(&orgModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(org.OrganizationIdentifiers)
+			return nil, errNotFoundForID(org.Ids)
 		}
 		return nil, err
 	}
