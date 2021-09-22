@@ -104,14 +104,14 @@ var createOAuthClient = &cobra.Command{
 			"rights",
 		}}
 		cli := &ttnpb.Client{
-			Ids: ttnpb.ClientIdentifiers{ClientId: clientID},
+			Ids: &ttnpb.ClientIdentifiers{ClientId: clientID},
 		}
 
 		err = store.Transact(ctx, db, func(db *gorm.DB) error {
 			cliStore := store.GetClientStore(db)
 
 			var cliExists bool
-			if _, err := cliStore.GetClient(ctx, &cli.Ids, cliFieldMask); err == nil {
+			if _, err := cliStore.GetClient(ctx, cli.GetIds(), cliFieldMask); err == nil {
 				cliExists = true
 			}
 			cli.Name = name
@@ -144,7 +144,7 @@ var createOAuthClient = &cobra.Command{
 				err = memberStore.SetMember(
 					ctx,
 					ttnpb.UserIdentifiers{UserId: owner}.OrganizationOrUserIdentifiers(),
-					cli.Ids.GetEntityIdentifiers(),
+					cli.GetIds().GetEntityIdentifiers(),
 					ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
 				)
 				if err != nil {

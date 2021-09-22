@@ -37,7 +37,7 @@ func TestClientStore(t *testing.T) {
 		s := newStore(db)
 
 		created, err := store.CreateClient(ctx, &ttnpb.Client{
-			Ids:         ttnpb.ClientIdentifiers{ClientId: "foo"},
+			Ids:         &ttnpb.ClientIdentifiers{ClientId: "foo"},
 			Name:        "Foo Client",
 			Description: "The Amazing Foo Client",
 			Attributes: map[string]string{
@@ -49,7 +49,7 @@ func TestClientStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(created, should.NotBeNil) {
-			a.So(created.Ids.GetClientId(), should.Equal, "foo")
+			a.So(created.GetIds().GetClientId(), should.Equal, "foo")
 			a.So(created.Name, should.Equal, "Foo Client")
 			a.So(created.Description, should.Equal, "The Amazing Foo Client")
 			a.So(created.Attributes, should.HaveLength, 3)
@@ -61,7 +61,7 @@ func TestClientStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.Ids.GetClientId(), should.Equal, "foo")
+			a.So(got.GetIds().GetClientId(), should.Equal, "foo")
 			a.So(got.Name, should.Equal, "Foo Client")
 			a.So(got.Description, should.BeEmpty)
 			a.So(got.Attributes, should.HaveLength, 3)
@@ -70,7 +70,7 @@ func TestClientStore(t *testing.T) {
 		}
 
 		_, err = store.UpdateClient(ctx, &ttnpb.Client{
-			Ids: ttnpb.ClientIdentifiers{ClientId: "bar"},
+			Ids: &ttnpb.ClientIdentifiers{ClientId: "bar"},
 		}, nil)
 
 		if a.So(err, should.NotBeNil) {
@@ -78,7 +78,7 @@ func TestClientStore(t *testing.T) {
 		}
 
 		updated, err := store.UpdateClient(ctx, &ttnpb.Client{
-			Ids:         ttnpb.ClientIdentifiers{ClientId: "foo"},
+			Ids:         &ttnpb.ClientIdentifiers{ClientId: "foo"},
 			Name:        "Foobar Client",
 			Description: "The Amazing Foobar Client",
 			Attributes: map[string]string{
@@ -100,7 +100,7 @@ func TestClientStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.Ids.GetClientId(), should.Equal, created.Ids.GetClientId())
+			a.So(got.GetIds().GetClientId(), should.Equal, created.GetIds().GetClientId())
 			a.So(got.Name, should.Equal, created.Name)
 			a.So(got.Description, should.Equal, updated.Description)
 			a.So(got.Attributes, should.Resemble, updated.Attributes)
@@ -163,7 +163,7 @@ func TestClientStore(t *testing.T) {
 
 		// Check that client ids are released after purge
 		_, err = store.CreateClient(ctx, &ttnpb.Client{
-			Ids: ttnpb.ClientIdentifiers{ClientId: "foo"},
+			Ids: &ttnpb.ClientIdentifiers{ClientId: "foo"},
 		})
 
 		a.So(err, should.BeNil)

@@ -152,7 +152,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{
-				ClientIds: *cliID,
+				ClientIds: cliID,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
@@ -188,9 +188,9 @@ var (
 			}
 			client.Attributes = mergeAttributes(client.Attributes, cmd.Flags())
 			if cliID.GetClientId() != "" {
-				client.Ids = ttnpb.ClientIdentifiers{ClientId: cliID.GetClientId()}
+				client.Ids = &ttnpb.ClientIdentifiers{ClientId: cliID.GetClientId()}
 			}
-			if client.Ids.GetClientId() == "" {
+			if client.GetIds().GetClientId() == "" {
 				return errNoClientID
 			}
 
@@ -200,7 +200,7 @@ var (
 			}
 			res, err := ttnpb.NewClientRegistryClient(is).Create(ctx, &ttnpb.CreateClientRequest{
 				Client:       client,
-				Collaborator: *collaborator,
+				Collaborator: collaborator,
 			})
 			if err != nil {
 				return err
@@ -232,7 +232,7 @@ var (
 				return err
 			}
 			client.Attributes = mergeAttributes(client.Attributes, cmd.Flags())
-			client.Ids = *cliID
+			client.Ids = cliID
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {

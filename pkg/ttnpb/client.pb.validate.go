@@ -52,7 +52,14 @@ func (m *Client) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return ClientValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ClientValidationError{
 						field:  "ids",
@@ -455,7 +462,14 @@ func (m *GetClientRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "client_ids":
 
-			if v, ok := interface{}(&m.ClientIds).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetClientIds() == nil {
+				return GetClientRequestValidationError{
+					field:  "client_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetClientIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetClientRequestValidationError{
 						field:  "client_ids",
@@ -707,7 +721,14 @@ func (m *CreateClientRequest) ValidateFields(paths ...string) error {
 
 		case "collaborator":
 
-			if v, ok := interface{}(&m.Collaborator).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetCollaborator() == nil {
+				return CreateClientRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateClientRequestValidationError{
 						field:  "collaborator",
@@ -905,7 +926,14 @@ func (m *ListClientCollaboratorsRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "client_ids":
 
-			if v, ok := interface{}(&m.ClientIds).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetClientIds() == nil {
+				return ListClientCollaboratorsRequestValidationError{
+					field:  "client_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetClientIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListClientCollaboratorsRequestValidationError{
 						field:  "client_ids",
@@ -1010,7 +1038,14 @@ func (m *GetClientCollaboratorRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "client_ids":
 
-			if v, ok := interface{}(&m.ClientIds).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetClientIds() == nil {
+				return GetClientCollaboratorRequestValidationError{
+					field:  "client_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetClientIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetClientCollaboratorRequestValidationError{
 						field:  "client_ids",
@@ -1022,7 +1057,14 @@ func (m *GetClientCollaboratorRequest) ValidateFields(paths ...string) error {
 
 		case "collaborator":
 
-			if v, ok := interface{}(&m.Collaborator).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetCollaborator() == nil {
+				return GetClientCollaboratorRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetClientCollaboratorRequestValidationError{
 						field:  "collaborator",
@@ -1116,7 +1158,14 @@ func (m *SetClientCollaboratorRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "client_ids":
 
-			if v, ok := interface{}(&m.ClientIds).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetClientIds() == nil {
+				return SetClientCollaboratorRequestValidationError{
+					field:  "client_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetClientIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetClientCollaboratorRequestValidationError{
 						field:  "client_ids",
@@ -1128,7 +1177,14 @@ func (m *SetClientCollaboratorRequest) ValidateFields(paths ...string) error {
 
 		case "collaborator":
 
-			if v, ok := interface{}(&m.Collaborator).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetCollaborator() == nil {
+				return SetClientCollaboratorRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetClientCollaboratorRequestValidationError{
 						field:  "collaborator",

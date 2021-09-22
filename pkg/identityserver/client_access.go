@@ -60,17 +60,17 @@ func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.Clien
 }
 
 func (is *IdentityServer) getClientCollaborator(ctx context.Context, req *ttnpb.GetClientCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
-	if err := rights.RequireClient(ctx, req.ClientIds, ttnpb.RIGHT_CLIENT_ALL); err != nil {
+	if err := rights.RequireClient(ctx, *req.GetClientIds(), ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
-		OrganizationOrUserIdentifiers: req.Collaborator,
+		OrganizationOrUserIdentifiers: *req.GetCollaborator(),
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		rights, err := is.getMembershipStore(ctx, db).GetMember(
 			ctx,
-			&req.Collaborator,
-			req.ClientIds.GetEntityIdentifiers(),
+			req.GetCollaborator(),
+			req.GetClientIds().GetEntityIdentifiers(),
 		)
 		if err != nil {
 			return err
@@ -88,7 +88,7 @@ var errClientNeedsCollaborator = errors.DefineFailedPrecondition("client_needs_c
 
 func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
-	if err := rights.RequireClient(ctx, req.ClientIds, ttnpb.RIGHT_CLIENT_ALL); err != nil {
+	if err := rights.RequireClient(ctx, *req.GetClientIds(), ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
 
@@ -98,7 +98,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 		existingRights, err := store.GetMember(
 			ctx,
 			&req.Collaborator.OrganizationOrUserIdentifiers,
-			req.ClientIds.GetEntityIdentifiers(),
+			req.GetClientIds().GetEntityIdentifiers(),
 		)
 		if err != nil && !errors.IsNotFound(err) {
 			return err
@@ -110,20 +110,20 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 
 		// Require the caller to have all added rights.
 		if len(addedRights.GetRights()) > 0 {
-			if err := rights.RequireClient(ctx, req.ClientIds, addedRights.GetRights()...); err != nil {
+			if err := rights.RequireClient(ctx, *req.GetClientIds(), addedRights.GetRights()...); err != nil {
 				return err
 			}
 		}
 
 		// Unless we're deleting the collaborator, require the caller to have all removed rights.
 		if len(newRights.GetRights()) > 0 && len(removedRights.GetRights()) > 0 {
-			if err := rights.RequireClient(ctx, req.ClientIds, removedRights.GetRights()...); err != nil {
+			if err := rights.RequireClient(ctx, *req.GetClientIds(), removedRights.GetRights()...); err != nil {
 				return err
 			}
 		}
 
 		if removedRights.IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
-			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.ClientIds.GetEntityIdentifiers())
+			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetClientIds().GetEntityIdentifiers())
 			if err != nil {
 				return err
 			}
@@ -145,7 +145,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 		return store.SetMember(
 			ctx,
 			&req.Collaborator.OrganizationOrUserIdentifiers,
-			req.ClientIds.GetEntityIdentifiers(),
+			req.GetClientIds().GetEntityIdentifiers(),
 			ttnpb.RightsFrom(req.Collaborator.Rights...),
 		)
 	})
@@ -153,16 +153,16 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateClientCollaborator.New(ctx, events.WithIdentifiers(&req.ClientIds, &req.Collaborator.OrganizationOrUserIdentifiers)))
+		events.Publish(evtUpdateClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), &req.Collaborator.OrganizationOrUserIdentifiers)))
 		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 			data.SetEntity(req)
-			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
+			return &emails.CollaboratorChanged{Data: data, Collaborator: *req.GetCollaborator()}
 		})
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteClientCollaborator.New(ctx, events.WithIdentifiers(&req.ClientIds, &req.Collaborator.OrganizationOrUserIdentifiers)))
+		events.Publish(evtDeleteClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), &req.Collaborator.OrganizationOrUserIdentifiers)))
 	}
 	return ttnpb.Empty, nil
 }
@@ -171,7 +171,7 @@ func (is *IdentityServer) listClientCollaborators(ctx context.Context, req *ttnp
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	if err = rights.RequireClient(ctx, req.ClientIds, ttnpb.RIGHT_CLIENT_ALL); err != nil {
+	if err = rights.RequireClient(ctx, *req.GetClientIds(), ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
 	var total uint64
@@ -182,7 +182,7 @@ func (is *IdentityServer) listClientCollaborators(ctx context.Context, req *ttnp
 		}
 	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.ClientIds.GetEntityIdentifiers())
+		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetClientIds().GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

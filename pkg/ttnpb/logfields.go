@@ -85,7 +85,7 @@ func (req *CreateClientRequest) ExtractRequestFields(m map[string]interface{}) {
 		return
 	}
 	req.Client.ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator)
+	extractCollaboratorFields(m, req.GetCollaborator())
 }
 
 func (req *CreateGatewayRequest) ExtractRequestFields(m map[string]interface{}) {
@@ -116,7 +116,7 @@ func (req *SetClientCollaboratorRequest) ExtractRequestFields(m map[string]inter
 	if req == nil {
 		return
 	}
-	req.ClientIds.ExtractRequestFields(m)
+	req.GetClientIds().ExtractRequestFields(m)
 	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
 }
 

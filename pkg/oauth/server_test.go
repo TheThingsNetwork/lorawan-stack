@@ -64,7 +64,7 @@ var (
 		Ids: &ttnpb.UserIdentifiers{UserId: "user"},
 	}
 	mockClient = &ttnpb.Client{
-		Ids:                ttnpb.ClientIdentifiers{ClientId: "client"},
+		Ids:                &ttnpb.ClientIdentifiers{ClientId: "client"},
 		State:              ttnpb.STATE_APPROVED,
 		Grants:             []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
 		RedirectUris:       []string{"https://uri/callback", "http://uri/callback"},
@@ -232,7 +232,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.session = mockSession
 				s.res.user = mockUser
 				s.res.client = &ttnpb.Client{
-					Ids:          ttnpb.ClientIdentifiers{ClientId: "client"},
+					Ids:          &ttnpb.ClientIdentifiers{ClientId: "client"},
 					State:        ttnpb.STATE_REJECTED,
 					Grants:       []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
 					RedirectUris: []string{"https://uri/callback", "http://uri/callback"},
@@ -251,7 +251,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.session = mockSession
 				s.res.user = mockUser
 				s.res.client = &ttnpb.Client{
-					Ids:          ttnpb.ClientIdentifiers{ClientId: "client"},
+					Ids:          &ttnpb.ClientIdentifiers{ClientId: "client"},
 					State:        ttnpb.STATE_REQUESTED,
 					Grants:       []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
 					RedirectUris: []string{"https://uri/callback", "http://uri/callback"},
@@ -270,7 +270,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.session = mockSession
 				s.res.user = mockUser
 				s.res.client = &ttnpb.Client{
-					Ids:          ttnpb.ClientIdentifiers{ClientId: "client"},
+					Ids:          &ttnpb.ClientIdentifiers{ClientId: "client"},
 					State:        ttnpb.STATE_SUSPENDED,
 					Grants:       []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
 					RedirectUris: []string{"https://uri/callback", "http://uri/callback"},
@@ -289,7 +289,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.session = mockSession
 				s.res.user = mockUser
 				s.res.client = &ttnpb.Client{
-					Ids:          ttnpb.ClientIdentifiers{ClientId: "client"},
+					Ids:          &ttnpb.ClientIdentifiers{ClientId: "client"},
 					State:        ttnpb.STATE_REJECTED,
 					Grants:       []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
 					RedirectUris: []string{"https://uri/callback", "http://uri/callback"},
@@ -308,7 +308,7 @@ func TestOAuthFlow(t *testing.T) {
 				s.res.session = mockSession
 				s.res.user = mockUser
 				s.res.client = &ttnpb.Client{
-					Ids:          ttnpb.ClientIdentifiers{ClientId: "client"},
+					Ids:          &ttnpb.ClientIdentifiers{ClientId: "client"},
 					State:        ttnpb.STATE_APPROVED,
 					Grants:       []ttnpb.GrantType{},
 					RedirectUris: []string{"https://uri/callback", "http://uri/callback"},
@@ -339,10 +339,10 @@ func TestOAuthFlow(t *testing.T) {
 				a := assertions.New(t)
 				a.So(s.calls, should.Contain, "Authorize")
 				a.So(s.req.authorization.UserIds, should.Resemble, *mockUser.GetIds())
-				a.So(s.req.authorization.ClientIds, should.Resemble, mockClient.Ids)
+				a.So(s.req.authorization.ClientIds, should.Resemble, *mockClient.GetIds())
 				a.So(s.calls, should.Contain, "CreateAuthorizationCode")
 				a.So(s.req.authorizationCode.UserIds, should.Resemble, *mockUser.GetIds())
-				a.So(s.req.authorizationCode.ClientIds, should.Resemble, mockClient.Ids)
+				a.So(s.req.authorizationCode.ClientIds, should.Resemble, *mockClient.GetIds())
 				a.So(s.req.authorizationCode.UserSessionId, should.Equal, mockSession.SessionId)
 				a.So(s.req.authorizationCode.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.authorizationCode.Code, should.NotBeEmpty)
@@ -665,7 +665,7 @@ func TestTokenExchange(t *testing.T) {
 				s.res.client = mockClient
 				s.res.authorizationCode = &ttnpb.OAuthAuthorizationCode{
 					UserIds:       *mockUser.GetIds(),
-					ClientIds:     mockClient.Ids,
+					ClientIds:     *mockClient.GetIds(),
 					UserSessionId: mockSession.SessionId,
 					Rights:        mockClient.Rights,
 					Code:          "the code",
@@ -693,7 +693,7 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.req.code, should.Equal, "the code")
 				a.So(s.calls, should.Contain, "CreateAccessToken")
 				a.So(s.req.token.UserIds, should.Resemble, *mockUser.GetIds())
-				a.So(s.req.token.ClientIds, should.Resemble, mockClient.Ids)
+				a.So(s.req.token.ClientIds, should.Resemble, *mockClient.GetIds())
 				a.So(s.req.token.UserSessionId, should.Equal, mockSession.SessionId)
 				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.token.AccessToken, should.NotBeEmpty)
@@ -707,7 +707,7 @@ func TestTokenExchange(t *testing.T) {
 				s.res.client = mockClient
 				s.res.authorizationCode = &ttnpb.OAuthAuthorizationCode{
 					UserIds:       *mockUser.GetIds(),
-					ClientIds:     mockClient.Ids,
+					ClientIds:     *mockClient.GetIds(),
 					UserSessionId: mockSession.SessionId,
 					Rights:        mockClient.Rights,
 					Code:          "the code",
@@ -734,7 +734,7 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.req.code, should.Equal, "the code")
 				a.So(s.calls, should.Contain, "CreateAccessToken")
 				a.So(s.req.token.UserIds, should.Resemble, *mockUser.GetIds())
-				a.So(s.req.token.ClientIds, should.Resemble, mockClient.Ids)
+				a.So(s.req.token.ClientIds, should.Resemble, *mockClient.GetIds())
 				a.So(s.req.token.UserSessionId, should.Equal, mockSession.SessionId)
 				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.token.AccessToken, should.NotBeEmpty)
@@ -748,7 +748,7 @@ func TestTokenExchange(t *testing.T) {
 				s.res.client = mockClient
 				s.res.accessToken = &ttnpb.OAuthAccessToken{
 					UserIds:       *mockUser.GetIds(),
-					ClientIds:     mockClient.Ids,
+					ClientIds:     *mockClient.GetIds(),
 					UserSessionId: mockSession.SessionId,
 					Id:            "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
 					RefreshToken:  "PBKDF2$sha256$20000$IGAiKs46xX_M64E5$4xpyqnQT8SOa_Vf4xhEPk6WOZnhmAjG2mqGQiYBhm2s",
@@ -773,7 +773,7 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.req.tokenID, should.Equal, "IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A")
 				a.So(s.calls, should.Contain, "CreateAccessToken")
 				a.So(s.req.token.UserIds, should.Resemble, *mockUser.GetIds())
-				a.So(s.req.token.ClientIds, should.Resemble, mockClient.Ids)
+				a.So(s.req.token.ClientIds, should.Resemble, *mockClient.GetIds())
 				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.token.AccessToken, should.NotBeEmpty)
 				a.So(s.req.token.RefreshToken, should.NotBeEmpty)

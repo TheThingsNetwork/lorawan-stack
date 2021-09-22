@@ -17,63 +17,63 @@ package ttnpb
 // All EntityType methods implement the IDStringer interface.
 
 func (m *Client) EntityType() string {
-	return m.Ids.EntityType()
+	return m.GetIds().EntityType()
 }
 
 func (m *GetClientRequest) EntityType() string {
-	return m.ClientIds.EntityType()
+	return m.GetClientIds().EntityType()
 }
 
 func (m *ListClientCollaboratorsRequest) EntityType() string {
-	return m.ClientIds.EntityType()
+	return m.GetClientIds().EntityType()
 }
 
 func (m *GetClientCollaboratorRequest) EntityType() string {
-	return m.ClientIds.EntityType()
+	return m.GetClientIds().EntityType()
 }
 
 func (m *SetClientCollaboratorRequest) EntityType() string {
-	return m.ClientIds.EntityType()
+	return m.GetClientIds().EntityType()
 }
 
 // All IDString methods implement the IDStringer interface.
 
 func (m *Client) IDString() string {
-	return m.Ids.IDString()
+	return m.GetIds().IDString()
 }
 
 func (m *GetClientRequest) IDString() string {
-	return m.ClientIds.IDString()
+	return m.GetClientIds().IDString()
 }
 
 func (m *ListClientCollaboratorsRequest) IDString() string {
-	return m.ClientIds.IDString()
+	return m.GetClientIds().IDString()
 }
 
 func (m *GetClientCollaboratorRequest) IDString() string {
-	return m.ClientIds.IDString()
+	return m.GetClientIds().IDString()
 }
 
 func (m *SetClientCollaboratorRequest) IDString() string {
-	return m.ClientIds.IDString()
+	return m.GetClientIds().IDString()
 }
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
 func (m *Client) ExtractRequestFields(dst map[string]interface{}) {
-	m.Ids.ExtractRequestFields(dst)
+	m.GetIds().ExtractRequestFields(dst)
 }
 
 func (m *GetClientRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.ClientIds.ExtractRequestFields(dst)
+	m.GetClientIds().ExtractRequestFields(dst)
 }
 
 func (m *ListClientCollaboratorsRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.ClientIds.ExtractRequestFields(dst)
+	m.GetClientIds().ExtractRequestFields(dst)
 }
 
 func (m *GetClientCollaboratorRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.ClientIds.ExtractRequestFields(dst)
+	m.GetClientIds().ExtractRequestFields(dst)
 }
 
 // Wrap methods of m.ClientIdentifiers.
@@ -82,5 +82,5 @@ func (m *Client) GetEntityIdentifiers() *EntityIdentifiers {
 	if m == nil {
 		return nil
 	}
-	return m.Ids.GetEntityIdentifiers()
+	return m.GetIds().GetEntityIdentifiers()
 }

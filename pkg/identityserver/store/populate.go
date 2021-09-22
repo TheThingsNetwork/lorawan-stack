@@ -52,7 +52,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			},
 		)
 		client := &ttnpb.Client{
-			Ids:         ttnpb.ClientIdentifiers{ClientId: fmt.Sprintf("random-cli-%d", i+1)},
+			Ids:         &ttnpb.ClientIdentifiers{ClientId: fmt.Sprintf("random-cli-%d", i+1)},
 			Name:        fmt.Sprintf("Random %d", i+1),
 			Description: fmt.Sprintf("Randomly generated Client %d", i+1),
 		}

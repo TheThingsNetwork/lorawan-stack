@@ -41,14 +41,14 @@ func TestClientAccessRightsPermissionDenied(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := clientAccessUser.GetIds(), userCreds(clientAccessUserIdx)
-		clientID := userClients(userID).Clients[0].Ids
+		clientID := userClients(userID).Clients[0].GetIds()
 		collaboratorID := collaboratorUser.GetIds().GetOrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewClientAccessClient(cc)
 
 		_, err := reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 			ClientIds: clientID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_ALL},
 			},
@@ -67,11 +67,11 @@ func TestClientAccessPermissionDenied(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
 		collaboratorID := collaboratorUser.GetIds().GetOrganizationOrUserIdentifiers()
-		clientID := userClients(userID).Clients[0].Ids
+		clientID := userClients(userID).Clients[0].GetIds()
 
 		reg := ttnpb.NewClientAccessClient(cc)
 
-		rights, err := reg.ListRights(ctx, &clientID)
+		rights, err := reg.ListRights(ctx, clientID)
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
@@ -89,7 +89,7 @@ func TestClientAccessPermissionDenied(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 			ClientIds: clientID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 			},
@@ -107,11 +107,11 @@ func TestClientAccessClusterAuth(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
-		clientID := userClients(userID).Clients[0].Ids
+		clientID := userClients(userID).Clients[0].GetIds()
 
 		reg := ttnpb.NewClientAccessClient(cc)
 
-		rights, err := reg.ListRights(ctx, &clientID, is.WithClusterAuth())
+		rights, err := reg.ListRights(ctx, clientID, is.WithClusterAuth())
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
@@ -127,21 +127,20 @@ func TestClientAccessCRUD(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
 		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
-		clientID := userClients(userID).Clients[0].Ids
+		clientID := userClients(userID).Clients[0].GetIds()
 
 		reg := ttnpb.NewClientAccessClient(cc)
 
-		rights, err := reg.ListRights(ctx, &clientID, creds)
+		rights, err := reg.ListRights(ctx, clientID, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
 			a.So(rights.Rights, should.Contain, ttnpb.RIGHT_CLIENT_ALL)
 		}
 
-		modifiedClientID := clientID
-		modifiedClientID.ClientId = reverse(modifiedClientID.ClientId)
+		modifiedClientID := &ttnpb.ClientIdentifiers{ClientId: reverse(clientID.GetClientId())}
 
-		rights, err = reg.ListRights(ctx, &modifiedClientID, creds)
+		rights, err = reg.ListRights(ctx, modifiedClientID, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
@@ -159,7 +158,7 @@ func TestClientAccessCRUD(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 			ClientIds: clientID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 			},
@@ -169,7 +168,7 @@ func TestClientAccessCRUD(t *testing.T) {
 
 		res, err := reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
 			ClientIds:    clientID,
-			Collaborator: *collaboratorID,
+			Collaborator: collaboratorID,
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -179,7 +178,7 @@ func TestClientAccessCRUD(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 			ClientIds: clientID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 			},
 		}, creds)
@@ -188,7 +187,7 @@ func TestClientAccessCRUD(t *testing.T) {
 
 		res, err = reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
 			ClientIds:    clientID,
-			Collaborator: *collaboratorID,
+			Collaborator: collaboratorID,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
