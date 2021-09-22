@@ -82,7 +82,7 @@ func TestOrganizationPublicSafe(t *testing.T) {
 	a.So(((*Organization)(nil)).PublicSafe(), should.BeNil)
 
 	src := &Organization{
-		Ids:         OrganizationIdentifiers{OrganizationId: "foo"},
+		Ids:         &OrganizationIdentifiers{OrganizationId: "foo"},
 		Name:        "Name",
 		Description: "Description",
 		Attributes:  map[string]string{"key": "value"},

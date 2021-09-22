@@ -68,7 +68,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOrganizationAccessClient(is).ListCollaborators(ctx, &ttnpb.ListOrganizationCollaboratorsRequest{
-				OrganizationIds: *orgID, Limit: limit, Page: page,
+				OrganizationIds: orgID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
@@ -97,8 +97,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewOrganizationAccessClient(is).GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
-				OrganizationIds: *orgID,
-				Collaborator:    *collaborator,
+				OrganizationIds: orgID,
+				Collaborator:    collaborator,
 			})
 			if err != nil {
 				return err
@@ -130,8 +130,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewOrganizationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
-				OrganizationIds: *orgID,
-				Collaborator: ttnpb.Collaborator{
+				OrganizationIds: orgID,
+				Collaborator: &ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        rights,
 				},
@@ -162,8 +162,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewOrganizationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
-				OrganizationIds: *orgID,
-				Collaborator: ttnpb.Collaborator{
+				OrganizationIds: orgID,
+				Collaborator: &ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        nil,
 				},
@@ -196,7 +196,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOrganizationAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
-				OrganizationIds: *orgID, Limit: limit, Page: page,
+				OrganizationIds: orgID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
@@ -225,7 +225,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewOrganizationAccessClient(is).GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
-				OrganizationIds: *orgID,
+				OrganizationIds: orgID,
 				KeyId:           id,
 			})
 			if err != nil {
@@ -261,7 +261,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewOrganizationAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
-				OrganizationIds: *orgID,
+				OrganizationIds: orgID,
 				Name:            name,
 				Rights:          rights,
 				ExpiresAt:       expiryDate,
@@ -307,7 +307,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewOrganizationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
-				OrganizationIds: *orgID,
+				OrganizationIds: orgID,
 				APIKey: ttnpb.APIKey{
 					Id:        id,
 					Name:      name,
@@ -342,7 +342,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewOrganizationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
-				OrganizationIds: *orgID,
+				OrganizationIds: orgID,
 				APIKey: ttnpb.APIKey{
 					Id:     id,
 					Rights: nil,

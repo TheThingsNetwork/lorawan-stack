@@ -79,11 +79,11 @@ func (is *IdentityServer) listOrganizationRights(ctx context.Context, ids *ttnpb
 
 func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttnpb.CreateOrganizationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireOrganization(ctx, req.OrganizationIds, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireOrganization(ctx, *req.GetOrganizationIds(), ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	// Require that caller has at least the rights of the API key.
-	if err = rights.RequireOrganization(ctx, req.OrganizationIds, req.Rights...); err != nil {
+	if err = rights.RequireOrganization(ctx, *req.GetOrganizationIds(), req.Rights...); err != nil {
 		return nil, err
 	}
 	key, token, err := GenerateAPIKey(ctx, req.Name, req.ExpiresAt, req.Rights...)
@@ -91,14 +91,14 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.OrganizationIds.GetEntityIdentifiers(), key)
+		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), key)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	key.Key = token
-	events.Publish(evtCreateOrganizationAPIKey.NewWithIdentifiersAndData(ctx, &req.OrganizationIds, nil))
+	events.Publish(evtCreateOrganizationAPIKey.NewWithIdentifiersAndData(ctx, req.GetOrganizationIds(), nil))
 	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 		data.SetEntity(req)
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
@@ -110,7 +110,7 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 }
 
 func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, req *ttnpb.ListOrganizationAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
-	if err = rights.RequireOrganization(ctx, req.OrganizationIds, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireOrganization(ctx, *req.GetOrganizationIds(), ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	var total uint64
@@ -122,7 +122,7 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, req *ttnp
 	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.OrganizationIds.GetEntityIdentifiers())
+		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetOrganizationIds().GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -135,7 +135,7 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, req *ttnp
 }
 
 func (is *IdentityServer) getOrganizationAPIKey(ctx context.Context, req *ttnpb.GetOrganizationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	if err = rights.RequireOrganization(ctx, req.OrganizationIds, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireOrganization(ctx, *req.GetOrganizationIds(), ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -156,7 +156,7 @@ func (is *IdentityServer) getOrganizationAPIKey(ctx context.Context, req *ttnpb.
 
 func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttnpb.UpdateOrganizationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireOrganization(ctx, req.OrganizationIds, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireOrganization(ctx, *req.GetOrganizationIds(), ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -171,27 +171,27 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 			existingRights := ttnpb.RightsFrom(key.Rights...)
 
 			// Require the caller to have all added rights.
-			if err := rights.RequireOrganization(ctx, req.OrganizationIds, newRights.Sub(existingRights).GetRights()...); err != nil {
+			if err := rights.RequireOrganization(ctx, *req.GetOrganizationIds(), newRights.Sub(existingRights).GetRights()...); err != nil {
 				return err
 			}
 			// Require the caller to have all removed rights.
-			if err := rights.RequireOrganization(ctx, req.OrganizationIds, existingRights.Sub(newRights).GetRights()...); err != nil {
+			if err := rights.RequireOrganization(ctx, *req.GetOrganizationIds(), existingRights.Sub(newRights).GetRights()...); err != nil {
 				return err
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.OrganizationIds.GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	if key == nil { // API key was deleted.
-		events.Publish(evtDeleteOrganizationAPIKey.NewWithIdentifiersAndData(ctx, &req.OrganizationIds, nil))
+		events.Publish(evtDeleteOrganizationAPIKey.NewWithIdentifiersAndData(ctx, req.GetOrganizationIds(), nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateOrganizationAPIKey.NewWithIdentifiersAndData(ctx, &req.OrganizationIds, nil))
+	events.Publish(evtUpdateOrganizationAPIKey.NewWithIdentifiersAndData(ctx, req.GetOrganizationIds(), nil))
 	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 		data.SetEntity(req)
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
@@ -204,17 +204,17 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 }
 
 func (is *IdentityServer) getOrganizationCollaborator(ctx context.Context, req *ttnpb.GetOrganizationCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
-	if err := rights.RequireOrganization(ctx, req.OrganizationIds, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
+	if err := rights.RequireOrganization(ctx, *req.GetOrganizationIds(), ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
-		OrganizationOrUserIdentifiers: req.Collaborator,
+		OrganizationOrUserIdentifiers: *req.GetCollaborator(),
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		rights, err := is.getMembershipStore(ctx, db).GetMember(
 			ctx,
-			&req.Collaborator,
-			req.OrganizationIds.GetEntityIdentifiers(),
+			req.GetCollaborator(),
+			req.GetOrganizationIds().GetEntityIdentifiers(),
 		)
 		if err != nil {
 			return err
@@ -232,7 +232,7 @@ var errOrganizationNeedsCollaborator = errors.DefineFailedPrecondition("organiza
 
 func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *ttnpb.SetOrganizationCollaboratorRequest) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
-	if err := rights.RequireOrganization(ctx, req.OrganizationIds, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
+	if err := rights.RequireOrganization(ctx, *req.GetOrganizationIds(), ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
 		return nil, err
 	}
 
@@ -241,39 +241,39 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 
 		existingRights, err := store.GetMember(
 			ctx,
-			&req.Collaborator.OrganizationOrUserIdentifiers,
-			req.OrganizationIds.GetEntityIdentifiers(),
+			&req.GetCollaborator().OrganizationOrUserIdentifiers,
+			req.GetOrganizationIds().GetEntityIdentifiers(),
 		)
 		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
 		existingRights = existingRights.Implied()
-		newRights := ttnpb.RightsFrom(req.Collaborator.Rights...).Implied()
+		newRights := ttnpb.RightsFrom(req.GetCollaborator().GetRights()...).Implied()
 		addedRights := newRights.Sub(existingRights)
 		removedRights := existingRights.Sub(newRights)
 
 		// Require the caller to have all added rights.
 		if len(addedRights.GetRights()) > 0 {
-			if err := rights.RequireOrganization(ctx, req.OrganizationIds, addedRights.GetRights()...); err != nil {
+			if err := rights.RequireOrganization(ctx, *req.GetOrganizationIds(), addedRights.GetRights()...); err != nil {
 				return err
 			}
 		}
 
 		// Unless we're deleting the collaborator, require the caller to have all removed rights.
 		if len(newRights.GetRights()) > 0 && len(removedRights.GetRights()) > 0 {
-			if err := rights.RequireOrganization(ctx, req.OrganizationIds, removedRights.GetRights()...); err != nil {
+			if err := rights.RequireOrganization(ctx, *req.GetOrganizationIds(), removedRights.GetRights()...); err != nil {
 				return err
 			}
 		}
 
 		if removedRights.IncludesAll(ttnpb.RIGHT_ORGANIZATION_ALL) {
-			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.OrganizationIds.GetEntityIdentifiers())
+			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetOrganizationIds().GetEntityIdentifiers())
 			if err != nil {
 				return err
 			}
 			var hasOtherOwner bool
 			for member, rights := range memberRights {
-				if unique.ID(ctx, member) == unique.ID(ctx, &req.Collaborator.OrganizationOrUserIdentifiers) {
+				if unique.ID(ctx, member) == unique.ID(ctx, &req.GetCollaborator().OrganizationOrUserIdentifiers) {
 					continue
 				}
 				if rights.Implied().IncludesAll(ttnpb.RIGHT_ORGANIZATION_ALL) {
@@ -288,25 +288,25 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 
 		return store.SetMember(
 			ctx,
-			&req.Collaborator.OrganizationOrUserIdentifiers,
-			req.OrganizationIds.GetEntityIdentifiers(),
-			ttnpb.RightsFrom(req.Collaborator.Rights...),
+			&req.GetCollaborator().OrganizationOrUserIdentifiers,
+			req.GetOrganizationIds().GetEntityIdentifiers(),
+			ttnpb.RightsFrom(req.GetCollaborator().GetRights()...),
 		)
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateOrganizationCollaborator.New(ctx, events.WithIdentifiers(&req.OrganizationIds, &req.Collaborator.OrganizationOrUserIdentifiers)))
+	if len(req.GetCollaborator().GetRights()) > 0 {
+		events.Publish(evtUpdateOrganizationCollaborator.New(ctx, events.WithIdentifiers(req.GetOrganizationIds(), &req.GetCollaborator().OrganizationOrUserIdentifiers)))
 		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 			data.SetEntity(req)
-			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
+			return &emails.CollaboratorChanged{Data: data, Collaborator: *req.GetCollaborator()}
 		})
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteOrganizationCollaborator.New(ctx, events.WithIdentifiers(&req.OrganizationIds, &req.Collaborator.OrganizationOrUserIdentifiers)))
+		events.Publish(evtDeleteOrganizationCollaborator.New(ctx, events.WithIdentifiers(req.GetOrganizationIds(), &req.GetCollaborator().OrganizationOrUserIdentifiers)))
 	}
 	return ttnpb.Empty, nil
 }
@@ -315,7 +315,7 @@ func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, req
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	if err = rights.RequireOrganization(ctx, req.OrganizationIds, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
+	if err = rights.RequireOrganization(ctx, *req.GetOrganizationIds(), ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
 		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
 	var total uint64
@@ -326,7 +326,7 @@ func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, req
 		}
 	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.OrganizationIds.GetEntityIdentifiers())
+		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetOrganizationIds().GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

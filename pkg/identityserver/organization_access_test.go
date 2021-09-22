@@ -52,7 +52,7 @@ func TestOrganizationAccessNotFound(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
-		organizationID := userOrganizations(userID).Organizations[0].Ids
+		organizationID := userOrganizations(userID).Organizations[0].GetIds()
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
@@ -90,7 +90,7 @@ func TestOrganizationAccessRightsPermissionDenied(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := organizationAccessUser.GetIds(), userCreds(organizationAccessUserIdx)
-		organizationID := userOrganizations(userID).Organizations[0].Ids
+		organizationID := userOrganizations(userID).Organizations[0].GetIds()
 		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
@@ -109,7 +109,7 @@ func TestOrganizationAccessRightsPermissionDenied(t *testing.T) {
 
 		// Choose right that the user does not have and hence cannot add
 		right := ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC
-		APIKey = organizationAPIKeys(&organizationID).ApiKeys[0]
+		APIKey = organizationAPIKeys(organizationID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
@@ -128,7 +128,7 @@ func TestOrganizationAccessRightsPermissionDenied(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
 			},
@@ -146,13 +146,13 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
-		organizationID := userOrganizations(userID).Organizations[0].Ids
+		organizationID := userOrganizations(userID).Organizations[0].GetIds()
 		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
-		APIKeyID := organizationAPIKeys(&organizationID).ApiKeys[0].Id
+		APIKeyID := organizationAPIKeys(organizationID).ApiKeys[0].Id
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
-		rights, err := reg.ListRights(ctx, &organizationID)
+		rights, err := reg.ListRights(ctx, organizationID)
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
@@ -199,7 +199,7 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 		}
 		a.So(APIKey, should.BeNil)
 
-		APIKey = organizationAPIKeys(&organizationID).ApiKeys[0]
+		APIKey = organizationAPIKeys(organizationID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
@@ -214,7 +214,7 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
 			},
@@ -232,11 +232,11 @@ func TestOrganizationAccessClusterAuth(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
-		organizationID := userOrganizations(userID).Organizations[0].Ids
+		organizationID := userOrganizations(userID).Organizations[0].GetIds()
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
-		rights, err := reg.ListRights(ctx, &organizationID, is.WithClusterAuth())
+		rights, err := reg.ListRights(ctx, organizationID, is.WithClusterAuth())
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
@@ -251,29 +251,28 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
-		organizationID := userOrganizations(userID).Organizations[0].Ids
+		organizationID := userOrganizations(userID).Organizations[0].GetIds()
 		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
-		rights, err := reg.ListRights(ctx, &organizationID, creds)
+		rights, err := reg.ListRights(ctx, organizationID, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
 			a.So(rights.Rights, should.Contain, ttnpb.RIGHT_ORGANIZATION_ALL)
 		}
 
-		modifiedOrganizationID := organizationID
-		modifiedOrganizationID.OrganizationId = reverse(modifiedOrganizationID.OrganizationId)
+		modifiedOrganizationID := &ttnpb.OrganizationIdentifiers{OrganizationId: reverse(organizationID.GetOrganizationId())}
 
-		rights, err = reg.ListRights(ctx, &modifiedOrganizationID, creds)
+		rights, err = reg.ListRights(ctx, modifiedOrganizationID, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
 			a.So(rights.Rights, should.BeEmpty)
 		}
 
-		organizationAPIKeys := organizationAPIKeys(&organizationID)
+		organizationAPIKeys := organizationAPIKeys(organizationID)
 		organizationKey := organizationAPIKeys.ApiKeys[0]
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
@@ -336,7 +335,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
 			},
@@ -346,7 +345,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 
 		res, err := reg.GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator:    *collaboratorID,
+			Collaborator:    collaboratorID,
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -356,7 +355,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 			},
 		}, creds)
@@ -365,7 +364,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 
 		res, err = reg.GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator:    *collaboratorID,
+			Collaborator:    collaboratorID,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -380,7 +379,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, usrCreds := defaultUser.GetIds(), userCreds(defaultUserIdx)
-		organizationID := userOrganizations(userID).Organizations[0].Ids
+		organizationID := userOrganizations(userID).Organizations[0].GetIds()
 		collaboratorID := organizationAccessUser.GetIds().OrganizationOrUserIdentifiers()
 		collaboratorCreds := userCreds(organizationAccessUserIdx)
 		removedCollaboratorID := orgAccessCollaboratorUser.GetIds().OrganizationOrUserIdentifiers()
@@ -389,7 +388,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 
 		_, err := reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
@@ -403,7 +402,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_ORGANIZATION_ALL,
@@ -426,7 +425,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 		// Try revoking rights for the collaborator with RIGHT_ORGANIZATION_ALL without having it
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
@@ -462,7 +461,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 		newRights := ttnpb.AllOrganizationRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_ALL))
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights:                        newRights.Rights,
 			},
@@ -502,7 +501,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights:                        newRights.Rights,
 			},
@@ -513,7 +512,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 		// Try revoking RIGHT_ORGANIZATION_DELETE without having it
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights:                        newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_DELETE)).Rights,
 			},
@@ -539,7 +538,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 
 		res, err := reg.GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator:    *removedCollaboratorID,
+			Collaborator:    removedCollaboratorID,
 		}, collaboratorCreds)
 
 		if a.So(err, should.BeNil) {
@@ -549,7 +548,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 		// Delete collaborator with more rights
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights:                        []ttnpb.Right{},
 			},
@@ -559,7 +558,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 
 		_, err = reg.GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
-			Collaborator:    *removedCollaboratorID,
+			Collaborator:    removedCollaboratorID,
 		}, collaboratorCreds)
 
 		if a.So(err, should.NotBeNil) {

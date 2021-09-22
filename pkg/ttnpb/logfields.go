@@ -101,7 +101,7 @@ func (req *CreateOrganizationRequest) ExtractRequestFields(m map[string]interfac
 		return
 	}
 	req.Organization.ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator)
+	extractCollaboratorFields(m, req.GetCollaborator())
 }
 
 func (req *SetApplicationCollaboratorRequest) ExtractRequestFields(m map[string]interface{}) {
@@ -132,6 +132,6 @@ func (req *SetOrganizationCollaboratorRequest) ExtractRequestFields(m map[string
 	if req == nil {
 		return
 	}
-	req.OrganizationIds.ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
+	req.GetOrganizationIds().ExtractRequestFields(m)
+	extractCollaboratorFields(m, &req.GetCollaborator().OrganizationOrUserIdentifiers)
 }

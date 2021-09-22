@@ -37,7 +37,7 @@ func TestOrganizationStore(t *testing.T) {
 		s := newStore(db)
 
 		created, err := store.CreateOrganization(ctx, &ttnpb.Organization{
-			Ids:         ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
+			Ids:         &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 			Name:        "Foo Organization",
 			Description: "The Amazing Foo Organization",
 			Attributes: map[string]string{
@@ -49,7 +49,7 @@ func TestOrganizationStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(created, should.NotBeNil) {
-			a.So(created.Ids.OrganizationId, should.Equal, "foo")
+			a.So(created.GetIds().GetOrganizationId(), should.Equal, "foo")
 			a.So(created.Name, should.Equal, "Foo Organization")
 			a.So(created.Description, should.Equal, "The Amazing Foo Organization")
 			a.So(created.Attributes, should.HaveLength, 3)
@@ -61,7 +61,7 @@ func TestOrganizationStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.Ids.OrganizationId, should.Equal, "foo")
+			a.So(got.GetIds().GetOrganizationId(), should.Equal, "foo")
 			a.So(got.Name, should.Equal, "Foo Organization")
 			a.So(got.Description, should.BeEmpty)
 			a.So(got.Attributes, should.HaveLength, 3)
@@ -70,7 +70,7 @@ func TestOrganizationStore(t *testing.T) {
 		}
 
 		_, err = store.UpdateOrganization(ctx, &ttnpb.Organization{
-			Ids: ttnpb.OrganizationIdentifiers{OrganizationId: "bar"},
+			Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "bar"},
 		}, nil)
 
 		if a.So(err, should.NotBeNil) {
@@ -78,7 +78,7 @@ func TestOrganizationStore(t *testing.T) {
 		}
 
 		updated, err := store.UpdateOrganization(ctx, &ttnpb.Organization{
-			Ids:         ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
+			Ids:         &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 			Name:        "Foobar Organization",
 			Description: "The Amazing Foobar Organization",
 			Attributes: map[string]string{
@@ -100,7 +100,7 @@ func TestOrganizationStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.Ids.OrganizationId, should.Equal, created.Ids.OrganizationId)
+			a.So(got.GetIds().GetOrganizationId(), should.Equal, created.GetIds().GetOrganizationId())
 			a.So(got.Name, should.Equal, created.Name)
 			a.So(got.Description, should.Equal, updated.Description)
 			a.So(got.Attributes, should.Resemble, updated.Attributes)
@@ -163,7 +163,7 @@ func TestOrganizationStore(t *testing.T) {
 
 		// Check that organization ids are released after purge
 		_, err = store.CreateOrganization(ctx, &ttnpb.Organization{
-			Ids:         ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
+			Ids:         &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 			Name:        "Foo Organization",
 			Description: "The Amazing Foo Organization",
 			Attributes: map[string]string{

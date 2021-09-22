@@ -150,7 +150,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{
-				OrganizationIds: *orgID,
+				OrganizationIds: orgID,
 				FieldMask:       &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
@@ -181,10 +181,10 @@ var (
 				return err
 			}
 			organization.Attributes = mergeAttributes(organization.Attributes, cmd.Flags())
-			if orgID != nil && orgID.OrganizationId != "" {
-				organization.Ids = ttnpb.OrganizationIdentifiers{OrganizationId: orgID.OrganizationId}
+			if orgID.GetOrganizationId() != "" {
+				organization.Ids = &ttnpb.OrganizationIdentifiers{OrganizationId: orgID.GetOrganizationId()}
 			}
-			if organization.Ids.OrganizationId == "" {
+			if organization.GetIds().GetOrganizationId() == "" {
 				return errNoOrganizationID
 			}
 
@@ -194,7 +194,7 @@ var (
 			}
 			res, err := ttnpb.NewOrganizationRegistryClient(is).Create(ctx, &ttnpb.CreateOrganizationRequest{
 				Organization: organization,
-				Collaborator: *collaborator,
+				Collaborator: collaborator,
 			})
 			if err != nil {
 				return err
@@ -222,7 +222,7 @@ var (
 				return err
 			}
 			organization.Attributes = mergeAttributes(organization.Attributes, cmd.Flags())
-			organization.Ids = *orgID
+			organization.Ids = orgID
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {

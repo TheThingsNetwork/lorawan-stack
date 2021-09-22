@@ -17,129 +17,129 @@ package ttnpb
 // All EntityType methods implement the IDStringer interface.
 
 func (m *Organization) EntityType() string {
-	return m.Ids.EntityType()
+	return m.GetIds().EntityType()
 }
 
 func (m *GetOrganizationRequest) EntityType() string {
-	return m.OrganizationIds.EntityType()
+	return m.GetOrganizationIds().EntityType()
 }
 
 func (m *ListOrganizationAPIKeysRequest) EntityType() string {
-	return m.OrganizationIds.EntityType()
+	return m.GetOrganizationIds().EntityType()
 }
 
 func (m *GetOrganizationAPIKeyRequest) EntityType() string {
-	return m.OrganizationIds.EntityType()
+	return m.GetOrganizationIds().EntityType()
 }
 
 func (m *CreateOrganizationAPIKeyRequest) EntityType() string {
-	return m.OrganizationIds.EntityType()
+	return m.GetOrganizationIds().EntityType()
 }
 
 func (m *UpdateOrganizationAPIKeyRequest) EntityType() string {
-	return m.OrganizationIds.EntityType()
+	return m.GetOrganizationIds().EntityType()
 }
 
 func (m *ListOrganizationCollaboratorsRequest) EntityType() string {
-	return m.OrganizationIds.EntityType()
+	return m.GetOrganizationIds().EntityType()
 }
 
 func (m *GetOrganizationCollaboratorRequest) EntityType() string {
-	return m.OrganizationIds.EntityType()
+	return m.GetOrganizationIds().EntityType()
 }
 
 func (m *SetOrganizationCollaboratorRequest) EntityType() string {
-	return m.OrganizationIds.EntityType()
+	return m.GetOrganizationIds().EntityType()
 }
 
 // All IDString methods implement the IDStringer interface.
 
 func (m *Organization) IDString() string {
-	return m.Ids.IDString()
+	return m.GetIds().IDString()
 }
 
 func (m *GetOrganizationRequest) IDString() string {
-	return m.OrganizationIds.IDString()
+	return m.GetOrganizationIds().IDString()
 }
 
 func (m *ListOrganizationAPIKeysRequest) IDString() string {
-	return m.OrganizationIds.IDString()
+	return m.GetOrganizationIds().IDString()
 }
 
 func (m *GetOrganizationAPIKeyRequest) IDString() string {
-	return m.OrganizationIds.IDString()
+	return m.GetOrganizationIds().IDString()
 }
 
 func (m *CreateOrganizationAPIKeyRequest) IDString() string {
-	return m.OrganizationIds.IDString()
+	return m.GetOrganizationIds().IDString()
 }
 
 func (m *UpdateOrganizationAPIKeyRequest) IDString() string {
-	return m.OrganizationIds.IDString()
+	return m.GetOrganizationIds().IDString()
 }
 
 func (m *ListOrganizationCollaboratorsRequest) IDString() string {
-	return m.OrganizationIds.IDString()
+	return m.GetOrganizationIds().IDString()
 }
 
 func (m *GetOrganizationCollaboratorRequest) IDString() string {
-	return m.OrganizationIds.IDString()
+	return m.GetOrganizationIds().IDString()
 }
 
 func (m *SetOrganizationCollaboratorRequest) IDString() string {
-	return m.OrganizationIds.IDString()
+	return m.GetOrganizationIds().IDString()
 }
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
 func (m *Organization) ExtractRequestFields(dst map[string]interface{}) {
-	m.Ids.ExtractRequestFields(dst)
+	m.GetIds().ExtractRequestFields(dst)
 }
 
 func (m *GetOrganizationRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.OrganizationIds.ExtractRequestFields(dst)
+	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
 func (m *ListOrganizationAPIKeysRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.OrganizationIds.ExtractRequestFields(dst)
+	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
 func (m *GetOrganizationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.OrganizationIds.ExtractRequestFields(dst)
+	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
 func (m *CreateOrganizationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.OrganizationIds.ExtractRequestFields(dst)
+	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
 func (m *UpdateOrganizationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.OrganizationIds.ExtractRequestFields(dst)
+	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
 func (m *ListOrganizationCollaboratorsRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.OrganizationIds.ExtractRequestFields(dst)
+	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
 func (m *GetOrganizationCollaboratorRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.OrganizationIds.ExtractRequestFields(dst)
+	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
 // Wrap methods of m.OrganizationIdentifiers.
 
 func (m Organization) OrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
-	return m.Ids.OrganizationOrUserIdentifiers()
+	return m.GetIds().OrganizationOrUserIdentifiers()
 }
 
 func (m *Organization) GetEntityIdentifiers() *EntityIdentifiers {
 	if m == nil {
 		return nil
 	}
-	return m.Ids.GetEntityIdentifiers()
+	return m.GetIds().GetEntityIdentifiers()
 }
 
 func (m *Organization) GetOrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
 	if m == nil {
 		return nil
 	}
-	return m.Ids.OrganizationOrUserIdentifiers()
+	return m.GetIds().OrganizationOrUserIdentifiers()
 }
