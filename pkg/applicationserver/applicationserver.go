@@ -642,9 +642,19 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	return queue, nil
 }
 
-var errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join Server unavailable for JoinEUI `{join_eui}`")
+var (
+	errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join Server unavailable for JoinEUI `{join_eui}`")
+	errNoDevEUI      = errors.DefineInvalidArgument("no_dev_eui", "no device EUI provided")
+	errNoJoinEUI     = errors.DefineInvalidArgument("no_join_eui", "no join EUI provided")
+)
 
 func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, sessionKeyID []byte) (ttnpb.KeyEnvelope, error) {
+	if ids.DevEui == nil {
+		return ttnpb.KeyEnvelope{}, errNoDevEUI.New()
+	}
+	if ids.JoinEui == nil {
+		return ttnpb.KeyEnvelope{}, errNoJoinEUI.New()
+	}
 	req := &ttnpb.SessionKeyRequest{
 		SessionKeyId: sessionKeyID,
 		DevEui:       *ids.DevEui,
