@@ -49,8 +49,8 @@ func getUserSessionID(flagSet *pflag.FlagSet, args []string) (*ttnpb.UserSession
 		return nil, errNoSessionID
 	}
 	return &ttnpb.UserSessionIdentifiers{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserId: userID},
-		SessionId:       sessionID,
+		UserIds:   &ttnpb.UserIdentifiers{UserId: userID},
+		SessionId: sessionID,
 	}, nil
 }
 
@@ -76,10 +76,10 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewUserSessionRegistryClient(is).List(ctx, &ttnpb.ListUserSessionsRequest{
-				UserIdentifiers: *usrID,
-				Limit:           limit,
-				Page:            page,
-				Order:           getOrder(cmd.Flags()),
+				UserIds: usrID,
+				Limit:   limit,
+				Page:    page,
+				Order:   getOrder(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err

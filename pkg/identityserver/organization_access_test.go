@@ -29,7 +29,7 @@ import (
 func init() {
 	organizationAccessUser.Admin = false
 	organizationAccessUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&organizationAccessUser.UserIdentifiers).ApiKeys {
+	for _, apiKey := range userAPIKeys(organizationAccessUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_LINK,
 			ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
@@ -39,7 +39,7 @@ func init() {
 
 	orgAccessCollaboratorUser.Admin = false
 	orgAccessCollaboratorUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&orgAccessCollaboratorUser.UserIdentifiers).ApiKeys {
+	for _, apiKey := range userAPIKeys(orgAccessCollaboratorUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_ORGANIZATION_ALL,
 		}
@@ -51,8 +51,8 @@ func TestOrganizationAccessNotFound(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
-		organizationID := userOrganizations(&userID).Organizations[0].OrganizationIdentifiers
+		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
+		organizationID := userOrganizations(userID).Organizations[0].OrganizationIdentifiers
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
@@ -89,9 +89,9 @@ func TestOrganizationAccessRightsPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := organizationAccessUser.UserIdentifiers, userCreds(organizationAccessUserIdx)
-		organizationID := userOrganizations(&userID).Organizations[0].OrganizationIdentifiers
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		userID, creds := organizationAccessUser.GetIds(), userCreds(organizationAccessUserIdx)
+		organizationID := userOrganizations(userID).Organizations[0].OrganizationIdentifiers
+		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
@@ -145,9 +145,9 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.UserIdentifiers
-		organizationID := userOrganizations(&userID).Organizations[0].OrganizationIdentifiers
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		userID := defaultUser.GetIds()
+		organizationID := userOrganizations(userID).Organizations[0].OrganizationIdentifiers
+		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 		APIKeyID := organizationAPIKeys(&organizationID).ApiKeys[0].Id
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
@@ -231,8 +231,8 @@ func TestOrganizationAccessClusterAuth(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.UserIdentifiers
-		organizationID := userOrganizations(&userID).Organizations[0].OrganizationIdentifiers
+		userID := defaultUser.GetIds()
+		organizationID := userOrganizations(userID).Organizations[0].OrganizationIdentifiers
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
@@ -250,9 +250,9 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
-		organizationID := userOrganizations(&userID).Organizations[0].OrganizationIdentifiers
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
+		organizationID := userOrganizations(userID).Organizations[0].OrganizationIdentifiers
+		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
@@ -379,11 +379,11 @@ func TestOrganizationAccessRights(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, usrCreds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
-		organizationID := userOrganizations(&userID).Organizations[0].OrganizationIdentifiers
-		collaboratorID := organizationAccessUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		userID, usrCreds := defaultUser.GetIds(), userCreds(defaultUserIdx)
+		organizationID := userOrganizations(userID).Organizations[0].OrganizationIdentifiers
+		collaboratorID := organizationAccessUser.GetIds().OrganizationOrUserIdentifiers()
 		collaboratorCreds := userCreds(organizationAccessUserIdx)
-		removedCollaboratorID := orgAccessCollaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		removedCollaboratorID := orgAccessCollaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 

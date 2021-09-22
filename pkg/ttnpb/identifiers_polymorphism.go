@@ -120,7 +120,7 @@ func (ids GatewayIdentifiers) IDString() string { return ids.GatewayId }
 func (ids OrganizationIdentifiers) IDString() string { return ids.OrganizationId }
 
 // IDString returns the ID string of this Identifier.
-func (ids UserIdentifiers) IDString() string { return ids.UserId }
+func (ids UserIdentifiers) IDString() string { return ids.GetUserId() }
 
 // IDString returns the ID string of the Identifiers inside the oneof.
 func (ids EntityIdentifiers) IDString() string {

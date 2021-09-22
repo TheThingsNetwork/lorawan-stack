@@ -28,7 +28,7 @@ import (
 
 func init() {
 	// remove clients assigned to the user by the populator
-	userID := paginationUser.UserIdentifiers
+	userID := paginationUser.GetIds()
 	for _, client := range population.Clients {
 		for id, collaborators := range population.Memberships {
 			if client.IDString() == id.IDString() {
@@ -123,7 +123,7 @@ func TestClientsCRUD(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewClientRegistryClient(cc)
 
-		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
+		userID, creds := population.Users[defaultUserIdx].GetIds(), userCreds(defaultUserIdx)
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		is.config.UserRights.CreateClients = false
@@ -133,7 +133,7 @@ func TestClientsCRUD(t *testing.T) {
 				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo"},
 				Name:              "Foo Client",
 			},
-			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+			Collaborator: *userID.GetOrganizationOrUserIdentifiers(),
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -268,7 +268,7 @@ func TestClientsPagination(t *testing.T) {
 	a := assertions.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := paginationUser.UserIdentifiers
+		userID := paginationUser.GetIds()
 		creds := userCreds(paginationUserIdx)
 
 		reg := ttnpb.NewClientRegistryClient(cc)

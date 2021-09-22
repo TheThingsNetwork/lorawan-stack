@@ -87,7 +87,7 @@ func init() {
 	userTestUser.TemporaryPasswordExpiresAt = nil
 
 	for id, apiKeys := range population.APIKeys {
-		if id.GetUserIds().GetUserId() == defaultUser.GetUserId() || id.GetUserIds().GetUserId() == userTestUser.GetUserId() {
+		if id.GetUserIds().GetUserId() == defaultUser.GetIds().GetUserId() || id.GetUserIds().GetUserId() == userTestUser.GetIds().GetUserId() {
 			expiredTime := time.Now().Add(-1 * time.Hour)
 			population.APIKeys[id] = append(
 				apiKeys,
@@ -125,7 +125,7 @@ func getTestUser() (*ttnpb.User, int) {
 
 func userCreds(idx int, preferredNames ...string) grpc.CallOption {
 	for id, apiKeys := range population.APIKeys {
-		if id.GetUserIds().GetUserId() == population.Users[idx].GetUserId() {
+		if id.GetUserIds().GetUserId() == population.Users[idx].GetIds().GetUserId() {
 			selectedIdx := 0
 			if len(preferredNames) == 0 {
 				preferredNames = []string{"default key"}

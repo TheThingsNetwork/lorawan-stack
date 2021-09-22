@@ -29,7 +29,7 @@ import (
 func init() {
 	applicationAccessUser.Admin = false
 	applicationAccessUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&applicationAccessUser.UserIdentifiers).ApiKeys {
+	for _, apiKey := range userAPIKeys(applicationAccessUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_LINK,
 			ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
@@ -38,7 +38,7 @@ func init() {
 	}
 	appAccessCollaboratorUser.Admin = false
 	appAccessCollaboratorUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&appAccessCollaboratorUser.UserIdentifiers).ApiKeys {
+	for _, apiKey := range userAPIKeys(appAccessCollaboratorUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_ALL,
 		}
@@ -50,8 +50,8 @@ func TestApplicationAccessNotFound(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
-		applicationID := userApplications(&userID).Applications[0].ApplicationIdentifiers
+		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
+		applicationID := userApplications(userID).Applications[0].ApplicationIdentifiers
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
@@ -88,9 +88,9 @@ func TestApplicationAccessRightsPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := applicationAccessUser.UserIdentifiers, userCreds(applicationAccessUserIdx)
-		applicationID := userApplications(&userID).Applications[0].ApplicationIdentifiers
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		userID, creds := applicationAccessUser.GetIds(), userCreds(applicationAccessUserIdx)
+		applicationID := userApplications(userID).Applications[0].ApplicationIdentifiers
+		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
@@ -144,9 +144,9 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.UserIdentifiers
-		applicationID := userApplications(&userID).Applications[0].ApplicationIdentifiers
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		userID := defaultUser.GetIds()
+		applicationID := userApplications(userID).Applications[0].ApplicationIdentifiers
+		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 		APIKeyID := applicationAPIKeys(&applicationID).ApiKeys[0].Id
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
@@ -230,8 +230,8 @@ func TestApplicationAccessClusterAuth(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.UserIdentifiers
-		applicationID := userApplications(&userID).Applications[0].ApplicationIdentifiers
+		userID := defaultUser.GetIds()
+		applicationID := userApplications(userID).Applications[0].ApplicationIdentifiers
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
@@ -249,9 +249,9 @@ func TestApplicationAccessCRUD(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
-		applicationID := userApplications(&userID).Applications[0].ApplicationIdentifiers
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
+		applicationID := userApplications(userID).Applications[0].ApplicationIdentifiers
+		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
@@ -378,11 +378,11 @@ func TestApplicationAccessRights(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, usrCreds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
-		applicationID := userApplications(&userID).Applications[0].ApplicationIdentifiers
-		collaboratorID := applicationAccessUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		userID, usrCreds := defaultUser.GetIds(), userCreds(defaultUserIdx)
+		applicationID := userApplications(userID).Applications[0].ApplicationIdentifiers
+		collaboratorID := applicationAccessUser.GetIds().OrganizationOrUserIdentifiers()
 		collaboratorCreds := userCreds(applicationAccessUserIdx)
-		removedCollaboratorID := appAccessCollaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		removedCollaboratorID := appAccessCollaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 

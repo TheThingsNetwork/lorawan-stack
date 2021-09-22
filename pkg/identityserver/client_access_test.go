@@ -28,7 +28,7 @@ import (
 func init() {
 	clientAccessUser.Admin = false
 	clientAccessUser.State = ttnpb.STATE_APPROVED
-	for _, apiKey := range userAPIKeys(&clientAccessUser.UserIdentifiers).ApiKeys {
+	for _, apiKey := range userAPIKeys(clientAccessUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_CLIENT_ALL,
 		}
@@ -40,9 +40,9 @@ func TestClientAccessRightsPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := clientAccessUser.UserIdentifiers, userCreds(clientAccessUserIdx)
-		clientID := userClients(&userID).Clients[0].ClientIdentifiers
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		userID, creds := clientAccessUser.GetIds(), userCreds(clientAccessUserIdx)
+		clientID := userClients(userID).Clients[0].ClientIdentifiers
+		collaboratorID := collaboratorUser.GetIds().GetOrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewClientAccessClient(cc)
 
@@ -65,9 +65,9 @@ func TestClientAccessPermissionDenied(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.UserIdentifiers
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
-		clientID := userClients(&userID).Clients[0].ClientIdentifiers
+		userID := defaultUser.GetIds()
+		collaboratorID := collaboratorUser.GetIds().GetOrganizationOrUserIdentifiers()
+		clientID := userClients(userID).Clients[0].ClientIdentifiers
 
 		reg := ttnpb.NewClientAccessClient(cc)
 
@@ -106,8 +106,8 @@ func TestClientAccessClusterAuth(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.UserIdentifiers
-		clientID := userClients(&userID).Clients[0].ClientIdentifiers
+		userID := defaultUser.GetIds()
+		clientID := userClients(userID).Clients[0].ClientIdentifiers
 
 		reg := ttnpb.NewClientAccessClient(cc)
 
@@ -125,9 +125,9 @@ func TestClientAccessCRUD(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
-		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
-		clientID := userClients(&userID).Clients[0].ClientIdentifiers
+		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
+		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
+		clientID := userClients(userID).Clients[0].ClientIdentifiers
 
 		reg := ttnpb.NewClientAccessClient(cc)
 

@@ -87,7 +87,7 @@ func (ids OrganizationIdentifiers) IsZero() bool {
 
 // IsZero returns true if all identifiers have zero-values.
 func (ids UserIdentifiers) IsZero() bool {
-	return ids.UserId == "" && ids.Email == ""
+	return ids.GetUserId() == "" && ids.GetEmail() == ""
 }
 
 // GetOrganizationOrUserIdentifiers returns the OrganizationIdentifiers as *OrganizationOrUserIdentifiers.

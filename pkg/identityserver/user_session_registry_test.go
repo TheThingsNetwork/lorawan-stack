@@ -39,30 +39,30 @@ func TestUserSessionsRegistry(t *testing.T) {
 		reg := ttnpb.NewUserSessionRegistryClient(cc)
 
 		_, err := reg.List(ctx, &ttnpb.ListUserSessionsRequest{
-			UserIdentifiers: user.UserIdentifiers,
+			UserIds: user.GetIds(),
 		}, credsWithoutRights)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Delete(ctx, &ttnpb.UserSessionIdentifiers{
-			UserIdentifiers: user.UserIdentifiers,
-			SessionId:       randomUUID,
+			UserIds:   user.GetIds(),
+			SessionId: randomUUID,
 		}, credsWithoutRights)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		sessions, err := reg.List(ctx, &ttnpb.ListUserSessionsRequest{
-			UserIdentifiers: user.UserIdentifiers,
+			UserIds: user.GetIds(),
 		}, creds)
 		if a.So(err, should.BeNil) {
 			a.So(sessions.Sessions, should.BeEmpty)
 		}
 
 		_, err = reg.Delete(ctx, &ttnpb.UserSessionIdentifiers{
-			UserIdentifiers: user.UserIdentifiers,
-			SessionId:       randomUUID,
+			UserIds:   user.GetIds(),
+			SessionId: randomUUID,
 		}, creds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
@@ -72,8 +72,8 @@ func TestUserSessionsRegistry(t *testing.T) {
 
 		err = is.withDatabase(ctx, func(db *gorm.DB) error {
 			created, err = store.GetUserSessionStore(db).CreateSession(ctx, &ttnpb.UserSession{
-				UserIdentifiers: user.UserIdentifiers,
-				SessionId:       randomUUID,
+				UserIds:   user.GetIds(),
+				SessionId: randomUUID,
 			})
 			return err
 		})
@@ -82,20 +82,20 @@ func TestUserSessionsRegistry(t *testing.T) {
 		}
 
 		sessions, err = reg.List(ctx, &ttnpb.ListUserSessionsRequest{
-			UserIdentifiers: user.UserIdentifiers,
+			UserIds: user.GetIds(),
 		}, creds)
 		if a.So(err, should.BeNil) {
 			a.So(sessions.Sessions, should.HaveLength, 1)
 		}
 
 		_, err = reg.Delete(ctx, &ttnpb.UserSessionIdentifiers{
-			UserIdentifiers: user.UserIdentifiers,
-			SessionId:       created.SessionId,
+			UserIds:   user.GetIds(),
+			SessionId: created.SessionId,
 		}, creds)
 		a.So(err, should.BeNil)
 
 		sessions, err = reg.List(ctx, &ttnpb.ListUserSessionsRequest{
-			UserIdentifiers: user.UserIdentifiers,
+			UserIds: user.GetIds(),
 		}, creds)
 		if a.So(err, should.BeNil) {
 			a.So(sessions.Sessions, should.BeEmpty)

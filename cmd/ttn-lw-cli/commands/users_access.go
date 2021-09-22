@@ -68,7 +68,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewUserAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
-				UserIdentifiers: *usrID, Limit: limit, Page: page,
+				UserIds: usrID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
@@ -97,8 +97,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewUserAccessClient(is).GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
-				UserIdentifiers: *usrID,
-				KeyId:           id,
+				UserIds: usrID,
+				KeyId:   id,
 			})
 			if err != nil {
 				return err
@@ -133,10 +133,10 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewUserAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
-				UserIdentifiers: *usrID,
-				Name:            name,
-				Rights:          rights,
-				ExpiresAt:       expiryDate,
+				UserIds:   usrID,
+				Name:      name,
+				Rights:    rights,
+				ExpiresAt: expiryDate,
 			})
 			if err != nil {
 				return err
@@ -179,7 +179,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewUserAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-				UserIdentifiers: *usrID,
+				UserIds: usrID,
 				APIKey: ttnpb.APIKey{
 					Id:        id,
 					Name:      name,
@@ -214,7 +214,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewUserAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-				UserIdentifiers: *usrID,
+				UserIds: usrID,
 				APIKey: ttnpb.APIKey{
 					Id:     id,
 					Rights: nil,
@@ -242,7 +242,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewUserAccessClient(is).CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-				UserIdentifiers: *usrID,
+				UserIds: usrID,
 			})
 			if err != nil {
 				return err

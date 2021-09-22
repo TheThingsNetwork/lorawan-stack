@@ -62,11 +62,11 @@ func (is *IdentityServer) listUserRights(ctx context.Context, ids *ttnpb.UserIde
 
 func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	// Require that caller has at least the rights of the API key.
-	if err = rights.RequireUser(ctx, req.UserIdentifiers, req.Rights...); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), req.Rights...); err != nil {
 		return nil, err
 	}
 	key, token, err := GenerateAPIKey(ctx, req.Name, req.ExpiresAt, req.Rights...)
@@ -74,15 +74,15 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.UserIdentifiers.GetEntityIdentifiers(), key)
+		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetUserIds().GetEntityIdentifiers(), key)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	key.Key = token
-	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
-	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
+	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
+	err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
 		data.SetEntity(req)
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
 	})
@@ -93,7 +93,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 }
 
 func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUserAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
-	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	var total uint64
@@ -105,7 +105,7 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUs
 	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.UserIdentifiers.GetEntityIdentifiers())
+		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetUserIds().GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -118,7 +118,7 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUs
 }
 
 func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -139,7 +139,7 @@ func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserA
 
 func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -154,28 +154,28 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 			existingRights := ttnpb.RightsFrom(key.Rights...)
 
 			// Require the caller to have all added rights.
-			if err := rights.RequireUser(ctx, req.UserIdentifiers, newRights.Sub(existingRights).GetRights()...); err != nil {
+			if err := rights.RequireUser(ctx, *req.GetUserIds(), newRights.Sub(existingRights).GetRights()...); err != nil {
 				return err
 			}
 			// Require the caller to have all removed rights.
-			if err := rights.RequireUser(ctx, req.UserIdentifiers, existingRights.Sub(newRights).GetRights()...); err != nil {
+			if err := rights.RequireUser(ctx, *req.GetUserIds(), existingRights.Sub(newRights).GetRights()...); err != nil {
 				return err
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIdentifiers.GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIds.GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	if key == nil { // API key was deleted.
-		events.Publish(evtDeleteUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
+		events.Publish(evtDeleteUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, &req.UserIdentifiers, nil))
-	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
+	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
+	err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
 		data.SetEntity(req)
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
 	})
@@ -201,7 +201,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 
 	var canCreateMoreTokens bool
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		activeTokens, err := store.GetLoginTokenStore(db).FindActiveLoginTokens(ctx, &req.UserIdentifiers)
+		activeTokens, err := store.GetLoginTokenStore(db).FindActiveLoginTokens(ctx, req.GetUserIds())
 		if err != nil {
 			return err
 		}
@@ -219,7 +219,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	if is.IsAdmin(ctx) {
 		canSkipEmail = true // Admin callers can skip sending emails.
 		err := is.withDatabase(ctx, func(db *gorm.DB) error {
-			usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, &pbtypes.FieldMask{Paths: []string{"admin"}})
+			usr, err := store.GetUserStore(db).GetUser(ctx, req.GetUserIds(), &pbtypes.FieldMask{Paths: []string{"admin"}})
 			if !usr.Admin {
 				canReturnToken = true // Admin callers can get login tokens for non-admin users.
 			}
@@ -236,15 +236,15 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		_, err := store.GetLoginTokenStore(db).CreateLoginToken(ctx, &ttnpb.LoginToken{
-			UserIdentifiers: req.UserIdentifiers,
-			ExpiresAt:       time.Now().Add(loginTokenConfig.TokenTTL),
-			Token:           token,
+			UserIds:   req.GetUserIds(),
+			ExpiresAt: time.Now().Add(loginTokenConfig.TokenTTL),
+			Token:     token,
 		})
 		return err
 	})
 
 	if !(canSkipEmail && req.SkipEmail) {
-		err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
+		err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
 			return &emails.LoginToken{Data: data, LoginToken: token, TTL: loginTokenConfig.TokenTTL}
 		})
 		if err != nil {

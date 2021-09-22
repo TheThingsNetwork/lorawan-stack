@@ -40,8 +40,8 @@ func TestUserSessionStore(t *testing.T) {
 			Name: "Test User",
 		}
 
-		userIDs := ttnpb.UserIdentifiers{UserId: "test"}
-		doesNotExistIDs := ttnpb.UserIdentifiers{UserId: "does_not_exist"}
+		userIDs := &ttnpb.UserIdentifiers{UserId: "test"}
+		doesNotExistIDs := &ttnpb.UserIdentifiers{UserId: "does_not_exist"}
 
 		if err := newStore(db).createEntity(ctx, user); err != nil {
 			panic(err)
@@ -49,15 +49,15 @@ func TestUserSessionStore(t *testing.T) {
 
 		store := GetUserSessionStore(db)
 
-		_, err := store.CreateSession(ctx, &ttnpb.UserSession{UserIdentifiers: doesNotExistIDs})
+		_, err := store.CreateSession(ctx, &ttnpb.UserSession{UserIds: doesNotExistIDs})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
 		created, err := store.CreateSession(ctx, &ttnpb.UserSession{
-			UserIdentifiers: userIDs,
-			SessionSecret:   "123412341234123412341234",
+			UserIds:       userIDs,
+			SessionSecret: "123412341234123412341234",
 		})
 
 		a.So(err, should.BeNil)
@@ -69,13 +69,13 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(created.ExpiresAt, should.BeNil)
 		}
 
-		_, err = store.GetSession(ctx, &doesNotExistIDs, created.SessionId)
+		_, err = store.GetSession(ctx, doesNotExistIDs, created.SessionId)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		got, err := store.GetSession(ctx, &userIDs, created.SessionId)
+		got, err := store.GetSession(ctx, userIDs, created.SessionId)
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -95,9 +95,9 @@ func TestUserSessionStore(t *testing.T) {
 
 		later := time.Now().Add(time.Hour)
 		updated, err := store.UpdateSession(ctx, &ttnpb.UserSession{
-			UserIdentifiers: userIDs,
-			SessionId:       created.SessionId,
-			ExpiresAt:       &later,
+			UserIds:   userIDs,
+			SessionId: created.SessionId,
+			ExpiresAt: &later,
 		})
 
 		a.So(err, should.BeNil)
@@ -108,26 +108,26 @@ func TestUserSessionStore(t *testing.T) {
 		}
 
 		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserId: "does_not_exist"},
+			UserIds: &ttnpb.UserIdentifiers{UserId: "does_not_exist"},
 		})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{UserIdentifiers: userIDs, SessionId: "00000000-0000-0000-0000-000000000000"})
+		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{UserIds: userIDs, SessionId: "00000000-0000-0000-0000-000000000000"})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		_, err = store.FindSessions(ctx, &doesNotExistIDs)
+		_, err = store.FindSessions(ctx, doesNotExistIDs)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		list, err := store.FindSessions(ctx, &userIDs)
+		list, err := store.FindSessions(ctx, userIDs)
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
@@ -136,17 +136,17 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(list[0].ExpiresAt, should.Resemble, updated.ExpiresAt)
 		}
 
-		err = store.DeleteSession(ctx, &doesNotExistIDs, created.SessionId)
+		err = store.DeleteSession(ctx, doesNotExistIDs, created.SessionId)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		err = store.DeleteSession(ctx, &userIDs, created.SessionId)
+		err = store.DeleteSession(ctx, userIDs, created.SessionId)
 
 		a.So(err, should.BeNil)
 
-		_, err = store.GetSession(ctx, &userIDs, created.SessionId)
+		_, err = store.GetSession(ctx, userIDs, created.SessionId)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
@@ -158,7 +158,7 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		list, err = store.FindSessions(ctx, &userIDs)
+		list, err = store.FindSessions(ctx, userIDs)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
@@ -170,19 +170,19 @@ func TestUserSessionStore(t *testing.T) {
 			"111123124321543453456652532154",
 		} {
 			_, err := store.CreateSession(ctx, &ttnpb.UserSession{
-				UserIdentifiers: userIDs,
-				SessionSecret:   sessionSecret,
+				UserIds:       userIDs,
+				SessionSecret: sessionSecret,
 			})
 			a.So(err, should.BeNil)
 		}
-		list, err = store.FindSessions(ctx, &userIDs)
+		list, err = store.FindSessions(ctx, userIDs)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.HaveLength, 4)
 
-		err = store.DeleteAllUserSessions(ctx, &userIDs)
+		err = store.DeleteAllUserSessions(ctx, userIDs)
 
-		list, err = store.FindSessions(ctx, &userIDs)
+		list, err = store.FindSessions(ctx, userIDs)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)

@@ -177,8 +177,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{
-				UserIdentifiers: *usrID,
-				FieldMask:       &pbtypes.FieldMask{Paths: paths},
+				UserIds:   usrID,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -206,10 +206,10 @@ var (
 				return err
 			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
-			if usrID != nil && usrID.UserId != "" {
-				user.UserId = usrID.UserId
+			if usrID.GetUserId() != "" {
+				user.Ids = &ttnpb.UserIdentifiers{UserId: usrID.GetUserId()}
 			}
-			if user.UserId == "" {
+			if user.GetIds().GetUserId() == "" {
 				return errNoUserID
 			}
 
@@ -303,7 +303,7 @@ var (
 				return err
 			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
-			user.UserIdentifiers = *usrID
+			user.Ids = usrID
 			if profilePicture, err := cmd.Flags().GetString("profile_picture"); err == nil && profilePicture != "" {
 				user.ProfilePicture, err = readPicture(profilePicture)
 				if err != nil {
@@ -345,7 +345,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewUserRegistryClient(is).CreateTemporaryPassword(ctx, &ttnpb.CreateTemporaryPasswordRequest{
-				UserIdentifiers: *usrID,
+				UserIds: usrID,
 			})
 
 			return err
@@ -401,7 +401,7 @@ var (
 			revokeAllAccess, _ := cmd.Flags().GetBool("revoke-all-access")
 
 			res, err := ttnpb.NewUserRegistryClient(is).UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
-				UserIdentifiers: *usrID,
+				UserIds:         usrID,
 				Old:             old,
 				New:             new,
 				RevokeAllAccess: revokeAllAccess,

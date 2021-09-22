@@ -28,7 +28,7 @@ import (
 
 func init() {
 	// remove applications assigned to the user by the populator
-	userID := paginationUser.UserIdentifiers
+	userID := paginationUser.GetIds()
 	for _, app := range population.Applications {
 		for id, collaborators := range population.Memberships {
 			if app.IDString() == id.IDString() {
@@ -123,7 +123,7 @@ func TestApplicationsCRUD(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewApplicationRegistryClient(cc)
 
-		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
+		userID, creds := population.Users[defaultUserIdx].GetIds(), userCreds(defaultUserIdx)
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		is.config.UserRights.CreateApplications = false
@@ -133,7 +133,7 @@ func TestApplicationsCRUD(t *testing.T) {
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 				Name:                   "Foo Application",
 			},
-			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+			Collaborator: *userID.GetOrganizationOrUserIdentifiers(),
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -236,14 +236,14 @@ func TestApplicationsPagination(t *testing.T) {
 	a := assertions.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := paginationUser.UserIdentifiers
+		userID := paginationUser.GetIds()
 		creds := userCreds(paginationUserIdx)
 
 		reg := ttnpb.NewApplicationRegistryClient(cc)
 
 		list, err := reg.List(test.Context(), &ttnpb.ListApplicationsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: userID.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
 		}, creds)
