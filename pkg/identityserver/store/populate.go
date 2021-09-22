@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/randutil"
 )
 
@@ -113,6 +114,17 @@ func NewPopulator(size int, seed int64) *Populator {
 				Rights: []ttnpb.Right{ttnpb.RIGHT_ALL},
 			},
 		)
+		eui := &types.EUI64{}
+		eui.UnmarshalNumber(uint64(i + 1))
+		endDevice := &ttnpb.EndDevice{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: *application.Ids,
+				JoinEui:                eui,
+				DevEui:                 eui,
+				DeviceId:               fmt.Sprintf("random-device-%d", i+1),
+			},
+		}
+		p.EndDevices = append(p.EndDevices, endDevice)
 	}
 	var userIndex, organizationIndex int
 	for _, application := range p.Applications {
@@ -200,6 +212,7 @@ type Populator struct {
 	Gateways      []*ttnpb.Gateway
 	Organizations []*ttnpb.Organization
 	Users         []*ttnpb.User
+	EndDevices    []*ttnpb.EndDevice
 
 	APIKeys     map[*ttnpb.EntityIdentifiers][]*ttnpb.APIKey
 	Memberships map[*ttnpb.EntityIdentifiers][]*ttnpb.Collaborator
@@ -237,6 +250,9 @@ func (p *Populator) Populate(ctx context.Context, db *gorm.DB) (err error) {
 	}
 	if err = p.populateMemberships(ctx, tx); err != nil {
 		return fmt.Errorf("failed to populate memberships: %w", err)
+	}
+	if err = p.populateEndDevices(ctx, tx); err != nil {
+		return fmt.Errorf("failed to populate end devices: %w", err)
 	}
 	return nil
 }
@@ -347,6 +363,16 @@ func (p *Populator) populateMemberships(ctx context.Context, db *gorm.DB) (err e
 			); err != nil {
 				return err
 			}
+		}
+	}
+	return nil
+}
+
+func (p *Populator) populateEndDevices(ctx context.Context, db *gorm.DB) (err error) {
+	for i, endDevice := range p.EndDevices {
+		p.EndDevices[i], err = GetEndDeviceStore(db).CreateEndDevice(ctx, endDevice)
+		if err != nil {
+			return err
 		}
 	}
 	return nil

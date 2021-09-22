@@ -132,6 +132,14 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		start := time.Now()
 
+		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{
+			FieldMask:      &pbtypes.FieldMask{Paths: []string{"ids"}},
+			ApplicationIds: nil,
+		}, is.WithClusterAuth())
+
+		a.So(err, should.BeNil)
+		a.So(list.EndDevices, should.HaveLength, 16)
+
 		created, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -190,15 +198,15 @@ func TestEndDevicesCRUD(t *testing.T) {
 			a.So(err, should.HaveSameErrorDefinitionAs, errEndDeviceEUIsTaken)
 		}
 
-		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{
-			FieldMask:              &pbtypes.FieldMask{Paths: []string{"name"}},
-			ApplicationIdentifiers: *app.GetIds(),
+		list, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
+			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
+			ApplicationIds: app.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)
-		if a.So(list, should.NotBeNil) && a.So(list.EndDevices, should.HaveLength, 1) {
-			if a.So(list.EndDevices[0], should.NotBeNil) {
-				a.So(list.EndDevices[0].Name, should.Equal, "test-device-name")
+		if a.So(list, should.NotBeNil) && a.So(list.EndDevices, should.HaveLength, 2) {
+			if a.So(list.EndDevices[1], should.NotBeNil) {
+				a.So(list.EndDevices[1].Name, should.Equal, "test-device-name")
 			}
 		}
 

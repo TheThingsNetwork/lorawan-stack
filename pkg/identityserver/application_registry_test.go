@@ -127,8 +127,17 @@ func TestApplicationsCRUD(t *testing.T) {
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		is.config.UserRights.CreateApplications = false
+		// Test batch fetch with cluster authorization
+		list, err := reg.List(ctx, &ttnpb.ListApplicationsRequest{
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"ids"}},
+			Collaborator: nil,
+			Deleted:      true,
+		}, is.WithClusterAuth())
 
-		_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
+		a.So(err, should.BeNil)
+		a.So(list.Applications, should.HaveLength, 16)
+
+		_, err = reg.Create(ctx, &ttnpb.CreateApplicationRequest{
 			Application: ttnpb.Application{
 				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 				Name: "Foo Application",
