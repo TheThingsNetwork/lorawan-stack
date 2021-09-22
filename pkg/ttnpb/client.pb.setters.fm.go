@@ -14,18 +14,18 @@ func (dst *Client) SetFields(src *Client, paths ...string) error {
 			if len(subs) > 0 {
 				var newDst, newSrc *ClientIdentifiers
 				if src != nil {
-					newSrc = &src.ClientIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.ClientIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ClientIdentifiers = src.ClientIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero ClientIdentifiers
-					dst.ClientIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "created_at":
@@ -216,18 +216,18 @@ func (dst *GetClientRequest) SetFields(src *GetClientRequest, paths ...string) e
 			if len(subs) > 0 {
 				var newDst, newSrc *ClientIdentifiers
 				if src != nil {
-					newSrc = &src.ClientIdentifiers
+					newSrc = &src.ClientIds
 				}
-				newDst = &dst.ClientIdentifiers
+				newDst = &dst.ClientIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ClientIdentifiers = src.ClientIdentifiers
+					dst.ClientIds = src.ClientIds
 				} else {
 					var zero ClientIdentifiers
-					dst.ClientIdentifiers = zero
+					dst.ClientIds = zero
 				}
 			}
 		case "field_mask":
@@ -424,18 +424,18 @@ func (dst *ListClientCollaboratorsRequest) SetFields(src *ListClientCollaborator
 			if len(subs) > 0 {
 				var newDst, newSrc *ClientIdentifiers
 				if src != nil {
-					newSrc = &src.ClientIdentifiers
+					newSrc = &src.ClientIds
 				}
-				newDst = &dst.ClientIdentifiers
+				newDst = &dst.ClientIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ClientIdentifiers = src.ClientIdentifiers
+					dst.ClientIds = src.ClientIds
 				} else {
 					var zero ClientIdentifiers
-					dst.ClientIdentifiers = zero
+					dst.ClientIds = zero
 				}
 			}
 		case "limit":
@@ -473,36 +473,36 @@ func (dst *GetClientCollaboratorRequest) SetFields(src *GetClientCollaboratorReq
 			if len(subs) > 0 {
 				var newDst, newSrc *ClientIdentifiers
 				if src != nil {
-					newSrc = &src.ClientIdentifiers
+					newSrc = &src.ClientIds
 				}
-				newDst = &dst.ClientIdentifiers
+				newDst = &dst.ClientIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ClientIdentifiers = src.ClientIdentifiers
+					dst.ClientIds = src.ClientIds
 				} else {
 					var zero ClientIdentifiers
-					dst.ClientIdentifiers = zero
+					dst.ClientIds = zero
 				}
 			}
 		case "collaborator":
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationOrUserIdentifiers
+					newSrc = &src.Collaborator
 				}
-				newDst = &dst.OrganizationOrUserIdentifiers
+				newDst = &dst.Collaborator
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationOrUserIdentifiers = src.OrganizationOrUserIdentifiers
+					dst.Collaborator = src.Collaborator
 				} else {
 					var zero OrganizationOrUserIdentifiers
-					dst.OrganizationOrUserIdentifiers = zero
+					dst.Collaborator = zero
 				}
 			}
 
@@ -520,18 +520,18 @@ func (dst *SetClientCollaboratorRequest) SetFields(src *SetClientCollaboratorReq
 			if len(subs) > 0 {
 				var newDst, newSrc *ClientIdentifiers
 				if src != nil {
-					newSrc = &src.ClientIdentifiers
+					newSrc = &src.ClientIds
 				}
-				newDst = &dst.ClientIdentifiers
+				newDst = &dst.ClientIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ClientIdentifiers = src.ClientIdentifiers
+					dst.ClientIds = src.ClientIds
 				} else {
 					var zero ClientIdentifiers
-					dst.ClientIdentifiers = zero
+					dst.ClientIds = zero
 				}
 			}
 		case "collaborator":

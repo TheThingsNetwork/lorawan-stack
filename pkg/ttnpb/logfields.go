@@ -116,7 +116,7 @@ func (req *SetClientCollaboratorRequest) ExtractRequestFields(m map[string]inter
 	if req == nil {
 		return
 	}
-	req.ClientIdentifiers.ExtractRequestFields(m)
+	req.ClientIds.ExtractRequestFields(m)
 	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
 }
 

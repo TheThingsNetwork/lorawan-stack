@@ -123,7 +123,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 			authorization, err := s.store.GetAuthorization(
 				req.Context(),
 				session.GetUserIds(),
-				&client.ClientIdentifiers,
+				&client.Ids,
 			)
 			if err != nil && !errors.IsNotFound(err) {
 				return err
@@ -156,7 +156,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 		if ar.Authorized {
-			events.Publish(evtAuthorize.New(req.Context(), events.WithIdentifiers(session.GetUserIds(), &client.ClientIdentifiers)))
+			events.Publish(evtAuthorize.New(req.Context(), events.WithIdentifiers(session.GetUserIds(), &client.Ids)))
 		}
 		oauth2.FinishAuthorizeRequest(resp, req, ar)
 		return s.output(c, resp)
@@ -280,7 +280,7 @@ func (s *server) Token(c echo.Context) error {
 		}
 	}
 	if ar.Authorized {
-		events.Publish(evtTokenExchange.New(req.Context(), events.WithIdentifiers(userIDs, &client.ClientIdentifiers)))
+		events.Publish(evtTokenExchange.New(req.Context(), events.WithIdentifiers(userIDs, &client.Ids)))
 	}
 	oauth2.FinishAccessRequest(resp, req, ar)
 	delete(resp.Output, "scope")

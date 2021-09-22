@@ -60,7 +60,7 @@ func TestClientsPermissionDenied(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
+				Ids: ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
 			},
 			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 		})
@@ -70,8 +70,8 @@ func TestClientsPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetClientRequest{
-			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
-			FieldMask:         &pbtypes.FieldMask{Paths: []string{"name"}},
+			ClientIds: ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -98,8 +98,8 @@ func TestClientsPermissionDenied(t *testing.T) {
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
-				Name:              "Updated Name",
+				Ids:  ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
+				Name: "Updated Name",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
@@ -130,8 +130,8 @@ func TestClientsCRUD(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo"},
-				Name:              "Foo Client",
+				Ids:  ttnpb.ClientIdentifiers{ClientId: "foo"},
+				Name: "Foo Client",
 			},
 			Collaborator: *userID.GetOrganizationOrUserIdentifiers(),
 		}, creds)
@@ -144,8 +144,8 @@ func TestClientsCRUD(t *testing.T) {
 
 		created, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: "foo"},
-				Name:              "Foo Client",
+				Ids:  ttnpb.ClientIdentifiers{ClientId: "foo"},
+				Name: "Foo Client",
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
 		}, creds)
@@ -156,8 +156,8 @@ func TestClientsCRUD(t *testing.T) {
 		}
 
 		got, err := reg.Get(ctx, &ttnpb.GetClientRequest{
-			ClientIdentifiers: created.ClientIdentifiers,
-			FieldMask:         &pbtypes.FieldMask{Paths: []string{"name"}},
+			ClientIds: created.Ids,
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -166,15 +166,15 @@ func TestClientsCRUD(t *testing.T) {
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetClientRequest{
-			ClientIdentifiers: created.ClientIdentifiers,
-			FieldMask:         &pbtypes.FieldMask{Paths: []string{"ids"}},
+			ClientIds: created.Ids,
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetClientRequest{
-			ClientIdentifiers: created.ClientIdentifiers,
-			FieldMask:         &pbtypes.FieldMask{Paths: []string{"attributes"}},
+			ClientIds: created.Ids,
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
 
 		if a.So(err, should.NotBeNil) {
@@ -183,8 +183,8 @@ func TestClientsCRUD(t *testing.T) {
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifiers: created.ClientIdentifiers,
-				Name:              "Updated Name",
+				Ids:  created.Ids,
+				Name: "Updated Name",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
@@ -196,9 +196,9 @@ func TestClientsCRUD(t *testing.T) {
 
 		updated, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifiers: created.ClientIdentifiers,
-				State:             ttnpb.STATE_FLAGGED,
-				StateDescription:  "something is wrong",
+				Ids:              created.Ids,
+				State:            ttnpb.STATE_FLAGGED,
+				StateDescription: "something is wrong",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"state", "state_description"}},
 		}, userCreds(adminUserIdx))
@@ -211,8 +211,8 @@ func TestClientsCRUD(t *testing.T) {
 
 		updated, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifiers: created.ClientIdentifiers,
-				State:             ttnpb.STATE_APPROVED,
+				Ids:   created.Ids,
+				State: ttnpb.STATE_APPROVED,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"state"}},
 		}, userCreds(adminUserIdx))
@@ -223,8 +223,8 @@ func TestClientsCRUD(t *testing.T) {
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetClientRequest{
-			ClientIdentifiers: created.ClientIdentifiers,
-			FieldMask:         &pbtypes.FieldMask{Paths: []string{"state", "state_description"}},
+			ClientIds: created.Ids,
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"state", "state_description"}},
 		}, creds)
 
 		if a.So(err, should.BeNil) {
@@ -242,7 +242,7 @@ func TestClientsCRUD(t *testing.T) {
 			if a.So(list, should.NotBeNil) && a.So(list.Clients, should.NotBeEmpty) {
 				var found bool
 				for _, item := range list.Clients {
-					if item.ClientIdentifiers == created.ClientIdentifiers {
+					if item.Ids == created.Ids {
 						found = true
 						a.So(item.Name, should.Equal, "Updated Name")
 					}
@@ -251,15 +251,15 @@ func TestClientsCRUD(t *testing.T) {
 			}
 		}
 
-		_, err = reg.Delete(ctx, &created.ClientIdentifiers, creds)
+		_, err = reg.Delete(ctx, &created.Ids, creds)
 		a.So(err, should.BeNil)
 
-		_, err = reg.Purge(ctx, &created.ClientIdentifiers, creds)
+		_, err = reg.Purge(ctx, &created.Ids, creds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.Purge(ctx, &created.ClientIdentifiers, userCreds(adminUserIdx))
+		_, err = reg.Purge(ctx, &created.Ids, userCreds(adminUserIdx))
 		a.So(err, should.BeNil)
 	})
 }
