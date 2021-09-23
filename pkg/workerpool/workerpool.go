@@ -16,6 +16,7 @@ package workerpool
 
 import (
 	"context"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -72,6 +73,9 @@ type WorkerPool interface {
 	// Publish may spawn a worker in order to fullfil the work load.
 	// Publish does not block.
 	Publish(ctx context.Context, item interface{}) error
+
+	// Wait blocks until all workers have been closed.
+	Wait()
 }
 
 type contextualItem struct {
@@ -86,6 +90,7 @@ type workerPool struct {
 	fastQueue chan *contextualItem // fastQueue allows direct communication between publishers and idle workers.
 
 	workers int32
+	wg      sync.WaitGroup
 }
 
 func (wp *workerPool) handle(ctx context.Context, it *contextualItem, handler Handler) {
@@ -105,6 +110,7 @@ func (wp *workerPool) workerBody(handler Handler, initialWork *contextualItem) f
 			}
 		}()
 
+		defer wp.wg.Done()
 		defer registerWorkerStopped(wp.Name)
 
 		registerWorkerIdle(wp.Name)
@@ -152,6 +158,7 @@ func (wp *workerPool) spawnWorker(initialWork *contextualItem) (bool, error) {
 	}
 
 	registerWorkerStarted(wp.Name)
+	wp.wg.Add(1)
 
 	wp.StartTask(&component.TaskConfig{
 		Context: wp.Context,
@@ -226,6 +233,11 @@ func (wp *workerPool) Publish(ctx context.Context, item interface{}) error {
 		ctx:  wp.FromRequestContext(ctx),
 		item: item,
 	})
+}
+
+// Wait implements WorkerPool.
+func (wp *workerPool) Wait() {
+	wp.wg.Wait()
 }
 
 // NewWorkerPool creates a new WorkerPool with the provided configuration.
