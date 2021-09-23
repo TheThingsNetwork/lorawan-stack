@@ -16,13 +16,20 @@ import { connect } from 'react-redux'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
+import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
+
 import { getJoinEUIPrefixes } from '@console/store/actions/join-server'
 
 import { selectJoinEUIPrefixesFetching } from '@console/store/selectors/join-server'
 
-const mapStateToProps = state => ({
-  fetching: selectJoinEUIPrefixesFetching(state),
-})
+const mapStateToProps = state => {
+  const { enabled: jsEnabled } = selectJsConfig()
+
+  return {
+    fetching: selectJoinEUIPrefixesFetching(state) && jsEnabled,
+    jsEnabled,
+  }
+}
 const mapDispatchToProps = { getPrefixes: getJoinEUIPrefixes }
 
 export default DeviceAdd =>
@@ -31,7 +38,11 @@ export default DeviceAdd =>
     mapDispatchToProps,
   )(
     withRequest(
-      ({ getPrefixes }) => getPrefixes(),
+      ({ getPrefixes, jsEnabled }) => {
+        if (jsEnabled) {
+          return getPrefixes()
+        }
+      },
       ({ fetching }) => fetching,
     )(DeviceAdd),
   )

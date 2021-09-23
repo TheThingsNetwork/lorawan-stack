@@ -182,6 +182,7 @@ const sessionSchema = Yup.object({
 const macSettingsSchema = Yup.object({
   mac_settings: Yup.object().when(
     [
+      '$nsEnabled',
       '_activation_mode',
       'supports_class_b',
       'supports_class_c',
@@ -195,6 +196,7 @@ const macSettingsSchema = Yup.object({
       '$hasPingSlotFrequency',
     ],
     (
+      nsEnabled,
       mode,
       isClassB,
       isClassC,
@@ -207,8 +209,12 @@ const macSettingsSchema = Yup.object({
       hasClassCTimeout,
       hasPingSlotFrequency,
       schema,
-    ) =>
-      schema.shape({
+    ) => {
+      if (!nsEnabled) {
+        return schema.strip()
+      }
+
+      return schema.shape({
         resets_f_cnt: Yup.lazy(() => {
           if (mode !== ACTIVATION_MODES.ABP) {
             return Yup.boolean().strip()
@@ -373,27 +379,31 @@ const macSettingsSchema = Yup.object({
 
           return Yup.string()
         }),
-      }),
+      })
+    },
   ),
 })
 
 const validationSchema = Yup.object({
-  supports_class_b: Yup.boolean().when(['_device_class'], (deviceClass, schema) =>
-    schema
-      .transform(() => undefined)
-      .default(
-        deviceClass === DEVICE_CLASS_MAP.CLASS_B ||
-          deviceClass === DEVICE_CLASS_MAP.CLASS_B_C ||
-          false,
-      ),
+  supports_class_b: Yup.boolean().when(
+    ['_device_class', '$nsEnabled'],
+    (deviceClass, nsEnabled, schema) => {
+      if (!nsEnabled) {
+        return schema.strip()
+      }
+
+      return schema
+        .transform(() => undefined)
+        .default(
+          deviceClass === DEVICE_CLASS_MAP.CLASS_B || deviceClass === DEVICE_CLASS_MAP.CLASS_B_C,
+        )
+    },
   ),
   supports_class_c: Yup.boolean().when(['_device_class'], (deviceClass, schema) =>
     schema
       .transform(() => undefined)
       .default(
-        deviceClass === DEVICE_CLASS_MAP.CLASS_C ||
-          deviceClass === DEVICE_CLASS_MAP.CLASS_B_C ||
-          false,
+        deviceClass === DEVICE_CLASS_MAP.CLASS_C || deviceClass === DEVICE_CLASS_MAP.CLASS_B_C,
       ),
   ),
   supports_join: Yup.boolean().when(
@@ -439,7 +449,7 @@ const validationSchema = Yup.object({
       return schema.required(sharedMessages.validateRequired)
     }
 
-    return schema.oneOf(Object.values(DEVICE_CLASS_MAP)).default(DEVICE_CLASS_MAP.CLASS_A)
+    return schema.oneOf(Object.values(DEVICE_CLASS_MAP))
   }),
   _default_ns_settings: Yup.bool(),
   _activation_mode: Yup.mixed().when(

@@ -48,6 +48,7 @@ import {
   mayReadApplicationDeviceKeys,
   mayScheduleDownlinks,
   maySendUplink,
+  mayViewApplicationLink,
   checkFromState,
 } from '@console/lib/feature-checks'
 
@@ -88,20 +89,25 @@ import style from './device.styl'
       mayReadKeys: checkFromState(mayReadApplicationDeviceKeys, state),
       mayScheduleDownlinks: checkFromState(mayScheduleDownlinks, state),
       maySendUplink: checkFromState(maySendUplink, state),
+      mayViewLink: checkFromState(mayViewApplicationLink, state),
       fetching,
       error: selectDeviceError(state),
     }
   },
   dispatch => ({
-    loadDeviceData: (appId, devId, selectors, config) => {
-      dispatch(getDevice(appId, devId, selectors, config))
-      dispatch(getApplicationLink(appId, ['skip_payload_crypto']))
+    loadDeviceData: (appId, devId, deviceSelector, linkSelector, mayViewLink) => {
+      dispatch(getDevice(appId, devId, deviceSelector, { ignoreNotFound: true }))
+
+      if (mayViewLink) {
+        dispatch(getApplicationLink(appId, linkSelector))
+      }
     },
     stopStream: id => dispatch(stopDeviceEventsStream(id)),
   }),
 )
-@withRequest(({ appId, devId, loadDeviceData, mayReadKeys }) => {
-  const selector = [
+@withRequest(({ appId, devId, loadDeviceData, mayReadKeys, mayViewLink }) => {
+  const linkSelector = ['skip_payload_crypto']
+  const deviceSelector = [
     'name',
     'description',
     'version_ids',
@@ -131,12 +137,12 @@ import style from './device.styl'
   ]
 
   if (mayReadKeys) {
-    selector.push('session')
-    selector.push('pending_session')
-    selector.push('root_keys')
+    deviceSelector.push('session')
+    deviceSelector.push('pending_session')
+    deviceSelector.push('root_keys')
   }
 
-  return loadDeviceData(appId, devId, selector, { ignoreNotFound: true })
+  return loadDeviceData(appId, devId, deviceSelector, linkSelector, mayViewLink)
 })
 @withBreadcrumb('device.single', props => {
   const {

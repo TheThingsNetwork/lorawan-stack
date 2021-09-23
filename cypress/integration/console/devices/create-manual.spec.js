@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { generateHexValue, disableJoinServer, disableNetworkServer } from '../../../support/utils'
+import {
+  generateHexValue,
+  disableJoinServer,
+  disableNetworkServer,
+  disableApplicationServer,
+} from '../../../support/utils'
 
 describe('End device manual create', () => {
   const user = {
@@ -498,8 +503,37 @@ describe('End device manual create', () => {
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
         cy.findByLabelText('LoRaWAN class for multicast downlinks').selectOption('class-b')
-        cy.findByLabelText('Network defaults').uncheck()
         cy.findByLabelText('Ping slot periodicity').selectOption(device.ping_slot_periodicity)
+        cy.findByLabelText('Device address').type(device.dev_addr)
+        cy.findByLabelText('AppSKey').type(device.app_s_key)
+        cy.findByLabelText('NwkSKey').type(device.nwk_s_key)
+        cy.findByLabelText('End device ID').type(device.id)
+
+        cy.findByRole('button', { name: 'Register end device' }).click()
+
+        cy.location('pathname').should(
+          'eq',
+          `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
+        )
+        cy.findByTestId('full-error-view').should('not.exist')
+      })
+
+      it('succeeds registering a new class C end device', () => {
+        const device = {
+          id: 'multicast-test-1-0-class-c',
+          dev_addr: generateHexValue(8),
+          lorawan_version: 'MAC_V1_0',
+          frequency_plan_id: '863-870 MHz',
+          app_s_key: generateHexValue(32),
+          nwk_s_key: generateHexValue(32),
+          ping_slot_periodicity: 'EVERY_4S',
+        }
+
+        cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+        cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+        cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
+        cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
+        cy.findByLabelText('LoRaWAN class for multicast downlinks').selectOption('class-c')
         cy.findByLabelText('Device address').type(device.dev_addr)
         cy.findByLabelText('AppSKey').type(device.app_s_key)
         cy.findByLabelText('NwkSKey').type(device.nwk_s_key)
@@ -603,6 +637,105 @@ describe('End device manual create', () => {
     })
   })
 
+  describe('Application server disabled', () => {
+    const appId = 'no-as-test-app'
+    const application = {
+      ids: { application_id: appId },
+    }
+
+    beforeEach(() => {
+      cy.augmentStackConfig(disableApplicationServer)
+      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/add/manual`)
+    })
+
+    before(() => {
+      cy.createApplication(application, user.ids.user_id)
+    })
+
+    it('succeeds registering a new OTAA end device', () => {
+      const device = {
+        app_eui: generateHexValue(16),
+        dev_eui: generateHexValue(16),
+        lorawan_version: 'MAC_V1_0',
+        frequency_plan_id: '863-870 MHz',
+        app_key: generateHexValue(32),
+      }
+
+      cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+      cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+      cy.findByLabelText('DevEUI').type(device.dev_eui)
+      cy.findByLabelText('AppEUI').type(device.app_eui)
+      cy.findByLabelText('AppKey').type(device.app_key)
+
+      cy.findByRole('button', { name: 'Register end device' }).click()
+
+      cy.location('pathname').should(
+        'eq',
+        `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/eui-${device.dev_eui}`,
+      )
+      cy.findByTestId('full-error-view').should('not.exist')
+    })
+
+    it('succeeds registering a new ABP end device', () => {
+      const device = {
+        id: 'abp-tess-no-as',
+        dev_addr: generateHexValue(8),
+        lorawan_version: 'MAC_V1_0',
+        frequency_plan_id: '863-870 MHz',
+        nwk_s_key: generateHexValue(32),
+      }
+
+      cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+      cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+      cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
+      cy.findByLabelText('Activation by personalization (ABP)').check()
+      cy.findByLabelText('Device address').type(device.dev_addr)
+      cy.findByLabelText('NwkSKey').type(device.nwk_s_key)
+      cy.findByLabelText('AppSKey').should('not.exist')
+      cy.findByLabelText('End device ID').type(device.id)
+
+      cy.findByRole('button', { name: 'Register end device' }).click()
+
+      cy.location('pathname').should(
+        'eq',
+        `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
+      )
+      cy.findByTestId('full-error-view').should('not.exist')
+    })
+
+    it('succeeds registering a new Multicast end device', () => {
+      const device = {
+        id: 'multicast-test-no-as',
+        dev_addr: generateHexValue(8),
+        lorawan_version: 'MAC_V1_0',
+        frequency_plan_id: '863-870 MHz',
+        app_s_key: generateHexValue(32),
+        nwk_s_key: generateHexValue(32),
+        ping_slot_periodicity: 'EVERY_2S',
+      }
+
+      cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+      cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+      cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
+      cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
+      cy.findByLabelText('LoRaWAN class for multicast downlinks').selectOption('class-b')
+      cy.findByLabelText('Ping slot periodicity').selectOption(device.ping_slot_periodicity)
+      cy.findByLabelText('Device address').type(device.dev_addr)
+      cy.findByLabelText('AppSKey').should('not.exist')
+      cy.findByLabelText('NwkSKey').type(device.nwk_s_key)
+      cy.findByLabelText('End device ID').type(device.id)
+
+      cy.findByRole('button', { name: 'Register end device' }).click()
+
+      cy.location('pathname').should(
+        'eq',
+        `${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${device.id}`,
+      )
+      cy.findByTestId('full-error-view').should('not.exist')
+    })
+  })
+
   describe('Network server disabled', () => {
     const appId = 'no-ns-test-app'
     const application = {
@@ -629,9 +762,12 @@ describe('End device manual create', () => {
       }
 
       cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+      cy.findByLabelText('Frequency plan').should('not.exist')
       cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
       cy.findByLabelText('Over the air activation (OTAA)').should('have.attr', 'checked')
       cy.findByLabelText('Over the air activation (OTAA)').should('not.have.attr', 'disabled')
+      cy.findByLabelText('Network defaults').should('not.exist')
+      cy.findByLabelText('Additional LoRaWAN class capabilities').should('not.exist')
       cy.findByLabelText('DevEUI').type(device.dev_eui)
       cy.findByLabelText('AppEUI').type(device.app_eui)
       cy.findByLabelText('AppKey').type(device.app_key)
