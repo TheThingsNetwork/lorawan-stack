@@ -64,7 +64,7 @@ func TestGatewayPublicSafe(t *testing.T) {
 	a.So(((*Gateway)(nil)).PublicSafe(), should.BeNil)
 
 	src := &Gateway{
-		Ids:         GatewayIdentifiers{GatewayId: "foo"},
+		Ids:         &GatewayIdentifiers{GatewayId: "foo"},
 		Name:        "Name",
 		Description: "Description",
 		Attributes:  map[string]string{"key": "value"},

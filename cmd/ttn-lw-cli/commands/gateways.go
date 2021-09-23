@@ -231,7 +231,7 @@ var (
 			}
 
 			res, err := cli.Get(ctx, &ttnpb.GetGatewayRequest{
-				GatewayIds: *gtwID,
+				GatewayIds: gtwID,
 				FieldMask:  &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
@@ -276,6 +276,10 @@ var (
 			}
 
 			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
+
+			if gateway.Ids == nil {
+				gateway.Ids = &ttnpb.GatewayIdentifiers{}
+			}
 			if gtwID != nil {
 				if gtwID.GatewayId != "" {
 					gateway.Ids.GatewayId = gtwID.GatewayId
@@ -284,7 +288,6 @@ var (
 					gateway.Ids.Eui = gtwID.Eui
 				}
 			}
-
 			if gateway.Ids.GatewayId == "" {
 				return errNoGatewayID.New()
 			}
@@ -339,7 +342,7 @@ var (
 				return err
 			}
 			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
-			gateway.Ids = *gtwID
+			gateway.Ids = gtwID
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -348,7 +351,7 @@ var (
 
 			if len(antennaPaths) > 0 || antennaAdd || antennaRemove {
 				res, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
-					GatewayIds: gateway.Ids,
+					GatewayIds: gateway.GetIds(),
 					FieldMask:  &pbtypes.FieldMask{Paths: []string{"antennas"}},
 				})
 				if err != nil {
@@ -443,7 +446,7 @@ var (
 			}
 
 			gateway, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
-				GatewayIds: *gtwID,
+				GatewayIds: gtwID,
 				FieldMask:  &pbtypes.FieldMask{Paths: []string{"gateway_server_address"}},
 			})
 			if err != nil {

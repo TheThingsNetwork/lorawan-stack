@@ -438,7 +438,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		isAuthenticated = true
 	}
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIds: ids,
+		GatewayIds: &ids,
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{
 				"antennas",
@@ -466,7 +466,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		}
 		logger.Warn("Connect unregistered gateway")
 		gtw = &ttnpb.Gateway{
-			Ids:                    ids,
+			Ids:                    &ids,
 			FrequencyPlanId:        fpID,
 			FrequencyPlanIds:       []string{fpID},
 			EnforceDutyCycle:       true,
@@ -480,7 +480,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, errUnauthenticatedGatewayConnection.New()
 	}
 
-	ids = gtw.Ids
+	ids = *gtw.GetIds()
 
 	conn, err := io.NewConnection(ctx, frontend, gtw, gs.FrequencyPlans, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay)
 	if err != nil {
@@ -583,7 +583,7 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 	conn.tasksDone.Add(1)
 	gs.StartTask(&component.TaskConfig{
 		Context: conn.Context(),
-		ID:      fmt.Sprintf("disconnect_on_change_%s", unique.ID(conn.Context(), conn.Gateway().Ids)),
+		ID:      fmt.Sprintf("disconnect_on_change_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
 		Func: func(ctx context.Context) error {
 			d := random.Jitter(gs.config.FetchGatewayInterval, gs.config.FetchGatewayJitter)
 			select {
@@ -593,7 +593,7 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 			}
 
 			gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
-				GatewayIds: conn.Gateway().Ids,
+				GatewayIds: conn.Gateway().GetIds(),
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"antennas",
@@ -685,7 +685,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 		if !pass {
 			break
 		}
-		switch err := host.handler.HandleUplink(ctx, gtw.Ids, ids, msg); codes.Code(errors.Code(err)) {
+		switch err := host.handler.HandleUplink(ctx, *gtw.Ids, ids, msg); codes.Code(errors.Code(err)) {
 		case codes.Canceled, codes.DeadlineExceeded,
 			codes.Unknown, codes.Internal,
 			codes.Unimplemented, codes.Unavailable:
@@ -694,13 +694,13 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 			registerForwardUplink(ctx, gtw, msg.UplinkMessage, host.name)
 		}
 	case *ttnpb.GatewayStatus:
-		if err := host.handler.HandleStatus(ctx, gtw.Ids, msg); err != nil {
+		if err := host.handler.HandleStatus(ctx, *gtw.Ids, msg); err != nil {
 			registerDropStatus(ctx, gtw, msg, host.name, err)
 		} else {
 			registerForwardStatus(ctx, gtw, msg, host.name)
 		}
 	case *ttnpb.TxAcknowledgment:
-		if err := host.handler.HandleTxAck(ctx, gtw.Ids, msg); err != nil {
+		if err := host.handler.HandleTxAck(ctx, *gtw.Ids, msg); err != nil {
 			logger.WithField("host", host.name).WithError(err).Debug("Drop Tx acknowledgment")
 		}
 	}
@@ -714,8 +714,8 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 		logger   = log.FromContext(ctx)
 	)
 	defer func() {
-		gs.connections.Delete(unique.ID(ctx, gtw.Ids))
-		registerGatewayDisconnect(ctx, gtw.Ids, protocol)
+		gs.connections.Delete(unique.ID(ctx, gtw.GetIds()))
+		registerGatewayDisconnect(ctx, *gtw.GetIds(), protocol)
 		logger.Info("Disconnected")
 		close(conn.upstreamDone)
 	}()
@@ -802,7 +802,7 @@ func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
 	ctx := conn.Context()
 	logger := log.FromContext(ctx)
 
-	ids := conn.Connection.Gateway().Ids
+	ids := conn.Connection.Gateway().GetIds()
 	connectTime := conn.Connection.ConnectTime()
 	stats := &ttnpb.GatewayConnectionStats{
 		ConnectedAt: &connectTime,
@@ -810,13 +810,13 @@ func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
 	}
 
 	// Initial update, so that the gateway appears connected.
-	if err := gs.statsRegistry.Set(ctx, ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel); err != nil {
+	if err := gs.statsRegistry.Set(ctx, *ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel); err != nil {
 		logger.WithError(err).Error("Failed to initialize connection stats")
 	}
 
 	defer func() {
 		logger.Debug("Delete connection stats")
-		if err := gs.statsRegistry.Set(gs.FromRequestContext(ctx), ids, nil, nil); err != nil {
+		if err := gs.statsRegistry.Set(gs.FromRequestContext(ctx), *ids, nil, nil); err != nil {
 			logger.WithError(err).Error("Failed to clear connection stats")
 		}
 	}()
@@ -827,7 +827,7 @@ func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
 		case <-conn.StatsChanged():
 		}
 		stats, paths := conn.Stats()
-		if err := gs.statsRegistry.Set(ctx, ids, stats, paths); err != nil {
+		if err := gs.statsRegistry.Set(ctx, *ids, stats, paths); err != nil {
 			logger.WithError(err).Error("Failed to update connection stats")
 		}
 		timeout := time.After(gs.updateConnectionStatsDebounceTime)
@@ -901,7 +901,7 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 					break
 				}
 
-				err := gs.entityRegistry.UpdateAntennas(ctx, gtw.Ids, antennas)
+				err := gs.entityRegistry.UpdateAntennas(ctx, *gtw.GetIds(), antennas)
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to update antennas")
 				} else {
@@ -922,7 +922,7 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 // GetFrequencyPlans gets the frequency plans by the gateway identifiers.
 func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIds: ids,
+		GatewayIds: &ids,
 		FieldMask:  &pbtypes.FieldMask{Paths: []string{"frequency_plan_ids"}},
 	})
 	var fpIDs []string

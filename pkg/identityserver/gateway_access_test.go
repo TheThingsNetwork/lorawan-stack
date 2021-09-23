@@ -53,7 +53,7 @@ func TestGatewayAccessNotFound(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
-		gatewayID := userGateways(userID).Gateways[0].Ids
+		gatewayID := userGateways(userID).Gateways[0].GetIds()
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
@@ -91,7 +91,7 @@ func TestGatewayAccessRightsPermissionDenied(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := gatewayAccessUser.GetIds(), userCreds(gatewayAccessUserIdx)
-		gatewayID := userGateways(userID).Gateways[0].Ids
+		gatewayID := userGateways(userID).Gateways[0].GetIds()
 		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
@@ -110,7 +110,7 @@ func TestGatewayAccessRightsPermissionDenied(t *testing.T) {
 
 		// Choose right that the user does not have and hence cannot add
 		right := ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC
-		APIKey = gatewayAPIKeys(&gatewayID).ApiKeys[0]
+		APIKey = gatewayAPIKeys(gatewayID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIds: gatewayID,
@@ -129,7 +129,7 @@ func TestGatewayAccessRightsPermissionDenied(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			},
@@ -147,13 +147,13 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
-		gatewayID := userGateways(userID).Gateways[0].Ids
+		gatewayID := userGateways(userID).Gateways[0].GetIds()
 		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
-		APIKeyID := gatewayAPIKeys(&gatewayID).ApiKeys[0].Id
+		APIKeyID := gatewayAPIKeys(gatewayID).ApiKeys[0].Id
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
-		rights, err := reg.ListRights(ctx, &gatewayID)
+		rights, err := reg.ListRights(ctx, gatewayID)
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
@@ -200,7 +200,7 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 		}
 		a.So(APIKey, should.BeNil)
 
-		APIKey = gatewayAPIKeys(&gatewayID).ApiKeys[0]
+		APIKey = gatewayAPIKeys(gatewayID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIds: gatewayID,
@@ -215,7 +215,7 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			},
@@ -233,11 +233,11 @@ func TestGatewayAccessClusterAuth(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
-		gatewayID := userGateways(userID).Gateways[0].Ids
+		gatewayID := userGateways(userID).Gateways[0].GetIds()
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
-		rights, err := reg.ListRights(ctx, &gatewayID, is.WithClusterAuth())
+		rights, err := reg.ListRights(ctx, gatewayID, is.WithClusterAuth())
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
@@ -252,29 +252,28 @@ func TestGatewayAccessCRUD(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
-		gatewayID := userGateways(userID).Gateways[0].Ids
+		gatewayID := userGateways(userID).Gateways[0].GetIds()
 		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
-		rights, err := reg.ListRights(ctx, &gatewayID, creds)
+		rights, err := reg.ListRights(ctx, gatewayID, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
 			a.So(rights.Rights, should.Contain, ttnpb.RIGHT_GATEWAY_ALL)
 		}
 
-		modifiedGatewayID := gatewayID
-		modifiedGatewayID.GatewayId = reverse(modifiedGatewayID.GatewayId)
+		modifiedGatewayID := &ttnpb.GatewayIdentifiers{GatewayId: reverse(gatewayID.GetGatewayId())}
 
-		rights, err = reg.ListRights(ctx, &modifiedGatewayID, creds)
+		rights, err = reg.ListRights(ctx, modifiedGatewayID, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
 			a.So(rights.Rights, should.BeEmpty)
 		}
 
-		gatewayAPIKeys := gatewayAPIKeys(&gatewayID)
+		gatewayAPIKeys := gatewayAPIKeys(gatewayID)
 		gatewayKey := gatewayAPIKeys.ApiKeys[0]
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
@@ -337,7 +336,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			},
@@ -347,7 +346,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 
 		res, err := reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
 			GatewayIds:   gatewayID,
-			Collaborator: *collaboratorID,
+			Collaborator: collaboratorID,
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -357,7 +356,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 			},
 		}, creds)
@@ -366,7 +365,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 
 		res, err = reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
 			GatewayIds:   gatewayID,
-			Collaborator: *collaboratorID,
+			Collaborator: collaboratorID,
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -381,7 +380,7 @@ func TestGatewayAccessRights(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, usrCreds := defaultUser.GetIds(), userCreds(defaultUserIdx)
-		gatewayID := userGateways(userID).Gateways[0].Ids
+		gatewayID := userGateways(userID).Gateways[0].GetIds()
 		collaboratorID := gatewayAccessUser.GetIds().OrganizationOrUserIdentifiers()
 		collaboratorCreds := userCreds(gatewayAccessUserIdx)
 		removedCollaboratorID := gtwAccessCollaboratorUser.GetIds().OrganizationOrUserIdentifiers()
@@ -390,7 +389,7 @@ func TestGatewayAccessRights(t *testing.T) {
 
 		_, err := reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_LINK,
@@ -404,7 +403,7 @@ func TestGatewayAccessRights(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_ALL,
@@ -427,7 +426,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		// Try revoking rights for the collaborator with RIGHT_GATEWAY_ALL without having it
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_LINK,
@@ -463,7 +462,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		newRights := ttnpb.AllGatewayRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_ALL))
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights:                        newRights.Rights,
 			},
@@ -503,7 +502,7 @@ func TestGatewayAccessRights(t *testing.T) {
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights:                        newRights.Rights,
 			},
@@ -514,7 +513,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		// Try revoking RIGHT_GATEWAY_DELETE without having it
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights:                        newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_DELETE)).Rights,
 			},
@@ -540,7 +539,7 @@ func TestGatewayAccessRights(t *testing.T) {
 
 		res, err := reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
 			GatewayIds:   gatewayID,
-			Collaborator: *removedCollaboratorID,
+			Collaborator: removedCollaboratorID,
 		}, collaboratorCreds)
 
 		if a.So(err, should.BeNil) {
@@ -550,7 +549,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		// Delete collaborator with more rights
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
-			Collaborator: ttnpb.Collaborator{
+			Collaborator: &ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights:                        []ttnpb.Right{},
 			},
@@ -560,7 +559,7 @@ func TestGatewayAccessRights(t *testing.T) {
 
 		_, err = reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
 			GatewayIds:   gatewayID,
-			Collaborator: *removedCollaboratorID,
+			Collaborator: removedCollaboratorID,
 		}, collaboratorCreds)
 
 		if a.So(err, should.NotBeNil) {

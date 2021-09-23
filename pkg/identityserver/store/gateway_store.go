@@ -68,7 +68,7 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes
 func (s *gatewayStore) CreateGateway(ctx context.Context, gtw *ttnpb.Gateway) (*ttnpb.Gateway, error) {
 	defer trace.StartRegion(ctx, "create gateway").End()
 	gtwModel := Gateway{
-		GatewayID: gtw.Ids.GatewayId, // The ID is not mutated by fromPB.
+		GatewayID: gtw.GetIds().GetGatewayId(), // The ID is not mutated by fromPB.
 	}
 	gtwModel.fromPB(gtw, nil)
 	if err := s.createEntity(ctx, &gtwModel); err != nil {
@@ -128,12 +128,12 @@ func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifi
 
 func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) (updated *ttnpb.Gateway, err error) {
 	defer trace.StartRegion(ctx, "update gateway").End()
-	query := s.query(ctx, Gateway{}, withGatewayID(gtw.Ids.GetGatewayId()))
+	query := s.query(ctx, Gateway{}, withGatewayID(gtw.GetIds().GetGatewayId()))
 	query = selectGatewayFields(ctx, query, fieldMask)
 	var gtwModel Gateway
 	if err = query.First(&gtwModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(gtw.Ids)
+			return nil, errNotFoundForID(gtw.GetIds())
 		}
 		return nil, err
 	}

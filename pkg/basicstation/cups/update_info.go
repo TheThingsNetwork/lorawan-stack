@@ -57,12 +57,12 @@ var (
 // `TargetCUPSURI` is set in order to make the gateway connect once again to this CUPS but using auth and then receive the LNS credentials.
 func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*ttnpb.Gateway, error) {
 	logger := log.FromContext(ctx)
-	ids := ttnpb.GatewayIdentifiers{
+	ids := &ttnpb.GatewayIdentifiers{
 		GatewayId: fmt.Sprintf("eui-%s", strings.ToLower(req.Router.EUI64.String())),
 		Eui:       &req.Router.EUI64,
 	}
 	logger = logger.WithField("gateway_uid", unique.ID(ctx, ids))
-	registry, err := s.getRegistry(ctx, &ids)
+	registry, err := s.getRegistry(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -78,12 +78,12 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 		return nil, err
 	}
 	logger.Info("Created new gateway")
-	accessRegistry, err := s.getAccess(ctx, &gtw.Ids)
+	accessRegistry, err := s.getAccess(ctx, gtw.GetIds())
 	if err != nil {
 		return nil, err
 	}
 	cupsKey, err := accessRegistry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
-		GatewayIds: gtw.Ids,
+		GatewayIds: gtw.GetIds(),
 		Name:       fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_INFO,
@@ -96,7 +96,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	}
 	logger.WithField("api_key_id", cupsKey.Id).Info("Created gateway API key for CUPS")
 	lnsKey, err := accessRegistry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
-		GatewayIds: gtw.Ids,
+		GatewayIds: gtw.GetIds(),
 		Name:       fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_INFO,
@@ -185,10 +185,10 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 			if err != nil {
 				return err
 			}
-			ids = &gtw.Ids
+			ids = gtw.GetIds()
 			// Use the generated CUPS API Key for authenticating subsequent calls.
 			md := metadata.New(map[string]string{
-				"id":            ids.GatewayId,
+				"id":            gtw.GetIds().GetGatewayId(),
 				"authorization": fmt.Sprintf("Bearer %s", string(gtw.TargetCupsKey.Value)),
 			})
 			if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
@@ -237,7 +237,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 	}
 
 	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIds: *ids,
+		GatewayIds: ids,
 		FieldMask:  &getGatewayMask,
 	}, gatewayAuth)
 	if err != nil {
@@ -286,7 +286,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 		logger := logger.WithField("lns_uri", gtw.GatewayServerAddress)
 		logger.Debug("Configure LNS")
 		if gtw.LbsLnsSecret == nil {
-			return errLNSCredentials.WithAttributes("gateway_uid", gtw.Ids.GatewayId)
+			return errLNSCredentials.WithAttributes("gateway_uid", gtw.GetIds().GetGatewayId())
 		}
 		if gtw.GatewayServerAddress == "" {
 			if req.LNSURI != "" {
@@ -361,7 +361,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 		gtw.Attributes[cupsPackageAttribute] = req.Package
 	}
 
-	registry, err = s.getRegistry(ctx, &gtw.Ids)
+	registry, err = s.getRegistry(ctx, gtw.GetIds())
 	if err != nil {
 		return err
 	}

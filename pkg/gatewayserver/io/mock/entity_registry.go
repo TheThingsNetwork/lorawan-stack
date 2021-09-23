@@ -55,7 +55,7 @@ func NewIS(ctx context.Context) (*IdentityServer, string) {
 func (is *IdentityServer) Add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) {
 	uid := unique.ID(ctx, ids)
 	is.gateways[uid] = &ttnpb.Gateway{
-		Ids: ids,
+		Ids: &ids,
 	}
 	if key != "" {
 		is.gateways[uid].RequireAuthenticatedConnection = true
@@ -67,7 +67,7 @@ var errNotFound = errors.DefineNotFound("not_found", "not found")
 
 // Get retrives the Gateway.
 func (is *IdentityServer) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
-	uid := unique.ID(ctx, req.GatewayIds)
+	uid := unique.ID(ctx, req.GetGatewayIds())
 	app, ok := is.gateways[uid]
 	if !ok {
 		return nil, errNotFound.New()

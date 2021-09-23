@@ -81,7 +81,7 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 	gtw, ok := s.gateways[unique.ID(ctx, ids)]
 	if !ok {
 		gtw = &ttnpb.Gateway{
-			Ids:             ids,
+			Ids:             &ids,
 			FrequencyPlanId: test.EUFrequencyPlanID,
 		}
 	}

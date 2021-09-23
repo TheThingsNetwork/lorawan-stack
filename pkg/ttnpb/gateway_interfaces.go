@@ -17,111 +17,111 @@ package ttnpb
 // All EntityType methods implement the IDStringer interface.
 
 func (m *Gateway) EntityType() string {
-	return m.Ids.EntityType()
+	return m.GetIds().EntityType()
 }
 
 func (m *GetGatewayRequest) EntityType() string {
-	return m.GatewayIds.EntityType()
+	return m.GetGatewayIds().EntityType()
 }
 
 func (m *ListGatewayAPIKeysRequest) EntityType() string {
-	return m.GatewayIds.EntityType()
+	return m.GetGatewayIds().EntityType()
 }
 
 func (m *GetGatewayAPIKeyRequest) EntityType() string {
-	return m.GatewayIds.EntityType()
+	return m.GetGatewayIds().EntityType()
 }
 
 func (m *CreateGatewayAPIKeyRequest) EntityType() string {
-	return m.GatewayIds.EntityType()
+	return m.GetGatewayIds().EntityType()
 }
 
 func (m *UpdateGatewayAPIKeyRequest) EntityType() string {
-	return m.GatewayIds.EntityType()
+	return m.GetGatewayIds().EntityType()
 }
 
 func (m *ListGatewayCollaboratorsRequest) EntityType() string {
-	return m.GatewayIds.EntityType()
+	return m.GetGatewayIds().EntityType()
 }
 
 func (m *GetGatewayCollaboratorRequest) EntityType() string {
-	return m.GatewayIds.EntityType()
+	return m.GetGatewayIds().EntityType()
 }
 
 func (m *SetGatewayCollaboratorRequest) EntityType() string {
-	return m.GatewayIds.EntityType()
+	return m.GetGatewayIds().EntityType()
 }
 
 // All IDString methods implement the IDStringer interface.
 
 func (m *Gateway) IDString() string {
-	return m.Ids.IDString()
+	return m.GetIds().IDString()
 }
 
 func (m *GetGatewayRequest) IDString() string {
-	return m.GatewayIds.IDString()
+	return m.GetGatewayIds().IDString()
 }
 
 func (m *ListGatewayAPIKeysRequest) IDString() string {
-	return m.GatewayIds.IDString()
+	return m.GetGatewayIds().IDString()
 }
 
 func (m *GetGatewayAPIKeyRequest) IDString() string {
-	return m.GatewayIds.IDString()
+	return m.GetGatewayIds().IDString()
 }
 
 func (m *CreateGatewayAPIKeyRequest) IDString() string {
-	return m.GatewayIds.IDString()
+	return m.GetGatewayIds().IDString()
 }
 
 func (m *UpdateGatewayAPIKeyRequest) IDString() string {
-	return m.GatewayIds.IDString()
+	return m.GetGatewayIds().IDString()
 }
 
 func (m *ListGatewayCollaboratorsRequest) IDString() string {
-	return m.GatewayIds.IDString()
+	return m.GetGatewayIds().IDString()
 }
 
 func (m *GetGatewayCollaboratorRequest) IDString() string {
-	return m.GatewayIds.IDString()
+	return m.GetGatewayIds().IDString()
 }
 
 func (m *SetGatewayCollaboratorRequest) IDString() string {
-	return m.GatewayIds.IDString()
+	return m.GetGatewayIds().IDString()
 }
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
 func (m *Gateway) ExtractRequestFields(dst map[string]interface{}) {
-	m.Ids.ExtractRequestFields(dst)
+	m.GetIds().ExtractRequestFields(dst)
 }
 
 func (m *GetGatewayRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.GatewayIds.ExtractRequestFields(dst)
+	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
 func (m *ListGatewayAPIKeysRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.GatewayIds.ExtractRequestFields(dst)
+	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
 func (m *GetGatewayAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.GatewayIds.ExtractRequestFields(dst)
+	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
 func (m *CreateGatewayAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.GatewayIds.ExtractRequestFields(dst)
+	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
 func (m *UpdateGatewayAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.GatewayIds.ExtractRequestFields(dst)
+	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
 func (m *ListGatewayCollaboratorsRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.GatewayIds.ExtractRequestFields(dst)
+	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
 func (m *GetGatewayCollaboratorRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.GatewayIds.ExtractRequestFields(dst)
+	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
 // Wrap methods of m.GatewayIdentifiers.
@@ -130,5 +130,5 @@ func (m *Gateway) GetEntityIdentifiers() *EntityIdentifiers {
 	if m == nil {
 		return nil
 	}
-	return m.Ids.GetEntityIdentifiers()
+	return m.GetIds().GetEntityIdentifiers()
 }

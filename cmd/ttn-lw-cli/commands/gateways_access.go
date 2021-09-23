@@ -68,7 +68,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewGatewayAccessClient(is).ListCollaborators(ctx, &ttnpb.ListGatewayCollaboratorsRequest{
-				GatewayIds: *gtwID, Limit: limit, Page: page,
+				GatewayIds: gtwID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
@@ -97,8 +97,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewGatewayAccessClient(is).GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
-				GatewayIds:   *gtwID,
-				Collaborator: *collaborator,
+				GatewayIds:   gtwID,
+				Collaborator: collaborator,
 			})
 			if err != nil {
 				return err
@@ -130,8 +130,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewGatewayAccessClient(is).SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
-				GatewayIds: *gtwID,
-				Collaborator: ttnpb.Collaborator{
+				GatewayIds: gtwID,
+				Collaborator: &ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        rights,
 				},
@@ -162,8 +162,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewGatewayAccessClient(is).SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
-				GatewayIds: *gtwID,
-				Collaborator: ttnpb.Collaborator{
+				GatewayIds: gtwID,
+				Collaborator: &ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        nil,
 				},
@@ -196,7 +196,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewGatewayAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
-				GatewayIds: *gtwID, Limit: limit, Page: page,
+				GatewayIds: gtwID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
@@ -225,7 +225,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewGatewayAccessClient(is).GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
-				GatewayIds: *gtwID,
+				GatewayIds: gtwID,
 				KeyId:      id,
 			})
 			if err != nil {
@@ -261,7 +261,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewGatewayAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
-				GatewayIds: *gtwID,
+				GatewayIds: gtwID,
 				Name:       name,
 				Rights:     rights,
 				ExpiresAt:  expiryDate,
@@ -306,7 +306,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewGatewayAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
-				GatewayIds: *gtwID,
+				GatewayIds: gtwID,
 				APIKey: ttnpb.APIKey{
 					Id:        id,
 					Name:      name,
@@ -341,7 +341,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewGatewayAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
-				GatewayIds: *gtwID,
+				GatewayIds: gtwID,
 				APIKey: ttnpb.APIKey{
 					Id:     id,
 					Rights: nil,

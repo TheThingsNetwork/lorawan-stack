@@ -58,7 +58,7 @@ func NewPopulator(size int, seed int64) *Populator {
 		}
 		p.Clients = append(p.Clients, client)
 		gateway := &ttnpb.Gateway{
-			Ids:         ttnpb.GatewayIdentifiers{GatewayId: fmt.Sprintf("random-gtw-%d", i+1)},
+			Ids:         &ttnpb.GatewayIdentifiers{GatewayId: fmt.Sprintf("random-gtw-%d", i+1)},
 			Name:        fmt.Sprintf("Random %d", i+1),
 			Description: fmt.Sprintf("Randomly generated Gateway %d", i+1),
 		}

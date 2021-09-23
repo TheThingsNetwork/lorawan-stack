@@ -53,7 +53,7 @@ var (
 	serverAddress          = "127.0.0.1:0"
 	registeredGatewayUID   = "eui-0101010101010101"
 	registeredGatewayID    = ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayUID}
-	registeredGateway      = ttnpb.Gateway{Ids: registeredGatewayID, FrequencyPlanId: "EU_863_870"}
+	registeredGateway      = ttnpb.Gateway{Ids: &registeredGatewayID, FrequencyPlanId: "EU_863_870"}
 	registeredGatewayToken = "secrettoken"
 
 	discoveryEndPoint      = "/router-info"

@@ -67,7 +67,7 @@ func (is IS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gate
 	} else if err != nil {
 		return nil, err
 	}
-	registry, err := is.newRegistryClient(ctx, &req.GatewayIds)
+	registry, err := is.newRegistryClient(ctx, req.GetGatewayIds())
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, a
 	}
 	req := &ttnpb.UpdateGatewayRequest{
 		Gateway: ttnpb.Gateway{
-			Ids:      ids,
+			Ids:      &ids,
 			Antennas: antennas,
 		},
 		FieldMask: &pbtypes.FieldMask{

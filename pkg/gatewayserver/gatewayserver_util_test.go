@@ -69,7 +69,7 @@ func startMockIS(ctx context.Context) (*mockIS, string) {
 func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string, locationPublic bool, updateLocationFromStatus bool) {
 	uid := unique.ID(ctx, ids)
 	is.gateways[uid] = &ttnpb.Gateway{
-		Ids:              ids,
+		Ids:              &ids,
 		FrequencyPlanId:  test.EUFrequencyPlanID,
 		FrequencyPlanIds: []string{test.EUFrequencyPlanID},
 		Antennas: []ttnpb.GatewayAntenna{
@@ -90,7 +90,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 var errNotFound = errors.DefineNotFound("not_found", "not found")
 
 func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
-	uid := unique.ID(ctx, req.GatewayIds)
+	uid := unique.ID(ctx, req.GetGatewayIds())
 	gtw, ok := is.gateways[uid]
 	if !ok {
 		return nil, errNotFound.New()
@@ -99,7 +99,7 @@ func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb
 }
 
 func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
-	uid := unique.ID(ctx, req.Gateway.Ids)
+	uid := unique.ID(ctx, req.Gateway.GetIds())
 	gtw, ok := is.gateways[uid]
 	if !ok {
 		return nil, errNotFound.New()

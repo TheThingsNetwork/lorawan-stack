@@ -75,7 +75,7 @@ func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	gateway, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIds: id,
+		GatewayIds: &id,
 		FieldMask: &types.FieldMask{Paths: []string{
 			"description",
 			"attributes",
@@ -137,7 +137,7 @@ func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	default:
-		res.ID = gateway.Ids.GatewayId
+		res.ID = gateway.GetIds().GetGatewayId()
 		if rtr != nil {
 			res.Router = rtr
 			res.FallbackRouters = []*router{rtr}

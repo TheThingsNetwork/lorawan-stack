@@ -40,7 +40,7 @@ func listContactInfo(entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, e
 	case *ttnpb.EntityIdentifiers_ClientIds:
 		res, err = ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{ClientIds: id.ClientIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_GatewayIds:
-		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: *id.GatewayIds, FieldMask: fieldMask})
+		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: id.GatewayIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_OrganizationIds:
 		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIds: id.OrganizationIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_UserIds:
@@ -67,7 +67,7 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 	case *ttnpb.EntityIdentifiers_ClientIds:
 		res, err = ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{ClientIds: id.ClientIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_GatewayIds:
-		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: *id.GatewayIds, FieldMask: fieldMask})
+		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: id.GatewayIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_OrganizationIds:
 		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIds: id.OrganizationIds, FieldMask: fieldMask})
 	case *ttnpb.EntityIdentifiers_UserIds:

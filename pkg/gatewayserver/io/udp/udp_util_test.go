@@ -134,7 +134,7 @@ func expectConnection(t *testing.T, server mock.Server, connections *sync.Map, e
 		if !a.So(expectNew, should.BeTrue) {
 			t.Fatal("Should not have a new connection")
 		}
-		actual := *conn.Gateway().Ids.Eui
+		actual := *conn.Gateway().GetIds().GetEui()
 		if actual != eui {
 			t.Fatalf("New connection for unexpected EUI %v", actual)
 		}

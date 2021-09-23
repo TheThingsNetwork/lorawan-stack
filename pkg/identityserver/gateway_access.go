@@ -79,11 +79,11 @@ func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.Gate
 
 func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireGateway(ctx, req.GatewayIds, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	// Require that caller has at least the rights of the API key.
-	if err = rights.RequireGateway(ctx, req.GatewayIds, req.Rights...); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), req.Rights...); err != nil {
 		return nil, err
 	}
 	key, token, err := GenerateAPIKey(ctx, req.Name, req.ExpiresAt, req.Rights...)
@@ -91,14 +91,14 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GatewayIds.GetEntityIdentifiers(), key)
+		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), key)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	key.Key = token
-	events.Publish(evtCreateGatewayAPIKey.NewWithIdentifiersAndData(ctx, &req.GatewayIds, nil))
+	events.Publish(evtCreateGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GetGatewayIds(), nil))
 	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 		data.SetEntity(req)
 		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
@@ -110,7 +110,7 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 }
 
 func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.ListGatewayAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
-	if err = rights.RequireGateway(ctx, req.GatewayIds, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	var total uint64
@@ -122,7 +122,7 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.Lis
 	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GatewayIds.GetEntityIdentifiers())
+		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetGatewayIds().GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -135,7 +135,7 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.Lis
 }
 
 func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	if err = rights.RequireGateway(ctx, req.GatewayIds, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -156,7 +156,7 @@ func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGa
 
 func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireGateway(ctx, req.GatewayIds, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -171,27 +171,27 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 			existingRights := ttnpb.RightsFrom(key.Rights...)
 
 			// Require the caller to have all added rights.
-			if err := rights.RequireGateway(ctx, req.GatewayIds, newRights.Sub(existingRights).GetRights()...); err != nil {
+			if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), newRights.Sub(existingRights).GetRights()...); err != nil {
 				return err
 			}
 			// Require the caller to have all removed rights.
-			if err := rights.RequireGateway(ctx, req.GatewayIds, existingRights.Sub(newRights).GetRights()...); err != nil {
+			if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), existingRights.Sub(newRights).GetRights()...); err != nil {
 				return err
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GatewayIds.GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	if key == nil { // API key was deleted.
-		events.Publish(evtDeleteGatewayAPIKey.NewWithIdentifiersAndData(ctx, &req.GatewayIds, nil))
+		events.Publish(evtDeleteGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GetGatewayIds(), nil))
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateGatewayAPIKey.NewWithIdentifiersAndData(ctx, &req.GatewayIds, nil))
+	events.Publish(evtUpdateGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GetGatewayIds(), nil))
 	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 		data.SetEntity(req)
 		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
@@ -204,17 +204,17 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 }
 
 func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb.GetGatewayCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
-	if err := rights.RequireGateway(ctx, req.GatewayIds, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+	if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
-		OrganizationOrUserIdentifiers: req.Collaborator,
+		OrganizationOrUserIdentifiers: *req.GetCollaborator(),
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		rights, err := is.getMembershipStore(ctx, db).GetMember(
 			ctx,
-			&req.Collaborator,
-			req.GatewayIds.GetEntityIdentifiers(),
+			req.GetCollaborator(),
+			req.GetGatewayIds().GetEntityIdentifiers(),
 		)
 		if err != nil {
 			return err
@@ -232,7 +232,7 @@ var errGatewayNeedsCollaborator = errors.DefineFailedPrecondition("gateway_needs
 
 func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
-	if err := rights.RequireGateway(ctx, req.GatewayIds, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+	if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
@@ -240,39 +240,39 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 
 		existingRights, err := store.GetMember(
 			ctx,
-			&req.Collaborator.OrganizationOrUserIdentifiers,
-			req.GatewayIds.GetEntityIdentifiers(),
+			&req.GetCollaborator().OrganizationOrUserIdentifiers,
+			req.GetGatewayIds().GetEntityIdentifiers(),
 		)
 		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
 		existingRights = existingRights.Implied()
-		newRights := ttnpb.RightsFrom(req.Collaborator.Rights...).Implied()
+		newRights := ttnpb.RightsFrom(req.GetCollaborator().GetRights()...).Implied()
 		addedRights := newRights.Sub(existingRights)
 		removedRights := existingRights.Sub(newRights)
 
 		// Require the caller to have all added rights.
 		if len(addedRights.GetRights()) > 0 {
-			if err := rights.RequireGateway(ctx, req.GatewayIds, addedRights.GetRights()...); err != nil {
+			if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), addedRights.GetRights()...); err != nil {
 				return err
 			}
 		}
 
 		// Unless we're deleting the collaborator, require the caller to have all removed rights.
 		if len(newRights.GetRights()) > 0 && len(removedRights.GetRights()) > 0 {
-			if err := rights.RequireGateway(ctx, req.GatewayIds, removedRights.GetRights()...); err != nil {
+			if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), removedRights.GetRights()...); err != nil {
 				return err
 			}
 		}
 
 		if removedRights.IncludesAll(ttnpb.RIGHT_GATEWAY_ALL) {
-			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GatewayIds.GetEntityIdentifiers())
+			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetGatewayIds().GetEntityIdentifiers())
 			if err != nil {
 				return err
 			}
 			var hasOtherOwner bool
 			for member, rights := range memberRights {
-				if unique.ID(ctx, member) == unique.ID(ctx, &req.Collaborator.OrganizationOrUserIdentifiers) {
+				if unique.ID(ctx, member) == unique.ID(ctx, &req.GetCollaborator().OrganizationOrUserIdentifiers) {
 					continue
 				}
 				if rights.Implied().IncludesAll(ttnpb.RIGHT_GATEWAY_ALL) {
@@ -287,25 +287,25 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 
 		return store.SetMember(
 			ctx,
-			&req.Collaborator.OrganizationOrUserIdentifiers,
-			req.GatewayIds.GetEntityIdentifiers(),
-			ttnpb.RightsFrom(req.Collaborator.Rights...),
+			&req.GetCollaborator().OrganizationOrUserIdentifiers,
+			req.GetGatewayIds().GetEntityIdentifiers(),
+			ttnpb.RightsFrom(req.GetCollaborator().GetRights()...),
 		)
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateGatewayCollaborator.New(ctx, events.WithIdentifiers(&req.GatewayIds, &req.Collaborator.OrganizationOrUserIdentifiers)))
+	if len(req.GetCollaborator().GetRights()) > 0 {
+		events.Publish(evtUpdateGatewayCollaborator.New(ctx, events.WithIdentifiers(req.GetGatewayIds(), &req.GetCollaborator().OrganizationOrUserIdentifiers)))
 		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 			data.SetEntity(req)
-			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
+			return &emails.CollaboratorChanged{Data: data, Collaborator: *req.GetCollaborator()}
 		})
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteGatewayCollaborator.New(ctx, events.WithIdentifiers(&req.GatewayIds, &req.Collaborator.OrganizationOrUserIdentifiers)))
+		events.Publish(evtDeleteGatewayCollaborator.New(ctx, events.WithIdentifiers(req.GetGatewayIds(), &req.GetCollaborator().OrganizationOrUserIdentifiers)))
 	}
 	return ttnpb.Empty, nil
 }
@@ -314,7 +314,7 @@ func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttn
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	if err = rights.RequireGateway(ctx, req.GatewayIds, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
 	var total uint64
@@ -325,7 +325,7 @@ func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttn
 		}
 	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GatewayIds.GetEntityIdentifiers())
+		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetGatewayIds().GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}
