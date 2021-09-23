@@ -178,7 +178,7 @@ func TestConnection(t *testing.T) {
 
 			// Assert claim, give some time.
 			<-time.After(timeout)
-			hasClaim := gs.HasDownlinkClaim(ctx, conn.Gateway().GatewayIdentifiers)
+			hasClaim := gs.HasDownlinkClaim(ctx, conn.Gateway().Ids)
 			if tc.LosesDownlinkPath {
 				a.So(hasClaim, should.BeFalse)
 			} else {

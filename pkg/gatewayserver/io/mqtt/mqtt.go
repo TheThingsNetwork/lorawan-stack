@@ -167,13 +167,13 @@ func (c *connection) setup(ctx context.Context) (err error) {
 				token := c.tokens.Next(down, time.Now())
 				down.CorrelationIds = append(down.CorrelationIds, c.tokens.FormatCorrelationID(token))
 
-				buf, err := c.format.FromDownlink(down, c.io.Gateway().GatewayIdentifiers)
+				buf, err := c.format.FromDownlink(down, c.io.Gateway().Ids)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
 				}
 				logger.Info("Publish downlink message")
-				topicParts := c.format.DownlinkTopic(unique.ID(c.io.Context(), c.io.Gateway().GatewayIdentifiers))
+				topicParts := c.format.DownlinkTopic(unique.ID(c.io.Context(), c.io.Gateway().Ids))
 				c.session.Publish(&packet.PublishPacket{
 					TopicName:  topic.Join(topicParts),
 					TopicParts: topicParts,
@@ -322,7 +322,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 	case c.format.IsBirthTopic(pkt.TopicParts):
 	case c.format.IsLastWillTopic(pkt.TopicParts):
 	case c.format.IsUplinkTopic(pkt.TopicParts):
-		up, err := c.format.ToUplink(pkt.Message, c.io.Gateway().GatewayIdentifiers)
+		up, err := c.format.ToUplink(pkt.Message, c.io.Gateway().Ids)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal uplink message")
 			return
@@ -332,7 +332,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to handle uplink message")
 		}
 	case c.format.IsStatusTopic(pkt.TopicParts):
-		status, err := c.format.ToStatus(pkt.Message, c.io.Gateway().GatewayIdentifiers)
+		status, err := c.format.ToStatus(pkt.Message, c.io.Gateway().Ids)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal status message")
 			return
@@ -341,7 +341,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to handle status message")
 		}
 	case c.format.IsTxAckTopic(pkt.TopicParts):
-		ack, err := c.format.ToTxAck(pkt.Message, c.io.Gateway().GatewayIdentifiers)
+		ack, err := c.format.ToTxAck(pkt.Message, c.io.Gateway().Ids)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgment message")
 			return

@@ -89,7 +89,7 @@ var secretFieldSeparator = []byte(":")
 
 // functions to set fields from the gateway model into the gateway proto.
 var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
-	"ids.eui":        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Eui = gtw.GatewayEUI.toPB() },
+	"ids.eui":        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Ids.Eui = gtw.GatewayEUI.toPB() },
 	nameField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Name = gtw.Name },
 	descriptionField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Description = gtw.Description },
 	attributesField:  func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Attributes = attributes(gtw.Attributes).toMap() },
@@ -193,7 +193,7 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 
 // functions to set fields from the gateway proto into the gateway model.
 var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
-	"ids.eui":        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayEUI = eui(pb.Eui) },
+	"ids.eui":        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayEUI = eui(pb.Ids.Eui) },
 	nameField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Name = pb.Name },
 	descriptionField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Description = pb.Description },
 	attributesField: func(gtw *Gateway, pb *ttnpb.Gateway) {
@@ -341,8 +341,8 @@ var gatewayColumnNames = map[string][]string{
 }
 
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {
-	pb.GatewayIdentifiers.GatewayId = gtw.GatewayID
-	pb.GatewayIdentifiers.Eui = gtw.GatewayEUI.toPB() // Always present.
+	pb.Ids.GatewayId = gtw.GatewayID
+	pb.Ids.Eui = gtw.GatewayEUI.toPB() // Always present.
 	pb.CreatedAt = cleanTime(gtw.CreatedAt)
 	pb.UpdatedAt = cleanTime(gtw.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(gtw.DeletedAt)

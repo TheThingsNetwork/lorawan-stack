@@ -808,7 +808,7 @@ func TestGatewayServer(t *testing.T) {
 									a := assertions.New(t)
 
 									gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIdentifiers: ids,
+										GatewayIds: ids,
 									})
 									a.So(err, should.BeNil)
 
@@ -848,7 +848,7 @@ func TestGatewayServer(t *testing.T) {
 
 									time.Sleep(timeout)
 									gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIdentifiers: ids,
+										GatewayIds: ids,
 									})
 									a.So(err, should.BeNil)
 									a.So(gtw.Antennas[0].Location, should.Resemble, tc.ExpectLocation)
@@ -906,14 +906,14 @@ func TestGatewayServer(t *testing.T) {
 									is.add(ctx, ids, registeredGatewayKey, locationPublic, false)
 
 									gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIdentifiers: ids,
+										GatewayIds: ids,
 									})
 									a.So(err, should.BeNil)
 									a.So(gtw.LocationPublic, should.Equal, locationPublic)
 									gtw.LocationPublic = locationPublic
 									gtw.Antennas[0].Location = location
 									gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIdentifiers: ids,
+										GatewayIds: ids,
 									})
 									a.So(err, should.BeNil)
 									a.So(gtw.LocationPublic, should.Equal, locationPublic)
@@ -992,7 +992,7 @@ func TestGatewayServer(t *testing.T) {
 					var location *ttnpb.Location
 					if rtc.SupportsLocationUpdate {
 						gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
-							GatewayIdentifiers: ids,
+							GatewayIds: ids,
 						})
 						a.So(err, should.BeNil)
 						location = gtw.Antennas[0].Location

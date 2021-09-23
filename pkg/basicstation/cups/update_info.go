@@ -69,7 +69,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	auth := s.defaultOwnerAuth(ctx)
 	gtw, err := registry.Create(ctx, &ttnpb.CreateGatewayRequest{
 		Gateway: ttnpb.Gateway{
-			GatewayIdentifiers:   ids,
+			Ids:                  ids,
 			GatewayServerAddress: s.defaultLNSURI,
 		},
 		Collaborator: s.defaultOwner,
@@ -78,13 +78,13 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 		return nil, err
 	}
 	logger.Info("Created new gateway")
-	accessRegistry, err := s.getAccess(ctx, &gtw.GatewayIdentifiers)
+	accessRegistry, err := s.getAccess(ctx, &gtw.Ids)
 	if err != nil {
 		return nil, err
 	}
 	cupsKey, err := accessRegistry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
-		GatewayIdentifiers: gtw.GatewayIdentifiers,
-		Name:               fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
+		GatewayIds: gtw.Ids,
+		Name:       fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_INFO,
 			ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
@@ -96,8 +96,8 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	}
 	logger.WithField("api_key_id", cupsKey.Id).Info("Created gateway API key for CUPS")
 	lnsKey, err := accessRegistry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
-		GatewayIdentifiers: gtw.GatewayIdentifiers,
-		Name:               fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
+		GatewayIds: gtw.Ids,
+		Name:       fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_INFO,
 			ttnpb.RIGHT_GATEWAY_LINK,
@@ -108,7 +108,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	}
 	_, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
 		Gateway: ttnpb.Gateway{
-			GatewayIdentifiers: ids,
+			Ids: ids,
 			LbsLnsSecret: &ttnpb.Secret{
 				Value: []byte(lnsKey.Key),
 			},
@@ -185,7 +185,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 			if err != nil {
 				return err
 			}
-			ids = &gtw.GatewayIdentifiers
+			ids = &gtw.Ids
 			// Use the generated CUPS API Key for authenticating subsequent calls.
 			md := metadata.New(map[string]string{
 				"id":            ids.GatewayId,
@@ -237,8 +237,8 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 	}
 
 	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIdentifiers: *ids,
-		FieldMask:          &getGatewayMask,
+		GatewayIds: *ids,
+		FieldMask:  &getGatewayMask,
 	}, gatewayAuth)
 	if err != nil {
 		return err
@@ -286,7 +286,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 		logger := logger.WithField("lns_uri", gtw.GatewayServerAddress)
 		logger.Debug("Configure LNS")
 		if gtw.LbsLnsSecret == nil {
-			return errLNSCredentials.WithAttributes("gateway_uid", gtw.GatewayId)
+			return errLNSCredentials.WithAttributes("gateway_uid", gtw.Ids.GatewayId)
 		}
 		if gtw.GatewayServerAddress == "" {
 			if req.LNSURI != "" {
@@ -295,9 +295,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 				gtw.GatewayServerAddress = s.defaultLNSURI
 			}
 		}
-		var (
-			scheme, host, port string
-		)
+		var scheme, host, port string
 		if gtw.GatewayServerAddress != req.LNSURI {
 			scheme, host, port, err = parseAddress("wss", gtw.GatewayServerAddress)
 			if err != nil {
@@ -363,7 +361,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 		gtw.Attributes[cupsPackageAttribute] = req.Package
 	}
 
-	registry, err = s.getRegistry(ctx, &gtw.GatewayIdentifiers)
+	registry, err = s.getRegistry(ctx, &gtw.Ids)
 	if err != nil {
 		return err
 	}

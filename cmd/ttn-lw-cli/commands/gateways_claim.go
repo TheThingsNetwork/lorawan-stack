@@ -158,10 +158,10 @@ If no API key is provided, a new one will be created.`,
 			} else {
 				logger.Info("No API Key provided. Creating one")
 				res, err := ttnpb.NewGatewayAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
-					GatewayIdentifiers: *gtwID,
-					Name:               "Gateway Claim Authorization Key", // This field can only have 50 chars.
-					Rights:             requiredRights,
-					ExpiresAt:          expiryDate,
+					GatewayIds: *gtwID,
+					Name:       "Gateway Claim Authorization Key", // This field can only have 50 chars.
+					Rights:     requiredRights,
+					ExpiresAt:  expiryDate,
 				})
 				if err != nil {
 					return err

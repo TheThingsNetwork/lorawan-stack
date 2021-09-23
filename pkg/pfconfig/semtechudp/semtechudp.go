@@ -46,8 +46,8 @@ func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error)
 		return nil, err
 	}
 
-	if gateway.Eui != nil {
-		c.GatewayConf.GatewayID = gateway.Eui.String()
+	if gateway.Ids.Eui != nil {
+		c.GatewayConf.GatewayID = gateway.Ids.Eui.String()
 	}
 	c.GatewayConf.ServerAddress, c.GatewayConf.ServerPortUp, c.GatewayConf.ServerPortDown = host, uint32(port), uint32(port)
 	server := c.GatewayConf

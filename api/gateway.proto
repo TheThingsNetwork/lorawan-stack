@@ -86,7 +86,7 @@ message GatewayClaimAuthenticationCode {
 // Gateway is the message that defines a gateway on the network.
 message Gateway {
   // The identifiers of the gateway. These are public and can be seen by any authenticated user in the network.
-  GatewayIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // When the gateway was created. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   // When the gateway was last updated. This information is public and can be seen by any authenticated user in the network.
@@ -198,7 +198,7 @@ message Gateways {
 }
 
 message GetGatewayRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the gateway fields that should be returned.
   google.protobuf.FieldMask field_mask = 2;
 }
@@ -240,7 +240,7 @@ message UpdateGatewayRequest {
 }
 
 message ListGatewayAPIKeysRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Limit the number of results per page.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -248,13 +248,13 @@ message ListGatewayAPIKeysRequest {
 }
 
 message GetGatewayAPIKeyRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Unique public identifier for the API key.
   string key_id = 2;
 }
 
 message CreateGatewayAPIKeyRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   string name = 2 [(validate.rules).string.max_len = 50];
   repeated Right rights = 3 [
     (validate.rules).repeated = {
@@ -267,14 +267,14 @@ message CreateGatewayAPIKeyRequest {
 }
 
 message UpdateGatewayAPIKeyRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the api key fields that should be updated.
   google.protobuf.FieldMask field_mask = 3;
 }
 
 message ListGatewayCollaboratorsRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Limit the number of results per page.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -282,12 +282,12 @@ message ListGatewayCollaboratorsRequest {
 }
 
 message GetGatewayCollaboratorRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message SetGatewayCollaboratorRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 

@@ -287,18 +287,18 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.GatewayIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "created_at":
@@ -678,18 +678,18 @@ func (dst *GetGatewayRequest) SetFields(src *GetGatewayRequest, paths ...string)
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+					newSrc = &src.GatewayIds
 				}
-				newDst = &dst.GatewayIdentifiers
+				newDst = &dst.GatewayIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.GatewayIds = src.GatewayIds
 				} else {
 					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.GatewayIds = zero
 				}
 			}
 		case "field_mask":
@@ -907,18 +907,18 @@ func (dst *ListGatewayAPIKeysRequest) SetFields(src *ListGatewayAPIKeysRequest, 
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+					newSrc = &src.GatewayIds
 				}
-				newDst = &dst.GatewayIdentifiers
+				newDst = &dst.GatewayIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.GatewayIds = src.GatewayIds
 				} else {
 					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.GatewayIds = zero
 				}
 			}
 		case "limit":
@@ -956,18 +956,18 @@ func (dst *GetGatewayAPIKeyRequest) SetFields(src *GetGatewayAPIKeyRequest, path
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+					newSrc = &src.GatewayIds
 				}
-				newDst = &dst.GatewayIdentifiers
+				newDst = &dst.GatewayIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.GatewayIds = src.GatewayIds
 				} else {
 					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.GatewayIds = zero
 				}
 			}
 		case "key_id":
@@ -995,18 +995,18 @@ func (dst *CreateGatewayAPIKeyRequest) SetFields(src *CreateGatewayAPIKeyRequest
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+					newSrc = &src.GatewayIds
 				}
-				newDst = &dst.GatewayIdentifiers
+				newDst = &dst.GatewayIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.GatewayIds = src.GatewayIds
 				} else {
 					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.GatewayIds = zero
 				}
 			}
 		case "name":
@@ -1052,18 +1052,18 @@ func (dst *UpdateGatewayAPIKeyRequest) SetFields(src *UpdateGatewayAPIKeyRequest
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+					newSrc = &src.GatewayIds
 				}
-				newDst = &dst.GatewayIdentifiers
+				newDst = &dst.GatewayIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.GatewayIds = src.GatewayIds
 				} else {
 					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.GatewayIds = zero
 				}
 			}
 		case "api_key":
@@ -1108,18 +1108,18 @@ func (dst *ListGatewayCollaboratorsRequest) SetFields(src *ListGatewayCollaborat
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+					newSrc = &src.GatewayIds
 				}
-				newDst = &dst.GatewayIdentifiers
+				newDst = &dst.GatewayIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.GatewayIds = src.GatewayIds
 				} else {
 					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.GatewayIds = zero
 				}
 			}
 		case "limit":
@@ -1157,36 +1157,36 @@ func (dst *GetGatewayCollaboratorRequest) SetFields(src *GetGatewayCollaboratorR
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+					newSrc = &src.GatewayIds
 				}
-				newDst = &dst.GatewayIdentifiers
+				newDst = &dst.GatewayIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.GatewayIds = src.GatewayIds
 				} else {
 					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.GatewayIds = zero
 				}
 			}
 		case "collaborator":
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationOrUserIdentifiers
+					newSrc = &src.Collaborator
 				}
-				newDst = &dst.OrganizationOrUserIdentifiers
+				newDst = &dst.Collaborator
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationOrUserIdentifiers = src.OrganizationOrUserIdentifiers
+					dst.Collaborator = src.Collaborator
 				} else {
 					var zero OrganizationOrUserIdentifiers
-					dst.OrganizationOrUserIdentifiers = zero
+					dst.Collaborator = zero
 				}
 			}
 
@@ -1204,18 +1204,18 @@ func (dst *SetGatewayCollaboratorRequest) SetFields(src *SetGatewayCollaboratorR
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+					newSrc = &src.GatewayIds
 				}
-				newDst = &dst.GatewayIdentifiers
+				newDst = &dst.GatewayIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.GatewayIds = src.GatewayIds
 				} else {
 					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.GatewayIds = zero
 				}
 			}
 		case "collaborator":

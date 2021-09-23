@@ -56,8 +56,8 @@ func TestFlow(t *testing.T) {
 	ids := ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}
 	antennaGain := float32(3)
 	gtw := &ttnpb.Gateway{
-		GatewayIdentifiers: ids,
-		FrequencyPlanId:    "EU_863_870",
+		Ids:             ids,
+		FrequencyPlanId: "EU_863_870",
 		Antennas: []ttnpb.GatewayAntenna{
 			{
 				Gain: antennaGain,
@@ -509,8 +509,8 @@ func TestSubBandEIRPOverride(t *testing.T) {
 	ids := ttnpb.GatewayIdentifiers{GatewayId: "bar-gateway"}
 	antennaGain := float32(3)
 	gtw := &ttnpb.Gateway{
-		GatewayIdentifiers: ids,
-		FrequencyPlanId:    "AS_923_925_AU", // Overrides maximum EIRP to 30 dBm in 915.0 – 928.0 MHz sub-band.
+		Ids:             ids,
+		FrequencyPlanId: "AS_923_925_AU", // Overrides maximum EIRP to 30 dBm in 915.0 – 928.0 MHz sub-band.
 		Antennas: []ttnpb.GatewayAntenna{
 			{
 				Gain: antennaGain,
