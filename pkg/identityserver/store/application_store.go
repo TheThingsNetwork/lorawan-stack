@@ -66,7 +66,7 @@ func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *pbt
 func (s *applicationStore) CreateApplication(ctx context.Context, app *ttnpb.Application) (*ttnpb.Application, error) {
 	defer trace.StartRegion(ctx, "create application").End()
 	appModel := Application{
-		ApplicationID: app.Ids.GetApplicationId(), // The ID is not mutated by fromPB.
+		ApplicationID: app.GetIds().GetApplicationId(), // The ID is not mutated by fromPB.
 	}
 	appModel.fromPB(app, nil)
 	if err := s.createEntity(ctx, &appModel); err != nil {
@@ -123,12 +123,12 @@ func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.Applica
 
 func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.Application, fieldMask *pbtypes.FieldMask) (updated *ttnpb.Application, err error) {
 	defer trace.StartRegion(ctx, "update application").End()
-	query := s.query(ctx, Application{}, withApplicationID(app.Ids.GetApplicationId()))
+	query := s.query(ctx, Application{}, withApplicationID(app.GetIds().GetApplicationId()))
 	query = selectApplicationFields(ctx, query, fieldMask)
 	var appModel Application
 	if err = query.First(&appModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(app.Ids)
+			return nil, errNotFoundForID(app.GetIds())
 		}
 		return nil, err
 	}

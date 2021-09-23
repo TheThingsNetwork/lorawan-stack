@@ -112,7 +112,7 @@ func startMockIS(ctx context.Context) (*mockIS, string) {
 func (is *mockIS) add(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) {
 	uid := unique.ID(ctx, ids)
 	is.applications[uid] = &ttnpb.Application{
-		Ids: ids,
+		Ids: &ids,
 	}
 	if key != "" {
 		is.applicationAuths[uid] = []string{fmt.Sprintf("Bearer %v", key)}
@@ -122,7 +122,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key
 var errNotFound = errors.DefineNotFound("not_found", "not found")
 
 func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetApplicationRequest) (*ttnpb.Application, error) {
-	uid := unique.ID(ctx, req.ApplicationIds)
+	uid := unique.ID(ctx, req.GetApplicationIds())
 	app, ok := is.applications[uid]
 	if !ok {
 		return nil, errNotFound.New()

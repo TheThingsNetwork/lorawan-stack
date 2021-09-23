@@ -17,111 +17,111 @@ package ttnpb
 // All EntityType methods implement the IDStringer interface.
 
 func (m *Application) EntityType() string {
-	return m.Ids.EntityType()
+	return m.GetIds().EntityType()
 }
 
 func (m *GetApplicationRequest) EntityType() string {
-	return m.ApplicationIds.EntityType()
+	return m.GetApplicationIds().EntityType()
 }
 
 func (m *ListApplicationAPIKeysRequest) EntityType() string {
-	return m.ApplicationIds.EntityType()
+	return m.GetApplicationIds().EntityType()
 }
 
 func (m *GetApplicationAPIKeyRequest) EntityType() string {
-	return m.ApplicationIds.EntityType()
+	return m.GetApplicationIds().EntityType()
 }
 
 func (m *CreateApplicationAPIKeyRequest) EntityType() string {
-	return m.ApplicationIds.EntityType()
+	return m.GetApplicationIds().EntityType()
 }
 
 func (m *UpdateApplicationAPIKeyRequest) EntityType() string {
-	return m.ApplicationIds.EntityType()
+	return m.GetApplicationIds().EntityType()
 }
 
 func (m *ListApplicationCollaboratorsRequest) EntityType() string {
-	return m.ApplicationIds.EntityType()
+	return m.GetApplicationIds().EntityType()
 }
 
 func (m *GetApplicationCollaboratorRequest) EntityType() string {
-	return m.ApplicationIds.EntityType()
+	return m.GetApplicationIds().EntityType()
 }
 
 func (m *SetApplicationCollaboratorRequest) EntityType() string {
-	return m.ApplicationIds.EntityType()
+	return m.GetApplicationIds().EntityType()
 }
 
 // All IDString methods implement the IDStringer interface.
 
 func (m *Application) IDString() string {
-	return m.Ids.IDString()
+	return m.GetIds().IDString()
 }
 
 func (m *GetApplicationRequest) IDString() string {
-	return m.ApplicationIds.IDString()
+	return m.GetApplicationIds().IDString()
 }
 
 func (m *ListApplicationAPIKeysRequest) IDString() string {
-	return m.ApplicationIds.IDString()
+	return m.GetApplicationIds().IDString()
 }
 
 func (m *GetApplicationAPIKeyRequest) IDString() string {
-	return m.ApplicationIds.IDString()
+	return m.GetApplicationIds().IDString()
 }
 
 func (m *CreateApplicationAPIKeyRequest) IDString() string {
-	return m.ApplicationIds.IDString()
+	return m.GetApplicationIds().IDString()
 }
 
 func (m *UpdateApplicationAPIKeyRequest) IDString() string {
-	return m.ApplicationIds.IDString()
+	return m.GetApplicationIds().IDString()
 }
 
 func (m *ListApplicationCollaboratorsRequest) IDString() string {
-	return m.ApplicationIds.IDString()
+	return m.GetApplicationIds().IDString()
 }
 
 func (m *GetApplicationCollaboratorRequest) IDString() string {
-	return m.ApplicationIds.IDString()
+	return m.GetApplicationIds().IDString()
 }
 
 func (m *SetApplicationCollaboratorRequest) IDString() string {
-	return m.ApplicationIds.IDString()
+	return m.GetApplicationIds().IDString()
 }
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
 func (m *Application) ExtractRequestFields(dst map[string]interface{}) {
-	m.Ids.ExtractRequestFields(dst)
+	m.GetIds().ExtractRequestFields(dst)
 }
 
 func (m *GetApplicationRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.ApplicationIds.ExtractRequestFields(dst)
+	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
 func (m *ListApplicationAPIKeysRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.ApplicationIds.ExtractRequestFields(dst)
+	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
 func (m *GetApplicationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.ApplicationIds.ExtractRequestFields(dst)
+	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
 func (m *CreateApplicationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.ApplicationIds.ExtractRequestFields(dst)
+	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
 func (m *UpdateApplicationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.ApplicationIds.ExtractRequestFields(dst)
+	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
 func (m *ListApplicationCollaboratorsRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.ApplicationIds.ExtractRequestFields(dst)
+	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
 func (m *GetApplicationCollaboratorRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.ApplicationIds.ExtractRequestFields(dst)
+	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
 // Wrap methods of m.ApplicationIdentifiers.
@@ -130,5 +130,5 @@ func (m *Application) GetEntityIdentifiers() *EntityIdentifiers {
 	if m == nil {
 		return nil
 	}
-	return m.Ids.GetEntityIdentifiers()
+	return m.GetIds().GetEntityIdentifiers()
 }

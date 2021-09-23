@@ -51,7 +51,7 @@ key is provided, a new API key will be created.`,
 				}
 				logger.Info("Creating API key")
 				apiKey, err := ttnpb.NewApplicationAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-					ApplicationIds: *appID,
+					ApplicationIds: appID,
 					Name:           "Device Claiming",
 					Rights: []ttnpb.Right{
 						ttnpb.RIGHT_APPLICATION_DEVICES_READ,

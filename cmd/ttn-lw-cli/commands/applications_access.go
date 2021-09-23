@@ -68,7 +68,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewApplicationAccessClient(is).ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
-				ApplicationIds: *appID, Limit: limit, Page: page,
+				ApplicationIds: appID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
@@ -97,8 +97,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationAccessClient(is).GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
-				ApplicationIds: *appID,
-				Collaborator:   *collaborator,
+				ApplicationIds: appID,
+				Collaborator:   collaborator,
 			})
 			if err != nil {
 				return err
@@ -130,8 +130,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewApplicationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-				ApplicationIds: *appID,
-				Collaborator: ttnpb.Collaborator{
+				ApplicationIds: appID,
+				Collaborator: &ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        rights,
 				},
@@ -162,8 +162,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewApplicationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-				ApplicationIds: *appID,
-				Collaborator: ttnpb.Collaborator{
+				ApplicationIds: appID,
+				Collaborator: &ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        nil,
 				},
@@ -196,7 +196,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewApplicationAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
-				ApplicationIds: *appID, Limit: limit, Page: page,
+				ApplicationIds: appID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
@@ -225,7 +225,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationAccessClient(is).GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
-				ApplicationIds: *appID,
+				ApplicationIds: appID,
 				KeyId:          id,
 			})
 			if err != nil {
@@ -261,7 +261,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-				ApplicationIds: *appID,
+				ApplicationIds: appID,
 				Name:           name,
 				Rights:         rights,
 				ExpiresAt:      expiryDate,
@@ -306,7 +306,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewApplicationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-				ApplicationIds: *appID,
+				ApplicationIds: appID,
 				APIKey: ttnpb.APIKey{
 					Id:        id,
 					Name:      name,
@@ -341,7 +341,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewApplicationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-				ApplicationIds: *appID,
+				ApplicationIds: appID,
 				APIKey: ttnpb.APIKey{
 					Id:     id,
 					Rights: nil,

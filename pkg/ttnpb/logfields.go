@@ -109,7 +109,7 @@ func (req *SetApplicationCollaboratorRequest) ExtractRequestFields(m map[string]
 		return
 	}
 	req.ApplicationIds.ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
+	extractCollaboratorFields(m, &req.GetCollaborator().OrganizationOrUserIdentifiers)
 }
 
 func (req *SetClientCollaboratorRequest) ExtractRequestFields(m map[string]interface{}) {

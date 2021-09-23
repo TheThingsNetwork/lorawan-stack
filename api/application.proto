@@ -38,7 +38,7 @@ option (gogoproto.stringer_all) = true;
 // Application is the message that defines an Application in the network.
 message Application {
   // The identifiers of the application. These are public and can be seen by any authenticated user in the network.
-  ApplicationIdentifiers ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationIdentifiers ids = 1 [(validate.rules).message.required = true];
   // When the application was created. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   // When the application was last updated. This information is public and can be seen by any authenticated user in the network.
@@ -77,7 +77,7 @@ message IssueDevEUIResponse {
 }
 
 message GetApplicationRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   // The names of the application fields that should be returned.
   google.protobuf.FieldMask field_mask = 2;
 }
@@ -115,7 +115,7 @@ message UpdateApplicationRequest {
 }
 
 message ListApplicationAPIKeysRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   // Limit the number of results per page.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -123,13 +123,13 @@ message ListApplicationAPIKeysRequest {
 }
 
 message GetApplicationAPIKeyRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   // Unique public identifier for the API key.
   string key_id = 2;
 }
 
 message CreateApplicationAPIKeyRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   string name = 2 [(validate.rules).string.max_len = 50];
   repeated Right rights = 3 [
     (validate.rules).repeated = {
@@ -142,14 +142,14 @@ message CreateApplicationAPIKeyRequest {
 }
 
 message UpdateApplicationAPIKeyRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the api key fields that should be updated.
   google.protobuf.FieldMask field_mask = 3;
 }
 
 message ListApplicationCollaboratorsRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   // Limit the number of results per page.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -157,11 +157,11 @@ message ListApplicationCollaboratorsRequest {
 }
 
 message GetApplicationCollaboratorRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(validate.rules).message.required = true];
 }
 
 message SetApplicationCollaboratorRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
+  Collaborator collaborator = 2 [(validate.rules).message.required = true];
 }
