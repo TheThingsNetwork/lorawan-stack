@@ -128,9 +128,10 @@ const NetworkServerForm = React.memo(props => {
         'app_s_key',
       ])
 
+      const isOTAA = values._activation_mode === ACTIVATION_MODES.OTAA
       const mac_settings = castedValues.mac_settings
       let session
-      if (castedValues.session && castedValues.session.keys) {
+      if (!isOTAA && castedValues.session && castedValues.session.keys) {
         const { app_s_key, ...keys } = castedValues.session.keys
         session = {
           ...updatedValues.session,
