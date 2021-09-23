@@ -59,9 +59,9 @@ type Config struct {
 	context.Context                  // The base context of the pool.
 	Name              string         // The name of the pool.
 	CreateHandler     HandlerFactory // The function that creates handlers.
-	MinWorkers        int            // The minimum number of workers in the pool.
+	MinWorkers        int            // The minimum number of workers in the pool. Use -1 to disable.
 	MaxWorkers        int            // The maximum number of workers in the pool.
-	QueueSize         int            // The size of the work queue.
+	QueueSize         int            // The size of the work queue. Use -1 to disable.
 	WorkerIdleTimeout time.Duration  // The maximum amount of time a worker will stay idle before closing.
 }
 
@@ -233,14 +233,24 @@ func NewWorkerPool(cfg Config) (WorkerPool, error) {
 	if cfg.WorkerIdleTimeout == 0 {
 		cfg.WorkerIdleTimeout = defaultWorkerIdleTimeout
 	}
-	if cfg.MinWorkers <= 0 {
+	// We treat 0 as being default initialized, and use the defaults.
+	if cfg.MinWorkers == 0 {
 		cfg.MinWorkers = defaultMinWorkers
+	}
+	// We treat negative values as explicitly disabling the minimum number of workers.
+	if cfg.MinWorkers < 0 {
+		cfg.MinWorkers = 0
 	}
 	if cfg.MaxWorkers <= 0 {
 		cfg.MaxWorkers = defaultMaxWorkers
 	}
-	if cfg.QueueSize <= 0 {
+	// We treat 0 as being default initialized, and use the defaults.
+	if cfg.QueueSize == 0 {
 		cfg.QueueSize = defaultQueueSize
+	}
+	// We treat negative values as explicitly disabling the queue.
+	if cfg.QueueSize < 0 {
+		cfg.QueueSize = 0
 	}
 	if cfg.MinWorkers > cfg.MaxWorkers {
 		cfg.MaxWorkers = cfg.MinWorkers
