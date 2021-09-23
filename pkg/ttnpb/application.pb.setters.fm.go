@@ -15,18 +15,18 @@ func (dst *Application) SetFields(src *Application, paths ...string) error {
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "created_at":
@@ -162,18 +162,18 @@ func (dst *GetApplicationRequest) SetFields(src *GetApplicationRequest, paths ..
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "field_mask":
@@ -370,18 +370,18 @@ func (dst *ListApplicationAPIKeysRequest) SetFields(src *ListApplicationAPIKeysR
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "limit":
@@ -419,18 +419,18 @@ func (dst *GetApplicationAPIKeyRequest) SetFields(src *GetApplicationAPIKeyReque
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "key_id":
@@ -458,18 +458,18 @@ func (dst *CreateApplicationAPIKeyRequest) SetFields(src *CreateApplicationAPIKe
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "name":
@@ -515,18 +515,18 @@ func (dst *UpdateApplicationAPIKeyRequest) SetFields(src *UpdateApplicationAPIKe
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "api_key":
@@ -571,18 +571,18 @@ func (dst *ListApplicationCollaboratorsRequest) SetFields(src *ListApplicationCo
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "limit":
@@ -620,36 +620,36 @@ func (dst *GetApplicationCollaboratorRequest) SetFields(src *GetApplicationColla
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "collaborator":
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
-					newSrc = &src.OrganizationOrUserIdentifiers
+					newSrc = &src.Collaborator
 				}
-				newDst = &dst.OrganizationOrUserIdentifiers
+				newDst = &dst.Collaborator
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationOrUserIdentifiers = src.OrganizationOrUserIdentifiers
+					dst.Collaborator = src.Collaborator
 				} else {
 					var zero OrganizationOrUserIdentifiers
-					dst.OrganizationOrUserIdentifiers = zero
+					dst.Collaborator = zero
 				}
 			}
 
@@ -667,18 +667,18 @@ func (dst *SetApplicationCollaboratorRequest) SetFields(src *SetApplicationColla
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "collaborator":

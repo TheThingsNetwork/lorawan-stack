@@ -38,9 +38,9 @@ func NewPopulator(size int, seed int64) *Populator {
 	}
 	for i := 0; i < size; i++ {
 		application := &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: fmt.Sprintf("random-app-%d", i+1)},
-			Name:                   fmt.Sprintf("Random %d", i+1),
-			Description:            fmt.Sprintf("Randomly generated Application %d", i+1),
+			Ids:         ttnpb.ApplicationIdentifiers{ApplicationId: fmt.Sprintf("random-app-%d", i+1)},
+			Name:        fmt.Sprintf("Random %d", i+1),
+			Description: fmt.Sprintf("Randomly generated Application %d", i+1),
 		}
 		applicationID := application.GetEntityIdentifiers()
 		p.Applications = append(p.Applications, application)

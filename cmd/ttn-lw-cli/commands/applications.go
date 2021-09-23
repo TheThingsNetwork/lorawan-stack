@@ -153,8 +153,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{
-				ApplicationIdentifiers: *appID,
-				FieldMask:              &pbtypes.FieldMask{Paths: paths},
+				ApplicationIds: *appID,
+				FieldMask:      &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -184,10 +184,10 @@ var (
 				return err
 			}
 			application.Attributes = mergeAttributes(application.Attributes, cmd.Flags())
-			if appID != nil && appID.ApplicationId != "" {
-				application.ApplicationId = appID.ApplicationId
+			if appID.GetApplicationId() != "" {
+				application.Ids = ttnpb.ApplicationIdentifiers{ApplicationId: appID.ApplicationId}
 			}
-			if application.ApplicationId == "" {
+			if application.Ids.GetApplicationId() == "" {
 				return errNoApplicationID
 			}
 
@@ -225,7 +225,7 @@ var (
 				return err
 			}
 			application.Attributes = mergeAttributes(application.Attributes, cmd.Flags())
-			application.ApplicationIdentifiers = *appID
+			application.Ids = *appID
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {

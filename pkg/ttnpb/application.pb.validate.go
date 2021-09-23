@@ -52,7 +52,7 @@ func (m *Application) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationValidationError{
 						field:  "ids",
@@ -439,7 +439,7 @@ func (m *GetApplicationRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationRequestValidationError{
 						field:  "application_ids",
@@ -893,7 +893,7 @@ func (m *ListApplicationAPIKeysRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationAPIKeysRequestValidationError{
 						field:  "application_ids",
@@ -998,7 +998,7 @@ func (m *GetApplicationAPIKeyRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationAPIKeyRequestValidationError{
 						field:  "application_ids",
@@ -1094,7 +1094,7 @@ func (m *CreateApplicationAPIKeyRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateApplicationAPIKeyRequestValidationError{
 						field:  "application_ids",
@@ -1244,7 +1244,7 @@ func (m *UpdateApplicationAPIKeyRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateApplicationAPIKeyRequestValidationError{
 						field:  "application_ids",
@@ -1362,7 +1362,7 @@ func (m *ListApplicationCollaboratorsRequest) ValidateFields(paths ...string) er
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationCollaboratorsRequestValidationError{
 						field:  "application_ids",
@@ -1467,7 +1467,7 @@ func (m *GetApplicationCollaboratorRequest) ValidateFields(paths ...string) erro
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationCollaboratorRequestValidationError{
 						field:  "application_ids",
@@ -1479,7 +1479,7 @@ func (m *GetApplicationCollaboratorRequest) ValidateFields(paths ...string) erro
 
 		case "collaborator":
 
-			if v, ok := interface{}(&m.OrganizationOrUserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Collaborator).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationCollaboratorRequestValidationError{
 						field:  "collaborator",
@@ -1573,7 +1573,7 @@ func (m *SetApplicationCollaboratorRequest) ValidateFields(paths ...string) erro
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationCollaboratorRequestValidationError{
 						field:  "application_ids",

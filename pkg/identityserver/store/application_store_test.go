@@ -37,9 +37,9 @@ func TestApplicationStore(t *testing.T) {
 		s := newStore(db)
 
 		created, err := store.CreateApplication(ctx, &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			Name:                   "Foo Application",
-			Description:            "The Amazing Foo Application",
+			Ids:         ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			Name:        "Foo Application",
+			Description: "The Amazing Foo Application",
 			Attributes: map[string]string{
 				"foo": "bar",
 				"bar": "baz",
@@ -70,7 +70,7 @@ func TestApplicationStore(t *testing.T) {
 		}
 
 		_, err = store.UpdateApplication(ctx, &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "bar"},
+			Ids: ttnpb.ApplicationIdentifiers{ApplicationId: "bar"},
 		}, nil)
 
 		if a.So(err, should.NotBeNil) {
@@ -78,9 +78,9 @@ func TestApplicationStore(t *testing.T) {
 		}
 
 		updated, err := store.UpdateApplication(ctx, &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			Name:                   "Foobar Application",
-			Description:            "The Amazing Foobar Application",
+			Ids:         ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			Name:        "Foobar Application",
+			Description: "The Amazing Foobar Application",
 			Attributes: map[string]string{
 				"foo": "bar",
 				"baz": "baz",
@@ -163,7 +163,7 @@ func TestApplicationStore(t *testing.T) {
 
 		// Check that application ids are released after purge
 		_, err = store.CreateApplication(ctx, &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			Ids: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 		})
 
 		a.So(err, should.BeNil)

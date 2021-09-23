@@ -136,7 +136,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-device-id",
-					ApplicationIdentifiers: app.ApplicationIdentifiers,
+					ApplicationIdentifiers: app.Ids,
 					JoinEui:                &joinEUI,
 					DevEui:                 &devEUI,
 				},
@@ -155,7 +155,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceId:               "test-device-id",
-				ApplicationIdentifiers: app.ApplicationIdentifiers,
+				ApplicationIdentifiers: app.Ids,
 			},
 		}, creds)
 
@@ -178,7 +178,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "other-test-device-id",
-					ApplicationIdentifiers: app.ApplicationIdentifiers,
+					ApplicationIdentifiers: app.Ids,
 					JoinEui:                &joinEUI,
 					DevEui:                 &devEUI,
 				},
@@ -192,7 +192,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{
 			FieldMask:              &pbtypes.FieldMask{Paths: []string{"name"}},
-			ApplicationIdentifiers: app.ApplicationIdentifiers,
+			ApplicationIdentifiers: app.Ids,
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -209,7 +209,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-device-id",
-					ApplicationIdentifiers: app.ApplicationIdentifiers,
+					ApplicationIdentifiers: app.Ids,
 				},
 				Name: "test-device-name-new",
 			},
@@ -223,7 +223,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		_, err = reg.Delete(ctx, &ttnpb.EndDeviceIdentifiers{
 			DeviceId:               "test-device-id",
-			ApplicationIdentifiers: app.ApplicationIdentifiers,
+			ApplicationIdentifiers: app.Ids,
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -232,7 +232,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceId:               "test-device-id",
-				ApplicationIdentifiers: app.ApplicationIdentifiers,
+				ApplicationIdentifiers: app.Ids,
 			},
 		}, creds)
 
