@@ -131,6 +131,11 @@ func (s *server) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifie
 	return nil
 }
 
+// StartTask implements io.Server.
+func (s *server) StartTask(cfg *component.TaskConfig) {
+	component.DefaultStartTask(cfg)
+}
+
 func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifiers) bool {
 	_, ok := s.downlinkClaims.Load(unique.ID(ctx, ids))
 	return ok

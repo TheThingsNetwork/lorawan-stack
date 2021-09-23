@@ -24,6 +24,7 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -71,6 +72,7 @@ type Server interface {
 	RateLimiter() ratelimit.Interface
 	// ValidateGatewayID validates the ID of the gateway.
 	ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
+	component.TaskStarter
 }
 
 // Connection is a connection to a gateway managed by a frontend.

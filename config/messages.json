@@ -4265,15 +4265,6 @@
       "file": "firewall_ratelimit.go"
     }
   },
-  "error:pkg/gatewayserver/io/udp:udp_frontend_recovered": {
-    "translations": {
-      "en": "internal server error"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp",
-      "file": "udp.go"
-    }
-  },
   "error:pkg/gatewayserver/io/ws/lbslns:empty_gateway_eui": {
     "translations": {
       "en": "empty gateway EUI"
