@@ -46,10 +46,10 @@ func TestClientPublicSafe(t *testing.T) {
 	a.So(((*Client)(nil)).PublicSafe(), should.BeNil)
 
 	src := &Client{
-		ClientIdentifiers: ClientIdentifiers{ClientId: "foo"},
-		Name:              "Name",
-		Description:       "Description",
-		Attributes:        map[string]string{"key": "value"},
+		Ids:         &ClientIdentifiers{ClientId: "foo"},
+		Name:        "Name",
+		Description: "Description",
+		Attributes:  map[string]string{"key": "value"},
 	}
 	safe := src.PublicSafe()
 

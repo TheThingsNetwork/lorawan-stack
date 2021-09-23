@@ -67,7 +67,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewClientAccessClient(is).ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
-				ClientIdentifiers: *cliID, Limit: limit, Page: page,
+				ClientIds: cliID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
@@ -96,8 +96,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewClientAccessClient(is).GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
-				ClientIdentifiers:             *cliID,
-				OrganizationOrUserIdentifiers: *collaborator,
+				ClientIds:    cliID,
+				Collaborator: collaborator,
 			})
 			if err != nil {
 				return err
@@ -129,8 +129,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewClientAccessClient(is).SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
-				ClientIdentifiers: *cliID,
-				Collaborator: ttnpb.Collaborator{
+				ClientIds: cliID,
+				Collaborator: &ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        rights,
 				},
@@ -161,8 +161,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewClientAccessClient(is).SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
-				ClientIdentifiers: *cliID,
-				Collaborator: ttnpb.Collaborator{
+				ClientIds: cliID,
+				Collaborator: &ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        nil,
 				},

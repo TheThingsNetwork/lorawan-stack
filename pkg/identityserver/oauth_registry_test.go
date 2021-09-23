@@ -36,7 +36,7 @@ func TestOAuthRegistry(t *testing.T) {
 
 		_, err := oauthStore.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
 			UserIds:   *user.GetIds(),
-			ClientIds: client.ClientIdentifiers,
+			ClientIds: *client.GetIds(),
 			Rights:    client.Rights,
 		})
 		if err != nil {
@@ -45,7 +45,7 @@ func TestOAuthRegistry(t *testing.T) {
 
 		err = oauthStore.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 			UserIds:       *user.GetIds(),
-			ClientIds:     client.ClientIdentifiers,
+			ClientIds:     *client.GetIds(),
 			UserSessionId: "12345678-1234-5678-1234-567812345678",
 			Id:            "access_token_id",
 			Rights:        client.Rights,
@@ -64,12 +64,12 @@ func TestOAuthRegistry(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(authorizations, should.NotBeNil) && a.So(authorizations.Authorizations, should.HaveLength, 1) {
-			a.So(authorizations.Authorizations[0].ClientIds.ClientId, should.Equal, client.ClientId)
+			a.So(authorizations.Authorizations[0].ClientIds.GetClientId(), should.Equal, client.GetIds().GetClientId())
 		}
 
 		tokens, err := reg.ListTokens(ctx, &ttnpb.ListOAuthAccessTokensRequest{
 			UserIds:   *user.GetIds(),
-			ClientIds: client.ClientIdentifiers,
+			ClientIds: *client.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -80,7 +80,7 @@ func TestOAuthRegistry(t *testing.T) {
 
 		_, err = reg.DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
 			UserIds:   *user.GetIds(),
-			ClientIds: client.ClientIdentifiers,
+			ClientIds: *client.GetIds(),
 			Id:        "access_token_id",
 		}, creds)
 
@@ -88,7 +88,7 @@ func TestOAuthRegistry(t *testing.T) {
 
 		tokens, err = reg.ListTokens(ctx, &ttnpb.ListOAuthAccessTokensRequest{
 			UserIds:   *user.GetIds(),
-			ClientIds: client.ClientIdentifiers,
+			ClientIds: *client.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -98,7 +98,7 @@ func TestOAuthRegistry(t *testing.T) {
 
 		_, err = reg.Delete(ctx, &ttnpb.OAuthClientAuthorizationIdentifiers{
 			UserIds:   *user.GetIds(),
-			ClientIds: client.ClientIdentifiers,
+			ClientIds: *client.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)
