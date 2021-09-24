@@ -28,7 +28,8 @@ import (
 )
 
 var (
-	registerPacketBrokerFlags = &pflag.FlagSet{}
+	registerPacketBrokerFlags          = &pflag.FlagSet{}
+	packetbrokerGatewayVisibilityFlags = util.FieldFlags(&ttnpb.PacketBrokerGatewayVisibility{})
 )
 
 func packetBrokerNetworkIDFlags(allowDefault bool) *pflag.FlagSet {
@@ -148,6 +149,8 @@ func getPacketBrokerRoutingPolicy(flagSet *pflag.FlagSet) (up ttnpb.PacketBroker
 	}
 	return
 }
+
+var errPacketBrokerNetworkID = errors.DefineInvalidArgument("packet_broker_network_id", "invalid Packet Broker network ID")
 
 var (
 	packetBrokerCommand = &cobra.Command{
@@ -269,7 +272,7 @@ var (
 		},
 	}
 	packetBrokerHomeNetworksPolicyGetCommand = &cobra.Command{
-		Use:   "get [default|net-id] [tenant-id]",
+		Use:   "get [default|[net-id] [tenant-id]]",
 		Short: "Get a Home Network routing policy",
 		Example: `
   To get the default routing policy:
@@ -304,7 +307,7 @@ var (
 		},
 	}
 	packetBrokerHomeNetworksPolicySetCommand = &cobra.Command{
-		Use:   "set [default|net-id] [tenant-id]",
+		Use:   "set [default|[net-id] [tenant-id]]",
 		Short: "Set a Home Network routing policy",
 		Long: `Set a Home Network routing policy
 
@@ -355,7 +358,7 @@ for the Home Network (by NetID and tenant ID).`,
 		},
 	}
 	packetBrokerHomeNetworksPolicyDeleteCommand = &cobra.Command{
-		Use:   "delete [default|net-id] [tenant-id]",
+		Use:   "delete [default|[net-id] [tenant-id]]",
 		Short: "Delete a Home Network routing policy",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id, err := getPacketBrokerNetworkID(cmd.Flags(), args, true)
@@ -376,6 +379,115 @@ for the Home Network (by NetID and tenant ID).`,
 				return err
 			}
 			packetBrokerCacheInfo()
+			return nil
+		},
+	}
+	packetBrokerHomeNetworksGatewayVisibilitiesCommand = &cobra.Command{
+		Use:     "gateway-visibilities",
+		Aliases: []string{"gateway-visibility", "gatewayvisibilities", "gatewayvisibility", "gatewayvis"},
+		Short:   "Manage Home Network gateway visibilities",
+	}
+	packetBrokerHomeNetworksGatewayVisibilityGetCommand = &cobra.Command{
+		Use:   "get default",
+		Short: "Get a Home Network gateway visibility",
+		Example: `
+  To get the default gateway visibility:
+    $ ttn-lw-cli packetbroker home-network gateway-visibilities get default`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			id, err := getPacketBrokerNetworkID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+			// TODO: Support per-network settings (https://github.com/TheThingsNetwork/lorawan-stack/issues/4409)
+			if id != nil {
+				return errPacketBrokerNetworkID
+			}
+
+			pba, err := api.Dial(ctx, config.PacketBrokerAgentGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewPbaClient(pba).GetHomeNetworkDefaultGatewayVisibility(ctx, ttnpb.Empty)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
+	packetBrokerHomeNetworksGatewayVisibilitySetCommand = &cobra.Command{
+		Use:   "set default",
+		Short: "Set a Home Network gateway visibility",
+		Long: `Set a Home Network gateway visibility
+
+Specify default to configure the default gateway visibility.`,
+		Example: `
+  To set the default gateway visibility to show location and online status:
+    $ ttn-lw-cli packetbroker home-network gateway-visibilities set default \
+      --location --status
+
+  To set the default gateway visibility to show all fields:
+    $ ttn-lw-cli packetbroker home-network gateway-visibilities set default \
+      --all`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			id, err := getPacketBrokerNetworkID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+			// TODO: Support per-network settings (https://github.com/TheThingsNetwork/lorawan-stack/issues/4409)
+			if id != nil {
+				return errPacketBrokerNetworkID
+			}
+
+			pba, err := api.Dial(ctx, config.PacketBrokerAgentGRPCAddress)
+			if err != nil {
+				return err
+			}
+			visibility := &ttnpb.PacketBrokerGatewayVisibility{}
+			if err := util.SetFields(visibility, packetbrokerGatewayVisibilityFlags); err != nil {
+				return err
+			}
+			if all, _ := cmd.Flags().GetBool("all"); all {
+				visibility.Location = true
+				visibility.AntennaPlacement = true
+				visibility.AntennaCount = true
+				visibility.FineTimestamps = true
+				visibility.ContactInfo = true
+				visibility.Status = true
+				visibility.FrequencyPlan = true
+				visibility.PacketRates = true
+			}
+			_, err = ttnpb.NewPbaClient(pba).SetHomeNetworkDefaultGatewayVisibility(ctx, &ttnpb.SetPacketBrokerDefaultGatewayVisibilityRequest{
+				Visibility: visibility,
+			})
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, visibility)
+		},
+	}
+	packetBrokerHomeNetworksGatewayVisibilityDeleteCommand = &cobra.Command{
+		Use:   "delete default",
+		Short: "Delete a Home Network gateway visibility",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			id, err := getPacketBrokerNetworkID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+			// TODO: Support per-network settings (https://github.com/TheThingsNetwork/lorawan-stack/issues/4409)
+			if id != nil {
+				return errPacketBrokerNetworkID
+			}
+
+			pba, err := api.Dial(ctx, config.PacketBrokerAgentGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewPbaClient(pba).DeleteHomeNetworkDefaultGatewayVisibility(ctx, ttnpb.Empty)
+			if err != nil {
+				return err
+			}
 			return nil
 		},
 	}
@@ -460,6 +572,12 @@ func init() {
 	packetBrokerHomeNetworksPolicyDeleteCommand.Flags().AddFlagSet(packetBrokerNetworkIDFlags(true))
 	packetBrokerHomeNetworksPoliciesCommand.AddCommand(packetBrokerHomeNetworksPolicyDeleteCommand)
 	packetBrokerHomeNetworksCommand.AddCommand(packetBrokerHomeNetworksPoliciesCommand)
+	packetBrokerHomeNetworksGatewayVisibilitiesCommand.AddCommand(packetBrokerHomeNetworksGatewayVisibilityGetCommand)
+	packetBrokerHomeNetworksGatewayVisibilitySetCommand.Flags().AddFlagSet(packetbrokerGatewayVisibilityFlags)
+	packetBrokerHomeNetworksGatewayVisibilitySetCommand.Flags().Bool("all", false, "")
+	packetBrokerHomeNetworksGatewayVisibilitiesCommand.AddCommand(packetBrokerHomeNetworksGatewayVisibilitySetCommand)
+	packetBrokerHomeNetworksGatewayVisibilitiesCommand.AddCommand(packetBrokerHomeNetworksGatewayVisibilityDeleteCommand)
+	packetBrokerHomeNetworksCommand.AddCommand(packetBrokerHomeNetworksGatewayVisibilitiesCommand)
 	packetBrokerHomeNetworksListCommand.Flags().AddFlagSet(paginationFlags())
 	packetBrokerHomeNetworksListCommand.Flags().AddFlagSet(packetBrokerNetworkSearchFlags())
 	packetBrokerHomeNetworksCommand.AddCommand(packetBrokerHomeNetworksListCommand)
