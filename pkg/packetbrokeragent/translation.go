@@ -1018,6 +1018,22 @@ func toPBDownlinkRoutingPolicy(policy *ttnpb.PacketBrokerRoutingPolicyDownlink) 
 	}
 }
 
+func fromPBDefaultGatewayVisibility(visibility *packetbroker.GatewayVisibility) *ttnpb.PacketBrokerDefaultGatewayVisibility {
+	return &ttnpb.PacketBrokerDefaultGatewayVisibility{
+		UpdatedAt: visibility.GetUpdatedAt(),
+		Visibility: &ttnpb.PacketBrokerGatewayVisibility{
+			Location:         visibility.GetLocation(),
+			AntennaPlacement: visibility.GetAntennaPlacement(),
+			AntennaCount:     visibility.GetAntennaCount(),
+			FineTimestamps:   visibility.GetFineTimestamps(),
+			ContactInfo:      visibility.GetContactInfo(),
+			Status:           visibility.GetStatus(),
+			FrequencyPlan:    visibility.GetFrequencyPlan(),
+			PacketRates:      visibility.GetPacketRates(),
+		},
+	}
+}
+
 var errInconsistentBands = errors.DefineInvalidArgument("inconsistent_bands", "inconsistent bands")
 
 func toPBFrequencyPlan(fps ...*frequencyplans.FrequencyPlan) (*packetbroker.GatewayFrequencyPlan, error) {

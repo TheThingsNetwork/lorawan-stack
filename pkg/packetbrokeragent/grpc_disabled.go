@@ -67,6 +67,18 @@ func (s disabledServer) DeleteHomeNetworkRoutingPolicy(context.Context, *ttnpb.P
 	return nil, errNotEnabled.New()
 }
 
+func (s *disabledServer) GetHomeNetworkDefaultGatewayVisibility(context.Context, *pbtypes.Empty) (*ttnpb.PacketBrokerDefaultGatewayVisibility, error) {
+	return nil, errNotEnabled.New()
+}
+
+func (s *disabledServer) SetHomeNetworkDefaultGatewayVisibility(context.Context, *ttnpb.SetPacketBrokerDefaultGatewayVisibilityRequest) (*pbtypes.Empty, error) {
+	return nil, errNotEnabled.New()
+}
+
+func (s *disabledServer) DeleteHomeNetworkDefaultGatewayVisibility(context.Context, *pbtypes.Empty) (*pbtypes.Empty, error) {
+	return nil, errNotEnabled.New()
+}
+
 func (s disabledServer) ListNetworks(context.Context, *ttnpb.ListPacketBrokerNetworksRequest) (*ttnpb.PacketBrokerNetworks, error) {
 	return nil, errNotEnabled.New()
 }
