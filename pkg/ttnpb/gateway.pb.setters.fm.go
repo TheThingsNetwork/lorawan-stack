@@ -4,7 +4,6 @@ package ttnpb
 
 import (
 	fmt "fmt"
-	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 	time "time"
 )
 
@@ -740,8 +739,7 @@ func (dst *GetGatewayIdentifiersForEUIRequest) SetFields(src *GetGatewayIdentifi
 			if src != nil {
 				dst.Eui = src.Eui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.Eui = zero
+				dst.Eui = nil
 			}
 
 		default:

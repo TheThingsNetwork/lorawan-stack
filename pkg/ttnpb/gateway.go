@@ -15,7 +15,7 @@
 package ttnpb
 
 func (r *GetGatewayIdentifiersForEUIRequest) RateLimitKey() string {
-	if r == nil {
+	if r == nil || r.Eui == nil {
 		return ""
 	}
 	return r.Eui.String()
