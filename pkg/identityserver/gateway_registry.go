@@ -68,6 +68,7 @@ var (
 	errGatewayEUITaken         = errors.DefineAlreadyExists("gateway_eui_taken", "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`")
 	errAdminsPurgeGateways     = errors.DefinePermissionDenied("admins_purge_gateways", "gateways may only be purged by admins")
 	errClaimAuthenticationCode = errors.DefineInvalidArgument("claim_authentication_code", "invalid claim authentication code")
+	errNoGatewayEUI            = errors.DefineInvalidArgument("no_gateway_eui", "no gateway EUI")
 )
 
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
@@ -164,7 +165,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	if err != nil {
 		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
 			if ids, err := is.getGatewayIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-				Eui: *req.GetIds().GetEui(),
+				Eui: req.GetIds().GetEui(),
 			}); err == nil {
 				return nil, errGatewayEUITaken.WithAttributes(
 					"gateway_eui", req.GetIds().GetEui().String(),
@@ -277,9 +278,12 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
+	if req.Eui == nil {
+		return nil, errNoGatewayEUI.New()
+	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtw, err := store.GetGatewayStore(db).GetGateway(ctx, &ttnpb.GatewayIdentifiers{
-			Eui: &req.Eui,
+			Eui: req.Eui,
 		}, &pbtypes.FieldMask{Paths: []string{"ids.gateway_id", "ids.eui"}})
 		if err != nil {
 			return err

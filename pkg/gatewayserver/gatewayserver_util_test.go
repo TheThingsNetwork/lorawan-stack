@@ -87,7 +87,10 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 	}
 }
 
-var errNotFound = errors.DefineNotFound("not_found", "not found")
+var (
+	errNotFound     = errors.DefineNotFound("not_found", "not found")
+	errNoGatewayEUI = errors.DefineInvalidArgument("no_gateway_eui", "not gateway EUI")
+)
 
 func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
 	uid := unique.ID(ctx, req.GetGatewayIds())
@@ -109,7 +112,10 @@ func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (
 }
 
 func (is *mockIS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
-	if req.Eui == registeredGatewayEUI {
+	if req.Eui == nil {
+		return nil, errNoGatewayEUI.New()
+	}
+	if *req.Eui == registeredGatewayEUI {
 		return &ttnpb.GatewayIdentifiers{
 			GatewayId: registeredGatewayID,
 			Eui:       &registeredGatewayEUI,
