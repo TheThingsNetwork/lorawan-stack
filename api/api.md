@@ -3790,7 +3790,6 @@ Gateway is the message that defines a gateway on the network.
 | `description` | <p>`string.max_len`: `2000`</p> |
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 | `contact_info` | <p>`repeated.max_items`: `10`</p> |
-| `version_ids` | <p>`message.required`: `true`</p> |
 | `gateway_server_address` | <p>`string.pattern`: `^([a-z]{2,5}://)?(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 | `update_channel` | <p>`string.max_len`: `128`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |

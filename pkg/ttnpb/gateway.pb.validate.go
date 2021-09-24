@@ -757,7 +757,7 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "version_ids":
 
-			if v, ok := interface{}(&m.GatewayVersionIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetVersionIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayValidationError{
 						field:  "version_ids",

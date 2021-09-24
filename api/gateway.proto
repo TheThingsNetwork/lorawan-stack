@@ -112,7 +112,7 @@ message Gateway {
   // Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.
   repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
 
-  GatewayVersionIdentifiers version_ids = 8 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayVersionIdentifiers version_ids = 8;
 
   // The address of the Gateway Server to connect to.
   // This information is public and can be seen by any authenticated user in the network if status_public is true.

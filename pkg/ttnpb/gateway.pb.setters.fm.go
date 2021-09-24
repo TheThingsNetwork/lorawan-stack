@@ -378,19 +378,26 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 		case "version_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayVersionIdentifiers
-				if src != nil {
-					newSrc = &src.GatewayVersionIdentifiers
+				if (src == nil || src.VersionIds == nil) && dst.VersionIds == nil {
+					continue
 				}
-				newDst = &dst.GatewayVersionIdentifiers
+				if src != nil {
+					newSrc = src.VersionIds
+				}
+				if dst.VersionIds != nil {
+					newDst = dst.VersionIds
+				} else {
+					newDst = &GatewayVersionIdentifiers{}
+					dst.VersionIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayVersionIdentifiers = src.GatewayVersionIdentifiers
+					dst.VersionIds = src.VersionIds
 				} else {
-					var zero GatewayVersionIdentifiers
-					dst.GatewayVersionIdentifiers = zero
+					dst.VersionIds = nil
 				}
 			}
 		case "gateway_server_address":
