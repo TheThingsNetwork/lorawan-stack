@@ -3226,7 +3226,6 @@ Template for creating end devices.
 
 | Field | Validations |
 | ----- | ----------- |
-| `application_ids` | <p>`message.required`: `true`</p> |
 | `order` | <p>`string.in`: `[ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
