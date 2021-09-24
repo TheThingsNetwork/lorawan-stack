@@ -33159,6 +33159,42 @@
           ]
         },
         {
+          "name": "PacketBrokerDefaultGatewayVisibility",
+          "longName": "PacketBrokerDefaultGatewayVisibility",
+          "fullName": "ttn.lorawan.v3.PacketBrokerDefaultGatewayVisibility",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "updated_at",
+              "description": "Timestamp when the policy got last updated.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "visibility",
+              "description": "",
+              "label": "",
+              "type": "PacketBrokerGatewayVisibility",
+              "longType": "PacketBrokerGatewayVisibility",
+              "fullType": "ttn.lorawan.v3.PacketBrokerGatewayVisibility",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "PacketBrokerDefaultRoutingPolicy",
           "longName": "PacketBrokerDefaultRoutingPolicy",
           "fullName": "ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy",
@@ -33451,6 +33487,114 @@
               "type": "bytes",
               "longType": "bytes",
               "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PacketBrokerGatewayVisibility",
+          "longName": "PacketBrokerGatewayVisibility",
+          "fullName": "ttn.lorawan.v3.PacketBrokerGatewayVisibility",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "location",
+              "description": "Show location.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "antenna_placement",
+              "description": "Show antenna placement (indoor/outdoor).",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "antenna_count",
+              "description": "Show antenna count.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "fine_timestamps",
+              "description": "Show whether the gateway produces fine timestamps.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "contact_info",
+              "description": "Show contact information.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "status",
+              "description": "Show status (online/offline).",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "frequency_plan",
+              "description": "Show frequency plan.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "packet_rates",
+              "description": "Show receive and transmission packet rates.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -33899,6 +34043,38 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SetPacketBrokerDefaultGatewayVisibilityRequest",
+          "longName": "SetPacketBrokerDefaultGatewayVisibilityRequest",
+          "fullName": "ttn.lorawan.v3.SetPacketBrokerDefaultGatewayVisibilityRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "visibility",
+              "description": "",
+              "label": "",
+              "type": "PacketBrokerGatewayVisibility",
+              "longType": "PacketBrokerGatewayVisibility",
+              "fullType": "ttn.lorawan.v3.PacketBrokerGatewayVisibility",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -34397,6 +34573,78 @@
                     {
                       "method": "DELETE",
                       "pattern": "/pba/home-networks/policies/{net_id}/{tenant_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetHomeNetworkDefaultGatewayVisibility",
+              "description": "Get the default gateway visibility.\nGetting gateway visibilities requires administrative access.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "PacketBrokerDefaultGatewayVisibility",
+              "responseLongType": "PacketBrokerDefaultGatewayVisibility",
+              "responseFullType": "ttn.lorawan.v3.PacketBrokerDefaultGatewayVisibility",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/pba/home-networks/gateway-visibilities/default"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "SetHomeNetworkDefaultGatewayVisibility",
+              "description": "Set the default gateway visibility.\nSetting gateway visibilities requires administrative access.",
+              "requestType": "SetPacketBrokerDefaultGatewayVisibilityRequest",
+              "requestLongType": "SetPacketBrokerDefaultGatewayVisibilityRequest",
+              "requestFullType": "ttn.lorawan.v3.SetPacketBrokerDefaultGatewayVisibilityRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/pba/home-networks/gateway-visibilities/default",
+                      "body": "*"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/pba/home-networks/gateway-visibilities/default",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteHomeNetworkDefaultGatewayVisibility",
+              "description": "Deletes the default gateway visibility.\nDeleting gateway visibilities requires administrative access.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/pba/home-networks/gateway-visibilities/default"
                     }
                   ]
                 }

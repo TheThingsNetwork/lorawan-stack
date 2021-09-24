@@ -254,6 +254,59 @@ var SetPacketBrokerRoutingPolicyRequestFieldPathsTopLevel = []string{
 	"home_network_id",
 	"uplink",
 }
+var PacketBrokerGatewayVisibilityFieldPathsNested = []string{
+	"antenna_count",
+	"antenna_placement",
+	"contact_info",
+	"fine_timestamps",
+	"frequency_plan",
+	"location",
+	"packet_rates",
+	"status",
+}
+
+var PacketBrokerGatewayVisibilityFieldPathsTopLevel = []string{
+	"antenna_count",
+	"antenna_placement",
+	"contact_info",
+	"fine_timestamps",
+	"frequency_plan",
+	"location",
+	"packet_rates",
+	"status",
+}
+var PacketBrokerDefaultGatewayVisibilityFieldPathsNested = []string{
+	"updated_at",
+	"visibility",
+	"visibility.antenna_count",
+	"visibility.antenna_placement",
+	"visibility.contact_info",
+	"visibility.fine_timestamps",
+	"visibility.frequency_plan",
+	"visibility.location",
+	"visibility.packet_rates",
+	"visibility.status",
+}
+
+var PacketBrokerDefaultGatewayVisibilityFieldPathsTopLevel = []string{
+	"updated_at",
+	"visibility",
+}
+var SetPacketBrokerDefaultGatewayVisibilityRequestFieldPathsNested = []string{
+	"visibility",
+	"visibility.antenna_count",
+	"visibility.antenna_placement",
+	"visibility.contact_info",
+	"visibility.fine_timestamps",
+	"visibility.frequency_plan",
+	"visibility.location",
+	"visibility.packet_rates",
+	"visibility.status",
+}
+
+var SetPacketBrokerDefaultGatewayVisibilityRequestFieldPathsTopLevel = []string{
+	"visibility",
+}
 var ListPacketBrokerNetworksRequestFieldPathsNested = []string{
 	"limit",
 	"name_contains",
