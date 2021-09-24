@@ -218,11 +218,11 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewEndDeviceRegistryClient(is).List(ctx, &ttnpb.ListEndDevicesRequest{
-				ApplicationIdentifiers: *appID,
-				FieldMask:              &pbtypes.FieldMask{Paths: paths},
-				Limit:                  limit,
-				Page:                   page,
-				Order:                  getOrder(cmd.Flags()),
+				ApplicationIds: appID,
+				FieldMask:      &pbtypes.FieldMask{Paths: paths},
+				Limit:          limit,
+				Page:           page,
+				Order:          getOrder(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err

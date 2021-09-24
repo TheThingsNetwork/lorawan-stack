@@ -78,7 +78,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 
 		_, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "test-app-id",
 			},
 		})
