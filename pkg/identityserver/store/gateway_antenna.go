@@ -37,7 +37,7 @@ func init() {
 	registerModel(&GatewayAntenna{})
 }
 
-func (a GatewayAntenna) toPB() ttnpb.GatewayAntenna {
+func (a GatewayAntenna) toPB() *ttnpb.GatewayAntenna {
 	var loc *ttnpb.Location
 	if a.Location != (Location{}) {
 		loc = &ttnpb.Location{
@@ -48,7 +48,7 @@ func (a GatewayAntenna) toPB() ttnpb.GatewayAntenna {
 			Source:    ttnpb.SOURCE_REGISTRY,
 		}
 	}
-	return ttnpb.GatewayAntenna{
+	return &ttnpb.GatewayAntenna{
 		Gain:       a.Gain,
 		Location:   loc,
 		Attributes: attributes(a.Attributes).toMap(),

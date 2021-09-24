@@ -161,7 +161,7 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	},
 	antennasField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		sort.Slice(gtw.Antennas, func(i int, j int) bool { return gtw.Antennas[i].Index < gtw.Antennas[j].Index })
-		pb.Antennas = make([]ttnpb.GatewayAntenna, len(gtw.Antennas))
+		pb.Antennas = make([]*ttnpb.GatewayAntenna, len(gtw.Antennas))
 		for i, antenna := range gtw.Antennas {
 			pb.Antennas[i] = antenna.toPB()
 		}
@@ -283,7 +283,7 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 		gtw.Antennas = antennas
 		for i, pb := range pb.Antennas {
 			antenna := gtw.Antennas[i]
-			antenna.fromPB(pb)
+			antenna.fromPB(*pb)
 			antenna.Index = i
 			gtw.Antennas[i] = antenna
 		}
