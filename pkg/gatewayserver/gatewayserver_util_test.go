@@ -72,7 +72,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 		Ids:              &ids,
 		FrequencyPlanId:  test.EUFrequencyPlanID,
 		FrequencyPlanIds: []string{test.EUFrequencyPlanID},
-		Antennas: []ttnpb.GatewayAntenna{
+		Antennas: []*ttnpb.GatewayAntenna{
 			{
 				Location: &ttnpb.Location{
 					Source: ttnpb.SOURCE_REGISTRY,

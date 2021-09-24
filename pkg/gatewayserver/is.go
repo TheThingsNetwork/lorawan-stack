@@ -85,10 +85,16 @@ func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, a
 	if err != nil {
 		return err
 	}
+
+	a := make([]*ttnpb.GatewayAntenna, 0)
+	for _, antenna := range antennas {
+		a = append(a, &antenna)
+	}
+
 	req := &ttnpb.UpdateGatewayRequest{
 		Gateway: ttnpb.Gateway{
 			Ids:      &ids,
-			Antennas: antennas,
+			Antennas: a,
 		},
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"antennas"},
