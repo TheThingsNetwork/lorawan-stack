@@ -292,11 +292,11 @@ var (
 				return errNoGatewayID.New()
 			}
 
-			var antenna ttnpb.GatewayAntenna
-			if err = util.SetFields(&antenna, setGatewayAntennaFlags, "antenna"); err != nil {
+			var antenna *ttnpb.GatewayAntenna
+			if err = util.SetFields(antenna, setGatewayAntennaFlags, "antenna"); err != nil {
 				return err
 			}
-			gateway.Antennas = []ttnpb.GatewayAntenna{antenna}
+			gateway.Antennas = []*ttnpb.GatewayAntenna{antenna}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -359,7 +359,7 @@ var (
 				}
 				antennaIndex, _ := cmd.Flags().GetInt("antenna.index")
 				if antennaAdd || len(res.Antennas) == 0 {
-					res.Antennas = append(res.Antennas, ttnpb.GatewayAntenna{})
+					res.Antennas = append(res.Antennas, &ttnpb.GatewayAntenna{})
 					antennaIndex = len(res.Antennas) - 1
 				} else if antennaIndex > len(res.Antennas) {
 					return errAntennaIndex.New()
