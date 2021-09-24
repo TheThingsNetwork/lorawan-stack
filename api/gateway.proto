@@ -142,7 +142,6 @@ message Gateway {
 
   // Antennas of the gateway. Location information of the antennas is public and can be seen by any authenticated user in the network if location_public=true.
   repeated GatewayAntenna antennas = 13 [
-    (gogoproto.nullable) = false,
     (validate.rules).repeated.max_items = 8
   ];
   // The status of this gateway may be publicly displayed.

@@ -819,14 +819,14 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "antennas":
 
-			if len(m.Antennas) > 8 {
+			if len(m.GetAntennas()) > 8 {
 				return GatewayValidationError{
 					field:  "antennas",
 					reason: "value must contain no more than 8 item(s)",
 				}
 			}
 
-			for idx, item := range m.Antennas {
+			for idx, item := range m.GetAntennas() {
 				_, _ = idx, item
 
 				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
