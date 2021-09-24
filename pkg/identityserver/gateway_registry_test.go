@@ -218,13 +218,21 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: ttnpb.Gateway{
 				Ids:  created.GetIds(),
 				Name: "Updated Name",
+				VersionIds: &ttnpb.GatewayVersionIdentifiers{
+					FirmwareVersion: "1.0.0",
+				},
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name", "version_ids.firmware_version"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
 			a.So(updated.Name, should.Equal, "Updated Name")
+			a.So(updated.VersionIds, should.NotBeNil)
+			a.So(updated.VersionIds.FirmwareVersion, should.Equal, "1.0.0")
+			a.So(updated.VersionIds.BrandId, should.BeEmpty)
+			a.So(updated.VersionIds.ModelId, should.BeEmpty)
+			a.So(updated.VersionIds.HardwareVersion, should.BeEmpty)
 		}
 
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {

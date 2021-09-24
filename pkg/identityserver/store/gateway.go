@@ -94,17 +94,49 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	descriptionField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Description = gtw.Description },
 	attributesField:  func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Attributes = attributes(gtw.Attributes).toMap() },
 	versionIDsField: func(pb *ttnpb.Gateway, gtw *Gateway) {
-		pb.GatewayVersionIdentifiers = ttnpb.GatewayVersionIdentifiers{
+		pb.VersionIds = &ttnpb.GatewayVersionIdentifiers{
 			BrandId:         gtw.BrandID,
 			ModelId:         gtw.ModelID,
 			HardwareVersion: gtw.HardwareVersion,
 			FirmwareVersion: gtw.FirmwareVersion,
 		}
 	},
-	brandIDField:              func(pb *ttnpb.Gateway, gtw *Gateway) { pb.BrandId = gtw.BrandID },
-	modelIDField:              func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ModelId = gtw.ModelID },
-	hardwareVersionField:      func(pb *ttnpb.Gateway, gtw *Gateway) { pb.HardwareVersion = gtw.HardwareVersion },
-	firmwareVersionField:      func(pb *ttnpb.Gateway, gtw *Gateway) { pb.FirmwareVersion = gtw.FirmwareVersion },
+	brandIDField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		if pb.VersionIds != nil {
+			pb.VersionIds.BrandId = gtw.BrandID
+		} else {
+			pb.VersionIds = &ttnpb.GatewayVersionIdentifiers{
+				BrandId: gtw.BrandID,
+			}
+		}
+	},
+	modelIDField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		if pb.VersionIds != nil {
+			pb.VersionIds.ModelId = gtw.ModelID
+		} else {
+			pb.VersionIds = &ttnpb.GatewayVersionIdentifiers{
+				ModelId: gtw.ModelID,
+			}
+		}
+	},
+	hardwareVersionField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		if pb.VersionIds != nil {
+			pb.VersionIds.HardwareVersion = gtw.HardwareVersion
+		} else {
+			pb.VersionIds = &ttnpb.GatewayVersionIdentifiers{
+				HardwareVersion: gtw.HardwareVersion,
+			}
+		}
+	},
+	firmwareVersionField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		if pb.VersionIds != nil {
+			pb.VersionIds.FirmwareVersion = gtw.FirmwareVersion
+		} else {
+			pb.VersionIds = &ttnpb.GatewayVersionIdentifiers{
+				FirmwareVersion: gtw.FirmwareVersion,
+			}
+		}
+	},
 	gatewayServerAddressField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.GatewayServerAddress = gtw.GatewayServerAddress },
 	autoUpdateField:           func(pb *ttnpb.Gateway, gtw *Gateway) { pb.AutoUpdate = gtw.AutoUpdate },
 	updateChannelField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.UpdateChannel = gtw.UpdateChannel },
@@ -200,15 +232,33 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 		gtw.Attributes = attributes(gtw.Attributes).updateFromMap(pb.Attributes)
 	},
 	versionIDsField: func(gtw *Gateway, pb *ttnpb.Gateway) {
-		gtw.BrandID = pb.BrandId
-		gtw.ModelID = pb.ModelId
-		gtw.HardwareVersion = pb.HardwareVersion
-		gtw.FirmwareVersion = pb.FirmwareVersion
+		if pb.VersionIds != nil {
+			gtw.BrandID = pb.VersionIds.BrandId
+			gtw.ModelID = pb.VersionIds.ModelId
+			gtw.HardwareVersion = pb.VersionIds.HardwareVersion
+			gtw.FirmwareVersion = pb.VersionIds.FirmwareVersion
+		}
 	},
-	brandIDField:              func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.BrandID = pb.BrandId },
-	modelIDField:              func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ModelID = pb.ModelId },
-	hardwareVersionField:      func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.HardwareVersion = pb.HardwareVersion },
-	firmwareVersionField:      func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FirmwareVersion = pb.FirmwareVersion },
+	brandIDField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		if pb.VersionIds != nil {
+			gtw.BrandID = pb.VersionIds.BrandId
+		}
+	},
+	modelIDField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		if pb.VersionIds != nil {
+			gtw.ModelID = pb.VersionIds.ModelId
+		}
+	},
+	hardwareVersionField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		if pb.VersionIds != nil {
+			gtw.HardwareVersion = pb.VersionIds.HardwareVersion
+		}
+	},
+	firmwareVersionField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		if pb.VersionIds != nil {
+			gtw.FirmwareVersion = pb.VersionIds.FirmwareVersion
+		}
+	},
 	gatewayServerAddressField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayServerAddress = pb.GatewayServerAddress },
 	autoUpdateField:           func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.AutoUpdate = pb.AutoUpdate },
 	updateChannelField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.UpdateChannel = pb.UpdateChannel },
