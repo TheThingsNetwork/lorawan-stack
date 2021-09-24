@@ -70,7 +70,7 @@ func TestBuildLorad(t *testing.T) {
 			Name: "EU868/1 antenna",
 			Gateway: &ttnpb.Gateway{
 				FrequencyPlanId: test.EUFrequencyPlanID,
-				Antennas: []ttnpb.GatewayAntenna{
+				Antennas: []*ttnpb.GatewayAntenna{
 					{
 						Gain: 4,
 						Location: &ttnpb.Location{
@@ -104,7 +104,7 @@ func TestBuildLorad(t *testing.T) {
 			Name: "EU868/3 antennas",
 			Gateway: &ttnpb.Gateway{
 				FrequencyPlanId: test.EUFrequencyPlanID,
-				Antennas: []ttnpb.GatewayAntenna{
+				Antennas: []*ttnpb.GatewayAntenna{
 					{
 						Gain: 4,
 						Location: &ttnpb.Location{
