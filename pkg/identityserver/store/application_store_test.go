@@ -37,9 +37,9 @@ func TestApplicationStore(t *testing.T) {
 		s := newStore(db)
 
 		created, err := store.CreateApplication(ctx, &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			Name:                   "Foo Application",
-			Description:            "The Amazing Foo Application",
+			Ids:         &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			Name:        "Foo Application",
+			Description: "The Amazing Foo Application",
 			Attributes: map[string]string{
 				"foo": "bar",
 				"bar": "baz",
@@ -49,7 +49,7 @@ func TestApplicationStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(created, should.NotBeNil) {
-			a.So(created.ApplicationId, should.Equal, "foo")
+			a.So(created.GetIds().GetApplicationId(), should.Equal, "foo")
 			a.So(created.Name, should.Equal, "Foo Application")
 			a.So(created.Description, should.Equal, "The Amazing Foo Application")
 			a.So(created.Attributes, should.HaveLength, 3)
@@ -61,7 +61,7 @@ func TestApplicationStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.ApplicationId, should.Equal, "foo")
+			a.So(got.GetIds().GetApplicationId(), should.Equal, "foo")
 			a.So(got.Name, should.Equal, "Foo Application")
 			a.So(got.Description, should.BeEmpty)
 			a.So(got.Attributes, should.HaveLength, 3)
@@ -70,7 +70,7 @@ func TestApplicationStore(t *testing.T) {
 		}
 
 		_, err = store.UpdateApplication(ctx, &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "bar"},
+			Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "bar"},
 		}, nil)
 
 		if a.So(err, should.NotBeNil) {
@@ -78,9 +78,9 @@ func TestApplicationStore(t *testing.T) {
 		}
 
 		updated, err := store.UpdateApplication(ctx, &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			Name:                   "Foobar Application",
-			Description:            "The Amazing Foobar Application",
+			Ids:         &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			Name:        "Foobar Application",
+			Description: "The Amazing Foobar Application",
 			Attributes: map[string]string{
 				"foo": "bar",
 				"baz": "baz",
@@ -100,7 +100,7 @@ func TestApplicationStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.ApplicationId, should.Equal, created.ApplicationId)
+			a.So(got.GetIds().GetApplicationId(), should.Equal, created.GetIds().GetApplicationId())
 			a.So(got.Name, should.Equal, created.Name)
 			a.So(got.Description, should.Equal, updated.Description)
 			a.So(got.Attributes, should.Resemble, updated.Attributes)
@@ -163,7 +163,7 @@ func TestApplicationStore(t *testing.T) {
 
 		// Check that application ids are released after purge
 		_, err = store.CreateApplication(ctx, &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 		})
 
 		a.So(err, should.BeNil)

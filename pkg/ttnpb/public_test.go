@@ -28,10 +28,10 @@ func TestApplicationPublicSafe(t *testing.T) {
 	a.So(((*Application)(nil)).PublicSafe(), should.BeNil)
 
 	src := &Application{
-		ApplicationIdentifiers: ApplicationIdentifiers{ApplicationId: "foo"},
-		Name:                   "Name",
-		Description:            "Description",
-		Attributes:             map[string]string{"key": "value"},
+		Ids:         &ApplicationIdentifiers{ApplicationId: "foo"},
+		Name:        "Name",
+		Description: "Description",
+		Attributes:  map[string]string{"key": "value"},
 	}
 	safe := src.PublicSafe()
 
