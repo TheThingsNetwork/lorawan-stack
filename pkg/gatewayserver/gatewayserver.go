@@ -23,11 +23,8 @@ import (
 	"math"
 	"net"
 	"net/http"
-	"os"
-	"runtime/debug"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -56,6 +53,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 )
@@ -632,25 +630,80 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 
 var errHostHandle = errors.Define("host_handle", "host `{host}` failed to handle message")
 
-var (
-	// maxUpstreamHandlers is the maximum number of goroutines per gateway connection to handle upstream messages.
-	maxUpstreamHandlers = int32(1 << 5)
-	// upstreamHandlerIdleTimeout is the duration after which an idle upstream handler stops to save resources.
-	upstreamHandlerIdleTimeout = (1 << 7) * time.Millisecond
-)
-
 type upstreamHost struct {
 	name          string
 	handler       upstream.Handler
-	handlers      int32
-	handleWg      sync.WaitGroup
-	handleCh      chan upstreamItem
+	pool          workerpool.WorkerPool
+	gtw           *ttnpb.Gateway
 	correlationID string
 }
 
-type upstreamItem struct {
-	ctx context.Context
-	val interface{}
+func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
+	ctx = events.ContextWithCorrelationID(ctx, host.correlationID)
+	logger := log.FromContext(ctx)
+	gtw := host.gtw
+	switch msg := item.(type) {
+	case *ttnpb.GatewayUplinkMessage:
+		up := *msg.UplinkMessage
+		msg = &ttnpb.GatewayUplinkMessage{
+			BandId:        msg.BandId,
+			UplinkMessage: &up,
+		}
+		msg.CorrelationIds = append(make([]string, 0, len(msg.CorrelationIds)+1), msg.CorrelationIds...)
+		msg.CorrelationIds = append(msg.CorrelationIds, host.correlationID)
+		drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
+			logger := logger.WithError(err)
+			if ids.JoinEui != nil {
+				logger = logger.WithField("join_eui", *ids.JoinEui)
+			}
+			if ids.DevEui != nil && !ids.DevEui.IsZero() {
+				logger = logger.WithField("dev_eui", *ids.DevEui)
+			}
+			if ids.DevAddr != nil && !ids.DevAddr.IsZero() {
+				logger = logger.WithField("dev_addr", *ids.DevAddr)
+			}
+			logger.Debug("Drop message")
+			registerDropUplink(ctx, gtw, msg.UplinkMessage, host.name, err)
+		}
+		ids, err := lorawan.GetUplinkMessageIdentifiers(msg.RawPayload)
+		if err != nil {
+			drop(ttnpb.EndDeviceIdentifiers{}, err)
+			break
+		}
+		var pass bool
+		switch {
+		case ids.DevAddr != nil:
+			for _, prefix := range host.handler.DevAddrPrefixes() {
+				if ids.DevAddr.HasPrefix(prefix) {
+					pass = true
+					break
+				}
+			}
+		default:
+			pass = true
+		}
+		if !pass {
+			break
+		}
+		switch err := host.handler.HandleUplink(ctx, gtw.GatewayIdentifiers, ids, msg); codes.Code(errors.Code(err)) {
+		case codes.Canceled, codes.DeadlineExceeded,
+			codes.Unknown, codes.Internal,
+			codes.Unimplemented, codes.Unavailable:
+			drop(ids, errHostHandle.WithCause(err).WithAttributes("host", host.name))
+		default:
+			registerForwardUplink(ctx, gtw, msg.UplinkMessage, host.name)
+		}
+	case *ttnpb.GatewayStatus:
+		if err := host.handler.HandleStatus(ctx, gtw.GatewayIdentifiers, msg); err != nil {
+			registerDropStatus(ctx, gtw, msg, host.name, err)
+		} else {
+			registerForwardStatus(ctx, gtw, msg, host.name)
+		}
+	case *ttnpb.TxAcknowledgment:
+		if err := host.handler.HandleTxAck(ctx, gtw.GatewayIdentifiers, msg); err != nil {
+			logger.WithField("host", host.name).WithError(err).Debug("Drop Tx acknowledgment")
+		}
+	}
 }
 
 func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
@@ -667,83 +720,6 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 		close(conn.upstreamDone)
 	}()
 
-	handleFn := func(ctx context.Context, host *upstreamHost) {
-		defer recoverHandler(ctx)
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-time.After(upstreamHandlerIdleTimeout):
-				return
-			case item := <-host.handleCh:
-				ctx := item.ctx
-				ctx = events.ContextWithCorrelationID(ctx, host.correlationID)
-				switch msg := item.val.(type) {
-				case *ttnpb.GatewayUplinkMessage:
-					up := *msg.UplinkMessage
-					msg = &ttnpb.GatewayUplinkMessage{
-						BandId:        msg.BandId,
-						UplinkMessage: &up,
-					}
-					msg.CorrelationIds = append(make([]string, 0, len(msg.CorrelationIds)+1), msg.CorrelationIds...)
-					msg.CorrelationIds = append(msg.CorrelationIds, host.correlationID)
-					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
-						logger := logger.WithError(err)
-						if ids.JoinEui != nil {
-							logger = logger.WithField("join_eui", *ids.JoinEui)
-						}
-						if ids.DevEui != nil && !ids.DevEui.IsZero() {
-							logger = logger.WithField("dev_eui", *ids.DevEui)
-						}
-						if ids.DevAddr != nil && !ids.DevAddr.IsZero() {
-							logger = logger.WithField("dev_addr", *ids.DevAddr)
-						}
-						logger.Debug("Drop message")
-						registerDropUplink(ctx, gtw, msg.UplinkMessage, host.name, err)
-					}
-					ids, err := lorawan.GetUplinkMessageIdentifiers(msg.RawPayload)
-					if err != nil {
-						drop(ttnpb.EndDeviceIdentifiers{}, err)
-						break
-					}
-					var pass bool
-					switch {
-					case ids.DevAddr != nil:
-						for _, prefix := range host.handler.DevAddrPrefixes() {
-							if ids.DevAddr.HasPrefix(prefix) {
-								pass = true
-								break
-							}
-						}
-					default:
-						pass = true
-					}
-					if !pass {
-						break
-					}
-					switch err := host.handler.HandleUplink(ctx, gtw.GatewayIdentifiers, ids, msg); codes.Code(errors.Code(err)) {
-					case codes.Canceled, codes.DeadlineExceeded,
-						codes.Unknown, codes.Internal,
-						codes.Unimplemented, codes.Unavailable:
-						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", host.name))
-					default:
-						registerForwardUplink(ctx, gtw, msg.UplinkMessage, host.name)
-					}
-				case *ttnpb.GatewayStatus:
-					if err := host.handler.HandleStatus(ctx, gtw.GatewayIdentifiers, msg); err != nil {
-						registerDropStatus(ctx, gtw, msg, host.name, err)
-					} else {
-						registerForwardStatus(ctx, gtw, msg, host.name)
-					}
-				case *ttnpb.TxAcknowledgment:
-					if err := host.handler.HandleTxAck(ctx, gtw.GatewayIdentifiers, msg); err != nil {
-						logger.WithField("host", host.name).WithError(err).Debug("Drop Tx acknowledgment")
-					}
-				}
-			}
-		}
-	}
-
 	hosts := make([]*upstreamHost, 0, len(gs.upstreamHandlers))
 	for name, handler := range gs.upstreamHandlers {
 		if name == "packetbroker" && gtw.DisablePacketBrokerForwarding {
@@ -752,11 +728,25 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 		host := &upstreamHost{
 			name:          name,
 			handler:       handler,
-			handleCh:      make(chan upstreamItem),
+			gtw:           gtw,
 			correlationID: fmt.Sprintf("gs:up:host:%s", events.NewCorrelationID()),
 		}
+		wp, err := workerpool.NewWorkerPool(workerpool.Config{
+			Component:     gs,
+			Context:       ctx,
+			Name:          fmt.Sprintf("upstream_handlers_%v", name),
+			CreateHandler: workerpool.StaticHandlerFactory(host.handlePacket),
+			MinWorkers:    -1,
+			MaxWorkers:    32,
+			QueueSize:     -1,
+		})
+		if err != nil {
+			conn.Disconnect(err)
+			return
+		}
+		defer wp.Wait()
+		host.pool = wp
 		hosts = append(hosts, host)
-		defer host.handleWg.Wait()
 	}
 
 	for {
@@ -796,40 +786,17 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 			}
 			val = msg
 		}
-		item := upstreamItem{ctx, val}
 		for _, host := range hosts {
-			host := host
-			select {
-			case <-ctx.Done():
-				return
-			case host.handleCh <- item:
-			default:
-				if atomic.LoadInt32(&host.handlers) < maxUpstreamHandlers {
-					atomic.AddInt32(&host.handlers, 1)
-					host.handleWg.Add(1)
-					registerUpstreamHandlerStart(ctx, host.name)
-					go func() {
-						defer host.handleWg.Done()
-						defer atomic.AddInt32(&host.handlers, -1)
-						defer registerUpstreamHandlerStop(ctx, host.name)
-						handleFn(ctx, host)
-					}()
-					go func() {
-						select {
-						case <-ctx.Done():
-							return
-						case host.handleCh <- item:
-						}
-					}()
-					continue
-				}
-				logger.WithField("name", host.name).Warn("Upstream handler busy, fail message")
-				switch msg := val.(type) {
-				case *ttnpb.UplinkMessage:
-					registerFailUplink(ctx, gtw, msg, host.name)
-				case *ttnpb.GatewayStatus:
-					registerFailStatus(ctx, gtw, msg, host.name)
-				}
+			err := host.pool.Publish(ctx, val)
+			if err == nil {
+				continue
+			}
+			logger.WithField("name", host.name).WithError(err).Warn("Upstream handler publish failed")
+			switch msg := val.(type) {
+			case *ttnpb.UplinkMessage:
+				registerFailUplink(ctx, gtw, msg, host.name)
+			case *ttnpb.GatewayStatus:
+				registerFailStatus(ctx, gtw, msg, host.name)
 			}
 		}
 	}
@@ -1017,22 +984,4 @@ func (gs *GatewayServer) GetMQTTConfig(ctx context.Context) (*config.MQTT, error
 		return nil, err
 	}
 	return &config.MQTT, nil
-}
-
-var errHandlerRecovered = errors.DefineInternal("handler_recovered", "internal server error")
-
-func recoverHandler(ctx context.Context) error {
-	if p := recover(); p != nil {
-		fmt.Fprintln(os.Stderr, p)
-		os.Stderr.Write(debug.Stack())
-		var err error
-		if pErr, ok := p.(error); ok {
-			err = errHandlerRecovered.WithCause(pErr)
-		} else {
-			err = errHandlerRecovered.WithAttributes("panic", p)
-		}
-		log.FromContext(ctx).WithError(err).Error("Handler failed")
-		return err
-	}
-	return nil
 }

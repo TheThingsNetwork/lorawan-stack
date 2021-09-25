@@ -16,6 +16,7 @@ package workerpool
 
 import (
 	"context"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -59,9 +60,9 @@ type Config struct {
 	context.Context                  // The base context of the pool.
 	Name              string         // The name of the pool.
 	CreateHandler     HandlerFactory // The function that creates handlers.
-	MinWorkers        int            // The minimum number of workers in the pool.
+	MinWorkers        int            // The minimum number of workers in the pool. Use -1 to disable.
 	MaxWorkers        int            // The maximum number of workers in the pool.
-	QueueSize         int            // The size of the work queue.
+	QueueSize         int            // The size of the work queue. Use -1 to disable.
 	WorkerIdleTimeout time.Duration  // The maximum amount of time a worker will stay idle before closing.
 }
 
@@ -72,6 +73,9 @@ type WorkerPool interface {
 	// Publish may spawn a worker in order to fullfil the work load.
 	// Publish does not block.
 	Publish(ctx context.Context, item interface{}) error
+
+	// Wait blocks until all workers have been closed.
+	Wait()
 }
 
 type contextualItem struct {
@@ -86,6 +90,7 @@ type workerPool struct {
 	fastQueue chan *contextualItem // fastQueue allows direct communication between publishers and idle workers.
 
 	workers int32
+	wg      sync.WaitGroup
 }
 
 func (wp *workerPool) handle(ctx context.Context, it *contextualItem, handler Handler) {
@@ -105,6 +110,7 @@ func (wp *workerPool) workerBody(handler Handler, initialWork *contextualItem) f
 			}
 		}()
 
+		defer wp.wg.Done()
 		defer registerWorkerStopped(wp.Name)
 
 		registerWorkerIdle(wp.Name)
@@ -152,6 +158,7 @@ func (wp *workerPool) spawnWorker(initialWork *contextualItem) (bool, error) {
 	}
 
 	registerWorkerStarted(wp.Name)
+	wp.wg.Add(1)
 
 	wp.StartTask(&component.TaskConfig{
 		Context: wp.Context,
@@ -228,19 +235,34 @@ func (wp *workerPool) Publish(ctx context.Context, item interface{}) error {
 	})
 }
 
+// Wait implements WorkerPool.
+func (wp *workerPool) Wait() {
+	wp.wg.Wait()
+}
+
 // NewWorkerPool creates a new WorkerPool with the provided configuration.
 func NewWorkerPool(cfg Config) (WorkerPool, error) {
 	if cfg.WorkerIdleTimeout == 0 {
 		cfg.WorkerIdleTimeout = defaultWorkerIdleTimeout
 	}
-	if cfg.MinWorkers <= 0 {
+	// We treat 0 as being default initialized, and use the defaults.
+	if cfg.MinWorkers == 0 {
 		cfg.MinWorkers = defaultMinWorkers
+	}
+	// We treat negative values as explicitly disabling the minimum number of workers.
+	if cfg.MinWorkers < 0 {
+		cfg.MinWorkers = 0
 	}
 	if cfg.MaxWorkers <= 0 {
 		cfg.MaxWorkers = defaultMaxWorkers
 	}
-	if cfg.QueueSize <= 0 {
+	// We treat 0 as being default initialized, and use the defaults.
+	if cfg.QueueSize == 0 {
 		cfg.QueueSize = defaultQueueSize
+	}
+	// We treat negative values as explicitly disabling the queue.
+	if cfg.QueueSize < 0 {
+		cfg.QueueSize = 0
 	}
 	if cfg.MinWorkers > cfg.MaxWorkers {
 		cfg.MaxWorkers = cfg.MinWorkers

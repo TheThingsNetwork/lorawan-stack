@@ -33,7 +33,8 @@ type NS struct {
 // StartNS starts the mock NS.
 func StartNS(ctx context.Context) (*NS, string) {
 	ns := &NS{
-		upCh: make(chan *ttnpb.UplinkMessage, 1),
+		upCh:    make(chan *ttnpb.UplinkMessage, 1),
+		txAckCh: make(chan *ttnpb.GatewayTxAcknowledgment, 1),
 	}
 	srv := rpcserver.New(ctx)
 	ttnpb.RegisterGsNsServer(srv.Server, ns)
