@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -216,4 +217,76 @@ func (*mockComponent) StartTask(cfg *component.TaskConfig) {
 
 func (*mockComponent) FromRequestContext(ctx context.Context) context.Context {
 	return ctx
+}
+
+func benchmarkWorkerPool(b *testing.B, processingDelay time.Duration, publishingDelay time.Duration) {
+	_, ctx := test.New(b)
+
+	var totalQueueDelayMS int64
+	var totalHandled int64
+	var published, dropped int64
+
+	for r := 0; r < b.N; r++ {
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		handler := func(ctx context.Context, item interface{}) {
+			tm := item.(time.Time)
+			delay := time.Now().Sub(tm).Milliseconds()
+			atomic.AddInt64(&totalQueueDelayMS, delay)
+			atomic.AddInt64(&totalHandled, 1)
+
+			time.Sleep(random.Jitter(processingDelay, 0.15))
+		}
+
+		wp := NewWorkerPool(Config{
+			Component: &mockComponent{},
+			Context:   ctx,
+			Handler:   handler,
+		})
+
+		var wg sync.WaitGroup
+		publisher := func() {
+			defer wg.Done()
+			for p := 0; p < 1_000; p++ {
+				if err := wp.Publish(ctx, time.Now()); err != nil {
+					atomic.AddInt64(&dropped, 1)
+				} else {
+					atomic.AddInt64(&published, 1)
+				}
+				time.Sleep(random.Jitter(publishingDelay, 0.15))
+			}
+		}
+
+		for i := 0; i < defaultMaxWorkers; i++ {
+			wg.Add(1)
+			go publisher()
+		}
+
+		wg.Wait()
+
+		time.Sleep(testTimeout)
+		cancel()
+		wp.Wait()
+	}
+
+	b.ReportMetric(float64(totalQueueDelayMS)/float64(totalHandled), "queueDelayMS")
+	b.ReportMetric(float64(published), "published")
+	b.ReportMetric(float64(dropped), "dropped")
+}
+
+func BenchmarkWorkerPool(b *testing.B) {
+	delays := []time.Duration{5 * time.Millisecond, 10 * time.Millisecond, 50 * time.Millisecond}
+	for _, processingDelay := range delays {
+		for _, publishingDelay := range delays {
+			name := fmt.Sprintf(
+				"processingDelay/%v/publishingDelay/%v",
+				processingDelay,
+				publishingDelay,
+			)
+			b.Run(name, func(b *testing.B) {
+				benchmarkWorkerPool(b, processingDelay, publishingDelay)
+			})
+		}
+	}
 }
