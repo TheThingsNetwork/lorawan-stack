@@ -731,19 +731,15 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 			gtw:           gtw,
 			correlationID: fmt.Sprintf("gs:up:host:%s", events.NewCorrelationID()),
 		}
-		wp, err := workerpool.NewWorkerPool(workerpool.Config{
-			Component:     gs,
-			Context:       ctx,
-			Name:          fmt.Sprintf("upstream_handlers_%v", name),
-			CreateHandler: workerpool.StaticHandlerFactory(host.handlePacket),
-			MinWorkers:    -1,
-			MaxWorkers:    32,
-			QueueSize:     -1,
+		wp := workerpool.NewWorkerPool(workerpool.Config{
+			Component:  gs,
+			Context:    ctx,
+			Name:       fmt.Sprintf("upstream_handlers_%v", name),
+			Handler:    host.handlePacket,
+			MinWorkers: -1,
+			MaxWorkers: 32,
+			QueueSize:  -1,
 		})
-		if err != nil {
-			conn.Disconnect(err)
-			return
-		}
 		defer wp.Wait()
 		host.pool = wp
 		hosts = append(hosts, host)

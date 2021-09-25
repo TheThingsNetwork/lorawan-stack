@@ -50,11 +50,7 @@ func (mockComponent) FromRequestContext(ctx context.Context) context.Context {
 }
 
 func createdPooledSink(ctx context.Context, t *testing.T, sink web.Sink) web.Sink {
-	q, err := web.NewPooledSink(ctx, mockComponent{}, web.StaticSinkFactory(sink), 1, 4)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return q
+	return web.NewPooledSink(ctx, mockComponent{}, sink, 1, 4)
 }
 
 func TestWebhooks(t *testing.T) {

@@ -80,17 +80,14 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 
 		limitLogs: limitLogs,
 	}
-	wp, err := workerpool.NewWorkerPool(workerpool.Config{
-		Component:     server,
-		Context:       ctx,
-		Name:          "udp",
-		CreateHandler: workerpool.StaticHandlerFactory(s.handlePacket),
-		MaxWorkers:    config.PacketHandlers,
-		QueueSize:     config.PacketBuffer,
+	wp := workerpool.NewWorkerPool(workerpool.Config{
+		Component:  server,
+		Context:    ctx,
+		Name:       "udp",
+		Handler:    s.handlePacket,
+		MaxWorkers: config.PacketHandlers,
+		QueueSize:  config.PacketBuffer,
 	})
-	if err != nil {
-		return err
-	}
 	go s.gc()
 	go func() {
 		<-ctx.Done()
