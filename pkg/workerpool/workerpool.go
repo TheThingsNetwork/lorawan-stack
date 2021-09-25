@@ -93,10 +93,21 @@ func (wp *workerPool) handle(it *contextualItem) {
 
 func (wp *workerPool) workerBody(initialWork *contextualItem) func(context.Context) error {
 	worker := func(ctx context.Context) error {
-		var decremented bool
+		var timeout bool
 		defer func() {
-			if !decremented {
-				atomic.AddInt32(&wp.workers, -1)
+			if timeout {
+				return
+			}
+			atomic.AddInt32(&wp.workers, -1)
+			select {
+			case <-ctx.Done():
+			case <-wp.Done():
+			default:
+				// Since the task did not finish due to a context cancellation
+				// or a timeout, the worker body must have panicked. As such
+				// we attempt to spawn a replacement worker in order to avoid
+				// stalling the queue indefinitely.
+				wp.spawnWorker(nil)
 			}
 		}()
 
@@ -120,7 +131,7 @@ func (wp *workerPool) workerBody(initialWork *contextualItem) func(context.Conte
 
 			case <-time.After(wp.WorkerIdleTimeout):
 				if decrementIfGreaterThan(&wp.workers, int32(wp.MinWorkers)) {
-					decremented = true
+					timeout = true
 					return nil
 				}
 
