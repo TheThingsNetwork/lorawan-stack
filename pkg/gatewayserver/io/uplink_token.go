@@ -49,5 +49,8 @@ func ParseUplinkToken(buf []byte) (*ttnpb.UplinkToken, error) {
 	if err := proto.Unmarshal(buf, &token); err != nil {
 		return nil, err
 	}
+	if err := token.ValidateFields(); err != nil {
+		return nil, err
+	}
 	return &token, nil
 }

@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -425,6 +426,16 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 					gatewayReceiveTime = &t
 				}
 			}
+
+			if md.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
+				continue
+			}
+
+			if len(md.UplinkToken) == 0 {
+				log.FromContext(ctx).WithField("downlink_path_constraint", md.DownlinkPathConstraint).Error("Empty uplink token with favorable downlink path constraint")
+				continue
+			}
+
 			if len(gatewayUplinkToken) == 0 {
 				var err error
 				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, md.GatewayIdentifiers, md.UplinkToken, config.TokenEncrypter)
