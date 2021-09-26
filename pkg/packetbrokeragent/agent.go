@@ -18,8 +18,6 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
-	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -705,7 +703,6 @@ func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 
 func (a *Agent) subscribeUplink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"namespace", "packetbrokeragent",
 		"home_network_net_id", a.netID,
 		"home_network_tenant_id", a.subscriptionTenantID,
 		"home_network_cluster_id", a.homeNetworkClusterID,
@@ -771,148 +768,97 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	}
 	logger.Info("Subscribed as Home Network")
 
-	var (
-		reportCh       = make(chan *packetbroker.UplinkMessageDeliveryStateChange)
-		reportWorkerCh = make(chan *packetbroker.UplinkMessageDeliveryStateChange)
-		uplinkCh       = make(chan *packetbroker.RoutedUplinkMessage)
-	)
-	defer close(uplinkCh)
-
-	wg := &sync.WaitGroup{}
-	defer wg.Wait()
-
 	ctx, cancel := context.WithCancel(ctx)
+
+	reportPool := workerpool.NewWorkerPool(workerpool.Config{
+		Component:  a,
+		Context:    ctx,
+		Name:       "pb_homenetwork_subscribe_report",
+		Handler:    a.handleUplinkMessageDeliveryState(client),
+		MaxWorkers: a.homeNetworkConfig.WorkerPool.Limit / 2,
+	})
+	defer reportPool.Wait()
+
+	uplinkPool := workerpool.NewWorkerPool(workerpool.Config{
+		Component:  a,
+		Context:    ctx,
+		Name:       "pb_homenetwork_subscribe",
+		Handler:    a.handleUplink(reportPool),
+		MaxWorkers: a.homeNetworkConfig.WorkerPool.Limit / 2,
+	})
+	defer uplinkPool.Wait()
+
 	defer cancel()
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var workers int32
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case rep := <-reportCh:
-				select {
-				case reportWorkerCh <- rep:
-				default:
-					if int(atomic.LoadInt32(&workers)) < a.homeNetworkConfig.WorkerPool.Limit/2 {
-						wg.Add(1)
-						worker := atomic.AddInt32(&workers, 1)
-						logger := logger.WithField("worker", worker)
-						go func() {
-							if err := a.reportUplinkMessageDeliveryState(log.NewContext(ctx, logger), client, reportWorkerCh); err != nil {
-								logger.WithError(err).Warn("Home Network uplink reporter worker stopped")
-							}
-							wg.Done()
-							atomic.AddInt32(&workers, -1)
-						}()
-					}
-					select {
-					case reportWorkerCh <- rep:
-					case <-time.After(workerBusyTimeout):
-						logger.Warn("Home Network uplink reporter workers busy, drop message")
-					}
-				}
-			}
-		}
-	}()
-
-	var workers int32
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
 			return err
 		}
-		select {
-		case uplinkCh <- msg:
-		default:
-			if int(atomic.LoadInt32(&workers)) < a.homeNetworkConfig.WorkerPool.Limit/2 {
-				wg.Add(1)
-				worker := atomic.AddInt32(&workers, 1)
-				logger := logger.WithField("worker", worker)
-				go func() {
-					if err := a.handleUplink(log.NewContext(ctx, logger), uplinkCh, reportCh); err != nil {
-						logger.WithError(err).Warn("Home Network uplink handler stopped")
-					}
-					wg.Done()
-					atomic.AddInt32(&workers, -1)
-				}()
-			}
-			select {
-			case uplinkCh <- msg:
-			case <-time.After(workerBusyTimeout):
-				logger.Warn("Home Network uplink handler busy, drop message")
-			}
+		if err := uplinkPool.Publish(ctx, msg); err != nil {
+			logger.WithError(err).Warn("Home Network uplink handler busy, drop message")
 		}
 	}
 }
 
-func (a *Agent) reportUplinkMessageDeliveryState(ctx context.Context, client routingpb.HomeNetworkDataClient, reportCh <-chan *packetbroker.UplinkMessageDeliveryStateChange) error {
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-time.After(workerIdleTimeout):
-			return nil
-		case rep := <-reportCh:
-			var forwarderNetID types.NetID
-			forwarderNetID.UnmarshalNumber(rep.ForwarderNetId)
-			var homeNetworkNetID types.NetID
-			homeNetworkNetID.UnmarshalNumber(rep.HomeNetworkNetId)
-			logger := log.FromContext(ctx).WithFields(log.Fields(
-				"message_id", rep.Id,
-				"from_forwarder_net_id", forwarderNetID,
-				"from_forwarder_tenant_id", rep.ForwarderTenantId,
-				"from_forwarder_cluster_id", rep.ForwarderClusterId,
-			))
-			ctx := log.NewContext(ctx, logger)
-			logger.Debug("Received uplink message delivery state change")
+func (a *Agent) handleUplinkMessageDeliveryState(client routingpb.HomeNetworkDataClient) workerpool.Handler {
+	h := func(ctx context.Context, item interface{}) {
+		rep := item.(*packetbroker.UplinkMessageDeliveryStateChange)
+		var forwarderNetID types.NetID
+		forwarderNetID.UnmarshalNumber(rep.ForwarderNetId)
+		var homeNetworkNetID types.NetID
+		homeNetworkNetID.UnmarshalNumber(rep.HomeNetworkNetId)
+		logger := log.FromContext(ctx).WithFields(log.Fields(
+			"message_id", rep.Id,
+			"from_forwarder_net_id", forwarderNetID,
+			"from_forwarder_tenant_id", rep.ForwarderTenantId,
+			"from_forwarder_cluster_id", rep.ForwarderClusterId,
+		))
+		ctx = log.NewContext(ctx, logger)
+		logger.Debug("Received uplink message delivery state change")
 
-			pbaMetrics.uplinkStateReported.WithLabelValues(ctx,
-				homeNetworkNetID.String(), rep.HomeNetworkTenantId, rep.HomeNetworkClusterId,
-			).Inc()
+		pbaMetrics.uplinkStateReported.WithLabelValues(ctx,
+			homeNetworkNetID.String(), rep.HomeNetworkTenantId, rep.HomeNetworkClusterId,
+		).Inc()
 
-			_, err := client.ReportUplinkMessageDeliveryState(ctx, &routingpb.UplinkMessageDeliveryStateChangeRequest{
-				StateChange: rep,
-			})
-			if err != nil {
-				logger.WithError(err).Warn("Failed to report uplink message delivery state change")
-			}
+		ctx, cancel := context.WithTimeout(ctx, publishMessageTimeout)
+		defer cancel()
+
+		_, err := client.ReportUplinkMessageDeliveryState(ctx, &routingpb.UplinkMessageDeliveryStateChangeRequest{
+			StateChange: rep,
+		})
+		if err != nil {
+			logger.WithError(err).Warn("Failed to report uplink message delivery state change")
 		}
 	}
+	return h
 }
 
-func (a *Agent) handleUplink(ctx context.Context, uplinkCh <-chan *packetbroker.RoutedUplinkMessage, reportCh chan<- *packetbroker.UplinkMessageDeliveryStateChange) error {
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-time.After(workerIdleTimeout):
-			return nil
-		case up := <-uplinkCh:
-			if up.Message == nil {
-				continue
-			}
-			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:uplink:%s", up.Id))
-			var forwarderNetID types.NetID
-			forwarderNetID.UnmarshalNumber(up.ForwarderNetId)
-			ctx = log.NewContextWithFields(ctx, log.Fields(
-				"message_id", up.Id,
-				"from_forwarder_net_id", forwarderNetID,
-				"from_forwarder_tenant_id", up.ForwarderTenantId,
-				"from_forwarder_cluster_id", up.ForwarderClusterId,
-			))
-			if err := a.handleUplinkMessage(ctx, up, reportCh); err != nil {
-				log.FromContext(ctx).WithError(err).Debug("Failed to handle incoming uplink message")
-			}
+func (a *Agent) handleUplink(reportPool workerpool.WorkerPool) workerpool.Handler {
+	h := func(ctx context.Context, item interface{}) {
+		up := item.(*packetbroker.RoutedUplinkMessage)
+		if up.Message == nil {
+			return
+		}
+		ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:uplink:%s", up.Id))
+		var forwarderNetID types.NetID
+		forwarderNetID.UnmarshalNumber(up.ForwarderNetId)
+		ctx = log.NewContextWithFields(ctx, log.Fields(
+			"message_id", up.Id,
+			"from_forwarder_net_id", forwarderNetID,
+			"from_forwarder_tenant_id", up.ForwarderTenantId,
+			"from_forwarder_cluster_id", up.ForwarderClusterId,
+		))
+		if err := a.handleUplinkMessage(ctx, up, reportPool); err != nil {
+			log.FromContext(ctx).WithError(err).Debug("Failed to handle incoming uplink message")
 		}
 	}
+	return h
 }
 
 var errMessageIdentifiers = errors.DefineFailedPrecondition("message_identifiers", "invalid message identifiers")
 
-func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.RoutedUplinkMessage, reportCh chan<- *packetbroker.UplinkMessageDeliveryStateChange) (err error) {
+func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.RoutedUplinkMessage, reportPool workerpool.WorkerPool) (err error) {
 	receivedAt := time.Now()
 	logger := log.FromContext(ctx)
 
@@ -933,11 +879,8 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 				Value: packetbroker.UplinkMessageProcessingError_UPLINK_INTERNAL,
 			}
 		}
-		select {
-		case <-ctx.Done():
-		case reportCh <- report:
-		case <-time.After(workerBusyTimeout):
-			logger.Warn("Home Network uplink reporter enqueuer busy, drop message")
+		if err := reportPool.Publish(ctx, report); err != nil {
+			logger.WithError(err).Warn("Home Network uplink reporter enqueuer busy, drop message")
 		}
 	}()
 
