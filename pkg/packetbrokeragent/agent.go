@@ -43,8 +43,6 @@ import (
 )
 
 const (
-	downstreamBufferSize = 1 << 5
-
 	// publishMessageTimeout defines the timeout for publishing messages.
 	publishMessageTimeout = 3 * time.Second
 )
@@ -249,7 +247,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	}
 
 	if a.homeNetworkConfig.Enable {
-		a.downstreamCh = make(chan *downlinkMessage, downstreamBufferSize)
+		a.downstreamCh = make(chan *downlinkMessage)
 		if a.homeNetworkConfig.WorkerPool.Limit <= 1 {
 			a.homeNetworkConfig.WorkerPool.Limit = 2
 		}
@@ -1065,7 +1063,6 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 
 func (a *Agent) publishDownlink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"namespace", "packetbrokeragent",
 		"home_network_net_id", a.netID,
 		"home_network_cluster_id", a.homeNetworkClusterID,
 	))
@@ -1083,84 +1080,61 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 	logger.Info("Connected as Home Network")
 
-	downlinkCh := make(chan *downlinkMessage)
-	defer close(downlinkCh)
-
-	wg := &sync.WaitGroup{}
-	defer wg.Wait()
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	var workers int32
+	wp := workerpool.NewWorkerPool(workerpool.Config{
+		Component:  a,
+		Context:    ctx,
+		Name:       "pb_homenetwork_publish",
+		Handler:    a.homeNetworkPublisher(conn),
+		MaxWorkers: a.homeNetworkConfig.WorkerPool.Limit,
+	})
+	defer wp.Wait()
 
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		case msg := <-a.downstreamCh:
-			select {
-			case downlinkCh <- msg:
-			default:
-				if int(atomic.LoadInt32(&workers)) < a.homeNetworkConfig.WorkerPool.Limit {
-					wg.Add(1)
-					atomic.AddInt32(&workers, 1)
-					go func() {
-						if err := a.runHomeNetworkPublisher(ctx, conn, downlinkCh); err != nil {
-							logger.WithError(err).Warn("Home Network publisher stopped")
-						}
-						wg.Done()
-						atomic.AddInt32(&workers, -1)
-					}()
-				}
-				select {
-				case downlinkCh <- msg:
-				case <-time.After(workerBusyTimeout):
-					logger.Warn("Home Network publisher busy, drop message")
-				}
+			if err := wp.Publish(ctx, msg); err != nil {
+				logger.WithError(err).Warn("Home Network publisher busy, drop message")
 			}
 		}
 	}
 }
 
-func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientConn, downlinkCh <-chan *downlinkMessage) error {
+func (a *Agent) homeNetworkPublisher(conn *grpc.ClientConn) workerpool.Handler {
 	client := routingpb.NewHomeNetworkDataClient(conn)
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-time.After(workerIdleTimeout):
-			return nil
-		case down := <-downlinkCh:
-			tenantID := a.tenantIDExtractor(down.Context)
-			msg, token := down.DownlinkMessage, down.agentUplinkToken
-			ctx := log.NewContextWithFields(ctx, log.Fields(
-				"forwarder_net_id", token.ForwarderNetID,
-				"forwarder_tenant_id", token.ForwarderTenantID,
-				"forwarder_cluster_id", token.ForwarderClusterID,
-				"home_network_tenant_id", tenantID,
-			))
-			logger := log.FromContext(ctx)
-			req := &routingpb.PublishDownlinkMessageRequest{
-				HomeNetworkNetId:     a.netID.MarshalNumber(),
-				HomeNetworkTenantId:  tenantID,
-				HomeNetworkClusterId: a.homeNetworkClusterID,
-				ForwarderNetId:       token.ForwarderNetID.MarshalNumber(),
-				ForwarderTenantId:    token.ForwarderTenantID,
-				ForwarderClusterId:   token.ForwarderClusterID,
-				Message:              msg,
-			}
-			ctx, cancel := context.WithTimeout(ctx, publishMessageTimeout)
-			res, err := client.Publish(ctx, req)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to publish downlink message")
-			} else {
-				logger.WithField("message_id", res.Id).Debug("Published downlink message")
-				pbaMetrics.downlinkForwarded.WithLabelValues(ctx,
-					a.netID.String(), tenantID, a.homeNetworkClusterID,
-					token.ForwarderNetID.String(), token.ForwarderTenantID, token.ForwarderClusterID,
-				).Inc()
-			}
-			cancel()
+	h := func(ctx context.Context, item interface{}) {
+		down := item.(*downlinkMessage)
+		tenantID := a.tenantIDExtractor(down.Context)
+		msg, token := down.DownlinkMessage, down.agentUplinkToken
+		ctx = log.NewContextWithFields(ctx, log.Fields(
+			"forwarder_net_id", token.ForwarderNetID,
+			"forwarder_tenant_id", token.ForwarderTenantID,
+			"forwarder_cluster_id", token.ForwarderClusterID,
+			"home_network_tenant_id", tenantID,
+		))
+		logger := log.FromContext(ctx)
+		req := &routingpb.PublishDownlinkMessageRequest{
+			HomeNetworkNetId:     a.netID.MarshalNumber(),
+			HomeNetworkTenantId:  tenantID,
+			HomeNetworkClusterId: a.homeNetworkClusterID,
+			ForwarderNetId:       token.ForwarderNetID.MarshalNumber(),
+			ForwarderTenantId:    token.ForwarderTenantID,
+			ForwarderClusterId:   token.ForwarderClusterID,
+			Message:              msg,
+		}
+		ctx, cancel := context.WithTimeout(ctx, publishMessageTimeout)
+		defer cancel()
+		res, err := client.Publish(ctx, req)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to publish downlink message")
+		} else {
+			logger.WithField("message_id", res.Id).Debug("Published downlink message")
+			pbaMetrics.downlinkForwarded.WithLabelValues(ctx,
+				a.netID.String(), tenantID, a.homeNetworkClusterID,
+				token.ForwarderNetID.String(), token.ForwarderTenantID, token.ForwarderClusterID,
+			).Inc()
 		}
 	}
+	return h
 }
