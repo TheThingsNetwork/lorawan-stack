@@ -446,7 +446,6 @@ func (a *Agent) forwarderPublisher(conn *grpc.ClientConn) workerpool.Handler {
 
 func (a *Agent) subscribeDownlink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"namespace", "packetbrokeragent",
 		"forwarder_net_id", a.netID,
 		"forwarder_tenant_id", a.subscriptionTenantID,
 		"forwarder_cluster_id", a.clusterID,
@@ -476,146 +475,95 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 	logger.Info("Subscribed as Forwarder")
 
-	var (
-		reportCh       = make(chan *packetbroker.DownlinkMessageDeliveryStateChange)
-		reportWorkerCh = make(chan *packetbroker.DownlinkMessageDeliveryStateChange)
-		downlinkCh     = make(chan *packetbroker.RoutedDownlinkMessage)
-	)
-	defer close(downlinkCh)
-
-	wg := &sync.WaitGroup{}
-	defer wg.Wait()
-
 	ctx, cancel := context.WithCancel(ctx)
+
+	reportPool := workerpool.NewWorkerPool(workerpool.Config{
+		Component:  a,
+		Context:    ctx,
+		Name:       "pb_forwarder_subscribe_report",
+		Handler:    a.handleDownlinkMessageDeliveryState(client),
+		MaxWorkers: a.forwarderConfig.WorkerPool.Limit / 2,
+	})
+	defer reportPool.Wait()
+
+	downlinkPool := workerpool.NewWorkerPool(workerpool.Config{
+		Component:  a,
+		Context:    ctx,
+		Name:       "pb_forwarder_subscribe",
+		Handler:    a.handleDownlink(reportPool),
+		MaxWorkers: a.forwarderConfig.WorkerPool.Limit / 2,
+	})
+	defer downlinkPool.Wait()
+
 	defer cancel()
 
-	wg.Add(1)
-	go func() {
-		var workers int32
-		defer wg.Done()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case rep := <-reportCh:
-				select {
-				case reportWorkerCh <- rep:
-				default:
-					if int(atomic.LoadInt32(&workers)) < a.forwarderConfig.WorkerPool.Limit/2 {
-						wg.Add(1)
-						worker := atomic.AddInt32(&workers, 1)
-						logger := logger.WithField("worker", worker)
-						go func() {
-							if err := a.reportDownlinkMessageDeliveryState(log.NewContext(ctx, logger), client, reportWorkerCh); err != nil {
-								logger.WithError(err).Warn("Forwarder downlink reporter worker stopped")
-							}
-							wg.Done()
-							atomic.AddInt32(&workers, -1)
-						}()
-					}
-					select {
-					case reportWorkerCh <- rep:
-					case <-time.After(workerBusyTimeout):
-						logger.Warn("Forwarder downlink reporter workers busy, drop message")
-					}
-				}
-			}
-		}
-	}()
-
-	var workers int32
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
 			return err
 		}
-		select {
-		case downlinkCh <- msg:
-		default:
-			if int(atomic.LoadInt32(&workers)) < a.forwarderConfig.WorkerPool.Limit/2 {
-				wg.Add(1)
-				worker := atomic.AddInt32(&workers, 1)
-				logger := logger.WithField("worker", worker)
-				go func() {
-					if err := a.handleDownlink(log.NewContext(ctx, logger), downlinkCh, reportCh); err != nil {
-						logger.WithError(err).Warn("Forwarder downlink handler stopped")
-					}
-					wg.Done()
-					atomic.AddInt32(&workers, -1)
-				}()
-			}
-			select {
-			case downlinkCh <- msg:
-			case <-time.After(workerBusyTimeout):
-				logger.Warn("Forwarder downlink handler busy, drop message")
-			}
+		if err := downlinkPool.Publish(ctx, msg); err != nil {
+			logger.WithError(err).Warn("Forwarder downlink handler busy, drop message")
 		}
 	}
 }
 
-func (a *Agent) reportDownlinkMessageDeliveryState(ctx context.Context, client routingpb.ForwarderDataClient, reportCh <-chan *packetbroker.DownlinkMessageDeliveryStateChange) error {
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-time.After(workerIdleTimeout):
-			return nil
-		case rep := <-reportCh:
-			var homeNetworkNetID types.NetID
-			homeNetworkNetID.UnmarshalNumber(rep.HomeNetworkNetId)
-			var forwarderNetID types.NetID
-			forwarderNetID.UnmarshalNumber(rep.ForwarderNetId)
-			logger := log.FromContext(ctx).WithFields(log.Fields(
-				"message_id", rep.Id,
-				"from_home_network_net_id", homeNetworkNetID,
-				"from_home_network_tenant_id", rep.HomeNetworkTenantId,
-				"from_home_network_cluster_id", rep.HomeNetworkClusterId,
-			))
-			ctx := log.NewContext(ctx, logger)
-			logger.Debug("Received downlink message delivery state change")
+func (a *Agent) handleDownlinkMessageDeliveryState(client routingpb.ForwarderDataClient) workerpool.Handler {
+	h := func(ctx context.Context, item interface{}) {
+		rep := item.(*packetbroker.DownlinkMessageDeliveryStateChange)
+		var homeNetworkNetID types.NetID
+		homeNetworkNetID.UnmarshalNumber(rep.HomeNetworkNetId)
+		var forwarderNetID types.NetID
+		forwarderNetID.UnmarshalNumber(rep.ForwarderNetId)
+		logger := log.FromContext(ctx).WithFields(log.Fields(
+			"message_id", rep.Id,
+			"from_home_network_net_id", homeNetworkNetID,
+			"from_home_network_tenant_id", rep.HomeNetworkTenantId,
+			"from_home_network_cluster_id", rep.HomeNetworkClusterId,
+		))
+		ctx = log.NewContext(ctx, logger)
+		logger.Debug("Received downlink message delivery state change")
 
-			pbaMetrics.downlinkStateReported.WithLabelValues(ctx,
-				forwarderNetID.String(), rep.ForwarderTenantId, rep.ForwarderClusterId,
-			).Inc()
+		pbaMetrics.downlinkStateReported.WithLabelValues(ctx,
+			forwarderNetID.String(), rep.ForwarderTenantId, rep.ForwarderClusterId,
+		).Inc()
 
-			_, err := client.ReportDownlinkMessageDeliveryState(ctx, &routingpb.DownlinkMessageDeliveryStateChangeRequest{
-				StateChange: rep,
-			})
-			if err != nil {
-				logger.WithError(err).Warn("Failed to report downlink message delivery state change")
-			}
+		ctx, cancel := context.WithTimeout(ctx, publishMessageTimeout)
+		defer cancel()
+
+		_, err := client.ReportDownlinkMessageDeliveryState(ctx, &routingpb.DownlinkMessageDeliveryStateChangeRequest{
+			StateChange: rep,
+		})
+		if err != nil {
+			logger.WithError(err).Warn("Failed to report downlink message delivery state change")
 		}
 	}
+	return h
 }
 
-func (a *Agent) handleDownlink(ctx context.Context, downlinkCh <-chan *packetbroker.RoutedDownlinkMessage, reportCh chan<- *packetbroker.DownlinkMessageDeliveryStateChange) error {
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-time.After(workerIdleTimeout):
-			return nil
-		case down := <-downlinkCh:
-			if down.Message == nil {
-				continue
-			}
-			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:downlink:%s", down.Id))
-			var homeNetworkNetID types.NetID
-			homeNetworkNetID.UnmarshalNumber(down.HomeNetworkNetId)
-			ctx = log.NewContextWithFields(ctx, log.Fields(
-				"message_id", down.Id,
-				"from_home_network_net_id", homeNetworkNetID,
-				"from_home_network_tenant_id", down.HomeNetworkTenantId,
-				"from_home_network_cluster_id", down.HomeNetworkClusterId,
-			))
-			if err := a.handleDownlinkMessage(ctx, down, reportCh); err != nil {
-				log.FromContext(ctx).WithError(err).Debug("Failed to handle incoming downlink message")
-			}
+func (a *Agent) handleDownlink(reportPool workerpool.WorkerPool) workerpool.Handler {
+	h := func(ctx context.Context, item interface{}) {
+		down := item.(*packetbroker.RoutedDownlinkMessage)
+		if down.Message == nil {
+			return
+		}
+		ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:downlink:%s", down.Id))
+		var homeNetworkNetID types.NetID
+		homeNetworkNetID.UnmarshalNumber(down.HomeNetworkNetId)
+		ctx = log.NewContextWithFields(ctx, log.Fields(
+			"message_id", down.Id,
+			"from_home_network_net_id", homeNetworkNetID,
+			"from_home_network_tenant_id", down.HomeNetworkTenantId,
+			"from_home_network_cluster_id", down.HomeNetworkClusterId,
+		))
+		if err := a.handleDownlinkMessage(ctx, down, reportPool); err != nil {
+			log.FromContext(ctx).WithError(err).Debug("Failed to handle incoming downlink message")
 		}
 	}
+	return h
 }
 
-func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.RoutedDownlinkMessage, reportCh chan<- *packetbroker.DownlinkMessageDeliveryStateChange) (err error) {
+func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.RoutedDownlinkMessage, reportPool workerpool.WorkerPool) (err error) {
 	receivedAt := time.Now()
 	logger := log.FromContext(ctx)
 
@@ -636,11 +584,8 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 				Error: packetbroker.DownlinkMessageProcessingError_DOWNLINK_INTERNAL,
 			}
 		}
-		select {
-		case <-ctx.Done():
-		case reportCh <- report:
-		case <-time.After(workerBusyTimeout):
-			logger.Warn("Forwarder downlink reporter enqueuer busy, drop message")
+		if err := reportPool.Publish(ctx, report); err != nil {
+			logger.WithError(err).Warn("Forwarder downlink reporter enqueuer busy, drop message")
 		}
 	}()
 
