@@ -37,12 +37,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 	"gopkg.in/square/go-jose.v2"
 )
 
 const (
-	upstreamBufferSize   = 1 << 6
 	downstreamBufferSize = 1 << 5
 
 	// publishMessageTimeout defines the timeout for publishing messages.
@@ -218,7 +218,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	}
 
 	if a.forwarderConfig.Enable {
-		a.upstreamCh = make(chan *uplinkMessage, upstreamBufferSize)
+		a.upstreamCh = make(chan *uplinkMessage)
 		if a.forwarderConfig.WorkerPool.Limit <= 1 {
 			a.forwarderConfig.WorkerPool.Limit = 2
 		}
@@ -310,7 +310,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 
 	newTaskConfig := func(id string, fn component.TaskFunc) *component.TaskConfig {
 		return &component.TaskConfig{
-			Context: c.Context(),
+			Context: ctx,
 			ID:      id,
 			Func:    fn,
 			Restart: component.TaskRestartOnFailure,
@@ -377,7 +377,6 @@ const (
 
 func (a *Agent) publishUplink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"namespace", "packetbrokeragent",
 		"forwarder_net_id", a.netID,
 		"forwarder_cluster_id", a.clusterID,
 	))
@@ -395,79 +394,56 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 	logger.Info("Connected as Forwarder")
 
-	uplinkCh := make(chan *uplinkMessage)
-	defer close(uplinkCh)
-
-	wg := &sync.WaitGroup{}
-	defer wg.Wait()
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	var workers int32
+	wp := workerpool.NewWorkerPool(workerpool.Config{
+		Component:  a,
+		Context:    ctx,
+		Name:       "pb_forwarder_publish",
+		Handler:    a.forwarderPublisher(conn),
+		MaxWorkers: a.forwarderConfig.WorkerPool.Limit,
+	})
+	defer wp.Wait()
 
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		case msg := <-a.upstreamCh:
-			select {
-			case uplinkCh <- msg:
-			default:
-				if int(atomic.LoadInt32(&workers)) < a.forwarderConfig.WorkerPool.Limit {
-					wg.Add(1)
-					atomic.AddInt32(&workers, 1)
-					go func() {
-						if err := a.runForwarderPublisher(ctx, conn, uplinkCh); err != nil {
-							logger.WithError(err).Warn("Forwarder publisher stopped")
-						}
-						wg.Done()
-						atomic.AddInt32(&workers, -1)
-					}()
-				}
-				select {
-				case uplinkCh <- msg:
-				case <-time.After(workerBusyTimeout):
-					logger.Warn("Forwarder publisher busy, drop message")
-				}
+			if err := wp.Publish(ctx, msg); err != nil {
+				logger.WithError(err).Warn("Forwarder publisher busy, drop message")
 			}
 		}
 	}
 }
 
-func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn, uplinkCh <-chan *uplinkMessage) error {
+func (a *Agent) forwarderPublisher(conn *grpc.ClientConn) workerpool.Handler {
 	client := routingpb.NewForwarderDataClient(conn)
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-time.After(workerIdleTimeout):
-			return nil
-		case up := <-uplinkCh:
-			tenantID := a.tenantIDExtractor(up.Context)
-			msg := up.UplinkMessage
-			ctx := log.NewContextWithFields(ctx, log.Fields(
-				"forwarder_tenant_id", tenantID,
-			))
-			logger := log.FromContext(ctx)
-			req := &routingpb.PublishUplinkMessageRequest{
-				ForwarderNetId:     a.netID.MarshalNumber(),
-				ForwarderTenantId:  tenantID,
-				ForwarderClusterId: a.clusterID,
-				Message:            msg,
-			}
-			ctx, cancel := context.WithTimeout(ctx, publishMessageTimeout)
-			res, err := client.Publish(ctx, req)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to publish uplink message")
-			} else {
-				logger.WithField("message_id", res.Id).Debug("Published uplink message")
-				pbaMetrics.uplinkForwarded.WithLabelValues(ctx,
-					a.netID.String(), tenantID, a.clusterID,
-				).Inc()
-			}
-			cancel()
+	h := func(ctx context.Context, item interface{}) {
+		up := item.(*uplinkMessage)
+		tenantID := a.tenantIDExtractor(up.Context)
+		msg := up.UplinkMessage
+		ctx = log.NewContextWithFields(ctx, log.Fields(
+			"forwarder_tenant_id", tenantID,
+		))
+		logger := log.FromContext(ctx)
+		req := &routingpb.PublishUplinkMessageRequest{
+			ForwarderNetId:     a.netID.MarshalNumber(),
+			ForwarderTenantId:  tenantID,
+			ForwarderClusterId: a.clusterID,
+			Message:            msg,
+		}
+		ctx, cancel := context.WithTimeout(ctx, publishMessageTimeout)
+		defer cancel()
+		res, err := client.Publish(ctx, req)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to publish uplink message")
+		} else {
+			logger.WithField("message_id", res.Id).Debug("Published uplink message")
+			pbaMetrics.uplinkForwarded.WithLabelValues(ctx,
+				a.netID.String(), tenantID, a.clusterID,
+			).Inc()
 		}
 	}
+	return h
 }
 
 func (a *Agent) subscribeDownlink(ctx context.Context) error {
