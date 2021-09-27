@@ -68,11 +68,11 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	}
 	auth := s.defaultOwnerAuth(ctx)
 	gtw, err := registry.Create(ctx, &ttnpb.CreateGatewayRequest{
-		Gateway: ttnpb.Gateway{
+		Gateway: &ttnpb.Gateway{
 			Ids:                  ids,
 			GatewayServerAddress: s.defaultLNSURI,
 		},
-		Collaborator: s.defaultOwner,
+		Collaborator: &s.defaultOwner,
 	}, auth)
 	if err != nil {
 		return nil, err
@@ -107,7 +107,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 		return nil, err
 	}
 	_, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
-		Gateway: ttnpb.Gateway{
+		Gateway: &ttnpb.Gateway{
 			Ids: ids,
 			LbsLnsSecret: &ttnpb.Secret{
 				Value: []byte(lnsKey.Key),
@@ -366,7 +366,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 		return err
 	}
 	_, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
-		Gateway: *gtw,
+		Gateway: gtw,
 		FieldMask: &pbtypes.FieldMask{Paths: []string{
 			"attributes",
 		}},

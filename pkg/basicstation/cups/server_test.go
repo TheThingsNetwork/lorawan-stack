@@ -309,19 +309,19 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Create, should.NotBeNil) {
-					a.So(s.req.Create.GetIds().GetGatewayId(), should.Equal, "eui-58a0cbfffe800019")
-					a.So(s.req.Create.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Create.GetGateway().GetIds().GetGatewayId(), should.Equal, "eui-58a0cbfffe800019")
+					a.So(s.req.Create.GetGateway().GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 				}
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "eui-58a0cbfffe800019")
-					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Update.GetGateway().GetIds().GetGatewayId(), should.Equal, "eui-58a0cbfffe800019")
+					a.So(s.req.Update.GetGateway().GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(false, false, false).Attributes
 					for _, attr := range []string{
 						cupsStationAttribute,
 						cupsModelAttribute,
 						cupsPackageAttribute,
 					} {
-						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
+						a.So(s.req.Update.GetGateway().Attributes[attr], should.Equal, expectedAttributes[attr])
 					}
 				}
 			},
@@ -355,15 +355,15 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "test-gateway")
-					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Update.GetGateway().GetIds().GetGatewayId(), should.Equal, "test-gateway")
+					a.So(s.req.Update.GetGateway().GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(true, false, false).Attributes
 					for _, attr := range []string{
 						cupsStationAttribute,
 						cupsModelAttribute,
 						cupsPackageAttribute,
 					} {
-						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
+						a.So(s.req.Update.GetGateway().Attributes[attr], should.Equal, expectedAttributes[attr])
 					}
 				}
 			},
@@ -397,15 +397,15 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "test-gateway")
-					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Update.GetGateway().GetIds().GetGatewayId(), should.Equal, "test-gateway")
+					a.So(s.req.Update.GetGateway().GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(true, false, false).Attributes
 					for _, attr := range []string{
 						cupsStationAttribute,
 						cupsModelAttribute,
 						cupsPackageAttribute,
 					} {
-						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
+						a.So(s.req.Update.GetGateway().Attributes[attr], should.Equal, expectedAttributes[attr])
 					}
 				}
 			},
@@ -457,15 +457,15 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "test-gateway")
-					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Update.GetGateway().GetIds().GetGatewayId(), should.Equal, "test-gateway")
+					a.So(s.req.Update.GetGateway().GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(true, false, false).Attributes
 					for _, attr := range []string{
 						cupsStationAttribute,
 						cupsModelAttribute,
 						cupsPackageAttribute,
 					} {
-						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
+						a.So(s.req.Update.GetGateway().Attributes[attr], should.Equal, expectedAttributes[attr])
 					}
 				}
 			},
@@ -499,15 +499,15 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "test-gateway")
-					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Update.GetGateway().GetIds().GetGatewayId(), should.Equal, "test-gateway")
+					a.So(s.req.Update.GetGateway().GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(false, true, false).Attributes
 					for _, attr := range []string{
 						cupsStationAttribute,
 						cupsModelAttribute,
 						cupsPackageAttribute,
 					} {
-						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
+						a.So(s.req.Update.GetGateway().Attributes[attr], should.Equal, expectedAttributes[attr])
 					}
 				}
 			},
@@ -541,15 +541,15 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "test-gateway")
-					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Update.GetGateway().GetIds().GetGatewayId(), should.Equal, "test-gateway")
+					a.So(s.req.Update.GetGateway().GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(false, false, true).Attributes
 					for _, attr := range []string{
 						cupsStationAttribute,
 						cupsModelAttribute,
 						cupsPackageAttribute,
 					} {
-						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
+						a.So(s.req.Update.GetGateway().Attributes[attr], should.Equal, expectedAttributes[attr])
 					}
 				}
 			},

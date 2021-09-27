@@ -92,7 +92,7 @@ func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, a
 	}
 
 	req := &ttnpb.UpdateGatewayRequest{
-		Gateway: ttnpb.Gateway{
+		Gateway: &ttnpb.Gateway{
 			Ids:      &ids,
 			Antennas: a,
 		},

@@ -107,7 +107,7 @@ func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (
 	if !ok {
 		return nil, errNotFound.New()
 	}
-	gtw.SetFields(&req.Gateway, req.FieldMask.GetPaths()...)
+	gtw.SetFields(req.Gateway, req.FieldMask.GetPaths()...)
 	return gtw, nil
 }
 

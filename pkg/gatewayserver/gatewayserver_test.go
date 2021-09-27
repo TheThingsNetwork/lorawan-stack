@@ -817,7 +817,7 @@ func TestGatewayServer(t *testing.T) {
 									}
 									gtw.UpdateLocationFromStatus = tc.UpdateLocation
 									gtw, err = is.Update(ctx, &ttnpb.UpdateGatewayRequest{
-										Gateway: *gtw,
+										Gateway: gtw,
 										FieldMask: &pbtypes.FieldMask{
 											Paths: []string{
 												"antennas",
