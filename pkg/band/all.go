@@ -76,6 +76,15 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP001_V1_1_REV_A:   IN_865_867_RP1_V1_1_Rev_A,
 		ttnpb.RP001_V1_1_REV_B:   IN_865_867_RP1_V1_1_Rev_B,
 	},
+	ISM_2400: {
+		ttnpb.TS001_V1_0:         ISM_2400_Universal,
+		ttnpb.TS001_V1_0_1:       ISM_2400_Universal,
+		ttnpb.RP001_V1_0_2:       ISM_2400_Universal,
+		ttnpb.RP001_V1_0_2_REV_B: ISM_2400_Universal,
+		ttnpb.RP001_V1_0_3_REV_A: ISM_2400_Universal,
+		ttnpb.RP001_V1_1_REV_A:   ISM_2400_Universal,
+		ttnpb.RP001_V1_1_REV_B:   ISM_2400_Universal,
+	},
 }
 
 // Get returns the band if it was found, and returns an error otherwise.
