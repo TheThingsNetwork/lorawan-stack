@@ -68,7 +68,7 @@ func logRegistryRPCError(ctx context.Context, err error, msg string) {
 	switch {
 	case errors.IsNotFound(err), errors.IsInvalidArgument(err):
 		printLog = logger.Debug
-	case errors.IsFailedPrecondition(err):
+	case errors.IsFailedPrecondition(err), errors.IsResourceExhausted(err):
 		printLog = logger.Warn
 	default:
 		printLog = logger.Error
