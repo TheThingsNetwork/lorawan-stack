@@ -14,6 +14,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - The Gateway Server worker pools may now drop workers if they are idle for too long.
+- FPort = 0 uplinks are no longer decoded by the Application Server, and the Network Server no longer provides the frame payload to the Application Server for these messages.
 
 ### Deprecated
 
