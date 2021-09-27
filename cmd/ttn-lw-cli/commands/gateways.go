@@ -303,8 +303,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewGatewayRegistryClient(is).Create(ctx, &ttnpb.CreateGatewayRequest{
-				Gateway:      gateway,
-				Collaborator: *collaborator,
+				Gateway:      &gateway,
+				Collaborator: collaborator,
 			})
 			if err != nil {
 				return err
@@ -376,7 +376,7 @@ var (
 			}
 
 			res, err := ttnpb.NewGatewayRegistryClient(is).Update(ctx, &ttnpb.UpdateGatewayRequest{
-				Gateway:   gateway,
+				Gateway:   &gateway,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
