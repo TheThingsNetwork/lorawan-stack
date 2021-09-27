@@ -362,11 +362,9 @@ const ManualForm = props => {
     }
   }, [defaultNsSettings, pingPeriodicityRequired])
 
-  const [phyVersion, setPhyVersion] = React.useState()
+  const [phyVersion, setPhyVersion] = React.useState(initialValues.lorawan_phy_version)
   const phyVersionRef = React.useRef(phyVersion)
-  const handlePhyVersionChange = React.useCallback(version => {
-    setPhyVersion(version)
-  }, [])
+  const handlePhyVersionChange = React.useCallback(version => setPhyVersion(version), [])
 
   const [freqPlan, setFreqPlan] = React.useState()
   const freqPlanRef = React.useRef(freqPlan)
@@ -374,26 +372,24 @@ const ManualForm = props => {
     option => {
       const { value: freqPlan } = option
       setFreqPlan(freqPlan)
-      if (freqPlan !== freqPlanRef.current) {
-        setPhyVersion(undefined)
-        setLorawanVersion(undefined)
+      freqPlanRef.current = freqPlan
 
-        if (formRef.current) {
-          const { values, setValues } = formRef.current
-          setValues(
-            validationSchema.cast(
-              {
-                ...values,
-                lorawan_phy_version: undefined,
-                lorawan_version: undefined,
-                frequency_plan_id: freqPlan,
-              },
-              { context: validationContext },
-            ),
-          )
-        }
+      if (formRef.current) {
+        const { values, setValues } = formRef.current
 
-        freqPlanRef.current = freqPlan
+        setLorawanVersion(defaultValues.lorawan_version)
+        setPhyVersion(defaultValues.lorawan_phy_version)
+        setValues(
+          validationSchema.cast(
+            {
+              ...values,
+              lorawan_version: defaultValues.lorawan_version,
+              lorawan_phy_version: defaultValues.lorawan_phy_version,
+              frequency_plan_id: freqPlan,
+            },
+            { context: validationContext },
+          ),
+        )
       }
     },
     [validationContext],
@@ -604,22 +600,21 @@ const ManualForm = props => {
       )}
       <Form.Field
         required
-        title={sharedMessages.phyVersion}
-        name="lorawan_phy_version"
-        component={PhyVersionInput}
-        lorawanVersion={lorawanVersion}
-        tooltipId={tooltipIds.REGIONAL_PARAMETERS}
-        onChange={handlePhyVersionChange}
-        frequencyPlan={freqPlan}
-      />
-      <Form.Field
-        required
         title={sharedMessages.macVersion}
         name="lorawan_version"
         component={LorawanVersionInput}
         tooltipId={tooltipIds.LORAWAN_VERSION}
         onChange={handleLorawanVersionChange}
-        phyVersion={phyVersion}
+        frequencyPlan={freqPlan}
+      />
+      <Form.Field
+        required
+        title={sharedMessages.phyVersion}
+        name="lorawan_phy_version"
+        component={PhyVersionInput}
+        tooltipId={tooltipIds.REGIONAL_PARAMETERS}
+        onChange={handlePhyVersionChange}
+        lorawanVersion={lorawanVersion}
       />
       <hr />
       <AdvancedSettingsSection

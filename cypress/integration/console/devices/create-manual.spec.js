@@ -88,15 +88,12 @@ describe('End device manual create', () => {
           app_eui: generateHexValue(16),
           dev_eui: generateHexValue(16),
           lorawan_version: 'MAC_V1_0',
-          phy_version: 'PHY_V1_0',
           frequency_plan_id: '863-870 MHz',
           app_key: generateHexValue(32),
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
-        cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('AppEUI').type(device.app_eui)
         cy.findByLabelText('AppKey').type(device.app_key)
@@ -117,14 +114,12 @@ describe('End device manual create', () => {
           app_eui: generateHexValue(16),
           dev_eui: generateHexValue(16),
           lorawan_version: 'MAC_V1_0',
-          phy_version: 'PHY_V1_0',
           frequency_plan_id: '863-870 MHz',
           app_key: generateHexValue(32),
           class_b_timeout: 10,
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Additional LoRaWAN class capabilities').selectOption('class-b')
@@ -150,13 +145,11 @@ describe('End device manual create', () => {
           app_eui: generateHexValue(16),
           dev_eui: generateHexValue(16),
           lorawan_version: 'MAC_V1_0',
-          phy_version: 'PHY_V1_0',
           frequency_plan_id: '863-870 MHz',
           app_key: generateHexValue(32),
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Additional LoRaWAN class capabilities').selectOption('class-c')
@@ -184,8 +177,8 @@ describe('End device manual create', () => {
           app_key: generateHexValue(32),
         }
 
-        cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
+        cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Additional LoRaWAN class capabilities').selectOption('class-c')
         cy.findByLabelText('Cluster settings').check()
@@ -217,8 +210,8 @@ describe('End device manual create', () => {
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('AppEUI').type(device.app_eui)
         cy.findByLabelText('AppKey').type(device.app_key)
@@ -248,8 +241,8 @@ describe('End device manual create', () => {
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('JoinEUI').type(device.app_eui)
         cy.findByLabelText('AppKey').type(device.app_key)
@@ -273,13 +266,11 @@ describe('End device manual create', () => {
           app_eui: generateHexValue(16),
           dev_eui: generateHexValue(16),
           lorawan_version: 'MAC_V1_0',
-          phy_version: 'PHY_V1_0',
           frequency_plan_id: '863-870 MHz',
           join_server_address: 'external-js-address',
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Use external LoRaWAN backend servers').check()
@@ -356,14 +347,12 @@ describe('End device manual create', () => {
           id: 'abp-test-1-0-class-a',
           dev_addr: generateHexValue(8),
           lorawan_version: 'MAC_V1_0',
-          phy_version: 'PHY_V1_0',
           frequency_plan_id: '863-870 MHz',
           nwk_s_key: generateHexValue(32),
           app_s_key: generateHexValue(32),
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Activation by personalization (ABP)').check()
@@ -386,7 +375,6 @@ describe('End device manual create', () => {
           id: 'abp-test-1-0-class-b',
           dev_addr: generateHexValue(8),
           lorawan_version: 'MAC_V1_0',
-          phy_version: 'PHY_V1_0',
           frequency_plan_id: '863-870 MHz',
           nwk_s_key: generateHexValue(32),
           app_s_key: generateHexValue(32),
@@ -395,7 +383,6 @@ describe('End device manual create', () => {
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Activation by personalization (ABP)').check()
@@ -423,13 +410,11 @@ describe('End device manual create', () => {
           dev_addr: generateHexValue(8),
           lorawan_version: 'MAC_V1_0',
           frequency_plan_id: '863-870 MHz',
-          phy_version: 'PHY_V1_0',
           nwk_s_key: generateHexValue(32),
           app_s_key: generateHexValue(32),
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Activation by personalization (ABP)').check()
@@ -464,8 +449,8 @@ describe('End device manual create', () => {
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
+        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Activation by personalization (ABP)').check()
         cy.findByLabelText('Device address').type(device.dev_addr)
@@ -542,7 +527,6 @@ describe('End device manual create', () => {
           id: 'multicast-test-1-0-class-b',
           dev_addr: generateHexValue(8),
           lorawan_version: 'MAC_V1_0',
-          phy_version: 'PHY_V1_1_REV_A',
           frequency_plan_id: '863-870 MHz',
           app_s_key: generateHexValue(32),
           nwk_s_key: generateHexValue(32),
@@ -550,7 +534,6 @@ describe('End device manual create', () => {
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
@@ -575,7 +558,6 @@ describe('End device manual create', () => {
           id: 'multicast-test-1-0-class-c',
           dev_addr: generateHexValue(8),
           lorawan_version: 'MAC_V1_0',
-          phy_version: 'PHY_V1_0',
           frequency_plan_id: '863-870 MHz',
           app_s_key: generateHexValue(32),
           nwk_s_key: generateHexValue(32),
@@ -583,7 +565,6 @@ describe('End device manual create', () => {
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-        cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
@@ -634,14 +615,12 @@ describe('End device manual create', () => {
         id: 'abp-test-no-js',
         dev_addr: generateHexValue(8),
         lorawan_version: 'MAC_V1_0',
-        phy_version: 'PHY_V1_0',
         frequency_plan_id: '863-870 MHz',
         app_s_key: generateHexValue(32),
         nwk_s_key: generateHexValue(32),
       }
 
       cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-      cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
       cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
       cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
       cy.findByLabelText('Activation by personalization (ABP)').check()
@@ -665,7 +644,6 @@ describe('End device manual create', () => {
         id: 'multicast-test-no-js',
         dev_addr: generateHexValue(8),
         lorawan_version: 'MAC_V1_0',
-        phy_version: 'PHY_V1_0',
         frequency_plan_id: '863-870 MHz',
         app_s_key: generateHexValue(32),
         nwk_s_key: generateHexValue(32),
@@ -673,7 +651,6 @@ describe('End device manual create', () => {
       }
 
       cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-      cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
       cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
       cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
       cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
@@ -716,13 +693,11 @@ describe('End device manual create', () => {
         app_eui: generateHexValue(16),
         dev_eui: generateHexValue(16),
         lorawan_version: 'MAC_V1_0',
-        phy_version: 'PHY_V1_0',
         frequency_plan_id: '863-870 MHz',
         app_key: generateHexValue(32),
       }
 
       cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-      cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
       cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
       cy.findByLabelText('DevEUI').type(device.dev_eui)
       cy.findByLabelText('AppEUI').type(device.app_eui)
@@ -742,13 +717,11 @@ describe('End device manual create', () => {
         id: 'abp-tess-no-as',
         dev_addr: generateHexValue(8),
         lorawan_version: 'MAC_V1_0',
-        phy_version: 'PHY_V1_0',
         frequency_plan_id: '863-870 MHz',
         nwk_s_key: generateHexValue(32),
       }
 
       cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-      cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
       cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
       cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
       cy.findByLabelText('Activation by personalization (ABP)').check()
@@ -771,7 +744,6 @@ describe('End device manual create', () => {
         id: 'multicast-test-no-as',
         dev_addr: generateHexValue(8),
         lorawan_version: 'MAC_V1_0',
-        phy_version: 'PHY_V1_0',
         frequency_plan_id: '863-870 MHz',
         app_s_key: generateHexValue(32),
         nwk_s_key: generateHexValue(32),
@@ -779,7 +751,6 @@ describe('End device manual create', () => {
       }
 
       cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
-      cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
       cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
       cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
       cy.findByLabelText('Define multicast group (ABP & Multicast)').check()
@@ -821,13 +792,11 @@ describe('End device manual create', () => {
         app_eui: generateHexValue(16),
         dev_eui: generateHexValue(16),
         lorawan_version: 'MAC_V1_0',
-        phy_version: 'PHY_V1_0',
         frequency_plan_id: '863-870 MHz',
         app_key: generateHexValue(32),
       }
 
       cy.findByLabelText('Frequency plan').should('not.exist')
-      cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
       cy.findByLabelText('LoRaWAN version').selectOption(device.lorawan_version)
       cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
       cy.findByLabelText('Over the air activation (OTAA)').should('have.attr', 'checked')

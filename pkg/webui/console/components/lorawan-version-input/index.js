@@ -13,7 +13,12 @@
 // limitations under the License.
 
 import React from 'react'
+import { unionBy } from 'lodash'
+import { defineMessages } from 'react-intl'
 
+import api from '@console/api'
+
+import toast from '@ttn-lw/components/toast'
 import Select from '@ttn-lw/components/select'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -33,6 +38,7 @@ import {
   MAC_V1_0_4,
   MAC_V1_1,
   LORAWAN_VERSIONS,
+  parseLorawanMacVersion,
 } from '@console/lib/device-utils'
 
 const phyVersionsMap = {
@@ -44,31 +50,56 @@ const phyVersionsMap = {
   [PHY_V1_1_REV_A.value]: [MAC_V1_1, MAC_V1_0_4],
   [PHY_V1_1_REV_B.value]: [MAC_V1_1, MAC_V1_0_4],
 }
+const m = defineMessages({
+  phyVersionError: 'Failed to fetch regional parameters versions',
+})
 
 const LorawanVersionInput = props => {
-  const { phyVersion, onChange, value, ...rest } = props
+  const { frequencyPlan, onChange, value, ...rest } = props
 
+  const [phyVersions, setPhyVersions] = React.useState([])
   const [options, setOptions] = React.useState(LORAWAN_VERSIONS)
+
   React.useEffect(() => {
-    if (phyVersion) {
-      setOptions(phyVersionsMap[phyVersion])
-    } else {
-      setOptions(LORAWAN_VERSIONS)
+    const fetchPhyVersions = async () => {
+      try {
+        const { version_info } = await api.configuration.getPhyVersions()
+        setPhyVersions(version_info)
+      } catch (err) {
+        toast({
+          type: toast.types.ERROR,
+          message: m.phyVersionError,
+        })
+      }
     }
-  }, [phyVersion])
+
+    fetchPhyVersions()
+  }, [])
+
+  React.useEffect(() => {
+    const currentPhyVersions = phyVersions.filter(({ band_id }) => frequencyPlan.includes(band_id))
+    if (currentPhyVersions.length > 0) {
+      const versions = currentPhyVersions[0].phy_versions
+      const options = unionBy(
+        ...versions.map(version => phyVersionsMap[version]),
+        v => v.value,
+      ).sort((a, b) => parseLorawanMacVersion(a.value) - parseLorawanMacVersion(b.value))
+      setOptions(options)
+    }
+  }, [frequencyPlan, phyVersions])
 
   return <Select onChange={onChange} value={value} options={options} {...rest} />
 }
 
 LorawanVersionInput.propTypes = {
+  frequencyPlan: PropTypes.string,
   onChange: PropTypes.func.isRequired,
-  phyVersion: PropTypes.string,
   value: PropTypes.string,
 }
 
 LorawanVersionInput.defaultProps = {
-  phyVersion: undefined,
   value: undefined,
+  frequencyPlan: '',
 }
 
 export default LorawanVersionInput
