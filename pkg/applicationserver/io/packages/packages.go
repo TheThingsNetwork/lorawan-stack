@@ -45,7 +45,7 @@ type Server interface {
 	rpcserver.Registerer
 }
 
-func createPackagePoolHandler(name string, handler ApplicationPackageHandler, timeout time.Duration) workerpool.HandlerFactory {
+func createPackagePoolHandler(name string, handler ApplicationPackageHandler, timeout time.Duration) workerpool.Handler {
 	h := func(ctx context.Context, item interface{}) {
 		associatedUp := item.(*associatedApplicationUp)
 		pair, up := associatedUp.pair, associatedUp.up
@@ -60,7 +60,7 @@ func createPackagePoolHandler(name string, handler ApplicationPackageHandler, ti
 		}
 		registerMessageProcessed(ctx, name)
 	}
-	return workerpool.StaticHandlerFactory(h)
+	return h
 }
 
 // New returns an application packages server wrapping the given registries and handlers.
@@ -74,31 +74,24 @@ func New(ctx context.Context, as io.Server, registry Registry, handlers map[stri
 		pools:    make(map[string]workerpool.WorkerPool),
 	}
 	for name, handler := range handlers {
-		wp, err := workerpool.NewWorkerPool(workerpool.Config{
-			Component:     as,
-			Context:       ctx,
-			Name:          fmt.Sprintf("application_packages_%v", name),
-			CreateHandler: createPackagePoolHandler(name, handler, timeout),
-			MaxWorkers:    workers,
+		s.pools[name] = workerpool.NewWorkerPool(workerpool.Config{
+			Component:  as,
+			Context:    ctx,
+			Name:       fmt.Sprintf("application_packages_%v", name),
+			Handler:    createPackagePoolHandler(name, handler, timeout),
+			MaxWorkers: workers,
 		})
-		if err != nil {
-			return nil, err
-		}
-		s.pools[name] = wp
 	}
 	sub, err := as.Subscribe(ctx, "applicationpackages", nil, false)
 	if err != nil {
 		return nil, err
 	}
-	wp, err := workerpool.NewWorkerPool(workerpool.Config{
-		Component:     as,
-		Context:       ctx,
-		Name:          "application_packages_fanout",
-		CreateHandler: workerpool.HandlerFactoryFromUplinkHandler(s.handleUp),
+	wp := workerpool.NewWorkerPool(workerpool.Config{
+		Component: as,
+		Context:   ctx,
+		Name:      "application_packages_fanout",
+		Handler:   workerpool.HandlerFromUplinkHandler(s.handleUp),
 	})
-	if err != nil {
-		return nil, err
-	}
 	sub.Pipe(ctx, as, "application_packages", wp.Publish)
 	return s, nil
 }

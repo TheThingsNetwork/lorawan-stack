@@ -160,20 +160,18 @@ type ApplicationPackagesConfig struct {
 // NewWebhooks returns a new web.Webhooks based on the configuration.
 // If Target is empty, this method returns nil.
 func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.Webhooks, error) {
-	var factory web.SinkFactory
+	var sink web.Sink
 	switch c.Target {
 	case "":
 		return nil, nil
 	case "direct":
-		factory = func() (web.Sink, error) {
-			client, err := server.HTTPClient(ctx)
-			if err != nil {
-				return nil, err
-			}
-			client.Timeout = c.Timeout
-			return &web.HTTPClientSink{
-				Client: client,
-			}, nil
+		client, err := server.HTTPClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+		client.Timeout = c.Timeout
+		sink = &web.HTTPClientSink{
+			Client: client,
 		}
 	default:
 		return nil, errWebhooksTarget.WithAttributes("target", c.Target)
@@ -182,17 +180,9 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 		return nil, errWebhooksRegistry.New()
 	}
 	if c.QueueSize > 0 || c.Workers > 0 {
-		q, err := web.NewPooledSink(ctx, server, factory, c.Workers, c.QueueSize)
-		if err != nil {
-			return nil, err
-		}
-		return web.NewWebhooks(ctx, server, c.Registry, q, c.Downlinks)
+		sink = web.NewPooledSink(ctx, server, sink, c.Workers, c.QueueSize)
 	}
-	target, err := factory()
-	if err != nil {
-		return nil, err
-	}
-	return web.NewWebhooks(ctx, server, c.Registry, target, c.Downlinks)
+	return web.NewWebhooks(ctx, server, c.Registry, sink, c.Downlinks)
 }
 
 // NewPubSub returns a new pubsub.PubSub based on the configuration.
