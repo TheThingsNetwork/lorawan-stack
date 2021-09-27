@@ -89,9 +89,9 @@ message Gateway {
   // The identifiers of the gateway. These are public and can be seen by any authenticated user in the network.
   GatewayIdentifiers ids = 1 [(validate.rules).message.required = true];
   // When the gateway was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
   // When the gateway was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
   // When the gateway was deleted. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp deleted_at = 26 [(gogoproto.stdtime) = true];
 
@@ -316,10 +316,10 @@ message GatewayAntenna {
 
 message GatewayStatus {
   // Current time of the gateway
-  google.protobuf.Timestamp time = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
+  google.protobuf.Timestamp time = 1 [(gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
   // Boot time of the gateway
   // - can be left out to save bandwidth; old value will be kept
-  google.protobuf.Timestamp boot_time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp boot_time = 2 [(gogoproto.stdtime) = true];
   // Versions of gateway subsystems
   // - each field can be left out to save bandwidth; old value will be kept
   // - map keys are written in snake_case
@@ -374,9 +374,9 @@ message GatewayConnectionStats {
   uint64 downlink_count = 8;
 
   message RoundTripTimes {
-    google.protobuf.Duration min = 1 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
-    google.protobuf.Duration max = 2 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
-    google.protobuf.Duration median = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    google.protobuf.Duration min = 1 [(gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    google.protobuf.Duration max = 2 [(gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    google.protobuf.Duration median = 3 [(gogoproto.stdduration) = true, (validate.rules).duration.required = true];
     uint32 count = 4;
   }
   RoundTripTimes round_trip_times = 9;

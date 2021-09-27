@@ -263,10 +263,10 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 	}
 
 	currentTime := time.Time(stat.Time)
-	status.Time = currentTime
+	status.Time = &currentTime
 	if stat.Boot != nil {
 		bootTime := time.Time(*stat.Boot)
-		status.BootTime = bootTime
+		status.BootTime = &bootTime
 	}
 
 	addVersions(status, stat)
@@ -306,8 +306,12 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 	}
 	if up.GatewayStatus != nil {
 		// TODO: Handle multiple antenna locations (https://github.com/TheThingsNetwork/lorawan-stack/issues/2006).
+		var time time.Time
+		if up.GatewayStatus.Time != nil {
+			time = *up.GatewayStatus.Time
+		}
 		stat = &Stat{
-			Time: ExpandedTime(up.GatewayStatus.Time),
+			Time: ExpandedTime(time),
 		}
 		if len(up.GatewayStatus.AntennaLocations) > 0 {
 			loc := up.GatewayStatus.AntennaLocations[0]

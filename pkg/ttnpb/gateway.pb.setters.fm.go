@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *GatewayBrand) SetFields(src *GatewayBrand, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -314,8 +311,7 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -324,8 +320,7 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "deleted_at":
 			if len(subs) > 0 {
@@ -1429,8 +1424,7 @@ func (dst *GatewayStatus) SetFields(src *GatewayStatus, paths ...string) error {
 			if src != nil {
 				dst.Time = src.Time
 			} else {
-				var zero time.Time
-				dst.Time = zero
+				dst.Time = nil
 			}
 		case "boot_time":
 			if len(subs) > 0 {
@@ -1439,8 +1433,7 @@ func (dst *GatewayStatus) SetFields(src *GatewayStatus, paths ...string) error {
 			if src != nil {
 				dst.BootTime = src.BootTime
 			} else {
-				var zero time.Time
-				dst.BootTime = zero
+				dst.BootTime = nil
 			}
 		case "versions":
 			if len(subs) > 0 {
@@ -1703,8 +1696,7 @@ func (dst *GatewayConnectionStats_RoundTripTimes) SetFields(src *GatewayConnecti
 			if src != nil {
 				dst.Min = src.Min
 			} else {
-				var zero time.Duration
-				dst.Min = zero
+				dst.Min = nil
 			}
 		case "max":
 			if len(subs) > 0 {
@@ -1713,8 +1705,7 @@ func (dst *GatewayConnectionStats_RoundTripTimes) SetFields(src *GatewayConnecti
 			if src != nil {
 				dst.Max = src.Max
 			} else {
-				var zero time.Duration
-				dst.Max = zero
+				dst.Max = nil
 			}
 		case "median":
 			if len(subs) > 0 {
@@ -1723,8 +1714,7 @@ func (dst *GatewayConnectionStats_RoundTripTimes) SetFields(src *GatewayConnecti
 			if src != nil {
 				dst.Median = src.Median
 			} else {
-				var zero time.Duration
-				dst.Median = zero
+				dst.Median = nil
 			}
 		case "count":
 			if len(subs) > 0 {

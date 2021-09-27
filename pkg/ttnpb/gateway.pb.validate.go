@@ -644,7 +644,7 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayValidationError{
 						field:  "created_at",
@@ -656,7 +656,7 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayValidationError{
 						field:  "updated_at",
@@ -2684,9 +2684,16 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 		switch name {
 		case "time":
 
+			if m.GetTime() == nil {
+				return GatewayStatusValidationError{
+					field:  "time",
+					reason: "value is required",
+				}
+			}
+
 		case "boot_time":
 
-			if v, ok := interface{}(&m.BootTime).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetBootTime()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayStatusValidationError{
 						field:  "boot_time",
@@ -3247,9 +3254,30 @@ func (m *GatewayConnectionStats_RoundTripTimes) ValidateFields(paths ...string) 
 		switch name {
 		case "min":
 
+			if m.GetMin() == nil {
+				return GatewayConnectionStats_RoundTripTimesValidationError{
+					field:  "min",
+					reason: "value is required",
+				}
+			}
+
 		case "max":
 
+			if m.GetMax() == nil {
+				return GatewayConnectionStats_RoundTripTimesValidationError{
+					field:  "max",
+					reason: "value is required",
+				}
+			}
+
 		case "median":
+
+			if m.GetMedian() == nil {
+				return GatewayConnectionStats_RoundTripTimesValidationError{
+					field:  "median",
+					reason: "value is required",
+				}
+			}
 
 		case "count":
 			// no validation rules for Count
