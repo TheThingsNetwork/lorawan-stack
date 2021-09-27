@@ -130,6 +130,9 @@ func (as *ApplicationServer) decryptUplink(ctx context.Context, dev *ttnpb.EndDe
 }
 
 func (as *ApplicationServer) decodeUplink(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
+	if uplink.FPort == 0 {
+		return nil
+	}
 	var formatter ttnpb.PayloadFormatter
 	var parameter string
 	if dev.Formatters != nil {
