@@ -499,7 +499,7 @@ func TestRx1DataRate(t *testing.T) {
 		t.Run(tc.bandID, func(t *testing.T) {
 			a := assertions.New(t)
 
-			b, err := Get(tc.bandID, ttnpb.RP001_V1_1_REV_B)
+			b, err := GetLatest(tc.bandID)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Error when getting band %s: %s", tc.bandID, err)
 			}

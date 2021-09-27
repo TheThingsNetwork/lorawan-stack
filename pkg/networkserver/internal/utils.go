@@ -50,17 +50,13 @@ var LoRaWANVersionPairs = map[ttnpb.MACVersion]map[ttnpb.PHYVersion]struct{}{
 
 var LoRaWANBands = func() map[string]map[ttnpb.PHYVersion]*band.Band {
 	bands := make(map[string]map[ttnpb.PHYVersion]*band.Band, len(band.All))
-	for _, b := range band.All {
-		vers := b.Versions()
+	for id, vers := range band.All {
 		m := make(map[ttnpb.PHYVersion]*band.Band, len(vers))
-		for _, ver := range vers {
-			b, err := b.Version(ver)
-			if err != nil {
-				panic(fmt.Errorf("failed to obtain %s band of version %s", b.ID, ver))
-			}
+		for ver, b := range vers {
+			b := b
 			m[ver] = &b
 		}
-		bands[b.ID] = m
+		bands[id] = m
 	}
 	return bands
 }()

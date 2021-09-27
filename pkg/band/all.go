@@ -33,3 +33,11 @@ func Get(id string, version ttnpb.PHYVersion) (Band, error) {
 	}
 	return band, nil
 }
+
+const latestSupportedVersion = ttnpb.RP001_V1_1_REV_B
+
+// GetLatest returns the latest version of the band if it was found,
+// and returns an error otherwise.
+func GetLatest(id string) (Band, error) {
+	return Get(id, latestSupportedVersion)
+}
