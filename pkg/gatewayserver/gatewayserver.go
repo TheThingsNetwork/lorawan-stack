@@ -377,7 +377,7 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 	}
 	if ids.GatewayId == "" {
 		extIDs, err := gs.entityRegistry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-			Eui: ids.Eui,
+			Eui: *ids.Eui,
 		})
 		if err == nil {
 			ids = *extIDs

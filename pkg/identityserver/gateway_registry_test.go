@@ -214,7 +214,7 @@ func TestGatewaysCRUD(t *testing.T) {
 		}
 
 		ids, err := reg.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-			Eui: &eui,
+			Eui: eui,
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
@@ -562,20 +562,13 @@ func TestGatewaysSecrets(t *testing.T) {
 
 		// Get By EUI
 		ids, err := reg.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-			Eui: &eui,
+			Eui: eui,
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 		if a.So(ids, should.NotBeNil) {
 			a.So(ids.GetGatewayId(), should.Equal, created.GetIds().GetGatewayId())
 		}
-
-		// Empty EUI
-		_, err = reg.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-			Eui: nil,
-		}, creds)
-
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
 
 		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: &ttnpb.Gateway{
