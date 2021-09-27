@@ -778,19 +778,6 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	}
 
 	client := routingpb.NewHomeNetworkDataClient(conn)
-	stream, err := client.Subscribe(ctx, &routingpb.SubscribeHomeNetworkRequest{
-		HomeNetworkNetId:     a.netID.MarshalNumber(),
-		HomeNetworkTenantId:  a.subscriptionTenantID,
-		HomeNetworkClusterId: a.homeNetworkClusterID,
-		Filters:              filters,
-		Group:                a.clusterID,
-	})
-	if err != nil {
-		return err
-	}
-	logger.Info("Subscribed as Home Network")
-
-	ctx, cancel := context.WithCancel(ctx)
 
 	reportPool := workerpool.NewWorkerPool(workerpool.Config{
 		Component:  a,
@@ -810,17 +797,49 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	})
 	defer uplinkPool.Wait()
 
-	defer cancel()
+	var wg sync.WaitGroup
+	defer wg.Wait()
+	for i := 0; i < subscribeStreamCount; i++ {
+		wg.Add(1)
+		a.StartTask(&component.TaskConfig{
+			Context: ctx,
+			ID:      "pb_homenetwork_subscribe_stream",
+			Func:    a.subscribeUplinkStream(client, uplinkPool, filters),
+			Done:    wg.Done,
+			Restart: component.TaskRestartOnFailure,
+			Backoff: component.DialTaskBackoffConfig,
+		})
+	}
 
-	for {
-		msg, err := stream.Recv()
+	<-ctx.Done()
+	return ctx.Err()
+}
+
+func (a *Agent) subscribeUplinkStream(client routingpb.HomeNetworkDataClient, uplinkPool workerpool.WorkerPool, filters []*packetbroker.RoutingFilter) func(context.Context) error {
+	f := func(ctx context.Context) (err error) {
+		stream, err := client.Subscribe(ctx, &routingpb.SubscribeHomeNetworkRequest{
+			HomeNetworkNetId:     a.netID.MarshalNumber(),
+			HomeNetworkTenantId:  a.subscriptionTenantID,
+			HomeNetworkClusterId: a.homeNetworkClusterID,
+			Filters:              filters,
+			Group:                a.clusterID,
+		})
 		if err != nil {
 			return err
 		}
-		if err := uplinkPool.Publish(ctx, msg); err != nil {
-			logger.WithError(err).Warn("Home Network uplink handler busy, drop message")
+		logger := log.FromContext(ctx)
+		logger.Info("Subscribed as Home Network")
+		for {
+			msg, err := stream.Recv()
+			if err != nil {
+				return err
+			}
+			if err := uplinkPool.Publish(ctx, msg); err != nil {
+				logger.WithError(err).Warn("Home Network uplink handler busy, drop message")
+			}
 		}
 	}
+	return f
 }
 
 func (a *Agent) handleUplinkMessageDeliveryState(client routingpb.HomeNetworkDataClient) workerpool.Handler {
