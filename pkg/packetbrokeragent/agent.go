@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -41,6 +42,9 @@ import (
 )
 
 const (
+	// subscribeStreamCount is the number of subscription streams that are used by the Forwarder and Home Network roles.
+	subscribeStreamCount = 8
+
 	// publishMessageTimeout defines the timeout for publishing messages.
 	publishMessageTimeout = 3 * time.Second
 )
@@ -461,19 +465,6 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:conn:down:%s", events.NewCorrelationID()))
 
 	client := routingpb.NewForwarderDataClient(conn)
-	stream, err := client.Subscribe(ctx, &routingpb.SubscribeForwarderRequest{
-		ForwarderNetId:     a.netID.MarshalNumber(),
-		ForwarderTenantId:  a.subscriptionTenantID,
-		ForwarderClusterId: a.clusterID,
-		Group:              a.clusterID,
-	})
-	if err != nil {
-		return err
-	}
-	logger := log.FromContext(ctx)
-	logger.Info("Subscribed as Forwarder")
-
-	ctx, cancel := context.WithCancel(ctx)
 
 	reportPool := workerpool.NewWorkerPool(workerpool.Config{
 		Component:  a,
@@ -493,17 +484,48 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 	})
 	defer downlinkPool.Wait()
 
-	defer cancel()
+	var wg sync.WaitGroup
+	defer wg.Wait()
+	for i := 0; i < subscribeStreamCount; i++ {
+		wg.Add(1)
+		a.StartTask(&component.TaskConfig{
+			Context: ctx,
+			ID:      "pb_forwarder_subscribe_stream",
+			Func:    a.subscribeDownlinkStream(client, downlinkPool),
+			Done:    wg.Done,
+			Restart: component.TaskRestartOnFailure,
+			Backoff: component.DialTaskBackoffConfig,
+		})
+	}
 
-	for {
-		msg, err := stream.Recv()
+	<-ctx.Done()
+	return ctx.Err()
+}
+
+func (a *Agent) subscribeDownlinkStream(client routingpb.ForwarderDataClient, downlinkPool workerpool.WorkerPool) func(context.Context) error {
+	f := func(ctx context.Context) (err error) {
+		stream, err := client.Subscribe(ctx, &routingpb.SubscribeForwarderRequest{
+			ForwarderNetId:     a.netID.MarshalNumber(),
+			ForwarderTenantId:  a.subscriptionTenantID,
+			ForwarderClusterId: a.clusterID,
+			Group:              a.clusterID,
+		})
 		if err != nil {
 			return err
 		}
-		if err := downlinkPool.Publish(ctx, msg); err != nil {
-			logger.WithError(err).Warn("Forwarder downlink handler busy, drop message")
+		logger := log.FromContext(ctx)
+		logger.Info("Subscribed as Forwarder")
+		for {
+			msg, err := stream.Recv()
+			if err != nil {
+				return err
+			}
+			if err := downlinkPool.Publish(ctx, msg); err != nil {
+				logger.WithError(err).Warn("Forwarder downlink handler busy, drop message")
+			}
 		}
 	}
+	return f
 }
 
 func (a *Agent) handleDownlinkMessageDeliveryState(client routingpb.ForwarderDataClient) workerpool.Handler {
