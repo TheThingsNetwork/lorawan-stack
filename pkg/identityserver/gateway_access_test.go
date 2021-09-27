@@ -74,12 +74,24 @@ func TestGatewayAccessNotFound(t *testing.T) {
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIds: gatewayID,
-			APIKey:     apiKey,
+			ApiKey:     &apiKey,
 			FieldMask:  &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
+		a.So(updated, should.BeNil)
+
+		// Check with nil API Key
+		updated, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+			GatewayIds: gatewayID,
+			ApiKey:     nil,
+			FieldMask:  &pbtypes.FieldMask{Paths: []string{"name"}},
+		}, creds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
 		}
 		a.So(updated, should.BeNil)
 	})
@@ -114,7 +126,7 @@ func TestGatewayAccessRightsPermissionDenied(t *testing.T) {
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIds: gatewayID,
-			APIKey: ttnpb.APIKey{
+			ApiKey: &ttnpb.APIKey{
 				Id:     APIKey.Id,
 				Name:   APIKey.Name,
 				Rights: []ttnpb.Right{right},
@@ -204,7 +216,7 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIds: gatewayID,
-			APIKey:     *APIKey,
+			ApiKey:     APIKey,
 			FieldMask:  &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
 		})
 
@@ -325,7 +337,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		APIKey.Name = newAPIKeyName
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIds: gatewayID,
-			APIKey:     *APIKey,
+			ApiKey:     APIKey,
 			FieldMask:  &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
@@ -443,7 +455,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		// Try revoking rights for the api key with RIGHT_GATEWAY_ALL without having it
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIds: gatewayID,
-			APIKey: ttnpb.APIKey{
+			ApiKey: &ttnpb.APIKey{
 				Id: APIKey.Id,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_LINK,
@@ -473,7 +485,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		// Remove RIGHT_GATEWAY_ALL from api key to be removed
 		key, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIds: gatewayID,
-			APIKey: ttnpb.APIKey{
+			ApiKey: &ttnpb.APIKey{
 				Id:     APIKey.Id,
 				Rights: newRights.Rights,
 			},
@@ -488,7 +500,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		newRights = newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK))
 		key, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIds: gatewayID,
-			APIKey: ttnpb.APIKey{
+			ApiKey: &ttnpb.APIKey{
 				Id:     APIKey.Id,
 				Rights: newRights.Rights,
 			},
@@ -526,7 +538,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		// Try revoking RIGHT_GATEWAY_DELETE from api key without having it
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIds: gatewayID,
-			APIKey: ttnpb.APIKey{
+			ApiKey: &ttnpb.APIKey{
 				Id:     APIKey.Id,
 				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_DELETE)).Rights,
 			},
@@ -569,7 +581,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		// Delete api key with more rights
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIds: gatewayID,
-			APIKey: ttnpb.APIKey{
+			ApiKey: &ttnpb.APIKey{
 				Id:     APIKey.Id,
 				Rights: []ttnpb.Right{},
 			},

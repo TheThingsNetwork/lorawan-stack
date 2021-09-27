@@ -61,10 +61,10 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 		reg := ttnpb.NewGatewayRegistryClient(cc)
 
 		_, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"},
 			},
-			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -99,7 +99,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids:  &ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"},
 				Name: "Updated Name",
 			},
@@ -133,27 +133,66 @@ func TestGatewaysCRUD(t *testing.T) {
 		is.config.UserRights.CreateGateways = false
 
 		_, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "foo",
 					Eui:       &eui,
 				},
 				Name: "Foo Gateway",
 			},
-			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
 		}, creds)
+
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		is.config.UserRights.CreateGateways = true
 
-		created, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+		// Attempt to Create Empty
+		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway:      nil,
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
+		}, creds)
+
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+
+		// Nil Collaborator
+		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "foo",
 					Eui:       &eui,
 				},
 				Name: "Foo Gateway",
 			},
-			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+			Collaborator: nil,
+		}, creds)
+
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+
+		// Credentials without rights.
+		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway: &ttnpb.Gateway{
+				Ids: &ttnpb.GatewayIdentifiers{
+					GatewayId: "foo",
+					Eui:       &eui,
+				},
+				Name: "Foo Gateway",
+			},
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
+		}, credsWithoutRights)
+
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+		// Valid request
+		created, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway: &ttnpb.Gateway{
+				Ids: &ttnpb.GatewayIdentifiers{
+					GatewayId: "foo",
+					Eui:       &eui,
+				},
+				Name: "Foo Gateway",
+			},
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -184,14 +223,14 @@ func TestGatewaysCRUD(t *testing.T) {
 		}
 
 		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "bar",
 					Eui:       &eui,
 				},
 				Name: "Bar Gateway",
 			},
-			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -214,8 +253,16 @@ func TestGatewaysCRUD(t *testing.T) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
+		// Update with nil gateway
+		_, err = reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
+			Gateway:   nil,
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name", "version_ids.firmware_version"}},
+		}, creds)
+
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+
 		updated, err := reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids:  created.GetIds(),
 				Name: "Updated Name",
 				VersionIds: &ttnpb.GatewayVersionIdentifiers{
@@ -354,14 +401,14 @@ func TestGatewaysSecrets(t *testing.T) {
 		is.config.UserRights.CreateGateways = false
 
 		_, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: gatewayID,
 					Eui:       &eui,
 				},
 				Name: gatewayName,
 			},
-			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
 		}, creds)
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
@@ -373,7 +420,7 @@ func TestGatewaysSecrets(t *testing.T) {
 		gatewayNameWithoutEncKey := "Foo Gateway without encryption key"
 
 		createdWithoutEncKey, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: gatewayIDWithoutEncKey,
 					Eui:       &euiWithoutEncKey,
@@ -384,7 +431,7 @@ func TestGatewaysSecrets(t *testing.T) {
 				TargetCupsUri:           targetCUPSURI,
 				TargetCupsKey:           secret,
 			},
-			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -418,7 +465,7 @@ func TestGatewaysSecrets(t *testing.T) {
 		is.config.Gateways.EncryptionKeyID = "is-test"
 
 		created, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: gatewayID,
 					Eui:       &eui,
@@ -429,7 +476,7 @@ func TestGatewaysSecrets(t *testing.T) {
 				TargetCupsUri:           targetCUPSURI,
 				TargetCupsKey:           secret,
 			},
-			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -469,7 +516,7 @@ func TestGatewaysSecrets(t *testing.T) {
 			a.So(got.ClaimAuthenticationCode, should.BeNil)
 		}
 		cacUpdated, err := reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids:                     created.GetIds(),
 				ClaimAuthenticationCode: &otherGtwClaimAuthCode,
 			},
@@ -483,7 +530,7 @@ func TestGatewaysSecrets(t *testing.T) {
 		validFrom := time.Now().UTC()
 		validTo := from.Add(10 * time.Minute)
 		cacWithoutSecret, err := reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids: created.GetIds(),
 				ClaimAuthenticationCode: &ttnpb.GatewayClaimAuthenticationCode{
 					ValidFrom: &validFrom,
@@ -498,7 +545,7 @@ func TestGatewaysSecrets(t *testing.T) {
 		validFrom = time.Now().UTC()
 		validTo = from.Add(-20 * time.Minute)
 		cacWithoutInvalidTime, err := reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids: created.GetIds(),
 				ClaimAuthenticationCode: &ttnpb.GatewayClaimAuthenticationCode{
 					Secret: &ttnpb.Secret{
@@ -531,14 +578,14 @@ func TestGatewaysSecrets(t *testing.T) {
 		a.So(errors.IsInvalidArgument(err), should.BeTrue)
 
 		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "bar",
 					Eui:       &eui,
 				},
 				Name: "Bar Gateway",
 			},
-			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -573,7 +620,7 @@ func TestGatewaysSecrets(t *testing.T) {
 		updatedSecretValue := []byte("my new secret value")
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
-			Gateway: ttnpb.Gateway{
+			Gateway: &ttnpb.Gateway{
 				Ids: created.GetIds(),
 				LbsLnsSecret: &ttnpb.Secret{
 					Value: updatedSecretValue,
