@@ -950,6 +950,10 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		log.FromContext(ctx).WithError(err).Error("Failed to update downlink task queue after data uplink")
 	}
 	if !matched.IsRetransmission {
+		var frmPayload []byte
+		if pld.FPort != 0 {
+			frmPayload = pld.FrmPayload
+		}
 		queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: stored.EndDeviceIdentifiers,
 			CorrelationIds:       up.CorrelationIds,
@@ -958,7 +962,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 					Confirmed:       up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
 					FCnt:            pld.FullFCnt,
 					FPort:           pld.FPort,
-					FrmPayload:      pld.FrmPayload,
+					FrmPayload:      frmPayload,
 					RxMetadata:      up.RxMetadata,
 					SessionKeyId:    stored.Session.SessionKeyId,
 					Settings:        up.Settings,
