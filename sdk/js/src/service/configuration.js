@@ -19,16 +19,21 @@ class Configuration {
     this._api = service
   }
 
-  async listNsFrequencyPlans(appId) {
+  async listNsFrequencyPlans() {
     const result = await this._api.ListFrequencyPlans({ component: 'ns' })
 
     return Marshaler.payloadListResponse('frequency_plans', result)
   }
 
-  async listGsFrequencyPlans(appId) {
+  async listGsFrequencyPlans() {
     const result = await this._api.ListFrequencyPlans({ component: 'gs' })
 
     return Marshaler.payloadListResponse('frequency_plans', result)
+  }
+
+  async getPhyVersions() {
+    const result = await this._api.GetPhyVersions()
+    return Marshaler.payloadSingleResponse(result)
   }
 }
 
