@@ -393,8 +393,10 @@ var gatewayColumnNames = map[string][]string{
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {
 	pb.Ids = &ttnpb.GatewayIdentifiers{GatewayId: gtw.GatewayID}
 	pb.Ids.Eui = gtw.GatewayEUI.toPB() // Always present.
-	pb.CreatedAt = cleanTime(gtw.CreatedAt)
-	pb.UpdatedAt = cleanTime(gtw.UpdatedAt)
+	createdAt := cleanTime(gtw.CreatedAt)
+	updatedAt := cleanTime(gtw.UpdatedAt)
+	pb.CreatedAt = &createdAt
+	pb.UpdatedAt = &updatedAt
 	pb.DeletedAt = cleanTimePtr(gtw.DeletedAt)
 	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultGatewayFieldMask
