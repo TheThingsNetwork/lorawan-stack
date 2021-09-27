@@ -5399,15 +5399,6 @@
       "file": "contact_info_registry.go"
     }
   },
-  "error:pkg/identityserver:no_gateway_eui": {
-    "translations": {
-      "en": "no gateway EUI"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "gateway_registry.go"
-    }
-  },
   "error:pkg/identityserver:no_invite_rights": {
     "translations": {
       "en": "no rights for inviting users"
