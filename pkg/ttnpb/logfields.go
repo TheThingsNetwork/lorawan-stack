@@ -93,7 +93,7 @@ func (req *CreateGatewayRequest) ExtractRequestFields(m map[string]interface{}) 
 		return
 	}
 	req.Gateway.ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator)
+	extractCollaboratorFields(m, req.GetCollaborator())
 }
 
 func (req *CreateOrganizationRequest) ExtractRequestFields(m map[string]interface{}) {

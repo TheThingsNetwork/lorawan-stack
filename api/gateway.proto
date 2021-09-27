@@ -228,13 +228,13 @@ message ListGatewaysRequest {
 }
 
 message CreateGatewayRequest {
-  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Gateway gateway = 1 [(validate.rules).message.required = true];
   // Collaborator to grant all rights on the newly created gateway.
-  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(validate.rules).message.required = true];
 }
 
 message UpdateGatewayRequest {
-  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Gateway gateway = 1 [(validate.rules).message.required = true];
   // The names of the gateway fields that should be updated.
   google.protobuf.FieldMask field_mask = 2;
 }
@@ -268,7 +268,7 @@ message CreateGatewayAPIKeyRequest {
 
 message UpdateGatewayAPIKeyRequest {
   GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
-  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  APIKey api_key = 2 [(validate.rules).message.required = true];
   // The names of the api key fields that should be updated.
   google.protobuf.FieldMask field_mask = 3;
 }

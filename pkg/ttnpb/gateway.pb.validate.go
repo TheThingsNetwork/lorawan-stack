@@ -1459,7 +1459,14 @@ func (m *CreateGatewayRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "gateway":
 
-			if v, ok := interface{}(&m.Gateway).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetGateway() == nil {
+				return CreateGatewayRequestValidationError{
+					field:  "gateway",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetGateway()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateGatewayRequestValidationError{
 						field:  "gateway",
@@ -1471,7 +1478,14 @@ func (m *CreateGatewayRequest) ValidateFields(paths ...string) error {
 
 		case "collaborator":
 
-			if v, ok := interface{}(&m.Collaborator).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetCollaborator() == nil {
+				return CreateGatewayRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateGatewayRequestValidationError{
 						field:  "collaborator",
@@ -1564,7 +1578,14 @@ func (m *UpdateGatewayRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "gateway":
 
-			if v, ok := interface{}(&m.Gateway).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetGateway() == nil {
+				return UpdateGatewayRequestValidationError{
+					field:  "gateway",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetGateway()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateGatewayRequestValidationError{
 						field:  "gateway",
@@ -2059,7 +2080,14 @@ func (m *UpdateGatewayAPIKeyRequest) ValidateFields(paths ...string) error {
 
 		case "api_key":
 
-			if v, ok := interface{}(&m.APIKey).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApiKey() == nil {
+				return UpdateGatewayAPIKeyRequestValidationError{
+					field:  "api_key",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApiKey()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateGatewayAPIKeyRequestValidationError{
 						field:  "api_key",

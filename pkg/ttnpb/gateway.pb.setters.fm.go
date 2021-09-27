@@ -840,10 +840,18 @@ func (dst *CreateGatewayRequest) SetFields(src *CreateGatewayRequest, paths ...s
 		case "gateway":
 			if len(subs) > 0 {
 				var newDst, newSrc *Gateway
-				if src != nil {
-					newSrc = &src.Gateway
+				if (src == nil || src.Gateway == nil) && dst.Gateway == nil {
+					continue
 				}
-				newDst = &dst.Gateway
+				if src != nil {
+					newSrc = src.Gateway
+				}
+				if dst.Gateway != nil {
+					newDst = dst.Gateway
+				} else {
+					newDst = &Gateway{}
+					dst.Gateway = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -851,17 +859,24 @@ func (dst *CreateGatewayRequest) SetFields(src *CreateGatewayRequest, paths ...s
 				if src != nil {
 					dst.Gateway = src.Gateway
 				} else {
-					var zero Gateway
-					dst.Gateway = zero
+					dst.Gateway = nil
 				}
 			}
 		case "collaborator":
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationOrUserIdentifiers
-				if src != nil {
-					newSrc = &src.Collaborator
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
 				}
-				newDst = &dst.Collaborator
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -869,8 +884,7 @@ func (dst *CreateGatewayRequest) SetFields(src *CreateGatewayRequest, paths ...s
 				if src != nil {
 					dst.Collaborator = src.Collaborator
 				} else {
-					var zero OrganizationOrUserIdentifiers
-					dst.Collaborator = zero
+					dst.Collaborator = nil
 				}
 			}
 
@@ -887,10 +901,18 @@ func (dst *UpdateGatewayRequest) SetFields(src *UpdateGatewayRequest, paths ...s
 		case "gateway":
 			if len(subs) > 0 {
 				var newDst, newSrc *Gateway
-				if src != nil {
-					newSrc = &src.Gateway
+				if (src == nil || src.Gateway == nil) && dst.Gateway == nil {
+					continue
 				}
-				newDst = &dst.Gateway
+				if src != nil {
+					newSrc = src.Gateway
+				}
+				if dst.Gateway != nil {
+					newDst = dst.Gateway
+				} else {
+					newDst = &Gateway{}
+					dst.Gateway = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -898,8 +920,7 @@ func (dst *UpdateGatewayRequest) SetFields(src *UpdateGatewayRequest, paths ...s
 				if src != nil {
 					dst.Gateway = src.Gateway
 				} else {
-					var zero Gateway
-					dst.Gateway = zero
+					dst.Gateway = nil
 				}
 			}
 		case "field_mask":
@@ -1116,19 +1137,26 @@ func (dst *UpdateGatewayAPIKeyRequest) SetFields(src *UpdateGatewayAPIKeyRequest
 		case "api_key":
 			if len(subs) > 0 {
 				var newDst, newSrc *APIKey
-				if src != nil {
-					newSrc = &src.APIKey
+				if (src == nil || src.ApiKey == nil) && dst.ApiKey == nil {
+					continue
 				}
-				newDst = &dst.APIKey
+				if src != nil {
+					newSrc = src.ApiKey
+				}
+				if dst.ApiKey != nil {
+					newDst = dst.ApiKey
+				} else {
+					newDst = &APIKey{}
+					dst.ApiKey = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.APIKey = src.APIKey
+					dst.ApiKey = src.ApiKey
 				} else {
-					var zero APIKey
-					dst.APIKey = zero
+					dst.ApiKey = nil
 				}
 			}
 		case "field_mask":
