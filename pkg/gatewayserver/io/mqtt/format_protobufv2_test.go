@@ -259,8 +259,8 @@ func TestProtobufV2Status(t *testing.T) {
 				RxOk: 14,
 			},
 			Expected: &ttnpb.GatewayStatus{
-				BootTime: time.Unix(0, 0),
-				Time:     time.Unix(0, 0),
+				BootTime: mqtt.TimePtr(time.Unix(0, 0)),
+				Time:     mqtt.TimePtr(time.Unix(0, 0)),
 				Metrics: map[string]float32{
 					"lmnw": 0.0,
 					"lmst": 0.0,
@@ -282,8 +282,8 @@ func TestProtobufV2Status(t *testing.T) {
 				Fpga:     4,
 			},
 			Expected: &ttnpb.GatewayStatus{
-				BootTime: time.Unix(0, 0),
-				Time:     time.Unix(0, 0),
+				BootTime: mqtt.TimePtr(time.Unix(0, 0)),
+				Time:     mqtt.TimePtr(time.Unix(0, 0)),
 				Metrics: map[string]float32{
 					"lmnw": 0.0,
 					"lmst": 0.0,
@@ -316,8 +316,8 @@ func TestProtobufV2Status(t *testing.T) {
 				Rtt: 3,
 			},
 			Expected: &ttnpb.GatewayStatus{
-				BootTime: time.Unix(0, 0),
-				Time:     time.Unix(0, 0),
+				BootTime: mqtt.TimePtr(time.Unix(0, 0)),
+				Time:     mqtt.TimePtr(time.Unix(0, 0)),
 				Metrics: map[string]float32{
 					"lmnw":              0.0,
 					"lmst":              0.0,
@@ -348,8 +348,8 @@ func TestProtobufV2Status(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.GatewayStatus{
-				BootTime: time.Unix(0, 0),
-				Time:     time.Unix(0, 0),
+				BootTime: mqtt.TimePtr(time.Unix(0, 0)),
+				Time:     mqtt.TimePtr(time.Unix(0, 0)),
 				Metrics: map[string]float32{
 					"lmnw": 0.0,
 					"lmst": 0.0,
