@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,58 +13,64 @@
 // limitations under the License.
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
+
+import api from '@console/api'
 
 import Select from '@ttn-lw/components/select'
+import toast from '@ttn-lw/components/toast'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import {
-  PHY_V1_0,
-  PHY_V1_0_1,
-  PHY_V1_0_2_REV_A,
-  PHY_V1_0_2_REV_B,
-  PHY_V1_0_3_REV_A,
-  PHY_V1_1_REV_A,
-  PHY_V1_1_REV_B,
-  LORAWAN_PHY_VERSIONS,
-  parseLorawanMacVersion,
-} from '@console/lib/device-utils'
+import { LORAWAN_PHY_VERSIONS } from '@console/lib/device-utils'
 
-const lorawanVersionPairs = {
-  100: [PHY_V1_0],
-  101: [PHY_V1_0_1],
-  102: [PHY_V1_0_2_REV_A, PHY_V1_0_2_REV_B],
-  103: [PHY_V1_0_3_REV_A],
-  104: LORAWAN_PHY_VERSIONS,
-  110: [PHY_V1_1_REV_A, PHY_V1_1_REV_B],
-  0: LORAWAN_PHY_VERSIONS,
-}
-
-const getOptions = lwVersion => lorawanVersionPairs[parseLorawanMacVersion(lwVersion)]
+const m = defineMessages({
+  phyVersionError: 'Failed to fetch phy versions',
+})
 
 const PhyVersionInput = props => {
-  const { lorawanVersion, onChange, disabled, value, ...rest } = props
+  const { onChange, disabled, value, frequencyPlan, ...rest } = props
 
-  const [phyVersions, setPhyVersions] = React.useState(getOptions(lorawanVersion))
+  const [phyVersions, setPhyVersions] = React.useState([])
+  const [options, setOptions] = React.useState(LORAWAN_PHY_VERSIONS)
 
-  const lorawanVersionRef = React.useRef(lorawanVersion)
   React.useEffect(() => {
-    const options = getOptions(lorawanVersion)
-    setPhyVersions(options)
+    const currentPhyVersions = phyVersions.filter(({ band_id }) => frequencyPlan.includes(band_id))
 
-    if (!value && options.length <= 1) {
-      onChange(options[0].value)
-    } else if (lorawanVersion !== lorawanVersionRef.current) {
-      onChange(options[0].value)
-      lorawanVersionRef.current = lorawanVersion
+    if (currentPhyVersions.length > 0) {
+      const versions = currentPhyVersions[0].phy_versions
+      if (versions.lengh === 1) {
+        onChange(versions[0])
+      }
+
+      const options = versions.map(phyVersion =>
+        LORAWAN_PHY_VERSIONS.find(({ value }) => value === phyVersion),
+      )
+      setOptions(options.length === 0 ? LORAWAN_PHY_VERSIONS : options)
     }
-  }, [lorawanVersion, onChange, value])
+  }, [frequencyPlan, onChange, phyVersions])
+
+  React.useEffect(() => {
+    const fetchPhyVersions = async () => {
+      try {
+        const { version_info } = await api.configuration.getPhyVersions()
+        setPhyVersions(version_info)
+      } catch (err) {
+        toast({
+          type: toast.types.ERROR,
+          message: m.phyVersionError,
+        })
+      }
+    }
+
+    fetchPhyVersions()
+  }, [])
 
   return (
     <Select
-      options={phyVersions}
+      options={options}
       onChange={onChange}
-      disabled={phyVersions.length <= 1 || disabled}
+      disabled={options.length <= 1 || disabled}
       value={value}
       {...rest}
     />
@@ -73,15 +79,15 @@ const PhyVersionInput = props => {
 
 PhyVersionInput.propTypes = {
   disabled: PropTypes.bool,
-  lorawanVersion: PropTypes.string,
+  frequencyPlan: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
 }
 
 PhyVersionInput.defaultProps = {
-  lorawanVersion: undefined,
   disabled: false,
   value: undefined,
+  frequencyPlan: '',
 }
 
 export default PhyVersionInput
