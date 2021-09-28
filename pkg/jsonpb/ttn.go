@@ -47,19 +47,21 @@ type TTNMarshaler struct {
 func (*TTNMarshaler) ContentType() string { return "application/json" }
 
 func (m *TTNMarshaler) Marshal(v interface{}) ([]byte, error) {
-	if marshaler, ok := v.(jsonplugin.Marshaler); ok && jsonpluginFeatureFlag {
-		b, err := jsonplugin.MarshalerConfig{
-			EnumsAsInts: true,
-		}.Marshal(marshaler)
-		if err != nil {
-			return nil, err
-		}
-		if m.GoGoJSONPb.Indent == "" {
-			return b, nil
-		} else {
-			var buf bytes.Buffer
-			json.Indent(&buf, b, "", m.GoGoJSONPb.Indent)
-			return buf.Bytes(), nil
+	if jsonpluginFeatureFlag {
+		if marshaler, ok := v.(jsonplugin.Marshaler); ok {
+			b, err := jsonplugin.MarshalerConfig{
+				EnumsAsInts: true,
+			}.Marshal(marshaler)
+			if err != nil {
+				return nil, err
+			}
+			if m.GoGoJSONPb.Indent == "" {
+				return b, nil
+			} else {
+				var buf bytes.Buffer
+				json.Indent(&buf, b, "", m.GoGoJSONPb.Indent)
+				return buf.Bytes(), nil
+			}
 		}
 	}
 	return m.GoGoJSONPb.Marshal(v)
@@ -75,28 +77,32 @@ type TTNEncoder struct {
 }
 
 func (e *TTNEncoder) Encode(v interface{}) error {
-	if marshaler, ok := v.(jsonplugin.Marshaler); ok && jsonpluginFeatureFlag {
-		b, err := jsonplugin.MarshalerConfig{
-			EnumsAsInts: true,
-		}.Marshal(marshaler)
-		if err != nil {
+	if jsonpluginFeatureFlag {
+		if marshaler, ok := v.(jsonplugin.Marshaler); ok {
+			b, err := jsonplugin.MarshalerConfig{
+				EnumsAsInts: true,
+			}.Marshal(marshaler)
+			if err != nil {
+				return err
+			}
+			if e.gogo.Indent == "" {
+				_, err = e.w.Write(b)
+			} else {
+				var buf bytes.Buffer
+				json.Indent(&buf, b, "", e.gogo.Indent)
+				io.Copy(e.w, &buf)
+			}
 			return err
 		}
-		if e.gogo.Indent == "" {
-			_, err = e.w.Write(b)
-		} else {
-			var buf bytes.Buffer
-			json.Indent(&buf, b, "", e.gogo.Indent)
-			io.Copy(e.w, &buf)
-		}
-		return err
 	}
 	return e.gogo.NewEncoder(e.w).Encode(v)
 }
 
 func (m *TTNMarshaler) Unmarshal(data []byte, v interface{}) error {
-	if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok && jsonpluginFeatureFlag {
-		return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
+	if jsonpluginFeatureFlag {
+		if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
+			return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
+		}
 	}
 	return m.GoGoJSONPb.Unmarshal(data, v)
 }
@@ -111,13 +117,15 @@ type NewDecoder struct {
 }
 
 func (d *NewDecoder) Decode(v interface{}) error {
-	if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok && jsonpluginFeatureFlag {
-		var data json.RawMessage
-		err := json.NewDecoder(d.r).Decode(&data)
-		if err != nil {
-			return err
+	if jsonpluginFeatureFlag {
+		if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
+			var data json.RawMessage
+			err := json.NewDecoder(d.r).Decode(&data)
+			if err != nil {
+				return err
+			}
+			return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
 		}
-		return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
 	}
 	return d.gogo.NewDecoder(d.r).Decode(v)
 }
