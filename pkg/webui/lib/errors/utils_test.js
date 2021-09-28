@@ -14,7 +14,7 @@
 
 import { withScope, captureException } from '@sentry/browser'
 
-import { getSentryErrorTitle, createFrontendError, ingestError } from './utils'
+import { getSentryErrorTitle, createFrontendError, ingestError, toMessageProps } from './utils'
 import errorMessages from './error-messages'
 
 jest.mock('@sentry/browser')
@@ -27,7 +27,7 @@ const setFingerprint = jest.fn()
 captureException.mockImplementation(jest.fn)
 withScope.mockImplementation(callback => callback({ setTags, setExtras, setFingerprint }))
 
-const backendError = {
+const backendErrorWithDetails = {
   code: 2,
   message:
     'error:pkg/assets:http (HTTP error: `` is not a valid ID. Must be at least 2 and at most 36 characters long and may consist of only letters, numbers and dashes. It may not start or end with a dash)',
@@ -43,6 +43,41 @@ const backendError = {
       },
     },
   ],
+}
+
+const backendErrorWithDetailsAndCause = {
+  code: 3,
+  message: 'error:pkg/ttnpb:identifiers (invalid identifiers)',
+  details: [
+    {
+      '@type': 'type.googleapis.com/ttn.lorawan.v3.ErrorDetails',
+      cause: {
+        attributes: {
+          field: 'example_field',
+          reason: 'Example validation error',
+        },
+        code: 3,
+        correlation_id: 'ab15917421584dafb5c9abb50e91ae71',
+        message_format: 'invalid `{field}`: {reason}',
+        name: 'validation',
+        namespace: 'pkg/errors',
+      },
+      code: 3,
+      correlation_id: 'e319ea4850b84ef0a12b8d7080bf83d6',
+      message_format: 'invalid identifiers',
+      name: 'identifiers',
+      namespace: 'pkg/ttnpb',
+    },
+  ],
+}
+
+const backendErrorDetails = {
+  '@type': 'type.googleapis.com/ttn.lorawan.v3.ErrorDetails',
+  namespace: 'pkg/networkserver',
+  name: 'duplicate',
+  message_format: 'uplink is a duplicate',
+  correlation_id: 'c2b9568e95df4d369974b822bc3e1b48',
+  code: 9,
 }
 
 const conflictBackendError = {
@@ -62,7 +97,7 @@ const conflictBackendError = {
 
 const frontendError = createFrontendError(
   errorMessages.unknownErrorTitle,
-  undefined,
+  errorMessages.genericError,
   undefined,
   500,
 )
@@ -75,7 +110,7 @@ const errorInstance = new Error('There was an unknown error')
 
 describe('Get Sentry error title', () => {
   it('retrieves the right error title', () => {
-    expect(getSentryErrorTitle(backendError)).toBe(backendError.message)
+    expect(getSentryErrorTitle(backendErrorWithDetails)).toBe(backendErrorWithDetails.message)
     expect(getSentryErrorTitle(frontendError)).toBe(frontendError.errorTitle.defaultMessage)
     expect(getSentryErrorTitle(codeError)).toBe(codeError.code)
     expect(getSentryErrorTitle(statusCodeError)).toBe(`status code: ${statusCodeError.statusCode}`)
@@ -91,7 +126,7 @@ describe('Ingest error', () => {
 
   describe('when passing backend errors', () => {
     it('correctly forwards sentry-worthy errors', () => {
-      ingestError(backendError)
+      ingestError(backendErrorWithDetails)
       expect(withScope).toHaveBeenCalledTimes(1)
       expect(setTags).toHaveBeenCalledTimes(1)
       expect(setTags.mock.calls[0][0]).toHaveProperty('frontendOrigin', true)
@@ -104,7 +139,7 @@ describe('Ingest error', () => {
       expect(captureException).toHaveBeenCalledTimes(1)
       expect(captureException.mock.calls[0][0] instanceof Error).toBe(true)
       expect(captureException.mock.calls[0][0].toString()).toBe(
-        `Error: ${getSentryErrorTitle(backendError)}`,
+        `Error: ${getSentryErrorTitle(backendErrorWithDetails)}`,
       )
     })
 
@@ -199,7 +234,7 @@ describe('Ingest error', () => {
 
   it('correctly decorates extras and tags', () => {
     ingestError(
-      backendError,
+      backendErrorWithDetails,
       { ingestedBy: 'ErrorNotification' },
       { requestAction: 'GET_APPLICATIONS_REQUEST' },
     )
@@ -212,5 +247,61 @@ describe('Ingest error', () => {
     expect(Object.keys(setExtras.mock.calls[0][0])).toHaveLength(4)
     expect(setFingerprint).toHaveBeenCalledTimes(1)
     expect(captureException).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('Converting errors to message props', () => {
+  it('correctly extracts from error details', () => {
+    const messageProps = toMessageProps(backendErrorDetails)
+    expect(messageProps).toMatchObject({
+      content: {
+        id: 'error:pkg/networkserver:duplicate',
+        defaultMessage: 'uplink is a duplicate',
+      },
+      values: undefined,
+    })
+  })
+
+  it('correctly extracts from errors with details and no causes', () => {
+    const messageProps = toMessageProps(backendErrorWithDetails)
+    expect(messageProps).toMatchObject({
+      content: {
+        id: 'error:pkg/assets:http',
+        defaultMessage: 'HTTP error: {message}',
+      },
+      values: {
+        message:
+          '`` is not a valid ID. Must be at least 2 and at most 36 characters long and may consist of only letters, numbers and dashes. It may not start or end with a dash',
+      },
+    })
+  })
+
+  it('correctly extracts from errors with details and cause', () => {
+    const messageProps = toMessageProps(backendErrorWithDetailsAndCause)
+    expect(messageProps).toMatchObject({
+      content: {
+        id: 'error:pkg/errors:validation',
+        defaultMessage: 'invalid `{field}`: {reason}',
+      },
+      values: {
+        field: 'example_field',
+        reason: 'Example validation error',
+      },
+    })
+  })
+
+  it('correctly extracts from frontend errors', () => {
+    const messageProps = toMessageProps(frontendError)
+    expect(messageProps).toMatchObject({
+      title: errorMessages.unknownErrorTitle,
+      content: errorMessages.genericError,
+    })
+  })
+
+  it('correctly extracts from unknown errors', () => {
+    const messageProps = toMessageProps(null)
+    expect(messageProps).toMatchObject({
+      content: errorMessages.genericError,
+    })
   })
 })
