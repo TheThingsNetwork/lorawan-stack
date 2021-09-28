@@ -758,7 +758,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: false,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: timePtrUTC(time.Unix(424242, 0).UTC()),
+											Time: timePtrUTC(time.Unix(424242, 0)),
 											AntennaLocations: []*ttnpb.Location{
 												{
 													Source:    ttnpb.SOURCE_GPS,
