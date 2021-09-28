@@ -120,10 +120,10 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 		deviceID = args[1]
 	}
 	if applicationID == "" && requireID {
-		return nil, errNoApplicationID
+		return nil, errNoApplicationID.New()
 	}
 	if deviceID == "" && requireID {
-		return nil, errNoEndDeviceID
+		return nil, errNoEndDeviceID.New()
 	}
 	ids := &ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
@@ -181,7 +181,7 @@ var (
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !config.NetworkServerEnabled {
-				return errNetworkServerDisabled
+				return errNetworkServerDisabled.New()
 			}
 
 			baseFrequency, _ := cmd.Flags().GetUint32("base-frequency")
@@ -207,7 +207,7 @@ var (
 
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectEndDeviceListFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.EndDeviceRegistry/List"].Allowed)
@@ -240,7 +240,7 @@ var (
 
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectEndDeviceListFlags)
 
@@ -399,7 +399,7 @@ var (
 				}
 				if withSession, _ := cmd.Flags().GetBool("with-session"); withSession {
 					if device.ProvisionerId != "" {
-						return errEndDeviceKeysWithProvisioner
+						return errEndDeviceKeysWithProvisioner.New()
 					}
 					ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
 					if err != nil {
@@ -458,7 +458,7 @@ var (
 				}
 				if withKeys, _ := cmd.Flags().GetBool("with-root-keys"); withKeys {
 					if device.ProvisionerId != "" {
-						return errEndDeviceKeysWithProvisioner
+						return errEndDeviceKeysWithProvisioner.New()
 					}
 					// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsNetwork/lorawan-stack/issues/47).
 					device.RootKeys = &ttnpb.RootKeys{
@@ -525,17 +525,17 @@ var (
 			paths = append(paths, newPaths...)
 
 			if device.ApplicationId == "" {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 			if device.DeviceId == "" {
-				return errNoEndDeviceID
+				return errNoEndDeviceID.New()
 			}
 
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(device.SupportsJoin, paths...)
 
 			// Require EUIs for devices that need to be added to the Join Server.
 			if len(jsPaths) > 0 && (device.JoinEui == nil || device.DevEui == nil) {
-				return errNoEndDeviceEUI
+				return errNoEndDeviceEUI.New()
 			}
 			var isDevice ttnpb.EndDevice
 			logger.WithField("paths", isPaths).Debug("Create end device on Identity Server")
@@ -656,14 +656,14 @@ var (
 			// EUIs can not be updated, so we only accept EUI flags if they are equal to the existing ones.
 			if device.JoinEui != nil {
 				if existingDevice.JoinEui != nil && *device.JoinEui != *existingDevice.JoinEui {
-					return errEndDeviceEUIUpdate
+					return errEndDeviceEUIUpdate.New()
 				}
 			} else {
 				device.JoinEui = existingDevice.JoinEui
 			}
 			if device.DevEui != nil {
 				if existingDevice.DevEui != nil && *device.DevEui != *existingDevice.DevEui {
-					return errEndDeviceEUIUpdate
+					return errEndDeviceEUIUpdate.New()
 				}
 			} else {
 				device.DevEui = existingDevice.DevEui
@@ -671,11 +671,11 @@ var (
 
 			// Require EUIs for devices that need to be updated in the Join Server.
 			if len(jsPaths) > 0 && (device.JoinEui == nil || device.DevEui == nil) {
-				return errNoEndDeviceEUI
+				return errNoEndDeviceEUI.New()
 			}
 
 			if nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
-				return errAddressMismatchEndDevice
+				return errAddressMismatchEndDevice.New()
 			}
 
 			if hasUpdateDeviceLocationFlags(cmd.Flags()) {
@@ -701,7 +701,7 @@ var (
 
 			appID := getApplicationID(cmd.Flags(), nil)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 
 			provisionerID, _ := cmd.Flags().GetString("provisioner-id")
@@ -868,21 +868,21 @@ var (
 			// EUIs must match registered EUIs if set.
 			if devID.JoinEui != nil {
 				if existingDevice.JoinEui != nil && *devID.JoinEui != *existingDevice.JoinEui {
-					return errInconsistentEndDeviceEUI
+					return errInconsistentEndDeviceEUI.New()
 				}
 			} else {
 				devID.JoinEui = existingDevice.JoinEui
 			}
 			if devID.DevEui != nil {
 				if existingDevice.DevEui != nil && *devID.DevEui != *existingDevice.DevEui {
-					return errInconsistentEndDeviceEUI
+					return errInconsistentEndDeviceEUI.New()
 				}
 			} else {
 				devID.DevEui = existingDevice.DevEui
 			}
 
 			if nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
-				return errAddressMismatchEndDevice
+				return errAddressMismatchEndDevice.New()
 			}
 
 			return deleteEndDevice(ctx, devID)
@@ -916,7 +916,7 @@ values will be stored in the Join Server.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			targetAppID := getApplicationID(cmd.Flags(), args)
 			if targetAppID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 
 			req := &ttnpb.ClaimEndDeviceRequest{
@@ -1037,10 +1037,10 @@ This command may take end device identifiers from stdin.`,
 					return err
 				}
 				if dev.ApplicationId == "" {
-					return errNoApplicationID
+					return errNoApplicationID.New()
 				}
 				if dev.DeviceId == "" {
-					return errNoEndDeviceID
+					return errNoEndDeviceID.New()
 				}
 				ids = &dev.EndDeviceIdentifiers
 			} else {
@@ -1092,13 +1092,13 @@ This command may take end device identifiers from stdin.`,
 
 			nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(device, config)
 			if len(nsPaths) > 0 && nsMismatch {
-				return errAddressMismatchEndDevice
+				return errAddressMismatchEndDevice.New()
 			}
 			if len(asPaths) > 0 && asMismatch {
-				return errAddressMismatchEndDevice
+				return errAddressMismatchEndDevice.New()
 			}
 			if len(jsPaths) > 0 && jsMismatch {
-				return errAddressMismatchEndDevice
+				return errAddressMismatchEndDevice.New()
 			}
 
 			dev, err := getEndDevice(device.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths, true)
@@ -1153,7 +1153,7 @@ This command may take end device identifiers from stdin.`,
 				return err
 			}
 			if !config.JoinServerEnabled {
-				return errJoinServerDisabled
+				return errJoinServerDisabled.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -1172,7 +1172,7 @@ This command may take end device identifiers from stdin.`,
 				return err
 			}
 			if _, _, nok := compareServerAddressesEndDevice(dev, config); nok {
-				return errAddressMismatchEndDevice
+				return errAddressMismatchEndDevice.New()
 			}
 
 			js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
@@ -1203,7 +1203,7 @@ This command may take end device identifiers from stdin.`,
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !config.NetworkServerEnabled {
-				return errNetworkServerDisabled
+				return errNetworkServerDisabled.New()
 			}
 
 			req := &ttnpb.GetDefaultMACSettingsRequest{}

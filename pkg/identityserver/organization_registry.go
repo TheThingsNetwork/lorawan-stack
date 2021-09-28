@@ -74,7 +74,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 	}
 	if usrIDs := req.GetCollaborator().GetUserIds(); usrIDs != nil {
 		if !is.IsAdmin(ctx) && !is.configFromContext(ctx).UserRights.CreateOrganizations {
-			return nil, errAdminsCreateOrganizations
+			return nil, errAdminsCreateOrganizations.New()
 		}
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_ORGANIZATIONS_CREATE); err != nil {
 			return nil, err
@@ -287,7 +287,7 @@ func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.Or
 
 func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
 	if !is.IsAdmin(ctx) {
-		return nil, errAdminsPurgeOrganizations
+		return nil, errAdminsPurgeOrganizations.New()
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		err := store.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)

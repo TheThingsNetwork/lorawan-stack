@@ -41,7 +41,7 @@ func (s *server) ClientLogout(c echo.Context) error {
 	accessTokenID := c.QueryParam("access_token_id")
 	redirectURI := s.config.UI.MountPath()
 	if accessTokenID == "" {
-		return errMissingAccessTokenIDParam
+		return errMissingAccessTokenIDParam.New()
 	}
 	at, err := s.store.GetAccessToken(ctx, accessTokenID)
 	if err != nil && !errors.IsNotFound(err) {

@@ -179,7 +179,7 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 			updatedInfo, err := updateContactInfo(id, func(existing []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error) {
 				for _, existing := range existing {
 					if existing.ContactMethod == contactInfo.ContactMethod && existing.ContactType == contactInfo.ContactType && existing.Value == contactInfo.Value {
-						return nil, errContactInfoExists
+						return nil, errContactInfoExists.New()
 					}
 				}
 				return append(existing, &contactInfo), nil
@@ -213,7 +213,7 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 					}
 				}
 				if !found {
-					return nil, errMatchingContactInfoNotFound
+					return nil, errMatchingContactInfoNotFound.New()
 				}
 				return updatedInfo, nil
 			})
@@ -258,10 +258,10 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 			default:
 			}
 			if reference == "" {
-				return errNoValidationReference
+				return errNoValidationReference.New()
 			}
 			if token == "" {
-				return errNoValidationToken
+				return errNoValidationToken.New()
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {

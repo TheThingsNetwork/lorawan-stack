@@ -307,7 +307,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				&applicationserver.Config{
 					Links: &MockLinkRegistry{
 						GetFunc: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
-							return nil, errNotFound
+							return nil, errNotFound.New()
 						},
 					},
 					Devices: &MockDeviceRegistry{

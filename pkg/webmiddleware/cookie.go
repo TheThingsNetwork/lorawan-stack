@@ -44,7 +44,7 @@ var errInvalidContext = errors.DefineInternal("secure_cookie_invalid_context", "
 func GetSecureCookie(ctx context.Context) (*securecookie.SecureCookie, error) {
 	secureCookie, _ := ctx.Value(secureCookieCtxKey).(*securecookie.SecureCookie)
 	if secureCookie == nil {
-		return nil, errInvalidContext
+		return nil, errInvalidContext.New()
 	}
 	return secureCookie, nil
 }

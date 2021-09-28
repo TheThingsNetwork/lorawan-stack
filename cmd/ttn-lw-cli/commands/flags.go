@@ -151,10 +151,10 @@ func getAPIKeyExpiry(flagSet *pflag.FlagSet) (*time.Time, error) {
 	if expiry != "" {
 		expiryDate, err := time.Parse(time.RFC3339, expiry)
 		if err != nil {
-			return nil, errInvalidDateFormat
+			return nil, errInvalidDateFormat.New()
 		}
 		if expiryDate.Before(time.Now()) {
-			return nil, errExpiryDateInPast
+			return nil, errExpiryDateInPast.New()
 		}
 		return &expiryDate, nil
 	}

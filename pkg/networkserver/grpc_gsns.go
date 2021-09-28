@@ -818,7 +818,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		return errDeviceNotFound.WithCause(err)
 	}
 	if !ok {
-		return errDeviceNotFound
+		return errDeviceNotFound.New()
 	}
 
 	pld.FullFCnt = matched.FullFCnt

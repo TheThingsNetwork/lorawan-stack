@@ -76,7 +76,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	}
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
 		if !is.IsAdmin(ctx) && !is.configFromContext(ctx).UserRights.CreateGateways {
-			return nil, errAdminsCreateGateways
+			return nil, errAdminsCreateGateways.New()
 		}
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_GATEWAYS_CREATE); err != nil {
 			return nil, err
@@ -599,7 +599,7 @@ func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.Gateway
 
 func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	if !is.IsAdmin(ctx) {
-		return nil, errAdminsPurgeGateways
+		return nil, errAdminsPurgeGateways.New()
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		// delete related API keys before purging the gateway
@@ -628,11 +628,11 @@ func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayId
 
 func validateClaimAuthenticationCode(authCode ttnpb.GatewayClaimAuthenticationCode) error {
 	if authCode.Secret == nil {
-		return errClaimAuthenticationCode
+		return errClaimAuthenticationCode.New()
 	}
 	if authCode.ValidFrom != nil && authCode.ValidTo != nil {
 		if authCode.ValidTo.Before(*authCode.ValidFrom) {
-			return errClaimAuthenticationCode
+			return errClaimAuthenticationCode.New()
 		}
 	}
 	return nil

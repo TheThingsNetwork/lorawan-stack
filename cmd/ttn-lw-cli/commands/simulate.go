@@ -101,7 +101,7 @@ func (m *simulateMetadataParams) setDefaults() error {
 		}
 		dr, ok := phy.DataRates[drIdx]
 		if !ok {
-			return errInvalidDataRateIndex
+			return errInvalidDataRateIndex.New()
 		}
 		lora := dr.Rate.GetLora()
 		m.SpreadingFactor, m.Bandwidth = lora.SpreadingFactor, lora.Bandwidth

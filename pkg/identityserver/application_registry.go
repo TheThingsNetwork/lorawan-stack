@@ -80,7 +80,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 	}
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
 		if !is.IsAdmin(ctx) && !is.configFromContext(ctx).UserRights.CreateApplications {
-			return nil, errAdminsCreateApplications
+			return nil, errAdminsCreateApplications.New()
 		}
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_APPLICATIONS_CREATE); err != nil {
 			return nil, err
@@ -306,7 +306,7 @@ func (is *IdentityServer) restoreApplication(ctx context.Context, ids *ttnpb.App
 
 func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
 	if !is.IsAdmin(ctx) {
-		return nil, errAdminsPurgeApplications
+		return nil, errAdminsPurgeApplications.New()
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		total, err := store.GetEndDeviceStore(db).CountEndDevices(ctx, ids)
