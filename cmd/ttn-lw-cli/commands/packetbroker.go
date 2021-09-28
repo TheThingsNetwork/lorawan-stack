@@ -447,6 +447,16 @@ Specify default to configure the default gateway visibility.`,
 			if err := util.SetFields(visibility, packetbrokerGatewayVisibilityFlags); err != nil {
 				return err
 			}
+			if all, _ := cmd.Flags().GetBool("all"); all {
+				visibility.Location = true
+				visibility.AntennaPlacement = true
+				visibility.AntennaCount = true
+				visibility.FineTimestamps = true
+				visibility.ContactInfo = true
+				visibility.Status = true
+				visibility.FrequencyPlan = true
+				visibility.PacketRates = true
+			}
 			_, err = ttnpb.NewPbaClient(pba).SetHomeNetworkDefaultGatewayVisibility(ctx, &ttnpb.SetPacketBrokerDefaultGatewayVisibilityRequest{
 				Visibility: visibility,
 			})
