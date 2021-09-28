@@ -82,6 +82,7 @@ func (dn *DevNonce) UnmarshalJSON(data []byte) error {
 func (dn *DevNonce) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if dn == nil {
 		s.WriteNil()
+		return
 	}
 	s.WriteString(fmt.Sprintf("%X", dn[:]))
 }

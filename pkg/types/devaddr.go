@@ -76,6 +76,7 @@ func (addr *DevAddr) UnmarshalJSON(data []byte) error {
 func (addr *DevAddr) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if addr == nil {
 		s.WriteNil()
+		return
 	}
 	s.WriteString(fmt.Sprintf("%X", addr[:]))
 }

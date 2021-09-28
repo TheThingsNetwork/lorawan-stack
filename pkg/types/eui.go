@@ -70,6 +70,7 @@ func (eui *EUI64) UnmarshalJSON(data []byte) error {
 func (eui *EUI64) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if eui == nil {
 		s.WriteNil()
+		return
 	}
 	s.WriteString(fmt.Sprintf("%X", eui[:]))
 }

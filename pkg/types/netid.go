@@ -70,6 +70,7 @@ func (id *NetID) UnmarshalJSON(data []byte) error {
 func (id *NetID) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if id == nil {
 		s.WriteNil()
+		return
 	}
 	s.WriteString(fmt.Sprintf("%X", id[:]))
 }

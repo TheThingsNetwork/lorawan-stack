@@ -70,6 +70,7 @@ func (jn *JoinNonce) UnmarshalJSON(data []byte) error {
 func (jn *JoinNonce) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if jn == nil {
 		s.WriteNil()
+		return
 	}
 	s.WriteString(fmt.Sprintf("%X", jn[:]))
 }
