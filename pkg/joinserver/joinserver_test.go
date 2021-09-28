@@ -149,7 +149,10 @@ func TestInvalidJoinRequests(t *testing.T) {
 				if err := devReg.Init(ctx); !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
-				keyReg := &redis.KeyRegistry{Redis: redisClient}
+				keyReg := &redis.KeyRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+				if err := keyReg.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
 				aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(ctx)
 				defer aasRegCloseFn()
 
@@ -2049,7 +2052,10 @@ func TestHandleJoin(t *testing.T) {
 				if err := devReg.Init(ctx); !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
-				keyReg := &redis.KeyRegistry{Redis: redisClient}
+				keyReg := &redis.KeyRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+				if err := keyReg.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
 				aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(ctx)
 				defer aasRegCloseFn()
 

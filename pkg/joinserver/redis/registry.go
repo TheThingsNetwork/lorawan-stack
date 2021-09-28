@@ -391,7 +391,20 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 
 // KeyRegistry is an implementation of joinserver.KeyRegistry.
 type KeyRegistry struct {
-	Redis *ttnredis.Client
+	Redis   *ttnredis.Client
+	LockTTL time.Duration
+
+	entropyMu *sync.Mutex
+	entropy   io.Reader
+}
+
+func (r *KeyRegistry) Init(ctx context.Context) error {
+	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
+		return err
+	}
+	r.entropyMu = &sync.Mutex{}
+	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
+	return nil
 }
 
 func (r *KeyRegistry) idKey(joinEUI, devEUI types.EUI64, id []byte) string {
@@ -420,10 +433,15 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 	}
 	ik := r.idKey(joinEUI, devEUI, id)
 
+	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	if err != nil {
+		return nil, err
+	}
+
 	defer trace.StartRegion(ctx, "set session keys").End()
 
 	var pb *ttnpb.SessionKeys
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+	err = ttnredis.LockedWatch(ctx, r.Redis, ik, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, ik)
 		stored := &ttnpb.SessionKeys{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -517,7 +535,7 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 			return err
 		}
 		return nil
-	}, ik)
+	})
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}

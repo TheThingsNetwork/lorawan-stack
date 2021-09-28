@@ -337,9 +337,14 @@ var startCommand = &cobra.Command{
 				return shared.ErrInitializeJoinServer.WithCause(err)
 			}
 			config.JS.Devices = deviceRegistry
-			config.JS.Keys = &jsredis.KeyRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("js", "keys")),
+			keyRegistry := &jsredis.KeyRegistry{
+				Redis:   redis.New(config.Redis.WithNamespace("js", "keys")),
+				LockTTL: defaultLockTTL,
 			}
+			if err := keyRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeJoinServer.WithCause(err)
+			}
+			config.JS.Keys = keyRegistry
 			config.JS.ApplicationActivationSettings = &jsredis.ApplicationActivationSettingRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("js", "application-activation-settings")),
 			}
