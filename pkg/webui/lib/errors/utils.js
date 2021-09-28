@@ -44,6 +44,20 @@ export const isBackend = error =>
 export const isFrontend = error => Boolean(error) && typeof error === 'object' && error.isFrontend
 
 /**
+ * Returns whether the backend error has `details` attached.
+ *
+ * @param {object} error - The object to be tested.
+ * @returns {boolean} `true` if `the error object contains `details` with
+ * at least one item, `false` otherwise.
+ */
+export const isBackendErrorWithDetails = error =>
+  isBackend(error) &&
+  'details' in error &&
+  error.details instanceof Array &&
+  error.details.length !== 0 &&
+  typeof error.details[0] === 'object'
+
+/**
  * Returns whether `details` is a backend error details object.
  *
  * @param {object} details - The object to be tested.
@@ -204,7 +218,9 @@ export const isConflictError = error =>
  * @returns {boolean} `true` if `error` has translation ids, `false` otherwise.
  */
 export const isTranslated = error =>
-  isBackend(error) || isFrontend(error) || (typeof error === 'object' && error.id)
+  isBackend(error) ||
+  isFrontend(error) ||
+  (isPlainObject(error) && typeof error.id === 'string' && typeof error.defaultMessage === 'string')
 
 /**
  * Returns whether `error` is a 'network error' as JavaScript TypeError.
@@ -384,9 +400,10 @@ export const getCorrelationId = error =>
  */
 export const toMessageProps = error => {
   let props
+
   // Check if it is a error message and transform it to a intl message.
-  if (isBackend(error) || isBackendErrorDetails(error)) {
-    const errorDetails = isBackendErrorDetails(error) ? error : getBackendErrorDetails(error)
+  if (isBackendErrorDetails(error) || isBackendErrorWithDetails(error)) {
+    const errorDetails = error.details ? error.details[0] : error
     if (hasCauses(errorDetails)) {
       // Use the root cause if any.
       const rootCause = getBackendErrorRootCause(errorDetails)
@@ -400,11 +417,19 @@ export const toMessageProps = error => {
     } else {
       props = {
         content: {
-          id: getBackendErrorId(error),
-          defaultMessage: getBackendErrorDefaultMessage(error),
+          id: getBackendErrorDetailsId(errorDetails),
+          defaultMessage: errorDetails.message_format,
         },
-        values: getBackendErrorMessageAttributes(error),
+        values: errorDetails.attributes,
       }
+    }
+  } else if (isBackend()) {
+    props = {
+      content: {
+        id: getBackendErrorId(error),
+        defaultMessage: getBackendErrorDefaultMessage(error),
+      },
+      values: getBackendErrorMessageAttributes(error),
     }
   } else if (isFrontend(error)) {
     props = {
