@@ -15,6 +15,7 @@
 package band_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -498,7 +499,7 @@ func TestRx1DataRate(t *testing.T) {
 		t.Run(tc.bandID, func(t *testing.T) {
 			a := assertions.New(t)
 
-			b, err := GetByID(tc.bandID)
+			b, err := GetLatest(tc.bandID)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Error when getting band %s: %s", tc.bandID, err)
 			}
@@ -534,9 +535,11 @@ func TestRx1DataRate(t *testing.T) {
 func TestParseChMaskBands(t *testing.T) {
 	a := assertions.New(t)
 
-	for _, b := range All {
-		if !a.So(b.ParseChMask, should.NotBeNil) {
-			t.Fatalf("Band %s should have a ParseChMask function defined", b.ID)
+	for version, versions := range All {
+		for _, b := range versions {
+			if !a.So(b.ParseChMask, should.NotBeNil) {
+				t.Fatalf("Band %s:%v should have a ParseChMask function defined", b.ID, version)
+			}
 		}
 	}
 }
@@ -544,25 +547,29 @@ func TestParseChMaskBands(t *testing.T) {
 func TestGenerateChMasksBands(t *testing.T) {
 	a := assertions.New(t)
 
-	for _, b := range All {
-		if !a.So(b.GenerateChMasks, should.NotBeNil) {
-			t.Fatalf("Band %s should have a GenerateChMasks function defined", b.ID)
+	for version, versions := range All {
+		for _, b := range versions {
+			if !a.So(b.GenerateChMasks, should.NotBeNil) {
+				t.Fatalf("Band %s:%v should have a GenerateChMasks function defined", b.ID, version)
+			}
 		}
 	}
 }
 
 func TestFindSubBand(t *testing.T) {
-	for _, b := range All {
-		t.Run(b.ID, func(t *testing.T) {
-			a := assertions.New(t)
-			for _, ch := range b.UplinkChannels {
-				sb, ok := b.FindSubBand(ch.Frequency)
-				if !a.So(ok, should.BeTrue) {
-					t.Fatalf("Frequency %d not found in sub-bands", ch.Frequency)
+	for version, versions := range All {
+		for _, b := range versions {
+			t.Run(fmt.Sprintf("%v:%v", b.ID, version), func(t *testing.T) {
+				a := assertions.New(t)
+				for _, ch := range b.UplinkChannels {
+					sb, ok := b.FindSubBand(ch.Frequency)
+					if !a.So(ok, should.BeTrue) {
+						t.Fatalf("Frequency %d not found in sub-bands", ch.Frequency)
+					}
+					a.So(sb.MinFrequency, should.BeLessThanOrEqualTo, ch.Frequency)
+					a.So(sb.MaxFrequency, should.BeGreaterThanOrEqualTo, ch.Frequency)
 				}
-				a.So(sb.MinFrequency, should.BeLessThanOrEqualTo, ch.Frequency)
-				a.So(sb.MaxFrequency, should.BeGreaterThanOrEqualTo, ch.Frequency)
-			}
-		})
+			})
+		}
 	}
 }

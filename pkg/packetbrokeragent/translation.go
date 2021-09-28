@@ -339,7 +339,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 	}
 
 	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-	phy, err := band.GetByID(msg.BandId)
+	phy, err := band.GetLatest(msg.BandId)
 	if err != nil {
 		return nil, errUnknownBand.WithAttributes("band_id", msg.BandId)
 	}
@@ -493,7 +493,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 	if !ok {
 		return nil, errUnknownRegion.WithAttributes("region", msg.Message.GatewayRegion)
 	}
-	phy, err := band.GetByID(bandID)
+	phy, err := band.GetLatest(bandID)
 	if err != nil {
 		return nil, errUnknownBand.WithAttributes("band_id", bandID)
 	}
@@ -704,13 +704,9 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 	if err != nil {
 		return nil, nil, errFrequencyPlanNotConfigured.WithAttributes("id", req.FrequencyPlanId)
 	}
-	phy, err := band.GetByID(fp.BandID)
+	phy, err := band.Get(fp.BandID, req.LorawanPhyVersion)
 	if err != nil {
 		return nil, nil, errUnknownBand.WithAttributes("band_id", fp.BandID)
-	}
-	phy, err = phy.Version(req.LorawanPhyVersion)
-	if err != nil {
-		return nil, nil, err
 	}
 
 	down := &packetbroker.DownlinkMessage{
@@ -812,7 +808,7 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 		if bandID, ok = fromPBRegion[msg.Region]; !ok {
 			return "", nil, errUnknownRegion.WithAttributes("region", msg.Region)
 		}
-		p, err := band.GetByID(bandID)
+		p, err := band.GetLatest(bandID)
 		if err != nil {
 			return "", nil, errUnknownRegion.WithCause(err).WithAttributes("region", msg.Region)
 		}
@@ -830,7 +826,7 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 		req.LorawanPhyVersion = phyVersion
 		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
 		if phy != nil {
-			p, err := phy.Version(phyVersion)
+			p, err := band.Get(phy.ID, phyVersion)
 			if err != nil {
 				return "", nil, err
 			}
@@ -1040,7 +1036,7 @@ func toPBFrequencyPlan(fps ...*frequencyplans.FrequencyPlan) (*packetbroker.Gate
 	if len(fps) == 0 {
 		return nil, nil
 	}
-	phy, err := band.GetByID(fps[0].BandID)
+	phy, err := band.GetLatest(fps[0].BandID)
 	if err != nil {
 		return nil, err
 	}

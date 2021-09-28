@@ -420,19 +420,16 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		}
 	}
 
-	phy, err := band.GetByID(fp.BandID)
-	if err != nil {
-		return false, false, 0, err
-	}
-
 	lwPhyVersion := request.GetLorawanPhyVersion()
 	// Backwards compatibility. If there's no PHY version defined, assume that the band is already versioned.
 	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-	if lwPhyVersion != ttnpb.PHY_UNKNOWN {
-		phy, err = phy.Version(request.GetLorawanPhyVersion())
-		if err != nil {
-			return false, false, 0, err
-		}
+	if lwPhyVersion == ttnpb.PHY_UNKNOWN {
+		lwPhyVersion = ttnpb.RP001_V1_1_REV_B
+	}
+
+	phy, err := band.Get(fp.BandID, lwPhyVersion)
+	if err != nil {
+		return false, false, 0, err
 	}
 
 	// TODO: Take fully defined data rate from TxRequest (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).

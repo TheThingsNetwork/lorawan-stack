@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package band
 import "go.thethings.network/lorawan-stack/v3/pkg/errors"
 
 var (
-	errBandNotFound                         = errors.DefineNotFound("band_not_found", "band `{id}` not found")
+	errBandNotFound                         = errors.DefineNotFound("band_not_found", "band `{id}@{version}` not found")
 	errDataRateIndexTooHigh                 = errors.DefineInvalidArgument("data_rate_index_too_high", "data rate index must be lower or equal to {max}")
 	errDataRateOffsetTooHigh                = errors.DefineInvalidArgument("data_rate_offset_too_high", "data rate offset must be lower or equal to {max}")
 	errInvalidChannelCount                  = errors.DefineInvalidArgument("invalid_channel_count", "invalid number of channels defined")

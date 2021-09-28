@@ -70,11 +70,7 @@ func (m *simulateMetadataParams) setDefaults() error {
 	if m.LoRaWANPHYVersion == ttnpb.PHY_UNKNOWN {
 		m.LoRaWANPHYVersion = ttnpb.RP001_V1_0_2_REV_B
 	}
-	phy, err := band.GetByID(m.BandID)
-	if err != nil {
-		return err
-	}
-	phy, err = phy.Version(m.LoRaWANPHYVersion)
+	phy, err := band.Get(m.BandID, m.LoRaWANPHYVersion)
 	if err != nil {
 		return err
 	}
@@ -286,11 +282,7 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 }
 
 func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *ttnpb.DownlinkMessage) error {
-	phy, err := band.GetByID(dev.FrequencyPlanId)
-	if err != nil {
-		return err
-	}
-	phy, err = phy.Version(dev.LorawanPhyVersion)
+	phy, err := band.Get(dev.FrequencyPlanId, dev.LorawanPhyVersion)
 	if err != nil {
 		return err
 	}

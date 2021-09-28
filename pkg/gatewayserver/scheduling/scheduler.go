@@ -140,7 +140,7 @@ func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyP
 					}
 				}
 			} else {
-				band, err := band.GetByID(fp.BandID)
+				band, err := band.GetLatest(fp.BandID)
 				if err != nil {
 					return nil, err
 				}

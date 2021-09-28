@@ -23,12 +23,7 @@ import (
 // This function returns nil if the CFList could not be computed, or if the
 // device does not support CFLists.
 func CFList(fp FrequencyPlan, version ttnpb.PHYVersion) *ttnpb.CFList {
-	phy, err := band.GetByID(fp.BandID)
-	if err != nil {
-		return nil
-	}
-
-	phy, err = phy.Version(version)
+	phy, err := band.Get(fp.BandID, version)
 	if err != nil {
 		return nil
 	}
