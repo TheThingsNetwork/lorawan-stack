@@ -6821,9 +6821,9 @@
       "file": "config.go"
     }
   },
-  "error:pkg/networkserver:downlink_queue_capacity_exceeded": {
+  "error:pkg/networkserver:downlink_queue_capacity": {
     "translations": {
-      "en": "Downlink queue capacity exceeded"
+      "en": "downlink queue capacity exceeded"
     },
     "description": {
       "package": "pkg/networkserver",

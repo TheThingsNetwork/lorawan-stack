@@ -810,13 +810,13 @@ func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
 	}
 
 	// Initial update, so that the gateway appears connected.
-	if err := gs.statsRegistry.Set(ctx, *ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel); err != nil {
+	if err := gs.statsRegistry.Set(ctx, *ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel); err != nil && !errors.IsCanceled(err) {
 		logger.WithError(err).Error("Failed to initialize connection stats")
 	}
 
 	defer func() {
 		logger.Debug("Delete connection stats")
-		if err := gs.statsRegistry.Set(gs.FromRequestContext(ctx), *ids, nil, nil); err != nil {
+		if err := gs.statsRegistry.Set(gs.FromRequestContext(ctx), *ids, nil, nil); err != nil && !errors.IsCanceled(err) {
 			logger.WithError(err).Error("Failed to clear connection stats")
 		}
 	}()
@@ -827,7 +827,7 @@ func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
 		case <-conn.StatsChanged():
 		}
 		stats, paths := conn.Stats()
-		if err := gs.statsRegistry.Set(ctx, *ids, stats, paths); err != nil {
+		if err := gs.statsRegistry.Set(ctx, *ids, stats, paths); err != nil && !errors.IsCanceled(err) {
 			logger.WithError(err).Error("Failed to update connection stats")
 		}
 		timeout := time.After(gs.updateConnectionStatsDebounceTime)
