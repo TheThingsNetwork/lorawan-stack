@@ -224,6 +224,35 @@ message SetPacketBrokerRoutingPolicyRequest {
   PacketBrokerRoutingPolicyDownlink downlink = 3 [(validate.rules).message.required = true];
 }
 
+message PacketBrokerGatewayVisibility {
+  // Show location.
+  bool location = 1;
+  // Show antenna placement (indoor/outdoor).
+  bool antenna_placement = 2;
+  // Show antenna count.
+  bool antenna_count = 3;
+  // Show whether the gateway produces fine timestamps.
+  bool fine_timestamps = 4;
+  // Show contact information.
+  bool contact_info = 5;
+  // Show status (online/offline).
+  bool status = 6;
+  // Show frequency plan.
+  bool frequency_plan = 8;
+  // Show receive and transmission packet rates.
+  bool packet_rates = 9;
+}
+
+message PacketBrokerDefaultGatewayVisibility {
+  // Timestamp when the policy got last updated.
+  google.protobuf.Timestamp updated_at = 1;
+  PacketBrokerGatewayVisibility visibility = 2;
+}
+
+message SetPacketBrokerDefaultGatewayVisibilityRequest {
+  PacketBrokerGatewayVisibility visibility = 1 [(validate.rules).message.required = true];
+}
+
 message ListPacketBrokerNetworksRequest {
   // Limit the number of results per page.
   uint32 limit = 1 [(validate.rules).uint32.lte = 1000];
@@ -370,6 +399,35 @@ service Pba {
       additional_bindings {
         delete: "/pba/home-networks/policies/{net_id}/{tenant_id}"
       }
+    };
+  };
+
+  // Get the default gateway visibility.
+  // Getting gateway visibilities requires administrative access.
+  rpc GetHomeNetworkDefaultGatewayVisibility(google.protobuf.Empty) returns (PacketBrokerDefaultGatewayVisibility) {
+    option (google.api.http) = {
+      get: "/pba/home-networks/gateway-visibilities/default"
+    };
+  };
+
+  // Set the default gateway visibility.
+  // Setting gateway visibilities requires administrative access.
+  rpc SetHomeNetworkDefaultGatewayVisibility(SetPacketBrokerDefaultGatewayVisibilityRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/pba/home-networks/gateway-visibilities/default"
+      body: "*"
+      additional_bindings {
+        post: "/pba/home-networks/gateway-visibilities/default"
+        body: "*"
+      }
+    };
+  };
+
+  // Deletes the default gateway visibility.
+  // Deleting gateway visibilities requires administrative access.
+  rpc DeleteHomeNetworkDefaultGatewayVisibility(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/pba/home-networks/gateway-visibilities/default"
     };
   };
 
