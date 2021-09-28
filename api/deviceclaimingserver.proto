@@ -36,9 +36,9 @@ option (gogoproto.stringer_all) = true;
 message ClaimEndDeviceRequest {
   message AuthenticatedIdentifiers {
     // JoinEUI (or AppEUI) of the device to claim.
-    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+    bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
     // DevEUI of the device to claim.
-    bytes dev_eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+    bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
     // Authentication code to prove ownership.
     // In the LoRa Alliance TR005 specification, this equals the OwnerToken.
     string authentication_code = 3 [(validate.rules).string.pattern = "^[A-Z0-9]{1,32}$"];
@@ -142,7 +142,7 @@ message CUPSRedirection {
 
 message ClaimGatewayRequest {
   message AuthenticatedIdentifiers {
-    bytes gateway_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+    bytes gateway_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
     bytes authentication_code = 2 [(validate.rules).bytes.max_len = 2048];
   }
   oneof source_gateway {

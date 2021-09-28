@@ -2,7 +2,10 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
+)
 
 func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -565,7 +568,8 @@ func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimE
 			if src != nil {
 				dst.JoinEui = src.JoinEui
 			} else {
-				dst.JoinEui = nil
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
+				dst.JoinEui = zero
 			}
 		case "dev_eui":
 			if len(subs) > 0 {
@@ -574,7 +578,8 @@ func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimE
 			if src != nil {
 				dst.DevEui = src.DevEui
 			} else {
-				dst.DevEui = nil
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
+				dst.DevEui = zero
 			}
 		case "authentication_code":
 			if len(subs) > 0 {
@@ -633,7 +638,8 @@ func (dst *ClaimGatewayRequest_AuthenticatedIdentifiers) SetFields(src *ClaimGat
 			if src != nil {
 				dst.GatewayEui = src.GatewayEui
 			} else {
-				dst.GatewayEui = nil
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
+				dst.GatewayEui = zero
 			}
 		case "authentication_code":
 			if len(subs) > 0 {
