@@ -24,6 +24,7 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -71,6 +72,7 @@ type Server interface {
 	RateLimiter() ratelimit.Interface
 	// ValidateGatewayID validates the ID of the gateway.
 	ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
+	component.TaskStarter
 }
 
 // Connection is a connection to a gateway managed by a frontend.
@@ -228,7 +230,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 			continue
 		}
 		buf, err := UplinkToken(ttnpb.GatewayAntennaIdentifiers{
-			GatewayIdentifiers: c.gateway.GatewayIdentifiers,
+			GatewayIdentifiers: *c.gateway.GetIds(),
 			AntennaIndex:       md.AntennaIndex,
 		}, md.Timestamp, ct, up.ReceivedAt)
 		if err != nil {
@@ -260,7 +262,9 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		atomic.StoreInt64(&c.lastUplinkTime, up.ReceivedAt.UnixNano())
 		c.notifyStatsChanged()
 	default:
-		return errBufferFull.New()
+		err := errBufferFull.New()
+		registerDropMessage(c.ctx, c.gateway, "uplink", err)
+		return err
 	}
 	return nil
 }
@@ -282,7 +286,9 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 			}
 		}
 	default:
-		return errBufferFull.New()
+		err := errBufferFull.New()
+		registerDropMessage(c.ctx, c.gateway, "status", err)
+		return err
 	}
 	return nil
 }
@@ -295,7 +301,9 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 	case c.txAckCh <- ack:
 		c.notifyStatsChanged()
 	default:
-		return errBufferFull.New()
+		err := errBufferFull.New()
+		registerDropMessage(c.ctx, c.gateway, "txack", err)
+		return err
 	}
 	return nil
 }
@@ -412,19 +420,16 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		}
 	}
 
-	phy, err := band.GetByID(fp.BandID)
-	if err != nil {
-		return false, false, 0, err
-	}
-
 	lwPhyVersion := request.GetLorawanPhyVersion()
 	// Backwards compatibility. If there's no PHY version defined, assume that the band is already versioned.
 	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-	if lwPhyVersion != ttnpb.PHY_UNKNOWN {
-		phy, err = phy.Version(request.GetLorawanPhyVersion())
-		if err != nil {
-			return false, false, 0, err
-		}
+	if lwPhyVersion == ttnpb.PHY_UNKNOWN {
+		lwPhyVersion = ttnpb.RP001_V1_1_REV_B
+	}
+
+	phy, err := band.Get(fp.BandID, lwPhyVersion)
+	if err != nil {
+		return false, false, 0, err
 	}
 
 	// TODO: Take fully defined data rate from TxRequest (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).

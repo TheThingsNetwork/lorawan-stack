@@ -88,9 +88,9 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 		if ar == nil {
 			return s.output(c, resp)
 		}
-		ar.UserData = userData{UserSessionIdentifiers: ttnpb.UserSessionIdentifiers{
-			UserIdentifiers: session.UserIdentifiers,
-			SessionId:       session.SessionId,
+		ar.UserData = userData{UserSessionIdentifiers: &ttnpb.UserSessionIdentifiers{
+			UserIds:   session.GetUserIds(),
+			SessionId: session.SessionId,
 		}}
 		client := ttnpb.Client(ar.Client.(osinClient))
 		if !clientHasGrant(&client, ttnpb.GRANT_AUTHORIZATION_CODE) {
@@ -122,8 +122,8 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 		if !ar.Authorized {
 			authorization, err := s.store.GetAuthorization(
 				req.Context(),
-				&session.UserIdentifiers,
-				&client.ClientIdentifiers,
+				session.GetUserIds(),
+				client.GetIds(),
 			)
 			if err != nil && !errors.IsNotFound(err) {
 				return err
@@ -156,7 +156,7 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 		if ar.Authorized {
-			events.Publish(evtAuthorize.New(req.Context(), events.WithIdentifiers(&session.UserIdentifiers, &client.ClientIdentifiers)))
+			events.Publish(evtAuthorize.New(req.Context(), events.WithIdentifiers(session.GetUserIds(), client.GetIds())))
 		}
 		oauth2.FinishAuthorizeRequest(resp, req, ar)
 		return s.output(c, resp)
@@ -264,7 +264,7 @@ func (s *server) Token(c echo.Context) error {
 	}
 
 	client := ttnpb.Client(ar.Client.(osinClient))
-	userIDs := ar.UserData.(userData).UserIdentifiers
+	userIDs := ar.UserData.(userData).UserSessionIdentifiers.GetUserIds()
 	ar.GenerateRefresh = clientHasGrant(&client, ttnpb.GRANT_REFRESH_TOKEN)
 	switch ar.Type {
 	case osin.AUTHORIZATION_CODE:
@@ -280,7 +280,7 @@ func (s *server) Token(c echo.Context) error {
 		}
 	}
 	if ar.Authorized {
-		events.Publish(evtTokenExchange.New(req.Context(), events.WithIdentifiers(&userIDs, &client.ClientIdentifiers)))
+		events.Publish(evtTokenExchange.New(req.Context(), events.WithIdentifiers(userIDs, client.GetIds())))
 	}
 	oauth2.FinishAccessRequest(resp, req, ar)
 	delete(resp.Output, "scope")

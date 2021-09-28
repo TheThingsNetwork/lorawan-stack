@@ -41,7 +41,7 @@ func (s *server) ClientLogout(c echo.Context) error {
 	accessTokenID := c.QueryParam("access_token_id")
 	redirectURI := s.config.UI.MountPath()
 	if accessTokenID == "" {
-		return errMissingAccessTokenIDParam
+		return errMissingAccessTokenIDParam.New()
 	}
 	at, err := s.store.GetAccessToken(ctx, accessTokenID)
 	if err != nil && !errors.IsNotFound(err) {
@@ -83,8 +83,8 @@ func (s *server) ClientLogout(c echo.Context) error {
 		return err
 	}
 	if session != nil {
-		events.Publish(evtUserSessionTerminated.NewWithIdentifiersAndData(ctx, &session.UserIdentifiers, nil))
-		if err = s.store.DeleteSession(ctx, &session.UserIdentifiers, session.SessionId); err != nil {
+		events.Publish(evtUserSessionTerminated.NewWithIdentifiersAndData(ctx, session.GetUserIds(), nil))
+		if err = s.store.DeleteSession(ctx, session.GetUserIds(), session.SessionId); err != nil {
 			return err
 		}
 	}

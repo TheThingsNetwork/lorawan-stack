@@ -327,6 +327,9 @@ const DeviceRepository = props => {
                 onIdSelect={handleIdTextSelect}
                 generateDevEUI={handleDevEUIRequest}
                 applicationDevEUICounter={applicationDevEUICounter}
+                nsEnabled={nsEnabled}
+                asEnabled={asEnabled}
+                jsEnabled={jsEnabled}
               />
             ) : (
               <Message content={m.enterDataDescription} component="p" />

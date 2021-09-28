@@ -48,7 +48,7 @@ func TestFrequenciesCFList(t *testing.T) {
 	cfList := frequencyplans.CFList(euFP, ttnpb.RP001_V1_1_REV_B)
 	a.So(cfList.Type, should.Equal, ttnpb.CFListType_FREQUENCIES)
 
-	phy, err := band.GetByID(euFP.BandID)
+	phy, err := band.Get(euFP.BandID, ttnpb.RP001_V1_1_REV_B)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}

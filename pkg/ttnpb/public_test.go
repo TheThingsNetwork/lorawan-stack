@@ -28,10 +28,10 @@ func TestApplicationPublicSafe(t *testing.T) {
 	a.So(((*Application)(nil)).PublicSafe(), should.BeNil)
 
 	src := &Application{
-		ApplicationIdentifiers: ApplicationIdentifiers{ApplicationId: "foo"},
-		Name:                   "Name",
-		Description:            "Description",
-		Attributes:             map[string]string{"key": "value"},
+		Ids:         &ApplicationIdentifiers{ApplicationId: "foo"},
+		Name:        "Name",
+		Description: "Description",
+		Attributes:  map[string]string{"key": "value"},
 	}
 	safe := src.PublicSafe()
 
@@ -46,10 +46,10 @@ func TestClientPublicSafe(t *testing.T) {
 	a.So(((*Client)(nil)).PublicSafe(), should.BeNil)
 
 	src := &Client{
-		ClientIdentifiers: ClientIdentifiers{ClientId: "foo"},
-		Name:              "Name",
-		Description:       "Description",
-		Attributes:        map[string]string{"key": "value"},
+		Ids:         &ClientIdentifiers{ClientId: "foo"},
+		Name:        "Name",
+		Description: "Description",
+		Attributes:  map[string]string{"key": "value"},
 	}
 	safe := src.PublicSafe()
 
@@ -64,10 +64,10 @@ func TestGatewayPublicSafe(t *testing.T) {
 	a.So(((*Gateway)(nil)).PublicSafe(), should.BeNil)
 
 	src := &Gateway{
-		GatewayIdentifiers: GatewayIdentifiers{GatewayId: "foo"},
-		Name:               "Name",
-		Description:        "Description",
-		Attributes:         map[string]string{"key": "value"},
+		Ids:         &GatewayIdentifiers{GatewayId: "foo"},
+		Name:        "Name",
+		Description: "Description",
+		Attributes:  map[string]string{"key": "value"},
 	}
 	safe := src.PublicSafe()
 
@@ -82,10 +82,10 @@ func TestOrganizationPublicSafe(t *testing.T) {
 	a.So(((*Organization)(nil)).PublicSafe(), should.BeNil)
 
 	src := &Organization{
-		OrganizationIdentifiers: OrganizationIdentifiers{OrganizationId: "foo"},
-		Name:                    "Name",
-		Description:             "Description",
-		Attributes:              map[string]string{"key": "value"},
+		Ids:         &OrganizationIdentifiers{OrganizationId: "foo"},
+		Name:        "Name",
+		Description: "Description",
+		Attributes:  map[string]string{"key": "value"},
 	}
 	safe := src.PublicSafe()
 
@@ -100,10 +100,10 @@ func TestUserPublicSafe(t *testing.T) {
 	a.So(((*User)(nil)).PublicSafe(), should.BeNil)
 
 	src := &User{
-		UserIdentifiers: UserIdentifiers{UserId: "foo"},
-		Name:            "Name",
-		Description:     "Description",
-		Attributes:      map[string]string{"key": "value"},
+		Ids:         &UserIdentifiers{UserId: "foo"},
+		Name:        "Name",
+		Description: "Description",
+		Attributes:  map[string]string{"key": "value"},
 	}
 	safe := src.PublicSafe()
 

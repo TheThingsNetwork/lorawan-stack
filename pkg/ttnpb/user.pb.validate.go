@@ -51,7 +51,14 @@ func (m *User) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return UserValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UserValidationError{
 						field:  "ids",
@@ -513,7 +520,14 @@ func (m *GetUserRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return GetUserRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetUserRequestValidationError{
 						field:  "user_ids",
@@ -945,7 +959,14 @@ func (m *CreateTemporaryPasswordRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return CreateTemporaryPasswordRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateTemporaryPasswordRequestValidationError{
 						field:  "user_ids",
@@ -1039,7 +1060,14 @@ func (m *UpdateUserPasswordRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return UpdateUserPasswordRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateUserPasswordRequestValidationError{
 						field:  "user_ids",
@@ -1153,7 +1181,14 @@ func (m *ListUserAPIKeysRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return ListUserAPIKeysRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListUserAPIKeysRequestValidationError{
 						field:  "user_ids",
@@ -1257,7 +1292,14 @@ func (m *GetUserAPIKeyRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return GetUserAPIKeyRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetUserAPIKeyRequestValidationError{
 						field:  "user_ids",
@@ -1352,7 +1394,14 @@ func (m *CreateUserAPIKeyRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return CreateUserAPIKeyRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateUserAPIKeyRequestValidationError{
 						field:  "user_ids",
@@ -1501,7 +1550,14 @@ func (m *UpdateUserAPIKeyRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return UpdateUserAPIKeyRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateUserAPIKeyRequestValidationError{
 						field:  "user_ids",
@@ -2289,7 +2345,14 @@ func (m *UserSessionIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return UserSessionIdentifiersValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UserSessionIdentifiersValidationError{
 						field:  "user_ids",
@@ -2391,7 +2454,14 @@ func (m *UserSession) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return UserSessionValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UserSessionValidationError{
 						field:  "user_ids",
@@ -2625,7 +2695,14 @@ func (m *ListUserSessionsRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return ListUserSessionsRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListUserSessionsRequestValidationError{
 						field:  "user_ids",
@@ -2744,7 +2821,14 @@ func (m *LoginToken) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return LoginTokenValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return LoginTokenValidationError{
 						field:  "user_ids",
@@ -2875,7 +2959,14 @@ func (m *CreateLoginTokenRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return CreateLoginTokenRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateLoginTokenRequestValidationError{
 						field:  "user_ids",

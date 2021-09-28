@@ -188,7 +188,7 @@ func TestServer(t *testing.T) {
 			Value: []byte("KEYCONTENTS"),
 		}
 		gtw := ttnpb.Gateway{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+			Ids: &ttnpb.GatewayIdentifiers{
 				GatewayId: "test-gateway",
 				Eui:       &mockGatewayEUI,
 			},
@@ -227,7 +227,7 @@ func TestServer(t *testing.T) {
 			Name: "No Auth",
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway(false, false, false)
-				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+				c.res.GetIdentifiersForEUI = c.res.Get.GetIds()
 			},
 			RequestSetup: func(req *http.Request) {
 				req.Header.Del(echo.HeaderAuthorization)
@@ -240,7 +240,7 @@ func TestServer(t *testing.T) {
 			Name: "Zero EUI",
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway(false, false, false)
-				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+				c.res.GetIdentifiersForEUI = c.res.Get.GetIds()
 			},
 			RequestSetup: func(req *http.Request) {
 				req.Body = io.NopCloser(strings.NewReader(`{
@@ -267,7 +267,7 @@ func TestServer(t *testing.T) {
 			StoreSetup: func(c *mockGatewayClient) {
 				c.err.GetIdentifiersForEUI = mockErrNotFound
 				c.res.Create = &ttnpb.Gateway{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					Ids: &ttnpb.GatewayIdentifiers{
 						GatewayId: "eui-58a0cbfffe800019",
 						Eui:       &mockGatewayEUI,
 					},
@@ -309,12 +309,12 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Create, should.NotBeNil) {
-					a.So(s.req.Create.GatewayIdentifiers.GatewayId, should.Equal, "eui-58a0cbfffe800019")
-					a.So(s.req.Create.GatewayIdentifiers.Eui, should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Create.GetIds().GetGatewayId(), should.Equal, "eui-58a0cbfffe800019")
+					a.So(s.req.Create.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 				}
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GatewayIdentifiers.GatewayId, should.Equal, "eui-58a0cbfffe800019")
-					a.So(s.req.Update.GatewayIdentifiers.Eui, should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "eui-58a0cbfffe800019")
+					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(false, false, false).Attributes
 					for _, attr := range []string{
 						cupsStationAttribute,
@@ -330,7 +330,7 @@ func TestServer(t *testing.T) {
 			Name: "Existing Gateway",
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway(true, false, false)
-				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+				c.res.GetIdentifiersForEUI = c.res.Get.GetIds()
 			},
 			Options: []Option{
 				WithAllowCUPSURIUpdate(true),
@@ -355,8 +355,8 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GatewayIdentifiers.GatewayId, should.Equal, "test-gateway")
-					a.So(s.req.Update.GatewayIdentifiers.Eui, should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "test-gateway")
+					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(true, false, false).Attributes
 					for _, attr := range []string{
 						cupsStationAttribute,
@@ -372,7 +372,7 @@ func TestServer(t *testing.T) {
 			Name: "Existing Gateway Without Bearer",
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway(true, false, false)
-				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+				c.res.GetIdentifiersForEUI = c.res.Get.GetIds()
 			},
 			Options: []Option{
 				WithAllowCUPSURIUpdate(true),
@@ -397,8 +397,8 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GatewayIdentifiers.GatewayId, should.Equal, "test-gateway")
-					a.So(s.req.Update.GatewayIdentifiers.Eui, should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "test-gateway")
+					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(true, false, false).Attributes
 					for _, attr := range []string{
 						cupsStationAttribute,
@@ -414,7 +414,7 @@ func TestServer(t *testing.T) {
 			Name: "Existing Gateway Without LNS Secret",
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway(false, false, false)
-				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+				c.res.GetIdentifiersForEUI = c.res.Get.GetIds()
 			},
 			Options: []Option{
 				WithAllowCUPSURIUpdate(true),
@@ -427,10 +427,54 @@ func TestServer(t *testing.T) {
 			},
 		},
 		{
+			Name: "Existing Gateway with Plaintext LNS",
+			StoreSetup: func(c *mockGatewayClient) {
+				gtw := mockGateway(true, false, false)
+				gtw.GatewayServerAddress = "ws://192.168.2.3:1885"
+				c.res.Get = gtw
+				c.res.GetIdentifiersForEUI = c.res.Get.GetIds()
+			},
+			Options: []Option{
+				WithAllowCUPSURIUpdate(true),
+			},
+			RequestSetup: func(req *http.Request) {
+				req.Header.Set(echo.HeaderAuthorization, "Bearer KEYCONTENTS")
+			},
+			AssertError: func(err error) bool {
+				return err == nil
+			},
+			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
+				var res UpdateInfoResponse
+				err := res.UnmarshalBinary(rec.Body.Bytes())
+				a.So(err, should.BeNil)
+				a.So(res.CUPSURI, should.BeEmpty)
+				a.So(res.LNSURI, should.Equal, "ws://192.168.2.3:1885")
+				a.So(res.CUPSCredentials, should.BeEmpty)
+				a.So(res.LNSCredentials, should.BeEmpty)
+				a.So(res.SignatureKeyCRC, should.BeZeroValue)
+				a.So(res.Signature, should.BeEmpty)
+				a.So(res.UpdateData, should.BeEmpty)
+			},
+			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
+				if a.So(s.req.Update, should.NotBeNil) {
+					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "test-gateway")
+					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
+					expectedAttributes := mockGateway(true, false, false).Attributes
+					for _, attr := range []string{
+						cupsStationAttribute,
+						cupsModelAttribute,
+						cupsPackageAttribute,
+					} {
+						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
+					}
+				}
+			},
+		},
+		{
 			Name: "CUPS redirection",
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway(false, true, false)
-				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+				c.res.GetIdentifiersForEUI = c.res.Get.GetIds()
 			},
 			Options: []Option{
 				WithAllowCUPSURIUpdate(true),
@@ -455,8 +499,8 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GatewayIdentifiers.GatewayId, should.Equal, "test-gateway")
-					a.So(s.req.Update.GatewayIdentifiers.Eui, should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "test-gateway")
+					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(false, true, false).Attributes
 					for _, attr := range []string{
 						cupsStationAttribute,
@@ -472,7 +516,7 @@ func TestServer(t *testing.T) {
 			Name: "CUPS Credentials Update",
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway(false, false, true)
-				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+				c.res.GetIdentifiersForEUI = c.res.Get.GetIds()
 			},
 			Options: []Option{
 				WithAllowCUPSURIUpdate(true),
@@ -497,8 +541,8 @@ func TestServer(t *testing.T) {
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
 				if a.So(s.req.Update, should.NotBeNil) {
-					a.So(s.req.Update.GatewayIdentifiers.GatewayId, should.Equal, "test-gateway")
-					a.So(s.req.Update.GatewayIdentifiers.Eui, should.Resemble, &mockGatewayEUI)
+					a.So(s.req.Update.GetIds().GetGatewayId(), should.Equal, "test-gateway")
+					a.So(s.req.Update.GetIds().GetEui(), should.Resemble, &mockGatewayEUI)
 					expectedAttributes := mockGateway(false, false, true).Attributes
 					for _, attr := range []string{
 						cupsStationAttribute,

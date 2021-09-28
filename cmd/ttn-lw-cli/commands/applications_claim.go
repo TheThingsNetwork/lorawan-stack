@@ -35,7 +35,7 @@ key is provided, a new API key will be created.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 
 			expiryDate, err := getAPIKeyExpiry(cmd.Flags())
@@ -51,8 +51,8 @@ key is provided, a new API key will be created.`,
 				}
 				logger.Info("Creating API key")
 				apiKey, err := ttnpb.NewApplicationAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-					ApplicationIdentifiers: *appID,
-					Name:                   "Device Claiming",
+					ApplicationIds: appID,
+					Name:           "Device Claiming",
 					Rights: []ttnpb.Right{
 						ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 						ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
@@ -84,7 +84,7 @@ key is provided, a new API key will be created.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 
 			dcs, err := api.Dial(ctx, config.DeviceClaimingServerGRPCAddress)

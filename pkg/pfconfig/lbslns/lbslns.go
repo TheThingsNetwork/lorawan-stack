@@ -241,7 +241,7 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 	conf.JoinEUI = nil
 	conf.NetID = nil
 
-	phy, err := band.GetByID(bandID)
+	phy, err := band.GetLatest(bandID)
 	if err != nil {
 		return RouterConfig{}, errFrequencyPlan.New()
 	}
@@ -293,7 +293,7 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 
 // getDataRatesFromBandID parses the available data rates from the band into DataRates.
 func getDataRatesFromBandID(id string) (DataRates, error) {
-	phy, err := band.GetByID(id)
+	phy, err := band.GetLatest(id)
 	if err != nil {
 		return DataRates{}, err
 	}

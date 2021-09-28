@@ -33,15 +33,24 @@ const m = defineMessages({
 // `<FormCollapseSection />` aggregates a set of form fields under common title as well as adds
 // functionality to hide or show the fields.
 const FormCollapseSection = props => {
-  const { className, id, title, onCollapse, initiallyCollapsed, children } = props
+  const { className, id, title, onCollapse, isCollapsed, initiallyCollapsed, children } = props
   const { formatMessage } = useIntl()
   const { disabled } = useFormContext()
 
+  // Check if the component is 'controlled'. When the `isCollapsed` prop is passed the component
+  // is considered as 'uncontrolled' and it's state must be controlled from the outside.
+  const isControlled = typeof isCollapsed === 'undefined'
+
   const [collapsed, setCollapsed] = React.useState(initiallyCollapsed)
   const onExpandedChange = React.useCallback(() => {
-    setCollapsed(collapsed => !collapsed)
-    onCollapse(!collapsed)
-  }, [collapsed, onCollapse])
+    if (isControlled) {
+      setCollapsed(collapsed => !collapsed)
+    } else {
+      onCollapse()
+    }
+  }, [isControlled, onCollapse])
+
+  const isSectionClosed = isControlled ? collapsed : isCollapsed
 
   return (
     <div className={className}>
@@ -49,15 +58,15 @@ const FormCollapseSection = props => {
         className={style.button}
         type="button"
         onClick={onExpandedChange}
-        aria-label={collapsed ? formatMessage(m.expand) : formatMessage(m.collapse)}
-        aria-expanded={!collapsed}
+        aria-label={isSectionClosed ? formatMessage(m.expand) : formatMessage(m.collapse)}
+        aria-expanded={!isSectionClosed}
         aria-controls={id}
         disabled={disabled}
       >
         <Message content={title} className={style.title} />
-        <Icon className={style.icon} icon={collapsed ? 'expand_down' : 'expand_up'} />
+        <Icon className={style.icon} icon={isSectionClosed ? 'expand_down' : 'expand_up'} />
       </button>
-      <div className={classnames(style.content, { [style.expanded]: !collapsed })} id={id}>
+      <div className={classnames(style.content, { [style.expanded]: !isSectionClosed })} id={id}>
         {children}
       </div>
     </div>
@@ -69,6 +78,7 @@ FormCollapseSection.propTypes = {
   className: PropTypes.string,
   id: PropTypes.string.isRequired,
   initiallyCollapsed: PropTypes.bool,
+  isCollapsed: PropTypes.bool,
   onCollapse: PropTypes.func,
   title: PropTypes.message.isRequired,
 }
@@ -76,6 +86,7 @@ FormCollapseSection.propTypes = {
 FormCollapseSection.defaultProps = {
   className: undefined,
   onCollapse: () => null,
+  isCollapsed: undefined,
   initiallyCollapsed: true,
 }
 

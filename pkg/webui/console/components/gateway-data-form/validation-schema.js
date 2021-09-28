@@ -22,7 +22,10 @@ import {
   attributeKeyTooLongCheck,
   attributeValueTooLongCheck,
 } from '@console/lib/attributes'
-import { address as addressRegexp, delay as delayRegexp } from '@console/lib/regexp'
+import {
+  addressWithOptionalScheme as addressWithOptionalSchemeRegexp,
+  delay as delayRegexp,
+} from '@console/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   owner_id: Yup.string(),
@@ -41,11 +44,17 @@ const validationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(128, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  frequency_plan_id: Yup.string()
-    .max(64, Yup.passValues(sharedMessages.validateTooLong))
-    .required(sharedMessages.validateRequired),
+  frequency_plan_id: Yup.string().when(['$gsEnabled'], (gsEnabled, schema) => {
+    if (!gsEnabled) {
+      return schema.strip()
+    }
+
+    return schema
+      .max(64, Yup.passValues(sharedMessages.validateTooLong))
+      .required(sharedMessages.validateRequired)
+  }),
   gateway_server_address: Yup.string().matches(
-    addressRegexp,
+    addressWithOptionalSchemeRegexp,
     Yup.passValues(sharedMessages.validateAddressFormat),
   ),
   require_authenticated_connection: Yup.boolean().default(false),

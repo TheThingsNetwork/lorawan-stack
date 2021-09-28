@@ -277,7 +277,7 @@ var defaultTxLUTConfigs = []TxLUTConfig{
 
 // BuildSX1301Config builds the SX1301 configuration for the given frequency plan.
 func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Config, error) {
-	phy, err := band.GetByID(frequencyPlan.BandID)
+	phy, err := band.GetLatest(frequencyPlan.BandID)
 	if err != nil {
 		return nil, err
 	}

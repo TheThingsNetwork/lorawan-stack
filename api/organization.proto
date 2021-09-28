@@ -37,7 +37,7 @@ option (gogoproto.stringer_all) = true;
 
 message Organization {
   // The identifiers of the organization. These are public and can be seen by any authenticated user in the network.
-  OrganizationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationIdentifiers ids = 1 [(validate.rules).message.required = true];
   // When the organization was created. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   // When the organization was last updated. This information is public and can be seen by any authenticated user in the network.
@@ -70,7 +70,7 @@ message Organizations {
 }
 
 message GetOrganizationRequest {
-  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
   // The names of the organization fields that should be returned.
   google.protobuf.FieldMask field_mask = 2;
 }
@@ -102,7 +102,7 @@ message CreateOrganizationRequest {
   // Collaborator to grant all rights on the newly created application.
   // NOTE: It is currently not possible to have organizations collaborating on
   // other organizations.
-  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(validate.rules).message.required = true];
 }
 
 message UpdateOrganizationRequest {
@@ -112,7 +112,7 @@ message UpdateOrganizationRequest {
 }
 
 message ListOrganizationAPIKeysRequest {
-  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
   // Limit the number of results per page.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -120,13 +120,13 @@ message ListOrganizationAPIKeysRequest {
 }
 
 message GetOrganizationAPIKeyRequest {
-  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
   // Unique public identifier for the API key.
   string key_id = 2;
 }
 
 message CreateOrganizationAPIKeyRequest {
-  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
   string name = 2 [(validate.rules).string.max_len = 50];
   repeated Right rights = 3 [
     (validate.rules).repeated = {
@@ -139,14 +139,14 @@ message CreateOrganizationAPIKeyRequest {
 }
 
 message UpdateOrganizationAPIKeyRequest {
-  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
   APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The names of the api key fields that should be updated.
   google.protobuf.FieldMask field_mask = 3;
 }
 
 message ListOrganizationCollaboratorsRequest {
-  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
   // Limit the number of results per page.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -154,13 +154,13 @@ message ListOrganizationCollaboratorsRequest {
 }
 
 message GetOrganizationCollaboratorRequest {
-  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
   // NOTE: It is currently not possible to have organizations collaborating on
   // other organizations.
-  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(validate.rules).message.required = true];
 }
 
 message SetOrganizationCollaboratorRequest {
-  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
+  Collaborator collaborator = 2 [(validate.rules).message.required = true];
 }

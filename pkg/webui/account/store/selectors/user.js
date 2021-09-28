@@ -18,9 +18,12 @@ export const selectUser = state => selectUserStore(state).user
 
 export const selectUserId = state => {
   const user = selectUser(state)
-  const { ids = {} } = user
 
-  return ids.user_id
+  if (!Boolean(user)) {
+    return undefined
+  }
+
+  return user.ids.user_id
 }
 
 export const selectUserIsAdmin = state => {

@@ -69,7 +69,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -95,10 +95,10 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID, cliID := getUserAndClientID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -145,10 +145,10 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID, cliID := getUserAndClientID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -178,14 +178,14 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID, cliID := getUserAndClientID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 			tokenID, _ := cmd.Flags().GetString("token-id")
 			if tokenID == "" {
-				return errNoTokenID
+				return errNoTokenID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)

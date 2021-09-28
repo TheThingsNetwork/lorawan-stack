@@ -22,6 +22,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	iampb "go.packetbroker.org/api/iam"
 	iampbv2 "go.packetbroker.org/api/iam/v2"
+	mappingpb "go.packetbroker.org/api/mapping/v2"
 	routingpb "go.packetbroker.org/api/routing"
 	packetbroker "go.packetbroker.org/api/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -393,6 +394,72 @@ func (s *pbaServer) DeleteHomeNetworkRoutingPolicy(ctx context.Context, req *ttn
 			ForwarderTenantId:   s.tenantIDExtractor(ctx),
 			HomeNetworkNetId:    req.GetNetId(),
 			HomeNetworkTenantId: req.GetTenantId(),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.Empty, nil
+}
+
+func (s *pbaServer) GetHomeNetworkDefaultGatewayVisibility(ctx context.Context, req *pbtypes.Empty) (*ttnpb.PacketBrokerDefaultGatewayVisibility, error) {
+	if err := rights.RequireIsAdmin(ctx); err != nil {
+		return nil, err
+	}
+	if !s.forwarderConfig.Enable {
+		return nil, errNotEnabled.New()
+	}
+
+	res, err := mappingpb.NewGatewayVisibilityManagerClient(s.cpConn).GetDefaultVisibility(ctx, &mappingpb.GetDefaultGatewayVisibilityRequest{
+		ForwarderNetId:    s.netID.MarshalNumber(),
+		ForwarderTenantId: s.tenantIDExtractor(ctx),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return fromPBDefaultGatewayVisibility(res.GetVisibility()), nil
+}
+
+func (s *pbaServer) SetHomeNetworkDefaultGatewayVisibility(ctx context.Context, req *ttnpb.SetPacketBrokerDefaultGatewayVisibilityRequest) (*pbtypes.Empty, error) {
+	if err := rights.RequireIsAdmin(ctx); err != nil {
+		return nil, err
+	}
+	if !s.forwarderConfig.Enable {
+		return nil, errNotEnabled.New()
+	}
+
+	_, err := mappingpb.NewGatewayVisibilityManagerClient(s.cpConn).SetDefaultVisibility(ctx, &mappingpb.SetGatewayVisibilityRequest{
+		Visibility: &packetbroker.GatewayVisibility{
+			ForwarderNetId:    s.netID.MarshalNumber(),
+			ForwarderTenantId: s.tenantIDExtractor(ctx),
+			Location:          req.Visibility.Location,
+			AntennaPlacement:  req.Visibility.AntennaPlacement,
+			AntennaCount:      req.Visibility.AntennaCount,
+			FineTimestamps:    req.Visibility.FineTimestamps,
+			ContactInfo:       req.Visibility.ContactInfo,
+			Status:            req.Visibility.Status,
+			FrequencyPlan:     req.Visibility.FrequencyPlan,
+			PacketRates:       req.Visibility.PacketRates,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.Empty, nil
+}
+
+func (s *pbaServer) DeleteHomeNetworkDefaultGatewayVisibility(ctx context.Context, req *pbtypes.Empty) (*pbtypes.Empty, error) {
+	if err := rights.RequireIsAdmin(ctx); err != nil {
+		return nil, err
+	}
+	if !s.forwarderConfig.Enable {
+		return nil, errNotEnabled.New()
+	}
+
+	_, err := mappingpb.NewGatewayVisibilityManagerClient(s.cpConn).SetDefaultVisibility(ctx, &mappingpb.SetGatewayVisibilityRequest{
+		Visibility: &packetbroker.GatewayVisibility{
+			ForwarderNetId:    s.netID.MarshalNumber(),
+			ForwarderTenantId: s.tenantIDExtractor(ctx),
 		},
 	})
 	if err != nil {

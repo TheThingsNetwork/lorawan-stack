@@ -140,7 +140,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectOrganizationFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.OrganizationRegistry/Get"].Allowed)
@@ -150,8 +150,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{
-				OrganizationIdentifiers: *orgID,
-				FieldMask:               &pbtypes.FieldMask{Paths: paths},
+				OrganizationIds: orgID,
+				FieldMask:       &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -168,7 +168,7 @@ var (
 			orgID := getOrganizationID(cmd.Flags(), args)
 			collaborator := getUserID(cmd.Flags(), nil).GetOrganizationOrUserIdentifiers()
 			if collaborator == nil {
-				return errNoCollaborator
+				return errNoCollaborator.New()
 			}
 			var organization ttnpb.Organization
 			if inputDecoder != nil {
@@ -181,11 +181,11 @@ var (
 				return err
 			}
 			organization.Attributes = mergeAttributes(organization.Attributes, cmd.Flags())
-			if orgID != nil && orgID.OrganizationId != "" {
-				organization.OrganizationId = orgID.OrganizationId
+			if orgID.GetOrganizationId() != "" {
+				organization.Ids = &ttnpb.OrganizationIdentifiers{OrganizationId: orgID.GetOrganizationId()}
 			}
-			if organization.OrganizationId == "" {
-				return errNoOrganizationID
+			if organization.GetIds().GetOrganizationId() == "" {
+				return errNoOrganizationID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -194,7 +194,7 @@ var (
 			}
 			res, err := ttnpb.NewOrganizationRegistryClient(is).Create(ctx, &ttnpb.CreateOrganizationRequest{
 				Organization: organization,
-				Collaborator: *collaborator,
+				Collaborator: collaborator,
 			})
 			if err != nil {
 				return err
@@ -210,7 +210,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setOrganizationFlags, attributesFlags())
 			if len(paths) == 0 {
@@ -222,7 +222,7 @@ var (
 				return err
 			}
 			organization.Attributes = mergeAttributes(organization.Attributes, cmd.Flags())
-			organization.OrganizationIdentifiers = *orgID
+			organization.Ids = orgID
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -247,7 +247,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -268,7 +268,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -290,14 +290,14 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 			force, err := cmd.Flags().GetBool("force")
 			if err != nil {
 				return err
 			}
 			if !confirmChoice(organizationPurgeWarning, force) {
-				return errNoConfirmation
+				return errNoConfirmation.New()
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -315,7 +315,7 @@ var (
 	organizationsContactInfoCommand = contactInfoCommands("organization", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		orgID := getOrganizationID(cmd.Flags(), args)
 		if orgID == nil {
-			return nil, errNoOrganizationID
+			return nil, errNoOrganizationID.New()
 		}
 		return orgID.GetEntityIdentifiers(), nil
 	})

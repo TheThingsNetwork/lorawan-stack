@@ -33,7 +33,6 @@ import {
   selectPacketBrokerNetworks,
   selectPacketBrokerNetworksTotalCount,
   selectPacketBrokerNetworksFetching,
-  selectPacketBrokerNetworksError,
   selectPacketBrokerForwarderPolicyById,
   selectPacketBrokerHomeNetworkPolicyById,
   selectPacketBrokerOwnCombinedId,
@@ -142,7 +141,6 @@ class PacketBrokerNetworksTable extends Component {
       networks: decoratedNetworks,
       totalCount: selectPacketBrokerNetworksTotalCount(state),
       fetching: selectPacketBrokerNetworksFetching(state),
-      error: selectPacketBrokerNetworksError(state),
       mayAdd: false,
     }
   }

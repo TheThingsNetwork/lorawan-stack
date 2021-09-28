@@ -808,7 +808,7 @@ func TestGatewayServer(t *testing.T) {
 									a := assertions.New(t)
 
 									gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIdentifiers: ids,
+										GatewayIds: &ids,
 									})
 									a.So(err, should.BeNil)
 
@@ -848,7 +848,7 @@ func TestGatewayServer(t *testing.T) {
 
 									time.Sleep(timeout)
 									gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIdentifiers: ids,
+										GatewayIds: &ids,
 									})
 									a.So(err, should.BeNil)
 									a.So(gtw.Antennas[0].Location, should.Resemble, tc.ExpectLocation)
@@ -906,14 +906,14 @@ func TestGatewayServer(t *testing.T) {
 									is.add(ctx, ids, registeredGatewayKey, locationPublic, false)
 
 									gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIdentifiers: ids,
+										GatewayIds: &ids,
 									})
 									a.So(err, should.BeNil)
 									a.So(gtw.LocationPublic, should.Equal, locationPublic)
 									gtw.LocationPublic = locationPublic
 									gtw.Antennas[0].Location = location
 									gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIdentifiers: ids,
+										GatewayIds: &ids,
 									})
 									a.So(err, should.BeNil)
 									a.So(gtw.LocationPublic, should.Equal, locationPublic)
@@ -992,7 +992,7 @@ func TestGatewayServer(t *testing.T) {
 					var location *ttnpb.Location
 					if rtc.SupportsLocationUpdate {
 						gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
-							GatewayIdentifiers: ids,
+							GatewayIds: &ids,
 						})
 						a.So(err, should.BeNil)
 						location = gtw.Antennas[0].Location
@@ -1277,13 +1277,13 @@ func TestGatewayServer(t *testing.T) {
 								a := assertions.New(t)
 
 								upEvents := map[string]events.Channel{}
-								for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.up.repeat"} {
+								for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.io.up.repeat"} {
 									upEvents[event] = make(events.Channel, 5)
 								}
 								defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
 									PublishFunc: func(ev events.Event) {
 										switch name := ev.Name(); name {
-										case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.up.repeat":
+										case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.io.up.repeat":
 											go func() {
 												upEvents[name] <- ev
 											}()
@@ -1308,8 +1308,8 @@ func TestGatewayServer(t *testing.T) {
 
 								if tc.RepeatUpEvent && !ptc.DeduplicatesUplinks {
 									select {
-									case evt := <-upEvents["gs.up.repeat"]:
-										a.So(evt.Name(), should.Equal, "gs.up.repeat")
+									case evt := <-upEvents["gs.io.up.repeat"]:
+										a.So(evt.Name(), should.Equal, "gs.io.up.repeat")
 									case <-time.After(timeout):
 										t.Fatal("Expected repeat uplink event timeout")
 									}
@@ -1364,6 +1364,14 @@ func TestGatewayServer(t *testing.T) {
 											t.Fatal("No acknowledgment attached to the downlink emission fail event")
 										}
 										a.So(received, should.Resemble, expected.Result)
+									case <-time.After(timeout):
+										t.Fatal("Expected Tx acknowledgment event timeout")
+									}
+									select {
+									case ack := <-ns.TxAck():
+										if a.So(ack, should.NotBeNil) {
+											a.So(ack.TxAck, should.Resemble, expected)
+										}
 									case <-time.After(timeout):
 										t.Fatal("Expected Tx acknowledgment event timeout")
 									}

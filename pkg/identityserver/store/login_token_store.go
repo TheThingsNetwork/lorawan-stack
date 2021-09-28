@@ -61,7 +61,7 @@ func (s *loginTokenStore) FindActiveLoginTokens(ctx context.Context, userIDs *tt
 
 func (s *loginTokenStore) CreateLoginToken(ctx context.Context, loginToken *ttnpb.LoginToken) (*ttnpb.LoginToken, error) {
 	defer trace.StartRegion(ctx, "create login token").End()
-	user, err := s.findEntity(ctx, loginToken.UserIdentifiers, "id")
+	user, err := s.findEntity(ctx, loginToken.GetUserIds(), "id")
 	if err != nil {
 		return nil, err
 	}
@@ -92,10 +92,10 @@ func (s *loginTokenStore) ConsumeLoginToken(ctx context.Context, token string) (
 		return nil, err
 	}
 	if loginTokenModel.Used {
-		return nil, errLoginTokenAlreadyUsed
+		return nil, errLoginTokenAlreadyUsed.New()
 	}
 	if loginTokenModel.ExpiresAt.Before(time.Now()) {
-		return nil, errLoginTokenExpired
+		return nil, errLoginTokenExpired.New()
 	}
 	loginTokenModel.Used = true
 	if err := s.updateEntity(ctx, &loginTokenModel, "used"); err != nil {

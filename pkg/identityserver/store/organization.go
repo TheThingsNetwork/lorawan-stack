@@ -77,7 +77,7 @@ var organizationColumnNames = map[string][]string{
 }
 
 func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMask) {
-	pb.OrganizationIdentifiers.OrganizationId = org.Account.UID
+	pb.Ids = &ttnpb.OrganizationIdentifiers{OrganizationId: org.Account.UID}
 	pb.CreatedAt = cleanTime(org.CreatedAt)
 	pb.UpdatedAt = cleanTime(org.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(org.DeletedAt)

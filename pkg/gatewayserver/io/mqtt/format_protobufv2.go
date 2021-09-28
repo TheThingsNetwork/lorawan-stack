@@ -129,7 +129,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		if !ok {
 			return nil, errFrequencyPlan.WithAttributes("frequency_plan", lorawanMetadata.FrequencyPlan)
 		}
-		phy, err := band.GetByID(bandID)
+		phy, err := band.GetLatest(bandID)
 		if err != nil {
 			return nil, err
 		}

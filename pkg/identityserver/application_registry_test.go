@@ -28,7 +28,7 @@ import (
 
 func init() {
 	// remove applications assigned to the user by the populator
-	userID := paginationUser.UserIdentifiers
+	userID := paginationUser.GetIds()
 	for _, app := range population.Applications {
 		for id, collaborators := range population.Memberships {
 			if app.IDString() == id.IDString() {
@@ -60,7 +60,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
 			Application: ttnpb.Application{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
+				Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
 			},
 			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 		})
@@ -70,8 +70,8 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetApplicationRequest{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
-			FieldMask:              &pbtypes.FieldMask{Paths: []string{"name"}},
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
+			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -98,8 +98,8 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
 			Application: ttnpb.Application{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
-				Name:                   "Updated Name",
+				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
+				Name: "Updated Name",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
@@ -123,17 +123,17 @@ func TestApplicationsCRUD(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewApplicationRegistryClient(cc)
 
-		userID, creds := population.Users[defaultUserIdx].UserIdentifiers, userCreds(defaultUserIdx)
+		userID, creds := population.Users[defaultUserIdx].GetIds(), userCreds(defaultUserIdx)
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		is.config.UserRights.CreateApplications = false
 
 		_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
 			Application: ttnpb.Application{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-				Name:                   "Foo Application",
+				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+				Name: "Foo Application",
 			},
-			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+			Collaborator: *userID.GetOrganizationOrUserIdentifiers(),
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -144,8 +144,8 @@ func TestApplicationsCRUD(t *testing.T) {
 
 		created, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
 			Application: ttnpb.Application{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-				Name:                   "Foo Application",
+				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+				Name: "Foo Application",
 			},
 			Collaborator: *userID.OrganizationOrUserIdentifiers(),
 		}, creds)
@@ -156,8 +156,8 @@ func TestApplicationsCRUD(t *testing.T) {
 		}
 
 		got, err := reg.Get(ctx, &ttnpb.GetApplicationRequest{
-			ApplicationIdentifiers: created.ApplicationIdentifiers,
-			FieldMask:              &pbtypes.FieldMask{Paths: []string{"name"}},
+			ApplicationIds: created.GetIds(),
+			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -166,15 +166,15 @@ func TestApplicationsCRUD(t *testing.T) {
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetApplicationRequest{
-			ApplicationIdentifiers: created.ApplicationIdentifiers,
-			FieldMask:              &pbtypes.FieldMask{Paths: []string{"ids"}},
+			ApplicationIds: created.GetIds(),
+			FieldMask:      &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetApplicationRequest{
-			ApplicationIdentifiers: created.ApplicationIdentifiers,
-			FieldMask:              &pbtypes.FieldMask{Paths: []string{"attributes"}},
+			ApplicationIds: created.GetIds(),
+			FieldMask:      &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
 
 		if a.So(err, should.NotBeNil) {
@@ -183,8 +183,8 @@ func TestApplicationsCRUD(t *testing.T) {
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
 			Application: ttnpb.Application{
-				ApplicationIdentifiers: created.ApplicationIdentifiers,
-				Name:                   "Updated Name",
+				Ids:  created.GetIds(),
+				Name: "Updated Name",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
@@ -204,7 +204,7 @@ func TestApplicationsCRUD(t *testing.T) {
 			if a.So(list, should.NotBeNil) && a.So(list.Applications, should.NotBeEmpty) {
 				var found bool
 				for _, item := range list.Applications {
-					if item.ApplicationId == created.ApplicationId {
+					if item.GetIds().GetApplicationId() == created.GetIds().GetApplicationId() {
 						found = true
 						a.So(item.Name, should.Equal, updated.Name)
 					}
@@ -214,20 +214,20 @@ func TestApplicationsCRUD(t *testing.T) {
 		}
 
 		// Check that returned value is not nil
-		devEUIResponse, err := reg.IssueDevEUI(ctx, &created.ApplicationIdentifiers, userCreds(adminUserIdx))
+		devEUIResponse, err := reg.IssueDevEUI(ctx, created.GetIds(), userCreds(adminUserIdx))
 		a.So(err, should.BeNil)
 		a.So(devEUIResponse, should.NotBeNil)
 		a.So(devEUIResponse.DevEui, should.NotBeZeroValue)
 
-		_, err = reg.Delete(ctx, &created.ApplicationIdentifiers, creds)
+		_, err = reg.Delete(ctx, created.GetIds(), creds)
 		a.So(err, should.BeNil)
 
-		_, err = reg.Purge(ctx, &created.ApplicationIdentifiers, creds)
+		_, err = reg.Purge(ctx, created.GetIds(), creds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.Purge(ctx, &created.ApplicationIdentifiers, userCreds(adminUserIdx))
+		_, err = reg.Purge(ctx, created.GetIds(), userCreds(adminUserIdx))
 		a.So(err, should.BeNil)
 	})
 }
@@ -236,14 +236,14 @@ func TestApplicationsPagination(t *testing.T) {
 	a := assertions.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := paginationUser.UserIdentifiers
+		userID := paginationUser.GetIds()
 		creds := userCreds(paginationUserIdx)
 
 		reg := ttnpb.NewApplicationRegistryClient(cc)
 
 		list, err := reg.List(test.Context(), &ttnpb.ListApplicationsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: userID.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
 		}, creds)

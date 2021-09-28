@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { disableGatewayServer, generateHexValue } from '../../../support/utils'
+
 describe('Gateway create', () => {
-  const gatewayId = 'test-gateway'
-  const frequencyPlanId = 'EU_863_870'
   const userId = 'create-gateway-test-user'
   const user = {
     ids: { user_id: userId },
@@ -30,11 +30,10 @@ describe('Gateway create', () => {
 
   beforeEach(() => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(`${Cypress.config('consoleRootPath')}/gateways/add`)
   })
 
   it('displays UI elements in place', () => {
-    cy.visit(`${Cypress.config('consoleRootPath')}/gateways/add`)
-
     cy.findByText('Add gateway', { selector: 'h1' }).should('be.visible')
     cy.findByLabelText('Gateway ID').should('be.visible')
     cy.findByLabelText('Gateway EUI').should('be.visible')
@@ -81,20 +80,28 @@ describe('Gateway create', () => {
   })
 
   it('validates before submitting an empty form', () => {
-    cy.visit(`${Cypress.config('consoleRootPath')}/gateways/add`)
-
     cy.findByRole('button', { name: 'Create gateway' }).click()
 
     cy.findErrorByLabelText('Gateway ID')
       .should('contain.text', 'Gateway ID is required')
       .and('be.visible')
+    cy.findErrorByLabelText('Frequency plan')
+      .should('contain.text', 'Frequency plan is required')
+      .and('be.visible')
+
     cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/gateways/add`)
   })
 
   it('succeeds adding gateway', () => {
+    const gateway = {
+      id: 'test-gateway',
+      frequency_plan: 'EU_863_870',
+      eui: generateHexValue(16),
+    }
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/add`)
-    cy.findByLabelText('Gateway ID').type(gatewayId)
-    cy.findByLabelText('Frequency plan').selectOption(frequencyPlanId)
+    cy.findByLabelText('Gateway ID').type(gateway.id)
+    cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByLabelText('Frequency plan').selectOption(gateway.frequency_plan)
 
     cy.findByRole('button', { name: 'Create gateway' }).click()
 
@@ -102,7 +109,71 @@ describe('Gateway create', () => {
     cy.findByTestId('full-error-view').should('not.exist')
     cy.location('pathname').should(
       'eq',
-      `${Cypress.config('consoleRootPath')}/gateways/${gatewayId}`,
+      `${Cypress.config('consoleRootPath')}/gateways/${gateway.id}`,
     )
+  })
+
+  it('succeeds adding gateway without frequency plan', () => {
+    const gateway = {
+      id: 'test-gateway-no-fp',
+      eui: generateHexValue(16),
+    }
+    cy.visit(`${Cypress.config('consoleRootPath')}/gateways/add`)
+    cy.findByLabelText('Gateway ID').type(gateway.id)
+    cy.findByLabelText('Gateway EUI').type(gateway.eui)
+    cy.findByLabelText('Frequency plan').selectOption('no-frequency-plan')
+
+    cy.findByRole('button', { name: 'Create gateway' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('full-error-view').should('not.exist')
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/gateways/${gateway.id}`,
+    )
+  })
+
+  it('succeeds adding gateway without eui', () => {
+    const gateway = {
+      id: 'test-gateway-no-eui',
+      frequency_plan: 'EU_863_870',
+    }
+    cy.visit(`${Cypress.config('consoleRootPath')}/gateways/add`)
+    cy.findByLabelText('Gateway ID').type(gateway.id)
+    cy.findByLabelText('Frequency plan').selectOption(gateway.frequency_plan)
+
+    cy.findByRole('button', { name: 'Create gateway' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('full-error-view').should('not.exist')
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/gateways/${gateway.id}`,
+    )
+  })
+
+  describe('Gateway Server disabled', () => {
+    beforeEach(() => {
+      cy.augmentStackConfig(disableGatewayServer)
+      cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+      cy.visit(`${Cypress.config('consoleRootPath')}/gateways/add`)
+    })
+
+    it('succeeds adding gateway without frequency plan', () => {
+      const gateway = {
+        id: 'test-gateway-no-gs-fp',
+      }
+      cy.findByLabelText('Gateway ID').type(gateway.id)
+      cy.findByLabelText('Frequency plan').should('not.exist')
+
+      cy.findByRole('button', { name: 'Create gateway' }).click()
+
+      cy.findByTestId('error-notification').should('not.exist')
+      cy.findByTestId('full-error-view').should('not.exist')
+      cy.location('pathname').should(
+        'eq',
+        `${Cypress.config('consoleRootPath')}/gateways/${gateway.id}`,
+      )
+    })
   })
 })

@@ -422,7 +422,7 @@ var (
 
 // Validate returns an error if the frequency plan is invalid.
 func (fp FrequencyPlan) Validate() error {
-	_, err := band.GetByID(fp.BandID)
+	_, err := band.GetLatest(fp.BandID)
 	if err != nil {
 		return err
 	}
@@ -480,7 +480,7 @@ func (fp *FrequencyPlan) RespectsDwellTime(isDownlink bool, frequency uint64, du
 
 // ToConcentratorConfig returns the frequency plan in the protobuf format.
 func (fp *FrequencyPlan) ToConcentratorConfig() (*ttnpb.ConcentratorConfig, error) {
-	phy, err := band.GetByID(fp.BandID)
+	phy, err := band.GetLatest(fp.BandID)
 	if err != nil {
 		return nil, err
 	}

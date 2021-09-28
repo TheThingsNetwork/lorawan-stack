@@ -294,7 +294,7 @@ func TestUplinkDataFrame(t *testing.T) {
 			FrequencyPlanID:       "EU_863_870",
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
-				return errors.Resemble(err, errUplinkDataFrame)
+				return errors.Resemble(err, errMDHR)
 			},
 		},
 		{

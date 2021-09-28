@@ -38,31 +38,31 @@ func TestContactInfoStore(t *testing.T) {
 		appStore := GetApplicationStore(db)
 
 		app, err := appStore.CreateApplication(ctx, &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 		})
 
 		a.So(err, should.BeNil)
 
 		s := GetContactInfoStore(db)
 
-		contactInfo, err := s.GetContactInfo(ctx, app.ApplicationIdentifiers)
+		contactInfo, err := s.GetContactInfo(ctx, app.GetIds())
 
 		a.So(err, should.BeNil)
 		a.So(contactInfo, should.BeEmpty)
 
-		_, err = s.SetContactInfo(ctx, app.ApplicationIdentifiers, []*ttnpb.ContactInfo{
+		_, err = s.SetContactInfo(ctx, app.GetIds(), []*ttnpb.ContactInfo{
 			{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com", ValidatedAt: &now},
 			{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "admin@example.com"},
 		})
 
 		a.So(err, should.BeNil)
 
-		contactInfo, err = s.GetContactInfo(ctx, app.ApplicationIdentifiers)
+		contactInfo, err = s.GetContactInfo(ctx, app.GetIds())
 
 		a.So(err, should.BeNil)
 		a.So(contactInfo, should.HaveLength, 2)
 
-		_, err = s.SetContactInfo(ctx, app.ApplicationIdentifiers, []*ttnpb.ContactInfo{
+		_, err = s.SetContactInfo(ctx, app.GetIds(), []*ttnpb.ContactInfo{
 			{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "bar@example.com"},
 			{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com"},
 			{ContactType: ttnpb.CONTACT_TYPE_ABUSE, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com"},
@@ -72,7 +72,7 @@ func TestContactInfoStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 
-		contactInfo, err = s.GetContactInfo(ctx, app.ApplicationIdentifiers)
+		contactInfo, err = s.GetContactInfo(ctx, app.GetIds())
 
 		a.So(err, should.BeNil)
 		if a.So(contactInfo, should.HaveLength, 5) {
@@ -83,11 +83,11 @@ func TestContactInfoStore(t *testing.T) {
 			}
 		}
 
-		err = s.DeleteEntityContactInfo(ctx, app.ApplicationIdentifiers)
+		err = s.DeleteEntityContactInfo(ctx, app.GetIds())
 
 		a.So(err, should.BeNil)
 
-		contactInfo, err = s.GetContactInfo(ctx, app.ApplicationIdentifiers)
+		contactInfo, err = s.GetContactInfo(ctx, app.GetIds())
 
 		a.So(contactInfo, should.HaveLength, 0)
 	})
@@ -103,14 +103,14 @@ func TestContactInfoValidation(t *testing.T) {
 		usrStore := GetUserStore(db)
 
 		usr, err := usrStore.CreateUser(ctx, &ttnpb.User{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserId: "foo"},
+			Ids: &ttnpb.UserIdentifiers{UserId: "foo"},
 		})
 
 		a.So(err, should.BeNil)
 
 		s := GetContactInfoStore(db)
 
-		info, err := s.SetContactInfo(ctx, usr.UserIdentifiers, []*ttnpb.ContactInfo{
+		info, err := s.SetContactInfo(ctx, usr.GetIds(), []*ttnpb.ContactInfo{
 			{ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com"},
 		})
 
@@ -147,7 +147,7 @@ func TestContactInfoValidation(t *testing.T) {
 
 		a.So(err, should.BeNil)
 
-		info, err = s.GetContactInfo(ctx, usr)
+		info, err = s.GetContactInfo(ctx, usr.GetIds())
 
 		a.So(err, should.BeNil)
 		if a.So(info, should.HaveLength, 1) {

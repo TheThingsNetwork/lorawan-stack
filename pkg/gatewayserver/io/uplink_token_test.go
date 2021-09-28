@@ -45,4 +45,7 @@ func TestUplinkToken(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(token.GatewayAntennaIdentifiers, should.Resemble, ids)
 	a.So(token.Timestamp, should.Equal, timestamp)
+
+	_, err = io.ParseUplinkToken(nil)
+	a.So(err, should.NotBeNil)
 }

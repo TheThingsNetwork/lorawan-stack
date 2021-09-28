@@ -11,7 +11,30 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Packet Broker gateway visibility management (default settings only). See `ttn-lw-cli packetbroker home-networks gateway-visibilities --help` for more information.
+
+### Changed
+
+- The Gateway Server worker pools may now drop workers if they are idle for too long.
+- FPort = 0 uplinks are no longer decoded by the Application Server, and the Network Server no longer provides the frame payload to the Application Server for these messages.
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+- Emails to admins about requested OAuth clients.
+- `session` handling for joined OTAA end devices in the Console.
+
+### Security
+
+## [3.15.0] - 2021-09-17
+
+### Added
+
 - RPC to query supported PHY versions for a given Band ID.
+- Non-TLS LNS endpoint support.
 
 ### Changed
 
@@ -19,10 +42,7 @@ For details about compatibility between different releases, see the **Commitment
 - LBS timestamp rollover threshold.
 - Layout of error pages.
 - The Application Server worker pools may now drop workers if they are idle for too long.
-
-### Deprecated
-
-### Removed
+- Improved error page UX in the Console.
 
 ### Fixed
 
@@ -31,8 +51,9 @@ For details about compatibility between different releases, see the **Commitment
 - Not rendering site header and footer for error pages in some situations.
 - Not providing a copy button for error pages in some situations.
 - Improved errors for invalid URLs.
-
-### Security
+- Limit length of search queries within tables in the Console to 50 to comply with API validation.
+- External Join Server address handling in end device creation form in the Console.
+- Updating `supports_class_b` field in the end device general settings page in the Console.
 
 ## [3.14.2] - 2021-08-27
 
@@ -1751,7 +1772,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.2...v3.14
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.0...v3.15
+[3.15.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.2...v3.15.0
 [3.14.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.1...v3.14.2
 [3.14.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.0...v3.14.1
 [3.14.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.13.3...v3.14.0

@@ -66,7 +66,7 @@ func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.
 func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttnpb.Client, error) {
 	defer trace.StartRegion(ctx, "create client").End()
 	cliModel := Client{
-		ClientID: cli.ClientId, // The ID is not mutated by fromPB.
+		ClientID: cli.GetIds().GetClientId(), // The ID is not mutated by fromPB.
 	}
 	cliModel.fromPB(cli, nil)
 	if err := s.createEntity(ctx, &cliModel); err != nil {
@@ -123,12 +123,12 @@ func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers
 
 func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, fieldMask *pbtypes.FieldMask) (updated *ttnpb.Client, err error) {
 	defer trace.StartRegion(ctx, "update client").End()
-	query := s.query(ctx, Client{}, withClientID(cli.GetClientId()))
+	query := s.query(ctx, Client{}, withClientID(cli.GetIds().GetClientId()))
 	query = selectClientFields(ctx, query, fieldMask)
 	var cliModel Client
 	if err = query.First(&cliModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(cli.ClientIdentifiers)
+			return nil, errNotFoundForID(cli.GetIds())
 		}
 		return nil, err
 	}

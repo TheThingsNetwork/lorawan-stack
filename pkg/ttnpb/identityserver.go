@@ -25,7 +25,7 @@ func (m *AuthInfoResponse) GetEntityIdentifiers() *EntityIdentifiers {
 	case *AuthInfoResponse_OauthAccessToken:
 		return accessMethod.OauthAccessToken.UserIds.GetEntityIdentifiers()
 	case *AuthInfoResponse_UserSession:
-		return accessMethod.UserSession.UserIdentifiers.GetEntityIdentifiers()
+		return accessMethod.UserSession.GetUserIds().GetEntityIdentifiers()
 	}
 	return nil
 }

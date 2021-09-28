@@ -265,12 +265,12 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 	return nil
 }
 
-var errDownlinkQueueCapacityExceeded = errors.DefineResourceExhausted("downlink_queue_capacity_exceeded", "Downlink queue capacity exceeded")
+var errDownlinkQueueCapacity = errors.DefineResourceExhausted("downlink_queue_capacity", "downlink queue capacity exceeded")
 
 // DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
 	if n := len(req.Downlinks); n > ns.downlinkQueueCapacity*2 {
-		return nil, errDownlinkQueueCapacityExceeded.New()
+		return nil, errDownlinkQueueCapacity.New()
 	} else if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
@@ -309,7 +309,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 				return nil, nil, err
 			}
 			if len(dev.Session.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity || len(dev.PendingSession.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity {
-				return nil, nil, errDownlinkQueueCapacityExceeded.New()
+				return nil, nil, errDownlinkQueueCapacity.New()
 			}
 			return dev, []string{
 				"session.queued_application_downlinks",
@@ -339,7 +339,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 // DownlinkQueuePush is called by the Application Server to push a downlink to queue for a device.
 func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
 	if n := len(req.Downlinks); n > ns.downlinkQueueCapacity*2 {
-		return nil, errDownlinkQueueCapacityExceeded.New()
+		return nil, errDownlinkQueueCapacity.New()
 	} else if n == 0 {
 		return ttnpb.Empty, nil
 	} else if err := clusterauth.Authorized(ctx); err != nil {
@@ -369,7 +369,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 				return nil, nil, err
 			}
 			if len(dev.Session.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity || len(dev.PendingSession.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity {
-				return nil, nil, errDownlinkQueueCapacityExceeded.New()
+				return nil, nil, errDownlinkQueueCapacity.New()
 			}
 			return dev, []string{
 				"session.queued_application_downlinks",

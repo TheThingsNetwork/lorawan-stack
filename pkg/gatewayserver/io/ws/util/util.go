@@ -57,7 +57,7 @@ func GetFCtrlAsUint(fCtrl ttnpb.FCtrl) uint {
 }
 
 func GetDataRateFromIndex(bandID string, index int) (ttnpb.DataRate, string, error) {
-	phy, err := band.GetByID(bandID)
+	phy, err := band.GetLatest(bandID)
 	if err != nil {
 		return ttnpb.DataRate{}, "", errDataRateIndex.WithCause(err)
 	}
@@ -80,7 +80,7 @@ func GetDataRateFromIndex(bandID string, index int) (ttnpb.DataRate, string, err
 }
 
 func GetDataRateIndexFromDataRate(bandID string, dr ttnpb.DataRate) (int, error) {
-	phy, err := band.GetByID(bandID)
+	phy, err := band.GetLatest(bandID)
 	if err != nil {
 		return 0, err
 	}

@@ -142,7 +142,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectClientFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.ClientRegistry/Get"].Allowed)
@@ -152,8 +152,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{
-				ClientIdentifiers: *cliID,
-				FieldMask:         &pbtypes.FieldMask{Paths: paths},
+				ClientIds: cliID,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -170,7 +170,7 @@ var (
 			cliID := getClientID(cmd.Flags(), args)
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
-				return errNoCollaborator
+				return errNoCollaborator.New()
 			}
 			var client ttnpb.Client
 			client.State = ttnpb.STATE_APPROVED // This may not be honored by the server.
@@ -187,11 +187,11 @@ var (
 				return err
 			}
 			client.Attributes = mergeAttributes(client.Attributes, cmd.Flags())
-			if cliID != nil && cliID.ClientId != "" {
-				client.ClientId = cliID.ClientId
+			if cliID.GetClientId() != "" {
+				client.Ids = &ttnpb.ClientIdentifiers{ClientId: cliID.GetClientId()}
 			}
-			if client.ClientId == "" {
-				return errNoClientID
+			if client.GetIds().GetClientId() == "" {
+				return errNoClientID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -200,7 +200,7 @@ var (
 			}
 			res, err := ttnpb.NewClientRegistryClient(is).Create(ctx, &ttnpb.CreateClientRequest{
 				Client:       client,
-				Collaborator: *collaborator,
+				Collaborator: collaborator,
 			})
 			if err != nil {
 				return err
@@ -220,7 +220,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setClientFlags, attributesFlags())
 			if len(paths) == 0 {
@@ -232,7 +232,7 @@ var (
 				return err
 			}
 			client.Attributes = mergeAttributes(client.Attributes, cmd.Flags())
-			client.ClientIdentifiers = *cliID
+			client.Ids = cliID
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -257,7 +257,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -278,7 +278,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -300,7 +300,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 
 			force, err := cmd.Flags().GetBool("force")
@@ -308,7 +308,7 @@ var (
 				return err
 			}
 			if !confirmChoice(clientPurgeWarning, force) {
-				return errNoConfirmation
+				return errNoConfirmation.New()
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -325,7 +325,7 @@ var (
 	clientsContactInfoCommand = contactInfoCommands("client", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		cliID := getClientID(cmd.Flags(), args)
 		if cliID == nil {
-			return nil, errNoClientID
+			return nil, errNoClientID.New()
 		}
 		return cliID.GetEntityIdentifiers(), nil
 	})

@@ -1945,6 +1945,315 @@ var _ interface {
 	ErrorName() string
 } = SetPacketBrokerRoutingPolicyRequestValidationError{}
 
+// ValidateFields checks the field values on PacketBrokerGatewayVisibility with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *PacketBrokerGatewayVisibility) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerGatewayVisibilityFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "location":
+			// no validation rules for Location
+		case "antenna_placement":
+			// no validation rules for AntennaPlacement
+		case "antenna_count":
+			// no validation rules for AntennaCount
+		case "fine_timestamps":
+			// no validation rules for FineTimestamps
+		case "contact_info":
+			// no validation rules for ContactInfo
+		case "status":
+			// no validation rules for Status
+		case "frequency_plan":
+			// no validation rules for FrequencyPlan
+		case "packet_rates":
+			// no validation rules for PacketRates
+		default:
+			return PacketBrokerGatewayVisibilityValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerGatewayVisibilityValidationError is the validation error
+// returned by PacketBrokerGatewayVisibility.ValidateFields if the designated
+// constraints aren't met.
+type PacketBrokerGatewayVisibilityValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerGatewayVisibilityValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerGatewayVisibilityValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerGatewayVisibilityValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerGatewayVisibilityValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerGatewayVisibilityValidationError) ErrorName() string {
+	return "PacketBrokerGatewayVisibilityValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerGatewayVisibilityValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerGatewayVisibility.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerGatewayVisibilityValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerGatewayVisibilityValidationError{}
+
+// ValidateFields checks the field values on
+// PacketBrokerDefaultGatewayVisibility with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *PacketBrokerDefaultGatewayVisibility) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PacketBrokerDefaultGatewayVisibilityFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "updated_at":
+
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerDefaultGatewayVisibilityValidationError{
+						field:  "updated_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "visibility":
+
+			if v, ok := interface{}(m.GetVisibility()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerDefaultGatewayVisibilityValidationError{
+						field:  "visibility",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return PacketBrokerDefaultGatewayVisibilityValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PacketBrokerDefaultGatewayVisibilityValidationError is the validation error
+// returned by PacketBrokerDefaultGatewayVisibility.ValidateFields if the
+// designated constraints aren't met.
+type PacketBrokerDefaultGatewayVisibilityValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PacketBrokerDefaultGatewayVisibilityValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PacketBrokerDefaultGatewayVisibilityValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PacketBrokerDefaultGatewayVisibilityValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PacketBrokerDefaultGatewayVisibilityValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PacketBrokerDefaultGatewayVisibilityValidationError) ErrorName() string {
+	return "PacketBrokerDefaultGatewayVisibilityValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PacketBrokerDefaultGatewayVisibilityValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPacketBrokerDefaultGatewayVisibility.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PacketBrokerDefaultGatewayVisibilityValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PacketBrokerDefaultGatewayVisibilityValidationError{}
+
+// ValidateFields checks the field values on
+// SetPacketBrokerDefaultGatewayVisibilityRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *SetPacketBrokerDefaultGatewayVisibilityRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = SetPacketBrokerDefaultGatewayVisibilityRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "visibility":
+
+			if m.GetVisibility() == nil {
+				return SetPacketBrokerDefaultGatewayVisibilityRequestValidationError{
+					field:  "visibility",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetVisibility()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return SetPacketBrokerDefaultGatewayVisibilityRequestValidationError{
+						field:  "visibility",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return SetPacketBrokerDefaultGatewayVisibilityRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// SetPacketBrokerDefaultGatewayVisibilityRequestValidationError is the
+// validation error returned by
+// SetPacketBrokerDefaultGatewayVisibilityRequest.ValidateFields if the
+// designated constraints aren't met.
+type SetPacketBrokerDefaultGatewayVisibilityRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetPacketBrokerDefaultGatewayVisibilityRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetPacketBrokerDefaultGatewayVisibilityRequestValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e SetPacketBrokerDefaultGatewayVisibilityRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetPacketBrokerDefaultGatewayVisibilityRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetPacketBrokerDefaultGatewayVisibilityRequestValidationError) ErrorName() string {
+	return "SetPacketBrokerDefaultGatewayVisibilityRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetPacketBrokerDefaultGatewayVisibilityRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetPacketBrokerDefaultGatewayVisibilityRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetPacketBrokerDefaultGatewayVisibilityRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetPacketBrokerDefaultGatewayVisibilityRequestValidationError{}
+
 // ValidateFields checks the field values on ListPacketBrokerNetworksRequest
 // with the rules defined in the proto definition for this message. If any
 // rules are violated, an error is returned.

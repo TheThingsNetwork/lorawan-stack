@@ -167,7 +167,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectUserFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.UserRegistry/Get"].Allowed)
@@ -177,8 +177,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{
-				UserIdentifiers: *usrID,
-				FieldMask:       &pbtypes.FieldMask{Paths: paths},
+				UserIds:   usrID,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -206,11 +206,11 @@ var (
 				return err
 			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
-			if usrID != nil && usrID.UserId != "" {
-				user.UserId = usrID.UserId
+			if usrID.GetUserId() != "" {
+				user.Ids = &ttnpb.UserIdentifiers{UserId: usrID.GetUserId()}
 			}
-			if user.UserId == "" {
-				return errNoUserID
+			if user.GetIds().GetUserId() == "" {
+				return errNoUserID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -240,7 +240,7 @@ var (
 					return err
 				}
 				if string(pw) != user.Password {
-					return errPasswordMismatch
+					return errPasswordMismatch.New()
 				}
 			}
 
@@ -284,7 +284,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setUserFlags, attributesFlags(), profilePictureFlags)
 			if len(paths) == 0 {
@@ -303,7 +303,7 @@ var (
 				return err
 			}
 			user.Attributes = mergeAttributes(user.Attributes, cmd.Flags())
-			user.UserIdentifiers = *usrID
+			user.Ids = usrID
 			if profilePicture, err := cmd.Flags().GetString("profile_picture"); err == nil && profilePicture != "" {
 				user.ProfilePicture, err = readPicture(profilePicture)
 				if err != nil {
@@ -335,7 +335,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 
 			usrID.Email, _ = cmd.Flags().GetString("email")
@@ -345,7 +345,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewUserRegistryClient(is).CreateTemporaryPassword(ctx, &ttnpb.CreateTemporaryPasswordRequest{
-				UserIdentifiers: *usrID,
+				UserIds: usrID,
 			})
 
 			return err
@@ -362,7 +362,7 @@ var (
 
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -401,7 +401,7 @@ var (
 			revokeAllAccess, _ := cmd.Flags().GetBool("revoke-all-access")
 
 			res, err := ttnpb.NewUserRegistryClient(is).UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
-				UserIdentifiers: *usrID,
+				UserIds:         usrID,
 				Old:             old,
 				New:             new,
 				RevokeAllAccess: revokeAllAccess,
@@ -420,7 +420,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -441,7 +441,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -459,7 +459,7 @@ var (
 	usersContactInfoCommand = contactInfoCommands("user", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		usrID := getUserID(cmd.Flags(), args)
 		if usrID == nil {
-			return nil, errNoUserID
+			return nil, errNoUserID.New()
 		}
 		return usrID.GetEntityIdentifiers(), nil
 	})
@@ -471,14 +471,14 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 			force, err := cmd.Flags().GetBool("force")
 			if err != nil {
 				return err
 			}
 			if !confirmChoice(userPurgeWarning, force) {
-				return errNoConfirmation
+				return errNoConfirmation.New()
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {

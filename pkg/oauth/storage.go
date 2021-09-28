@@ -32,7 +32,7 @@ const redirectURISeparator = ";"
 type osinClient ttnpb.Client
 
 func (cli osinClient) GetId() string {
-	return cli.ClientIdentifiers.ClientId
+	return cli.Ids.GetClientId()
 }
 
 func (cli osinClient) GetSecret() string {
@@ -55,7 +55,7 @@ func (cli osinClient) GetUserData() interface{} { return nil }
 
 // userData is used as the UserData interface in osin structs.
 type userData struct {
-	ttnpb.UserSessionIdentifiers
+	*ttnpb.UserSessionIdentifiers
 	ID string
 }
 
@@ -87,8 +87,8 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 	client := ttnpb.Client(data.Client.(osinClient))
 	rights := rightsFromScope(data.Scope)
 	_, err := s.oauth.Authorize(s.ctx, &ttnpb.OAuthClientAuthorization{
-		ClientIds: client.ClientIdentifiers,
-		UserIds:   userSessionIDs.UserIdentifiers,
+		ClientIds: *client.GetIds(),
+		UserIds:   *userSessionIDs.GetUserIds(),
 		Rights:    rights,
 	})
 	if err != nil {
@@ -98,8 +98,8 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 		data.CreatedAt = time.Now()
 	}
 	err = s.oauth.CreateAuthorizationCode(s.ctx, &ttnpb.OAuthAuthorizationCode{
-		ClientIds:     client.ClientIdentifiers,
-		UserIds:       userSessionIDs.UserIdentifiers,
+		ClientIds:     *client.GetIds(),
+		UserIds:       *userSessionIDs.GetUserIds(),
 		UserSessionId: userSessionIDs.SessionId,
 		Rights:        rights,
 		Code:          data.Code,
@@ -132,9 +132,9 @@ func (s *storage) LoadAuthorize(code string) (data *osin.AuthorizeData, err erro
 		State:       authorizationCode.State,
 		CreatedAt:   authorizationCode.CreatedAt,
 		UserData: userData{
-			UserSessionIdentifiers: ttnpb.UserSessionIdentifiers{
-				UserIdentifiers: authorizationCode.UserIds,
-				SessionId:       authorizationCode.UserSessionId,
+			UserSessionIdentifiers: &ttnpb.UserSessionIdentifiers{
+				UserIds:   &authorizationCode.UserIds,
+				SessionId: authorizationCode.UserSessionId,
 			},
 		},
 	}, nil
@@ -207,8 +207,8 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 		}
 	}
 	return s.oauth.CreateAccessToken(s.ctx, &ttnpb.OAuthAccessToken{
-		ClientIds:     client.ClientIdentifiers,
-		UserIds:       userSessionIDs.UserIdentifiers,
+		ClientIds:     *client.GetIds(),
+		UserIds:       *userSessionIDs.GetUserIds(),
 		UserSessionId: userSessionIDs.SessionId,
 		Rights:        rights,
 		Id:            accessID,
@@ -236,9 +236,9 @@ func (s *storage) loadAccess(id string) (*osin.AccessData, error) {
 		Scope:        rightsToScope(accessToken.Rights...),
 		CreatedAt:    accessToken.CreatedAt,
 		UserData: userData{
-			UserSessionIdentifiers: ttnpb.UserSessionIdentifiers{
-				UserIdentifiers: accessToken.UserIds,
-				SessionId:       accessToken.UserSessionId,
+			UserSessionIdentifiers: &ttnpb.UserSessionIdentifiers{
+				UserIds:   &accessToken.UserIds,
+				SessionId: accessToken.UserSessionId,
 			},
 			ID: id,
 		},

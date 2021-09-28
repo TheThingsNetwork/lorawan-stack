@@ -248,6 +248,9 @@ export const isSentryWorthy = error =>
  * @returns {string} The Sentry error title.
  */
 export const getSentryErrorTitle = error => {
+  if (typeof error === 'string') {
+    return `invalid string error: "${error}"`
+  }
   if (typeof error !== 'object') {
     return `invalid error type: ${error}`
   }
@@ -272,18 +275,22 @@ export const getSentryErrorTitle = error => {
     return error.code
   } else if ('statusCode' in error) {
     return `status code: ${error.statusCode}`
+  } else if ('id' in error && 'defaultMessage' in error) {
+    return error.defaultMessage
   }
 
   return 'untitled or empty error'
 }
 
 /**
- * Returns the id of the error, used as message id.
+ * Returns the id of the error, used as message id,
+ * `undefined` otherwise.
  *
- * @param {object} error - The backend error object.
+ * @param {object} error - The error object.
  * @returns {string} The ID.
  */
-export const getBackendErrorId = error => error.message.split(' ')[0]
+export const getBackendErrorId = error =>
+  isBackend(error) ? error.message.split(' ')[0] : undefined
 
 /**
  * Returns the id of the error details, used as message id.
@@ -356,7 +363,18 @@ export const getBackendErrorRootCause = error => {
  * @param {object} error - The backend error object.
  * @returns {string} The attributes or undefined.
  */
-export const getBackendErrorMessageAttributes = error => error.details[0].attributes
+export const getBackendErrorMessageAttributes = error =>
+  isBackend(error) ? error.details[0].attributes : undefined
+
+/**
+ * Returns the correlation ID of the backend error message if present,
+ * `undefined` otherwise.
+ *
+ * @param {object} error - The backend error object.
+ * @returns {string} The correlation ID.
+ */
+export const getCorrelationId = error =>
+  isBackend(error) ? error.details[0].correlation_id : undefined
 
 /**
  * Adapts the error object to props of message object, if possible.

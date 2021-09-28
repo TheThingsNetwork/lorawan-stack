@@ -68,57 +68,37 @@ func (s *HTTPClientSink) Process(req *http.Request) error {
 	return errRequest.WithAttributes("code", res.StatusCode)
 }
 
-// SinkFactory creates a sink.
-type SinkFactory func() (Sink, error)
-
-// StaticSinkFactory creates a SinkFactory that always returns the same Sink.
-func StaticSinkFactory(s Sink) SinkFactory {
-	return func() (Sink, error) {
-		return s, nil
-	}
-}
-
 // pooledSink is a Sink with worker pool.
 type pooledSink struct {
 	pool workerpool.WorkerPool
 }
 
-func createPoolHandlerFactory(createSink SinkFactory) workerpool.HandlerFactory {
-	factory := func() (workerpool.Handler, error) {
-		sink, err := createSink()
-		if err != nil {
-			return nil, err
+func createPoolHandler(sink Sink) workerpool.Handler {
+	h := func(ctx context.Context, item interface{}) {
+		req := item.(*http.Request)
+		if err := sink.Process(req); err != nil {
+			registerWebhookFailed(ctx, err)
+			log.FromContext(ctx).WithError(err).Warn("Failed to process message")
+		} else {
+			registerWebhookSent(ctx)
 		}
-		h := func(ctx context.Context, item interface{}) {
-			req := item.(*http.Request)
-			if err := sink.Process(req); err != nil {
-				registerWebhookFailed(ctx, err)
-				log.FromContext(ctx).WithError(err).Warn("Failed to process message")
-			} else {
-				registerWebhookSent(ctx)
-			}
-		}
-		return h, nil
 	}
-	return factory
+	return h
 }
 
 // NewPooledSink creates a Sink that queues requests and processes them in parallel workers.
-func NewPooledSink(ctx context.Context, c workerpool.Component, createSink SinkFactory, workers int, queueSize int) (Sink, error) {
-	wp, err := workerpool.NewWorkerPool(workerpool.Config{
-		Component:     c,
-		Context:       ctx,
-		Name:          "webhooks",
-		CreateHandler: createPoolHandlerFactory(createSink),
-		MaxWorkers:    workers,
-		QueueSize:     queueSize,
+func NewPooledSink(ctx context.Context, c workerpool.Component, sink Sink, workers int, queueSize int) Sink {
+	wp := workerpool.NewWorkerPool(workerpool.Config{
+		Component:  c,
+		Context:    ctx,
+		Name:       "webhooks",
+		Handler:    createPoolHandler(sink),
+		MaxWorkers: workers,
+		QueueSize:  queueSize,
 	})
-	if err != nil {
-		return nil, err
-	}
 	return &pooledSink{
 		pool: wp,
-	}, nil
+	}
 }
 
 // Process sends the request to the workers.
@@ -159,15 +139,12 @@ func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry
 	if err != nil {
 		return nil, err
 	}
-	wp, err := workerpool.NewWorkerPool(workerpool.Config{
-		Component:     server,
-		Context:       ctx,
-		Name:          "webhooks_fanout",
-		CreateHandler: workerpool.HandlerFactoryFromUplinkHandler(w.handleUp),
+	wp := workerpool.NewWorkerPool(workerpool.Config{
+		Component: server,
+		Context:   ctx,
+		Name:      "webhooks_fanout",
+		Handler:   workerpool.HandlerFromUplinkHandler(w.handleUp),
 	})
-	if err != nil {
-		return nil, err
-	}
 	sub.Pipe(ctx, server, "webhooks", wp.Publish)
 	return w, nil
 }

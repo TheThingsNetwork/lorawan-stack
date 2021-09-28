@@ -37,6 +37,7 @@ import JoinEUIPRefixesInput from '@console/components/join-eui-prefixes-input'
 import DevAddrInput from '@console/containers/dev-addr-input'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
+import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import { isBackend, getBackendErrorName } from '@ttn-lw/lib/errors/utils'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -48,13 +49,13 @@ import {
   ACTIVATION_MODES,
   parseLorawanMacVersion,
   generate16BytesKey,
-  DEVICE_CLASSES,
 } from '@console/lib/device-utils'
 
 import { REGISTRATION_TYPES } from '../../utils'
 import messages from '../../messages'
 import style from '../../device-add.styl'
 
+import { DEVICE_CLASS_MAP } from './constants'
 import AdvancedSettingsSection from './advanced-settings'
 import validationSchema, { devEUISchema } from './validation-schema'
 
@@ -99,7 +100,7 @@ const defaultValues = {
     ping_slot_periodicity: '',
   },
   _activation_mode: '',
-  _device_class: undefined,
+  _device_class: '',
   _external_servers: false,
   _registration: REGISTRATION_TYPES.SINGLE,
   _default_ns_settings: true,
@@ -139,6 +140,7 @@ const ManualForm = props => {
   const asUrl = asEnabled ? asConfig.base_url : undefined
   const jsUrl = jsEnabled ? jsConfig.base_url : undefined
   const nsUrl = nsEnabled ? nsConfig.base_url : undefined
+  const jsHost = getHostFromUrl(jsUrl)
 
   const [macSettings, setMacSettings] = React.useState({})
 
@@ -180,21 +182,23 @@ const ManualForm = props => {
       nsUrl,
     ],
   )
-  const initialValues = React.useMemo(
-    () =>
-      validationSchema.cast(
-        merge({}, defaultValues, {
-          supports_join: jsEnabled,
-          _activation_mode: jsEnabled
-            ? ACTIVATION_MODES.OTAA
-            : nsEnabled
-            ? ACTIVATION_MODES.ABP
-            : ACTIVATION_MODES.NONE,
-        }),
-        { context: validationContext },
-      ),
-    [jsEnabled, nsEnabled, validationContext],
-  )
+  const initialValues = React.useMemo(() => {
+    const initialActivationMode = jsEnabled
+      ? ACTIVATION_MODES.OTAA
+      : nsEnabled
+      ? ACTIVATION_MODES.ABP
+      : ACTIVATION_MODES.NONE
+
+    return validationSchema.cast(
+      merge({}, defaultValues, {
+        supports_join: jsEnabled,
+        _device_class:
+          initialActivationMode === ACTIVATION_MODES.MULTICAST ? '' : DEVICE_CLASS_MAP.CLASS_A,
+        _activation_mode: initialActivationMode,
+      }),
+      { context: validationContext },
+    )
+  }, [jsEnabled, nsEnabled, validationContext])
   const formRef = React.useRef(null)
   const deviceIdInputRef = React.useRef(null)
   const euiInputRef = React.useRef(null)
@@ -231,6 +235,14 @@ const ManualForm = props => {
     fetchDevEUICounter(appId)
   }, [appId, fetchDevEUICounter])
 
+  const [requireRootKeys, setRequireRootKeys] = React.useState(jsEnabled)
+  const handleJsAddressChange = React.useCallback(
+    jsAddress => {
+      setRequireRootKeys(jsHost === jsAddress)
+    },
+    [jsHost],
+  )
+
   const [error, setError] = React.useState(undefined)
   const handleSetError = React.useCallback(error => setError(error), [])
 
@@ -238,18 +250,22 @@ const ManualForm = props => {
   const handleLorawanVersionChange = React.useCallback(version => setLorawanVersion(version), [])
 
   const [defaultNsSettings, setDefaultNsSettings] = React.useState(true)
-  const handleDefaultNsSettings = React.useCallback(checked => setDefaultNsSettings(checked), [])
+  const handleDefaultNsSettings = React.useCallback(checked => {
+    setDefaultNsSettings(checked)
+  }, [])
 
   const [activationMode, setActivationMode] = React.useState(initialValues._activation_mode)
   const handleActivationModeChange = React.useCallback(
     mode => {
       const { setValues, values } = formRef.current
+
       setValues(
         validationSchema.cast(
           {
             ...defaultValues,
             ...values,
             _activation_mode: mode,
+            _device_class: mode === ACTIVATION_MODES.MULTICAST ? '' : DEVICE_CLASS_MAP.CLASS_A,
             mac_settings: defaultNsSettings
               ? merge({}, defaultValues.mac_settings, values.mac_settings, macSettings)
               : merge({}, defaultValues.mac_settings, values.mac_settings),
@@ -264,13 +280,13 @@ const ManualForm = props => {
   )
 
   const [deviceClass, setDeviceClass] = React.useState(
-    initialValues._activation_mode === ACTIVATION_MODES.OTAA ? DEVICE_CLASSES.CLASS_A : undefined,
+    initialValues._activation_mode === ACTIVATION_MODES.MULTICAST ? '' : DEVICE_CLASS_MAP.CLASS_A,
   )
   const handleDeviceClassChange = React.useCallback(
-    devClass => {
+    deviceClass => {
       const { setValues, values } = formRef.current
 
-      setDeviceClass(devClass)
+      setDeviceClass(deviceClass)
       setValues(
         validationSchema.cast(
           {
@@ -284,6 +300,63 @@ const ManualForm = props => {
     },
     [macSettings, validationContext],
   )
+
+  const lwVersion = parseLorawanMacVersion(lorawanVersion)
+  const isOTAA = activationMode === ACTIVATION_MODES.OTAA
+  const isABP = activationMode === ACTIVATION_MODES.ABP
+  const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
+  const isClassB =
+    deviceClass === DEVICE_CLASS_MAP.CLASS_B || deviceClass === DEVICE_CLASS_MAP.CLASS_B_C
+  const devEUIGenerateDisabled =
+    applicationDevEUICounter === env.devEUIConfig.applicationLimit ||
+    !env.devEUIConfig.devEUIIssuingEnabled ||
+    devEUIGenerated
+
+  const pingPeriodicityRequired = isClassB && (isABP || isMulticast)
+
+  const [useExternalServers, setUseExternalServers] = React.useState(false)
+  const handleUseExternalServersChange = React.useCallback(
+    evt => {
+      const { checked } = evt.target
+      const { values, setValues } = formRef.current
+
+      if (checked) {
+        if (pingPeriodicityRequired) {
+          return
+        }
+      }
+
+      if (!checked) {
+        setRequireRootKeys(true)
+        setValues(
+          validationSchema.cast(
+            {
+              ...values,
+              join_server_address: initialValues.join_server_address,
+              network_server_address: initialValues.network_server_address,
+              application_server_address: initialValues.application_server_address,
+            },
+            { context: validationContext },
+          ),
+        )
+      }
+
+      setUseExternalServers(checked)
+    },
+    [
+      initialValues.application_server_address,
+      initialValues.join_server_address,
+      initialValues.network_server_address,
+      pingPeriodicityRequired,
+      validationContext,
+    ],
+  )
+
+  React.useEffect(() => {
+    if (defaultNsSettings && pingPeriodicityRequired) {
+      setDefaultNsSettings(false)
+    }
+  }, [defaultNsSettings, pingPeriodicityRequired])
 
   const [freqPlan, setFreqPlan] = React.useState()
   const freqPlanRef = React.useRef(freqPlan)
@@ -375,15 +448,6 @@ const ManualForm = props => {
     }
   }, [])
 
-  const lwVersion = parseLorawanMacVersion(lorawanVersion)
-  const isOTAA = activationMode === ACTIVATION_MODES.OTAA
-  const isABP = activationMode === ACTIVATION_MODES.ABP
-  const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
-  const devEUIGenerateDisabled =
-    applicationDevEUICounter === env.devEUIConfig.applicationLimit ||
-    !env.devEUIConfig.devEUIIssuingEnabled ||
-    devEUIGenerated
-
   const handleSubmit = React.useCallback(
     async (values, { setSubmitting, resetForm }) => {
       try {
@@ -406,9 +470,10 @@ const ManualForm = props => {
           lorawan_version,
           lorawan_phy_version,
           frequency_plan_id,
+          mac_settings = {},
         } = castedValues
 
-        if (Object.keys(castedValues.mac_settings).length === 0) {
+        if (Object.keys(mac_settings).length === 0) {
           delete castedValues.mac_settings
         }
 
@@ -518,12 +583,14 @@ const ManualForm = props => {
         tooltipId={tooltipIds.REGIONAL_PARAMETERS}
         onChange={handlePhyVersionChange}
       />
-      <NsFrequencyPlansSelect
-        required={nsEnabled}
-        tooltipId={tooltipIds.FREQUENCY_PLAN}
-        name="frequency_plan_id"
-        onChange={handleFreqPlanChange}
-      />
+      {nsEnabled && (
+        <NsFrequencyPlansSelect
+          required
+          tooltipId={tooltipIds.FREQUENCY_PLAN}
+          name="frequency_plan_id"
+          onChange={handleFreqPlanChange}
+        />
+      )}
       <hr />
       <AdvancedSettingsSection
         jsEnabled={jsConfig.enabled}
@@ -533,9 +600,12 @@ const ManualForm = props => {
         deviceClass={deviceClass}
         onDeviceClassChange={handleDeviceClassChange}
         onDefaultNsSettingsChange={handleDefaultNsSettings}
+        onUseExternalServersChange={handleUseExternalServersChange}
+        onJsAddressChange={handleJsAddressChange}
         defaultNsSettings={defaultNsSettings}
         freqPlan={freqPlan}
         defaultMacSettings={macSettings}
+        useExternalServers={useExternalServers}
       />
       <hr />
       {!isMulticast && devEUIComponent}
@@ -611,7 +681,7 @@ const ManualForm = props => {
             tooltipId={tooltipIds.JOIN_EUI}
           />
           <Form.Field
-            required
+            required={requireRootKeys}
             disabled={!mayEditKeys}
             title={sharedMessages.appKey}
             name="root_keys.app_key.key"
@@ -626,7 +696,7 @@ const ManualForm = props => {
           />
           {lwVersion >= 110 && (
             <Form.Field
-              required
+              required={requireRootKeys}
               title={sharedMessages.nwkKey}
               name="root_keys.nwk_key.key"
               type="byte"

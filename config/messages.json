@@ -1772,6 +1772,15 @@
       "file": "applications_webhooks.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:packet_broker_network_id": {
+    "translations": {
+      "en": "invalid Packet Broker network ID"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "packetbroker.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:password_mismatch": {
     "translations": {
       "en": "password did not match"
@@ -2627,9 +2636,27 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:no_dev_eui": {
+    "translations": {
+      "en": "no device EUI provided"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
   "error:pkg/applicationserver:no_device_session": {
     "translations": {
       "en": "no device session; check device activation"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:no_join_eui": {
+    "translations": {
+      "en": "no join EUI provided"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -2917,7 +2944,7 @@
   },
   "error:pkg/band:band_not_found": {
     "translations": {
-      "en": "band `{id}` not found"
+      "en": "band `{id}@{version}` not found"
     },
     "description": {
       "package": "pkg/band",
@@ -4247,15 +4274,6 @@
       "file": "firewall_ratelimit.go"
     }
   },
-  "error:pkg/gatewayserver/io/udp:udp_frontend_recovered": {
-    "translations": {
-      "en": "internal server error"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp",
-      "file": "udp.go"
-    }
-  },
   "error:pkg/gatewayserver/io/ws/lbslns:empty_gateway_eui": {
     "translations": {
       "en": "empty gateway EUI"
@@ -4268,6 +4286,15 @@
   "error:pkg/gatewayserver/io/ws/lbslns:join_request_message": {
     "translations": {
       "en": "invalid join-request message received"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/lbslns",
+      "file": "upstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws/lbslns:mhdr": {
+    "translations": {
+      "en": "invalid MHDR `{mhdr}` received"
     },
     "description": {
       "package": "pkg/gatewayserver/io/ws/lbslns",
@@ -4637,15 +4664,6 @@
   "error:pkg/gatewayserver:gateway_not_registered": {
     "translations": {
       "en": "gateway `{gateway_uid}` is not registered"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "gatewayserver.go"
-    }
-  },
-  "error:pkg/gatewayserver:handler_recovered": {
-    "translations": {
-      "en": "internal server error"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -6803,9 +6821,9 @@
       "file": "config.go"
     }
   },
-  "error:pkg/networkserver:downlink_queue_capacity_exceeded": {
+  "error:pkg/networkserver:downlink_queue_capacity": {
     "translations": {
-      "en": "Downlink queue capacity exceeded"
+      "en": "downlink queue capacity exceeded"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -8405,7 +8423,16 @@
       "file": "oauthclient.go"
     }
   },
-  "error:pkg/web/oauthclient:no_state": {
+  "error:pkg/web/oauthclient:no_state_cookie": {
+    "translations": {
+      "en": "no state cookie stored"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:no_state_param": {
     "translations": {
       "en": "no state parameter present in request"
     },
@@ -9080,6 +9107,42 @@
       "file": "observability.go"
     }
   },
+  "event:gs.io.status.drop": {
+    "translations": {
+      "en": "drop gateway status"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.io.tx.ack.drop": {
+    "translations": {
+      "en": "drop tx ack message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.io.up.drop": {
+    "translations": {
+      "en": "drop uplink message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.io.up.repeat": {
+    "translations": {
+      "en": "received repeated uplink message from gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "observability.go"
+    }
+  },
   "event:gs.status.drop": {
     "translations": {
       "en": "drop gateway status"
@@ -9140,15 +9203,6 @@
     },
     "description": {
       "package": "pkg/gatewayserver",
-      "file": "observability.go"
-    }
-  },
-  "event:gs.up.repeat": {
-    "translations": {
-      "en": "received repeated uplink message from gateway"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io",
       "file": "observability.go"
     }
   },

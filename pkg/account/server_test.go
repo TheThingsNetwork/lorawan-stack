@@ -59,12 +59,12 @@ type authorizeFormData struct {
 
 var (
 	mockSession = &ttnpb.UserSession{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserId: "user"},
-		SessionId:       "session_id",
-		CreatedAt:       time.Now().Truncate(time.Second),
+		UserIds:   &ttnpb.UserIdentifiers{UserId: "user"},
+		SessionId: "session_id",
+		CreatedAt: time.Now().Truncate(time.Second),
 	}
 	mockUser = &ttnpb.User{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserId: "user"},
+		Ids: &ttnpb.UserIdentifiers{UserId: "user"},
 	}
 )
 
@@ -293,7 +293,7 @@ func TestAuthentication(t *testing.T) {
 			Name: "token login",
 			StoreSetup: func(s *mockStore) {
 				s.res.loginToken = &ttnpb.LoginToken{
-					UserIdentifiers: mockUser.UserIdentifiers,
+					UserIds: mockUser.GetIds(),
 				}
 				s.res.session = mockSession
 			},
@@ -307,7 +307,7 @@ func TestAuthentication(t *testing.T) {
 				a.So(s.req.token, should.Equal, "this-is-the-token")
 
 				a.So(s.calls, should.Contain, "CreateSession")
-				a.So(s.req.session.UserIdentifiers, should.Resemble, mockUser.UserIdentifiers)
+				a.So(s.req.session.GetUserIds(), should.Resemble, mockUser.GetIds())
 			},
 		},
 	} {

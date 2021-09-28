@@ -13,19 +13,26 @@ func (dst *Client) SetFields(src *Client, paths ...string) error {
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ClientIdentifiers
-				if src != nil {
-					newSrc = &src.ClientIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.ClientIdentifiers
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &ClientIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ClientIdentifiers = src.ClientIdentifiers
+					dst.Ids = src.Ids
 				} else {
-					var zero ClientIdentifiers
-					dst.ClientIdentifiers = zero
+					dst.Ids = nil
 				}
 			}
 		case "created_at":
@@ -215,19 +222,26 @@ func (dst *GetClientRequest) SetFields(src *GetClientRequest, paths ...string) e
 		case "client_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ClientIdentifiers
-				if src != nil {
-					newSrc = &src.ClientIdentifiers
+				if (src == nil || src.ClientIds == nil) && dst.ClientIds == nil {
+					continue
 				}
-				newDst = &dst.ClientIdentifiers
+				if src != nil {
+					newSrc = src.ClientIds
+				}
+				if dst.ClientIds != nil {
+					newDst = dst.ClientIds
+				} else {
+					newDst = &ClientIdentifiers{}
+					dst.ClientIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ClientIdentifiers = src.ClientIdentifiers
+					dst.ClientIds = src.ClientIds
 				} else {
-					var zero ClientIdentifiers
-					dst.ClientIdentifiers = zero
+					dst.ClientIds = nil
 				}
 			}
 		case "field_mask":
@@ -356,10 +370,18 @@ func (dst *CreateClientRequest) SetFields(src *CreateClientRequest, paths ...str
 		case "collaborator":
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationOrUserIdentifiers
-				if src != nil {
-					newSrc = &src.Collaborator
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
 				}
-				newDst = &dst.Collaborator
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -367,8 +389,7 @@ func (dst *CreateClientRequest) SetFields(src *CreateClientRequest, paths ...str
 				if src != nil {
 					dst.Collaborator = src.Collaborator
 				} else {
-					var zero OrganizationOrUserIdentifiers
-					dst.Collaborator = zero
+					dst.Collaborator = nil
 				}
 			}
 
@@ -423,19 +444,26 @@ func (dst *ListClientCollaboratorsRequest) SetFields(src *ListClientCollaborator
 		case "client_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ClientIdentifiers
-				if src != nil {
-					newSrc = &src.ClientIdentifiers
+				if (src == nil || src.ClientIds == nil) && dst.ClientIds == nil {
+					continue
 				}
-				newDst = &dst.ClientIdentifiers
+				if src != nil {
+					newSrc = src.ClientIds
+				}
+				if dst.ClientIds != nil {
+					newDst = dst.ClientIds
+				} else {
+					newDst = &ClientIdentifiers{}
+					dst.ClientIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ClientIdentifiers = src.ClientIdentifiers
+					dst.ClientIds = src.ClientIds
 				} else {
-					var zero ClientIdentifiers
-					dst.ClientIdentifiers = zero
+					dst.ClientIds = nil
 				}
 			}
 		case "limit":
@@ -472,37 +500,51 @@ func (dst *GetClientCollaboratorRequest) SetFields(src *GetClientCollaboratorReq
 		case "client_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ClientIdentifiers
-				if src != nil {
-					newSrc = &src.ClientIdentifiers
+				if (src == nil || src.ClientIds == nil) && dst.ClientIds == nil {
+					continue
 				}
-				newDst = &dst.ClientIdentifiers
+				if src != nil {
+					newSrc = src.ClientIds
+				}
+				if dst.ClientIds != nil {
+					newDst = dst.ClientIds
+				} else {
+					newDst = &ClientIdentifiers{}
+					dst.ClientIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ClientIdentifiers = src.ClientIdentifiers
+					dst.ClientIds = src.ClientIds
 				} else {
-					var zero ClientIdentifiers
-					dst.ClientIdentifiers = zero
+					dst.ClientIds = nil
 				}
 			}
 		case "collaborator":
 			if len(subs) > 0 {
 				var newDst, newSrc *OrganizationOrUserIdentifiers
-				if src != nil {
-					newSrc = &src.OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
 				}
-				newDst = &dst.OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OrganizationOrUserIdentifiers = src.OrganizationOrUserIdentifiers
+					dst.Collaborator = src.Collaborator
 				} else {
-					var zero OrganizationOrUserIdentifiers
-					dst.OrganizationOrUserIdentifiers = zero
+					dst.Collaborator = nil
 				}
 			}
 
@@ -519,28 +561,43 @@ func (dst *SetClientCollaboratorRequest) SetFields(src *SetClientCollaboratorReq
 		case "client_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ClientIdentifiers
-				if src != nil {
-					newSrc = &src.ClientIdentifiers
+				if (src == nil || src.ClientIds == nil) && dst.ClientIds == nil {
+					continue
 				}
-				newDst = &dst.ClientIdentifiers
+				if src != nil {
+					newSrc = src.ClientIds
+				}
+				if dst.ClientIds != nil {
+					newDst = dst.ClientIds
+				} else {
+					newDst = &ClientIdentifiers{}
+					dst.ClientIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ClientIdentifiers = src.ClientIdentifiers
+					dst.ClientIds = src.ClientIds
 				} else {
-					var zero ClientIdentifiers
-					dst.ClientIdentifiers = zero
+					dst.ClientIds = nil
 				}
 			}
 		case "collaborator":
 			if len(subs) > 0 {
 				var newDst, newSrc *Collaborator
-				if src != nil {
-					newSrc = &src.Collaborator
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
 				}
-				newDst = &dst.Collaborator
+				if src != nil {
+					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &Collaborator{}
+					dst.Collaborator = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -548,8 +605,7 @@ func (dst *SetClientCollaboratorRequest) SetFields(src *SetClientCollaboratorReq
 				if src != nil {
 					dst.Collaborator = src.Collaborator
 				} else {
-					var zero Collaborator
-					dst.Collaborator = zero
+					dst.Collaborator = nil
 				}
 			}
 

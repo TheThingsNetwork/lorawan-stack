@@ -16,6 +16,7 @@ package workerpool
 
 import (
 	"context"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
@@ -33,6 +34,7 @@ type workPoolMetrics struct {
 	workQueueSize  *prometheus.GaugeVec
 	workProcessed  *metrics.ContextualCounterVec
 	workDropped    *metrics.ContextualCounterVec
+	workLatency    *prometheus.HistogramVec
 }
 
 func (m workPoolMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -42,6 +44,7 @@ func (m workPoolMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.workQueueSize.Describe(ch)
 	m.workProcessed.Describe(ch)
 	m.workDropped.Describe(ch)
+	m.workLatency.Describe(ch)
 }
 
 func (m workPoolMetrics) Collect(ch chan<- prometheus.Metric) {
@@ -51,6 +54,7 @@ func (m workPoolMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.workQueueSize.Collect(ch)
 	m.workProcessed.Collect(ch)
 	m.workDropped.Collect(ch)
+	m.workLatency.Collect(ch)
 }
 
 var poolMetrics = &workPoolMetrics{
@@ -102,6 +106,15 @@ var poolMetrics = &workPoolMetrics{
 		},
 		[]string{poolLabel},
 	),
+	workLatency: metrics.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Subsystem: subsystem,
+			Name:      "work_latency_seconds",
+			Help:      "Histogram of message processing latency (seconds)",
+			Buckets:   []float64{0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0},
+		},
+		[]string{poolLabel},
+	),
 }
 
 func init() {
@@ -140,4 +153,8 @@ func registerWorkProcessed(ctx context.Context, name string) {
 
 func registerWorkDropped(ctx context.Context, name string) {
 	poolMetrics.workDropped.WithLabelValues(ctx, name).Inc()
+}
+
+func registerWorkLatency(name string, start time.Time) {
+	poolMetrics.workLatency.WithLabelValues(name).Observe(time.Since(start).Seconds())
 }

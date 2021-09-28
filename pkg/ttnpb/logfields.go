@@ -85,7 +85,7 @@ func (req *CreateClientRequest) ExtractRequestFields(m map[string]interface{}) {
 		return
 	}
 	req.Client.ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator)
+	extractCollaboratorFields(m, req.GetCollaborator())
 }
 
 func (req *CreateGatewayRequest) ExtractRequestFields(m map[string]interface{}) {
@@ -101,22 +101,22 @@ func (req *CreateOrganizationRequest) ExtractRequestFields(m map[string]interfac
 		return
 	}
 	req.Organization.ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator)
+	extractCollaboratorFields(m, req.GetCollaborator())
 }
 
 func (req *SetApplicationCollaboratorRequest) ExtractRequestFields(m map[string]interface{}) {
 	if req == nil {
 		return
 	}
-	req.ApplicationIdentifiers.ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
+	req.ApplicationIds.ExtractRequestFields(m)
+	extractCollaboratorFields(m, &req.GetCollaborator().OrganizationOrUserIdentifiers)
 }
 
 func (req *SetClientCollaboratorRequest) ExtractRequestFields(m map[string]interface{}) {
 	if req == nil {
 		return
 	}
-	req.ClientIdentifiers.ExtractRequestFields(m)
+	req.GetClientIds().ExtractRequestFields(m)
 	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
 }
 
@@ -124,7 +124,7 @@ func (req *SetGatewayCollaboratorRequest) ExtractRequestFields(m map[string]inte
 	if req == nil {
 		return
 	}
-	req.GatewayIdentifiers.ExtractRequestFields(m)
+	req.GetGatewayIds().ExtractRequestFields(m)
 	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
 }
 
@@ -132,6 +132,6 @@ func (req *SetOrganizationCollaboratorRequest) ExtractRequestFields(m map[string
 	if req == nil {
 		return
 	}
-	req.OrganizationIdentifiers.ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
+	req.GetOrganizationIds().ExtractRequestFields(m)
+	extractCollaboratorFields(m, &req.GetCollaborator().OrganizationOrUserIdentifiers)
 }

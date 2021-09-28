@@ -25,11 +25,12 @@ import (
 )
 
 var (
-	errRefused      = errors.DefinePermissionDenied("refused", "refused by OAuth server", "reason")
-	errNoStateParam = errors.DefinePermissionDenied("no_state", "no state parameter present in request")
-	errNoCodeParam  = errors.DefinePermissionDenied("no_code", "no code parameter present in request")
-	errInvalidState = errors.DefinePermissionDenied("invalid_state", "invalid state parameter")
-	errExchange     = errors.DefinePermissionDenied("exchange", "token exchange refused")
+	errRefused       = errors.DefinePermissionDenied("refused", "refused by OAuth server", "reason")
+	errNoStateParam  = errors.DefinePermissionDenied("no_state_param", "no state parameter present in request")
+	errNoStateCookie = errors.DefinePermissionDenied("no_state_cookie", "no state cookie stored")
+	errNoCodeParam   = errors.DefinePermissionDenied("no_code", "no code parameter present in request")
+	errInvalidState  = errors.DefinePermissionDenied("invalid_state", "invalid state parameter")
+	errExchange      = errors.DefinePermissionDenied("exchange", "token exchange refused")
 )
 
 type oauthAuthorizeResponse struct {
@@ -64,13 +65,16 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 	}
 
 	stateCookie, err := oc.getStateCookie(c)
+	value, acErr := oc.getAuthCookie(c)
 	if err != nil {
 		// Running the callback without state cookie often occurs when re-running
 		// the callback after successful token exchange (e.g. using the browser's
 		// back button after logging in). If there is a valid auth cookie, we just
 		// redirect back to the client mount instead of showing an error.
-		value, err := oc.getAuthCookie(c)
-		if err == nil && value.AccessToken != "" {
+		if acErr != nil {
+			return errNoStateCookie.New()
+		}
+		if value.AccessToken != "" {
 			config := oc.configFromContext(c.Request().Context())
 			return c.Redirect(http.StatusFound, config.RootURL)
 		}

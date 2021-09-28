@@ -42,9 +42,9 @@ func TestUserStore(t *testing.T) {
 		a.So(list, should.BeEmpty)
 
 		created, err := store.CreateUser(ctx, &ttnpb.User{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserId: "foo"},
-			Name:            "Foo User",
-			Description:     "The Amazing Foo User",
+			Ids:         &ttnpb.UserIdentifiers{UserId: "foo"},
+			Name:        "Foo User",
+			Description: "The Amazing Foo User",
 			Attributes: map[string]string{
 				"foo": "bar",
 				"bar": "baz",
@@ -60,7 +60,7 @@ func TestUserStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(created, should.NotBeNil) {
-			a.So(created.UserId, should.Equal, "foo")
+			a.So(created.GetIds().UserId, should.Equal, "foo")
 			a.So(created.Name, should.Equal, "Foo User")
 			a.So(created.Description, should.Equal, "The Amazing Foo User")
 			a.So(created.Attributes, should.HaveLength, 3)
@@ -75,7 +75,7 @@ func TestUserStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.UserId, should.Equal, "foo")
+			a.So(got.GetIds().UserId, should.Equal, "foo")
 			a.So(got.Name, should.Equal, "Foo User")
 			a.So(got.Description, should.BeEmpty)
 			a.So(got.Attributes, should.HaveLength, 3)
@@ -84,7 +84,7 @@ func TestUserStore(t *testing.T) {
 		}
 
 		_, err = store.UpdateUser(ctx, &ttnpb.User{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserId: "bar"},
+			Ids: &ttnpb.UserIdentifiers{UserId: "bar"},
 		}, nil)
 
 		if a.So(err, should.NotBeNil) {
@@ -92,9 +92,9 @@ func TestUserStore(t *testing.T) {
 		}
 
 		updated, err := store.UpdateUser(ctx, &ttnpb.User{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserId: "foo"},
-			Name:            "Foobar User",
-			Description:     "The Amazing Foobar User",
+			Ids:         &ttnpb.UserIdentifiers{UserId: "foo"},
+			Name:        "Foobar User",
+			Description: "The Amazing Foobar User",
 			Attributes: map[string]string{
 				"foo": "bar",
 				"baz": "baz",
@@ -121,7 +121,7 @@ func TestUserStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.UserId, should.Equal, created.UserId)
+			a.So(got.GetIds().GetUserId(), should.Equal, created.GetIds().GetUserId())
 			a.So(got.Name, should.Equal, created.Name)
 			a.So(got.Description, should.Equal, updated.Description)
 			a.So(got.Attributes, should.Resemble, updated.Attributes)
@@ -191,9 +191,9 @@ func TestUserStore(t *testing.T) {
 
 		// Check that user ids are released
 		_, err = store.CreateUser(ctx, &ttnpb.User{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserId: "foo"},
-			Name:            "Foo User",
-			Description:     "The Amazing Foo User",
+			Ids:         &ttnpb.UserIdentifiers{UserId: "foo"},
+			Name:        "Foo User",
+			Description: "The Amazing Foo User",
 			Attributes: map[string]string{
 				"foo": "bar",
 				"bar": "baz",

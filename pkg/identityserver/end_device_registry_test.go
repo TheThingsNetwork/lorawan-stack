@@ -123,9 +123,9 @@ func TestEndDevicesCRUD(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewEndDeviceRegistryClient(cc)
 
-		userID := defaultUser.UserIdentifiers
+		userID := defaultUser.GetIds()
 		creds := userCreds(defaultUserIdx)
-		app := userApplications(&userID).Applications[0]
+		app := userApplications(userID).Applications[0]
 
 		joinEUI := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 		devEUI := types.EUI64{8, 7, 6, 5, 4, 3, 2, 1}
@@ -136,7 +136,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-device-id",
-					ApplicationIdentifiers: app.ApplicationIdentifiers,
+					ApplicationIdentifiers: *app.GetIds(),
 					JoinEui:                &joinEUI,
 					DevEui:                 &devEUI,
 				},
@@ -155,7 +155,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceId:               "test-device-id",
-				ApplicationIdentifiers: app.ApplicationIdentifiers,
+				ApplicationIdentifiers: *app.GetIds(),
 			},
 		}, creds)
 
@@ -178,7 +178,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "other-test-device-id",
-					ApplicationIdentifiers: app.ApplicationIdentifiers,
+					ApplicationIdentifiers: *app.GetIds(),
 					JoinEui:                &joinEUI,
 					DevEui:                 &devEUI,
 				},
@@ -192,7 +192,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{
 			FieldMask:              &pbtypes.FieldMask{Paths: []string{"name"}},
-			ApplicationIdentifiers: app.ApplicationIdentifiers,
+			ApplicationIdentifiers: *app.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -209,7 +209,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-device-id",
-					ApplicationIdentifiers: app.ApplicationIdentifiers,
+					ApplicationIdentifiers: *app.GetIds(),
 				},
 				Name: "test-device-name-new",
 			},
@@ -223,7 +223,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		_, err = reg.Delete(ctx, &ttnpb.EndDeviceIdentifiers{
 			DeviceId:               "test-device-id",
-			ApplicationIdentifiers: app.ApplicationIdentifiers,
+			ApplicationIdentifiers: *app.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -232,7 +232,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceId:               "test-device-id",
-				ApplicationIdentifiers: app.ApplicationIdentifiers,
+				ApplicationIdentifiers: *app.GetIds(),
 			},
 		}, creds)
 

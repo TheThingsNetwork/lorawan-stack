@@ -20,7 +20,6 @@ import (
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -66,12 +65,16 @@ func TestIdentifiersIsZero(t *testing.T) {
 func TestOrganizationOrUserIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
-	usrID := NewPopulatedUserIdentifiers(test.Randy, true)
+	usrID := UserIdentifiers{
+		UserId: "foo-user",
+	}
 	ouID := usrID.OrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
 	a.So(ouID.GetUserIds(), should.Resemble, usrID)
 
-	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
+	orgID := OrganizationIdentifiers{
+		OrganizationId: "foo-org",
+	}
 	ouID = orgID.OrganizationOrUserIdentifiers()
 	a.So(ouID, should.NotBeNil)
 	a.So(ouID.GetOrganizationIds(), should.Resemble, orgID)
@@ -80,27 +83,37 @@ func TestOrganizationOrUserIdentifiers(t *testing.T) {
 func TestEntityIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
-	appID := NewPopulatedApplicationIdentifiers(test.Randy, true)
+	appID := ApplicationIdentifiers{
+		ApplicationId: "foo-app",
+	}
 	eID := appID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetApplicationIds(), should.Resemble, appID)
 
-	cliID := NewPopulatedClientIdentifiers(test.Randy, true)
+	cliID := ClientIdentifiers{
+		ClientId: "foo-client",
+	}
 	eID = cliID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetClientIds(), should.Resemble, cliID)
 
-	devID := NewPopulatedEndDeviceIdentifiers(test.Randy, true)
+	devID := EndDeviceIdentifiers{
+		DeviceId: "foo-device",
+	}
 	eID = devID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetDeviceIds(), should.Resemble, devID)
 
-	gtwID := NewPopulatedGatewayIdentifiers(test.Randy, true)
+	gtwID := GatewayIdentifiers{
+		GatewayId: "foo-gateway",
+	}
 	eID = gtwID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetGatewayIds(), should.Resemble, gtwID)
 
-	orgID := NewPopulatedOrganizationIdentifiers(test.Randy, true)
+	orgID := OrganizationIdentifiers{
+		OrganizationId: "foo-org",
+	}
 	eID = orgID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetOrganizationIds(), should.Resemble, orgID)
@@ -110,7 +123,9 @@ func TestEntityIdentifiers(t *testing.T) {
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetOrganizationIds(), should.Resemble, orgID)
 
-	usrID := NewPopulatedUserIdentifiers(test.Randy, true)
+	usrID := UserIdentifiers{
+		UserId: "foo-user",
+	}
 	eID = usrID.GetEntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.GetUserIds(), should.Resemble, usrID)

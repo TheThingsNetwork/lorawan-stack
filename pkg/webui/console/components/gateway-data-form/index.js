@@ -45,13 +45,12 @@ class GatewayDataForm extends React.Component {
     /** The SubmitBar content. */
     children: PropTypes.node.isRequired,
     error: PropTypes.error,
+    gsEnabled: PropTypes.bool.isRequired,
     initialValues: PropTypes.gateway,
     onSubmit: PropTypes.func.isRequired,
-    update: PropTypes.bool,
   }
 
   static defaultProps = {
-    update: false,
     error: '',
     initialValues: validationSchema.cast({}),
   }
@@ -61,8 +60,7 @@ class GatewayDataForm extends React.Component {
 
     this.state = {
       shouldDisplayWarning: this.isNotValidDuration(props.initialValues.schedule_anytime_delay),
-      showFrequencyPlanWarning:
-        isEmptyFrequencyPlan(props.initialValues.frequency_plan_id) && props.update,
+      showFrequencyPlanWarning: isEmptyFrequencyPlan(props.initialValues.frequency_plan_id),
     }
   }
 
@@ -119,7 +117,7 @@ class GatewayDataForm extends React.Component {
   }
 
   render() {
-    const { update, error, initialValues, children } = this.props
+    const { error, initialValues, children, gsEnabled } = this.props
     const { shouldDisplayWarning, showFrequencyPlanWarning } = this.state
 
     return (
@@ -128,15 +126,15 @@ class GatewayDataForm extends React.Component {
         onSubmit={this.onSubmit}
         initialValues={initialValues}
         validationSchema={validationSchema}
+        validationContext={{ gsEnabled }}
       >
         <Form.SubTitle title={sharedMessages.generalSettings} />
-        {!update && <OwnersSelect name="owner_id" required autoFocus />}
+        <OwnersSelect name="owner_id" required autoFocus />
         <Form.Field
           title={sharedMessages.gatewayID}
           name="ids.gateway_id"
           placeholder={sharedMessages.gatewayIdPlaceholder}
           required
-          disabled={update}
           component={Input}
           tooltipId={tooltipIds.GATEWAY_ID}
         />
@@ -208,14 +206,16 @@ class GatewayDataForm extends React.Component {
           tooltipId={tooltipIds.GATEWAY_ATTRIBUTES}
         />
         <Message component="h4" content={sharedMessages.lorawanOptions} />
-        <GsFrequencyPlansSelect
-          name="frequency_plan_id"
-          menuPlacement="top"
-          onChange={this.handleFrequencyPlanChange}
-          tooltipId={tooltipIds.FREQUENCY_PLAN}
-          warning={showFrequencyPlanWarning ? sharedMessages.frequencyPlanWarning : undefined}
-          required
-        />
+        {gsEnabled && (
+          <GsFrequencyPlansSelect
+            name="frequency_plan_id"
+            menuPlacement="top"
+            onChange={this.handleFrequencyPlanChange}
+            tooltipId={tooltipIds.FREQUENCY_PLAN}
+            warning={showFrequencyPlanWarning ? sharedMessages.frequencyPlanWarning : undefined}
+            required
+          />
+        )}
         <Form.Field
           title={sharedMessages.gatewayScheduleDownlinkLate}
           name="schedule_downlink_late"

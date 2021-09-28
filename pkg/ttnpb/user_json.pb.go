@@ -19,11 +19,11 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
 		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.UserIdentifiers)
+		gogo.MarshalMessage(s, x.Ids)
 	}
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
@@ -171,7 +171,7 @@ func (x *User) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v UserIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.UserIdentifiers = v
+			x.Ids = &v
 		case "created_at", "createdAt":
 			s.AddField("created_at")
 			v := s.ReadTime()
@@ -425,11 +425,11 @@ func (x *CreateUserAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.UserIds != nil || s.HasField("user_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("user_ids")
 		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.UserIdentifiers)
+		gogo.MarshalMessage(s, x.UserIds)
 	}
 	if x.Name != "" || s.HasField("name") {
 		s.WriteMoreIf(&wroteField)
@@ -473,7 +473,7 @@ func (x *CreateUserAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v UserIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.UserIdentifiers = v
+			x.UserIds = &v
 		case "name":
 			s.AddField("name")
 			x.Name = s.ReadString()
@@ -503,11 +503,11 @@ func (x *UpdateUserAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.UserIds != nil || s.HasField("user_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("user_ids")
 		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.UserIdentifiers)
+		gogo.MarshalMessage(s, x.UserIds)
 	}
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
@@ -540,7 +540,7 @@ func (x *UpdateUserAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v UserIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.UserIdentifiers = v
+			x.UserIds = &v
 		case "api_key", "apiKey":
 			if !s.ReadNil() {
 				x.APIKey.UnmarshalProtoJSON(s.WithField("api_key", true))

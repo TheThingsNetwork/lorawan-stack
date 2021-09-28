@@ -59,7 +59,7 @@ func Decrypt(key types.AES128Key, encrypted []byte) ([]byte, error) {
 		return nil, err
 	}
 	if len(encrypted) < gcm.NonceSize() {
-		return nil, errMalformedCipherText
+		return nil, errMalformedCipherText.New()
 	}
 	return gcm.Open(nil,
 		encrypted[:gcm.NonceSize()],

@@ -71,7 +71,7 @@ const abortAuthorization = defineSmokeTest(
     // Check Console error.
     cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/oauth/callback`)
     cy.findByTestId('full-error-view').should('exist')
-    cy.findByText('Forbidden').should('be.visible')
+    cy.findByText(/Login failed/).should('be.visible')
   },
 )
 

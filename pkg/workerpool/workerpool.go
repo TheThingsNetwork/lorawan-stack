@@ -16,6 +16,7 @@ package workerpool
 
 import (
 	"context"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -43,26 +44,16 @@ type Component interface {
 // Handler is a function that processes items published to the worker pool.
 type Handler func(ctx context.Context, item interface{})
 
-// HandlerFactory is a function that creates a Handler.
-type HandlerFactory func() (Handler, error)
-
-// StaticHandlerFactory creates a HandlerFactory that always returns the same handler.
-func StaticHandlerFactory(f Handler) HandlerFactory {
-	return func() (Handler, error) {
-		return f, nil
-	}
-}
-
 // Config is the configuration of the worker pool.
 type Config struct {
 	Component
-	context.Context                  // The base context of the pool.
-	Name              string         // The name of the pool.
-	CreateHandler     HandlerFactory // The function that creates handlers.
-	MinWorkers        int            // The minimum number of workers in the pool.
-	MaxWorkers        int            // The maximum number of workers in the pool.
-	QueueSize         int            // The size of the work queue.
-	WorkerIdleTimeout time.Duration  // The maximum amount of time a worker will stay idle before closing.
+	context.Context                 // The base context of the pool.
+	Name              string        // The name of the pool.
+	Handler           Handler       // The work handler.
+	MinWorkers        int           // The minimum number of workers in the pool. Use -1 to disable.
+	MaxWorkers        int           // The maximum number of workers in the pool.
+	QueueSize         int           // The size of the work queue. Use -1 to disable.
+	WorkerIdleTimeout time.Duration // The maximum amount of time a worker will stay idle before closing.
 }
 
 // WorkerPool is a dynamic pool of workers to which work items can be published.
@@ -72,6 +63,9 @@ type WorkerPool interface {
 	// Publish may spawn a worker in order to fullfil the work load.
 	// Publish does not block.
 	Publish(ctx context.Context, item interface{}) error
+
+	// Wait blocks until all workers have been closed.
+	Wait()
 }
 
 type contextualItem struct {
@@ -86,31 +80,45 @@ type workerPool struct {
 	fastQueue chan *contextualItem // fastQueue allows direct communication between publishers and idle workers.
 
 	workers int32
+	wg      sync.WaitGroup
 }
 
-func (wp *workerPool) handle(ctx context.Context, it *contextualItem, handler Handler) {
+func (wp *workerPool) handle(it *contextualItem) {
 	registerWorkerBusy(wp.Name)
 	defer registerWorkerIdle(wp.Name)
 	defer registerWorkProcessed(it.ctx, wp.Name)
-	handler(it.ctx, it.item)
+	defer registerWorkLatency(wp.Name, time.Now())
+	wp.Handler(it.ctx, it.item)
 }
 
-func (wp *workerPool) workerBody(handler Handler, initialWork *contextualItem) func(context.Context) error {
+func (wp *workerPool) workerBody(initialWork *contextualItem) func(context.Context) error {
 	worker := func(ctx context.Context) error {
-		var decremented bool
+		var timeout bool
 		defer func() {
-			if !decremented {
-				atomic.AddInt32(&wp.workers, -1)
+			if timeout {
+				return
+			}
+			atomic.AddInt32(&wp.workers, -1)
+			select {
+			case <-ctx.Done():
+			case <-wp.Done():
+			default:
+				// Since the task did not finish due to a context cancellation
+				// or a timeout, the worker body must have panicked. As such
+				// we attempt to spawn a replacement worker in order to avoid
+				// stalling the queue indefinitely.
+				wp.spawnWorker(nil)
 			}
 		}()
 
+		defer wp.wg.Done()
 		defer registerWorkerStopped(wp.Name)
 
 		registerWorkerIdle(wp.Name)
 		defer registerWorkerBusy(wp.Name)
 
 		if initialWork != nil {
-			wp.handle(ctx, initialWork, handler)
+			wp.handle(initialWork)
 		}
 
 		for {
@@ -123,16 +131,16 @@ func (wp *workerPool) workerBody(handler Handler, initialWork *contextualItem) f
 
 			case <-time.After(wp.WorkerIdleTimeout):
 				if decrementIfGreaterThan(&wp.workers, int32(wp.MinWorkers)) {
-					decremented = true
+					timeout = true
 					return nil
 				}
 
 			case item := <-wp.fastQueue:
-				wp.handle(ctx, item, handler)
+				wp.handle(item)
 
 			case item := <-wp.mainQueue:
 				registerWorkDequeued(wp.Name)
-				wp.handle(ctx, item, handler)
+				wp.handle(item)
 			}
 		}
 	}
@@ -140,27 +148,23 @@ func (wp *workerPool) workerBody(handler Handler, initialWork *contextualItem) f
 }
 
 // spawnWorker spawns a worker task, if a worker slot is available.
-func (wp *workerPool) spawnWorker(initialWork *contextualItem) (bool, error) {
-	handler, err := wp.CreateHandler()
-	if err != nil {
-		return false, err
-	}
-
+func (wp *workerPool) spawnWorker(initialWork *contextualItem) bool {
 	if !incrementIfSmallerThan(&wp.workers, int32(wp.MaxWorkers)) {
-		return false, nil
+		return false
 	}
 
 	registerWorkerStarted(wp.Name)
+	wp.wg.Add(1)
 
 	wp.StartTask(&component.TaskConfig{
 		Context: wp.Context,
 		ID:      wp.Name,
-		Func:    wp.workerBody(handler, initialWork),
+		Func:    wp.workerBody(initialWork),
 		Restart: component.TaskRestartNever,
 		Backoff: component.DefaultTaskBackoffConfig,
 	})
 
-	return true, nil
+	return true
 }
 
 var errPoolFull = errors.DefineResourceExhausted("pool_full", "the worker pool is full")
@@ -207,12 +211,8 @@ func (wp *workerPool) enqueueSpawn(ctx context.Context, it *contextualItem) erro
 	default:
 	}
 
-	spawned, err := wp.spawnWorker(it)
-	// err == nil if spawned || it == nil
-	// which is fine as the work is either picked up by the new worker
-	// or was already placed in the queue.
-	if err != nil || spawned || it == nil {
-		return err
+	if spawned := wp.spawnWorker(it); spawned || it == nil {
+		return nil
 	}
 
 	registerWorkDropped(it.ctx, wp.Name)
@@ -227,19 +227,34 @@ func (wp *workerPool) Publish(ctx context.Context, item interface{}) error {
 	})
 }
 
+// Wait implements WorkerPool.
+func (wp *workerPool) Wait() {
+	wp.wg.Wait()
+}
+
 // NewWorkerPool creates a new WorkerPool with the provided configuration.
-func NewWorkerPool(cfg Config) (WorkerPool, error) {
+func NewWorkerPool(cfg Config) WorkerPool {
 	if cfg.WorkerIdleTimeout == 0 {
 		cfg.WorkerIdleTimeout = defaultWorkerIdleTimeout
 	}
-	if cfg.MinWorkers <= 0 {
+	// We treat 0 as being default initialized, and use the defaults.
+	if cfg.MinWorkers == 0 {
 		cfg.MinWorkers = defaultMinWorkers
+	}
+	// We treat negative values as explicitly disabling the minimum number of workers.
+	if cfg.MinWorkers < 0 {
+		cfg.MinWorkers = 0
 	}
 	if cfg.MaxWorkers <= 0 {
 		cfg.MaxWorkers = defaultMaxWorkers
 	}
-	if cfg.QueueSize <= 0 {
+	// We treat 0 as being default initialized, and use the defaults.
+	if cfg.QueueSize == 0 {
 		cfg.QueueSize = defaultQueueSize
+	}
+	// We treat negative values as explicitly disabling the queue.
+	if cfg.QueueSize < 0 {
+		cfg.QueueSize = 0
 	}
 	if cfg.MinWorkers > cfg.MaxWorkers {
 		cfg.MaxWorkers = cfg.MinWorkers
@@ -253,12 +268,10 @@ func NewWorkerPool(cfg Config) (WorkerPool, error) {
 	}
 
 	for i := 0; i < wp.MinWorkers; i++ {
-		if _, err := wp.spawnWorker(nil); err != nil {
-			return nil, err
-		}
+		wp.spawnWorker(nil)
 	}
 
-	return wp, nil
+	return wp
 }
 
 func incrementIfSmallerThan(i *int32, max int32) bool {

@@ -233,7 +233,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			res.AccessMethod = &ttnpb.AuthInfoResponse_UserSession{
 				UserSession: session,
 			}
-			user, err = store.GetUserStore(db).GetUser(ctx, &session.UserIdentifiers, userFieldMask)
+			user, err = store.GetUserStore(db).GetUser(ctx, session.GetUserIds(), userFieldMask)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)
@@ -257,7 +257,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	}
 
 	if user != nil {
-		rpclog.AddField(ctx, "auth.user_id", user.UserIdentifiers.UserId)
+		rpclog.AddField(ctx, "auth.user_id", user.GetIds().GetUserId())
 
 		if is.configFromContext(ctx).UserRegistration.ContactInfoValidation.Required && user.PrimaryEmailAddressValidatedAt == nil {
 			// Go to profile page, edit basic settings (such as email), delete account.

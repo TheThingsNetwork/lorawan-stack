@@ -99,12 +99,11 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 			}
 
 			var uidStreamID string
-			switch pld := up.Up.(type) {
+			switch up.Up.(type) {
 			case *ttnpb.ApplicationUp_JoinAccept:
 				uidStreamID = q.uidJoinAcceptKey(uid)
 			case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 				uidStreamID = q.uidInvalidationKey(uid)
-				p.Set(ctx, uidLastInvalidationKey(q.redis, unique.ID(ctx, up.EndDeviceIdentifiers)), pld.DownlinkQueueInvalidated.LastFCntDown, 0)
 			default:
 				uidStreamID = q.uidGenericUplinkKey(uid)
 			}
@@ -179,7 +178,6 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, consumerID string, f f
 		}
 
 		t, err := f(ctx, appID, func(limit int, g func(...*ttnpb.ApplicationUp) error) error {
-			var invalidationFCnts map[string]uint64
 			ups := make([]*ttnpb.ApplicationUp, 0, limit)
 
 			processMessages := func(stream string, msgs ...redis.XMessage) error {
@@ -197,25 +195,7 @@ func (q *ApplicationUplinkQueue) Pop(ctx context.Context, consumerID string, f f
 					if err = ttnredis.UnmarshalProto(s, up); err != nil {
 						return err
 					}
-					var skip bool
-					if stream == invalidationUpStream {
-						devUID := unique.ID(ctx, up.EndDeviceIdentifiers)
-						lastFCnt, ok := invalidationFCnts[devUID]
-						if !ok {
-							lastFCnt, err = q.redis.Get(ctx, uidLastInvalidationKey(q.redis, devUID)).Uint64()
-							if err != nil {
-								return ttnredis.ConvertError(err)
-							}
-							if invalidationFCnts == nil {
-								invalidationFCnts = make(map[string]uint64, len(msgs))
-							}
-							invalidationFCnts[devUID] = lastFCnt
-						}
-						skip = uint64(up.GetDownlinkQueueInvalidated().GetLastFCntDown()) < lastFCnt
-					}
-					if !skip {
-						ups = append(ups, up)
-					}
+					ups = append(ups, up)
 				}
 				return g(ups...)
 			}

@@ -19,11 +19,11 @@ func (x *Application) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
 		// NOTE: ApplicationIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.ApplicationIdentifiers)
+		gogo.MarshalMessage(s, x.Ids)
 	}
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
@@ -99,7 +99,7 @@ func (x *Application) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: ApplicationIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v ApplicationIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.ApplicationIdentifiers = v
+			x.Ids = &v
 		case "created_at", "createdAt":
 			s.AddField("created_at")
 			v := s.ReadTime()
@@ -305,11 +305,11 @@ func (x *CreateApplicationAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalS
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.ApplicationIds != nil || s.HasField("application_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("application_ids")
 		// NOTE: ApplicationIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.ApplicationIdentifiers)
+		gogo.MarshalMessage(s, x.ApplicationIds)
 	}
 	if x.Name != "" || s.HasField("name") {
 		s.WriteMoreIf(&wroteField)
@@ -353,7 +353,7 @@ func (x *CreateApplicationAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.Unmars
 			// NOTE: ApplicationIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v ApplicationIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.ApplicationIdentifiers = v
+			x.ApplicationIds = &v
 		case "name":
 			s.AddField("name")
 			x.Name = s.ReadString()
@@ -383,11 +383,11 @@ func (x *UpdateApplicationAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalS
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.ApplicationIds != nil || s.HasField("application_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("application_ids")
 		// NOTE: ApplicationIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.ApplicationIdentifiers)
+		gogo.MarshalMessage(s, x.ApplicationIds)
 	}
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
@@ -420,7 +420,7 @@ func (x *UpdateApplicationAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.Unmars
 			// NOTE: ApplicationIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v ApplicationIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.ApplicationIdentifiers = v
+			x.ApplicationIds = &v
 		case "api_key", "apiKey":
 			if !s.ReadNil() {
 				x.APIKey.UnmarshalProtoJSON(s.WithField("api_key", true))
@@ -444,13 +444,13 @@ func (x *SetApplicationCollaboratorRequest) MarshalProtoJSON(s *jsonplugin.Marsh
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.ApplicationIds != nil || s.HasField("application_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("application_ids")
 		// NOTE: ApplicationIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.ApplicationIdentifiers)
+		gogo.MarshalMessage(s, x.ApplicationIds)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Collaborator != nil || s.HasField("collaborator") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("collaborator")
 		x.Collaborator.MarshalProtoJSON(s.WithField("collaborator"))
@@ -472,9 +472,10 @@ func (x *SetApplicationCollaboratorRequest) UnmarshalProtoJSON(s *jsonplugin.Unm
 			// NOTE: ApplicationIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v ApplicationIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.ApplicationIdentifiers = v
+			x.ApplicationIds = &v
 		case "collaborator":
 			if !s.ReadNil() {
+				x.Collaborator = &Collaborator{}
 				x.Collaborator.UnmarshalProtoJSON(s.WithField("collaborator", true))
 			}
 		}

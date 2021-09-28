@@ -32,7 +32,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -59,7 +59,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -68,7 +68,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOrganizationAccessClient(is).ListCollaborators(ctx, &ttnpb.ListOrganizationCollaboratorsRequest{
-				OrganizationIdentifiers: *orgID, Limit: limit, Page: page,
+				OrganizationIds: orgID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
@@ -85,11 +85,11 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), nil)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
-				return errNoCollaborator
+				return errNoCollaborator.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -97,8 +97,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewOrganizationAccessClient(is).GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
-				OrganizationIdentifiers:       *orgID,
-				OrganizationOrUserIdentifiers: *collaborator,
+				OrganizationIds: orgID,
+				Collaborator:    collaborator,
 			})
 			if err != nil {
 				return err
@@ -114,15 +114,15 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), nil)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 			collaborator := getUserID(cmd.Flags(), nil).GetOrganizationOrUserIdentifiers()
 			if collaborator == nil {
-				return errNoCollaborator
+				return errNoCollaborator.New()
 			}
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				return errNoCollaboratorRights
+				return errNoCollaboratorRights.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -130,8 +130,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewOrganizationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
-				OrganizationIdentifiers: *orgID,
-				Collaborator: ttnpb.Collaborator{
+				OrganizationIds: orgID,
+				Collaborator: &ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        rights,
 				},
@@ -150,11 +150,11 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), nil)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 			collaborator := getUserID(cmd.Flags(), nil).GetOrganizationOrUserIdentifiers()
 			if collaborator == nil {
-				return errNoCollaborator
+				return errNoCollaborator.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -162,8 +162,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewOrganizationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
-				OrganizationIdentifiers: *orgID,
-				Collaborator: ttnpb.Collaborator{
+				OrganizationIds: orgID,
+				Collaborator: &ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        nil,
 				},
@@ -187,7 +187,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -196,7 +196,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOrganizationAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
-				OrganizationIdentifiers: *orgID, Limit: limit, Page: page,
+				OrganizationIds: orgID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
@@ -213,11 +213,11 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), firstArgs(1, args...))
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 			id := getAPIKeyID(cmd.Flags(), args, 1)
 			if id == "" {
-				return errNoAPIKeyID
+				return errNoAPIKeyID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -225,8 +225,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewOrganizationAccessClient(is).GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
-				OrganizationIdentifiers: *orgID,
-				KeyId:                   id,
+				OrganizationIds: orgID,
+				KeyId:           id,
 			})
 			if err != nil {
 				return err
@@ -242,13 +242,13 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 			name, _ := cmd.Flags().GetString("name")
 
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				return errNoAPIKeyRights
+				return errNoAPIKeyRights.New()
 			}
 
 			expiryDate, err := getAPIKeyExpiry(cmd.Flags())
@@ -261,10 +261,10 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewOrganizationAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
-				OrganizationIdentifiers: *orgID,
-				Name:                    name,
-				Rights:                  rights,
-				ExpiresAt:               expiryDate,
+				OrganizationIds: orgID,
+				Name:            name,
+				Rights:          rights,
+				ExpiresAt:       expiryDate,
 			})
 			if err != nil {
 				return err
@@ -285,11 +285,11 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), firstArgs(1, args...))
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 			id := getAPIKeyID(cmd.Flags(), args, 1)
 			if id == "" {
-				return errNoAPIKeyID
+				return errNoAPIKeyID.New()
 			}
 			name, _ := cmd.Flags().GetString("name")
 
@@ -307,7 +307,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewOrganizationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
-				OrganizationIdentifiers: *orgID,
+				OrganizationIds: orgID,
 				APIKey: ttnpb.APIKey{
 					Id:        id,
 					Name:      name,
@@ -330,11 +330,11 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), firstArgs(1, args...))
 			if orgID == nil {
-				return errNoOrganizationID
+				return errNoOrganizationID.New()
 			}
 			id := getAPIKeyID(cmd.Flags(), args, 1)
 			if id == "" {
-				return errNoAPIKeyID
+				return errNoAPIKeyID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -342,7 +342,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewOrganizationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
-				OrganizationIdentifiers: *orgID,
+				OrganizationIds: orgID,
 				APIKey: ttnpb.APIKey{
 					Id:     id,
 					Rights: nil,

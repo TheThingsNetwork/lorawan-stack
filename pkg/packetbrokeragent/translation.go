@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -338,7 +339,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 	}
 
 	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-	phy, err := band.GetByID(msg.BandId)
+	phy, err := band.GetLatest(msg.BandId)
 	if err != nil {
 		return nil, errUnknownBand.WithAttributes("band_id", msg.BandId)
 	}
@@ -425,6 +426,16 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 					gatewayReceiveTime = &t
 				}
 			}
+
+			if md.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
+				continue
+			}
+
+			if len(md.UplinkToken) == 0 {
+				log.FromContext(ctx).WithField("downlink_path_constraint", md.DownlinkPathConstraint).Error("Empty uplink token with favorable downlink path constraint")
+				continue
+			}
+
 			if len(gatewayUplinkToken) == 0 {
 				var err error
 				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, md.GatewayIdentifiers, md.UplinkToken, config.TokenEncrypter)
@@ -482,7 +493,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 	if !ok {
 		return nil, errUnknownRegion.WithAttributes("region", msg.Message.GatewayRegion)
 	}
-	phy, err := band.GetByID(bandID)
+	phy, err := band.GetLatest(bandID)
 	if err != nil {
 		return nil, errUnknownBand.WithAttributes("band_id", bandID)
 	}
@@ -693,13 +704,9 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 	if err != nil {
 		return nil, nil, errFrequencyPlanNotConfigured.WithAttributes("id", req.FrequencyPlanId)
 	}
-	phy, err := band.GetByID(fp.BandID)
+	phy, err := band.Get(fp.BandID, req.LorawanPhyVersion)
 	if err != nil {
 		return nil, nil, errUnknownBand.WithAttributes("band_id", fp.BandID)
-	}
-	phy, err = phy.Version(req.LorawanPhyVersion)
-	if err != nil {
-		return nil, nil, err
 	}
 
 	down := &packetbroker.DownlinkMessage{
@@ -801,7 +808,7 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 		if bandID, ok = fromPBRegion[msg.Region]; !ok {
 			return "", nil, errUnknownRegion.WithAttributes("region", msg.Region)
 		}
-		p, err := band.GetByID(bandID)
+		p, err := band.GetLatest(bandID)
 		if err != nil {
 			return "", nil, errUnknownRegion.WithCause(err).WithAttributes("region", msg.Region)
 		}
@@ -819,7 +826,7 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 		req.LorawanPhyVersion = phyVersion
 		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
 		if phy != nil {
-			p, err := phy.Version(phyVersion)
+			p, err := band.Get(phy.ID, phyVersion)
 			if err != nil {
 				return "", nil, err
 			}
@@ -1007,13 +1014,29 @@ func toPBDownlinkRoutingPolicy(policy *ttnpb.PacketBrokerRoutingPolicyDownlink) 
 	}
 }
 
+func fromPBDefaultGatewayVisibility(visibility *packetbroker.GatewayVisibility) *ttnpb.PacketBrokerDefaultGatewayVisibility {
+	return &ttnpb.PacketBrokerDefaultGatewayVisibility{
+		UpdatedAt: visibility.GetUpdatedAt(),
+		Visibility: &ttnpb.PacketBrokerGatewayVisibility{
+			Location:         visibility.GetLocation(),
+			AntennaPlacement: visibility.GetAntennaPlacement(),
+			AntennaCount:     visibility.GetAntennaCount(),
+			FineTimestamps:   visibility.GetFineTimestamps(),
+			ContactInfo:      visibility.GetContactInfo(),
+			Status:           visibility.GetStatus(),
+			FrequencyPlan:    visibility.GetFrequencyPlan(),
+			PacketRates:      visibility.GetPacketRates(),
+		},
+	}
+}
+
 var errInconsistentBands = errors.DefineInvalidArgument("inconsistent_bands", "inconsistent bands")
 
 func toPBFrequencyPlan(fps ...*frequencyplans.FrequencyPlan) (*packetbroker.GatewayFrequencyPlan, error) {
 	if len(fps) == 0 {
 		return nil, nil
 	}
-	phy, err := band.GetByID(fps[0].BandID)
+	phy, err := band.GetLatest(fps[0].BandID)
 	if err != nil {
 		return nil, err
 	}

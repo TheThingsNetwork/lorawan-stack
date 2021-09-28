@@ -81,8 +81,8 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 	gtw, ok := s.gateways[unique.ID(ctx, ids)]
 	if !ok {
 		gtw = &ttnpb.Gateway{
-			GatewayIdentifiers: ids,
-			FrequencyPlanId:    test.EUFrequencyPlanID,
+			Ids:             &ids,
+			FrequencyPlanId: test.EUFrequencyPlanID,
 		}
 	}
 	conn, err := io.NewConnection(ctx, frontend, gtw, s.FrequencyPlans, true, nil)
@@ -129,6 +129,11 @@ func (s *server) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentif
 func (s *server) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
 	s.downlinkClaims.Delete(unique.ID(ctx, ids))
 	return nil
+}
+
+// StartTask implements io.Server.
+func (s *server) StartTask(cfg *component.TaskConfig) {
+	component.DefaultStartTask(cfg)
 }
 
 func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifiers) bool {

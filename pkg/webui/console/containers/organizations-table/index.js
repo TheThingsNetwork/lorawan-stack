@@ -42,7 +42,6 @@ import {
   selectOrganizations,
   selectOrganizationsTotalCount,
   selectOrganizationsFetching,
-  selectOrganizationsError,
 } from '@console/store/selectors/organizations'
 
 const m = defineMessages({
@@ -175,7 +174,6 @@ const OrganizationsTable = props => {
       organizations: selectOrganizations(state),
       totalCount: selectOrganizationsTotalCount(state),
       fetching: selectOrganizationsFetching(state),
-      error: selectOrganizationsError(state),
       mayAdd: checkFromState(mayCreateOrganizations, state),
     }),
     [],

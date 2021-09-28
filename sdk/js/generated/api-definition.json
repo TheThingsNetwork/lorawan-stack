@@ -4684,6 +4684,43 @@
         }
       ]
     },
+    "GetHomeNetworkDefaultGatewayVisibility": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/pba/home-networks/gateway-visibilities/default",
+          "parameters": []
+        }
+      ]
+    },
+    "SetHomeNetworkDefaultGatewayVisibility": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/pba/home-networks/gateway-visibilities/default",
+          "body": "*",
+          "parameters": []
+        },
+        {
+          "method": "post",
+          "pattern": "/pba/home-networks/gateway-visibilities/default",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    },
+    "DeleteHomeNetworkDefaultGatewayVisibility": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/pba/home-networks/gateway-visibilities/default",
+          "parameters": []
+        }
+      ]
+    },
     "ListNetworks": {
       "file": "lorawan-stack/api/packetbrokeragent.proto",
       "http": [

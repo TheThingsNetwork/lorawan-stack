@@ -35,7 +35,6 @@ import {
   selectUsers,
   selectUsersTotalCount,
   selectUsersFetching,
-  selectUsersError,
 } from '@console/store/selectors/users'
 
 import style from './users-table.styl'
@@ -140,7 +139,6 @@ export default class UsersTable extends Component {
       users: selectUsers(state),
       totalCount: selectUsersTotalCount(state),
       fetching: selectUsersFetching(state),
-      error: selectUsersError(state),
       mayAdd: checkFromState(mayManageUsers, state),
     }
   }

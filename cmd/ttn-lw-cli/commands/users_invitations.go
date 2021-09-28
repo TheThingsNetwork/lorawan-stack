@@ -75,7 +75,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			email := getEmail(cmd.Flags(), args)
 			if email == "" {
-				return errNoEmail
+				return errNoEmail.New()
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -97,7 +97,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			email := getEmail(cmd.Flags(), args)
 			if email == "" {
-				return errNoEmail
+				return errNoEmail.New()
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {

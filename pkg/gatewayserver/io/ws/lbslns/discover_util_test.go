@@ -17,6 +17,7 @@ package lbslns
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
@@ -62,4 +63,8 @@ func (srv mockServer) RateLimiter() ratelimit.Interface {
 
 func (srv mockServer) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
 	return ids.ValidateContext(ctx)
+}
+
+func (srv mockServer) StartTask(cfg *component.TaskConfig) {
+	component.DefaultStartTask(cfg)
 }

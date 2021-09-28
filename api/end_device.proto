@@ -43,8 +43,6 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.stringer_all) = true;
 
 message Session {
-  option (gogoproto.populate) = true;
-
   reserved 1; // RFU: Session ID
 
   // Device Address, issued by the Network Server or chosen by device manufacturer in case of testing range (beginning with 00-03).
@@ -308,8 +306,6 @@ message MACState {
   repeated MACCommand pending_requests = 10;
 
   message JoinRequest {
-    option (gogoproto.populate) = true;
-
     reserved 1,2,3,4,5,9,10; // deprecated JoinRequest fields.
     DLSettings downlink_settings = 6 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
     RxDelay rx_delay = 7 [(validate.rules).enum.defined_only = true];
@@ -581,8 +577,6 @@ message EndDevices {
 }
 
 message DevAddrPrefix {
-  option (gogoproto.populate) = true;
-
   // DevAddr base.
   bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
   // Number of most significant bits from dev_addr that are used as prefix.

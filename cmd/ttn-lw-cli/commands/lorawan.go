@@ -301,7 +301,7 @@ var (
 
 			bandID, _ := cmd.Flags().GetString("band")
 			if bandID != "" {
-				band, err := band.GetByID(bandID)
+				band, err := band.Get(bandID, lorawanConfig.PHYVersion)
 				if err != nil {
 					return err
 				}

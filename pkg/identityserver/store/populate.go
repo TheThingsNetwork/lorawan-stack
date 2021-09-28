@@ -38,9 +38,9 @@ func NewPopulator(size int, seed int64) *Populator {
 	}
 	for i := 0; i < size; i++ {
 		application := &ttnpb.Application{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: fmt.Sprintf("random-app-%d", i+1)},
-			Name:                   fmt.Sprintf("Random %d", i+1),
-			Description:            fmt.Sprintf("Randomly generated Application %d", i+1),
+			Ids:         &ttnpb.ApplicationIdentifiers{ApplicationId: fmt.Sprintf("random-app-%d", i+1)},
+			Name:        fmt.Sprintf("Random %d", i+1),
+			Description: fmt.Sprintf("Randomly generated Application %d", i+1),
 		}
 		applicationID := application.GetEntityIdentifiers()
 		p.Applications = append(p.Applications, application)
@@ -52,15 +52,15 @@ func NewPopulator(size int, seed int64) *Populator {
 			},
 		)
 		client := &ttnpb.Client{
-			ClientIdentifiers: ttnpb.ClientIdentifiers{ClientId: fmt.Sprintf("random-cli-%d", i+1)},
-			Name:              fmt.Sprintf("Random %d", i+1),
-			Description:       fmt.Sprintf("Randomly generated Client %d", i+1),
+			Ids:         &ttnpb.ClientIdentifiers{ClientId: fmt.Sprintf("random-cli-%d", i+1)},
+			Name:        fmt.Sprintf("Random %d", i+1),
+			Description: fmt.Sprintf("Randomly generated Client %d", i+1),
 		}
 		p.Clients = append(p.Clients, client)
 		gateway := &ttnpb.Gateway{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: fmt.Sprintf("random-gtw-%d", i+1)},
-			Name:               fmt.Sprintf("Random %d", i+1),
-			Description:        fmt.Sprintf("Randomly generated Gateway %d", i+1),
+			Ids:         &ttnpb.GatewayIdentifiers{GatewayId: fmt.Sprintf("random-gtw-%d", i+1)},
+			Name:        fmt.Sprintf("Random %d", i+1),
+			Description: fmt.Sprintf("Randomly generated Gateway %d", i+1),
 		}
 		gatewayID := gateway.GetEntityIdentifiers()
 
@@ -84,9 +84,9 @@ func NewPopulator(size int, seed int64) *Populator {
 			},
 		)
 		organization := &ttnpb.Organization{
-			OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationId: fmt.Sprintf("random-org-%d", i+1)},
-			Name:                    fmt.Sprintf("Random %d", i+1),
-			Description:             fmt.Sprintf("Randomly generated Organization %d", i+1),
+			Ids:         &ttnpb.OrganizationIdentifiers{OrganizationId: fmt.Sprintf("random-org-%d", i+1)},
+			Name:        fmt.Sprintf("Random %d", i+1),
+			Description: fmt.Sprintf("Randomly generated Organization %d", i+1),
 		}
 		organizationID := organization.GetEntityIdentifiers()
 		p.Organizations = append(p.Organizations, organization)
@@ -98,7 +98,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			},
 		)
 		user := &ttnpb.User{
-			UserIdentifiers:                ttnpb.UserIdentifiers{UserId: fmt.Sprintf("random-usr-%d", i+1)},
+			Ids:                            &ttnpb.UserIdentifiers{UserId: fmt.Sprintf("random-usr-%d", i+1)},
 			Name:                           fmt.Sprintf("Random %d", i+1),
 			Description:                    fmt.Sprintf("Randomly generated User %d", i+1),
 			PrimaryEmailAddress:            fmt.Sprintf("user-%d@example.com", i+1),
@@ -311,7 +311,7 @@ func (p *Populator) populateUsers(ctx context.Context, db *gorm.DB) (err error) 
 			return err
 		}
 		p.Users[i].Password = password
-		p.Users[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, user, user.ContactInfo)
+		p.Users[i].ContactInfo, err = GetContactInfoStore(db).SetContactInfo(ctx, user.GetIds(), user.ContactInfo)
 		if err != nil {
 			return err
 		}

@@ -89,13 +89,13 @@ func getApplicationPackageAssociationID(flagSet *pflag.FlagSet, args []string) (
 		fport = uint8(fport64)
 	}
 	if applicationID == "" {
-		return nil, errNoApplicationID
+		return nil, errNoApplicationID.New()
 	}
 	if deviceID == "" {
-		return nil, errNoEndDeviceID
+		return nil, errNoEndDeviceID.New()
 	}
 	if fport == 0 {
-		return nil, errNoFPort
+		return nil, errNoFPort.New()
 	}
 	return &ttnpb.ApplicationPackageAssociationIdentifiers{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -130,10 +130,10 @@ func getApplicationPackageDefaultAssociationID(flagSet *pflag.FlagSet, args []st
 		fport = uint8(fport64)
 	}
 	if applicationID == "" {
-		return nil, errNoApplicationID
+		return nil, errNoApplicationID.New()
 	}
 	if fport == 0 {
-		return nil, errNoFPort
+		return nil, errNoFPort.New()
 	}
 	return &ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
@@ -358,7 +358,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationPackageDefaultAssociationsFlags)
 			if len(paths) == 0 {

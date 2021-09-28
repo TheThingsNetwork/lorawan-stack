@@ -52,6 +52,12 @@ import {
 
 import validationSchema from './validation-schema'
 
+const defaultValues = {
+  mac_settings: {
+    ping_slot_periodicity: '',
+  },
+}
+
 const NetworkServerForm = React.memo(props => {
   const { device, onSubmit, onSubmitSuccess, mayEditKeys, mayReadKeys } = props
   const { multicast = false, supports_join = false, supports_class_b = false } = device
@@ -94,9 +100,14 @@ const NetworkServerForm = React.memo(props => {
     () =>
       validationSchema.cast(
         {
+          ...defaultValues,
           ...device,
           _activation_mode: initialActivationMode,
           _device_classes: { class_b: device.supports_class_b, class_c: device.supports_class_c },
+          mac_settings: {
+            ...defaultValues.mac_settings,
+            ...device.mac_settings,
+          },
         },
         { context: validationContext },
       ),
@@ -117,9 +128,10 @@ const NetworkServerForm = React.memo(props => {
         'app_s_key',
       ])
 
+      const isOTAA = values._activation_mode === ACTIVATION_MODES.OTAA
       const mac_settings = castedValues.mac_settings
       let session
-      if (castedValues.session && castedValues.session.keys) {
+      if (!isOTAA && castedValues.session && castedValues.session.keys) {
         const { app_s_key, ...keys } = castedValues.session.keys
         session = {
           ...updatedValues.session,
@@ -143,6 +155,27 @@ const NetworkServerForm = React.memo(props => {
       }
     },
     [initialValues, onSubmit, onSubmitSuccess, validationContext],
+  )
+
+  const handleDeviceClassChange = React.useCallback(
+    deviceClasses => {
+      const { setValues, values } = formRef.current
+      setValues(
+        validationSchema.cast(
+          {
+            ...defaultValues,
+            ...values,
+            _device_classes: deviceClasses,
+            mac_settings: {
+              ...defaultValues.mac_settings,
+              ...values.mac_settings,
+            },
+          },
+          { context: validationContext },
+        ),
+      )
+    },
+    [validationContext],
   )
 
   const handleVersionChange = React.useCallback(
@@ -231,6 +264,7 @@ const NetworkServerForm = React.memo(props => {
         component={Checkbox.Group}
         required={isMulticast}
         tooltipId={tooltipIds.CLASSES}
+        onChange={handleDeviceClassChange}
       >
         <Checkbox
           name="class_b"

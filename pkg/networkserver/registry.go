@@ -50,7 +50,7 @@ var errDeviceExists = errors.DefineAlreadyExists("device_exists", "device alread
 func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, context.Context, error) {
 	return r.SetByID(ctx, dev.ApplicationIdentifiers, dev.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel, func(_ context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if stored != nil {
-			return nil, nil, errDeviceExists
+			return nil, nil, errDeviceExists.New()
 		}
 		return dev, paths, nil
 	})
@@ -66,9 +66,9 @@ func logRegistryRPCError(ctx context.Context, err error, msg string) {
 	logger := log.FromContext(ctx).WithError(err)
 	var printLog func(args ...interface{})
 	switch {
-	case errors.IsNotFound(err), errors.IsInvalidArgument(err):
+	case errors.IsNotFound(err), errors.IsInvalidArgument(err), errors.IsCanceled(err):
 		printLog = logger.Debug
-	case errors.IsFailedPrecondition(err):
+	case errors.IsFailedPrecondition(err), errors.IsResourceExhausted(err):
 		printLog = logger.Warn
 	default:
 		printLog = logger.Error

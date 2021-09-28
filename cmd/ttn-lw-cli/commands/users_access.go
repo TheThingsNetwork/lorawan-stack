@@ -32,7 +32,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -59,7 +59,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -68,7 +68,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewUserAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
-				UserIdentifiers: *usrID, Limit: limit, Page: page,
+				UserIds: usrID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
@@ -85,11 +85,11 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 			id := getAPIKeyID(cmd.Flags(), args, 1)
 			if id == "" {
-				return errNoAPIKeyID
+				return errNoAPIKeyID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -97,8 +97,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewUserAccessClient(is).GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
-				UserIdentifiers: *usrID,
-				KeyId:           id,
+				UserIds: usrID,
+				KeyId:   id,
 			})
 			if err != nil {
 				return err
@@ -114,13 +114,13 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 			name, _ := cmd.Flags().GetString("name")
 
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				return errNoAPIKeyRights
+				return errNoAPIKeyRights.New()
 			}
 
 			expiryDate, err := getAPIKeyExpiry(cmd.Flags())
@@ -133,10 +133,10 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewUserAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
-				UserIdentifiers: *usrID,
-				Name:            name,
-				Rights:          rights,
-				ExpiresAt:       expiryDate,
+				UserIds:   usrID,
+				Name:      name,
+				Rights:    rights,
+				ExpiresAt: expiryDate,
 			})
 			if err != nil {
 				return err
@@ -157,11 +157,11 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 			id := getAPIKeyID(cmd.Flags(), args, 1)
 			if id == "" {
-				return errNoAPIKeyID
+				return errNoAPIKeyID.New()
 			}
 			name, _ := cmd.Flags().GetString("name")
 
@@ -179,7 +179,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewUserAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-				UserIdentifiers: *usrID,
+				UserIds: usrID,
 				APIKey: ttnpb.APIKey{
 					Id:        id,
 					Name:      name,
@@ -202,11 +202,11 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 			id := getAPIKeyID(cmd.Flags(), args, 1)
 			if id == "" {
-				return errNoAPIKeyID
+				return errNoAPIKeyID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -214,7 +214,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewUserAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-				UserIdentifiers: *usrID,
+				UserIds: usrID,
 				APIKey: ttnpb.APIKey{
 					Id:     id,
 					Rights: nil,
@@ -235,14 +235,14 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
 			res, err := ttnpb.NewUserAccessClient(is).CreateLoginToken(ctx, &ttnpb.CreateLoginTokenRequest{
-				UserIdentifiers: *usrID,
+				UserIds: usrID,
 			})
 			if err != nil {
 				return err

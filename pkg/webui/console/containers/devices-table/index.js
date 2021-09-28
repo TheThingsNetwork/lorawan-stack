@@ -52,7 +52,6 @@ import {
   selectDevices,
   selectDevicesTotalCount,
   selectDevicesFetching,
-  selectDevicesError,
   selectDeviceDerivedLastSeen,
 } from '@console/store/selectors/devices'
 
@@ -167,7 +166,6 @@ class DevicesTable extends React.Component {
       devices: decoratedDevices,
       totalCount: selectDevicesTotalCount(state),
       fetching: selectDevicesFetching(state),
-      error: selectDevicesError(state),
       mayAdd: mayCreateDevices,
     }
   }

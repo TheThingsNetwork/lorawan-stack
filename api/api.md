@@ -500,10 +500,12 @@
   - [Message `ListHomeNetworkRoutingPoliciesRequest`](#ttn.lorawan.v3.ListHomeNetworkRoutingPoliciesRequest)
   - [Message `ListPacketBrokerHomeNetworksRequest`](#ttn.lorawan.v3.ListPacketBrokerHomeNetworksRequest)
   - [Message `ListPacketBrokerNetworksRequest`](#ttn.lorawan.v3.ListPacketBrokerNetworksRequest)
+  - [Message `PacketBrokerDefaultGatewayVisibility`](#ttn.lorawan.v3.PacketBrokerDefaultGatewayVisibility)
   - [Message `PacketBrokerDefaultRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy)
   - [Message `PacketBrokerDevAddrBlock`](#ttn.lorawan.v3.PacketBrokerDevAddrBlock)
   - [Message `PacketBrokerGateway`](#ttn.lorawan.v3.PacketBrokerGateway)
   - [Message `PacketBrokerGateway.GatewayIdentifiers`](#ttn.lorawan.v3.PacketBrokerGateway.GatewayIdentifiers)
+  - [Message `PacketBrokerGatewayVisibility`](#ttn.lorawan.v3.PacketBrokerGatewayVisibility)
   - [Message `PacketBrokerInfo`](#ttn.lorawan.v3.PacketBrokerInfo)
   - [Message `PacketBrokerNetwork`](#ttn.lorawan.v3.PacketBrokerNetwork)
   - [Message `PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier)
@@ -513,6 +515,7 @@
   - [Message `PacketBrokerRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerRoutingPolicy)
   - [Message `PacketBrokerRoutingPolicyDownlink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyDownlink)
   - [Message `PacketBrokerRoutingPolicyUplink`](#ttn.lorawan.v3.PacketBrokerRoutingPolicyUplink)
+  - [Message `SetPacketBrokerDefaultGatewayVisibilityRequest`](#ttn.lorawan.v3.SetPacketBrokerDefaultGatewayVisibilityRequest)
   - [Message `SetPacketBrokerDefaultRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest)
   - [Message `SetPacketBrokerRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerRoutingPolicyRequest)
   - [Message `UpdatePacketBrokerGatewayRequest`](#ttn.lorawan.v3.UpdatePacketBrokerGatewayRequest)
@@ -3757,7 +3760,7 @@ Gateway is the message that defines a gateway on the network.
 | `attributes` | [`Gateway.AttributesEntry`](#ttn.lorawan.v3.Gateway.AttributesEntry) | repeated | Key-value attributes for this gateway. Typically used for organizing gateways or for storing integration-specific data. |
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway. |
 | `version_ids` | [`GatewayVersionIdentifiers`](#ttn.lorawan.v3.GatewayVersionIdentifiers) |  |  |
-| `gateway_server_address` | [`string`](#string) |  | The address of the Gateway Server to connect to. This information is public and can be seen by any authenticated user in the network if status_public is true. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
+| `gateway_server_address` | [`string`](#string) |  | The address of the Gateway Server to connect to. This information is public and can be seen by any authenticated user in the network if status_public is true. The typical format of the address is "scheme://host:port". The scheme is optional. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | `auto_update` | [`bool`](#bool) |  |  |
 | `update_channel` | [`string`](#string) |  |  |
 | `frequency_plan_id` | [`string`](#string) |  | Frequency plan ID of the gateway. This information is public and can be seen by any authenticated user in the network. DEPRECATED: use frequency_plan_ids. This equals the first element of the frequency_plan_ids field. |
@@ -3788,7 +3791,7 @@ Gateway is the message that defines a gateway on the network.
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 | `contact_info` | <p>`repeated.max_items`: `10`</p> |
 | `version_ids` | <p>`message.required`: `true`</p> |
-| `gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
+| `gateway_server_address` | <p>`string.pattern`: `^([a-z]{2,5}://)?(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 | `update_channel` | <p>`string.max_len`: `128`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
 | `frequency_plan_ids` | <p>`repeated.max_items`: `8`</p><p>`repeated.items.string.max_len`: `64`</p> |
@@ -7189,6 +7192,13 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | `tenant_id_contains` | <p>`string.max_len`: `100`</p> |
 | `name_contains` | <p>`string.max_len`: `100`</p> |
 
+### <a name="ttn.lorawan.v3.PacketBrokerDefaultGatewayVisibility">Message `PacketBrokerDefaultGatewayVisibility`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when the policy got last updated. |
+| `visibility` | [`PacketBrokerGatewayVisibility`](#ttn.lorawan.v3.PacketBrokerGatewayVisibility) |  |  |
+
 ### <a name="ttn.lorawan.v3.PacketBrokerDefaultRoutingPolicy">Message `PacketBrokerDefaultRoutingPolicy`</a>
 
 | Field | Type | Label | Description |
@@ -7244,6 +7254,19 @@ There is no (longer) wire compatibility needed; new fields may use any tag.
 | Field | Validations |
 | ----- | ----------- |
 | `gateway_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.PacketBrokerGatewayVisibility">Message `PacketBrokerGatewayVisibility`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `location` | [`bool`](#bool) |  | Show location. |
+| `antenna_placement` | [`bool`](#bool) |  | Show antenna placement (indoor/outdoor). |
+| `antenna_count` | [`bool`](#bool) |  | Show antenna count. |
+| `fine_timestamps` | [`bool`](#bool) |  | Show whether the gateway produces fine timestamps. |
+| `contact_info` | [`bool`](#bool) |  | Show contact information. |
+| `status` | [`bool`](#bool) |  | Show status (online/offline). |
+| `frequency_plan` | [`bool`](#bool) |  | Show frequency plan. |
+| `packet_rates` | [`bool`](#bool) |  | Show receive and transmission packet rates. |
 
 ### <a name="ttn.lorawan.v3.PacketBrokerInfo">Message `PacketBrokerInfo`</a>
 
@@ -7322,6 +7345,18 @@ There is no (longer) wire compatibility needed; new fields may use any tag.
 | `application_data` | [`bool`](#bool) |  | Forward uplink messages with FPort between 1 and 255. |
 | `signal_quality` | [`bool`](#bool) |  | Forward RSSI and SNR. |
 | `localization` | [`bool`](#bool) |  | Forward gateway location, RSSI, SNR and fine timestamp. |
+
+### <a name="ttn.lorawan.v3.SetPacketBrokerDefaultGatewayVisibilityRequest">Message `SetPacketBrokerDefaultGatewayVisibilityRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `visibility` | [`PacketBrokerGatewayVisibility`](#ttn.lorawan.v3.PacketBrokerGatewayVisibility) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `visibility` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.SetPacketBrokerDefaultRoutingPolicyRequest">Message `SetPacketBrokerDefaultRoutingPolicyRequest`</a>
 
@@ -7408,6 +7443,9 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `GetHomeNetworkRoutingPolicy` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) | [`PacketBrokerRoutingPolicy`](#ttn.lorawan.v3.PacketBrokerRoutingPolicy) | Get the routing policy for the given Home Network. Getting routing policies requires administrative access. |
 | `SetHomeNetworkRoutingPolicy` | [`SetPacketBrokerRoutingPolicyRequest`](#ttn.lorawan.v3.SetPacketBrokerRoutingPolicyRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the routing policy for the given Home Network. Setting routing policies requires administrative access. |
 | `DeleteHomeNetworkRoutingPolicy` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the routing policy for the given Home Network. Deleting routing policies requires administrative access. |
+| `GetHomeNetworkDefaultGatewayVisibility` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`PacketBrokerDefaultGatewayVisibility`](#ttn.lorawan.v3.PacketBrokerDefaultGatewayVisibility) | Get the default gateway visibility. Getting gateway visibilities requires administrative access. |
+| `SetHomeNetworkDefaultGatewayVisibility` | [`SetPacketBrokerDefaultGatewayVisibilityRequest`](#ttn.lorawan.v3.SetPacketBrokerDefaultGatewayVisibilityRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the default gateway visibility. Setting gateway visibilities requires administrative access. |
+| `DeleteHomeNetworkDefaultGatewayVisibility` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Deletes the default gateway visibility. Deleting gateway visibilities requires administrative access. |
 | `ListNetworks` | [`ListPacketBrokerNetworksRequest`](#ttn.lorawan.v3.ListPacketBrokerNetworksRequest) | [`PacketBrokerNetworks`](#ttn.lorawan.v3.PacketBrokerNetworks) | List all listed networks. Listing networks requires administrative access. |
 | `ListHomeNetworks` | [`ListPacketBrokerHomeNetworksRequest`](#ttn.lorawan.v3.ListPacketBrokerHomeNetworksRequest) | [`PacketBrokerNetworks`](#ttn.lorawan.v3.PacketBrokerNetworks) | List the listed home networks for which routing policies can be configured. Listing home networks requires administrative access. |
 | `ListForwarderRoutingPolicies` | [`ListForwarderRoutingPoliciesRequest`](#ttn.lorawan.v3.ListForwarderRoutingPoliciesRequest) | [`PacketBrokerRoutingPolicies`](#ttn.lorawan.v3.PacketBrokerRoutingPolicies) | List the routing policies that Forwarders configured with Packet Broker Agent as Home Network. Listing routing policies requires administrative access. |
@@ -7433,6 +7471,10 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `SetHomeNetworkRoutingPolicy` | `POST` | `/api/v3/pba/home-networks/policies/{home_network_id.net_id}/{home_network_id.tenant_id}` | `*` |
 | `DeleteHomeNetworkRoutingPolicy` | `DELETE` | `/api/v3/pba/home-networks/policies/{net_id}` |  |
 | `DeleteHomeNetworkRoutingPolicy` | `DELETE` | `/api/v3/pba/home-networks/policies/{net_id}/{tenant_id}` |  |
+| `GetHomeNetworkDefaultGatewayVisibility` | `GET` | `/api/v3/pba/home-networks/gateway-visibilities/default` |  |
+| `SetHomeNetworkDefaultGatewayVisibility` | `PUT` | `/api/v3/pba/home-networks/gateway-visibilities/default` | `*` |
+| `SetHomeNetworkDefaultGatewayVisibility` | `POST` | `/api/v3/pba/home-networks/gateway-visibilities/default` | `*` |
+| `DeleteHomeNetworkDefaultGatewayVisibility` | `DELETE` | `/api/v3/pba/home-networks/gateway-visibilities/default` |  |
 | `ListNetworks` | `GET` | `/api/v3/pba/networks` |  |
 | `ListHomeNetworks` | `GET` | `/api/v3/pba/home-networks` |  |
 | `ListForwarderRoutingPolicies` | `GET` | `/api/v3/pba/forwarders/policies` |  |

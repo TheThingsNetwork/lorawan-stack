@@ -55,7 +55,7 @@ var eventsCommand = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ids := getEntityIdentifiersSlice(cmd.Flags())
 		if len(ids) == 0 {
-			return errNoIDs
+			return errNoIDs.New()
 		}
 		tail, _ := cmd.Flags().GetUint32("tail")
 		req := &ttnpb.StreamEventsRequest{

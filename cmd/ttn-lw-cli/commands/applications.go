@@ -143,7 +143,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.ApplicationRegistry/Get"].Allowed)
@@ -153,8 +153,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{
-				ApplicationIdentifiers: *appID,
-				FieldMask:              &pbtypes.FieldMask{Paths: paths},
+				ApplicationIds: appID,
+				FieldMask:      &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -171,7 +171,7 @@ var (
 			appID := getApplicationID(cmd.Flags(), args)
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
-				return errNoCollaborator
+				return errNoCollaborator.New()
 			}
 			var application ttnpb.Application
 			if inputDecoder != nil {
@@ -184,11 +184,11 @@ var (
 				return err
 			}
 			application.Attributes = mergeAttributes(application.Attributes, cmd.Flags())
-			if appID != nil && appID.ApplicationId != "" {
-				application.ApplicationId = appID.ApplicationId
+			if appID.GetApplicationId() != "" {
+				application.Ids = &ttnpb.ApplicationIdentifiers{ApplicationId: appID.ApplicationId}
 			}
-			if application.ApplicationId == "" {
-				return errNoApplicationID
+			if application.GetIds().GetApplicationId() == "" {
+				return errNoApplicationID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -213,7 +213,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationFlags, attributesFlags())
 			if len(paths) == 0 {
@@ -225,7 +225,7 @@ var (
 				return err
 			}
 			application.Attributes = mergeAttributes(application.Attributes, cmd.Flags())
-			application.ApplicationIdentifiers = *appID
+			application.Ids = appID
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -250,7 +250,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -271,7 +271,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -289,7 +289,7 @@ var (
 	applicationsContactInfoCommand = contactInfoCommands("application", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		appID := getApplicationID(cmd.Flags(), args)
 		if appID == nil {
-			return nil, errNoApplicationID
+			return nil, errNoApplicationID.New()
 		}
 		return appID.GetEntityIdentifiers(), nil
 	})
@@ -300,7 +300,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 
 			force, err := cmd.Flags().GetBool("force")
@@ -308,7 +308,7 @@ var (
 				return err
 			}
 			if !confirmChoice(applicationPurgeWarning, force) {
-				return errNoConfirmation
+				return errNoConfirmation.New()
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -329,7 +329,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {

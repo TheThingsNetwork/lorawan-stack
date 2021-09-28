@@ -38,6 +38,7 @@ var (
 	errJoinRequestMessage = errors.Define("join_request_message", "invalid join-request message received")
 	errUplinkDataFrame    = errors.Define("uplink_data_Frame", "invalid uplink data frame received")
 	errUplinkMessage      = errors.Define("uplink_message", "invalid uplink message received")
+	errMDHR               = errors.Define("mhdr", "invalid MHDR `{mhdr}` received")
 )
 
 // UpInfo provides additional metadata on each upstream message.
@@ -136,7 +137,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 
 	var parsedMHDR ttnpb.MHDR
 	if err := lorawan.UnmarshalMHDR([]byte{byte(req.MHdr)}, &parsedMHDR); err != nil {
-		return nil, errJoinRequestMessage.WithCause(err)
+		return nil, errMDHR.WithAttributes(`mhdr`, parsedMHDR)
 	}
 
 	micBytes, err := util.GetInt32AsByteSlice(req.MIC)
@@ -258,7 +259,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
 	if parsedMHDR.MType != ttnpb.MType_UNCONFIRMED_UP && parsedMHDR.MType != ttnpb.MType_CONFIRMED_UP {
-		return nil, errUplinkDataFrame.New()
+		return nil, errMDHR.WithAttributes(`mhdr`, parsedMHDR)
 	}
 
 	micBytes, err := util.GetInt32AsByteSlice(updf.MIC)

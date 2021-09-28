@@ -93,10 +93,10 @@ func getApplicationPubSubID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appli
 		pubsubID = args[1]
 	}
 	if applicationID == "" {
-		return nil, errNoApplicationID
+		return nil, errNoApplicationID.New()
 	}
 	if pubsubID == "" {
-		return nil, errNoPubSubID
+		return nil, errNoPubSubID.New()
 	}
 	return &ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
@@ -169,7 +169,7 @@ var (
 			forwardDeprecatedProviderFlags(cmd.Flags())
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationPubSubFlags)
 			if len(paths) == 0 {

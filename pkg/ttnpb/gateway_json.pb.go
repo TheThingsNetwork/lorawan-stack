@@ -39,11 +39,11 @@ func (x *Gateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
 		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.GatewayIdentifiers)
+		gogo.MarshalMessage(s, x.Ids)
 	}
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
@@ -234,7 +234,7 @@ func (x *Gateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v GatewayIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.GatewayIdentifiers = v
+			x.Ids = &v
 		case "created_at", "createdAt":
 			s.AddField("created_at")
 			v := s.ReadTime()
@@ -526,11 +526,11 @@ func (x *CreateGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("gateway_ids")
 		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.GatewayIdentifiers)
+		gogo.MarshalMessage(s, x.GatewayIds)
 	}
 	if x.Name != "" || s.HasField("name") {
 		s.WriteMoreIf(&wroteField)
@@ -574,7 +574,7 @@ func (x *CreateGatewayAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalS
 			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v GatewayIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.GatewayIdentifiers = v
+			x.GatewayIds = &v
 		case "name":
 			s.AddField("name")
 			x.Name = s.ReadString()
@@ -604,11 +604,11 @@ func (x *UpdateGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("gateway_ids")
 		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.GatewayIdentifiers)
+		gogo.MarshalMessage(s, x.GatewayIds)
 	}
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
@@ -641,7 +641,7 @@ func (x *UpdateGatewayAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalS
 			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v GatewayIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.GatewayIdentifiers = v
+			x.GatewayIds = &v
 		case "api_key", "apiKey":
 			if !s.ReadNil() {
 				x.APIKey.UnmarshalProtoJSON(s.WithField("api_key", true))
@@ -665,13 +665,13 @@ func (x *SetGatewayCollaboratorRequest) MarshalProtoJSON(s *jsonplugin.MarshalSt
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.GatewayIds != nil || s.HasField("gateway_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("gateway_ids")
 		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.GatewayIdentifiers)
+		gogo.MarshalMessage(s, x.GatewayIds)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Collaborator != nil || s.HasField("collaborator") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("collaborator")
 		x.Collaborator.MarshalProtoJSON(s.WithField("collaborator"))
@@ -693,9 +693,10 @@ func (x *SetGatewayCollaboratorRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarsh
 			// NOTE: GatewayIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v GatewayIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.GatewayIdentifiers = v
+			x.GatewayIds = &v
 		case "collaborator":
 			if !s.ReadNil() {
+				x.Collaborator = &Collaborator{}
 				x.Collaborator.UnmarshalProtoJSON(s.WithField("collaborator", true))
 			}
 		}

@@ -66,10 +66,11 @@ export const mayEditBasicApplicationInfo = {
   rightsSelector: selectApplicationRights,
   check: rights => rights.includes('RIGHT_APPLICATION_SETTINGS_BASIC'),
 }
-export const maySetApplicationPayloadFormatters = {
+export const mayViewApplicationLink = {
   rightsSelector: selectApplicationRights,
   check: rights => rights.includes('RIGHT_APPLICATION_LINK') && asEnabled,
 }
+export const maySetApplicationPayloadFormatters = mayViewApplicationLink
 export const mayViewApplicationEvents = {
   rightsSelector: selectApplicationRights,
   check: rights => rights.includes('RIGHT_APPLICATION_TRAFFIC_READ'),

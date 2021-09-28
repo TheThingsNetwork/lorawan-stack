@@ -57,6 +57,9 @@ const Registration = props => {
     onIdSelect,
     generateDevEUI,
     applicationDevEUICounter,
+    nsEnabled,
+    asEnabled,
+    jsEnabled,
   } = props
   const state = useRepositoryContext()
   const hasTemplate = Boolean(template)
@@ -160,12 +163,14 @@ const Registration = props => {
   return (
     <Overlay visible={fetching} loading={fetching} spinnerMessage={m.fetching}>
       <div data-test-id="device-registration">
-        <FreqPlansSelect
-          required
-          tooltipId={tooltipIds.FREQUENCY_PLAN}
-          name="frequency_plan_id"
-          bandId={band}
-        />
+        {nsEnabled && (
+          <FreqPlansSelect
+            required
+            tooltipId={tooltipIds.FREQUENCY_PLAN}
+            name="frequency_plan_id"
+            bandId={band}
+          />
+        )}
         {isOTAA && (
           <>
             <Form.Field
@@ -178,93 +183,105 @@ const Registration = props => {
               tooltipId={tooltipIds.JOIN_EUI}
             />
             {devEUIComponent}
-            <Form.Field
-              required
-              title={sharedMessages.appKey}
-              name="root_keys.app_key.key"
-              type="byte"
-              min={16}
-              max={16}
-              component={Input.Generate}
-              disabled={!mayEditKeys}
-              mayGenerateValue={mayEditKeys}
-              onGenerateValue={generate16BytesKey}
-              tooltipId={tooltipIds.APP_KEY}
-              placeholder={appKeyPlaceholder}
-            />
-            {lwVersion >= 110 && (
-              <Form.Field
-                required
-                title={sharedMessages.nwkKey}
-                name="root_keys.nwk_key.key"
-                type="byte"
-                min={16}
-                max={16}
-                component={Input.Generate}
-                disabled={!mayEditKeys}
-                mayGenerateValue={mayEditKeys}
-                onGenerateValue={generate16BytesKey}
-                placeholder={nwkKeyPlaceholder}
-                tooltipId={tooltipIds.NETWORK_KEY}
-              />
+            {jsEnabled && (
+              <>
+                <Form.Field
+                  required
+                  title={sharedMessages.appKey}
+                  name="root_keys.app_key.key"
+                  type="byte"
+                  min={16}
+                  max={16}
+                  component={Input.Generate}
+                  disabled={!mayEditKeys}
+                  mayGenerateValue={mayEditKeys}
+                  onGenerateValue={generate16BytesKey}
+                  tooltipId={tooltipIds.APP_KEY}
+                  placeholder={appKeyPlaceholder}
+                />
+                {lwVersion >= 110 && (
+                  <Form.Field
+                    required
+                    title={sharedMessages.nwkKey}
+                    name="root_keys.nwk_key.key"
+                    type="byte"
+                    min={16}
+                    max={16}
+                    component={Input.Generate}
+                    disabled={!mayEditKeys}
+                    mayGenerateValue={mayEditKeys}
+                    onGenerateValue={generate16BytesKey}
+                    placeholder={nwkKeyPlaceholder}
+                    tooltipId={tooltipIds.NETWORK_KEY}
+                  />
+                )}
+              </>
             )}
           </>
         )}
         {!isOTAA && (
           <>
-            <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
+            {nsEnabled && (
+              <DevAddrInput title={sharedMessages.devAddr} name="session.dev_addr" required />
+            )}
             {lwVersion === 104 && devEUIComponent}
-            <Form.Field
-              required={mayEditKeys}
-              title={sharedMessages.appSKey}
-              name="session.keys.app_s_key.key"
-              type="byte"
-              min={16}
-              max={16}
-              component={Input.Generate}
-              mayGenerateValue={mayEditKeys}
-              onGenerateValue={generate16BytesKey}
-              tooltipId={tooltipIds.APP_SESSION_KEY}
-            />
-            <Form.Field
-              mayGenerateValue
-              title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
-              name="session.keys.f_nwk_s_int_key.key"
-              type="byte"
-              min={16}
-              max={16}
-              required
-              component={Input.Generate}
-              onGenerateValue={generate16BytesKey}
-              tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
-            />
-            {lwVersion >= 110 && (
+            {asEnabled && (
               <Form.Field
-                mayGenerateValue
-                title={sharedMessages.sNwkSIKey}
-                name="session.keys.s_nwk_s_int_key.key"
+                required={mayEditKeys}
+                title={sharedMessages.appSKey}
+                name="session.keys.app_s_key.key"
                 type="byte"
                 min={16}
                 max={16}
-                required
-                description={sharedMessages.sNwkSIKeyDescription}
                 component={Input.Generate}
+                mayGenerateValue={mayEditKeys}
                 onGenerateValue={generate16BytesKey}
+                tooltipId={tooltipIds.APP_SESSION_KEY}
               />
             )}
-            {lwVersion >= 110 && (
-              <Form.Field
-                mayGenerateValue
-                title={sharedMessages.nwkSEncKey}
-                name="session.keys.nwk_s_enc_key.key"
-                type="byte"
-                min={16}
-                max={16}
-                required
-                description={sharedMessages.nwkSEncKeyDescription}
-                component={Input.Generate}
-                onGenerateValue={generate16BytesKey}
-              />
+            {nsEnabled && (
+              <>
+                <Form.Field
+                  mayGenerateValue
+                  title={lwVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
+                  name="session.keys.f_nwk_s_int_key.key"
+                  type="byte"
+                  min={16}
+                  max={16}
+                  required
+                  component={Input.Generate}
+                  onGenerateValue={generate16BytesKey}
+                  tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
+                />
+                {lwVersion >= 110 && (
+                  <Form.Field
+                    mayGenerateValue
+                    title={sharedMessages.sNwkSIKey}
+                    name="session.keys.s_nwk_s_int_key.key"
+                    type="byte"
+                    min={16}
+                    max={16}
+                    required
+                    description={sharedMessages.sNwkSIKeyDescription}
+                    component={Input.Generate}
+                    onGenerateValue={generate16BytesKey}
+                  />
+                )}
+                {lwVersion >= 110 && (
+                  <Form.Field
+                    mayGenerateValue
+                    title={sharedMessages.nwkSEncKey}
+                    name="session.keys.nwk_s_enc_key.key"
+                    type="byte"
+                    min={16}
+                    max={16}
+                    required
+                    description={sharedMessages.nwkSEncKeyDescription}
+                    component={Input.Generate}
+                    onGenerateValue={generate16BytesKey}
+                  />
+                )}
+              </>
             )}
           </>
         )}
@@ -290,9 +307,12 @@ const Registration = props => {
 
 Registration.propTypes = {
   applicationDevEUICounter: PropTypes.number.isRequired,
+  asEnabled: PropTypes.bool.isRequired,
   fetching: PropTypes.bool,
   generateDevEUI: PropTypes.func.isRequired,
+  jsEnabled: PropTypes.bool.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,
+  nsEnabled: PropTypes.bool.isRequired,
   onIdPrefill: PropTypes.func.isRequired,
   onIdSelect: PropTypes.func.isRequired,
   prefixes: PropTypes.euiPrefixes.isRequired,

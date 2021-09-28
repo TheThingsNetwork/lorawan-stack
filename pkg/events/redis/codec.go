@@ -41,7 +41,7 @@ var errUnknownEncoding = errors.DefineInvalidArgument("unknown_encoding", "unkno
 
 func decodeEventData(enc string, evt *ttnpb.Event) error {
 	if !strings.HasPrefix(enc, protoEncodingPrefix) {
-		return errUnknownEncoding
+		return errUnknownEncoding.New()
 	}
 	bpb, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(enc, protoEncodingPrefix))
 	if err != nil {

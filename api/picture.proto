@@ -31,11 +31,7 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.stringer_all) = true;
 
 message Picture {
-  option (gogoproto.populate) = true;
-
   message Embedded {
-    option (gogoproto.populate) = true;
-
     // MIME type of the picture.
     string mime_type = 1 [(validate.rules).string.max_len = 32];
     // Picture data. A data URI can be constructed as follows:

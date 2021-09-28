@@ -87,22 +87,30 @@ const idsSchema = Yup.object({
 
 const rootKeysSchema = Yup.object({
   root_keys: Yup.object().when(
-    ['lorawan_version', '$mayEditKeys', '_activation_mode'],
-    (version, mayEditKeys, mode, schema) => {
-      if (!mayEditKeys || mode !== ACTIVATION_MODES.OTAA) {
+    [
+      'lorawan_version',
+      '$mayEditKeys',
+      '_activation_mode',
+      '$jsEnabled',
+      '$jsUrl',
+      'join_server_address',
+    ],
+    (version, mayEditKeys, mode, jsEnabled, jsUrl, jsHost, schema) => {
+      if (
+        !jsEnabled ||
+        !mayEditKeys ||
+        mode !== ACTIVATION_MODES.OTAA ||
+        getHostFromUrl(jsUrl) !== jsHost
+      ) {
         return schema.strip()
       }
 
       const strippedSchema = Yup.object().strip()
-      const keySchema = Yup.lazy(() =>
-        mayEditKeys
-          ? Yup.object().shape({
-              key: Yup.string()
-                .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
-                .required(sharedMessages.validateRequired),
-            })
-          : Yup.object().strip(),
-      )
+      const keySchema = Yup.object().shape({
+        key: Yup.string()
+          .length(16 * 2, Yup.passValues(sharedMessages.validateLength))
+          .required(sharedMessages.validateRequired),
+      })
 
       if (parseLorawanMacVersion(version) < 110) {
         return schema.shape({
@@ -174,6 +182,7 @@ const sessionSchema = Yup.object({
 const macSettingsSchema = Yup.object({
   mac_settings: Yup.object().when(
     [
+      '$nsEnabled',
       '_activation_mode',
       'supports_class_b',
       'supports_class_c',
@@ -187,6 +196,7 @@ const macSettingsSchema = Yup.object({
       '$hasPingSlotFrequency',
     ],
     (
+      nsEnabled,
       mode,
       isClassB,
       isClassC,
@@ -199,8 +209,12 @@ const macSettingsSchema = Yup.object({
       hasClassCTimeout,
       hasPingSlotFrequency,
       schema,
-    ) =>
-      schema.shape({
+    ) => {
+      if (!nsEnabled) {
+        return schema.strip()
+      }
+
+      return schema.shape({
         resets_f_cnt: Yup.lazy(() => {
           if (mode !== ACTIVATION_MODES.ABP) {
             return Yup.boolean().strip()
@@ -365,27 +379,31 @@ const macSettingsSchema = Yup.object({
 
           return Yup.string()
         }),
-      }),
+      })
+    },
   ),
 })
 
 const validationSchema = Yup.object({
-  supports_class_b: Yup.boolean().when(['_device_class'], (deviceClass, schema) =>
-    schema
-      .transform(() => undefined)
-      .default(
-        deviceClass === DEVICE_CLASS_MAP.CLASS_B ||
-          deviceClass === DEVICE_CLASS_MAP.CLASS_B_C ||
-          false,
-      ),
+  supports_class_b: Yup.boolean().when(
+    ['_device_class', '$nsEnabled'],
+    (deviceClass, nsEnabled, schema) => {
+      if (!nsEnabled) {
+        return schema.strip()
+      }
+
+      return schema
+        .transform(() => undefined)
+        .default(
+          deviceClass === DEVICE_CLASS_MAP.CLASS_B || deviceClass === DEVICE_CLASS_MAP.CLASS_B_C,
+        )
+    },
   ),
   supports_class_c: Yup.boolean().when(['_device_class'], (deviceClass, schema) =>
     schema
       .transform(() => undefined)
       .default(
-        deviceClass === DEVICE_CLASS_MAP.CLASS_C ||
-          deviceClass === DEVICE_CLASS_MAP.CLASS_B_C ||
-          false,
+        deviceClass === DEVICE_CLASS_MAP.CLASS_C || deviceClass === DEVICE_CLASS_MAP.CLASS_B_C,
       ),
   ),
   supports_join: Yup.boolean().when(
@@ -431,7 +449,7 @@ const validationSchema = Yup.object({
       return schema.required(sharedMessages.validateRequired)
     }
 
-    return schema.oneOf(Object.values(DEVICE_CLASS_MAP)).default(DEVICE_CLASS_MAP.CLASS_A)
+    return schema.oneOf(Object.values(DEVICE_CLASS_MAP))
   }),
   _default_ns_settings: Yup.bool(),
   _activation_mode: Yup.mixed().when(

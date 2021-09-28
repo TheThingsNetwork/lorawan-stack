@@ -220,10 +220,10 @@ This command takes end device templates from stdin.`,
 				startDevEUIHex = args[1]
 			}
 			if joinEUIHex == "" {
-				return errNoEndDeviceTemplateJoinEUI
+				return errNoEndDeviceTemplateJoinEUI.New()
 			}
 			if startDevEUIHex == "" {
-				return errNoEndDeviceTemplateStartDevEUI
+				return errNoEndDeviceTemplateStartDevEUI.New()
 			}
 
 			var joinEUI types.EUI64
@@ -296,7 +296,7 @@ This command takes end device templates from stdin.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			formatID := getTemplateFormatID(cmd.Flags(), args)
 			if formatID == "" {
-				return errNoTemplateFormatID
+				return errNoTemplateFormatID.New()
 			}
 			data, err := getDataBytes("", cmd.Flags())
 			if err != nil {
@@ -415,7 +415,7 @@ command to assign EUIs to map to end device templates.`,
 				}
 				if mappedEntry == nil {
 					if fail, _ := cmd.Flags().GetBool("fail-not-found"); fail {
-						return errEndDeviceMappingNotFound
+						return errEndDeviceMappingNotFound.New()
 					}
 					continue
 				}

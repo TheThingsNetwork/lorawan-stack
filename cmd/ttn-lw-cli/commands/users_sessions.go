@@ -43,14 +43,14 @@ func getUserSessionID(flagSet *pflag.FlagSet, args []string) (*ttnpb.UserSession
 		sessionID = args[1]
 	}
 	if userID == "" {
-		return nil, errNoUserID
+		return nil, errNoUserID.New()
 	}
 	if sessionID == "" {
-		return nil, errNoSessionID
+		return nil, errNoSessionID.New()
 	}
 	return &ttnpb.UserSessionIdentifiers{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserId: userID},
-		SessionId:       sessionID,
+		UserIds:   &ttnpb.UserIdentifiers{UserId: userID},
+		SessionId: sessionID,
 	}, nil
 }
 
@@ -67,7 +67,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -76,10 +76,10 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewUserSessionRegistryClient(is).List(ctx, &ttnpb.ListUserSessionsRequest{
-				UserIdentifiers: *usrID,
-				Limit:           limit,
-				Page:            page,
-				Order:           getOrder(cmd.Flags()),
+				UserIds: usrID,
+				Limit:   limit,
+				Page:    page,
+				Order:   getOrder(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err

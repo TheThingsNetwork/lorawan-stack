@@ -84,6 +84,9 @@ const AdvancedSettingsSection = props => {
     defaultNsSettings,
     freqPlan,
     defaultMacSettings,
+    useExternalServers,
+    onUseExternalServersChange,
+    onJsAddressChange,
   } = props
 
   const { values: formValues } = useFormContext()
@@ -104,12 +107,6 @@ const AdvancedSettingsSection = props => {
   // but by index. The factory preset frequencies is really the frequencies in Hertz,
   // so it requires bands with a CFList type of Frequencies.
   const disableFactoryPresetFreq = hasCFListTypeChMask(freqPlan)
-
-  const [externalServers, setExternalServer] = React.useState(false)
-  const handleExternalServers = React.useCallback(
-    () => setExternalServer(external => !external),
-    [],
-  )
 
   const handleDefaultNsSettings = React.useCallback(
     evt => onDefaultNsSettingsChange(evt.target.checked),
@@ -139,23 +136,27 @@ const AdvancedSettingsSection = props => {
           disabled={!nsEnabled}
         />
       </Form.Field>
-      <Form.Field
-        title={isMulticast ? m.multicastClassCapabilities : messages.classCapabilities}
-        required={isMulticast}
-        name="_device_class"
-        component={Select}
-        onChange={onDeviceClassChange}
-        options={isMulticast ? multicastClassOptions : allClassOptions}
-        tooltipId={tooltipIds.CLASSES}
-      />
-      <Form.Field
-        title={messages.networkDefaults}
-        label={messages.defaultNetworksSettings}
-        name="_default_ns_settings"
-        component={Checkbox}
-        onChange={handleDefaultNsSettings}
-        tooltipId={tooltipIds.NETWORK_RX_DEFAULTS}
-      />
+      {nsEnabled && (
+        <>
+          <Form.Field
+            title={isMulticast ? m.multicastClassCapabilities : messages.classCapabilities}
+            required={isMulticast}
+            name="_device_class"
+            component={Select}
+            onChange={onDeviceClassChange}
+            options={isMulticast ? multicastClassOptions : allClassOptions}
+            tooltipId={tooltipIds.CLASSES}
+          />
+          <Form.Field
+            title={messages.networkDefaults}
+            label={messages.defaultNetworksSettings}
+            name="_default_ns_settings"
+            component={Checkbox}
+            onChange={handleDefaultNsSettings}
+            tooltipId={tooltipIds.NETWORK_RX_DEFAULTS}
+          />
+        </>
+      )}
       {!defaultNsSettings && nsEnabled && (
         <>
           {isABP && (
@@ -372,10 +373,10 @@ const AdvancedSettingsSection = props => {
         label={m.useExternalServers}
         name="_external_servers"
         component={Checkbox}
-        onChange={handleExternalServers}
+        onChange={onUseExternalServersChange}
         tooltipId={tooltipIds.CLUSTER_SETTINGS}
       />
-      {externalServers && (
+      {useExternalServers && (
         <>
           <Form.Field
             title={sharedMessages.networkServerAddress}
@@ -387,6 +388,7 @@ const AdvancedSettingsSection = props => {
               title={sharedMessages.joinServerAddress}
               name="join_server_address"
               component={Input}
+              onChange={onJsAddressChange}
             />
           )}
           {(isABP || isMulticast) && (
@@ -433,6 +435,9 @@ AdvancedSettingsSection.propTypes = {
   onActivationModeChange: PropTypes.func.isRequired,
   onDefaultNsSettingsChange: PropTypes.func.isRequired,
   onDeviceClassChange: PropTypes.func.isRequired,
+  onJsAddressChange: PropTypes.func.isRequired,
+  onUseExternalServersChange: PropTypes.func.isRequired,
+  useExternalServers: PropTypes.bool.isRequired,
 }
 
 AdvancedSettingsSection.defaultProps = {

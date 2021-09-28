@@ -58,7 +58,7 @@ var errNoIdentifiers = errors.DefineInvalidArgument("no_identifiers", "no identi
 // Stream implements the EventsServer interface.
 func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Events_StreamServer) error {
 	if len(req.Identifiers) == 0 {
-		return errNoIdentifiers
+		return errNoIdentifiers.New()
 	}
 	ctx := stream.Context()
 

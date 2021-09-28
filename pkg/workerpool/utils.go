@@ -21,8 +21,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// HandlerFactoryFromUplinkHandler converts a static uplink handler to a HandlerFactory.
-func HandlerFactoryFromUplinkHandler(handler func(context.Context, *ttnpb.ApplicationUp) error) HandlerFactory {
+// HandlerFromUplinkHandler converts a static uplink handler to a Handler.
+func HandlerFromUplinkHandler(handler func(context.Context, *ttnpb.ApplicationUp) error) Handler {
 	h := func(ctx context.Context, item interface{}) {
 		up := item.(*ttnpb.ApplicationUp)
 
@@ -30,5 +30,5 @@ func HandlerFactoryFromUplinkHandler(handler func(context.Context, *ttnpb.Applic
 			log.FromContext(ctx).WithError(err).Warn("Failed to submit message")
 		}
 	}
-	return StaticHandlerFactory(h)
+	return h
 }

@@ -108,14 +108,6 @@ var gsMetrics = &messageMetrics{
 		},
 		[]string{protocol},
 	),
-	upstreamHandlers: metrics.NewContextualGaugeVec(
-		prometheus.GaugeOpts{
-			Subsystem: subsystem,
-			Name:      "upstream_handlers",
-			Help:      "Number of upstream handlers",
-		},
-		[]string{host},
-	),
 	statusReceived: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
@@ -202,7 +194,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "downlink_tx_failed_total",
 			Help:      "Total number of unsuccessfully emitted downlinks",
 		},
-		[]string{protocol},
+		[]string{protocol, "result"},
 	),
 }
 
@@ -212,7 +204,6 @@ func init() {
 
 type messageMetrics struct {
 	gatewaysConnected   *metrics.ContextualGaugeVec
-	upstreamHandlers    *metrics.ContextualGaugeVec
 	statusReceived      *metrics.ContextualCounterVec
 	statusForwarded     *metrics.ContextualCounterVec
 	statusDropped       *metrics.ContextualCounterVec
@@ -228,7 +219,6 @@ type messageMetrics struct {
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.gatewaysConnected.Describe(ch)
-	m.upstreamHandlers.Describe(ch)
 	m.statusReceived.Describe(ch)
 	m.statusForwarded.Describe(ch)
 	m.statusDropped.Describe(ch)
@@ -244,7 +234,6 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.gatewaysConnected.Collect(ch)
-	m.upstreamHandlers.Collect(ch)
 	m.statusReceived.Collect(ch)
 	m.statusForwarded.Collect(ch)
 	m.statusDropped.Collect(ch)
@@ -266,14 +255,6 @@ func registerGatewayConnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, p
 func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, protocol string) {
 	events.Publish(evtGatewayDisconnect.NewWithIdentifiersAndData(ctx, &ids, nil))
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Dec()
-}
-
-func registerUpstreamHandlerStart(ctx context.Context, host string) {
-	gsMetrics.upstreamHandlers.WithLabelValues(ctx, host).Inc()
-}
-
-func registerUpstreamHandlerStop(ctx context.Context, host string) {
-	gsMetrics.upstreamHandlers.WithLabelValues(ctx, host).Dec()
 }
 
 func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, protocol string) {
@@ -334,6 +315,6 @@ func registerSuccessDownlink(ctx context.Context, gtw *ttnpb.Gateway, protocol s
 }
 
 func registerFailDownlink(ctx context.Context, gtw *ttnpb.Gateway, ack *ttnpb.TxAcknowledgment, protocol string) {
-	events.Publish(evtTxFailureDown.NewWithIdentifiersAndData(ctx, gtw, ack.Result))
-	gsMetrics.downlinkTxFailed.WithLabelValues(ctx, protocol).Inc()
+	events.Publish(evtTxFailureDown.NewWithIdentifiersAndData(ctx, gtw, ack.Result.String()))
+	gsMetrics.downlinkTxFailed.WithLabelValues(ctx, protocol, ack.Result.String()).Inc()
 }

@@ -16,10 +16,7 @@ package udp
 
 import (
 	"context"
-	"fmt"
 	"net"
-	"os"
-	"runtime/debug"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -35,6 +32,7 @@ import (
 	encoding "go.thethings.network/lorawan-stack/v3/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 )
 
 type srv struct {
@@ -43,7 +41,6 @@ type srv struct {
 
 	server      io.Server
 	conn        *net.UDPConn
-	packetCh    chan encoding.Packet
 	connections sync.Map
 	firewall    Firewall
 
@@ -54,14 +51,15 @@ func (*srv) Protocol() string            { return "udp" }
 func (*srv) SupportsDownlinkClaim() bool { return true }
 
 var (
-	errUDPFrontendRecovered      = errors.DefineInternal("udp_frontend_recovered", "internal server error")
-	limitLogsConfig              = config.RateLimitingProfile{MaxPerMin: 1}
-	limitLogsSize           uint = 1 << 13
+	limitLogsConfig      = config.RateLimitingProfile{MaxPerMin: 1}
+	limitLogsSize   uint = 1 << 13
 )
 
 // Serve serves the UDP frontend.
 func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) error {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/udp")
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	var firewall Firewall
 	if config.AddrChangeBlock > 0 {
 		firewall = NewMemoryFirewall(ctx, config.AddrChangeBlock)
@@ -78,29 +76,27 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 		config:   config,
 		server:   server,
 		conn:     conn,
-		packetCh: make(chan encoding.Packet, config.PacketBuffer),
 		firewall: firewall,
 
 		limitLogs: limitLogs,
 	}
+	wp := workerpool.NewWorkerPool(workerpool.Config{
+		Component:  server,
+		Context:    ctx,
+		Name:       "udp",
+		Handler:    s.handlePacket,
+		MaxWorkers: config.PacketHandlers,
+		QueueSize:  config.PacketBuffer,
+	})
 	go s.gc()
 	go func() {
 		<-ctx.Done()
 		s.conn.Close()
 	}()
-	for i := 0; i < config.PacketHandlers; i++ {
-		go s.handlePackets()
-	}
-	return s.read()
+	return s.read(wp)
 }
 
-func (s *srv) read() (err error) {
-	defer func() {
-		retrievedErr := recoverUDPFrontend(s.ctx)
-		if retrievedErr != nil {
-			err = retrievedErr
-		}
-	}()
+func (s *srv) read(wp workerpool.WorkerPool) error {
 	var buf [65507]byte
 	for {
 		n, addr, err := s.conn.ReadFromUDP(buf[:])
@@ -112,10 +108,11 @@ func (s *srv) read() (err error) {
 		}
 		now := time.Now()
 		ctx := log.NewContextWithField(s.ctx, "remote_addr", addr.String())
+		logger := log.FromContext(ctx)
 
 		if err := ratelimit.Require(s.server.RateLimiter(), ratelimit.GatewayUDPTrafficResource(addr)); err != nil {
 			if ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(addr.IP.String())) == nil {
-				log.FromContext(s.ctx).WithError(err).Warn("Drop packet")
+				logger.WithError(err).Warn("Drop packet")
 			}
 			continue
 		}
@@ -127,67 +124,58 @@ func (s *srv) read() (err error) {
 			GatewayAddr: addr,
 			ReceivedAt:  now,
 		}
-		if err = packet.UnmarshalBinary(packetBuf); err != nil {
-			log.FromContext(ctx).WithError(err).Debug("Failed to unmarshal packet")
+		if err := packet.UnmarshalBinary(packetBuf); err != nil {
+			logger.WithError(err).Debug("Failed to unmarshal packet")
 			continue
 		}
 		switch packet.PacketType {
 		case encoding.PullData, encoding.PushData, encoding.TxAck:
 		default:
-			log.FromContext(ctx).WithField("packet_type", packet.PacketType).Debug("Invalid packet type for uplink")
+			logger.WithField("packet_type", packet.PacketType).Debug("Invalid packet type for uplink")
 			continue
 		}
 		if packet.GatewayEUI == nil {
-			log.FromContext(ctx).Debug("No gateway EUI in uplink message")
+			logger.Debug("No gateway EUI in uplink message")
 			continue
 		}
 
-		select {
-		case s.packetCh <- packet:
-		default:
-			log.FromContext(ctx).Warn("Packet handlers busy, dropping packet")
+		if err := wp.Publish(ctx, packet); err != nil {
+			logger.WithError(err).Warn("UDP packet publishing failed")
 		}
 	}
 }
 
-func (s *srv) handlePackets() {
-	defer recoverUDPFrontend(s.ctx)
-	for {
-		select {
-		case <-s.ctx.Done():
-			return
+func (s *srv) handlePacket(ctx context.Context, pkt interface{}) {
+	packet := pkt.(encoding.Packet)
 
-		case packet := <-s.packetCh:
-			eui := *packet.GatewayEUI
-			ctx := log.NewContextWithField(s.ctx, "gateway_eui", eui)
-			logger := log.FromContext(ctx)
+	eui := *packet.GatewayEUI
+	ctx = log.NewContextWithField(ctx, "gateway_eui", eui)
+	logger := log.FromContext(ctx)
 
-			switch packet.PacketType {
-			case encoding.PullData, encoding.PushData:
-				if err := s.writeAckFor(packet); err != nil {
-					logger.WithError(err).Warn("Failed to write acknowledgment")
-				}
-			}
-
-			if s.firewall != nil {
-				if err := s.firewall.Filter(packet); err != nil {
-					if !errors.IsResourceExhausted(err) || ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(eui.String())) == nil {
-						logger.WithError(err).Warn("Packet filtered")
-					}
-					break
-				}
-			}
-
-			cs, err := s.connect(ctx, eui)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to connect")
-				break
-			}
-
-			if err := s.handleUp(cs.io.Context(), cs, packet); err != nil {
-				logger.WithError(err).Warn("Failed to handle upstream packet")
-			}
+	switch packet.PacketType {
+	case encoding.PullData, encoding.PushData:
+		if err := s.writeAckFor(packet); err != nil {
+			logger.WithError(err).Warn("Failed to write acknowledgment")
 		}
+	}
+
+	if s.firewall != nil {
+		if err := s.firewall.Filter(packet); err != nil {
+			if !errors.IsResourceExhausted(err) || ratelimit.Require(s.limitLogs, ratelimit.NewCustomResource(eui.String())) == nil {
+				logger.WithError(err).Warn("Packet filtered")
+			}
+			return
+		}
+	}
+
+	cs, err := s.connect(ctx, eui)
+	if err != nil {
+		logger.WithError(err).Warn("Failed to connect")
+		return
+	}
+
+	if err := s.handleUp(cs.io.Context(), cs, packet); err != nil {
+		logger.WithError(err).Warn("Failed to handle upstream packet")
 	}
 }
 
@@ -258,7 +246,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet) error {
 	logger := log.FromContext(ctx)
 	md := encoding.UpstreamMetadata{
-		ID: state.io.Gateway().GatewayIdentifiers,
+		ID: *state.io.Gateway().GetIds(),
 		IP: packet.GatewayAddr.IP.String(),
 	}
 
@@ -363,14 +351,14 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 		state.startHandleDownMu.Unlock()
 	}()
 	logger := log.FromContext(ctx)
-	if err := s.server.ClaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
+	if err := s.server.ClaimDownlink(ctx, *state.io.Gateway().GetIds()); err != nil {
 		logger.WithError(err).Error("Failed to claim downlink path")
 		return errClaimDownlinkFailed.WithCause(err)
 	}
 	logger.Info("Downlink path claimed")
 	defer func() {
 		ctx := s.server.FromRequestContext(ctx)
-		if err := s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
+		if err := s.server.UnclaimDownlink(ctx, *state.io.Gateway().GetIds()); err != nil {
 			logger.WithError(err).Error("Failed to unclaim downlink path")
 			return
 		}
@@ -529,20 +517,4 @@ type state struct {
 	startHandleDownMu sync.RWMutex
 
 	tokens io.DownlinkTokens
-}
-
-func recoverUDPFrontend(ctx context.Context) error {
-	if p := recover(); p != nil {
-		fmt.Fprintln(os.Stderr, p)
-		os.Stderr.Write(debug.Stack())
-		var err error
-		if pErr, ok := p.(error); ok {
-			err = errUDPFrontendRecovered.WithCause(pErr)
-		} else {
-			err = errUDPFrontendRecovered.WithAttributes("panic", p)
-		}
-		log.FromContext(ctx).WithError(err).Error("UDP frontend failed")
-		return err
-	}
-	return nil
 }
