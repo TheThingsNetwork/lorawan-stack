@@ -246,7 +246,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet) error {
 	logger := log.FromContext(ctx)
 	md := encoding.UpstreamMetadata{
-		ID: state.io.Gateway().GatewayIdentifiers,
+		ID: *state.io.Gateway().GetIds(),
 		IP: packet.GatewayAddr.IP.String(),
 	}
 
@@ -351,14 +351,14 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 		state.startHandleDownMu.Unlock()
 	}()
 	logger := log.FromContext(ctx)
-	if err := s.server.ClaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
+	if err := s.server.ClaimDownlink(ctx, *state.io.Gateway().GetIds()); err != nil {
 		logger.WithError(err).Error("Failed to claim downlink path")
 		return errClaimDownlinkFailed.WithCause(err)
 	}
 	logger.Info("Downlink path claimed")
 	defer func() {
 		ctx := s.server.FromRequestContext(ctx)
-		if err := s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
+		if err := s.server.UnclaimDownlink(ctx, *state.io.Gateway().GetIds()); err != nil {
 			logger.WithError(err).Error("Failed to unclaim downlink path")
 			return
 		}

@@ -124,7 +124,7 @@ func (req *SetGatewayCollaboratorRequest) ExtractRequestFields(m map[string]inte
 	if req == nil {
 		return
 	}
-	req.GatewayIdentifiers.ExtractRequestFields(m)
+	req.GetGatewayIds().ExtractRequestFields(m)
 	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
 }
 

@@ -230,7 +230,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 			continue
 		}
 		buf, err := UplinkToken(ttnpb.GatewayAntennaIdentifiers{
-			GatewayIdentifiers: c.gateway.GatewayIdentifiers,
+			GatewayIdentifiers: *c.gateway.GetIds(),
 			AntennaIndex:       md.AntennaIndex,
 		}, md.Timestamp, ct, up.ReceivedAt)
 		if err != nil {
