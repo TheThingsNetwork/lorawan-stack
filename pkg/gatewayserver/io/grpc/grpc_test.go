@@ -50,6 +50,8 @@ var (
 	timeout = (1 << 4) * test.Delay
 )
 
+func timePtr(t time.Time) *time.Time { return &t }
+
 func TestAuthentication(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)
@@ -220,7 +222,8 @@ func TestTraffic(t *testing.T) {
 			{},
 			{
 				GatewayStatus: &ttnpb.GatewayStatus{
-					Ip: []string{"1.1.1.1"},
+					Ip:   []string{"1.1.1.1"},
+					Time: timePtr(time.Now()),
 				},
 			},
 			{
@@ -269,7 +272,8 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 				GatewayStatus: &ttnpb.GatewayStatus{
-					Ip: []string{"2.2.2.2"},
+					Ip:   []string{"2.2.2.2"},
+					Time: timePtr(time.Now()),
 				},
 			},
 			{
@@ -333,7 +337,8 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 				GatewayStatus: &ttnpb.GatewayStatus{
-					Ip: []string{"3.3.3.3"},
+					Ip:   []string{"3.3.3.3"},
+					Time: timePtr(time.Now()),
 				},
 			},
 			{
