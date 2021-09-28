@@ -70,7 +70,7 @@ var createAdminUserCommand = &cobra.Command{
 				return err
 			}
 			if string(pw) != password {
-				return errPasswordMismatch
+				return errPasswordMismatch.New()
 			}
 		}
 		if password == "" {

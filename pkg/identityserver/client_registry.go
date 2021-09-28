@@ -79,7 +79,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 	}
 	if usrIDs := req.GetCollaborator().GetUserIds(); usrIDs != nil {
 		if !createdByAdmin && !is.configFromContext(ctx).UserRights.CreateClients {
-			return nil, errAdminsCreateClients
+			return nil, errAdminsCreateClients.New()
 		}
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_CLIENTS_CREATE); err != nil {
 			return nil, err
@@ -368,7 +368,7 @@ func (is *IdentityServer) restoreClient(ctx context.Context, ids *ttnpb.ClientId
 
 func (is *IdentityServer) purgeClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*pbtypes.Empty, error) {
 	if !is.IsAdmin(ctx) {
-		return nil, errAdminsPurgeClients
+		return nil, errAdminsPurgeClients.New()
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		// delete related authorizations before purging the client

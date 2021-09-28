@@ -43,10 +43,10 @@ func getUserSessionID(flagSet *pflag.FlagSet, args []string) (*ttnpb.UserSession
 		sessionID = args[1]
 	}
 	if userID == "" {
-		return nil, errNoUserID
+		return nil, errNoUserID.New()
 	}
 	if sessionID == "" {
-		return nil, errNoSessionID
+		return nil, errNoSessionID.New()
 	}
 	return &ttnpb.UserSessionIdentifiers{
 		UserIds:   &ttnpb.UserIdentifiers{UserId: userID},
@@ -67,7 +67,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
-				return errNoUserID
+				return errNoUserID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)

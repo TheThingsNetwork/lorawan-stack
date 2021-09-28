@@ -72,7 +72,7 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 		// back button after logging in). If there is a valid auth cookie, we just
 		// redirect back to the client mount instead of showing an error.
 		if acErr != nil {
-			return errNoStateCookie
+			return errNoStateCookie.New()
 		}
 		if value.AccessToken != "" {
 			config := oc.configFromContext(c.Request().Context())

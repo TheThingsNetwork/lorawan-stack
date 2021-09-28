@@ -142,7 +142,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectClientFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.ClientRegistry/Get"].Allowed)
@@ -170,7 +170,7 @@ var (
 			cliID := getClientID(cmd.Flags(), args)
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
-				return errNoCollaborator
+				return errNoCollaborator.New()
 			}
 			var client ttnpb.Client
 			client.State = ttnpb.STATE_APPROVED // This may not be honored by the server.
@@ -191,7 +191,7 @@ var (
 				client.Ids = &ttnpb.ClientIdentifiers{ClientId: cliID.GetClientId()}
 			}
 			if client.GetIds().GetClientId() == "" {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -220,7 +220,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setClientFlags, attributesFlags())
 			if len(paths) == 0 {
@@ -257,7 +257,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -278,7 +278,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -300,7 +300,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
 			if cliID == nil {
-				return errNoClientID
+				return errNoClientID.New()
 			}
 
 			force, err := cmd.Flags().GetBool("force")
@@ -308,7 +308,7 @@ var (
 				return err
 			}
 			if !confirmChoice(clientPurgeWarning, force) {
-				return errNoConfirmation
+				return errNoConfirmation.New()
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -325,7 +325,7 @@ var (
 	clientsContactInfoCommand = contactInfoCommands("client", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
 		cliID := getClientID(cmd.Flags(), args)
 		if cliID == nil {
-			return nil, errNoClientID
+			return nil, errNoClientID.New()
 		}
 		return cliID.GetEntityIdentifiers(), nil
 	})

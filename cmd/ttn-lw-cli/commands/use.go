@@ -56,7 +56,7 @@ var (
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 {
-				return errNoHost
+				return errNoHost.New()
 			}
 			insecure, _ := cmd.Flags().GetBool("insecure")
 			fetchCA, _ := cmd.Flags().GetBool("fetch-ca")

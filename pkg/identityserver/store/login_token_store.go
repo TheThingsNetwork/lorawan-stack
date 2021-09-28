@@ -92,10 +92,10 @@ func (s *loginTokenStore) ConsumeLoginToken(ctx context.Context, token string) (
 		return nil, err
 	}
 	if loginTokenModel.Used {
-		return nil, errLoginTokenAlreadyUsed
+		return nil, errLoginTokenAlreadyUsed.New()
 	}
 	if loginTokenModel.ExpiresAt.Before(time.Now()) {
-		return nil, errLoginTokenExpired
+		return nil, errLoginTokenExpired.New()
 	}
 	loginTokenModel.Used = true
 	if err := s.updateEntity(ctx, &loginTokenModel, "used"); err != nil {

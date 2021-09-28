@@ -58,10 +58,10 @@ var createAPIKeyCommand = &cobra.Command{
 		if expiry != "" {
 			expiryDate, err := time.Parse(time.RFC3339, expiry)
 			if err != nil {
-				return errInvalidDateFormat
+				return errInvalidDateFormat.New()
 			}
 			if expiryDate.Before(time.Now()) {
-				return errExpiryDateInPast
+				return errExpiryDateInPast.New()
 			}
 		}
 

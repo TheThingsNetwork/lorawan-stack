@@ -400,7 +400,7 @@ for the Home Network (by NetID and tenant ID).`,
 			}
 			// TODO: Support per-network settings (https://github.com/TheThingsNetwork/lorawan-stack/issues/4409)
 			if id != nil {
-				return errPacketBrokerNetworkID
+				return errPacketBrokerNetworkID.New()
 			}
 
 			pba, err := api.Dial(ctx, config.PacketBrokerAgentGRPCAddress)
@@ -436,7 +436,7 @@ Specify default to configure the default gateway visibility.`,
 			}
 			// TODO: Support per-network settings (https://github.com/TheThingsNetwork/lorawan-stack/issues/4409)
 			if id != nil {
-				return errPacketBrokerNetworkID
+				return errPacketBrokerNetworkID.New()
 			}
 
 			pba, err := api.Dial(ctx, config.PacketBrokerAgentGRPCAddress)
@@ -477,7 +477,7 @@ Specify default to configure the default gateway visibility.`,
 			}
 			// TODO: Support per-network settings (https://github.com/TheThingsNetwork/lorawan-stack/issues/4409)
 			if id != nil {
-				return errPacketBrokerNetworkID
+				return errPacketBrokerNetworkID.New()
 			}
 
 			pba, err := api.Dial(ctx, config.PacketBrokerAgentGRPCAddress)

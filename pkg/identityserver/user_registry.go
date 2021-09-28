@@ -744,7 +744,7 @@ func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdenti
 
 func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
 	if !is.IsAdmin(ctx) {
-		return nil, errAdminsPurgeUsers
+		return nil, errAdminsPurgeUsers.New()
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		err := store.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)

@@ -60,10 +60,10 @@ func getApplicationWebhookID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appl
 		webhookID = args[1]
 	}
 	if applicationID == "" {
-		return nil, errNoApplicationID
+		return nil, errNoApplicationID.New()
 	}
 	if webhookID == "" {
-		return nil, errNoWebhookID
+		return nil, errNoWebhookID.New()
 	}
 	return &ttnpb.ApplicationWebhookIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
@@ -140,7 +140,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
-				return errNoApplicationID
+				return errNoApplicationID.New()
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationWebhookFlags)
 			if len(paths) == 0 {
