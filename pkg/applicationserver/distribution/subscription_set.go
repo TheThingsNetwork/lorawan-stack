@@ -35,7 +35,7 @@ const (
 // newSubscriptionSet creates a new subscription set. The timeout represents
 // the period after which the set will shut down if empty. If the timeout is
 // zero, the set never timeouts.
-func newSubscriptionSet(ctx context.Context, rd RequestDecoupler, timeout time.Duration) *subscriptionSet {
+func newSubscriptionSet(ctx context.Context, rd RequestDecoupler, timeout time.Duration, opts ...io.SubscriptionOption) *subscriptionSet {
 	ctx, cancel := errorcontext.New(ctx)
 	s := &subscriptionSet{
 		ctx:           ctx,
@@ -45,6 +45,7 @@ func newSubscriptionSet(ctx context.Context, rd RequestDecoupler, timeout time.D
 		subscribeCh:   make(chan *io.Subscription, 1),
 		unsubscribeCh: make(chan *io.Subscription, 1),
 		upCh:          make(chan *io.ContextualApplicationUp, subscriptionSetBufferSize),
+		subOpts:       opts,
 	}
 	go s.run()
 	return s
@@ -58,6 +59,7 @@ type subscriptionSet struct {
 	subscribeCh   chan *io.Subscription
 	unsubscribeCh chan *io.Subscription
 	upCh          chan *io.ContextualApplicationUp
+	subOpts       []io.SubscriptionOption
 }
 
 // Context returns the context of the set.
@@ -72,7 +74,7 @@ func (s *subscriptionSet) Cancel(err error) {
 
 // Subscribe creates a subscription for the provided application with the given protocol.
 func (s *subscriptionSet) Subscribe(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
-	sub := io.NewSubscription(ctx, protocol, ids)
+	sub := io.NewSubscription(ctx, protocol, ids, s.subOpts...)
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()

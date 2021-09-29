@@ -105,19 +105,47 @@ type Subscription struct {
 	protocol string
 	ids      *ttnpb.ApplicationIdentifiers
 
-	upCh chan *ContextualApplicationUp
+	upCh    chan *ContextualApplicationUp
+	publish func(context.Context, context.Context, chan<- *ContextualApplicationUp, *ContextualApplicationUp) error
+}
+
+// SubscriptionOption is an option for a Subscription.
+type SubscriptionOption interface {
+	// apply is unexposed in order to ensure that options
+	// are not applied after the Subscription has been created.
+	apply(*Subscription)
+}
+
+type subscriptionOptionFunc func(s *Subscription)
+
+func (f subscriptionOptionFunc) apply(s *Subscription) { f(s) }
+
+// WithBlocking controls if the Publish call is blocking or not.
+func WithBlocking(blocking bool) SubscriptionOption {
+	return subscriptionOptionFunc(func(s *Subscription) {
+		if blocking {
+			s.publish = blockingPublish
+		} else {
+			s.publish = nonBlockingPublish
+		}
+	})
 }
 
 // NewSubscription instantiates a new application or integration subscription.
-func NewSubscription(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers) *Subscription {
+func NewSubscription(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers, opts ...SubscriptionOption) *Subscription {
 	ctx, cancelCtx := errorcontext.New(ctx)
-	return &Subscription{
+	s := &Subscription{
 		ctx:       ctx,
 		cancelCtx: cancelCtx,
 		protocol:  protocol,
 		ids:       ids,
 		upCh:      make(chan *ContextualApplicationUp, bufferSize),
+		publish:   nonBlockingPublish,
 	}
+	for _, opt := range opts {
+		opt.apply(s)
+	}
+	return s
 }
 
 // Context returns the subscription context.
@@ -134,23 +162,39 @@ func (s *Subscription) Protocol() string { return s.protocol }
 // ApplicationIDs returns the application identifiers, if the subscription represents any specific.
 func (s *Subscription) ApplicationIDs() *ttnpb.ApplicationIdentifiers { return s.ids }
 
-var errBufferFull = errors.DefineResourceExhausted("buffer_full", "buffer is full")
-
 // Publish publishes an upstream message.
-// This method returns immediately, returning nil if the message is buffered, or with an error when the buffer is full.
 func (s *Subscription) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	ctxUp := &ContextualApplicationUp{
 		Context:       ctx,
 		ApplicationUp: up,
 	}
+	return s.publish(ctx, s.ctx, s.upCh, ctxUp)
+}
+
+func blockingPublish(ctx context.Context, subCtx context.Context, upCh chan<- *ContextualApplicationUp, up *ContextualApplicationUp) error {
 	select {
-	case <-s.ctx.Done():
-		return s.ctx.Err()
-	case s.upCh <- ctxUp:
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-subCtx.Done():
+		return subCtx.Err()
+	case upCh <- up:
+		return nil
+	}
+}
+
+var errBufferFull = errors.DefineResourceExhausted("buffer_full", "buffer is full")
+
+func nonBlockingPublish(ctx context.Context, subCtx context.Context, upCh chan<- *ContextualApplicationUp, up *ContextualApplicationUp) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-subCtx.Done():
+		return subCtx.Err()
+	case upCh <- up:
+		return nil
 	default:
 		return errBufferFull.New()
 	}
-	return nil
 }
 
 // Up returns the upstream channel.
