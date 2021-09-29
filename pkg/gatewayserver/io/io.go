@@ -324,7 +324,8 @@ var (
 	errDownlinkPath     = errors.DefineInvalidArgument("downlink_path", "invalid downlink path")
 	errRxEmpty          = errors.DefineFailedPrecondition("rx_empty", "settings empty")
 	errRxWindowSchedule = errors.Define("rx_window_schedule", "schedule in Rx window `{window}` failed")
-	errDataRate         = errors.DefineInvalidArgument("data_rate", "no data rate with index `{index}`")
+	errDataRateRxWindow = errors.DefineInvalidArgument("data_rate_rx_window", "invalid data rate in Rx window `{window}`")
+	errDataRateIndex    = errors.DefineInvalidArgument("data_rate_index", "no data rate with index `{index}`")
 	errTooLong          = errors.DefineInvalidArgument("too_long", "the payload length `{payload_length}` exceeds maximum `{maximum_length}` at data rate index `{data_rate_index}`")
 	errTxSchedule       = errors.DefineAborted("tx_schedule", "failed to schedule")
 )
@@ -432,19 +433,23 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		return false, false, 0, err
 	}
 
-	// TODO: Take fully defined data rate from TxRequest (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
 	var rxErrs []errors.ErrorDetails
 	for i, rx := range []struct {
+		dataRate      *ttnpb.DataRate
 		dataRateIndex ttnpb.DataRateIndex
 		frequency     uint64
 		delay         time.Duration
 	}{
 		{
+			dataRate: request.Rx1DataRate,
+			// TODO: Remove; request.Rx{1,2}DataRate must now be set (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
 			dataRateIndex: request.Rx1DataRateIndex,
 			frequency:     request.Rx1Frequency,
 			delay:         0,
 		},
 		{
+			dataRate: request.Rx2DataRate,
+			// TODO: Remove; request.Rx{1,2}DataRate must now be set (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
 			dataRateIndex: request.Rx2DataRateIndex,
 			frequency:     request.Rx2Frequency,
 			delay:         time.Second,
@@ -454,18 +459,30 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			rxErrs = append(rxErrs, errRxEmpty)
 			continue
 		}
+		if rx.dataRate == nil {
+			dr, ok := phy.DataRates[rx.dataRateIndex]
+			if !ok {
+				return false, false, 0, errDataRateIndex.WithAttributes("index", rx.dataRateIndex)
+			}
+			rx.dataRate = &dr.Rate
+		}
+		var (
+			ok     bool
+			bandDR band.DataRate
+		)
+		rx.dataRateIndex, bandDR, ok = phy.FindDownlinkDataRate(*rx.dataRate)
+		if !ok {
+			return false, false, 0, errDataRateRxWindow.WithAttributes("window", i+1)
+		}
+
 		logger := logger.WithFields(log.Fields(
 			"rx_window", i+1,
 			"frequency", rx.frequency,
 			"data_rate_index", rx.dataRateIndex,
 		))
 		logger.Debug("Attempt to schedule downlink in receive window")
-		dr, ok := phy.DataRates[rx.dataRateIndex]
-		if !ok {
-			return false, false, 0, errDataRate.WithAttributes("index", rx.dataRateIndex)
-		}
 		// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
-		maxPHYLength := dr.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()) + 5
+		maxPHYLength := bandDR.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()) + 5
 		if len(msg.RawPayload) > int(maxPHYLength) {
 			return false, false, 0, errTooLong.WithAttributes(
 				"payload_length", len(msg.RawPayload),
@@ -484,7 +501,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			eirp = *sb.MaxEIRP
 		}
 		settings := ttnpb.TxSettings{
-			DataRate: dr.Rate,
+			DataRate: *rx.dataRate,
 			// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
 			DataRateIndex: rx.dataRateIndex,
 			Frequency:     rx.frequency,
@@ -496,7 +513,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
 			settings.Downlink.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
 		}
-		switch mod := dr.Rate.Modulation.(type) {
+		switch mod := rx.dataRate.Modulation.(type) {
 		case *ttnpb.DataRate_Lora:
 			// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466).
 			settings.CodingRate = phy.LoRaCodingRate

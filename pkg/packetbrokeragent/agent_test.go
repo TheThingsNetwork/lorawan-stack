@@ -32,7 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
-	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent"
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent/mock"
@@ -75,13 +74,7 @@ func TestForwarder(t *testing.T) {
 	defer cancel()
 
 	c := componenttest.NewComponent(t, &component.Config{
-		ServiceBase: config.ServiceBase{
-			TLS: tlsconfig.Config{
-				Client: tlsconfig.Client{
-					RootCA: "testdata/serverca.pem",
-				},
-			},
-		},
+		ServiceBase: config.ServiceBase{},
 	})
 	c.FrequencyPlans = test.FrequencyPlanStore
 
@@ -177,7 +170,6 @@ func TestForwarder(t *testing.T) {
 						},
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						DataRate:             packetbroker.NewLoRaDataRate(7, 125000, "4/5"),
-						DataRateIndex:        5,
 						Frequency:            869525000,
 						CodingRate:           "4/5",
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
@@ -299,7 +291,6 @@ func TestForwarder(t *testing.T) {
 						},
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						DataRate:             packetbroker.NewLoRaDataRate(9, 125000, "4/5"),
-						DataRateIndex:        3,
 						Frequency:            868300000,
 						CodingRate:           "4/5",
 						GatewayMetadata: &packetbroker.UplinkMessage_GatewayMetadata{
@@ -426,10 +417,26 @@ func TestForwarder(t *testing.T) {
 					},
 					Priority:         ttnpb.TxSchedulePriority_NORMAL,
 					Rx1DataRateIndex: 5,
+					Rx1DataRate: &ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_Lora{
+							Lora: &ttnpb.LoRaDataRate{
+								SpreadingFactor: 7,
+								Bandwidth:       125000,
+							},
+						},
+					},
 					Rx1Frequency:     868100000,
 					Rx1Delay:         ttnpb.RX_DELAY_5,
 					Rx2DataRateIndex: 0,
-					Rx2Frequency:     869525000,
+					Rx2DataRate: &ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_Lora{
+							Lora: &ttnpb.LoRaDataRate{
+								SpreadingFactor: 12,
+								Bandwidth:       125000,
+							},
+						},
+					},
+					Rx2Frequency: 869525000,
 				},
 			},
 		})
@@ -519,15 +526,7 @@ func TestHomeNetwork(t *testing.T) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	c := componenttest.NewComponent(t, &component.Config{
-		ServiceBase: config.ServiceBase{
-			TLS: tlsconfig.Config{
-				Client: tlsconfig.Client{
-					RootCA: "testdata/serverca.pem",
-				},
-			},
-		},
-	})
+	c := componenttest.NewComponent(t, &component.Config{})
 	c.FrequencyPlans = test.FrequencyPlanStore
 
 	dp, addr := mustServePBDataPlane(ctx, t)
@@ -574,7 +573,7 @@ func TestHomeNetwork(t *testing.T) {
 								Plain: "foo-gateway",
 							},
 						},
-						DataRateIndex:        5, // NOTE: Fallback behavior; DataRate is not defined, only the DataRateIndex
+						DataRate:             packetbroker.NewLoRaDataRate(7, 125000, "4/5"),
 						ForwarderReceiveTime: test.Must(pbtypes.TimestampProto(time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC))).(*pbtypes.Timestamp),
 						Frequency:            869525000,
 						CodingRate:           "4/5",
@@ -689,9 +688,8 @@ func TestHomeNetwork(t *testing.T) {
 								},
 							},
 						},
-						DataRateIndex: 5,
-						Frequency:     869525000,
-						CodingRate:    "4/5",
+						Frequency:  869525000,
+						CodingRate: "4/5",
 					},
 				},
 			},
@@ -801,9 +799,8 @@ func TestHomeNetwork(t *testing.T) {
 								},
 							},
 						},
-						DataRateIndex: 3,
-						Frequency:     869525000,
-						CodingRate:    "4/5",
+						Frequency:  869525000,
+						CodingRate: "4/5",
 					},
 				},
 			},
@@ -858,12 +855,26 @@ func TestHomeNetwork(t *testing.T) {
 							},
 						},
 					},
-					Priority:         ttnpb.TxSchedulePriority_NORMAL,
-					Rx1DataRateIndex: 5,
-					Rx1Frequency:     868100000,
-					Rx1Delay:         ttnpb.RX_DELAY_5,
-					Rx2DataRateIndex: 0,
-					Rx2Frequency:     869525000,
+					Priority: ttnpb.TxSchedulePriority_NORMAL,
+					Rx1DataRate: &ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_Lora{
+							Lora: &ttnpb.LoRaDataRate{
+								Bandwidth:       125000,
+								SpreadingFactor: 7,
+							},
+						},
+					},
+					Rx1Frequency: 868100000,
+					Rx1Delay:     ttnpb.RX_DELAY_5,
+					Rx2DataRate: &ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_Lora{
+							Lora: &ttnpb.LoRaDataRate{
+								Bandwidth:       125000,
+								SpreadingFactor: 12,
+							},
+						},
+					},
+					Rx2Frequency: 869525000,
 				},
 			},
 		}
@@ -895,14 +906,12 @@ func TestHomeNetwork(t *testing.T) {
 				Class:      packetbroker.DownlinkMessageClass_CLASS_A,
 				Priority:   packetbroker.DownlinkMessagePriority_NORMAL,
 				Rx1: &packetbroker.DownlinkMessage_RXSettings{
-					Frequency:     868100000,
-					DataRate:      packetbroker.NewLoRaDataRate(7, 125000, "4/5"),
-					DataRateIndex: 5,
+					Frequency: 868100000,
+					DataRate:  packetbroker.NewLoRaDataRate(7, 125000, "4/5"),
 				},
 				Rx2: &packetbroker.DownlinkMessage_RXSettings{
-					Frequency:     869525000,
-					DataRate:      packetbroker.NewLoRaDataRate(12, 125000, "4/5"),
-					DataRateIndex: 0,
+					Frequency: 869525000,
+					DataRate:  packetbroker.NewLoRaDataRate(12, 125000, "4/5"),
 				},
 				Rx1Delay:           pbtypes.DurationProto(5 * time.Second),
 				GatewayUplinkToken: []byte(`test-token`),

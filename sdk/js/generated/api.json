@@ -27148,8 +27148,20 @@
               }
             },
             {
+              "name": "rx1_data_rate",
+              "description": "LoRaWAN data rate for Rx1.",
+              "label": "",
+              "type": "DataRate",
+              "longType": "DataRate",
+              "fullType": "ttn.lorawan.v3.DataRate",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "rx1_data_rate_index",
-              "description": "LoRaWAN data rate index for Rx1.",
+              "description": "LoRaWAN data rate index for Rx1.\nDEPRECATED: Use rx1_data_rate instead.",
               "label": "",
               "type": "DataRateIndex",
               "longType": "DataRateIndex",
@@ -27180,8 +27192,20 @@
               "defaultValue": ""
             },
             {
+              "name": "rx2_data_rate",
+              "description": "LoRaWAN data rate for Rx2.",
+              "label": "",
+              "type": "DataRate",
+              "longType": "DataRate",
+              "fullType": "ttn.lorawan.v3.DataRate",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "rx2_data_rate_index",
-              "description": "LoRaWAN data rate index for Rx2.",
+              "description": "LoRaWAN data rate index for Rx2.\nDEPRECATED: Use rx2_data_rate instead.",
               "label": "",
               "type": "DataRateIndex",
               "longType": "DataRateIndex",

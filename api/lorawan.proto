@@ -361,11 +361,17 @@ message TxRequest {
 
   // Rx1 delay (Rx2 delay is Rx1 delay + 1 second).
   RxDelay rx1_delay = 3 [(validate.rules).enum.defined_only = true];
+  // LoRaWAN data rate for Rx1.
+  DataRate rx1_data_rate = 12;
   // LoRaWAN data rate index for Rx1.
+  // DEPRECATED: Use rx1_data_rate instead.
   DataRateIndex rx1_data_rate_index = 4 [(validate.rules).enum.defined_only = true];
   // Frequency (Hz) for Rx1.
   uint64 rx1_frequency = 5;
+  // LoRaWAN data rate for Rx2.
+  DataRate rx2_data_rate = 13;
   // LoRaWAN data rate index for Rx2.
+  // DEPRECATED: Use rx2_data_rate instead.
   DataRateIndex rx2_data_rate_index = 6 [(validate.rules).enum.defined_only = true];
   // Frequency (Hz) for Rx2.
   uint64 rx2_frequency = 7;

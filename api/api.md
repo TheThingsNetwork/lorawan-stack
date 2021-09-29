@@ -5697,9 +5697,11 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 | `class` | [`Class`](#ttn.lorawan.v3.Class) |  |  |
 | `downlink_paths` | [`DownlinkPath`](#ttn.lorawan.v3.DownlinkPath) | repeated | Downlink paths used to select a gateway for downlink. In class A, the downlink paths are required to only contain uplink tokens. In class B and C, the downlink paths may contain uplink tokens and fixed gateways antenna identifiers. |
 | `rx1_delay` | [`RxDelay`](#ttn.lorawan.v3.RxDelay) |  | Rx1 delay (Rx2 delay is Rx1 delay + 1 second). |
-| `rx1_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx1. |
+| `rx1_data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  | LoRaWAN data rate for Rx1. |
+| `rx1_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx1. DEPRECATED: Use rx1_data_rate instead. |
 | `rx1_frequency` | [`uint64`](#uint64) |  | Frequency (Hz) for Rx1. |
-| `rx2_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx2. |
+| `rx2_data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  | LoRaWAN data rate for Rx2. |
+| `rx2_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx2. DEPRECATED: Use rx2_data_rate instead. |
 | `rx2_frequency` | [`uint64`](#uint64) |  | Frequency (Hz) for Rx2. |
 | `priority` | [`TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority) |  | Priority for scheduling. Requests with a higher priority are allocated more channel time than messages with a lower priority, in duty-cycle limited regions. A priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object. |
 | `absolute_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the downlink message should be transmitted. This value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots. This requires the gateway to have GPS time sychronization. If the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations. |

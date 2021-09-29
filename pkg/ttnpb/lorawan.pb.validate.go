@@ -2014,6 +2014,18 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "rx1_data_rate":
+
+			if v, ok := interface{}(m.GetRx1DataRate()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return TxRequestValidationError{
+						field:  "rx1_data_rate",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "rx1_data_rate_index":
 
 			if _, ok := DataRateIndex_name[int32(m.GetRx1DataRateIndex())]; !ok {
@@ -2025,6 +2037,18 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 
 		case "rx1_frequency":
 			// no validation rules for Rx1Frequency
+		case "rx2_data_rate":
+
+			if v, ok := interface{}(m.GetRx2DataRate()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return TxRequestValidationError{
+						field:  "rx2_data_rate",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "rx2_data_rate_index":
 
 			if _, ok := DataRateIndex_name[int32(m.GetRx2DataRateIndex())]; !ok {
