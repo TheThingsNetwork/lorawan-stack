@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
@@ -852,20 +853,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_A,
-							DownlinkPaths: paths,
-							Priority:      ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:   &lastUp.Settings.DataRate,
-							Rx1Delay:      dev.MacState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:  dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							Rx2DataRate: &ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_Lora{
-									Lora: &ttnpb.LoRaDataRate{
-										Bandwidth:       125000,
-										SpreadingFactor: 12 - uint32(dev.MacState.CurrentParameters.Rx2DataRateIndex),
-									},
-								},
-							},
+							Class:             ttnpb.CLASS_A,
+							DownlinkPaths:     paths,
+							Priority:          ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRate:       &lastUp.Settings.DataRate,
+							Rx1Delay:          dev.MacState.CurrentParameters.Rx1Delay,
+							Rx1Frequency:      dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
@@ -1014,20 +1008,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_A,
-							DownlinkPaths: paths,
-							Priority:      ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:   &lastUp.Settings.DataRate,
-							Rx1Delay:      dev.MacState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:  dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							Rx2DataRate: &ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_Lora{
-									Lora: &ttnpb.LoRaDataRate{
-										Bandwidth:       125000,
-										SpreadingFactor: 12 - uint32(dev.MacState.CurrentParameters.Rx2DataRateIndex),
-									},
-								},
-							},
+							Class:             ttnpb.CLASS_A,
+							DownlinkPaths:     paths,
+							Priority:          ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRate:       &lastUp.Settings.DataRate,
+							Rx1Delay:          dev.MacState.CurrentParameters.Rx1Delay,
+							Rx1Frequency:      dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
@@ -1180,20 +1167,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_A,
-							DownlinkPaths: paths,
-							Priority:      ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:   &lastUp.Settings.DataRate,
-							Rx1Delay:      dev.MacState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:  dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							Rx2DataRate: &ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_Lora{
-									Lora: &ttnpb.LoRaDataRate{
-										Bandwidth:       125000,
-										SpreadingFactor: 12 - uint32(dev.MacState.CurrentParameters.Rx2DataRateIndex),
-									},
-								},
-							},
+							Class:             ttnpb.CLASS_A,
+							DownlinkPaths:     paths,
+							Priority:          ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRate:       &lastUp.Settings.DataRate,
+							Rx1Delay:          dev.MacState.CurrentParameters.Rx1Delay,
+							Rx1Frequency:      dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
@@ -1664,20 +1644,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_A,
-							DownlinkPaths: paths,
-							Priority:      ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:   &lastUp.Settings.DataRate,
-							Rx1Delay:      dev.MacState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:  dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							Rx2DataRate: &ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_Lora{
-									Lora: &ttnpb.LoRaDataRate{
-										Bandwidth:       125000,
-										SpreadingFactor: 12 - uint32(dev.MacState.CurrentParameters.Rx2DataRateIndex),
-									},
-								},
-							},
+							Class:             ttnpb.CLASS_A,
+							DownlinkPaths:     paths,
+							Priority:          ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRate:       &lastUp.Settings.DataRate,
+							Rx1Delay:          dev.MacState.CurrentParameters.Rx1Delay,
+							Rx1Frequency:      dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
@@ -1821,17 +1794,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_C,
-							DownlinkPaths: paths,
-							Priority:      ttnpb.TxSchedulePriority_HIGH,
-							Rx2DataRate: &ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_Lora{
-									Lora: &ttnpb.LoRaDataRate{
-										Bandwidth:       125000,
-										SpreadingFactor: 12 - uint32(dev.MacState.CurrentParameters.Rx2DataRateIndex),
-									},
-								},
-							},
+							Class:             ttnpb.CLASS_C,
+							DownlinkPaths:     paths,
+							Priority:          ttnpb.TxSchedulePriority_HIGH,
+							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
@@ -2103,18 +2069,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_C,
-							DownlinkPaths: paths,
-							Priority:      ttnpb.TxSchedulePriority_HIGH,
-							AbsoluteTime:  TimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
-							Rx2DataRate: &ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_Lora{
-									Lora: &ttnpb.LoRaDataRate{
-										Bandwidth:       125000,
-										SpreadingFactor: 12 - uint32(dev.MacState.CurrentParameters.Rx2DataRateIndex),
-									},
-								},
-							},
+							Class:             ttnpb.CLASS_C,
+							DownlinkPaths:     paths,
+							Priority:          ttnpb.TxSchedulePriority_HIGH,
+							AbsoluteTime:      TimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
+							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
@@ -2273,17 +2232,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_C,
-							DownlinkPaths: paths,
-							Priority:      ttnpb.TxSchedulePriority_HIGH,
-							Rx2DataRate: &ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_Lora{
-									Lora: &ttnpb.LoRaDataRate{
-										Bandwidth:       125000,
-										SpreadingFactor: 12 - uint32(dev.MacState.CurrentParameters.Rx2DataRateIndex),
-									},
-								},
-							},
+							Class:             ttnpb.CLASS_C,
+							DownlinkPaths:     paths,
+							Priority:          ttnpb.TxSchedulePriority_HIGH,
+							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
@@ -2533,20 +2485,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					joinAcceptBytes,
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_A,
-							DownlinkPaths: paths,
-							Priority:      ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:   &lastUp.Settings.DataRate,
-							Rx1Delay:      DefaultEU868JoinAcceptDelay,
-							Rx1Frequency:  dev.PendingMacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							Rx2DataRate: &ttnpb.DataRate{
-								Modulation: &ttnpb.DataRate_Lora{
-									Lora: &ttnpb.LoRaDataRate{
-										Bandwidth:       125000,
-										SpreadingFactor: 12 - uint32(dev.PendingMacState.CurrentParameters.Rx2DataRateIndex),
-									},
-								},
-							},
+							Class:             ttnpb.CLASS_A,
+							DownlinkPaths:     paths,
+							Priority:          ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRate:       &lastUp.Settings.DataRate,
+							Rx1Delay:          DefaultEU868JoinAcceptDelay,
+							Rx1Frequency:      dev.PendingMacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:      dev.PendingMacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
@@ -2750,4 +2695,16 @@ func TestProcessDownlinkTask(t *testing.T) {
 			},
 		})
 	}
+}
+
+func rx2DataRateFromIndex(dev *ttnpb.EndDevice, a *assertions.Assertion, t *testing.T) *ttnpb.DataRate {
+	phy, err := DeviceBand(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher))
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	dr, ok := phy.DataRates[dev.MacState.CurrentParameters.Rx2DataRateIndex]
+	if !a.So(ok, should.BeTrue) {
+		t.FailNow()
+	}
+	return &dr.Rate
 }
