@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
@@ -84,6 +85,8 @@ message AsConfiguration {
   message PubSub {
     message Providers {
       enum Status {
+        option (thethings.json.enum) = { marshal_as_string: true };
+
         // No restrictions are in place.
         ENABLED = 0;
         // Warnings are being emitted that the provider will be deprecated in the future.

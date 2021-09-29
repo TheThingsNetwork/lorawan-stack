@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
@@ -63,6 +64,8 @@ message ApplicationPubSub {
     string password = 4 [(validate.rules).string.max_len = 100];
 
     enum QoS {
+      option (thethings.json.enum) = { marshal_as_string: true };
+
       AT_MOST_ONCE = 0;
       AT_LEAST_ONCE = 1;
       EXACTLY_ONCE = 2;

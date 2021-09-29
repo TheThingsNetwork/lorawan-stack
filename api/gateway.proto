@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
@@ -292,6 +293,7 @@ message SetGatewayCollaboratorRequest {
 }
 
 enum GatewayAntennaPlacement {
+  option (thethings.json.enum) = { marshal_as_string: true, prefix: "PLACEMENT" };
   PLACEMENT_UNKNOWN = 0;
   INDOOR = 1;
   OUTDOOR = 2;
