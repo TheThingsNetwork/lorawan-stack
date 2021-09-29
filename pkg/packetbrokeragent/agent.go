@@ -598,7 +598,7 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 		DownlinkToken:        down.Message.DownlinkToken,
 		State:                packetbroker.MessageDeliveryState_PROCESSED,
 	}
-	defer func() {
+	defer func(ctx context.Context) {
 		if err != nil && report.Result == nil {
 			report.Result = &packetbroker.DownlinkMessageDeliveryStateChange_Error{
 				Error: packetbroker.DownlinkMessageProcessingError_DOWNLINK_INTERNAL,
@@ -607,7 +607,7 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 		if err := reportPool.Publish(ctx, report); err != nil {
 			logger.WithError(err).Warn("Forwarder downlink reporter enqueuer busy, drop message")
 		}
-	}()
+	}(ctx)
 
 	for _, filler := range a.tenantContextFillers {
 		var err error
@@ -914,7 +914,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 		ForwarderUplinkToken: up.Message.ForwarderUplinkToken,
 		State:                packetbroker.MessageDeliveryState_PROCESSED,
 	}
-	defer func() {
+	defer func(ctx context.Context) {
 		if err != nil && report.Error == nil {
 			report.Error = &packetbroker.UplinkMessageProcessingErrorValue{
 				Value: packetbroker.UplinkMessageProcessingError_UPLINK_INTERNAL,
@@ -923,7 +923,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 		if err := reportPool.Publish(ctx, report); err != nil {
 			logger.WithError(err).Warn("Home Network uplink reporter enqueuer busy, drop message")
 		}
-	}()
+	}(ctx)
 
 	if err := a.decryptUplink(ctx, up.Message); err != nil {
 		logger.WithError(err).Warn("Failed to decrypt message")
