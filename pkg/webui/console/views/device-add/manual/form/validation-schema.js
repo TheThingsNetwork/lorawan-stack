@@ -23,8 +23,6 @@ import { REGISTRATION_TYPES } from '../../utils'
 
 import { DEVICE_CLASS_MAP } from './constants'
 
-const toUndefined = value => (!Boolean(value) ? undefined : value)
-
 const factoryPresetFreqNumericTest = frequencies =>
   frequencies.every(freq => {
     if (typeof freq !== 'undefined') {
@@ -517,16 +515,13 @@ const validationSchema = Yup.object({
     },
   ),
   join_server_address: Yup.string().when(
-    ['_activation_mode', '$jsUrl', '$jsEnabled'],
-    (activationMode, jsUrl, jsEnabled, schema) => {
+    ['_activation_mode', '$jsEnabled'],
+    (activationMode, jsEnabled, schema) => {
       if (activationMode !== ACTIVATION_MODES.OTAA || !jsEnabled) {
         return schema.strip()
       }
 
-      return schema
-        .matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
-        .transform(toUndefined)
-        .default(getHostFromUrl(jsUrl))
+      return schema.matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
     },
   ),
   application_server_address: Yup.string().when(

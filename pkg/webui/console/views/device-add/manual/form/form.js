@@ -141,6 +141,8 @@ const ManualForm = props => {
   const jsUrl = jsEnabled ? jsConfig.base_url : undefined
   const nsUrl = nsEnabled ? nsConfig.base_url : undefined
   const jsHost = getHostFromUrl(jsUrl)
+  const nsHost = getHostFromUrl(nsUrl)
+  const asHost = getHostFromUrl(asUrl)
 
   const [macSettings, setMacSettings] = React.useState({})
 
@@ -191,6 +193,9 @@ const ManualForm = props => {
 
     return validationSchema.cast(
       merge({}, defaultValues, {
+        join_server_address: jsHost,
+        network_server_address: nsHost,
+        application_server_address: asHost,
         supports_join: jsEnabled,
         _device_class:
           initialActivationMode === ACTIVATION_MODES.MULTICAST ? '' : DEVICE_CLASS_MAP.CLASS_A,
@@ -198,7 +203,7 @@ const ManualForm = props => {
       }),
       { context: validationContext },
     )
-  }, [jsEnabled, nsEnabled, validationContext])
+  }, [asHost, jsEnabled, jsHost, nsEnabled, nsHost, validationContext])
   const formRef = React.useRef(null)
   const deviceIdInputRef = React.useRef(null)
   const euiInputRef = React.useRef(null)
