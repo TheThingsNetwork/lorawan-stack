@@ -1060,16 +1060,24 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 									}
 									if conf.SetRX1 {
 										txReq.Rx1Delay = conf.RX1Delay
-										txReq.Rx1DataRateIndex = test.Must(phy.Rx1DataRate(
+										rx1DRIdx := test.Must(phy.Rx1DataRate(
 											conf.Uplink.Settings.DataRateIndex,
 											conf.MACState.CurrentParameters.Rx1DataRateOffset,
 											conf.MACState.CurrentParameters.DownlinkDwellTime.GetValue()),
 										).(ttnpb.DataRateIndex)
+										rx1DR := phy.DataRates[rx1DRIdx]
+										txReq.Rx1DataRate = &rx1DR.Rate
 										txReq.Rx1Frequency = conf.MACState.CurrentParameters.Channels[test.Must(phy.Rx1Channel(uint8(conf.Uplink.DeviceChannelIndex))).(uint8)].DownlinkFrequency
+										// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
+										txReq.Rx1DataRateIndex = rx1DRIdx
 									}
 									if conf.SetRX2 {
-										txReq.Rx2DataRateIndex = conf.MACState.CurrentParameters.Rx2DataRateIndex
+										rx2DRIdx := conf.MACState.CurrentParameters.Rx2DataRateIndex
+										rx2DR := phy.DataRates[rx2DRIdx]
+										txReq.Rx2DataRate = &rx2DR.Rate
 										txReq.Rx2Frequency = conf.MACState.CurrentParameters.Rx2Frequency
+										// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
+										txReq.Rx2DataRateIndex = rx2DRIdx
 									}
 									return txReq
 								}(),
@@ -2154,11 +2162,18 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 					EndDeviceIds: &x.EndDeviceIdentifiers,
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							Class:             ttnpb.CLASS_A,
-							Priority:          priority,
-							FrequencyPlanId:   x.FrequencyPlanId,
-							Rx1Delay:          ttnpb.RxDelay(Band(x.FrequencyPlanId, x.LorawanPhyVersion).JoinAcceptDelay1 / time.Second),
-							Rx2DataRateIndex:  x.PendingMacState.CurrentParameters.Rx2DataRateIndex,
+							Class:           ttnpb.CLASS_A,
+							Priority:        priority,
+							FrequencyPlanId: x.FrequencyPlanId,
+							Rx1Delay:        ttnpb.RxDelay(Band(x.FrequencyPlanId, x.LorawanPhyVersion).JoinAcceptDelay1 / time.Second),
+							Rx2DataRate: &ttnpb.DataRate{
+								Modulation: &ttnpb.DataRate_Lora{
+									Lora: &ttnpb.LoRaDataRate{
+										Bandwidth:       125000,
+										SpreadingFactor: 12 - uint32(x.PendingMacState.CurrentParameters.Rx2DataRateIndex),
+									},
+								},
+							},
 							Rx2Frequency:      x.PendingMacState.CurrentParameters.Rx2Frequency,
 							LorawanPhyVersion: x.LorawanPhyVersion,
 							// TODO: Generate RX1 transmission parameters if necessary.
