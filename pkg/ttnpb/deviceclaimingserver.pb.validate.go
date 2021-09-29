@@ -52,7 +52,14 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "target_application_ids":
 
-			if v, ok := interface{}(&m.TargetApplicationIds).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetTargetApplicationIds() == nil {
+				return ClaimEndDeviceRequestValidationError{
+					field:  "target_application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetTargetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ClaimEndDeviceRequestValidationError{
 						field:  "target_application_ids",
@@ -262,7 +269,14 @@ func (m *AuthorizeApplicationRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApplicationIds() == nil {
+				return AuthorizeApplicationRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return AuthorizeApplicationRequestValidationError{
 						field:  "application_ids",
@@ -526,7 +540,14 @@ func (m *ClaimGatewayRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "collaborator":
 
-			if v, ok := interface{}(&m.Collaborator).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetCollaborator() == nil {
+				return ClaimGatewayRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ClaimGatewayRequestValidationError{
 						field:  "collaborator",
@@ -715,7 +736,14 @@ func (m *AuthorizeGatewayRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "gateway_ids":
 
-			if v, ok := interface{}(&m.GatewayIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetGatewayIds() == nil {
+				return AuthorizeGatewayRequestValidationError{
+					field:  "gateway_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetGatewayIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return AuthorizeGatewayRequestValidationError{
 						field:  "gateway_ids",

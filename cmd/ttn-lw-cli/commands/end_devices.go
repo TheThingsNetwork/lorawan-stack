@@ -920,7 +920,7 @@ values will be stored in the Join Server.`,
 			}
 
 			req := &ttnpb.ClaimEndDeviceRequest{
-				TargetApplicationIds: *targetAppID,
+				TargetApplicationIds: targetAppID,
 			}
 
 			var joinEUI, devEUI *types.EUI64
