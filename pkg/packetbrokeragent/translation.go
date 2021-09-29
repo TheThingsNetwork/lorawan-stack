@@ -19,7 +19,6 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
-	"math"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -299,7 +298,6 @@ var (
 	errUnsupportedLoRaWANVersion = errors.DefineAborted("unsupported_lorawan_version", "unsupported LoRaWAN version `{version}`")
 	errUnknownBand               = errors.DefineFailedPrecondition("unknown_band", "unknown band `{band_id}`")
 	errUnknownDataRate           = errors.DefineFailedPrecondition("unknown_data_rate", "unknown data rate")
-	errUnknownDataRateIndex      = errors.DefineFailedPrecondition("unknown_data_rate_index", "unknown data rate `{index}` in region `{region}`")
 	errUnsupportedMType          = errors.DefineAborted("unsupported_m_type", "unsupported LoRaWAN MType `{m_type}`")
 	errWrapGatewayUplinkToken    = errors.DefineAborted("wrap_gateway_uplink_token", "wrap gateway uplink token")
 )
@@ -335,17 +333,6 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 		return nil, errUnknownBand.WithAttributes("band_id", msg.BandId)
 	}
 	if up.DataRate, ok = toPBDataRate(msg.Settings.DataRate, msg.Settings.CodingRate); !ok {
-		return nil, errUnknownDataRate.New()
-	}
-
-	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-	phy, err := band.GetLatest(msg.BandId)
-	if err != nil {
-		return nil, errUnknownBand.WithAttributes("band_id", msg.BandId)
-	}
-	if dataRateIndex, _, ok := phy.FindUplinkDataRate(msg.Settings.DataRate); ok {
-		up.DataRateIndex = uint32(dataRateIndex)
-	} else {
 		return nil, errUnknownDataRate.New()
 	}
 
@@ -486,44 +473,9 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 var errWrapUplinkTokens = errors.DefineAborted("wrap_uplink_tokens", "wrap uplink tokens")
 
 func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, receivedAt time.Time, includeHops bool) (*ttnpb.UplinkMessage, error) {
-	// NOTE: The data rate index is set for informative purposes only. The band cannot be versioned because there is no
-	// Regional Parameters version available in uplink messages.
-	// TODO: Remove usage of data rate index (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-	bandID, ok := fromPBRegion[msg.Message.GatewayRegion]
+	dataRate, codingRate, ok := fromPBDataRate(msg.Message.DataRate)
 	if !ok {
-		return nil, errUnknownRegion.WithAttributes("region", msg.Message.GatewayRegion)
-	}
-	phy, err := band.GetLatest(bandID)
-	if err != nil {
-		return nil, errUnknownBand.WithAttributes("band_id", bandID)
-	}
-	var (
-		dataRate      ttnpb.DataRate
-		dataRateIndex ttnpb.DataRateIndex
-		codingRate    = msg.Message.CodingRate
-	)
-	if msg.Message.DataRate != nil {
-		dataRate, codingRate, ok = fromPBDataRate(msg.Message.DataRate)
-		if !ok {
-			return nil, errUnknownDataRate.New()
-		}
-		dataRateIndex, _, ok = phy.FindUplinkDataRate(dataRate)
-		if !ok {
-			return nil, errUnknownDataRate.New()
-		}
-	} else {
-		if msg.Message.DataRateIndex > math.MaxInt32 {
-			return nil, errUnknownDataRate.New()
-		}
-		phyDR, ok := phy.DataRates[ttnpb.DataRateIndex(msg.Message.DataRateIndex)]
-		if !ok {
-			return nil, errUnknownDataRateIndex.WithAttributes(
-				"index", msg.Message.DataRateIndex,
-				"region", msg.Message.GatewayRegion,
-			)
-		}
-		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
-		dataRate, dataRateIndex = phyDR.Rate, ttnpb.DataRateIndex(msg.Message.DataRateIndex)
+		return nil, errUnknownDataRate.New()
 	}
 
 	var forwarderNetID, homeNetworkNetID types.NetID
@@ -554,10 +506,9 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 	up := &ttnpb.UplinkMessage{
 		RawPayload: msg.Message.PhyPayload.GetPlain(),
 		Settings: ttnpb.TxSettings{
-			DataRate:      dataRate,
-			DataRateIndex: dataRateIndex,
-			Frequency:     msg.Message.Frequency,
-			CodingRate:    codingRate,
+			DataRate:   dataRate,
+			Frequency:  msg.Message.Frequency,
+			CodingRate: codingRate,
 		},
 		ReceivedAt:     receivedAt,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
@@ -698,8 +649,7 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 		return nil, nil, errNoRequest.New()
 	}
 
-	// TODO: Convert data rate and fill out new rx{1,2}_data_rate fields (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-	// That will lead to removing getting the frequency plan and the band and versioning the band.
+	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
 	fp, err := fps.GetByID(req.FrequencyPlanId)
 	if err != nil {
 		return nil, nil, errFrequencyPlanNotConfigured.WithAttributes("id", req.FrequencyPlanId)
@@ -725,34 +675,39 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 		Value: rpVersion,
 	}
 	for i, rx := range []struct {
+		dataRate *ttnpb.DataRate
+		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
 		dataRateIndex ttnpb.DataRateIndex
 		frequency     uint64
 		dst           **packetbroker.DownlinkMessage_RXSettings
 	}{
-		{req.Rx1DataRateIndex, req.Rx1Frequency, &down.Rx1},
-		{req.Rx2DataRateIndex, req.Rx2Frequency, &down.Rx2},
+		{req.Rx1DataRate, req.Rx1DataRateIndex, req.Rx1Frequency, &down.Rx1},
+		{req.Rx2DataRate, req.Rx2DataRateIndex, req.Rx2Frequency, &down.Rx2},
 	} {
 		if rx.frequency == 0 {
 			continue
 		}
-		dr, ok := phy.DataRates[rx.dataRateIndex]
-		if !ok {
-			return nil, nil, errDataRateNotFound.WithAttributes("index", rx.dataRateIndex)
+		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
+		if rx.dataRate == nil {
+			dr, ok := phy.DataRates[rx.dataRateIndex]
+			if !ok {
+				return nil, nil, errDataRateNotFound.WithAttributes("index", rx.dataRateIndex)
+			}
+			rx.dataRate = &dr.Rate
 		}
 		// TODO: Get coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 		var codingRate string
-		switch dr.Rate.Modulation.(type) {
+		switch rx.dataRate.Modulation.(type) {
 		case *ttnpb.DataRate_Lora:
 			codingRate = phy.LoRaCodingRate
 		}
-		pbDR, ok := toPBDataRate(dr.Rate, codingRate)
+		pbDR, ok := toPBDataRate(*rx.dataRate, codingRate)
 		if !ok {
 			return nil, nil, errIncompatibleDataRate.WithAttributes("rx_window", i+1)
 		}
 		*rx.dst = &packetbroker.DownlinkMessage_RXSettings{
-			DataRate:      pbDR,
-			DataRateIndex: uint32(rx.dataRateIndex),
-			Frequency:     rx.frequency,
+			DataRate:  pbDR,
+			Frequency: rx.frequency,
 		}
 	}
 	if down.Class, ok = toPBClass[req.Class]; !ok {
@@ -845,30 +800,28 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 	}
 	req.Rx1Delay = ttnpb.RxDelay(rx1Delay / time.Second)
 	for i, rx := range []struct {
-		settings      *packetbroker.DownlinkMessage_RXSettings
+		settings *packetbroker.DownlinkMessage_RXSettings
+		dataRate **ttnpb.DataRate
+		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
 		dataRateIndex *ttnpb.DataRateIndex
 		frequency     *uint64
 	}{
-		{msg.Rx1, &req.Rx1DataRateIndex, &req.Rx1Frequency},
-		{msg.Rx2, &req.Rx2DataRateIndex, &req.Rx2Frequency},
+		{msg.Rx1, &req.Rx1DataRate, &req.Rx1DataRateIndex, &req.Rx1Frequency},
+		{msg.Rx2, &req.Rx2DataRate, &req.Rx2DataRateIndex, &req.Rx2Frequency},
 	} {
 		if rx.settings == nil {
 			continue
 		}
-		if rx.settings.DataRate != nil && phy != nil {
-			dr, _, ok := fromPBDataRate(rx.settings.DataRate)
-			if !ok {
-				return "", nil, errIncompatibleDataRate.WithAttributes("rx_window", i+1)
-			}
-			// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
+		dr, _, ok := fromPBDataRate(rx.settings.DataRate)
+		if !ok {
+			return "", nil, errIncompatibleDataRate.WithAttributes("rx_window", i+1)
+		}
+		*rx.dataRate = &dr
+		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
+		if phy != nil {
 			if *rx.dataRateIndex, _, ok = phy.FindDownlinkDataRate(dr); !ok {
 				return "", nil, errIncompatibleDataRate.WithAttributes("rx_window", i+1)
 			}
-		} else {
-			// NOTE: This is fallback behavior: downlink messages sent by newer clients of Packet Broker, including
-			// The Things Stack from 3.14.1, will send the fully defined data rate in the downlink message.
-			// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
-			*rx.dataRateIndex = ttnpb.DataRateIndex(rx.settings.DataRateIndex)
 		}
 		*rx.frequency = rx.settings.Frequency
 	}
