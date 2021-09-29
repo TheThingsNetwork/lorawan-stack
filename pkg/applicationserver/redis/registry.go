@@ -473,7 +473,7 @@ func (r *ApplicationUplinkRegistry) Push(ctx context.Context, ids ttnpb.EndDevic
 	}
 
 	uidKey := r.uidKey(unique.ID(ctx, ids))
-	_, err = r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+	_, err = r.Redis.TxPipelined(ctx, func(p redis.Pipeliner) error {
 		p.LPush(ctx, uidKey, s)
 		p.LTrim(ctx, uidKey, 0, r.Limit-1)
 		return nil

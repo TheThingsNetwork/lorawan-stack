@@ -461,7 +461,7 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 				return err
 			}
 		}
-		_, err = tx.Pipelined(ctx, pipelined)
+		_, err = tx.TxPipelined(ctx, pipelined)
 		if err != nil {
 			return err
 		}
