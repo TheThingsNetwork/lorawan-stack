@@ -291,9 +291,14 @@ var startCommand = &cobra.Command{
 
 		if start.ApplicationServer {
 			logger.Info("Setting up Application Server")
-			config.AS.Links = &asredis.LinkRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("as", "links")),
+			linkRegistry := &asredis.LinkRegistry{
+				Redis:   redis.New(config.Redis.WithNamespace("as", "links")),
+				LockTTL: defaultLockTTL,
 			}
+			if err := linkRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeApplicationServer.WithCause(err)
+			}
+			config.AS.Links = linkRegistry
 			deviceRegistry := &asredis.DeviceRegistry{
 				Redis:   NewComponentDeviceRegistryRedis(*config, "as"),
 				LockTTL: defaultLockTTL,

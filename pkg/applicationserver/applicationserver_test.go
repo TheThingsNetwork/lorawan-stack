@@ -190,7 +190,10 @@ func TestApplicationServer(t *testing.T) {
 	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
 	defer linksRedisClient.Close()
-	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient, LockTTL: test.Delay << 10}
+	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			DefaultFormatters: &ttnpb.MessagePayloadFormatters{
@@ -2282,7 +2285,10 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
 	defer linksRedisClient.Close()
-	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient, LockTTL: test.Delay << 10}
+	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			SkipPayloadCrypto: &pbtypes.BoolValue{Value: true},
@@ -2774,7 +2780,10 @@ func TestLocationFromPayload(t *testing.T) {
 	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
 	defer linksRedisClient.Close()
-	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient, LockTTL: test.Delay << 10}
+	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	_, err = linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{}, nil, nil
 	})
