@@ -4382,9 +4382,18 @@
       "file": "io.go"
     }
   },
-  "error:pkg/gatewayserver/io:data_rate": {
+  "error:pkg/gatewayserver/io:data_rate_index": {
     "translations": {
       "en": "no data rate with index `{index}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:data_rate_rx_window": {
+    "translations": {
+      "en": "invalid data rate in Rx window `{window}`"
     },
     "description": {
       "package": "pkg/gatewayserver/io",
@@ -7481,15 +7490,6 @@
   "error:pkg/packetbrokeragent:unknown_data_rate": {
     "translations": {
       "en": "unknown data rate"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "translation.go"
-    }
-  },
-  "error:pkg/packetbrokeragent:unknown_data_rate_index": {
-    "translations": {
-      "en": "unknown data rate `{index}` in region `{region}`"
     },
     "description": {
       "package": "pkg/packetbrokeragent",
