@@ -345,9 +345,14 @@ var startCommand = &cobra.Command{
 				return shared.ErrInitializeJoinServer.WithCause(err)
 			}
 			config.JS.Keys = keyRegistry
-			config.JS.ApplicationActivationSettings = &jsredis.ApplicationActivationSettingRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("js", "application-activation-settings")),
+			applicationActivationSettingRegistry := &jsredis.ApplicationActivationSettingRegistry{
+				Redis:   redis.New(config.Redis.WithNamespace("js", "application-activation-settings")),
+				LockTTL: defaultLockTTL,
 			}
+			if err := applicationActivationSettingRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeJoinServer.WithCause(err)
+			}
+			config.JS.ApplicationActivationSettings = applicationActivationSettingRegistry
 			js, err := joinserver.New(c, &config.JS)
 			if err != nil {
 				return shared.ErrInitializeJoinServer.WithCause(err)

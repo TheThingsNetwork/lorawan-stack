@@ -52,6 +52,7 @@ type DeviceRegistry struct {
 	entropy   io.Reader
 }
 
+// Init initializes the DeviceRegistry.
 func (r *DeviceRegistry) Init(ctx context.Context) error {
 	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
@@ -398,6 +399,7 @@ type KeyRegistry struct {
 	entropy   io.Reader
 }
 
+// Init initializes the KeyRegistry.
 func (r *KeyRegistry) Init(ctx context.Context) error {
 	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
@@ -558,7 +560,21 @@ func filterGetApplicationActivationSettings(pb *ttnpb.ApplicationActivationSetti
 
 // ApplicationActivationSettingRegistry is an implementation of joinserver.ApplicationActivationSettingRegistry.
 type ApplicationActivationSettingRegistry struct {
-	Redis *ttnredis.Client
+	Redis   *ttnredis.Client
+	LockTTL time.Duration
+
+	entropyMu *sync.Mutex
+	entropy   io.Reader
+}
+
+// Init initializes the ApplicationActivationSettingRegistry.
+func (r *ApplicationActivationSettingRegistry) Init(ctx context.Context) error {
+	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
+		return err
+	}
+	r.entropyMu = &sync.Mutex{}
+	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
+	return nil
 }
 
 func (r *ApplicationActivationSettingRegistry) uidKey(uid string) string {
@@ -587,10 +603,15 @@ func (r *ApplicationActivationSettingRegistry) SetByID(ctx context.Context, appI
 	}
 	uk := r.uidKey(unique.ID(ctx, appID))
 
+	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	if err != nil {
+		return nil, err
+	}
+
 	defer trace.StartRegion(ctx, "set application activation settings").End()
 
 	var pb *ttnpb.ApplicationActivationSettings
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+	err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, uk)
 		stored := &ttnpb.ApplicationActivationSettings{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -671,7 +692,7 @@ func (r *ApplicationActivationSettingRegistry) SetByID(ctx context.Context, appI
 			return err
 		}
 		return nil
-	}, uk)
+	})
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}

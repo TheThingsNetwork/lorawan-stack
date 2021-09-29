@@ -40,7 +40,11 @@ func NewRedisApplicationActivationSettingRegistry(ctx context.Context) (Applicat
 	tb := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, "application-activation-settings")
 	reg := &redis.ApplicationActivationSettingRegistry{
-		Redis: cl,
+		Redis:   cl,
+		LockTTL: test.Delay << 10,
+	}
+	if err := reg.Init(ctx); !assertions.New(tb).So(err, should.BeNil) {
+		tb.FailNow()
 	}
 	return reg,
 		func() {
