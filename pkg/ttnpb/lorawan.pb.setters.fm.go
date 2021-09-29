@@ -1250,6 +1250,31 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 				var zero RxDelay
 				dst.Rx1Delay = zero
 			}
+		case "rx1_data_rate":
+			if len(subs) > 0 {
+				var newDst, newSrc *DataRate
+				if (src == nil || src.Rx1DataRate == nil) && dst.Rx1DataRate == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Rx1DataRate
+				}
+				if dst.Rx1DataRate != nil {
+					newDst = dst.Rx1DataRate
+				} else {
+					newDst = &DataRate{}
+					dst.Rx1DataRate = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Rx1DataRate = src.Rx1DataRate
+				} else {
+					dst.Rx1DataRate = nil
+				}
+			}
 		case "rx1_data_rate_index":
 			if len(subs) > 0 {
 				return fmt.Errorf("'rx1_data_rate_index' has no subfields, but %s were specified", subs)
@@ -1269,6 +1294,31 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 			} else {
 				var zero uint64
 				dst.Rx1Frequency = zero
+			}
+		case "rx2_data_rate":
+			if len(subs) > 0 {
+				var newDst, newSrc *DataRate
+				if (src == nil || src.Rx2DataRate == nil) && dst.Rx2DataRate == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Rx2DataRate
+				}
+				if dst.Rx2DataRate != nil {
+					newDst = dst.Rx2DataRate
+				} else {
+					newDst = &DataRate{}
+					dst.Rx2DataRate = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Rx2DataRate = src.Rx2DataRate
+				} else {
+					dst.Rx2DataRate = nil
+				}
 			}
 		case "rx2_data_rate_index":
 			if len(subs) > 0 {

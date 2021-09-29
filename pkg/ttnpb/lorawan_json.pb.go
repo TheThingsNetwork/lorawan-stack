@@ -1151,6 +1151,12 @@ func (x *TxRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("rx1_delay")
 		x.Rx1Delay.MarshalProtoJSON(s)
 	}
+	if x.Rx1DataRate != nil || s.HasField("rx1_data_rate") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rx1_data_rate")
+		// NOTE: DataRate does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.Rx1DataRate)
+	}
 	if x.Rx1DataRateIndex != 0 || s.HasField("rx1_data_rate_index") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("rx1_data_rate_index")
@@ -1160,6 +1166,12 @@ func (x *TxRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("rx1_frequency")
 		s.WriteUint64(x.Rx1Frequency)
+	}
+	if x.Rx2DataRate != nil || s.HasField("rx2_data_rate") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("rx2_data_rate")
+		// NOTE: DataRate does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.Rx2DataRate)
 	}
 	if x.Rx2DataRateIndex != 0 || s.HasField("rx2_data_rate_index") {
 		s.WriteMoreIf(&wroteField)
@@ -1230,12 +1242,24 @@ func (x *TxRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "rx1_delay", "rx1Delay":
 			s.AddField("rx1_delay")
 			x.Rx1Delay.UnmarshalProtoJSON(s)
+		case "rx1_data_rate", "rx1DataRate":
+			s.AddField("rx1_data_rate")
+			// NOTE: DataRate does not seem to implement UnmarshalProtoJSON.
+			var v DataRate
+			gogo.UnmarshalMessage(s, &v)
+			x.Rx1DataRate = &v
 		case "rx1_data_rate_index", "rx1DataRateIndex":
 			s.AddField("rx1_data_rate_index")
 			x.Rx1DataRateIndex.UnmarshalProtoJSON(s)
 		case "rx1_frequency", "rx1Frequency":
 			s.AddField("rx1_frequency")
 			x.Rx1Frequency = s.ReadUint64()
+		case "rx2_data_rate", "rx2DataRate":
+			s.AddField("rx2_data_rate")
+			// NOTE: DataRate does not seem to implement UnmarshalProtoJSON.
+			var v DataRate
+			gogo.UnmarshalMessage(s, &v)
+			x.Rx2DataRate = &v
 		case "rx2_data_rate_index", "rx2DataRateIndex":
 			s.AddField("rx2_data_rate_index")
 			x.Rx2DataRateIndex.UnmarshalProtoJSON(s)
