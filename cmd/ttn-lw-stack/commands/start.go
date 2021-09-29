@@ -294,9 +294,14 @@ var startCommand = &cobra.Command{
 			config.AS.Links = &asredis.LinkRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("as", "links")),
 			}
-			config.AS.Devices = &asredis.DeviceRegistry{
-				Redis: NewComponentDeviceRegistryRedis(*config, "as"),
+			deviceRegistry := &asredis.DeviceRegistry{
+				Redis:   NewComponentDeviceRegistryRedis(*config, "as"),
+				LockTTL: defaultLockTTL,
 			}
+			if err := deviceRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeApplicationServer.WithCause(err)
+			}
+			config.AS.Devices = deviceRegistry
 			config.AS.UplinkStorage.Registry = &asredis.ApplicationUplinkRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("as", "applicationups")),
 				Limit: config.AS.UplinkStorage.Limit,

@@ -174,19 +174,24 @@ func TestDeviceRegistry(t *testing.T) {
 	}
 	for _, tc := range []struct {
 		Name string
-		New  func(ctx context.Context) (reg DeviceRegistry, closeFn func() error)
+		New  func(ctx context.Context) (reg DeviceRegistry, closeFn func() error, err error)
 		N    uint16
 	}{
 		{
 			Name: "Redis",
-			New: func(ctx context.Context) (DeviceRegistry, func() error) {
+			New: func(ctx context.Context) (DeviceRegistry, func() error, error) {
 				cl, flush := test.NewRedis(ctx, namespace[:]...)
-				return &redis.DeviceRegistry{
-						Redis: cl,
-					}, func() error {
-						flush()
-						return cl.Close()
-					}
+				registry := &redis.DeviceRegistry{
+					Redis:   cl,
+					LockTTL: test.Delay << 10,
+				}
+				if err := registry.Init(ctx); err != nil {
+					return nil, nil, err
+				}
+				return registry, func() error {
+					flush()
+					return cl.Close()
+				}, nil
 			},
 			N: 8,
 		},
@@ -195,8 +200,11 @@ func TestDeviceRegistry(t *testing.T) {
 			test.RunSubtest(t, test.SubtestConfig{
 				Name:     fmt.Sprintf("%s/%d", tc.Name, i),
 				Parallel: true,
-				Func: func(ctx context.Context, t *testing.T, _ *assertions.Assertion) {
-					reg, closeFn := tc.New(ctx)
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					reg, closeFn, err := tc.New(ctx)
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
 					reg = wrapEndDeviceRegistryWithReplacedFields(reg, replacedEndDeviceFields...)
 					if closeFn != nil {
 						defer func() {

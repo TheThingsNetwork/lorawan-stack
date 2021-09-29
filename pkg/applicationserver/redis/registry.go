@@ -16,10 +16,14 @@ package redis
 
 import (
 	"context"
+	"io"
+	"math/rand"
 	"runtime/trace"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -36,7 +40,21 @@ var (
 
 // DeviceRegistry is a Redis device registry.
 type DeviceRegistry struct {
-	Redis *ttnredis.Client
+	Redis   *ttnredis.Client
+	LockTTL time.Duration
+
+	entropyMu *sync.Mutex
+	entropy   io.Reader
+}
+
+// Init initializes the DeviceRegistry.
+func (r *DeviceRegistry) Init(ctx context.Context) error {
+	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
+		return err
+	}
+	r.entropyMu = &sync.Mutex{}
+	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
+	return nil
 }
 
 func (r *DeviceRegistry) uidKey(uid string) string {
@@ -77,10 +95,15 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 	uid := unique.ID(ctx, ids)
 	uk := r.uidKey(uid)
 
+	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	if err != nil {
+		return nil, err
+	}
+
 	defer trace.StartRegion(ctx, "set end device").End()
 
 	var pb *ttnpb.EndDevice
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+	err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, uk)
 		stored := &ttnpb.EndDevice{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -219,7 +242,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 			return err
 		}
 		return nil
-	}, uk)
+	})
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}

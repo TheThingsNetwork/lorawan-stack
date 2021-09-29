@@ -182,7 +182,10 @@ func TestApplicationServer(t *testing.T) {
 	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
-	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
@@ -2271,7 +2274,10 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
-	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
@@ -2754,7 +2760,10 @@ func TestLocationFromPayload(t *testing.T) {
 	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
-	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	_, err := deviceRegistry.Set(ctx, registeredDevice.EndDeviceIdentifiers, nil, func(ed *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return registeredDevice, []string{"ids", "session", "formatters"}, nil
 	})
