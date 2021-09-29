@@ -368,13 +368,6 @@ func (a *Agent) dialContext(ctx context.Context, target string, dialOpts ...grpc
 	return grpc.DialContext(ctx, target, opts...)
 }
 
-const (
-	// workerIdleTimeout is the duration after which an idle worker stops to save resources.
-	workerIdleTimeout = (1 << 7) * time.Millisecond
-	// workerBusyTimeout is the duration after which a message is dropped if all workers are busy.
-	workerBusyTimeout = (1 << 6) * time.Millisecond
-)
-
 func (a *Agent) publishUplink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"forwarder_net_id", a.netID,
