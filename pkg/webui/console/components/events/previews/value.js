@@ -26,7 +26,7 @@ const Value = React.memo(({ event }) => {
       {Array.isArray(data.value) || typeof data.value === 'object' ? (
         <JSONPayload data={data.value} />
       ) : (
-        <DescriptionList.Item value={data.value} />
+        <DescriptionList.Item data={data.value} />
       )}
     </DescriptionList>
   )
