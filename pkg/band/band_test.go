@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	. "go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -572,4 +573,69 @@ func TestFindSubBand(t *testing.T) {
 			})
 		}
 	}
+}
+
+func TestFindDataRate(t *testing.T) {
+	a := assertions.New(t)
+
+	// US_902_928
+	testBand, _ := Get(band.US_902_928, ttnpb.RP001_V1_0_2_REV_B)
+	dr := ttnpb.DataRate{
+		Modulation: &ttnpb.DataRate_Lora{
+			Lora: &ttnpb.LoRaDataRate{
+				Bandwidth:       500000,
+				SpreadingFactor: 8,
+			},
+		},
+	}
+	index, _, ok := testBand.FindDownlinkDataRate(dr)
+	a.So(ok, should.BeTrue)
+	if index != ttnpb.DATA_RATE_12 && index != ttnpb.DATA_RATE_4 {
+		t.Fatalf("Invalid index, expected 4 or 12. Got %d", index)
+	}
+
+	dr = ttnpb.DataRate{
+		Modulation: &ttnpb.DataRate_Lora{
+			Lora: &ttnpb.LoRaDataRate{
+				Bandwidth:       500000,
+				SpreadingFactor: 8,
+			},
+		},
+	}
+	index, _, ok = testBand.FindUplinkDataRate(dr)
+	a.So(ok, should.BeTrue)
+	if index != ttnpb.DATA_RATE_12 && index != ttnpb.DATA_RATE_4 {
+		t.Fatalf("Invalid index, expected 4 or 12. Got %d", index)
+	}
+
+	// AU_915_928
+	testBand, _ = Get(band.AU_915_928, ttnpb.RP001_V1_0_3_REV_A)
+	dr = ttnpb.DataRate{
+		Modulation: &ttnpb.DataRate_Lora{
+			Lora: &ttnpb.LoRaDataRate{
+				Bandwidth:       500000,
+				SpreadingFactor: 12,
+			},
+		},
+	}
+	index, _, ok = testBand.FindDownlinkDataRate(dr)
+	a.So(ok, should.BeTrue)
+	if index != ttnpb.DATA_RATE_12 && index != ttnpb.DATA_RATE_8 {
+		t.Fatalf("Invalid index, expected 8 or 12. Got %d", index)
+	}
+
+	dr = ttnpb.DataRate{
+		Modulation: &ttnpb.DataRate_Lora{
+			Lora: &ttnpb.LoRaDataRate{
+				Bandwidth:       500000,
+				SpreadingFactor: 12,
+			},
+		},
+	}
+	index, _, ok = testBand.FindUplinkDataRate(dr)
+	a.So(ok, should.BeTrue)
+	if index != ttnpb.DATA_RATE_12 && index != ttnpb.DATA_RATE_8 {
+		t.Fatalf("Invalid index, expected 8 or 12. Got %d", index)
+	}
+
 }
