@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,90 +15,135 @@
 package interop
 
 import (
-	"net/http"
-
-	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 var (
-	errUnknownMACVersion  = errors.DefineInvalidArgument("unknown_mac_version", "unknown MAC version")
-	errInvalidLength      = errors.DefineInvalidArgument("invalid_length", "invalid length")
-	errInvalidRequestType = errors.DefineInvalidArgument("invalid_request_type", "invalid request type `{type}`")
-	errNotRegistered      = errors.DefineNotFound("not_registered", "not registered")
-	errUnexpectedResult   = errors.Define("unexpected_result", "unexpected result code {code}", "code")
+	errUnknownMACVersion   = errors.DefineInvalidArgument("unknown_mac_version", "unknown MAC version")
+	errInvalidLength       = errors.DefineInvalidArgument("invalid_length", "invalid length")
+	errInvalidRequestType  = errors.DefineInvalidArgument("invalid_request_type", "invalid request type `{type}`")
+	errNotRegistered       = errors.DefineNotFound("not_registered", "not registered")
+	errUnexpectedResult    = errors.Define("unexpected_result", "unexpected result code {code}", "code")
+	errCallerNotAuthorized = errors.DefinePermissionDenied("caller_not_authorized", "caller is not authorized for `{target}`")
+	errUnauthenticated     = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
 
-	ErrNoAction           = defineError("no_action", ResultNoAction, "no action")
-	ErrMIC                = defineError("mic", ResultMICFailed, "MIC failed")
-	ErrFrameReplayed      = defineError("frame_replayed", ResultFrameReplayed, "frame replayed")
-	ErrJoinReq            = defineError("join_req", ResultJoinReqFailed, "join-request failed")
-	ErrNoRoamingAgreement = defineError("no_roaming_agreement", ResultNoRoamingAgreement, "no roaming agreement")
-	ErrDeviceRoaming      = defineError("device_roaming", ResultDevRoamingDisallowed, "device roaming disallowed")
-	ErrRoamingActivation  = defineError("roaming_activation", ResultRoamingActDisallowed, "roaming activation disallowed")
-	ErrActivation         = defineError("activation", ResultActivationDisallowed, "activation disallowed")
-	ErrUnknownDevEUI      = defineError("unknown_dev_eui", ResultUnknownDevEUI, "unknown DevEUI")
-	ErrUnknownDevAddr     = defineError("unknown_dev_addr", ResultUnknownDevAddr, "unknown DevAddr")
-	ErrUnknownSender      = defineError("unknown_sender", ResultUnknownSender, "unknown sender")
-	ErrUnknownReceiver    = defineError("unknown_receiver", ResultUnknownReceiver, "unknown receiver")
-	ErrDeferred           = defineError("deferred", ResultDeferred, "deferred")
-	ErrTransmitFailed     = defineError("transmit_failed", ResultXmitFailed, "transmit failed")
-	ErrFPort              = defineError("f_port", ResultInvalidFPort, "invalid FPort")
-	ErrProtocolVersion    = defineError("protocol_version", ResultInvalidProtocolVersion, "invalid protocol version")
-	ErrStaleDeviceProfile = defineError("stale_device_profile", ResultStaleDeviceProfile, "stale device profile")
-	ErrMalformedMessage   = defineError("malformed_message", ResultMalformedMessage, "malformed message")
-	ErrFrameSize          = defineError("frame_size", ResultFrameSizeError, "frame size error")
+	ErrNoAction           = errors.DefineAborted("no_action", "no action")
+	ErrMIC                = errors.DefineCorruption("mic", "MIC failed")
+	ErrFrameReplayed      = errors.DefineAborted("frame_replayed", "frame replayed")
+	ErrJoinReq            = errors.DefineAborted("join_req", "join-request failed")
+	ErrNoRoamingAgreement = errors.DefineFailedPrecondition("no_roaming_agreement", "no roaming agreement")
+	ErrDeviceRoaming      = errors.DefineFailedPrecondition("device_roaming", "device roaming disallowed")
+	ErrRoamingActivation  = errors.DefineFailedPrecondition("roaming_activation", "roaming activation disallowed")
+	ErrActivation         = errors.DefineFailedPrecondition("activation", "activation disallowed")
+	ErrUnknownDevEUI      = errors.DefineNotFound("unknown_dev_eui", "unknown DevEUI")
+	ErrUnknownDevAddr     = errors.DefineNotFound("unknown_dev_addr", "unknown DevAddr")
+	ErrUnknownSender      = errors.DefineNotFound("unknown_sender", "unknown sender")
+	ErrUnknownReceiver    = errors.DefineNotFound("unknown_receiver", "unknown receiver")
+	ErrDeferred           = errors.DefineAborted("deferred", "deferred")
+	ErrTransmitFailed     = errors.DefineAborted("transmit_failed", "transmit failed")
+	ErrFPort              = errors.DefineInvalidArgument("f_port", "invalid FPort")
+	ErrProtocolVersion    = errors.DefineInvalidArgument("protocol_version", "invalid protocol version")
+	ErrStaleDeviceProfile = errors.DefineFailedPrecondition("stale_device_profile", "stale device profile")
+	ErrMalformedMessage   = errors.DefineInvalidArgument("malformed_message", "malformed message")
+	ErrFrameSize          = errors.DefineInvalidArgument("frame_size", "frame size error")
+
+	resultErrors = map[ResultCode]*errors.Definition{
+		ResultNoAction:               ErrNoAction,
+		ResultMICFailed:              ErrMIC,
+		ResultFrameReplayed:          ErrFrameReplayed,
+		ResultJoinReqFailed:          ErrJoinReq,
+		ResultNoRoamingAgreement:     ErrNoRoamingAgreement,
+		ResultDevRoamingDisallowed:   ErrDeviceRoaming,
+		ResultRoamingActDisallowed:   ErrRoamingActivation,
+		ResultActivationDisallowed:   ErrActivation,
+		ResultUnknownDevEUI:          ErrUnknownDevEUI,
+		ResultUnknownDevAddr:         ErrUnknownDevAddr,
+		ResultUnknownSender:          ErrUnknownSender,
+		ResultUnkownReceiver:         ErrUnknownReceiver,
+		ResultUnknownReceiver:        ErrUnknownReceiver,
+		ResultDeferred:               ErrDeferred,
+		ResultXmitFailed:             ErrTransmitFailed,
+		ResultInvalidFPort:           ErrFPort,
+		ResultInvalidProtocolVersion: ErrProtocolVersion,
+		ResultStaleDeviceProfile:     ErrStaleDeviceProfile,
+		ResultMalformedMessage:       ErrMalformedMessage,
+		ResultMalformedRequest:       ErrMalformedMessage,
+		ResultFrameSizeError:         ErrFrameSize,
+	}
+	errorResultCodes = map[*errors.Definition]map[ProtocolVersion]ResultCode{
+		ErrNoAction: {
+			ProtocolV1_1: ResultNoAction,
+		},
+		ErrMIC: {
+			ProtocolV1_0: ResultMICFailed,
+			ProtocolV1_1: ResultMICFailed,
+		},
+		ErrFrameReplayed: {
+			ProtocolV1_1: ResultFrameReplayed,
+		},
+		ErrJoinReq: {
+			ProtocolV1_0: ResultJoinReqFailed,
+			ProtocolV1_1: ResultJoinReqFailed,
+		},
+		ErrNoRoamingAgreement: {
+			ProtocolV1_0: ResultNoRoamingAgreement,
+			ProtocolV1_1: ResultNoRoamingAgreement,
+		},
+		ErrDeviceRoaming: {
+			ProtocolV1_0: ResultDevRoamingDisallowed,
+			ProtocolV1_1: ResultDevRoamingDisallowed,
+		},
+		ErrRoamingActivation: {
+			ProtocolV1_0: ResultRoamingActDisallowed,
+			ProtocolV1_1: ResultRoamingActDisallowed,
+		},
+		ErrActivation: {
+			ProtocolV1_0: ResultActivationDisallowed,
+			ProtocolV1_1: ResultActivationDisallowed,
+		},
+		ErrUnknownDevEUI: {
+			ProtocolV1_0: ResultUnknownDevEUI,
+			ProtocolV1_1: ResultUnknownDevEUI,
+		},
+		ErrUnknownDevAddr: {
+			ProtocolV1_0: ResultUnknownDevAddr,
+			ProtocolV1_1: ResultUnknownDevAddr,
+		},
+		ErrUnknownSender: {
+			ProtocolV1_0: ResultUnknownSender,
+			ProtocolV1_1: ResultUnknownSender,
+		},
+		ErrUnknownReceiver: {
+			ProtocolV1_0: ResultUnkownReceiver,
+			ProtocolV1_1: ResultUnkownReceiver,
+		},
+		ErrDeferred: {
+			ProtocolV1_0: ResultDeferred,
+			ProtocolV1_1: ResultDeferred,
+		},
+		ErrTransmitFailed: {
+			ProtocolV1_0: ResultXmitFailed,
+			ProtocolV1_1: ResultXmitFailed,
+		},
+		ErrFPort: {
+			ProtocolV1_0: ResultInvalidFPort,
+			ProtocolV1_1: ResultInvalidFPort,
+		},
+		ErrProtocolVersion: {
+			ProtocolV1_0: ResultInvalidProtocolVersion,
+			ProtocolV1_1: ResultInvalidProtocolVersion,
+		},
+		ErrStaleDeviceProfile: {
+			ProtocolV1_0: ResultStaleDeviceProfile,
+			ProtocolV1_1: ResultStaleDeviceProfile,
+		},
+		ErrMalformedMessage: {
+			ProtocolV1_0: ResultMalformedRequest,
+			ProtocolV1_1: ResultMalformedMessage,
+		},
+		ErrFrameSize: {
+			ProtocolV1_0: ResultFrameSizeError,
+			ProtocolV1_1: ResultFrameSizeError,
+		},
+	}
 )
-
-var (
-	errorResults = make(map[string]ResultCode)
-	resultErrors = make(map[ResultCode]*errors.Definition)
-)
-
-func defineError(name string, result ResultCode, message string) *errors.Definition {
-	definition := errors.DefineInvalidArgument(name, message)
-	errorResults[definition.FullName()] = result
-	resultErrors[result] = definition
-	return definition
-}
-
-type errorMessage struct {
-	Message string `json:"message"`
-}
-
-// ErrorHandler is an echo.HTTPErrorHandler.
-func ErrorHandler(err error, c echo.Context) {
-	if httpErr, ok := err.(*echo.HTTPError); ok {
-		c.JSON(httpErr.Code, httpErr.Message)
-		return
-	}
-
-	result, statusCode, description := ResultOther, http.StatusInternalServerError, ""
-	if ttnErr, ok := errors.From(err); ok {
-		if val, ok := errorResults[ttnErr.FullName()]; ok {
-			result = val
-			if cause := errors.Cause(ttnErr); cause != nil && !errors.IsInternal(cause) {
-				description = cause.Error()
-			}
-		}
-		statusCode = errors.ToHTTPStatusCode(err)
-	}
-
-	if header, ok := c.Get(headerKey).(*RawMessageHeader); ok {
-		answerHeader, err := header.AnswerHeader()
-		if err != nil {
-			c.NoContent(http.StatusBadRequest)
-		} else {
-			c.JSON(statusCode, ErrorMessage{
-				RawMessageHeader: answerHeader,
-				Result: Result{
-					ResultCode:  result,
-					Description: description,
-				},
-			})
-		}
-	} else if description != "" {
-		c.JSON(statusCode, errorMessage{description})
-	} else {
-		c.NoContent(statusCode)
-	}
-}

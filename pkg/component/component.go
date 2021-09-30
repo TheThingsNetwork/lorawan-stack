@@ -192,7 +192,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 	}
 
 	config.Interop.SenderClientCA.BlobConfig = config.Blob
-	c.interop, err = interop.NewServer(c, c.FillContext, config.Interop)
+	c.interop, err = interop.NewServer(c, c.fillers, config.Interop)
 	if err != nil {
 		return nil, err
 	}

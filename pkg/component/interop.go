@@ -16,7 +16,6 @@ package component
 
 import (
 	"crypto/tls"
-	"crypto/x509"
 	"io/ioutil"
 	stdlog "log"
 	"net"
@@ -46,16 +45,11 @@ func (c *Component) serveInterop(lis net.Listener) error {
 }
 
 func (c *Component) interopEndpoints() []Endpoint {
-	certPool := x509.NewCertPool()
-	for _, certs := range c.interop.SenderClientCAs {
-		for _, cert := range certs {
-			certPool.AddCert(cert)
-		}
-	}
 	return []Endpoint{
 		// TODO: Enable TCP endpoint (https://github.com/TheThingsNetwork/lorawan-stack/issues/717)
 		NewTLSEndpoint(c.config.Interop.ListenTLS, "Interop",
-			WithTLSClientAuth(tls.RequireAndVerifyClientCert, certPool, nil),
+			// TODO: Change to RequestClientCert (https://github.com/TheThingsNetwork/lorawan-stack/issues/718).
+			WithTLSClientAuth(tls.RequireAndVerifyClientCert, c.interop.ClientCAPool(), nil),
 			WithNextProtos("h2", "http/1.1"),
 		),
 	}

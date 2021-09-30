@@ -15,11 +15,17 @@
 package interop
 
 import (
+	"context"
 	"crypto/tls"
-	"fmt"
+	"crypto/x509"
+	"encoding/pem"
+	"io/ioutil"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type tlsConfig struct {
@@ -36,10 +42,12 @@ type fetcherFileReader struct {
 	fetcher fetch.Interface
 }
 
+var errFetchFile = errors.Define("fetch_file", "fetch file `{name}`")
+
 func (r fetcherFileReader) ReadFile(name string) ([]byte, error) {
 	b, err := r.fetcher.File(name)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to fetch %q: %w", name, err)
+		return nil, errFetchFile.WithCause(err).WithAttributes("name", name)
 	}
 	return b, nil
 }
@@ -65,5 +73,92 @@ func (conf tlsConfig) TLSConfig(fetcher fetch.Interface) (*tls.Config, error) {
 	return res, nil
 }
 
-// InteropClientConfigurationName represents the filename of interop client configuration.
-const InteropClientConfigurationName = "config.yml"
+const (
+	// InteropClientConfigurationName represents the filename of interop client configuration.
+	InteropClientConfigurationName = "config.yml"
+	// SenderClientCAsConfigurationName represents the filename of sender client CAs configuration.
+	SenderClientCAsConfigurationName = "config.yml"
+)
+
+func fetchSenderClientCAs(ctx context.Context, conf config.InteropServer) (map[string][]*x509.Certificate, error) {
+	decodeCerts := func(b []byte) (res []*x509.Certificate, err error) {
+		for len(b) > 0 {
+			var block *pem.Block
+			block, b = pem.Decode(b)
+			if block == nil {
+				break
+			}
+			if block.Type != "CERTIFICATE" || len(block.Headers) != 0 {
+				continue
+			}
+			cert, err := x509.ParseCertificate(block.Bytes)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, cert)
+		}
+		return res, nil
+	}
+
+	var senderClientCAs map[string][]*x509.Certificate
+	if len(conf.SenderClientCADeprecated) > 0 {
+		senderClientCAs = make(map[string][]*x509.Certificate, len(conf.SenderClientCA.Static))
+		for id, filename := range conf.SenderClientCADeprecated {
+			b, err := ioutil.ReadFile(filename)
+			if err != nil {
+				return nil, err
+			}
+			certs, err := decodeCerts(b)
+			if err != nil {
+				return nil, err
+			}
+			if len(certs) > 0 {
+				senderClientCAs[id] = certs
+			}
+		}
+	} else if len(conf.SenderClientCA.Static) > 0 {
+		senderClientCAs = make(map[string][]*x509.Certificate, len(conf.SenderClientCA.Static))
+		for id, b := range conf.SenderClientCA.Static {
+			certs, err := decodeCerts(b)
+			if err != nil {
+				return nil, err
+			}
+			if len(certs) > 0 {
+				senderClientCAs[id] = certs
+			}
+		}
+	} else {
+		fetcher, err := conf.SenderClientCA.Fetcher(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if fetcher != nil {
+			confFileBytes, err := fetcher.File(SenderClientCAsConfigurationName)
+			if err != nil {
+				return nil, err
+			}
+
+			var yamlConf map[string]string
+			if err := yaml.UnmarshalStrict(confFileBytes, &yamlConf); err != nil {
+				return nil, err
+			}
+
+			senderClientCAs = make(map[string][]*x509.Certificate, len(yamlConf))
+			for senderID, filename := range yamlConf {
+				b, err := fetcher.File(filename)
+				if err != nil {
+					return nil, err
+				}
+				certs, err := decodeCerts(b)
+				if err != nil {
+					return nil, err
+				}
+				if len(certs) > 0 {
+					senderClientCAs[senderID] = certs
+				}
+			}
+		}
+	}
+
+	return senderClientCAs, nil
+}

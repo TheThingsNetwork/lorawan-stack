@@ -15,51 +15,24 @@
 package interop
 
 import (
-	"crypto/x509"
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
-
-	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// MessageHeader contains the message header.
+// MessageHeader is the common LoRaWAN Backend Interfaces message header.
 type MessageHeader struct {
-	ProtocolVersion string
+	ProtocolVersion ProtocolVersion
 	TransactionID   uint32
 	MessageType     MessageType
-	SenderToken     Buffer `json:",omitempty"`
-	ReceiverToken   Buffer `json:",omitempty"`
+	SenderID,
+	ReceiverID string
+	SenderToken   Buffer `json:",omitempty"`
+	ReceiverToken Buffer `json:",omitempty"`
 }
 
 // AnswerHeader returns the header of the answer message.
 func (h MessageHeader) AnswerHeader() (MessageHeader, error) {
-	var ansType MessageType
-	switch h.MessageType {
-	case MessageTypeJoinReq:
-		ansType = MessageTypeJoinAns
-	case MessageTypeRejoinReq:
-		ansType = MessageTypeRejoinAns
-	case MessageTypeAppSKeyReq:
-		ansType = MessageTypeAppSKeyAns
-	case MessageTypePRStartReq:
-		ansType = MessageTypePRStartAns
-	case MessageTypePRStopReq:
-		ansType = MessageTypePRStopAns
-	case MessageTypeHRStartReq:
-		ansType = MessageTypeHRStartAns
-	case MessageTypeHRStopReq:
-		ansType = MessageTypeHRStopAns
-	case MessageTypeHomeNSReq:
-		ansType = MessageTypeHomeNSAns
-	case MessageTypeProfileReq:
-		ansType = MessageTypeProfileAns
-	case MessageTypeXmitDataReq:
-		ansType = MessageTypeXmitDataAns
-	case MessageTypeXmitLocReq:
-		ansType = MessageTypeXmitLocAns
-	default:
+	ansType, ok := h.MessageType.Answer()
+	if !ok {
 		return MessageHeader{}, errInvalidRequestType.WithAttributes("type", h.MessageType)
 	}
 	return MessageHeader{
@@ -67,26 +40,9 @@ func (h MessageHeader) AnswerHeader() (MessageHeader, error) {
 		TransactionID:   h.TransactionID,
 		MessageType:     ansType,
 		ReceiverToken:   h.SenderToken,
-	}, nil
-}
-
-// RawMessageHeader contains a message header with generic sender and receiver IDs.
-type RawMessageHeader struct {
-	MessageHeader
-	SenderID,
-	ReceiverID string
-}
-
-// AnswerHeader returns the header of the answer message.
-func (h RawMessageHeader) AnswerHeader() (RawMessageHeader, error) {
-	header, err := h.MessageHeader.AnswerHeader()
-	if err != nil {
-		return RawMessageHeader{}, err
-	}
-	return RawMessageHeader{
-		MessageHeader: header,
-		SenderID:      h.ReceiverID,
-		ReceiverID:    h.SenderID,
+		ReceiverID:      h.SenderID,
+		SenderID:        h.ReceiverID,
+		SenderToken:     h.ReceiverToken,
 	}, nil
 }
 
@@ -98,7 +54,7 @@ type Result struct {
 
 // ErrorMessage is a message with raw header and a result field.
 type ErrorMessage struct {
-	RawMessageHeader
+	MessageHeader
 	Result Result
 }
 
@@ -108,21 +64,7 @@ type NsJsMessageHeader struct {
 	SenderID NetID
 	// ReceiverID is a JoinEUI.
 	ReceiverID EUI64
-	SenderNSID NetID
-}
-
-// AnswerHeader returns the header of the answer message.
-func (h NsJsMessageHeader) AnswerHeader() (JsNsMessageHeader, error) {
-	header, err := h.MessageHeader.AnswerHeader()
-	if err != nil {
-		return JsNsMessageHeader{}, err
-	}
-	return JsNsMessageHeader{
-		MessageHeader: header,
-		SenderID:      h.ReceiverID,
-		ReceiverID:    h.SenderID,
-		ReceiverNSID:  h.SenderNSID,
-	}, nil
+	SenderNSID *string `json:",omitempty"`
 }
 
 // JsNsMessageHeader contains the message header for JS to NS messages.
@@ -131,7 +73,7 @@ type JsNsMessageHeader struct {
 	// SenderID is a JoinEUI.
 	SenderID     EUI64
 	ReceiverID   NetID
-	ReceiverNSID NetID
+	ReceiverNSID *string `json:",omitempty"`
 }
 
 // AsJsMessageHeader contains the message header for AS to JS messages.
@@ -140,19 +82,6 @@ type AsJsMessageHeader struct {
 	SenderID string
 	// ReceiverID is a JoinEUI.
 	ReceiverID EUI64
-}
-
-// AnswerHeader returns the header of the answer message.
-func (h AsJsMessageHeader) AnswerHeader() (JsAsMessageHeader, error) {
-	header, err := h.MessageHeader.AnswerHeader()
-	if err != nil {
-		return JsAsMessageHeader{}, err
-	}
-	return JsAsMessageHeader{
-		MessageHeader: header,
-		SenderID:      h.ReceiverID,
-		ReceiverID:    h.SenderID,
-	}, nil
 }
 
 // JsAsMessageHeader contains the message header for JS to AS messages.
@@ -215,84 +144,6 @@ type HomeNSReq struct {
 type HomeNSAns struct {
 	JsNsMessageHeader
 	Result Result
-	HNSID  NetID
+	HNSID  *string `json:",omitempty"`
 	HNetID NetID
-}
-
-// parseMessage parses the header and the message type of the request body.
-// This middleware sets the header in the context on the `headerKey` and the message on the `messageKey`.
-func parseMessage() echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			buf, err := ioutil.ReadAll(c.Request().Body)
-			if err != nil {
-				return err
-			}
-			if len(buf) == 0 {
-				return echo.NewHTTPError(http.StatusBadRequest)
-			}
-			var header RawMessageHeader
-			if err := json.Unmarshal(buf, &header); err != nil {
-				return echo.NewHTTPError(http.StatusBadRequest)
-			}
-			if header.ProtocolVersion == "" || header.MessageType == "" {
-				return echo.NewHTTPError(http.StatusBadRequest)
-			}
-			c.Set(headerKey, &header)
-			switch header.ProtocolVersion {
-			case "1.0", "1.1":
-			default:
-				return ErrProtocolVersion.New()
-			}
-			var msg interface{}
-			switch header.MessageType {
-			case MessageTypeJoinReq:
-				msg = &JoinReq{}
-			case MessageTypeJoinAns:
-				msg = &JoinAns{}
-			case MessageTypeAppSKeyReq:
-				msg = &AppSKeyReq{}
-			case MessageTypeAppSKeyAns:
-				msg = &AppSKeyAns{}
-			case MessageTypeHomeNSReq:
-				msg = &HomeNSReq{}
-			case MessageTypeHomeNSAns:
-				msg = &HomeNSAns{}
-			default:
-				return ErrMalformedMessage.New()
-			}
-			if err := json.Unmarshal(buf, msg); err != nil {
-				return ErrMalformedMessage.New()
-			}
-			c.Set(messageKey, msg)
-			return next(c)
-		}
-	}
-}
-
-// verifySenderID verifies whether the SenderID of the message is authorized for the request according to the trusted
-// certificates that are provided through the given callback.
-func verifySenderID(getSenderClientCAs func(string) []*x509.Certificate) echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			header := c.Get(headerKey).(*RawMessageHeader)
-			senderClientCAs := getSenderClientCAs(header.SenderID)
-			if len(senderClientCAs) == 0 {
-				return ErrUnknownSender.New()
-			}
-			if state := c.Request().TLS; state != nil {
-				for _, chain := range state.VerifiedChains {
-					for _, cert := range chain {
-						for _, senderCA := range senderClientCAs {
-							if cert.Equal(senderCA) {
-								return next(c)
-							}
-						}
-					}
-				}
-			}
-			// TODO: Check headers (https://github.com/TheThingsNetwork/lorawan-stack/issues/717)
-			return ErrUnknownSender.New()
-		}
-	}
 }
