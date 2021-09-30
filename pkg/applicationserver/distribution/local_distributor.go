@@ -28,7 +28,7 @@ import (
 // A timeout of 0 means the underlying subscriptions never timeout.
 func NewLocalDistributor(ctx context.Context, rd RequestDecoupler, timeout time.Duration) Distributor {
 	return &localDistributor{
-		broadcast:     newSubscriptionSet(ctx, rd, 0),
+		broadcast:     newSubscriptionSet(ctx, rd, 0, io.WithBlocking(true)),
 		subscriptions: newSubscriptionMap(ctx, rd, timeout, noSetup),
 	}
 }
