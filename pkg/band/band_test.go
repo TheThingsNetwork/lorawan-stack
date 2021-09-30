@@ -590,8 +590,8 @@ func TestFindDataRate(t *testing.T) {
 	}
 	index, _, ok := testBand.FindDownlinkDataRate(dr)
 	a.So(ok, should.BeTrue)
-	if index != ttnpb.DATA_RATE_12 && index != ttnpb.DATA_RATE_4 {
-		t.Fatalf("Invalid index, expected 4 or 12. Got %d", index)
+	if index != ttnpb.DATA_RATE_12 {
+		t.Fatalf("Invalid index, expected 12. Got %d", index)
 	}
 
 	dr = ttnpb.DataRate{
@@ -604,8 +604,8 @@ func TestFindDataRate(t *testing.T) {
 	}
 	index, _, ok = testBand.FindUplinkDataRate(dr)
 	a.So(ok, should.BeTrue)
-	if index != ttnpb.DATA_RATE_12 && index != ttnpb.DATA_RATE_4 {
-		t.Fatalf("Invalid index, expected 4 or 12. Got %d", index)
+	if index != ttnpb.DATA_RATE_4 {
+		t.Fatalf("Invalid index, expected 4. Got %d", index)
 	}
 
 	// AU_915_928
@@ -620,8 +620,8 @@ func TestFindDataRate(t *testing.T) {
 	}
 	index, _, ok = testBand.FindDownlinkDataRate(dr)
 	a.So(ok, should.BeTrue)
-	if index != ttnpb.DATA_RATE_12 && index != ttnpb.DATA_RATE_8 {
-		t.Fatalf("Invalid index, expected 8 or 12. Got %d", index)
+	if index != ttnpb.DATA_RATE_8 {
+		t.Fatalf("Invalid index, expected 8. Got %d", index)
 	}
 
 	dr = ttnpb.DataRate{
@@ -634,8 +634,8 @@ func TestFindDataRate(t *testing.T) {
 	}
 	index, _, ok = testBand.FindUplinkDataRate(dr)
 	a.So(ok, should.BeTrue)
-	if index != ttnpb.DATA_RATE_12 && index != ttnpb.DATA_RATE_8 {
-		t.Fatalf("Invalid index, expected 8 or 12. Got %d", index)
+	if index != ttnpb.DATA_RATE_8 {
+		t.Fatalf("Invalid index, expected 8. Got %d", index)
 	}
 
 }
