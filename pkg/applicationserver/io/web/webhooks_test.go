@@ -54,7 +54,7 @@ func createdPooledSink(ctx context.Context, t *testing.T, sink web.Sink) web.Sin
 }
 
 func TestWebhooks(t *testing.T) {
-	_, ctx := test.New(t)
+	a, ctx := test.New(t)
 
 	redisClient, flush := test.NewRedis(ctx, "web_test")
 	defer flush()
@@ -63,7 +63,11 @@ func TestWebhooks(t *testing.T) {
 		PublicAddress: "https://example.com/api/v3",
 	}
 	registry := &redis.WebhookRegistry{
-		Redis: redisClient,
+		Redis:   redisClient,
+		LockTTL: test.Delay << 10,
+	}
+	if err := registry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
 	}
 	ids := ttnpb.ApplicationWebhookIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,

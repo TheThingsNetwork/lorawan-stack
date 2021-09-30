@@ -326,9 +326,14 @@ var startCommand = &cobra.Command{
 			}
 			config.AS.Packages.Registry = applicationPackagesRegistry
 			if config.AS.Webhooks.Target != "" {
-				config.AS.Webhooks.Registry = &asiowebredis.WebhookRegistry{
-					Redis: redis.New(config.Redis.WithNamespace("as", "io", "webhooks")),
+				webhookRegistry := &asiowebredis.WebhookRegistry{
+					Redis:   redis.New(config.Redis.WithNamespace("as", "io", "webhooks")),
+					LockTTL: defaultLockTTL,
 				}
+				if err := webhookRegistry.Init(ctx); err != nil {
+					return shared.ErrInitializeApplicationServer.WithCause(err)
+				}
+				config.AS.Webhooks.Registry = webhookRegistry
 			}
 			fetcher, err := config.AS.EndDeviceFetcher.NewFetcher(c)
 			if err != nil {

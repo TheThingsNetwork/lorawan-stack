@@ -217,7 +217,10 @@ func TestApplicationServer(t *testing.T) {
 	webhooksRedisClient, webhooksFlush := test.NewRedis(ctx, "applicationserver_test", "webhooks")
 	defer webhooksFlush()
 	defer webhooksRedisClient.Close()
-	webhookRegistry := iowebredis.WebhookRegistry{Redis: webhooksRedisClient}
+	webhookRegistry := iowebredis.WebhookRegistry{Redis: webhooksRedisClient, LockTTL: test.Delay << 10}
+	if err := webhookRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	pubsubRedisClient, pubsubFlush := test.NewRedis(ctx, "applicationserver_test", "pubsub")
 	defer pubsubFlush()

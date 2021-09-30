@@ -16,10 +16,14 @@ package redis
 
 import (
 	"context"
+	"io"
+	"math/rand"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
+	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -50,7 +54,21 @@ func applyWebhookFieldMask(dst, src *ttnpb.ApplicationWebhook, paths ...string) 
 
 // WebhookRegistry is a Redis webhook registry.
 type WebhookRegistry struct {
-	Redis *ttnredis.Client
+	Redis   *ttnredis.Client
+	LockTTL time.Duration
+
+	entropyMu *sync.Mutex
+	entropy   io.Reader
+}
+
+// Init initializes the WebhookRegistry.
+func (r *WebhookRegistry) Init(ctx context.Context) error {
+	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
+		return err
+	}
+	r.entropyMu = &sync.Mutex{}
+	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
+	return nil
 }
 
 func (r *WebhookRegistry) appKey(uid string) string {
@@ -102,8 +120,13 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
 	ik := r.idKey(appUID, ids.WebhookId)
 
+	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	if err != nil {
+		return nil, err
+	}
+
 	var pb *ttnpb.ApplicationWebhook
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+	err = ttnredis.LockedWatch(ctx, r.Redis, ik, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, ik)
 		stored := &ttnpb.ApplicationWebhook{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -212,7 +235,7 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 			return err
 		}
 		return nil
-	}, ik)
+	})
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
