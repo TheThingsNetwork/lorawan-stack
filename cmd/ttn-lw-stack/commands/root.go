@@ -141,6 +141,5 @@ func init() {
 	Root.AddCommand(commands.GenManPages(Root))
 	Root.AddCommand(commands.GenMDDoc(Root))
 	Root.AddCommand(commands.GenJSONTree(Root))
-	Root.AddCommand(commands.GenYAMLDoc(Root))
 	Root.AddCommand(commands.Complete())
 }
