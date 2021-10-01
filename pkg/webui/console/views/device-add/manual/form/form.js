@@ -728,7 +728,16 @@ const ManualForm = props => {
         <Radio label={messages.multipleRegistration} value={REGISTRATION_TYPES.MULTIPLE} />
       </Form.Field>
       <SubmitBar>
-        <Form.Submit message={messages.submitTitle} component={SubmitButton} />
+        <Form.Submit
+          message={messages.submitTitle}
+          component={SubmitButton}
+          onClick={e => {
+            e.preventDefault()
+            if (formRef.current) {
+              formRef.current.handleSubmit()
+            }
+          }}
+        />
       </SubmitBar>
     </Form>
   )
