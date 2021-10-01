@@ -89,7 +89,7 @@ const AdvancedSettingsSection = props => {
     onJsAddressChange,
   } = props
 
-  const { values: formValues } = useFormContext()
+  const { values: formValues, isValidating, isSubmitting } = useFormContext()
   const { mac_settings: macSettings } = formValues
 
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
@@ -113,11 +113,20 @@ const AdvancedSettingsSection = props => {
     [onDefaultNsSettingsChange],
   )
 
+  // List of error types that should trigger an expand if present during form submission.
+  const errorTitles = [
+    'mac_settings',
+    '_device_class',
+    'network_server_address',
+    'join_server_address',
+  ]
+
   return (
     <Form.CollapseSection
       className={style.advancesSection}
       id="advanced-settings"
       title={m.advancedSectionTitle}
+      errorTitles={errorTitles}
     >
       <Form.Field
         title={sharedMessages.activationMode}

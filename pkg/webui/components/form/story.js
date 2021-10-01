@@ -142,7 +142,11 @@ storiesOf('Form', module)
           <Radio label="Radio 2" value="radio2" />
           <Radio label="Radio 3" value="radio3" />
         </Form.Field>
-        <Form.CollapseSection title="Optional information" id="optional-section">
+        <Form.CollapseSection
+          title="Optional information"
+          id="optional-section"
+          errorTitles={['about']}
+        >
           <Form.Field
             component={Input}
             type="textarea"

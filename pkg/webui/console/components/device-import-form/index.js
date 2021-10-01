@@ -159,7 +159,11 @@ export default class DeviceBulkCreateForm extends Component {
               name="data"
               required
             />
-            <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
+            <Form.CollapseSection
+              id="advanced-settings"
+              title={m.advancedSectionTitle}
+              errorTitles={['components', 'set_claim_auth_code']}
+            >
               <Form.Field
                 onChange={this.handleComponentChange}
                 component={Checkbox.Group}

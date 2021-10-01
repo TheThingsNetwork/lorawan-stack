@@ -107,6 +107,7 @@ const MacSettingsSection = props => {
       initiallyCollapsed={initiallyCollapsed}
       onCollapse={handleIsCollapsedChange}
       isCollapsed={isCollapsed}
+      errorTitles={['mac_settings']}
     >
       <Form.Field
         title={sharedMessages.frameCounterWidth}
