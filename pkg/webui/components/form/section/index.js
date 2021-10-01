@@ -22,8 +22,20 @@ import Icon from '@ttn-lw/components/icon'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import getByPath from '@ttn-lw/lib/get-by-path'
+
+import Field from '../field'
 
 import style from './section.styl'
+
+const recursiveMap = (children, fn) =>
+  React.Children.map(children, child => {
+    if (child && child.props && child.props.children) {
+      return [fn(child), recursiveMap(child.props.children, fn)]
+    }
+
+    return fn(child)
+  })
 
 const m = defineMessages({
   expand: 'Expand section',
@@ -35,13 +47,13 @@ const m = defineMessages({
 const FormCollapseSection = props => {
   const { className, id, title, onCollapse, isCollapsed, initiallyCollapsed, children } = props
   const { formatMessage } = useIntl()
-  const { disabled } = useFormContext()
+  const { disabled, errors, isSubmitting, isValid } = useFormContext()
 
   // Check if the component is 'controlled'. When the `isCollapsed` prop is passed the component
   // is considered as 'uncontrolled' and it's state must be controlled from the outside.
   const isControlled = typeof isCollapsed === 'undefined'
-
   const [collapsed, setCollapsed] = React.useState(initiallyCollapsed)
+
   const onExpandedChange = React.useCallback(() => {
     if (isControlled) {
       setCollapsed(collapsed => !collapsed)
@@ -49,6 +61,26 @@ const FormCollapseSection = props => {
       onCollapse()
     }
   }, [isControlled, onCollapse])
+
+  // Trigger an expand if there is an error in a field within the section when submitting.
+  // Uses `errorTitles` to determine what types of errors should trigger an expand.
+  React.useEffect(() => {
+    if (collapsed) {
+      const fieldNames = recursiveMap(children, child => {
+        if (child !== null && child.type === Field && 'name' in child.props) {
+          return child.props.name
+        }
+      })
+      if (isSubmitting && !isValid) {
+        for (const fieldName of fieldNames) {
+          if (getByPath(errors, fieldName) !== undefined) {
+            setCollapsed(false)
+            break
+          }
+        }
+      }
+    }
+  }, [isSubmitting, isValid, children, errors, collapsed])
 
   const isSectionClosed = isControlled ? collapsed : isCollapsed
 

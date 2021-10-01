@@ -98,7 +98,7 @@ class InnerForm extends React.PureComponent {
     } = this.props
 
     return (
-      <form className={classnames(style.container, className)} onSubmit={handleSubmit}>
+      <form className={classnames(style.container, className)} onSubmit={handleSubmit} noValidate>
         {(formError || formInfo) && (
           <div style={{ outline: 'none' }} ref={this.notificationRef} tabIndex="-1">
             {formError && <ErrorNotification content={formError} title={formErrorTitle} small />}
