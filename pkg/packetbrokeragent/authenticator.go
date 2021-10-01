@@ -74,7 +74,7 @@ func (a *oauth2Authenticator) AuthInfo(ctx context.Context) (ttnpb.PacketBrokerN
 				NetID    uint32 `json:"nid"`
 				TenantID string `json:"tid"`
 			} `json:"ns"`
-		} `json:"https://iam.packetbroker.org/claims"`
+		} `json:"https://iam.packetbroker.net/claims"`
 	}
 	if err := parsed.UnsafeClaimsWithoutVerification(&claims); err != nil {
 		return ttnpb.PacketBrokerNetworkIdentifier{}, errOAuth2Token.WithCause(err)
