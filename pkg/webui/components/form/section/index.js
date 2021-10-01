@@ -33,15 +33,24 @@ const m = defineMessages({
 // `<FormCollapseSection />` aggregates a set of form fields under common title as well as adds
 // functionality to hide or show the fields.
 const FormCollapseSection = props => {
-  const { className, id, title, onCollapse, isCollapsed, initiallyCollapsed, children } = props
+  const {
+    className,
+    id,
+    title,
+    onCollapse,
+    isCollapsed,
+    initiallyCollapsed,
+    children,
+    errorTitles,
+  } = props
   const { formatMessage } = useIntl()
-  const { disabled } = useFormContext()
+  const { disabled, errors, isSubmitting } = useFormContext()
 
   // Check if the component is 'controlled'. When the `isCollapsed` prop is passed the component
   // is considered as 'uncontrolled' and it's state must be controlled from the outside.
   const isControlled = typeof isCollapsed === 'undefined'
-
   const [collapsed, setCollapsed] = React.useState(initiallyCollapsed)
+
   const onExpandedChange = React.useCallback(() => {
     if (isControlled) {
       setCollapsed(collapsed => !collapsed)
@@ -49,6 +58,20 @@ const FormCollapseSection = props => {
       onCollapse()
     }
   }, [isControlled, onCollapse])
+
+  // Trigger an expand if there is an error in a field within the section when submitting.
+  // Uses `errorTitles` to determine what types of errors should trigger an expand.
+  React.useEffect(() => {
+    if (isSubmitting) {
+      for (let i = 0; i < errorTitles.length; i++) {
+        const title = errorTitles[i]
+        if (errors[title]) {
+          setCollapsed(false)
+          break
+        }
+      }
+    }
+  }, [isSubmitting])
 
   const isSectionClosed = isControlled ? collapsed : isCollapsed
 
@@ -81,6 +104,7 @@ FormCollapseSection.propTypes = {
   isCollapsed: PropTypes.bool,
   onCollapse: PropTypes.func,
   title: PropTypes.message.isRequired,
+  errorTitles: PropTypes.array,
 }
 
 FormCollapseSection.defaultProps = {
@@ -88,6 +112,7 @@ FormCollapseSection.defaultProps = {
   onCollapse: () => null,
   isCollapsed: undefined,
   initiallyCollapsed: true,
+  errorTitles: [],
 }
 
 export default FormCollapseSection
