@@ -465,7 +465,14 @@ func FieldKey(addrKey string) string {
 
 const noUplinkMatchMarker = '-'
 
-var errNoUplinkMatch = errors.DefineNotFound("no_uplink_match", "no device matches uplink")
+var (
+	errNoUplinkMatch = errors.DefineNotFound("no_uplink_match", "no device matches uplink")
+
+	errNoCandidates       = errors.DefineNotFound("no_candidates", "no device candidates found")
+	errNoMatchMarker      = errors.DefineNotFound("found_no_match_marker", "found no match marker")
+	errCandidate          = errors.DefineNotFound("candidate", "candidate failed matching")
+	errNoCandidateMatched = errors.DefineNotFound("no_candidate_match", "no candidate matches uplink")
+)
 
 // RangeByUplinkMatches ranges over devices matching the uplink.
 func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, *networkserver.UplinkMatch) (bool, error)) error {
@@ -519,7 +526,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	vs, err := ttnredis.RunInterfaceSliceScript(ctx, r.Redis, deviceMatchScript, matchKeys, lsb, cacheTTL.Milliseconds()).Result()
 	if err != nil {
 		if err == redis.Nil {
-			return errNoUplinkMatch.New()
+			return errNoUplinkMatch.WithCause(errNoCandidates)
 		}
 		return ttnredis.ConvertError(err)
 	}
@@ -532,7 +539,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	}
 	processResult := func(ctx context.Context, s string) error {
 		if s == string(noUplinkMatchMarker) {
-			return errNoUplinkMatch.New()
+			return errNoUplinkMatch.WithCause(errNoMatchMarker)
 		}
 		ctx = log.NewContextWithField(ctx, "match_key", matchResultKey)
 		res := &UplinkMatchResult{}
@@ -569,7 +576,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			return ttnredis.ConvertError(err)
 		}
 		if !ok {
-			return errNoUplinkMatch.New()
+			return errNoUplinkMatch.WithCause(errCandidate)
 		}
 		return nil
 	}
@@ -764,7 +771,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		return ttnredis.ConvertError(err)
 	}
 	if ok {
-		return errNoUplinkMatch.New()
+		return errNoUplinkMatch.WithCause(errNoCandidateMatched)
 	}
 
 	// Another instance set the result, while this goroutine was busy with processing.
