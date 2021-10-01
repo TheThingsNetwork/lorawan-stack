@@ -22,6 +22,18 @@ import errorMessages from './error-messages'
 import grpcErrToHttpErr from './grpc-error-map'
 
 /**
+ * Returns whether the given object has a valid `details` prop.
+ *
+ * @param {object} object - The object to be tested.
+ * @returns {boolean} `true` if `object` has a valid `details` prop, `false` otherwise.
+ */
+export const hasValidDetails = object =>
+  'details' in object &&
+  object.details instanceof Array &&
+  object.details.length !== 0 &&
+  typeof object.details[0] === 'object'
+
+/**
  * Tests whether the error is a backend error object.
  *
  * @param {object} error - The error to be tested.
@@ -32,7 +44,7 @@ export const isBackend = error =>
   typeof error === 'object' &&
   !('id' in error) &&
   error.message &&
-  error.details &&
+  hasValidDetails(error) &&
   (error.code || error.grpc_code)
 
 /**
@@ -42,20 +54,6 @@ export const isBackend = error =>
  * @returns {boolean} `true` if `error` is a well known frontend error object.
  */
 export const isFrontend = error => Boolean(error) && typeof error === 'object' && error.isFrontend
-
-/**
- * Returns whether the backend error has `details` attached.
- *
- * @param {object} error - The object to be tested.
- * @returns {boolean} `true` if `the error object contains `details` with
- * at least one item, `false` otherwise.
- */
-export const isBackendErrorWithDetails = error =>
-  isBackend(error) &&
-  'details' in error &&
-  error.details instanceof Array &&
-  error.details.length !== 0 &&
-  typeof error.details[0] === 'object'
 
 /**
  * Returns whether `details` is a backend error details object.
@@ -326,15 +324,35 @@ export const getBackendErrorDetails = error =>
   isBackendErrorDetails(error) ? error : error.details[0]
 
 /**
+ * Returns the error details' first path error, if any.
+ *
+ * @param {object} details - The backend error details object.
+ * @returns {object} - The first path error if exists, `undefined` otherwise.
+ */
+export const getBackendErrorDetailsPathError = details => {
+  if (!isBackendErrorDetails(details) || !hasValidDetails(details)) {
+    return undefined
+  }
+  const detailsDetails = details.details[0]
+  if (
+    !('path_errors' in detailsDetails) ||
+    !(detailsDetails.path_errors instanceof Array) ||
+    detailsDetails.path_errors.length === 0
+  ) {
+    return undefined
+  }
+
+  return detailsDetails.path_errors[0]
+}
+
+/**
  * Returns the name of the error extracted from the details array.
  *
  * @param {object} error - The backend error object.
  * @returns {string} - The error name.
  */
 export const getBackendErrorName = error =>
-  error && error.details instanceof Array && error.details[0] && error.details[0].name
-    ? error.details[0].name
-    : undefined
+  hasValidDetails(error) ? error.details[0].name : undefined
 /**
  * Returns the default message of the error, used as fallback translation.
  *
@@ -396,55 +414,58 @@ export const getCorrelationId = error =>
  * Adapts the error object to props of message object, if possible.
  *
  * @param {object} error - The backend error object.
- * @returns {object} Message props of the error object, or generic error object.
+ * @param {boolean} each - Whether to return an array of all messages contained
+ * in the error object, including causes and details.
+ * @returns {object|Array} Message props of the error object, or generic error object.
  */
-export const toMessageProps = error => {
-  let props
+export const toMessageProps = (error, each = false) => {
+  const props = []
 
-  // Check if it is a error message and transform it to a intl message.
-  if (isBackendErrorDetails(error) || isBackendErrorWithDetails(error)) {
-    const errorDetails = error.details ? error.details[0] : error
+  // Check if it is an error message and transform it to a intl message.
+  if (isBackendErrorDetails(error) || isBackend(error)) {
+    const pathErrors = getBackendErrorDetailsPathError(error)
+    let errorDetails
+    if (isBackendErrorDetails(pathErrors)) {
+      errorDetails = pathErrors
+    } else if ('details' in error) {
+      errorDetails = error.details[0]
+    } else {
+      errorDetails = error
+    }
+
     if (hasCauses(errorDetails)) {
       // Use the root cause if any.
       const rootCause = getBackendErrorRootCause(errorDetails)
-      props = {
+      props.push({
         content: {
           id: getBackendErrorDetailsId(rootCause),
           defaultMessage: rootCause.message_format,
         },
         values: rootCause.attributes,
-      }
-    } else {
-      props = {
-        content: {
-          id: getBackendErrorDetailsId(errorDetails),
-          defaultMessage: errorDetails.message_format,
-        },
-        values: errorDetails.attributes,
-      }
+      })
     }
-  } else if (isBackend()) {
-    props = {
+
+    props.push({
       content: {
-        id: getBackendErrorId(error),
-        defaultMessage: getBackendErrorDefaultMessage(error),
+        id: getBackendErrorDetailsId(errorDetails),
+        defaultMessage: errorDetails.message_format,
       },
-      values: getBackendErrorMessageAttributes(error),
-    }
+      values: errorDetails.attributes,
+    })
   } else if (isFrontend(error)) {
-    props = {
+    props.push({
       content: error.errorMessage,
       title: error.errorTitle,
-    }
+    })
   } else if (isTranslated(error)) {
     // Fall back to normal message.
-    props = { content: error }
-  } else {
+    props.push({ content: error })
+  } else if (props.length === 0) {
     // Fall back to generic error message.
-    props = { content: errorMessages.genericError }
+    props.push({ content: errorMessages.genericError })
   }
 
-  return props
+  return each ? props : props[0]
 }
 
 /**

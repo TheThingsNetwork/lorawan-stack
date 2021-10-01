@@ -80,6 +80,42 @@ const backendErrorDetails = {
   code: 9,
 }
 
+const backendErrorDetailsWithPathErrors = {
+  '@type': 'type.googleapis.com/ttn.lorawan.v3.ErrorDetails',
+  namespace: 'pkg/gatewayserver',
+  name: 'schedule',
+  message_format: 'failed to schedule',
+  correlation_id: '4827366aac5c437b9027904002f9f6ee',
+  code: 10,
+  details: [
+    {
+      '@type': 'type.googleapis.com/ttn.lorawan.v3.ScheduleDownlinkErrorDetails',
+      path_errors: [
+        {
+          namespace: 'pkg/gatewayserver',
+          name: 'schedule_path',
+          message_format: 'failed to schedule on path `{gateway_uid}`',
+          attributes: {
+            gateway_uid: 'ttig-adrian-2@tti',
+          },
+          correlation_id: '563a0e2e63e64cb28322590c61b3dd73',
+          cause: {
+            namespace: 'pkg/gatewayserver/io',
+            name: 'data_rate_rx_window',
+            message_format: 'invalid data rate in Rx window `{window}`',
+            attributes: {
+              window: 1,
+            },
+            correlation_id: '0aa2e629add64961bd8276ca274fc17f',
+            code: 3,
+          },
+          code: 3,
+        },
+      ],
+    },
+  ],
+}
+
 const conflictBackendError = {
   code: 6,
   message: 'error:pkg/identityserver/store:id_taken (ID already taken)',
@@ -286,6 +322,57 @@ describe('Converting errors to message props', () => {
       values: {
         field: 'example_field',
         reason: 'Example validation error',
+      },
+    })
+  })
+
+  it('correctly extracts all message props when using the `each` option (details with cause)', () => {
+    const messageProps = toMessageProps(backendErrorWithDetailsAndCause, true)
+    expect(messageProps).toBeInstanceOf(Array)
+    expect(messageProps).toHaveLength(2)
+    expect(messageProps[0]).toMatchObject({
+      content: {
+        id: 'error:pkg/errors:validation',
+        defaultMessage: 'invalid `{field}`: {reason}',
+      },
+      values: {
+        field: 'example_field',
+        reason: 'Example validation error',
+      },
+    })
+    expect(messageProps[1]).toMatchObject({
+      content: {
+        id: 'error:pkg/ttnpb:identifiers',
+        defaultMessage: 'invalid identifiers',
+      },
+    })
+  })
+
+  it('correctly extracts all message props when using the `each` option (only details)', () => {
+    const messageProps = toMessageProps(backendErrorWithDetails, true)
+    expect(messageProps).toBeInstanceOf(Array)
+    expect(messageProps).toHaveLength(1)
+    expect(messageProps[0]).toMatchObject({
+      content: {
+        id: 'error:pkg/assets:http',
+        defaultMessage: 'HTTP error: {message}',
+      },
+      values: {
+        message:
+          '`` is not a valid ID. Must be at least 2 and at most 36 characters long and may consist of only letters, numbers and dashes. It may not start or end with a dash',
+      },
+    })
+  })
+
+  it('correctly extracts from error details with path errors', () => {
+    const messageProps = toMessageProps(backendErrorDetailsWithPathErrors)
+    expect(messageProps).toMatchObject({
+      content: {
+        id: 'error:pkg/gatewayserver/io:data_rate_rx_window',
+        defaultMessage: 'invalid data rate in Rx window `{window}`',
+      },
+      values: {
+        window: 1,
       },
     })
   })
