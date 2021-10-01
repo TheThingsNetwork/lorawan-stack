@@ -23,6 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Emails to admins about requested OAuth clients.
 - `session` handling for joined OTAA end devices in the Console.
+- `FormCollapseSection` components that contain fields that had validation errors when submitting a form should automatically expand.
 
 ### Security
 
