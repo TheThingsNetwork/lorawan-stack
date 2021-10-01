@@ -26,6 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - LoRaWAN Backend Interfaces 1.1 fields that were used in 1.0 (most notably `SenderNSID` and `ReceiverNSID`). Usage of `NSID` is now only supported with LoRaWAN Backend Interfaces 1.1 as specified.
+- Collapsed form fields sections that contain fields that had validation errors when submitting a form now expand automatically.
 
 ### Security
 
