@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 - Emails to admins about requested OAuth clients.
 - `session` handling for joined OTAA end devices in the Console.
 - Empty Join Server address handling in end device creation form in the Console.
+- Data Rate to data rate index matching for uplinks and downlinks.
 
 ### Security
 
