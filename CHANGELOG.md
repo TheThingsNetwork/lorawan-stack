@@ -11,12 +11,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Packet Broker gateway visibility management (default settings only). See `ttn-lw-cli packetbroker home-networks gateway-visibilities --help` for more information.
-
 ### Changed
-
-- The Gateway Server worker pools may now drop workers if they are idle for too long.
-- FPort = 0 uplinks are no longer decoded by the Application Server, and the Network Server no longer provides the frame payload to the Application Server for these messages.
 
 ### Deprecated
 
@@ -24,12 +19,25 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+### Security
+
+## [3.15.1] - 2021-10-01
+
+### Added
+
+- Packet Broker gateway visibility management (default settings only). See `ttn-lw-cli packetbroker home-networks gateway-visibilities --help` for more information.
+
+### Changed
+
+- The Gateway Server worker pools may now drop workers if they are idle for too long.
+- FPort = 0 uplinks are no longer decoded by the Application Server, and the Network Server no longer provides the frame payload to the Application Server for these messages.
+
+### Fixed
+
 - Emails to admins about requested OAuth clients.
 - `session` handling for joined OTAA end devices in the Console.
 - Empty Join Server address handling in end device creation form in the Console.
 - Data Rate to data rate index matching for uplinks and downlinks.
-
-### Security
 
 ## [3.15.0] - 2021-09-17
 
@@ -1774,7 +1782,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.0...v3.15
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.1...v3.15
+[3.15.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.0...v3.15.1
 [3.15.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.2...v3.15.0
 [3.14.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.1...v3.14.2
 [3.14.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.0...v3.14.1
