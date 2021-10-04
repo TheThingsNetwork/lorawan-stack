@@ -101,6 +101,7 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 			MessageHeader: header,
 			SenderID:      in.ReceiverID,
 			ReceiverID:    in.SenderID,
+			ReceiverNSID:  in.SenderNSID,
 		},
 		PHYPayload: interop.Buffer(res.RawPayload),
 		Result: interop.Result{
@@ -146,6 +147,7 @@ func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSRe
 			MessageHeader: header,
 			SenderID:      in.ReceiverID,
 			ReceiverID:    in.SenderID,
+			ReceiverNSID:  in.SenderNSID,
 		},
 		Result: interop.Result{
 			ResultCode: interop.ResultSuccess,
