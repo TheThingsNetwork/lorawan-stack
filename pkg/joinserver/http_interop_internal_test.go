@@ -31,7 +31,7 @@ import (
 
 type mockInteropHandler struct {
 	HandleJoinFunc   func(context.Context, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
-	GetHomeNetIDFunc func(context.Context, types.EUI64, types.EUI64) (*types.NetID, error)
+	GetHomeNetIDFunc func(context.Context, types.EUI64, types.EUI64) (netID *types.NetID, nsID string, err error)
 	GetAppSKeyFunc   func(context.Context, *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error)
 }
 
@@ -42,7 +42,7 @@ func (h mockInteropHandler) HandleJoin(ctx context.Context, req *ttnpb.JoinReque
 	return h.HandleJoinFunc(ctx, req)
 }
 
-func (h mockInteropHandler) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (*types.NetID, error) {
+func (h mockInteropHandler) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (*types.NetID, string, error) {
 	if h.GetHomeNetIDFunc == nil {
 		panic("GetHomeNetID should not be called")
 	}
@@ -450,7 +450,7 @@ func TestInteropHomeNSRequest(t *testing.T) {
 		ExpectedJoinEUI   types.EUI64
 		ExpectedDevEUI    types.EUI64
 		ErrorAssertion    func(*testing.T, error) bool
-		GetNetIDFunc      func() (*types.NetID, error)
+		GetNetIDFunc      func() (*types.NetID, string, error)
 		ExpectedHomeNSAns *interop.HomeNSAns
 	}{
 		{
@@ -468,8 +468,8 @@ func TestInteropHomeNSRequest(t *testing.T) {
 			},
 			ExpectedJoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			GetNetIDFunc: func() (*types.NetID, error) {
-				return &types.NetID{0x42, 0xff, 0xff}, nil
+			GetNetIDFunc: func() (*types.NetID, string, error) {
+				return &types.NetID{0x42, 0xff, 0xff}, "thethings.example.com", nil
 			},
 			ExpectedHomeNSAns: &interop.HomeNSAns{
 				JsNsMessageHeader: interop.JsNsMessageHeader{
@@ -484,6 +484,7 @@ func TestInteropHomeNSRequest(t *testing.T) {
 					ResultCode: interop.ResultSuccess,
 				},
 				HNetID: interop.NetID{0x42, 0xff, 0xff},
+				// NOTE: HNSID is not returned as the field is not supported in LoRaWAN Backend Interfaces 1.0.
 			},
 		},
 		{
@@ -501,8 +502,8 @@ func TestInteropHomeNSRequest(t *testing.T) {
 			},
 			ExpectedJoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			GetNetIDFunc: func() (*types.NetID, error) {
-				return &types.NetID{0x42, 0xff, 0xff}, nil
+			GetNetIDFunc: func() (*types.NetID, string, error) {
+				return &types.NetID{0x42, 0xff, 0xff}, "thethings.example.com", nil
 			},
 			ExpectedHomeNSAns: &interop.HomeNSAns{
 				JsNsMessageHeader: interop.JsNsMessageHeader{
@@ -516,8 +517,8 @@ func TestInteropHomeNSRequest(t *testing.T) {
 				Result: interop.Result{
 					ResultCode: interop.ResultSuccess,
 				},
-				HNSID:  stringPtr("test"),
 				HNetID: interop.NetID{0x42, 0xff, 0xff},
+				HNSID:  stringPtr("thethings.example.com"),
 			},
 		},
 		{
@@ -535,8 +536,8 @@ func TestInteropHomeNSRequest(t *testing.T) {
 			},
 			ExpectedJoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			GetNetIDFunc: func() (*types.NetID, error) {
-				return nil, nil
+			GetNetIDFunc: func() (*types.NetID, string, error) {
+				return nil, "thethings.example.com", nil
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -550,7 +551,7 @@ func TestInteropHomeNSRequest(t *testing.T) {
 
 			srv := interopServer{
 				JS: &mockInteropHandler{
-					GetHomeNetIDFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64) (*types.NetID, error) {
+					GetHomeNetIDFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64) (*types.NetID, string, error) {
 						if !a.So(joinEUI, should.Resemble, tc.ExpectedJoinEUI) || !a.So(devEUI, should.Resemble, tc.ExpectedDevEUI) {
 							t.FailNow()
 						}

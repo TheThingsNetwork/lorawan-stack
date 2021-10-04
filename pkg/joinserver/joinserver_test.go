@@ -2825,10 +2825,11 @@ func TestGetHomeNetID(t *testing.T) {
 		ContextFunc func(context.Context) context.Context
 		Authorizer  Authorizer
 
-		GetByEUI func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.ContextualEndDevice, error)
-		JoinEUI  types.EUI64
-		DevEUI   types.EUI64
-		Response *types.NetID
+		GetByEUI      func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.ContextualEndDevice, error)
+		JoinEUI       types.EUI64
+		DevEUI        types.EUI64
+		ResponseNetID *types.NetID
+		ResponseNSID  string
 
 		ErrorAssertion func(*testing.T, error) bool
 	}{
@@ -2842,6 +2843,7 @@ func TestGetHomeNetID(t *testing.T) {
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"net_id",
+					"network_server_address",
 				})
 				return nil, errTest.New()
 			},
@@ -2865,6 +2867,7 @@ func TestGetHomeNetID(t *testing.T) {
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"net_id",
+					"network_server_address",
 				})
 				return &ttnpb.ContextualEndDevice{
 					Context: ctx,
@@ -2874,9 +2877,10 @@ func TestGetHomeNetID(t *testing.T) {
 					},
 				}, nil
 			},
-			JoinEUI:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			DevEUI:   types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			Response: &types.NetID{0x42, 0xff, 0xff},
+			JoinEUI:       types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			DevEUI:        types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			ResponseNetID: &types.NetID{0x42, 0xff, 0xff},
+			ResponseNSID:  nsAddr,
 		},
 	} {
 		tc := tc
@@ -2894,18 +2898,21 @@ func TestGetHomeNetID(t *testing.T) {
 						},
 					},
 				)).(*JoinServer)
-				netID, err := js.GetHomeNetID(ctx, tc.JoinEUI, tc.DevEUI, tc.Authorizer)
+				netID, nsID, err := js.GetHomeNetID(ctx, tc.JoinEUI, tc.DevEUI, tc.Authorizer)
 
 				if tc.ErrorAssertion != nil {
 					if !tc.ErrorAssertion(t, err) {
-						t.Errorf("Received unexpected error: %s", err)
+						t.Fatalf("Received unexpected error: %s", err)
 					}
 					a.So(netID, should.BeNil)
 					return
 				}
 
-				a.So(err, should.BeNil)
-				a.So(netID, should.Resemble, tc.Response)
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(netID, should.Resemble, tc.ResponseNetID)
+				a.So(nsID, should.Equal, tc.ResponseNSID)
 			},
 		})
 	}

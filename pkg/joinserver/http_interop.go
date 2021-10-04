@@ -28,7 +28,7 @@ import (
 
 type interopHandler interface {
 	HandleJoin(context.Context, *ttnpb.JoinRequest, Authorizer) (*ttnpb.JoinResponse, error)
-	GetHomeNetID(context.Context, types.EUI64, types.EUI64, Authorizer) (*types.NetID, error)
+	GetHomeNetID(context.Context, types.EUI64, types.EUI64, Authorizer) (netID *types.NetID, nsID string, err error)
 	GetAppSKey(context.Context, *ttnpb.SessionKeyRequest, Authorizer) (*ttnpb.AppSKeyResponse, error)
 }
 
@@ -123,7 +123,7 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSReq) (*interop.HomeNSAns, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
 
-	netID, err := srv.JS.GetHomeNetID(ctx, types.EUI64(in.ReceiverID), types.EUI64(in.DevEUI), InteropAuthorizer)
+	netID, nsID, err := srv.JS.GetHomeNetID(ctx, types.EUI64(in.ReceiverID), types.EUI64(in.DevEUI), InteropAuthorizer)
 	if err != nil {
 		switch {
 		case errors.Resemble(err, errRegistryOperation):
@@ -141,7 +141,7 @@ func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSRe
 	if err != nil {
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
-	return &interop.HomeNSAns{
+	ans := &interop.HomeNSAns{
 		JsNsMessageHeader: interop.JsNsMessageHeader{
 			MessageHeader: header,
 			SenderID:      in.ReceiverID,
@@ -151,7 +151,11 @@ func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSRe
 			ResultCode: interop.ResultSuccess,
 		},
 		HNetID: interop.NetID(*netID),
-	}, nil
+	}
+	if nsID != "" && in.ProtocolVersion.SupportsNSID() {
+		ans.HNSID = &nsID
+	}
+	return ans, nil
 }
 
 func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKeyReq) (*interop.AppSKeyAns, error) {
