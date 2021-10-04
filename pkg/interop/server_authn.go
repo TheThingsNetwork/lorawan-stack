@@ -49,19 +49,32 @@ func (s *Server) verifySenderCertificate(ctx context.Context, senderID string, s
 }
 
 type authInfo interface {
-	Addresses() []string
+	GetAddresses() []string
 }
 
-type nsAuthInfo struct {
-	netID     types.NetID
-	addresses []string
+// NetworkServerAuthInfo contains authentication information of the Network Server.
+type NetworkServerAuthInfo struct {
+	NetID     types.NetID
+	Addresses []string
 }
 
-func (a nsAuthInfo) Addresses() []string { return a.addresses }
+func (n NetworkServerAuthInfo) GetAddresses() []string { return n.Addresses }
 
 type nsAuthInfoKeyType struct{}
 
 var nsAuthInfoKey nsAuthInfoKeyType
+
+// NewContextWithNetworkServerAuthInfo returns a derived context with the given authentication information of the
+// Network Server.
+func NewContextWithNetworkServerAuthInfo(parent context.Context, authInfo NetworkServerAuthInfo) context.Context {
+	return context.WithValue(parent, nsAuthInfoKey, authInfo)
+}
+
+// NetworkServerAuthInfoFromContext returns the authentication information of the Network Server from context.
+func NetworkServerAuthInfoFromContext(ctx context.Context) (NetworkServerAuthInfo, bool) {
+	authInfo, ok := ctx.Value(nsAuthInfoKey).(NetworkServerAuthInfo)
+	return authInfo, ok
+}
 
 func (s *Server) authenticateNS(ctx context.Context, r *http.Request, senderID string) (context.Context, error) {
 	var netID types.NetID
@@ -75,9 +88,9 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, senderID s
 		if err != nil {
 			return nil, err
 		}
-		return context.WithValue(ctx, nsAuthInfoKey, &nsAuthInfo{
-			netID:     netID,
-			addresses: addrs,
+		return NewContextWithNetworkServerAuthInfo(ctx, NetworkServerAuthInfo{
+			NetID:     netID,
+			Addresses: addrs,
 		}), nil
 	}
 
@@ -86,16 +99,28 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, senderID s
 	return ctx, nil
 }
 
-type asAuthInfo struct {
-	asID      string
-	addresses []string
+type ApplicationServerAuthInfo struct {
+	ASID      string
+	Addresses []string
 }
 
-func (a asAuthInfo) Addresses() []string { return a.addresses }
+func (a ApplicationServerAuthInfo) GetAddresses() []string { return a.Addresses }
 
 type asAuthInfoKeyType struct{}
 
 var asAuthInfoKey asAuthInfoKeyType
+
+// NewContextWithApplicationServerAuthInfo returns a derived context with the given authentication information of the
+// Application Server.
+func NewContextWithApplicationServerAuthInfo(parent context.Context, authInfo ApplicationServerAuthInfo) context.Context {
+	return context.WithValue(parent, asAuthInfoKey, authInfo)
+}
+
+// ApplicationServerAuthInfoFromContext returns the authentication information of the Application Server from context.
+func ApplicationServerAuthInfoFromContext(ctx context.Context) (ApplicationServerAuthInfo, bool) {
+	authInfo, ok := ctx.Value(asAuthInfoKey).(ApplicationServerAuthInfo)
+	return authInfo, ok
+}
 
 func (s *Server) authenticateAS(ctx context.Context, r *http.Request, senderID string) (context.Context, error) {
 	state := r.TLS
@@ -106,9 +131,9 @@ func (s *Server) authenticateAS(ctx context.Context, r *http.Request, senderID s
 	if err != nil {
 		return nil, err
 	}
-	return context.WithValue(ctx, nsAuthInfoKey, &asAuthInfo{
-		asID:      senderID,
-		addresses: addrs,
+	return NewContextWithApplicationServerAuthInfo(ctx, ApplicationServerAuthInfo{
+		ASID:      senderID,
+		Addresses: addrs,
 	}), nil
 }
 

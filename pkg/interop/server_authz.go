@@ -37,15 +37,15 @@ func (a Authorizer) RequireAuthorized(ctx context.Context) error {
 // RequireAddress returns an error if the given address is not authorized in the context.
 func (a Authorizer) RequireAddress(ctx context.Context, addr string) error {
 	var authInfo authInfo
-	if nsAuthInfo, ok := ctx.Value(nsAuthInfoKey).(*nsAuthInfo); ok {
+	if nsAuthInfo, ok := NetworkServerAuthInfoFromContext(ctx); ok {
 		authInfo = nsAuthInfo
-	} else if asAuthInfo, ok := ctx.Value(asAuthInfoKey).(*asAuthInfo); ok {
+	} else if asAuthInfo, ok := ApplicationServerAuthInfoFromContext(ctx); ok {
 		authInfo = asAuthInfo
 	} else {
 		return errUnauthenticated.New()
 	}
 	// The authenticated addresses are considered patterns; a *. suffix matches any first host part.
-	patterns := authInfo.Addresses()
+	patterns := authInfo.GetAddresses()
 	if len(patterns) == 0 {
 		return errCallerNotAuthorized.WithAttributes("target", addr)
 	}
@@ -81,11 +81,11 @@ func (a Authorizer) RequireAddress(ctx context.Context, addr string) error {
 
 // RequireID returns an error if the given NetID is not authorized in the context.
 func (a Authorizer) RequireNetID(ctx context.Context, netID types.NetID) error {
-	nsAuthInfo, ok := ctx.Value(nsAuthInfoKey).(*nsAuthInfo)
+	nsAuthInfo, ok := NetworkServerAuthInfoFromContext(ctx)
 	if !ok {
 		return errCallerNotAuthorized.WithAttributes("target", netID.String())
 	}
-	if !nsAuthInfo.netID.Equal(netID) {
+	if !nsAuthInfo.NetID.Equal(netID) {
 		return errCallerNotAuthorized.WithAttributes("target", netID.String())
 	}
 	return nil
@@ -93,11 +93,11 @@ func (a Authorizer) RequireNetID(ctx context.Context, netID types.NetID) error {
 
 // RequireID returns an error if the given AS-ID is not authorized in the context.
 func (a Authorizer) RequireASID(ctx context.Context, id string) error {
-	asAuthInfo, ok := ctx.Value(asAuthInfoKey).(*asAuthInfo)
+	asAuthInfo, ok := ApplicationServerAuthInfoFromContext(ctx)
 	if !ok {
 		return errCallerNotAuthorized.WithAttributes("target", id)
 	}
-	if asAuthInfo.asID != id {
+	if asAuthInfo.ASID != id {
 		return errCallerNotAuthorized.WithAttributes("target", id)
 	}
 	return nil
