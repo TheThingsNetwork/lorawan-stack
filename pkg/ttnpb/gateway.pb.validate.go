@@ -2547,13 +2547,6 @@ func (m *GatewayAntenna) ValidateFields(paths ...string) error {
 			// no validation rules for Gain
 		case "location":
 
-			if m.GetLocation() == nil {
-				return GatewayAntennaValidationError{
-					field:  "location",
-					reason: "value is required",
-				}
-			}
-
 			if v, ok := interface{}(m.GetLocation()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayAntennaValidationError{

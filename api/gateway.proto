@@ -303,7 +303,7 @@ message GatewayAntenna {
   // Antenna gain relative to the gateway, in dBi.
   float gain = 1;
   // location is the antenna's location.
-  Location location = 2 [(validate.rules).message.required = true];
+  Location location = 2;
   map<string,string> attributes = 3 [
     (validate.rules).map = {
       max_pairs: 10,

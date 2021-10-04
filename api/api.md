@@ -3828,7 +3828,6 @@ GatewayAntenna is the message that defines a gateway antenna.
 
 | Field | Validations |
 | ----- | ----------- |
-| `location` | <p>`message.required`: `true`</p> |
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayAntenna.AttributesEntry">Message `GatewayAntenna.AttributesEntry`</a>
