@@ -45,15 +45,23 @@ func (x *Gateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, x.Ids)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.CreatedAt != nil || s.HasField("created_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("created_at")
-		s.WriteTime(x.CreatedAt)
+		if x.CreatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.CreatedAt)
+		}
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.UpdatedAt != nil || s.HasField("updated_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("updated_at")
-		s.WriteTime(x.UpdatedAt)
+		if x.UpdatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.UpdatedAt)
+		}
 	}
 	if x.DeletedAt != nil || s.HasField("deleted_at") {
 		s.WriteMoreIf(&wroteField)
@@ -97,11 +105,11 @@ func (x *Gateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.VersionIds != nil || s.HasField("version_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("version_ids")
 		// NOTE: GatewayVersionIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.GatewayVersionIdentifiers)
+		gogo.MarshalMessage(s, x.VersionIds)
 	}
 	if x.GatewayServerAddress != "" || s.HasField("gateway_server_address") {
 		s.WriteMoreIf(&wroteField)
@@ -241,14 +249,14 @@ func (x *Gateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.CreatedAt = *v
+			x.CreatedAt = v
 		case "updated_at", "updatedAt":
 			s.AddField("updated_at")
 			v := s.ReadTime()
 			if s.Err() != nil {
 				return
 			}
-			x.UpdatedAt = *v
+			x.UpdatedAt = v
 		case "deleted_at", "deletedAt":
 			s.AddField("deleted_at")
 			v := s.ReadTime()
@@ -287,7 +295,7 @@ func (x *Gateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: GatewayVersionIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v GatewayVersionIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.GatewayVersionIdentifiers = v
+			x.VersionIds = &v
 		case "gateway_server_address", "gatewayServerAddress":
 			s.AddField("gateway_server_address")
 			x.GatewayServerAddress = s.ReadString()
@@ -306,7 +314,11 @@ func (x *Gateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "antennas":
 			s.AddField("antennas")
 			s.ReadArray(func() {
-				v := GatewayAntenna{}
+				if s.ReadNil() {
+					x.Antennas = append(x.Antennas, nil)
+					return
+				}
+				v := &GatewayAntenna{}
 				v.UnmarshalProtoJSON(s.WithField("antennas", false))
 				if s.Err() != nil {
 					return
@@ -432,16 +444,16 @@ func (x *CreateGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Gateway != nil || s.HasField("gateway") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("gateway")
 		x.Gateway.MarshalProtoJSON(s.WithField("gateway"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Collaborator != nil || s.HasField("collaborator") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("collaborator")
 		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.Collaborator)
+		gogo.MarshalMessage(s, x.Collaborator)
 	}
 	s.WriteObjectEnd()
 }
@@ -457,6 +469,7 @@ func (x *CreateGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			s.ReadAny() // ignore unknown field
 		case "gateway":
 			if !s.ReadNil() {
+				x.Gateway = &Gateway{}
 				x.Gateway.UnmarshalProtoJSON(s.WithField("gateway", true))
 			}
 		case "collaborator":
@@ -464,7 +477,7 @@ func (x *CreateGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v OrganizationOrUserIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.Collaborator = v
+			x.Collaborator = &v
 		}
 	})
 }
@@ -477,7 +490,7 @@ func (x *UpdateGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Gateway != nil || s.HasField("gateway") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("gateway")
 		x.Gateway.MarshalProtoJSON(s.WithField("gateway"))
@@ -505,6 +518,7 @@ func (x *UpdateGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			s.ReadAny() // ignore unknown field
 		case "gateway":
 			if !s.ReadNil() {
+				x.Gateway = &Gateway{}
 				x.Gateway.UnmarshalProtoJSON(s.WithField("gateway", true))
 			}
 		case "field_mask", "fieldMask":
@@ -610,10 +624,10 @@ func (x *UpdateGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState
 		// NOTE: GatewayIdentifiers does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, x.GatewayIds)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.ApiKey != nil || s.HasField("api_key") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("api_key")
-		x.APIKey.MarshalProtoJSON(s.WithField("api_key"))
+		x.ApiKey.MarshalProtoJSON(s.WithField("api_key"))
 	}
 	if x.FieldMask != nil || s.HasField("field_mask") {
 		s.WriteMoreIf(&wroteField)
@@ -644,7 +658,8 @@ func (x *UpdateGatewayAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalS
 			x.GatewayIds = &v
 		case "api_key", "apiKey":
 			if !s.ReadNil() {
-				x.APIKey.UnmarshalProtoJSON(s.WithField("api_key", true))
+				x.ApiKey = &APIKey{}
+				x.ApiKey.UnmarshalProtoJSON(s.WithField("api_key", true))
 			}
 		case "field_mask", "fieldMask":
 			s.AddField("field_mask")
@@ -779,15 +794,23 @@ func (x *GatewayStatus) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Time != nil || s.HasField("time") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("time")
-		s.WriteTime(x.Time)
+		if x.Time == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.Time)
+		}
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.BootTime != nil || s.HasField("boot_time") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("boot_time")
-		s.WriteTime(x.BootTime)
+		if x.BootTime == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.BootTime)
+		}
 	}
 	if x.Versions != nil || s.HasField("versions") {
 		s.WriteMoreIf(&wroteField)
@@ -856,14 +879,14 @@ func (x *GatewayStatus) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.Time = *v
+			x.Time = v
 		case "boot_time", "bootTime":
 			s.AddField("boot_time")
 			v := s.ReadTime()
 			if s.Err() != nil {
 				return
 			}
-			x.BootTime = *v
+			x.BootTime = v
 		case "versions":
 			s.AddField("versions")
 			x.Versions = make(map[string]string)
