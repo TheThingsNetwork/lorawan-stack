@@ -4672,6 +4672,12 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.DeriveSessionKeysRequest">Message `DeriveSessionKeysRequest`</a>
 
 | Field | Type | Label | Description |
@@ -4698,6 +4704,12 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.GetRootKeysRequest">Message `GetRootKeysRequest`</a>
 
@@ -4773,6 +4785,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 | Field | Validations |
 | ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
 | `provisioner_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersFromData">Message `ProvisionEndDevicesRequest.IdentifiersFromData`</a>
@@ -4816,6 +4829,13 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 | `settings` | [`ApplicationActivationSettings`](#ttn.lorawan.v3.ApplicationActivationSettings) |  |  |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `settings` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.AppJs">Service `AppJs`</a>
 

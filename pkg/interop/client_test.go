@@ -435,7 +435,7 @@ paths:
 			Request: makeSessionKeyRequest(),
 			ResponseAssertion: func(t *testing.T, resp *ttnpb.AppSKeyResponse) bool {
 				return assertions.New(t).So(resp, should.Resemble, &ttnpb.AppSKeyResponse{
-					AppSKey: ttnpb.KeyEnvelope{
+					AppSKey: &ttnpb.KeyEnvelope{
 						KekLabel:     "as:010042",
 						EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69},
 					},
@@ -571,7 +571,7 @@ paths:
 			Request: makeSessionKeyRequest(),
 			ResponseAssertion: func(t *testing.T, resp *ttnpb.AppSKeyResponse) bool {
 				return assertions.New(t).So(resp, should.Resemble, &ttnpb.AppSKeyResponse{
-					AppSKey: ttnpb.KeyEnvelope{
+					AppSKey: &ttnpb.KeyEnvelope{
 						KekLabel:     "as:010042",
 						EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69},
 					},

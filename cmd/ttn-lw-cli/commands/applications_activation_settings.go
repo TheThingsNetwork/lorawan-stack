@@ -61,8 +61,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationActivationSettingRegistryClient(js).Get(ctx, &ttnpb.GetApplicationActivationSettingsRequest{
-				ApplicationIdentifiers: *appID,
-				FieldMask:              &pbtypes.FieldMask{Paths: paths},
+				ApplicationIds: appID,
+				FieldMask:      &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -92,9 +92,9 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationActivationSettingRegistryClient(js).Set(ctx, &ttnpb.SetApplicationActivationSettingsRequest{
-				ApplicationIdentifiers:        *appID,
-				ApplicationActivationSettings: aas,
-				FieldMask:                     &pbtypes.FieldMask{Paths: paths},
+				ApplicationIds: appID,
+				Settings:       &aas,
+				FieldMask:      &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -118,7 +118,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewApplicationActivationSettingRegistryClient(as).Delete(ctx, &ttnpb.DeleteApplicationActivationSettingsRequest{
-				ApplicationIdentifiers: *appID,
+				ApplicationIds: appID,
 			})
 			return err
 		},

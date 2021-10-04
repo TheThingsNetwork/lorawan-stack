@@ -192,7 +192,7 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 	}
 
 	return &ttnpb.AppSKeyResponse{
-		AppSKey: ttnpb.KeyEnvelope(interopAns.AppSKey),
+		AppSKey: (*ttnpb.KeyEnvelope)(&interopAns.AppSKey),
 	}, nil
 }
 

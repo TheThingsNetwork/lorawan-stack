@@ -637,9 +637,9 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 	}
 
 	return &ttnpb.NwkSKeysResponse{
-		NwkSEncKey:  *ks.NwkSEncKey,
-		FNwkSIntKey: *ks.FNwkSIntKey,
-		SNwkSIntKey: *ks.SNwkSIntKey,
+		NwkSEncKey:  ks.NwkSEncKey,
+		FNwkSIntKey: ks.FNwkSIntKey,
+		SNwkSIntKey: ks.SNwkSIntKey,
 	}, nil
 }
 
@@ -707,7 +707,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		return nil, errNoAppSKey.New()
 	}
 	return &ttnpb.AppSKeyResponse{
-		AppSKey: *ks.AppSKey,
+		AppSKey: ks.AppSKey,
 	}, nil
 }
 
