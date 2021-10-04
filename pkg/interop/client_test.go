@@ -650,7 +650,7 @@ func TestHandleJoinRequest(t *testing.T) {
 
 					b, err := ioutil.ReadAll(r.Body)
 					a.So(err, should.BeNil)
-					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","SenderNSID":"42FFFF","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
+					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
 					a.So(r.Body.Close(), should.BeNil)
 
@@ -769,7 +769,7 @@ paths:
 
 					b, err := ioutil.ReadAll(r.Body)
 					a.So(err, should.BeNil)
-					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","SenderNSID":"42FFFF","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
+					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
 					a.So(r.Body.Close(), should.BeNil)
 
@@ -888,7 +888,7 @@ paths:
 
 					b, err := ioutil.ReadAll(r.Body)
 					a.So(err, should.BeNil)
-					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","SenderNSID":"42FFFF","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
+					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
 					a.So(r.Body.Close(), should.BeNil)
 
@@ -899,7 +899,6 @@ paths:
   "ReceiverToken": "01",
   "SenderID": "70B3D57ED0000000",
   "ReceiverID": "000000",
-  "ReceiverNSID": "000000",
   "PHYPayload": "204D675073BB4153B23653EFA82C1F3A49E19C2A8696C9A34BF492674779E4BEFA",
   "Result": {
     "ResultCode": "Success"
@@ -1038,7 +1037,7 @@ paths:
 
 					b, err := ioutil.ReadAll(r.Body)
 					a.So(err, should.BeNil)
-					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","SenderNSID":"42FFFF","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
+					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
 					a.So(r.Body.Close(), should.BeNil)
 
@@ -1049,7 +1048,6 @@ paths:
   "ReceiverToken": "01",
   "SenderID": "70B3D57ED0000000",
   "ReceiverID": "000000",
-  "ReceiverNSID": "000000",
   "PHYPayload": "204D675073BB4153B23653EFA82C1F3A49E19C2A8696C9A34BF492674779E4BEFA",
   "Result": {
     "ResultCode": "Success"
@@ -1188,7 +1186,7 @@ paths:
 
 					b, err := ioutil.ReadAll(r.Body)
 					a.So(err, should.BeNil)
-					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","SenderNSID":"42FFFF","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
+					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
 					a.So(r.Body.Close(), should.BeNil)
 
@@ -1199,7 +1197,6 @@ paths:
   "ReceiverToken": "01",
   "SenderID": "70B3D57ED0000000",
   "ReceiverID": "000000",
-  "ReceiverNSID": "000000",
   "PHYPayload": "204D675073BB4153B23653EFA82C1F3A49E19C2A8696C9A34BF492674779E4BEFA",
   "Result": {
     "ResultCode": "Success"

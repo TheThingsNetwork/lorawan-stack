@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,47 +52,6 @@ const (
 
 	defaultHTTPSPort = 443
 )
-
-// JoinServerProtocol represents the protocol used for connection to Join Server by interop client.
-type JoinServerProtocol uint8
-
-const (
-	// LoRaWANJoinServerProtocol1_0 represents Join Server protocol defined by LoRaWAN Backend Interfaces 1.0 specification.
-	LoRaWANJoinServerProtocol1_0 JoinServerProtocol = iota
-	// LoRaWANJoinServerProtocol1_1 represents Join Server protocol defined by LoRaWAN Backend Interfaces 1.1 specification.
-	LoRaWANJoinServerProtocol1_1
-)
-
-// BackendInterfacesVersion returns the version of LoRaWAN Backend Interfaces specification version the protocol p is compliant with.
-// BackendInterfacesVersion panics if p is not compliant with LoRaWAN Backend Interfaces specification.
-func (p JoinServerProtocol) BackendInterfacesVersion() string {
-	switch p {
-	case LoRaWANJoinServerProtocol1_0:
-		return "1.0"
-	case LoRaWANJoinServerProtocol1_1:
-		return "1.1"
-	default:
-		panic(fmt.Sprintf("Join Server protocol	`%v` is not compliant with Backend Interfaces specification", p))
-	}
-}
-
-// UnmarshalYAML implements yaml.Unmarshaler.
-func (p *JoinServerProtocol) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var s string
-	if err := unmarshal(&s); err != nil {
-		return err
-	}
-	switch s {
-	case "BI1.1":
-		*p = LoRaWANJoinServerProtocol1_1
-		return nil
-	case "BI1.0":
-		*p = LoRaWANJoinServerProtocol1_0
-		return nil
-	default:
-		return errUnknownProtocol.New()
-	}
-}
 
 type jsRPCPaths struct {
 	Join    string `yaml:"join"`
@@ -188,7 +147,7 @@ func httpExchange(ctx context.Context, httpReq *http.Request, res interface{}, d
 type joinServerHTTPClient struct {
 	Client         http.Client
 	NewRequestFunc func(types.EUI64, func(jsRPCPaths) string, interface{}) (*http.Request, error)
-	Protocol       JoinServerProtocol
+	Protocol       ProtocolVersion
 }
 
 func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64, pathFunc func(jsRPCPaths) string, req, res interface{}) error {
@@ -217,7 +176,7 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 	if err := cl.exchange(ctx, req.JoinEui, jsRPCPaths.appSKey, &AppSKeyReq{
 		AsJsMessageHeader: AsJsMessageHeader{
 			MessageHeader: MessageHeader{
-				ProtocolVersion: cl.Protocol.BackendInterfacesVersion(),
+				ProtocolVersion: cl.Protocol,
 				MessageType:     MessageTypeAppSKeyReq,
 			},
 			SenderID:   asID,
@@ -238,6 +197,7 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 }
 
 var (
+	errNoJoinRequestPayload = errors.DefineInvalidArgument("no_join_request_payload", "no join-request payload")
 	errGenerateSessionKeyID = errors.Define("generate_session_key_id", "failed to generate session key ID")
 
 	generatedSessionKeyIDPrefix = []byte("ttn-lw-interop-generated:")
@@ -247,7 +207,7 @@ var (
 func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
-		return nil, ErrMalformedMessage.New()
+		return nil, errNoJoinRequestPayload.New()
 	}
 
 	dlSettings, err := lorawan.MarshalDLSettings(req.DownlinkSettings)
@@ -267,12 +227,11 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	if err := cl.exchange(ctx, pld.JoinEui, jsRPCPaths.join, &JoinReq{
 		NsJsMessageHeader: NsJsMessageHeader{
 			MessageHeader: MessageHeader{
-				ProtocolVersion: cl.Protocol.BackendInterfacesVersion(),
+				ProtocolVersion: cl.Protocol,
 				MessageType:     MessageTypeJoinReq,
 			},
 			SenderID:   NetID(netID),
 			ReceiverID: EUI64(pld.JoinEui),
-			SenderNSID: NetID(netID),
 		},
 		MACVersion: MACVersion(req.SelectedMacVersion),
 		PHYPayload: Buffer(req.RawPayload),
@@ -327,7 +286,7 @@ func makeJoinServerHTTPRequestFunc(scheme, dns, fqdn string, port uint32, rpcPat
 		port = defaultHTTPSPort
 	}
 	return func(joinEUI types.EUI64, pathFunc func(jsRPCPaths) string, pld interface{}) (*http.Request, error) {
-		fqdn := fqdn // Create a new reference to fqdn to avoid mutating the variable in the outside scope.
+		fqdn := fqdn
 		if fqdn == "" {
 			fqdn = JoinServerFQDN(joinEUI, dns)
 		}
@@ -348,8 +307,6 @@ type prefixJoinServerClient struct {
 type Client struct {
 	joinServers []prefixJoinServerClient // Sorted by JoinEUI prefix range length.
 }
-
-var errUnknownProtocol = errors.DefineInvalidArgument("unknown_protocol", "unknown protocol")
 
 var errUnknownConfig = errors.DefineNotFound("unknown_config", "configuration is unknown")
 
@@ -406,8 +363,8 @@ func NewClient(ctx context.Context, conf config.InteropClient) (*Client, error) 
 
 		var yamlJSConf struct {
 			ComponentConfig `yaml:",inline"`
-			Paths           jsRPCPaths         `yaml:"paths"`
-			Protocol        JoinServerProtocol `yaml:"protocol"`
+			Paths           jsRPCPaths      `yaml:"paths"`
+			Protocol        ProtocolVersion `yaml:"protocol"`
 		}
 		if err := yaml.UnmarshalStrict(jsFileBytes, &yamlJSConf); err != nil {
 			return nil, err
@@ -415,7 +372,7 @@ func NewClient(ctx context.Context, conf config.InteropClient) (*Client, error) 
 
 		var js joinServerClient
 		switch yamlJSConf.Protocol {
-		case LoRaWANJoinServerProtocol1_0, LoRaWANJoinServerProtocol1_1:
+		case ProtocolV1_0, ProtocolV1_1:
 			tlsConf := fallbackTLS
 			if !yamlJSConf.TLS.IsZero() {
 				tlsConf, err = yamlJSConf.TLS.TLSConfig(fetcher)
@@ -483,7 +440,7 @@ func (cl Client) GetAppSKey(ctx context.Context, asID string, req *ttnpb.Session
 func (cl Client) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
-		return nil, ErrMalformedMessage.New()
+		return nil, errNoJoinRequestPayload.New()
 	}
 	js, ok := cl.joinServer(pld.JoinEui)
 	if !ok {
