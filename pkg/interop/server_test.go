@@ -17,6 +17,7 @@ package interop_test
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"net/http"
 	"testing"
@@ -77,18 +78,21 @@ func TestServer(t *testing.T) {
 	for _, tc := range []struct {
 		Name              string
 		JS                interop.JoinServer
+		ClientTLSConfig   *tls.Config
 		RequestBody       interface{}
 		ResponseAssertion func(*testing.T, *http.Response) bool
 	}{
 		{
-			Name: "Empty",
+			Name:            "Empty",
+			ClientTLSConfig: makeClientTLSConfig(),
 			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
 				a := assertions.New(t)
 				return a.So(res.StatusCode, should.Equal, http.StatusBadRequest)
 			},
 		},
 		{
-			Name: "JoinReq/InvalidSenderID",
+			Name:            "JoinReq/InvalidSenderID",
+			ClientTLSConfig: makeClientTLSConfig(),
 			RequestBody: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
@@ -114,7 +118,8 @@ func TestServer(t *testing.T) {
 			},
 		},
 		{
-			Name: "JoinReq/NotRegistered",
+			Name:            "JoinReq/NotRegistered",
+			ClientTLSConfig: makeClientTLSConfig(),
 			RequestBody: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
@@ -149,6 +154,7 @@ func TestServer(t *testing.T) {
 					return nil, interop.ErrUnknownDevEUI.New()
 				},
 			},
+			ClientTLSConfig: makeClientTLSConfig(),
 			RequestBody: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
@@ -183,6 +189,7 @@ func TestServer(t *testing.T) {
 					return nil, interop.ErrUnknownDevEUI.New()
 				},
 			},
+			ClientTLSConfig: makeClientTLSConfig(),
 			RequestBody: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
@@ -244,6 +251,7 @@ func TestServer(t *testing.T) {
 					}, nil
 				},
 			},
+			ClientTLSConfig: makeClientTLSConfig(),
 			RequestBody: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
@@ -291,7 +299,9 @@ func TestServer(t *testing.T) {
 			defer srv.Close()
 
 			client := srv.Client()
-			client.Transport.(*http.Transport).TLSClientConfig = makeClientTLSConfig()
+			if tc.ClientTLSConfig != nil {
+				client.Transport.(*http.Transport).TLSClientConfig = tc.ClientTLSConfig
+			}
 
 			buf, err := json.Marshal(tc.RequestBody)
 			if !a.So(err, should.BeNil) {
