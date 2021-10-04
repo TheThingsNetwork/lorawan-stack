@@ -23,13 +23,15 @@ import (
 	"strings"
 
 	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 )
 
 // Data contains data to render templates.
 type Data struct {
 	TemplateData
-	AppConfig interface{}
-	PageData  interface{}
+	AppConfig            interface{}
+	ExperimentalFeatures map[string]bool
+	PageData             interface{}
 }
 
 // TemplateData contains data to use in the App template.
@@ -96,6 +98,7 @@ const appHTML = `
 				ASSETS_ROOT:{{$assetsBaseURL}},
 				BRANDING_ROOT:{{$brandingBaseURL}},
 				APP_CONFIG:{{.AppConfig}},
+				EXPERIMENTAL_FEATURES:{{.ExperimentalFeatures}},
 				SITE_NAME:{{.SiteName}},
 				SITE_TITLE:{{.Title}},
 				SITE_SUB_TITLE:{{.SubTitle}},
@@ -167,9 +170,10 @@ func (t *AppTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo
 	}
 	templateData.JSFiles = jsFiles
 	return t.template.Execute(w, Data{
-		TemplateData: templateData,
-		AppConfig:    c.Get("app_config"),
-		PageData:     pageData,
+		TemplateData:         templateData,
+		AppConfig:            c.Get("app_config"),
+		ExperimentalFeatures: experimental.AllFeatures(c.Request().Context()),
+		PageData:             pageData,
 	})
 }
 

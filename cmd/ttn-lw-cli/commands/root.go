@@ -37,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	conf "go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/io"
 	pkgversion "go.thethings.network/lorawan-stack/v3/pkg/version"
@@ -100,6 +101,9 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		if err = mgr.Unmarshal(config); err != nil {
 			return err
 		}
+
+		// enable configured experimental features
+		experimental.EnableFeatures(config.Experimental.Features...)
 
 		// create input decoder on Stdin
 		if rd, ok := cmdio.BufferedPipe(os.Stdin); ok {

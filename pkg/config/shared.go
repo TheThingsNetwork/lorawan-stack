@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -38,8 +39,9 @@ import (
 
 // Base represents base component configuration.
 type Base struct {
-	Config []string `name:"config" shorthand:"c" description:"Location of the config files"`
-	Log    Log      `name:"log"`
+	Config       []string            `name:"config" shorthand:"c" description:"Location of the config files"`
+	Log          Log                 `name:"log"`
+	Experimental experimental.Config `name:"experimental"`
 }
 
 // Log represents configuration for the logger.

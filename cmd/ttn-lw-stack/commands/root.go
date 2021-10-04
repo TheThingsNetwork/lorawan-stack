@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared/version"
 	conf "go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	logobservability "go.thethings.network/lorawan-stack/v3/pkg/log/middleware/observability"
 	logsentry "go.thethings.network/lorawan-stack/v3/pkg/log/middleware/sentry"
@@ -64,6 +65,9 @@ var (
 			if err = mgr.Unmarshal(config); err != nil {
 				return err
 			}
+
+			// enable configured experimental features
+			experimental.EnableFeatures(config.Experimental.Features...)
 
 			// initialize configuration fallbacks
 			if err := shared.InitializeFallbacks(&config.ServiceBase); err != nil {
