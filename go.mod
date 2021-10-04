@@ -53,12 +53,12 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.13
 	github.com/bluele/gcache v0.0.2
-	github.com/chrj/smtpd v0.1.2
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/disintegration/imaging v1.6.2
 	github.com/dop251/goja v0.0.0-20210427212725-462d53687b0d
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eclipse/paho.mqtt.golang v1.3.4
+	github.com/emersion/go-smtp v0.15.0
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/felixge/httpsnoop v1.0.2
 	github.com/getsentry/sentry-go v0.11.0
@@ -169,6 +169,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
+	github.com/emersion/go-sasl v0.0.0-20200509203442-7bfe0ed36a21 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/glycerine/go-unsnap-stream v0.0.0-20181221182339-f9677308dec2 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect

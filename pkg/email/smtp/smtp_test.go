@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@ package smtp
 
 import (
 	"net"
-	"sync"
 	"testing"
 
-	"github.com/chrj/smtpd"
+	"github.com/emersion/go-smtp"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -36,19 +35,10 @@ func TestSMTP(t *testing.T) {
 	}
 	defer lis.Close()
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	var received smtpd.Envelope
-
-	server := &smtpd.Server{
-		Hostname: "example.com",
-		Handler: func(_ smtpd.Peer, env smtpd.Envelope) error {
-			received = env
-			wg.Done()
-			return nil
-		},
+	bkd := &backend{
+		messages: make(chan *message, 1),
 	}
+	server := smtp.NewServer(bkd)
 
 	go server.Serve(lis)
 
@@ -75,14 +65,13 @@ func TestSMTP(t *testing.T) {
 		RecipientAddress: "john.doe@example.com",
 		Subject:          "Testing SMTP",
 		HTMLBody:         "<h1>Testing SMTP</h1><p>We are testing SMTP</p>",
-		TextBody:         "****************\nTesting SMTP\n****************\n\nWe are testing SMTP",
+		TextBody:         "****************\r\nTesting SMTP\r\n****************\r\n\r\nWe are testing SMTP",
 	}
 
 	err = smtp.Send(email)
-
 	a.So(err, should.BeNil)
 
-	wg.Wait()
+	received := <-bkd.messages
 
 	a.So(received.Sender, should.Equal, "unit@test.local")
 	a.So(received.Recipients, should.Contain, email.RecipientAddress)
