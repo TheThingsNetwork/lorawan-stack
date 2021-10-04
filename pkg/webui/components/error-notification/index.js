@@ -25,7 +25,7 @@ const ErrorNotification = ({ content, title, details, noIngest, ...rest }) => {
 
   useEffect(() => {
     if (!noIngest) {
-      ingestError(details, {
+      ingestError(details || content, {
         ingestedBy: 'ErrorNotification',
       })
     }
