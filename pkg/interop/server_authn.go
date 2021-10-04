@@ -17,7 +17,10 @@ package interop
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
+	"net"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -48,6 +51,42 @@ func (s *Server) verifySenderCertificate(ctx context.Context, senderID string, s
 	return nil, errUnauthenticated.New()
 }
 
+func verifySenderNSID(patterns []string, nsID string) error {
+	if len(patterns) == 0 {
+		return errCallerNotAuthorized.WithAttributes("target", nsID)
+	}
+
+	host := nsID
+	if url, err := url.Parse(nsID); err == nil && url.Host != "" {
+		host = url.Host
+	}
+	if h, _, err := net.SplitHostPort(nsID); err == nil {
+		host = h
+	}
+	if len(host) == 0 {
+		return errCallerNotAuthorized.WithAttributes("target", nsID)
+	}
+	hostParts := strings.Split(host, ".")
+
+nextPattern:
+	for _, pattern := range patterns {
+		patternParts := strings.Split(pattern, ".")
+		if len(patternParts) != len(hostParts) {
+			return errCallerNotAuthorized.WithAttributes("target", nsID)
+		}
+		for i, patternPart := range patternParts {
+			if i == 0 && patternPart == "*" {
+				continue
+			}
+			if patternPart != hostParts[i] {
+				continue nextPattern
+			}
+		}
+		return nil
+	}
+	return errCallerNotAuthorized.WithAttributes("target", nsID)
+}
+
 type authInfo interface {
 	GetAddresses() []string
 }
@@ -76,20 +115,28 @@ func NetworkServerAuthInfoFromContext(ctx context.Context) (NetworkServerAuthInf
 	return authInfo, ok
 }
 
-func (s *Server) authenticateNS(ctx context.Context, r *http.Request, senderID string) (context.Context, error) {
-	var netID types.NetID
-	if err := netID.UnmarshalText([]byte(strings.TrimPrefix(senderID, "0x"))); err != nil {
+func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byte) (context.Context, error) {
+	var header NsMessageHeader
+	if err := json.Unmarshal(data, &header); err != nil {
 		return nil, err
+	}
+	if !header.ProtocolVersion.SupportsNSID() && header.SenderNSID != nil {
+		return nil, ErrMalformedMessage.New()
 	}
 
 	// If the client presents a TLS client certificate, use that for authentication.
 	if state := r.TLS; state != nil && len(state.PeerCertificates) > 0 {
-		addrs, err := s.verifySenderCertificate(ctx, netID.String(), state)
+		addrs, err := s.verifySenderCertificate(ctx, types.NetID(header.SenderID).String(), state)
 		if err != nil {
 			return nil, err
 		}
+		if header.SenderNSID != nil {
+			if err := verifySenderNSID(addrs, *header.SenderNSID); err != nil {
+				return nil, err
+			}
+		}
 		return NewContextWithNetworkServerAuthInfo(ctx, NetworkServerAuthInfo{
-			NetID:     netID,
+			NetID:     types.NetID(header.SenderID),
 			Addresses: addrs,
 		}), nil
 	}
@@ -122,27 +169,32 @@ func ApplicationServerAuthInfoFromContext(ctx context.Context) (ApplicationServe
 	return authInfo, ok
 }
 
-func (s *Server) authenticateAS(ctx context.Context, r *http.Request, senderID string) (context.Context, error) {
+func (s *Server) authenticateAS(ctx context.Context, r *http.Request, data []byte) (context.Context, error) {
+	var header AsMessageHeader
+	if err := json.Unmarshal(data, &header); err != nil {
+		return nil, err
+	}
+
 	state := r.TLS
 	if state == nil {
 		return nil, errUnauthenticated.New()
 	}
-	addrs, err := s.verifySenderCertificate(ctx, senderID, state)
+	addrs, err := s.verifySenderCertificate(ctx, header.SenderID, state)
 	if err != nil {
 		return nil, err
 	}
 	return NewContextWithApplicationServerAuthInfo(ctx, ApplicationServerAuthInfo{
-		ASID:      senderID,
+		ASID:      header.SenderID,
 		Addresses: addrs,
 	}), nil
 }
 
-type senderAuthenticatorFunc func(ctx context.Context, r *http.Request, senderID string) (context.Context, error)
+type senderAuthenticatorFunc func(ctx context.Context, r *http.Request, data []byte) (context.Context, error)
 
-func (f senderAuthenticatorFunc) Authenticate(ctx context.Context, r *http.Request, senderID string) (context.Context, error) {
-	return f(ctx, r, senderID)
+func (f senderAuthenticatorFunc) Authenticate(ctx context.Context, r *http.Request, data []byte) (context.Context, error) {
+	return f(ctx, r, data)
 }
 
 type senderAuthenticator interface {
-	Authenticate(ctx context.Context, r *http.Request, senderID string) (context.Context, error)
+	Authenticate(ctx context.Context, r *http.Request, data []byte) (context.Context, error)
 }

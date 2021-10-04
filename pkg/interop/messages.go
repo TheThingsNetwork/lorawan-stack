@@ -58,6 +58,18 @@ type ErrorMessage struct {
 	Result Result
 }
 
+// NsMessageHeader contains the message header for NS messages.
+type NsMessageHeader struct {
+	MessageHeader
+	SenderID   NetID
+	SenderNSID *string `json:",omitempty"`
+}
+
+// AsMessageHeader contains the message header for AS messages.
+type AsMessageHeader struct {
+	MessageHeader
+}
+
 // NsJsMessageHeader contains the message header for NS to JS messages.
 type NsJsMessageHeader struct {
 	MessageHeader

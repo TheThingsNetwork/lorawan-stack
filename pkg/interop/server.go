@@ -189,7 +189,7 @@ func (s *Server) handle() http.Handler {
 			writeError(w, r, header, ErrMalformedMessage.New())
 			return
 		}
-		ctx, err = senderAuthenticator.Authenticate(ctx, r, header.SenderID)
+		ctx, err = senderAuthenticator.Authenticate(ctx, r, data)
 		if err != nil {
 			writeError(w, r, header, ErrUnknownSender.WithCause(err))
 			return

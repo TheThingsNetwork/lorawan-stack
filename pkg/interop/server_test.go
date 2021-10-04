@@ -174,6 +174,41 @@ func TestServer(t *testing.T) {
 			},
 		},
 		{
+			Name: "JoinReq/Unauthenticated NSID",
+			JS: mockTarget{
+				JoinRequestFunc: func(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
+					if err := authorizer.RequireAuthorized(ctx); err != nil {
+						return nil, err
+					}
+					return nil, interop.ErrUnknownDevEUI.New()
+				},
+			},
+			RequestBody: &interop.JoinReq{
+				NsJsMessageHeader: interop.NsJsMessageHeader{
+					MessageHeader: interop.MessageHeader{
+						MessageType:     interop.MessageTypeJoinReq,
+						ProtocolVersion: interop.ProtocolV1_1,
+					},
+					SenderID:   interop.NetID{0x0, 0x0, 0x01},
+					SenderNSID: stringPtr("example.com"), // The client is authenticated with NSID localhost and *.localhost only
+					ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+				},
+				MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
+			},
+			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
+				a := assertions.New(t)
+				if !a.So(res.StatusCode, should.Equal, http.StatusOK) {
+					return false
+				}
+				var msg interop.ErrorMessage
+				err := json.NewDecoder(res.Body).Decode(&msg)
+				if !a.So(err, should.BeNil) {
+					return false
+				}
+				return a.So(msg.Result.ResultCode, should.Equal, interop.ResultUnknownSender)
+			},
+		},
+		{
 			Name: "JoinReq/UnknownDevEUI",
 			JS: mockTarget{
 				JoinRequestFunc: func(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
