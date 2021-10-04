@@ -17,6 +17,9 @@ package packetbrokeragent
 import (
 	"context"
 	"crypto/tls"
+	"net"
+	"net/url"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -43,13 +46,30 @@ type oauth2Authenticator struct {
 	tlsConfig   tlsConfigurator
 }
 
-func newOAuth2(ctx context.Context, oauth2Config OAuth2Config, tlsConfig tlsConfigurator) authenticator {
+func newOAuth2(ctx context.Context, oauth2Config OAuth2Config, tlsConfig tlsConfigurator, targetAddresses ...string) authenticator {
+	hosts := make(map[string]bool, len(targetAddresses))
+	for _, addr := range targetAddresses {
+		if addr == "" {
+			continue
+		}
+		if h, _, err := net.SplitHostPort(addr); err == nil {
+			addr = h
+		}
+		hosts[addr] = true
+	}
+	audience := make([]string, 0, len(hosts))
+	for h := range hosts {
+		audience = append(audience, h)
+	}
 	config := clientcredentials.Config{
 		ClientID:     oauth2Config.ClientID,
 		ClientSecret: oauth2Config.ClientSecret,
 		Scopes:       []string{"networks"},
 		AuthStyle:    oauth2.AuthStyleInParams,
 		TokenURL:     oauth2Config.TokenURL,
+		EndpointParams: url.Values{
+			"audience": []string{strings.Join(audience, " ")},
+		},
 	}
 	return &oauth2Authenticator{
 		tokenSource: config.TokenSource(ctx),
@@ -74,7 +94,7 @@ func (a *oauth2Authenticator) AuthInfo(ctx context.Context) (ttnpb.PacketBrokerN
 				NetID    uint32 `json:"nid"`
 				TenantID string `json:"tid"`
 			} `json:"ns"`
-		} `json:"https://iam.packetbroker.org/claims"`
+		} `json:"https://iam.packetbroker.net/claims"`
 	}
 	if err := parsed.UnsafeClaimsWithoutVerification(&claims); err != nil {
 		return ttnpb.PacketBrokerNetworkIdentifier{}, errOAuth2Token.WithCause(err)

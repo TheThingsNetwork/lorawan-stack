@@ -168,7 +168,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		if !conf.Insecure {
 			tlsConfig = c
 		}
-		authenticator = newOAuth2(ctx, conf.OAuth2, tlsConfig)
+		authenticator = newOAuth2(ctx, conf.OAuth2, tlsConfig,
+			conf.IAMAddress,
+			conf.ControlPlaneAddress,
+			conf.DataPlaneAddress,
+			conf.MapperAddress,
+		)
 	}
 
 	homeNetworkClusterID := conf.HomeNetworkClusterID

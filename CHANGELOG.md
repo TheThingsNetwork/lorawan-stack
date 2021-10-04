@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support for enhanced security policies of Packet Broker services.
+
 ### Changed
 
 ### Deprecated
