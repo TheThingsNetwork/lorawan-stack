@@ -62,6 +62,7 @@ func (a Authorizer) RequireAddress(ctx context.Context, addr string) error {
 	}
 	hostParts := strings.Split(host, ".")
 
+nextPattern:
 	for _, pattern := range patterns {
 		patternParts := strings.Split(pattern, ".")
 		if len(patternParts) != len(hostParts) {
@@ -72,11 +73,12 @@ func (a Authorizer) RequireAddress(ctx context.Context, addr string) error {
 				continue
 			}
 			if patternPart != hostParts[i] {
-				return errCallerNotAuthorized.WithAttributes("target", addr)
+				continue nextPattern
 			}
 		}
+		return nil
 	}
-	return nil
+	return errCallerNotAuthorized.WithAttributes("target", addr)
 }
 
 // RequireID returns an error if the given NetID is not authorized in the context.
