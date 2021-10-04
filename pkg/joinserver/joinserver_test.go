@@ -16,20 +16,20 @@ package joinserver_test
 
 import (
 	"context"
-	"crypto/x509/pkix"
 	"testing"
 	"time"
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	. "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/joinserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -52,6 +52,18 @@ var (
 )
 
 func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
+
+func keyToBytes(key types.AES128Key) []byte { return key[:] }
+
+func keyPtr(key types.AES128Key) *types.AES128Key { return &key }
+
+func mustWrapKey(key types.AES128Key, kek []byte) []byte {
+	return test.Must(crypto.WrapKey(key[:], kek)).([]byte)
+}
+
+func mustWrapAES128KeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel string, kek types.AES128Key) *ttnpb.KeyEnvelope {
+	return test.Must(cryptoutil.WrapAES128KeyWithKEK(ctx, key, kekLabel, kek)).(*ttnpb.KeyEnvelope)
+}
 
 func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
 	return test.Must(crypto.EncryptJoinAccept(key, pld)).([]byte)
@@ -125,6 +137,7 @@ func TestInvalidJoinRequests(t *testing.T) {
 			Assertion: errors.IsInvalidArgument,
 		},
 	} {
+		tc := tc
 		test.RunSubtestFromContext(ctx, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -277,28 +290,28 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveAppSKey(
+						Key: keyPtr(crypto.DeriveAppSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveSNwkSIntKey(
+						Key: keyPtr(crypto.DeriveSNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveFNwkSIntKey(
+						Key: keyPtr(crypto.DeriveFNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveNwkSEncKey(
+						Key: keyPtr(crypto.DeriveNwkSEncKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -384,7 +397,7 @@ func TestHandleJoin(t *testing.T) {
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						KekLabel: "as:as.test.org",
-						EncryptedKey: MustWrapKey(
+						EncryptedKey: mustWrapKey(
 							crypto.DeriveAppSKey(
 								appKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -396,7 +409,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
 						KekLabel: "ns:ns.test.org",
-						EncryptedKey: MustWrapKey(
+						EncryptedKey: mustWrapKey(
 							crypto.DeriveSNwkSIntKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -408,7 +421,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						KekLabel: "ns:ns.test.org",
-						EncryptedKey: MustWrapKey(
+						EncryptedKey: mustWrapKey(
 							crypto.DeriveFNwkSIntKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -420,7 +433,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
 						KekLabel: "ns:ns.test.org",
-						EncryptedKey: MustWrapKey(
+						EncryptedKey: mustWrapKey(
 							crypto.DeriveNwkSEncKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -515,7 +528,7 @@ func TestHandleJoin(t *testing.T) {
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						KekLabel: "test-as-kek",
-						EncryptedKey: MustWrapKey(
+						EncryptedKey: mustWrapKey(
 							crypto.DeriveAppSKey(
 								appKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -527,7 +540,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
 						KekLabel: "test-ns-kek",
-						EncryptedKey: MustWrapKey(
+						EncryptedKey: mustWrapKey(
 							crypto.DeriveSNwkSIntKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -539,7 +552,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						KekLabel: "test-ns-kek",
-						EncryptedKey: MustWrapKey(
+						EncryptedKey: mustWrapKey(
 							crypto.DeriveFNwkSIntKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -551,7 +564,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
 						KekLabel: "test-ns-kek",
-						EncryptedKey: MustWrapKey(
+						EncryptedKey: mustWrapKey(
 							crypto.DeriveNwkSEncKey(
 								nwkKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -592,7 +605,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{
 				KekLabel: "test-aas-kek",
-				Kek: MustWrapAES128KeyWithKEK(
+				Kek: mustWrapAES128KeyWithKEK(
 					ctx,
 					types.AES128Key{0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					"test-aas-kek-kek",
@@ -649,7 +662,7 @@ func TestHandleJoin(t *testing.T) {
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						KekLabel: "test-aas-kek",
-						EncryptedKey: MustWrapKey(
+						EncryptedKey: mustWrapKey(
 							crypto.DeriveAppSKey(
 								appKey,
 								types.JoinNonce{0x00, 0x00, 0x01},
@@ -660,21 +673,21 @@ func TestHandleJoin(t *testing.T) {
 						),
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveSNwkSIntKey(
+						Key: keyPtr(crypto.DeriveSNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveFNwkSIntKey(
+						Key: keyPtr(crypto.DeriveFNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveNwkSEncKey(
+						Key: keyPtr(crypto.DeriveNwkSEncKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -757,28 +770,28 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveAppSKey(
+						Key: keyPtr(crypto.DeriveAppSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveSNwkSIntKey(
+						Key: keyPtr(crypto.DeriveSNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveFNwkSIntKey(
+						Key: keyPtr(crypto.DeriveFNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveNwkSEncKey(
+						Key: keyPtr(crypto.DeriveNwkSEncKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -862,28 +875,28 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveAppSKey(
+						Key: keyPtr(crypto.DeriveAppSKey(
 							appKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x24, 0x42})),
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveSNwkSIntKey(
+						Key: keyPtr(crypto.DeriveSNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x24, 0x42})),
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveFNwkSIntKey(
+						Key: keyPtr(crypto.DeriveFNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x24, 0x42})),
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveNwkSEncKey(
+						Key: keyPtr(crypto.DeriveNwkSEncKey(
 							nwkKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1016,14 +1029,14 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
+						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
+						Key: keyPtr(crypto.DeriveLegacyAppSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
@@ -1102,14 +1115,14 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
+						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
+						Key: keyPtr(crypto.DeriveLegacyAppSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
@@ -1188,14 +1201,14 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
+						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
+						Key: keyPtr(crypto.DeriveLegacyAppSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
@@ -1274,14 +1287,14 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
+						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
+						Key: keyPtr(crypto.DeriveLegacyAppSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
@@ -1362,14 +1375,14 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
+						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x24, 0x42})),
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
+						Key: keyPtr(crypto.DeriveLegacyAppSKey(
 							appKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.NetID{0x42, 0xff, 0xff},
@@ -1451,14 +1464,14 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
+						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x24, 0x42})),
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
+						Key: keyPtr(crypto.DeriveLegacyAppSKey(
 							appKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.NetID{0x42, 0xff, 0xff},
@@ -1468,13 +1481,14 @@ func TestHandleJoin(t *testing.T) {
 			},
 		},
 		{
-			Name: "1.0.0/TLS client auth/new device",
+			Name: "1.0.0/interop auth/new device",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return auth.NewContextWithX509DN(ctx, pkix.Name{
-					CommonName: "*.test.org",
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+					NetID:     types.NetID{0x42, 0xff, 0xff},
+					Addresses: []string{"*.test.org"},
 				})
 			},
-			Authorizer: X509DNAuthorizer,
+			Authorizer: InteropAuthorizer,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEui:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1542,14 +1556,14 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
+						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
+						Key: keyPtr(crypto.DeriveLegacyAppSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
@@ -1561,11 +1575,11 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name: "1.0.0/NetID mismatch",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return auth.NewContextWithX509DN(ctx, pkix.Name{
-					CommonName: nsAddr,
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+					Addresses: []string{nsAddr},
 				})
 			},
-			Authorizer: X509DNAuthorizer,
+			Authorizer: InteropAuthorizer,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEui:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1615,11 +1629,11 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name: "1.0.0/no NetID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return auth.NewContextWithX509DN(ctx, pkix.Name{
-					CommonName: nsAddr,
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+					Addresses: []string{nsAddr},
 				})
 			},
-			Authorizer: X509DNAuthorizer,
+			Authorizer: InteropAuthorizer,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEui:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1668,11 +1682,11 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name: "1.0.0/address not authorized",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return auth.NewContextWithX509DN(ctx, pkix.Name{
-					CommonName: "other.hostname.local",
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+					Addresses: []string{"other.hostname.local"},
 				})
 			},
-			Authorizer: X509DNAuthorizer,
+			Authorizer: InteropAuthorizer,
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEui:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -2018,6 +2032,7 @@ func TestHandleJoin(t *testing.T) {
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 	} {
+		tc := tc
 		test.RunSubtestFromContext(ctx, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -2326,14 +2341,14 @@ func TestGetNwkSKeys(t *testing.T) {
 				return &ttnpb.SessionKeys{
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyPtr(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						Key: keyPtr(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
-						Key:      KeyPtr(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						Key:      keyPtr(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KekLabel: "NwkSEncKey-kek",
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key:      KeyPtr(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						Key:      keyPtr(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KekLabel: "SNwkSIntKey-kek",
 					},
 				}, nil
@@ -2345,19 +2360,20 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 			KeyResponse: &ttnpb.NwkSKeysResponse{
 				FNwkSIntKey: ttnpb.KeyEnvelope{
-					Key: KeyPtr(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					Key: keyPtr(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 				},
 				NwkSEncKey: ttnpb.KeyEnvelope{
-					Key:      KeyPtr(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					Key:      keyPtr(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 					KekLabel: "NwkSEncKey-kek",
 				},
 				SNwkSIntKey: ttnpb.KeyEnvelope{
-					Key:      KeyPtr(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					Key:      keyPtr(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 					KekLabel: "SNwkSIntKey-kek",
 				},
 			},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -2460,11 +2476,11 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Address not authorized",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return auth.NewContextWithX509DN(ctx, pkix.Name{
-					CommonName: "other.hostname.local",
+				return interop.NewContextWithApplicationServerAuthInfo(ctx, interop.ApplicationServerAuthInfo{
+					Addresses: []string{"other.hostname.local"},
 				})
 			},
-			Authorizer: X509DNAuthorizer,
+			Authorizer: InteropAuthorizer,
 			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2476,7 +2492,7 @@ func TestGetAppSKey(t *testing.T) {
 				return &ttnpb.SessionKeys{
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
-						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						EncryptedKey: keyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KekLabel:     "test-kek",
 					},
 				}, nil
@@ -2502,19 +2518,21 @@ func TestGetAppSKey(t *testing.T) {
 				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrCallerNotAuthorized)
+				return assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue)
 			},
 		},
 		{
 			Name: "No application rights",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
+				ctx = rights.NewContextWithAuthInfo(ctx, &ttnpb.AuthInfoResponse{})
+				ctx = rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}): {
 							Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_DEVICES_READ}, // Require READ_KEYS
 						},
 					},
 				})
+				return ctx
 			},
 			Authorizer: ApplicationRightsAuthorizer,
 			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
@@ -2528,7 +2546,7 @@ func TestGetAppSKey(t *testing.T) {
 				return &ttnpb.SessionKeys{
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
-						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						EncryptedKey: keyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KekLabel:     "test-kek",
 					},
 				}, nil
@@ -2574,7 +2592,7 @@ func TestGetAppSKey(t *testing.T) {
 				return &ttnpb.SessionKeys{
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
-						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						EncryptedKey: keyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KekLabel:     "test-kek",
 					},
 				}, nil
@@ -2586,7 +2604,7 @@ func TestGetAppSKey(t *testing.T) {
 			},
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
-					EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					EncryptedKey: keyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 					KekLabel:     "test-kek",
 				},
 			},
@@ -2594,13 +2612,15 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Matching request/application auth",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
+				ctx = rights.NewContextWithAuthInfo(ctx, &ttnpb.AuthInfoResponse{})
+				ctx = rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}): {
 							Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS},
 						},
 					},
 				})
+				return ctx
 			},
 			Authorizer: ApplicationRightsAuthorizer,
 			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
@@ -2614,7 +2634,7 @@ func TestGetAppSKey(t *testing.T) {
 				return &ttnpb.SessionKeys{
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
-						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						EncryptedKey: keyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KekLabel:     "test-kek",
 					},
 				}, nil
@@ -2643,19 +2663,19 @@ func TestGetAppSKey(t *testing.T) {
 			},
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
-					EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					EncryptedKey: keyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 					KekLabel:     "test-kek",
 				},
 			},
 		},
 		{
-			Name: "Matching request/TLS client auth/address ID",
+			Name: "Matching request/interop auth/address ID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return auth.NewContextWithX509DN(ctx, pkix.Name{
-					CommonName: "as.test.org",
+				return interop.NewContextWithApplicationServerAuthInfo(ctx, interop.ApplicationServerAuthInfo{
+					Addresses: []string{"as.test.org"},
 				})
 			},
-			Authorizer: X509DNAuthorizer,
+			Authorizer: InteropAuthorizer,
 			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2667,7 +2687,7 @@ func TestGetAppSKey(t *testing.T) {
 				return &ttnpb.SessionKeys{
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
-						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						EncryptedKey: keyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KekLabel:     "test-kek",
 					},
 				}, nil
@@ -2700,19 +2720,19 @@ func TestGetAppSKey(t *testing.T) {
 			},
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
-					EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					EncryptedKey: keyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 					KekLabel:     "test-kek",
 				},
 			},
 		},
 		{
-			Name: "Matching request/TLS client auth/custom ID",
+			Name: "Matching request/interop auth/custom ID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return auth.NewContextWithX509DN(ctx, pkix.Name{
-					CommonName: "test-as-id",
+				return interop.NewContextWithApplicationServerAuthInfo(ctx, interop.ApplicationServerAuthInfo{
+					ASID: "test-as-id",
 				})
 			},
-			Authorizer: X509DNAuthorizer,
+			Authorizer: InteropAuthorizer,
 			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2724,7 +2744,7 @@ func TestGetAppSKey(t *testing.T) {
 				return &ttnpb.SessionKeys{
 					SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 					AppSKey: &ttnpb.KeyEnvelope{
-						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						EncryptedKey: keyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KekLabel:     "test-kek",
 					},
 				}, nil
@@ -2758,12 +2778,13 @@ func TestGetAppSKey(t *testing.T) {
 			},
 			KeyResponse: &ttnpb.AppSKeyResponse{
 				AppSKey: ttnpb.KeyEnvelope{
-					EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					EncryptedKey: keyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 					KekLabel:     "test-kek",
 				},
 			},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -2781,13 +2802,15 @@ func TestGetAppSKey(t *testing.T) {
 
 				if tc.ErrorAssertion != nil {
 					if !tc.ErrorAssertion(t, err) {
-						t.Errorf("Received unexpected error: %s", err)
+						t.Fatalf("Received unexpected error: %s", err)
 					}
 					a.So(res, should.BeNil)
 					return
 				}
 
-				a.So(err, should.BeNil)
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
 				a.So(res, should.Resemble, tc.KeyResponse)
 			},
 		})
@@ -2856,6 +2879,7 @@ func TestGetHomeNetID(t *testing.T) {
 			Response: &types.NetID{0x42, 0xff, 0xff},
 		},
 	} {
+		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -66,16 +66,15 @@ func TestInteropJoinRequest(t *testing.T) {
 		ExpectedJoinAns     *interop.JoinAns
 	}{
 		{
-			Name: "Normal/1.0.3",
+			Name: "Normal/TS001-1.0.3",
 			JoinReq: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x13},
 					ReceiverID: interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-					SenderNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				PHYPayload: interop.Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:    interop.DevAddr{0x1, 0x2, 0x3, 0x4},
@@ -121,12 +120,11 @@ func TestInteropJoinRequest(t *testing.T) {
 			ExpectedJoinAns: &interop.JoinAns{
 				JsNsMessageHeader: interop.JsNsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinAns,
 					},
-					SenderID:     interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-					ReceiverID:   interop.NetID{0x0, 0x0, 0x13},
-					ReceiverNSID: interop.NetID{0x0, 0x0, 0x13},
+					SenderID:   interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+					ReceiverID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				PHYPayload: interop.Buffer{0x1, 0x2, 0x3, 0x4},
 				Result: interop.Result{
@@ -145,16 +143,15 @@ func TestInteropJoinRequest(t *testing.T) {
 			},
 		},
 		{
-			Name: "Normal/1.1",
+			Name: "Normal/TS001-1.1",
 			JoinReq: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x13},
 					ReceiverID: interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-					SenderNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				PHYPayload: interop.Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:    interop.DevAddr{0x1, 0x2, 0x3, 0x4},
@@ -208,12 +205,11 @@ func TestInteropJoinRequest(t *testing.T) {
 			ExpectedJoinAns: &interop.JoinAns{
 				JsNsMessageHeader: interop.JsNsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinAns,
 					},
-					SenderID:     interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-					ReceiverID:   interop.NetID{0x0, 0x0, 0x13},
-					ReceiverNSID: interop.NetID{0x0, 0x0, 0x13},
+					SenderID:   interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+					ReceiverID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				PHYPayload: []byte{0x1, 0x2, 0x3, 0x4},
 				Result: interop.Result{
@@ -244,12 +240,11 @@ func TestInteropJoinRequest(t *testing.T) {
 			JoinReq: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x13},
 					ReceiverID: interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-					SenderNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				PHYPayload: interop.Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:    interop.DevAddr{0x1, 0x2, 0x3, 0x4},
@@ -288,12 +283,11 @@ func TestInteropJoinRequest(t *testing.T) {
 			JoinReq: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x13},
 					ReceiverID: interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-					SenderNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				PHYPayload: interop.Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:    interop.DevAddr{0x1, 0x2, 0x3, 0x4},
@@ -332,12 +326,11 @@ func TestInteropJoinRequest(t *testing.T) {
 			JoinReq: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x13},
 					ReceiverID: interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-					SenderNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				PHYPayload: interop.Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:    interop.DevAddr{0x1, 0x2, 0x3, 0x4},
@@ -376,12 +369,11 @@ func TestInteropJoinRequest(t *testing.T) {
 			JoinReq: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x13},
 					ReceiverID: interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-					SenderNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				PHYPayload: interop.Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:    interop.DevAddr{0x1, 0x2, 0x3, 0x4},
@@ -401,12 +393,11 @@ func TestInteropJoinRequest(t *testing.T) {
 			JoinReq: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x13},
 					ReceiverID: interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-					SenderNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				PHYPayload: interop.Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x21, 0x22, 0x23},
 				DevAddr:    interop.DevAddr{0x1, 0x2, 0x3, 0x4},
@@ -463,16 +454,15 @@ func TestInteropHomeNSRequest(t *testing.T) {
 		ExpectedHomeNSAns *interop.HomeNSAns
 	}{
 		{
-			Name: "Normal",
+			Name: "Normal/TS002-1.0",
 			HomeNSReq: &interop.HomeNSReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x13},
 					ReceiverID: interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					SenderNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				DevEUI: interop.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			},
@@ -484,17 +474,49 @@ func TestInteropHomeNSRequest(t *testing.T) {
 			ExpectedHomeNSAns: &interop.HomeNSAns{
 				JsNsMessageHeader: interop.JsNsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinAns,
 					},
-					SenderID:     interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ReceiverID:   interop.NetID{0x0, 0x0, 0x13},
-					ReceiverNSID: interop.NetID{0x0, 0x0, 0x13},
+					SenderID:   interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ReceiverID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				Result: interop.Result{
 					ResultCode: interop.ResultSuccess,
 				},
-				HNSID:  interop.NetID{0x42, 0xff, 0xff},
+				HNetID: interop.NetID{0x42, 0xff, 0xff},
+			},
+		},
+		{
+			Name: "Normal/TS002-1.1",
+			HomeNSReq: &interop.HomeNSReq{
+				NsJsMessageHeader: interop.NsJsMessageHeader{
+					MessageHeader: interop.MessageHeader{
+						ProtocolVersion: interop.ProtocolV1_1,
+						MessageType:     interop.MessageTypeJoinReq,
+					},
+					SenderID:   interop.NetID{0x0, 0x0, 0x13},
+					ReceiverID: interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				DevEUI: interop.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			},
+			ExpectedJoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			ExpectedDevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			GetNetIDFunc: func() (*types.NetID, error) {
+				return &types.NetID{0x42, 0xff, 0xff}, nil
+			},
+			ExpectedHomeNSAns: &interop.HomeNSAns{
+				JsNsMessageHeader: interop.JsNsMessageHeader{
+					MessageHeader: interop.MessageHeader{
+						ProtocolVersion: interop.ProtocolV1_1,
+						MessageType:     interop.MessageTypeJoinAns,
+					},
+					SenderID:   interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ReceiverID: interop.NetID{0x0, 0x0, 0x13},
+				},
+				Result: interop.Result{
+					ResultCode: interop.ResultSuccess,
+				},
+				HNSID:  stringPtr("test"),
 				HNetID: interop.NetID{0x42, 0xff, 0xff},
 			},
 		},
@@ -503,12 +525,11 @@ func TestInteropHomeNSRequest(t *testing.T) {
 			HomeNSReq: &interop.HomeNSReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x13},
 					ReceiverID: interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					SenderNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				DevEUI: interop.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			},
@@ -569,7 +590,7 @@ func TestInteropAppSKeyRequest(t *testing.T) {
 			AppSKeyReq: &interop.AppSKeyReq{
 				AsJsMessageHeader: interop.AsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   "test.local",
@@ -594,7 +615,7 @@ func TestInteropAppSKeyRequest(t *testing.T) {
 			ExpectedAppSKeyAns: &interop.AppSKeyAns{
 				JsAsMessageHeader: interop.JsAsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinAns,
 					},
 					SenderID:   interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -616,7 +637,7 @@ func TestInteropAppSKeyRequest(t *testing.T) {
 			AppSKeyReq: &interop.AppSKeyReq{
 				AsJsMessageHeader: interop.AsJsMessageHeader{
 					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: "1.0",
+						ProtocolVersion: interop.ProtocolV1_0,
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   "test.local",

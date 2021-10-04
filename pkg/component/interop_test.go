@@ -47,7 +47,11 @@ func (m mockInterop) JoinRequest(ctx context.Context, req *interop.JoinReq) (*in
 		return nil, err
 	}
 	return &interop.JoinAns{
-		JsNsMessageHeader: ansHeader,
+		JsNsMessageHeader: interop.JsNsMessageHeader{
+			MessageHeader: ansHeader,
+			SenderID:      req.ReceiverID,
+			ReceiverID:    req.SenderID,
+		},
 		Result: interop.Result{
 			ResultCode: interop.ResultSuccess,
 		},
@@ -60,7 +64,11 @@ func (m mockInterop) AppSKeyRequest(ctx context.Context, req *interop.AppSKeyReq
 		return nil, err
 	}
 	return &interop.AppSKeyAns{
-		JsAsMessageHeader: ansHeader,
+		JsAsMessageHeader: interop.JsAsMessageHeader{
+			MessageHeader: ansHeader,
+			SenderID:      req.ReceiverID,
+			ReceiverID:    req.SenderID,
+		},
 		Result: interop.Result{
 			ResultCode: interop.ResultSuccess,
 		},
@@ -73,7 +81,11 @@ func (m mockInterop) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) 
 		return nil, err
 	}
 	return &interop.HomeNSAns{
-		JsNsMessageHeader: ansHeader,
+		JsNsMessageHeader: interop.JsNsMessageHeader{
+			MessageHeader: ansHeader,
+			SenderID:      req.ReceiverID,
+			ReceiverID:    req.SenderID,
+		},
 		Result: interop.Result{
 			ResultCode: interop.ResultSuccess,
 		},
@@ -167,11 +179,11 @@ func TestInteropTLS(t *testing.T) {
 		a.So(err, should.BeNil)
 		res, err := client.Post("https://localhost:9188", "application/json", bytes.NewReader(buf))
 		a.So(err, should.BeNil)
-		a.So(res.StatusCode, should.Equal, http.StatusBadRequest)
+		a.So(res.StatusCode, should.Equal, http.StatusOK)
 		var msg interop.ErrorMessage
 		if !a.So(json.NewDecoder(res.Body).Decode(&msg), should.BeNil) {
 			t.FailNow()
 		}
-		a.So(msg.Result, should.Resemble, interop.Result{ResultCode: interop.ResultUnknownSender})
+		a.So(msg.Result.ResultCode, should.Resemble, interop.ResultUnknownSender)
 	}
 }
