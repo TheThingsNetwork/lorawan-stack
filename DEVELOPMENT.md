@@ -55,7 +55,7 @@ The Things Stack components are primarily built in Go, we use React for web fron
 
 ## Development Environment
 
-The Things Network's development tooling uses [Mage](https://magefile.org/). Under the hood, `mage` calls other tools such as `git`, `go`, `yarn`, `docker` etc. Recent versions are supported; Node v12.x and Go v1.17x.
+The Things Network's development tooling uses [Mage](https://magefile.org/). Under the hood, `mage` calls other tools such as `git`, `go`, `yarn`, `docker` etc. Recent versions are supported; Node v12.x and Go v1.17x. Note that we do not support Docker Compose v2 at the moment.
 
 - Follow [Go's installation guide](https://golang.org/doc/install) to install Go.
 - Download Node.js [from their website](https://nodejs.org) and install it.
