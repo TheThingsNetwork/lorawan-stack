@@ -6569,6 +6569,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver/redis:candidate": {
+    "translations": {
+      "en": "candidate failed matching"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/networkserver/redis:database_corruption": {
     "translations": {
       "en": "database is corrupted"
@@ -6599,6 +6608,15 @@
   "error:pkg/networkserver/redis:field_count": {
     "translations": {
       "en": "invalid field count '{count}'"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:found_no_match_marker": {
+    "translations": {
+      "en": "found no match marker"
     },
     "description": {
       "package": "pkg/networkserver/redis",
@@ -6657,6 +6675,24 @@
     "description": {
       "package": "pkg/networkserver/redis",
       "file": "application_uplink_queue.go"
+    }
+  },
+  "error:pkg/networkserver/redis:no_candidate_match": {
+    "translations": {
+      "en": "no candidate matches uplink"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:no_candidates": {
+    "translations": {
+      "en": "no device candidates found"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
     }
   },
   "error:pkg/networkserver/redis:no_uplink_match": {
