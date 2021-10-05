@@ -79,7 +79,7 @@ func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string,
 	}
 	// TODO: Revisit these fields for v3 events (https://github.com/TheThingsNetwork/lorawan-stack/issues/2629)
 	stat := &ttnpb.GatewayStatus{
-		Time: receivedAt,
+		Time: &receivedAt,
 		Versions: map[string]string{
 			"station":  version.Station,
 			"firmware": version.Firmware,

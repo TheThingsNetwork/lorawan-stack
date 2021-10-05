@@ -72,7 +72,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 		Ids:              &ids,
 		FrequencyPlanId:  test.EUFrequencyPlanID,
 		FrequencyPlanIds: []string{test.EUFrequencyPlanID},
-		Antennas: []ttnpb.GatewayAntenna{
+		Antennas: []*ttnpb.GatewayAntenna{
 			{
 				Location: &ttnpb.Location{
 					Source: ttnpb.SOURCE_REGISTRY,
@@ -87,7 +87,10 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 	}
 }
 
-var errNotFound = errors.DefineNotFound("not_found", "not found")
+var (
+	errNotFound     = errors.DefineNotFound("not_found", "not found")
+	errNoGatewayEUI = errors.DefineInvalidArgument("no_gateway_eui", "not gateway EUI")
+)
 
 func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
 	uid := unique.ID(ctx, req.GetGatewayIds())
@@ -104,7 +107,7 @@ func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (
 	if !ok {
 		return nil, errNotFound.New()
 	}
-	gtw.SetFields(&req.Gateway, req.FieldMask.GetPaths()...)
+	gtw.SetFields(req.Gateway, req.FieldMask.GetPaths()...)
 	return gtw, nil
 }
 

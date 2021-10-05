@@ -20,8 +20,22 @@ func (m *Gateway) EntityType() string {
 	return m.GetIds().EntityType()
 }
 
+func (m *CreateGatewayRequest) EntityType() string {
+	if m == nil || m.GetGateway() == nil {
+		return ""
+	}
+	return m.GetGateway().EntityType()
+}
+
 func (m *GetGatewayRequest) EntityType() string {
 	return m.GetGatewayIds().EntityType()
+}
+
+func (m *UpdateGatewayRequest) EntityType() string {
+	if m == nil || m.GetGateway() == nil {
+		return ""
+	}
+	return m.GetGateway().EntityType()
 }
 
 func (m *ListGatewayAPIKeysRequest) EntityType() string {
@@ -37,6 +51,9 @@ func (m *CreateGatewayAPIKeyRequest) EntityType() string {
 }
 
 func (m *UpdateGatewayAPIKeyRequest) EntityType() string {
+	if m.GetGatewayIds() == nil {
+		return ""
+	}
 	return m.GetGatewayIds().EntityType()
 }
 
@@ -58,8 +75,22 @@ func (m *Gateway) IDString() string {
 	return m.GetIds().IDString()
 }
 
+func (m *CreateGatewayRequest) IDString() string {
+	if m == nil || m.GetGateway() == nil {
+		return ""
+	}
+	return m.GetGateway().IDString()
+}
+
 func (m *GetGatewayRequest) IDString() string {
 	return m.GetGatewayIds().IDString()
+}
+
+func (m *UpdateGatewayRequest) IDString() string {
+	if m == nil || m.GetGateway() == nil {
+		return ""
+	}
+	return m.GetGateway().IDString()
 }
 
 func (m *ListGatewayAPIKeysRequest) IDString() string {
@@ -98,6 +129,13 @@ func (m *Gateway) ExtractRequestFields(dst map[string]interface{}) {
 
 func (m *GetGatewayRequest) ExtractRequestFields(dst map[string]interface{}) {
 	m.GetGatewayIds().ExtractRequestFields(dst)
+}
+
+func (m *UpdateGatewayRequest) ExtractRequestFields(dst map[string]interface{}) {
+	if m == nil || m.GetGateway() == nil || m.GetGateway().GetIds() == nil {
+		return
+	}
+	m.GetGateway().GetIds().ExtractRequestFields(dst)
 }
 
 func (m *ListGatewayAPIKeysRequest) ExtractRequestFields(dst map[string]interface{}) {

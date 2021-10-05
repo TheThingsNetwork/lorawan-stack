@@ -307,7 +307,7 @@ var (
 			}
 			_, err = ttnpb.NewGatewayAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 				GatewayIds: gtwID,
-				APIKey: ttnpb.APIKey{
+				ApiKey: &ttnpb.APIKey{
 					Id:        id,
 					Name:      name,
 					Rights:    rights,
@@ -342,7 +342,7 @@ var (
 			}
 			_, err = ttnpb.NewGatewayAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 				GatewayIds: gtwID,
-				APIKey: ttnpb.APIKey{
+				ApiKey: &ttnpb.APIKey{
 					Id:     id,
 					Rights: nil,
 				},

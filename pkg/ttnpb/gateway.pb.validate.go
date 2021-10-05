@@ -644,7 +644,7 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayValidationError{
 						field:  "created_at",
@@ -656,7 +656,7 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayValidationError{
 						field:  "updated_at",
@@ -757,7 +757,7 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "version_ids":
 
-			if v, ok := interface{}(&m.GatewayVersionIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetVersionIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayValidationError{
 						field:  "version_ids",
@@ -819,14 +819,14 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "antennas":
 
-			if len(m.Antennas) > 8 {
+			if len(m.GetAntennas()) > 8 {
 				return GatewayValidationError{
 					field:  "antennas",
 					reason: "value must contain no more than 8 item(s)",
 				}
 			}
 
-			for idx, item := range m.Antennas {
+			for idx, item := range m.GetAntennas() {
 				_, _ = idx, item
 
 				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
@@ -1459,7 +1459,14 @@ func (m *CreateGatewayRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "gateway":
 
-			if v, ok := interface{}(&m.Gateway).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetGateway() == nil {
+				return CreateGatewayRequestValidationError{
+					field:  "gateway",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetGateway()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateGatewayRequestValidationError{
 						field:  "gateway",
@@ -1471,7 +1478,14 @@ func (m *CreateGatewayRequest) ValidateFields(paths ...string) error {
 
 		case "collaborator":
 
-			if v, ok := interface{}(&m.Collaborator).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetCollaborator() == nil {
+				return CreateGatewayRequestValidationError{
+					field:  "collaborator",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCollaborator()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateGatewayRequestValidationError{
 						field:  "collaborator",
@@ -1564,7 +1578,14 @@ func (m *UpdateGatewayRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "gateway":
 
-			if v, ok := interface{}(&m.Gateway).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetGateway() == nil {
+				return UpdateGatewayRequestValidationError{
+					field:  "gateway",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetGateway()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateGatewayRequestValidationError{
 						field:  "gateway",
@@ -2059,7 +2080,14 @@ func (m *UpdateGatewayAPIKeyRequest) ValidateFields(paths ...string) error {
 
 		case "api_key":
 
-			if v, ok := interface{}(&m.APIKey).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApiKey() == nil {
+				return UpdateGatewayAPIKeyRequestValidationError{
+					field:  "api_key",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApiKey()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateGatewayAPIKeyRequestValidationError{
 						field:  "api_key",
@@ -2519,13 +2547,6 @@ func (m *GatewayAntenna) ValidateFields(paths ...string) error {
 			// no validation rules for Gain
 		case "location":
 
-			if m.GetLocation() == nil {
-				return GatewayAntennaValidationError{
-					field:  "location",
-					reason: "value is required",
-				}
-			}
-
 			if v, ok := interface{}(m.GetLocation()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayAntennaValidationError{
@@ -2656,9 +2677,16 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 		switch name {
 		case "time":
 
+			if m.GetTime() == nil {
+				return GatewayStatusValidationError{
+					field:  "time",
+					reason: "value is required",
+				}
+			}
+
 		case "boot_time":
 
-			if v, ok := interface{}(&m.BootTime).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetBootTime()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayStatusValidationError{
 						field:  "boot_time",
@@ -3219,9 +3247,30 @@ func (m *GatewayConnectionStats_RoundTripTimes) ValidateFields(paths ...string) 
 		switch name {
 		case "min":
 
+			if m.GetMin() == nil {
+				return GatewayConnectionStats_RoundTripTimesValidationError{
+					field:  "min",
+					reason: "value is required",
+				}
+			}
+
 		case "max":
 
+			if m.GetMax() == nil {
+				return GatewayConnectionStats_RoundTripTimesValidationError{
+					field:  "max",
+					reason: "value is required",
+				}
+			}
+
 		case "median":
+
+			if m.GetMedian() == nil {
+				return GatewayConnectionStats_RoundTripTimesValidationError{
+					field:  "median",
+					reason: "value is required",
+				}
+			}
 
 		case "count":
 			// no validation rules for Count

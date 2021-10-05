@@ -149,10 +149,12 @@ func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 		}
 		if len(gateway.Antennas) > 0 {
 			loc := gateway.Antennas[0].Location
-			res.AntennaLocation = &antennaLocation{
-				Latitude:  loc.Latitude,
-				Longitude: loc.Longitude,
-				Altitude:  loc.Altitude,
+			if loc != nil {
+				res.AntennaLocation = &antennaLocation{
+					Latitude:  loc.Latitude,
+					Longitude: loc.Longitude,
+					Altitude:  loc.Altitude,
+				}
 			}
 		}
 		if token, ok := gateway.Attributes["token"]; ok {

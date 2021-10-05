@@ -471,7 +471,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 			FrequencyPlanIds:       []string{fpID},
 			EnforceDutyCycle:       true,
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
-			Antennas:               []ttnpb.GatewayAntenna{},
+			Antennas:               []*ttnpb.GatewayAntenna{},
 		}
 	} else if err != nil {
 		return nil, err
@@ -547,7 +547,14 @@ func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIde
 }
 
 func requireDisconnect(connected, current *ttnpb.Gateway) bool {
-	if !sameAntennaLocations(connected.Antennas, current.Antennas) {
+	fromPtrArray := func(in []*ttnpb.GatewayAntenna) []ttnpb.GatewayAntenna {
+		ret := make([]ttnpb.GatewayAntenna, len(in))
+		for _, a := range in {
+			ret = append(ret, *a)
+		}
+		return ret
+	}
+	if !sameAntennaLocations(fromPtrArray(connected.GetAntennas()), fromPtrArray(current.GetAntennas())) {
 		// Gateway Server may update the location from status messages. If the locations aren't the same, but if the new
 		// location is a GPS location, do not disconnect the gateway. This is to avoid that updating the location from a
 		// gateway status message results in disconnecting the gateway.
@@ -883,12 +890,13 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 			if ok && len(status.AntennaLocations) > 0 {
 				// Construct the union of antennas that are in the gateway fetched from the entity registry with the antennas
 				// that are in the status message.
-				c := len(gtw.Antennas)
+				gtwAntennas := gtw.GetAntennas()
+				c := len(gtwAntennas)
 				if cs := len(status.AntennaLocations); cs > c {
 					c = cs
 				}
 				antennas := make([]ttnpb.GatewayAntenna, c)
-				for i, ant := range gtw.Antennas {
+				for i, ant := range gtwAntennas {
 					antennas[i].Gain = ant.Gain
 				}
 				for i := range antennas {

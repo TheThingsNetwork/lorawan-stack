@@ -109,7 +109,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 	gtw := conn.Gateway()
 	antennas := make([]*ttnpb.GatewayAntenna, len(gtw.Antennas))
 	for i, ant := range gtw.Antennas {
-		antennas[i] = &ant
+		antennas[i] = ant
 	}
 	req := &ttnpb.UpdatePacketBrokerGatewayRequest{
 		Gateway: &ttnpb.PacketBrokerGateway{

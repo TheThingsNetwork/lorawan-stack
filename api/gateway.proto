@@ -89,9 +89,9 @@ message Gateway {
   // The identifiers of the gateway. These are public and can be seen by any authenticated user in the network.
   GatewayIdentifiers ids = 1 [(validate.rules).message.required = true];
   // When the gateway was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
   // When the gateway was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
   // When the gateway was deleted. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp deleted_at = 26 [(gogoproto.stdtime) = true];
 
@@ -112,7 +112,7 @@ message Gateway {
   // Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.
   repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
 
-  GatewayVersionIdentifiers version_ids = 8 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayVersionIdentifiers version_ids = 8;
 
   // The address of the Gateway Server to connect to.
   // This information is public and can be seen by any authenticated user in the network if status_public is true.
@@ -142,7 +142,6 @@ message Gateway {
 
   // Antennas of the gateway. Location information of the antennas is public and can be seen by any authenticated user in the network if location_public=true.
   repeated GatewayAntenna antennas = 13 [
-    (gogoproto.nullable) = false,
     (validate.rules).repeated.max_items = 8
   ];
   // The status of this gateway may be publicly displayed.
@@ -159,7 +158,7 @@ message Gateway {
   bool enforce_duty_cycle = 17;
   DownlinkPathConstraint downlink_path_constraint = 18 [(validate.rules).enum.defined_only = true];
   // Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite.
-  google.protobuf.Duration schedule_anytime_delay = 19 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
+  google.protobuf.Duration schedule_anytime_delay = 19 [(gogoproto.stdduration) = true];
   // Update the location of this gateway from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported.
   bool update_location_from_status = 21;
   // The LoRa Basics Station LNS secret.
@@ -229,13 +228,13 @@ message ListGatewaysRequest {
 }
 
 message CreateGatewayRequest {
-  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Gateway gateway = 1 [(validate.rules).message.required = true];
   // Collaborator to grant all rights on the newly created gateway.
-  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(validate.rules).message.required = true];
 }
 
 message UpdateGatewayRequest {
-  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Gateway gateway = 1 [(validate.rules).message.required = true];
   // The names of the gateway fields that should be updated.
   google.protobuf.FieldMask field_mask = 2;
 }
@@ -269,7 +268,7 @@ message CreateGatewayAPIKeyRequest {
 
 message UpdateGatewayAPIKeyRequest {
   GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
-  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  APIKey api_key = 2 [(validate.rules).message.required = true];
   // The names of the api key fields that should be updated.
   google.protobuf.FieldMask field_mask = 3;
 }
@@ -304,7 +303,7 @@ message GatewayAntenna {
   // Antenna gain relative to the gateway, in dBi.
   float gain = 1;
   // location is the antenna's location.
-  Location location = 2 [(validate.rules).message.required = true];
+  Location location = 2;
   map<string,string> attributes = 3 [
     (validate.rules).map = {
       max_pairs: 10,
@@ -317,10 +316,10 @@ message GatewayAntenna {
 
 message GatewayStatus {
   // Current time of the gateway
-  google.protobuf.Timestamp time = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
+  google.protobuf.Timestamp time = 1 [(gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
   // Boot time of the gateway
   // - can be left out to save bandwidth; old value will be kept
-  google.protobuf.Timestamp boot_time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp boot_time = 2 [(gogoproto.stdtime) = true];
   // Versions of gateway subsystems
   // - each field can be left out to save bandwidth; old value will be kept
   // - map keys are written in snake_case
@@ -375,9 +374,9 @@ message GatewayConnectionStats {
   uint64 downlink_count = 8;
 
   message RoundTripTimes {
-    google.protobuf.Duration min = 1 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
-    google.protobuf.Duration max = 2 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
-    google.protobuf.Duration median = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    google.protobuf.Duration min = 1 [(gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    google.protobuf.Duration max = 2 [(gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    google.protobuf.Duration median = 3 [(gogoproto.stdduration) = true, (validate.rules).duration.required = true];
     uint32 count = 4;
   }
   RoundTripTimes round_trip_times = 9;
