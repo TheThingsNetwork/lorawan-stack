@@ -16,7 +16,6 @@ package interop
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"net"
 	"net/http"
@@ -26,31 +25,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-func (s *Server) verifySenderCertificate(ctx context.Context, senderID string, state *tls.ConnectionState) (addrs []string, err error) {
-	// TODO: Support reading TLS client certificate from proxy headers (https://github.com/TheThingsNetwork/lorawan-stack/issues/717).
-	senderClientCAs, err := s.SenderClientCAs(ctx, senderID)
-	if err != nil {
-		return nil, err
-	}
-	for _, chain := range state.VerifiedChains {
-		peerCert, clientCA := chain[0], chain[len(chain)-1]
-		for _, senderClientCA := range senderClientCAs {
-			if clientCA.Equal(senderClientCA) {
-				// If the TLS client certificate contains DNS addresses, use those. Otherwise, fallback to using CommonName as address.
-				if len(peerCert.DNSNames) > 0 {
-					addrs = append([]string(nil), peerCert.DNSNames...)
-				} else {
-					addrs = []string{peerCert.Subject.CommonName}
-				}
-				return
-			}
-		}
-	}
-	// TODO: Verify state.PeerCertificates[0] with senderClientCAs as Roots and state.PeerCertificates[1:] as Intermediates.
-	// (https://github.com/TheThingsNetwork/lorawan-stack/issues/718).
-	return nil, errUnauthenticated.New()
-}
-
+// verifySenderNSID verifies that one of the address patterns matches the NSID.
+// The pattern may contain a wildcard (*.host) or port (host:1885).
 func verifySenderNSID(patterns []string, nsID string) error {
 	if len(patterns) == 0 {
 		return errCallerNotAuthorized.WithAttributes("target", nsID)
@@ -115,6 +91,15 @@ func NetworkServerAuthInfoFromContext(ctx context.Context) (NetworkServerAuthInf
 	return authInfo, ok
 }
 
+// authenticateNS authenticates the client as a Network Server.
+//
+// If the client presents a TLS client certificate, it is verified against the trusted CAs of the NetID.
+// Any DNS names in the X.509 Subject Alternative Names are taken as address patterns used to verify the NSID. If there
+// are no DNS names, the Common Name is used as the single address pattern.
+// If the TLS client certificate verification fails, this method returns an error.
+//
+// If the client presents a Bearer token in the Authorization header of the HTTP request, it is verified as token issued
+// by Packet Broker.
 func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byte) (context.Context, error) {
 	var header NsMessageHeader
 	if err := json.Unmarshal(data, &header); err != nil {
