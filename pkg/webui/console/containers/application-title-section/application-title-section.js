@@ -13,11 +13,13 @@
 // limitations under the License.
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
 
 import applicationIcon from '@assets/misc/application.svg'
 
-import Spinner from '@ttn-lw/components/spinner'
 import Status from '@ttn-lw/components/status'
+import DocTooltip from '@ttn-lw/components/tooltip/doc'
+import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -28,6 +30,13 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './application-title-section.styl'
+
+const m = defineMessages({
+  lastSeenAvailableTooltip:
+    'The elapsed time since the network registered activity (sent uplinks, confirmed downlinks or (re)join requests) of the end device(s) in this application.',
+  noActivityTooltip:
+    'The network has not recently registered any activity (sent uplinks, confirmed downlinks or (re)join requests) of the end device(s) in this application.',
+})
 
 const { Content } = EntityTitleSection
 
@@ -50,6 +59,63 @@ const ApplicationTitleSection = props => {
 
   const showLastSeen = Boolean(lastSeen)
 
+  const bottomBarLeft = showLastSeen ? (
+    <DocTooltip
+      interactive
+      docPath="/getting-started/console/troubleshooting"
+      content={<Message content={m.lastSeenAvailableTooltip} />}
+    >
+      <LastSeen lastSeen={lastSeen} flipped>
+        <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+      </LastSeen>
+    </DocTooltip>
+  ) : (
+    <DocTooltip
+      content={<Message content={m.noActivityTooltip} />}
+      docPath="/getting-started/console/troubleshooting"
+    >
+      <Status
+        status="mediocre"
+        label={sharedMessages.noRecentActivity}
+        className={style.lastSeen}
+        flipped
+      >
+        <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+      </Status>
+    </DocTooltip>
+  )
+  const bottomBarRight = (
+    <>
+      {mayViewDevices && (
+        <Content.EntityCount
+          icon="devices"
+          value={devicesTotalCount}
+          keyMessage={sharedMessages.deviceCounted}
+          errored={devicesErrored}
+          toAllUrl={`/applications/${appId}/devices`}
+        />
+      )}
+      {mayViewCollaborators && (
+        <Content.EntityCount
+          icon="collaborators"
+          value={collaboratorsTotalCount}
+          keyMessage={sharedMessages.collaboratorCounted}
+          errored={collaboratorsErrored}
+          toAllUrl={`/applications/${appId}/collaborators`}
+        />
+      )}
+      {mayViewApiKeys && (
+        <Content.EntityCount
+          icon="api_keys"
+          value={apiKeysTotalCount}
+          keyMessage={sharedMessages.apiKeyCounted}
+          errored={apiKeysErrored}
+          toAllUrl={`/applications/${appId}/api-keys`}
+        />
+      )}
+    </>
+  )
+
   return (
     <EntityTitleSection
       id={appId}
@@ -57,55 +123,7 @@ const ApplicationTitleSection = props => {
       icon={applicationIcon}
       iconAlt={sharedMessages.application}
     >
-      <Content creationDate={application.created_at}>
-        {fetching ? (
-          <Spinner after={0} faded micro inline>
-            <Message content={sharedMessages.fetching} />
-          </Spinner>
-        ) : (
-          <>
-            {showLastSeen ? (
-              <Status status="good" className={style.lastSeen} flipped>
-                <LastSeen lastSeen={lastSeen} />
-              </Status>
-            ) : (
-              <Status
-                status="mediocre"
-                label={sharedMessages.lastSeenUnavailable}
-                className={style.lastSeen}
-                flipped
-              />
-            )}
-            {mayViewDevices && (
-              <Content.EntityCount
-                icon="devices"
-                value={devicesTotalCount}
-                keyMessage={sharedMessages.deviceCounted}
-                errored={devicesErrored}
-                toAllUrl={`/applications/${appId}/devices`}
-              />
-            )}
-            {mayViewCollaborators && (
-              <Content.EntityCount
-                icon="collaborators"
-                value={collaboratorsTotalCount}
-                keyMessage={sharedMessages.collaboratorCounted}
-                errored={collaboratorsErrored}
-                toAllUrl={`/applications/${appId}/collaborators`}
-              />
-            )}
-            {mayViewApiKeys && (
-              <Content.EntityCount
-                icon="api_keys"
-                value={apiKeysTotalCount}
-                keyMessage={sharedMessages.apiKeyCounted}
-                errored={apiKeysErrored}
-                toAllUrl={`/applications/${appId}/api-keys`}
-              />
-            )}
-          </>
-        )}
-      </Content>
+      <Content fetching={fetching} bottomBarLeft={bottomBarLeft} bottomBarRight={bottomBarRight} />
     </EntityTitleSection>
   )
 }
