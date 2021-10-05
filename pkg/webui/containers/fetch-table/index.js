@@ -110,6 +110,7 @@ class FetchTable extends Component {
     mayAdd: PropTypes.bool,
     pageSize: PropTypes.number,
     pathname: PropTypes.string.isRequired,
+    rowKeySelector: PropTypes.func,
     searchItemsAction: PropTypes.func,
     searchPlaceholderMessage: PropTypes.message,
     searchQueryMaxLength: PropTypes.number,
@@ -141,6 +142,7 @@ class FetchTable extends Component {
     totalCount: 0,
     items: [],
     headers: [],
+    rowKeySelector: undefined,
     fetchingSearch: false,
     addMessage: undefined,
     tableTitle: undefined,
@@ -303,6 +305,7 @@ class FetchTable extends Component {
       addMessage,
       tableTitle,
       headers,
+      rowKeySelector,
       tabs,
       searchable,
       handlesPagination,
@@ -393,6 +396,7 @@ class FetchTable extends Component {
             onPageChange={this.onPageChange}
             loading={fetching}
             headers={headers}
+            rowKeySelector={rowKeySelector}
             data={initialFetch ? [] : items}
             emptyMessage={sharedMessages.noMatch}
             handlesPagination={handlesPagination}
