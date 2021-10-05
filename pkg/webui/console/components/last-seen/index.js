@@ -15,6 +15,8 @@
 import React from 'react'
 import classnames from 'classnames'
 
+import Status from '@ttn-lw/components/status'
+
 import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
 
@@ -32,33 +34,44 @@ const computeDeltaInSeconds = (from, to) => {
   return Math.floor((from - to) / 1000)
 }
 
-const LastSeen = props => {
-  const { className, lastSeen, short } = props
+const LastSeen = React.forwardRef((props, ref) => {
+  const { className, lastSeen, short, updateIntervalInSeconds, children, flipped } = props
 
   return (
-    <div className={classnames(className, style.container)}>
-      {!short && <Message className={style.message} content={sharedMessages.lastSeen} />}
-      <DateTime.Relative
-        value={lastSeen}
-        computeDelta={computeDeltaInSeconds}
-        firstToLower={!short}
-      />
-    </div>
+    <Status status="good" pulseTrigger={lastSeen} flipped={flipped} ref={ref}>
+      <div className={classnames(className, style.container)}>
+        {!short && <Message className={style.message} content={sharedMessages.lastSeen} />}
+        <DateTime.Relative
+          value={lastSeen}
+          computeDelta={computeDeltaInSeconds}
+          firstToLower={!short}
+          updateIntervalInSeconds={updateIntervalInSeconds}
+          relativeTimeStyle={short ? 'short' : undefined}
+        />
+      </div>
+      {children}
+    </Status>
   )
-}
+})
 
 LastSeen.propTypes = {
+  children: PropTypes.node,
   className: PropTypes.string,
+  flipped: PropTypes.bool,
   lastSeen: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number, // Support timestamps.
     PropTypes.instanceOf(Date),
   ]).isRequired,
   short: PropTypes.bool,
+  updateIntervalInSeconds: PropTypes.number,
 }
 
 LastSeen.defaultProps = {
+  children: undefined,
   className: undefined,
+  flipped: false,
+  updateIntervalInSeconds: undefined,
   short: false,
 }
 
