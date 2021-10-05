@@ -131,6 +131,7 @@ import style from './device.styl'
     'network_server_kek_label',
     'claim_authentication_code',
     'mac_state.recent_uplinks',
+    'pending_mac_state.recent_uplinks',
     'attributes',
     'skip_payload_crypto_override',
   ]

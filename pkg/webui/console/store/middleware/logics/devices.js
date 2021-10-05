@@ -18,6 +18,8 @@ import api from '@console/api'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
+import { mayReadApplicationDeviceKeys, checkFromState } from '@console/lib/feature-checks'
+
 import * as devices from '@console/store/actions/devices'
 import * as deviceTemplateFormats from '@console/store/actions/device-template-formats'
 
@@ -53,7 +55,7 @@ const updateDeviceLogic = createRequestLogic(
 
 const getDevicesListLogic = createRequestLogic({
   type: devices.GET_DEVICES_LIST,
-  process: async ({ action }) => {
+  process: async ({ action, getState }) => {
     const {
       id: appId,
       params: { page, limit, order, query },
@@ -74,19 +76,32 @@ const getDevicesListLogic = createRequestLogic({
       : await api.devices.list(appId, { page, limit, order }, selectors)
 
     if (options.withLastSeen) {
-      const macStateFetching = data.end_devices.map(async device => {
-        const deviceResult = await api.device.get(
-          appId,
-          device.ids.device_id,
-          'mac_state.recent_uplinks',
-          [STACK_COMPONENTS_MAP.ns],
-        )
+      const mayReadKeys = checkFromState(mayReadApplicationDeviceKeys, getState())
+      const selector = ['mac_state.recent_uplinks', 'pending_mac_state.recent_uplinks']
+      if (mayReadKeys) {
+        selector.push('session.started_at', 'pending_session')
+      }
+      const activityFetching = data.end_devices.map(async device => {
+        const deviceResult = await api.device.get(appId, device.ids.device_id, selector, [
+          STACK_COMPONENTS_MAP.ns,
+        ])
+
+        // Merge activity-relevant fields into fetched device.
         if ('mac_state' in deviceResult) {
           device.mac_state = deviceResult.mac_state
+        } else if ('pending_mac_state' in deviceResult) {
+          device.pending_mac_state = deviceResult.pending_mac_state
+        }
+        if (mayReadKeys) {
+          if ('session' in deviceResult) {
+            device.session = deviceResult.session
+          } else if ('pending_session' in deviceResult) {
+            device.pending_session = deviceResult.pendingSession
+          }
         }
       })
 
-      await Promise.all(macStateFetching)
+      await Promise.all(activityFetching)
     }
 
     return { entities: data.end_devices, totalCount: data.totalCount }

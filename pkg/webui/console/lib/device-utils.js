@@ -149,19 +149,35 @@ export const getLastSeen = device => {
   if (!device) {
     return
   }
-
-  const { mac_state } = device
-  if (mac_state) {
-    const { recent_uplinks } = mac_state
+  let lastUplinkReceivedAt
+  let relevantSessionStart
+  const relevantSession = device.session || device.pending_session
+  const relevantMacState = device.mac_state || device.pending_mac_state
+  if (relevantMacState) {
+    const { recent_uplinks } = relevantMacState
     if (recent_uplinks) {
       const last_uplink = Boolean(recent_uplinks)
         ? recent_uplinks[recent_uplinks.length - 1]
         : undefined
       if (last_uplink) {
-        return last_uplink.received_at
+        lastUplinkReceivedAt = last_uplink.received_at
       }
     }
   }
+  if (relevantSession) {
+    relevantSessionStart =
+      relevantSession.started_at !== '0001-01-01T00:00:00Z' ? relevantSession.started_at : undefined
+  }
+
+  // Return the whichever timestamp is available.
+  if (!relevantSessionStart) {
+    return lastUplinkReceivedAt
+  } else if (!lastUplinkReceivedAt) {
+    return relevantSessionStart
+  }
+
+  // Return whichever timestamp is more recent.
+  return [relevantSessionStart, lastUplinkReceivedAt].sort().reverse()[0]
 }
 
 /**
