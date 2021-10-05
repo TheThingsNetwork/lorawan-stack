@@ -16,14 +16,20 @@ package packetbroker
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
 	"net"
+	"net/http"
 	"net/url"
 	"strings"
+	"sync"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/jwt"
 )
 
@@ -32,11 +38,6 @@ type Scope string
 
 const (
 	ScopeNetworks Scope = "networks"
-)
-
-const (
-	defaultTokenURL        = "https://iam.packetbroker.net/token"
-	defaultTokenPublicKeys = "https://iam.packetbroker.net/.well-known/jwks.json"
 )
 
 type tokenOptions struct {
@@ -85,7 +86,7 @@ func WithAudienceFromAddresses(addresses ...string) TokenOption {
 // TokenSource returns a new OAuth 2.0 token source using Packet Broker credentials.
 func TokenSource(ctx context.Context, clientID, clientSecret string, opts ...TokenOption) oauth2.TokenSource {
 	o := tokenOptions{
-		tokenURL: defaultTokenURL,
+		tokenURL: DefaultTokenURL,
 	}
 	for _, opt := range opts {
 		opt(&o)
@@ -109,23 +110,38 @@ func TokenSource(ctx context.Context, clientID, clientSecret string, opts ...Tok
 	return config.TokenSource(ctx)
 }
 
-var errOAuth2Token = errors.DefineUnauthenticated("oauth2_token", "invalid OAuth 2.0 token for network authentication")
+// TokenNetworkClaims defines a Packet Broker network identifier.
+type TokenNetworkClaim struct {
+	NetID    uint32 `json:"nid"`
+	TenantID string `json:"tid"`
+}
+
+// IAMTokenClaims defines the claims from Packet Broker IAM.
+type IAMTokenClaims struct {
+	Cluster  bool                `json:"c,omitempty"`
+	Networks []TokenNetworkClaim `json:"ns,omitempty"`
+	Rights   []int32             `json:"rights,omitempty"`
+}
+
+// TokenClaims defines the Packet Broker JSON Web Token (JWT) claims.
+type TokenClaims struct {
+	jwt.Claims
+	PacketBroker IAMTokenClaims `json:"https://iam.packetbroker.net/claims,omitempty"`
+}
+
+var (
+	errOAuth2Token   = errors.DefineUnauthenticated("oauth2_token", "invalid OAuth 2.0 token")
+	errNotAuthorized = errors.DefinePermissionDenied("not_authorized", "not authorized")
+)
 
 // UnverifiedNetworkIdentifier returns the Packet Broker network identifier from the given token.
 // This function does not verify the token.
-func UnverifiedNetworkIdentifier(token *oauth2.Token) (ttnpb.PacketBrokerNetworkIdentifier, error) {
-	parsed, err := jwt.ParseSigned(token.AccessToken)
+func UnverifiedNetworkIdentifier(token string) (ttnpb.PacketBrokerNetworkIdentifier, error) {
+	parsed, err := jwt.ParseSigned(token)
 	if err != nil {
 		return ttnpb.PacketBrokerNetworkIdentifier{}, errOAuth2Token.WithCause(err)
 	}
-	var claims struct {
-		PacketBroker struct {
-			Networks []struct {
-				NetID    uint32 `json:"nid"`
-				TenantID string `json:"tid"`
-			} `json:"ns"`
-		} `json:"https://iam.packetbroker.net/claims"`
-	}
+	var claims TokenClaims
 	if err := parsed.UnsafeClaimsWithoutVerification(&claims); err != nil {
 		return ttnpb.PacketBrokerNetworkIdentifier{}, errOAuth2Token.WithCause(err)
 	}
@@ -136,4 +152,102 @@ func UnverifiedNetworkIdentifier(token *oauth2.Token) (ttnpb.PacketBrokerNetwork
 		NetId:    claims.PacketBroker.Networks[0].NetID,
 		TenantId: claims.PacketBroker.Networks[0].TenantID,
 	}, nil
+}
+
+// PublicKeyProvider provides a set of public keys.
+type PublicKeyProvider interface {
+	PublicKeys(context.Context) (*jose.JSONWebKeySet, error)
+}
+
+// PublicKeyProviderFunc is a function that implements PublicKeyProvider.
+type PublicKeyProviderFunc func(context.Context) (*jose.JSONWebKeySet, error)
+
+// PublicKeys implements PublicKeyProvider.
+func (f PublicKeyProviderFunc) PublicKeys(ctx context.Context) (*jose.JSONWebKeySet, error) {
+	return f(ctx)
+}
+
+// ParseAndVerify parses and verifies the token and returns the claims.
+// See Verify for the verification process.
+func ParseAndVerify(ctx context.Context, token *oauth2.Token, keyProvider PublicKeyProvider, issuer, audience string) (TokenClaims, error) {
+	t, err := jwt.ParseSigned(token.AccessToken)
+	if err != nil {
+		return TokenClaims{}, errOAuth2Token.WithCause(err)
+	}
+	return Verify(ctx, t, keyProvider, issuer, audience)
+}
+
+// Verify verifies the token and returns the claims.
+// If issuer is non-empty, the token's issuer must match the issuer.
+// If audience is non-empty, one of the token's audiences must match the audience.
+// The current system timestamp is used as reference to verify not before, issued at and expiry.
+func Verify(ctx context.Context, token *jwt.JSONWebToken, keyProvider PublicKeyProvider, issuer, audience string) (TokenClaims, error) {
+	keys, err := keyProvider.PublicKeys(ctx)
+	if err != nil {
+		return TokenClaims{}, err
+	}
+	var claims TokenClaims
+	if err := token.Claims(keys, &claims); err != nil {
+		return TokenClaims{}, errOAuth2Token.WithCause(err)
+	}
+
+	exp := jwt.Expected{
+		Issuer: issuer,
+		Time:   time.Now(),
+	}
+	if audience != "" {
+		exp.Audience = jwt.Audience{audience}
+	}
+	if err := claims.Validate(exp); err != nil {
+		return TokenClaims{}, errNotAuthorized.WithCause(err)
+	}
+	return claims, nil
+}
+
+// CachePublicKey caches the result from the given PublicKeyProvider with the TTL.
+func CachePublicKey(provider PublicKeyProvider, ttl time.Duration) PublicKeyProvider {
+	var (
+		key *jose.JSONWebKeySet
+		err error
+		t   time.Time
+		mu  sync.Mutex
+	)
+	return PublicKeyProviderFunc(func(ctx context.Context) (*jose.JSONWebKeySet, error) {
+		mu.Lock()
+		defer mu.Unlock()
+		if key == nil && err == nil || time.Since(t) > ttl {
+			key, err = provider.PublicKeys(ctx)
+			t = time.Now()
+		}
+		return key, err
+	})
+}
+
+var errFetchToken = errors.DefineAborted("fetch_token", "fetch token")
+
+// PublicKeyFromURL loads the public keys from the given URL.
+func PublicKeyFromURL(client *http.Client, url string) PublicKeyProvider {
+	return PublicKeyProviderFunc(func(ctx context.Context) (*jose.JSONWebKeySet, error) {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+		if err != nil {
+			return nil, errFetchToken.WithCause(err)
+		}
+		res, err := client.Do(req)
+		if err != nil {
+			return nil, errFetchToken.WithCause(err)
+		}
+		defer res.Body.Close()
+		buf, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return nil, errFetchToken.WithCause(err)
+		}
+		if res.StatusCode < 200 || res.StatusCode >= 300 {
+			return nil, errFetchToken.New()
+		}
+		key := new(jose.JSONWebKeySet)
+		if err := json.Unmarshal(buf, key); err != nil {
+			return nil, errFetchToken.WithCause(err)
+		}
+		return key, nil
+	})
 }

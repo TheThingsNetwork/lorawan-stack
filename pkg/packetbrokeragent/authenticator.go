@@ -57,7 +57,7 @@ func (a *oauth2Authenticator) AuthInfo(ctx context.Context) (ttnpb.PacketBrokerN
 	if err != nil {
 		return ttnpb.PacketBrokerNetworkIdentifier{}, err
 	}
-	return packetbroker.NetworkIdentifier(token)
+	return packetbroker.UnverifiedNetworkIdentifier(token.AccessToken)
 }
 
 func (a *oauth2Authenticator) DialOptions(ctx context.Context) (res []grpc.DialOption, err error) {
