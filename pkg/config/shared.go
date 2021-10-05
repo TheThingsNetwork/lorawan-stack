@@ -414,6 +414,7 @@ func (c SenderClientCA) Fetcher(ctx context.Context) (fetch.Interface, error) {
 // InteropServer represents the server-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropServer struct {
 	ListenTLS                string            `name:"listen-tls" description:"Address for the interop server to listen on"`
+	TrustedProxies           []string          `name:"trusted-proxies" description:"CIDRs of trusted reverse proxies"`
 	SenderClientCA           SenderClientCA    `name:"sender-client-ca"`
 	SenderClientCADeprecated map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust; deprecated - use sender-client-ca instead"`
 }

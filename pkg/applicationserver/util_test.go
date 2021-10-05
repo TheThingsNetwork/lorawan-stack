@@ -291,6 +291,6 @@ func (js *mockJS) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) 
 		return nil, errNotFound.New()
 	}
 	return &ttnpb.AppSKeyResponse{
-		AppSKey: key,
+		AppSKey: &key,
 	}, nil
 }

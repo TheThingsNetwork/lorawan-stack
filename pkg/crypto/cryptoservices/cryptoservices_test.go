@@ -379,7 +379,7 @@ type mockNetworkRPCServer struct {
 
 func (s *mockNetworkRPCServer) JoinRequestMIC(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+		EndDeviceIdentifiers: *req.Ids,
 	}
 	mic, err := s.Network.JoinRequestMIC(ctx, dev, req.LorawanVersion, req.Payload)
 	if err != nil {
@@ -392,9 +392,9 @@ func (s *mockNetworkRPCServer) JoinRequestMIC(ctx context.Context, req *ttnpb.Cr
 
 func (s *mockNetworkRPCServer) JoinAcceptMIC(ctx context.Context, req *ttnpb.JoinAcceptMICRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+		EndDeviceIdentifiers: *req.PayloadRequest.Ids,
 	}
-	mic, err := s.Network.JoinAcceptMIC(ctx, dev, req.LorawanVersion, byte(req.JoinRequestType), req.DevNonce, req.Payload)
+	mic, err := s.Network.JoinAcceptMIC(ctx, dev, req.PayloadRequest.LorawanVersion, byte(req.JoinRequestType), req.DevNonce, req.PayloadRequest.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -405,7 +405,7 @@ func (s *mockNetworkRPCServer) JoinAcceptMIC(ctx context.Context, req *ttnpb.Joi
 
 func (s *mockNetworkRPCServer) EncryptJoinAccept(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+		EndDeviceIdentifiers: *req.Ids,
 	}
 	data, err := s.Network.EncryptJoinAccept(ctx, dev, req.LorawanVersion, req.Payload)
 	if err != nil {
@@ -418,7 +418,7 @@ func (s *mockNetworkRPCServer) EncryptJoinAccept(ctx context.Context, req *ttnpb
 
 func (s *mockNetworkRPCServer) EncryptRejoinAccept(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+		EndDeviceIdentifiers: *req.Ids,
 	}
 	data, err := s.Network.EncryptRejoinAccept(ctx, dev, req.LorawanVersion, req.Payload)
 	if err != nil {
@@ -431,7 +431,7 @@ func (s *mockNetworkRPCServer) EncryptRejoinAccept(ctx context.Context, req *ttn
 
 func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.DeriveSessionKeysRequest) (*ttnpb.NwkSKeysResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+		EndDeviceIdentifiers: *req.Ids,
 	}
 	nwkSKeys, err := s.Network.DeriveNwkSKeys(ctx, dev, req.LorawanVersion, req.JoinNonce, req.DevNonce, req.NetId)
 	if err != nil {
@@ -450,15 +450,15 @@ func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.De
 		return nil, err
 	}
 	return &ttnpb.NwkSKeysResponse{
-		FNwkSIntKey: *fNwkSIntKeyEnvelope,
-		SNwkSIntKey: *sNwkSIntKeyEnvelope,
-		NwkSEncKey:  *nwkSEncKeyEnvelope,
+		FNwkSIntKey: fNwkSIntKeyEnvelope,
+		SNwkSIntKey: sNwkSIntKeyEnvelope,
+		NwkSEncKey:  nwkSEncKeyEnvelope,
 	}, nil
 }
 
 func (s *mockNetworkRPCServer) GetNwkKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+		EndDeviceIdentifiers: *req.Ids,
 	}
 	nwkKey, err := s.Network.GetNwkKey(ctx, dev)
 	if err != nil {
@@ -474,7 +474,7 @@ type mockApplicationRPCServer struct {
 
 func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb.DeriveSessionKeysRequest) (*ttnpb.AppSKeyResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+		EndDeviceIdentifiers: *req.Ids,
 	}
 	appSKey, err := s.Application.DeriveAppSKey(ctx, dev, req.LorawanVersion, req.JoinNonce, req.DevNonce, req.NetId)
 	if err != nil {
@@ -485,13 +485,13 @@ func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb
 		return nil, err
 	}
 	return &ttnpb.AppSKeyResponse{
-		AppSKey: *appSKeyEnvelope,
+		AppSKey: appSKeyEnvelope,
 	}, nil
 }
 
 func (s *mockApplicationRPCServer) GetAppKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: req.EndDeviceIdentifiers,
+		EndDeviceIdentifiers: *req.Ids,
 	}
 	appKey, err := s.Application.GetAppKey(ctx, dev)
 	if err != nil {

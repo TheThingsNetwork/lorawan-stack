@@ -5678,6 +5678,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/interop:caller_not_authorized": {
+    "translations": {
+      "en": "caller is not authorized for `{target}`"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/interop:deferred": {
     "translations": {
       "en": "deferred"
@@ -5703,6 +5712,15 @@
     "description": {
       "package": "pkg/interop",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:fetch_file": {
+    "translations": {
+      "en": "fetch file `{name}`"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "config.go"
     }
   },
   "error:pkg/interop:frame_replayed": {
@@ -5786,6 +5804,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/interop:no_join_request_payload": {
+    "translations": {
+      "en": "no join-request payload"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "client.go"
+    }
+  },
   "error:pkg/interop:no_roaming_agreement": {
     "translations": {
       "en": "no roaming agreement"
@@ -5834,6 +5861,15 @@
   "error:pkg/interop:transmit_failed": {
     "translations": {
       "en": "transmit failed"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:unauthenticated": {
+    "translations": {
+      "en": "unauthenticated"
     },
     "description": {
       "package": "pkg/interop",
@@ -5891,7 +5927,7 @@
     },
     "description": {
       "package": "pkg/interop",
-      "file": "client.go"
+      "file": "types.go"
     }
   },
   "error:pkg/interop:unknown_receiver": {
@@ -5982,15 +6018,6 @@
     "description": {
       "package": "pkg/joinserver",
       "file": "grpc_application_activation_settings_registry.go"
-    }
-  },
-  "error:pkg/joinserver:caller_not_authorized": {
-    "translations": {
-      "en": "caller `{name}` is not authorized for the entity"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
     }
   },
   "error:pkg/joinserver:compute_mic": {

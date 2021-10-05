@@ -276,7 +276,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 // Provision is deprecated.
 // TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999)
 func (srv jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesRequest, stream ttnpb.JsEndDeviceRegistry_ProvisionServer) error {
-	if err := rights.RequireApplication(stream.Context(), req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+	if err := rights.RequireApplication(stream.Context(), *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return err
 	}
 	return errProvisionerNotFound.WithAttributes("id", req.ProvisionerId)

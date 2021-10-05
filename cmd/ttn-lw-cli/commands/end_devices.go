@@ -711,9 +711,9 @@ var (
 			}
 
 			req := &ttnpb.ProvisionEndDevicesRequest{
-				ApplicationIdentifiers: *appID,
-				ProvisionerId:          provisionerID,
-				ProvisioningData:       data,
+				ApplicationIds:   appID,
+				ProvisionerId:    provisionerID,
+				ProvisioningData: data,
 			}
 
 			var joinEUI types.EUI64

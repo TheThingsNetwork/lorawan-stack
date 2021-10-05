@@ -17,39 +17,21 @@ package joinserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
-	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 var (
-	ErrCallerNotAuthorized = errCallerNotAuthorized
-	ErrDevNonceTooSmall    = errDevNonceTooSmall
-	ErrNoAppSKey           = errNoAppSKey
-	ErrNoFNwkSIntKey       = errNoFNwkSIntKey
-	ErrNoNwkSEncKey        = errNoNwkSEncKey
-	ErrNoSNwkSIntKey       = errNoSNwkSIntKey
-	ErrRegistryOperation   = errRegistryOperation
-	ErrReuseDevNonce       = errReuseDevNonce
+	ErrDevNonceTooSmall  = errDevNonceTooSmall
+	ErrNoAppSKey         = errNoAppSKey
+	ErrNoFNwkSIntKey     = errNoFNwkSIntKey
+	ErrNoNwkSEncKey      = errNoNwkSEncKey
+	ErrNoSNwkSIntKey     = errNoSNwkSIntKey
+	ErrRegistryOperation = errRegistryOperation
+	ErrReuseDevNonce     = errReuseDevNonce
 )
 
-func KeyToBytes(key types.AES128Key) []byte { return key[:] }
-
-func KeyPtr(key types.AES128Key) *types.AES128Key { return &key }
-
-func MustWrapKey(key types.AES128Key, kek []byte) []byte {
-	return test.Must(crypto.WrapKey(key[:], kek)).([]byte)
-}
-
-func MustWrapAES128Key(ctx context.Context, key types.AES128Key, kekLabel string, v crypto.KeyVault) *ttnpb.KeyEnvelope {
-	return test.Must(cryptoutil.WrapAES128Key(ctx, key, kekLabel, v)).(*ttnpb.KeyEnvelope)
-}
-
-func MustWrapAES128KeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel string, kek types.AES128Key) *ttnpb.KeyEnvelope {
-	return test.Must(cryptoutil.WrapAES128KeyWithKEK(ctx, key, kekLabel, kek)).(*ttnpb.KeyEnvelope)
-}
+func stringPtr(s string) *string { return &s }
 
 type AsJsServer = asJsServer
 type NsJsServer = nsJsServer

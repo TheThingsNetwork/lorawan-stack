@@ -16,27 +16,29 @@ package joinserver
 
 import (
 	"context"
-	"net"
-	"net/url"
-	"strings"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // Authorizer checks whether the request context is authorized.
 type Authorizer interface {
-	Authorized(ctx context.Context) error
+	// RequireAuthorized returns an error if the given context is not authorized.
+	RequireAuthorized(ctx context.Context) error
 }
 
-// TrustedOriginAuthorizer authorizes the request context by the trusted address or ID that the origin presents.
-// This is typically used in TLS client authentication where the trusted address or ID are presented in the X.509 DN or SANs.
-type TrustedOriginAuthorizer interface {
+// ExternalAuthorizer authorizes the request context by the identity that the origin presents.
+type ExternalAuthorizer interface {
 	Authorizer
+	// RequireAddress returns an error if the given address is not authorized in the context.
 	RequireAddress(ctx context.Context, addr string) error
-	RequireID(ctx context.Context, id string) error
+	// RequireNetID returns an error if the given NetID is not authorized in the context.
+	RequireNetID(ctx context.Context, netID types.NetID) error
+	// RequireASID returns an error if the given AS-ID is not authorized in the context.
+	RequireASID(ctx context.Context, id string) error
 }
 
 // ApplicationAccessAuthorizer authorizes the request context for application access.
@@ -46,94 +48,29 @@ type ApplicationAccessAuthorizer interface {
 }
 
 var (
-	// X509DNAuthorizer authorizes the caller by the X.509 Distinguished Name of the presented client certificate.
-	X509DNAuthorizer Authorizer = new(x509DNAuthorizer)
+	// InteropAuthorizer authorizes the caller by proof of identity used with LoRaWAN Backend Interfaces.
+	InteropAuthorizer ExternalAuthorizer = new(interop.Authorizer)
 
 	// ClusterAuthorizes authorizes clusters.
 	ClusterAuthorizer Authorizer = new(clusterAuthorizer)
 
 	// ApplicationRightsAuthorizes authorizes the caller by application rights.
-	ApplicationRightsAuthorizer Authorizer = new(applicationRightsAuthorizer)
+	ApplicationRightsAuthorizer ApplicationAccessAuthorizer = new(applicationRightsAuthorizer)
 )
-
-type x509DNAuthorizer struct {
-}
-
-var _ TrustedOriginAuthorizer = (*x509DNAuthorizer)(nil)
-
-// Authorized implements Authorizer.
-func (a x509DNAuthorizer) Authorized(ctx context.Context) error {
-	if _, ok := auth.X509DNFromContext(ctx); !ok {
-		return errUnauthenticated.New()
-	}
-	return nil
-}
-
-// RequireAddress implements TrustedOriginAuthorizer.
-func (a x509DNAuthorizer) RequireAddress(ctx context.Context, addr string) error {
-	dn, ok := auth.X509DNFromContext(ctx)
-	if !ok {
-		return errUnauthenticated.New()
-	}
-
-	host := addr
-	if url, err := url.Parse(addr); err == nil && url.Host != "" {
-		host = url.Host
-	}
-	if h, _, err := net.SplitHostPort(addr); err == nil {
-		host = h
-	}
-
-	host = strings.TrimSuffix(host, ".")
-	pattern := strings.TrimSuffix(dn.CommonName, ".")
-	if len(pattern) == 0 || len(host) == 0 {
-		return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
-	}
-
-	patternParts := strings.Split(pattern, ".")
-	hostParts := strings.Split(host, ".")
-	if len(patternParts) != len(hostParts) {
-		return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
-	}
-	for i, patternPart := range patternParts {
-		if i == 0 && patternPart == "*" {
-			continue
-		}
-		if patternPart != hostParts[i] {
-			return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
-		}
-	}
-
-	return nil
-}
-
-// RequireID implements TrustedOriginAuthorizer.
-func (a x509DNAuthorizer) RequireID(ctx context.Context, id string) error {
-	dn, ok := auth.X509DNFromContext(ctx)
-	if !ok {
-		return errUnauthenticated.New()
-	}
-	if !strings.EqualFold(id, dn.CommonName) {
-		return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
-	}
-	return nil
-}
 
 type clusterAuthorizer struct {
 }
 
-// Authorized implements Authorizer.
-func (a clusterAuthorizer) Authorized(ctx context.Context) error {
+// RequireAuthorized implements Authorizer.
+func (a clusterAuthorizer) RequireAuthorized(ctx context.Context) error {
 	return clusterauth.Authorized(ctx)
 }
 
 type applicationRightsAuthorizer struct {
 }
 
-var _ ApplicationAccessAuthorizer = (*applicationRightsAuthorizer)(nil)
-
-// Authorized implements Authorizer.
-func (a applicationRightsAuthorizer) Authorized(ctx context.Context) error {
+// RequireAuthorized implements Authorizer.
+func (a applicationRightsAuthorizer) RequireAuthorized(ctx context.Context) error {
 	authInfo, err := rights.AuthInfo(ctx)
 	if err != nil {
 		return err

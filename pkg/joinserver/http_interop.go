@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import (
 
 type interopHandler interface {
 	HandleJoin(context.Context, *ttnpb.JoinRequest, Authorizer) (*ttnpb.JoinResponse, error)
-	GetHomeNetID(context.Context, types.EUI64, types.EUI64, Authorizer) (*types.NetID, error)
+	GetHomeNetID(context.Context, types.EUI64, types.EUI64, Authorizer) (netID *types.NetID, nsID string, err error)
 	GetAppSKey(context.Context, *ttnpb.SessionKeyRequest, Authorizer) (*ttnpb.AppSKeyResponse, error)
 }
 
@@ -72,7 +72,7 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
 
-	res, err := srv.JS.HandleJoin(ctx, req, X509DNAuthorizer)
+	res, err := srv.JS.HandleJoin(ctx, req, InteropAuthorizer)
 	if err != nil {
 		switch {
 		case errors.Resemble(err, errDecodePayload),
@@ -80,7 +80,7 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 			errors.Resemble(err, errNoDevEUI),
 			errors.Resemble(err, errNoJoinEUI):
 			return nil, interop.ErrMalformedMessage.WithCause(err)
-		case errors.Resemble(err, errCallerNotAuthorized):
+		case errors.IsPermissionDenied(err):
 			return nil, interop.ErrActivation.WithCause(err)
 		case errors.Resemble(err, errMICMismatch):
 			return nil, interop.ErrMIC.WithCause(err)
@@ -97,8 +97,13 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
 	ans := &interop.JoinAns{
-		JsNsMessageHeader: header,
-		PHYPayload:        interop.Buffer(res.RawPayload),
+		JsNsMessageHeader: interop.JsNsMessageHeader{
+			MessageHeader: header,
+			SenderID:      in.ReceiverID,
+			ReceiverID:    in.SenderID,
+			ReceiverNSID:  in.SenderNSID,
+		},
+		PHYPayload: interop.Buffer(res.RawPayload),
 		Result: interop.Result{
 			ResultCode: interop.ResultSuccess,
 		},
@@ -119,26 +124,40 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSReq) (*interop.HomeNSAns, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
 
-	netID, err := srv.JS.GetHomeNetID(ctx, types.EUI64(in.ReceiverID), types.EUI64(in.DevEUI), X509DNAuthorizer)
+	netID, nsID, err := srv.JS.GetHomeNetID(ctx, types.EUI64(in.ReceiverID), types.EUI64(in.DevEUI), InteropAuthorizer)
 	if err != nil {
+		switch {
+		case errors.Resemble(err, errRegistryOperation):
+			if errors.IsNotFound(errors.Cause(err)) {
+				return nil, interop.ErrUnknownDevEUI.WithCause(err)
+			}
+		}
 		return nil, err
 	}
 	if netID == nil {
-		return nil, interop.ErrActivation
+		return nil, interop.ErrActivation.New()
 	}
 
 	header, err := in.AnswerHeader()
 	if err != nil {
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
-	return &interop.HomeNSAns{
-		JsNsMessageHeader: header,
+	ans := &interop.HomeNSAns{
+		JsNsMessageHeader: interop.JsNsMessageHeader{
+			MessageHeader: header,
+			SenderID:      in.ReceiverID,
+			ReceiverID:    in.SenderID,
+			ReceiverNSID:  in.SenderNSID,
+		},
 		Result: interop.Result{
 			ResultCode: interop.ResultSuccess,
 		},
-		HNSID:  interop.NetID(*netID),
 		HNetID: interop.NetID(*netID),
-	}, nil
+	}
+	if nsID != "" && in.ProtocolVersion.SupportsNSID() {
+		ans.HNSID = &nsID
+	}
+	return ans, nil
 }
 
 func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKeyReq) (*interop.AppSKeyAns, error) {
@@ -157,10 +176,10 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKey
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
 
-	res, err := srv.JS.GetAppSKey(ctx, req, X509DNAuthorizer)
+	res, err := srv.JS.GetAppSKey(ctx, req, InteropAuthorizer)
 	if err != nil {
 		switch {
-		case errors.Resemble(err, errCallerNotAuthorized):
+		case errors.IsPermissionDenied(err):
 			return nil, interop.ErrActivation.WithCause(err)
 		case errors.Resemble(err, errRegistryOperation):
 			if errors.IsNotFound(errors.Cause(err)) {
@@ -175,12 +194,16 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKey
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
 	return &interop.AppSKeyAns{
-		JsAsMessageHeader: header,
+		JsAsMessageHeader: interop.JsAsMessageHeader{
+			MessageHeader: header,
+			SenderID:      in.ReceiverID,
+			ReceiverID:    in.SenderID,
+		},
 		Result: interop.Result{
 			ResultCode: interop.ResultSuccess,
 		},
 		DevEUI:       in.DevEUI,
-		AppSKey:      interop.KeyEnvelope(res.AppSKey),
+		AppSKey:      interop.KeyEnvelope(*res.AppSKey),
 		SessionKeyID: in.SessionKeyID,
 	}, nil
 }

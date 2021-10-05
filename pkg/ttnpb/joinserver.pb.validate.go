@@ -146,7 +146,14 @@ func (m *NwkSKeysResponse) ValidateFields(paths ...string) error {
 		switch name {
 		case "f_nwk_s_int_key":
 
-			if v, ok := interface{}(&m.FNwkSIntKey).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetFNwkSIntKey() == nil {
+				return NwkSKeysResponseValidationError{
+					field:  "f_nwk_s_int_key",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetFNwkSIntKey()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return NwkSKeysResponseValidationError{
 						field:  "f_nwk_s_int_key",
@@ -158,7 +165,14 @@ func (m *NwkSKeysResponse) ValidateFields(paths ...string) error {
 
 		case "s_nwk_s_int_key":
 
-			if v, ok := interface{}(&m.SNwkSIntKey).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetSNwkSIntKey() == nil {
+				return NwkSKeysResponseValidationError{
+					field:  "s_nwk_s_int_key",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetSNwkSIntKey()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return NwkSKeysResponseValidationError{
 						field:  "s_nwk_s_int_key",
@@ -170,7 +184,14 @@ func (m *NwkSKeysResponse) ValidateFields(paths ...string) error {
 
 		case "nwk_s_enc_key":
 
-			if v, ok := interface{}(&m.NwkSEncKey).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetNwkSEncKey() == nil {
+				return NwkSKeysResponseValidationError{
+					field:  "nwk_s_enc_key",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetNwkSEncKey()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return NwkSKeysResponseValidationError{
 						field:  "nwk_s_enc_key",
@@ -261,7 +282,14 @@ func (m *AppSKeyResponse) ValidateFields(paths ...string) error {
 		switch name {
 		case "app_s_key":
 
-			if v, ok := interface{}(&m.AppSKey).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetAppSKey() == nil {
+				return AppSKeyResponseValidationError{
+					field:  "app_s_key",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetAppSKey()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return AppSKeyResponseValidationError{
 						field:  "app_s_key",
@@ -352,7 +380,14 @@ func (m *CryptoServicePayloadRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return CryptoServicePayloadRequestValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CryptoServicePayloadRequestValidationError{
 						field:  "ids",
@@ -578,7 +613,14 @@ func (m *JoinAcceptMICRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "payload_request":
 
-			if v, ok := interface{}(&m.CryptoServicePayloadRequest).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetPayloadRequest() == nil {
+				return JoinAcceptMICRequestValidationError{
+					field:  "payload_request",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetPayloadRequest()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return JoinAcceptMICRequestValidationError{
 						field:  "payload_request",
@@ -682,7 +724,14 @@ func (m *DeriveSessionKeysRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return DeriveSessionKeysRequestValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return DeriveSessionKeysRequestValidationError{
 						field:  "ids",
@@ -821,7 +870,14 @@ func (m *GetRootKeysRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return GetRootKeysRequestValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetRootKeysRequestValidationError{
 						field:  "ids",
@@ -944,7 +1000,14 @@ func (m *ProvisionEndDevicesRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApplicationIds() == nil {
+				return ProvisionEndDevicesRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ProvisionEndDevicesRequestValidationError{
 						field:  "application_ids",
@@ -1231,7 +1294,14 @@ func (m *GetApplicationActivationSettingsRequest) ValidateFields(paths ...string
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApplicationIds() == nil {
+				return GetApplicationActivationSettingsRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationActivationSettingsRequestValidationError{
 						field:  "application_ids",
@@ -1337,7 +1407,14 @@ func (m *SetApplicationActivationSettingsRequest) ValidateFields(paths ...string
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApplicationIds() == nil {
+				return SetApplicationActivationSettingsRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationActivationSettingsRequestValidationError{
 						field:  "application_ids",
@@ -1349,7 +1426,14 @@ func (m *SetApplicationActivationSettingsRequest) ValidateFields(paths ...string
 
 		case "settings":
 
-			if v, ok := interface{}(&m.ApplicationActivationSettings).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetSettings() == nil {
+				return SetApplicationActivationSettingsRequestValidationError{
+					field:  "settings",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetSettings()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationActivationSettingsRequestValidationError{
 						field:  "settings",
@@ -1455,7 +1539,14 @@ func (m *DeleteApplicationActivationSettingsRequest) ValidateFields(paths ...str
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApplicationIds() == nil {
+				return DeleteApplicationActivationSettingsRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return DeleteApplicationActivationSettingsRequestValidationError{
 						field:  "application_ids",

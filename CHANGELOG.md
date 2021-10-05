@@ -12,8 +12,11 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Support for enhanced security policies of Packet Broker services.
+- Backend Interfaces middleware to extract proxy headers from trusted proxies. This adds a configuration `interop.trusted-proxies` that is similar to the existing `http.trusted-proxies` option.
 
 ### Changed
+
+- The NSID field of LoRaWAN Backend Interfaces 1.1 is now interpreted as Network Server address. Clients authenticating with `SenderNSID` must be authenticated as a Network Server with that address (see Security below).
 
 ### Deprecated
 
@@ -21,7 +24,11 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- LoRaWAN Backend Interfaces 1.1 fields that were used in 1.0 (most notably `SenderNSID` and `ReceiverNSID`). Usage of `NSID` is now only supported with LoRaWAN Backend Interfaces 1.1 as specified.
+
 ### Security
+
+- Network Servers using LoRaWAN Backend Interfaces to interact with the Join Server can now provide a single Network Server address in the X.509 Common Name of the TLS client certificate (the old behavior) or multiple Network Server addresses in the X.509 DNS Subject Alternative Names (SANs). DNS names have precedence over an address in the Common Name.
 
 ## [3.15.1] - 2021-10-01
 

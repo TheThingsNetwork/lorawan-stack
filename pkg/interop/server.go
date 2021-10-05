@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,27 +17,19 @@ package interop
 import (
 	"context"
 	"crypto/x509"
-	"encoding/pem"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
-	echo "github.com/labstack/echo/v4"
-	echomiddleware "github.com/labstack/echo/v4/middleware"
-	"go.thethings.network/lorawan-stack/v3/pkg/auth"
+	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
-	"go.thethings.network/lorawan-stack/v3/pkg/web"
-	"go.thethings.network/lorawan-stack/v3/pkg/web/middleware"
-	yaml "gopkg.in/yaml.v2"
-)
-
-const (
-	headerKey  = "header"
-	messageKey = "message"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 )
 
 // Registerer allows components to register their interop services to the web server.
@@ -52,49 +44,30 @@ type JoinServer interface {
 	HomeNSRequest(context.Context, *HomeNSReq) (*HomeNSAns, error)
 }
 
-// HomeNetworkServer represents a Home Network Server.
-type HomeNetworkServer interface {
-}
-
-// ServingNetworkServer represents a Serving Network Server.
-type ServingNetworkServer interface {
-}
-
-// ForwardingNetworkServer represents a Forwarding Network Server.
-type ForwardingNetworkServer interface {
-}
-
-// ApplicationServer represents an Application Server.
-type ApplicationServer interface {
-}
-
 type noopServer struct{}
 
 func (noopServer) JoinRequest(context.Context, *JoinReq) (*JoinAns, error) {
-	return nil, errNotRegistered.New()
+	return nil, ErrMalformedMessage.New()
 }
 
 func (noopServer) AppSKeyRequest(context.Context, *AppSKeyReq) (*AppSKeyAns, error) {
-	return nil, errNotRegistered.New()
+	return nil, ErrMalformedMessage.New()
 }
 
 func (noopServer) HomeNSRequest(context.Context, *HomeNSReq) (*HomeNSAns, error) {
-	return nil, errNotRegistered.New()
+	return nil, ErrMalformedMessage.New()
 }
 
 // Server is the server.
 type Server struct {
-	SenderClientCAs map[string][]*x509.Certificate
+	config config.InteropServer
 
-	rootGroup *echo.Group
-	server    *echo.Echo
-	config    config.InteropServer
+	router *mux.Router
 
-	js  JoinServer
-	hNS HomeNetworkServer
-	sNS ServingNetworkServer
-	fNS ForwardingNetworkServer
-	as  ApplicationServer
+	senderClientCAs    map[string][]*x509.Certificate
+	senderClientCAPool *x509.CertPool
+
+	js JoinServer
 }
 
 // Components represents the Component to the Interop Server.
@@ -103,141 +76,54 @@ type Component interface {
 	RateLimiter() ratelimit.Interface
 }
 
-// SenderClientCAsConfigurationName represents the filename of sender client CAs configuration.
-const SenderClientCAsConfigurationName = "config.yml"
-
 // NewServer builds a new server.
-func NewServer(c Component, contextFiller fillcontext.Filler, conf config.InteropServer) (*Server, error) {
+func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.InteropServer) (*Server, error) {
 	logger := log.FromContext(c.Context()).WithField("namespace", "interop")
 
-	decodeCerts := func(b []byte) (res []*x509.Certificate, err error) {
-		for len(b) > 0 {
-			var block *pem.Block
-			block, b = pem.Decode(b)
-			if block == nil {
-				break
-			}
-			if block.Type != "CERTIFICATE" || len(block.Headers) != 0 {
-				continue
-			}
-			cert, err := x509.ParseCertificate(block.Bytes)
-			if err != nil {
-				return nil, err
-			}
-			res = append(res, cert)
+	senderClientCAs, err := fetchSenderClientCAs(c.Context(), conf)
+	if err != nil {
+		return nil, err
+	}
+	senderClientCAPool := x509.NewCertPool()
+	for _, certs := range senderClientCAs {
+		for _, cert := range certs {
+			senderClientCAPool.AddCert(cert)
 		}
-		return res, nil
 	}
 
-	var senderClientCAs map[string][]*x509.Certificate
-	if len(conf.SenderClientCADeprecated) > 0 {
-		senderClientCAs = make(map[string][]*x509.Certificate, len(conf.SenderClientCA.Static))
-		for id, filename := range conf.SenderClientCADeprecated {
-			b, err := ioutil.ReadFile(filename)
-			if err != nil {
-				return nil, err
-			}
-			certs, err := decodeCerts(b)
-			if err != nil {
-				return nil, err
-			}
-			if len(certs) > 0 {
-				senderClientCAs[id] = certs
-			}
-		}
-	} else if len(conf.SenderClientCA.Static) > 0 {
-		senderClientCAs = make(map[string][]*x509.Certificate, len(conf.SenderClientCA.Static))
-		for id, b := range conf.SenderClientCA.Static {
-			certs, err := decodeCerts(b)
-			if err != nil {
-				return nil, err
-			}
-			if len(certs) > 0 {
-				senderClientCAs[id] = certs
-			}
-		}
-	} else {
-		fetcher, err := conf.SenderClientCA.Fetcher(c.Context())
-		if err != nil {
-			return nil, err
-		}
-		if fetcher != nil {
-			confFileBytes, err := fetcher.File(SenderClientCAsConfigurationName)
-			if err != nil {
-				return nil, err
-			}
-
-			var yamlConf map[string]string
-			if err := yaml.UnmarshalStrict(confFileBytes, &yamlConf); err != nil {
-				return nil, err
-			}
-
-			senderClientCAs = make(map[string][]*x509.Certificate, len(yamlConf))
-			for senderID, filename := range yamlConf {
-				b, err := fetcher.File(filename)
-				if err != nil {
-					return nil, err
-				}
-				certs, err := decodeCerts(b)
-				if err != nil {
-					return nil, err
-				}
-				if len(certs) > 0 {
-					senderClientCAs[senderID] = certs
-				}
-			}
-		}
-	}
-	getSenderClientCAs := func(senderID string) []*x509.Certificate {
-		// TODO: Lookup client CAs by sender ID (https://github.com/TheThingsNetwork/lorawan-stack/issues/718)
-		return senderClientCAs[senderID]
-	}
-
-	server := echo.New()
-
-	server.Logger = web.NewNoopLogger()
-	server.HTTPErrorHandler = ErrorHandler
-
-	server.Use(
-		middleware.ID(""),
-		echomiddleware.BodyLimit("16M"),
-		ratelimit.EchoMiddleware(c.RateLimiter(), "http:interop"),
-		middleware.Recover(),
-	)
-	if contextFiller != nil {
-		server.Use(middleware.FillContext(contextFiller))
-	}
-
-	noop := &noopServer{}
 	s := &Server{
-		SenderClientCAs: senderClientCAs,
-		rootGroup: server.Group(
-			"",
-			middleware.Log(logger),
-			middleware.Normalize(middleware.RedirectPermanent),
-			parseMessage(),
-			verifySenderID(getSenderClientCAs),
-		),
-		config: conf,
-		server: server,
-		js:     noop,
-		hNS:    noop,
-		sNS:    noop,
-		fNS:    noop,
-		as:     noop,
+		senderClientCAs:    senderClientCAs,
+		senderClientCAPool: senderClientCAPool,
+		config:             conf,
+		js:                 &noopServer{},
 	}
 
-	// In 1.0, NS, JS and AS receive messages on the root path.
-	// In 1.1, only JS and AS receive messages on the root path. Since NS can play various roles (hNS, sNS and fNS), their
-	// group is created on registration of the handler.
-	s.rootGroup.POST("/", s.handleRequest)
+	var proxyConfiguration webmiddleware.ProxyConfiguration
+	proxyConfiguration.ParseAndAddTrusted(conf.TrustedProxies...)
+	s.router = mux.NewRouter()
+	s.router.NotFoundHandler = http.HandlerFunc(webhandlers.NotFound)
+	s.router.Use(
+		mux.MiddlewareFunc(webmiddleware.Recover()),
+		mux.MiddlewareFunc(webmiddleware.FillContext(contextFillers...)),
+		mux.MiddlewareFunc(webmiddleware.RequestURL()),
+		mux.MiddlewareFunc(webmiddleware.RequestID()),
+		mux.MiddlewareFunc(webmiddleware.ProxyHeaders(proxyConfiguration)),
+		mux.MiddlewareFunc(webmiddleware.MaxBody(1<<15)), // 32 kB.
+		mux.MiddlewareFunc(webmiddleware.Log(logger, nil)),
+		mux.MiddlewareFunc(ratelimit.HTTPMiddleware(c.RateLimiter(), "http:interop")),
+	)
+	s.router.
+		NewRoute().
+		Handler(s.handle()).
+		Headers("Content-Type", "application/json").
+		Methods(http.MethodPost)
 
 	return s, nil
 }
 
-// ServeHTTP implements http.Handler.
+// ServeHTTP serves the HTTP request.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.server.ServeHTTP(w, r)
+	s.router.ServeHTTP(w, r)
 }
 
 // RegisterJS registers the Join Server for AS-JS, hNS-JS and vNS-JS messages.
@@ -245,55 +131,106 @@ func (s *Server) RegisterJS(js JoinServer) {
 	s.js = js
 }
 
-// RegisterHNS registers the Home Network Server for AS-hNS, JS-hNS and sNS-hNS messages.
-func (s *Server) RegisterHNS(hNS HomeNetworkServer) {
-	s.hNS = hNS
-	s.rootGroup.POST("/hns", s.handleNsRequest)
+// ClientCAPool returns a certificate pool of all configured client CAs.
+func (s *Server) ClientCAPool() *x509.CertPool {
+	return s.senderClientCAPool
 }
 
-// RegisterSNS registers the Serving Network Server for hNS-sNS, fNS-sNS and JS-vNS messages.
-func (s *Server) RegisterSNS(sNS ServingNetworkServer) {
-	s.sNS = sNS
-	s.rootGroup.POST("/sns", s.handleNsRequest)
+// SenderClientCAs returns the client certificate authorities that are trusted for the given SenderID.
+// The SenderID is typically a NetID, but an AS-ID or JoinEUI can also be used to trust Application Servers and Join Servers respectively.
+func (s *Server) SenderClientCAs(ctx context.Context, senderID string) ([]*x509.Certificate, error) {
+	// TODO: Lookup partner CA by SenderID with DNS (https://github.com/TheThingsNetwork/lorawan-stack/issues/718).
+	return s.senderClientCAs[senderID], nil
 }
 
-// RegisterFNS registers the Forwarding Network Server for sNS-fNS and JS-vNS messages.
-func (s *Server) RegisterFNS(fNS ForwardingNetworkServer) {
-	s.fNS = fNS
-	s.rootGroup.POST("/fns", s.handleNsRequest)
-}
-
-// RegisterAS registers the Application Server for JS-AS messages.
-func (s *Server) RegisterAS(as ApplicationServer) {
-	s.as = as
-}
-
-func (s *Server) handleRequest(c echo.Context) error {
-	cid := fmt.Sprintf("interop:%s:%s", c.Request().URL.Path, c.Request().Header.Get(echo.HeaderXRequestID))
-	ctx := events.ContextWithCorrelationID(c.Request().Context(), cid)
-	if state := c.Request().TLS; state != nil {
-		ctx = auth.NewContextWithX509DN(ctx, state.PeerCertificates[0].Subject)
+func (s *Server) handle() http.Handler {
+	senderAuthenticators := map[MessageType]senderAuthenticator{
+		MessageTypeJoinReq:    senderAuthenticatorFunc(s.authenticateNS),
+		MessageTypeRejoinReq:  senderAuthenticatorFunc(s.authenticateNS),
+		MessageTypeAppSKeyReq: senderAuthenticatorFunc(s.authenticateAS),
+		MessageTypeHomeNSReq:  senderAuthenticatorFunc(s.authenticateNS),
 	}
 
-	var ans interface{}
-	var err error
-	switch req := c.Get(messageKey).(type) {
-	case *JoinReq:
-		ans, err = s.js.JoinRequest(ctx, req)
-	case *HomeNSReq:
-		ans, err = s.js.HomeNSRequest(ctx, req)
-	case *AppSKeyReq:
-		ans, err = s.js.AppSKeyRequest(ctx, req)
-	default:
-		return ErrMalformedMessage.New()
-	}
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, ans)
-}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cid := fmt.Sprintf("interop:%s", r.Header.Get("X-Request-ID"))
+		ctx := events.ContextWithCorrelationID(r.Context(), cid)
+		logger := log.FromContext(ctx)
 
-func (s *Server) handleNsRequest(c echo.Context) error {
-	// TODO: Implement LoRaWAN roaming (https://github.com/TheThingsNetwork/lorawan-stack/issues/230)
-	return echo.NewHTTPError(http.StatusNotFound)
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			logger.WithError(err).Debug("Failed to read body")
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		var header MessageHeader
+		if err := json.Unmarshal(data, &header); err != nil {
+			logger.WithError(err).Debug("Failed to unmarshal body")
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		logger = logger.WithFields(log.Fields(
+			"message_type", header.MessageType,
+			"protocol_version", header.ProtocolVersion,
+			"sender_id", header.SenderID,
+			"receiver_id", header.ReceiverID,
+		))
+		ctx = log.NewContext(ctx, logger)
+
+		if err := header.MessageType.Validate(header.ProtocolVersion); err != nil {
+			logger.WithError(err).Debug("Invalid protocol version or message type")
+			writeError(w, r, header, err)
+			return
+		}
+
+		senderAuthenticator, ok := senderAuthenticators[header.MessageType]
+		if !ok {
+			writeError(w, r, header, ErrMalformedMessage.New())
+			return
+		}
+		ctx, err = senderAuthenticator.Authenticate(ctx, r, data)
+		if err != nil {
+			writeError(w, r, header, ErrUnknownSender.WithCause(err))
+			return
+		}
+
+		var msg interface{}
+		switch header.MessageType {
+		case MessageTypeJoinReq, MessageTypeRejoinReq:
+			msg = &JoinReq{}
+		case MessageTypeAppSKeyReq:
+			msg = &AppSKeyReq{}
+		case MessageTypeHomeNSReq:
+			msg = &HomeNSReq{}
+		default:
+			writeError(w, r, header, ErrMalformedMessage.New())
+			return
+		}
+
+		if err := json.Unmarshal(data, msg); err != nil {
+			writeError(w, r, header, ErrMalformedMessage.WithCause(err))
+			return
+		}
+
+		var ans interface{}
+		switch req := msg.(type) {
+		case *JoinReq:
+			ans, err = s.js.JoinRequest(ctx, req)
+		case *HomeNSReq:
+			ans, err = s.js.HomeNSRequest(ctx, req)
+		case *AppSKeyReq:
+			ans, err = s.js.AppSKeyRequest(ctx, req)
+		default:
+			writeError(w, r, header, ErrMalformedMessage.New())
+			return
+		}
+		if err != nil {
+			logger.WithError(err).Warn("Failed to handle request")
+			writeError(w, r, header, err)
+			return
+		}
+
+		json.NewEncoder(w).Encode(ans)
+	})
 }

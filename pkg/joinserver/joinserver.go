@@ -198,7 +198,7 @@ var (
 
 // HandleJoin handles the given join-request.
 func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, authorizer Authorizer) (res *ttnpb.JoinResponse, err error) {
-	if err := authorizer.Authorized(ctx); err != nil {
+	if err := authorizer.RequireAuthorized(ctx); err != nil {
 		return nil, err
 	}
 
@@ -290,7 +290,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				}
 			}(dev.ApplicationIdentifiers)
 
-			if trustedOriginAuth, ok := authorizer.(TrustedOriginAuthorizer); ok {
+			if externalAuth, ok := authorizer.(ExternalAuthorizer); ok {
 				netID := dev.NetId
 				if netID == nil {
 					appSettings, err := getAppSettings()
@@ -306,8 +306,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				if !req.NetId.Equal(*netID) {
 					return nil, nil, errNetIDMismatch.WithAttributes("net_id", req.NetId)
 				}
+				if err := externalAuth.RequireNetID(ctx, *netID); err != nil {
+					return nil, nil, err
+				}
 				if dev.NetworkServerAddress != "" {
-					if err := trustedOriginAuth.RequireAddress(ctx, dev.NetworkServerAddress); err != nil {
+					if err := externalAuth.RequireAddress(ctx, dev.NetworkServerAddress); err != nil {
 						return nil, nil, err
 					}
 				}
@@ -573,11 +576,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 
 // GetNwkSKeys returns the requested network session keys.
 func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest, authorizer Authorizer) (*ttnpb.NwkSKeysResponse, error) {
-	if err := authorizer.Authorized(ctx); err != nil {
+	if err := authorizer.RequireAuthorized(ctx); err != nil {
 		return nil, err
 	}
 
-	if trustedOriginAuth, ok := authorizer.(TrustedOriginAuthorizer); ok {
+	if externalAuth, ok := authorizer.(ExternalAuthorizer); ok {
 		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, req.DevEui,
 			[]string{
 				"network_server_address",
@@ -586,8 +589,27 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
+		netID := dev.NetId
+		if netID == nil {
+			appSettings, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
+				"home_net_id",
+				"kek_label",
+				"kek",
+			})
+			if err == nil {
+				netID = appSettings.HomeNetId
+			} else if !errors.IsNotFound(err) {
+				return nil, errLookupNetID.WithCause(err)
+			}
+		}
+		if netID == nil {
+			return nil, errNoNetID.New()
+		}
+		if err := externalAuth.RequireNetID(ctx, *netID); err != nil {
+			return nil, err
+		}
 		if dev.NetworkServerAddress != "" {
-			if err := trustedOriginAuth.RequireAddress(ctx, dev.NetworkServerAddress); err != nil {
+			if err := externalAuth.RequireAddress(ctx, dev.NetworkServerAddress); err != nil {
 				return nil, err
 			}
 		}
@@ -615,19 +637,19 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 	}
 
 	return &ttnpb.NwkSKeysResponse{
-		NwkSEncKey:  *ks.NwkSEncKey,
-		FNwkSIntKey: *ks.FNwkSIntKey,
-		SNwkSIntKey: *ks.SNwkSIntKey,
+		NwkSEncKey:  ks.NwkSEncKey,
+		FNwkSIntKey: ks.FNwkSIntKey,
+		SNwkSIntKey: ks.SNwkSIntKey,
 	}, nil
 }
 
 // GetAppSKey returns the requested application session key.
 func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest, authorizer Authorizer) (*ttnpb.AppSKeyResponse, error) {
-	if err := authorizer.Authorized(ctx); err != nil {
+	if err := authorizer.RequireAuthorized(ctx); err != nil {
 		return nil, err
 	}
 
-	if trustedOriginAuth, ok := authorizer.(TrustedOriginAuthorizer); ok {
+	if externalAuth, ok := authorizer.(ExternalAuthorizer); ok {
 		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, req.DevEui,
 			[]string{
 				"application_server_address",
@@ -638,11 +660,11 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 			return nil, errRegistryOperation.WithCause(err)
 		}
 		if dev.ApplicationServerId != "" {
-			if err := trustedOriginAuth.RequireID(ctx, dev.ApplicationServerId); err != nil {
+			if err := externalAuth.RequireASID(ctx, dev.ApplicationServerId); err != nil {
 				return nil, err
 			}
 		} else if dev.ApplicationServerAddress != "" {
-			if err := trustedOriginAuth.RequireAddress(ctx, dev.ApplicationServerAddress); err != nil {
+			if err := externalAuth.RequireAddress(ctx, dev.ApplicationServerAddress); err != nil {
 				return nil, err
 			}
 		} else {
@@ -658,7 +680,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 			if sets.ApplicationServerId == "" {
 				return nil, errNoApplicationServerID.New()
 			}
-			if err := trustedOriginAuth.RequireID(ctx, sets.ApplicationServerId); err != nil {
+			if err := externalAuth.RequireASID(ctx, sets.ApplicationServerId); err != nil {
 				return nil, err
 			}
 		}
@@ -685,35 +707,36 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		return nil, errNoAppSKey.New()
 	}
 	return &ttnpb.AppSKeyResponse{
-		AppSKey: *ks.AppSKey,
+		AppSKey: ks.AppSKey,
 	}, nil
 }
 
 // GetHomeNetID returns the requested NetID.
-func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (*types.NetID, error) {
-	if err := authorizer.Authorized(ctx); err != nil {
-		return nil, err
+func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (netID *types.NetID, nsID string, err error) {
+	if err := authorizer.RequireAuthorized(ctx); err != nil {
+		return nil, "", err
 	}
 
 	dev, err := js.devices.GetByEUI(ctx, joinEUI, devEUI,
 		[]string{
 			"net_id",
+			"network_server_address",
 		},
 	)
 	if err != nil {
-		return nil, errRegistryOperation.WithCause(err)
+		return nil, "", errRegistryOperation.WithCause(err)
 	}
 	if dev.NetId != nil {
-		return dev.NetId, nil
+		return dev.NetId, dev.NetworkServerAddress, nil
 	}
 	sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
 		"home_net_id",
 	})
 	if err != nil {
 		if !errors.IsNotFound(err) {
-			return nil, errGetApplicationActivationSettings.WithCause(err)
+			return nil, "", errGetApplicationActivationSettings.WithCause(err)
 		}
-		return nil, nil
+		return nil, "", nil
 	}
-	return sets.HomeNetId, nil
+	return sets.HomeNetId, dev.NetworkServerAddress, nil
 }

@@ -19,11 +19,11 @@ func (x *CryptoServicePayloadRequest) MarshalProtoJSON(s *jsonplugin.MarshalStat
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
 		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.EndDeviceIdentifiers)
+		gogo.MarshalMessage(s, x.Ids)
 	}
 	if x.LorawanVersion != 0 || s.HasField("lorawan_version") {
 		s.WriteMoreIf(&wroteField)
@@ -66,7 +66,7 @@ func (x *CryptoServicePayloadRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarshal
 			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v EndDeviceIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceIdentifiers = v
+			x.Ids = &v
 		case "lorawan_version", "lorawanVersion":
 			s.AddField("lorawan_version")
 			x.LorawanVersion.UnmarshalProtoJSON(s)
@@ -95,10 +95,10 @@ func (x *JoinAcceptMICRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.PayloadRequest != nil || s.HasField("payload_request") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("payload_request")
-		x.CryptoServicePayloadRequest.MarshalProtoJSON(s.WithField("payload_request"))
+		x.PayloadRequest.MarshalProtoJSON(s.WithField("payload_request"))
 	}
 	if x.JoinRequestType != 0 || s.HasField("join_request_type") {
 		s.WriteMoreIf(&wroteField)
@@ -124,7 +124,8 @@ func (x *JoinAcceptMICRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			s.ReadAny() // ignore unknown field
 		case "payload_request", "payloadRequest":
 			if !s.ReadNil() {
-				x.CryptoServicePayloadRequest.UnmarshalProtoJSON(s.WithField("payload_request", true))
+				x.PayloadRequest = &CryptoServicePayloadRequest{}
+				x.PayloadRequest.UnmarshalProtoJSON(s.WithField("payload_request", true))
 			}
 		case "join_request_type", "joinRequestType":
 			s.AddField("join_request_type")
@@ -144,11 +145,11 @@ func (x *DeriveSessionKeysRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) 
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
 		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.EndDeviceIdentifiers)
+		gogo.MarshalMessage(s, x.Ids)
 	}
 	if x.LorawanVersion != 0 || s.HasField("lorawan_version") {
 		s.WriteMoreIf(&wroteField)
@@ -201,7 +202,7 @@ func (x *DeriveSessionKeysRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSta
 			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v EndDeviceIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceIdentifiers = v
+			x.Ids = &v
 		case "lorawan_version", "lorawanVersion":
 			s.AddField("lorawan_version")
 			x.LorawanVersion.UnmarshalProtoJSON(s)

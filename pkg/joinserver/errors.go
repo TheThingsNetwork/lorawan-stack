@@ -17,7 +17,6 @@ package joinserver
 import "go.thethings.network/lorawan-stack/v3/pkg/errors"
 
 var (
-	errCallerNotAuthorized            = errors.DefinePermissionDenied("caller_not_authorized", "caller `{name}` is not authorized for the entity")
 	errComputeMIC                     = errors.DefineInvalidArgument("compute_mic", "failed to compute MIC")
 	errDecodePayload                  = errors.DefineInvalidArgument("decode_payload", "failed to decode payload")
 	errDeriveAppSKey                  = errors.Define("derive_app_s_key", "failed to derive application session key")

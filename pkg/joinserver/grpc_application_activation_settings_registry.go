@@ -33,10 +33,10 @@ var errApplicationActivationSettingsNotFound = errors.DefineNotFound("applicatio
 
 // Get implements ttnpb.ApplicationActivationSettingsRegistryServer.
 func (srv applicationActivationSettingsRegistryServer) Get(ctx context.Context, req *ttnpb.GetApplicationActivationSettingsRequest) (*ttnpb.ApplicationActivationSettings, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 		return nil, err
 	}
-	sets, err := srv.JS.applicationActivationSettings.GetByID(ctx, req.ApplicationIdentifiers, req.FieldMask.GetPaths())
+	sets, err := srv.JS.applicationActivationSettings.GetByID(ctx, *req.ApplicationIds, req.FieldMask.GetPaths())
 	if errors.IsNotFound(err) {
 		return nil, errApplicationActivationSettingsNotFound.WithCause(err)
 	}
@@ -62,7 +62,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 		return nil, errInvalidFieldMask.WithCause(errNoPaths)
 	}
 
-	reqKEK := req.ApplicationActivationSettings.Kek
+	reqKEK := req.Settings.Kek
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "kek.key") && reqKEK != nil {
 		if reqKEK.Key.IsZero() {
 			return nil, errInvalidFieldValue.WithAttributes("field", "kek.key")
@@ -70,12 +70,12 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 		if err := ttnpb.RequireFields(req.FieldMask.GetPaths(), "kek_label"); err != nil {
 			return nil, errInvalidFieldMask.WithCause(err)
 		}
-		if req.KekLabel == "" {
+		if req.Settings.KekLabel == "" {
 			return nil, errNoKEKLabel.New()
 		}
 	}
 
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -85,15 +85,15 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 		if err != nil {
 			return nil, errWrapKey.WithCause(err)
 		}
-		req.ApplicationActivationSettings.Kek = kek
+		req.Settings.Kek = kek
 		sets = append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...)
 		sets = ttnpb.AddFields(sets,
 			"kek.encrypted_key",
 			"kek.kek_label",
 		)
 	}
-	v, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, req.FieldMask.GetPaths(), func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
-		return &req.ApplicationActivationSettings, sets, nil
+	v, err := srv.JS.applicationActivationSettings.SetByID(ctx, *req.ApplicationIds, req.FieldMask.GetPaths(), func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+		return req.Settings, sets, nil
 	})
 	if err != nil {
 		return nil, err
@@ -104,10 +104,10 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 
 // Delete implements ttnpb.ApplicationActivationSettingsRegistryServer.
 func (srv applicationActivationSettingsRegistryServer) Delete(ctx context.Context, req *ttnpb.DeleteApplicationActivationSettingsRequest) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return nil, err
 	}
-	_, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIdentifiers, nil, func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+	_, err := srv.JS.applicationActivationSettings.SetByID(ctx, *req.ApplicationIds, nil, func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
 		if stored == nil {
 			return nil, nil, errApplicationActivationSettingsNotFound.New()
 		}

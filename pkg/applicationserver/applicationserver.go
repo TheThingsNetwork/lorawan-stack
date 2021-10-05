@@ -666,8 +666,8 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 			return ttnpb.KeyEnvelope{}, err
 		}
 		res, err := ttnpb.NewAsJsClient(cc).GetAppSKey(ctx, req, as.WithClusterAuth())
-		if err == nil {
-			return res.AppSKey, nil
+		if err == nil && res.AppSKey != nil {
+			return *res.AppSKey, nil
 		}
 		if !errors.IsNotFound(err) {
 			return ttnpb.KeyEnvelope{}, err
@@ -675,8 +675,8 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 	}
 	if as.interopClient != nil && !interop.GeneratedSessionKeyID(sessionKeyID) {
 		res, err := as.interopClient.GetAppSKey(ctx, as.interopID, req)
-		if err == nil {
-			return res.AppSKey, nil
+		if err == nil && res.AppSKey != nil {
+			return *res.AppSKey, nil
 		}
 		if !errors.IsNotFound(err) {
 			return ttnpb.KeyEnvelope{}, err
