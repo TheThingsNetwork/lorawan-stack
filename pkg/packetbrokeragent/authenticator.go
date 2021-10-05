@@ -17,19 +17,14 @@ package packetbrokeragent
 import (
 	"context"
 	"crypto/tls"
-	"net"
-	"net/url"
-	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"gopkg.in/square/go-jose.v2/jwt"
 )
 
 type tlsConfigurator interface {
@@ -47,65 +42,22 @@ type oauth2Authenticator struct {
 }
 
 func newOAuth2(ctx context.Context, oauth2Config OAuth2Config, tlsConfig tlsConfigurator, targetAddresses ...string) authenticator {
-	hosts := make(map[string]bool, len(targetAddresses))
-	for _, addr := range targetAddresses {
-		if addr == "" {
-			continue
-		}
-		if h, _, err := net.SplitHostPort(addr); err == nil {
-			addr = h
-		}
-		hosts[addr] = true
-	}
-	audience := make([]string, 0, len(hosts))
-	for h := range hosts {
-		audience = append(audience, h)
-	}
-	config := clientcredentials.Config{
-		ClientID:     oauth2Config.ClientID,
-		ClientSecret: oauth2Config.ClientSecret,
-		Scopes:       []string{"networks"},
-		AuthStyle:    oauth2.AuthStyleInParams,
-		TokenURL:     oauth2Config.TokenURL,
-		EndpointParams: url.Values{
-			"audience": []string{strings.Join(audience, " ")},
-		},
-	}
 	return &oauth2Authenticator{
-		tokenSource: config.TokenSource(ctx),
-		tlsConfig:   tlsConfig,
+		tokenSource: packetbroker.TokenSource(ctx, oauth2Config.ClientID, oauth2Config.ClientSecret,
+			packetbroker.WithTokenURL(oauth2Config.TokenURL),
+			packetbroker.WithScope(packetbroker.ScopeNetworks),
+			packetbroker.WithAudienceFromAddresses(targetAddresses...),
+		),
+		tlsConfig: tlsConfig,
 	}
 }
-
-var errOAuth2Token = errors.DefineUnauthenticated("oauth2_token", "invalid OAuth 2.0 token for network authentication")
 
 func (a *oauth2Authenticator) AuthInfo(ctx context.Context) (ttnpb.PacketBrokerNetworkIdentifier, error) {
 	token, err := a.tokenSource.Token()
 	if err != nil {
 		return ttnpb.PacketBrokerNetworkIdentifier{}, err
 	}
-	parsed, err := jwt.ParseSigned(token.AccessToken)
-	if err != nil {
-		return ttnpb.PacketBrokerNetworkIdentifier{}, errOAuth2Token.WithCause(err)
-	}
-	var claims struct {
-		PacketBroker struct {
-			Networks []struct {
-				NetID    uint32 `json:"nid"`
-				TenantID string `json:"tid"`
-			} `json:"ns"`
-		} `json:"https://iam.packetbroker.net/claims"`
-	}
-	if err := parsed.UnsafeClaimsWithoutVerification(&claims); err != nil {
-		return ttnpb.PacketBrokerNetworkIdentifier{}, errOAuth2Token.WithCause(err)
-	}
-	if len(claims.PacketBroker.Networks) == 0 {
-		return ttnpb.PacketBrokerNetworkIdentifier{}, errOAuth2Token.New()
-	}
-	return ttnpb.PacketBrokerNetworkIdentifier{
-		NetId:    claims.PacketBroker.Networks[0].NetID,
-		TenantId: claims.PacketBroker.Networks[0].TenantID,
-	}, nil
+	return packetbroker.NetworkIdentifier(token)
 }
 
 func (a *oauth2Authenticator) DialOptions(ctx context.Context) (res []grpc.DialOption, err error) {
