@@ -17,6 +17,7 @@ import api from '@console/api'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as collaborators from '@console/store/actions/collaborators'
+import { getUserSuccess } from '@console/store/actions/users'
 
 const validParentTypes = ['application', 'gateway', 'organization']
 
@@ -32,8 +33,19 @@ const parentTypeValidator = ({ action }, allow) => {
 const getCollaboratorLogic = createRequestLogic({
   type: collaborators.GET_COLLABORATOR,
   validate: parentTypeValidator,
-  process: ({ action }) => {
+  process: async ({ getState, action }, dispatch) => {
     const { parentType, parentId, collaboratorId, isUser } = action.payload
+
+    if (isUser) {
+      // Also retrieve the user to be able to determine whether
+      // it is an admin user.
+      const user = await api.users.get(collaboratorId, 'admin')
+      try {
+        dispatch(getUserSuccess(user))
+      } catch {
+        // Do not fail the action when the user could not be fetched.
+      }
+    }
 
     return isUser
       ? api[parentType].collaborators.getUser(parentId, collaboratorId)

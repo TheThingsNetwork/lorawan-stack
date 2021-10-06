@@ -35,6 +35,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { id as collaboratorIdRegexp } from '@console/lib/regexp'
 
 import { selectUserId } from '@console/store/selectors/user'
+import { selectUserById } from '@console/store/selectors/users'
 
 const validationSchema = Yup.object().shape({
   collaborator_id: Yup.string()
@@ -46,12 +47,17 @@ const validationSchema = Yup.object().shape({
 
 const isUser = collaborator => collaborator.ids && 'user_ids' in collaborator.ids
 
-@connect(state => ({
+@connect((state, { collaborator, update }) => ({
   currentUserId: selectUserId(state),
+  collaboratorIsAdmin:
+    update && isUser(collaborator)
+      ? Boolean(selectUserById(state, getCollaboratorId(collaborator)).admin)
+      : false,
 }))
 export default class CollaboratorForm extends Component {
   static propTypes = {
     collaborator: PropTypes.collaborator,
+    collaboratorIsAdmin: PropTypes.bool.isRequired,
     currentUserId: PropTypes.string.isRequired,
     error: PropTypes.error,
     onDelete: PropTypes.func,
@@ -163,6 +169,7 @@ export default class CollaboratorForm extends Component {
       pseudoRights,
       error: passedError,
       update,
+      collaboratorIsAdmin,
     } = this.props
 
     const { error: submitError } = this.state
@@ -174,6 +181,20 @@ export default class CollaboratorForm extends Component {
       isUser(collaborator) &&
       getCollaboratorId(collaborator) === currentUserId
 
+    let warning = null
+
+    if (update) {
+      if (isYou) {
+        warning = collaboratorIsAdmin ? (
+          <Notification small warning content={sharedMessages.collaboratorWarningAdminSelf} />
+        ) : (
+          <Notification small warning content={sharedMessages.collaboratorWarningSelf} />
+        )
+      } else if (collaboratorIsAdmin) {
+        warning = <Notification small warning content={sharedMessages.collaboratorWarningAdmin} />
+      }
+    }
+
     return (
       <Form
         error={error}
@@ -181,9 +202,7 @@ export default class CollaboratorForm extends Component {
         initialValues={this.computeInitialValues()}
         validationSchema={validationSchema}
       >
-        {update && isYou ? (
-          <Notification small warning content={sharedMessages.collaboratorWarningSelf} />
-        ) : null}
+        {warning}
         <Form.Field
           name="collaborator_id"
           component={Input}
