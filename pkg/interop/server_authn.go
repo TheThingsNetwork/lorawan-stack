@@ -64,16 +64,29 @@ nextPattern:
 }
 
 type authInfo interface {
-	GetAddresses() []string
+	addressPatterns() []string
 }
 
-// NetworkServerAuthInfo contains authentication information of the Network Server.
+// NetworkServerAuthInfo contains the authentication information of a Network Server.
 type NetworkServerAuthInfo struct {
 	NetID     types.NetID
 	Addresses []string
 }
 
-func (n NetworkServerAuthInfo) GetAddresses() []string { return n.Addresses }
+func (n NetworkServerAuthInfo) addressPatterns() []string { return n.Addresses }
+
+// Require returns an error if the given NetID does not match, or if the NSID is not matched by an address pattern.
+func (n NetworkServerAuthInfo) Require(netID types.NetID, nsID *string) error {
+	if !n.NetID.Equal(netID) {
+		return errUnauthenticated.New()
+	}
+	if nsID != nil {
+		if err := verifySenderNSID(n.Addresses, *nsID); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 type nsAuthInfoKeyType struct{}
 
@@ -81,13 +94,37 @@ var nsAuthInfoKey nsAuthInfoKeyType
 
 // NewContextWithNetworkServerAuthInfo returns a derived context with the given authentication information of the
 // Network Server.
-func NewContextWithNetworkServerAuthInfo(parent context.Context, authInfo NetworkServerAuthInfo) context.Context {
+func NewContextWithNetworkServerAuthInfo(parent context.Context, authInfo *NetworkServerAuthInfo) context.Context {
 	return context.WithValue(parent, nsAuthInfoKey, authInfo)
 }
 
 // NetworkServerAuthInfoFromContext returns the authentication information of the Network Server from context.
-func NetworkServerAuthInfoFromContext(ctx context.Context) (NetworkServerAuthInfo, bool) {
-	authInfo, ok := ctx.Value(nsAuthInfoKey).(NetworkServerAuthInfo)
+func NetworkServerAuthInfoFromContext(ctx context.Context) (*NetworkServerAuthInfo, bool) {
+	authInfo, ok := ctx.Value(nsAuthInfoKey).(*NetworkServerAuthInfo)
+	return authInfo, ok
+}
+
+// ApplicationServerAuthInfo contains the authentication information of an Application Server.
+type ApplicationServerAuthInfo struct {
+	ASID      string
+	Addresses []string
+}
+
+func (a ApplicationServerAuthInfo) addressPatterns() []string { return a.Addresses }
+
+type asAuthInfoKeyType struct{}
+
+var asAuthInfoKey asAuthInfoKeyType
+
+// NewContextWithApplicationServerAuthInfo returns a derived context with the given authentication information of the
+// Application Server.
+func NewContextWithApplicationServerAuthInfo(parent context.Context, authInfo *ApplicationServerAuthInfo) context.Context {
+	return context.WithValue(parent, asAuthInfoKey, authInfo)
+}
+
+// ApplicationServerAuthInfoFromContext returns the authentication information of the Application Server from context.
+func ApplicationServerAuthInfoFromContext(ctx context.Context) (*ApplicationServerAuthInfo, bool) {
+	authInfo, ok := ctx.Value(asAuthInfoKey).(*ApplicationServerAuthInfo)
 	return authInfo, ok
 }
 
@@ -109,49 +146,35 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byt
 		return nil, ErrMalformedMessage.New()
 	}
 
-	// If the client presents a TLS client certificate, use that for authentication.
-	if state := r.TLS; state != nil && len(state.PeerCertificates) > 0 {
-		addrs, err := s.verifySenderCertificate(ctx, types.NetID(header.SenderID).String(), state)
+	for _, authFunc := range []func(context.Context) (*NetworkServerAuthInfo, error){
+		// Verify TLS client certificate.
+		func(ctx context.Context) (*NetworkServerAuthInfo, error) {
+			if r.TLS == nil || len(r.TLS.PeerCertificates) == 0 {
+				return nil, nil
+			}
+			addrs, err := s.verifySenderCertificate(ctx, types.NetID(header.SenderID).String(), r.TLS)
+			if err != nil {
+				return nil, err
+			}
+			return &NetworkServerAuthInfo{
+				NetID:     types.NetID(header.SenderID),
+				Addresses: addrs,
+			}, nil
+		},
+	} {
+		authInfo, err := authFunc(ctx)
 		if err != nil {
 			return nil, err
 		}
-		if header.SenderNSID != nil {
-			if err := verifySenderNSID(addrs, *header.SenderNSID); err != nil {
+		if authInfo != nil {
+			if err := authInfo.Require(types.NetID(header.SenderID), header.SenderNSID); err != nil {
 				return nil, err
 			}
+			return NewContextWithNetworkServerAuthInfo(ctx, authInfo), nil
 		}
-		return NewContextWithNetworkServerAuthInfo(ctx, NetworkServerAuthInfo{
-			NetID:     types.NetID(header.SenderID),
-			Addresses: addrs,
-		}), nil
 	}
 
-	// TODO: Verify Packet Broker token (https://github.com/TheThingsNetwork/lorawan-stack/issues/4703).
-
-	return ctx, nil
-}
-
-type ApplicationServerAuthInfo struct {
-	ASID      string
-	Addresses []string
-}
-
-func (a ApplicationServerAuthInfo) GetAddresses() []string { return a.Addresses }
-
-type asAuthInfoKeyType struct{}
-
-var asAuthInfoKey asAuthInfoKeyType
-
-// NewContextWithApplicationServerAuthInfo returns a derived context with the given authentication information of the
-// Application Server.
-func NewContextWithApplicationServerAuthInfo(parent context.Context, authInfo ApplicationServerAuthInfo) context.Context {
-	return context.WithValue(parent, asAuthInfoKey, authInfo)
-}
-
-// ApplicationServerAuthInfoFromContext returns the authentication information of the Application Server from context.
-func ApplicationServerAuthInfoFromContext(ctx context.Context) (ApplicationServerAuthInfo, bool) {
-	authInfo, ok := ctx.Value(asAuthInfoKey).(ApplicationServerAuthInfo)
-	return authInfo, ok
+	return nil, errUnauthenticated.New()
 }
 
 func (s *Server) authenticateAS(ctx context.Context, r *http.Request, data []byte) (context.Context, error) {
@@ -168,7 +191,7 @@ func (s *Server) authenticateAS(ctx context.Context, r *http.Request, data []byt
 	if err != nil {
 		return nil, err
 	}
-	return NewContextWithApplicationServerAuthInfo(ctx, ApplicationServerAuthInfo{
+	return NewContextWithApplicationServerAuthInfo(ctx, &ApplicationServerAuthInfo{
 		ASID:      header.SenderID,
 		Addresses: addrs,
 	}), nil

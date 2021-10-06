@@ -41,7 +41,7 @@ func (a Authorizer) RequireAddress(ctx context.Context, addr string) error {
 	} else {
 		return errUnauthenticated.New()
 	}
-	return verifySenderNSID(authInfo.GetAddresses(), addr)
+	return verifySenderNSID(authInfo.addressPatterns(), addr)
 }
 
 // RequireID returns an error if the given NetID is not authorized in the context.
