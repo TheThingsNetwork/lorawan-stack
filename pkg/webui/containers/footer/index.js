@@ -22,15 +22,15 @@ import { selectOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 const Footer = props => {
   const onlineStatus = useSelector(selectOnlineStatus)
 
-  return <FooterComponent onlineStatus={onlineStatus} {...props} />
+  return <FooterComponent {...props} onlineStatus={onlineStatus} />
 }
 
-const { onlineStatus, ...propTypes } = FooterComponent.propTypes
+const { onlineStatus: onlineStatusPropType, ...propTypes } = FooterComponent.propTypes
 
 Footer.propTypes = propTypes
 
-Footer.defaultProps = {
-  ...FooterComponent.defaultProps,
-}
+const { onlineStatus: onlineStatusDefaultProp, ...defaultProps } = FooterComponent.defaultProps
+
+Footer.defaultProps = defaultProps
 
 export default Footer
