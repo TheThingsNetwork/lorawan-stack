@@ -35,7 +35,11 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
 	distribredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
+	asioapredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	iopubsubredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	iowebredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -2910,4 +2914,331 @@ func TestLocationFromPayload(t *testing.T) {
 	if loc, ok := dev.Locations["frm-payload"]; a.So(ok, should.BeTrue) {
 		assertLocation(loc)
 	}
+}
+
+func TestApplicationServerCleanup(t *testing.T) {
+	a, ctx := test.New(t)
+
+	app1 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-1"}
+	app2 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-2"}
+	app3 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-3"}
+	app4 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-4"}
+
+	webhookList := []ttnpb.ApplicationWebhookIdentifiers{
+		{
+			ApplicationIds: &app1,
+			WebhookId:      "test-1",
+		},
+		{
+			ApplicationIds: &app3,
+			WebhookId:      "test-2",
+		},
+		{
+			ApplicationIds: &app4,
+			WebhookId:      "test-3",
+		},
+	}
+
+	pubsubList := []ttnpb.ApplicationPubSubIdentifiers{
+		{
+			ApplicationIds: &app2,
+			PubSubId:       "test-1",
+		},
+		{
+			ApplicationIds: &app3,
+			PubSubId:       "test-2",
+		},
+		{
+			ApplicationIds: &app1,
+			PubSubId:       "test-3",
+		},
+	}
+	deviceList := []*ttnpb.EndDevice{
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app1,
+				DeviceId:               "dev-1",
+				JoinEui:                eui64Ptr(types.EUI64{0x41, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x41, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app1,
+				DeviceId:               "dev-2",
+				JoinEui:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app2,
+				DeviceId:               "dev-3",
+				JoinEui:                eui64Ptr(types.EUI64{0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app2,
+				DeviceId:               "dev-4",
+				JoinEui:                eui64Ptr(types.EUI64{0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x44, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app4,
+				DeviceId:               "dev-5",
+				JoinEui:                eui64Ptr(types.EUI64{0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x45, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app4,
+				DeviceId:               "dev-6",
+				JoinEui:                eui64Ptr(types.EUI64{0x46, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x46, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+	}
+
+	associationList := []ttnpb.ApplicationPackageAssociationIdentifiers{
+		{
+			EndDeviceIds: &deviceList[0].EndDeviceIdentifiers,
+			FPort:        1,
+		},
+		{
+			EndDeviceIds: &deviceList[0].EndDeviceIdentifiers,
+			FPort:        1,
+		},
+		{
+			EndDeviceIds: &deviceList[2].EndDeviceIdentifiers,
+			FPort:        1,
+		},
+		{
+			EndDeviceIds: &deviceList[5].EndDeviceIdentifiers,
+			FPort:        1,
+		},
+	}
+	defaultAssociationList := []ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
+		{
+			ApplicationIds: &app1,
+			FPort:          1,
+		},
+		{
+			ApplicationIds: &app1,
+			FPort:          2,
+		},
+		{
+			ApplicationIds: &app2,
+			FPort:          3,
+		},
+		{
+			ApplicationIds: &app4,
+			FPort:          4,
+		},
+	}
+
+	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
+	defer devsFlush()
+	defer devsRedisClient.Close()
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	webhooksRedisClient, webhooksFlush := test.NewRedis(ctx, "applicationserver_test", "webhooks")
+	defer webhooksFlush()
+	defer webhooksRedisClient.Close()
+	webhookRegistry := iowebredis.WebhookRegistry{Redis: webhooksRedisClient, LockTTL: test.Delay << 10}
+	if err := webhookRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	pubsubRedisClient, pubsubFlush := test.NewRedis(ctx, "applicationserver_test", "pubsub")
+	defer pubsubFlush()
+	defer pubsubRedisClient.Close()
+	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient, LockTTL: test.Delay << 10}
+	if err := pubsubRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	applicationUpsRedisClient, applicationUpsFlush := test.NewRedis(ctx, "applicationserver_test", "applicationups")
+	defer applicationUpsFlush()
+	defer applicationUpsRedisClient.Close()
+	applicationUpsRegistry := &redis.ApplicationUplinkRegistry{
+		Redis: applicationUpsRedisClient,
+		Limit: 16,
+	}
+
+	applicationPackagesRedisClient, applicationPackagesFlush := test.NewRedis(ctx, "applicationserver_test", "applicationpackages")
+	defer applicationPackagesFlush()
+	defer applicationPackagesRedisClient.Close()
+	applicationPackagesRegistry := &asioapredis.ApplicationPackagesRegistry{
+		Redis:   applicationPackagesRedisClient,
+		LockTTL: test.Delay << 10,
+	}
+	if err := applicationPackagesRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	for _, dev := range deviceList {
+		ret, err := deviceRegistry.Set(ctx, dev.EndDeviceIdentifiers, []string{
+			"ids.application_ids",
+			"ids.dev_eui",
+			"ids.device_id",
+			"ids.join_eui"}, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			return dev, []string{
+				"ids.application_ids",
+				"ids.dev_eui",
+				"ids.device_id",
+				"ids.join_eui"}, nil
+		})
+		if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+			t.Fatalf("Failed to create device: %s", err)
+		}
+	}
+
+	for _, webID := range webhookList {
+		_, err := webhookRegistry.Set(ctx,
+			&webID,
+			[]string{
+				"ids.application_ids",
+				"ids.webhook_id",
+			},
+			func(web *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+				return &ttnpb.ApplicationWebhook{
+						Ids: &webID,
+					},
+					[]string{
+						"ids.application_ids",
+						"ids.webhook_id",
+					}, nil
+			})
+		a.So(err, should.BeNil)
+	}
+
+	for _, pubsubID := range pubsubList {
+		_, err := pubsubRegistry.Set(ctx, &pubsubID,
+			[]string{
+				"ids.application_ids",
+				"ids.pub_sub_id",
+			},
+			func(ps *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
+				return &ttnpb.ApplicationPubSub{
+						Ids: &pubsubID,
+					},
+					[]string{
+						"ids.application_ids",
+						"ids.pub_sub_id",
+					},
+					nil
+			})
+		a.So(err, should.BeNil)
+	}
+
+	for _, associationID := range associationList {
+		_, err := applicationPackagesRegistry.SetAssociation(ctx, &associationID,
+			[]string{
+				"ids.end_device_ids.application_ids",
+				"ids.end_device_ids.device_id",
+				"ids.f_port",
+			},
+			func(as *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
+				return &ttnpb.ApplicationPackageAssociation{
+						Ids: &associationID,
+					},
+					[]string{
+						"ids.end_device_ids.application_ids",
+						"ids.end_device_ids.device_id",
+						"ids.f_port",
+					},
+					nil
+			})
+		a.So(err, should.BeNil)
+	}
+
+	for _, defaultAssociationID := range defaultAssociationList {
+		_, err := applicationPackagesRegistry.SetDefaultAssociation(ctx, &defaultAssociationID,
+			[]string{
+				"ids.application_ids",
+				"ids.f_port",
+			},
+			func(as *ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error) {
+				return &ttnpb.ApplicationPackageDefaultAssociation{
+						Ids: &defaultAssociationID,
+					},
+					[]string{
+						"ids.application_ids",
+						"ids.f_port",
+					},
+					nil
+			})
+		a.So(err, should.BeNil)
+	}
+
+	// Mock IS application and device sets
+	isApplicationSet := map[string]struct{}{
+		unique.ID(ctx, app3): {},
+		unique.ID(ctx, app4): {},
+	}
+	isDeviceSet := map[string]struct{}{
+		unique.ID(ctx, deviceList[4].EndDeviceIdentifiers): {},
+		unique.ID(ctx, deviceList[5].EndDeviceIdentifiers): {},
+	}
+
+	// Test cleaner initialization (or just range to local set)
+	pubsubCleaner := &pubsub.RegistryCleaner{
+		PubSubRegistry: pubsubRegistry,
+	}
+	err := pubsubCleaner.RangeToLocalSet(ctx)
+	a.So(err, should.BeNil)
+	a.So(pubsubCleaner.LocalSet, should.HaveLength, 3)
+
+	webhookCleaner := &web.RegistryCleaner{
+		WebRegistry: webhookRegistry,
+	}
+	err = webhookCleaner.RangeToLocalSet(ctx)
+	a.So(err, should.BeNil)
+	a.So(webhookCleaner.LocalSet, should.HaveLength, 3)
+
+	devCleaner := &applicationserver.RegistryCleaner{
+		DevRegistry:    deviceRegistry,
+		AppUpsRegistry: applicationUpsRegistry,
+	}
+	err = devCleaner.RangeToLocalSet(ctx)
+	a.So(err, should.BeNil)
+	a.So(devCleaner.LocalSet, should.HaveLength, 6)
+
+	packagesCleaner := &packages.RegistryCleaner{
+		ApplicationPackagesRegistry: applicationPackagesRegistry,
+	}
+	err = packagesCleaner.RangeToLocalSet(ctx)
+	a.So(err, should.BeNil)
+	a.So(packagesCleaner.LocalApplicationSet, should.HaveLength, 3)
+	a.So(packagesCleaner.LocalDeviceSet, should.HaveLength, 3)
+
+	// Test cleaning data
+	err = pubsubCleaner.CleanData(ctx, isApplicationSet)
+	a.So(err, should.BeNil)
+	pubsubCleaner.RangeToLocalSet(ctx)
+	a.So(pubsubCleaner.LocalSet, should.HaveLength, 1)
+
+	err = webhookCleaner.CleanData(ctx, isApplicationSet)
+	a.So(err, should.BeNil)
+	webhookCleaner.RangeToLocalSet(ctx)
+	a.So(webhookCleaner.LocalSet, should.HaveLength, 2)
+
+	err = devCleaner.CleanData(ctx, isDeviceSet)
+	a.So(err, should.BeNil)
+	devCleaner.RangeToLocalSet(ctx)
+	a.So(devCleaner.LocalSet, should.HaveLength, 2)
+
+	err = packagesCleaner.CleanData(ctx, isDeviceSet, isApplicationSet)
+	a.So(err, should.BeNil)
+	packagesCleaner.RangeToLocalSet(ctx)
+	a.So(packagesCleaner.LocalApplicationSet, should.HaveLength, 1)
+	a.So(packagesCleaner.LocalDeviceSet, should.HaveLength, 1)
 }
