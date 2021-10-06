@@ -296,8 +296,9 @@ var (
 			if err = util.SetFields(antenna, setGatewayAntennaFlags, "antenna"); err != nil {
 				return err
 			}
-			gateway.Antennas = []*ttnpb.GatewayAntenna{antenna}
-
+			if antenna != nil {
+				gateway.Antennas = []*ttnpb.GatewayAntenna{antenna}
+			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
