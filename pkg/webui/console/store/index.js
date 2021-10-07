@@ -17,6 +17,7 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { createLogicMiddleware } from 'redux-logic'
 import { routerMiddleware } from 'connected-react-router'
 import createSentryMiddleware from 'redux-sentry-middleware'
+import { cloneDeepWith } from 'lodash'
 
 import sensitiveFields from '@ttn-lw/constants/sensitive-data'
 
@@ -34,10 +35,21 @@ const composeEnhancers = (dev && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
 let middlewares = [requestPromiseMiddleware, createLogicMiddleware(logics)]
 
 if (env.sentryDsn) {
+  const trimEvents = state => ({
+    ...state,
+    events: cloneDeepWith(state.events, (value, key) => {
+      if (key === 'events' && value instanceof Array) {
+        // Only transfer the last 5 events to Sentry to avoid
+        // `Payload too large` errors.
+        return value.slice(0, 5)
+      }
+    }),
+  })
+
   middlewares = [
     createSentryMiddleware(Sentry, {
       actionTransformer: action => omitDeep(action, sensitiveFields),
-      stateTransformer: state => omitDeep(state, sensitiveFields),
+      stateTransformer: state => omitDeep(trimEvents(state), sensitiveFields),
       getUserContext: state => ({ user_id: selectUserId(state) }),
     }),
     ...middlewares,
