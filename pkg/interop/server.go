@@ -204,6 +204,7 @@ func (s *Server) handle() http.Handler {
 		}
 		ctx, err = senderAuthenticator.Authenticate(ctx, r, data)
 		if err != nil {
+			logger.WithError(err).Warn("Failed to authenticate")
 			writeError(w, r, header, err)
 			return
 		}

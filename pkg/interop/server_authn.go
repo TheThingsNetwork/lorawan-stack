@@ -147,7 +147,7 @@ type tokenVerifier interface {
 func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byte) (context.Context, error) {
 	var header NsMessageHeader
 	if err := json.Unmarshal(data, &header); err != nil {
-		return nil, ErrMalformedMessage.New()
+		return nil, ErrMalformedMessage.WithCause(err)
 	}
 	if !header.ProtocolVersion.SupportsNSID() && header.SenderNSID != nil {
 		return nil, ErrMalformedMessage.New()
@@ -170,17 +170,20 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byt
 		},
 		// Verify token in a best-effort manner.
 		func(ctx context.Context) (*NetworkServerAuthInfo, error) {
+			logger := log.FromContext(ctx).WithField("authenticator", "packetbroker")
 			authz := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
 			if len(authz) < 2 || strings.ToLower(authz[0]) != "bearer" {
 				return nil, nil
 			}
 			token, err := jwt.ParseSigned(authz[1])
 			if err != nil {
+				logger.WithError(err).Debug("Failed to parse token")
 				return nil, nil
 			}
 			var claims jwt.Claims
 			err = token.UnsafeClaimsWithoutVerification(&claims)
 			if err != nil {
+				logger.WithError(err).Debug("Failed to parse claims")
 				return nil, nil
 			}
 			if tokenVerifier, ok := s.tokenVerifiers[claims.Issuer]; ok {
@@ -190,12 +193,12 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byt
 				}
 				return authInfo, nil
 			}
+			logger.WithError(err).WithField("issuer", claims.Issuer).Debug("Unknown token issuer")
 			return nil, nil
 		},
 	} {
 		authInfo, err := authFunc(ctx)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to authenticate Network Server")
 			return nil, ErrUnknownSender.WithCause(err)
 		}
 		if authInfo != nil {
