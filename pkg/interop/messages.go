@@ -25,8 +25,10 @@ type MessageHeader struct {
 	MessageType     MessageType
 	SenderID,
 	ReceiverID string
-	SenderToken   Buffer `json:",omitempty"`
-	ReceiverToken Buffer `json:",omitempty"`
+	SenderNSID    *string `json:",omitempty"`
+	ReceiverNSID  *string `json:",omitempty"`
+	SenderToken   Buffer  `json:",omitempty"`
+	ReceiverToken Buffer  `json:",omitempty"`
 }
 
 // AnswerHeader returns the header of the answer message.
@@ -41,8 +43,10 @@ func (h MessageHeader) AnswerHeader() (MessageHeader, error) {
 		MessageType:     ansType,
 		ReceiverToken:   h.SenderToken,
 		ReceiverID:      h.SenderID,
+		ReceiverNSID:    h.SenderNSID,
 		SenderID:        h.ReceiverID,
 		SenderToken:     h.ReceiverToken,
+		SenderNSID:      h.ReceiverNSID,
 	}, nil
 }
 
