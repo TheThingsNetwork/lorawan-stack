@@ -75,7 +75,6 @@ var DefaultHTTPConfig = config.HTTP{
 var DefaultInteropServerConfig = config.InteropServer{
 	ListenTLS:        ":8886",
 	PublicTLSAddress: "https://" + DefaultPublicHost + ":8886",
-	TrustedProxies:   []string{"127.0.0.0/8", "10.0.0.0/8", "100.64.0.0/10", "172.16.0.0/12", "192.168.0.0/16"},
 	PacketBroker: config.PacketBrokerInteropAuth{
 		Enabled:     true,
 		TokenIssuer: packetbroker.DefaultTokenIssuer,

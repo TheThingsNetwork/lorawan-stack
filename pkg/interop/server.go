@@ -114,8 +114,6 @@ func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.Int
 		js:                 &noopServer{},
 	}
 
-	var proxyConfiguration webmiddleware.ProxyConfiguration
-	proxyConfiguration.ParseAndAddTrusted(conf.TrustedProxies...)
 	s.router = mux.NewRouter()
 	s.router.NotFoundHandler = http.HandlerFunc(webhandlers.NotFound)
 	s.router.Use(
@@ -123,7 +121,6 @@ func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.Int
 		mux.MiddlewareFunc(webmiddleware.FillContext(contextFillers...)),
 		mux.MiddlewareFunc(webmiddleware.RequestURL()),
 		mux.MiddlewareFunc(webmiddleware.RequestID()),
-		mux.MiddlewareFunc(webmiddleware.ProxyHeaders(proxyConfiguration)),
 		mux.MiddlewareFunc(webmiddleware.MaxBody(1<<15)), // 32 kB.
 		mux.MiddlewareFunc(webmiddleware.Log(logger, nil)),
 		mux.MiddlewareFunc(ratelimit.HTTPMiddleware(c.RateLimiter(), "http:interop")),
