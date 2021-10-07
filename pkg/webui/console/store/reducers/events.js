@@ -75,7 +75,21 @@ const addEvent = (state, event) => {
     return {}
   }
 
-  const currentEvents = events
+  let nonConsecutiveEvents = events
+
+  // Avoid consecutive disconnect/reconnect messages in the Live Data view.
+  if (events.length > 1 && (event.name === events[0].name || event.name === events[1].name)) {
+    if (event.name === 'synthetic.status.reconnected') {
+      const lastTwoEvents = [events[0], events[1]]
+      const prevIndex = lastTwoEvents.map(e => e.name).indexOf(event.name)
+
+      nonConsecutiveEvents = prevIndex === 0 ? events.slice(1) : events[0] + events.slice(2)
+    } else if (event.name === 'synthetic.error.unknown') {
+      return {} // If the disconnect already exists we don't want to add the event
+    }
+  }
+
+  const currentEvents = nonConsecutiveEvents
 
   // Keep events sorted in descending order by `time`.
   let insertIndex = 0
