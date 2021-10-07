@@ -28,8 +28,7 @@ import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import createPasswordValidationSchema from '@ttn-lw/lib/create-password-validation-schema'
-
-import { userId as userIdRegexp } from '@console/lib/regexp'
+import { userId as userIdRegexp } from '@ttn-lw/lib/regexp'
 
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 

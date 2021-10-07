@@ -15,8 +15,9 @@
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import Yup from '@ttn-lw/lib/yup'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
+import { id as deviceIdRegexp } from '@ttn-lw/lib/regexp'
 
-import { id as deviceIdRegexp, address as addressRegexp } from '@console/lib/regexp'
+import { address as addressRegexp } from '@console/lib/regexp'
 import { ACTIVATION_MODES, parseLorawanMacVersion } from '@console/lib/device-utils'
 
 import { REGISTRATION_TYPES } from '../../utils'
