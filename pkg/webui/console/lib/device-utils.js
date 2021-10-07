@@ -45,13 +45,20 @@ export const LORAWAN_PHY_VERSIONS = Object.freeze([
   PHY_V1_1_REV_B,
 ])
 
+export const MAC_V1_0 = { value: 'MAC_V1_0', label: 'MAC V1.0' }
+export const MAC_V1_0_1 = { value: 'MAC_V1_0_1', label: 'MAC V1.0.1' }
+export const MAC_V1_0_2 = { value: 'MAC_V1_0_2', label: 'MAC V1.0.2' }
+export const MAC_V1_0_3 = { value: 'MAC_V1_0_3', label: 'MAC V1.0.3' }
+export const MAC_V1_0_4 = { value: 'MAC_V1_0_4', label: 'MAC V1.0.4' }
+export const MAC_V1_1 = { value: 'MAC_V1_1', label: 'MAC V1.1' }
+
 export const LORAWAN_VERSIONS = Object.freeze([
-  { value: 'MAC_V1_0', label: 'MAC V1.0' },
-  { value: 'MAC_V1_0_1', label: 'MAC V1.0.1' },
-  { value: 'MAC_V1_0_2', label: 'MAC V1.0.2' },
-  { value: 'MAC_V1_0_3', label: 'MAC V1.0.3' },
-  { value: 'MAC_V1_0_4', label: 'MAC V1.0.4' },
-  { value: 'MAC_V1_1', label: 'MAC V1.1' },
+  MAC_V1_0,
+  MAC_V1_0_1,
+  MAC_V1_0_2,
+  MAC_V1_0_3,
+  MAC_V1_0_4,
+  MAC_V1_1,
 ])
 
 export const FRAME_WIDTH_COUNT = Object.freeze({

@@ -22,7 +22,6 @@ import api from '@console/api'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import Radio from '@ttn-lw/components/radio-button'
-import Select from '@ttn-lw/components/select'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import toast from '@ttn-lw/components/toast'
@@ -32,6 +31,7 @@ import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Message from '@ttn-lw/lib/components/message'
 
 import PhyVersionInput from '@console/components/phy-version-input'
+import LorawanVersionInput from '@console/components/lorawan-version-input'
 import JoinEUIPRefixesInput from '@console/components/join-eui-prefixes-input'
 
 import DevAddrInput from '@console/containers/dev-addr-input'
@@ -45,7 +45,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import env from '@ttn-lw/lib/env'
 
 import {
-  LORAWAN_VERSIONS,
   ACTIVATION_MODES,
   parseLorawanMacVersion,
   generate16BytesKey,
@@ -363,17 +362,38 @@ const ManualForm = props => {
     }
   }, [defaultNsSettings, pingPeriodicityRequired])
 
+  const [phyVersion, setPhyVersion] = React.useState(initialValues.lorawan_phy_version)
+  const phyVersionRef = React.useRef(phyVersion)
+  const handlePhyVersionChange = React.useCallback(version => setPhyVersion(version), [])
+
   const [freqPlan, setFreqPlan] = React.useState()
   const freqPlanRef = React.useRef(freqPlan)
-  const handleFreqPlanChange = React.useCallback(band => {
-    setFreqPlan(band.value)
-  }, [])
+  const handleFreqPlanChange = React.useCallback(
+    option => {
+      const { value: freqPlan } = option
+      setFreqPlan(freqPlan)
+      freqPlanRef.current = freqPlan
 
-  const [phyVersion, setPhyVersion] = React.useState()
-  const phyVersionRef = React.useRef(phyVersion)
-  const handlePhyVersionChange = React.useCallback(version => {
-    setPhyVersion(version)
-  }, [])
+      if (formRef.current) {
+        const { values, setValues } = formRef.current
+
+        setLorawanVersion(defaultValues.lorawan_version)
+        setPhyVersion(defaultValues.lorawan_phy_version)
+        setValues(
+          validationSchema.cast(
+            {
+              ...values,
+              lorawan_version: defaultValues.lorawan_version,
+              lorawan_phy_version: defaultValues.lorawan_phy_version,
+              frequency_plan_id: freqPlan,
+            },
+            { context: validationContext },
+          ),
+        )
+      }
+    },
+    [validationContext],
+  )
 
   React.useEffect(() => {
     const updateMacSettings = async () => {
@@ -570,32 +590,32 @@ const ManualForm = props => {
       error={error}
       formikRef={formRef}
     >
+      {nsEnabled && (
+        <NsFrequencyPlansSelect
+          required={nsEnabled}
+          tooltipId={tooltipIds.FREQUENCY_PLAN}
+          name="frequency_plan_id"
+          onChange={handleFreqPlanChange}
+        />
+      )}
       <Form.Field
         required
         title={sharedMessages.macVersion}
         name="lorawan_version"
-        component={Select}
-        options={LORAWAN_VERSIONS}
+        component={LorawanVersionInput}
         tooltipId={tooltipIds.LORAWAN_VERSION}
         onChange={handleLorawanVersionChange}
+        frequencyPlan={freqPlan}
       />
       <Form.Field
         required
         title={sharedMessages.phyVersion}
         name="lorawan_phy_version"
         component={PhyVersionInput}
-        lorawanVersion={lorawanVersion}
         tooltipId={tooltipIds.REGIONAL_PARAMETERS}
         onChange={handlePhyVersionChange}
+        lorawanVersion={lorawanVersion}
       />
-      {nsEnabled && (
-        <NsFrequencyPlansSelect
-          required
-          tooltipId={tooltipIds.FREQUENCY_PLAN}
-          name="frequency_plan_id"
-          onChange={handleFreqPlanChange}
-        />
-      )}
       <hr />
       <AdvancedSettingsSection
         jsEnabled={jsConfig.enabled}

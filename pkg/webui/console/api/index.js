@@ -306,6 +306,7 @@ export default {
   configuration: {
     listNsFrequencyPlans: tts.Configuration.listNsFrequencyPlans.bind(tts.Configuration),
     listGsFrequencyPlans: tts.Configuration.listGsFrequencyPlans.bind(tts.Configuration),
+    getPhyVersions: tts.Configuration.getPhyVersions.bind(tts.Configuration),
   },
   js: {
     joinEUIPrefixes: {

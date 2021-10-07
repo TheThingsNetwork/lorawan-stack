@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@ import Select from '@ttn-lw/components/select'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import {
+  LORAWAN_PHY_VERSIONS,
+  parseLorawanMacVersion,
   PHY_V1_0,
   PHY_V1_0_1,
   PHY_V1_0_2_REV_A,
   PHY_V1_0_2_REV_B,
   PHY_V1_0_3_REV_A,
-  PHY_V1_1_REV_A,
   PHY_V1_1_REV_B,
-  LORAWAN_PHY_VERSIONS,
-  parseLorawanMacVersion,
+  PHY_V1_1_REV_A,
 } from '@console/lib/device-utils'
 
 const lorawanVersionPairs = {
@@ -40,31 +40,30 @@ const lorawanVersionPairs = {
   0: LORAWAN_PHY_VERSIONS,
 }
 
-const getOptions = lwVersion => lorawanVersionPairs[parseLorawanMacVersion(lwVersion)]
-
 const PhyVersionInput = props => {
   const { lorawanVersion, onChange, disabled, value, ...rest } = props
 
-  const [phyVersions, setPhyVersions] = React.useState(getOptions(lorawanVersion))
-
   const lorawanVersionRef = React.useRef(lorawanVersion)
-  React.useEffect(() => {
-    const options = getOptions(lorawanVersion)
-    setPhyVersions(options)
+  const [options, setOptions] = React.useState(LORAWAN_PHY_VERSIONS)
 
-    if (!value && options.length <= 1) {
+  React.useEffect(() => {
+    const options =
+      lorawanVersionPairs[parseLorawanMacVersion(lorawanVersion)] || LORAWAN_PHY_VERSIONS
+    if (options.length === 1) {
       onChange(options[0].value)
     } else if (lorawanVersion !== lorawanVersionRef.current) {
-      onChange(options[0].value)
       lorawanVersionRef.current = lorawanVersion
+      onChange('')
     }
-  }, [lorawanVersion, onChange, value])
+
+    setOptions(options)
+  }, [lorawanVersion, onChange])
 
   return (
     <Select
-      options={phyVersions}
+      options={options}
       onChange={onChange}
-      disabled={phyVersions.length <= 1 || disabled}
+      disabled={options.length <= 1 || disabled}
       value={value}
       {...rest}
     />
@@ -73,15 +72,17 @@ const PhyVersionInput = props => {
 
 PhyVersionInput.propTypes = {
   disabled: PropTypes.bool,
+  frequencyPlan: PropTypes.string,
   lorawanVersion: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
 }
 
 PhyVersionInput.defaultProps = {
-  lorawanVersion: undefined,
   disabled: false,
   value: undefined,
+  frequencyPlan: '',
+  lorawanVersion: '',
 }
 
 export default PhyVersionInput

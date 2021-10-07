@@ -18,12 +18,12 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Input from '@ttn-lw/components/input'
 import Radio from '@ttn-lw/components/radio-button'
-import Select from '@ttn-lw/components/select'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
 import Checkbox from '@ttn-lw/components/checkbox'
 
 import PhyVersionInput from '@console/components/phy-version-input'
+import LorawanVersionInput from '@console/components/lorawan-version-input'
 import MacSettingsSection from '@console/components/mac-settings-section'
 
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
@@ -37,7 +37,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import {
   parseLorawanMacVersion,
   ACTIVATION_MODES,
-  LORAWAN_VERSIONS,
   generate16BytesKey,
 } from '@console/lib/device-utils'
 
@@ -72,6 +71,11 @@ const NetworkServerForm = React.memo(props => {
 
   const [lorawanVersion, setLorawanVersion] = React.useState(device.lorawan_version)
   const lwVersion = parseLorawanMacVersion(lorawanVersion)
+
+  const [freqPlan, setFreqPlan] = React.useState(device.frequency_plan_id)
+  const handleFreqPlanChange = React.useCallback(plan => {
+    setFreqPlan(plan.value)
+  }, [])
 
   const [isClassB, setClassB] = React.useState(supports_class_b)
   const handleClassBChange = React.useCallback(evt => {
@@ -236,27 +240,28 @@ const NetworkServerForm = React.memo(props => {
       formikRef={formRef}
       enableReinitialize
     >
+      <NsFrequencyPlansSelect
+        name="frequency_plan_id"
+        required
+        tooltipId={tooltipIds.FREQUENCY_PLAN}
+        onChange={handleFreqPlanChange}
+      />
       <Form.Field
         title={sharedMessages.macVersion}
         name="lorawan_version"
-        component={Select}
+        component={LorawanVersionInput}
         required
-        options={LORAWAN_VERSIONS}
         onChange={handleVersionChange}
         tooltipId={tooltipIds.LORAWAN_VERSION}
+        frequencyPlan={freqPlan}
       />
       <Form.Field
         title={sharedMessages.phyVersion}
         name="lorawan_phy_version"
         component={PhyVersionInput}
-        lorawanVersion={lorawanVersion}
         required
         tooltipId={tooltipIds.REGIONAL_PARAMETERS}
-      />
-      <NsFrequencyPlansSelect
-        name="frequency_plan_id"
-        required
-        tooltipId={tooltipIds.FREQUENCY_PLAN}
+        lorawanVersion={lorawanVersion}
       />
       <Form.Field
         title={sharedMessages.lorawanClassCapabilities}

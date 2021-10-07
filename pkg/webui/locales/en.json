@@ -184,6 +184,7 @@
   "console.components.location-form.index.deleteFailure": "An error occurred and the location could not be deleted",
   "console.components.location-form.index.deleteSuccess": "Location deleted",
   "console.components.location-form.index.loadingLocation": "Loading location...",
+  "console.components.lorawan-version-input.index.phyVersionError": "Failed to fetch regional parameters versions",
   "console.components.mac-settings-section.index.delayValue": "{count, plural, one {{count} second} other {{count} seconds}}",
   "console.components.mac-settings-section.index.factoryPresetFreqDescription": "List of factory-preset frequencies. Note: order is respected.",
   "console.components.mac-settings-section.index.factoryPresetFreqTitle": "Factory Preset Frequencies",
