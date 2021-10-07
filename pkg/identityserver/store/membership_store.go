@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,39 +33,84 @@ type membershipStore struct {
 	*store
 }
 
-func (s *membershipStore) queryMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) *gorm.DB {
-	accountQuery := s.query(WithoutSoftDeleted(ctx), Account{}).
-		Select(`"accounts"."id"`).
-		Where(fmt.Sprintf(`"accounts"."account_type" = '%s' AND "accounts"."uid" = ?`, id.EntityType()), id.IDString()).
-		QueryExpr()
-	organizationQuery := s.query(WithoutSoftDeleted(ctx), Account{}).
-		Select(`"accounts"."id"`).
-		Joins(`JOIN "memberships" ON "memberships"."entity_type" = "accounts"."account_type" AND "memberships"."entity_id" = "accounts"."account_id"`).
-		Where(`"memberships"."account_id" = (?)`, accountQuery).
-		QueryExpr()
-	query := s.query(ctx, &Membership{})
-	if includeIndirect && id.EntityType() == "user" && entityType != "organization" {
-		query = query.Where("entity_type = ? AND (account_id = (?) OR account_id IN (?))", entityType, accountQuery, organizationQuery)
-	} else {
-		query = query.Where("entity_type = ? AND (account_id = (?))", entityType, accountQuery)
+func (s *membershipStore) queryWithIndirectMemberships(ctx context.Context, entityType string, entityIDs ...string) *gorm.DB {
+	idColumnName := fmt.Sprintf(`"%[1]ss"."%[1]s_id"`, entityType)
+	if entityType == "organization" {
+		idColumnName = `"organization_accounts"."uid"`
 	}
+	query := s.query(ctx, modelForEntityType(entityType)).Select([]string{
+		`"indirect_accounts"."account_type" "indirect_account_type"`,
+		`"indirect_accounts"."uid" "indirect_account_friendly_id"`,
+		`"indirect_memberships"."rights" "indirect_account_rights"`,
+		`"direct_accounts"."account_type" "direct_account_type"`,
+		`"direct_accounts"."uid" "direct_account_friendly_id"`,
+		`"direct_memberships"."rights" "direct_account_rights"`,
+		`"direct_memberships"."entity_type" "entity_type"`,
+		idColumnName + ` "entity_friendly_id"`,
+	})
+	if len(entityIDs) > 0 {
+		query = query.Where(idColumnName+" IN (?)", entityIDs)
+	}
+	if entityType == "organization" {
+		query = query.Joins(`JOIN "accounts" "organization_accounts" ON "organization_accounts"."account_id" = "organizations"."id" AND "organization_accounts"."account_type" = 'organization'`)
+	}
+	query = query.Joins(fmt.Sprintf(`JOIN "memberships" "direct_memberships" ON "direct_memberships"."entity_id" = "%[1]ss"."id" AND "direct_memberships"."entity_type" = '%[1]s'`, entityType)).
+		Joins(`JOIN "accounts" "direct_accounts" ON "direct_accounts"."id" = "direct_memberships"."account_id"`).
+		Joins(`LEFT JOIN "memberships" "indirect_memberships" ON "indirect_memberships"."entity_id" = "direct_accounts"."account_id" AND "indirect_memberships"."entity_type" = "direct_accounts"."account_type"`).
+		Joins(`LEFT JOIN "accounts" "indirect_accounts" ON "indirect_accounts"."id" = "indirect_memberships"."account_id"`)
+	query = query.Where(`"direct_accounts"."deleted_at" IS NULL AND "indirect_accounts"."deleted_at" IS NULL`)
 	return query
 }
 
-func (s *membershipStore) FindMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) ([]*ttnpb.EntityIdentifiers, error) {
-	defer trace.StartRegion(ctx, fmt.Sprintf("find %s memberships of %s", entityType, id.IDString())).End()
+func (s *membershipStore) queryWithDirectMemberships(ctx context.Context, entityType string, entityIDs ...string) *gorm.DB {
+	idColumnName := fmt.Sprintf(`"%[1]ss"."%[1]s_id"`, entityType)
+	if entityType == "organization" {
+		idColumnName = `"organization_accounts"."uid"`
+	}
+	query := s.query(ctx, modelForEntityType(entityType)).Select([]string{
+		`"direct_accounts"."account_type" "direct_account_type"`,
+		`"direct_accounts"."uid" "direct_account_friendly_id"`,
+		`"direct_memberships"."rights" "direct_account_rights"`,
+		`"direct_memberships"."entity_type" "entity_type"`,
+		idColumnName + ` "entity_friendly_id"`,
+	})
+	if len(entityIDs) > 0 {
+		query = query.Where(idColumnName+" IN (?)", entityIDs)
+	}
+	if entityType == "organization" {
+		query = query.Joins(`JOIN "accounts" "organization_accounts" ON "organization_accounts"."account_id" = "organizations"."id" AND "organization_accounts"."account_type" = 'organization'`)
+	}
+	query = query.Joins(fmt.Sprintf(`JOIN "memberships" "direct_memberships" ON "direct_memberships"."entity_id" = "%[1]ss"."id" AND "direct_memberships"."entity_type" = '%[1]s'`, entityType)).
+		Joins(`JOIN "accounts" "direct_accounts" ON "direct_accounts"."id" = "direct_memberships"."account_id"`)
+	query = query.Where(`"direct_accounts"."deleted_at" IS NULL`)
+	return query
+}
 
-	membershipsQuery := s.queryMemberships(ctx, id, entityType, includeIndirect).Select("entity_id").QueryExpr()
-	query := s.query(ctx, modelForEntityType(entityType))
+func (s *membershipStore) queryMemberships(ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, entityIDs []string, includeIndirect bool) *gorm.DB {
+	if accountID.EntityType() == "user" && includeIndirect {
+		return s.queryWithIndirectMemberships(ctx, entityType, entityIDs...).Where(
+			`("direct_accounts"."account_type" = 'user' AND "direct_accounts"."uid" = ?) OR ("indirect_accounts"."account_type" = 'user' AND "indirect_accounts"."uid" = ?)`,
+			accountID.IDString(), accountID.IDString(),
+		)
+	}
+	return s.queryWithDirectMemberships(ctx, entityType, entityIDs...).Where(
+		fmt.Sprintf(`"direct_accounts"."account_type" = '%s' AND "direct_accounts"."uid" = ?`, accountID.EntityType()),
+		accountID.IDString(),
+	)
+}
+
+func (s *membershipStore) FindMemberships(ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) ([]*ttnpb.EntityIdentifiers, error) {
+	defer trace.StartRegion(ctx, fmt.Sprintf("find %s memberships of %s", entityType, accountID.IDString())).End()
+
+	membershipsQuery := s.queryMemberships(ctx, accountID, entityType, nil, includeIndirect).Select(`"direct_memberships"."entity_id"`).QueryExpr()
+	query := s.query(ctx, modelForEntityType(entityType)).Where(fmt.Sprintf(`"%[1]ss"."id" IN (?)`, entityType), membershipsQuery)
 	switch entityType {
 	case "organization":
 		query = query.
 			Joins(`JOIN "accounts" ON "accounts"."account_type" = 'organization' AND "accounts"."account_id" = "organizations"."id"`).
-			Where(`"accounts"."account_type" = ? AND "accounts"."account_id" IN (?)`, entityType, membershipsQuery).
 			Select(`"accounts"."uid" AS "friendly_id"`)
 	default:
 		query = query.
-			Where(fmt.Sprintf(`"%[1]ss"."id" IN (?)`, entityType), membershipsQuery).
 			Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, entityType))
 	}
 
