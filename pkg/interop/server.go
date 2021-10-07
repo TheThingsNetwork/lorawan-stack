@@ -67,6 +67,8 @@ type Server struct {
 	senderClientCAs    map[string][]*x509.Certificate
 	senderClientCAPool *x509.CertPool
 
+	tokenVerifiers map[string]tokenVerifier
+
 	js JoinServer
 }
 
@@ -74,13 +76,15 @@ type Server struct {
 type Component interface {
 	Context() context.Context
 	RateLimiter() ratelimit.Interface
+	HTTPClient(context.Context) (*http.Client, error)
 }
 
 // NewServer builds a new server.
 func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.InteropServer) (*Server, error) {
-	logger := log.FromContext(c.Context()).WithField("namespace", "interop")
+	ctx := c.Context()
+	logger := log.FromContext(ctx).WithField("namespace", "interop")
 
-	senderClientCAs, err := fetchSenderClientCAs(c.Context(), conf)
+	senderClientCAs, err := fetchSenderClientCAs(ctx, conf)
 	if err != nil {
 		return nil, err
 	}
@@ -91,10 +95,22 @@ func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.Int
 		}
 	}
 
+	tokenVerifiers := make(map[string]tokenVerifier)
+	if conf.PacketBroker.Enabled {
+		iss := conf.PacketBroker.TokenIssuer
+		aud := conf.PublicTLSAddress // The token audience must match the configured public TLS address.
+		tokenVerifier, err := newPacketBrokerTokenVerifier(ctx, iss, aud, c)
+		if err != nil {
+			return nil, err
+		}
+		tokenVerifiers[iss] = tokenVerifier
+	}
+
 	s := &Server{
+		config:             conf,
 		senderClientCAs:    senderClientCAs,
 		senderClientCAPool: senderClientCAPool,
-		config:             conf,
+		tokenVerifiers:     tokenVerifiers,
 		js:                 &noopServer{},
 	}
 
@@ -191,7 +207,7 @@ func (s *Server) handle() http.Handler {
 		}
 		ctx, err = senderAuthenticator.Authenticate(ctx, r, data)
 		if err != nil {
-			writeError(w, r, header, ErrUnknownSender.WithCause(err))
+			writeError(w, r, header, err)
 			return
 		}
 

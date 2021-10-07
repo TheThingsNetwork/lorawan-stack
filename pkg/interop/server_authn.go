@@ -24,6 +24,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"gopkg.in/square/go-jose.v2/jwt"
 )
 
 // verifySenderNSID verifies that one of the address patterns matches the NSID.
@@ -129,6 +130,11 @@ func ApplicationServerAuthInfoFromContext(ctx context.Context) (*ApplicationServ
 	return authInfo, ok
 }
 
+type tokenVerifier interface {
+	VerifyNetworkServer(context.Context, *jwt.JSONWebToken) (*NetworkServerAuthInfo, error)
+	VerifyApplicationServer(context.Context, *jwt.JSONWebToken) (*ApplicationServerAuthInfo, error)
+}
+
 // authenticateNS authenticates the client as a Network Server.
 //
 // If the client presents a TLS client certificate, it is verified against the trusted CAs of the NetID.
@@ -161,6 +167,30 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byt
 				NetID:     types.NetID(header.SenderID),
 				Addresses: addrs,
 			}, nil
+		},
+		// Verify token in a best-effort manner.
+		func(ctx context.Context) (*NetworkServerAuthInfo, error) {
+			authz := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
+			if len(authz) < 2 || strings.ToLower(authz[0]) != "bearer" {
+				return nil, nil
+			}
+			token, err := jwt.ParseSigned(authz[1])
+			if err != nil {
+				return nil, nil
+			}
+			var claims jwt.Claims
+			err = token.UnsafeClaimsWithoutVerification(&claims)
+			if err != nil {
+				return nil, nil
+			}
+			if tokenVerifier, ok := s.tokenVerifiers[claims.Issuer]; ok {
+				authInfo, err := tokenVerifier.VerifyNetworkServer(ctx, token)
+				if err != nil {
+					return nil, errUnauthenticated.WithCause(err)
+				}
+				return authInfo, nil
+			}
+			return nil, nil
 		},
 	} {
 		authInfo, err := authFunc(ctx)

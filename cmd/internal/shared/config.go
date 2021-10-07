@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"golang.org/x/crypto/acme"
 )
@@ -72,7 +73,13 @@ var DefaultHTTPConfig = config.HTTP{
 
 // DefaultInteropServerConfig is the default interop server config.
 var DefaultInteropServerConfig = config.InteropServer{
-	ListenTLS: ":8886",
+	ListenTLS:        ":8886",
+	PublicTLSAddress: "https://" + DefaultPublicHost + ":8886",
+	TrustedProxies:   []string{"127.0.0.0/8", "10.0.0.0/8", "100.64.0.0/10", "172.16.0.0/12", "192.168.0.0/16"},
+	PacketBroker: config.PacketBrokerInteropAuth{
+		Enabled:     true,
+		TokenIssuer: packetbroker.DefaultTokenIssuer,
+	},
 }
 
 // DefaultGRPCConfig is the default config for GRPC.
