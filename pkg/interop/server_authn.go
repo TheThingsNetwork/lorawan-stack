@@ -22,6 +22,7 @@ import (
 	"net/url"
 	"strings"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
@@ -140,7 +141,7 @@ func ApplicationServerAuthInfoFromContext(ctx context.Context) (*ApplicationServ
 func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byte) (context.Context, error) {
 	var header NsMessageHeader
 	if err := json.Unmarshal(data, &header); err != nil {
-		return nil, err
+		return nil, ErrMalformedMessage.New()
 	}
 	if !header.ProtocolVersion.SupportsNSID() && header.SenderNSID != nil {
 		return nil, ErrMalformedMessage.New()
@@ -164,32 +165,33 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byt
 	} {
 		authInfo, err := authFunc(ctx)
 		if err != nil {
-			return nil, err
+			log.FromContext(ctx).WithError(err).Warn("Failed to authenticate Network Server")
+			return nil, ErrUnknownSender.WithCause(err)
 		}
 		if authInfo != nil {
 			if err := authInfo.Require(types.NetID(header.SenderID), header.SenderNSID); err != nil {
-				return nil, err
+				return nil, ErrUnknownSender.WithCause(err)
 			}
 			return NewContextWithNetworkServerAuthInfo(ctx, authInfo), nil
 		}
 	}
 
-	return nil, errUnauthenticated.New()
+	return nil, ErrUnknownSender.New()
 }
 
 func (s *Server) authenticateAS(ctx context.Context, r *http.Request, data []byte) (context.Context, error) {
 	var header AsMessageHeader
 	if err := json.Unmarshal(data, &header); err != nil {
-		return nil, err
+		return nil, ErrMalformedMessage.WithCause(err)
 	}
 
 	state := r.TLS
 	if state == nil {
-		return nil, errUnauthenticated.New()
+		return nil, ErrUnknownSender.New()
 	}
 	addrs, err := s.verifySenderCertificate(ctx, header.SenderID, state)
 	if err != nil {
-		return nil, err
+		return nil, ErrUnknownSender.WithCause(err)
 	}
 	return NewContextWithApplicationServerAuthInfo(ctx, &ApplicationServerAuthInfo{
 		ASID:      header.SenderID,
