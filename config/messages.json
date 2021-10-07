@@ -5822,6 +5822,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/interop:not_packet_broker_cluster": {
+    "translations": {
+      "en": "caller not authenticated as Packet Broker cluster"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "server_authn_token.go"
+    }
+  },
   "error:pkg/interop:not_registered": {
     "translations": {
       "en": "not registered"
@@ -7352,6 +7361,33 @@
       "file": "server.go"
     }
   },
+  "error:pkg/packetbroker:fetch_token": {
+    "translations": {
+      "en": "fetch token"
+    },
+    "description": {
+      "package": "pkg/packetbroker",
+      "file": "token.go"
+    }
+  },
+  "error:pkg/packetbroker:not_authorized": {
+    "translations": {
+      "en": "not authorized"
+    },
+    "description": {
+      "package": "pkg/packetbroker",
+      "file": "token.go"
+    }
+  },
+  "error:pkg/packetbroker:oauth2_token": {
+    "translations": {
+      "en": "invalid OAuth 2.0 token"
+    },
+    "description": {
+      "package": "pkg/packetbroker",
+      "file": "token.go"
+    }
+  },
   "error:pkg/packetbrokeragent:authentication_mode": {
     "translations": {
       "en": "invalid authentication mode `{mode}`"
@@ -7494,15 +7530,6 @@
     "description": {
       "package": "pkg/packetbrokeragent",
       "file": "grpc_disabled.go"
-    }
-  },
-  "error:pkg/packetbrokeragent:oauth2_token": {
-    "translations": {
-      "en": "invalid OAuth 2.0 token for network authentication"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "authenticator.go"
     }
   },
   "error:pkg/packetbrokeragent:packet_broker_internal": {
