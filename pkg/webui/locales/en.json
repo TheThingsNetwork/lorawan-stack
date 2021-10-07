@@ -892,6 +892,8 @@
   "lib.shared-messages.collaboratorId": "Collaborator ID",
   "lib.shared-messages.collaboratorIdPlaceholder": "collaborator-id",
   "lib.shared-messages.collaboratorWarningSelf": "Changing your own rights could result in loss of access",
+  "lib.shared-messages.collaboratorWarningAdmin": "This user is an administrator that will retain all rights to all entities regardless of collaborator status",
+  "lib.shared-messages.collaboratorWarningAdminSelf": "As an administrator, you aways retain all rights to all entities regardless of collaborator status",
   "lib.shared-messages.collaboratorModalWarning": "Are you sure you want to remove {collaboratorId} as a collaborator?",
   "lib.shared-messages.collaboratorModalWarningSelf": "Are you sure you want to remove yourself as a collaborator? Access to this entity will be lost until someone else adds you as a collaborator again.",
   "lib.shared-messages.collaboratorRemove": "Collaborator remove",

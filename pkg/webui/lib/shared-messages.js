@@ -91,6 +91,10 @@ export default defineMessages({
   collaboratorId: 'Collaborator ID',
   collaboratorIdPlaceholder: 'collaborator-id',
   collaboratorWarningSelf: 'Changing your own rights could result in loss of access',
+  collaboratorWarningAdmin:
+    'This user is an administrator that will retain all rights to all entities regardless of collaborator status',
+  collaboratorWarningAdminSelf:
+    'As an administrator, you aways retain all rights to all entities regardless of collaborator status',
   collaboratorModalWarning: 'Are you sure you want to remove {collaboratorId} as a collaborator?',
   collaboratorModalWarningSelf:
     'Are you sure you want to remove yourself as a collaborator? Access to this entity will be lost until someone else adds you as a collaborator again.',
