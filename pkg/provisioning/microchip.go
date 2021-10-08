@@ -27,6 +27,9 @@ type microchip struct{}
 
 // UniqueID returns the serial number.
 func (p *microchip) UniqueID(entry *pbtypes.Struct) (string, error) {
+	if entry == nil {
+		return "", errEntry.New()
+	}
 	sn := entry.Fields["uniqueId"].GetStringValue()
 	if sn == "" {
 		return "", errEntry.New()
