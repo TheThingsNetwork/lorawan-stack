@@ -81,9 +81,7 @@ describe('End device messaging', () => {
 
       cy.findByRole('button', { name: 'Simulate uplink' }).click()
 
-      cy.findByTestId('toast-notification')
-        .should('be.visible')
-        .and('contain', 'Uplink sent')
+      cy.findByTestId('toast-notification').should('be.visible').and('contain', 'Uplink sent')
 
       cy.findByTestId('error-notification').should('not.exist')
     })
@@ -102,7 +100,7 @@ describe('End device messaging', () => {
 
       cy.intercept(
         'GET',
-        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto,skip_payload_crypto_override,session,pending_session`,
+        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
         response,
       )
 
@@ -160,7 +158,7 @@ describe('End device messaging', () => {
 
       cy.intercept(
         'GET',
-        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto,skip_payload_crypto_override,session,pending_session`,
+        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
         response,
       )
 
