@@ -33,9 +33,9 @@ import messages from '../messages'
 
 const validationSchema = Yup.object()
   .shape({
-    skip_payload_crypto: Yup.boolean().default(false),
+    skip_payload_crypto_override: Yup.boolean().default(false),
     session: Yup.object().when(
-      ['skip_payload_crypto', '$mayEditKeys'],
+      ['skip_payload_crypto_override', '$mayEditKeys'],
       (skipPayloadCrypto, mayEditKeys, schema) => {
         if (skipPayloadCrypto || !mayEditKeys) {
           return schema.strip()
@@ -63,7 +63,7 @@ const ApplicationServerForm = React.memo(props => {
 
   const validationContext = React.useMemo(() => ({ mayEditKeys }), [mayEditKeys])
   const initialValues = React.useMemo(() => {
-    const { session = {}, skip_payload_crypto } = device
+    const { session = {}, skip_payload_crypto_override } = device
     const {
       keys = {
         app_s_key: {
@@ -74,7 +74,7 @@ const ApplicationServerForm = React.memo(props => {
 
     return validationSchema.cast(
       {
-        skip_payload_crypto,
+        skip_payload_crypto_override,
         session: {
           keys: {
             app_s_key: keys.app_s_key,
@@ -88,7 +88,7 @@ const ApplicationServerForm = React.memo(props => {
   const formRef = React.useRef(null)
   const sessionRef = React.useRef(device.session)
 
-  const [skipCrypto, setSkipCrypto] = React.useState(device.skip_payload_crypto || false)
+  const [skipCrypto, setSkipCrypto] = React.useState(device.skip_payload_crypto_override || false)
   const handleSkipCryptoChange = React.useCallback(
     evt => {
       const { checked } = evt.target
@@ -100,7 +100,7 @@ const ApplicationServerForm = React.memo(props => {
           validationSchema.cast(
             {
               ...values,
-              skip_payload_crypto: checked,
+              skip_payload_crypto_override: checked,
               session: {
                 keys: {
                   app_s_key: {
@@ -117,7 +117,7 @@ const ApplicationServerForm = React.memo(props => {
           validationSchema.cast(
             {
               ...values,
-              skip_payload_crypto: checked,
+              skip_payload_crypto_override: checked,
               // Reset initial app_s_key value.
               session: sessionRef.current || '',
             },
@@ -165,7 +165,7 @@ const ApplicationServerForm = React.memo(props => {
       <Form.Field
         autoFocus
         title={sharedMessages.skipCryptoTitle}
-        name="skip_payload_crypto"
+        name="skip_payload_crypto_override"
         description={sharedMessages.skipCryptoDescription}
         component={Checkbox}
         onChange={handleSkipCryptoChange}

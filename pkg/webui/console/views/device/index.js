@@ -132,7 +132,6 @@ import style from './device.styl'
     'claim_authentication_code',
     'mac_state.recent_uplinks',
     'attributes',
-    'skip_payload_crypto',
     'skip_payload_crypto_override',
   ]
 
