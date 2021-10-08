@@ -35,7 +35,7 @@ import {
   selectApplicationSiteTitle,
 } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { id as userRegexp } from '@ttn-lw/lib/regexp'
+import { userId as userIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { selectEnableUserRegistration } from '@account/lib/selectors/app-config'
 
@@ -56,7 +56,7 @@ const validationSchema = Yup.object().shape({
   user_id: Yup.string()
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(36, Yup.passValues(sharedMessages.validateTooLong))
-    .matches(userRegexp, Yup.passValues(sharedMessages.validateIdFormat))
+    .matches(userIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
     .required(sharedMessages.validateRequired)
     .trim(),
   password: Yup.string().required(sharedMessages.validateRequired),

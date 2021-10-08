@@ -14,3 +14,4 @@
 
 export const url = /^\b((http|https):\/\/?)[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|\/?))$/
 export const id = /^[a-z0-9](?:[-]?[a-z0-9]){2,}$/
+export const userId = /^[a-z0-9](?:[-]?[a-z0-9]){1,}$/

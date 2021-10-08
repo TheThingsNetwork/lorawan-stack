@@ -31,8 +31,7 @@ import Yup from '@ttn-lw/lib/yup'
 import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import { id as collaboratorIdRegexp } from '@console/lib/regexp'
+import { userId as collaboratorIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { selectUserId } from '@console/store/selectors/user'
 import { selectUserById } from '@console/store/selectors/users'
