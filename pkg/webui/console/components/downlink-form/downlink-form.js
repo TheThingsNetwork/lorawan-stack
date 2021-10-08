@@ -23,6 +23,7 @@ import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import toast from '@ttn-lw/components/toast'
 import Form from '@ttn-lw/components/form'
+import CodeEditor from '@ttn-lw/components/code-editor'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -34,37 +35,77 @@ import { hexToBase64 } from '@console/lib/bytes'
 
 const m = defineMessages({
   insertMode: 'Insert Mode',
+  payloadType: 'Payload type',
+  bytes: 'Bytes',
   replace: 'Replace downlink queue',
   push: 'Push to downlink queue (append)',
   confirmedDownlink: 'Confirmed downlink',
   scheduleDownlink: 'Schedule downlink',
   downlinkSuccess: 'Downlink scheduled',
-  payloadDescription: 'The desired payload bytes of the downlink message',
+  bytesPayloadDescription: 'The desired payload bytes of the downlink message',
+  jsonPayloadDescription: 'The decoded payload of the downlink message',
   invalidSessionWarning:
     'Downlinks can only be scheduled for end devices with a valid session. Please make sure your end device is properly connected to the network.',
 })
 
 const validationSchema = Yup.object({
   _mode: Yup.string().oneOf(['replace', 'push']).required(sharedMessages.validateRequired),
+  _payload_type: Yup.string().oneOf(['bytes', 'json']),
   f_port: Yup.number()
     .min(1, Yup.passValues(sharedMessages.validateNumberGte))
     .max(223, Yup.passValues(sharedMessages.validateNumberLte))
     .required(sharedMessages.validateRequired),
   confirmed: Yup.bool().required(),
-  frm_payload: Yup.string().test(
-    'len',
-    Yup.passValues(sharedMessages.validateHexLength),
-    val => !Boolean(val) || val.length % 2 === 0,
-  ),
+  frm_payload: Yup.string().when('_payload_type', {
+    is: type => type === 'bytes',
+    then: schema =>
+      schema.test(
+        'len',
+        Yup.passValues(sharedMessages.validateHexLength),
+        val => !Boolean(val) || val.length % 2 === 0,
+      ),
+    otherwise: schema => schema.strip(),
+  }),
+  decoded_payload: Yup.string().when('_payload_type', {
+    is: type => type === 'json',
+    then: schema =>
+      schema.test('valid-json', sharedMessages.validateJson, json => {
+        try {
+          JSON.parse(json)
+          return true
+        } catch (e) {
+          return false
+        }
+      }),
+    otherwise: schema => schema.strip(),
+  }),
 })
 
+const initialValues = {
+  _mode: 'replace',
+  _payload_type: 'bytes',
+  f_port: 1,
+  confirmed: false,
+  frm_payload: '',
+  decoded_payload: '',
+}
+
 const DownlinkForm = ({ appId, devId, device, downlinkQueue, skipPayloadCrypto }) => {
+  const [payloadType, setPayloadType] = React.useState('bytes')
   const [error, setError] = useState('')
+
   const handleSubmit = useCallback(
     async (vals, { setSubmitting, resetForm }) => {
-      const { _mode, ...values } = validationSchema.cast(vals)
+      const { _mode, _payload_type, ...values } = validationSchema.cast(vals)
       try {
-        values.frm_payload = hexToBase64(values.frm_payload)
+        if (_payload_type === 'bytes') {
+          values.frm_payload = hexToBase64(values.frm_payload)
+        }
+
+        if (_payload_type === 'json') {
+          values.decoded_payload = JSON.parse(values.decoded_payload)
+        }
+
         await downlinkQueue[_mode](appId, devId, [values])
         toast({
           title: sharedMessages.success,
@@ -79,13 +120,6 @@ const DownlinkForm = ({ appId, devId, device, downlinkQueue, skipPayloadCrypto }
     },
     [appId, devId, downlinkQueue],
   )
-
-  const initialValues = {
-    _mode: 'replace',
-    f_port: 1,
-    confirmed: false,
-    frm_payload: '',
-  }
 
   const validSession = device.session || device.pending_session
   const payloadCryptoSkipped = device.skip_payload_crypto_override || skipPayloadCrypto
@@ -120,13 +154,35 @@ const DownlinkForm = ({ appId, devId, device, downlinkQueue, skipPayloadCrypto }
           required
         />
         <Form.Field
-          title={sharedMessages.payload}
-          description={m.payloadDescription}
-          name="frm_payload"
-          component={Input}
-          type="byte"
-          unbounded
-        />
+          name="_payload_type"
+          title={m.payloadType}
+          component={RadioButton.Group}
+          onChange={setPayloadType}
+          horizontal
+        >
+          <RadioButton label={m.bytes} value="bytes" />
+          <RadioButton label="JSON" value="json" />
+        </Form.Field>
+        {payloadType === 'bytes' ? (
+          <Form.Field
+            title={sharedMessages.payload}
+            description={m.bytesPayloadDescription}
+            name="frm_payload"
+            component={Input}
+            type="byte"
+            unbounded
+          />
+        ) : (
+          <Form.Field
+            title={sharedMessages.payload}
+            description={m.jsonPayloadDescription}
+            language="json"
+            name="decoded_payload"
+            component={CodeEditor}
+            minLines={14}
+            maxLines={14}
+          />
+        )}
         <Form.Field label={m.confirmedDownlink} name="confirmed" component={Checkbox} />
         <SubmitBar>
           <Form.Submit component={SubmitButton} message={m.scheduleDownlink} />

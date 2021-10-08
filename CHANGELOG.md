@@ -14,6 +14,7 @@ For details about compatibility between different releases, see the **Commitment
 - Support for enhanced security policies of Packet Broker services.
 - Backend Interfaces middleware to extract proxy headers from trusted proxies. This adds a configuration `interop.trusted-proxies` that is similar to the existing `http.trusted-proxies` option.
 - Handling of MAC and PHY versions in end device forms based on selected frequency plan in the Console.
+- Support for scheduling downlink messages as JSON in the Console.
 
 ### Changed
 

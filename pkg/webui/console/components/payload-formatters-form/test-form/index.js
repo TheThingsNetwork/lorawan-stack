@@ -33,7 +33,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './test-form.styl'
 
 const m = defineMessages({
-  jsonError: '{field} must be a valid JSON object',
   validResult: 'Payload is valid',
   noResult: 'No test result generated yet',
   testDecoder: 'Test decoder',
@@ -56,7 +55,7 @@ const validationSchema = Yup.object({
       )
     }
 
-    return schema.test('valid-json', Yup.passValues(m.jsonError), json => {
+    return schema.test('valid-json', Yup.passValues(sharedMessages.validateJson), json => {
       try {
         JSON.parse(json)
         return true

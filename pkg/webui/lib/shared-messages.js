@@ -398,6 +398,7 @@ export default defineMessages({
   validateHexLength: '{field} must be a complete hex value',
   validateIdFormat: '{field} must contain only lowercase letters, numbers and dashes (-)',
   validateInt32: '{field} must be a whole number, negative or positive',
+  validateJson: '{field} must be a valid JSON object',
   validateLatitude: 'Latitude must be a whole or decimal number between -90 and 90',
   validateLength: '{field} must be exactly {length} characters long',
   validateLongitude: 'Longitude must be a whole or decimal number between -180 and 180',
