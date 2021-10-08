@@ -19,6 +19,7 @@ import (
 )
 
 var (
+	errNoPublicTLSAddress  = errors.DefineFailedPrecondition("no_public_tls_address", "no public TLS address configured for interop")
 	errUnknownMACVersion   = errors.DefineInvalidArgument("unknown_mac_version", "unknown MAC version")
 	errInvalidLength       = errors.DefineInvalidArgument("invalid_length", "invalid length")
 	errInvalidRequestType  = errors.DefineInvalidArgument("invalid_request_type", "invalid request type `{type}`")

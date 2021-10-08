@@ -5813,6 +5813,15 @@
       "file": "client.go"
     }
   },
+  "error:pkg/interop:no_public_tls_address": {
+    "translations": {
+      "en": "no public TLS address configured for interop"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/interop:no_roaming_agreement": {
     "translations": {
       "en": "no roaming agreement"

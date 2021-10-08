@@ -98,7 +98,11 @@ func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.Int
 	tokenVerifiers := make(map[string]tokenVerifier)
 	if conf.PacketBroker.Enabled {
 		iss := conf.PacketBroker.TokenIssuer
-		aud := conf.PublicTLSAddress // The token audience must match the configured public TLS address.
+		// The token audience must match the configured public TLS address. Therefore, a non-empty value must be set.
+		aud := conf.PublicTLSAddress
+		if aud == "" {
+			return nil, errNoPublicTLSAddress.New()
+		}
 		tokenVerifier, err := newPacketBrokerTokenVerifier(ctx, iss, aud, c)
 		if err != nil {
 			return nil, err
