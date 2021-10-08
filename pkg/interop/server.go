@@ -81,8 +81,8 @@ type Component interface {
 
 // NewServer builds a new server.
 func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.InteropServer) (*Server, error) {
-	ctx := c.Context()
-	logger := log.FromContext(ctx).WithField("namespace", "interop")
+	ctx := log.NewContextWithField(c.Context(), "namespace", "interop")
+	logger := log.FromContext(ctx)
 
 	senderClientCAs, err := fetchSenderClientCAs(ctx, conf)
 	if err != nil {
