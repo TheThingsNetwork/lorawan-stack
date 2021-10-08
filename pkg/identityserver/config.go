@@ -102,7 +102,10 @@ type Config struct {
 		ApplicationLimit int                  `name:"application-limit" description:"Maximum DevEUI addresses to be issued per application"`
 		Prefix           ttntypes.EUI64Prefix `name:"prefix" description:"DevEUI block prefix"`
 		InitCounter      int64                `name:"init-counter" description:"Initial counter value for the addresses to be issued (default 0)"`
-	} `name:"dev-eui-block" description:"IEEE MAC block used to issue DevEUI's to devices that are not yet programmed"`
+	} `name:"dev-eui-block" description:"IEEE MAC block used to issue DevEUIs to devices that are not yet programmed"`
+	Network struct {
+		NetID ttntypes.NetID `name:"net-id" description:"NetID of this network"`
+	} `name:"network"`
 }
 
 type emailTemplatesConfig struct {

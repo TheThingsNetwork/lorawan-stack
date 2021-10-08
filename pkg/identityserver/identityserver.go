@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -177,6 +178,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	c.RegisterGRPC(is)
 	c.RegisterWeb(is.oauth)
 	c.RegisterWeb(is.account)
+	c.RegisterInterop(is)
 
 	return is, nil
 }
@@ -229,6 +231,11 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterEndDeviceRegistrySearchHandler(is.Context(), s, conn)
 	ttnpb.RegisterOAuthAuthorizationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterContactInfoRegistryHandler(is.Context(), s, conn)
+}
+
+// RegisterInterop registers the LoRaWAN Backend Interfaces interoperability services.
+func (is *IdentityServer) RegisterInterop(srv *interop.Server) {
+	srv.RegisterIS(&interopServer{IdentityServer: is})
 }
 
 // Roles returns the roles that the Identity Server fulfills.

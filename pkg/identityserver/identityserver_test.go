@@ -349,6 +349,7 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 	conf.DevEUIBlock.Enabled = true
 	conf.DevEUIBlock.Prefix = euiBlock
 	conf.DevEUIBlock.ApplicationLimit = 3
+	conf.Network.NetID = test.DefaultNetID
 	is, err := New(c, conf)
 	if err != nil {
 		t.Fatal(err)
