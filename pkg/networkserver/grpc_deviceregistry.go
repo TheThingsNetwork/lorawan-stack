@@ -1202,8 +1202,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
 			fp, phy, err := DeviceFrequencyPlanAndBand(&ttnpb.EndDevice{
-				FrequencyPlanId:   m["frequency_plan_id"].FrequencyPlanId,
-				LorawanPhyVersion: m["lorawan_phy_version"].LorawanPhyVersion,
+				FrequencyPlanId:   m["frequency_plan_id"].GetFrequencyPlanId(),
+				LorawanPhyVersion: m["lorawan_phy_version"].GetLorawanPhyVersion(),
 			}, ns.FrequencyPlans)
 			if err != nil {
 				return err
