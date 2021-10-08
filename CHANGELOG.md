@@ -24,6 +24,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Removed
 
+- Option to select targeted stack components during end device import in the Console.
+
 ### Fixed
 
 - LoRaWAN Backend Interfaces 1.1 fields that were used in 1.0 (most notably `SenderNSID` and `ReceiverNSID`). Usage of `NSID` is now only supported with LoRaWAN Backend Interfaces 1.1 as specified.
