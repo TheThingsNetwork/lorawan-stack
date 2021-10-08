@@ -33,6 +33,7 @@ For details about compatibility between different releases, see the **Commitment
 - LoRaWAN Backend Interfaces 1.1 fields that were used in 1.0 (most notably `SenderNSID` and `ReceiverNSID`). Usage of `NSID` is now only supported with LoRaWAN Backend Interfaces 1.1 as specified.
 - Connection status not being shown as toast notification.
 - Registering and logging in users with 2 character user IDs in the Account App.
+- Frequency plan display for the gateway overview page in the Console.
 
 ### Security
 
