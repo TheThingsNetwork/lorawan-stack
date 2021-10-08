@@ -36,6 +36,8 @@ let connectionCheckResolve
 
 const connectionManagementLogic = createLogic({
   type: status.SET_CONNECTION_STATUS,
+  debounce: 1000,
+  latest: true,
   process: async ({ action }, dispatch, done) => {
     if (action.payload.onlineStatus === ONLINE_STATUS.CHECKING) {
       if (action.meta && action.meta._attachPromise) {
@@ -75,6 +77,7 @@ const connectionCheckLogic = createLogic({
   // also trigger reconnection attempts, which is why this action is throttled
   // to 3 seconds.
   throttle: 3000,
+  latest: true,
   validate: ({ action, getState }, allow, reject) => {
     if (selectIsOfflineStatus(getState()) && navigator.onLine) {
       return allow(action)
@@ -103,8 +106,8 @@ const connectionCheckFailLogic = createLogic({
   cancelType: status.ATTEMPT_RECONNECT_SUCCESS,
   warnTimeout: 65000,
   process: (_, dispatch, done) => {
-    // Use increasing intervals, capped at 1min to prevent request spamming.
-    interval = Math.min(interval * 1.5, 60000)
+    // Use increasing intervals, capped at 30min to prevent request spamming.
+    interval = Math.min(interval * 1.5, 30 * 60 * 1000)
     periodicCheck = setTimeout(connectionCheck(dispatch, done), interval)
   },
 })
