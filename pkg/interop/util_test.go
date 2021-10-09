@@ -15,14 +15,21 @@
 package interop_test
 
 import (
+	"context"
+	"crypto/ed25519"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
 
+	"github.com/gorilla/mux"
+	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2/jwt"
 )
 
 var (
@@ -78,7 +85,7 @@ func makeClientTLSConfig() *tls.Config {
 func makeServerTLSConfig() *tls.Config {
 	return &tls.Config{
 		Certificates: makeServerCertificates(),
-		ClientAuth:   tls.RequireAndVerifyClientCert,
+		ClientAuth:   tls.VerifyClientCertIfGiven,
 		ClientCAs:    makeCertPool(),
 	}
 }
@@ -88,4 +95,55 @@ func newTLSServer(hdl http.Handler) *httptest.Server {
 	srv.TLS = makeServerTLSConfig()
 	srv.StartTLS()
 	return srv
+}
+
+func makePacketBrokerTokenIssuer(ctx context.Context, subject string) (iss string, tok func(aud string) string) {
+	public, private, err := ed25519.GenerateKey(nil)
+	if err != nil {
+		panic(err)
+	}
+	var (
+		publicJWK = jose.JSONWebKey{
+			Algorithm: string(jose.EdDSA),
+			Key:       public,
+			KeyID:     "test",
+		}
+		privateJWK = jose.JSONWebKey{
+			Algorithm: string(jose.EdDSA),
+			Key:       private,
+			KeyID:     "test",
+		}
+		sig = test.Must(jose.NewSigner(jose.SigningKey{
+			Algorithm: jose.SignatureAlgorithm(privateJWK.Algorithm),
+			Key:       privateJWK,
+		}, new(jose.SignerOptions).WithType("JWT"))).(jose.Signer)
+	)
+
+	router := mux.NewRouter()
+	router.Handle("/.well-known/jwks.json", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(&jose.JSONWebKeySet{
+			Keys: []jose.JSONWebKey{publicJWK},
+		})
+	}))
+	srv := httptest.NewServer(router)
+
+	go func() {
+		<-ctx.Done()
+		srv.Close()
+	}()
+
+	return srv.URL, func(aud string) string {
+		claims := packetbroker.TokenClaims{
+			Claims: jwt.Claims{
+				Issuer:   srv.URL,
+				Subject:  subject,
+				Audience: jwt.Audience{aud},
+			},
+			PacketBroker: packetbroker.IAMTokenClaims{
+				Cluster: true,
+			},
+		}
+		return test.Must(jwt.Signed(sig).Claims(claims).CompactSerialize()).(string)
+	}
 }

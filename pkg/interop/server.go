@@ -67,6 +67,8 @@ type Server struct {
 	senderClientCAs    map[string][]*x509.Certificate
 	senderClientCAPool *x509.CertPool
 
+	tokenVerifiers map[string]tokenVerifier
+
 	js JoinServer
 }
 
@@ -74,13 +76,15 @@ type Server struct {
 type Component interface {
 	Context() context.Context
 	RateLimiter() ratelimit.Interface
+	HTTPClient(context.Context) (*http.Client, error)
 }
 
 // NewServer builds a new server.
 func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.InteropServer) (*Server, error) {
-	logger := log.FromContext(c.Context()).WithField("namespace", "interop")
+	ctx := log.NewContextWithField(c.Context(), "namespace", "interop")
+	logger := log.FromContext(ctx)
 
-	senderClientCAs, err := fetchSenderClientCAs(c.Context(), conf)
+	senderClientCAs, err := fetchSenderClientCAs(ctx, conf)
 	if err != nil {
 		return nil, err
 	}
@@ -91,15 +95,29 @@ func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.Int
 		}
 	}
 
+	tokenVerifiers := make(map[string]tokenVerifier)
+	if conf.PacketBroker.Enabled {
+		iss := conf.PacketBroker.TokenIssuer
+		// The token audience must match the configured public TLS address. Therefore, a non-empty value must be set.
+		aud := conf.PublicTLSAddress
+		if aud == "" {
+			return nil, errNoPublicTLSAddress.New()
+		}
+		tokenVerifier, err := newPacketBrokerTokenVerifier(ctx, iss, aud, c)
+		if err != nil {
+			return nil, err
+		}
+		tokenVerifiers[iss] = tokenVerifier
+	}
+
 	s := &Server{
+		config:             conf,
 		senderClientCAs:    senderClientCAs,
 		senderClientCAPool: senderClientCAPool,
-		config:             conf,
+		tokenVerifiers:     tokenVerifiers,
 		js:                 &noopServer{},
 	}
 
-	var proxyConfiguration webmiddleware.ProxyConfiguration
-	proxyConfiguration.ParseAndAddTrusted(conf.TrustedProxies...)
 	s.router = mux.NewRouter()
 	s.router.NotFoundHandler = http.HandlerFunc(webhandlers.NotFound)
 	s.router.Use(
@@ -107,7 +125,6 @@ func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.Int
 		mux.MiddlewareFunc(webmiddleware.FillContext(contextFillers...)),
 		mux.MiddlewareFunc(webmiddleware.RequestURL()),
 		mux.MiddlewareFunc(webmiddleware.RequestID()),
-		mux.MiddlewareFunc(webmiddleware.ProxyHeaders(proxyConfiguration)),
 		mux.MiddlewareFunc(webmiddleware.MaxBody(1<<15)), // 32 kB.
 		mux.MiddlewareFunc(webmiddleware.Log(logger, nil)),
 		mux.MiddlewareFunc(ratelimit.HTTPMiddleware(c.RateLimiter(), "http:interop")),
@@ -191,7 +208,8 @@ func (s *Server) handle() http.Handler {
 		}
 		ctx, err = senderAuthenticator.Authenticate(ctx, r, data)
 		if err != nil {
-			writeError(w, r, header, ErrUnknownSender.WithCause(err))
+			logger.WithError(err).Warn("Failed to authenticate")
+			writeError(w, r, header, err)
 			return
 		}
 

@@ -1483,7 +1483,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name: "1.0.0/interop auth/new device",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, &interop.NetworkServerAuthInfo{
 					NetID:     types.NetID{0x42, 0xff, 0xff},
 					Addresses: []string{"*.test.org"},
 				})
@@ -1575,7 +1575,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name: "1.0.0/NetID mismatch",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, &interop.NetworkServerAuthInfo{
 					Addresses: []string{nsAddr},
 				})
 			},
@@ -1629,7 +1629,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name: "1.0.0/no NetID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, &interop.NetworkServerAuthInfo{
 					Addresses: []string{nsAddr},
 				})
 			},
@@ -1682,7 +1682,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name: "1.0.0/address not authorized",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, &interop.NetworkServerAuthInfo{
 					Addresses: []string{"other.hostname.local"},
 				})
 			},
@@ -2476,7 +2476,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Address not authorized",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithApplicationServerAuthInfo(ctx, interop.ApplicationServerAuthInfo{
+				return interop.NewContextWithApplicationServerAuthInfo(ctx, &interop.ApplicationServerAuthInfo{
 					Addresses: []string{"other.hostname.local"},
 				})
 			},
@@ -2671,7 +2671,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Matching request/interop auth/address ID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithApplicationServerAuthInfo(ctx, interop.ApplicationServerAuthInfo{
+				return interop.NewContextWithApplicationServerAuthInfo(ctx, &interop.ApplicationServerAuthInfo{
 					Addresses: []string{"as.test.org"},
 				})
 			},
@@ -2728,7 +2728,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Matching request/interop auth/custom ID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithApplicationServerAuthInfo(ctx, interop.ApplicationServerAuthInfo{
+				return interop.NewContextWithApplicationServerAuthInfo(ctx, &interop.ApplicationServerAuthInfo{
 					ASID: "test-as-id",
 				})
 			},

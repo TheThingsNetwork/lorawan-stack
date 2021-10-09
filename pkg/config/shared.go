@@ -411,12 +411,21 @@ func (c SenderClientCA) Fetcher(ctx context.Context) (fetch.Interface, error) {
 	}
 }
 
+// PacketBrokerInteropAuth respresents authen
+type PacketBrokerInteropAuth struct {
+	Enabled     bool   `name:"enabled" description:"Enable Packet Broker to authenticate"`
+	TokenIssuer string `name:"token-issuer" description:"Required issuer of Packet Broker tokens"`
+}
+
 // InteropServer represents the server-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropServer struct {
-	ListenTLS                string            `name:"listen-tls" description:"Address for the interop server to listen on"`
-	TrustedProxies           []string          `name:"trusted-proxies" description:"CIDRs of trusted reverse proxies"`
+	ListenTLS        string `name:"listen-tls" description:"Address for the interop server to listen on"`
+	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the interop server"`
+
 	SenderClientCA           SenderClientCA    `name:"sender-client-ca"`
 	SenderClientCADeprecated map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust; deprecated - use sender-client-ca instead"`
+
+	PacketBroker PacketBrokerInteropAuth `name:"packet-broker"`
 }
 
 // ServiceBase represents base service configuration.
@@ -428,7 +437,7 @@ type ServiceBase struct {
 	Events           Events               `name:"events"`
 	GRPC             GRPC                 `name:"grpc"`
 	HTTP             HTTP                 `name:"http"`
-	Interop          InteropServer        `name:"interop"`
+	Interop          InteropServer        `name:"interop" description:"LoRaWAN Backend Interfaces interoperability configuration"`
 	TLS              tlsconfig.Config     `name:"tls"`
 	Sentry           Sentry               `name:"sentry"`
 	Blob             BlobConfig           `name:"blob"`
