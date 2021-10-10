@@ -76,12 +76,13 @@ class GatewayDataForm extends React.Component {
 
   @bind
   onSubmit(values, helpers) {
-    const { onSubmit } = this.props
+    const { onSubmit, gsEnabled } = this.props
 
     const castedValues = validationSchema.cast(
       isEmptyFrequencyPlan(values.frequency_plan_id)
         ? { ...values, frequency_plan_id: '' }
         : values,
+      { context: { gsEnabled } },
     )
 
     onSubmit(castedValues, helpers)
