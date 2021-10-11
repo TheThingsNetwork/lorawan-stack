@@ -37,21 +37,24 @@ func TestInteropServer(t *testing.T) {
 
 		joinEUI := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 		devEUI := types.EUI64{8, 7, 6, 5, 4, 3, 2, 1}
-
-		_, err := store.GetEndDeviceStore(is.db).CreateEndDevice(ctx, &ttnpb.EndDevice{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationId: "test-app-id",
-				},
-				DeviceId: "test-device-id",
-				JoinEui:  &joinEUI,
-				DevEui:   &devEUI,
+		id := ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationId: "test-app-id",
 			},
+			DeviceId: "test-device-id",
+			JoinEui:  &joinEUI,
+			DevEui:   &devEUI,
+		}
+
+		store := store.GetEndDeviceStore(is.db)
+		_, err := store.CreateEndDevice(ctx, &ttnpb.EndDevice{
+			EndDeviceIdentifiers: id,
 			NetworkServerAddress: "thethings.example.com",
 		})
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
+		defer store.DeleteEndDevice(ctx, &id)
 
 		ctx := interop.NewContextWithNetworkServerAuthInfo(ctx, &interop.NetworkServerAuthInfo{
 			NetID:     types.NetID{0x0, 0x0, 0x0},
