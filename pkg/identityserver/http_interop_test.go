@@ -95,7 +95,7 @@ func TestInteropServer(t *testing.T) {
 		}
 		a.So(ans.HNetID, should.Equal, interop.NetID(test.DefaultNetID))
 		if a.So(ans.HNSID, should.NotBeNil) {
-			a.So(*ans.HNSID, should.Equal, "thethings.example.com")
+			a.So(*ans.HNSID, should.Equal, "test@thethings.example.com")
 		}
 
 		// Test an unknown device
