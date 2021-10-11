@@ -123,9 +123,14 @@ func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids t
 	devUID := unique.ID(ctx, ids)
 	uidKey := r.uidKey(devUID)
 
+	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	if err != nil {
+		return nil, err
+	}
+
 	defer trace.StartRegion(ctx, "list application package associations by device id").End()
 
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) (err error) {
+	err = ttnredis.LockedWatch(ctx, r.Redis, uidKey, lockerID, r.LockTTL, func(tx *redis.Tx) (err error) {
 		opts := []ttnredis.FindProtosOption{ttnredis.FindProtosSorted(false)}
 
 		limit, offset := ttnredis.PaginationLimitAndOffsetFromContext(ctx)
@@ -149,7 +154,7 @@ func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids t
 				return true, nil
 			}
 		})
-	}, uidKey)
+	})
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
@@ -163,10 +168,15 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 	uidKey := r.uidKey(devUID)
 	associationkey := r.associationKey(devUID, fPort)
 
+	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	if err != nil {
+		return nil, err
+	}
+
 	defer trace.StartRegion(ctx, "set application package association by id").End()
 
 	var pb *ttnpb.ApplicationPackageAssociation
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+	err = ttnredis.LockedWatch(ctx, r.Redis, associationkey, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, associationkey)
 		stored := &ttnpb.ApplicationPackageAssociation{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -285,7 +295,7 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 			return err
 		}
 		return nil
-	}, associationkey)
+	})
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
@@ -308,9 +318,14 @@ func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context
 	appUID := unique.ID(ctx, ids)
 	uidKey := r.uidKey(appUID)
 
+	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	if err != nil {
+		return nil, err
+	}
+
 	defer trace.StartRegion(ctx, "list application package default associations by application id").End()
 
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) (err error) {
+	err = ttnredis.LockedWatch(ctx, r.Redis, uidKey, lockerID, r.LockTTL, func(tx *redis.Tx) (err error) {
 		opts := []ttnredis.FindProtosOption{ttnredis.FindProtosSorted(false)}
 
 		limit, offset := ttnredis.PaginationLimitAndOffsetFromContext(ctx)
@@ -334,7 +349,7 @@ func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context
 				return true, nil
 			}
 		})
-	}, uidKey)
+	})
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
@@ -348,10 +363,15 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 	uidKey := r.uidKey(appUID)
 	associationkey := r.associationKey(appUID, fPort)
 
+	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	if err != nil {
+		return nil, err
+	}
+
 	defer trace.StartRegion(ctx, "set application package default association by id").End()
 
 	var pb *ttnpb.ApplicationPackageDefaultAssociation
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+	err = ttnredis.LockedWatch(ctx, r.Redis, associationkey, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, associationkey)
 		stored := &ttnpb.ApplicationPackageDefaultAssociation{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -466,7 +486,7 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 			return err
 		}
 		return nil
-	}, associationkey)
+	})
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
