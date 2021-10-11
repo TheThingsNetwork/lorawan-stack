@@ -294,7 +294,7 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids *tt
 }
 
 // GetDefaultAssociation implements applicationpackages.AssociationRegistry.
-func (r ApplicationPackagesRegistry) GetDefaultAssociation(ctx context.Context, ids ttnpb.ApplicationPackageDefaultAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageDefaultAssociation, error) {
+func (r ApplicationPackagesRegistry) GetDefaultAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageDefaultAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageDefaultAssociation, error) {
 	pb := &ttnpb.ApplicationPackageDefaultAssociation{}
 	defer trace.StartRegion(ctx, "get application package default association by id").End()
 	if err := ttnredis.GetProto(ctx, r.Redis, r.associationKey(unique.ID(ctx, ids.ApplicationIds), r.fPortStr(ids.FPort))).ScanProto(pb); err != nil {

@@ -35,7 +35,7 @@ type AssociationRegistry interface {
 // DefaultAssociationRegistry is a registry for application package default associations.
 type DefaultAssociationRegistry interface {
 	// GetDefaultAssociation returns the default association by its identifiers.
-	GetDefaultAssociation(ctx context.Context, ids ttnpb.ApplicationPackageDefaultAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageDefaultAssociation, error)
+	GetDefaultAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageDefaultAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageDefaultAssociation, error)
 	// ListDefaultAssociation returns all of the default associations of the application.
 	ListDefaultAssociations(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationPackageDefaultAssociation, error)
 	// SetDefaultAssociation creates, updates or deletes the default association by its identifiers.
