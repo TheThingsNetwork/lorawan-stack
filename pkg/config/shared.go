@@ -421,8 +421,8 @@ type PacketBrokerInteropAuth struct {
 
 // InteropServer represents the server-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropServer struct {
-	ListenTLS        string `name:"listen-tls" description:"Address for the interop server to listen on"`
-	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the interop server"`
+	ListenTLS        string `name:"listen-tls" description:"Address for the interop server for LoRaWAN Backend Interfaces to listen on"`
+	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the interop server for LoRaWAN Backend Interfaces"`
 
 	SenderClientCA           SenderClientCA    `name:"sender-client-ca"`
 	SenderClientCADeprecated map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust; deprecated - use sender-client-ca instead"`
@@ -439,7 +439,7 @@ type ServiceBase struct {
 	Events           Events               `name:"events"`
 	GRPC             GRPC                 `name:"grpc"`
 	HTTP             HTTP                 `name:"http"`
-	Interop          InteropServer        `name:"interop" description:"LoRaWAN Backend Interfaces interoperability configuration"`
+	Interop          InteropServer        `name:"interop"`
 	TLS              tlsconfig.Config     `name:"tls"`
 	Sentry           Sentry               `name:"sentry"`
 	Blob             BlobConfig           `name:"blob"`
