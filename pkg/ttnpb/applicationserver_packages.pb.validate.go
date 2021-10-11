@@ -258,7 +258,14 @@ func (m *ApplicationPackageAssociationIdentifiers) ValidateFields(paths ...strin
 		switch name {
 		case "end_device_ids":
 
-			if v, ok := interface{}(&m.EndDeviceIds).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetEndDeviceIds() == nil {
+				return ApplicationPackageAssociationIdentifiersValidationError{
+					field:  "end_device_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEndDeviceIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageAssociationIdentifiersValidationError{
 						field:  "end_device_ids",

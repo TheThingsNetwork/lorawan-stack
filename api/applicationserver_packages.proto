@@ -46,7 +46,7 @@ message ApplicationPackages {
 }
 
 message ApplicationPackageAssociationIdentifiers {
-  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
   uint32 f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255}];
 }
 

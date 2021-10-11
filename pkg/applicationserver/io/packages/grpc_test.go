@@ -45,8 +45,8 @@ var (
 	unregisteredApplicationID = ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-app"}
 	registeredDeviceID        = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: registeredApplicationID, DeviceId: "test-dev"}
 	unregisteredDeviceID      = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: unregisteredApplicationID, DeviceId: "invalid-dev"}
-	registeredAssociationID   = ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: registeredDeviceID, FPort: 123}
-	unregisteredAssociationID = ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: unregisteredDeviceID, FPort: 123}
+	registeredAssociationID   = ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &registeredDeviceID, FPort: 123}
+	unregisteredAssociationID = ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &unregisteredDeviceID, FPort: 123}
 	registeredApplicationUp1  = ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: registeredDeviceID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -386,7 +386,7 @@ func TestAssociations(t *testing.T) {
 		for i := 1; i < 21; i++ {
 			association := ttnpb.ApplicationPackageAssociation{
 				Ids: ttnpb.ApplicationPackageAssociationIdentifiers{
-					EndDeviceIds: registeredDeviceID,
+					EndDeviceIds: &registeredDeviceID,
 					FPort:        uint32(i),
 				},
 				PackageName: fmt.Sprintf("test-package-%v", i),
