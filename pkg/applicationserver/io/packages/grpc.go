@@ -159,7 +159,7 @@ func (s *server) DeleteDefaultAssociation(ctx context.Context, ids *ttnpb.Applic
 	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
-	_, err := s.registry.SetDefaultAssociation(ctx, *ids, nil,
+	_, err := s.registry.SetDefaultAssociation(ctx, ids, nil,
 		func(assoc *ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error) {
 			return nil, nil, nil
 		},

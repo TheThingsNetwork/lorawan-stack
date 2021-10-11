@@ -403,7 +403,7 @@ var (
 			if err = util.SetFields(&association, setApplicationPackageDefaultAssociationsFlags); err != nil {
 				return err
 			}
-			association.Ids = *assocID
+			association.Ids = assocID
 
 			reader, err := getDataReader("data", cmd.Flags())
 			if err != nil {

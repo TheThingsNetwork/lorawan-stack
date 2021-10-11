@@ -343,7 +343,7 @@ func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context
 }
 
 // SetDefaultAssociation implements applicationpackages.AssociationRegistry.
-func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, ids ttnpb.ApplicationPackageDefaultAssociationIdentifiers, gets []string, f func(*ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error)) (*ttnpb.ApplicationPackageDefaultAssociation, error) {
+func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageDefaultAssociationIdentifiers, gets []string, f func(*ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error)) (*ttnpb.ApplicationPackageDefaultAssociation, error) {
 	appUID := unique.ID(ctx, ids.ApplicationIds)
 	fPort := r.fPortStr(ids.FPort)
 	uidKey := r.uidKey(appUID)
@@ -406,7 +406,8 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 				pb = &ttnpb.ApplicationPackageDefaultAssociation{}
 			}
 
-			pb.UpdatedAt = time.Now().UTC()
+			now := time.Now().UTC()
+			pb.UpdatedAt = &now
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)

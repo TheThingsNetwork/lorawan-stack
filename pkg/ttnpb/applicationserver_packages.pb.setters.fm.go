@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *ApplicationPackage) SetFields(src *ApplicationPackage, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -404,10 +401,18 @@ func (dst *ApplicationPackageDefaultAssociation) SetFields(src *ApplicationPacka
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPackageDefaultAssociationIdentifiers
-				if src != nil {
-					newSrc = &src.Ids
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.Ids
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &ApplicationPackageDefaultAssociationIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -415,8 +420,7 @@ func (dst *ApplicationPackageDefaultAssociation) SetFields(src *ApplicationPacka
 				if src != nil {
 					dst.Ids = src.Ids
 				} else {
-					var zero ApplicationPackageDefaultAssociationIdentifiers
-					dst.Ids = zero
+					dst.Ids = nil
 				}
 			}
 		case "created_at":
@@ -426,8 +430,7 @@ func (dst *ApplicationPackageDefaultAssociation) SetFields(src *ApplicationPacka
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -436,8 +439,7 @@ func (dst *ApplicationPackageDefaultAssociation) SetFields(src *ApplicationPacka
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "package_name":
 			if len(subs) > 0 {
