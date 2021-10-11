@@ -37,7 +37,12 @@ type Registerer interface {
 	RegisterInterop(s *Server)
 }
 
-// JoinServer represents a Join Server.
+// IdentityServer represents an Identity Server.
+type IdentityServer interface {
+	HomeNSRequest(context.Context, *HomeNSReq) (*HomeNSAns, error)
+}
+
+// JoinServer represents a Join Server as specified in LoRaWAN Backend Interfaces.
 type JoinServer interface {
 	JoinRequest(context.Context, *JoinReq) (*JoinAns, error)
 	AppSKeyRequest(context.Context, *AppSKeyReq) (*AppSKeyAns, error)
@@ -69,6 +74,7 @@ type Server struct {
 
 	tokenVerifiers map[string]tokenVerifier
 
+	is IdentityServer
 	js JoinServer
 }
 
@@ -143,7 +149,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
+// RegisterIS registers the Identity Server for answering to HomeNSRequest.
+func (s *Server) RegisterIS(is IdentityServer) {
+	s.is = is
+}
+
 // RegisterJS registers the Join Server for AS-JS, hNS-JS and vNS-JS messages.
+// If an Identity Server is registered with RegisterIS, the Identity Server takes precedence for handling HomeNSRequest.
 func (s *Server) RegisterJS(js JoinServer) {
 	s.js = js
 }
@@ -236,7 +248,12 @@ func (s *Server) handle() http.Handler {
 		case *JoinReq:
 			ans, err = s.js.JoinRequest(ctx, req)
 		case *HomeNSReq:
-			ans, err = s.js.HomeNSRequest(ctx, req)
+			// The registered Identity Server takes precedence over a registered Join Server to handle HomeNSRequest.
+			js := s.is
+			if js == nil {
+				js = s.js
+			}
+			ans, err = js.HomeNSRequest(ctx, req)
 		case *AppSKeyReq:
 			ans, err = s.js.AppSKeyRequest(ctx, req)
 		default:

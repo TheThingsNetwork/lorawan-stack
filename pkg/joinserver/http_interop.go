@@ -84,10 +84,8 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 			return nil, interop.ErrActivation.WithCause(err)
 		case errors.Resemble(err, errMICMismatch):
 			return nil, interop.ErrMIC.WithCause(err)
-		case errors.Resemble(err, errRegistryOperation):
-			if errors.IsNotFound(errors.Cause(err)) {
-				return nil, interop.ErrUnknownDevEUI.WithCause(err)
-			}
+		case errors.IsNotFound(err):
+			return nil, interop.ErrUnknownDevEUI.WithCause(err)
 		}
 		return nil, interop.ErrJoinReq.WithCause(err)
 	}
@@ -126,11 +124,8 @@ func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSRe
 
 	netID, nsID, err := srv.JS.GetHomeNetID(ctx, types.EUI64(in.ReceiverID), types.EUI64(in.DevEUI), InteropAuthorizer)
 	if err != nil {
-		switch {
-		case errors.Resemble(err, errRegistryOperation):
-			if errors.IsNotFound(errors.Cause(err)) {
-				return nil, interop.ErrUnknownDevEUI.WithCause(err)
-			}
+		if errors.IsNotFound(err) {
+			return nil, interop.ErrUnknownDevEUI.WithCause(err)
 		}
 		return nil, err
 	}
@@ -181,10 +176,8 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKey
 		switch {
 		case errors.IsPermissionDenied(err):
 			return nil, interop.ErrActivation.WithCause(err)
-		case errors.Resemble(err, errRegistryOperation):
-			if errors.IsNotFound(errors.Cause(err)) {
-				return nil, interop.ErrUnknownDevEUI.WithCause(err)
-			}
+		case errors.IsNotFound(err):
+			return nil, interop.ErrUnknownDevEUI.WithCause(err)
 		}
 		return nil, err
 	}
