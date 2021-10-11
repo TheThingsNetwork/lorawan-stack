@@ -230,7 +230,7 @@ func TestAssociations(t *testing.T) {
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-			Ids: registeredDeviceID,
+			Ids: &registeredDeviceID,
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res, should.NotBeNil)
@@ -285,7 +285,7 @@ func TestAssociations(t *testing.T) {
 		a.So(res1, should.Resemble, &association)
 
 		res2, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-			Ids: registeredDeviceID,
+			Ids: &registeredDeviceID,
 			FieldMask: &types.FieldMask{
 				Paths: []string{
 					"package_name",
@@ -363,7 +363,7 @@ func TestAssociations(t *testing.T) {
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-			Ids: registeredDeviceID,
+			Ids: &registeredDeviceID,
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res, should.NotBeNil)
@@ -449,7 +449,7 @@ func TestAssociations(t *testing.T) {
 					a := assertions.New(t)
 
 					res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-						Ids:   registeredDeviceID,
+						Ids:   &registeredDeviceID,
 						Limit: tc.limit,
 						Page:  tc.page,
 						FieldMask: &types.FieldMask{

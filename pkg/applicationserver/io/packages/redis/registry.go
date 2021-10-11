@@ -118,7 +118,7 @@ func (r ApplicationPackagesRegistry) GetAssociation(ctx context.Context, ids *tt
 }
 
 // ListAssociations implements applicationpackages.AssociationRegistry.
-func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) ([]*ttnpb.ApplicationPackageAssociation, error) {
+func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) ([]*ttnpb.ApplicationPackageAssociation, error) {
 	var pbs []*ttnpb.ApplicationPackageAssociation
 	devUID := unique.ID(ctx, ids)
 	uidKey := r.uidKey(devUID)

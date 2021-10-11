@@ -68,7 +68,7 @@ message GetApplicationPackageAssociationRequest {
 }
 
 message ListApplicationPackageAssociationRequest {
-  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  EndDeviceIdentifiers ids = 1 [(validate.rules).message.required = true];
   // Limit the number of results per page.
   // Each page is ordered by the FPort.
   uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
