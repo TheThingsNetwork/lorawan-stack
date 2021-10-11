@@ -75,10 +75,18 @@ func TestFindIndirectMemberships(t *testing.T) {
 			Rights:     Rights{Rights: []ttnpb.Right{6, 7}},
 		})
 
-		common, err := store.FindIndirectMemberships(ctx, &ttnpb.UserIdentifiers{UserId: "test-user"}, (&ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}).GetEntityIdentifiers())
+		{
+			common, err := store.FindAccountMembershipChains(ctx, ttnpb.UserIdentifiers{UserId: "test-user"}.OrganizationOrUserIdentifiers(), "application", "test-app")
+			if a.So(err, should.BeNil) {
+				a.So(common, should.HaveLength, 2)
+			}
+		}
 
-		if a.So(err, should.BeNil) {
-			a.So(common, should.HaveLength, 2)
+		{
+			common, err := store.FindAccountMembershipChains(ctx, ttnpb.OrganizationIdentifiers{OrganizationId: "test-org-1"}.OrganizationOrUserIdentifiers(), "application", "test-app")
+			if a.So(err, should.BeNil) {
+				a.So(common, should.HaveLength, 1)
+			}
 		}
 	})
 }
