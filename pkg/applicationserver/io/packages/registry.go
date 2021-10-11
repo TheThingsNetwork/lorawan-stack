@@ -23,7 +23,7 @@ import (
 // AssociationRegistry is a registry for application package end device associations.
 type AssociationRegistry interface {
 	// GetAssociation returns the association by its identifiers.
-	GetAssociation(ctx context.Context, ids ttnpb.ApplicationPackageAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageAssociation, error)
+	GetAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageAssociation, error)
 	// ListAssociations returns all of the associations of the end device.
 	ListAssociations(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) ([]*ttnpb.ApplicationPackageAssociation, error)
 	// SetAssociation creates, updates or deletes the association by its identifiers.

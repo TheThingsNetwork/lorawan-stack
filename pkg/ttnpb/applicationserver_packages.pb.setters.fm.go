@@ -203,10 +203,18 @@ func (dst *GetApplicationPackageAssociationRequest) SetFields(src *GetApplicatio
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPackageAssociationIdentifiers
-				if src != nil {
-					newSrc = &src.Ids
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.Ids
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &ApplicationPackageAssociationIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -214,8 +222,7 @@ func (dst *GetApplicationPackageAssociationRequest) SetFields(src *GetApplicatio
 				if src != nil {
 					dst.Ids = src.Ids
 				} else {
-					var zero ApplicationPackageAssociationIdentifiers
-					dst.Ids = zero
+					dst.Ids = nil
 				}
 			}
 		case "field_mask":

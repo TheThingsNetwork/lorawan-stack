@@ -63,7 +63,7 @@ message ApplicationPackageAssociations {
 }
 
 message GetApplicationPackageAssociationRequest {
-  ApplicationPackageAssociationIdentifiers ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationPackageAssociationIdentifiers ids = 1 [(validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2;
 }
 

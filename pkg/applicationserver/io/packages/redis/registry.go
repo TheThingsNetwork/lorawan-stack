@@ -108,7 +108,7 @@ func (r *ApplicationPackagesRegistry) transactionKey(uid string, fPort string, p
 }
 
 // GetAssociation implements applicationpackages.AssociationRegistry.
-func (r ApplicationPackagesRegistry) GetAssociation(ctx context.Context, ids ttnpb.ApplicationPackageAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageAssociation, error) {
+func (r ApplicationPackagesRegistry) GetAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageAssociation, error) {
 	pb := &ttnpb.ApplicationPackageAssociation{}
 	defer trace.StartRegion(ctx, "get application package association by id").End()
 	if err := ttnredis.GetProto(ctx, r.Redis, r.associationKey(unique.ID(ctx, ids.EndDeviceIds), r.fPortStr(ids.FPort))).ScanProto(pb); err != nil {

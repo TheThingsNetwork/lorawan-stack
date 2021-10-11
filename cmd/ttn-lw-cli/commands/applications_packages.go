@@ -196,7 +196,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-				Ids:       *assocID,
+				Ids:       assocID,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {

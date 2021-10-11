@@ -224,7 +224,7 @@ func TestAssociations(t *testing.T) {
 	t.Run("AssociationsNotFound", func(t *testing.T) {
 		a := assertions.New(t)
 		_, err = client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-			Ids: registeredAssociationID,
+			Ids: &registeredAssociationID,
 		}, creds)
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
@@ -273,7 +273,7 @@ func TestAssociations(t *testing.T) {
 	t.Run("AssociationsFound", func(t *testing.T) {
 		a := assertions.New(t)
 		res1, err := client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-			Ids: registeredAssociationID,
+			Ids: &registeredAssociationID,
 			FieldMask: &types.FieldMask{
 				Paths: []string{
 					"package_name",
@@ -357,7 +357,7 @@ func TestAssociations(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		_, err = client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-			Ids: registeredAssociationID,
+			Ids: &registeredAssociationID,
 		}, creds)
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
