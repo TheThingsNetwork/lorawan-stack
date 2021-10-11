@@ -237,7 +237,7 @@ func TestAssociations(t *testing.T) {
 		a.So(res.Associations, should.HaveLength, 0)
 	})
 
-	association := ttnpb.ApplicationPackageAssociation{
+	association := &ttnpb.ApplicationPackageAssociation{
 		Ids:         &registeredAssociationID,
 		PackageName: "test-package",
 		Data: &types.Struct{
@@ -384,7 +384,7 @@ func TestAssociations(t *testing.T) {
 		a := assertions.New(t)
 
 		for i := 1; i < 21; i++ {
-			association := ttnpb.ApplicationPackageAssociation{
+			association := &ttnpb.ApplicationPackageAssociation{
 				Ids: &ttnpb.ApplicationPackageAssociationIdentifiers{
 					EndDeviceIds: &registeredDeviceID,
 					FPort:        uint32(i),

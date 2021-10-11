@@ -78,7 +78,7 @@ message ListApplicationPackageAssociationRequest {
 }
 
 message SetApplicationPackageAssociationRequest {
-  ApplicationPackageAssociation association = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationPackageAssociation association = 1 [(validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2;
 }
 

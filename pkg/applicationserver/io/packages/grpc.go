@@ -81,9 +81,9 @@ func (s *server) SetAssociation(ctx context.Context, req *ttnpb.SetApplicationPa
 	return s.registry.SetAssociation(ctx, req.Association.Ids, appendImplicitAssociationsGetPaths(req.FieldMask.GetPaths()...),
 		func(assoc *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
 			if assoc != nil {
-				return &req.Association, req.FieldMask.GetPaths(), nil
+				return req.Association, req.FieldMask.GetPaths(), nil
 			}
-			return &req.Association, append(req.FieldMask.GetPaths(),
+			return req.Association, append(req.FieldMask.GetPaths(),
 				"ids.end_device_ids",
 				"ids.f_port",
 			), nil

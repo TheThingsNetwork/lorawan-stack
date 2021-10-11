@@ -859,7 +859,14 @@ func (m *SetApplicationPackageAssociationRequest) ValidateFields(paths ...string
 		switch name {
 		case "association":
 
-			if v, ok := interface{}(&m.Association).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetAssociation() == nil {
+				return SetApplicationPackageAssociationRequestValidationError{
+					field:  "association",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetAssociation()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationPackageAssociationRequestValidationError{
 						field:  "association",
