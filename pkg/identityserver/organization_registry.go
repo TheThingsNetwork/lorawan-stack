@@ -147,19 +147,19 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 
 func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.ListOrganizationsRequest) (orgs *ttnpb.Organizations, err error) {
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
-	var includeIndirect bool
-	if req.Collaborator == nil {
-		authInfo, err := is.authInfo(ctx)
-		if err != nil {
-			return nil, err
-		}
-		collaborator := authInfo.GetOrganizationOrUserIdentifiers()
-		if collaborator == nil {
-			return &ttnpb.Organizations{}, nil
-		}
-		req.Collaborator = collaborator
-		includeIndirect = true
+
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return nil, err
 	}
+	callerAccountID := authInfo.GetOrganizationOrUserIdentifiers()
+	if req.Collaborator == nil {
+		req.Collaborator = callerAccountID
+	}
+	if req.Collaborator == nil {
+		return &ttnpb.Organizations{}, nil
+	}
+
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_ORGANIZATIONS_LIST); err != nil {
 			return nil, err
@@ -167,9 +167,11 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
 		return nil, errNestedOrganizations.New()
 	}
+
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
+
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -178,14 +180,22 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 			setTotalHeader(ctx, total)
 		}
 	}()
+
 	orgs = &ttnpb.Organizations{}
+	var callerMemberships store.MembershipChains
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		ids, err := is.getMembershipStore(ctx, db).FindMemberships(paginateCtx, req.Collaborator, "organization", includeIndirect)
+		membershipStore := is.getMembershipStore(ctx, db)
+		ids, err := membershipStore.FindMemberships(paginateCtx, req.Collaborator, "organization", false)
 		if err != nil {
 			return err
 		}
 		if len(ids) == 0 {
 			return nil
+		}
+		callerMemberships, err = membershipStore.FindAccountMembershipChains(ctx, callerAccountID, "organization", idStrings(ids...)...)
+		if err != nil {
+			return err
 		}
 		orgIDs := make([]*ttnpb.OrganizationIdentifiers, 0, len(ids))
 		for _, id := range ids {
@@ -204,7 +214,8 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	}
 
 	for i, org := range orgs.Organizations {
-		if rights.RequireOrganization(ctx, *org.GetIds(), ttnpb.RIGHT_ORGANIZATION_INFO) != nil {
+		entityRights := callerMemberships.GetRights(callerAccountID, org.GetIds())
+		if !entityRights.IncludesAll(ttnpb.RIGHT_ORGANIZATION_INFO) {
 			orgs.Organizations[i] = org.PublicSafe()
 		}
 	}
