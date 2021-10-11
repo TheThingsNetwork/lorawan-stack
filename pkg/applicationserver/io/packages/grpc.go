@@ -96,7 +96,7 @@ func (s *server) DeleteAssociation(ctx context.Context, ids *ttnpb.ApplicationPa
 	if err := rights.RequireApplication(ctx, ids.EndDeviceIds.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
-	_, err := s.registry.SetAssociation(ctx, *ids, nil,
+	_, err := s.registry.SetAssociation(ctx, ids, nil,
 		func(assoc *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
 			return nil, nil, nil
 		},

@@ -258,7 +258,7 @@ var (
 			if err = util.SetFields(&association, setApplicationPackageAssociationsFlags); err != nil {
 				return err
 			}
-			association.Ids = *assocID
+			association.Ids = assocID
 
 			reader, err := getDataReader("data", cmd.Flags())
 			if err != nil {

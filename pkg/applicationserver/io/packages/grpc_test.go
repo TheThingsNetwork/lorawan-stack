@@ -238,7 +238,7 @@ func TestAssociations(t *testing.T) {
 	})
 
 	association := ttnpb.ApplicationPackageAssociation{
-		Ids:         registeredAssociationID,
+		Ids:         &registeredAssociationID,
 		PackageName: "test-package",
 		Data: &types.Struct{
 			Fields: map[string]*types.Value{
@@ -385,7 +385,7 @@ func TestAssociations(t *testing.T) {
 
 		for i := 1; i < 21; i++ {
 			association := ttnpb.ApplicationPackageAssociation{
-				Ids: ttnpb.ApplicationPackageAssociationIdentifiers{
+				Ids: &ttnpb.ApplicationPackageAssociationIdentifiers{
 					EndDeviceIds: &registeredDeviceID,
 					FPort:        uint32(i),
 				},

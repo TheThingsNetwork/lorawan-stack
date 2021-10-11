@@ -157,7 +157,7 @@ func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids t
 }
 
 // SetAssociation implements applicationpackages.AssociationRegistry.
-func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttnpb.ApplicationPackageAssociationIdentifiers, gets []string, f func(*ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error)) (*ttnpb.ApplicationPackageAssociation, error) {
+func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageAssociationIdentifiers, gets []string, f func(*ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error)) (*ttnpb.ApplicationPackageAssociation, error) {
 	devUID := unique.ID(ctx, ids.EndDeviceIds)
 	fPort := r.fPortStr(ids.FPort)
 	uidKey := r.uidKey(devUID)
@@ -220,7 +220,8 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 				pb = &ttnpb.ApplicationPackageAssociation{}
 			}
 
-			pb.UpdatedAt = time.Now().UTC()
+			now := time.Now().UTC()
+			pb.UpdatedAt = &now
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)

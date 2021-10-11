@@ -27,7 +27,7 @@ type AssociationRegistry interface {
 	// ListAssociations returns all of the associations of the end device.
 	ListAssociations(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) ([]*ttnpb.ApplicationPackageAssociation, error)
 	// SetAssociation creates, updates or deletes the association by its identifiers.
-	SetAssociation(ctx context.Context, ids ttnpb.ApplicationPackageAssociationIdentifiers, gets []string, f func(*ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error)) (*ttnpb.ApplicationPackageAssociation, error)
+	SetAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageAssociationIdentifiers, gets []string, f func(*ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error)) (*ttnpb.ApplicationPackageAssociation, error)
 	// WithPagination adds the pagination information to the context.
 	WithPagination(ctx context.Context, limit, page uint32, total *int64) context.Context
 }
