@@ -266,7 +266,7 @@ func TestAssociations(t *testing.T) {
 		a.So(err, should.BeNil)
 		association.CreatedAt = res.CreatedAt
 		association.UpdatedAt = res.UpdatedAt
-		a.So(res, should.Resemble, &association)
+		a.So(res, should.Resemble, association)
 	})
 
 	// Check that the association is available.
@@ -282,7 +282,7 @@ func TestAssociations(t *testing.T) {
 			},
 		}, creds)
 		a.So(err, should.BeNil)
-		a.So(res1, should.Resemble, &association)
+		a.So(res1, should.Resemble, association)
 
 		res2, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
 			Ids: &registeredDeviceID,
@@ -296,7 +296,7 @@ func TestAssociations(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(res2, should.NotBeNil)
 		a.So(res2.Associations, should.HaveLength, 1)
-		a.So(res2.Associations[0], should.Resemble, &association)
+		a.So(res2.Associations[0], should.Resemble, association)
 	})
 
 	// Send traffic and expect to arrive in the correct handler.
@@ -335,7 +335,7 @@ func TestAssociations(t *testing.T) {
 							t.Fatal("unexpected uplink")
 						} else {
 							a.So(up.ctx, should.NotBeNil)
-							a.So(up.assoc, should.Resemble, &association)
+							a.So(up.assoc, should.Resemble, association)
 						}
 					}
 				case <-time.After(2 * timeout):
