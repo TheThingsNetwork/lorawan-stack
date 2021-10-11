@@ -136,7 +136,7 @@ func getApplicationPackageDefaultAssociationID(flagSet *pflag.FlagSet, args []st
 		return nil, errNoFPort.New()
 	}
 	return &ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
-		ApplicationIds: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
 		FPort:          uint32(fport),
 	}, nil
 }
