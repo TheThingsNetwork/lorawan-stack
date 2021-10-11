@@ -258,7 +258,7 @@ func (m *ApplicationPackageAssociationIdentifiers) ValidateFields(paths ...strin
 		switch name {
 		case "end_device_ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.EndDeviceIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageAssociationIdentifiersValidationError{
 						field:  "end_device_ids",
@@ -361,7 +361,7 @@ func (m *ApplicationPackageAssociation) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationPackageAssociationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageAssociationValidationError{
 						field:  "ids",
@@ -608,7 +608,7 @@ func (m *GetApplicationPackageAssociationRequest) ValidateFields(paths ...string
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationPackageAssociationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationPackageAssociationRequestValidationError{
 						field:  "ids",
@@ -714,7 +714,7 @@ func (m *ListApplicationPackageAssociationRequest) ValidateFields(paths ...strin
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationPackageAssociationRequestValidationError{
 						field:  "ids",
@@ -831,7 +831,7 @@ func (m *SetApplicationPackageAssociationRequest) ValidateFields(paths ...string
 		switch name {
 		case "association":
 
-			if v, ok := interface{}(&m.ApplicationPackageAssociation).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Association).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationPackageAssociationRequestValidationError{
 						field:  "association",
@@ -938,7 +938,7 @@ func (m *ApplicationPackageDefaultAssociationIdentifiers) ValidateFields(paths .
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageDefaultAssociationIdentifiersValidationError{
 						field:  "application_ids",
@@ -1046,7 +1046,7 @@ func (m *ApplicationPackageDefaultAssociation) ValidateFields(paths ...string) e
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationPackageDefaultAssociationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageDefaultAssociationValidationError{
 						field:  "ids",
@@ -1294,7 +1294,7 @@ func (m *GetApplicationPackageDefaultAssociationRequest) ValidateFields(paths ..
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationPackageDefaultAssociationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationPackageDefaultAssociationRequestValidationError{
 						field:  "ids",
@@ -1404,7 +1404,7 @@ func (m *ListApplicationPackageDefaultAssociationRequest) ValidateFields(paths .
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationPackageDefaultAssociationRequestValidationError{
 						field:  "ids",
@@ -1527,7 +1527,7 @@ func (m *SetApplicationPackageDefaultAssociationRequest) ValidateFields(paths ..
 		switch name {
 		case "default":
 
-			if v, ok := interface{}(&m.ApplicationPackageDefaultAssociation).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Default).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationPackageDefaultAssociationRequestValidationError{
 						field:  "default",

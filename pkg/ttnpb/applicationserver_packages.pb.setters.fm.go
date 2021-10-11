@@ -65,18 +65,18 @@ func (dst *ApplicationPackageAssociationIdentifiers) SetFields(src *ApplicationP
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceIdentifiers
 				if src != nil {
-					newSrc = &src.EndDeviceIdentifiers
+					newSrc = &src.EndDeviceIds
 				}
-				newDst = &dst.EndDeviceIdentifiers
+				newDst = &dst.EndDeviceIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+					dst.EndDeviceIds = src.EndDeviceIds
 				} else {
 					var zero EndDeviceIdentifiers
-					dst.EndDeviceIdentifiers = zero
+					dst.EndDeviceIds = zero
 				}
 			}
 		case "f_port":
@@ -104,18 +104,18 @@ func (dst *ApplicationPackageAssociation) SetFields(src *ApplicationPackageAssoc
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPackageAssociationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationPackageAssociationIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.ApplicationPackageAssociationIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPackageAssociationIdentifiers = src.ApplicationPackageAssociationIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero ApplicationPackageAssociationIdentifiers
-					dst.ApplicationPackageAssociationIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "created_at":
@@ -192,18 +192,18 @@ func (dst *GetApplicationPackageAssociationRequest) SetFields(src *GetApplicatio
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPackageAssociationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationPackageAssociationIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.ApplicationPackageAssociationIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPackageAssociationIdentifiers = src.ApplicationPackageAssociationIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero ApplicationPackageAssociationIdentifiers
-					dst.ApplicationPackageAssociationIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "field_mask":
@@ -230,18 +230,18 @@ func (dst *ListApplicationPackageAssociationRequest) SetFields(src *ListApplicat
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceIdentifiers
 				if src != nil {
-					newSrc = &src.EndDeviceIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.EndDeviceIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero EndDeviceIdentifiers
-					dst.EndDeviceIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "limit":
@@ -288,18 +288,18 @@ func (dst *SetApplicationPackageAssociationRequest) SetFields(src *SetApplicatio
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPackageAssociation
 				if src != nil {
-					newSrc = &src.ApplicationPackageAssociation
+					newSrc = &src.Association
 				}
-				newDst = &dst.ApplicationPackageAssociation
+				newDst = &dst.Association
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPackageAssociation = src.ApplicationPackageAssociation
+					dst.Association = src.Association
 				} else {
 					var zero ApplicationPackageAssociation
-					dst.ApplicationPackageAssociation = zero
+					dst.Association = zero
 				}
 			}
 		case "field_mask":
@@ -326,18 +326,18 @@ func (dst *ApplicationPackageDefaultAssociationIdentifiers) SetFields(src *Appli
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "f_port":
@@ -365,18 +365,18 @@ func (dst *ApplicationPackageDefaultAssociation) SetFields(src *ApplicationPacka
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPackageDefaultAssociationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationPackageDefaultAssociationIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.ApplicationPackageDefaultAssociationIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPackageDefaultAssociationIdentifiers = src.ApplicationPackageDefaultAssociationIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero ApplicationPackageDefaultAssociationIdentifiers
-					dst.ApplicationPackageDefaultAssociationIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "created_at":
@@ -453,18 +453,18 @@ func (dst *GetApplicationPackageDefaultAssociationRequest) SetFields(src *GetApp
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPackageDefaultAssociationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationPackageDefaultAssociationIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.ApplicationPackageDefaultAssociationIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPackageDefaultAssociationIdentifiers = src.ApplicationPackageDefaultAssociationIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero ApplicationPackageDefaultAssociationIdentifiers
-					dst.ApplicationPackageDefaultAssociationIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "field_mask":
@@ -491,18 +491,18 @@ func (dst *ListApplicationPackageDefaultAssociationRequest) SetFields(src *ListA
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "limit":
@@ -549,18 +549,18 @@ func (dst *SetApplicationPackageDefaultAssociationRequest) SetFields(src *SetApp
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPackageDefaultAssociation
 				if src != nil {
-					newSrc = &src.ApplicationPackageDefaultAssociation
+					newSrc = &src.Default
 				}
-				newDst = &dst.ApplicationPackageDefaultAssociation
+				newDst = &dst.Default
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPackageDefaultAssociation = src.ApplicationPackageDefaultAssociation
+					dst.Default = src.Default
 				} else {
 					var zero ApplicationPackageDefaultAssociation
-					dst.ApplicationPackageDefaultAssociation = zero
+					dst.Default = zero
 				}
 			}
 		case "field_mask":

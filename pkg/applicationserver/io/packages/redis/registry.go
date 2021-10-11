@@ -111,7 +111,7 @@ func (r *ApplicationPackagesRegistry) transactionKey(uid string, fPort string, p
 func (r ApplicationPackagesRegistry) GetAssociation(ctx context.Context, ids ttnpb.ApplicationPackageAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageAssociation, error) {
 	pb := &ttnpb.ApplicationPackageAssociation{}
 	defer trace.StartRegion(ctx, "get application package association by id").End()
-	if err := ttnredis.GetProto(ctx, r.Redis, r.associationKey(unique.ID(ctx, ids.EndDeviceIdentifiers), r.fPortStr(ids.FPort))).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(ctx, r.Redis, r.associationKey(unique.ID(ctx, ids.EndDeviceIds), r.fPortStr(ids.FPort))).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyAssociationFieldMask(nil, pb, appendImplicitAssociationGetPaths(paths...)...)
@@ -158,7 +158,7 @@ func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids t
 
 // SetAssociation implements applicationpackages.AssociationRegistry.
 func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttnpb.ApplicationPackageAssociationIdentifiers, gets []string, f func(*ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error)) (*ttnpb.ApplicationPackageAssociation, error) {
-	devUID := unique.ID(ctx, ids.EndDeviceIdentifiers)
+	devUID := unique.ID(ctx, ids.EndDeviceIds)
 	fPort := r.fPortStr(ids.FPort)
 	uidKey := r.uidKey(devUID)
 	associationkey := r.associationKey(devUID, fPort)
@@ -242,17 +242,17 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 				if err != nil {
 					return err
 				}
-				if updated.ApplicationId != ids.ApplicationId || updated.DeviceId != ids.DeviceId || updated.FPort != ids.FPort {
+				if updated.Ids.EndDeviceIds.ApplicationId != ids.EndDeviceIds.ApplicationId || updated.Ids.EndDeviceIds.DeviceId != ids.EndDeviceIds.DeviceId || updated.Ids.FPort != ids.FPort {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.end_device_ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {
+				if ttnpb.HasAnyField(sets, "ids.end_device_ids.application_ids.application_id") && pb.Ids.EndDeviceIds.ApplicationId != stored.Ids.EndDeviceIds.ApplicationId {
 					return errReadOnlyField.WithAttributes("field", "ids.end_device_ids.application_ids.application_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.end_device_ids.device_id") && pb.DeviceId != stored.DeviceId {
+				if ttnpb.HasAnyField(sets, "ids.end_device_ids.device_id") && pb.Ids.EndDeviceIds.DeviceId != stored.Ids.EndDeviceIds.DeviceId {
 					return errReadOnlyField.WithAttributes("field", "ids.end_device_ids.device_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.f_port") && pb.FPort != stored.FPort {
+				if ttnpb.HasAnyField(sets, "ids.f_port") && pb.Ids.FPort != stored.Ids.FPort {
 					return errReadOnlyField.WithAttributes("field", "ids.f_port")
 				}
 				if err := cmd.ScanProto(updated); err != nil {
@@ -296,7 +296,7 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 func (r ApplicationPackagesRegistry) GetDefaultAssociation(ctx context.Context, ids ttnpb.ApplicationPackageDefaultAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageDefaultAssociation, error) {
 	pb := &ttnpb.ApplicationPackageDefaultAssociation{}
 	defer trace.StartRegion(ctx, "get application package default association by id").End()
-	if err := ttnredis.GetProto(ctx, r.Redis, r.associationKey(unique.ID(ctx, ids.ApplicationIdentifiers), r.fPortStr(ids.FPort))).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(ctx, r.Redis, r.associationKey(unique.ID(ctx, ids.ApplicationIds), r.fPortStr(ids.FPort))).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyDefaultAssociationFieldMask(nil, pb, appendImplicitAssociationGetPaths(paths...)...)
@@ -343,7 +343,7 @@ func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context
 
 // SetDefaultAssociation implements applicationpackages.AssociationRegistry.
 func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, ids ttnpb.ApplicationPackageDefaultAssociationIdentifiers, gets []string, f func(*ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error)) (*ttnpb.ApplicationPackageDefaultAssociation, error) {
-	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
+	appUID := unique.ID(ctx, ids.ApplicationIds)
 	fPort := r.fPortStr(ids.FPort)
 	uidKey := r.uidKey(appUID)
 	associationkey := r.associationKey(appUID, fPort)
@@ -426,14 +426,14 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 				if err != nil {
 					return err
 				}
-				if updated.ApplicationId != ids.ApplicationId || updated.FPort != ids.FPort {
+				if updated.Ids.ApplicationIds.ApplicationId != ids.ApplicationIds.ApplicationId || updated.Ids.FPort != ids.FPort {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.Ids.ApplicationIds.ApplicationId != stored.Ids.ApplicationIds.ApplicationId {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.f_port") && pb.FPort != stored.FPort {
+				if ttnpb.HasAnyField(sets, "ids.f_port") && pb.Ids.FPort != stored.Ids.FPort {
 					return errReadOnlyField.WithAttributes("field", "ids.f_port")
 				}
 				if err := cmd.ScanProto(updated); err != nil {
