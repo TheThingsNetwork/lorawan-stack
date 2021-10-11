@@ -16,19 +16,16 @@ package jsonpb
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
-	"os"
-	"strconv"
 
 	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 )
 
-var jsonpluginFeatureFlag = func() bool {
-	b, _ := strconv.ParseBool(os.Getenv("TTN_LW_EXP_JSONPLUGIN"))
-	return b
-}()
+var jsonpluginFeatureFlag = experimental.DefineFeature("jsonpb.jsonplugin", false)
 
 // TTN returns the default TTN JSONPb marshaler.
 func TTN() *TTNMarshaler {
@@ -47,7 +44,7 @@ type TTNMarshaler struct {
 func (*TTNMarshaler) ContentType() string { return "application/json" }
 
 func (m *TTNMarshaler) Marshal(v interface{}) ([]byte, error) {
-	if jsonpluginFeatureFlag {
+	if jsonpluginFeatureFlag.GetValue(context.Background()) {
 		if marshaler, ok := v.(jsonplugin.Marshaler); ok {
 			b, err := jsonplugin.MarshalerConfig{
 				EnumsAsInts: true,
@@ -77,7 +74,7 @@ type TTNEncoder struct {
 }
 
 func (e *TTNEncoder) Encode(v interface{}) error {
-	if jsonpluginFeatureFlag {
+	if jsonpluginFeatureFlag.GetValue(context.Background()) {
 		if marshaler, ok := v.(jsonplugin.Marshaler); ok {
 			b, err := jsonplugin.MarshalerConfig{
 				EnumsAsInts: true,
@@ -99,7 +96,7 @@ func (e *TTNEncoder) Encode(v interface{}) error {
 }
 
 func (m *TTNMarshaler) Unmarshal(data []byte, v interface{}) error {
-	if jsonpluginFeatureFlag {
+	if jsonpluginFeatureFlag.GetValue(context.Background()) {
 		if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
 			return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
 		}
@@ -117,7 +114,7 @@ type NewDecoder struct {
 }
 
 func (d *NewDecoder) Decode(v interface{}) error {
-	if jsonpluginFeatureFlag {
+	if jsonpluginFeatureFlag.GetValue(context.Background()) {
 		if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
 			var data json.RawMessage
 			err := json.NewDecoder(d.r).Decode(&data)

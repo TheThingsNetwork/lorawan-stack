@@ -19,6 +19,7 @@ For details about compatibility between different releases, see the **Commitment
   - `interop.public-tls-address`: public address of the interop server. The audience in the incoming OAuth 2.0 token from Packet Broker is verified against this address to ensure that other networks cannot impersonate as Packet Broker;
   - `interop.packet-broker.enabled`: enable Packet Broker to authenticate;
   - `interop.packet-broker.token-issuer`: the issuer of the incoming OAuth 2.0 token from Packet Broker is verified against this value.
+- Configuration option `experimental.features` to enable experimental features.
 
 ### Changed
 
