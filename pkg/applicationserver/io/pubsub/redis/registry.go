@@ -16,10 +16,14 @@ package redis
 
 import (
 	"context"
+	"io"
+	"math/rand"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
+	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -52,7 +56,21 @@ func applyPubSubFieldMask(dst, src *ttnpb.ApplicationPubSub, paths ...string) (*
 
 // PubSubRegistry is a Redis pub/sub registry.
 type PubSubRegistry struct {
-	Redis *ttnredis.Client
+	Redis   *ttnredis.Client
+	LockTTL time.Duration
+
+	entropyMu *sync.Mutex
+	entropy   io.Reader
+}
+
+// Init initializes the PubSubRegistry.
+func (r *PubSubRegistry) Init(ctx context.Context) error {
+	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
+		return err
+	}
+	r.entropyMu = &sync.Mutex{}
+	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
+	return nil
 }
 
 func (r *PubSubRegistry) allKey(ctx context.Context) string {
@@ -144,8 +162,13 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
 	ik := r.uidKey(appUID, ids.PubSubId)
 
+	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	if err != nil {
+		return nil, err
+	}
+
 	var pb *ttnpb.ApplicationPubSub
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+	err = ttnredis.LockedWatch(ctx, r.Redis, ik, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, ik)
 		stored := &ttnpb.ApplicationPubSub{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -262,7 +285,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 			return err
 		}
 		return nil
-	}, ik)
+	})
 	if err != nil {
 		return nil, err
 	}

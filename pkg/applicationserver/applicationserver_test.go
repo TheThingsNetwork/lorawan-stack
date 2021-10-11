@@ -225,7 +225,10 @@ func TestApplicationServer(t *testing.T) {
 	pubsubRedisClient, pubsubFlush := test.NewRedis(ctx, "applicationserver_test", "pubsub")
 	defer pubsubFlush()
 	defer pubsubRedisClient.Close()
-	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient}
+	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient, LockTTL: test.Delay << 10}
+	if err := pubsubRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	distribRedisClient, distribFlush := test.NewRedis(ctx, "applicationserver_test", "traffic")
 	defer distribFlush()

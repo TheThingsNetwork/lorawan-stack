@@ -314,9 +314,14 @@ var startCommand = &cobra.Command{
 			config.AS.Distribution.PubSub = &asdistribredis.PubSub{
 				Redis: redis.New(config.Cache.Redis.WithNamespace("as", "traffic")),
 			}
-			config.AS.PubSub.Registry = &asiopsredis.PubSubRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("as", "io", "pubsub")),
+			pubsubRegistry := &asiopsredis.PubSubRegistry{
+				Redis:   redis.New(config.Redis.WithNamespace("as", "io", "pubsub")),
+				LockTTL: defaultLockTTL,
 			}
+			if err := pubsubRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeApplicationServer.WithCause(err)
+			}
+			config.AS.PubSub.Registry = pubsubRegistry
 			applicationPackagesRegistry := &asioapredis.ApplicationPackagesRegistry{
 				Redis:   redis.New(config.Redis.WithNamespace("as", "io", "applicationpackages")),
 				LockTTL: defaultLockTTL,

@@ -66,7 +66,11 @@ func TestIntegrate(t *testing.T) {
 	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
-	pubsubRegistry := &redis.PubSubRegistry{Redis: redisClient}
+	pubsubRegistry := &redis.PubSubRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+	if err := pubsubRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
 	_, err = pubsubRegistry.Set(ctx, ps1, paths, func(_ *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 		return &ttnpb.ApplicationPubSub{
 			ApplicationPubSubIdentifiers: ps1,
