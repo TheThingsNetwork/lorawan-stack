@@ -37,7 +37,7 @@ type DefaultAssociationRegistry interface {
 	// GetDefaultAssociation returns the default association by its identifiers.
 	GetDefaultAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageDefaultAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageDefaultAssociation, error)
 	// ListDefaultAssociation returns all of the default associations of the application.
-	ListDefaultAssociations(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationPackageDefaultAssociation, error)
+	ListDefaultAssociations(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationPackageDefaultAssociation, error)
 	// SetDefaultAssociation creates, updates or deletes the default association by its identifiers.
 	SetDefaultAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageDefaultAssociationIdentifiers, gets []string, f func(*ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error)) (*ttnpb.ApplicationPackageDefaultAssociation, error)
 	// WithPagination adds the pagination information to the context.

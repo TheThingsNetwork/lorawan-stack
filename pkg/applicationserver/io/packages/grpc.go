@@ -117,7 +117,7 @@ func (s *server) GetDefaultAssociation(ctx context.Context, req *ttnpb.GetApplic
 
 // ListDefaultAssociations implements ttnpb.ApplicationPackageRegistryServer.
 func (s *server) ListDefaultAssociations(ctx context.Context, req *ttnpb.ListApplicationPackageDefaultAssociationRequest) (assoc *ttnpb.ApplicationPackageDefaultAssociations, err error) {
-	if err := rights.RequireApplication(ctx, req.Ids, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+	if err := rights.RequireApplication(ctx, *req.Ids, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
 	var total int64

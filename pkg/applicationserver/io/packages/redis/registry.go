@@ -304,7 +304,7 @@ func (r ApplicationPackagesRegistry) GetDefaultAssociation(ctx context.Context, 
 }
 
 // ListDefaultAssociations implements applicationpackages.AssociationRegistry.
-func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationPackageDefaultAssociation, error) {
+func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationPackageDefaultAssociation, error) {
 	var pbs []*ttnpb.ApplicationPackageDefaultAssociation
 	appUID := unique.ID(ctx, ids)
 	uidKey := r.uidKey(appUID)

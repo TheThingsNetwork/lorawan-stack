@@ -375,7 +375,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).ListDefaultAssociations(ctx, &ttnpb.ListApplicationPackageDefaultAssociationRequest{
-				Ids:       *appID,
+				Ids:       appID,
 				Limit:     limit,
 				Page:      page,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
