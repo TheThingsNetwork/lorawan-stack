@@ -33,7 +33,7 @@ type interopServer struct {
 	interop.Authorizer
 }
 
-func (srv interopServer) hNSID(ctx context.Context, dev *ttnpb.EndDevice) string {
+func (srv *interopServer) hNSID(ctx context.Context, dev *ttnpb.EndDevice) string {
 	hNSID := dev.NetworkServerAddress
 	if tid := srv.configFromContext(ctx).Network.TenantID; tid != "" {
 		hNSID = fmt.Sprintf("%s@%s", tid, hNSID)
@@ -41,7 +41,7 @@ func (srv interopServer) hNSID(ctx context.Context, dev *ttnpb.EndDevice) string
 	return hNSID
 }
 
-func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSReq) (*interop.HomeNSAns, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "identityserver/interop")
 	if err := srv.RequireAuthorized(ctx); err != nil {
 		return nil, err
