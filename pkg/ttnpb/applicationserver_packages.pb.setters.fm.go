@@ -604,10 +604,18 @@ func (dst *SetApplicationPackageDefaultAssociationRequest) SetFields(src *SetApp
 		case "default":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPackageDefaultAssociation
-				if src != nil {
-					newSrc = &src.Default
+				if (src == nil || src.Default == nil) && dst.Default == nil {
+					continue
 				}
-				newDst = &dst.Default
+				if src != nil {
+					newSrc = src.Default
+				}
+				if dst.Default != nil {
+					newDst = dst.Default
+				} else {
+					newDst = &ApplicationPackageDefaultAssociation{}
+					dst.Default = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -615,8 +623,7 @@ func (dst *SetApplicationPackageDefaultAssociationRequest) SetFields(src *SetApp
 				if src != nil {
 					dst.Default = src.Default
 				} else {
-					var zero ApplicationPackageDefaultAssociation
-					dst.Default = zero
+					dst.Default = nil
 				}
 			}
 		case "field_mask":

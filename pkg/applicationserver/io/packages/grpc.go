@@ -144,9 +144,9 @@ func (s *server) SetDefaultAssociation(ctx context.Context, req *ttnpb.SetApplic
 	return s.registry.SetDefaultAssociation(ctx, req.Default.Ids, appendImplicitAssociationsGetPaths(req.FieldMask.GetPaths()...),
 		func(assoc *ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error) {
 			if assoc != nil {
-				return &req.Default, req.FieldMask.GetPaths(), nil
+				return req.Default, req.FieldMask.GetPaths(), nil
 			}
-			return &req.Default, append(req.FieldMask.GetPaths(),
+			return req.Default, append(req.FieldMask.GetPaths(),
 				"ids.application_ids",
 				"ids.f_port",
 			), nil

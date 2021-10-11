@@ -399,7 +399,7 @@ var (
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPackageDefaultAssociationsFlags)
 
-			var association ttnpb.ApplicationPackageDefaultAssociation
+			association := &ttnpb.ApplicationPackageDefaultAssociation{}
 			if err = util.SetFields(&association, setApplicationPackageDefaultAssociationsFlags); err != nil {
 				return err
 			}

@@ -115,7 +115,7 @@ message ListApplicationPackageDefaultAssociationRequest {
 }
 
 message SetApplicationPackageDefaultAssociationRequest {
-  ApplicationPackageDefaultAssociation default = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationPackageDefaultAssociation default = 1 [(validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2;
 }
 

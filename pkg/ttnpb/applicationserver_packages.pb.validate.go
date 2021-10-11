@@ -1590,7 +1590,14 @@ func (m *SetApplicationPackageDefaultAssociationRequest) ValidateFields(paths ..
 		switch name {
 		case "default":
 
-			if v, ok := interface{}(&m.Default).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetDefault() == nil {
+				return SetApplicationPackageDefaultAssociationRequestValidationError{
+					field:  "default",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDefault()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationPackageDefaultAssociationRequestValidationError{
 						field:  "default",

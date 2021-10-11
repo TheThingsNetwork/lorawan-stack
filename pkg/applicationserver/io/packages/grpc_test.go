@@ -45,8 +45,8 @@ var (
 	unregisteredApplicationID = ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-app"}
 	registeredDeviceID        = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: registeredApplicationID, DeviceId: "test-dev"}
 	unregisteredDeviceID      = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: unregisteredApplicationID, DeviceId: "invalid-dev"}
-	registeredAssociationID   = ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &registeredDeviceID, FPort: 123}
-	unregisteredAssociationID = ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &unregisteredDeviceID, FPort: 123}
+	registeredAssociationID   = &ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &registeredDeviceID, FPort: 123}
+	unregisteredAssociationID = &ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &unregisteredDeviceID, FPort: 123}
 	registeredApplicationUp1  = ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: registeredDeviceID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -224,7 +224,7 @@ func TestAssociations(t *testing.T) {
 	t.Run("AssociationsNotFound", func(t *testing.T) {
 		a := assertions.New(t)
 		_, err = client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-			Ids: &registeredAssociationID,
+			Ids: registeredAssociationID,
 		}, creds)
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
@@ -238,7 +238,7 @@ func TestAssociations(t *testing.T) {
 	})
 
 	association := &ttnpb.ApplicationPackageAssociation{
-		Ids:         &registeredAssociationID,
+		Ids:         registeredAssociationID,
 		PackageName: "test-package",
 		Data: &types.Struct{
 			Fields: map[string]*types.Value{
@@ -273,7 +273,7 @@ func TestAssociations(t *testing.T) {
 	t.Run("AssociationsFound", func(t *testing.T) {
 		a := assertions.New(t)
 		res1, err := client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-			Ids: &registeredAssociationID,
+			Ids: registeredAssociationID,
 			FieldMask: &types.FieldMask{
 				Paths: []string{
 					"package_name",
@@ -353,11 +353,11 @@ func TestAssociations(t *testing.T) {
 	t.Run("Deletion", func(t *testing.T) {
 		a := assertions.New(t)
 
-		_, err := client.DeleteAssociation(ctx, &registeredAssociationID, creds)
+		_, err := client.DeleteAssociation(ctx, registeredAssociationID, creds)
 		a.So(err, should.BeNil)
 
 		_, err = client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-			Ids: &registeredAssociationID,
+			Ids: registeredAssociationID,
 		}, creds)
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
