@@ -17,10 +17,10 @@ package redis
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
-	"io"
 	"net"
 	"strconv"
 	"strings"
@@ -985,12 +985,9 @@ outer:
 	}
 }
 
-// GenerateLockerID generates a unique locker ID from the provided entropy source.
-// The mutex is acquired and held during entropy extraction.
-func GenerateLockerID(entropy io.Reader, mu *sync.Mutex) (string, error) {
-	mu.Lock()
-	defer mu.Unlock()
-	lockID, err := ulid.New(ulid.Timestamp(time.Now()), entropy)
+// GenerateLockerID generates a unique locker ID to be used with a Redis mutex.
+func GenerateLockerID() (string, error) {
+	lockID, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
 	if err != nil {
 		return "", err
 	}

@@ -16,14 +16,10 @@ package redis
 
 import (
 	"context"
-	"io"
-	"math/rand"
 	"runtime/trace"
-	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -34,9 +30,6 @@ import (
 type GatewayConnectionStatsRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
-
-	entropyMu *sync.Mutex
-	entropy   io.Reader
 }
 
 // Init initializes the GatewayConnectionStatsRegistry.
@@ -44,8 +37,6 @@ func (r *GatewayConnectionStatsRegistry) Init(ctx context.Context) error {
 	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
 	}
-	r.entropyMu = &sync.Mutex{}
-	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
 	return nil
 }
 
@@ -57,7 +48,7 @@ func (r *GatewayConnectionStatsRegistry) key(uid string) string {
 func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats, paths []string) error {
 	uid := unique.ID(ctx, ids)
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return err
 	}

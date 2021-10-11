@@ -18,14 +18,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"io"
-	"math/rand"
 	"runtime/trace"
-	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/provisioning"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -47,9 +43,6 @@ var (
 type DeviceRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
-
-	entropyMu *sync.Mutex
-	entropy   io.Reader
 }
 
 // Init initializes the DeviceRegistry.
@@ -57,8 +50,6 @@ func (r *DeviceRegistry) Init(ctx context.Context) error {
 	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
 	}
-	r.entropyMu = &sync.Mutex{}
-	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
 	return nil
 }
 
@@ -331,7 +322,7 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	}
 	ek := r.euiKey(joinEUI, devEUI)
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return nil, err
 	}
@@ -394,9 +385,6 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 type KeyRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
-
-	entropyMu *sync.Mutex
-	entropy   io.Reader
 }
 
 // Init initializes the KeyRegistry.
@@ -404,8 +392,6 @@ func (r *KeyRegistry) Init(ctx context.Context) error {
 	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
 	}
-	r.entropyMu = &sync.Mutex{}
-	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
 	return nil
 }
 
@@ -435,7 +421,7 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 	}
 	ik := r.idKey(joinEUI, devEUI, id)
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return nil, err
 	}
@@ -562,9 +548,6 @@ func filterGetApplicationActivationSettings(pb *ttnpb.ApplicationActivationSetti
 type ApplicationActivationSettingRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
-
-	entropyMu *sync.Mutex
-	entropy   io.Reader
 }
 
 // Init initializes the ApplicationActivationSettingRegistry.
@@ -572,8 +555,6 @@ func (r *ApplicationActivationSettingRegistry) Init(ctx context.Context) error {
 	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
 	}
-	r.entropyMu = &sync.Mutex{}
-	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
 	return nil
 }
 
@@ -603,7 +584,7 @@ func (r *ApplicationActivationSettingRegistry) SetByID(ctx context.Context, appI
 	}
 	uk := r.uidKey(unique.ID(ctx, appID))
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return nil, err
 	}

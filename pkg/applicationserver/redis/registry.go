@@ -16,14 +16,10 @@ package redis
 
 import (
 	"context"
-	"io"
-	"math/rand"
 	"runtime/trace"
-	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -42,9 +38,6 @@ var (
 type DeviceRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
-
-	entropyMu *sync.Mutex
-	entropy   io.Reader
 }
 
 // Init initializes the DeviceRegistry.
@@ -52,8 +45,6 @@ func (r *DeviceRegistry) Init(ctx context.Context) error {
 	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
 	}
-	r.entropyMu = &sync.Mutex{}
-	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
 	return nil
 }
 
@@ -95,7 +86,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 	uid := unique.ID(ctx, ids)
 	uk := r.uidKey(uid)
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return nil, err
 	}
@@ -260,9 +251,6 @@ func applyLinkFieldMask(dst, src *ttnpb.ApplicationLink, paths ...string) (*ttnp
 type LinkRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
-
-	entropyMu *sync.Mutex
-	entropy   io.Reader
 }
 
 // Init initializes the LinkRegistry.
@@ -270,8 +258,6 @@ func (r *LinkRegistry) Init(ctx context.Context) error {
 	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
 	}
-	r.entropyMu = &sync.Mutex{}
-	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
 	return nil
 }
 
@@ -333,7 +319,7 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 	uid := unique.ID(ctx, ids)
 	uk := r.appKey(uid)
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return nil, err
 	}

@@ -16,14 +16,10 @@ package redis
 
 import (
 	"context"
-	"io"
-	"math/rand"
-	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
-	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -58,9 +54,6 @@ func applyPubSubFieldMask(dst, src *ttnpb.ApplicationPubSub, paths ...string) (*
 type PubSubRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
-
-	entropyMu *sync.Mutex
-	entropy   io.Reader
 }
 
 // Init initializes the PubSubRegistry.
@@ -68,8 +61,6 @@ func (r *PubSubRegistry) Init(ctx context.Context) error {
 	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
 	}
-	r.entropyMu = &sync.Mutex{}
-	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
 	return nil
 }
 
@@ -162,7 +153,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
 	ik := r.uidKey(appUID, ids.PubSubId)
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return nil, err
 	}

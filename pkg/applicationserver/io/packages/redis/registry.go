@@ -16,16 +16,12 @@ package redis
 
 import (
 	"context"
-	"io"
-	"math/rand"
 	"runtime/trace"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
-	ulid "github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -67,9 +63,6 @@ func applyDefaultAssociationFieldMask(dst, src *ttnpb.ApplicationPackageDefaultA
 type ApplicationPackagesRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
-
-	entropyMu *sync.Mutex
-	entropy   io.Reader
 }
 
 // Init initializes the ApplicationPackagesRegistry.
@@ -77,8 +70,6 @@ func (r *ApplicationPackagesRegistry) Init(ctx context.Context) error {
 	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
 	}
-	r.entropyMu = &sync.Mutex{}
-	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
 	return nil
 }
 
@@ -123,7 +114,7 @@ func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids t
 	devUID := unique.ID(ctx, ids)
 	uidKey := r.uidKey(devUID)
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +159,7 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids ttn
 	uidKey := r.uidKey(devUID)
 	associationkey := r.associationKey(devUID, fPort)
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return nil, err
 	}
@@ -318,7 +309,7 @@ func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context
 	appUID := unique.ID(ctx, ids)
 	uidKey := r.uidKey(appUID)
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return nil, err
 	}
@@ -363,7 +354,7 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 	uidKey := r.uidKey(appUID)
 	associationkey := r.associationKey(appUID, fPort)
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return nil, err
 	}
@@ -502,7 +493,7 @@ func (r ApplicationPackagesRegistry) WithPagination(ctx context.Context, limit, 
 func (r *ApplicationPackagesRegistry) EndDeviceTransaction(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fPort uint32, packageName string, fn func(ctx context.Context) error) error {
 	k := r.transactionKey(unique.ID(ctx, ids), r.fPortStr(fPort), packageName)
 
-	lockerID, err := ttnredis.GenerateLockerID(r.entropy, r.entropyMu)
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return err
 	}
