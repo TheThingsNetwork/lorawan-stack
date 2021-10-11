@@ -1013,7 +1013,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if st.HasSetField("ids.dev_addr") {
 		if err := st.ValidateField(func(dev *ttnpb.EndDevice) bool {
 			if st.Device.DevAddr == nil {
-				return dev.Session == nil
+				return dev.GetSession() == nil
 			}
 			return dev.GetSession() != nil && dev.Session.DevAddr.Equal(*st.Device.DevAddr)
 		}, "session.dev_addr"); err != nil {
