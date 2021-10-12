@@ -43,11 +43,11 @@ func (s *entitySearch) queryMetaFields(ctx context.Context, query *gorm.DB, enti
 	if v := req.GetIdContains(); v != "" {
 		switch entityType {
 		case "organization", "user":
-			query = query.Where(`"accounts"."uid" LIKE ?`, "%"+v+"%")
+			query = query.Where(`"accounts"."uid" ILIKE ?`, "%"+v+"%")
 		case "end_device":
-			query = query.Where(`"end_devices"."device_id" LIKE ?`, "%"+v+"%")
+			query = query.Where(`"end_devices"."device_id" ILIKE ?`, "%"+v+"%")
 		default:
-			query = query.Where(fmt.Sprintf(`"%[1]ss"."%[1]s_id" LIKE ?`, entityType), "%"+v+"%")
+			query = query.Where(fmt.Sprintf(`"%[1]ss"."%[1]s_id" ILIKE ?`, entityType), "%"+v+"%")
 		}
 	}
 	if dbKind, ok := query.Get("db:kind"); ok && dbKind == "PostgreSQL" {
