@@ -706,6 +706,9 @@ var (
 					if dev, ok := m["ids.dev_eui"]; ok && dev.DevEui != nil && !dev.DevEui.IsZero() {
 						return true, ""
 					}
+					if m["lorawan_version"].GetLorawanVersion() == ttnpb.MAC_UNKNOWN {
+						return false, "lorawan_version"
+					}
 					if m["lorawan_version"].LorawanVersion.RequireDevEUIForABP() && !m["multicast"].GetMulticast() {
 						return false, "ids.dev_eui"
 					}
