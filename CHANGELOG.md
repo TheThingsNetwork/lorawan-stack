@@ -14,7 +14,6 @@ For details about compatibility between different releases, see the **Commitment
 - Support for enhanced security policies of Packet Broker services.
 - Handling of MAC and PHY versions in end device forms based on selected frequency plan in the Console.
 - Support for scheduling downlink messages as JSON in the Console.
-- Backend Interfaces middleware to extract proxy headers from trusted proxies. This adds a configuration `interop.trusted-proxies` that is similar to the existing `http.trusted-proxies` option.
 - Support for Packet Broker authentication through LoRaWAN Backend Interfaces. This adds the following configuration options:
   - `interop.public-tls-address`: public address of the interop server. The audience in the incoming OAuth 2.0 token from Packet Broker is verified against this address to ensure that other networks cannot impersonate as Packet Broker;
   - `interop.packet-broker.enabled`: enable Packet Broker to authenticate;
