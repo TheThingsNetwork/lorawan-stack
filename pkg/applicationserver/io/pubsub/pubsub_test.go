@@ -47,7 +47,11 @@ func TestPubSub(t *testing.T) {
 	defer flush()
 	defer redisClient.Close()
 	registry := &redis.PubSubRegistry{
-		Redis: redisClient,
+		Redis:   redisClient,
+		LockTTL: test.Delay << 10,
+	}
+	if err := registry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
 	}
 	ids := ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,

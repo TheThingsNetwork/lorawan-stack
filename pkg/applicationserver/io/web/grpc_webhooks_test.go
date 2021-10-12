@@ -55,7 +55,10 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
-	webhookReg := &redis.WebhookRegistry{Redis: redisClient}
+	webhookReg := &redis.WebhookRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+	if err := webhookReg.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	srv := web.NewWebhookRegistryRPC(webhookReg, nil)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
 	componenttest.StartComponent(t, c)

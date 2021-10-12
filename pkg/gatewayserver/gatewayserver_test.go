@@ -177,7 +177,11 @@ func TestGatewayServer(t *testing.T) {
 				defer statsFlush()
 				defer statsRedisClient.Close()
 				statsRegistry := &gsredis.GatewayConnectionStatsRegistry{
-					Redis: statsRedisClient,
+					Redis:   statsRedisClient,
+					LockTTL: test.Delay << 10,
+				}
+				if err := statsRegistry.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
 				}
 				config.Stats = statsRegistry
 			}

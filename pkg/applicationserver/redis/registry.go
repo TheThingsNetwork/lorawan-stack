@@ -36,7 +36,16 @@ var (
 
 // DeviceRegistry is a Redis device registry.
 type DeviceRegistry struct {
-	Redis *ttnredis.Client
+	Redis   *ttnredis.Client
+	LockTTL time.Duration
+}
+
+// Init initializes the DeviceRegistry.
+func (r *DeviceRegistry) Init(ctx context.Context) error {
+	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *DeviceRegistry) uidKey(uid string) string {
@@ -77,10 +86,15 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 	uid := unique.ID(ctx, ids)
 	uk := r.uidKey(uid)
 
+	lockerID, err := ttnredis.GenerateLockerID()
+	if err != nil {
+		return nil, err
+	}
+
 	defer trace.StartRegion(ctx, "set end device").End()
 
 	var pb *ttnpb.EndDevice
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+	err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, uk)
 		stored := &ttnpb.EndDevice{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -219,7 +233,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 			return err
 		}
 		return nil
-	}, uk)
+	})
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
@@ -235,7 +249,16 @@ func applyLinkFieldMask(dst, src *ttnpb.ApplicationLink, paths ...string) (*ttnp
 
 // LinkRegistry is a store for application links.
 type LinkRegistry struct {
-	Redis *ttnredis.Client
+	Redis   *ttnredis.Client
+	LockTTL time.Duration
+}
+
+// Init initializes the LinkRegistry.
+func (r *LinkRegistry) Init(ctx context.Context) error {
+	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *LinkRegistry) allKey(ctx context.Context) string {
@@ -293,13 +316,18 @@ func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context
 
 // Set creates, updates or deletes the link by the application identifiers.
 func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, gets []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
-	defer trace.StartRegion(ctx, "set link").End()
-
 	uid := unique.ID(ctx, ids)
 	uk := r.appKey(uid)
 
+	lockerID, err := ttnredis.GenerateLockerID()
+	if err != nil {
+		return nil, err
+	}
+
+	defer trace.StartRegion(ctx, "set link").End()
+
 	var pb *ttnpb.ApplicationLink
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+	err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, uk)
 		stored := &ttnpb.ApplicationLink{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -378,7 +406,7 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 			return err
 		}
 		return nil
-	}, uk)
+	})
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
@@ -431,7 +459,7 @@ func (r *ApplicationUplinkRegistry) Push(ctx context.Context, ids ttnpb.EndDevic
 	}
 
 	uidKey := r.uidKey(unique.ID(ctx, ids))
-	_, err = r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+	_, err = r.Redis.TxPipelined(ctx, func(p redis.Pipeliner) error {
 		p.LPush(ctx, uidKey, s)
 		p.LTrim(ctx, uidKey, 0, r.Limit-1)
 		return nil

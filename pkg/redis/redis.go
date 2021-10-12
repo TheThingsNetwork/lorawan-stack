@@ -17,6 +17,7 @@ package redis
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
+	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
@@ -981,6 +983,15 @@ outer:
 			idsArg = append(idsArg, ">")
 		}
 	}
+}
+
+// GenerateLockerID generates a unique locker ID to be used with a Redis mutex.
+func GenerateLockerID() (string, error) {
+	lockID, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
+	if err != nil {
+		return "", err
+	}
+	return lockID.String(), nil
 }
 
 func init() {

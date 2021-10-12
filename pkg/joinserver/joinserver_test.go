@@ -145,8 +145,14 @@ func TestInvalidJoinRequests(t *testing.T) {
 				redisClient, flush := test.NewRedis(ctx, "joinserver_test")
 				defer flush()
 				defer redisClient.Close()
-				devReg := &redis.DeviceRegistry{Redis: redisClient}
-				keyReg := &redis.KeyRegistry{Redis: redisClient}
+				devReg := &redis.DeviceRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+				if err := devReg.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				keyReg := &redis.KeyRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+				if err := keyReg.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
 				aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(ctx)
 				defer aasRegCloseFn()
 
@@ -2042,8 +2048,14 @@ func TestHandleJoin(t *testing.T) {
 				redisClient, flush := test.NewRedis(ctx, "joinserver_test")
 				defer flush()
 				defer redisClient.Close()
-				devReg := &redis.DeviceRegistry{Redis: redisClient}
-				keyReg := &redis.KeyRegistry{Redis: redisClient}
+				devReg := &redis.DeviceRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+				if err := devReg.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				keyReg := &redis.KeyRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+				if err := keyReg.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
 				aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(ctx)
 				defer aasRegCloseFn()
 

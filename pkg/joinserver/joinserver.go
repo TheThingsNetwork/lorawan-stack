@@ -18,11 +18,9 @@ package joinserver
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"encoding/binary"
-	"io"
-	"math/rand"
 	"sort"
-	"sync"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -56,9 +54,6 @@ type JoinServer struct {
 
 	euiPrefixes []types.EUI64Prefix
 
-	entropyMu *sync.Mutex
-	entropy   io.Reader
-
 	grpc struct {
 		nsJs                          nsJsServer
 		asJs                          asJsServer
@@ -86,9 +81,6 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		applicationActivationSettings: conf.ApplicationActivationSettings,
 
 		euiPrefixes: conf.JoinEUIPrefixes,
-
-		entropyMu: &sync.Mutex{},
-		entropy:   ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0),
 	}
 
 	js.grpc.applicationActivationSettings = applicationActivationSettingsRegistryServer{
@@ -376,9 +368,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				return nil, nil, errEncodePayload.WithCause(err)
 			}
 
-			js.entropyMu.Lock()
-			skID, err := ulid.New(ulid.Timestamp(time.Now()), js.entropy)
-			js.entropyMu.Unlock()
+			skID, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
 			if err != nil {
 				return nil, nil, errGenerateSessionKeyID.New()
 			}

@@ -182,12 +182,18 @@ func TestApplicationServer(t *testing.T) {
 	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
-	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
 	defer linksRedisClient.Close()
-	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient, LockTTL: test.Delay << 10}
+	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			DefaultFormatters: &ttnpb.MessagePayloadFormatters{
@@ -211,12 +217,18 @@ func TestApplicationServer(t *testing.T) {
 	webhooksRedisClient, webhooksFlush := test.NewRedis(ctx, "applicationserver_test", "webhooks")
 	defer webhooksFlush()
 	defer webhooksRedisClient.Close()
-	webhookRegistry := iowebredis.WebhookRegistry{Redis: webhooksRedisClient}
+	webhookRegistry := iowebredis.WebhookRegistry{Redis: webhooksRedisClient, LockTTL: test.Delay << 10}
+	if err := webhookRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	pubsubRedisClient, pubsubFlush := test.NewRedis(ctx, "applicationserver_test", "pubsub")
 	defer pubsubFlush()
 	defer pubsubRedisClient.Close()
-	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient}
+	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient, LockTTL: test.Delay << 10}
+	if err := pubsubRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	distribRedisClient, distribFlush := test.NewRedis(ctx, "applicationserver_test", "traffic")
 	defer distribFlush()
@@ -2271,12 +2283,18 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
-	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
 	defer linksRedisClient.Close()
-	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient, LockTTL: test.Delay << 10}
+	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			SkipPayloadCrypto: &pbtypes.BoolValue{Value: true},
@@ -2754,7 +2772,10 @@ func TestLocationFromPayload(t *testing.T) {
 	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
-	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	_, err := deviceRegistry.Set(ctx, registeredDevice.EndDeviceIdentifiers, nil, func(ed *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return registeredDevice, []string{"ids", "session", "formatters"}, nil
 	})
@@ -2765,7 +2786,10 @@ func TestLocationFromPayload(t *testing.T) {
 	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
 	defer linksRedisClient.Close()
-	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient, LockTTL: test.Delay << 10}
+	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	_, err = linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{}, nil, nil
 	})

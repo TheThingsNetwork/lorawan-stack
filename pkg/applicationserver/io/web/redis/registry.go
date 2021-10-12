@@ -50,7 +50,16 @@ func applyWebhookFieldMask(dst, src *ttnpb.ApplicationWebhook, paths ...string) 
 
 // WebhookRegistry is a Redis webhook registry.
 type WebhookRegistry struct {
-	Redis *ttnredis.Client
+	Redis   *ttnredis.Client
+	LockTTL time.Duration
+}
+
+// Init initializes the WebhookRegistry.
+func (r *WebhookRegistry) Init(ctx context.Context) error {
+	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *WebhookRegistry) appKey(uid string) string {
@@ -102,8 +111,13 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
 	ik := r.idKey(appUID, ids.WebhookId)
 
+	lockerID, err := ttnredis.GenerateLockerID()
+	if err != nil {
+		return nil, err
+	}
+
 	var pb *ttnpb.ApplicationWebhook
-	err := r.Redis.Watch(ctx, func(tx *redis.Tx) error {
+	err = ttnredis.LockedWatch(ctx, r.Redis, ik, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, ik)
 		stored := &ttnpb.ApplicationWebhook{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -212,7 +226,7 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 			return err
 		}
 		return nil
-	}, ik)
+	})
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
