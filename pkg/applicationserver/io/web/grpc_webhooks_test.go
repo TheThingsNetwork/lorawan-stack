@@ -128,7 +128,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// Get.
 	{
 		res, err := client.Get(ctx, &ttnpb.GetApplicationWebhookRequest{
-			Ids: ttnpb.ApplicationWebhookIdentifiers{
+			Ids: &ttnpb.ApplicationWebhookIdentifiers{
 				ApplicationIds: &registeredApplicationID,
 				WebhookId:      registeredWebhookID,
 			},

@@ -77,7 +77,7 @@ func (r *WebhookRegistry) makeIDKeyFunc(appUID string) func(id string) string {
 }
 
 // Get implements WebhookRegistry.
-func (r WebhookRegistry) Get(ctx context.Context, ids ttnpb.ApplicationWebhookIdentifiers, paths []string) (*ttnpb.ApplicationWebhook, error) {
+func (r WebhookRegistry) Get(ctx context.Context, ids *ttnpb.ApplicationWebhookIdentifiers, paths []string) (*ttnpb.ApplicationWebhook, error) {
 	pb := &ttnpb.ApplicationWebhook{}
 	if err := ttnredis.GetProto(ctx, r.Redis, r.idKey(unique.ID(ctx, ids.ApplicationIds), ids.WebhookId)).ScanProto(pb); err != nil {
 		return nil, err

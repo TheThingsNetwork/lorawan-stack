@@ -969,10 +969,18 @@ func (dst *GetApplicationWebhookRequest) SetFields(src *GetApplicationWebhookReq
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhookIdentifiers
-				if src != nil {
-					newSrc = &src.Ids
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.Ids
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &ApplicationWebhookIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -980,8 +988,7 @@ func (dst *GetApplicationWebhookRequest) SetFields(src *GetApplicationWebhookReq
 				if src != nil {
 					dst.Ids = src.Ids
 				} else {
-					var zero ApplicationWebhookIdentifiers
-					dst.Ids = zero
+					dst.Ids = nil
 				}
 			}
 		case "field_mask":

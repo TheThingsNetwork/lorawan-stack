@@ -123,7 +123,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationWebhookRegistryClient(as).Get(ctx, &ttnpb.GetApplicationWebhookRequest{
-				Ids:       *webhookID,
+				Ids:       webhookID,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
