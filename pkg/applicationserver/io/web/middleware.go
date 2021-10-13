@@ -80,8 +80,8 @@ func (w *webhooks) validateAndFillIDs(next http.Handler) http.Handler {
 		ctx = withDeviceID(ctx, devID)
 
 		hookID := ttnpb.ApplicationWebhookIdentifiers{
-			ApplicationIdentifiers: appID,
-			WebhookId:              vars["webhook_id"],
+			ApplicationIds: appID,
+			WebhookId:      vars["webhook_id"],
 		}
 		if err := hookID.ValidateContext(ctx); err != nil {
 			webhandlers.Error(w, r, err)

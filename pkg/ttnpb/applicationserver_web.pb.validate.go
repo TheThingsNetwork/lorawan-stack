@@ -52,7 +52,7 @@ func (m *ApplicationWebhookIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationWebhookIdentifiersValidationError{
 						field:  "application_ids",
@@ -395,7 +395,7 @@ func (m *ApplicationWebhookTemplate) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationWebhookTemplateIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationWebhookTemplateValidationError{
 						field:  "ids",
@@ -825,7 +825,7 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationWebhookIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationWebhookValidationError{
 						field:  "ids",
@@ -1302,7 +1302,7 @@ func (m *GetApplicationWebhookRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationWebhookIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationWebhookRequestValidationError{
 						field:  "ids",
@@ -1408,7 +1408,7 @@ func (m *ListApplicationWebhooksRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationWebhooksRequestValidationError{
 						field:  "application_ids",
@@ -1514,7 +1514,7 @@ func (m *SetApplicationWebhookRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "webhook":
 
-			if v, ok := interface{}(&m.ApplicationWebhook).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Webhook).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationWebhookRequestValidationError{
 						field:  "webhook",
@@ -1620,7 +1620,7 @@ func (m *GetApplicationWebhookTemplateRequest) ValidateFields(paths ...string) e
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationWebhookTemplateIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationWebhookTemplateRequestValidationError{
 						field:  "ids",

@@ -66,8 +66,8 @@ func getApplicationWebhookID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appl
 		return nil, errNoWebhookID.New()
 	}
 	return &ttnpb.ApplicationWebhookIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
-		WebhookId:              webhookID,
+		ApplicationIds: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
+		WebhookId:      webhookID,
 	}, nil
 }
 
@@ -123,8 +123,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationWebhookRegistryClient(as).Get(ctx, &ttnpb.GetApplicationWebhookRequest{
-				ApplicationWebhookIdentifiers: *webhookID,
-				FieldMask:                     &pbtypes.FieldMask{Paths: paths},
+				Ids:       *webhookID,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -156,8 +156,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationWebhookRegistryClient(as).List(ctx, &ttnpb.ListApplicationWebhooksRequest{
-				ApplicationIdentifiers: *appID,
-				FieldMask:              &pbtypes.FieldMask{Paths: paths},
+				ApplicationIds: *appID,
+				FieldMask:      &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -183,15 +183,15 @@ var (
 			}
 			headers, _ := cmd.Flags().GetStringSlice("headers")
 			webhook.Headers = mergeKV(webhook.Headers, headers)
-			webhook.ApplicationWebhookIdentifiers = *webhookID
+			webhook.Ids = *webhookID
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
 			}
 			res, err := ttnpb.NewApplicationWebhookRegistryClient(as).Set(ctx, &ttnpb.SetApplicationWebhookRequest{
-				ApplicationWebhook: webhook,
-				FieldMask:          &pbtypes.FieldMask{Paths: paths},
+				Webhook:   webhook,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

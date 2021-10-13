@@ -35,7 +35,7 @@ var errTemplateNotFound = errors.DefineNotFound("template_not_found", "template 
 
 // GetTemplate implements TemplateStore.
 func (ts *noopTemplateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
-	return nil, errTemplateNotFound.WithAttributes("template_id", req.TemplateId)
+	return nil, errTemplateNotFound.WithAttributes("template_id", req.Ids.TemplateId)
 }
 
 // ListTemplates implements TemplateStore.
@@ -72,7 +72,7 @@ func (ts *templateStore) prependBaseURL(template *ttnpb.ApplicationWebhookTempla
 
 // GetTemplate implements the TemplateStore interface.
 func (ts *templateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
-	template, err := ts.getTemplate(req.ApplicationWebhookTemplateIdentifiers)
+	template, err := ts.getTemplate(req.Ids)
 	if err != nil {
 		return nil, err
 	}
@@ -268,7 +268,7 @@ func (t webhookTemplate) pbFields() []*ttnpb.ApplicationWebhookTemplateField {
 
 func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
 	return &ttnpb.ApplicationWebhookTemplate{
-		ApplicationWebhookTemplateIdentifiers: ttnpb.ApplicationWebhookTemplateIdentifiers{
+		Ids: ttnpb.ApplicationWebhookTemplateIdentifiers{
 			TemplateId: t.TemplateID,
 		},
 		Name:                     t.Name,

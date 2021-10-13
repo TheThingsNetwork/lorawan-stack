@@ -70,8 +70,8 @@ func TestApplicationServer(t *testing.T) {
 	registeredApplicationKey := "secret"
 	registeredApplicationFormatter := ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
 	registeredApplicationWebhookID := ttnpb.ApplicationWebhookIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		WebhookId:              "test",
+		ApplicationIds: registeredApplicationID,
+		WebhookId:      "test",
 	}
 	registeredApplicationPubSubID := ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,
@@ -773,19 +773,19 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationWebhookRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationWebhookRequest{
-					ApplicationWebhook: ttnpb.ApplicationWebhook{
-						ApplicationWebhookIdentifiers: registeredApplicationWebhookID,
-						BaseUrl:                       webhookTarget.URL,
-						Format:                        "json",
-						UplinkMessage:                 &ttnpb.ApplicationWebhook_Message{Path: ""},
-						JoinAccept:                    &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkAck:                   &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkNack:                  &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkQueued:                &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkSent:                  &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkFailed:                &ttnpb.ApplicationWebhook_Message{Path: ""},
-						LocationSolved:                &ttnpb.ApplicationWebhook_Message{Path: ""},
-						ServiceData:                   &ttnpb.ApplicationWebhook_Message{Path: ""},
+					Webhook: ttnpb.ApplicationWebhook{
+						Ids:            registeredApplicationWebhookID,
+						BaseUrl:        webhookTarget.URL,
+						Format:         "json",
+						UplinkMessage:  &ttnpb.ApplicationWebhook_Message{Path: ""},
+						JoinAccept:     &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkAck:    &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkNack:   &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkQueued: &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkSent:   &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkFailed: &ttnpb.ApplicationWebhook_Message{Path: ""},
+						LocationSolved: &ttnpb.ApplicationWebhook_Message{Path: ""},
+						ServiceData:    &ttnpb.ApplicationWebhook_Message{Path: ""},
 					},
 					FieldMask: &pbtypes.FieldMask{
 						Paths: []string{

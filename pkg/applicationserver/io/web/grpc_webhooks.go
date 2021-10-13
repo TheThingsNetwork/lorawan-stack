@@ -69,17 +69,17 @@ func (s webhookRegistryRPC) ListTemplates(ctx context.Context, req *ttnpb.ListAp
 }
 
 func (s webhookRegistryRPC) Get(ctx context.Context, req *ttnpb.GetApplicationWebhookRequest) (*ttnpb.ApplicationWebhook, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+	if err := rights.RequireApplication(ctx, req.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	return s.webhooks.Get(ctx, req.ApplicationWebhookIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...))
+	return s.webhooks.Get(ctx, req.Ids, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...))
 }
 
 func (s webhookRegistryRPC) List(ctx context.Context, req *ttnpb.ListApplicationWebhooksRequest) (*ttnpb.ApplicationWebhooks, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+	if err := rights.RequireApplication(ctx, req.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	webhooks, err := s.webhooks.List(ctx, req.ApplicationIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...))
+	webhooks, err := s.webhooks.List(ctx, req.ApplicationIds, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...))
 	if err != nil {
 		return nil, err
 	}
@@ -94,19 +94,19 @@ func (s webhookRegistryRPC) List(ctx context.Context, req *ttnpb.ListApplication
 }
 
 func (s webhookRegistryRPC) Set(ctx context.Context, req *ttnpb.SetApplicationWebhookRequest) (*ttnpb.ApplicationWebhook, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers,
+	if err := rights.RequireApplication(ctx, req.Webhook.Ids.ApplicationIds,
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 	); err != nil {
 		return nil, err
 	}
-	return s.webhooks.Set(ctx, req.ApplicationWebhookIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...),
+	return s.webhooks.Set(ctx, req.Webhook.Ids, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...),
 		func(webhook *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 			if webhook != nil {
-				return &req.ApplicationWebhook, req.FieldMask.GetPaths(), nil
+				return &req.Webhook, req.FieldMask.GetPaths(), nil
 			}
-			return &req.ApplicationWebhook, append(req.FieldMask.GetPaths(),
+			return &req.Webhook, append(req.FieldMask.GetPaths(),
 				"ids.application_ids",
 				"ids.webhook_id",
 			), nil
@@ -115,7 +115,7 @@ func (s webhookRegistryRPC) Set(ctx context.Context, req *ttnpb.SetApplicationWe
 }
 
 func (s webhookRegistryRPC) Delete(ctx context.Context, req *ttnpb.ApplicationWebhookIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers,
+	if err := rights.RequireApplication(ctx, req.ApplicationIds,
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,

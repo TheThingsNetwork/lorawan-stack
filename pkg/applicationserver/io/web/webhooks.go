@@ -184,7 +184,7 @@ func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.Applic
 	}
 	return fmt.Sprintf(downlinkOperationURLFormat,
 		baseURL,
-		webhookID.ApplicationId,
+		webhookID.ApplicationIds.ApplicationId,
 		webhookID.WebhookId,
 		devID.DeviceId,
 		op,
@@ -230,7 +230,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	wg := sync.WaitGroup{}
 	for i := range hooks {
 		hook := hooks[i]
-		logger := log.FromContext(ctx).WithField("hook", hook.WebhookId)
+		logger := log.FromContext(ctx).WithField("hook", hook.Ids.WebhookId)
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -321,8 +321,8 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	}
 	if hook.DownlinkApiKey != "" {
 		req.Header.Set(downlinkKeyHeader, hook.DownlinkApiKey)
-		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "push"))
-		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "replace"))
+		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.Ids, msg.EndDeviceIdentifiers, "push"))
+		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.Ids, msg.EndDeviceIdentifiers, "replace"))
 	}
 	if domain := w.createDomain(ctx); domain != "" {
 		req.Header.Set(domainHeader, domain)
