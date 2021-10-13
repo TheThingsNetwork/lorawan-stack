@@ -32,7 +32,7 @@ type interopServer struct {
 	interop.Authorizer
 }
 
-func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSReq) (*interop.TTIHomeNSAns, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "identityserver/interop")
 	if err := srv.RequireAuthorized(ctx); err != nil {
 		return nil, err
@@ -57,29 +57,30 @@ func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSR
 		return nil, err
 	}
 
-	_ = dev
-
 	var (
-		conf      = srv.configFromContext(ctx)
-		homeNetID = conf.Network.NetID
-		hNSID     *types.EUI64
+		conf  = srv.configFromContext(ctx)
+		hNSID *types.EUI64
 	)
 
 	header, err := in.AnswerHeader()
 	if err != nil {
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
-	ans := &interop.HomeNSAns{
-		JsNsMessageHeader: interop.JsNsMessageHeader{
-			MessageHeader: header,
-			SenderID:      in.ReceiverID,
-			ReceiverID:    in.SenderID,
-			ReceiverNSID:  in.SenderNSID,
+	ans := &interop.TTIHomeNSAns{
+		HomeNSAns: interop.HomeNSAns{
+			JsNsMessageHeader: interop.JsNsMessageHeader{
+				MessageHeader: header,
+				SenderID:      in.ReceiverID,
+				ReceiverID:    in.SenderID,
+				ReceiverNSID:  in.SenderNSID,
+			},
+			Result: interop.Result{
+				ResultCode: interop.ResultSuccess,
+			},
+			HNetID: interop.NetID(conf.Network.NetID),
 		},
-		Result: interop.Result{
-			ResultCode: interop.ResultSuccess,
-		},
-		HNetID: interop.NetID(homeNetID),
+		HNSAddress: dev.NetworkServerAddress,
+		HTenantID:  conf.Network.TenantID,
 	}
 	if in.ProtocolVersion.SupportsNSID() {
 		ans.HNSID = (*interop.EUI64)(hNSID)
