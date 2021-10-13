@@ -16,7 +16,6 @@ package identityserver
 
 import (
 	"context"
-	"fmt"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -31,14 +30,6 @@ import (
 type interopServer struct {
 	*IdentityServer
 	interop.Authorizer
-}
-
-func (srv *interopServer) hNSID(ctx context.Context, dev *ttnpb.EndDevice) string {
-	hNSID := dev.NetworkServerAddress
-	if tid := srv.configFromContext(ctx).Network.TenantID; tid != "" {
-		hNSID = fmt.Sprintf("%s@%s", tid, hNSID)
-	}
-	return hNSID
 }
 
 func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSReq) (*interop.HomeNSAns, error) {
@@ -66,8 +57,13 @@ func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSR
 		return nil, err
 	}
 
-	homeNetID := srv.configFromContext(ctx).Network.NetID
-	hNSID := srv.hNSID(ctx, dev)
+	_ = dev
+
+	var (
+		conf      = srv.configFromContext(ctx)
+		homeNetID = conf.Network.NetID
+		hNSID     *types.EUI64
+	)
 
 	header, err := in.AnswerHeader()
 	if err != nil {
@@ -86,7 +82,7 @@ func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSR
 		HNetID: interop.NetID(homeNetID),
 	}
 	if in.ProtocolVersion.SupportsNSID() {
-		ans.HNSID = &hNSID
+		ans.HNSID = (*interop.EUI64)(hNSID)
 	}
 	return ans, nil
 }

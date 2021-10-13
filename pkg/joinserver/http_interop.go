@@ -28,7 +28,7 @@ import (
 
 type interopHandler interface {
 	HandleJoin(context.Context, *ttnpb.JoinRequest, Authorizer) (*ttnpb.JoinResponse, error)
-	GetHomeNetID(context.Context, types.EUI64, types.EUI64, Authorizer) (netID *types.NetID, nsID string, err error)
+	GetHomeNetID(context.Context, types.EUI64, types.EUI64, Authorizer) (netID *types.NetID, nsID *types.EUI64, err error)
 	GetAppSKey(context.Context, *ttnpb.SessionKeyRequest, Authorizer) (*ttnpb.AppSKeyResponse, error)
 }
 
@@ -149,8 +149,8 @@ func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSRe
 		},
 		HNetID: interop.NetID(*netID),
 	}
-	if nsID != "" && in.ProtocolVersion.SupportsNSID() {
-		ans.HNSID = &nsID
+	if nsID != nil && in.ProtocolVersion.SupportsNSID() {
+		ans.HNSID = (*interop.EUI64)(nsID)
 	}
 	return ans, nil
 }

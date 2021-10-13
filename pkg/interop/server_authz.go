@@ -16,6 +16,9 @@ package interop
 
 import (
 	"context"
+	"net"
+	"net/url"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -41,7 +44,41 @@ func (a Authorizer) RequireAddress(ctx context.Context, addr string) error {
 	} else {
 		return errUnauthenticated.New()
 	}
-	return verifySenderNSID(authInfo.addressPatterns(), addr)
+
+	patterns := authInfo.addressPatterns()
+	if len(patterns) == 0 {
+		return errCallerNotAuthorized.WithAttributes("target", addr)
+	}
+
+	host := addr
+	if url, err := url.Parse(addr); err == nil && url.Host != "" {
+		host = url.Host
+	}
+	if h, _, err := net.SplitHostPort(addr); err == nil {
+		host = h
+	}
+	if len(host) == 0 {
+		return errCallerNotAuthorized.WithAttributes("target", addr)
+	}
+	hostParts := strings.Split(host, ".")
+
+nextPattern:
+	for _, pattern := range patterns {
+		patternParts := strings.Split(pattern, ".")
+		if len(patternParts) != len(hostParts) {
+			return errCallerNotAuthorized.WithAttributes("target", addr)
+		}
+		for i, patternPart := range patternParts {
+			if i == 0 && patternPart == "*" {
+				continue
+			}
+			if patternPart != hostParts[i] {
+				continue nextPattern
+			}
+		}
+		return nil
+	}
+	return errCallerNotAuthorized.WithAttributes("target", addr)
 }
 
 // RequireID returns an error if the given NetID is not authorized in the context.

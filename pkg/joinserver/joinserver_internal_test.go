@@ -31,8 +31,6 @@ var (
 	ErrReuseDevNonce     = errReuseDevNonce
 )
 
-func stringPtr(s string) *string { return &s }
-
 type AsJsServer = asJsServer
 type NsJsServer = nsJsServer
 type JsDeviceServer = jsEndDeviceRegistryServer

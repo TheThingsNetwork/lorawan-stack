@@ -2841,7 +2841,7 @@ func TestGetHomeNetID(t *testing.T) {
 		JoinEUI       types.EUI64
 		DevEUI        types.EUI64
 		ResponseNetID *types.NetID
-		ResponseNSID  string
+		ResponseNSID  *types.EUI64
 
 		ErrorAssertion func(*testing.T, error) bool
 	}{
@@ -2892,7 +2892,6 @@ func TestGetHomeNetID(t *testing.T) {
 			JoinEUI:       types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEUI:        types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ResponseNetID: &types.NetID{0x42, 0xff, 0xff},
-			ResponseNSID:  nsAddr,
 		},
 	} {
 		tc := tc

@@ -31,7 +31,7 @@ import (
 
 type mockInteropHandler struct {
 	HandleJoinFunc   func(context.Context, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
-	GetHomeNetIDFunc func(context.Context, types.EUI64, types.EUI64) (netID *types.NetID, nsID string, err error)
+	GetHomeNetIDFunc func(context.Context, types.EUI64, types.EUI64) (netID *types.NetID, nsID *types.EUI64, err error)
 	GetAppSKeyFunc   func(context.Context, *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error)
 }
 
@@ -42,7 +42,7 @@ func (h mockInteropHandler) HandleJoin(ctx context.Context, req *ttnpb.JoinReque
 	return h.HandleJoinFunc(ctx, req)
 }
 
-func (h mockInteropHandler) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (*types.NetID, string, error) {
+func (h mockInteropHandler) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (*types.NetID, *types.EUI64, error) {
 	if h.GetHomeNetIDFunc == nil {
 		panic("GetHomeNetID should not be called")
 	}
@@ -450,7 +450,7 @@ func TestInteropHomeNSRequest(t *testing.T) {
 		ExpectedJoinEUI   types.EUI64
 		ExpectedDevEUI    types.EUI64
 		ErrorAssertion    func(*testing.T, error) bool
-		GetNetIDFunc      func() (*types.NetID, string, error)
+		GetNetIDFunc      func() (*types.NetID, *types.EUI64, error)
 		ExpectedHomeNSAns *interop.HomeNSAns
 	}{
 		{
@@ -468,8 +468,8 @@ func TestInteropHomeNSRequest(t *testing.T) {
 			},
 			ExpectedJoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			GetNetIDFunc: func() (*types.NetID, string, error) {
-				return &types.NetID{0x42, 0xff, 0xff}, "thethings.example.com", nil
+			GetNetIDFunc: func() (*types.NetID, *types.EUI64, error) {
+				return &types.NetID{0x42, 0xff, 0xff}, &types.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0}, nil
 			},
 			ExpectedHomeNSAns: &interop.HomeNSAns{
 				JsNsMessageHeader: interop.JsNsMessageHeader{
@@ -496,15 +496,15 @@ func TestInteropHomeNSRequest(t *testing.T) {
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x13},
-					SenderNSID: stringPtr("eu1.cloud.thethings.network"),
+					SenderNSID: &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0xff},
 					ReceiverID: interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},
 				DevEUI: interop.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			},
 			ExpectedJoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			GetNetIDFunc: func() (*types.NetID, string, error) {
-				return &types.NetID{0x42, 0xff, 0xff}, "thethings.example.com", nil
+			GetNetIDFunc: func() (*types.NetID, *types.EUI64, error) {
+				return &types.NetID{0x42, 0xff, 0xff}, &types.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0}, nil
 			},
 			ExpectedHomeNSAns: &interop.HomeNSAns{
 				JsNsMessageHeader: interop.JsNsMessageHeader{
@@ -514,13 +514,13 @@ func TestInteropHomeNSRequest(t *testing.T) {
 					},
 					SenderID:     interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ReceiverID:   interop.NetID{0x0, 0x0, 0x13},
-					ReceiverNSID: stringPtr("eu1.cloud.thethings.network"),
+					ReceiverNSID: &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0xff},
 				},
 				Result: interop.Result{
 					ResultCode: interop.ResultSuccess,
 				},
 				HNetID: interop.NetID{0x42, 0xff, 0xff},
-				HNSID:  stringPtr("thethings.example.com"),
+				HNSID:  &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0},
 			},
 		},
 		{
@@ -538,8 +538,8 @@ func TestInteropHomeNSRequest(t *testing.T) {
 			},
 			ExpectedJoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			GetNetIDFunc: func() (*types.NetID, string, error) {
-				return nil, "thethings.example.com", nil
+			GetNetIDFunc: func() (*types.NetID, *types.EUI64, error) {
+				return nil, nil, nil
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -553,7 +553,7 @@ func TestInteropHomeNSRequest(t *testing.T) {
 
 			srv := interopServer{
 				JS: &mockInteropHandler{
-					GetHomeNetIDFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64) (*types.NetID, string, error) {
+					GetHomeNetIDFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64) (*types.NetID, *types.EUI64, error) {
 						if !a.So(joinEUI, should.Resemble, tc.ExpectedJoinEUI) || !a.So(devEUI, should.Resemble, tc.ExpectedDevEUI) {
 							t.FailNow()
 						}
