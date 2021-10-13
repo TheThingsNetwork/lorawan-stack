@@ -258,7 +258,14 @@ func (m *ApplicationPackageAssociationIdentifiers) ValidateFields(paths ...strin
 		switch name {
 		case "end_device_ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetEndDeviceIds() == nil {
+				return ApplicationPackageAssociationIdentifiersValidationError{
+					field:  "end_device_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEndDeviceIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageAssociationIdentifiersValidationError{
 						field:  "end_device_ids",
@@ -361,7 +368,14 @@ func (m *ApplicationPackageAssociation) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationPackageAssociationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return ApplicationPackageAssociationValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageAssociationValidationError{
 						field:  "ids",
@@ -373,7 +387,7 @@ func (m *ApplicationPackageAssociation) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageAssociationValidationError{
 						field:  "created_at",
@@ -385,7 +399,7 @@ func (m *ApplicationPackageAssociation) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageAssociationValidationError{
 						field:  "updated_at",
@@ -608,7 +622,14 @@ func (m *GetApplicationPackageAssociationRequest) ValidateFields(paths ...string
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationPackageAssociationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return GetApplicationPackageAssociationRequestValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationPackageAssociationRequestValidationError{
 						field:  "ids",
@@ -714,7 +735,14 @@ func (m *ListApplicationPackageAssociationRequest) ValidateFields(paths ...strin
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return ListApplicationPackageAssociationRequestValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationPackageAssociationRequestValidationError{
 						field:  "ids",
@@ -831,7 +859,14 @@ func (m *SetApplicationPackageAssociationRequest) ValidateFields(paths ...string
 		switch name {
 		case "association":
 
-			if v, ok := interface{}(&m.ApplicationPackageAssociation).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetAssociation() == nil {
+				return SetApplicationPackageAssociationRequestValidationError{
+					field:  "association",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetAssociation()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationPackageAssociationRequestValidationError{
 						field:  "association",
@@ -938,7 +973,14 @@ func (m *ApplicationPackageDefaultAssociationIdentifiers) ValidateFields(paths .
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApplicationIds() == nil {
+				return ApplicationPackageDefaultAssociationIdentifiersValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageDefaultAssociationIdentifiersValidationError{
 						field:  "application_ids",
@@ -1046,7 +1088,14 @@ func (m *ApplicationPackageDefaultAssociation) ValidateFields(paths ...string) e
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationPackageDefaultAssociationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return ApplicationPackageDefaultAssociationValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageDefaultAssociationValidationError{
 						field:  "ids",
@@ -1058,7 +1107,7 @@ func (m *ApplicationPackageDefaultAssociation) ValidateFields(paths ...string) e
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageDefaultAssociationValidationError{
 						field:  "created_at",
@@ -1070,7 +1119,7 @@ func (m *ApplicationPackageDefaultAssociation) ValidateFields(paths ...string) e
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPackageDefaultAssociationValidationError{
 						field:  "updated_at",
@@ -1294,7 +1343,14 @@ func (m *GetApplicationPackageDefaultAssociationRequest) ValidateFields(paths ..
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationPackageDefaultAssociationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return GetApplicationPackageDefaultAssociationRequestValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationPackageDefaultAssociationRequestValidationError{
 						field:  "ids",
@@ -1404,7 +1460,14 @@ func (m *ListApplicationPackageDefaultAssociationRequest) ValidateFields(paths .
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return ListApplicationPackageDefaultAssociationRequestValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationPackageDefaultAssociationRequestValidationError{
 						field:  "ids",
@@ -1527,7 +1590,14 @@ func (m *SetApplicationPackageDefaultAssociationRequest) ValidateFields(paths ..
 		switch name {
 		case "default":
 
-			if v, ok := interface{}(&m.ApplicationPackageDefaultAssociation).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetDefault() == nil {
+				return SetApplicationPackageDefaultAssociationRequestValidationError{
+					field:  "default",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDefault()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationPackageDefaultAssociationRequestValidationError{
 						field:  "default",

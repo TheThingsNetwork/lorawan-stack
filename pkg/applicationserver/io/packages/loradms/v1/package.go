@@ -277,13 +277,13 @@ func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackage
 		if err := defaultData.fromStruct(def.Data); err != nil {
 			return nil, 0, err
 		}
-		fPort = def.FPort
+		fPort = def.Ids.FPort
 	}
 	if assoc != nil {
 		if err := associationData.fromStruct(assoc.Data); err != nil {
 			return nil, 0, err
 		}
-		fPort = assoc.FPort
+		fPort = assoc.Ids.FPort
 	}
 	var merged packageData
 	for _, data := range []*packageData{

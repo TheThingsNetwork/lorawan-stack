@@ -45,8 +45,8 @@ var (
 	unregisteredApplicationID = ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-app"}
 	registeredDeviceID        = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: registeredApplicationID, DeviceId: "test-dev"}
 	unregisteredDeviceID      = ttnpb.EndDeviceIdentifiers{ApplicationIdentifiers: unregisteredApplicationID, DeviceId: "invalid-dev"}
-	registeredAssociationID   = ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIdentifiers: registeredDeviceID, FPort: 123}
-	unregisteredAssociationID = ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIdentifiers: unregisteredDeviceID, FPort: 123}
+	registeredAssociationID   = &ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &registeredDeviceID, FPort: 123}
+	unregisteredAssociationID = &ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &unregisteredDeviceID, FPort: 123}
 	registeredApplicationUp1  = ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: registeredDeviceID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -224,22 +224,22 @@ func TestAssociations(t *testing.T) {
 	t.Run("AssociationsNotFound", func(t *testing.T) {
 		a := assertions.New(t)
 		_, err = client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-			ApplicationPackageAssociationIdentifiers: registeredAssociationID,
+			Ids: registeredAssociationID,
 		}, creds)
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-			EndDeviceIdentifiers: registeredDeviceID,
+			Ids: &registeredDeviceID,
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res, should.NotBeNil)
 		a.So(res.Associations, should.HaveLength, 0)
 	})
 
-	association := ttnpb.ApplicationPackageAssociation{
-		ApplicationPackageAssociationIdentifiers: registeredAssociationID,
-		PackageName:                              "test-package",
+	association := &ttnpb.ApplicationPackageAssociation{
+		Ids:         registeredAssociationID,
+		PackageName: "test-package",
 		Data: &types.Struct{
 			Fields: map[string]*types.Value{
 				"state": {
@@ -255,7 +255,7 @@ func TestAssociations(t *testing.T) {
 	t.Run("Create", func(t *testing.T) {
 		a := assertions.New(t)
 		res, err := client.SetAssociation(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
-			ApplicationPackageAssociation: association,
+			Association: association,
 			FieldMask: &types.FieldMask{
 				Paths: []string{
 					"package_name",
@@ -266,14 +266,14 @@ func TestAssociations(t *testing.T) {
 		a.So(err, should.BeNil)
 		association.CreatedAt = res.CreatedAt
 		association.UpdatedAt = res.UpdatedAt
-		a.So(res, should.Resemble, &association)
+		a.So(res, should.Resemble, association)
 	})
 
 	// Check that the association is available.
 	t.Run("AssociationsFound", func(t *testing.T) {
 		a := assertions.New(t)
 		res1, err := client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-			ApplicationPackageAssociationIdentifiers: registeredAssociationID,
+			Ids: registeredAssociationID,
 			FieldMask: &types.FieldMask{
 				Paths: []string{
 					"package_name",
@@ -282,10 +282,10 @@ func TestAssociations(t *testing.T) {
 			},
 		}, creds)
 		a.So(err, should.BeNil)
-		a.So(res1, should.Resemble, &association)
+		a.So(res1, should.Resemble, association)
 
 		res2, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-			EndDeviceIdentifiers: registeredDeviceID,
+			Ids: &registeredDeviceID,
 			FieldMask: &types.FieldMask{
 				Paths: []string{
 					"package_name",
@@ -296,7 +296,7 @@ func TestAssociations(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(res2, should.NotBeNil)
 		a.So(res2.Associations, should.HaveLength, 1)
-		a.So(res2.Associations[0], should.Resemble, &association)
+		a.So(res2.Associations[0], should.Resemble, association)
 	})
 
 	// Send traffic and expect to arrive in the correct handler.
@@ -335,7 +335,7 @@ func TestAssociations(t *testing.T) {
 							t.Fatal("unexpected uplink")
 						} else {
 							a.So(up.ctx, should.NotBeNil)
-							a.So(up.assoc, should.Resemble, &association)
+							a.So(up.assoc, should.Resemble, association)
 						}
 					}
 				case <-time.After(2 * timeout):
@@ -353,17 +353,17 @@ func TestAssociations(t *testing.T) {
 	t.Run("Deletion", func(t *testing.T) {
 		a := assertions.New(t)
 
-		_, err := client.DeleteAssociation(ctx, &registeredAssociationID, creds)
+		_, err := client.DeleteAssociation(ctx, registeredAssociationID, creds)
 		a.So(err, should.BeNil)
 
 		_, err = client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-			ApplicationPackageAssociationIdentifiers: registeredAssociationID,
+			Ids: registeredAssociationID,
 		}, creds)
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-			EndDeviceIdentifiers: registeredDeviceID,
+			Ids: &registeredDeviceID,
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res, should.NotBeNil)
@@ -384,15 +384,15 @@ func TestAssociations(t *testing.T) {
 		a := assertions.New(t)
 
 		for i := 1; i < 21; i++ {
-			association := ttnpb.ApplicationPackageAssociation{
-				ApplicationPackageAssociationIdentifiers: ttnpb.ApplicationPackageAssociationIdentifiers{
-					EndDeviceIdentifiers: registeredDeviceID,
-					FPort:                uint32(i),
+			association := &ttnpb.ApplicationPackageAssociation{
+				Ids: &ttnpb.ApplicationPackageAssociationIdentifiers{
+					EndDeviceIds: &registeredDeviceID,
+					FPort:        uint32(i),
 				},
 				PackageName: fmt.Sprintf("test-package-%v", i),
 			}
 			res, err := client.SetAssociation(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
-				ApplicationPackageAssociation: association,
+				Association: association,
 				FieldMask: &types.FieldMask{
 					Paths: []string{
 						"package_name",
@@ -449,9 +449,9 @@ func TestAssociations(t *testing.T) {
 					a := assertions.New(t)
 
 					res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-						EndDeviceIdentifiers: registeredDeviceID,
-						Limit:                tc.limit,
-						Page:                 tc.page,
+						Ids:   &registeredDeviceID,
+						Limit: tc.limit,
+						Page:  tc.page,
 						FieldMask: &types.FieldMask{
 							Paths: []string{
 								"package_name",
@@ -462,7 +462,7 @@ func TestAssociations(t *testing.T) {
 					a.So(res, should.NotBeNil)
 					a.So(res.Associations, should.HaveLength, tc.length)
 					for _, association := range res.Associations {
-						a.So(association.FPort, should.BeBetweenOrEqual, tc.portLow, tc.portHigh)
+						a.So(association.GetIds().FPort, should.BeBetweenOrEqual, tc.portLow, tc.portHigh)
 					}
 				})
 		}
