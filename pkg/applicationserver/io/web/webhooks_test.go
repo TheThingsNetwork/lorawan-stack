@@ -70,7 +70,7 @@ func TestWebhooks(t *testing.T) {
 		t.FailNow()
 	}
 	ids := ttnpb.ApplicationWebhookIdentifiers{
-		ApplicationIds: registeredApplicationID,
+		ApplicationIds: &registeredApplicationID,
 		WebhookId:      registeredWebhookID,
 	}
 	for _, tc := range []struct {

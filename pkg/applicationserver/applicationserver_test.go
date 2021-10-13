@@ -70,7 +70,7 @@ func TestApplicationServer(t *testing.T) {
 	registeredApplicationKey := "secret"
 	registeredApplicationFormatter := ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
 	registeredApplicationWebhookID := ttnpb.ApplicationWebhookIdentifiers{
-		ApplicationIds: registeredApplicationID,
+		ApplicationIds: &registeredApplicationID,
 		WebhookId:      "test",
 	}
 	registeredApplicationPubSubID := ttnpb.ApplicationPubSubIdentifiers{
