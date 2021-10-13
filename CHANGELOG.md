@@ -18,7 +18,7 @@ For details about compatibility between different releases, see the **Commitment
   - `interop.public-tls-address`: public address of the interop server. The audience in the incoming OAuth 2.0 token from Packet Broker is verified against this address to ensure that other networks cannot impersonate as Packet Broker;
   - `interop.packet-broker.enabled`: enable Packet Broker to authenticate;
   - `interop.packet-broker.token-issuer`: the issuer of the incoming OAuth 2.0 token from Packet Broker is verified against this value.
-- Support for LoRaWAN Backend Interfaces in Identity Server to obtain an end device's NetID, tenant ID and Network Server address. This adds the following configuration options:
+- Support for LoRaWAN Backend Interfaces in Identity Server to obtain an end device's NetID, tenant ID and Network Server address with the use of a vendor-specifc extension (`VSExtension`). This adds the following configuration options:
   - `is.network.net-id`: the NetID of the network. When running a Network Server, make sure that this is the same value as `ns.net-id`.
   - `is.network.tenant-id`: the Tenant ID in the host NetID. Leave blank if the NetID that you use is dedicated for this Identity Server.
 - Configuration option `experimental.features` to enable experimental features.

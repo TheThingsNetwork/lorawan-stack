@@ -5768,6 +5768,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/interop:invalid_vendor_id": {
+    "translations": {
+      "en": "invalid vendor ID"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/interop:join_req": {
     "translations": {
       "en": "join-request failed"

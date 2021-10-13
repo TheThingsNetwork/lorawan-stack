@@ -52,7 +52,7 @@ func (c *mockComponent) HTTPClient(context.Context) (*http.Client, error) {
 type mockTarget struct {
 	JoinRequestFunc    func(context.Context, *interop.JoinReq) (*interop.JoinAns, error)
 	AppSKeyRequestFunc func(context.Context, *interop.AppSKeyReq) (*interop.AppSKeyAns, error)
-	HomeNSRequestFunc  func(context.Context, *interop.HomeNSReq) (*interop.HomeNSAns, error)
+	HomeNSRequestFunc  func(context.Context, *interop.HomeNSReq) (*interop.TTIHomeNSAns, error)
 }
 
 func (m mockTarget) JoinRequest(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
@@ -69,7 +69,7 @@ func (m mockTarget) AppSKeyRequest(ctx context.Context, req *interop.AppSKeyReq)
 	panic("AppSKeyRequest called but not registered")
 }
 
-func (m mockTarget) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+func (m mockTarget) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.TTIHomeNSAns, error) {
 	if m.HomeNSRequestFunc != nil {
 		return m.HomeNSRequestFunc(ctx, req)
 	}
@@ -249,7 +249,7 @@ func TestServer(t *testing.T) {
 		{
 			Name: "PacketBroker/HomeNSReq/Success",
 			JS: mockTarget{
-				HomeNSRequestFunc: func(ctx context.Context, req *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+				HomeNSRequestFunc: func(ctx context.Context, req *interop.HomeNSReq) (*interop.TTIHomeNSAns, error) {
 					if err := authorizer.RequireAuthorized(ctx); err != nil {
 						return nil, err
 					}
@@ -259,22 +259,24 @@ func TestServer(t *testing.T) {
 					if err := authorizer.RequireAddress(ctx, "test.packetbroker.io"); err != nil {
 						return nil, err
 					}
-					return &interop.HomeNSAns{
-						JsNsMessageHeader: interop.JsNsMessageHeader{
-							MessageHeader: interop.MessageHeader{
-								ProtocolVersion: req.ProtocolVersion,
-								MessageType:     interop.MessageTypeHomeNSAns,
-								TransactionID:   req.TransactionID,
+					return &interop.TTIHomeNSAns{
+						HomeNSAns: interop.HomeNSAns{
+							JsNsMessageHeader: interop.JsNsMessageHeader{
+								MessageHeader: interop.MessageHeader{
+									ProtocolVersion: req.ProtocolVersion,
+									MessageType:     interop.MessageTypeHomeNSAns,
+									TransactionID:   req.TransactionID,
+								},
+								SenderID:     req.ReceiverID,
+								ReceiverID:   req.SenderID,
+								ReceiverNSID: req.SenderNSID,
 							},
-							SenderID:     req.ReceiverID,
-							ReceiverID:   req.SenderID,
-							ReceiverNSID: req.SenderNSID,
+							Result: interop.Result{
+								ResultCode: interop.ResultSuccess,
+							},
+							HNetID: interop.NetID{0x0, 0x0, 0x1},
+							HNSID:  &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0},
 						},
-						Result: interop.Result{
-							ResultCode: interop.ResultSuccess,
-						},
-						HNetID: interop.NetID{0x0, 0x0, 0x1},
-						HNSID:  &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0},
 					}, nil
 				},
 			},

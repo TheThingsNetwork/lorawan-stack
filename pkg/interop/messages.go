@@ -25,10 +25,11 @@ type MessageHeader struct {
 	MessageType     MessageType
 	SenderID,
 	ReceiverID string
-	SenderNSID    *EUI64 `json:",omitempty"`
-	ReceiverNSID  *EUI64 `json:",omitempty"`
-	SenderToken   Buffer `json:",omitempty"`
-	ReceiverToken Buffer `json:",omitempty"`
+	SenderNSID    *EUI64       `json:",omitempty"`
+	ReceiverNSID  *EUI64       `json:",omitempty"`
+	SenderToken   Buffer       `json:",omitempty"`
+	ReceiverToken Buffer       `json:",omitempty"`
+	VSExtension   *VSExtension `json:",omitempty"`
 }
 
 // AnswerHeader returns the header of the answer message.
@@ -48,6 +49,11 @@ func (h MessageHeader) AnswerHeader() (MessageHeader, error) {
 		SenderToken:     h.ReceiverToken,
 		SenderNSID:      h.ReceiverNSID,
 	}, nil
+}
+
+// VSExtension is a vendor-specific extension.
+type VSExtension struct {
+	VendorID VendorID
 }
 
 // Result contains the result of an operation.

@@ -27,6 +27,7 @@ var (
 	errUnexpectedResult    = errors.Define("unexpected_result", "unexpected result code {code}", "code")
 	errCallerNotAuthorized = errors.DefinePermissionDenied("caller_not_authorized", "caller is not authorized for `{target}`")
 	errUnauthenticated     = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
+	errInvalidVendorID     = errors.DefineInvalidArgument("invalid_vendor_id", "invalid vendor ID")
 
 	ErrNoAction           = errors.DefineAborted("no_action", "no action")
 	ErrMIC                = errors.DefineCorruption("mic", "MIC failed")
