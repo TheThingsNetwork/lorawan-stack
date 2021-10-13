@@ -122,7 +122,7 @@ func (s webhookRegistryRPC) Delete(ctx context.Context, req *ttnpb.ApplicationWe
 	); err != nil {
 		return nil, err
 	}
-	_, err := s.webhooks.Set(ctx, *req, nil,
+	_, err := s.webhooks.Set(ctx, req, nil,
 		func(webhook *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 			return nil, nil, nil
 		},

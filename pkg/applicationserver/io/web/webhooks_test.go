@@ -69,7 +69,7 @@ func TestWebhooks(t *testing.T) {
 	if err := registry.Init(ctx); !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	ids := ttnpb.ApplicationWebhookIdentifiers{
+	ids := &ttnpb.ApplicationWebhookIdentifiers{
 		ApplicationIds: &registeredApplicationID,
 		WebhookId:      registeredWebhookID,
 	}

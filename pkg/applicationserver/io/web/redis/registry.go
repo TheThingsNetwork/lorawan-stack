@@ -107,7 +107,7 @@ func (r WebhookRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifi
 }
 
 // Set implements WebhookRegistry.
-func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookIdentifiers, gets []string, f func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error)) (*ttnpb.ApplicationWebhook, error) {
+func (r WebhookRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationWebhookIdentifiers, gets []string, f func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error)) (*ttnpb.ApplicationWebhook, error) {
 	appUID := unique.ID(ctx, ids.ApplicationIds)
 	ik := r.idKey(appUID, ids.WebhookId)
 
@@ -165,7 +165,8 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 				pb = &ttnpb.ApplicationWebhook{}
 			}
 
-			pb.UpdatedAt = time.Now().UTC()
+			now := time.Now().UTC()
+			pb.UpdatedAt = &now
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)

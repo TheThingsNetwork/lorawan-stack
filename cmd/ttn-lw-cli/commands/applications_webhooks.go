@@ -183,7 +183,7 @@ var (
 			}
 			headers, _ := cmd.Flags().GetStringSlice("headers")
 			webhook.Headers = mergeKV(webhook.Headers, headers)
-			webhook.Ids = *webhookID
+			webhook.Ids = webhookID
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {

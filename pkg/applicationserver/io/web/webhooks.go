@@ -176,7 +176,7 @@ const (
 	domainHeader = "X-Tts-Domain"
 )
 
-func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.ApplicationWebhookIdentifiers, devID ttnpb.EndDeviceIdentifiers, op string) string {
+func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID *ttnpb.ApplicationWebhookIdentifiers, devID ttnpb.EndDeviceIdentifiers, op string) string {
 	downlinks := w.downlinks
 	baseURL := downlinks.PublicTLSAddress
 	if baseURL == "" {

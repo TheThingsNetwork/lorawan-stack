@@ -99,7 +99,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	{
 		_, err := client.Set(ctx, &ttnpb.SetApplicationWebhookRequest{
 			Webhook: ttnpb.ApplicationWebhook{
-				Ids: ttnpb.ApplicationWebhookIdentifiers{
+				Ids: &ttnpb.ApplicationWebhookIdentifiers{
 					ApplicationIds: &registeredApplicationID,
 					WebhookId:      registeredWebhookID,
 				},

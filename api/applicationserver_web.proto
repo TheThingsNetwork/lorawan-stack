@@ -102,9 +102,9 @@ message ApplicationWebhookTemplates {
 }
 
 message ApplicationWebhook {
-  ApplicationWebhookIdentifiers ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  ApplicationWebhookIdentifiers ids = 1 [(validate.rules).message.required = true];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
 
   // Base URL to which the message's path is appended.
   string base_url = 4 [(validate.rules).string.uri = true];
