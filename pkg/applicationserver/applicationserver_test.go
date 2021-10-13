@@ -344,7 +344,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "grpc",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
@@ -395,7 +395,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "mqtt",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				clientOpts := mqtt.NewClientOptions()
@@ -460,7 +460,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "pubsub/nats",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				evCh := make(chan events.Event, EventsBufferSize)
@@ -602,7 +602,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "pubsub/mqtt",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				evCh := make(chan events.Event, EventsBufferSize)
@@ -748,7 +748,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "webhooks",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				// Start web server to read upstream.
