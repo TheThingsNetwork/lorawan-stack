@@ -96,7 +96,7 @@ func (ts *templateStore) ListTemplates(ctx context.Context, req *ttnpb.ListAppli
 
 	var templates ttnpb.ApplicationWebhookTemplates
 	for _, id := range ids {
-		template, err := ts.getTemplate(ttnpb.ApplicationWebhookTemplateIdentifiers{
+		template, err := ts.getTemplate(&ttnpb.ApplicationWebhookTemplateIdentifiers{
 			TemplateId: id,
 		})
 		if err != nil {
@@ -159,7 +159,7 @@ func (ts *templateStore) getAllTemplateIDs() ([]string, error) {
 	return ids, err
 }
 
-func (ts *templateStore) template(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (*ttnpb.ApplicationWebhookTemplate, error) {
+func (ts *templateStore) template(ids *ttnpb.ApplicationWebhookTemplateIdentifiers) (*ttnpb.ApplicationWebhookTemplate, error) {
 	data, err := ts.fetcher.File(fmt.Sprintf("%s.yml", ids.TemplateId))
 	if err != nil {
 		return nil, errFetchFailed.WithCause(err)
@@ -172,7 +172,7 @@ func (ts *templateStore) template(ids ttnpb.ApplicationWebhookTemplateIdentifier
 	return template.toPB(), nil
 }
 
-func (ts *templateStore) getTemplate(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (t *ttnpb.ApplicationWebhookTemplate, err error) {
+func (ts *templateStore) getTemplate(ids *ttnpb.ApplicationWebhookTemplateIdentifiers) (t *ttnpb.ApplicationWebhookTemplate, err error) {
 	ts.templatesMu.Lock()
 	defer ts.templatesMu.Unlock()
 	if cached, ok := ts.templates[ids.TemplateId]; ok && cached.err == nil && time.Since(cached.time) < yamlFetchErrorCache {

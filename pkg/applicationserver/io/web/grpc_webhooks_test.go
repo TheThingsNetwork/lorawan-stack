@@ -246,7 +246,7 @@ description: Bar`),
 			client := ttnpb.NewApplicationWebhookRegistryClient(c.LoopbackConn())
 
 			getRes, err := client.GetTemplate(ctx, &ttnpb.GetApplicationWebhookTemplateRequest{
-				Ids: ttnpb.ApplicationWebhookTemplateIdentifiers{
+				Ids: &ttnpb.ApplicationWebhookTemplateIdentifiers{
 					TemplateId: "foo",
 				},
 			})
