@@ -25,7 +25,7 @@ type WebhookRegistry interface {
 	// Get returns the webhook by its identifiers.
 	Get(ctx context.Context, ids *ttnpb.ApplicationWebhookIdentifiers, paths []string) (*ttnpb.ApplicationWebhook, error)
 	// List returns all webhooks of the application.
-	List(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationWebhook, error)
+	List(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationWebhook, error)
 	// Set creates, updates or deletes the webhook by its identifiers.
 	Set(ctx context.Context, ids *ttnpb.ApplicationWebhookIdentifiers, paths []string, f func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error)) (*ttnpb.ApplicationWebhook, error)
 }

@@ -86,7 +86,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// Check empty.
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
-			ApplicationIds: registeredApplicationID,
+			ApplicationIds: &registeredApplicationID,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
@@ -115,7 +115,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// List; assert one.
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
-			ApplicationIds: registeredApplicationID,
+			ApplicationIds: &registeredApplicationID,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
@@ -152,7 +152,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// Check empty.
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
-			ApplicationIds: registeredApplicationID,
+			ApplicationIds: &registeredApplicationID,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},

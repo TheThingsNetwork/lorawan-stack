@@ -206,7 +206,7 @@ func (w *webhooks) createDomain(ctx context.Context) string {
 
 func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 	ctx = log.NewContextWithField(ctx, "namespace", namespace)
-	hooks, err := w.registry.List(ctx, msg.ApplicationIdentifiers,
+	hooks, err := w.registry.List(ctx, &msg.ApplicationIdentifiers,
 		[]string{
 			"base_url",
 			"downlink_ack",

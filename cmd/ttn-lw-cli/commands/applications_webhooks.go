@@ -156,7 +156,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationWebhookRegistryClient(as).List(ctx, &ttnpb.ListApplicationWebhooksRequest{
-				ApplicationIds: *appID,
+				ApplicationIds: appID,
 				FieldMask:      &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {

@@ -86,7 +86,7 @@ func (r WebhookRegistry) Get(ctx context.Context, ids *ttnpb.ApplicationWebhookI
 }
 
 // List implements WebhookRegistry.
-func (r WebhookRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationWebhook, error) {
+func (r WebhookRegistry) List(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationWebhook, error) {
 	var pbs []*ttnpb.ApplicationWebhook
 	appUID := unique.ID(ctx, ids)
 	err := ttnredis.FindProtos(ctx, r.Redis, r.appKey(appUID), r.makeIDKeyFunc(appUID)).Range(func() (proto.Message, func() (bool, error)) {
