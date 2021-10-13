@@ -1549,7 +1549,14 @@ func (m *SetApplicationWebhookRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "webhook":
 
-			if v, ok := interface{}(&m.Webhook).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetWebhook() == nil {
+				return SetApplicationWebhookRequestValidationError{
+					field:  "webhook",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetWebhook()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationWebhookRequestValidationError{
 						field:  "webhook",

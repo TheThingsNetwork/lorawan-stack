@@ -1059,10 +1059,18 @@ func (dst *SetApplicationWebhookRequest) SetFields(src *SetApplicationWebhookReq
 		case "webhook":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhook
-				if src != nil {
-					newSrc = &src.Webhook
+				if (src == nil || src.Webhook == nil) && dst.Webhook == nil {
+					continue
 				}
-				newDst = &dst.Webhook
+				if src != nil {
+					newSrc = src.Webhook
+				}
+				if dst.Webhook != nil {
+					newDst = dst.Webhook
+				} else {
+					newDst = &ApplicationWebhook{}
+					dst.Webhook = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1070,8 +1078,7 @@ func (dst *SetApplicationWebhookRequest) SetFields(src *SetApplicationWebhookReq
 				if src != nil {
 					dst.Webhook = src.Webhook
 				} else {
-					var zero ApplicationWebhook
-					dst.Webhook = zero
+					dst.Webhook = nil
 				}
 			}
 		case "field_mask":

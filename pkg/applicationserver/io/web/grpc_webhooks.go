@@ -104,9 +104,9 @@ func (s webhookRegistryRPC) Set(ctx context.Context, req *ttnpb.SetApplicationWe
 	return s.webhooks.Set(ctx, req.Webhook.Ids, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...),
 		func(webhook *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 			if webhook != nil {
-				return &req.Webhook, req.FieldMask.GetPaths(), nil
+				return req.Webhook, req.FieldMask.GetPaths(), nil
 			}
-			return &req.Webhook, append(req.FieldMask.GetPaths(),
+			return req.Webhook, append(req.FieldMask.GetPaths(),
 				"ids.application_ids",
 				"ids.webhook_id",
 			), nil

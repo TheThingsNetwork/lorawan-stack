@@ -177,8 +177,8 @@ var (
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationWebhookFlags, headersFlags())
 
-			var webhook ttnpb.ApplicationWebhook
-			if err = util.SetFields(&webhook, setApplicationWebhookFlags); err != nil {
+			webhook := &ttnpb.ApplicationWebhook{}
+			if err = util.SetFields(webhook, setApplicationWebhookFlags); err != nil {
 				return err
 			}
 			headers, _ := cmd.Flags().GetStringSlice("headers")

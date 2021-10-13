@@ -161,7 +161,7 @@ message ListApplicationWebhooksRequest {
 }
 
 message SetApplicationWebhookRequest {
-  ApplicationWebhook webhook = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationWebhook webhook = 1 [(validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2;
 }
 

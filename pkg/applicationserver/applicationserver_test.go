@@ -773,7 +773,7 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationWebhookRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationWebhookRequest{
-					Webhook: ttnpb.ApplicationWebhook{
+					Webhook: &ttnpb.ApplicationWebhook{
 						Ids:            registeredApplicationWebhookID,
 						BaseUrl:        webhookTarget.URL,
 						Format:         "json",
