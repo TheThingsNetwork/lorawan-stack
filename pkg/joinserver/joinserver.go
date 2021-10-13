@@ -579,6 +579,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
+		ctx = dev.Context
 		netID := dev.NetId
 		if netID == nil {
 			appSettings, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
@@ -649,6 +650,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
+		ctx = dev.Context
 		if dev.ApplicationServerId != "" {
 			if err := externalAuth.RequireASID(ctx, dev.ApplicationServerId); err != nil {
 				return nil, err
@@ -680,6 +682,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
+		ctx = dev.Context
 		if err := appAuth.RequireApplication(ctx, dev.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
@@ -701,10 +704,18 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 	}, nil
 }
 
-// GetHomeNetID returns the requested NetID.
-func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (netID *types.NetID, nsID *types.EUI64, err error) {
+// EndDeviceHomeNetwork contains information about the end device's home network.
+type EndDeviceHomeNetwork struct {
+	NetID                *types.NetID
+	TenantID             string
+	NSID                 *types.EUI64
+	NetworkServerAddress string
+}
+
+// GetHomeNetwork returns the home network of an end device.
+func (js *JoinServer) GetHomeNetwork(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (*EndDeviceHomeNetwork, error) {
 	if err := authorizer.RequireAuthorized(ctx); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	dev, err := js.devices.GetByEUI(ctx, joinEUI, devEUI,
@@ -714,21 +725,26 @@ func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EU
 		},
 	)
 	if err != nil {
-		return nil, nil, errRegistryOperation.WithCause(err)
+		return nil, errRegistryOperation.WithCause(err)
 	}
-	if dev.NetId != nil {
-		// TODO: Return NSID (https://github.com/TheThingsNetwork/lorawan-stack/issues/4741).
-		return dev.NetId, nil, nil
-	}
-	sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
-		"home_net_id",
-	})
-	if err != nil {
-		if !errors.IsNotFound(err) {
-			return nil, nil, errGetApplicationActivationSettings.WithCause(err)
+	ctx = dev.Context
+	netID := dev.NetId
+
+	if netID == nil {
+		sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
+			"home_net_id",
+		})
+		if err != nil {
+			if !errors.IsNotFound(err) {
+				return nil, errGetApplicationActivationSettings.WithCause(err)
+			}
+			return nil, nil
 		}
-		return nil, nil, nil
+		netID = sets.HomeNetId
 	}
 	// TODO: Return NSID (https://github.com/TheThingsNetwork/lorawan-stack/issues/4741).
-	return sets.HomeNetId, nil, nil
+	return &EndDeviceHomeNetwork{
+		NetID:                netID,
+		NetworkServerAddress: dev.NetworkServerAddress,
+	}, nil
 }

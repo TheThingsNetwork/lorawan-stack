@@ -2909,21 +2909,21 @@ func TestGetHomeNetID(t *testing.T) {
 						},
 					},
 				)).(*JoinServer)
-				netID, nsID, err := js.GetHomeNetID(ctx, tc.JoinEUI, tc.DevEUI, tc.Authorizer)
+				homeNetwork, err := js.GetHomeNetwork(ctx, tc.JoinEUI, tc.DevEUI, tc.Authorizer)
 
 				if tc.ErrorAssertion != nil {
 					if !tc.ErrorAssertion(t, err) {
 						t.Fatalf("Received unexpected error: %s", err)
 					}
-					a.So(netID, should.BeNil)
+					a.So(homeNetwork, should.BeNil)
 					return
 				}
 
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
-				a.So(netID, should.Resemble, tc.ResponseNetID)
-				a.So(nsID, should.Equal, tc.ResponseNSID)
+				a.So(homeNetwork.NetID, should.Resemble, tc.ResponseNetID)
+				a.So(homeNetwork.NSID, should.Equal, tc.ResponseNSID)
 			},
 		})
 	}
