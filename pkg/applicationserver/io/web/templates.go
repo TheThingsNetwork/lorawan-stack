@@ -268,7 +268,7 @@ func (t webhookTemplate) pbFields() []*ttnpb.ApplicationWebhookTemplateField {
 
 func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
 	return &ttnpb.ApplicationWebhookTemplate{
-		Ids: ttnpb.ApplicationWebhookTemplateIdentifiers{
+		Ids: &ttnpb.ApplicationWebhookTemplateIdentifiers{
 			TemplateId: t.TemplateID,
 		},
 		Name:                     t.Name,

@@ -58,7 +58,7 @@ message ApplicationWebhookTemplateField {
 }
 
 message ApplicationWebhookTemplate {
-  ApplicationWebhookTemplateIdentifiers ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationWebhookTemplateIdentifiers ids = 1 [(validate.rules).message.required = true];
 
   string name = 2 [(validate.rules).string.max_len = 20];
   string description = 3 [(validate.rules).string.max_len = 100];
