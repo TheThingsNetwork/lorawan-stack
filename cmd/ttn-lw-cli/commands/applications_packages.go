@@ -255,7 +255,7 @@ var (
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPackageAssociationsFlags)
 
 			association := &ttnpb.ApplicationPackageAssociation{}
-			if err = util.SetFields(&association, setApplicationPackageAssociationsFlags); err != nil {
+			if err = util.SetFields(association, setApplicationPackageAssociationsFlags); err != nil {
 				return err
 			}
 			association.Ids = assocID
@@ -400,7 +400,7 @@ var (
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPackageDefaultAssociationsFlags)
 
 			association := &ttnpb.ApplicationPackageDefaultAssociation{}
-			if err = util.SetFields(&association, setApplicationPackageDefaultAssociationsFlags); err != nil {
+			if err = util.SetFields(association, setApplicationPackageDefaultAssociationsFlags); err != nil {
 				return err
 			}
 			association.Ids = assocID
