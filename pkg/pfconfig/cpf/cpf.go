@@ -93,11 +93,13 @@ func BuildLorad(gtw *ttnpb.Gateway, fps *frequencyplans.Store) (*LoradConfig, er
 		}
 	}
 	var gatewayConf LoradGatewayConf
-	if len(gtw.Antennas) > 0 {
-		a := gtw.Antennas[0]
-		sx1301Conf.AntennaGain = a.Gain
-		gatewayConf.BeaconLatitude = a.Location.Latitude
-		gatewayConf.BeaconLongitude = a.Location.Longitude
+	if antennas := gtw.GetAntennas(); len(antennas) > 0 {
+		antenna := antennas[0]
+		sx1301Conf.AntennaGain = antenna.Gain
+		if location := antenna.Location; location != nil {
+			gatewayConf.BeaconLatitude = location.Latitude
+			gatewayConf.BeaconLongitude = location.Longitude
+		}
 	}
 	// TODO: Configure Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/1748).
 	return &LoradConfig{
