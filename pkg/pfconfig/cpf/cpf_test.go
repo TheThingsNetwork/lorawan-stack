@@ -101,6 +101,32 @@ func TestBuildLorad(t *testing.T) {
 			},
 		},
 		{
+			Name: "EU868/1 antenna/No location",
+			Gateway: &ttnpb.Gateway{
+				FrequencyPlanId: test.EUFrequencyPlanID,
+				Antennas: []*ttnpb.GatewayAntenna{
+					{
+						Gain: 4,
+					},
+				},
+			},
+			Config: &LoradConfig{
+				SX1301Conf: LoradSX1301Conf{
+					SX1301Config: func() shared.SX1301Config {
+						conf := sx1301Config(test.EUFrequencyPlanID)
+						conf.AntennaGain = 4
+						return conf
+					}(),
+					AntennaGainDesc:   "Antenna gain, in dBi",
+					InsertionLoss:     0.5,
+					InsertionLossDesc: "Insertion loss, in dBi",
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
 			Name: "EU868/3 antennas",
 			Gateway: &ttnpb.Gateway{
 				FrequencyPlanId: test.EUFrequencyPlanID,
