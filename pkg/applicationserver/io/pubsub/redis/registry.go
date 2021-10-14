@@ -128,7 +128,7 @@ func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(contex
 }
 
 // List implements pubsub.Registry.
-func (r PubSubRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationPubSub, error) {
+func (r PubSubRegistry) List(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationPubSub, error) {
 	var pbs []*ttnpb.ApplicationPubSub
 	appUID := unique.ID(ctx, ids)
 	err := ttnredis.FindProtos(ctx, r.Redis, r.appKey(appUID), r.makeUIDKeyFunc(appUID)).Range(func() (proto.Message, func() (bool, error)) {

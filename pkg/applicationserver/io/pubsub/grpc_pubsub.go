@@ -63,7 +63,7 @@ func (ps *PubSub) Get(ctx context.Context, req *ttnpb.GetApplicationPubSubReques
 
 // List implements ttnpb.ApplicationPubSubRegistryServer.
 func (ps *PubSub) List(ctx context.Context, req *ttnpb.ListApplicationPubSubsRequest) (*ttnpb.ApplicationPubSubs, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
 	pubsubs, err := ps.registry.List(ctx, req.ApplicationIds, appendImplicitPubSubGetPaths(req.FieldMask.GetPaths()...))

@@ -635,10 +635,18 @@ func (dst *ListApplicationPubSubsRequest) SetFields(src *ListApplicationPubSubsR
 		case "application_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationIds
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
 				}
-				newDst = &dst.ApplicationIds
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -646,8 +654,7 @@ func (dst *ListApplicationPubSubsRequest) SetFields(src *ListApplicationPubSubsR
 				if src != nil {
 					dst.ApplicationIds = src.ApplicationIds
 				} else {
-					var zero ApplicationIdentifiers
-					dst.ApplicationIds = zero
+					dst.ApplicationIds = nil
 				}
 			}
 		case "field_mask":

@@ -185,7 +185,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationPubSubRegistryClient(as).List(ctx, &ttnpb.ListApplicationPubSubsRequest{
-				ApplicationIds: *appID,
+				ApplicationIds: appID,
 				FieldMask:      &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
