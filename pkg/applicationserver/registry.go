@@ -116,7 +116,7 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 // LinkRegistry is a store for application links.
 type LinkRegistry interface {
 	// Get returns the link by the application identifiers.
-	Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error)
+	Get(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error)
 	// Range ranges the links and calls the callback function, until false is returned.
 	Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error
 	// Set creates, updates or deletes the link by the application identifiers.

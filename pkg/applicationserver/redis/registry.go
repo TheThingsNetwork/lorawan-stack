@@ -270,7 +270,7 @@ func (r *LinkRegistry) appKey(uid string) string {
 }
 
 // Get returns the link by the application identifiers.
-func (r *LinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
+func (r *LinkRegistry) Get(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
 	defer trace.StartRegion(ctx, "get link").End()
 
 	pb := &ttnpb.ApplicationLink{}

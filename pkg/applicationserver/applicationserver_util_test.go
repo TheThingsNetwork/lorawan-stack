@@ -58,13 +58,13 @@ func (noopEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifi
 
 // MockLinkRegistry is a mock LinkRegistry used for testing.
 type MockLinkRegistry struct {
-	GetFunc   func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error)
+	GetFunc   func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error)
 	RangeFunc func(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error
 	SetFunc   func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error)
 }
 
 // Get calls GetFunc if set and panics otherwise.
-func (m MockLinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
+func (m MockLinkRegistry) Get(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
 	if m.GetFunc == nil {
 		panic("Get called, but not set")
 	}

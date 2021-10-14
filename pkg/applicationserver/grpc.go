@@ -49,7 +49,7 @@ nextPath:
 
 // getLink calls the underlying link registry in order to retrieve the link.
 // If the link is not found, an empty link is returned instead.
-func (as *ApplicationServer) getLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
+func (as *ApplicationServer) getLink(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
 	link, err := as.linkRegistry.Get(ctx, ids, paths)
 	if err != nil && errors.IsNotFound(err) {
 		return &ttnpb.ApplicationLink{}, nil
@@ -61,7 +61,7 @@ func (as *ApplicationServer) getLink(ctx context.Context, ids ttnpb.ApplicationI
 
 // GetLink implements ttnpb.AsServer.
 func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicationLinkRequest) (*ttnpb.ApplicationLink, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = removeDeprecatedPaths(ctx, req.FieldMask)
@@ -130,7 +130,7 @@ func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHa
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
-	link, err := as.getLink(ctx, req.ApplicationUps[0].ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, &req.ApplicationUps[0].ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
