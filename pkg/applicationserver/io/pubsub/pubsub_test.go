@@ -54,13 +54,13 @@ func TestPubSub(t *testing.T) {
 		t.FailNow()
 	}
 	ids := ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIds: registeredApplicationID,
+		ApplicationIds: &registeredApplicationID,
 		PubSubId:       registeredPubSubID,
 	}
 
 	ps := &ttnpb.ApplicationPubSub{
 		Ids: ttnpb.ApplicationPubSubIdentifiers{
-			ApplicationIds: registeredApplicationID,
+			ApplicationIds: &registeredApplicationID,
 			PubSubId:       registeredPubSubID,
 		},
 		Provider: &ttnpb.ApplicationPubSub_Nats{
@@ -133,7 +133,7 @@ func TestPubSub(t *testing.T) {
 		t.Fatalf("Failed to set pubsub in registry: %s", err)
 	}
 
-	result, err := registry.List(ctx, ids.ApplicationIds, paths)
+	result, err := registry.List(ctx, *ids.ApplicationIds, paths)
 	a.So(err, should.BeNil)
 	if a.So(len(result), should.Equal, 1) {
 		a.So(result[0], should.Resemble, ps)

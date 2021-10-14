@@ -67,7 +67,7 @@ func TestOpenConnection(t *testing.T) {
 
 	pb := &ttnpb.ApplicationPubSub{
 		Ids: ttnpb.ApplicationPubSubIdentifiers{
-			ApplicationIds: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app1",
 			},
 			PubSubId: "ps1",

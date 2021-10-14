@@ -28,7 +28,7 @@ import (
 )
 
 var withIdentifiersOption = events.WithDataType(&ttnpb.ApplicationPubSubIdentifiers{
-	ApplicationIds: ttnpb.ApplicationIdentifiers{
+	ApplicationIds: &ttnpb.ApplicationIdentifiers{
 		ApplicationId: "application-id",
 	},
 	PubSubId: "pubsub-id",
@@ -140,14 +140,14 @@ func providerLabelValue(i *integration) string {
 }
 
 func registerIntegrationStart(ctx context.Context, i *integration) {
-	events.Publish(evtPubSubStart.NewWithIdentifiersAndData(ctx, &i.Ids.ApplicationIds, i.Ids))
+	events.Publish(evtPubSubStart.NewWithIdentifiersAndData(ctx, i.Ids.ApplicationIds, i.Ids))
 	labelValue := providerLabelValue(i)
 	pubsubMetrics.integrationsStarted.WithLabelValues(ctx, labelValue).Inc()
 	pubsubMetrics.integrationsStopped.WithLabelValues(ctx, labelValue) // Initialize the "stopped" counter.
 }
 
 func registerIntegrationStop(ctx context.Context, i *integration) {
-	events.Publish(evtPubSubStop.NewWithIdentifiersAndData(ctx, &i.Ids.ApplicationIds, i.Ids))
+	events.Publish(evtPubSubStop.NewWithIdentifiersAndData(ctx, i.Ids.ApplicationIds, i.Ids))
 	pubsubMetrics.integrationsStopped.WithLabelValues(ctx, providerLabelValue(i)).Inc()
 }
 
@@ -160,6 +160,6 @@ func registerIntegrationFail(ctx context.Context, i *integration, err error) {
 			"pub_sub_id", i.Ids.PubSubId,
 		).
 		WithCause(err)
-	events.Publish(evtPubSubFail.NewWithIdentifiersAndData(ctx, &i.Ids.ApplicationIds, err))
+	events.Publish(evtPubSubFail.NewWithIdentifiersAndData(ctx, i.Ids.ApplicationIds, err))
 	pubsubMetrics.integrationsFailed.WithLabelValues(ctx, providerLabelValue(i)).Inc()
 }

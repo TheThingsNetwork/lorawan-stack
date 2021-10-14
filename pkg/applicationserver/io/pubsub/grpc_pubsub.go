@@ -48,7 +48,7 @@ func (ps *PubSub) GetFormats(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Appl
 
 // Get implements ttnpb.ApplicationPubSubRegistryServer.
 func (ps *PubSub) Get(ctx context.Context, req *ttnpb.GetApplicationPubSubRequest) (*ttnpb.ApplicationPubSub, error) {
-	if err := rights.RequireApplication(ctx, req.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+	if err := rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
 	pubsub, err := ps.registry.Get(ctx, req.Ids, appendImplicitPubSubGetPaths(req.FieldMask.GetPaths()...))
@@ -80,7 +80,7 @@ func (ps *PubSub) List(ctx context.Context, req *ttnpb.ListApplicationPubSubsReq
 
 // Set implements ttnpb.ApplicationPubSubRegistryServer.
 func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubRequest) (*ttnpb.ApplicationPubSub, error) {
-	if err := rights.RequireApplication(ctx, req.Pubsub.Ids.ApplicationIds,
+	if err := rights.RequireApplication(ctx, *req.Pubsub.Ids.ApplicationIds,
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
@@ -112,13 +112,13 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 		)).WithError(err).Warn("Failed to cancel pub/sub")
 	}
 	ps.startTask(ps.ctx, req.Pubsub.Ids)
-	events.Publish(evtSetPubSub.NewWithIdentifiersAndData(ctx, &req.Pubsub.Ids.ApplicationIds, req.Pubsub.Ids))
+	events.Publish(evtSetPubSub.NewWithIdentifiersAndData(ctx, req.Pubsub.Ids.ApplicationIds, req.Pubsub.Ids))
 	return pubsub, nil
 }
 
 // Delete implements ttnpb.ApplicationPubSubRegistryServer.
 func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, ids.ApplicationIds,
+	if err := rights.RequireApplication(ctx, *ids.ApplicationIds,
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
@@ -139,6 +139,6 @@ func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdenti
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtDeletePubSub.NewWithIdentifiersAndData(ctx, &ids.ApplicationIds, *ids))
+	events.Publish(evtDeletePubSub.NewWithIdentifiersAndData(ctx, ids.ApplicationIds, *ids))
 	return ttnpb.Empty, nil
 }

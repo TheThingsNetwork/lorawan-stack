@@ -281,7 +281,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 			logger.Debug("Shutdown pub/sub connection success")
 		}
 	}()
-	i.sub, err = ps.server.Subscribe(ctx, "pubsub", &pb.Ids.ApplicationIds, false)
+	i.sub, err = ps.server.Subscribe(ctx, "pubsub", pb.Ids.ApplicationIds, false)
 	if err != nil {
 		return err
 	}
