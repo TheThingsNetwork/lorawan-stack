@@ -117,7 +117,7 @@ func TestIntegrate(t *testing.T) {
 	t.Run("AlreadyExisting", func(t *testing.T) {
 		select {
 		case conn := <-mockImpl.OpenConnectionCh:
-			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, &ps1)
+			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, ps1)
 		case <-time.After(timeout):
 			t.Fatal("Expect integration timeout")
 		}
@@ -164,7 +164,7 @@ func TestIntegrate(t *testing.T) {
 		}
 		select {
 		case conn := <-mockImpl.OpenConnectionCh:
-			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, &ps2)
+			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, ps2)
 		case <-time.After(timeout):
 			t.Fatal("Expect integration timeout")
 		}
@@ -177,9 +177,9 @@ func TestIntegrate(t *testing.T) {
 		if !a.So(err, should.BeNil) {
 			t.Fatalf("Unexpected error: %v", err)
 		}
-		actual.CreatedAt = &time.Time{}
-		actual.UpdatedAt = &time.Time{}
-		a.So(*actual, should.Resemble, integration)
+		actual.CreatedAt = nil
+		actual.UpdatedAt = nil
+		a.So(actual, should.Resemble, integration)
 
 		// Delete integration.
 		_, err = ps.Delete(ctx, ps2, creds)
@@ -188,7 +188,7 @@ func TestIntegrate(t *testing.T) {
 		}
 		select {
 		case conn := <-mockImpl.ShutdownCh:
-			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, &ps2)
+			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, ps2)
 		case <-time.After(timeout):
 			t.Fatal("Expect integration timeout")
 		}
