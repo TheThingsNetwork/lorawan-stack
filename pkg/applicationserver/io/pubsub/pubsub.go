@@ -75,7 +75,7 @@ func (ps *PubSub) startAll(ctx context.Context) error {
 	)
 }
 
-func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
+func (ps *PubSub) startTask(ctx context.Context, ids *ttnpb.ApplicationPubSubIdentifiers) {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", unique.ID(ctx, ids.ApplicationIds),
 		"pub_sub_id", ids.PubSubId,
@@ -84,7 +84,7 @@ func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 		Context: ctx,
 		ID:      "pubsub",
 		Func: func(ctx context.Context) error {
-			target, err := ps.registry.Get(ctx, ids, ttnpb.ApplicationPubSubFieldPathsNested)
+			target, err := ps.registry.Get(ctx, *ids, ttnpb.ApplicationPubSubFieldPathsNested)
 			if err != nil && !errors.IsNotFound(err) {
 				return err
 			} else if err != nil {
@@ -312,7 +312,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	return ctx.Err()
 }
 
-func (ps *PubSub) stop(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) error {
+func (ps *PubSub) stop(ctx context.Context, ids *ttnpb.ApplicationPubSubIdentifiers) error {
 	appUID := unique.ID(ctx, ids.ApplicationIds)
 	psUID := PubSubUID(appUID, ids.PubSubId)
 	if val, ok := ps.integrations.Load(psUID); ok {

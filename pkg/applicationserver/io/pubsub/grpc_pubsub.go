@@ -91,7 +91,7 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 		return nil, err
 	}
 	// Get all the fields here for starting the integration task.
-	pubsub, err := ps.registry.Set(ctx, req.Pubsub.Ids, appendImplicitPubSubGetPaths(req.FieldMask.GetPaths()...),
+	pubsub, err := ps.registry.Set(ctx, *req.Pubsub.Ids, appendImplicitPubSubGetPaths(req.FieldMask.GetPaths()...),
 		func(pubsub *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 			if pubsub != nil {
 				return &req.Pubsub, req.FieldMask.GetPaths(), nil
@@ -125,7 +125,7 @@ func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdenti
 	); err != nil {
 		return nil, err
 	}
-	if err := ps.stop(ctx, *ids); err != nil {
+	if err := ps.stop(ctx, ids); err != nil {
 		log.FromContext(ctx).WithFields(log.Fields(
 			"application_uid", unique.ID(ctx, ids.ApplicationIds),
 			"pub_sub_id", ids.PubSubId,

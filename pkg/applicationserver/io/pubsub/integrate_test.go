@@ -55,11 +55,11 @@ func TestIntegrate(t *testing.T) {
 	}
 
 	// ps1 is added to the pubsub registry, app2 will be integrated at runtime.
-	ps1 := ttnpb.ApplicationPubSubIdentifiers{
+	ps1 := &ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIds: &registeredApplicationID,
 		PubSubId:       "ps1",
 	}
-	ps2 := ttnpb.ApplicationPubSubIdentifiers{
+	ps2 := &ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIds: &registeredApplicationID,
 		PubSubId:       "ps2",
 	}
@@ -71,7 +71,7 @@ func TestIntegrate(t *testing.T) {
 		t.FailNow()
 	}
 
-	_, err = pubsubRegistry.Set(ctx, ps1, paths, func(_ *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
+	_, err = pubsubRegistry.Set(ctx, *ps1, paths, func(_ *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 		return &ttnpb.ApplicationPubSub{
 			Ids:    ps1,
 			Format: "json",
@@ -143,7 +143,7 @@ func TestIntegrate(t *testing.T) {
 
 		// Expect no integration.
 		_, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			Ids: ps2,
+			Ids: *ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
@@ -169,7 +169,7 @@ func TestIntegrate(t *testing.T) {
 			t.Fatal("Expect integration timeout")
 		}
 		actual, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			Ids: ps2,
+			Ids: *ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
@@ -177,12 +177,12 @@ func TestIntegrate(t *testing.T) {
 		if !a.So(err, should.BeNil) {
 			t.Fatalf("Unexpected error: %v", err)
 		}
-		actual.CreatedAt = time.Time{}
-		actual.UpdatedAt = time.Time{}
+		actual.CreatedAt = &time.Time{}
+		actual.UpdatedAt = &time.Time{}
 		a.So(*actual, should.Resemble, integration)
 
 		// Delete integration.
-		_, err = ps.Delete(ctx, &ps2, creds)
+		_, err = ps.Delete(ctx, ps2, creds)
 		if !a.So(err, should.BeNil) {
 			t.Fatalf("Unexpected error: %v", err)
 		}
@@ -193,7 +193,7 @@ func TestIntegrate(t *testing.T) {
 			t.Fatal("Expect integration timeout")
 		}
 		_, err = ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			Ids: ps2,
+			Ids: *ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},

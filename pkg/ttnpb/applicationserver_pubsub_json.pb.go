@@ -156,21 +156,29 @@ func (x *ApplicationPubSub) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
 		// NOTE: ApplicationPubSubIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.Ids)
+		gogo.MarshalMessage(s, x.Ids)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.CreatedAt != nil || s.HasField("created_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("created_at")
-		s.WriteTime(x.CreatedAt)
+		if x.CreatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.CreatedAt)
+		}
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.UpdatedAt != nil || s.HasField("updated_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("updated_at")
-		s.WriteTime(x.UpdatedAt)
+		if x.UpdatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.UpdatedAt)
+		}
 	}
 	if x.Format != "" || s.HasField("format") {
 		s.WriteMoreIf(&wroteField)
@@ -289,21 +297,21 @@ func (x *ApplicationPubSub) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: ApplicationPubSubIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v ApplicationPubSubIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.Ids = v
+			x.Ids = &v
 		case "created_at", "createdAt":
 			s.AddField("created_at")
 			v := s.ReadTime()
 			if s.Err() != nil {
 				return
 			}
-			x.CreatedAt = *v
+			x.CreatedAt = v
 		case "updated_at", "updatedAt":
 			s.AddField("updated_at")
 			v := s.ReadTime()
 			if s.Err() != nil {
 				return
 			}
-			x.UpdatedAt = *v
+			x.UpdatedAt = v
 		case "format":
 			s.AddField("format")
 			x.Format = s.ReadString()

@@ -73,7 +73,7 @@ func TestApplicationServer(t *testing.T) {
 		ApplicationIdentifiers: registeredApplicationID,
 		WebhookId:              "test",
 	}
-	registeredApplicationPubSubID := ttnpb.ApplicationPubSubIdentifiers{
+	registeredApplicationPubSubID := &ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIds: &registeredApplicationID,
 		PubSubId:       "test",
 	}

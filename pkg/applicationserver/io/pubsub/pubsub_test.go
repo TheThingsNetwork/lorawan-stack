@@ -59,7 +59,7 @@ func TestPubSub(t *testing.T) {
 	}
 
 	ps := &ttnpb.ApplicationPubSub{
-		Ids: ttnpb.ApplicationPubSubIdentifiers{
+		Ids: &ttnpb.ApplicationPubSubIdentifiers{
 			ApplicationIds: &registeredApplicationID,
 			PubSubId:       registeredPubSubID,
 		},

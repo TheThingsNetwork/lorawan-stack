@@ -214,7 +214,8 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 				pb = &ttnpb.ApplicationPubSub{}
 			}
 
-			pb.UpdatedAt = time.Now().UTC()
+			now := time.Now().UTC()
+			pb.UpdatedAt = &now
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)

@@ -219,7 +219,7 @@ var (
 				return err
 			}
 			if pubsub == nil {
-				pubsub = &ttnpb.ApplicationPubSub{Ids: *pubsubID}
+				pubsub = &ttnpb.ApplicationPubSub{Ids: pubsubID}
 			}
 
 			if err = util.SetFields(pubsub, setApplicationPubSubFlags); err != nil {

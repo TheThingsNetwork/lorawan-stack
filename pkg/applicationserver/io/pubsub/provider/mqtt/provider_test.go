@@ -66,7 +66,7 @@ func TestOpenConnection(t *testing.T) {
 	defer tlsLis.Close()
 
 	pb := &ttnpb.ApplicationPubSub{
-		Ids: ttnpb.ApplicationPubSubIdentifiers{
+		Ids: &ttnpb.ApplicationPubSubIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app1",
 			},
