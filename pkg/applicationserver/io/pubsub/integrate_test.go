@@ -56,12 +56,12 @@ func TestIntegrate(t *testing.T) {
 
 	// ps1 is added to the pubsub registry, app2 will be integrated at runtime.
 	ps1 := ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		PubSubId:               "ps1",
+		ApplicationIds: registeredApplicationID,
+		PubSubId:       "ps1",
 	}
 	ps2 := ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		PubSubId:               "ps2",
+		ApplicationIds: registeredApplicationID,
+		PubSubId:       "ps2",
 	}
 	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
@@ -73,8 +73,8 @@ func TestIntegrate(t *testing.T) {
 
 	_, err = pubsubRegistry.Set(ctx, ps1, paths, func(_ *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 		return &ttnpb.ApplicationPubSub{
-			ApplicationPubSubIdentifiers: ps1,
-			Format:                       "json",
+			Ids:    ps1,
+			Format: "json",
 			Provider: &ttnpb.ApplicationPubSub_Nats{
 				Nats: &ttnpb.ApplicationPubSub_NATSProvider{
 					ServerUrl: "nats://localhost",
@@ -132,8 +132,8 @@ func TestIntegrate(t *testing.T) {
 	// ps2: expect no integration, set integration, expect integration, delete integration and expect integration to be gone.
 	t.Run("RuntimeCreation", func(t *testing.T) {
 		integration := ttnpb.ApplicationPubSub{
-			ApplicationPubSubIdentifiers: ps2,
-			Format:                       "json",
+			Ids:    ps2,
+			Format: "json",
 			Provider: &ttnpb.ApplicationPubSub_Nats{
 				Nats: &ttnpb.ApplicationPubSub_NATSProvider{
 					ServerUrl: "nats://localhost",
@@ -143,7 +143,7 @@ func TestIntegrate(t *testing.T) {
 
 		// Expect no integration.
 		_, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			ApplicationPubSubIdentifiers: ps2,
+			Ids: ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
@@ -154,7 +154,7 @@ func TestIntegrate(t *testing.T) {
 
 		// Set integration, expect integration to establish.
 		_, err = ps.Set(ctx, &ttnpb.SetApplicationPubSubRequest{
-			ApplicationPubSub: integration,
+			Pubsub: integration,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
@@ -169,7 +169,7 @@ func TestIntegrate(t *testing.T) {
 			t.Fatal("Expect integration timeout")
 		}
 		actual, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			ApplicationPubSubIdentifiers: ps2,
+			Ids: ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
@@ -193,7 +193,7 @@ func TestIntegrate(t *testing.T) {
 			t.Fatal("Expect integration timeout")
 		}
 		_, err = ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			ApplicationPubSubIdentifiers: ps2,
+			Ids: ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},

@@ -99,8 +99,8 @@ func getApplicationPubSubID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appli
 		return nil, errNoPubSubID.New()
 	}
 	return &ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
-		PubSubId:               pubsubID,
+		ApplicationIds: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
+		PubSubId:       pubsubID,
 	}, nil
 }
 
@@ -151,8 +151,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationPubSubRegistryClient(as).Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-				ApplicationPubSubIdentifiers: *pubsubID,
-				FieldMask:                    &pbtypes.FieldMask{Paths: paths},
+				Ids:       *pubsubID,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -185,8 +185,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationPubSubRegistryClient(as).List(ctx, &ttnpb.ListApplicationPubSubsRequest{
-				ApplicationIdentifiers: *appID,
-				FieldMask:              &pbtypes.FieldMask{Paths: paths},
+				ApplicationIds: *appID,
+				FieldMask:      &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -212,14 +212,14 @@ var (
 				return err
 			}
 			pubsub, err := ttnpb.NewApplicationPubSubRegistryClient(as).Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-				ApplicationPubSubIdentifiers: *pubsubID,
-				FieldMask:                    &pbtypes.FieldMask{Paths: paths},
+				Ids:       *pubsubID,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil && !errors.IsNotFound(err) {
 				return err
 			}
 			if pubsub == nil {
-				pubsub = &ttnpb.ApplicationPubSub{ApplicationPubSubIdentifiers: *pubsubID}
+				pubsub = &ttnpb.ApplicationPubSub{Ids: *pubsubID}
 			}
 
 			if err = util.SetFields(pubsub, setApplicationPubSubFlags); err != nil {
@@ -303,8 +303,8 @@ var (
 			}
 
 			res, err := ttnpb.NewApplicationPubSubRegistryClient(as).Set(ctx, &ttnpb.SetApplicationPubSubRequest{
-				ApplicationPubSub: *pubsub,
-				FieldMask:         &pbtypes.FieldMask{Paths: paths},
+				Pubsub:    *pubsub,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

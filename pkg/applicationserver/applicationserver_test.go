@@ -74,8 +74,8 @@ func TestApplicationServer(t *testing.T) {
 		WebhookId:              "test",
 	}
 	registeredApplicationPubSubID := ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		PubSubId:               "test",
+		ApplicationIds: registeredApplicationID,
+		PubSubId:       "test",
 	}
 
 	// This device gets registered in the device registry of the Application Server.
@@ -473,8 +473,8 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationPubSubRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationPubSubRequest{
-					ApplicationPubSub: ttnpb.ApplicationPubSub{
-						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
+					Pubsub: ttnpb.ApplicationPubSub{
+						Ids: registeredApplicationPubSubID,
 						Provider: &ttnpb.ApplicationPubSub_Nats{
 							Nats: &ttnpb.ApplicationPubSub_NATSProvider{
 								ServerUrl: "nats://localhost:4124",
@@ -615,8 +615,8 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationPubSubRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationPubSubRequest{
-					ApplicationPubSub: ttnpb.ApplicationPubSub{
-						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
+					Pubsub: ttnpb.ApplicationPubSub{
+						Ids: registeredApplicationPubSubID,
 						Provider: &ttnpb.ApplicationPubSub_Mqtt{
 							Mqtt: &ttnpb.ApplicationPubSub_MQTTProvider{
 								ServerUrl:    fmt.Sprintf("tcp://%v", mqttLis.Addr()),

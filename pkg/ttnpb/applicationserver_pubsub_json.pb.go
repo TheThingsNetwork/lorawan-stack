@@ -160,7 +160,7 @@ func (x *ApplicationPubSub) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
 		// NOTE: ApplicationPubSubIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.ApplicationPubSubIdentifiers)
+		gogo.MarshalMessage(s, &x.Ids)
 	}
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
@@ -289,7 +289,7 @@ func (x *ApplicationPubSub) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: ApplicationPubSubIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v ApplicationPubSubIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.ApplicationPubSubIdentifiers = v
+			x.Ids = v
 		case "created_at", "createdAt":
 			s.AddField("created_at")
 			v := s.ReadTime()
@@ -469,7 +469,7 @@ func (x *SetApplicationPubSubRequest) MarshalProtoJSON(s *jsonplugin.MarshalStat
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("pubsub")
-		x.ApplicationPubSub.MarshalProtoJSON(s.WithField("pubsub"))
+		x.Pubsub.MarshalProtoJSON(s.WithField("pubsub"))
 	}
 	if x.FieldMask != nil || s.HasField("field_mask") {
 		s.WriteMoreIf(&wroteField)
@@ -494,7 +494,7 @@ func (x *SetApplicationPubSubRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarshal
 			s.ReadAny() // ignore unknown field
 		case "pubsub":
 			if !s.ReadNil() {
-				x.ApplicationPubSub.UnmarshalProtoJSON(s.WithField("pubsub", true))
+				x.Pubsub.UnmarshalProtoJSON(s.WithField("pubsub", true))
 			}
 		case "field_mask", "fieldMask":
 			s.AddField("field_mask")

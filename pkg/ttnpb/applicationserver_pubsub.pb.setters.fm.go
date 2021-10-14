@@ -14,18 +14,18 @@ func (dst *ApplicationPubSubIdentifiers) SetFields(src *ApplicationPubSubIdentif
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "pub_sub_id":
@@ -53,18 +53,18 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPubSubIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationPubSubIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.ApplicationPubSubIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPubSubIdentifiers = src.ApplicationPubSubIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero ApplicationPubSubIdentifiers
-					dst.ApplicationPubSubIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "created_at":
@@ -582,18 +582,18 @@ func (dst *GetApplicationPubSubRequest) SetFields(src *GetApplicationPubSubReque
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPubSubIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationPubSubIdentifiers
+					newSrc = &src.Ids
 				}
-				newDst = &dst.ApplicationPubSubIdentifiers
+				newDst = &dst.Ids
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPubSubIdentifiers = src.ApplicationPubSubIdentifiers
+					dst.Ids = src.Ids
 				} else {
 					var zero ApplicationPubSubIdentifiers
-					dst.ApplicationPubSubIdentifiers = zero
+					dst.Ids = zero
 				}
 			}
 		case "field_mask":
@@ -620,18 +620,18 @@ func (dst *ListApplicationPubSubsRequest) SetFields(src *ListApplicationPubSubsR
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+					newSrc = &src.ApplicationIds
 				}
-				newDst = &dst.ApplicationIdentifiers
+				newDst = &dst.ApplicationIds
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
 					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = zero
 				}
 			}
 		case "field_mask":
@@ -658,18 +658,18 @@ func (dst *SetApplicationPubSubRequest) SetFields(src *SetApplicationPubSubReque
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPubSub
 				if src != nil {
-					newSrc = &src.ApplicationPubSub
+					newSrc = &src.Pubsub
 				}
-				newDst = &dst.ApplicationPubSub
+				newDst = &dst.Pubsub
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPubSub = src.ApplicationPubSub
+					dst.Pubsub = src.Pubsub
 				} else {
 					var zero ApplicationPubSub
-					dst.ApplicationPubSub = zero
+					dst.Pubsub = zero
 				}
 			}
 		case "field_mask":

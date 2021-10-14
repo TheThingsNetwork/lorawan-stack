@@ -52,7 +52,7 @@ func (m *ApplicationPubSubIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPubSubIdentifiersValidationError{
 						field:  "application_ids",
@@ -164,7 +164,7 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationPubSubIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationPubSubValidationError{
 						field:  "ids",
@@ -699,7 +699,7 @@ func (m *GetApplicationPubSubRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.ApplicationPubSubIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Ids).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationPubSubRequestValidationError{
 						field:  "ids",
@@ -805,7 +805,7 @@ func (m *ListApplicationPubSubsRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListApplicationPubSubsRequestValidationError{
 						field:  "application_ids",
@@ -911,7 +911,7 @@ func (m *SetApplicationPubSubRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "pubsub":
 
-			if v, ok := interface{}(&m.ApplicationPubSub).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Pubsub).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationPubSubRequestValidationError{
 						field:  "pubsub",

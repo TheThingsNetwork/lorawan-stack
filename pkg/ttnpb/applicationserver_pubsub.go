@@ -43,3 +43,69 @@ func (q *ApplicationPubSub_MQTTProvider_QoS) UnmarshalText(b []byte) error {
 	}
 	return errCouldNotParse("ApplicationPubSub_MQTTProvider_QoS")(string(b))
 }
+
+// All EntityType methods implement the IDStringer interface.
+
+func (m *ApplicationPubSubIdentifiers) EntityType() string {
+	return m.ApplicationIds.EntityType()
+}
+
+func (m *ApplicationPubSub) EntityType() string {
+	return m.Ids.EntityType()
+}
+
+func (m *GetApplicationPubSubRequest) EntityType() string {
+	return m.Ids.EntityType()
+}
+
+func (m *ListApplicationPubSubsRequest) EntityType() string {
+	return m.ApplicationIds.EntityType()
+}
+
+func (m *SetApplicationPubSubRequest) EntityType() string {
+	return m.Pubsub.EntityType()
+}
+
+// All IDString methods implement the IDStringer interface.
+
+func (m *ApplicationPubSubIdentifiers) IDString() string {
+	return m.ApplicationIds.IDString()
+}
+
+func (m *ApplicationPubSub) IDString() string {
+	return m.Ids.IDString()
+}
+
+func (m *GetApplicationPubSubRequest) IDString() string {
+	return m.Ids.IDString()
+}
+
+func (m *ListApplicationPubSubsRequest) IDString() string {
+	return m.ApplicationIds.IDString()
+}
+
+func (m *SetApplicationPubSubRequest) IDString() string {
+	return m.Pubsub.IDString()
+}
+
+// All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
+
+func (m *ApplicationPubSubIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
+	m.ApplicationIds.ExtractRequestFields(dst)
+}
+
+func (m *ApplicationPubSub) ExtractRequestFields(dst map[string]interface{}) {
+	m.Ids.ExtractRequestFields(dst)
+}
+
+func (m *GetApplicationPubSubRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.Ids.ExtractRequestFields(dst)
+}
+
+func (m *ListApplicationPubSubsRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.ApplicationIds.ExtractRequestFields(dst)
+}
+
+func (m *SetApplicationPubSubRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.Pubsub.ExtractRequestFields(dst)
+}
