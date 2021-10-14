@@ -32,16 +32,6 @@ func (dst *ApplicationLink) SetFields(src *ApplicationLink, paths ...string) err
 					dst.DefaultFormatters = nil
 				}
 			}
-		case "tls":
-			if len(subs) > 0 {
-				return fmt.Errorf("'tls' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Tls = src.Tls
-			} else {
-				var zero bool
-				dst.Tls = zero
-			}
 		case "skip_payload_crypto":
 			if len(subs) > 0 {
 				return fmt.Errorf("'skip_payload_crypto' has no subfields, but %s were specified", subs)

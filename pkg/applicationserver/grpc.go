@@ -34,6 +34,7 @@ nextPath:
 		for _, deprecated := range []string{
 			"api_key",
 			"network_server_address",
+			"tls",
 		} {
 			if path == deprecated {
 				warning.Add(ctx, fmt.Sprintf("field %v is deprecated", deprecated))

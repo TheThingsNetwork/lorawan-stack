@@ -46,9 +46,7 @@ message ApplicationLink {
   // Default message payload formatters to use when there are no formatters
   // defined on the end device level.
   MessagePayloadFormatters default_formatters = 3;
-  // Enable TLS for linking to the external Network Server.
-  // For cluster-local Network Servers, the cluster's TLS setting is used.
-  bool tls = 4;
+  reserved 4; // Deprecated: tls
   // Skip decryption of uplink payloads and encryption of downlink payloads.
   // Leave empty for the using the Application Server's default setting.
   google.protobuf.BoolValue skip_payload_crypto = 5;

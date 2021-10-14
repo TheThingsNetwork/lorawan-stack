@@ -62,8 +62,6 @@ func (m *ApplicationLink) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "tls":
-			// no validation rules for Tls
 		case "skip_payload_crypto":
 
 			if v, ok := interface{}(m.GetSkipPayloadCrypto()).(interface{ ValidateFields(...string) error }); ok {

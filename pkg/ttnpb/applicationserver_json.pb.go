@@ -25,11 +25,6 @@ func (x *ApplicationLink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("default_formatters")
 		x.DefaultFormatters.MarshalProtoJSON(s.WithField("default_formatters"))
 	}
-	if x.Tls || s.HasField("tls") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("tls")
-		s.WriteBool(x.Tls)
-	}
 	if x.SkipPayloadCrypto != nil || s.HasField("skip_payload_crypto") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("skip_payload_crypto")
@@ -56,9 +51,6 @@ func (x *ApplicationLink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.DefaultFormatters = &MessagePayloadFormatters{}
 				x.DefaultFormatters.UnmarshalProtoJSON(s.WithField("default_formatters", true))
 			}
-		case "tls":
-			s.AddField("tls")
-			x.Tls = s.ReadBool()
 		case "skip_payload_crypto", "skipPayloadCrypto":
 			s.AddField("skip_payload_crypto")
 			if !s.ReadNil() {

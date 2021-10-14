@@ -9,13 +9,11 @@ var ApplicationLinkFieldPathsNested = []string{
 	"default_formatters.up_formatter",
 	"default_formatters.up_formatter_parameter",
 	"skip_payload_crypto",
-	"tls",
 }
 
 var ApplicationLinkFieldPathsTopLevel = []string{
 	"default_formatters",
 	"skip_payload_crypto",
-	"tls",
 }
 var GetApplicationLinkRequestFieldPathsNested = []string{
 	"application_ids",
@@ -38,7 +36,6 @@ var SetApplicationLinkRequestFieldPathsNested = []string{
 	"link.default_formatters.up_formatter",
 	"link.default_formatters.up_formatter_parameter",
 	"link.skip_payload_crypto",
-	"link.tls",
 }
 
 var SetApplicationLinkRequestFieldPathsTopLevel = []string{
