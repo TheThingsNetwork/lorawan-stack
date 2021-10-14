@@ -15,9 +15,10 @@
 import api from '@console/api'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import * as collaborators from '@console/store/actions/collaborators'
-import { getUserSuccess } from '@console/store/actions/users'
+import { getUser } from '@console/store/actions/users'
 
 const validParentTypes = ['application', 'gateway', 'organization']
 
@@ -39,11 +40,10 @@ const getCollaboratorLogic = createRequestLogic({
     if (isUser) {
       // Also retrieve the user to be able to determine whether
       // it is an admin user.
-      const user = await api.users.get(collaboratorId, 'admin')
       try {
-        dispatch(getUserSuccess(user))
+        await dispatch(attachPromise(getUser(collaboratorId, 'admin')))
       } catch {
-        // Do not fail the action when the user could not be fetched.
+        // Do not fail the action if the user could not be fetched.
       }
     }
 
