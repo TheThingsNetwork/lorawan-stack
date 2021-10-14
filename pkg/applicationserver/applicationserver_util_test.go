@@ -60,7 +60,7 @@ func (noopEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifi
 type MockLinkRegistry struct {
 	GetFunc   func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error)
 	RangeFunc func(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error
-	SetFunc   func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error)
+	SetFunc   func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error)
 }
 
 // Get calls GetFunc if set and panics otherwise.
@@ -80,7 +80,7 @@ func (m MockLinkRegistry) Range(ctx context.Context, paths []string, f func(cont
 }
 
 // Set calls SetFunc if set and panics otherwise.
-func (m MockLinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
+func (m MockLinkRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
 	if m.SetFunc == nil {
 		panic("Set called, but not set")
 	}

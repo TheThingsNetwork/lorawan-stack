@@ -253,7 +253,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 			t.FailNow()
 		}
 
-		_, err = reg.Set(ctx, *ids, nil, func(pb *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+		_, err = reg.Set(ctx, ids, nil, func(pb *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 			if pb != nil {
 				t.Fatal("Link already exists")
 			}
@@ -283,7 +283,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 	}
 
 	for _, ids := range []*ttnpb.ApplicationIdentifiers{&app1IDs, &app2IDs} {
-		_, err := reg.Set(ctx, *ids, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+		_, err := reg.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 			return nil, nil, nil
 		})
 		if !a.So(err, should.BeNil) {

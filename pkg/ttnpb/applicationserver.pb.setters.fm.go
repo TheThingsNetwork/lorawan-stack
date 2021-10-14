@@ -110,10 +110,18 @@ func (dst *SetApplicationLinkRequest) SetFields(src *SetApplicationLinkRequest, 
 		case "application_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationIds
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
 				}
-				newDst = &dst.ApplicationIds
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -121,17 +129,24 @@ func (dst *SetApplicationLinkRequest) SetFields(src *SetApplicationLinkRequest, 
 				if src != nil {
 					dst.ApplicationIds = src.ApplicationIds
 				} else {
-					var zero ApplicationIdentifiers
-					dst.ApplicationIds = zero
+					dst.ApplicationIds = nil
 				}
 			}
 		case "link":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationLink
-				if src != nil {
-					newSrc = &src.Link
+				if (src == nil || src.Link == nil) && dst.Link == nil {
+					continue
 				}
-				newDst = &dst.Link
+				if src != nil {
+					newSrc = src.Link
+				}
+				if dst.Link != nil {
+					newDst = dst.Link
+				} else {
+					newDst = &ApplicationLink{}
+					dst.Link = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -139,8 +154,7 @@ func (dst *SetApplicationLinkRequest) SetFields(src *SetApplicationLinkRequest, 
 				if src != nil {
 					dst.Link = src.Link
 				} else {
-					var zero ApplicationLink
-					dst.Link = zero
+					dst.Link = nil
 				}
 			}
 		case "field_mask":

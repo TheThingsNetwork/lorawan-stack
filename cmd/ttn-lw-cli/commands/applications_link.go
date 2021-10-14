@@ -92,8 +92,8 @@ var (
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationLinkFlags)
 
-			var link ttnpb.ApplicationLink
-			if err := util.SetFields(&link, setApplicationLinkFlags); err != nil {
+			link := &ttnpb.ApplicationLink{}
+			if err := util.SetFields(link, setApplicationLinkFlags); err != nil {
 				return err
 			}
 			newPaths, err := parsePayloadFormatterParameterFlags("default-formatters", link.DefaultFormatters, cmd.Flags())
@@ -106,7 +106,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewAsClient(as).SetLink(ctx, &ttnpb.SetApplicationLinkRequest{
-				ApplicationIds: *appID,
+				ApplicationIds: appID,
 				Link:           link,
 				FieldMask:      &pbtypes.FieldMask{Paths: paths},
 			})

@@ -84,13 +84,13 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 			)
 		}
 	}
-	if err := rights.RequireApplication(ctx, req.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = removeDeprecatedPaths(ctx, req.FieldMask)
 	return as.linkRegistry.Set(ctx, req.ApplicationIds, ttnpb.ApplicationLinkFieldPathsTopLevel,
 		func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
-			return &req.Link, req.FieldMask.GetPaths(), nil
+			return req.Link, req.FieldMask.GetPaths(), nil
 		},
 	)
 }
@@ -100,7 +100,7 @@ func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.Applicat
 	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
-	_, err := as.linkRegistry.Set(ctx, *ids, nil, func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) { return nil, nil, nil })
+	_, err := as.linkRegistry.Set(ctx, ids, nil, func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) { return nil, nil, nil })
 	if err != nil {
 		return nil, err
 	}

@@ -60,8 +60,8 @@ message GetApplicationLinkRequest {
 }
 
 message SetApplicationLinkRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  ApplicationLink link = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
+  ApplicationLink link = 2 [(validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 3;
 }
 

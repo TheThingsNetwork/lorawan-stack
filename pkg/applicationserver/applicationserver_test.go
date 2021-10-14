@@ -194,7 +194,7 @@ func TestApplicationServer(t *testing.T) {
 	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+	_, err := linkRegistry.Set(ctx, &registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			DefaultFormatters: &ttnpb.MessagePayloadFormatters{
 				UpFormatter:   registeredApplicationFormatter,
@@ -2295,7 +2295,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+	_, err := linkRegistry.Set(ctx, &registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			SkipPayloadCrypto: &pbtypes.BoolValue{Value: true},
 		}, []string{"skip_payload_crypto"}, nil
@@ -2790,7 +2790,7 @@ func TestLocationFromPayload(t *testing.T) {
 	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	_, err = linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+	_, err = linkRegistry.Set(ctx, &registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{}, nil, nil
 	})
 	if err != nil {

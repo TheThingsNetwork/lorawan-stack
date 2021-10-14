@@ -315,7 +315,7 @@ func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context
 }
 
 // Set creates, updates or deletes the link by the application identifiers.
-func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, gets []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
+func (r *LinkRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, gets []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
 	uid := unique.ID(ctx, ids)
 	uk := r.appKey(uid)
 
