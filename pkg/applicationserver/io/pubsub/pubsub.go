@@ -84,7 +84,7 @@ func (ps *PubSub) startTask(ctx context.Context, ids *ttnpb.ApplicationPubSubIde
 		Context: ctx,
 		ID:      "pubsub",
 		Func: func(ctx context.Context) error {
-			target, err := ps.registry.Get(ctx, *ids, ttnpb.ApplicationPubSubFieldPathsNested)
+			target, err := ps.registry.Get(ctx, ids, ttnpb.ApplicationPubSubFieldPathsNested)
 			if err != nil && !errors.IsNotFound(err) {
 				return err
 			} else if err != nil {

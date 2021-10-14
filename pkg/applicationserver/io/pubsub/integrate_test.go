@@ -143,7 +143,7 @@ func TestIntegrate(t *testing.T) {
 
 		// Expect no integration.
 		_, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			Ids: *ps2,
+			Ids: ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
@@ -169,7 +169,7 @@ func TestIntegrate(t *testing.T) {
 			t.Fatal("Expect integration timeout")
 		}
 		actual, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			Ids: *ps2,
+			Ids: ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
@@ -193,7 +193,7 @@ func TestIntegrate(t *testing.T) {
 			t.Fatal("Expect integration timeout")
 		}
 		_, err = ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			Ids: *ps2,
+			Ids: ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},

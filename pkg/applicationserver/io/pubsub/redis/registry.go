@@ -83,7 +83,7 @@ func (r *PubSubRegistry) makeUIDKeyFunc(appUID string) func(id string) string {
 }
 
 // Get implements pubsub.Registry.
-func (r PubSubRegistry) Get(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers, paths []string) (*ttnpb.ApplicationPubSub, error) {
+func (r PubSubRegistry) Get(ctx context.Context, ids *ttnpb.ApplicationPubSubIdentifiers, paths []string) (*ttnpb.ApplicationPubSub, error) {
 	pb := &ttnpb.ApplicationPubSub{}
 	if err := ttnredis.GetProto(ctx, r.Redis, r.uidKey(unique.ID(ctx, ids.ApplicationIds), ids.PubSubId)).ScanProto(pb); err != nil {
 		return nil, err

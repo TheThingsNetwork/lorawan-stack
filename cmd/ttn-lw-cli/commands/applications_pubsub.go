@@ -151,7 +151,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationPubSubRegistryClient(as).Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-				Ids:       *pubsubID,
+				Ids:       pubsubID,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
@@ -212,7 +212,7 @@ var (
 				return err
 			}
 			pubsub, err := ttnpb.NewApplicationPubSubRegistryClient(as).Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-				Ids:       *pubsubID,
+				Ids:       pubsubID,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil && !errors.IsNotFound(err) {
