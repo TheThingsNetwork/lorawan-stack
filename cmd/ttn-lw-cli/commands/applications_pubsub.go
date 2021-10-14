@@ -303,7 +303,7 @@ var (
 			}
 
 			res, err := ttnpb.NewApplicationPubSubRegistryClient(as).Set(ctx, &ttnpb.SetApplicationPubSubRequest{
-				Pubsub:    *pubsub,
+				Pubsub:    pubsub,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {

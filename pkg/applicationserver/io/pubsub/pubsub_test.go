@@ -53,7 +53,7 @@ func TestPubSub(t *testing.T) {
 	if err := registry.Init(ctx); !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	ids := ttnpb.ApplicationPubSubIdentifiers{
+	ids := &ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIds: &registeredApplicationID,
 		PubSubId:       registeredPubSubID,
 	}

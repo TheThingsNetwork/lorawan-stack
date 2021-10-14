@@ -939,7 +939,14 @@ func (m *SetApplicationPubSubRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "pubsub":
 
-			if v, ok := interface{}(&m.Pubsub).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetPubsub() == nil {
+				return SetApplicationPubSubRequestValidationError{
+					field:  "pubsub",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetPubsub()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationPubSubRequestValidationError{
 						field:  "pubsub",

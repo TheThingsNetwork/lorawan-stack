@@ -474,7 +474,7 @@ func (x *SetApplicationPubSubRequest) MarshalProtoJSON(s *jsonplugin.MarshalStat
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Pubsub != nil || s.HasField("pubsub") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("pubsub")
 		x.Pubsub.MarshalProtoJSON(s.WithField("pubsub"))
@@ -502,6 +502,7 @@ func (x *SetApplicationPubSubRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarshal
 			s.ReadAny() // ignore unknown field
 		case "pubsub":
 			if !s.ReadNil() {
+				x.Pubsub = &ApplicationPubSub{}
 				x.Pubsub.UnmarshalProtoJSON(s.WithField("pubsub", true))
 			}
 		case "field_mask", "fieldMask":

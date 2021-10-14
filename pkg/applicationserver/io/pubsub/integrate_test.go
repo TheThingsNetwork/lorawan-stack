@@ -71,7 +71,7 @@ func TestIntegrate(t *testing.T) {
 		t.FailNow()
 	}
 
-	_, err = pubsubRegistry.Set(ctx, *ps1, paths, func(_ *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
+	_, err = pubsubRegistry.Set(ctx, ps1, paths, func(_ *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 		return &ttnpb.ApplicationPubSub{
 			Ids:    ps1,
 			Format: "json",
@@ -131,7 +131,7 @@ func TestIntegrate(t *testing.T) {
 
 	// ps2: expect no integration, set integration, expect integration, delete integration and expect integration to be gone.
 	t.Run("RuntimeCreation", func(t *testing.T) {
-		integration := ttnpb.ApplicationPubSub{
+		integration := &ttnpb.ApplicationPubSub{
 			Ids:    ps2,
 			Format: "json",
 			Provider: &ttnpb.ApplicationPubSub_Nats{

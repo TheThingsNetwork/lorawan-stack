@@ -680,10 +680,18 @@ func (dst *SetApplicationPubSubRequest) SetFields(src *SetApplicationPubSubReque
 		case "pubsub":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPubSub
-				if src != nil {
-					newSrc = &src.Pubsub
+				if (src == nil || src.Pubsub == nil) && dst.Pubsub == nil {
+					continue
 				}
-				newDst = &dst.Pubsub
+				if src != nil {
+					newSrc = src.Pubsub
+				}
+				if dst.Pubsub != nil {
+					newDst = dst.Pubsub
+				} else {
+					newDst = &ApplicationPubSub{}
+					dst.Pubsub = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -691,8 +699,7 @@ func (dst *SetApplicationPubSubRequest) SetFields(src *SetApplicationPubSubReque
 				if src != nil {
 					dst.Pubsub = src.Pubsub
 				} else {
-					var zero ApplicationPubSub
-					dst.Pubsub = zero
+					dst.Pubsub = nil
 				}
 			}
 		case "field_mask":

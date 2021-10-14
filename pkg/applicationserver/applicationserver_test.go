@@ -473,7 +473,7 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationPubSubRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationPubSubRequest{
-					Pubsub: ttnpb.ApplicationPubSub{
+					Pubsub: &ttnpb.ApplicationPubSub{
 						Ids: registeredApplicationPubSubID,
 						Provider: &ttnpb.ApplicationPubSub_Nats{
 							Nats: &ttnpb.ApplicationPubSub_NATSProvider{
@@ -615,7 +615,7 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationPubSubRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationPubSubRequest{
-					Pubsub: ttnpb.ApplicationPubSub{
+					Pubsub: &ttnpb.ApplicationPubSub{
 						Ids: registeredApplicationPubSubID,
 						Provider: &ttnpb.ApplicationPubSub_Mqtt{
 							Mqtt: &ttnpb.ApplicationPubSub_MQTTProvider{

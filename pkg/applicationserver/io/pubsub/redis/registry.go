@@ -149,7 +149,7 @@ func (r PubSubRegistry) List(ctx context.Context, ids *ttnpb.ApplicationIdentifi
 }
 
 // Set implements pubsub.Registry.
-func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers, gets []string, f func(*ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error)) (*ttnpb.ApplicationPubSub, error) {
+func (r PubSubRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationPubSubIdentifiers, gets []string, f func(*ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error)) (*ttnpb.ApplicationPubSub, error) {
 	appUID := unique.ID(ctx, ids.ApplicationIds)
 	ik := r.uidKey(appUID, ids.PubSubId)
 

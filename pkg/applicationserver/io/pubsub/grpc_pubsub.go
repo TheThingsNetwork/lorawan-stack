@@ -91,12 +91,12 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 		return nil, err
 	}
 	// Get all the fields here for starting the integration task.
-	pubsub, err := ps.registry.Set(ctx, *req.Pubsub.Ids, appendImplicitPubSubGetPaths(req.FieldMask.GetPaths()...),
+	pubsub, err := ps.registry.Set(ctx, req.Pubsub.Ids, appendImplicitPubSubGetPaths(req.FieldMask.GetPaths()...),
 		func(pubsub *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 			if pubsub != nil {
-				return &req.Pubsub, req.FieldMask.GetPaths(), nil
+				return req.Pubsub, req.FieldMask.GetPaths(), nil
 			}
-			return &req.Pubsub, append(req.FieldMask.GetPaths(),
+			return req.Pubsub, append(req.FieldMask.GetPaths(),
 				"ids.application_ids",
 				"ids.pub_sub_id",
 			), nil
@@ -131,7 +131,7 @@ func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdenti
 			"pub_sub_id", ids.PubSubId,
 		)).WithError(err).Warn("Failed to cancel pub/sub")
 	}
-	_, err := ps.registry.Set(ctx, *ids, nil,
+	_, err := ps.registry.Set(ctx, ids, nil,
 		func(pubsub *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 			return nil, nil, nil
 		},
