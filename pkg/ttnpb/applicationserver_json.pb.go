@@ -84,12 +84,12 @@ func (x *SetApplicationLinkRequest) MarshalProtoJSON(s *jsonplugin.MarshalState)
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("application_ids")
 		// NOTE: ApplicationIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.ApplicationIdentifiers)
+		gogo.MarshalMessage(s, &x.ApplicationIds)
 	}
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("link")
-		x.ApplicationLink.MarshalProtoJSON(s.WithField("link"))
+		x.Link.MarshalProtoJSON(s.WithField("link"))
 	}
 	if x.FieldMask != nil || s.HasField("field_mask") {
 		s.WriteMoreIf(&wroteField)
@@ -117,10 +117,10 @@ func (x *SetApplicationLinkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 			// NOTE: ApplicationIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v ApplicationIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.ApplicationIdentifiers = v
+			x.ApplicationIds = v
 		case "link":
 			if !s.ReadNil() {
-				x.ApplicationLink.UnmarshalProtoJSON(s.WithField("link", true))
+				x.Link.UnmarshalProtoJSON(s.WithField("link", true))
 			}
 		case "field_mask", "fieldMask":
 			s.AddField("field_mask")

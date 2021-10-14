@@ -71,8 +71,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewAsClient(as).GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
-				ApplicationIdentifiers: *appID,
-				FieldMask:              &pbtypes.FieldMask{Paths: paths},
+				ApplicationIds: *appID,
+				FieldMask:      &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -106,9 +106,9 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewAsClient(as).SetLink(ctx, &ttnpb.SetApplicationLinkRequest{
-				ApplicationIdentifiers: *appID,
-				ApplicationLink:        link,
-				FieldMask:              &pbtypes.FieldMask{Paths: paths},
+				ApplicationIds: *appID,
+				Link:            link,
+				FieldMask:      &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

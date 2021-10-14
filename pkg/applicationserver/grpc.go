@@ -61,36 +61,36 @@ func (as *ApplicationServer) getLink(ctx context.Context, ids ttnpb.ApplicationI
 
 // GetLink implements ttnpb.AsServer.
 func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicationLinkRequest) (*ttnpb.ApplicationLink, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err := rights.RequireApplication(ctx, req.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = removeDeprecatedPaths(ctx, req.FieldMask)
-	return as.linkRegistry.Get(ctx, req.ApplicationIdentifiers, req.FieldMask.GetPaths())
+	return as.linkRegistry.Get(ctx, req.ApplicationIds, req.FieldMask.GetPaths())
 }
 
 // SetLink implements ttnpb.AsServer.
 func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicationLinkRequest) (*ttnpb.ApplicationLink, error) {
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "default_formatters.up_formatter_parameter") {
-		if size := len(req.ApplicationLink.GetDefaultFormatters().GetUpFormatterParameter()); size > as.config.Formatters.MaxParameterLength {
+		if size := len(req.Link.GetDefaultFormatters().GetUpFormatterParameter()); size > as.config.Formatters.MaxParameterLength {
 			return nil, errInvalidFieldValue.WithAttributes("field", "default_formatters.up_formatter_parameter").WithCause(
 				errFormatterScriptTooLarge.WithAttributes("size", size, "max_size", as.config.Formatters.MaxParameterLength),
 			)
 		}
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "default_formatters.down_formatter_parameter") {
-		if size := len(req.ApplicationLink.GetDefaultFormatters().GetDownFormatterParameter()); size > as.config.Formatters.MaxParameterLength {
+		if size := len(req.Link.GetDefaultFormatters().GetDownFormatterParameter()); size > as.config.Formatters.MaxParameterLength {
 			return nil, errInvalidFieldValue.WithAttributes("field", "default_formatters.down_formatter_parameter").WithCause(
 				errFormatterScriptTooLarge.WithAttributes("size", size, "max_size", as.config.Formatters.MaxParameterLength),
 			)
 		}
 	}
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err := rights.RequireApplication(ctx, req.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = removeDeprecatedPaths(ctx, req.FieldMask)
-	return as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, ttnpb.ApplicationLinkFieldPathsTopLevel,
+	return as.linkRegistry.Set(ctx, req.ApplicationIds, ttnpb.ApplicationLinkFieldPathsTopLevel,
 		func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
-			return &req.ApplicationLink, req.FieldMask.GetPaths(), nil
+			return &req.Link, req.FieldMask.GetPaths(), nil
 		},
 	)
 }

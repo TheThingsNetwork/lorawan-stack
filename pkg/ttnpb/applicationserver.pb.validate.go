@@ -157,7 +157,7 @@ func (m *GetApplicationLinkRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationLinkRequestValidationError{
 						field:  "application_ids",
@@ -263,7 +263,7 @@ func (m *SetApplicationLinkRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.ApplicationIds).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationLinkRequestValidationError{
 						field:  "application_ids",
@@ -275,7 +275,7 @@ func (m *SetApplicationLinkRequest) ValidateFields(paths ...string) error {
 
 		case "link":
 
-			if v, ok := interface{}(&m.ApplicationLink).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(&m.Link).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationLinkRequestValidationError{
 						field:  "link",
