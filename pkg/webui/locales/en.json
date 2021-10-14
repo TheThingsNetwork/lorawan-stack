@@ -129,7 +129,7 @@
   "console.components.device-import-form.index.claiming": "Claiming",
   "console.components.device-import-form.index.setClaimAuthCode": "Set claim authentication code",
   "console.components.device-import-form.index.targetedComponents": "Targeted components",
-  "console.components.device-import-form.index.advancedSectionTitle": "Advanced claiming and component settings",
+  "console.components.device-import-form.index.advancedSectionTitle": "Advanced end device claiming settings",
   "console.components.device-import-form.index.infoText": "You can use the import functionality to register multiple end devices at once by uploading a file containing the registration information in one of the available formats. For more information, see also our documentation on <DocLink>Importing End Devices</DocLink>.",
   "console.components.downlink-form.downlink-form.insertMode": "Insert Mode",
   "console.components.downlink-form.downlink-form.payloadType": "Payload type",

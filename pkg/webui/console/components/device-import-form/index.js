@@ -16,8 +16,6 @@ import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
-import { dict as componentDict } from '@ttn-lw/constants/components'
-
 import Form from '@ttn-lw/components/form'
 import FileInput from '@ttn-lw/components/file-input'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -44,7 +42,7 @@ const m = defineMessages({
   claiming: 'Claiming',
   setClaimAuthCode: 'Set claim authentication code',
   targetedComponents: 'Targeted components',
-  advancedSectionTitle: 'Advanced claiming and component settings',
+  advancedSectionTitle: 'Advanced end device claiming settings',
   infoText:
     'You can use the import functionality to register multiple end devices at once by uploading a file containing the registration information in one of the available formats. For more information, see also our documentation on <DocLink>Importing End Devices</DocLink>.',
 })
@@ -53,43 +51,23 @@ const validationSchema = Yup.object({
   format_id: Yup.string().required(sharedMessages.validateRequired),
   data: Yup.string().required(m.selectAFile),
   set_claim_auth_code: Yup.boolean(),
-  components: Yup.object({
-    is: Yup.boolean().required(),
-    as: Yup.boolean(),
-    js: Yup.boolean(),
-    ns: Yup.boolean(),
-  }).required(sharedMessages.validateRequired),
 })
 
 export default class DeviceBulkCreateForm extends Component {
   static propTypes = {
-    components: PropTypes.components.isRequired,
     initialValues: PropTypes.shape({
       format_id: PropTypes.string,
       data: PropTypes.string,
       set_claim_auth_code: PropTypes.bool,
-      components: PropTypes.shape({
-        is: PropTypes.bool,
-        ns: PropTypes.bool,
-        js: PropTypes.bool,
-        as: PropTypes.bool,
-      }),
     }).isRequired,
+    jsEnabled: PropTypes.bool.isRequired,
     onSubmit: PropTypes.func.isRequired,
   }
 
-  constructor(props) {
-    super(props)
-
-    const { initialValues } = props
-
-    this.state = {
-      allowedFileExtensions: undefined,
-      formatDescription: undefined,
-      formatSelected: false,
-      jsSelected: Boolean(initialValues.components.js),
-    }
-    this.formRef = React.createRef()
+  state = {
+    allowedFileExtensions: undefined,
+    formatDescription: undefined,
+    formatSelected: false,
   }
 
   @bind
@@ -104,35 +82,19 @@ export default class DeviceBulkCreateForm extends Component {
     this.setState(newState)
   }
 
-  @bind
-  handleComponentChange(value) {
-    const { jsSelected } = this.state
-    const { values } = this.formRef.current
-    const { js } = value
-
-    if (js !== jsSelected) {
-      this.setState({ jsSelected: js }, () => {
-        if (values.set_claim_auth_code) {
-          const { setFieldValue } = this.formRef.current
-
-          // `claim_authentication_code` is stored in JS, so if the JS option is
-          // not selected we dont want to include it in the payload.
-          setFieldValue('set_claim_auth_code', false)
-        }
-      })
-    }
-  }
-
   render() {
-    const { initialValues, onSubmit, components } = this.props
-    const { allowedFileExtensions, formatSelected, formatDescription, jsSelected } = this.state
+    const { initialValues, onSubmit, jsEnabled } = this.props
+    const { allowedFileExtensions, formatSelected, formatDescription } = this.state
+    let passedInitialValues = initialValues
+    if (!jsEnabled && initialValues.set_claim_auth_code) {
+      passedInitialValues = { ...initialValues, set_claim_auth_code: false }
+    }
     return (
       <Form
-        formikRef={this.formRef}
         onSubmit={onSubmit}
         validationSchema={validationSchema}
         submitEnabledWhenInvalid
-        initialValues={initialValues}
+        initialValues={passedInitialValues}
       >
         <Message
           content={m.infoText}
@@ -161,23 +123,7 @@ export default class DeviceBulkCreateForm extends Component {
             />
             <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
               <Form.Field
-                onChange={this.handleComponentChange}
-                component={Checkbox.Group}
-                name="components"
-                title={m.targetedComponents}
-                horizontal
-              >
-                {components.map(component => (
-                  <Checkbox
-                    disabled={component === 'is'}
-                    key={component}
-                    name={component}
-                    label={componentDict[component]}
-                  />
-                ))}
-              </Form.Field>
-              <Form.Field
-                disabled={!jsSelected}
+                disabled={!jsEnabled}
                 title={m.claiming}
                 label={m.setClaimAuthCode}
                 component={Checkbox}
