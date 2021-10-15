@@ -41,6 +41,7 @@ For details about compatibility between different releases, see the **Commitment
 - Connection status not being shown as toast notification.
 - Registering and logging in users with 2 character user IDs in the Account App.
 - Frequency plan display for the gateway overview page in the Console.
+- Profile settings link not being present in the mobile menu in the Console.
 
 ### Security
 
