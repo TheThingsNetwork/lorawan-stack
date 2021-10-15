@@ -157,6 +157,23 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 	return userProto, nil
 }
 
+func (s *userStore) GetUserByPrimaryEmailAddress(ctx context.Context, email string, fieldMask *pbtypes.FieldMask) (*ttnpb.User, error) {
+	defer trace.StartRegion(ctx, "get user by primary email address").End()
+	query := s.query(ctx, User{}, withPrimaryEmailAddress(email))
+	query = query.Joins("LEFT JOIN accounts ON accounts.account_type = ? AND accounts.account_id = users.id", "user")
+	query = selectUserFields(ctx, query, fieldMask)
+	var userModel userWithUID
+	if err := query.First(&userModel).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, errUserNotFound.WithAttributes("user_id", email)
+		}
+		return nil, err
+	}
+	userProto := &ttnpb.User{}
+	userModel.toPB(userProto, fieldMask)
+	return userProto, nil
+}
+
 func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *pbtypes.FieldMask) (updated *ttnpb.User, err error) {
 	defer trace.StartRegion(ctx, "update user").End()
 	query := s.query(ctx, User{}, withUserID(usr.GetIds().GetUserId()))

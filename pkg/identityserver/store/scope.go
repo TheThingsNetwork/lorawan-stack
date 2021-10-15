@@ -177,6 +177,19 @@ func withUserID(id ...string) func(*gorm.DB) *gorm.DB {
 	}
 }
 
+func withPrimaryEmailAddress(emails ...string) func(*gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		switch len(emails) {
+		case 0:
+			return db
+		case 1:
+			return db.Where("users.primary_email_address = ?", emails[0])
+		default:
+			return db.Where("users.primary_email_address IN (?)", emails)
+		}
+	}
+}
+
 func splitEndDeviceIDString(s string) (appID string, devID string) {
 	sepIdx := strings.Index(s, ".")
 	return s[:sepIdx], s[sepIdx+1:]

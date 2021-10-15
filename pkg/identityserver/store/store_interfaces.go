@@ -101,6 +101,7 @@ type UserStore interface {
 	FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers, fieldMask *pbtypes.FieldMask) ([]*ttnpb.User, error)
 	ListAdmins(ctx context.Context, fieldMask *pbtypes.FieldMask) ([]*ttnpb.User, error)
 	GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *pbtypes.FieldMask) (*ttnpb.User, error)
+	GetUserByPrimaryEmailAddress(ctx context.Context, email string, fieldMask *pbtypes.FieldMask) (*ttnpb.User, error)
 	UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *pbtypes.FieldMask) (*ttnpb.User, error)
 	DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) error
 	RestoreUser(ctx context.Context, id *ttnpb.UserIdentifiers) error
