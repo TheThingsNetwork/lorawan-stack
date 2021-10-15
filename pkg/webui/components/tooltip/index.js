@@ -42,7 +42,7 @@ const Tooltip = props => {
 
   const handleShow = useCallback(
     instance => {
-      if (currentInstance) {
+      if (currentInstance && currentInstance.state && !currentInstance.state.isDestroyed) {
         currentInstance.hide()
       }
       currentInstance = instance
