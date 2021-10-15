@@ -28,6 +28,7 @@ import Tabs from '@ttn-lw/components/tabs'
 import Overlay from '@ttn-lw/components/overlay'
 import ErrorNotification from '@ttn-lw/components/error-notification'
 
+import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 import debounce from '@ttn-lw/lib/debounce'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -65,6 +66,7 @@ const m = defineMessages({
 
 @connect((state, props) => {
   const base = props.baseDataSelector(state, props)
+  const appRootPath = selectApplicationRootPath()
 
   return {
     items: base[props.entity] || [],
@@ -74,12 +76,14 @@ const m = defineMessages({
     pathname: state.router.location.pathname,
     mayAdd: 'mayAdd' in base ? base.mayAdd : true,
     error: base.error,
+    appRootPath,
   }
 })
 class FetchTable extends Component {
   static propTypes = {
     actionItems: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
     addMessage: PropTypes.message,
+    appRootPath: PropTypes.string.isRequired,
     clickable: PropTypes.bool,
     dispatch: PropTypes.func.isRequired,
     entity: PropTypes.string.isRequired,
@@ -263,8 +267,9 @@ class FetchTable extends Component {
   }
 
   @bind
-  onItemClick(index) {
+  onItemClick(index, evt) {
     const {
+      appRootPath,
       dispatch,
       pathname,
       items,
@@ -291,7 +296,11 @@ class FetchTable extends Component {
       entityPath = `${itemPathPrefix}/${item_id}`
     }
 
-    dispatch(push(`${pathname}${entityPath}`))
+    if (evt.metaKey || evt.button === 1) {
+      window.open(`${appRootPath}${pathname}${entityPath}`)
+    } else {
+      dispatch(push(`${pathname}${entityPath}`))
+    }
   }
 
   render() {
@@ -393,6 +402,7 @@ class FetchTable extends Component {
             totalCount={totalCount}
             pageSize={pageSize}
             onRowClick={this.onItemClick}
+            onRowMouseDown={this.onItemClick}
             onPageChange={this.onPageChange}
             loading={fetching}
             headers={headers}

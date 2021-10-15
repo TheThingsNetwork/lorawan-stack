@@ -66,6 +66,7 @@ class Tabular extends React.Component {
       loading,
       small,
       onRowClick,
+      onRowMouseDown,
       page,
       order,
       orderBy,
@@ -119,6 +120,7 @@ class Tabular extends React.Component {
             key={appliedRowKeySelector(row)}
             id={rowIndex}
             onClick={onRowClick}
+            onMouseDown={onRowMouseDown}
             clickable={clickable}
           >
             {headers.map((header, index) => {
@@ -203,6 +205,7 @@ Tabular.propTypes = {
   onPageChange: PropTypes.func,
   /** Function to be called when the table row gets clicked. */
   onRowClick: PropTypes.func,
+  onRowMouseDown: PropTypes.func,
   /**
    * Function to be called when the table should be sorted. Passes
    * the new ordering type and the name of the head cell that the
@@ -233,6 +236,7 @@ Tabular.defaultProps = {
   handlesPagination: false,
   loading: false,
   onRowClick: () => null,
+  onRowMouseDown: () => null,
   onPageChange: () => null,
   onSortRequest: () => null,
   small: false,
