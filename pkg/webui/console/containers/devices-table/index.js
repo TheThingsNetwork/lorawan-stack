@@ -97,11 +97,9 @@ const headers = [
     width: 14,
     render: lastSeen =>
       lastSeen ? (
-        <Status status="good">
-          <LastSeen lastSeen={lastSeen} short />
-        </Status>
+        <LastSeen lastSeen={lastSeen} short />
       ) : (
-        <Status status="mediocre" label={sharedMessages.unknown} />
+        <Status status="mediocre" label={sharedMessages.never} />
       ),
   },
 ]

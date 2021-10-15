@@ -38,11 +38,11 @@ const popperModifiers = [
 ]
 
 const Tooltip = props => {
-  const { className, children, content, interactive, placement, delay, onShow } = props
+  const { className, children, content, interactive, placement, delay, onShow, appendTo } = props
 
   const handleShow = useCallback(
     instance => {
-      if (currentInstance) {
+      if (currentInstance && currentInstance.state && !currentInstance.state.isDestroyed) {
         currentInstance.hide()
       }
       currentInstance = instance
@@ -60,6 +60,7 @@ const Tooltip = props => {
       popperOptions={{ modifiers: popperModifiers }}
       delay={delay}
       onShow={handleShow}
+      appendTo={appendTo || interactive ? 'parent' : document.body}
       animation="fade"
       duration={250}
     >
@@ -69,6 +70,7 @@ const Tooltip = props => {
 }
 
 Tooltip.propTypes = {
+  appendTo: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.string]),
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   content: PropTypes.node.isRequired,
@@ -95,6 +97,7 @@ Tooltip.propTypes = {
 }
 
 Tooltip.defaultProps = {
+  appendTo: undefined,
   className: '',
   interactive: false,
   placement: 'bottom',

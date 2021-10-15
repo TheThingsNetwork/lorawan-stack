@@ -93,6 +93,10 @@ export default class CollaboratorsTable extends Component {
     ]
   }
 
+  rowKeySelector(row) {
+    return `${'user_ids' in row.ids ? 'u' : 'c'}_${getCollaboratorId(row)}`
+  }
+
   getCollaboratorPathPrefix(collaborator) {
     return `/${'user_ids' in collaborator.ids ? 'user' : 'organization'}/${getCollaboratorId(
       collaborator,
@@ -104,6 +108,7 @@ export default class CollaboratorsTable extends Component {
       <FetchTable
         entity="collaborators"
         headers={this.headers}
+        rowKeySelector={this.rowKeySelector}
         getItemPathPrefix={this.getCollaboratorPathPrefix}
         addMessage={sharedMessages.addCollaborator}
         tableTitle={<Message content={sharedMessages.collaborators} />}

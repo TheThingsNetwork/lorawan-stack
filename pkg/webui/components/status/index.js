@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import classnames from 'classnames'
-import { defineMessages, injectIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -29,68 +29,87 @@ const m = defineMessages({
   unknown: 'unknown',
 })
 
-const Status = ({
-  intl,
-  className,
-  status,
-  label,
-  pulse,
-  labelValues,
-  children,
-  title,
-  flipped,
-}) => {
-  const cls = classnames(style.status, {
-    [style.statusGood]: status === 'good',
-    [style.statusBad]: status === 'bad',
-    [style.statusMediocre]: status === 'mediocre',
-    [style.statusUnknown]: status === 'unknown',
-    [style[`${status}-pulse`]]: typeof pulse === 'boolean' ? pulse : status === 'good',
-    [style.flipped]: flipped,
-  })
+const Status = React.forwardRef(
+  (
+    { className, status, label, pulse, pulseTrigger, labelValues, children, title, flipped },
+    ref,
+  ) => {
+    const intl = useIntl()
+    const [animate, setAnimate] = useState(false)
+    const pulseArmed = useRef(false)
+    useEffect(() => {
+      if (pulseArmed.current) {
+        setAnimate(true)
+      } else {
+        pulseArmed.current = true
+      }
+    }, [pulseTrigger])
 
-  let statusLabel = null
-  if (React.isValidElement(label)) {
-    statusLabel = React.cloneElement(label, {
-      ...label.props,
-      className: classnames(label.props.className, style.statusLabel, { [style.flipped]: flipped }),
+    const handleAnimationEnd = useCallback(() => {
+      setAnimate(false)
+    }, [setAnimate])
+
+    const cls = classnames(style.status, {
+      [style.statusGood]: status === 'good',
+      [style.statusBad]: status === 'bad',
+      [style.statusMediocre]: status === 'mediocre',
+      [style.statusUnknown]: status === 'unknown',
+      [style[`${status}-pulse`]]: typeof pulse === 'boolean' ? pulse : status === 'good',
+      [style.flipped]: flipped,
+      [style[`triggered-${status}-pulse`]]: animate,
     })
-  } else {
-    statusLabel = label && (
-      <Message className={style.statusLabel} content={label} values={labelValues} />
+
+    let statusLabel = null
+    if (React.isValidElement(label)) {
+      statusLabel = React.cloneElement(label, {
+        ...label.props,
+        className: classnames(label.props.className, style.statusLabel, {
+          [style.flipped]: flipped,
+        }),
+      })
+    } else {
+      statusLabel = label && (
+        <Message className={style.statusLabel} content={label} values={labelValues} />
+      )
+    }
+
+    let translatedTitle
+
+    if (title) {
+      translatedTitle = typeof title === 'string' ? title : intl.formatMessage(title)
+    } else if (label) {
+      translatedTitle = typeof label === 'string' ? label : intl.formatMessage(label)
+    } else {
+      translatedTitle = intl.formatMessage(m[status])
+    }
+
+    return (
+      <span
+        className={classnames(className, style.container)}
+        onAnimationEnd={handleAnimationEnd}
+        ref={ref}
+      >
+        {flipped && <span className={classnames(cls)} title={translatedTitle} />}
+        {statusLabel}
+        {children}
+        {!flipped && <span className={classnames(cls)} title={translatedTitle} />}
+      </span>
     )
-  }
-
-  let translatedTitle
-
-  if (title) {
-    translatedTitle = typeof title === 'string' ? title : intl.formatMessage(title)
-  } else if (label) {
-    translatedTitle = typeof label === 'string' ? label : intl.formatMessage(label)
-  } else {
-    translatedTitle = intl.formatMessage(m[status])
-  }
-
-  return (
-    <span className={classnames(className, style.container)}>
-      {flipped && <span className={classnames(cls)} title={translatedTitle} />}
-      {statusLabel}
-      {children}
-      {!flipped && <span className={classnames(cls)} title={translatedTitle} />}
-    </span>
-  )
-}
+  },
+)
 
 Status.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
   flipped: PropTypes.bool,
-  intl: PropTypes.shape({
-    formatMessage: PropTypes.func,
-  }).isRequired,
   label: PropTypes.message,
   labelValues: PropTypes.shape({}),
   pulse: PropTypes.bool,
+  pulseTrigger: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.instanceOf(Date),
+  ]),
   status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
   title: PropTypes.message,
 }
@@ -102,8 +121,9 @@ Status.defaultProps = {
   label: undefined,
   labelValues: undefined,
   pulse: undefined,
+  pulseTrigger: undefined,
   status: 'unknown',
   title: undefined,
 }
 
-export default injectIntl(Status)
+export default Status

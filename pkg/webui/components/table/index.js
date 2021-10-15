@@ -75,6 +75,7 @@ class Tabular extends React.Component {
       paginated,
       data,
       headers,
+      rowKeySelector,
       emptyMessage,
       clickable,
     } = this.props
@@ -104,12 +105,22 @@ class Tabular extends React.Component {
     )
 
     const minWidth = `${headers.length * 10}rem`
+    const defaultRowKeySelector = row => {
+      const key = headers[0].getValue ? headers[0].getValue(row) : getByPath(row, headers[0].name)
+      return typeof key === 'string' || typeof key === 'number' ? key : JSON.stringify(key)
+    }
+    const appliedRowKeySelector = rowKeySelector ? rowKeySelector : defaultRowKeySelector
 
     const paginatedData = this.handlePagination(data)
     const rows =
       paginatedData.length > 0 ? (
-        paginatedData.map((row, rowKey) => (
-          <Table.Row key={rowKey} id={rowKey} onClick={onRowClick} clickable={clickable}>
+        paginatedData.map((row, rowIndex) => (
+          <Table.Row
+            key={appliedRowKeySelector(row)}
+            id={rowIndex}
+            onClick={onRowClick}
+            clickable={clickable}
+          >
             {headers.map((header, index) => {
               const value = headers[index].getValue
                 ? headers[index].getValue(row)
@@ -208,6 +219,8 @@ Tabular.propTypes = {
   pageSize: PropTypes.number,
   /** A flag identifying whether the table should have pagination. */
   paginated: PropTypes.bool,
+  /** A selector to determine the `key` prop of the rendered rows. */
+  rowKeySelector: PropTypes.func,
   /** A flag specifying the height of data cells. */
   small: PropTypes.bool,
   /** The total number of available entries. */
@@ -231,6 +244,7 @@ Tabular.defaultProps = {
   page: 0,
   pageSize: undefined,
   clickable: true,
+  rowKeySelector: undefined,
 }
 
 export { Tabular as default, Table }

@@ -14,7 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
-import { FormattedNumber, useIntl } from 'react-intl'
+import { FormattedNumber } from 'react-intl'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -22,23 +22,21 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './messages-count.styl'
 
-const MessagesCount = props => {
-  const { className, icon, value, tooltipMessage, iconClassName } = props
-  const { formatMessage } = useIntl()
+const MessagesCount = React.forwardRef((props, ref) => {
+  const { className, icon, value, iconClassName } = props
 
   return (
-    <div title={formatMessage(tooltipMessage)} className={classnames(style.container, className)}>
+    <div ref={ref} className={classnames(style.container, className)}>
       <Icon className={iconClassName} icon={icon} nudgeUp />
       {typeof value === 'number' ? <FormattedNumber value={value} /> : value}
     </div>
   )
-}
+})
 
 MessagesCount.propTypes = {
   className: PropTypes.string,
   icon: PropTypes.string.isRequired,
   iconClassName: PropTypes.string,
-  tooltipMessage: PropTypes.message.isRequired,
   value: PropTypes.node.isRequired,
 }
 

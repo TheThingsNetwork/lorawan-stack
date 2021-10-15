@@ -23,11 +23,14 @@ For details about compatibility between different releases, see the **Commitment
   - `is.network.net-id`: the NetID of the network. When running a Network Server, make sure that this is the same value as `ns.net-id`.
   - `is.network.tenant-id`: the Tenant ID in the host NetID. Leave blank if you the NetID that you use is dedicated for the Identity Server.
 - Configuration option `experimental.features` to enable experimental features.
+- Tooltip descriptions for "Last activity" values (formerly "Last seen") and uplink/downlink counts in the Console.
+- Status pulses being triggered by incoming data in the Console.
 
 ### Changed
 
 - The NSID field of LoRaWAN Backend Interfaces 1.1 is now interpreted as Network Server address. Clients authenticating with `SenderNSID` must be authenticated as a Network Server with that address (see Security below).
 - Searching for entity IDs is now case insensitive.
+- Renamed entitie's "Last seen" to "Last activity" in the Console.
 
 ### Deprecated
 
@@ -42,6 +45,8 @@ For details about compatibility between different releases, see the **Commitment
 - Registering and logging in users with 2 character user IDs in the Account App.
 - Frequency plan display for the gateway overview page in the Console.
 - Profile settings link not being present in the mobile menu in the Console.
+- Calculation of "Last activity" values not using all available data in the Console.
+- Layout jumps due to length of "Last activity" text.
 
 ### Security
 

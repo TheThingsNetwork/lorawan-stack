@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { FormattedRelativeTime } from 'react-intl'
+import React, { useEffect, useState } from 'react'
+import { FormattedRelativeTime, defineMessages } from 'react-intl'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import DateTime from '.'
+
+const m = defineMessages({
+  justNow: 'just now',
+})
 
 const formatInSeconds = (from, to) => Math.floor((from - to) / 1000)
 
@@ -30,28 +36,55 @@ const RelativeTime = props => {
     updateIntervalInSeconds,
     firstToLower,
     children,
+    justNowMessage,
+    relativeTimeStyle,
   } = props
+
+  const from = new Date(value)
+  const to = new Date()
+  const delta = computeDelta(from, to)
+  const absDelta = Math.abs(delta)
+
+  const [showLessThan, setShowLessThan] = useState(false)
+
+  useEffect(() => {
+    // Do not show the `just now` message less than 5 seconds.
+    const minInterval = Math.max(updateIntervalInSeconds, 5)
+
+    // Show the `just now` message for deltas shorter than the update interval.
+    if (absDelta < minInterval) {
+      setShowLessThan(true)
+      const timer = setTimeout(() => {
+        setShowLessThan(false)
+      }, (minInterval - absDelta) * 1000)
+      return () => {
+        clearTimeout(timer)
+      }
+    }
+
+    setShowLessThan(false)
+  }, [showLessThan, absDelta, updateIntervalInSeconds])
 
   return (
     <DateTime className={className} value={value} firstToLower={firstToLower}>
-      {dateTime => {
-        const from = new Date(value)
-        const to = new Date()
-
-        const delta = computeDelta(from, to)
-
-        return (
-          <FormattedRelativeTime
-            key={dateTime}
-            value={delta}
-            numeric="auto"
-            updateIntervalInSeconds={updateIntervalInSeconds}
-            unit={unit}
-          >
-            {formattedRelativeTime => children(formattedRelativeTime)}
-          </FormattedRelativeTime>
-        )
-      }}
+      {dateTime => (
+        <FormattedRelativeTime
+          key={dateTime}
+          value={delta}
+          numeric="auto"
+          updateIntervalInSeconds={updateIntervalInSeconds}
+          unit={unit}
+          style={relativeTimeStyle}
+        >
+          {formattedRelativeTime =>
+            showLessThan ? (
+              <Message content={justNowMessage} values={{ count: updateIntervalInSeconds }} />
+            ) : (
+              children(formattedRelativeTime)
+            )
+          }
+        </FormattedRelativeTime>
+      )}
     </DateTime>
   )
 }
@@ -63,6 +96,10 @@ RelativeTime.propTypes = {
   computeDelta: PropTypes.func,
   /** Whether to convert the first character of the resulting message to lowercase. */
   firstToLower: PropTypes.bool,
+  /** Message to render when the delta is less than `updateIntervalInSeconds`. */
+  justNowMessage: PropTypes.message,
+  /** The style of the relative time rendering. */
+  relativeTimeStyle: PropTypes.oneOf(['long', 'short', 'narrow']),
   /** The unit to calculate relative date time. */
   unit: PropTypes.oneOf(['second', 'minute', 'hour', 'day', 'week', 'month', 'year']),
   /** The interval that the component will re-render in seconds. */
@@ -80,8 +117,10 @@ RelativeTime.defaultProps = {
   className: undefined,
   firstToLower: true,
   updateIntervalInSeconds: 1,
+  relativeTimeStyle: 'long',
   unit: 'second',
   computeDelta: formatInSeconds,
+  justNowMessage: m.justNow,
 }
 
 export default RelativeTime
