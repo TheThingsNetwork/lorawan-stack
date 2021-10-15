@@ -33,7 +33,7 @@ import style from './events.styl'
 
 const EventsWidget = ({ toAllUrl, className, events, scoped, entityId }) => {
   const title = (
-    <Status flipped status="good">
+    <Status flipped status="good" pulseTrigger={events.length > 0 ? events[0].time : ''}>
       <Message content={sharedMessages.liveData} className={style.widgetHeaderTitle} />
     </Status>
   )
