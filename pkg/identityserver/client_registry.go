@@ -193,19 +193,21 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 
 func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClientsRequest) (clis *ttnpb.Clients, err error) {
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, getPaths, nil)
+
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	callerAccountID := authInfo.GetOrganizationOrUserIdentifiers()
 	var includeIndirect bool
 	if req.Collaborator == nil {
-		authInfo, err := is.authInfo(ctx)
-		if err != nil {
-			return nil, err
-		}
-		collaborator := authInfo.GetOrganizationOrUserIdentifiers()
-		if collaborator == nil {
-			return &ttnpb.Clients{}, nil
-		}
-		req.Collaborator = collaborator
+		req.Collaborator = callerAccountID
 		includeIndirect = true
 	}
+	if req.Collaborator == nil {
+		return &ttnpb.Clients{}, nil
+	}
+
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_CLIENTS_LIST); err != nil {
 			return nil, err
@@ -215,9 +217,11 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 			return nil, err
 		}
 	}
+
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
+
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -226,14 +230,22 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 			setTotalHeader(ctx, total)
 		}
 	}()
+
 	clis = &ttnpb.Clients{}
+	var callerMemberships store.MembershipChains
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		ids, err := is.getMembershipStore(ctx, db).FindMemberships(paginateCtx, req.Collaborator, "client", includeIndirect)
+		membershipStore := is.getMembershipStore(ctx, db)
+		ids, err := membershipStore.FindMemberships(paginateCtx, req.Collaborator, "client", includeIndirect)
 		if err != nil {
 			return err
 		}
 		if len(ids) == 0 {
 			return nil
+		}
+		callerMemberships, err = membershipStore.FindAccountMembershipChains(ctx, callerAccountID, "client", idStrings(ids...)...)
+		if err != nil {
+			return err
 		}
 		cliIDs := make([]*ttnpb.ClientIdentifiers, 0, len(ids))
 		for _, id := range ids {
@@ -252,7 +264,8 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 	}
 
 	for i, cli := range clis.Clients {
-		if rights.RequireClient(ctx, *cli.GetIds(), ttnpb.RIGHT_CLIENT_ALL) != nil {
+		entityRights := callerMemberships.GetRights(callerAccountID, cli.GetIds())
+		if !entityRights.IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
 			clis.Clients[i] = cli.PublicSafe()
 		}
 	}

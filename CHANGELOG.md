@@ -31,6 +31,7 @@ For details about compatibility between different releases, see the **Commitment
 - The NSID field of LoRaWAN Backend Interfaces 1.1 is now interpreted as Network Server address. Clients authenticating with `SenderNSID` must be authenticated as a Network Server with that address (see Security below).
 - Searching for entity IDs is now case insensitive.
 - Renamed entitie's "Last seen" to "Last activity" in the Console.
+- The database queries for determining the rights of users on entities have been rewritten to reduce the number of round-trips to the database.
 
 ### Deprecated
 

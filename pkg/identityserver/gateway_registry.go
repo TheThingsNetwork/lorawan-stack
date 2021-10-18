@@ -303,19 +303,20 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, getPaths, []string{"frequency_plan_id"})
 
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	callerAccountID := authInfo.GetOrganizationOrUserIdentifiers()
 	var includeIndirect bool
 	if req.Collaborator == nil {
-		authInfo, err := is.authInfo(ctx)
-		if err != nil {
-			return nil, err
-		}
-		collaborator := authInfo.GetOrganizationOrUserIdentifiers()
-		if collaborator == nil {
-			return &ttnpb.Gateways{}, nil
-		}
-		req.Collaborator = collaborator
+		req.Collaborator = callerAccountID
 		includeIndirect = true
 	}
+	if req.Collaborator == nil {
+		return &ttnpb.Gateways{}, nil
+	}
+
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_GATEWAYS_LIST); err != nil {
 			return nil, err
@@ -325,9 +326,11 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			return nil, err
 		}
 	}
+
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
+
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -336,14 +339,22 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			setTotalHeader(ctx, total)
 		}
 	}()
+
 	gtws = &ttnpb.Gateways{}
+	var callerMemberships store.MembershipChains
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		ids, err := is.getMembershipStore(ctx, db).FindMemberships(paginateCtx, req.Collaborator, "gateway", includeIndirect)
+		membershipStore := is.getMembershipStore(ctx, db)
+		ids, err := membershipStore.FindMemberships(paginateCtx, req.Collaborator, "gateway", includeIndirect)
 		if err != nil {
 			return err
 		}
 		if len(ids) == 0 {
 			return nil
+		}
+		callerMemberships, err = membershipStore.FindAccountMembershipChains(ctx, callerAccountID, "gateway", idStrings(ids...)...)
+		if err != nil {
+			return err
 		}
 		gtwIDs := make([]*ttnpb.GatewayIdentifiers, 0, len(ids))
 		for _, id := range ids {
@@ -362,17 +373,19 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 	}
 
 	for i, gtw := range gtws.Gateways {
+		entityRights := callerMemberships.GetRights(callerAccountID, gtw.GetIds())
+
 		// Backwards compatibility for frequency_plan_id field.
 		if len(gtw.FrequencyPlanIds) > 0 {
 			gtw.FrequencyPlanId = gtw.FrequencyPlanIds[0]
 		}
 
-		if rights.RequireGateway(ctx, *gtw.GetIds(), ttnpb.RIGHT_GATEWAY_INFO) != nil {
+		if !entityRights.IncludesAll(ttnpb.RIGHT_GATEWAY_INFO) {
 			gtws.Gateways[i] = gtw.PublicSafe()
 		}
 
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret") {
-			if rights.RequireGateway(ctx, *gtw.GetIds(), ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
+			if !entityRights.IncludesAll(ttnpb.RIGHT_GATEWAY_READ_SECRETS) {
 				gtws.Gateways[i].LbsLnsSecret = nil
 			} else if gtws.Gateways[i].LbsLnsSecret != nil {
 				value := gtws.Gateways[i].LbsLnsSecret.Value
@@ -391,7 +404,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		}
 
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "target_cups_key") {
-			if rights.RequireGateway(ctx, *gtw.GetIds(), ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
+			if !entityRights.IncludesAll(ttnpb.RIGHT_GATEWAY_READ_SECRETS) {
 				gtws.Gateways[i].TargetCupsKey = nil
 			} else if gtws.Gateways[i].TargetCupsKey != nil {
 				value := gtws.Gateways[i].TargetCupsKey.Value
@@ -410,7 +423,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		}
 
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "claim_authentication_code") {
-			if rights.RequireGateway(ctx, *gtw.GetIds(), ttnpb.RIGHT_GATEWAY_READ_SECRETS) != nil {
+			if !entityRights.IncludesAll(ttnpb.RIGHT_GATEWAY_READ_SECRETS) {
 				gtws.Gateways[i].ClaimAuthenticationCode = nil
 			} else if gtws.Gateways[i].ClaimAuthenticationCode != nil && gtws.Gateways[i].ClaimAuthenticationCode.Secret != nil {
 				value := gtws.Gateways[i].ClaimAuthenticationCode.Secret.Value

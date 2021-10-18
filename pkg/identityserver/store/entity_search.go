@@ -86,7 +86,7 @@ func (s *entitySearch) queryMembership(ctx context.Context, query *gorm.DB, enti
 	if member == nil {
 		return query
 	}
-	membershipsQuery := (&membershipStore{store: s.store}).queryMemberships(ctx, member, entityType, true).Select("entity_id").QueryExpr()
+	membershipsQuery := (&membershipStore{store: s.store}).queryMemberships(ctx, member, entityType, nil, true).Select(`"direct_memberships"."entity_id"`).QueryExpr()
 	if entityType == "organization" {
 		query = query.Where(`"accounts"."account_type" = ? AND "accounts"."account_id" IN (?)`, entityType, membershipsQuery)
 	} else {

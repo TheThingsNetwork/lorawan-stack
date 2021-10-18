@@ -74,3 +74,11 @@ func validateContactInfo(info []*ttnpb.ContactInfo) error {
 func setTotalHeader(ctx context.Context, total uint64) {
 	grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(total, 10)))
 }
+
+func idStrings(entityIDs ...*ttnpb.EntityIdentifiers) []string {
+	idStrings := make([]string, len(entityIDs))
+	for i, entityID := range entityIDs {
+		idStrings[i] = entityID.IDString()
+	}
+	return idStrings
+}

@@ -73,42 +73,20 @@ func (is *IdentityServer) getRights(ctx context.Context, entityID *ttnpb.EntityI
 		return nil, universalRights, nil
 	}
 
+	// If the caller is requesting a user, and they're not that user (see above),
+	// they don't have rights on it, so nothing more to do.
+	if entityID.GetUserIds() != nil {
+		return nil, universalRights, nil
+	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		membershipStore := is.getMembershipStore(ctx, db)
-
-		// Find direct membership rights of the organization or user.
-		directMemberRights, err := membershipStore.GetMember(ctx, ouID, entityID)
-		if err != nil && !errors.IsNotFound(err) {
-			return err
-		}
-
-		// Expand the pseudo-rights.
-		entityRights = directMemberRights.Implied()
-
-		// If entityRights already includes all potential rights,
-		// there's nothing more to do.
-		if len(allPotentialRights.Sub(entityRights).GetRights()) == 0 {
-			return nil
-		}
-
-		// If the caller is not a user, there's nothing more to do.
-		usrID := ouID.GetUserIds()
-		if usrID == nil {
-			return nil
-		}
-
-		// Find indirect memberships (through organizations).
-		// TODO: Cache this (https://github.com/TheThingsNetwork/lorawan-stack/issues/443).
-		commonOrganizations, err := membershipStore.FindIndirectMemberships(ctx, usrID, entityID)
+		membershipChains, err := is.getMembershipStore(ctx, db).FindAccountMembershipChains(ctx, ouID, entityID.EntityType(), entityID.IDString())
 		if err != nil {
 			return err
 		}
-		for _, commonOrganization := range commonOrganizations {
-			rightsOnOrganization := commonOrganization.RightsOnOrganization.Implied()
-			organizationRights := commonOrganization.OrganizationRights.Implied()
-			entityRights = entityRights.Union(rightsOnOrganization.Intersect(organizationRights))
+		for _, chain := range membershipChains {
+			entityRights = entityRights.Union(chain.GetRights())
 		}
-
 		return nil
 	})
 	if err != nil {
