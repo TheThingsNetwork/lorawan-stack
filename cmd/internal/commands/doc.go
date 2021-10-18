@@ -15,16 +15,15 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
-	"github.com/spf13/pflag"
-	"gopkg.in/yaml.v2"
 )
 
 func disableAutoGenTag(cmd *cobra.Command) {
@@ -60,6 +59,14 @@ func GenManPages(root *cobra.Command) *cobra.Command {
 	return cmd
 }
 
+const MDDocFrontmatterTemplate = `---
+title: "%s"
+slug: %s
+type: "commands"
+---
+
+`
+
 // GenMDDoc generates markdown documentation for the given root command.
 func GenMDDoc(root *cobra.Command) *cobra.Command {
 	cmd := &cobra.Command{
@@ -74,100 +81,70 @@ func GenMDDoc(root *cobra.Command) *cobra.Command {
 				}
 			}
 			disableAutoGenTag(root)
-			return doc.GenMarkdownTree(root, dir)
+			prepender := func(filename string) string {
+				name := filepath.Base(filename)
+				base := strings.TrimSuffix(name, path.Ext(name))
+				title := strings.Replace(base, "_", " ", -1)
+				fmt.Printf(`Write "%s" to %s`+"\n", title, filename)
+				return fmt.Sprintf(MDDocFrontmatterTemplate, title, base)
+			}
+
+			linkHandler := func(name string) string {
+				base := strings.TrimSuffix(name, path.Ext(name))
+				return fmt.Sprintf(`{{< relref "%s" >}}`, strings.ToLower(base))
+			}
+			return doc.GenMarkdownTreeCustom(root, dir, prepender, linkHandler)
 		},
 	}
 	cmd.Flags().StringP("out", "o", "doc", "output directory")
 	return cmd
 }
 
-// GenYAMLDoc generates yaml documentation for the given root command.
-func GenYAMLDoc(root *cobra.Command) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:    "gen-yaml-doc",
-		Hidden: true,
-		Short:  fmt.Sprintf("Generate yaml documentation for %s", root.Name()),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			type Flag struct {
-				Name         string `yaml:"name,omitempty"`
-				Type         string `yaml:"type,omitempty"`
-				Shorthand    string `yaml:"shorthand,omitempty"`
-				Usage        string `yaml:"usage,omitempty"`
-				DefaultValue string `yaml:"default_value,omitempty"`
-				Hidden       bool   `yaml:"hidden,omitempty"`
-			}
-			buildFlag := func(flag *pflag.Flag) *Flag {
-				doc := &Flag{
-					Name:         flag.Name,
-					Type:         flag.Value.Type(),
-					Shorthand:    flag.Shorthand,
-					Usage:        flag.Usage,
-					DefaultValue: flag.DefValue,
-					Hidden:       flag.Hidden,
-				}
-				return doc
-			}
-			type Command struct {
-				Path            string   `yaml:"path,omitempty"`
-				ParentPath      string   `yaml:"parent_path,omitempty"`
-				Name            string   `yaml:"name,omitempty"`
-				Use             string   `yaml:"use,omitempty"`
-				Aliases         []string `yaml:"aliases,omitempty"`
-				Short           string   `yaml:"short,omitempty"`
-				Long            string   `yaml:"long,omitempty"`
-				Example         string   `yaml:"example,omitempty"`
-				Deprecated      string   `yaml:"deprecated,omitempty"`
-				Hidden          bool     `yaml:"hidden,omitempty"`
-				CommandFlags    []*Flag  `yaml:"command_flags,omitempty"`
-				PersistentFlags []*Flag  `yaml:"persistent_flags,omitempty"`
-			}
-			buildCommand := func(cmd *cobra.Command) *Command {
-				doc := &Command{
-					Name:       cmd.Name(),
-					Path:       cmd.CommandPath(),
-					Use:        strings.TrimSpace(strings.TrimPrefix(cmd.Use, cmd.Name())),
-					Aliases:    cmd.Aliases,
-					Short:      cmd.Short,
-					Long:       cmd.Long,
-					Example:    cmd.Example,
-					Deprecated: cmd.Deprecated,
-					Hidden:     cmd.Hidden,
-				}
-				if cmd.Parent() != nil {
-					doc.ParentPath = cmd.Parent().CommandPath()
-				}
-				cmd.LocalNonPersistentFlags().VisitAll(func(flag *pflag.Flag) {
-					doc.CommandFlags = append(doc.CommandFlags, buildFlag(flag))
-				})
-				cmd.PersistentFlags().VisitAll(func(flag *pflag.Flag) {
-					doc.PersistentFlags = append(doc.PersistentFlags, buildFlag(flag))
-				})
-				return doc
-			}
+type command struct {
+	Short       string             `json:"short,omitempty"`
+	Path        string             `json:"path,omitempty"`
+	SubCommands map[string]command `json:"subCommands,omitempty"`
+}
 
-			out := make(map[string]*Command)
-			var buildTree func(cmd *cobra.Command)
-			buildTree = func(cmd *cobra.Command) {
-				out[cmd.CommandPath()] = buildCommand(cmd)
-				for _, sub := range cmd.Commands() {
-					buildTree(sub)
-				}
-			}
-			buildTree(root)
+func commandTree(cmd *cobra.Command) (res command) {
+	res.Path = cmd.CommandPath()
+	res.Short = cmd.Short
+	if len(cmd.Commands()) == 0 {
+		return
+	}
+	res.SubCommands = make(map[string]command, len(cmd.Commands()))
+	for _, cmd := range cmd.Commands() {
+		if !cmd.IsAvailableCommand() || cmd.IsAdditionalHelpTopicCommand() {
+			continue
+		}
+		res.SubCommands[cmd.Name()] = commandTree(cmd)
+	}
+	return
+}
+
+// GenTree generates a JSON tree for the given root command
+func GenJSONTree(root *cobra.Command) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:    "gen-json-tree",
+		Hidden: true,
+		Short:  fmt.Sprintf("Generate JSON tree for %s", root.Name()),
+		RunE: func(cmd *cobra.Command, args []string) error {
 
 			dir, _ := cmd.Flags().GetString("out")
-			if _, err := os.Stat(dir); os.IsNotExist(err) {
-				if err := os.MkdirAll(dir, 0755); err != nil {
-					return err
-				}
-			}
 
-			b, err := yaml.Marshal(out)
+			out := filepath.Join(dir, root.Name()+".json")
+
+			f, err := os.Create(out)
 			if err != nil {
 				return err
 			}
+			defer f.Close()
 
-			return ioutil.WriteFile(filepath.Join(dir, root.Name()+".yml"), b, 0644)
+			enc := json.NewEncoder(f)
+			enc.SetIndent("", "  ")
+			return enc.Encode(map[string]command{
+				cmd.Root().Name(): commandTree(cmd.Root()),
+			})
 		},
 	}
 	cmd.Flags().StringP("out", "o", "doc", "output directory")

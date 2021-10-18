@@ -315,7 +315,7 @@ var (
 	versionCommand     = version.Print(Root)
 	genManPagesCommand = commands.GenManPages(Root)
 	genMDDocCommand    = commands.GenMDDoc(Root)
-	ganYAMLDocCommand  = commands.GenYAMLDoc(Root)
+	genJSONTreeCommand = commands.GenJSONTree(Root)
 	completeCommand    = commands.Complete()
 )
 
@@ -328,8 +328,8 @@ func init() {
 	Root.AddCommand(genManPagesCommand)
 	genMDDocCommand.PersistentPreRunE = preRun()
 	Root.AddCommand(genMDDocCommand)
-	ganYAMLDocCommand.PersistentPreRunE = preRun()
-	Root.AddCommand(ganYAMLDocCommand)
+	genJSONTreeCommand.PersistentPreRunE = preRun()
+	Root.AddCommand(genJSONTreeCommand)
 	completeCommand.PersistentPreRunE = preRun()
 	Root.AddCommand(completeCommand)
 }
