@@ -19,8 +19,9 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	sess "go.thethings.network/lorawan-stack/v3/pkg/account/session"
+	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
@@ -47,21 +48,13 @@ type Component interface {
 type server struct {
 	c           Component
 	config      oauth.Config
-	store       Store
+	store       account_store.Interface
 	session     sess.Session
 	generateCSP func(config *oauth.Config, nonce string) string
 }
 
-// Store used by the account app.
-type Store interface {
-	// UserStore, LoginTokenStore and UserSessionStore are needed for user login/logout.
-	store.UserStore
-	store.LoginTokenStore
-	store.UserSessionStore
-}
-
 // NewServer returns a new account app on top of the given store.
-func NewServer(c Component, store Store, config oauth.Config, cspFunc func(config *oauth.Config, nonce string) string) Server {
+func NewServer(c *component.Component, store account_store.Interface, config oauth.Config, cspFunc func(config *oauth.Config, nonce string) string) (Server, error) {
 	s := &server{
 		c:           c,
 		config:      config,
@@ -74,7 +67,7 @@ func NewServer(c Component, store Store, config oauth.Config, cspFunc func(confi
 		s.config.Mount = s.config.UI.MountPath()
 	}
 
-	return s
+	return s, nil
 }
 
 type ctxKeyType struct{}
