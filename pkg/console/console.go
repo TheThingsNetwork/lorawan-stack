@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ type Console struct {
 	*component.Component
 	oc     *oauthclient.OAuthClient
 	config Config
+	csp    map[string][]string
 }
 
 // New returns a new Console.
@@ -48,6 +49,32 @@ func New(c *component.Component, config Config) (*Console, error) {
 		Component: c,
 		oc:        oc,
 		config:    config,
+		csp: webui.CleanCSP(map[string][]string{
+			"default-src": {
+				"'self'",
+				config.UI.AssetsBaseURL,
+				config.UI.BrandingBaseURL,
+				"'unsafe-eval'",
+			},
+			"connect-src": {
+				"'self'",
+				config.UI.StackConfig.GS.BaseURL,
+				config.UI.StackConfig.IS.BaseURL,
+				config.UI.StackConfig.JS.BaseURL,
+				config.UI.StackConfig.NS.BaseURL,
+				config.UI.StackConfig.AS.BaseURL,
+				config.UI.StackConfig.EDTC.BaseURL,
+				config.UI.StackConfig.QRG.BaseURL,
+				config.UI.StackConfig.GCS.BaseURL,
+				"*.ingest.sentry.io",
+			},
+			"base-uri": {
+				"'self'",
+			},
+			"frame-ancestors": {
+				"'none'",
+			},
+		}),
 	}
 
 	if console.config.Mount == "" {
@@ -88,6 +115,15 @@ func path(u string) (string, error) {
 func (console *Console) RegisterRoutes(server *web.Server) {
 	group := server.Group(
 		console.config.Mount,
+		func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				nonce := webui.GenerateNonce()
+				c.Set("csp_nonce", nonce)
+				cspString := webui.GenerateCSPString(console.csp, nonce)
+				c.Response().Header().Set("Content-Security-Policy", cspString)
+				return next(c)
+			}
+		},
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
 				config := console.configFromContext(c.Request().Context())
