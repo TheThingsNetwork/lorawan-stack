@@ -153,7 +153,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		iogrpc.WithEndDeviceFetcher(as.endDeviceFetcher),
 		iogrpc.WithPayloadProcessor(as.formatters),
 		iogrpc.WithSkipPayloadCrypto(func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (bool, error) {
-			link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{"skip_payload_crypto"})
+			link, err := as.getLink(ctx, &ids.ApplicationIdentifiers, []string{"skip_payload_crypto"})
 			if err != nil {
 				return false, err
 			}
@@ -294,7 +294,7 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 
 // Publish processes the given upstream message and then publishes it to the application frontends.
 func (as *ApplicationServer) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
-	link, err := as.getLink(ctx, up.ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, &up.ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
@@ -528,7 +528,7 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 
 func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)) error {
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:downlink:%s", events.NewCorrelationID()))
-	link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, &ids.ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
@@ -598,7 +598,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if err != nil {
 		return nil, err
 	}
-	link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, &ids.ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})

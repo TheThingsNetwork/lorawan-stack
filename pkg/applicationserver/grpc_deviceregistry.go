@@ -76,7 +76,7 @@ func (r asEndDeviceRegistryServer) retrieveSessionKeys(ctx context.Context, dev 
 		return nil
 	}
 
-	link, err := r.AS.getLink(ctx, dev.ApplicationIdentifiers, []string{
+	link, err := r.AS.getLink(ctx, &dev.ApplicationIdentifiers, []string{
 		"skip_payload_crypto",
 	})
 	if err != nil {

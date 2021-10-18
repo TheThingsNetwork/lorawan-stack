@@ -1437,18 +1437,6 @@
               "defaultValue": ""
             },
             {
-              "name": "tls",
-              "description": "Enable TLS for linking to the external Network Server.\nFor cluster-local Network Servers, the cluster's TLS setting is used.",
-              "label": "",
-              "type": "bool",
-              "longType": "bool",
-              "fullType": "bool",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
               "name": "skip_payload_crypto",
               "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nLeave empty for the using the Application Server's default setting.",
               "label": "",

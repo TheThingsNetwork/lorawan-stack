@@ -244,9 +244,9 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 		},
 	}
 
-	for ids, link := range map[ttnpb.ApplicationIdentifiers]*ttnpb.ApplicationLink{
-		app1IDs: app1,
-		app2IDs: app2,
+	for ids, link := range map[*ttnpb.ApplicationIdentifiers]*ttnpb.ApplicationLink{
+		&app1IDs: app1,
+		&app2IDs: app2,
 	} {
 		_, err := reg.Get(ctx, ids, ttnpb.ApplicationLinkFieldPathsTopLevel)
 		if !a.So(errors.IsNotFound(err), should.BeTrue) {
@@ -282,7 +282,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 		t.FailNow()
 	}
 
-	for _, ids := range []ttnpb.ApplicationIdentifiers{app1IDs, app2IDs} {
+	for _, ids := range []*ttnpb.ApplicationIdentifiers{&app1IDs, &app2IDs} {
 		_, err := reg.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 			return nil, nil, nil
 		})

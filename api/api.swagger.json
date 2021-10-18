@@ -12245,10 +12245,6 @@
           "$ref": "#/definitions/v3MessagePayloadFormatters",
           "description": "Default message payload formatters to use when there are no formatters\ndefined on the end device level."
         },
-        "tls": {
-          "type": "boolean",
-          "description": "Enable TLS for linking to the external Network Server.\nFor cluster-local Network Servers, the cluster's TLS setting is used."
-        },
         "skip_payload_crypto": {
           "type": "boolean",
           "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nLeave empty for the using the Application Server's default setting."

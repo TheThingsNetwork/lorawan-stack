@@ -24,6 +24,7 @@ var asApplicationLinkFieldPaths = append(
 	ApplicationLinkFieldPathsNested[:],
 	"api_key",
 	"network_server_address",
+	"tls",
 )
 
 var isEndDeviceReadFieldPaths = []string{

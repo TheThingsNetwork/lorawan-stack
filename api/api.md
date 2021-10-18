@@ -885,7 +885,6 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `default_formatters` | [`MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters) |  | Default message payload formatters to use when there are no formatters defined on the end device level. |
-| `tls` | [`bool`](#bool) |  | Enable TLS for linking to the external Network Server. For cluster-local Network Servers, the cluster's TLS setting is used. |
 | `skip_payload_crypto` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Skip decryption of uplink payloads and encryption of downlink payloads. Leave empty for the using the Application Server's default setting. |
 
 ### <a name="ttn.lorawan.v3.ApplicationLinkStats">Message `ApplicationLinkStats`</a>
