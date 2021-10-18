@@ -2841,7 +2841,7 @@ func TestGetHomeNetID(t *testing.T) {
 		JoinEUI       types.EUI64
 		DevEUI        types.EUI64
 		ResponseNetID *types.NetID
-		ResponseNSID  string
+		ResponseNSID  *types.EUI64
 
 		ErrorAssertion func(*testing.T, error) bool
 	}{
@@ -2892,7 +2892,6 @@ func TestGetHomeNetID(t *testing.T) {
 			JoinEUI:       types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEUI:        types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ResponseNetID: &types.NetID{0x42, 0xff, 0xff},
-			ResponseNSID:  nsAddr,
 		},
 	} {
 		tc := tc
@@ -2910,21 +2909,21 @@ func TestGetHomeNetID(t *testing.T) {
 						},
 					},
 				)).(*JoinServer)
-				netID, nsID, err := js.GetHomeNetID(ctx, tc.JoinEUI, tc.DevEUI, tc.Authorizer)
+				homeNetwork, err := js.GetHomeNetwork(ctx, tc.JoinEUI, tc.DevEUI, tc.Authorizer)
 
 				if tc.ErrorAssertion != nil {
 					if !tc.ErrorAssertion(t, err) {
 						t.Fatalf("Received unexpected error: %s", err)
 					}
-					a.So(netID, should.BeNil)
+					a.So(homeNetwork, should.BeNil)
 					return
 				}
 
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
-				a.So(netID, should.Resemble, tc.ResponseNetID)
-				a.So(nsID, should.Equal, tc.ResponseNSID)
+				a.So(homeNetwork.NetID, should.Resemble, tc.ResponseNetID)
+				a.So(homeNetwork.NSID, should.Equal, tc.ResponseNSID)
 			},
 		})
 	}

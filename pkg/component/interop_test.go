@@ -75,19 +75,21 @@ func (m mockInterop) AppSKeyRequest(ctx context.Context, req *interop.AppSKeyReq
 	}, nil
 }
 
-func (m mockInterop) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+func (m mockInterop) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.TTIHomeNSAns, error) {
 	ansHeader, err := req.AnswerHeader()
 	if err != nil {
 		return nil, err
 	}
-	return &interop.HomeNSAns{
-		JsNsMessageHeader: interop.JsNsMessageHeader{
-			MessageHeader: ansHeader,
-			SenderID:      req.ReceiverID,
-			ReceiverID:    req.SenderID,
-		},
-		Result: interop.Result{
-			ResultCode: interop.ResultSuccess,
+	return &interop.TTIHomeNSAns{
+		HomeNSAns: interop.HomeNSAns{
+			JsNsMessageHeader: interop.JsNsMessageHeader{
+				MessageHeader: ansHeader,
+				SenderID:      req.ReceiverID,
+				ReceiverID:    req.SenderID,
+			},
+			Result: interop.Result{
+				ResultCode: interop.ResultSuccess,
+			},
 		},
 	}, nil
 }

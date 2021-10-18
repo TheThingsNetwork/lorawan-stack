@@ -17,53 +17,13 @@ package interop
 import (
 	"context"
 	"encoding/json"
-	"net"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"gopkg.in/square/go-jose.v2/jwt"
 )
-
-// verifySenderNSID verifies that one of the address patterns matches the NSID.
-// The pattern may contain a wildcard (*.host) or port (host:1885).
-func verifySenderNSID(patterns []string, nsID string) error {
-	if len(patterns) == 0 {
-		return errCallerNotAuthorized.WithAttributes("target", nsID)
-	}
-
-	host := nsID
-	if url, err := url.Parse(nsID); err == nil && url.Host != "" {
-		host = url.Host
-	}
-	if h, _, err := net.SplitHostPort(nsID); err == nil {
-		host = h
-	}
-	if len(host) == 0 {
-		return errCallerNotAuthorized.WithAttributes("target", nsID)
-	}
-	hostParts := strings.Split(host, ".")
-
-nextPattern:
-	for _, pattern := range patterns {
-		patternParts := strings.Split(pattern, ".")
-		if len(patternParts) != len(hostParts) {
-			return errCallerNotAuthorized.WithAttributes("target", nsID)
-		}
-		for i, patternPart := range patternParts {
-			if i == 0 && patternPart == "*" {
-				continue
-			}
-			if patternPart != hostParts[i] {
-				continue nextPattern
-			}
-		}
-		return nil
-	}
-	return errCallerNotAuthorized.WithAttributes("target", nsID)
-}
 
 type authInfo interface {
 	addressPatterns() []string
@@ -77,16 +37,12 @@ type NetworkServerAuthInfo struct {
 
 func (n NetworkServerAuthInfo) addressPatterns() []string { return n.Addresses }
 
-// Require returns an error if the given NetID does not match, or if the NSID is not matched by an address pattern.
-func (n NetworkServerAuthInfo) Require(netID types.NetID, nsID *string) error {
+// Require returns an error if the given NetID or NSID does not match.
+func (n NetworkServerAuthInfo) Require(netID types.NetID, nsID *EUI64) error {
 	if !n.NetID.Equal(netID) {
 		return errUnauthenticated.New()
 	}
-	if nsID != nil {
-		if err := verifySenderNSID(n.Addresses, *nsID); err != nil {
-			return err
-		}
-	}
+	// TODO: Verify NSID (https://github.com/TheThingsNetwork/lorawan-stack/issues/4741).
 	return nil
 }
 

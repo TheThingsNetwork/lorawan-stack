@@ -49,8 +49,6 @@ var (
 	ServerKey     = test.Must(ioutil.ReadFile(ServerKeyPath)).([]byte)
 )
 
-func stringPtr(s string) *string { return &s }
-
 func makeCertPool() *x509.CertPool {
 	certpool := x509.NewCertPool()
 	certpool.AppendCertsFromPEM(RootCA)

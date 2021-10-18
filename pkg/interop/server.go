@@ -39,14 +39,14 @@ type Registerer interface {
 
 // IdentityServer represents an Identity Server.
 type IdentityServer interface {
-	HomeNSRequest(context.Context, *HomeNSReq) (*HomeNSAns, error)
+	HomeNSRequest(context.Context, *HomeNSReq) (*TTIHomeNSAns, error)
 }
 
 // JoinServer represents a Join Server as specified in LoRaWAN Backend Interfaces.
 type JoinServer interface {
 	JoinRequest(context.Context, *JoinReq) (*JoinAns, error)
 	AppSKeyRequest(context.Context, *AppSKeyReq) (*AppSKeyAns, error)
-	HomeNSRequest(context.Context, *HomeNSReq) (*HomeNSAns, error)
+	HomeNSRequest(context.Context, *HomeNSReq) (*TTIHomeNSAns, error)
 }
 
 type noopServer struct{}
@@ -59,7 +59,7 @@ func (noopServer) AppSKeyRequest(context.Context, *AppSKeyReq) (*AppSKeyAns, err
 	return nil, ErrMalformedMessage.New()
 }
 
-func (noopServer) HomeNSRequest(context.Context, *HomeNSReq) (*HomeNSAns, error) {
+func (noopServer) HomeNSRequest(context.Context, *HomeNSReq) (*TTIHomeNSAns, error) {
 	return nil, ErrMalformedMessage.New()
 }
 

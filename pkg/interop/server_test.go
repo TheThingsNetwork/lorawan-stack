@@ -52,7 +52,7 @@ func (c *mockComponent) HTTPClient(context.Context) (*http.Client, error) {
 type mockTarget struct {
 	JoinRequestFunc    func(context.Context, *interop.JoinReq) (*interop.JoinAns, error)
 	AppSKeyRequestFunc func(context.Context, *interop.AppSKeyReq) (*interop.AppSKeyAns, error)
-	HomeNSRequestFunc  func(context.Context, *interop.HomeNSReq) (*interop.HomeNSAns, error)
+	HomeNSRequestFunc  func(context.Context, *interop.HomeNSReq) (*interop.TTIHomeNSAns, error)
 }
 
 func (m mockTarget) JoinRequest(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
@@ -69,7 +69,7 @@ func (m mockTarget) AppSKeyRequest(ctx context.Context, req *interop.AppSKeyReq)
 	panic("AppSKeyRequest called but not registered")
 }
 
-func (m mockTarget) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+func (m mockTarget) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.TTIHomeNSAns, error) {
 	if m.HomeNSRequestFunc != nil {
 		return m.HomeNSRequestFunc(ctx, req)
 	}
@@ -185,42 +185,6 @@ func TestServer(t *testing.T) {
 			},
 		},
 		{
-			Name: "ClientTLS/JoinReq/Unauthenticated NSID",
-			JS: mockTarget{
-				JoinRequestFunc: func(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
-					if err := authorizer.RequireAuthorized(ctx); err != nil {
-						return nil, err
-					}
-					return nil, interop.ErrUnknownDevEUI.New()
-				},
-			},
-			ClientTLSConfig: makeClientTLSConfig(),
-			RequestBody: &interop.JoinReq{
-				NsJsMessageHeader: interop.NsJsMessageHeader{
-					MessageHeader: interop.MessageHeader{
-						MessageType:     interop.MessageTypeJoinReq,
-						ProtocolVersion: interop.ProtocolV1_1,
-					},
-					SenderID:   interop.NetID{0x0, 0x0, 0x01},
-					SenderNSID: stringPtr("example.com"), // The client is authenticated with NSID localhost and *.localhost only
-					ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-				},
-				MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
-			},
-			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
-				a := assertions.New(t)
-				if !a.So(res.StatusCode, should.Equal, http.StatusOK) {
-					return false
-				}
-				var msg interop.ErrorMessage
-				err := json.NewDecoder(res.Body).Decode(&msg)
-				if !a.So(err, should.BeNil) {
-					return false
-				}
-				return a.So(msg.Result.ResultCode, should.Equal, interop.ResultUnknownSender)
-			},
-		},
-		{
 			Name: "ClientTLS/JoinReq/Success",
 			JS: mockTarget{
 				JoinRequestFunc: func(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
@@ -285,7 +249,7 @@ func TestServer(t *testing.T) {
 		{
 			Name: "PacketBroker/HomeNSReq/Success",
 			JS: mockTarget{
-				HomeNSRequestFunc: func(ctx context.Context, req *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+				HomeNSRequestFunc: func(ctx context.Context, req *interop.HomeNSReq) (*interop.TTIHomeNSAns, error) {
 					if err := authorizer.RequireAuthorized(ctx); err != nil {
 						return nil, err
 					}
@@ -295,22 +259,24 @@ func TestServer(t *testing.T) {
 					if err := authorizer.RequireAddress(ctx, "test.packetbroker.io"); err != nil {
 						return nil, err
 					}
-					return &interop.HomeNSAns{
-						JsNsMessageHeader: interop.JsNsMessageHeader{
-							MessageHeader: interop.MessageHeader{
-								ProtocolVersion: req.ProtocolVersion,
-								MessageType:     interop.MessageTypeHomeNSAns,
-								TransactionID:   req.TransactionID,
+					return &interop.TTIHomeNSAns{
+						HomeNSAns: interop.HomeNSAns{
+							JsNsMessageHeader: interop.JsNsMessageHeader{
+								MessageHeader: interop.MessageHeader{
+									ProtocolVersion: req.ProtocolVersion,
+									MessageType:     interop.MessageTypeHomeNSAns,
+									TransactionID:   req.TransactionID,
+								},
+								SenderID:     req.ReceiverID,
+								ReceiverID:   req.SenderID,
+								ReceiverNSID: req.SenderNSID,
 							},
-							SenderID:     req.ReceiverID,
-							ReceiverID:   req.SenderID,
-							ReceiverNSID: req.SenderNSID,
+							Result: interop.Result{
+								ResultCode: interop.ResultSuccess,
+							},
+							HNetID: interop.NetID{0x0, 0x0, 0x1},
+							HNSID:  &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0},
 						},
-						Result: interop.Result{
-							ResultCode: interop.ResultSuccess,
-						},
-						HNetID: interop.NetID{0x0, 0x0, 0x1},
-						HNSID:  stringPtr("localhost:4242"),
 					}, nil
 				},
 			},
@@ -322,7 +288,6 @@ func TestServer(t *testing.T) {
 						ProtocolVersion: interop.ProtocolV1_1,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x0},
-					SenderNSID: stringPtr("test.packetbroker.io"),
 					ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 				DevEUI: interop.EUI64{0x42, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
@@ -338,9 +303,8 @@ func TestServer(t *testing.T) {
 					a.So(msg.Result.ResultCode, should.Equal, interop.ResultSuccess) &&
 					a.So(msg.SenderID, should.Resemble, interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}) &&
 					a.So(msg.ReceiverID, should.Resemble, interop.NetID{0x0, 0x0, 0x0}) &&
-					a.So(msg.ReceiverNSID, should.Resemble, stringPtr("test.packetbroker.io")) &&
 					a.So(msg.HNetID, should.Resemble, interop.NetID{0x0, 0x0, 0x1}) &&
-					a.So(msg.HNSID, should.Resemble, stringPtr("localhost:4242"))
+					a.So(msg.HNSID, should.Resemble, &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0})
 			},
 		},
 	} {

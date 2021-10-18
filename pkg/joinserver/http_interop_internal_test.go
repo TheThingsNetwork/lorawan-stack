@@ -30,9 +30,9 @@ import (
 )
 
 type mockInteropHandler struct {
-	HandleJoinFunc   func(context.Context, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
-	GetHomeNetIDFunc func(context.Context, types.EUI64, types.EUI64) (netID *types.NetID, nsID string, err error)
-	GetAppSKeyFunc   func(context.Context, *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error)
+	HandleJoinFunc     func(context.Context, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
+	GetHomeNetworkFunc func(context.Context, types.EUI64, types.EUI64) (*EndDeviceHomeNetwork, error)
+	GetAppSKeyFunc     func(context.Context, *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error)
 }
 
 func (h mockInteropHandler) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, authorizer Authorizer) (*ttnpb.JoinResponse, error) {
@@ -42,11 +42,11 @@ func (h mockInteropHandler) HandleJoin(ctx context.Context, req *ttnpb.JoinReque
 	return h.HandleJoinFunc(ctx, req)
 }
 
-func (h mockInteropHandler) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (*types.NetID, string, error) {
-	if h.GetHomeNetIDFunc == nil {
-		panic("GetHomeNetID should not be called")
+func (h mockInteropHandler) GetHomeNetwork(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (*EndDeviceHomeNetwork, error) {
+	if h.GetHomeNetworkFunc == nil {
+		panic("GetHomeNetwork should not be called")
 	}
-	return h.GetHomeNetIDFunc(ctx, joinEUI, devEUI)
+	return h.GetHomeNetworkFunc(ctx, joinEUI, devEUI)
 }
 
 func (h mockInteropHandler) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest, authorizer Authorizer) (*ttnpb.AppSKeyResponse, error) {
@@ -445,13 +445,13 @@ func TestInteropJoinRequest(t *testing.T) {
 
 func TestInteropHomeNSRequest(t *testing.T) {
 	for _, tc := range []struct {
-		Name              string
-		HomeNSReq         *interop.HomeNSReq
-		ExpectedJoinEUI   types.EUI64
-		ExpectedDevEUI    types.EUI64
-		ErrorAssertion    func(*testing.T, error) bool
-		GetNetIDFunc      func() (*types.NetID, string, error)
-		ExpectedHomeNSAns *interop.HomeNSAns
+		Name               string
+		HomeNSReq          *interop.HomeNSReq
+		ExpectedJoinEUI    types.EUI64
+		ExpectedDevEUI     types.EUI64
+		ErrorAssertion     func(*testing.T, error) bool
+		GetHomeNetworkFunc func() (*EndDeviceHomeNetwork, error)
+		ExpectedHomeNSAns  *interop.TTIHomeNSAns
 	}{
 		{
 			Name: "Normal/TS002-1.0",
@@ -468,23 +468,32 @@ func TestInteropHomeNSRequest(t *testing.T) {
 			},
 			ExpectedJoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			GetNetIDFunc: func() (*types.NetID, string, error) {
-				return &types.NetID{0x42, 0xff, 0xff}, "thethings.example.com", nil
+			GetHomeNetworkFunc: func() (*EndDeviceHomeNetwork, error) {
+				return &EndDeviceHomeNetwork{
+					NetID:                &types.NetID{0x42, 0xff, 0xff},
+					NSID:                 &types.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0},
+					TenantID:             "foo-tenant",
+					NetworkServerAddress: "thethings.example.com",
+				}, nil
 			},
-			ExpectedHomeNSAns: &interop.HomeNSAns{
-				JsNsMessageHeader: interop.JsNsMessageHeader{
-					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: interop.ProtocolV1_0,
-						MessageType:     interop.MessageTypeJoinAns,
+			ExpectedHomeNSAns: &interop.TTIHomeNSAns{
+				HomeNSAns: interop.HomeNSAns{
+					JsNsMessageHeader: interop.JsNsMessageHeader{
+						MessageHeader: interop.MessageHeader{
+							ProtocolVersion: interop.ProtocolV1_0,
+							MessageType:     interop.MessageTypeJoinAns,
+						},
+						SenderID:   interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+						ReceiverID: interop.NetID{0x0, 0x0, 0x13},
 					},
-					SenderID:   interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ReceiverID: interop.NetID{0x0, 0x0, 0x13},
+					Result: interop.Result{
+						ResultCode: interop.ResultSuccess,
+					},
+					HNetID: interop.NetID{0x42, 0xff, 0xff},
+					// NOTE: HNSID is not returned as the field is not supported in LoRaWAN Backend Interfaces 1.0.
 				},
-				Result: interop.Result{
-					ResultCode: interop.ResultSuccess,
-				},
-				HNetID: interop.NetID{0x42, 0xff, 0xff},
-				// NOTE: HNSID is not returned as the field is not supported in LoRaWAN Backend Interfaces 1.0.
+				HTenantID:  "foo-tenant",
+				HNSAddress: "thethings.example.com",
 			},
 		},
 		{
@@ -496,31 +505,36 @@ func TestInteropHomeNSRequest(t *testing.T) {
 						MessageType:     interop.MessageTypeJoinReq,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x13},
-					SenderNSID: stringPtr("eu1.cloud.thethings.network"),
+					SenderNSID: &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0xff},
 					ReceiverID: interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},
 				DevEUI: interop.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			},
 			ExpectedJoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			GetNetIDFunc: func() (*types.NetID, string, error) {
-				return &types.NetID{0x42, 0xff, 0xff}, "thethings.example.com", nil
+			GetHomeNetworkFunc: func() (*EndDeviceHomeNetwork, error) {
+				return &EndDeviceHomeNetwork{
+					NetID: &types.NetID{0x42, 0xff, 0xff},
+					NSID:  &types.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0},
+				}, nil
 			},
-			ExpectedHomeNSAns: &interop.HomeNSAns{
-				JsNsMessageHeader: interop.JsNsMessageHeader{
-					MessageHeader: interop.MessageHeader{
-						ProtocolVersion: interop.ProtocolV1_1,
-						MessageType:     interop.MessageTypeJoinAns,
+			ExpectedHomeNSAns: &interop.TTIHomeNSAns{
+				HomeNSAns: interop.HomeNSAns{
+					JsNsMessageHeader: interop.JsNsMessageHeader{
+						MessageHeader: interop.MessageHeader{
+							ProtocolVersion: interop.ProtocolV1_1,
+							MessageType:     interop.MessageTypeJoinAns,
+						},
+						SenderID:     interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+						ReceiverID:   interop.NetID{0x0, 0x0, 0x13},
+						ReceiverNSID: &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0xff},
 					},
-					SenderID:     interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					ReceiverID:   interop.NetID{0x0, 0x0, 0x13},
-					ReceiverNSID: stringPtr("eu1.cloud.thethings.network"),
+					Result: interop.Result{
+						ResultCode: interop.ResultSuccess,
+					},
+					HNetID: interop.NetID{0x42, 0xff, 0xff},
+					HNSID:  &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
-				Result: interop.Result{
-					ResultCode: interop.ResultSuccess,
-				},
-				HNetID: interop.NetID{0x42, 0xff, 0xff},
-				HNSID:  stringPtr("thethings.example.com"),
 			},
 		},
 		{
@@ -538,8 +552,8 @@ func TestInteropHomeNSRequest(t *testing.T) {
 			},
 			ExpectedJoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			GetNetIDFunc: func() (*types.NetID, string, error) {
-				return nil, "thethings.example.com", nil
+			GetHomeNetworkFunc: func() (*EndDeviceHomeNetwork, error) {
+				return &EndDeviceHomeNetwork{}, nil
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -553,11 +567,11 @@ func TestInteropHomeNSRequest(t *testing.T) {
 
 			srv := interopServer{
 				JS: &mockInteropHandler{
-					GetHomeNetIDFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64) (*types.NetID, string, error) {
+					GetHomeNetworkFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64) (*EndDeviceHomeNetwork, error) {
 						if !a.So(joinEUI, should.Resemble, tc.ExpectedJoinEUI) || !a.So(devEUI, should.Resemble, tc.ExpectedDevEUI) {
 							t.FailNow()
 						}
-						return tc.GetNetIDFunc()
+						return tc.GetHomeNetworkFunc()
 					},
 				},
 			}

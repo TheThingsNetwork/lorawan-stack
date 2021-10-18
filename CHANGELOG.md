@@ -15,21 +15,19 @@ For details about compatibility between different releases, see the **Commitment
 - Support for enhanced security policies of Packet Broker services.
 - Handling of MAC and PHY versions in end device forms based on selected frequency plan in the Console.
 - Support for scheduling downlink messages as JSON in the Console.
-- Backend Interfaces middleware to extract proxy headers from trusted proxies. This adds a configuration `interop.trusted-proxies` that is similar to the existing `http.trusted-proxies` option.
 - Support for Packet Broker authentication through LoRaWAN Backend Interfaces. This adds the following configuration options:
   - `interop.public-tls-address`: public address of the interop server. The audience in the incoming OAuth 2.0 token from Packet Broker is verified against this address to ensure that other networks cannot impersonate as Packet Broker;
   - `interop.packet-broker.enabled`: enable Packet Broker to authenticate;
   - `interop.packet-broker.token-issuer`: the issuer of the incoming OAuth 2.0 token from Packet Broker is verified against this value.
-- Support for LoRaWAN Backend Interfaces in Identity Server to obtain an end device's NetID and NSID (Network Server address). This adds the following configuration options:
+- Support for LoRaWAN Backend Interfaces in Identity Server to obtain an end device's NetID, tenant ID and Network Server address with the use of a vendor-specifc extension (`VSExtension`). This adds the following configuration options:
   - `is.network.net-id`: the NetID of the network. When running a Network Server, make sure that this is the same value as `ns.net-id`.
-  - `is.network.tenant-id`: the Tenant ID in the host NetID. Leave blank if you the NetID that you use is dedicated for the Identity Server.
+  - `is.network.tenant-id`: the Tenant ID in the host NetID. Leave blank if the NetID that you use is dedicated for this Identity Server.
 - Configuration option `experimental.features` to enable experimental features.
 - Tooltip descriptions for "Last activity" values (formerly "Last seen") and uplink/downlink counts in the Console.
 - Status pulses being triggered by incoming data in the Console.
 
 ### Changed
 
-- The NSID field of LoRaWAN Backend Interfaces 1.1 is now interpreted as Network Server address. Clients authenticating with `SenderNSID` must be authenticated as a Network Server with that address (see Security below).
 - Searching for entity IDs is now case insensitive.
 - Renamed entitie's "Last seen" to "Last activity" in the Console.
 - The database queries for determining the rights of users on entities have been rewritten to reduce the number of round-trips to the database.
