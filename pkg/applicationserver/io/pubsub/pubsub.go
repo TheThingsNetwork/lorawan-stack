@@ -69,15 +69,15 @@ func New(c *component.Component, server io.Server, registry Registry, providerSt
 func (ps *PubSub) startAll(ctx context.Context) error {
 	return ps.registry.Range(ctx, []string{"ids"},
 		func(ctx context.Context, _ ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationPubSub) bool {
-			ps.startTask(ctx, pb.ApplicationPubSubIdentifiers)
+			ps.startTask(ctx, pb.Ids)
 			return true
 		},
 	)
 }
 
-func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
+func (ps *PubSub) startTask(ctx context.Context, ids *ttnpb.ApplicationPubSubIdentifiers) {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"application_uid", unique.ID(ctx, ids.ApplicationIdentifiers),
+		"application_uid", unique.ID(ctx, ids.ApplicationIds),
 		"pub_sub_id", ids.PubSubId,
 	))
 	ps.StartTask(&component.TaskConfig{
@@ -228,12 +228,12 @@ func (i *integration) startHandleDown(ctx context.Context) {
 }
 
 func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err error) {
-	appUID := unique.ID(ctx, pb.ApplicationIdentifiers)
-	psUID := PubSubUID(appUID, pb.PubSubId)
+	appUID := unique.ID(ctx, pb.Ids.ApplicationIds)
+	psUID := PubSubUID(appUID, pb.Ids.PubSubId)
 
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", appUID,
-		"pub_sub_id", pb.PubSubId,
+		"pub_sub_id", pb.Ids.PubSubId,
 		"provider", fmt.Sprintf("%T", pb.Provider),
 	))
 	logger := log.FromContext(ctx)
@@ -281,7 +281,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 			logger.Debug("Shutdown pub/sub connection success")
 		}
 	}()
-	i.sub, err = ps.server.Subscribe(ctx, "pubsub", &pb.ApplicationIdentifiers, false)
+	i.sub, err = ps.server.Subscribe(ctx, "pubsub", pb.Ids.ApplicationIds, false)
 	if err != nil {
 		return err
 	}
@@ -312,8 +312,8 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	return ctx.Err()
 }
 
-func (ps *PubSub) stop(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) error {
-	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
+func (ps *PubSub) stop(ctx context.Context, ids *ttnpb.ApplicationPubSubIdentifiers) error {
+	appUID := unique.ID(ctx, ids.ApplicationIds)
 	psUID := PubSubUID(appUID, ids.PubSubId)
 	if val, ok := ps.integrations.Load(psUID); ok {
 		i := val.(*integration)

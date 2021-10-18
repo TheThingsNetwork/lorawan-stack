@@ -73,9 +73,9 @@ func TestApplicationServer(t *testing.T) {
 		ApplicationIdentifiers: registeredApplicationID,
 		WebhookId:              "test",
 	}
-	registeredApplicationPubSubID := ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		PubSubId:               "test",
+	registeredApplicationPubSubID := &ttnpb.ApplicationPubSubIdentifiers{
+		ApplicationIds: &registeredApplicationID,
+		PubSubId:       "test",
 	}
 
 	// This device gets registered in the device registry of the Application Server.
@@ -460,7 +460,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "pubsub/nats",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				evCh := make(chan events.Event, EventsBufferSize)
@@ -473,8 +473,8 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationPubSubRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationPubSubRequest{
-					ApplicationPubSub: ttnpb.ApplicationPubSub{
-						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
+					Pubsub: &ttnpb.ApplicationPubSub{
+						Ids: registeredApplicationPubSubID,
 						Provider: &ttnpb.ApplicationPubSub_Nats{
 							Nats: &ttnpb.ApplicationPubSub_NATSProvider{
 								ServerUrl: "nats://localhost:4124",
@@ -602,7 +602,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "pubsub/mqtt",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				evCh := make(chan events.Event, EventsBufferSize)
@@ -615,8 +615,8 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationPubSubRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationPubSubRequest{
-					ApplicationPubSub: ttnpb.ApplicationPubSub{
-						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
+					Pubsub: &ttnpb.ApplicationPubSub{
+						Ids: registeredApplicationPubSubID,
 						Provider: &ttnpb.ApplicationPubSub_Mqtt{
 							Mqtt: &ttnpb.ApplicationPubSub_MQTTProvider{
 								ServerUrl:    fmt.Sprintf("tcp://%v", mqttLis.Addr()),
