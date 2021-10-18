@@ -18,6 +18,8 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 // TLSConfigOption provides customization for TLS configuration.
@@ -58,9 +60,16 @@ func WithNextProtos(protos ...string) TLSConfigOption {
 // GetTLSServerConfig gets the component's server TLS config and applies the given options.
 func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...TLSConfigOption) (*tls.Config, error) {
 	conf := c.GetBaseConfig(ctx).TLS
+	cipherSuites, err := conf.GetCipherSuites()
+	if cipherSuites != nil {
+		log.FromContext(ctx).Warn("TLS is configured to use a custom set of cipher suites. Make sure that your list is up to date, or disable the custom cipher suites")
+	}
+	if err != nil {
+		return nil, err
+	}
 	res := &tls.Config{
-		MinVersion:               tls.VersionTLS12,
-		PreferServerCipherSuites: true,
+		MinVersion:   tls.VersionTLS12,
+		CipherSuites: cipherSuites,
 	}
 
 	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)

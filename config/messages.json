@@ -3194,6 +3194,15 @@
       "file": "config.go"
     }
   },
+  "error:pkg/config/tlsconfig:tls_cipher_suite_invalid": {
+    "translations": {
+      "en": "invalid TLS cipher suite {cipher}"
+    },
+    "description": {
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
+    }
+  },
   "error:pkg/config/tlsconfig:tls_config_source_invalid": {
     "translations": {
       "en": "invalid TLS configuration source `{source}`"

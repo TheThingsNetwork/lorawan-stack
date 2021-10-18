@@ -11,6 +11,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- `tls.cipher-suites` config option to specify used cipher suites.
 - Support for enhanced security policies of Packet Broker services.
 - Handling of MAC and PHY versions in end device forms based on selected frequency plan in the Console.
 - Support for scheduling downlink messages as JSON in the Console.
