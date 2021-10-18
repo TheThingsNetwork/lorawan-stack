@@ -69,9 +69,9 @@ func TestWebhooks(t *testing.T) {
 	if err := registry.Init(ctx); !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	ids := ttnpb.ApplicationWebhookIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		WebhookId:              registeredWebhookID,
+	ids := &ttnpb.ApplicationWebhookIdentifiers{
+		ApplicationIds: &registeredApplicationID,
+		WebhookId:      registeredWebhookID,
 	}
 	for _, tc := range []struct {
 		prefix string
@@ -98,8 +98,8 @@ func TestWebhooks(t *testing.T) {
 			_, ctx := test.New(t)
 			_, err := registry.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 				return &ttnpb.ApplicationWebhook{
-						ApplicationWebhookIdentifiers: ids,
-						BaseUrl:                       "https://myapp.com/api/ttn/v3{/appID,devID}" + tc.suffix,
+						Ids:     ids,
+						BaseUrl: "https://myapp.com/api/ttn/v3{/appID,devID}" + tc.suffix,
 						Headers: map[string]string{
 							"Authorization": "key secret",
 						},

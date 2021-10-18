@@ -17,5 +17,71 @@ package ttnpb
 // IsZero reports whether ids represent zero identifiers.
 func (ids ApplicationWebhookIdentifiers) IsZero() bool {
 	return ids.GetWebhookId() == "" &&
-		ids.GetApplicationId() == ""
+		ids.GetApplicationIds().GetApplicationId() == ""
+}
+
+// All EntityType methods implement the IDStringer interface.
+
+func (m *ApplicationWebhookIdentifiers) EntityType() string {
+	return m.ApplicationIds.EntityType()
+}
+
+func (m *ApplicationWebhook) EntityType() string {
+	return m.Ids.EntityType()
+}
+
+func (m *GetApplicationWebhookRequest) EntityType() string {
+	return m.Ids.EntityType()
+}
+
+func (m *ListApplicationWebhooksRequest) EntityType() string {
+	return m.ApplicationIds.EntityType()
+}
+
+func (m *SetApplicationWebhookRequest) EntityType() string {
+	return m.Webhook.EntityType()
+}
+
+// All IDString methods implement the IDStringer interface.
+
+func (m *ApplicationWebhookIdentifiers) IDString() string {
+	return m.ApplicationIds.IDString()
+}
+
+func (m *ApplicationWebhook) IDString() string {
+	return m.Ids.IDString()
+}
+
+func (m *GetApplicationWebhookRequest) IDString() string {
+	return m.Ids.IDString()
+}
+
+func (m *ListApplicationWebhooksRequest) IDString() string {
+	return m.ApplicationIds.IDString()
+}
+
+func (m *SetApplicationWebhookRequest) IDString() string {
+	return m.Webhook.IDString()
+}
+
+// All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
+
+func (m *ApplicationWebhookIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
+	m.ApplicationIds.ExtractRequestFields(dst)
+}
+
+func (m *ApplicationWebhook) ExtractRequestFields(dst map[string]interface{}) {
+	m.Ids.ExtractRequestFields(dst)
+}
+
+func (m *GetApplicationWebhookRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.Ids.ExtractRequestFields(dst)
+}
+
+func (m *ListApplicationWebhooksRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.ApplicationIds.ExtractRequestFields(dst)
+}
+
+func (m *SetApplicationWebhookRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.Webhook.ExtractRequestFields(dst)
 }

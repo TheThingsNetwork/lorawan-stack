@@ -35,7 +35,7 @@ var errTemplateNotFound = errors.DefineNotFound("template_not_found", "template 
 
 // GetTemplate implements TemplateStore.
 func (ts *noopTemplateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
-	return nil, errTemplateNotFound.WithAttributes("template_id", req.TemplateId)
+	return nil, errTemplateNotFound.WithAttributes("template_id", req.Ids.TemplateId)
 }
 
 // ListTemplates implements TemplateStore.
@@ -72,7 +72,7 @@ func (ts *templateStore) prependBaseURL(template *ttnpb.ApplicationWebhookTempla
 
 // GetTemplate implements the TemplateStore interface.
 func (ts *templateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
-	template, err := ts.getTemplate(req.ApplicationWebhookTemplateIdentifiers)
+	template, err := ts.getTemplate(req.Ids)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (ts *templateStore) ListTemplates(ctx context.Context, req *ttnpb.ListAppli
 
 	var templates ttnpb.ApplicationWebhookTemplates
 	for _, id := range ids {
-		template, err := ts.getTemplate(ttnpb.ApplicationWebhookTemplateIdentifiers{
+		template, err := ts.getTemplate(&ttnpb.ApplicationWebhookTemplateIdentifiers{
 			TemplateId: id,
 		})
 		if err != nil {
@@ -159,7 +159,7 @@ func (ts *templateStore) getAllTemplateIDs() ([]string, error) {
 	return ids, err
 }
 
-func (ts *templateStore) template(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (*ttnpb.ApplicationWebhookTemplate, error) {
+func (ts *templateStore) template(ids *ttnpb.ApplicationWebhookTemplateIdentifiers) (*ttnpb.ApplicationWebhookTemplate, error) {
 	data, err := ts.fetcher.File(fmt.Sprintf("%s.yml", ids.TemplateId))
 	if err != nil {
 		return nil, errFetchFailed.WithCause(err)
@@ -172,7 +172,7 @@ func (ts *templateStore) template(ids ttnpb.ApplicationWebhookTemplateIdentifier
 	return template.toPB(), nil
 }
 
-func (ts *templateStore) getTemplate(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (t *ttnpb.ApplicationWebhookTemplate, err error) {
+func (ts *templateStore) getTemplate(ids *ttnpb.ApplicationWebhookTemplateIdentifiers) (t *ttnpb.ApplicationWebhookTemplate, err error) {
 	ts.templatesMu.Lock()
 	defer ts.templatesMu.Unlock()
 	if cached, ok := ts.templates[ids.TemplateId]; ok && cached.err == nil && time.Since(cached.time) < yamlFetchErrorCache {
@@ -268,7 +268,7 @@ func (t webhookTemplate) pbFields() []*ttnpb.ApplicationWebhookTemplateField {
 
 func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
 	return &ttnpb.ApplicationWebhookTemplate{
-		ApplicationWebhookTemplateIdentifiers: ttnpb.ApplicationWebhookTemplateIdentifiers{
+		Ids: &ttnpb.ApplicationWebhookTemplateIdentifiers{
 			TemplateId: t.TemplateID,
 		},
 		Name:                     t.Name,

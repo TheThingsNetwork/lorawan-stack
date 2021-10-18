@@ -33,7 +33,7 @@ func (m *ListApplicationPackageAssociationRequest) EntityType() string {
 }
 
 func (m *SetApplicationPackageAssociationRequest) EntityType() string {
-	return m.Association.Ids.EntityType()
+	return m.Association.EntityType()
 }
 
 func (m *ApplicationPackageDefaultAssociationIdentifiers) EntityType() string {
@@ -53,7 +53,7 @@ func (m *ListApplicationPackageDefaultAssociationRequest) EntityType() string {
 }
 
 func (m *SetApplicationPackageDefaultAssociationRequest) EntityType() string {
-	return m.Default.Ids.EntityType()
+	return m.Default.EntityType()
 }
 
 // All IDString methods implement the IDStringer interface.
@@ -75,7 +75,7 @@ func (m *ListApplicationPackageAssociationRequest) IDString() string {
 }
 
 func (m *SetApplicationPackageAssociationRequest) IDString() string {
-	return m.Association.Ids.IDString()
+	return m.Association.IDString()
 }
 
 func (m *ApplicationPackageDefaultAssociationIdentifiers) IDString() string {
@@ -95,7 +95,7 @@ func (m *ListApplicationPackageDefaultAssociationRequest) IDString() string {
 }
 
 func (m *SetApplicationPackageDefaultAssociationRequest) IDString() string {
-	return m.Default.Ids.IDString()
+	return m.Default.IDString()
 }
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
@@ -117,7 +117,7 @@ func (m *ListApplicationPackageAssociationRequest) ExtractRequestFields(dst map[
 }
 
 func (m *SetApplicationPackageAssociationRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.Association.Ids.ExtractRequestFields(dst)
+	m.Association.ExtractRequestFields(dst)
 }
 
 func (m *ApplicationPackageDefaultAssociationIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
@@ -137,5 +137,5 @@ func (m *ListApplicationPackageDefaultAssociationRequest) ExtractRequestFields(d
 }
 
 func (m *SetApplicationPackageDefaultAssociationRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.Default.Ids.ExtractRequestFields(dst)
+	m.Default.ExtractRequestFields(dst)
 }

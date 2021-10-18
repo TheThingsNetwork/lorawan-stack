@@ -69,9 +69,9 @@ func TestApplicationServer(t *testing.T) {
 	registeredApplicationID := ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
 	registeredApplicationKey := "secret"
 	registeredApplicationFormatter := ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
-	registeredApplicationWebhookID := ttnpb.ApplicationWebhookIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		WebhookId:              "test",
+	registeredApplicationWebhookID := &ttnpb.ApplicationWebhookIdentifiers{
+		ApplicationIds: &registeredApplicationID,
+		WebhookId:      "test",
 	}
 	registeredApplicationPubSubID := &ttnpb.ApplicationPubSubIdentifiers{
 		ApplicationIds: &registeredApplicationID,
@@ -344,7 +344,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "grpc",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
@@ -395,7 +395,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "mqtt",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				clientOpts := mqtt.NewClientOptions()
@@ -748,7 +748,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "webhooks",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				// Start web server to read upstream.
@@ -773,19 +773,19 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationWebhookRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationWebhookRequest{
-					ApplicationWebhook: ttnpb.ApplicationWebhook{
-						ApplicationWebhookIdentifiers: registeredApplicationWebhookID,
-						BaseUrl:                       webhookTarget.URL,
-						Format:                        "json",
-						UplinkMessage:                 &ttnpb.ApplicationWebhook_Message{Path: ""},
-						JoinAccept:                    &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkAck:                   &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkNack:                  &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkQueued:                &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkSent:                  &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkFailed:                &ttnpb.ApplicationWebhook_Message{Path: ""},
-						LocationSolved:                &ttnpb.ApplicationWebhook_Message{Path: ""},
-						ServiceData:                   &ttnpb.ApplicationWebhook_Message{Path: ""},
+					Webhook: &ttnpb.ApplicationWebhook{
+						Ids:            registeredApplicationWebhookID,
+						BaseUrl:        webhookTarget.URL,
+						Format:         "json",
+						UplinkMessage:  &ttnpb.ApplicationWebhook_Message{Path: ""},
+						JoinAccept:     &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkAck:    &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkNack:   &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkQueued: &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkSent:   &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkFailed: &ttnpb.ApplicationWebhook_Message{Path: ""},
+						LocationSolved: &ttnpb.ApplicationWebhook_Message{Path: ""},
+						ServiceData:    &ttnpb.ApplicationWebhook_Message{Path: ""},
 					},
 					FieldMask: &pbtypes.FieldMask{
 						Paths: []string{
