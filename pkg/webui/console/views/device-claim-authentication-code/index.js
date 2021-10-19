@@ -158,23 +158,26 @@ const DeviceClaimAuthenticationCode = props => {
           >
             <Form.Field
               title={sharedMessages.claimAuthCode}
-              type="password"
               name="claim_authentication_code.value"
               component={Input}
+              inputWidth="full"
+              sensitive
               required
             />
-            <Form.Field
-              title={sharedMessages.validFrom}
-              name="claim_authentication_code.valid_from"
-              component={Input}
-              type="date"
-            />
-            <Form.Field
-              title={sharedMessages.validTo}
-              name="claim_authentication_code.valid_to"
-              type="date"
-              component={Input}
-            />
+            <Form.FieldContainer horizontal>
+              <Form.Field
+                title={sharedMessages.validFrom}
+                name="claim_authentication_code.valid_from"
+                component={Input}
+                type="date"
+              />
+              <Form.Field
+                title={sharedMessages.validTo}
+                name="claim_authentication_code.valid_to"
+                type="date"
+                component={Input}
+              />
+            </Form.FieldContainer>
             <SubmitBar>
               <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
               <ModalButton

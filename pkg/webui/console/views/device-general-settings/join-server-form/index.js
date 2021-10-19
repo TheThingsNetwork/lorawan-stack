@@ -185,6 +185,7 @@ const JoinServerForm = React.memo(props => {
         mayGenerateValue={mayEditKeys && !appKeyHidden}
         onGenerateValue={generate16BytesKey}
         tooltipId={tooltipIds.APP_KEY}
+        sensitive
       />
       {isNewLorawanVersion && (
         <Form.Field
@@ -199,6 +200,7 @@ const JoinServerForm = React.memo(props => {
           mayGenerateValue={mayEditKeys && !nwkKeyHidden}
           onGenerateValue={generate16BytesKey}
           tooltipId={tooltipIds.NETWORK_KEY}
+          sensitive
         />
       )}
       <SubmitBar>

@@ -134,6 +134,7 @@ const LoRaCloudDASForm = () => {
         title={sharedMessages.token}
         description={m.tokenDescription}
         name="data.token"
+        sensitive
         required
       />
       <Form.Field component={Checkbox} title={m.lr1110Encoding} name="data.use_tlv_encoding" />

@@ -311,6 +311,7 @@ const NetworkServerForm = React.memo(props => {
             mayGenerateValue={mayEditKeys}
             onGenerateValue={generate16BytesKey}
             tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
+            sensitive
           />
           {lwVersion >= 110 && (
             <Form.Field
@@ -325,6 +326,7 @@ const NetworkServerForm = React.memo(props => {
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
+              sensitive
             />
           )}
           {lwVersion >= 110 && (
@@ -340,6 +342,7 @@ const NetworkServerForm = React.memo(props => {
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
+              sensitive
             />
           )}
         </>
