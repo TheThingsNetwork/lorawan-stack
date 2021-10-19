@@ -28,6 +28,8 @@ import (
 	conf "go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
+	"go.thethings.network/lorawan-stack/v3/pkg/i18n"
+	"go.thethings.network/lorawan-stack/v3/pkg/locales"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	logobservability "go.thethings.network/lorawan-stack/v3/pkg/log/middleware/observability"
 	logsentry "go.thethings.network/lorawan-stack/v3/pkg/log/middleware/sentry"
@@ -55,8 +57,13 @@ var (
 		SilenceUsage:  true,
 		Short:         "The Things Stack for LoRaWAN",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			err := i18n.Default().LoadFiles(locales.FS)
+			if err != nil {
+				return err
+			}
+
 			// read in config from file
-			err := mgr.ReadInConfig()
+			err = mgr.ReadInConfig()
 			if err != nil {
 				return err
 			}
