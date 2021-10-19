@@ -335,7 +335,7 @@ func (x *CreateUserRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.User != nil || s.HasField("user") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("user")
 		x.User.MarshalProtoJSON(s.WithField("user"))
@@ -359,6 +359,7 @@ func (x *CreateUserRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.ReadAny() // ignore unknown field
 		case "user":
 			if !s.ReadNil() {
+				x.User = &User{}
 				x.User.UnmarshalProtoJSON(s.WithField("user", true))
 			}
 		case "invitation_token", "invitationToken":
@@ -376,7 +377,7 @@ func (x *UpdateUserRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.User != nil || s.HasField("user") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("user")
 		x.User.MarshalProtoJSON(s.WithField("user"))
@@ -404,6 +405,7 @@ func (x *UpdateUserRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.ReadAny() // ignore unknown field
 		case "user":
 			if !s.ReadNil() {
+				x.User = &User{}
 				x.User.UnmarshalProtoJSON(s.WithField("user", true))
 			}
 		case "field_mask", "fieldMask":
@@ -509,10 +511,10 @@ func (x *UpdateUserAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, x.UserIds)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.ApiKey != nil || s.HasField("api_key") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("api_key")
-		x.APIKey.MarshalProtoJSON(s.WithField("api_key"))
+		x.ApiKey.MarshalProtoJSON(s.WithField("api_key"))
 	}
 	if x.FieldMask != nil || s.HasField("field_mask") {
 		s.WriteMoreIf(&wroteField)
@@ -543,7 +545,8 @@ func (x *UpdateUserAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			x.UserIds = &v
 		case "api_key", "apiKey":
 			if !s.ReadNil() {
-				x.APIKey.UnmarshalProtoJSON(s.WithField("api_key", true))
+				x.ApiKey = &APIKey{}
+				x.ApiKey.UnmarshalProtoJSON(s.WithField("api_key", true))
 			}
 		case "field_mask", "fieldMask":
 			s.AddField("field_mask")

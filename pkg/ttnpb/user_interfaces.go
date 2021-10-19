@@ -21,11 +21,11 @@ func (m *GetUserRequest) EntityType() string {
 }
 
 func (m *CreateUserRequest) EntityType() string {
-	return m.GetIds().EntityType()
+	return m.GetUser().GetIds().EntityType()
 }
 
 func (m *UpdateUserRequest) EntityType() string {
-	return m.GetIds().EntityType()
+	return m.GetUser().GetIds().EntityType()
 }
 
 func (m *CreateTemporaryPasswordRequest) EntityType() string {
@@ -79,11 +79,11 @@ func (m *GetUserRequest) IDString() string {
 }
 
 func (m *CreateUserRequest) IDString() string {
-	return m.Ids.IDString()
+	return m.GetUser().GetIds().IDString()
 }
 
 func (m *UpdateUserRequest) IDString() string {
-	return m.Ids.IDString()
+	return m.GetUser().GetIds().IDString()
 }
 
 func (m *CreateTemporaryPasswordRequest) IDString() string {
@@ -137,11 +137,11 @@ func (m *GetUserRequest) ExtractRequestFields(dst map[string]interface{}) {
 }
 
 func (m *CreateUserRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.Ids.ExtractRequestFields(dst)
+	m.GetUser().GetIds().ExtractRequestFields(dst)
 }
 
 func (m *UpdateUserRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.Ids.ExtractRequestFields(dst)
+	m.GetUser().GetIds().ExtractRequestFields(dst)
 }
 
 func (m *CreateTemporaryPasswordRequest) ExtractRequestFields(dst map[string]interface{}) {

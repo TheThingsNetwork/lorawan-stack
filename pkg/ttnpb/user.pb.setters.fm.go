@@ -372,10 +372,18 @@ func (dst *CreateUserRequest) SetFields(src *CreateUserRequest, paths ...string)
 		case "user":
 			if len(subs) > 0 {
 				var newDst, newSrc *User
-				if src != nil {
-					newSrc = &src.User
+				if (src == nil || src.User == nil) && dst.User == nil {
+					continue
 				}
-				newDst = &dst.User
+				if src != nil {
+					newSrc = src.User
+				}
+				if dst.User != nil {
+					newDst = dst.User
+				} else {
+					newDst = &User{}
+					dst.User = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -383,8 +391,7 @@ func (dst *CreateUserRequest) SetFields(src *CreateUserRequest, paths ...string)
 				if src != nil {
 					dst.User = src.User
 				} else {
-					var zero User
-					dst.User = zero
+					dst.User = nil
 				}
 			}
 		case "invitation_token":
@@ -411,10 +418,18 @@ func (dst *UpdateUserRequest) SetFields(src *UpdateUserRequest, paths ...string)
 		case "user":
 			if len(subs) > 0 {
 				var newDst, newSrc *User
-				if src != nil {
-					newSrc = &src.User
+				if (src == nil || src.User == nil) && dst.User == nil {
+					continue
 				}
-				newDst = &dst.User
+				if src != nil {
+					newSrc = src.User
+				}
+				if dst.User != nil {
+					newDst = dst.User
+				} else {
+					newDst = &User{}
+					dst.User = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -422,8 +437,7 @@ func (dst *UpdateUserRequest) SetFields(src *UpdateUserRequest, paths ...string)
 				if src != nil {
 					dst.User = src.User
 				} else {
-					var zero User
-					dst.User = zero
+					dst.User = nil
 				}
 			}
 		case "field_mask":
@@ -742,19 +756,26 @@ func (dst *UpdateUserAPIKeyRequest) SetFields(src *UpdateUserAPIKeyRequest, path
 		case "api_key":
 			if len(subs) > 0 {
 				var newDst, newSrc *APIKey
-				if src != nil {
-					newSrc = &src.APIKey
+				if (src == nil || src.ApiKey == nil) && dst.ApiKey == nil {
+					continue
 				}
-				newDst = &dst.APIKey
+				if src != nil {
+					newSrc = src.ApiKey
+				}
+				if dst.ApiKey != nil {
+					newDst = dst.ApiKey
+				} else {
+					newDst = &APIKey{}
+					dst.ApiKey = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.APIKey = src.APIKey
+					dst.ApiKey = src.ApiKey
 				} else {
-					var zero APIKey
-					dst.APIKey = zero
+					dst.ApiKey = nil
 				}
 			}
 		case "field_mask":

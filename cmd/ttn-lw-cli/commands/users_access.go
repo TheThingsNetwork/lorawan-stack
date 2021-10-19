@@ -180,7 +180,7 @@ var (
 			}
 			_, err = ttnpb.NewUserAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 				UserIds: usrID,
-				APIKey: ttnpb.APIKey{
+				ApiKey: &ttnpb.APIKey{
 					Id:        id,
 					Name:      name,
 					Rights:    rights,
@@ -215,7 +215,7 @@ var (
 			}
 			_, err = ttnpb.NewUserAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 				UserIds: usrID,
-				APIKey: ttnpb.APIKey{
+				ApiKey: &ttnpb.APIKey{
 					Id:     id,
 					Rights: nil,
 				},

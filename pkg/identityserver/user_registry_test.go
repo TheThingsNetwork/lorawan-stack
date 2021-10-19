@@ -105,7 +105,7 @@ func TestUserCreate(t *testing.T) {
 		userID := &ttnpb.UserIdentifiers{UserId: "test-user-id"}
 		reg := ttnpb.NewUserRegistryClient(cc)
 		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
-			User: ttnpb.User{
+			User: &ttnpb.User{
 				Ids:                 userID,
 				PrimaryEmailAddress: "test-user@example.com",
 				Password:            "test password",
@@ -121,7 +121,7 @@ func TestUserCreate(t *testing.T) {
 		userID := &ttnpb.UserIdentifiers{UserId: "test-user-id"}
 		reg := ttnpb.NewUserRegistryClient(cc)
 		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
-			User: ttnpb.User{
+			User: &ttnpb.User{
 				Ids:                 userID,
 				PrimaryEmailAddress: "test-user@example.com",
 				Password:            "test password",
@@ -136,7 +136,7 @@ func TestUserCreate(t *testing.T) {
 		userID := &ttnpb.UserIdentifiers{UserId: "test-user-id"}
 		reg := ttnpb.NewUserRegistryClient(cc)
 		created, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
-			User: ttnpb.User{
+			User: &ttnpb.User{
 				Ids:                 userID,
 				PrimaryEmailAddress: "test-user@example.com",
 				Password:            "test password",
@@ -228,7 +228,7 @@ func TestUsersWeakPassword(t *testing.T) {
 		weakPassword := "weak" // Does not meet minimum length requirement of 10 characters.
 
 		_, err := reg.Create(ctx, &ttnpb.CreateUserRequest{
-			User: ttnpb.User{
+			User: &ttnpb.User{
 				Ids:      &ttnpb.UserIdentifiers{UserId: "test-user-id"},
 				Password: weakPassword,
 			},
@@ -304,7 +304,7 @@ func TestUsersCRUD(t *testing.T) {
 		}
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateUserRequest{
-			User: ttnpb.User{
+			User: &ttnpb.User{
 				Ids:  user.GetIds(),
 				Name: "Updated Name",
 			},
@@ -317,7 +317,7 @@ func TestUsersCRUD(t *testing.T) {
 		}
 
 		updated, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
-			User: ttnpb.User{
+			User: &ttnpb.User{
 				Ids:              user.GetIds(),
 				State:            ttnpb.STATE_FLAGGED,
 				StateDescription: "something is wrong",
@@ -332,7 +332,7 @@ func TestUsersCRUD(t *testing.T) {
 		}
 
 		updated, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
-			User: ttnpb.User{
+			User: &ttnpb.User{
 				Ids:   user.GetIds(),
 				State: ttnpb.STATE_APPROVED,
 			},

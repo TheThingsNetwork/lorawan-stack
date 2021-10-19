@@ -759,7 +759,14 @@ func (m *CreateUserRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user":
 
-			if v, ok := interface{}(&m.User).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUser() == nil {
+				return CreateUserRequestValidationError{
+					field:  "user",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUser()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateUserRequestValidationError{
 						field:  "user",
@@ -854,7 +861,14 @@ func (m *UpdateUserRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "user":
 
-			if v, ok := interface{}(&m.User).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUser() == nil {
+				return UpdateUserRequestValidationError{
+					field:  "user",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUser()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateUserRequestValidationError{
 						field:  "user",
@@ -1569,7 +1583,14 @@ func (m *UpdateUserAPIKeyRequest) ValidateFields(paths ...string) error {
 
 		case "api_key":
 
-			if v, ok := interface{}(&m.APIKey).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApiKey() == nil {
+				return UpdateUserAPIKeyRequestValidationError{
+					field:  "api_key",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApiKey()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateUserAPIKeyRequestValidationError{
 						field:  "api_key",
