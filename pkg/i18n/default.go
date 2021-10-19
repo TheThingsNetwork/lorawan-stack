@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors
+package i18n
 
-var Supported = supported // Used by TestSupportedAttributes
+import "golang.org/x/text/language"
+
+var defaultBundle = func() *Bundle {
+	bundle, err := NewBundle(language.English)
+	if err != nil {
+		panic(err)
+	}
+	return bundle
+}()
+
+// Default returns the default bundle.
+func Default() *Bundle { return defaultBundle }

@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/gotnospirit/messageformat"
 	"go.thethings.network/lorawan-stack/v3/pkg/i18n"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -26,14 +25,12 @@ import (
 
 // Definition of a registered error.
 type Definition struct {
-	namespace              string
-	name                   string
-	messageFormat          string
-	messageFormatArguments []string
-	parsedMessageFormat    *messageformat.MessageFormat
-	publicAttributes       []string
-	code                   uint32 // 0 is invalid; so implies Unknown (code 2)
-	grpcStatus             *status.Status
+	namespace        string
+	name             string
+	message          *i18n.Message
+	publicAttributes []string
+	code             uint32 // 0 is invalid; so implies Unknown (code 2)
+	grpcStatus       *status.Status
 }
 
 // DefinitionInterface is the interface of an error definition.
@@ -81,10 +78,10 @@ func (d *Definition) FullName() string {
 
 // MessageFormat of the error.
 func (d *Definition) MessageFormat() string {
-	if d == nil {
+	if d == nil || d.message == nil {
 		return ""
 	}
-	return d.messageFormat
+	return d.message.String()
 }
 
 // Code of the error.
@@ -97,10 +94,12 @@ func (d *Definition) Code() uint32 {
 }
 
 func (d *Definition) String() string {
-	if d == nil {
-		return ""
+	if d != nil && d.message != nil {
+		if formatted, err := d.message.Format(d.PublicAttributes()); err == nil {
+			return fmt.Sprintf("error:%s (%s)", d.FullName(), formatted)
+		}
 	}
-	return fmt.Sprintf("error:%s (%s)", d.FullName(), d.messageFormat)
+	return fmt.Sprintf("error:%s", d.FullName())
 }
 
 // Error implements the error interface.
@@ -109,6 +108,17 @@ func (d *Definition) Error() string {
 		return ""
 	}
 	return d.String()
+}
+
+// Translate returns a copy of the definition that is translated to the preferred language, if available.
+func (d *Definition) Translate(languageString string) *Definition {
+	if d != nil && d.message != nil {
+		deriv := *d
+		lang := i18n.Default().MatchLanguageStrings(languageString)
+		deriv.message = i18n.Default().Get(d.message.ID(), lang)
+		return &deriv
+	}
+	return d
 }
 
 var messageFormatArgument = regexp.MustCompile(`\{[\s]*([a-z0-9_]+)`)
@@ -137,12 +147,10 @@ func define(code uint32, name, messageFormat string, publicAttributes ...string)
 	}
 
 	def := Definition{
-		namespace:              ns,
-		name:                   name,
-		messageFormat:          messageFormat,
-		messageFormatArguments: messageFormatArguments(messageFormat),
-		publicAttributes:       publicAttributes,
-		code:                   code,
+		namespace:        ns,
+		name:             name,
+		publicAttributes: publicAttributes,
+		code:             code,
 	}
 
 	fullName := def.FullName()
@@ -150,15 +158,15 @@ func define(code uint32, name, messageFormat string, publicAttributes ...string)
 		panic(fmt.Errorf("error %s already defined", fullName))
 	}
 
-	parsedMessageFormat, err := formatter.Parse(messageFormat)
+	var err error
+	def.message, err = i18n.Default().Define(fmt.Sprintf("error:%s", fullName), messageFormat)
 	if err != nil {
-		panic(fmt.Errorf("could not parse message format `%s` for %s: %s", messageFormat, fullName, err))
+		panic(err)
 	}
-	def.parsedMessageFormat = parsedMessageFormat
 
 	// All message format arguments must be public:
 nextArg:
-	for _, arg := range def.messageFormatArguments {
+	for _, arg := range def.message.Arguments() {
 		for _, attr := range def.publicAttributes {
 			if arg == attr {
 				continue nextArg
@@ -170,9 +178,6 @@ nextArg:
 	def.setGRPCStatus() // store the (marshaled) gRPC status message.
 
 	Definitions[fullName] = &def
-
-	desc := i18n.Define(fmt.Sprintf("error:%s", fullName), def.messageFormat)
-	desc.SetSource(2)
 
 	return &def
 }

@@ -155,15 +155,21 @@ func setErrorDetails(err *Error, details ErrorDetails) {
 		err.Definition = &Definition{}
 	}
 	if namespace := details.Namespace(); namespace != "" {
-		err.namespace = namespace
+		err.Definition.namespace = namespace
 	}
 	if name := details.Name(); name != "" {
-		err.name = name
+		err.Definition.name = name
 	}
-	if messageFormat := details.MessageFormat(); messageFormat != "" {
-		err.messageFormat = messageFormat
-		err.messageFormatArguments = messageFormatArguments(messageFormat)
-		err.parsedMessageFormat, _ = formatter.Parse(messageFormat)
+	if def, ok := Definitions[err.FullName()]; ok {
+		err.Definition = def
+		err.message = ""
+	} else if messageFormat := details.MessageFormat(); messageFormat != "" {
+		parsedMessageFormat, parseErr := formatter.Parse(messageFormat)
+		if parseErr == nil {
+			err.messageFormat = messageFormat
+			err.parsedMessageFormat = parsedMessageFormat
+			err.message = ""
+		}
 	}
 	if attributes := details.PublicAttributes(); len(attributes) != 0 {
 		err.attributes = attributes

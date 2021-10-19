@@ -22,23 +22,33 @@ import (
 	"sync/atomic"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/gotnospirit/messageformat"
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc/codes"
 )
 
-// New returns an error that formats as the given text.
+// New returns an error that formats as the given message.
 // This way of creating errors should be avoided if possible.
-func New(text string) *Error {
-	return build(&Definition{
-		namespace:     namespace(2),
-		messageFormat: text,
-		code:          uint32(codes.Unknown),
+func New(message string) *Error {
+	err := build(&Definition{
+		namespace: namespace(2),
+		code:      uint32(codes.Unknown),
 	}, 4)
+	err.message = message
+	return err
 }
+
+var formatter, _ = messageformat.New()
 
 // Error is a rich error implementation.
 type Error struct {
+	message string
+
 	*Definition
+
+	messageFormat       string
+	parsedMessageFormat *messageformat.MessageFormat
+
 	*stack
 	correlationID string
 	cause         error
@@ -51,7 +61,30 @@ func (e *Error) String() string {
 	if e == nil {
 		return ""
 	}
-	return fmt.Sprintf("error:%s (%s)", e.FullName(), e.FormatMessage(e.PublicAttributes()))
+	if e.message != "" {
+		return fmt.Sprintf("error:%s (%s)", e.FullName(), e.message)
+	}
+	if e.Definition.message != nil {
+		if formatted, err := e.Definition.message.Format(e.PublicAttributes()); err == nil {
+			return fmt.Sprintf("error:%s (%s)", e.FullName(), formatted)
+		}
+	}
+	if e.parsedMessageFormat != nil {
+		if formatted, err := e.parsedMessageFormat.FormatMap(e.PublicAttributes()); err == nil {
+			return fmt.Sprintf("error:%s (%s)", e.FullName(), formatted)
+		}
+	}
+	return fmt.Sprintf("error:%s", e.FullName())
+}
+
+// Translate translates the error given the requested language string.
+func (e *Error) Translate(languageString string) *Error {
+	if e == nil {
+		return nil
+	}
+	deriv := *e
+	deriv.Definition = e.Definition.Translate(languageString)
+	return e
 }
 
 // Error implements the error interface.

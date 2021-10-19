@@ -80,12 +80,13 @@ func FromHTTPStatusCode(status int, publicAttributes ...string) *Error {
 	if c, ok := httpErrorCodes[status]; ok {
 		code = c
 	}
-	return build(&Definition{
+	err := build(&Definition{
 		namespace:        namespace(2),
-		messageFormat:    http.StatusText(status),
 		publicAttributes: publicAttributes,
 		code:             code,
 	}, 4)
+	err.message = http.StatusText(status)
+	return err
 }
 
 // ToHTTP writes the error to the HTTP response.

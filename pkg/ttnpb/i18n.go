@@ -21,7 +21,9 @@ import (
 )
 
 func defineEnum(e fmt.Stringer, message string) {
-	i18n.Define("enum:"+e.String(), message).SetSource(1)
+	if _, err := i18n.Default().Define("enum:"+e.String(), message); err != nil {
+		panic(err)
+	}
 }
 
 func init() {

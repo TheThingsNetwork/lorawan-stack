@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,62 +15,47 @@
 package i18n_test
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
+	"encoding/json"
 	"testing"
-	"time"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/i18n"
+	"golang.org/x/text/language"
 )
 
-func TestI18N(t *testing.T) {
+func TestBundle(t *testing.T) {
 	a := assertions.New(t)
-	fileName := filepath.Join(os.TempDir(), fmt.Sprintf("TestI18N_%d", time.Now().Unix()))
 
-	m1 := make(i18n.MessageDescriptorMap)
-	m1.Define("not_used", "not used")
-
-	def := m1.Define("hello_world", "hello, world")
-	a.So(def.Description.Package, should.Equal, "pkg/i18n")
-	a.So(def.Description.File, should.Equal, "i18n_test.go")
-	def.Translations["nl"] = "hallo, wereld"
-	def.Translations["ja"] = "こんにちは世界"
-
-	a.So(def.Load(), should.BeNil)
-
-	def.Translations["unknown"] = "hello, world"
-
-	for lang, translation := range def.Translations {
-		actual := def.Format(lang, nil)
-		a.So(actual, should.Equal, translation)
-	}
-
-	err := m1.WriteFile(fileName)
+	bundle, err := i18n.NewBundle(language.English)
 	a.So(err, should.BeNil)
 
-	m2, err := i18n.ReadFile(fileName)
+	msg, err := bundle.Define("hello", "hello, @{username}!")
 	a.So(err, should.BeNil)
-	a.So(m2["hello_world"].Translations, should.Resemble, def.Translations)
-	a.So(m2["hello_world"].Description, should.Resemble, def.Description)
+	a.So(msg, should.NotBeNil)
+	a.So(msg.ID(), should.Equal, "hello")
+	a.So(msg.String(), should.Equal, "hello, @{username}!")
+	a.So(msg.Arguments(), should.Resemble, []string{"username"})
 
-	m3 := make(i18n.MessageDescriptorMap)
-	m3.Define("hello_world", "hello, beautiful world")
-	m3.Define("hello_you", "hello, you")
+	a.So(bundle.GetAllIDs(), should.Contain, "hello")
 
-	m3.Merge(m2)
+	_, err = bundle.Define("hello", "hello message")
+	a.So(err, should.NotBeNil)
 
-	a.So(m3.Cleanup(), should.Contain, "not_used")
-	a.So(m3.Updated(), should.Contain, "hello_world")
-}
+	translations, err := bundle.MessagesFor(language.Dutch, true)
+	a.So(err, should.BeNil)
 
-func Example() {
-	i18n.Define("welcome_message", "Welcome, {name}!")
+	translationData := []byte(`{"hello":"hallo, @{username}!"}`)
+	err = json.Unmarshal(translationData, translations)
+	a.So(err, should.BeNil)
 
-	fmt.Println(i18n.Format("welcome_message", "en", map[string]interface{}{"name": "Alice"}))
+	formatted, err := bundle.Get("hello", bundle.MatchLanguage(language.Dutch, language.English)).Format(map[string]interface{}{
+		"username": "htdvisser",
+	})
+	a.So(err, should.BeNil)
+	a.So(formatted, should.Equal, "hallo, @htdvisser!")
 
-	// Output:
-	// Welcome, Alice!
+	marshaled, err := json.Marshal(translations)
+	a.So(err, should.BeNil)
+	a.So(marshaled, should.Resemble, translationData)
 }

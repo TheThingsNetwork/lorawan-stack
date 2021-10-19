@@ -27,8 +27,8 @@ import (
 func FromGRPCStatus(status *status.Status) *Error {
 	err := build(&Definition{
 		code:          uint32(status.Code()),
-		messageFormat: status.Message(),
 	}, 0)
+	err.message = status.Message()
 	if ErrorDetailsFromProto == nil {
 		return err
 	}

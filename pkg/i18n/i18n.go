@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,261 +16,326 @@
 package i18n
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
 
 	"github.com/gotnospirit/messageformat"
+	jsoniter "github.com/json-iterator/go"
+	"golang.org/x/text/language"
 )
 
-const defaultLanguage = "en" // The language of the messages written in Go files.
-
-// MessageDescriptor describes a translatable message.
-type MessageDescriptor struct {
-	defaultFormat      *messageformat.MessageFormat
-	Translations       map[string]string `json:"translations,omitempty"`
-	translationFormats map[string]*messageformat.MessageFormat
-	Description        struct {
-		Package string `json:"package,omitempty"`
-		File    string `json:"file,omitempty"`
-	} `json:"description,omitempty"`
+// Message is a translatable or translated message.
+type Message struct {
 	id      string
-	touched bool
-	updated bool
+	message string
+	format  *messageformat.MessageFormat
+
+	pc        []uintptr
+	arguments []string
 }
 
-// Load the messages
-func (m *MessageDescriptor) Load() error {
-	defaultParser, err := messageformat.NewWithCulture(defaultLanguage)
+// ID returns the ID of the message.
+func (m *Message) ID() string { return m.id }
+
+func (m *Message) String() string { return m.message }
+
+// Format formats the message with the given data.
+func (m *Message) Format(data map[string]interface{}) (string, error) {
+	return m.format.FormatMap(data)
+}
+
+// Arguments returns the arguments in the message.
+func (m *Message) Arguments() []string {
+	if m.arguments == nil {
+		m.arguments = messageFormatArguments(m.message)
+	}
+	return m.arguments
+}
+
+// Clone creates a copy of the message.
+func (m *Message) Clone() *Message {
+	return &Message{
+		id:      m.id,
+		message: m.message,
+		format:  m.format,
+
+		pc:        m.pc,
+		arguments: m.arguments,
+	}
+}
+
+// Messages is a collection of messages for a language.
+type Messages struct {
+	lang     language.Tag
+	parser   *messageformat.Parser
+	messages map[string]*Message
+}
+
+// NewMessages creates a new message collection for the given language.
+func NewMessages(lang language.Tag) (*Messages, error) {
+	parser, err := messageformat.NewWithCulture(lang.String())
 	if err != nil {
-		return err
+		return nil, err
 	}
-	m.defaultFormat, err = defaultParser.Parse(m.Translations[defaultLanguage])
-	if err != nil {
-		return err
-	}
-	m.translationFormats = make(map[string]*messageformat.MessageFormat, len(m.Translations))
-	for language, translation := range m.Translations {
-		langParser, err := messageformat.NewWithCulture(language)
-		if err != nil {
-			return err
-		}
-		m.translationFormats[language], err = langParser.Parse(translation)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return &Messages{
+		lang:     lang,
+		parser:   parser,
+		messages: make(map[string]*Message),
+	}, nil
 }
 
-// Format a message descriptor in the given language.
-func (m *MessageDescriptor) Format(language string, data map[string]interface{}) (msg string) {
-	var err error
-	if fmt := m.translationFormats[language]; fmt != nil {
-		msg, err = fmt.FormatMap(data)
-	} else {
-		msg, err = m.defaultFormat.FormatMap(data)
+// Clone creates a copy of the messages.
+func (m *Messages) Clone() *Messages {
+	clonedMessages := make(map[string]*Message, len(m.messages))
+	for id, message := range m.messages {
+		clonedMessages[id] = message.Clone()
 	}
-	if err != nil {
-		msg = m.id // This shouldn't happen.
+	return &Messages{
+		lang:     m.lang,
+		parser:   m.parser,
+		messages: clonedMessages,
 	}
-	return
 }
 
-// Format a message from the global registry in the given language.
-func Format(id, language string, data map[string]interface{}) (msg string) {
-	return Global[id].Format(language, data)
-}
-
-// Touched returns whether the descriptor was touched (i.e. it is still used).
-func (m *MessageDescriptor) Touched() bool { return m.touched }
-
-// Updated returns whether the descriptor was updated.
-func (m *MessageDescriptor) Updated() bool { return m.updated }
-
-func (m *MessageDescriptor) String() string {
-	if m == nil {
-		return "<nil message descriptor>"
-	}
-	if translation, ok := m.Translations[defaultLanguage]; ok {
-		return translation
-	}
-	return m.id
-}
-
-var pathPrefix = func() string {
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		panic("could not determine location of i18n.go")
-	}
-	return strings.TrimSuffix(file, filepath.Join("pkg", "i18n", "i18n.go"))
+var i18nFile, stackPrefix = func() (string, string) {
+	pc := make([]uintptr, 10)
+	pc = pc[:runtime.Callers(1, pc)]
+	frame, _ := runtime.CallersFrames(pc).Next()
+	stackDir := filepath.Dir(filepath.Dir(filepath.Dir(frame.File)))
+	return frame.File, stackDir + "/"
 }()
 
-// SetSource sets the source package and file name of the message descriptor.
-// The argument skip is the number of stack frames to ascend, with 0 identifying the caller of SetSource.
-func (m *MessageDescriptor) SetSource(skip uint) {
-	_, file, _, ok := runtime.Caller(1 + int(skip))
-	if !ok {
-		panic("could not determine source of message")
+func getCallers(pc []uintptr) string {
+	frames := runtime.CallersFrames(pc)
+	locs := make([]string, 0, len(pc))
+	for {
+		frame, more := frames.Next()
+		if strings.HasPrefix(frame.File, stackPrefix) && frame.File != i18nFile {
+			locs = append(locs, fmt.Sprintf("%s:%d", strings.TrimPrefix(frame.File, stackPrefix), frame.Line))
+		}
+		if !more {
+			break
+		}
 	}
-	m.Description.Package = strings.TrimPrefix(filepath.Dir(file), pathPrefix)
-	m.Description.File = filepath.Base(file)
+	return strings.Join(locs, " > ")
 }
 
-// MessageDescriptorMap is a map of message descriptors.
-type MessageDescriptorMap map[string]*MessageDescriptor
-
-// Global registry.
-var Global = make(MessageDescriptorMap)
-
-// ReadFile reads the descriptors from a file.
-func ReadFile(filename string) (MessageDescriptorMap, error) {
-	bytes, err := os.ReadFile(filename)
+// Define defines a new message.
+func (m *Messages) Define(id, message string) (*Message, error) {
+	pc := make([]uintptr, 10)
+	pc = pc[:runtime.Callers(1, pc)]
+	if existing, exists := m.messages[id]; exists {
+		return nil, fmt.Errorf("message %q defined at %s was previously defined at %s", id, getCallers(pc), getCallers(existing.pc))
+	}
+	format, err := m.parser.Parse(message)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("message %q defined at %s could not be parsed: %w", id, getCallers(pc), err)
 	}
-	descriptors := make(MessageDescriptorMap)
-	err = json.Unmarshal(bytes, &descriptors)
-	if err != nil {
-		return nil, err
+	msg := &Message{
+		id:      id,
+		message: message,
+		format:  format,
+
+		pc: pc,
 	}
-	for id, descriptor := range descriptors {
-		descriptor.id = id
-	}
-	return descriptors, nil
+	m.messages[id] = msg
+	return msg, nil
 }
 
-// MarshalJSON marshals the descriptors to JSON.
-func (m MessageDescriptorMap) MarshalJSON() ([]byte, error) {
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
+// GetAllIDs returns the IDs of all messages.
+func (m *Messages) GetAllIDs() []string {
+	ids := make([]string, 0, len(m.messages))
+	for id := range m.messages {
+		ids = append(ids, id)
 	}
-	sort.Strings(keys)
-	var b bytes.Buffer
-	if err := b.WriteByte('{'); err != nil {
-		return nil, err
-	}
-	for i, k := range keys {
-		if i > 0 {
-			if _, err := b.Write([]byte{','}); err != nil {
-				return nil, err
-			}
-		}
-		keyJSON, err := json.Marshal(k)
-		if err != nil {
-			return nil, err
-		}
-		if _, err = b.Write(keyJSON); err != nil {
-			return nil, err
-		}
-		if err = b.WriteByte(':'); err != nil {
-			return nil, err
-		}
-		valJSON, err := json.Marshal(m[k])
-		if err != nil {
-			return nil, err
-		}
-		if _, err = b.Write(valJSON); err != nil {
-			return nil, err
-		}
-	}
-	if err := b.WriteByte('}'); err != nil {
-		return nil, err
-	}
-	return b.Bytes(), nil
+	sort.Strings(ids)
+	return ids
 }
 
-// WriteFile writes the descriptors to a file.
-func (m MessageDescriptorMap) WriteFile(filename string) error {
-	bytes, err := json.MarshalIndent(m, "", "  ")
-	if err != nil {
+// Get returns a message by ID, or nil if not defined.
+func (m *Messages) Get(id string) *Message {
+	return m.messages[id]
+}
+
+// Delete deletes a message by ID if it exists.
+func (m *Messages) Delete(id string) {
+	delete(m.messages, id)
+}
+
+var codec = jsoniter.ConfigCompatibleWithStandardLibrary
+
+// MarshalJSON implements the json.Marshaler interface.
+func (m *Messages) MarshalJSON() ([]byte, error) {
+	dto := make(map[string]string, len(m.messages))
+	for id, msg := range m.messages {
+		dto[id] = msg.message
+	}
+	return codec.Marshal(dto) // encoding/json sorts map keys.
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (m *Messages) UnmarshalJSON(data []byte) error {
+	dto := make(map[string]string)
+	if err := codec.Unmarshal(data, &dto); err != nil {
 		return err
 	}
-	return os.WriteFile(filename, append(bytes, '\n'), 0644)
-}
-
-// Define a message.
-func (m MessageDescriptorMap) Define(id, message string) *MessageDescriptor {
-	if existing := m[id]; existing != nil {
-		panic(fmt.Errorf("Message %s already defined in package %s (%s)", id, existing.Description.Package, existing.Description.File))
+	if m.messages == nil {
+		m.messages = make(map[string]*Message)
 	}
-	md := &MessageDescriptor{
-		Translations: map[string]string{
-			defaultLanguage: message,
-		},
-		id:      id,
-		touched: true,
-	}
-	if err := md.Load(); err != nil {
-		panic(err)
-	}
-	md.SetSource(1)
-	m[id] = md
-	return md
-}
-
-// Define a message in the global registry.
-func Define(id, message string) *MessageDescriptor {
-	d := Global.Define(id, message)
-	d.SetSource(1)
-	return d
-}
-
-// Get returns the MessageDescriptor of a specific message.
-func (m MessageDescriptorMap) Get(id string) *MessageDescriptor {
-	if md, ok := m[id]; ok {
-		return md
+	for id, message := range dto {
+		format, err := m.parser.Parse(message)
+		if err != nil {
+			return fmt.Errorf("message %q could not be parsed: %w", id, err)
+		}
+		msg, exists := m.messages[id]
+		if !exists {
+			msg = &Message{id: id}
+			m.messages[id] = msg
+		}
+		msg.message = message
+		msg.format = format
+		msg.arguments = nil
 	}
 	return nil
 }
 
-// Get returns the MessageDescriptor of a specific message from the global registry.
-func Get(id string) *MessageDescriptor {
-	return Global.Get(id)
+// Format formats the message with the given ID with the given data.
+// It returns an error if the message is not defined.
+func (m *Messages) Format(id string, data map[string]interface{}) (string, error) {
+	msg, ok := m.messages[id]
+	if !ok {
+		return "", fmt.Errorf("message %q not defined for language %q", id, m.lang)
+	}
+	return msg.Format(data)
 }
 
-// Merge messages from the given descriptor map into the current registry.
-func (m MessageDescriptorMap) Merge(other MessageDescriptorMap) {
-	for id, other := range other {
-		if m[id] == nil {
-			m[id] = other
-		} else {
-			if other.Translations[defaultLanguage] != m[id].Translations[defaultLanguage] {
-				m[id].updated = true
-			}
-			for language, translation := range other.Translations {
-				if language == defaultLanguage {
-					continue // This one is set from the Define.
-				}
-				m[id].Translations[language] = translation
-			}
-		}
+// Bundle is a bundle of messages for different languages.
+type Bundle struct {
+	defaultLanguage language.Tag
+	messages        map[language.Tag]*Messages
+	matcher         language.Matcher
+}
+
+// NewBundle creates a new bundle of messages.
+// Messages will be defined for the given default language.
+func NewBundle(defaultLanguage language.Tag) (*Bundle, error) {
+	defaultLanguageMessages, err := NewMessages(defaultLanguage)
+	if err != nil {
+		return nil, err
+	}
+	return &Bundle{
+		defaultLanguage: defaultLanguage,
+		messages: map[language.Tag]*Messages{
+			defaultLanguage: defaultLanguageMessages,
+		},
+		matcher: language.NewMatcher([]language.Tag{defaultLanguage}),
+	}, nil
+}
+
+// DefaultLanguage returns the default language of the bundle.
+func (b *Bundle) DefaultLanguage() language.Tag { return b.defaultLanguage }
+
+// Clone returns a copy of the bundle.
+func (b *Bundle) Clone() *Bundle {
+	clonedLanguages := make(map[language.Tag]*Messages, len(b.messages))
+	for lang, messages := range b.messages {
+		clonedLanguages[lang] = messages.Clone()
+	}
+	return &Bundle{
+		defaultLanguage: b.defaultLanguage,
+		messages:        clonedLanguages,
 	}
 }
 
-// Updated returns updated message descriptors.
-func (m MessageDescriptorMap) Updated() (updated []string) {
-	for id, descriptor := range m {
-		if descriptor.Updated() {
-			updated = append(updated, id)
+// MessagesFor returns the message collection for the given language.
+// If the bundle does not already contain a collection for this language, then
+// it creates one, optionally filling it with fallback messages.
+func (b *Bundle) MessagesFor(lang language.Tag, fallback bool) (*Messages, error) {
+	messages, ok := b.messages[lang]
+	if ok {
+		return messages, nil
+	}
+	if fallback {
+		fallbackLang, _, _ := b.matcher.Match(lang)
+		messages = b.messages[fallbackLang].Clone()
+	} else {
+		var err error
+		messages, err = NewMessages(lang)
+		if err != nil {
+			return nil, err
 		}
 	}
-	return
+	b.messages[lang] = messages
+	tags := make([]language.Tag, 0, len(b.messages))
+	tags = append(tags, b.defaultLanguage)
+	for lang := range b.messages {
+		if lang != b.defaultLanguage {
+			tags = append(tags, lang)
+		}
+	}
+	b.matcher = language.NewMatcher(tags)
+	return messages, nil
 }
 
-// Cleanup removes unused message descriptors.
-func (m MessageDescriptorMap) Cleanup() (deleted []string) {
-	for id, descriptor := range m {
-		if !descriptor.Touched() {
-			delete(m, id)
-			deleted = append(deleted, id)
+// Define defines a new message on the default language.
+func (b *Bundle) Define(id, message string) (*Message, error) {
+	return b.messages[b.defaultLanguage].Define(id, message)
+}
+
+// GetAllIDs returns the IDs of all messages defined for the default language.
+func (b *Bundle) GetAllIDs() []string {
+	return b.messages[b.defaultLanguage].GetAllIDs()
+}
+
+// Get returns a message by ID, or nil if not defined.
+func (b *Bundle) Get(id string, lang language.Tag) *Message {
+	messages, ok := b.messages[lang]
+	if !ok {
+		return nil
+	}
+	return messages.Get(id)
+}
+
+// MatchLanguage returns the first language that matches.
+func (b *Bundle) MatchLanguage(preferences ...language.Tag) language.Tag {
+	lang, _, _ := b.matcher.Match(preferences...)
+	return lang
+}
+
+// MatchLanguageStrings matches the language by strings as commonly used in Accept-Language headers.
+func (b *Bundle) MatchLanguageStrings(str ...string) language.Tag {
+	lang, _ := language.MatchStrings(b.matcher, str...)
+	return lang
+}
+
+// LoadFiles loads the locale files from the file system into the bundle.
+func (b *Bundle) LoadFiles(fsys fs.FS) error {
+	languageFiles, err := fs.Glob(fsys, "*.json")
+	if err != nil {
+		return err
+	}
+	for _, languageFile := range languageFiles {
+		lang, err := language.Parse(filepath.Base(strings.TrimSuffix(languageFile, ".json")))
+		if err != nil {
+			return err
+		}
+		translations, err := b.MessagesFor(lang, true)
+		if err != nil {
+			return err
+		}
+		languageData, err := fs.ReadFile(fsys, languageFile)
+		if err != nil {
+			return err
+		}
+		err = json.Unmarshal(languageData, translations)
+		if err != nil {
+			return err
 		}
 	}
-	return
+	return nil
 }

@@ -113,7 +113,10 @@ func defineSkip(name, description string, skip uint, opts ...Option) Builder {
 	}
 	definitions[name] = def
 
-	i18n.Define(fmt.Sprintf("%s:%s", i18nPrefix, name), description).SetSource(1 + skip)
+	_, err := i18n.Default().Define(fmt.Sprintf("%s:%s", i18nPrefix, name), description)
+	if err != nil {
+		panic(err)
+	}
 	initMetrics(name)
 
 	var b Builder = def

@@ -81,11 +81,13 @@ func (e *Error) mergeAttributes(kv ...interface{}) {
 	}
 	e.attributes = attributes
 
-	// Ensure that all attributes used as message format arguments are supported:
-	for k, v := range e.attributes {
-		for _, arg := range e.messageFormatArguments {
-			if k == arg {
-				e.attributes[k] = supported(v)
+	if e.Definition.message != nil {
+		// Ensure that all attributes used as message format arguments are supported:
+		for _, arg := range e.Definition.message.Arguments() {
+			for k, v := range e.attributes {
+				if k == arg {
+					e.attributes[k] = supported(v)
+				}
 			}
 		}
 	}

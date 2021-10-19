@@ -94,7 +94,7 @@
 # Clear generated code
 /api/api.md
 /api/api.swagger.json
-/config/messages.json
+/pkg/locales/*.json
 /pkg/ttnpb/*.pb.*.go
 /pkg/ttnpb/*.pb.go
 /pkg/webui/locales/*.json
