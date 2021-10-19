@@ -79,6 +79,7 @@ For details about compatibility between different releases, see the **Commitment
 - Packet broker page crashing when networks with a NetID of `0` are present.
 - Allowing to toggle visibility of sensitive values in text inputs in the Console.
 - Webhook failed event.
+- Server-side event filtering with the `names` field.
 
 ### Changed
 
