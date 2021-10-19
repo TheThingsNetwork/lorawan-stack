@@ -210,6 +210,7 @@ export default class WebhookTemplateForm extends Component {
               description={field.description}
               key={field.id}
               required={!field.optional}
+              sensitive={field.secret}
             />
           ))}
           <SubmitBar>

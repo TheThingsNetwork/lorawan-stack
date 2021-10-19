@@ -14,10 +14,11 @@
 
 import React, { useCallback } from 'react'
 import Tippy from '@tippyjs/react'
+import classnames from 'classnames'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import './tooltip.styl'
+import style from './tooltip.styl'
 
 let currentInstance
 
@@ -38,7 +39,19 @@ const popperModifiers = [
 ]
 
 const Tooltip = props => {
-  const { className, children, content, interactive, placement, delay, onShow, appendTo } = props
+  const {
+    appendTo,
+    children,
+    className,
+    content,
+    delay,
+    hideOnClick,
+    interactive,
+    onShow,
+    placement,
+    small,
+    trigger,
+  } = props
 
   const handleShow = useCallback(
     instance => {
@@ -53,7 +66,7 @@ const Tooltip = props => {
   )
   return (
     <Tippy
-      className={className}
+      className={classnames(className, { [style.small]: small })}
       content={content}
       interactive={interactive}
       placement={placement}
@@ -63,6 +76,8 @@ const Tooltip = props => {
       appendTo={appendTo || interactive ? 'parent' : document.body}
       animation="fade"
       duration={250}
+      hideOnClick={hideOnClick}
+      trigger={trigger}
     >
       {children}
     </Tippy>
@@ -74,7 +89,8 @@ Tooltip.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   content: PropTypes.node.isRequired,
-  delay: PropTypes.oneOfType([PropTypes.number, PropTypes.arrayOf([PropTypes.number])]),
+  delay: PropTypes.oneOfType([PropTypes.number, PropTypes.arrayOf(PropTypes.number)]),
+  hideOnClick: PropTypes.bool,
   interactive: PropTypes.bool,
   onShow: PropTypes.func,
   placement: PropTypes.oneOf([
@@ -94,15 +110,20 @@ Tooltip.propTypes = {
     'auto-start',
     'auto-end',
   ]),
+  small: PropTypes.bool,
+  trigger: PropTypes.string,
 }
 
 Tooltip.defaultProps = {
   appendTo: undefined,
   className: '',
+  hideOnClick: true,
   interactive: false,
   placement: 'bottom',
+  small: false,
   delay: 300,
   onShow: () => null,
+  trigger: 'mouseenter focus',
 }
 
 export default Tooltip

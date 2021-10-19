@@ -29,7 +29,7 @@ const ButtonIcon = props => {
     [style.right]: type === 'right',
   })
 
-  return <Icon className={cls} icon={icon} nudgeUp {...rest} />
+  return <Icon className={cls} icon={icon} {...rest} />
 }
 
 ButtonIcon.propTypes = {

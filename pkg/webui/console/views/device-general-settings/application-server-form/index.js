@@ -183,6 +183,7 @@ const ApplicationServerForm = React.memo(props => {
         mayGenerateValue={mayEditKeys && !skipCrypto}
         onGenerateValue={generate16BytesKey}
         tooltipId={tooltipIds.APP_SESSION_KEY}
+        sensitive
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

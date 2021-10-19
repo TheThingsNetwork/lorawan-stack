@@ -239,6 +239,7 @@ export default class WebhookForm extends Component {
             title={m.downlinkAPIKey}
             component={Input}
             description={m.downlinkAPIKeyDesc}
+            sensitive
             code
           />
           <Form.Field
