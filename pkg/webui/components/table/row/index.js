@@ -22,18 +22,25 @@ import style from './row.styl'
 
 class Row extends React.Component {
   @bind
-  onClick() {
+  onClick(evt) {
     const { id, onClick } = this.props
 
-    onClick(id)
+    onClick(id, evt)
   }
 
   @bind
   onKeyDown(evt) {
     const { id, onClick } = this.props
     if (evt.key === 'Enter') {
-      onClick(id)
+      onClick(id, evt)
     }
+  }
+
+  @bind
+  onMouseDown(evt) {
+    const { id, onMouseDown } = this.props
+
+    onMouseDown(id, evt)
   }
 
   get clickListener() {
@@ -65,6 +72,7 @@ class Row extends React.Component {
         className={rowClassNames}
         onKeyDown={this.onKeyDown}
         onClick={this.clickListener}
+        onMouseDown={this.onMouseDown}
         tabIndex={this.tabIndex}
       >
         {children}
@@ -91,6 +99,7 @@ Row.propTypes = {
    * is passed as an argument.
    */
   onClick: PropTypes.func,
+  onMouseDown: PropTypes.func,
 }
 
 Row.defaultProps = {
@@ -101,6 +110,7 @@ Row.defaultProps = {
   body: true,
   footer: false,
   onClick: () => null,
+  onMouseDown: () => null,
   id: undefined,
 }
 
