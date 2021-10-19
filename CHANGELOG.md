@@ -47,6 +47,7 @@ For details about compatibility between different releases, see the **Commitment
 - Profile settings link not being present in the mobile menu in the Console.
 - Calculation of "Last activity" values not using all available data in the Console.
 - Layout jumps due to length of "Last activity" text.
+- Invalid `session` handling in Network Layer settings form in the Console.
 
 ### Security
 
