@@ -16,17 +16,20 @@ package errors
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
 // FromGRPCStatus converts the gRPC status message into an Error.
 func FromGRPCStatus(status *status.Status) *Error {
 	err := build(&Definition{
-		code:          uint32(status.Code()),
+		code: uint32(status.Code()),
 	}, 0)
 	err.message = status.Message()
 	if ErrorDetailsFromProto == nil {
@@ -115,6 +118,10 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		res, err := handler(ctx, req)
 		if ttnErr, ok := From(err); ok {
+			md, _ := metadata.FromIncomingContext(ctx)
+			if acceptLanguage := md.Get("accept-language"); len(acceptLanguage) > 0 {
+				ttnErr = ttnErr.Translate(acceptLanguage[len(acceptLanguage)-1])
+			}
 			err = ttnErr
 		}
 		return res, err
@@ -126,6 +133,10 @@ func StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		err := handler(srv, stream)
 		if ttnErr, ok := From(err); ok {
+			md, _ := metadata.FromIncomingContext(stream.Context())
+			if acceptLanguage := md.Get("accept-language"); len(acceptLanguage) > 0 {
+				ttnErr = ttnErr.Translate(acceptLanguage[len(acceptLanguage)-1])
+			}
 			err = ttnErr
 		}
 		return err
@@ -175,4 +186,14 @@ func StreamClientInterceptor() grpc.StreamClientInterceptor {
 		}
 		return wrappedStream{s}, nil
 	}
+}
+
+// HTTPProtoErrorHandler wraps the default grpc-gateway error handler.
+func HTTPProtoErrorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
+	if ttnErr, ok := From(err); ok {
+		if acceptLanguage := r.Header.Get("Accept-Language"); acceptLanguage != "" {
+			err = ttnErr.Translate(acceptLanguage)
+		}
+	}
+	runtime.DefaultHTTPProtoErrorHandler(ctx, mux, marshaler, w, r, err)
 }

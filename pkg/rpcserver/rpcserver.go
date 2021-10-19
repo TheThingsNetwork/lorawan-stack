@@ -215,7 +215,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	server.ServeMux = runtime.NewServeMux(
 		runtime.WithMarshalerOption("*", jsonpb.TTN()),
 		runtime.WithMarshalerOption("text/event-stream", jsonpb.TTNEventStream()),
-		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
+		runtime.WithProtoErrorHandler(errors.HTTPProtoErrorHandler),
 		runtime.WithMetadata(func(ctx context.Context, req *http.Request) metadata.MD {
 			md := rpcmetadata.MD{
 				Host: req.Host,
@@ -226,7 +226,8 @@ func New(ctx context.Context, opts ...Option) *Server {
 		runtime.WithIncomingHeaderMatcher(func(s string) (string, bool) {
 			s = textproto.CanonicalMIMEHeaderKey(s)
 			switch s {
-			case "Forwarded",
+			case "Accept-Language",
+				"Forwarded",
 				"X-Request-Id",
 				"X-Forwarded-For",
 				"X-Real-Ip",
