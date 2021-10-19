@@ -24,17 +24,6 @@ import (
 var cancelSignals = []os.Signal{syscall.SIGHUP, os.Interrupt, syscall.SIGTERM}
 
 func newContext(parent context.Context) context.Context {
-	ctx, cancel := context.WithCancel(parent)
-	sig := make(chan os.Signal)
-	signal.Notify(sig, cancelSignals...)
-	go func() {
-		select {
-		case <-ctx.Done():
-		case sig := <-sig:
-			logger.WithField("signal", sig).Debug("Command interrupted")
-			cancel()
-		}
-		signal.Stop(sig)
-	}()
+	ctx, _ := signal.NotifyContext(parent, cancelSignals...)
 	return ctx
 }
