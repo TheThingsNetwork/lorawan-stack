@@ -19,6 +19,31 @@ class PacketBrokerAgent {
     this._api = service
   }
 
+  _emitDefault(idObject) {
+    if (!('net_id' in idObject)) {
+      return { ...idObject, net_id: 0 }
+    }
+
+    return idObject
+  }
+
+  _emitDefaults(iterable) {
+    for (const probe of iterable) {
+      if ('id' in probe) {
+        probe.id = this._emitDefault(probe.id)
+      } else {
+        if ('forwarder_id' in probe) {
+          probe.forwarder_id = this._emitDefault(probe.forwarder_id)
+        }
+        if ('home_network_id' in probe) {
+          probe.home_network_id = this._emitDefault(probe.home_network_id)
+        }
+      }
+    }
+
+    return iterable
+  }
+
   async getInfo() {
     const result = await this._api.GetInfo()
 
@@ -63,7 +88,7 @@ class PacketBrokerAgent {
       },
     })
 
-    return Marshaler.payloadSingleResponse(result)
+    return this._emitDefault(Marshaler.payloadSingleResponse(result))
   }
 
   async setHomeNetworkRoutingPolicy(netId, tenantId, policy) {
@@ -93,20 +118,26 @@ class PacketBrokerAgent {
 
   async listHomeNetworkRoutingPolicies(params) {
     const result = await this._api.ListHomeNetworkRoutingPolicies(undefined, params)
+    const response = Marshaler.unwrapPacketBrokerPolicies(result)
+    response.policies = this._emitDefaults(response.policies)
 
-    return Marshaler.unwrapPacketBrokerPolicies(result)
+    return response
   }
 
   async listNetworks(params) {
     const result = await this._api.ListNetworks(undefined, params)
+    const response = Marshaler.unwrapPacketBrokerNetworks(result)
+    response.networks = this._emitDefaults(response.networks)
 
-    return Marshaler.unwrapPacketBrokerNetworks(result)
+    return response
   }
 
   async listForwarderRoutingPolicies(params) {
     const result = await this._api.ListForwarderRoutingPolicies(undefined, params)
+    const response = Marshaler.unwrapPacketBrokerPolicies(result)
+    response.policies = this._emitDefaults(response.policies)
 
-    return Marshaler.unwrapPacketBrokerPolicies(result)
+    return response
   }
 }
 
