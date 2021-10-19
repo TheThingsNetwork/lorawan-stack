@@ -59,7 +59,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 		reg := ttnpb.NewApplicationRegistryClient(cc)
 
 		_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
-			Application: ttnpb.Application{
+			Application: &ttnpb.Application{
 				Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
 			},
 			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
@@ -97,7 +97,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
-			Application: ttnpb.Application{
+			Application: &ttnpb.Application{
 				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
 				Name: "Updated Name",
 			},
@@ -138,7 +138,7 @@ func TestApplicationsCRUD(t *testing.T) {
 		a.So(list.Applications, should.HaveLength, 16)
 
 		_, err = reg.Create(ctx, &ttnpb.CreateApplicationRequest{
-			Application: ttnpb.Application{
+			Application: &ttnpb.Application{
 				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 				Name: "Foo Application",
 			},
@@ -152,7 +152,7 @@ func TestApplicationsCRUD(t *testing.T) {
 		is.config.UserRights.CreateApplications = true
 
 		created, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
-			Application: ttnpb.Application{
+			Application: &ttnpb.Application{
 				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 				Name: "Foo Application",
 			},
@@ -191,7 +191,7 @@ func TestApplicationsCRUD(t *testing.T) {
 		}
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
-			Application: ttnpb.Application{
+			Application: &ttnpb.Application{
 				Ids:  created.GetIds(),
 				Name: "Updated Name",
 			},

@@ -76,7 +76,7 @@ var (
 )
 
 func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
-	if err = blacklist.Check(ctx, req.GetIds().GetApplicationId()); err != nil {
+	if err = blacklist.Check(ctx, req.Application.GetIds().GetApplicationId()); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
@@ -95,7 +95,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		app, err = store.GetApplicationStore(db).CreateApplication(ctx, &req.Application)
+		app, err = store.GetApplicationStore(db).CreateApplication(ctx, req.Application)
 		if err != nil {
 			return err
 		}
@@ -107,9 +107,9 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		); err != nil {
 			return err
 		}
-		if len(req.ContactInfo) > 0 {
-			cleanContactInfo(req.ContactInfo)
-			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.ContactInfo)
+		if len(req.Application.ContactInfo) > 0 {
+			cleanContactInfo(req.Application.ContactInfo)
+			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.Application.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -119,7 +119,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtCreateApplication.NewWithIdentifiersAndData(ctx, req.GetIds(), nil))
+	events.Publish(evtCreateApplication.NewWithIdentifiersAndData(ctx, req.Application.GetIds(), nil))
 	return app, nil
 }
 
@@ -254,7 +254,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 }
 
 func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.UpdateApplicationRequest) (app *ttnpb.Application, err error) {
-	if err = rights.RequireApplication(ctx, *req.GetIds(), ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err = rights.RequireApplication(ctx, *req.Application.GetIds(), ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -267,13 +267,13 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		app, err = store.GetApplicationStore(db).UpdateApplication(ctx, &req.Application, req.FieldMask)
+		app, err = store.GetApplicationStore(db).UpdateApplication(ctx, req.Application, req.FieldMask)
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			cleanContactInfo(req.ContactInfo)
-			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.ContactInfo)
+			cleanContactInfo(req.Application.ContactInfo)
+			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.Application.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -283,7 +283,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateApplication.NewWithIdentifiersAndData(ctx, req.GetIds(), req.FieldMask.GetPaths()))
+	events.Publish(evtUpdateApplication.NewWithIdentifiersAndData(ctx, req.Application.GetIds(), req.FieldMask.GetPaths()))
 	return app, nil
 }
 

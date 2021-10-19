@@ -89,7 +89,7 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 			return nil, err
 		}
 		contactInfoer, err = ttnpb.NewApplicationRegistryClient(is).Update(ctx, &ttnpb.UpdateApplicationRequest{
-			Application: *res,
+			Application: res,
 			FieldMask:   fieldMask,
 		})
 	case *ttnpb.Client:
