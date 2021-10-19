@@ -308,7 +308,7 @@ var (
 			}
 			_, err = ttnpb.NewOrganizationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 				OrganizationIds: orgID,
-				APIKey: ttnpb.APIKey{
+				ApiKey: &ttnpb.APIKey{
 					Id:        id,
 					Name:      name,
 					Rights:    rights,
@@ -343,7 +343,7 @@ var (
 			}
 			_, err = ttnpb.NewOrganizationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 				OrganizationIds: orgID,
-				APIKey: ttnpb.APIKey{
+				ApiKey: &ttnpb.APIKey{
 					Id:     id,
 					Rights: nil,
 				},

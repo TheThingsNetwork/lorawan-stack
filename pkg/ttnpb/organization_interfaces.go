@@ -24,6 +24,14 @@ func (m *GetOrganizationRequest) EntityType() string {
 	return m.GetOrganizationIds().EntityType()
 }
 
+func (m *CreateOrganizationRequest) EntityType() string {
+	return m.GetOrganization().GetIds().EntityType()
+}
+
+func (m *UpdateOrganizationRequest) EntityType() string {
+	return m.GetOrganization().GetIds().EntityType()
+}
+
 func (m *ListOrganizationAPIKeysRequest) EntityType() string {
 	return m.GetOrganizationIds().EntityType()
 }
@@ -62,6 +70,14 @@ func (m *GetOrganizationRequest) IDString() string {
 	return m.GetOrganizationIds().IDString()
 }
 
+func (m *CreateOrganizationRequest) IDString() string {
+	return m.GetOrganization().GetIds().IDString()
+}
+
+func (m *UpdateOrganizationRequest) IDString() string {
+	return m.GetOrganization().GetIds().IDString()
+}
+
 func (m *ListOrganizationAPIKeysRequest) IDString() string {
 	return m.GetOrganizationIds().IDString()
 }
@@ -98,6 +114,10 @@ func (m *Organization) ExtractRequestFields(dst map[string]interface{}) {
 
 func (m *GetOrganizationRequest) ExtractRequestFields(dst map[string]interface{}) {
 	m.GetOrganizationIds().ExtractRequestFields(dst)
+}
+
+func (m *UpdateOrganizationRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.GetOrganization().GetIds().ExtractRequestFields(dst)
 }
 
 func (m *ListOrganizationAPIKeysRequest) ExtractRequestFields(dst map[string]interface{}) {

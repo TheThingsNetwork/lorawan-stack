@@ -161,13 +161,13 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		if len(req.APIKey.Rights) > 0 {
-			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.APIKey.Id)
+		if len(req.ApiKey.Rights) > 0 {
+			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.ApiKey.Id)
 			if err != nil {
 				return err
 			}
 
-			newRights := ttnpb.RightsFrom(req.APIKey.Rights...)
+			newRights := ttnpb.RightsFrom(req.ApiKey.Rights...)
 			existingRights := ttnpb.RightsFrom(key.Rights...)
 
 			// Require the caller to have all added rights.
@@ -180,7 +180,7 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey, req.FieldMask)
 		return err
 	})
 	if err != nil {
