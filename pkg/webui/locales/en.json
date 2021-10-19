@@ -89,6 +89,8 @@
   "components.form.section.index.expand": "Expand section",
   "components.form.section.index.collapse": "Collapse section",
   "components.input.generate.generate": "Generate",
+  "components.input.index.showValue": "Show value",
+  "components.input.index.hideValue": "Hide value",
   "components.key-value-map.entry.deleteEntry": "Delete entry",
   "components.key-value-map.index.addEntry": "Add entry",
   "components.link.index.glossaryTitle": "See \"{term}\" in the glossary",
