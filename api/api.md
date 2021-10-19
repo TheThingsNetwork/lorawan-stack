@@ -3687,6 +3687,7 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 | `identifiers` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) | repeated |  |
 | `tail` | [`uint32`](#uint32) |  | If greater than zero, this will return historical events, up to this maximum when the stream starts. If used in combination with "after", the limit that is reached first, is used. The availability of historical events depends on server support and retention policy. |
 | `after` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | If not empty, this will return historical events after the given time when the stream starts. If used in combination with "tail", the limit that is reached first, is used. The availability of historical events depends on server support and retention policy. |
+| `names` | [`string`](#string) | repeated | If provided, this will filter events, so that only events with the given names are returned. Names can be provided as either exact event names (e.g. 'gs.up.receive'), or as regular expressions (e.g. '/^gs\..+/'). |
 
 ### <a name="ttn.lorawan.v3.Events">Service `Events`</a>
 

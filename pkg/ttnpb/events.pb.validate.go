@@ -248,6 +248,8 @@ func (m *StreamEventsRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "names":
+
 		default:
 			return StreamEventsRequestValidationError{
 				field:  name,

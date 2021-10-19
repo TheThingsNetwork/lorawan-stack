@@ -191,6 +191,15 @@ func (dst *StreamEventsRequest) SetFields(src *StreamEventsRequest, paths ...str
 			} else {
 				dst.After = nil
 			}
+		case "names":
+			if len(subs) > 0 {
+				return fmt.Errorf("'names' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Names = src.Names
+			} else {
+				dst.Names = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

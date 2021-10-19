@@ -80,6 +80,10 @@ message StreamEventsRequest {
   // If used in combination with "tail", the limit that is reached first, is used.
   // The availability of historical events depends on server support and retention policy.
   google.protobuf.Timestamp after = 3 [(gogoproto.stdtime) = true];
+  // If provided, this will filter events, so that only events with the given names are returned.
+  // Names can be provided as either exact event names (e.g. 'gs.up.receive'),
+  // or as regular expressions (e.g. '/^gs\..+/').
+  repeated string names = 4;
 }
 
 message FindRelatedEventsRequest {
