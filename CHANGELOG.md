@@ -25,6 +25,7 @@ For details about compatibility between different releases, see the **Commitment
 - Configuration option `experimental.features` to enable experimental features.
 - Tooltip descriptions for "Last activity" values (formerly "Last seen") and uplink/downlink counts in the Console.
 - Status pulses being triggered by incoming data in the Console.
+- Allowing to toggle visibility of sensitive values in text inputs in the Console.
 
 ### Changed
 
