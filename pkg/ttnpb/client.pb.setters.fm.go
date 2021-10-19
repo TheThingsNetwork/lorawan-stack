@@ -352,10 +352,18 @@ func (dst *CreateClientRequest) SetFields(src *CreateClientRequest, paths ...str
 		case "client":
 			if len(subs) > 0 {
 				var newDst, newSrc *Client
-				if src != nil {
-					newSrc = &src.Client
+				if (src == nil || src.Client == nil) && dst.Client == nil {
+					continue
 				}
-				newDst = &dst.Client
+				if src != nil {
+					newSrc = src.Client
+				}
+				if dst.Client != nil {
+					newDst = dst.Client
+				} else {
+					newDst = &Client{}
+					dst.Client = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -363,8 +371,7 @@ func (dst *CreateClientRequest) SetFields(src *CreateClientRequest, paths ...str
 				if src != nil {
 					dst.Client = src.Client
 				} else {
-					var zero Client
-					dst.Client = zero
+					dst.Client = nil
 				}
 			}
 		case "collaborator":
@@ -406,10 +413,18 @@ func (dst *UpdateClientRequest) SetFields(src *UpdateClientRequest, paths ...str
 		case "client":
 			if len(subs) > 0 {
 				var newDst, newSrc *Client
-				if src != nil {
-					newSrc = &src.Client
+				if (src == nil || src.Client == nil) && dst.Client == nil {
+					continue
 				}
-				newDst = &dst.Client
+				if src != nil {
+					newSrc = src.Client
+				}
+				if dst.Client != nil {
+					newDst = dst.Client
+				} else {
+					newDst = &Client{}
+					dst.Client = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -417,8 +432,7 @@ func (dst *UpdateClientRequest) SetFields(src *UpdateClientRequest, paths ...str
 				if src != nil {
 					dst.Client = src.Client
 				} else {
-					var zero Client
-					dst.Client = zero
+					dst.Client = nil
 				}
 			}
 		case "field_mask":

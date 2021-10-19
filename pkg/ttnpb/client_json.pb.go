@@ -317,7 +317,7 @@ func (x *CreateClientRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Client != nil || s.HasField("client") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("client")
 		x.Client.MarshalProtoJSON(s.WithField("client"))
@@ -342,6 +342,7 @@ func (x *CreateClientRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.ReadAny() // ignore unknown field
 		case "client":
 			if !s.ReadNil() {
+				x.Client = &Client{}
 				x.Client.UnmarshalProtoJSON(s.WithField("client", true))
 			}
 		case "collaborator":
@@ -362,7 +363,7 @@ func (x *UpdateClientRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Client != nil || s.HasField("client") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("client")
 		x.Client.MarshalProtoJSON(s.WithField("client"))
@@ -390,6 +391,7 @@ func (x *UpdateClientRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.ReadAny() // ignore unknown field
 		case "client":
 			if !s.ReadNil() {
+				x.Client = &Client{}
 				x.Client.UnmarshalProtoJSON(s.WithField("client", true))
 			}
 		case "field_mask", "fieldMask":
