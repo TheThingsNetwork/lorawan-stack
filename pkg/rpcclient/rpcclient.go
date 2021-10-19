@@ -41,19 +41,19 @@ import (
 // DefaultDialOptions for gRPC clients
 func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 	streamInterceptors := []grpc.StreamClientInterceptor{
-		errors.StreamClientInterceptor(),
 		metrics.StreamClientInterceptor,
 		grpc_opentracing.StreamClientInterceptor(),
 		rpclog.StreamClientInterceptor(ctx), // Gets logger from global context
 		warning.StreamClientInterceptor,
+		errors.StreamClientInterceptor(),
 	}
 
 	unaryInterceptors := []grpc.UnaryClientInterceptor{
-		errors.UnaryClientInterceptor(),
 		metrics.UnaryClientInterceptor,
 		grpc_opentracing.UnaryClientInterceptor(),
 		rpclog.UnaryClientInterceptor(ctx), // Gets logger from global context
 		warning.UnaryClientInterceptor,
+		errors.UnaryClientInterceptor(),
 	}
 
 	return []grpc.DialOption{
