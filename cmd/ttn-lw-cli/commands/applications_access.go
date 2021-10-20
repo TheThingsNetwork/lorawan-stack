@@ -307,7 +307,7 @@ var (
 			}
 			_, err = ttnpb.NewApplicationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 				ApplicationIds: appID,
-				APIKey: ttnpb.APIKey{
+				ApiKey: &ttnpb.APIKey{
 					Id:        id,
 					Name:      name,
 					Rights:    rights,
@@ -342,7 +342,7 @@ var (
 			}
 			_, err = ttnpb.NewApplicationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 				ApplicationIds: appID,
-				APIKey: ttnpb.APIKey{
+				ApiKey: &ttnpb.APIKey{
 					Id:     id,
 					Rights: nil,
 				},

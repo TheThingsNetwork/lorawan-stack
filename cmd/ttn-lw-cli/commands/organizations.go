@@ -193,7 +193,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewOrganizationRegistryClient(is).Create(ctx, &ttnpb.CreateOrganizationRequest{
-				Organization: organization,
+				Organization: &organization,
 				Collaborator: collaborator,
 			})
 			if err != nil {
@@ -229,7 +229,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewOrganizationRegistryClient(is).Update(ctx, &ttnpb.UpdateOrganizationRequest{
-				Organization: organization,
+				Organization: &organization,
 				FieldMask:    &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {

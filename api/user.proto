@@ -133,13 +133,13 @@ message ListUsersRequest {
 }
 
 message CreateUserRequest {
-  User user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  User user = 1 [(validate.rules).message.required = true];
   // The invitation token that was sent to the user (some networks require an invitation in order to register new users).
   string invitation_token = 2;
 }
 
 message UpdateUserRequest {
-  User user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  User user = 1 [(validate.rules).message.required = true];
   // The names of the user fields that should be updated.
   google.protobuf.FieldMask field_mask = 2;
 }
@@ -185,7 +185,7 @@ message CreateUserAPIKeyRequest {
 
 message UpdateUserAPIKeyRequest {
   UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
-  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  APIKey api_key = 2 [(validate.rules).message.required = true];
   // The names of the api key fields that should be updated.
   google.protobuf.FieldMask field_mask = 3;
 }

@@ -59,7 +59,7 @@ func TestClientsPermissionDenied(t *testing.T) {
 		reg := ttnpb.NewClientRegistryClient(cc)
 
 		_, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
-			Client: ttnpb.Client{
+			Client: &ttnpb.Client{
 				Ids: &ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
 			},
 			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
@@ -97,7 +97,7 @@ func TestClientsPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
-			Client: ttnpb.Client{
+			Client: &ttnpb.Client{
 				Ids:  &ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
 				Name: "Updated Name",
 			},
@@ -129,7 +129,7 @@ func TestClientsCRUD(t *testing.T) {
 		is.config.UserRights.CreateClients = false
 
 		_, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
-			Client: ttnpb.Client{
+			Client: &ttnpb.Client{
 				Ids:  &ttnpb.ClientIdentifiers{ClientId: "foo"},
 				Name: "Foo Client",
 			},
@@ -143,7 +143,7 @@ func TestClientsCRUD(t *testing.T) {
 		is.config.UserRights.CreateClients = true
 
 		created, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
-			Client: ttnpb.Client{
+			Client: &ttnpb.Client{
 				Ids:  &ttnpb.ClientIdentifiers{ClientId: "foo"},
 				Name: "Foo Client",
 			},
@@ -182,7 +182,7 @@ func TestClientsCRUD(t *testing.T) {
 		}
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateClientRequest{
-			Client: ttnpb.Client{
+			Client: &ttnpb.Client{
 				Ids:  created.GetIds(),
 				Name: "Updated Name",
 			},
@@ -195,7 +195,7 @@ func TestClientsCRUD(t *testing.T) {
 		}
 
 		updated, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
-			Client: ttnpb.Client{
+			Client: &ttnpb.Client{
 				Ids:              created.GetIds(),
 				State:            ttnpb.STATE_FLAGGED,
 				StateDescription: "something is wrong",
@@ -210,7 +210,7 @@ func TestClientsCRUD(t *testing.T) {
 		}
 
 		updated, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
-			Client: ttnpb.Client{
+			Client: &ttnpb.Client{
 				Ids:   created.GetIds(),
 				State: ttnpb.STATE_APPROVED,
 			},

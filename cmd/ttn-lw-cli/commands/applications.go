@@ -196,7 +196,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationRegistryClient(is).Create(ctx, &ttnpb.CreateApplicationRequest{
-				Application:  application,
+				Application:  &application,
 				Collaborator: *collaborator,
 			})
 			if err != nil {
@@ -232,7 +232,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationRegistryClient(is).Update(ctx, &ttnpb.UpdateApplicationRequest{
-				Application: application,
+				Application: &application,
 				FieldMask:   &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {

@@ -199,7 +199,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewClientRegistryClient(is).Create(ctx, &ttnpb.CreateClientRequest{
-				Client:       client,
+				Client:       &client,
 				Collaborator: collaborator,
 			})
 			if err != nil {
@@ -239,7 +239,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewClientRegistryClient(is).Update(ctx, &ttnpb.UpdateClientRequest{
-				Client:    client,
+				Client:    &client,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {

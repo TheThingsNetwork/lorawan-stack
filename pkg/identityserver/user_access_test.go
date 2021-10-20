@@ -62,7 +62,7 @@ func TestUserAccessNotFound(t *testing.T) {
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIds:   userID,
-			APIKey:    apiKey,
+			ApiKey:    &apiKey,
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
@@ -82,7 +82,7 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
-		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
+		apiKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
 			UserIds: userID,
 			Name:    "test-api-key-name",
 			Rights:  []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
@@ -91,14 +91,14 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKey, should.BeNil)
+		a.So(apiKey, should.BeNil)
 
-		APIKey = userAPIKeys(userID).ApiKeys[0]
-		APIKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_ALL}
+		apiKey = userAPIKeys(userID).ApiKeys[0]
+		apiKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_ALL}
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIds:   userID,
-			APIKey:    *APIKey,
+			ApiKey:    apiKey,
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
 		}, creds)
 
@@ -115,7 +115,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := population.Users[defaultUserIdx].GetIds()
-		APIKeyID := userAPIKeys(userID).ApiKeys[0].Id
+		apiKeyID := userAPIKeys(userID).ApiKeys[0].Id
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
@@ -126,26 +126,26 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 			a.So(rights.Rights, should.BeEmpty)
 		}
 
-		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
+		apiKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
 			UserIds: userID,
-			KeyId:   APIKeyID,
+			KeyId:   apiKeyID,
 		})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKey, should.BeNil)
+		a.So(apiKey, should.BeNil)
 
-		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
+		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
 			UserIds: userID,
 		})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKeys, should.BeNil)
+		a.So(apiKeys, should.BeNil)
 
-		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
+		apiKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
 			UserIds: userID,
 			Name:    "test-api-key-name",
 			Rights:  []ttnpb.Right{ttnpb.RIGHT_ALL},
@@ -154,13 +154,13 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKey, should.BeNil)
+		a.So(apiKey, should.BeNil)
 
-		APIKey = userAPIKeys(userID).ApiKeys[0]
+		apiKey = userAPIKeys(userID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIds:   userID,
-			APIKey:    *APIKey,
+			ApiKey:    apiKey,
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
 		})
 
@@ -216,15 +216,15 @@ func TestUserAccessCRUD(t *testing.T) {
 		userAPIKeys := userAPIKeys(user.GetIds())
 		userKey := userAPIKeys.ApiKeys[0]
 
-		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
+		apiKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
 			UserIds: user.GetIds(),
 			KeyId:   userKey.Id,
 		}, creds)
 
 		a.So(err, should.BeNil)
-		if a.So(APIKey, should.NotBeNil) {
-			a.So(APIKey.Id, should.Equal, userKey.Id)
-			a.So(APIKey.Key, should.BeEmpty)
+		if a.So(apiKey, should.NotBeNil) {
+			a.So(apiKey.Id, should.Equal, userKey.Id)
+			a.So(apiKey.Key, should.BeEmpty)
 		}
 
 		sort.Slice(userAPIKeys.ApiKeys, func(i int, j int) bool { return userAPIKeys.ApiKeys[i].Name < userAPIKeys.ApiKeys[j].Name })
@@ -257,7 +257,7 @@ func TestUserAccessCRUD(t *testing.T) {
 		created.Name = newAPIKeyName
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIds:   user.GetIds(),
-			APIKey:    *created,
+			ApiKey:    created,
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
