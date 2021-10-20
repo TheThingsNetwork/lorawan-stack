@@ -65,6 +65,10 @@ export default (parts, base = {}, minimum = [['ids'], ['created_at'], ['updated_
             }
 
             if (this.isLeaf) {
+              // TODO: Remove this once https://github.com/TheThingsNetwork/lorawan-stack/issues/4766 is resolved.
+              if (this.key.endsWith('_at') && e === '0001-01-01T00:00:00Z') {
+                return
+              }
               // Write the sub object leaf into the result.
               traverse(result).set([...path, ...this.path], e)
             }
