@@ -32,6 +32,8 @@ For details about compatibility between different releases, see the **Commitment
 - Searching for entity IDs is now case insensitive.
 - Renamed entitie's "Last seen" to "Last activity" in the Console.
 - The database queries for determining the rights of users on entities have been rewritten to reduce the number of round-trips to the database.
+- The default downlink path expiration timeout for UDP gateway connections has been increased to 90 seconds, and the default connection timeout has been increased to 3 minutes.
+  - The original downlink path expiration timeout was based on the fact that the default `PULL_DATA` interval is 5 seconds. In practice we have observed that most gateways actually send a `PULL_DATA` message every 30 seconds instead in order to preserve data transfer costs.
 
 ### Deprecated
 
