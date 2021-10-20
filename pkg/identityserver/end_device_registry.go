@@ -140,7 +140,13 @@ func (is *IdentityServer) getEndDeviceIdentifiersForEUIs(ctx context.Context, re
 }
 
 func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEndDevicesRequest) (devs *ttnpb.EndDevices, err error) {
-	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	// If nil identifiers passed, check that the request came from the cluster.
+	if req.GetApplicationIds() == nil {
+		if err = clusterauth.Authorized(ctx); err != nil {
+			return nil, err
+		}
+		req.FieldMask = cleanFieldMaskPaths([]string{"ids"}, req.FieldMask, nil, []string{"created_at", "updated_at"})
+	} else if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, getPaths, nil)
@@ -154,7 +160,7 @@ func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEnd
 	}()
 	devs = &ttnpb.EndDevices{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		devs.EndDevices, err = store.GetEndDeviceStore(db).ListEndDevices(ctx, &req.ApplicationIdentifiers, req.FieldMask)
+		devs.EndDevices, err = store.GetEndDeviceStore(db).ListEndDevices(ctx, req.GetApplicationIds(), req.FieldMask)
 		if err != nil {
 			return err
 		}

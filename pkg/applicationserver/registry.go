@@ -29,6 +29,8 @@ type DeviceRegistry interface {
 	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
 	// Set creates, updates or deletes the end device by its identifiers.
 	Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	// Range ranges over the end devices and calls the callback function, until false is returned.
+	Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
 }
 
 type replacedEndDeviceFieldRegistryWrapper struct {
@@ -75,6 +77,18 @@ func (w replacedEndDeviceFieldRegistryWrapper) Set(ctx context.Context, ids ttnp
 		d.GetTransform(dev)
 	}
 	return dev, nil
+}
+
+func (w replacedEndDeviceFieldRegistryWrapper) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
+	return w.registry.Range(ctx, paths, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice) bool {
+		if dev != nil {
+			for _, d := range replaced {
+				d.GetTransform(dev)
+			}
+		}
+		return f(ctx, ids, dev)
+	})
 }
 
 func wrapEndDeviceRegistryWithReplacedFields(r DeviceRegistry, fields ...registry.ReplacedEndDeviceField) DeviceRegistry {

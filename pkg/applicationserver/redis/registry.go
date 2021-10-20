@@ -16,7 +16,9 @@ package redis
 
 import (
 	"context"
+	"regexp"
 	"runtime/trace"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -54,6 +56,13 @@ func (r *DeviceRegistry) uidKey(uid string) string {
 
 func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 	return r.Redis.Key("eui", devEUI.String(), joinEUI.String())
+}
+
+func deviceRegex(key string) (*regexp.Regexp, error) {
+	keyRegex := strings.ReplaceAll(key, ":", "\\:")
+	keyRegex = strings.ReplaceAll(keyRegex, "*", ".[^\\:]*")
+	keyRegex = keyRegex + "$"
+	return regexp.Compile(keyRegex)
 }
 
 // Get returns the end device by its identifiers.
@@ -238,6 +247,30 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 		return nil, ttnredis.ConvertError(err)
 	}
 	return pb, nil
+}
+
+func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+	deviceEntityRegex, err := deviceRegex(r.uidKey(unique.GenericID(ctx, "*")))
+	if err != nil {
+		return err
+	}
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), 1, func(key string) (bool, error) {
+		if !deviceEntityRegex.MatchString(key) {
+			return true, nil
+		}
+		dev := &ttnpb.EndDevice{}
+		if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(dev); err != nil {
+			return false, err
+		}
+		dev, err := ttnpb.FilterGetEndDevice(dev, paths...)
+		if err != nil {
+			return false, err
+		}
+		if !f(ctx, dev.EndDeviceIdentifiers, dev) {
+			return false, nil
+		}
+		return true, nil
+	})
 }
 
 func applyLinkFieldMask(dst, src *ttnpb.ApplicationLink, paths ...string) (*ttnpb.ApplicationLink, error) {
