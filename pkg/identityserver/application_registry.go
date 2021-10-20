@@ -20,6 +20,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -162,28 +163,37 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 	}
 	callerAccountID := authInfo.GetOrganizationOrUserIdentifiers()
 	var includeIndirect bool
-	if req.Collaborator == nil {
-		req.Collaborator = callerAccountID
-		includeIndirect = true
-	}
-	if req.Collaborator == nil {
-		return &ttnpb.Applications{}, nil
-	}
-
-	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
-		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_APPLICATIONS_LIST); err != nil {
-			return nil, err
+	var clusterAuth bool
+	// If request comes from cluster (list all applications), skip caller rights check.
+	if clusterauth.Authorized(ctx) == nil && req.Collaborator == nil {
+		clusterAuth = true
+		req.FieldMask = cleanFieldMaskPaths([]string{"ids"}, req.FieldMask, nil, []string{"created_at", "updated_at"})
+		if req.Deleted {
+			ctx = store.WithSoftDeleted(ctx, false)
 		}
-	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
-		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.RIGHT_ORGANIZATION_APPLICATIONS_LIST); err != nil {
-			return nil, err
+	} else {
+		if req.Collaborator == nil {
+			req.Collaborator = callerAccountID
+			includeIndirect = true
+		}
+		if req.Collaborator == nil {
+			return &ttnpb.Applications{}, nil
+		}
+
+		if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
+			if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_APPLICATIONS_LIST); err != nil {
+				return nil, err
+			}
+		} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
+			if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.RIGHT_ORGANIZATION_APPLICATIONS_LIST); err != nil {
+				return nil, err
+			}
+		}
+
+		if req.Deleted {
+			ctx = store.WithSoftDeleted(ctx, true)
 		}
 	}
-
-	if req.Deleted {
-		ctx = store.WithSoftDeleted(ctx, true)
-	}
-
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -197,17 +207,23 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 	var callerMemberships store.MembershipChains
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		membershipStore := is.getMembershipStore(ctx, db)
-		ids, err := membershipStore.FindMemberships(paginateCtx, req.Collaborator, "application", includeIndirect)
-		if err != nil {
-			return err
-		}
-		if len(ids) == 0 {
-			return nil
-		}
-		callerMemberships, err = membershipStore.FindAccountMembershipChains(ctx, callerAccountID, "application", idStrings(ids...)...)
-		if err != nil {
-			return err
+		var ids []*ttnpb.EntityIdentifiers
+		// If request comes from cluster, skip membership checks.
+		if !clusterAuth {
+			membershipStore := is.getMembershipStore(ctx, db)
+			ids, err = membershipStore.FindMemberships(paginateCtx, req.Collaborator, "application", includeIndirect)
+			if err != nil {
+				return err
+			}
+			if len(ids) == 0 {
+				return nil
+			}
+			callerMemberships, err = membershipStore.FindAccountMembershipChains(ctx, callerAccountID, "application", idStrings(ids...)...)
+			if err != nil {
+				return err
+			}
+		} else {
+			ctx = paginateCtx
 		}
 		appIDs := make([]*ttnpb.ApplicationIdentifiers, 0, len(ids))
 		for _, id := range ids {
@@ -225,10 +241,12 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		return nil, err
 	}
 
-	for i, app := range apps.Applications {
-		entityRights := callerMemberships.GetRights(callerAccountID, app.GetIds())
-		if !entityRights.IncludesAll(ttnpb.RIGHT_APPLICATION_INFO) {
-			apps.Applications[i] = app.PublicSafe()
+	if !clusterAuth {
+		for i, app := range apps.Applications {
+			entityRights := callerMemberships.GetRights(callerAccountID, app.GetIds())
+			if !entityRights.IncludesAll(ttnpb.RIGHT_APPLICATION_INFO) {
+				apps.Applications[i] = app.PublicSafe()
+			}
 		}
 	}
 

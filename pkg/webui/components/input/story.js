@@ -36,27 +36,19 @@ class Example extends React.Component {
   }
 
   render() {
-    const { type, valid, component: Component, ...props } = this.props
+    const { type, component: Component, ...props } = this.props
     const { value } = this.state
 
     const InputComponent = Component ? Component : Input
 
-    return (
-      <InputComponent
-        {...props}
-        type={type}
-        onChange={this.onChange}
-        valid={valid || (Boolean(value) && value.length > 5)}
-        value={value}
-      />
-    )
+    return <InputComponent {...props} type={type} onChange={this.onChange} value={value} />
   }
 }
 
 const generateRandomValue = () => `random-value-${Math.floor(Math.random() * 100)}`
 const generateRandom16Bytes = () => crypto.randomBytes(16).toString('hex').toUpperCase()
 
-storiesOf('Input', module)
+storiesOf('Input/Normal', module)
   .add('Default', () => (
     <div>
       <Example label="Username" />
@@ -71,13 +63,12 @@ storiesOf('Input', module)
   .add('Readonly', () => <Example value="1234" readOnly />)
   .add('Password', () => <Example type="password" />)
   .add('Number', () => <Example type="number" />)
-  .add('Byte', () => <Example type="byte" min={1} max={5} />)
-  .add('Byte read-only', () => <Example type="byte" min={1} max={5} value="A0BF49A464" readOnly />)
   .add('Toggled', () => (
     <Example component={Input.Toggled} type="toggled" enabledMessage="Enabled" />
   ))
   .add('Textarea', () => <Example type="textarea" />)
   .add('With Spinner', () => <Example icon="search" loading />)
+  .add('Sensitive', () => <Example sensitive max={5} />)
   .add('With Action', () => (
     <div>
       <Example action={{ icon: 'build', secondary: true }} />
@@ -97,3 +88,8 @@ storiesOf('Input', module)
       />
     </>
   ))
+
+storiesOf('Input/Byte', module)
+  .add('Byte', () => <Example type="byte" min={1} max={5} />)
+  .add('Byte read-only', () => <Example type="byte" min={1} max={5} value="A0BF49A464" readOnly />)
+  .add('Sensitive', () => <Example type="byte" sensitive max={5} />)

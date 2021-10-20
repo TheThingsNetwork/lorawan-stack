@@ -26,12 +26,16 @@ For details about compatibility between different releases, see the **Commitment
 - Tooltip descriptions for "Last activity" values (formerly "Last seen") and uplink/downlink counts in the Console.
 - Status pulses being triggered by incoming data in the Console.
 - Packet broker page crashing when networks with a NetID of `0` are present.
+- Allowing to toggle visibility of sensitive values in text inputs in the Console.
+- Webhook failed event.
 
 ### Changed
 
 - Searching for entity IDs is now case insensitive.
 - Renamed entitie's "Last seen" to "Last activity" in the Console.
 - The database queries for determining the rights of users on entities have been rewritten to reduce the number of round-trips to the database.
+- The default downlink path expiration timeout for UDP gateway connections has been increased to 90 seconds, and the default connection timeout has been increased to 3 minutes.
+  - The original downlink path expiration timeout was based on the fact that the default `PULL_DATA` interval is 5 seconds. In practice we have observed that most gateways actually send a `PULL_DATA` message every 30 seconds instead in order to preserve data transfer costs.
 
 ### Deprecated
 
@@ -48,6 +52,7 @@ For details about compatibility between different releases, see the **Commitment
 - Profile settings link not being present in the mobile menu in the Console.
 - Calculation of "Last activity" values not using all available data in the Console.
 - Layout jumps due to length of "Last activity" text.
+- Invalid `session` handling in Network Layer settings form in the Console.
 
 ### Security
 

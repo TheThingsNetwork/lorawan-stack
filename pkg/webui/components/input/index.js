@@ -13,13 +13,16 @@
 // limitations under the License.
 
 import React from 'react'
-import { injectIntl } from 'react-intl'
+import { injectIntl, defineMessages } from 'react-intl'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
 import Icon from '@ttn-lw/components/icon'
 import Spinner from '@ttn-lw/components/spinner'
 import Button from '@ttn-lw/components/button'
+import Tooltip from '@ttn-lw/components/tooltip'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import { isSafariUserAgent } from '@ttn-lw/lib/navigator'
 import combineRefs from '@ttn-lw/lib/combine-refs'
@@ -30,6 +33,11 @@ import Toggled from './toggled'
 import Generate from './generate'
 
 import style from './input.styl'
+
+const m = defineMessages({
+  showValue: 'Show value',
+  hideValue: 'Hide value',
+})
 
 class Input extends React.Component {
   static propTypes = {
@@ -69,6 +77,7 @@ class Input extends React.Component {
     onFocus: PropTypes.func,
     placeholder: PropTypes.message,
     readOnly: PropTypes.bool,
+    sensitive: PropTypes.bool,
     showPerChar: PropTypes.bool,
     title: PropTypes.message,
     type: PropTypes.string,
@@ -99,6 +108,7 @@ class Input extends React.Component {
     onEnter: () => null,
     placeholder: undefined,
     readOnly: false,
+    sensitive: false,
     showPerChar: false,
     title: undefined,
     type: 'text',
@@ -109,14 +119,19 @@ class Input extends React.Component {
     forwardedRef: null,
   }
 
-  state = {
-    focus: false,
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      focus: false,
+      hidden: props.sensitive,
+    }
   }
 
   input = React.createRef(null)
 
   _computeByteInputWidth() {
-    const { showPerChar, max } = this.props
+    const { showPerChar, max, sensitive } = this.props
     const isSafari = isSafariUserAgent()
 
     const maxValue = showPerChar ? Math.ceil(max / 2) : max
@@ -124,12 +139,21 @@ class Input extends React.Component {
 
     let width
     if (maxValue === 16) {
-      width = isSafari ? '34rem' : '30rem'
+      width = isSafari ? 34 : 30
     } else {
-      width = `${maxValue * multiplier + 0.65}rem`
+      width = maxValue * multiplier + 0.65
     }
 
-    return width
+    if (sensitive) {
+      width += 2.3
+    }
+
+    return `${width}rem`
+  }
+
+  @bind
+  handleHideToggleClick() {
+    this.setState(({ hidden }) => ({ hidden: !hidden }))
   }
 
   focus() {
@@ -150,38 +174,39 @@ class Input extends React.Component {
 
   render() {
     const {
-      icon,
-      value,
-      error,
-      warning,
-      valid,
-      placeholder,
-      readOnly,
-      type,
-      disabled,
-      onChange,
-      onFocus,
-      onBlur,
-      onEnter,
+      action,
+      actionDisable,
+      autoComplete,
+      children,
       className,
-      label,
+      code,
       component,
-      loading,
-      title,
+      disabled,
+      error,
+      forwardedRef,
+      icon,
+      inputRef,
       inputWidth,
       intl,
-      code,
-      action,
-      autoComplete,
+      label,
+      loading,
+      onBlur,
+      onChange,
+      onEnter,
+      onFocus,
+      placeholder,
+      readOnly,
+      sensitive,
       showPerChar,
-      forwardedRef,
-      inputRef,
-      actionDisable,
-      children,
+      title,
+      type,
+      valid,
+      value,
+      warning,
       ...rest
     } = this.props
 
-    const { focus } = this.state
+    const { focus, hidden } = this.state
     const inputWidthValue = inputWidth || (type === 'byte' ? undefined : 'm')
 
     let Component = component
@@ -220,6 +245,7 @@ class Input extends React.Component {
       [style.actionable]: hasAction,
       [style.textarea]: type === 'textarea',
     })
+    const inputElemCls = classnames(style.input, { [style.hidden]: hidden })
 
     const passedProps = {
       ...rest,
@@ -233,7 +259,7 @@ class Input extends React.Component {
           {icon && <Icon className={style.icon} icon={icon} />}
           <Component
             key="i"
-            className={style.input}
+            className={inputElemCls}
             type={type}
             value={value}
             onFocus={this.onFocus}
@@ -249,6 +275,24 @@ class Input extends React.Component {
           />
           {v && <Valid show={v} />}
           {loading && <Spinner className={style.spinner} small />}
+          {sensitive && value.length !== 0 && (
+            <Tooltip
+              delay={[1250, 200]}
+              hideOnClick={false}
+              content={<Message content={hidden ? m.showValue : m.hideValue} />}
+              trigger="mouseenter"
+              small
+            >
+              <Button
+                icon={hidden ? 'visibility' : 'visibility_off'}
+                className={style.hideToggle}
+                onClick={this.handleHideToggleClick}
+                secondary
+                naked
+                type="button"
+              />
+            </Tooltip>
+          )}
         </div>
         {hasAction && (
           <div className={style.actions}>

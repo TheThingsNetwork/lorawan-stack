@@ -222,6 +222,7 @@ const LoRaCloudGLSForm = () => {
         title={sharedMessages.token}
         description={m.tokenDescription}
         name="data.token"
+        sensitive
         required
       />
       <Form.Field

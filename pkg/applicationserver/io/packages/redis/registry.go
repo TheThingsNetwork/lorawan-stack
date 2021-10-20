@@ -16,8 +16,10 @@ package redis
 
 import (
 	"context"
+	"regexp"
 	"runtime/trace"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -96,6 +98,13 @@ func (r *ApplicationPackagesRegistry) makeAssociationKeyFunc(uid string) func(po
 
 func (r *ApplicationPackagesRegistry) transactionKey(uid string, fPort string, packageName string) string {
 	return r.Redis.Key("transaction", uid, fPort, packageName)
+}
+
+func packagesRegex(uid string) (*regexp.Regexp, error) {
+	keyRegex := strings.ReplaceAll(uid, ":", "\\:")
+	keyRegex = strings.ReplaceAll(keyRegex, "*", ".[^\\:]*")
+	keyRegex = keyRegex + "\\:\\d*$"
+	return regexp.Compile(keyRegex)
 }
 
 // GetAssociation implements applicationpackages.AssociationRegistry.
@@ -511,4 +520,46 @@ func (r *ApplicationPackagesRegistry) EndDeviceTransaction(ctx context.Context, 
 		}
 	}()
 	return fn(ctx)
+}
+
+func (r ApplicationPackagesRegistry) Range(
+	ctx context.Context, paths []string,
+	devFunc func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationPackageAssociation) bool,
+	appFunc func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationPackageDefaultAssociation) bool,
+) error {
+	associationEntityRegex, err := packagesRegex(r.uidKey(unique.GenericID(ctx, "*")))
+	if err != nil {
+		return err
+	}
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.associationKey(unique.GenericID(ctx, "*"), "*"), 1, func(key string) (bool, error) {
+		if !associationEntityRegex.MatchString(key) {
+			return true, nil
+		}
+		if strings.Contains(key, ".") {
+			assoc := &ttnpb.ApplicationPackageAssociation{}
+			if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(assoc); err != nil {
+				return false, err
+			}
+			assoc, err := applyAssociationFieldMask(nil, assoc, paths...)
+			if err != nil {
+				return false, err
+			}
+			if !devFunc(ctx, *assoc.GetIds().GetEndDeviceIds(), assoc) {
+				return false, nil
+			}
+		} else {
+			defAssoc := &ttnpb.ApplicationPackageDefaultAssociation{}
+			if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(defAssoc); err != nil {
+				return false, err
+			}
+			defAssoc, err := applyDefaultAssociationFieldMask(nil, defAssoc, paths...)
+			if err != nil {
+				return false, err
+			}
+			if !appFunc(ctx, *defAssoc.GetIds().GetApplicationIds(), defAssoc) {
+				return false, nil
+			}
+		}
+		return true, nil
+	})
 }

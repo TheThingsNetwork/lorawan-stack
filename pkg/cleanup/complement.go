@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package commands
+package cleanup
 
-import (
-	"context"
-	"os"
-	"os/signal"
-	"syscall"
-)
-
-var cancelSignals = []os.Signal{syscall.SIGHUP, os.Interrupt, syscall.SIGTERM}
-
-func newContext(parent context.Context) context.Context {
-	ctx, _ := signal.NotifyContext(parent, cancelSignals...)
-	return ctx
+// ComputeSetComplement returns the complement of the first parameter set relative to the second parameter set.
+func ComputeSetComplement(isSet, localSet map[string]struct{}) (complement map[string]struct{}) {
+	complement = make(map[string]struct{})
+	for ids := range localSet {
+		if _, ok := isSet[ids]; ok {
+			continue
+		}
+		complement[ids] = struct{}{}
+	}
+	return complement
 }

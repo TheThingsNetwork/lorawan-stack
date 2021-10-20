@@ -165,6 +165,7 @@ const BasicSettingsForm = React.memo(props => {
         name="lbs_lns_secret.value"
         component={Input}
         disabled={!mayEditSecrets}
+        sensitive
       />
       <Form.Field
         title={sharedMessages.gatewayStatus}

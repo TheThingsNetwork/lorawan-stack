@@ -2734,7 +2734,7 @@ func (m *ListEndDevicesRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListEndDevicesRequestValidationError{
 						field:  "application_ids",

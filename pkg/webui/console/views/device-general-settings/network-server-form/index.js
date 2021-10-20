@@ -132,12 +132,15 @@ const NetworkServerForm = React.memo(props => {
         'app_s_key',
       ])
 
+      const patch = updatedValues
+      // Always submit current `mac_settings` values to avoid overwriting nested entries.
+      patch.mac_settings = castedValues.mac_settings
+
       const isOTAA = values._activation_mode === ACTIVATION_MODES.OTAA
-      const mac_settings = castedValues.mac_settings
-      let session
+      // Do not update session for joined OTAA end devices.
       if (!isOTAA && castedValues.session && castedValues.session.keys) {
         const { app_s_key, ...keys } = castedValues.session.keys
-        session = {
+        patch.session = {
           ...updatedValues.session,
           keys,
         }
@@ -145,12 +148,7 @@ const NetworkServerForm = React.memo(props => {
 
       setError('')
       try {
-        // Always submit current `mac_settings` values to avoid overwriting nested entries.
-        await onSubmit({
-          ...updatedValues,
-          mac_settings,
-          session,
-        })
+        await onSubmit(patch)
         resetForm({ values: castedValues })
         onSubmitSuccess()
       } catch (err) {
@@ -311,6 +309,7 @@ const NetworkServerForm = React.memo(props => {
             mayGenerateValue={mayEditKeys}
             onGenerateValue={generate16BytesKey}
             tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
+            sensitive
           />
           {lwVersion >= 110 && (
             <Form.Field
@@ -325,6 +324,7 @@ const NetworkServerForm = React.memo(props => {
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
+              sensitive
             />
           )}
           {lwVersion >= 110 && (
@@ -340,6 +340,7 @@ const NetworkServerForm = React.memo(props => {
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
+              sensitive
             />
           )}
         </>

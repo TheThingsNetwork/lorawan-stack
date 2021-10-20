@@ -54,4 +54,10 @@ type Registry interface {
 	AssociationRegistry
 	DefaultAssociationRegistry
 	TransactionRegistry
+	// Range ranges over the application packages and calls the appropriate callback function, until false is returned.
+	Range(
+		ctx context.Context, paths []string,
+		devFunc func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationPackageAssociation) bool,
+		appFunc func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationPackageDefaultAssociation) bool,
+	) error
 }

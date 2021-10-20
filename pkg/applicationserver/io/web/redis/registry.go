@@ -16,6 +16,8 @@ package redis
 
 import (
 	"context"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -74,6 +76,13 @@ func (r *WebhookRegistry) makeIDKeyFunc(appUID string) func(id string) string {
 	return func(id string) string {
 		return r.idKey(appUID, id)
 	}
+}
+
+func webhookRegex(key string) (*regexp.Regexp, error) {
+	keyRegex := strings.ReplaceAll(key, ":", "\\:")
+	keyRegex = strings.ReplaceAll(keyRegex, "*", ".[^\\:]*")
+	keyRegex = keyRegex + "$"
+	return regexp.Compile(keyRegex)
 }
 
 // Get implements WebhookRegistry.
@@ -232,4 +241,29 @@ func (r WebhookRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationWebhookI
 		return nil, ttnredis.ConvertError(err)
 	}
 	return pb, nil
+}
+
+// Range implements WebhookRegistry.
+func (r WebhookRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationWebhook) bool) error {
+	webhookEntityRegex, err := webhookRegex(r.idKey(unique.GenericID(ctx, "*"), "*"))
+	if err != nil {
+		return err
+	}
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.idKey(unique.GenericID(ctx, "*"), "*"), 1, func(key string) (bool, error) {
+		if !webhookEntityRegex.MatchString(key) {
+			return true, nil
+		}
+		wh := &ttnpb.ApplicationWebhook{}
+		if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(wh); err != nil {
+			return false, err
+		}
+		wh, err := applyWebhookFieldMask(nil, wh, paths...)
+		if err != nil {
+			return false, err
+		}
+		if !f(ctx, *wh.GetIds().GetApplicationIds(), wh) {
+			return false, nil
+		}
+		return true, nil
+	})
 }
