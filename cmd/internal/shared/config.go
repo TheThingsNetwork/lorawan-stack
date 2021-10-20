@@ -100,7 +100,7 @@ var DefaultEventsConfig = func() config.Events {
 		Backend: "internal",
 	}
 	c.Redis.Store.TTL = 10 * time.Minute
-	c.Redis.Store.EntityTTL = time.Hour
+	c.Redis.Store.EntityTTL = 24 * time.Hour
 	c.Redis.Store.EntityCount = 100
 	c.Redis.Store.CorrelationIDCount = 100
 	c.Redis.Workers = 16
