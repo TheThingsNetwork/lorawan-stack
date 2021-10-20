@@ -26,6 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 - Tooltip descriptions for "Last activity" values (formerly "Last seen") and uplink/downlink counts in the Console.
 - Status pulses being triggered by incoming data in the Console.
 - Allowing to toggle visibility of sensitive values in text inputs in the Console.
+- Webhook failed event.
 
 ### Changed
 

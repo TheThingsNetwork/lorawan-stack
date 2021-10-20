@@ -2035,7 +2035,7 @@
   },
   "error:pkg/applicationserver/io/packages/loradms/v1/api:request": {
     "translations": {
-      "en": "LoRaCloud DMS request failed"
+      "en": "LoRaCloud DMS request"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1/api",
@@ -2449,7 +2449,7 @@
   },
   "error:pkg/applicationserver/io/web:request": {
     "translations": {
-      "en": "request failed with status `{code}`"
+      "en": "request"
     },
     "description": {
       "package": "pkg/applicationserver/io/web",
@@ -8996,6 +8996,15 @@
     },
     "description": {
       "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.webhook.fail": {
+    "translations": {
+      "en": "fail to send webhook"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
       "file": "observability.go"
     }
   },

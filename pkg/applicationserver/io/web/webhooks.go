@@ -26,10 +26,12 @@ import (
 
 	stdio "io"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
 	"github.com/jtacoma/uritemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttnweb "go.thethings.network/lorawan-stack/v3/pkg/web"
@@ -38,7 +40,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 )
 
-const namespace = "applicationserver/io/web"
+const (
+	namespace = "applicationserver/io/web"
+
+	maxResponseSize = (1 << 10) // 1 KiB
+)
 
 // Sink processes HTTP requests.
 type Sink interface {
@@ -50,22 +56,39 @@ type HTTPClientSink struct {
 	*http.Client
 }
 
-var errRequest = errors.DefineUnavailable("request", "request failed with status `{code}`")
+var errRequest = errors.DefineUnavailable("request", "request")
+
+func createRequestErrorDetails(req *http.Request, res *http.Response) []proto.Message {
+	ctx := req.Context()
+	m := map[string]interface{}{
+		"webhook_id": webhookIDFromContext(ctx).WebhookId,
+		"url":        req.URL.String(),
+	}
+	if res != nil {
+		body, _ := stdio.ReadAll(stdio.LimitReader(res.Body, maxResponseSize))
+		m["status_code"] = res.StatusCode
+		m["body"] = string(body)
+	}
+	detail, err := gogoproto.Struct(m)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Error("Failed to marshal request error details")
+		return nil
+	}
+	return []proto.Message{detail}
+}
 
 // Process uses the HTTP client to perform the request.
 func (s *HTTPClientSink) Process(req *http.Request) error {
 	res, err := s.Do(req)
 	if err != nil {
-		return err
+		return errRequest.WithCause(err).WithDetails(createRequestErrorDetails(req, res)...)
 	}
-	defer func() {
-		stdio.Copy(ioutil.Discard, res.Body)
-		res.Body.Close()
-	}()
+	defer res.Body.Close()
+	defer stdio.Copy(stdio.Discard, res.Body)
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return nil
 	}
-	return errRequest.WithAttributes("code", res.StatusCode)
+	return errRequest.WithDetails(createRequestErrorDetails(req, res)...)
 }
 
 // pooledSink is a Sink with worker pool.
@@ -227,9 +250,11 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	if err != nil {
 		return err
 	}
+	ctx = withDeviceID(ctx, msg.EndDeviceIdentifiers)
 	wg := sync.WaitGroup{}
 	for i := range hooks {
 		hook := hooks[i]
+		ctx := withWebhookID(ctx, hook.Ids)
 		logger := log.FromContext(ctx).WithField("hook", hook.Ids.WebhookId)
 		wg.Add(1)
 		go func() {
