@@ -16,6 +16,7 @@ package console
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	echo "github.com/labstack/echo/v4"
@@ -49,32 +50,6 @@ func New(c *component.Component, config Config) (*Console, error) {
 		Component: c,
 		oc:        oc,
 		config:    config,
-		csp: webui.CleanCSP(map[string][]string{
-			"default-src": {
-				"'self'",
-				config.UI.AssetsBaseURL,
-				config.UI.BrandingBaseURL,
-				"'unsafe-eval'",
-			},
-			"connect-src": {
-				"'self'",
-				config.UI.StackConfig.GS.BaseURL,
-				config.UI.StackConfig.IS.BaseURL,
-				config.UI.StackConfig.JS.BaseURL,
-				config.UI.StackConfig.NS.BaseURL,
-				config.UI.StackConfig.AS.BaseURL,
-				config.UI.StackConfig.EDTC.BaseURL,
-				config.UI.StackConfig.QRG.BaseURL,
-				config.UI.StackConfig.GCS.BaseURL,
-				"*.ingest.sentry.io",
-			},
-			"base-uri": {
-				"'self'",
-			},
-			"frame-ancestors": {
-				"'none'",
-			},
-		}),
 	}
 
 	if console.config.Mount == "" {
@@ -111,6 +86,44 @@ func path(u string) (string, error) {
 	return p.Path, nil
 }
 
+func generateConsoleCSPString(config *Config, nonce string) string {
+	cspMap := webui.CleanCSP(map[string][]string{
+		"connect-src": {
+			"'self'",
+			config.UI.StackConfig.GS.BaseURL,
+			config.UI.StackConfig.IS.BaseURL,
+			config.UI.StackConfig.JS.BaseURL,
+			config.UI.StackConfig.NS.BaseURL,
+			config.UI.StackConfig.AS.BaseURL,
+			config.UI.StackConfig.EDTC.BaseURL,
+			config.UI.StackConfig.QRG.BaseURL,
+			config.UI.StackConfig.GCS.BaseURL,
+			"*.ingest.sentry.io",
+			"gravatar.com",
+			"www.gravatar.com",
+		},
+		"style-src": {
+			"'unsafe-inline'",
+			"'self'",
+			config.UI.AssetsBaseURL,
+			config.UI.BrandingBaseURL,
+		},
+		"script-src": {
+			"'unsafe-eval'",
+			"'strict-dynamic'",
+			fmt.Sprintf("'nonce-%s'", nonce),
+		},
+		"base-uri": {
+			"'self'",
+		},
+		"frame-ancestors": {
+			"'none'",
+		},
+	})
+
+	return webui.GenerateCSPString(cspMap)
+}
+
 // RegisterRoutes implements web.Registerer. It registers the Console to the web server.
 func (console *Console) RegisterRoutes(server *web.Server) {
 	group := server.Group(
@@ -119,7 +132,7 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 			return func(c echo.Context) error {
 				nonce := webui.GenerateNonce()
 				c.Set("csp_nonce", nonce)
-				cspString := webui.GenerateCSPString(console.csp, nonce)
+				cspString := generateConsoleCSPString(console.configFromContext(c.Request().Context()), nonce)
 				c.Response().Header().Set("Content-Security-Policy", cspString)
 				return next(c)
 			}

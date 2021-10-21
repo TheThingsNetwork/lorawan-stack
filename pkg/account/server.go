@@ -45,11 +45,12 @@ type Component interface {
 }
 
 type server struct {
-	c       Component
-	config  oauth.Config
-	store   Store
-	session sess.Session
-	csp     map[string][]string
+	c           Component
+	config      oauth.Config
+	store       Store
+	session     sess.Session
+	csp         map[string][]string
+	generateCSP func(config *oauth.Config, nonce string) string
 }
 
 // Store used by the account app.
@@ -61,13 +62,13 @@ type Store interface {
 }
 
 // NewServer returns a new account app on top of the given store.
-func NewServer(c Component, store Store, config oauth.Config, csp map[string][]string) Server {
+func NewServer(c Component, store Store, config oauth.Config, cspFunc func(config *oauth.Config, nonce string) string) Server {
 	s := &server{
-		c:       c,
-		config:  config,
-		store:   store,
-		session: sess.Session{Store: store},
-		csp:     csp,
+		c:           c,
+		config:      config,
+		store:       store,
+		session:     sess.Session{Store: store},
+		generateCSP: cspFunc,
 	}
 
 	if s.config.Mount == "" {
@@ -98,9 +99,10 @@ func (s *server) RegisterRoutes(server *web.Server) {
 		s.config.Mount,
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
+				config := s.configFromContext(c.Request().Context())
 				nonce := webui.GenerateNonce()
 				c.Set("csp_nonce", nonce)
-				cspString := webui.GenerateCSPString(s.csp, nonce)
+				cspString := s.generateCSP(config, nonce)
 				c.Response().Header().Set("Content-Security-Policy", cspString)
 				return next(c)
 			}

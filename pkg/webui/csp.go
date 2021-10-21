@@ -47,11 +47,17 @@ func CleanCSP(csp map[string][]string) map[string][]string {
 }
 
 // GenerateCSPNonce returns a final csp string from map of directives.
-func GenerateCSPString(csp map[string][]string, nonce string) string {
+func GenerateCSPString(csp map[string][]string) string {
 	resultList := make([]string, 0)
 	for key, value := range csp {
-		if key == "default-src" {
-			value = append(value, fmt.Sprintf("'nonce-%s'", nonce))
+		if key == "connect-src" || key == "style-src" {
+			for i := range value {
+				if value[i] != "'self'" && value[i] != "'unsafe-inline'" {
+					if !strings.HasSuffix(value[i], "/") {
+						value[i] = value[i] + "/"
+					}
+				}
+			}
 		}
 		resultList = append(resultList, fmt.Sprintf("%s %s;", key, strings.Join(value, " ")))
 	}
