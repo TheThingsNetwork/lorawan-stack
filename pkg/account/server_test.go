@@ -98,6 +98,7 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	})
+	csp := make(map[string][]string)
 	s := account.NewServer(c, store, oauth.Config{
 		Mount:       "/oauth",
 		CSRFAuthKey: []byte("12345678123456781234567812345678"),
@@ -108,7 +109,7 @@ func TestAuthentication(t *testing.T) {
 				CanonicalURL: "https://example.com/oauth",
 			},
 		},
-	})
+	}, csp)
 	c.RegisterWeb(s)
 	componenttest.StartComponent(t, c)
 

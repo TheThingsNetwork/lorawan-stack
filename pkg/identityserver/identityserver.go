@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 	"google.golang.org/grpc"
 )
 
@@ -116,6 +117,26 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		}
 	}
 
+	csp := webui.CleanCSP(map[string][]string{
+		"default-src": {
+			"'self'",
+			is.config.OAuth.UI.AssetsBaseURL,
+			is.config.OAuth.UI.BrandingBaseURL,
+			"'unsafe-eval'",
+		},
+		"connect-src": {
+			"'self'",
+			is.config.OAuth.UI.StackConfig.IS.BaseURL,
+			"*.ingest.sentry.io",
+		},
+		"base-uri": {
+			"'self'",
+		},
+		"frame-ancestors": {
+			"'none'",
+		},
+	})
+
 	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
 	is.config.OAuth.UI.FrontendConfig.EnableUserRegistration = is.config.UserRegistration.Enabled
 	is.oauth, err = oauth.NewServer(c, struct {
@@ -128,7 +149,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		UserSessionStore: store.GetUserSessionStore(is.db),
 		ClientStore:      store.GetClientStore(is.db),
 		OAuthStore:       store.GetOAuthStore(is.db),
-	}, is.config.OAuth)
+	}, is.config.OAuth, csp)
 
 	is.account = account.NewServer(c, struct {
 		store.UserStore
@@ -138,7 +159,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		UserStore:        store.GetUserStore(is.db),
 		LoginTokenStore:  store.GetLoginTokenStore(is.db),
 		UserSessionStore: store.GetUserSessionStore(is.db),
-	}, is.config.OAuth)
+	}, is.config.OAuth, csp)
 	if err != nil {
 		return nil, err
 	}

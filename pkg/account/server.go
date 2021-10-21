@@ -49,6 +49,7 @@ type server struct {
 	config  oauth.Config
 	store   Store
 	session sess.Session
+	csp     map[string][]string
 }
 
 // Store used by the account app.
@@ -60,12 +61,13 @@ type Store interface {
 }
 
 // NewServer returns a new account app on top of the given store.
-func NewServer(c Component, store Store, config oauth.Config) Server {
+func NewServer(c Component, store Store, config oauth.Config, csp map[string][]string) Server {
 	s := &server{
 		c:       c,
 		config:  config,
 		store:   store,
 		session: sess.Session{Store: store},
+		csp:     csp,
 	}
 
 	if s.config.Mount == "" {
@@ -94,6 +96,15 @@ func (s *server) RegisterRoutes(server *web.Server) {
 	csrfMiddleware := middleware.CSRF("_csrf", "/", s.config.CSRFAuthKey)
 	root := server.Group(
 		s.config.Mount,
+		func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				nonce := webui.GenerateNonce()
+				c.Set("csp_nonce", nonce)
+				cspString := webui.GenerateCSPString(s.csp, nonce)
+				c.Response().Header().Set("Content-Security-Policy", cspString)
+				return next(c)
+			}
+		},
 		ratelimit.EchoMiddleware(s.c.RateLimiter(), "http:account"),
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {

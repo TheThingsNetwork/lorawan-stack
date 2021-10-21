@@ -134,6 +134,7 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 	})
+	csp := make(map[string][]string)
 	s, err := oauth.NewServer(c, store, oauth.Config{
 		Mount:       "/oauth",
 		CSRFAuthKey: []byte("12345678123456781234567812345678"),
@@ -144,7 +145,7 @@ func TestOAuthFlow(t *testing.T) {
 				CanonicalURL: "https://example.com/oauth",
 			},
 		},
-	})
+	}, csp)
 	if err != nil {
 		panic(err)
 	}
@@ -549,6 +550,7 @@ func TestTokenExchange(t *testing.T) {
 			},
 		},
 	})
+	csp := make(map[string][]string)
 	s, err := oauth.NewServer(c, store, oauth.Config{
 		Mount: "/oauth",
 		UI: oauth.UIConfig{
@@ -557,7 +559,7 @@ func TestTokenExchange(t *testing.T) {
 				Title:    "OAuth",
 			},
 		},
-	})
+	}, csp)
 	if err != nil {
 		panic(err)
 	}

@@ -32,6 +32,7 @@ type Data struct {
 	AppConfig            interface{}
 	ExperimentalFeatures map[string]bool
 	PageData             interface{}
+	CSPNonce             string
 }
 
 // TemplateData contains data to use in the App template.
@@ -91,7 +92,7 @@ const appHTML = `
   </head>
   <body>
     <div id="app"></div>
-		<script>
+		<script nonce="{{.CSPNonce}}">
 		(function (win) {
 			var config = {
 				APP_ROOT:{{.MountPath}},
@@ -151,6 +152,7 @@ func RegisterHashedFile(original, hashed string) {
 // Render is the echo.Renderer that renders the web UI.
 func (t *AppTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo.Context) error {
 	templateData := c.Get("template_data").(TemplateData)
+	cspNonce := c.Get("csp_nonce").(string)
 	cssFiles := make([]string, len(templateData.CSSFiles))
 	for i, cssFile := range templateData.CSSFiles {
 		if hashedFile, ok := hashedFiles[cssFile]; ok {
@@ -174,6 +176,7 @@ func (t *AppTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo
 		AppConfig:            c.Get("app_config"),
 		ExperimentalFeatures: experimental.AllFeatures(c.Request().Context()),
 		PageData:             pageData,
+		CSPNonce:             cspNonce,
 	})
 }
 
