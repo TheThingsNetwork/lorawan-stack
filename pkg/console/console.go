@@ -102,12 +102,15 @@ func generateConsoleCSPString(config *Config, nonce string) string {
 			"www.gravatar.com",
 		},
 		"style-src": {
-			"'unsafe-inline'",
 			"'self'",
 			config.UI.AssetsBaseURL,
 			config.UI.BrandingBaseURL,
+			"'unsafe-inline'",
 		},
 		"script-src": {
+			"'self'",
+			config.UI.AssetsBaseURL,
+			config.UI.BrandingBaseURL,
 			"'unsafe-eval'",
 			"'strict-dynamic'",
 			fmt.Sprintf("'nonce-%s'", nonce),

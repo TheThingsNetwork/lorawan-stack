@@ -87,15 +87,18 @@ func GenerateCSPString(config *oauth.Config, nonce string) string {
 			"gravatar.com",
 			"www.gravatar.com",
 		},
-		"script-src": {
-			"'unsafe-eval'",
-			"'strict-dynamic'",
-			fmt.Sprintf("'nonce-%s'", nonce),
-		},
 		"style-src": {
 			"'self'",
 			config.UI.AssetsBaseURL,
 			config.UI.BrandingBaseURL,
+		},
+		"script-src": {
+			"'self'",
+			config.UI.AssetsBaseURL,
+			config.UI.BrandingBaseURL,
+			"'unsafe-eval'",
+			"'strict-dynamic'",
+			fmt.Sprintf("'nonce-%s'", nonce),
 		},
 		"base-uri": {
 			"'self'",
