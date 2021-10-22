@@ -98,7 +98,7 @@ func generateConsoleCSPString(config *Config, nonce string) string {
 			config.UI.StackConfig.EDTC.BaseURL,
 			config.UI.StackConfig.QRG.BaseURL,
 			config.UI.StackConfig.GCS.BaseURL,
-			"*.ingest.sentry.io",
+			config.UI.SentryDSN,
 			"gravatar.com",
 			"www.gravatar.com",
 		},

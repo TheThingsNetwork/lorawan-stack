@@ -83,7 +83,7 @@ func GenerateCSPString(config *oauth.Config, nonce string) string {
 		"connect-src": {
 			"'self'",
 			config.UI.StackConfig.IS.BaseURL,
-			"*.ingest.sentry.io",
+			config.UI.SentryDSN,
 			"gravatar.com",
 			"www.gravatar.com",
 		},
