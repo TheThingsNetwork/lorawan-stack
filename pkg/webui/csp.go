@@ -38,13 +38,17 @@ func GenerateNonce() string {
 // CleanCSP de-duplicates and removes empty entries from the CSP directive map.
 func CleanCSP(csp map[string][]string) map[string][]string {
 	for directive, entries := range csp {
-		occurred := map[string]bool{}
+		added := map[string]struct{}{}
 		cleanedDirective := []string{}
-		for i := range entries {
-			if !occurred[entries[i]] && entries[i] != "" {
-				occurred[entries[i]] = true
-				cleanedDirective = append(cleanedDirective, entries[i])
+		for _, entry := range entries {
+			if entry == "" || strings.HasPrefix(entry, "/") {
+				continue // Skip empty and relative locations.
 			}
+			if _, ok := added[entry]; ok {
+				continue // Skip already added locations.
+			}
+			added[entry] = struct{}{}
+			cleanedDirective = append(cleanedDirective, entry)
 		}
 		csp[directive] = cleanedDirective
 	}
