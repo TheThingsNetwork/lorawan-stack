@@ -33,7 +33,6 @@ type Console struct {
 	*component.Component
 	oc     *oauthclient.OAuthClient
 	config Config
-	csp    map[string][]string
 }
 
 // New returns a new Console.

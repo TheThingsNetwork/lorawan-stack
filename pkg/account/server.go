@@ -49,7 +49,6 @@ type server struct {
 	config      oauth.Config
 	store       Store
 	session     sess.Session
-	csp         map[string][]string
 	generateCSP func(config *oauth.Config, nonce string) string
 }
 
