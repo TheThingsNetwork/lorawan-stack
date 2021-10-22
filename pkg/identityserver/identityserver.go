@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"fmt"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -75,6 +76,37 @@ func (is *IdentityServer) configFromContext(ctx context.Context) *Config {
 	return is.config
 }
 
+// GenerateCSPString returns a Content-Security-Policy header value
+// for OAuth and Account app template.
+func GenerateCSPString(config *oauth.Config, nonce string) string {
+	cspMap := webui.CleanCSP(map[string][]string{
+		"connect-src": {
+			"'self'",
+			config.UI.StackConfig.IS.BaseURL,
+			config.UI.SentryDSN,
+			"gravatar.com",
+			"www.gravatar.com",
+		},
+		"script-src": {
+			"'unsafe-eval'",
+			"'strict-dynamic'",
+			fmt.Sprintf("'nonce-%s'", nonce),
+		},
+		"style-src": {
+			"'self'",
+			config.UI.AssetsBaseURL,
+			config.UI.BrandingBaseURL,
+		},
+		"base-uri": {
+			"'self'",
+		},
+		"frame-ancestors": {
+			"'none'",
+		},
+	})
+	return webui.GenerateCSPString(cspMap)
+}
+
 var errDBNeedsMigration = errors.Define("db_needs_migration", "the database needs to be migrated")
 
 // New returns new *IdentityServer.
@@ -117,26 +149,6 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		}
 	}
 
-	csp := webui.CleanCSP(map[string][]string{
-		"default-src": {
-			"'self'",
-			is.config.OAuth.UI.AssetsBaseURL,
-			is.config.OAuth.UI.BrandingBaseURL,
-			"'unsafe-eval'",
-		},
-		"connect-src": {
-			"'self'",
-			is.config.OAuth.UI.StackConfig.IS.BaseURL,
-			"*.ingest.sentry.io",
-		},
-		"base-uri": {
-			"'self'",
-		},
-		"frame-ancestors": {
-			"'none'",
-		},
-	})
-
 	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
 	is.config.OAuth.UI.FrontendConfig.EnableUserRegistration = is.config.UserRegistration.Enabled
 	is.oauth, err = oauth.NewServer(c, struct {
@@ -149,7 +161,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		UserSessionStore: store.GetUserSessionStore(is.db),
 		ClientStore:      store.GetClientStore(is.db),
 		OAuthStore:       store.GetOAuthStore(is.db),
-	}, is.config.OAuth, csp)
+	}, is.config.OAuth, GenerateCSPString)
 
 	is.account = account.NewServer(c, struct {
 		store.UserStore
@@ -159,7 +171,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		UserStore:        store.GetUserStore(is.db),
 		LoginTokenStore:  store.GetLoginTokenStore(is.db),
 		UserSessionStore: store.GetUserSessionStore(is.db),
-	}, is.config.OAuth, csp)
+	}, is.config.OAuth, GenerateCSPString)
 	if err != nil {
 		return nil, err
 	}

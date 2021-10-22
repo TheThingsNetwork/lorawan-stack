@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -98,7 +99,6 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	})
-	csp := make(map[string][]string)
 	s := account.NewServer(c, store, oauth.Config{
 		Mount:       "/oauth",
 		CSRFAuthKey: []byte("12345678123456781234567812345678"),
@@ -109,7 +109,7 @@ func TestAuthentication(t *testing.T) {
 				CanonicalURL: "https://example.com/oauth",
 			},
 		},
-	}, csp)
+	}, identityserver.GenerateCSPString)
 	c.RegisterWeb(s)
 	componenttest.StartComponent(t, c)
 

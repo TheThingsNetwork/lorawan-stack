@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -134,7 +135,6 @@ func TestOAuthFlow(t *testing.T) {
 			},
 		},
 	})
-	csp := make(map[string][]string)
 	s, err := oauth.NewServer(c, store, oauth.Config{
 		Mount:       "/oauth",
 		CSRFAuthKey: []byte("12345678123456781234567812345678"),
@@ -145,7 +145,7 @@ func TestOAuthFlow(t *testing.T) {
 				CanonicalURL: "https://example.com/oauth",
 			},
 		},
-	}, csp)
+	}, identityserver.GenerateCSPString)
 	if err != nil {
 		panic(err)
 	}
@@ -550,7 +550,6 @@ func TestTokenExchange(t *testing.T) {
 			},
 		},
 	})
-	csp := make(map[string][]string)
 	s, err := oauth.NewServer(c, store, oauth.Config{
 		Mount: "/oauth",
 		UI: oauth.UIConfig{
@@ -559,7 +558,7 @@ func TestTokenExchange(t *testing.T) {
 				Title:    "OAuth",
 			},
 		},
-	}, csp)
+	}, identityserver.GenerateCSPString)
 	if err != nil {
 		panic(err)
 	}

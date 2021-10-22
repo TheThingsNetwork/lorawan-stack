@@ -18,8 +18,14 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"net/url"
 	"strings"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 )
+
+// CSPFeatureFlag is the feature flag that enables the Content-Security-Policy header.
+var CSPFeatureFlag = experimental.DefineFeature("webui.csp", false)
 
 // GenerateNonce returns a nonce used for inline scripts.
 func GenerateNonce() string {
@@ -33,13 +39,22 @@ func GenerateNonce() string {
 // CleanCSP de-duplicates and removes empty entries from the CSP directive map.
 func CleanCSP(csp map[string][]string) map[string][]string {
 	for directive, entries := range csp {
-		occurred := map[string]bool{}
+		added := map[string]struct{}{}
 		cleanedDirective := []string{}
-		for i := range entries {
-			if !occurred[entries[i]] && entries[i] != "" {
-				occurred[entries[i]] = true
-				cleanedDirective = append(cleanedDirective, entries[i])
+		for _, entry := range entries {
+			if entry == "" || strings.HasPrefix(entry, "/") {
+				continue // Skip empty and relative locations.
 			}
+			if strings.HasPrefix(entry, "http://") || strings.HasPrefix(entry, "https://") {
+				if parsed, err := url.Parse(entry); err == nil {
+					entry = parsed.Host
+				}
+			}
+			if _, ok := added[entry]; ok {
+				continue // Skip already added locations.
+			}
+			added[entry] = struct{}{}
+			cleanedDirective = append(cleanedDirective, entry)
 		}
 		csp[directive] = cleanedDirective
 	}
@@ -47,12 +62,9 @@ func CleanCSP(csp map[string][]string) map[string][]string {
 }
 
 // GenerateCSPNonce returns a final csp string from map of directives.
-func GenerateCSPString(csp map[string][]string, nonce string) string {
+func GenerateCSPString(csp map[string][]string) string {
 	resultList := make([]string, 0)
 	for key, value := range csp {
-		if key == "default-src" {
-			value = append(value, fmt.Sprintf("'nonce-%s'", nonce))
-		}
 		resultList = append(resultList, fmt.Sprintf("%s %s;", key, strings.Join(value, " ")))
 	}
 	return strings.Join(resultList, " ")

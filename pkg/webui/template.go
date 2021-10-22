@@ -67,6 +67,7 @@ func (t TemplateData) MountPath() string {
 const appHTML = `
 {{- $assetsBaseURL := .AssetsBaseURL -}}
 {{- $brandingBaseURL := or .BrandingBaseURL .AssetsBaseURL -}}
+{{- $cspNonce := .CSPNonce -}}
 <!doctype html>
 <html lang="{{with .Language}}{{.}}{{else}}en{{end}}">
   <head>
@@ -92,7 +93,7 @@ const appHTML = `
   </head>
   <body>
     <div id="app"></div>
-		<script nonce="{{.CSPNonce}}">
+		<script nonce="{{$cspNonce}}">
 		(function (win) {
 			var config = {
 				APP_ROOT:{{.MountPath}},
@@ -113,7 +114,7 @@ const appHTML = `
 			}
 		})(window);
     </script>
-    {{range .JSFiles}}<script type="text/javascript" src="{{$assetsBaseURL}}/{{.}}"></script>{{end}}
+    {{range .JSFiles}}<script nonce="{{$cspNonce}}" type="text/javascript" src="{{$assetsBaseURL}}/{{.}}"></script>{{end}}
   </body>
 </html>
 `
@@ -152,7 +153,12 @@ func RegisterHashedFile(original, hashed string) {
 // Render is the echo.Renderer that renders the web UI.
 func (t *AppTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo.Context) error {
 	templateData := c.Get("template_data").(TemplateData)
-	cspNonce := c.Get("csp_nonce").(string)
+	var cspNonce string
+	if CSPFeatureFlag.GetValue(c.Request().Context()) {
+		if v, ok := c.Get("csp_nonce").(string); ok {
+			cspNonce = v
+		}
+	}
 	cssFiles := make([]string, len(templateData.CSSFiles))
 	for i, cssFile := range templateData.CSSFiles {
 		if hashedFile, ok := hashedFiles[cssFile]; ok {
