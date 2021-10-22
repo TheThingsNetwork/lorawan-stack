@@ -18,6 +18,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
@@ -44,6 +45,11 @@ func CleanCSP(csp map[string][]string) map[string][]string {
 			if entry == "" || strings.HasPrefix(entry, "/") {
 				continue // Skip empty and relative locations.
 			}
+			if strings.HasPrefix(entry, "http://") || strings.HasPrefix(entry, "https://") {
+				if parsed, err := url.Parse(entry); err == nil {
+					entry = parsed.Host
+				}
+			}
 			if _, ok := added[entry]; ok {
 				continue // Skip already added locations.
 			}
@@ -59,15 +65,6 @@ func CleanCSP(csp map[string][]string) map[string][]string {
 func GenerateCSPString(csp map[string][]string) string {
 	resultList := make([]string, 0)
 	for key, value := range csp {
-		if key == "connect-src" || key == "style-src" {
-			for i := range value {
-				if value[i] != "'self'" && value[i] != "'unsafe-inline'" {
-					if !strings.HasSuffix(value[i], "/") {
-						value[i] = value[i] + "/"
-					}
-				}
-			}
-		}
 		resultList = append(resultList, fmt.Sprintf("%s %s;", key, strings.Join(value, " ")))
 	}
 	return strings.Join(resultList, " ")
