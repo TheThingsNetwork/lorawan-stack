@@ -38,6 +38,8 @@ import createStore from './console/store'
 
 const appRoot = selectApplicationRootPath()
 
+console.log('test')
+
 // Initialize sentry before creating store.
 if (selectSentryDsnConfig) {
   Sentry.init(sentryConfig)

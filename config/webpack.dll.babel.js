@@ -18,6 +18,7 @@ import path from 'path'
 import webpack from 'webpack'
 
 const { CONTEXT = '.', CACHE_DIR = '.cache', PUBLIC_DIR = 'public' } = process.env
+const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development'
 
 const context = path.resolve(CONTEXT)
 const library = '[name]_[hash]'
@@ -28,7 +29,7 @@ const libs = Object.keys(pkg.dependencies || {}).filter(lib => !excludeLibs.incl
 
 export default {
   context,
-  mode: 'development',
+  mode,
   target: 'web',
   node: {
     fs: 'empty',
@@ -39,7 +40,7 @@ export default {
   recordsPath: path.resolve(context, CACHE_DIR, '_libs_records'),
   entry: { libs },
   output: {
-    filename: '[name].bundle.js',
+    filename: '[name].[hash].bundle.js',
     path: path.resolve(context, PUBLIC_DIR),
     library,
   },

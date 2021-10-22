@@ -24,7 +24,6 @@ import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import ShellPlugin from 'webpack-shell-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
-import HashOutput from 'webpack-plugin-hash-output'
 import nib from 'nib'
 
 import pjson from '../package.json'
@@ -250,7 +249,6 @@ export default {
   },
   plugins: env({
     all: [
-      new HashOutput(),
       new webpack.NamedModulesPlugin(),
       new webpack.NamedChunksPlugin(),
       new webpack.EnvironmentPlugin({
@@ -276,13 +274,17 @@ export default {
       new CleanWebpackPlugin({
         dry: WEBPACK_IS_DEV_SERVER_BUILD,
         verbose: false,
-        cleanOnceBeforeBuildPatterns: env({
-          production: ['**/*'],
-          development: ['**/*', '!libs.bundle.js', '!libs.bundle.js.map'],
-        }),
+        cleanOnceBeforeBuildPatterns: ['**/*', '!libs.*.bundle.js', '!libs.*.bundle.js.map'],
       }),
       // Copy static assets to output directory.
       new CopyWebpackPlugin({ patterns: [{ from: `${src}/assets/static` }] }),
+      new webpack.DllReferencePlugin({
+        context,
+        manifest: path.resolve(context, CACHE_DIR, 'dll.json'),
+      }),
+      new AddAssetHtmlPlugin({
+        filepath: path.resolve(context, PUBLIC_DIR, 'libs.*.bundle.js'),
+      }),
     ],
     production: [
       new webpack.SourceMapDevToolPlugin({
@@ -292,18 +294,11 @@ export default {
     ],
     development: [
       new webpack.HotModuleReplacementPlugin(),
-      new webpack.DllReferencePlugin({
-        context,
-        manifest: path.resolve(context, CACHE_DIR, 'dll.json'),
-      }),
       new webpack.WatchIgnorePlugin([
         /node_modules/,
         /locales/,
         new RegExp(path.resolve(context, PUBLIC_DIR)),
       ]),
-      new AddAssetHtmlPlugin({
-        filepath: path.resolve(context, PUBLIC_DIR, 'libs.bundle.js'),
-      }),
       new ShellPlugin({
         onBuildExit: [`${MAGE} js:extractLocaleFiles`],
       }),
