@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.15.2] - 2021-10-22
+
+### Added
+
 - `tls.cipher-suites` config option to specify used cipher suites.
 - Support for enhanced security policies of Packet Broker services.
 - Handling of MAC and PHY versions in end device forms based on selected frequency plan in the Console.
@@ -37,8 +51,6 @@ For details about compatibility between different releases, see the **Commitment
 - The default downlink path expiration timeout for UDP gateway connections has been increased to 90 seconds, and the default connection timeout has been increased to 3 minutes.
   - The original downlink path expiration timeout was based on the fact that the default `PULL_DATA` interval is 5 seconds. In practice we have observed that most gateways actually send a `PULL_DATA` message every 30 seconds instead in order to preserve data transfer costs.
 - The default duration for storing (sparse) entity events has been increased to 24 hours.
-
-### Deprecated
 
 ### Removed
 
@@ -1820,8 +1832,9 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.1...v3.15
-[3.15.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.0...v3.15.1
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.2...v3.15
+[3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.1...v3.15.2
+[3.15.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.0...v3.15.1
 [3.15.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.2...v3.15.0
 [3.14.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.1...v3.14.2
 [3.14.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.0...v3.14.1
