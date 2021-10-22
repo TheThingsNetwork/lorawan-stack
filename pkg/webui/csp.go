@@ -19,7 +19,12 @@ import (
 	"encoding/base64"
 	"fmt"
 	"strings"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 )
+
+// CSPFeatureFlag is the feature flag that enables the Content-Security-Policy header.
+var CSPFeatureFlag = experimental.DefineFeature("webui.csp", false)
 
 // GenerateNonce returns a nonce used for inline scripts.
 func GenerateNonce() string {
