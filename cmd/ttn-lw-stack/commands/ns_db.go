@@ -22,11 +22,13 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack/v5"
+	"go.thethings.network/lorawan-stack/v3/pkg/cleanup"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	nsredis "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 var (
@@ -463,6 +465,62 @@ var (
 			return recordSchemaVersion(cl)
 		},
 	}
+	nsDBCleanupCommand = &cobra.Command{
+		Use:   "cleanup",
+		Short: "Clean stale Network Server application data",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			logger.Info("Initiating device registry")
+			deviceCleaner, err := NewNSDeviceRegistryCleaner(ctx, &config.Redis)
+			if err != nil {
+				return err
+			}
+			// Define retry delay for obtaining cluster peer connection.
+			retryDelay := time.Duration(500) * time.Millisecond
+			// Create cluster and grpc connection with identity server.
+			conn, cl, err := NewClusterComponentConnection(ctx, *config, retryDelay, 5, ttnpb.ClusterRole_ENTITY_REGISTRY)
+			if err != nil {
+				return err
+			}
+			defer func() {
+				logger.Debug("Leaving cluster...")
+				if err := cl.Leave(); err != nil {
+					logger.WithError(err).Error("Could not leave cluster")
+					return
+				}
+				logger.Debug("Left cluster")
+			}()
+			paginationDelay, err := cmd.Flags().GetDuration("pagination-delay")
+			if err != nil {
+				return err
+			}
+			devClient := ttnpb.NewEndDeviceRegistryClient(conn)
+			endDeviceList, err := FetchIdentityServerEndDevices(ctx, devClient, cl.Auth(), paginationDelay)
+			if err != nil {
+				return err
+			}
+			deviceIdentityServerSet := make(map[string]struct{})
+			for _, dev := range endDeviceList {
+				deviceIdentityServerSet[unique.ID(ctx, dev.EndDeviceIdentifiers)] = struct{}{}
+			}
+			dryRun, err := cmd.Flags().GetBool("dry-run")
+			if err != nil {
+				return err
+			}
+			// If dry run flag set, print the app data to be deleted.
+			if dryRun {
+				deviceSet := cleanup.ComputeSetComplement(deviceIdentityServerSet, deviceCleaner.LocalSet)
+				logger.Info("Deleting device registry data for devices: ", setToArray(deviceSet))
+				logger.Warn("Dry run finished. No data deleted.")
+				return nil
+			}
+			logger.Info("Cleaning device registry")
+			err = deviceCleaner.CleanData(ctx, deviceIdentityServerSet)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
 )
 
 func schemaVersionKey(cl *ttnredis.Client) string {
@@ -494,6 +552,8 @@ func init() {
 	Root.AddCommand(nsDBCommand)
 	nsDBCommand.AddCommand(nsDBPruneCommand)
 	nsDBCommand.AddCommand(nsDBMigrateCommand)
-
+	nsDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
+	nsDBCleanupCommand.Flags().Duration("pagination-delay", 100, "Delay between batch requests")
+	nsDBCommand.AddCommand(nsDBCleanupCommand)
 	nsDBMigrateCommand.Flags().Bool("force", false, "Force perform database migrations")
 }
