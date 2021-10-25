@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Gateway disconnection when location updates from status messages are enabled.
+
 ### Security
 
 ## [3.15.2] - 2021-10-22

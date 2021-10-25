@@ -866,6 +866,8 @@ func sameAntennaLocations(a, b []*ttnpb.GatewayAntenna) bool {
 	return true
 }
 
+var statusLocationFields = ttnpb.ExcludeFields(ttnpb.LocationFieldPathsNested, "source")
+
 func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 	var (
 		ctx          = conn.Context()
@@ -888,16 +890,28 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 					c = cs
 				}
 				antennas := make([]*ttnpb.GatewayAntenna, c)
-				for i, ant := range gtwAntennas {
-					antennas[i] = &ttnpb.GatewayAntenna{
-						Gain: ant.Gain,
-					}
-				}
 				for i := range antennas {
+					antennas[i] = &ttnpb.GatewayAntenna{}
+
+					if i < len(gtwAntennas) {
+						if err := antennas[i].SetFields(
+							gtwAntennas[i],
+							ttnpb.GatewayAntennaFieldPathsNested...,
+						); err != nil {
+							log.FromContext(ctx).WithError(err).Warn("Failed to clone antenna")
+						}
+					}
+
 					if i < len(status.AntennaLocations) && status.AntennaLocations[i] != nil {
-						loc := *status.AntennaLocations[i]
-						loc.Source = ttnpb.SOURCE_GPS
-						antennas[i].Location = &loc
+						antennas[i].Location = &ttnpb.Location{
+							Source: ttnpb.SOURCE_GPS,
+						}
+						if err := antennas[i].Location.SetFields(
+							status.AntennaLocations[i],
+							statusLocationFields...,
+						); err != nil {
+							log.FromContext(ctx).WithError(err).Warn("Failed to clone antenna location")
+						}
 					}
 				}
 				if lastAntennas != nil && sameAntennaLocations(lastAntennas, antennas) {
