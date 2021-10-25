@@ -51,7 +51,7 @@ class ErrorView extends React.Component {
     // Clear the error when the route changes (e.g. user clicking a link).
     const { history } = this.props
     if (history) {
-      this.unlisten = history.listen((location, action) => {
+      this.unlisten = history.listen(() => {
         if (this.state.hasCaught) {
           this.setState({ hasCaught: false, error: undefined })
           this.unlisten()

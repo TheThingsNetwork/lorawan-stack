@@ -136,7 +136,7 @@ class LocationForm extends Component {
               loading: false,
             })
           },
-          error => {
+          () => {
             this.setState({ mapCenter: defaultLocation, loading: false })
           },
         )
@@ -147,7 +147,7 @@ class LocationForm extends Component {
   }
 
   @bind
-  async onSubmit(values, { resetForm, setSubmitting }) {
+  async onSubmit(values, { setSubmitting }) {
     const { onSubmit, entityId, validationSchema } = this.props
 
     this.setState({ error: '' })

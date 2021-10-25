@@ -131,7 +131,7 @@ const getApplicationsRightsLogic = createRequestLogic({
 
 const getApplicationLinkLogic = createRequestLogic({
   type: link.GET_APP_LINK,
-  process: async ({ action }, dispatch, done) => {
+  process: async ({ action }) => {
     const {
       payload: { id },
       meta: { selector = [] } = {},

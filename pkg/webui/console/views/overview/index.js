@@ -100,7 +100,7 @@ const overviewFetchingSelector = createFetchingSelector([GET_APPS_LIST_BASE, GET
     },
   }),
 )
-@withBreadcrumb('overview', props => <Breadcrumb path="/" content={sharedMessages.overview} />)
+@withBreadcrumb('overview', () => <Breadcrumb path="/" content={sharedMessages.overview} />)
 @withEnv
 export default class Overview extends React.Component {
   static propTypes = {

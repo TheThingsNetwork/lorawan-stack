@@ -275,7 +275,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
     }),
     createLogic({
       type: SET_EVENT_FILTER,
-      process: async ({ getState, action }, dispatch, done) => {
+      process: async ({ action }, dispatch, done) => {
         if (channel) {
           try {
             await channel.close()

@@ -145,7 +145,7 @@ const getGatewaysLogic = createRequestLogic({
 
 const getGatewaysRightsLogic = createRequestLogic({
   type: gateways.GET_GTWS_RIGHTS_LIST,
-  process: async ({ action }, dispatch, done) => {
+  process: async ({ action }) => {
     const { id } = action.payload
     const result = await api.rights.gateways(id)
     return result.rights.sort()

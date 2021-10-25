@@ -27,7 +27,7 @@ import RelativeTime from './relative'
 class DateTime extends React.PureComponent {
   state = { hasError: false }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true }
   }
 

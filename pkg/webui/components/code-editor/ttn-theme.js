@@ -16,7 +16,7 @@
 ace.define(
   'ace/theme/ttn',
   ['require', 'exports', 'module', 'ace/lib/dom'],
-  (acequire, exports, module) => {
+  (acequire, exports) => {
     exports.isDark = false
     exports.cssClass = 'ace-ttn'
     exports.cssText =

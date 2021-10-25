@@ -34,7 +34,7 @@ const parentTypeValidator = ({ action }, allow) => {
 const getCollaboratorLogic = createRequestLogic({
   type: collaborators.GET_COLLABORATOR,
   validate: parentTypeValidator,
-  process: async ({ getState, action }, dispatch) => {
+  process: async ({ action }, dispatch) => {
     const { parentType, parentId, collaboratorId, isUser } = action.payload
 
     if (isUser) {
@@ -56,7 +56,7 @@ const getCollaboratorLogic = createRequestLogic({
 const getCollaboratorsLogic = createRequestLogic({
   type: collaborators.GET_COLLABORATORS_LIST,
   validate: parentTypeValidator,
-  process: async ({ getState, action }) => {
+  process: async ({ action }) => {
     const { parentType, parentId, params } = action.payload
     const res = await api[parentType].collaborators.list(parentId, params)
     return { entities: res.collaborators, totalCount: res.totalCount }

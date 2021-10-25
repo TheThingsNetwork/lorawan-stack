@@ -25,7 +25,7 @@ import style from './story.styl'
 
 import Modal from '.'
 
-const StoryLogo = props => <Logo logo={{ src: LogoSVG, alt: 'Test' }} />
+const StoryLogo = () => <Logo logo={{ src: LogoSVG, alt: 'Test' }} />
 
 const bottomLine = (
   <div>

@@ -43,7 +43,7 @@ const NavigationLink = ({
   </NavLink>
 )
 
-const NavigationAnchorLink = ({ className, children, path, ...rest }) => (
+const NavigationAnchorLink = ({ className, children, path }) => (
   <Link.BaseAnchor href={path} className={classnames(className, style.link)} children={children} />
 )
 

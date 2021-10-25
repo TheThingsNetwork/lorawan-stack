@@ -149,7 +149,7 @@ const getPacketBrokerNetworkLogic = createRequestLogic({
     const network = await fetchThroughPagination(
       api.packetBroker.listNetworks,
       ids.tenant_id ? { tenant_id_contains: ids.tenant_id } : undefined,
-      (result, acc) => result.networks.find(n => combinePacketBrokerIds(n.id) === id),
+      result => result.networks.find(n => combinePacketBrokerIds(n.id) === id),
       (result, acc) => Boolean(acc),
     )
 

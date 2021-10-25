@@ -27,7 +27,7 @@ const Steps = props => {
     onStepsInit(
       React.Children.toArray(childrenRef.current)
         .filter(child => React.isValidElement(child) && child.type.displayName === 'Wizard.Step')
-        .map((step, index) => ({
+        .map(step => ({
           title: step.props.title,
           id: step.props.id,
         })),
@@ -36,7 +36,7 @@ const Steps = props => {
 
   return React.Children.toArray(children)
     .filter(child => React.isValidElement(child) && child.type.displayName === 'Wizard.Step')
-    .reduce((acc, child, index) => {
+    .reduce((acc, child) => {
       if (child.props.id === currentStepId) {
         return child
       }

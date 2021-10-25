@@ -131,7 +131,7 @@ export default class WebhookForm extends Component {
   }
 
   @bind
-  async handleSubmit(values, { setSubmitting, resetForm }) {
+  async handleSubmit(values, { resetForm }) {
     const { appId, onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
     const webhook = mapFormValuesToWebhook(values, appId)
 

@@ -26,7 +26,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { selectSelectedApplication } from '@console/store/selectors/applications'
 
-@connect((state, props) => ({
+@connect(state => ({
   application: selectSelectedApplication(state),
 }))
 class ApplicationDeviceList extends React.Component {
