@@ -854,14 +854,13 @@ func sameAntennaLocations(a, b []*ttnpb.GatewayAntenna) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for _, a := range a {
-		for _, b := range b {
-			if a.Location != nil && b.Location != nil && !sameLocation(*a.Location, *b.Location) {
-				return false
-			}
-			if (a.Location == nil) != (b.Location == nil) {
-				return false
-			}
+	for i := range a {
+		a, b := a[i], b[i]
+		if a.Location != nil && b.Location != nil && !sameLocation(*a.Location, *b.Location) {
+			return false
+		}
+		if (a.Location == nil) != (b.Location == nil) {
+			return false
 		}
 	}
 	return true
