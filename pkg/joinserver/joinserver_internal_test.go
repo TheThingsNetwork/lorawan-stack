@@ -36,10 +36,11 @@ type NsJsServer = nsJsServer
 type JsDeviceServer = jsEndDeviceRegistryServer
 
 type MockDeviceRegistry struct {
-	GetByEUIFunc func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.ContextualEndDevice, error)
-	GetByIDFunc  func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
-	SetByEUIFunc func(context.Context, types.EUI64, types.EUI64, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.ContextualEndDevice, error)
-	SetByIDFunc  func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	GetByEUIFunc  func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.ContextualEndDevice, error)
+	GetByIDFunc   func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
+	SetByEUIFunc  func(context.Context, types.EUI64, types.EUI64, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.ContextualEndDevice, error)
+	SetByIDFunc   func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	RangeByIDFunc func(context.Context, []string, func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
 }
 
 // GetByEUI calls GetByEUIFunc if set and panics otherwise.
@@ -72,6 +73,14 @@ func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.Application
 		panic("SetByID called, but not set")
 	}
 	return m.SetByIDFunc(ctx, appID, devID, paths, f)
+}
+
+// SetByID calls SetByIDFunc if set and panics otherwise.
+func (m MockDeviceRegistry) RangeByID(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+	if m.SetByIDFunc == nil {
+		panic("SetByID called, but not set")
+	}
+	return m.RangeByIDFunc(ctx, paths, f)
 }
 
 type MockKeyRegistry struct {

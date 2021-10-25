@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ type DeviceRegistry interface {
 	GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error)
 	SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.ContextualEndDevice, error)
 	SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	RangeByID(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
 }
 
 // DeleteDevice deletes device identified by joinEUI, devEUI from r.
@@ -55,6 +56,7 @@ func DeleteKeys(ctx context.Context, r KeyRegistry, joinEUI, devEUI types.EUI64,
 type ApplicationActivationSettingRegistry interface {
 	GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationActivationSettings, error)
 	SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error)) (*ttnpb.ApplicationActivationSettings, error)
+	Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationActivationSettings) bool) error
 }
 
 // DeleteApplicationActivationSettings deletes application activation settings from r.
