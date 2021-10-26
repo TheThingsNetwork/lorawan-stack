@@ -77,12 +77,9 @@ func (req *loginRequest) ValidateContext(ctx context.Context) error {
 	if strings.TrimSpace(req.Password) == "" {
 		return errMissingPassword.New()
 	}
-	if err := (&ttnpb.UserIdentifiers{
+	return (&ttnpb.UserIdentifiers{
 		UserId: req.UserID,
-	}).ValidateFields("user_id"); err != nil {
-		return err
-	}
-	return nil
+	}).ValidateFields("user_id")
 }
 
 func (s *server) Login(c echo.Context) error {
