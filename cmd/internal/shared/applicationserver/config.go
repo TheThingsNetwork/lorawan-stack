@@ -43,8 +43,8 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		Templates: DefaultWebhookTemplatesConfig,
 		Target:    "direct",
 		Timeout:   5 * time.Second,
-		QueueSize: 16,
-		Workers:   16,
+		QueueSize: 1024,
+		Workers:   1024,
 		Downlinks: web.DownlinksConfig{PublicAddress: shared.DefaultPublicURL + "/api/v3"},
 	},
 	EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
@@ -73,7 +73,7 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 	},
 	Packages: applicationserver.ApplicationPackagesConfig{
 		Config: packages.Config{
-			Workers: 16,
+			Workers: 1024,
 			Timeout: 10 * time.Second,
 		},
 	},
